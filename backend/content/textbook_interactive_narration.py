@@ -145,8 +145,9 @@ def interactive_cues(html):
     return cues
 
 
-def without_audio_helper(html):
+def without_audio_helper(html, *, source_media=False):
     """Only the exact generated audio block is excluded from teaching hashes."""
+    directory = "media" if source_media else "audio"
     blocks = AUDIO_BLOCK.findall(html)
     if len(blocks) > 1:
         raise ValueError("interactive_audio_helper_ambiguous")
@@ -159,17 +160,18 @@ def without_audio_helper(html):
             raise ValueError("interactive_audio_helper_changed") from exc
         if (not isinstance(urls, dict) or block not in {_helper(urls, code) for code in (AUDIO_CODE, _WAITING_AUDIO_CODE, _QUEUE_AUDIO_CODE, _INTERRUPTING_AUDIO_CODE)}
                 or any(IDENTITY.fullmatch(key) is None or not isinstance(url, str)
-                       or re.fullmatch(r"/api/classroom-media/[A-Za-z0-9_-]+/audio/[A-Za-z0-9_-]+\.wav", url) is None
+                       or re.fullmatch(rf"/api/classroom-media/[A-Za-z0-9_-]+/{directory}/[A-Za-z0-9_-]+\.wav", url) is None
                        for key, url in urls.items())):
             raise ValueError("interactive_audio_helper_changed")
     return AUDIO_BLOCK.sub("", html)
 
 
-def bind_interactive_audio(html, urls, classroom_id):
+def bind_interactive_audio(html, urls, classroom_id, *, source_media=False):
     cues = interactive_cues(html)
     if set(urls) != {cue["id"] for cue in cues}:
         raise ValueError("interactive_audio_cue_coverage_incomplete")
-    prefix = f"/api/classroom-media/{classroom_id}/audio/"
+    directory = "media" if source_media else "audio"
+    prefix = f"/api/classroom-media/{classroom_id}/{directory}/"
     if not IDENTITY.fullmatch(classroom_id) or any(
             not isinstance(url, str) or not url.startswith(prefix)
             or re.fullmatch(re.escape(prefix) + r"[A-Za-z0-9_-]+\.wav", url) is None
@@ -177,7 +179,7 @@ def bind_interactive_audio(html, urls, classroom_id):
         raise ValueError("interactive_audio_url_invalid")
     # Only our helper owns this symbol. Generated activities call it; they do
     # not synthesise speech or override the finite, audited sound inventory.
-    source = without_audio_helper(html)
+    source = without_audio_helper(html, source_media=source_media)
     if re.search(r"(?:window\s*\.\s*mira(?:Narrate|CancelNarration)\s*=(?!=)|function\s+mira(?:Narrate|CancelNarration)\b)", source):
         raise ValueError("interactive_audio_player_override_forbidden")
     # Rebinding is also used to verify immutable published snapshots. Preserve

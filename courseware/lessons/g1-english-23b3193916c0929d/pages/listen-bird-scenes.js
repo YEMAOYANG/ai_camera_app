@@ -1,0 +1,52 @@
+K.ready({title:'听一句，接对一幅图',sub:'听清是什么，再听它和旁边东西的关系。'});
+
+const boat = K.game(K.gameTemplates.wordBubbles({
+  voiceLead:true,
+  stepVoiceLead:true,
+  doneText:'物品和地点都听对了。',
+  art:{
+    backdrop:'__IMG:pond-backdrop__',
+    frames:['__IMG:bird-boat-idle__','__IMG:bird-boat-pop__'],
+    sticker:'__IMG:wing-sticker__',
+    icons:{
+      'bird-in':'__IMG:bird-in__','bird-on':'__IMG:bird-on__',
+      'cat-in-bag':'__IMG:cat-in-bag__','cat-in-hat':'__IMG:cat-in-hat__',
+      'cat-on-stool':'__IMG:cat-on-stool__','cat-under-stool':'__IMG:cat-under-stool__',
+      'ball-under-stool':'__IMG:ball-under-stool__','ball-on-stool':'__IMG:ball-on-stool__',
+      'pencil-in-bag':'__IMG:pencil-in-bag__','pencil-under-stool':'__IMG:pencil-under-stool__',
+      'heart-on-stool':'__IMG:heart-on-stool__','heart-under-stool':'__IMG:heart-under-stool__'
+    }
+  },
+  cues:[
+    {goal:'bird-in-hat',hint:'bubble-hint',hint2:'bubble-help',praise:'bubble-praise',
+      steps:['bird-in-hat','bird-on-hat']},
+    {goal:'cat-in-bag',hint:'bubble-hint',hint2:'bubble-help',praise:'bubble-praise',
+      steps:['cat-in-bag','cat-on-stool','cat-under-stool']},
+    {goal:'ball-under-stool',hint:'bubble-hint',hint2:'bubble-help',praise:'bubble-praise',
+      steps:['ball-under-stool','pencil-in-bag','heart-on-stool','pencil-under-stool']}
+  ],
+  levels:[
+    {
+      rounds:[{target:'bird-in',cards:['bird-in','bird-on']},{target:'bird-on',cards:['bird-in','bird-on']}],
+      drift:0,pace:.53,tolerance:61,hints:['看看小鸟的身体是不是进了开口。','再听一遍，看是在里面，还是在上面。']
+    },
+    {
+      rounds:[
+        {target:'cat-in-bag',cards:['cat-in-hat','cat-in-bag','cat-on-stool']},
+        {target:'cat-on-stool',cards:['cat-on-stool','cat-in-bag','cat-under-stool']},
+        {target:'cat-under-stool',cards:['cat-on-stool','cat-in-hat','cat-under-stool']}
+      ],
+      drift:17,pace:.70,tolerance:57,hints:['先听清是袋子、帽子还是小凳子。','再看小猫与那件东西的位置。']
+    },
+    {
+      rounds:[
+        {target:'ball-under-stool',cards:['ball-on-stool','pencil-under-stool','ball-under-stool']},
+        {target:'pencil-in-bag',cards:['pencil-in-bag','heart-on-stool','ball-under-stool']},
+        {target:'heart-on-stool',cards:['pencil-in-bag','heart-on-stool','heart-under-stool']},
+        {target:'pencil-under-stool',cards:['ball-on-stool','heart-on-stool','pencil-under-stool']}
+      ],
+      drift:25,pace:.86,tolerance:54,hints:['听清是什么道具，再找位置。','想一想，道具碰到了哪个面。']
+    }
+  ]
+}));
+boat.follow('#first-bird-bubble', () => ({x:429,y:191,w:112,h:118}));

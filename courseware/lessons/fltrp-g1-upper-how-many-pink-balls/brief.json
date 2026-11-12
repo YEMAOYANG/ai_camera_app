@@ -1,0 +1,864 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "binding": {
+    "editionId": "smartedu-english-six-year-g1-upper-sync-af05bc77",
+    "revisionId": "20260928-metadata-1",
+    "unitId": "9b496f25-8724-30c5-a5e4-8feb5ba24b67",
+    "nodeId": "4f52f3bd-d045-37ac-b612-f7aa88a05f2c",
+    "activityId": "f62e7b6b-2d3a-aaa6-bc99-d64caf6c1fe5",
+    "lessonTitle": "Unit 2 How many pink balls?",
+    "unitTitle": "Module 8",
+    "subject": "english",
+    "gradeCode": "primary_1",
+    "volume": "upper",
+    "schoolSystem": "six_year",
+    "teachingRevision": "1"
+  },
+  "lessonTitle": "Unit 2 How many pink balls?",
+  "teachingScope": "一个完整课件覆盖外研社一年级起点上册Module 8 Unit 2印刷47至49页六项活动。结合国家精品课第一课时和外研社第二课时及第三课时中U2相关复习。",
+  "authorship": {
+    "authorModel": "gpt-6.1-sol",
+    "method": "逐页核对国家和外研社资料后，直接原创讲解、教师操作、两款游戏配置和小检查。数量图按单物件程序拼排。",
+    "catalogSha256": "c20aa7d310bc5c58698fa447d09b472808bb00f2d1884f91dc71acd5d6a7bf16",
+    "sourceSha256": {
+      "official-notes.json": "881b376dca8e87461f1a46df6db3529733d7a99887376a4136907f02e543c57d",
+      "lesson.json": "f03d4f69ecfd2e1f85d2cb15f901e40a44b3b0885195de05f69310f607351ccf",
+      "asset-provenance.json": "0593c2c7d2f6f364a56f565af1060ae5f51ee5108ef99878d5668529dddd0178",
+      "art-source/counted-layout.json": "2f189183b3e943a0d9f3e735dbde907ef544ee2fa4c88455c12f0747996b2d37",
+      "art-source/compose.py": "3ccf5bc0d9ea368d9287314b283b50cc93e26760174e666a719beeb1e45f35df",
+      "pages/float-and-find.html": "5caf5d66662183cefe48174891f5308d77faa1d65acd3a4eedf8bfb8fc4d4195",
+      "pages/float-and-find.js": "b33304230f881872045293532d9597ec31768289bce13892c5398c055bb75516",
+      "pages/follow-the-flags.html": "d7449cf72660c0f85b8dfc4cedfebeaf27e580432b59187dfee4db92aa7a552e",
+      "pages/follow-the-flags.js": "4523dd3d652708b0714b6dda6fbf9950e4661bf014c9af7ba4a520d7594e92ce",
+      "tests/test_counted_art.py": "3e9f32b403ebed95bb5dbe3fd70adccfc47bcd420cade0d3c6a87c1f04b4ce7d"
+    },
+    "attestation": "Codex（gpt-6.1-sol）直接创作。课件正文、练习和课堂视觉布局为原创。课名和教材目标词句按原书。六个单球、场景、手部道具与游戏角色用内置ImageGen，六张物件图沿用可追溯的同风格内置ImageGen作品。计数图由单物件程序精确拼排。未使用DeepSeek初稿或官方整页图、原题、歌曲录音与谱面。",
+    "preVoicePlan": {
+      "generator": "courseware.tools.build prepare",
+      "artifact": "lines.json",
+      "sha256": "9306a2468b8cb082ee1b2a92734d82ada7a689053ec9017a267aa6a592f1d8ed",
+      "speechCount": 123,
+      "teacherVoice": "Jennifer",
+      "gameCueBindings": 22,
+      "quizRecordings": 6,
+      "longestLine": 34,
+      "recordingStatus": "pending",
+      "reusableSpeechIds": [
+        "fingers-to-ten-7",
+        "fingers-to-ten-12"
+      ]
+    },
+    "preVoiceReviewRevision": {
+      "status": "changes_ready_for_independent_recheck",
+      "priorVerificationReceipt": "output/courseware-lessons/fltrp-g1-upper-how-many-pink-balls/work-v2-prevoice-shared-engine/verification-prevoice.json",
+      "priorVerificationReceiptSha256": "5fcce26eb63cbb34b605358511aade7eb2c05433f10fa231e9665059809ec6bf",
+      "priorVoicePlanSha256": "96bd3f3ac1e75432e1991c14ac671c386cb3d7d11be777585e7a8a980d47d04a",
+      "revisedItems": [
+        "float-and-find-7",
+        "goal-3",
+        "goal-4",
+        "goal-5"
+      ],
+      "followup": {
+        "priorVerificationReceipt": "output/courseware-lessons/fltrp-g1-upper-how-many-pink-balls/work-v3-g7-corrections/verification-prevoice.json",
+        "priorVerificationReceiptSha256": "7c9590e94a730ebaa42b08553089d2f9c04fbc38340a29796ec41ee4dc7fd2a5",
+        "priorVoicePlanSha256": "aed4a3965932874a92f73ebc70ce02e36a63a9bd13fc7192aabde1d3480faa4b",
+        "revisedItems": [
+          "goal-4"
+        ],
+        "changedSpeechIds": [
+          "rainbow-cards-15",
+          "rainbow-cards-19",
+          "rainbow-cards-20"
+        ]
+      },
+      "comparisonFollowup": {
+        "priorVerificationReceipt": "output/courseware-lessons/fltrp-g1-upper-how-many-pink-balls/work-v4-rainbow-examples/verification-prevoice.json",
+        "priorVerificationReceiptSha256": "518cab98427f7b47d4aae8fbbc1ca69080939ec6a0762e52bbd1e03e2f940601",
+        "priorVoicePlanSha256": "a6109d55c6a0c7533d5af7dae8cee097f0d693be8a745856db5b69f096afd21e",
+        "revisedItems": [
+          "goal-4"
+        ],
+        "changedSpeechIds": [
+          "rainbow-cards-15",
+          "rainbow-cards-19",
+          "rainbow-cards-20"
+        ]
+      }
+    }
+  },
+  "goals": [
+    "借助手指和实物图用英语从one数到ten，一件对应一个数词，最后一个数词表示这一组的数量。",
+    "在听说情境中理解并使用pink、brown、ball和so many，听懂How many加颜色和复数物名的问句。先找指定颜色和物件，再数并按数量、颜色、物名作答，区分one brown ball和多个balls。",
+    "听清颜色、物名和数量，比较相似图片并选出对应一组。能在原例以外按物件类别计数。",
+    "在彩虹歌主题活动中听说并认出七个颜色词，用动作回应；了解歌曲中颜色的次序与自然彩虹常见画法各有用途。",
+    "看图说出学过的物名并数自己实际说出了几个，在教室或家里用熟悉物件做一次问答。"
+  ],
+  "pages": [
+    {
+      "key": "crate-rattle",
+      "title": "是谁让彩球滚出来了？",
+      "kind": "slide",
+      "sourceRefs": [
+        "教材47页活动2",
+        "国家课件11至12页"
+      ],
+      "plan": "彩球节开门前，布箱先抖一下，再揭示滚出来的混色球。请孩子猜是数全部还是只数一种颜色。老师用 So many balls 表达看见许多球的惊讶。"
+    },
+    {
+      "key": "fingers-to-ten",
+      "title": "十根手指跟着数",
+      "kind": "slide",
+      "sourceRefs": [
+        "教材47页活动1",
+        "国家教案3至4页",
+        "外研社216252第7至8页"
+      ],
+      "plan": "先看自己的指尖和手指。老师按一根手指一个数词的顺序从one读到ten，五后换手，从six接着数。讲清最后一个数词代表这一组的总数。"
+    },
+    {
+      "key": "colour-clues",
+      "title": "粉色和棕色，各是什么样？",
+      "kind": "slide",
+      "sourceRefs": [
+        "教材47页活动2",
+        "国家课件13至16页",
+        "外研社216252第8页"
+      ],
+      "plan": "在奶油底对照同形同大的粉球、棕球和旧颜色球。先凭图听辨pink、brown和ball，再用一个球与一群球的视觉对照学so many balls。"
+    },
+    {
+      "key": "pick-then-count",
+      "title": "只数口令里那一种",
+      "kind": "slide",
+      "sourceRefs": [
+        "教材47页活动2",
+        "国家教案5至7页",
+        "外研社216252第8至9页"
+      ],
+      "plan": "同一原创托盘有四个粉球、一个棕球和两个蓝球。问完留观察时间，示范先指粉球、逐个数到four，再回答。换问棕球得one，听清ball和balls的不同。两次轮流说问句和短答。"
+    },
+    {
+      "key": "float-and-find",
+      "title": "水面上的彩球口令",
+      "kind": "interactive",
+      "sourceRefs": [
+        "教材48页活动3",
+        "国家课件24页",
+        "国家教案9页"
+      ],
+      "template": {
+        "id": "wordBubbles",
+        "version": 1,
+        "entryPoint": "K.gameTemplates.wordBubbles",
+        "ownerApprovedOn": "2026-11-09",
+        "example": "courseware/kit/examples/classic-arcade/word-bubbles.json"
+      },
+      "knowledgeRule": "用英语听到颜色、物名和精确数量后，在总数相同的图片中找那一组。泡泡碰到语义正确的卡才计分。",
+      "controls": "方向键或屏上左右键对准漂来的图，按空格或吹泡泡键。吹到错组会提示，停下可再听和重新瞄。",
+      "levels": [
+        {
+          "level": 1,
+          "rounds": 2,
+          "progression": "静止两图、宽判定。先听two pink balls，从2粉1棕与1粉2棕中找。第二轮保留两图，口令换成two brown balls。"
+        },
+        {
+          "level": 2,
+          "rounds": 3,
+          "progression": "三张缓慢横漂的等总数卡。目标依次three pink balls、four blue balls、two brown balls，每次都有同色数量不同和等总数的干扰。"
+        },
+        {
+          "level": 3,
+          "rounds": 4,
+          "progression": "三张卡漂得稍快，瞄准范围略收窄。依次辨five pink balls、four brown balls、five blue balls、six pink balls。同回合的图按7个以内物件等总数排列。"
+        }
+      ],
+      "teacherDemo": "开始卡后暂停首关，指喇叭和固定示范图。讲从上往下逐个点粉球，再启动首个动作。做成一件事即停，首关重置后交给孩子。",
+      "cues": "Jennifer 预录关卡目标和逐步口令。voiceLead 与 stepVoiceLead 都开启。音频播完再解锁方向键与动作键，喇叭重播当前一步。首次失误只提示先听颜色、再听数量。两次后用模板的辅助亮图或慢速。配音在正文冻结后一次提交。"
+    },
+    {
+      "key": "count-the-kind",
+      "title": "颜色一样，东西一样吗？",
+      "kind": "slide",
+      "sourceRefs": [
+        "教材48页活动3",
+        "国家课件25至27页",
+        "国家任务单4页"
+      ],
+      "plan": "上排混放三个蓝球、两本蓝书、一个粉球。先问蓝球，再问蓝书，指着上排第二格和最后一格说one、two。下排三框按物名和数量匹配两本蓝书，右侧继续听彩球口令。"
+    },
+    {
+      "key": "follow-the-flags",
+      "title": "彩球邮车去哪里？",
+      "kind": "interactive",
+      "sourceRefs": [
+        "教材47页活动2",
+        "国家课件28至30页",
+        "国家作业练习2页"
+      ],
+      "template": {
+        "id": "listenDelivery",
+        "version": 1,
+        "entryPoint": "K.gameTemplates.listenDelivery",
+        "ownerApprovedOn": "2026-11-09",
+        "example": "courseware/kit/examples/classic-arcade/listen-delivery.json"
+      },
+      "knowledgeRule": "先听清颜色和数量，取到符合的整组彩球才能运送。第二条口令说彩旗颜色，等路上空隙穿越并到正确旗站交付。",
+      "controls": "用方向键或四个方向图标开车。空格或动作键取货或交货。撞车退回安全格，选错货物可直接再试。",
+      "levels": [
+        {
+          "level": 1,
+          "orders": 1,
+          "progression": "两个站、一路慢车。从2粉1棕与1粉2棕里取2个粉球的托盘，再送粉旗。"
+        },
+        {
+          "level": 2,
+          "orders": 2,
+          "progression": "三个站、两路车和一个安全间隔。先取3粉的托盘送蓝旗，再取3蓝的托盘送粉旗。数量相同但物件颜色不同。"
+        },
+        {
+          "level": 3,
+          "orders": 3,
+          "progression": "四个站、三路车。依次取4蓝、4粉、3蓝，分别送棕旗、粉旗、蓝旗。总数都为5，通过新口令辨色与数，再规划交货路线。"
+        }
+      ],
+      "teacherDemo": "开始卡后在首关暂停并指喇叭与首目标。讲到如何操作时启动示范。做成一件事即停，重置到第一关并清空本局得分、连击与进度后交给孩子。",
+      "cues": "Jennifer 预录关卡目标和逐步口令。voiceLead 与 stepVoiceLead 都开启。音频播完再解锁方向键与动作键，喇叭重播当前一步。首次失误只提示先听颜色、再听数量。两次后用模板的辅助亮图或慢速。配音在正文冻结后一次提交。"
+    },
+    {
+      "key": "rainbow-cards",
+      "title": "听见哪个颜色，就指哪张",
+      "kind": "slide",
+      "sourceRefs": [
+        "教材48页活动4",
+        "教材49页活动5",
+        "国家课件20至23页"
+      ],
+      "plan": "按上排四张、下排三张逐一指色牌，听中文颜色和对应的英文词。歌里红后唱黄、再唱粉，按这个次序指牌才能跟上歌。右侧示意图外三道依次是红、橙、黄，按图上的位置涂才画得像。"
+    },
+    {
+      "key": "words-we-can-say",
+      "title": "我会说几个词？",
+      "kind": "slide",
+      "sourceRefs": [
+        "教材49页活动6",
+        "国家课件28至30页",
+        "国家任务单4页"
+      ],
+      "plan": "先看抽屉图挑三张说物名，每说一个记一枚计数片。老师再用同图模拟家庭问答，问蓝尺子有几把，指下排中间数到one，完整答One blue ruler。孩子回家用熟悉实物交换问答角色。"
+    },
+    {
+      "key": "picture-check",
+      "title": "最后一批标签，你来核对",
+      "kind": "quiz",
+      "sourceRefs": [
+        "教材47页活动2",
+        "教材48页活动3",
+        "国家课件24至27页",
+        "外研社216253第1至4页"
+      ],
+      "plan": "用混色球卡、鸟图、文具图、风筝图和书本图换一组物件或数量。每题三组正式图和单独录音，正确位置轮换。需要先点数的问句另给题干图，孩子遮住文字也能听、数和选。"
+    },
+    {
+      "key": "crate-closed",
+      "title": "彩球都送到了",
+      "kind": "slide",
+      "sourceRefs": [
+        "教材47至49页",
+        "国家课件31至33页",
+        "国家作业练习1至2页"
+      ],
+      "plan": "回到开头的布箱。依次用图和声音复盘先筛颜色和物名、再逐个数、最后说数量加颜色加物名。提醒一个说ball、多个说balls。最后留一个亲子换角色问答。"
+    }
+  ],
+  "quizPlan": [
+    {
+      "id": "pink-sports-balls",
+      "skill": "filter-colour-and-count",
+      "audio": "How many pink balls?",
+      "position": "b",
+      "options": {
+        "a": "六个粉球",
+        "b": "七个粉球",
+        "c": "九个粉球"
+      },
+      "analysis": "先认出粉球，从上往下一个个点。数到seven才结束。九是连两个棕球也数进去的结果。",
+      "sceneImage": "混色计数卡有七个粉球和两个棕球，九个球的轮廓清楚分开。"
+    },
+    {
+      "id": "one-yellow-kite",
+      "skill": "hear-one-and-singular",
+      "audio": "One yellow kite.",
+      "position": "c",
+      "options": {
+        "a": "两只黄风筝",
+        "b": "一只橙风筝",
+        "c": "一只黄风筝"
+      },
+      "analysis": "One说明只有一只，yellow告诉我们颜色。选同时只有一只又是黄色的风筝。"
+    },
+    {
+      "id": "eight-blue-birds",
+      "skill": "listen-colour-object-quantity",
+      "audio": "Eight blue birds.",
+      "position": "a",
+      "options": {
+        "a": "八只蓝鸟",
+        "b": "六只蓝鸟",
+        "c": "八只红鸟"
+      },
+      "analysis": "Blue birds限定蓝色的鸟。从one数到eight的蓝鸟图才符合。"
+    },
+    {
+      "id": "ten-green-pencils",
+      "skill": "filter-object-and-count",
+      "audio": "How many green pencils?",
+      "position": "c",
+      "options": {
+        "a": "八支绿铅笔",
+        "b": "九支绿铅笔",
+        "c": "十支绿铅笔"
+      },
+      "analysis": "先认出绿色的铅笔。绿色的水笔和黄色的铅笔先跳过，只数符合两条线索的十支。",
+      "sceneImage": "文具计数卡有十支绿铅笔、一支带笔夹的绿水笔和两支黄铅笔。"
+    },
+    {
+      "id": "six-purple-kites",
+      "skill": "count-same-colour-object",
+      "audio": "How many purple kites?",
+      "position": "b",
+      "options": {
+        "a": "五只紫风筝",
+        "b": "六只紫风筝",
+        "c": "七只紫风筝"
+      },
+      "analysis": "先找有尾巴的紫风筝，紫书和黄风筝先跳过。符合颜色和形状的风筝共有six。",
+      "sceneImage": "风筝计数卡有六只紫风筝、一本紫书和一只黄风筝。"
+    },
+    {
+      "id": "nine-library-books",
+      "skill": "match-high-number-to-group",
+      "audio": "Nine books.",
+      "position": "a",
+      "options": {
+        "a": "九本书",
+        "b": "八本书",
+        "c": "十本书"
+      },
+      "analysis": "按固定方向把每本书点一次，最后的数词是nine。邻近的eight和ten各差一本。"
+    }
+  ],
+  "afterClassPractice": [
+    "和家人挑一组安全熟悉的实物，如两色积木或不同颜色的铅笔。大人先问指定颜色和物名的数量，孩子指一个说一个数词，再用数量加颜色加物名回答。下一轮交换角色。",
+    "任选三种熟悉物件，指一个说一个英文物名。家人帮忙看孩子说了几个并把亲口表达记为待观察。歌曲可在纸书和官方配套资源中随家人复习。"
+  ],
+  "weeklyQuestionSources": [
+    "听英文数词对应准确数量的实物图。",
+    "同一图按颜色及物名筛选，再逐个数并匹配数量。",
+    "同一物品颜色不同、同一颜色物品不同的图辨析。",
+    "一个物件及多个物件的口头短答区别。",
+    "听见旧色词或新色词后选择对应的色图。",
+    "换情境的家庭口语表达由大人观察，课堂点击证据记为听辨和配图。"
+  ],
+  "mediaPlan": {
+    "narration": "英语学科教师Jennifer。双语台词先朗读定稿。讲解、题干、两页目标、重听、失误提示与过关鼓励全走预录音。游戏借用本课独立教师句，且口令与当步唯一匹配。页面保留可静音的合成背景音乐和音效。",
+    "visual": "采用细纸纹、哑光水粉、剪纸轮廓、深松绿和暖奶油底。每个颜色和物件只生成一个透明单体，用代码按数量摆放。保留原母图、坐标、播放图SHA和用途。彩球卡每组总数尽量相同，色差清晰，布局轮换。邮车站图逻辑65像素，每组至多5个。艇卡逻辑83像素，每组至多7个。题图较大，点数逐一核对。",
+    "acceptance": "两页各三关实际G6及两遍自动通关，三种视口截图。640×360实际测按键至少44像素，目测每组球可逐个辨认。用听题、图和图标复核遮住文字后首轮可独立完成。",
+    "ballAtlas": {
+      "singleSources": {
+        "p": {
+          "id": "pink-ball",
+          "colour": "粉色",
+          "appearance": "明亮柔粉，和红球一眼可分",
+          "use": "两游戏、课内颜色与数量、题图"
+        },
+        "b": {
+          "id": "brown-ball",
+          "colour": "棕色",
+          "appearance": "中深暖棕，避免偏橙",
+          "use": "两游戏、课内颜色与数量、题图"
+        },
+        "u": {
+          "id": "blue-ball",
+          "colour": "蓝色",
+          "appearance": "饱和中蓝，避免偏紫或偏绿",
+          "use": "两游戏、课内颜色与数量"
+        },
+        "g": {
+          "id": "green-ball",
+          "colour": "绿色",
+          "appearance": "明净草绿",
+          "use": "封面、颜色复习"
+        },
+        "r": {
+          "id": "red-ball",
+          "colour": "红色",
+          "appearance": "饱和朱红，避免呈粉红",
+          "use": "封面、颜色复习"
+        },
+        "y": {
+          "id": "yellow-ball",
+          "colour": "黄色",
+          "appearance": "明亮柠檬黄，避免橙棕",
+          "use": "封面、颜色复习"
+        }
+      },
+      "atlasOrder": [
+        "pink-ball",
+        "brown-ball",
+        "blue-ball",
+        "green-ball",
+        "red-ball",
+        "yellow-ball"
+      ],
+      "artDirection": "六个独立透明球体。同一尺寸、角度、高光、圆形剪纸边和细纸纹。每格只画一只球，无字、数、影子或纹样。颜色占球面的大部分。",
+      "groupCanvas": "每张卡是256×256透明画布。以下圆心和直径均为画布百分比，从左上角量。每格复用对应单球，保持高光与尺寸。对画布居中，卡上不画数字、答案标记或背景边框。",
+      "gridsByTotal": {
+        "3": {
+          "diameter": 34,
+          "centres": [
+            [
+              27,
+              28
+            ],
+            [
+              73,
+              28
+            ],
+            [
+              50,
+              72
+            ]
+          ]
+        },
+        "4": {
+          "diameter": 34,
+          "centres": [
+            [
+              27,
+              27
+            ],
+            [
+              73,
+              27
+            ],
+            [
+              27,
+              73
+            ],
+            [
+              73,
+              73
+            ]
+          ]
+        },
+        "5": {
+          "diameter": 28,
+          "centres": [
+            [
+              18,
+              29
+            ],
+            [
+              50,
+              29
+            ],
+            [
+              82,
+              29
+            ],
+            [
+              34,
+              71
+            ],
+            [
+              66,
+              71
+            ]
+          ]
+        },
+        "6": {
+          "diameter": 28,
+          "centres": [
+            [
+              18,
+              28
+            ],
+            [
+              50,
+              28
+            ],
+            [
+              82,
+              28
+            ],
+            [
+              18,
+              72
+            ],
+            [
+              50,
+              72
+            ],
+            [
+              82,
+              72
+            ]
+          ]
+        },
+        "7": {
+          "diameter": 26,
+          "centres": [
+            [
+              18,
+              18
+            ],
+            [
+              50,
+              18
+            ],
+            [
+              82,
+              18
+            ],
+            [
+              34,
+              50
+            ],
+            [
+              66,
+              50
+            ],
+            [
+              34,
+              82
+            ],
+            [
+              66,
+              82
+            ]
+          ]
+        }
+      },
+      "paintOrderByGroup": {
+        "p2b1": "pbp",
+        "p1b2": "bpb",
+        "p3b1": "ppbp",
+        "p2b2": "pbpb",
+        "u3b1": "ubuu",
+        "u4p1": "uupuu",
+        "u3p2": "upupu",
+        "p4b1": "ppbpp",
+        "b2p2": "bppb",
+        "u2p2": "uppu",
+        "p5b1": "ppbppp",
+        "p4b2": "pbppbp",
+        "u5b1": "uubuuu",
+        "b4u2": "bubbub",
+        "b3u3": "ububub",
+        "p4u2": "puppup",
+        "u5p2": "uupuupu",
+        "u4p3": "upupupu",
+        "b5p2": "bbpbbpb",
+        "p6b1": "pppbppp",
+        "p5b2": "ppbppbp",
+        "u6b1": "uuubuuu",
+        "u2p3": "pupup"
+      },
+      "wordBubbles": {
+        "roundFields": [
+          "target",
+          "cardsInLeftToRightOrder",
+          "spokenColour",
+          "spokenCount"
+        ],
+        "levels": [
+          [
+            [
+              "p2b1",
+              [
+                "p2b1",
+                "p1b2"
+              ],
+              "p",
+              2
+            ],
+            [
+              "p1b2",
+              [
+                "p2b1",
+                "p1b2"
+              ],
+              "b",
+              2
+            ]
+          ],
+          [
+            [
+              "p3b1",
+              [
+                "p2b2",
+                "p3b1",
+                "u3b1"
+              ],
+              "p",
+              3
+            ],
+            [
+              "u4p1",
+              [
+                "u3p2",
+                "p4b1",
+                "u4p1"
+              ],
+              "u",
+              4
+            ],
+            [
+              "b2p2",
+              [
+                "b2p2",
+                "p3b1",
+                "u2p2"
+              ],
+              "b",
+              2
+            ]
+          ],
+          [
+            [
+              "p5b1",
+              [
+                "p4b2",
+                "p5b1",
+                "u5b1"
+              ],
+              "p",
+              5
+            ],
+            [
+              "b4u2",
+              [
+                "b3u3",
+                "p4u2",
+                "b4u2"
+              ],
+              "b",
+              4
+            ],
+            [
+              "u5p2",
+              [
+                "u5p2",
+                "u4p3",
+                "b5p2"
+              ],
+              "u",
+              5
+            ],
+            [
+              "p6b1",
+              [
+                "p5b2",
+                "p6b1",
+                "u6b1"
+              ],
+              "p",
+              6
+            ]
+          ]
+        ],
+        "mechanicsByLevel": [
+          {
+            "drift": 0,
+            "pace": 0.55,
+            "tolerance": 61
+          },
+          {
+            "drift": 16,
+            "pace": 0.75,
+            "tolerance": 56
+          },
+          {
+            "drift": 29,
+            "pace": 1.0,
+            "tolerance": 51
+          }
+        ]
+      },
+      "listenDelivery": {
+        "orderFields": [
+          "target",
+          "spokenColour",
+          "spokenCount",
+          "destination"
+        ],
+        "levels": [
+          {
+            "stationGroups": [
+              "p2b1",
+              "p1b2"
+            ],
+            "orders": [
+              [
+                "p2b1",
+                "p",
+                2,
+                "pink-flag"
+              ]
+            ],
+            "stationColumns": [
+              3,
+              6
+            ],
+            "drop": [
+              [
+                "pink-flag",
+                3
+              ],
+              [
+                "blue-flag",
+                6
+              ]
+            ],
+            "step": 0.33,
+            "lanes": [
+              {
+                "row": 2,
+                "speed": 0.9,
+                "spacing": 5.7,
+                "phase": 0
+              }
+            ]
+          },
+          {
+            "stationGroups": [
+              "p3b1",
+              "p2b2",
+              "u3b1"
+            ],
+            "orders": [
+              [
+                "p3b1",
+                "p",
+                3,
+                "blue-flag"
+              ],
+              [
+                "u3b1",
+                "u",
+                3,
+                "pink-flag"
+              ]
+            ],
+            "stationColumns": [
+              2,
+              4,
+              6
+            ],
+            "drop": [
+              [
+                "pink-flag",
+                2
+              ],
+              [
+                "blue-flag",
+                4
+              ],
+              [
+                "brown-flag",
+                6
+              ]
+            ],
+            "step": 0.29,
+            "lanes": [
+              {
+                "row": 1,
+                "speed": 0.85,
+                "spacing": 5.5,
+                "phase": 1
+              },
+              {
+                "row": 3,
+                "speed": -1.0,
+                "spacing": 5.6,
+                "phase": 0
+              }
+            ]
+          },
+          {
+            "stationGroups": [
+              "u4p1",
+              "u3p2",
+              "p4b1",
+              "u2p3"
+            ],
+            "orders": [
+              [
+                "u4p1",
+                "u",
+                4,
+                "brown-flag"
+              ],
+              [
+                "p4b1",
+                "p",
+                4,
+                "pink-flag"
+              ],
+              [
+                "u3p2",
+                "u",
+                3,
+                "blue-flag"
+              ]
+            ],
+            "stationColumns": [
+              1,
+              3,
+              5,
+              7
+            ],
+            "drop": [
+              [
+                "pink-flag",
+                2
+              ],
+              [
+                "blue-flag",
+                4
+              ],
+              [
+                "brown-flag",
+                6
+              ]
+            ],
+            "step": 0.26,
+            "lanes": [
+              {
+                "row": 1,
+                "speed": 0.9,
+                "spacing": 5.8,
+                "phase": 0
+              },
+              {
+                "row": 2,
+                "speed": -1.15,
+                "spacing": 5.4,
+                "phase": 1
+              },
+              {
+                "row": 3,
+                "speed": 1.2,
+                "spacing": 5.7,
+                "phase": 2
+              }
+            ]
+          }
+        ]
+      },
+      "countImageChecks": "题干和选项图从单物件按行生成。数目由画布布局数据决定，逐图核对源物件、坐标和数量。七粉二棕、十绿铅笔加异类、六紫风筝加异类三个题干单独检查。排列留空隙且遮住文字仍可逐个数。",
+      "reuseBoundary": "本课的六色球图集只供本课使用。《黄鸟》沿用既有登记素材。"
+    }
+  }
+}

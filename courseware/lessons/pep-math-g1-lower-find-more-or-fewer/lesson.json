@@ -1,0 +1,954 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "求比一个数多（或少）几的数是多少",
+  "description": "在木偶剧场对齐两组道具，看清多和少，找出另一组的数量。",
+  "grade": 1,
+  "roster": {
+    "math": {
+      "name": "小数老师",
+      "role": "teacher",
+      "gender": "male",
+      "voice": "Ethan",
+      "avatar": "/teachers/ashu-math-v1.png",
+      "color": "#53726a",
+      "persona": "用简单准确的口语带孩子数整条和散贴，再算。"
+    }
+  },
+  "images": {
+    "theater-cover": {
+      "file": "assets/theater-cover.png"
+    },
+    "theater-stage": {
+      "file": "assets/theater-stage.png"
+    },
+    "theater-path": {
+      "file": "assets/theater-path.png"
+    },
+    "wood-cart": {
+      "file": "assets/wood-cart.png"
+    },
+    "wood-cart-moving": {
+      "file": "assets/wood-cart-moving.png"
+    },
+    "wood-van": {
+      "file": "assets/wood-van.png"
+    },
+    "known-row": {
+      "file": "assets/known-row.png"
+    },
+    "same-and-extra": {
+      "file": "assets/same-and-extra.png"
+    },
+    "whole-target-row": {
+      "file": "assets/whole-target-row.png"
+    },
+    "short-row-gap": {
+      "file": "assets/short-row-gap.png"
+    },
+    "short-row-whole": {
+      "file": "assets/short-row-whole.png"
+    },
+    "window-with-more": {
+      "file": "assets/window-with-more.png"
+    },
+    "window-with-fewer": {
+      "file": "assets/window-with-fewer.png"
+    },
+    "review-reference": {
+      "file": "assets/review-reference.png"
+    },
+    "tile-6-plus-2": {
+      "file": "assets/tile-6-plus-2.png"
+    },
+    "tile-9-plus-3": {
+      "file": "assets/tile-9-plus-3.png"
+    },
+    "tile-11-minus-2": {
+      "file": "assets/tile-11-minus-2.png"
+    },
+    "tile-15-minus-7": {
+      "file": "assets/tile-15-minus-7.png"
+    },
+    "tile-24-plus-7": {
+      "file": "assets/tile-24-plus-7.png"
+    },
+    "tile-26-minus-8": {
+      "file": "assets/tile-26-minus-8.png"
+    },
+    "tile-total-8": {
+      "file": "assets/tile-total-8.png"
+    },
+    "tile-total-12": {
+      "file": "assets/tile-total-12.png"
+    },
+    "tile-total-9": {
+      "file": "assets/tile-total-9.png"
+    },
+    "tile-total-31": {
+      "file": "assets/tile-total-31.png"
+    },
+    "tile-total-18": {
+      "file": "assets/tile-total-18.png"
+    },
+    "delivery-5-plus-4": {
+      "file": "assets/delivery-5-plus-4.png"
+    },
+    "delivery-10-minus-3": {
+      "file": "assets/delivery-10-minus-3.png"
+    },
+    "delivery-18-minus-8": {
+      "file": "assets/delivery-18-minus-8.png"
+    },
+    "delivery-23-plus-9": {
+      "file": "assets/delivery-23-plus-9.png"
+    },
+    "delivery-27-minus-11": {
+      "file": "assets/delivery-27-minus-11.png"
+    },
+    "delivery-total-7": {
+      "file": "assets/delivery-total-7.png"
+    },
+    "delivery-total-9": {
+      "file": "assets/delivery-total-9.png"
+    },
+    "delivery-total-10": {
+      "file": "assets/delivery-total-10.png"
+    },
+    "delivery-total-13": {
+      "file": "assets/delivery-total-13.png"
+    },
+    "delivery-total-16": {
+      "file": "assets/delivery-total-16.png"
+    },
+    "delivery-total-23": {
+      "file": "assets/delivery-total-23.png"
+    },
+    "delivery-total-32": {
+      "file": "assets/delivery-total-32.png"
+    },
+    "window-round": {
+      "file": "assets/window-round.png"
+    },
+    "window-triangle": {
+      "file": "assets/window-triangle.png"
+    },
+    "q1-conditions": {
+      "file": "assets/q1-conditions.png"
+    },
+    "q2-conditions": {
+      "file": "assets/q2-conditions.png"
+    },
+    "q3-conditions": {
+      "file": "assets/q3-conditions.png"
+    },
+    "q4-conditions": {
+      "file": "assets/q4-conditions.png"
+    },
+    "q5-conditions": {
+      "file": "assets/q5-conditions.png"
+    },
+    "q6-conditions": {
+      "file": "assets/q6-conditions.png"
+    },
+    "q1-a": {
+      "file": "assets/q1-a.png"
+    },
+    "q1-b": {
+      "file": "assets/q1-b.png"
+    },
+    "q1-c": {
+      "file": "assets/q1-c.png"
+    },
+    "q2-a": {
+      "file": "assets/q2-a.png"
+    },
+    "q2-b": {
+      "file": "assets/q2-b.png"
+    },
+    "q2-c": {
+      "file": "assets/q2-c.png"
+    },
+    "q3-a": {
+      "file": "assets/q3-a.png"
+    },
+    "q3-b": {
+      "file": "assets/q3-b.png"
+    },
+    "q3-c": {
+      "file": "assets/q3-c.png"
+    },
+    "q4-a": {
+      "file": "assets/q4-a.png"
+    },
+    "q4-b": {
+      "file": "assets/q4-b.png"
+    },
+    "q4-c": {
+      "file": "assets/q4-c.png"
+    },
+    "q5-a": {
+      "file": "assets/q5-a.png"
+    },
+    "q5-b": {
+      "file": "assets/q5-b.png"
+    },
+    "q5-c": {
+      "file": "assets/q5-c.png"
+    },
+    "q6-a": {
+      "file": "assets/q6-a.png"
+    },
+    "q6-b": {
+      "file": "assets/q6-b.png"
+    },
+    "q6-c": {
+      "file": "assets/q6-c.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "listen-for-the-target",
+      "type": "slide",
+      "title": "给哪一排准备座椅",
+      "template": "two-columns",
+      "data": {
+        "title": "给哪一排准备座椅",
+        "left": {
+          "heading": "木偶剧场",
+          "body": "方牌排已经摆好"
+        },
+        "left_picture": "theater-cover",
+        "right": {
+          "heading": "听两排的关系",
+          "body": "圆牌排摆几把？"
+        },
+        "right_picture": "known-row"
+      },
+      "script": [
+        {
+          "say": "木偶戏快开场了。我们帮剧场给两排摆椅子。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "剧场给两排挂上不同的牌子。先听听哪一排已经有了数。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "图里，上面挂方牌的那排已经摆好，有八把椅子。"
+        },
+        {
+          "say": "下面挂圆牌的那排要比方牌排多五把。多五把说的是两排相差几把。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "我们要求圆牌排一整排的椅子数，回答时要说几把。"
+        },
+        {
+          "say": "用手指一指。已知八把的是上排，问有几把的是下排。"
+        },
+        {
+          "say": "接着把这两排对齐，看看下面的一排该摆多长。"
+        }
+      ]
+    },
+    {
+      "key": "join-the-extra-row",
+      "type": "slide",
+      "title": "同样多，再接一段",
+      "template": "two-columns",
+      "data": {
+        "title": "同样多，再接一段",
+        "left": {
+          "heading": "找多出来的部分",
+          "body": "同样多的 8 把，再接 5 把"
+        },
+        "left_picture": "same-and-extra",
+        "right": {
+          "heading": "求圆牌一整排",
+          "body": "8＋5＝13（把）"
+        },
+        "right_picture": "whole-target-row"
+      },
+      "script": [
+        {
+          "say": "圆牌排比方牌排多五把。先让两排从同一个地方起头。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "上排方牌有八格。下排先画同样多的八格，一格对一格。"
+        },
+        {
+          "say": "下排接在后面的五个橙格，就是比上排多的五把。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "下排的椅子有两部分，一部分是和上排一样多的八把，另一部分是多出的五把。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "右图括起下面一整排。要知道它一共几把，就把八把和五把合起来，所以用加法。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "八加五等于十三。圆牌排摆十三把。"
+        },
+        {
+          "say": "再验算。十三比八大，十三减八等于五。方向和相差的把数都对。"
+        }
+      ]
+    },
+    {
+      "key": "fold-away-the-gap",
+      "type": "slide",
+      "title": "短下去的是哪一段",
+      "template": "two-columns",
+      "data": {
+        "title": "短下去的是哪一段",
+        "left": {
+          "heading": "找少掉的部分",
+          "body": "虚线缺口是 6 只"
+        },
+        "left_picture": "short-row-gap",
+        "right": {
+          "heading": "求三角牌一整排",
+          "body": "16－6＝10（只）"
+        },
+        "right_picture": "short-row-whole"
+      },
+      "script": [
+        {
+          "say": "方牌道具有十六只手套，三角牌道具比它少六只。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "画两排时先对齐左头。上排画十六格，从右端往左数六格，画一条小线。"
+        },
+        {
+          "say": "下排实格画到小线。往右照上排一格对一格画虚线，正好留六格。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "从十六只里去掉这六只，就剩下和三角牌一样多的手套，所以用减法。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "右图括的是下面还在的实格，整段就是要找的三角牌手套数。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "十六减六等于十。三角牌道具有十只手套。"
+        },
+        {
+          "say": "再查。十比十六小，十六减十等于六。确实少六只。"
+        },
+        {
+          "say": "方牌有六个道具，圆牌比它多两个。找圆牌一共有几个。"
+        },
+        {
+          "say": "方牌有九个道具，圆牌比它多三个。找圆牌一共有几个。"
+        },
+        {
+          "say": "方牌有十一个道具，三角牌比它少两个。找三角牌有几个。"
+        },
+        {
+          "say": "方牌有十五个道具，三角牌比它少七个。找三角牌有几个。"
+        },
+        {
+          "say": "方牌有二十四个道具，圆牌比它多七个。找圆牌一共有几个。"
+        },
+        {
+          "say": "方牌有二十六个道具，三角牌比它少八个。找三角牌有几个。"
+        },
+        {
+          "say": "先看方牌的已知数，再看目标排是接长了，还是短了。"
+        },
+        {
+          "say": "算好问号，移到那个底牌紧挨的空格，再按下落钮。"
+        },
+        {
+          "say": "配好了。比较卡和它要求的总数都对上了。"
+        }
+      ]
+    },
+    {
+      "key": "arrange-prop-tiles",
+      "type": "interactive",
+      "title": "让道具卡落到配对处",
+      "page": "arrange-prop-tiles",
+      "startImage": "theater-stage",
+      "widgetType": "learning-arcade",
+      "gameAudio": {
+        "tile-6-plus-2": "fold-away-the-gap-12",
+        "tile-9-plus-3": "fold-away-the-gap-13",
+        "tile-11-minus-2": "fold-away-the-gap-14",
+        "tile-15-minus-7": "fold-away-the-gap-15",
+        "tile-24-plus-7": "fold-away-the-gap-16",
+        "tile-26-minus-8": "fold-away-the-gap-17",
+        "tile-hint": "fold-away-the-gap-18",
+        "tile-help": "fold-away-the-gap-19",
+        "tile-praise": "fold-away-the-gap-20"
+      },
+      "script": [
+        {
+          "say": "剧场来了一张道具卡。让它落到对应的数量牌旁边。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#first-prop-card"
+        },
+        {
+          "say": "左边放大的是同一张卡。上排方牌有六个，下排接了两个。"
+        },
+        {
+          "say": "求下排整排，要把六个和两个合起来。六加二等于八。"
+        },
+        {
+          "highlight": "#first-total-card"
+        },
+        {
+          "say": "找到底下一张八个的牌，选紧挨它左边的空格。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "示范卡从上面往下落。先向右挪到空格，再按下落钮。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "这两张牌配上了，亮了一下就收走。老师示范到这里。"
+        },
+        {
+          "say": "接下来轮到你。看左边的图算问号，再移动和落下。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ]
+    },
+    {
+      "key": "keep-one-reference",
+      "type": "slide",
+      "title": "同一条参照，两种方向",
+      "template": "two-columns",
+      "data": {
+        "title": "同一条参照，两种方向",
+        "left": {
+          "heading": "圆牌窗口多 16 张",
+          "body": "38＋16＝54（张）"
+        },
+        "left_picture": "window-with-more",
+        "right": {
+          "heading": "三角牌窗口少 9 张",
+          "body": "38－9＝29（张）"
+        },
+        "right_picture": "window-with-fewer"
+      },
+      "script": [
+        {
+          "say": "中间的方牌票台有三十八张票签。两个窗口都和它比。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "左图的圆牌窗口，比方牌票台多十六张。找橙色接上去的一段。"
+        },
+        {
+          "say": "圆牌窗口的整排，是同样多的三十八张和多出来的十六张。要合起来，所以用加法。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "三十八加十六等于五十四。圆牌窗口准备五十四张。"
+        },
+        {
+          "say": "五十四比三十八大。五十四减三十八等于十六，确实多十六张。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "右图的三角牌窗口少九张。它跟方牌的三十八张比。虚线就是少掉的九张。"
+        },
+        {
+          "say": "从三十八张去掉九张，剩下的那段才是三角牌窗口的票签，所以用减法。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "三十八减九等于二十九。三角牌窗口准备二十九张。"
+        },
+        {
+          "say": "二十九比三十八小。三十八减二十九等于九，确实少九张。"
+        },
+        {
+          "say": "两问都从同一张方牌的三十八张起算。看看每问是比它多，还是比它少。"
+        },
+        {
+          "say": "方牌有五张票签。找一袋比五张多四张的票签。"
+        },
+        {
+          "say": "方牌有十张票签。找一袋比十张少三张的票签。"
+        },
+        {
+          "say": "方牌有十八张票签。找一袋比十八张少八张的票签。"
+        },
+        {
+          "say": "方牌有二十三张票签。找一袋比二十三张多九张的票签。"
+        },
+        {
+          "say": "方牌有二十七张票签。找一袋比二十七张少十一张的票签。"
+        },
+        {
+          "say": "拿好了。把车开到圆牌窗口，到了按方钮送出。"
+        },
+        {
+          "say": "拿好了。把车开到三角牌窗口，到了按方钮送出。"
+        },
+        {
+          "say": "重听这一步。先算好要拿几张，装车后再找窗口标记。"
+        },
+        {
+          "say": "看发亮的位置。等来车过去，再开到窗口前。"
+        },
+        {
+          "say": "这一关的票签送齐了，数量和窗口都对。"
+        }
+      ]
+    },
+    {
+      "key": "deliver-the-right-count",
+      "type": "interactive",
+      "title": "把刚好的票签送过去",
+      "page": "deliver-the-right-count",
+      "startImage": "theater-path",
+      "widgetType": "learning-arcade",
+      "gameAudio": {
+        "delivery-5-plus-4": "keep-one-reference-15",
+        "delivery-10-minus-3": "keep-one-reference-16",
+        "delivery-18-minus-8": "keep-one-reference-17",
+        "delivery-23-plus-9": "keep-one-reference-18",
+        "delivery-27-minus-11": "keep-one-reference-19",
+        "take-to-round": "keep-one-reference-20",
+        "take-to-triangle": "keep-one-reference-21",
+        "delivery-hint": "keep-one-reference-22",
+        "delivery-help": "keep-one-reference-23",
+        "delivery-praise": "keep-one-reference-24"
+      },
+      "script": [
+        {
+          "say": "送票签先做一件事。听清参照数和多或少几张，选对一袋。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#first-ticket-conditions"
+        },
+        {
+          "say": "图里的方牌是五张。下排接四张。五加四等于九。"
+        },
+        {
+          "highlight": "#game-target"
+        },
+        {
+          "say": "在下面找九张那袋。车已经停在这袋前。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "按方钮，把这袋票签装上车。看看右边的小格。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "小格里有装好的票签了。老师只示范这一步。"
+        },
+        {
+          "highlight": "#first-ticket-window"
+        },
+        {
+          "say": "拿对以后，听要去哪个窗口。圆牌和三角牌都在上面。"
+        },
+        {
+          "say": "用箭头开车，等来车过去再走。到该去的窗口按方钮。"
+        },
+        {
+          "say": "轮到你从第一袋开始。听完取货，再听送到哪里。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ]
+    },
+    {
+      "key": "picture-check-a",
+      "type": "quiz",
+      "title": "看图找对的一段",
+      "intro": [
+        "听我讲数量和哪一组要找，再选图。",
+        "没听清，点小喇叭就能重听。"
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "question": "方牌桌有七张明信片。圆牌桌比它多四张。哪张图的括线，圈住了圆牌桌的全部明信片？",
+          "skill": "定位参照、差量和目标整组",
+          "answer": [
+            "B"
+          ],
+          "analysis": "方牌桌的七张是参照。圆牌桌有同样多的七张和多出的四张。七加四等于十一，所以括住下面整排。",
+          "visual": {
+            "kind": "asset",
+            "image": "q1-conditions",
+            "alt": "方牌桌七张，圆牌桌多四张"
+          },
+          "options": {
+            "A": {
+              "label": "图卡1",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-a",
+                "alt": "括线标上面方牌桌七格"
+              }
+            },
+            "B": {
+              "label": "图卡2",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-b",
+                "alt": "括线标下面圆牌桌全部十一格"
+              }
+            },
+            "C": {
+              "label": "图卡3",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-c",
+                "alt": "括线只标下面圆牌桌多出的四格"
+              }
+            }
+          }
+        },
+        {
+          "id": "q2",
+          "question": "水池东边的方牌有十三个标记，西边的三角牌少五个。哪张图画对了西边的数量？",
+          "skill": "从参照数量中减去少的部分",
+          "answer": [
+            "C"
+          ],
+          "analysis": "从东边的十三个去掉西边少的五个，得到八个。下面的西边那排要有八个实格和五格虚线。",
+          "visual": {
+            "kind": "asset",
+            "image": "q2-conditions",
+            "alt": "东边方牌十三个，西边三角牌少五个"
+          },
+          "options": {
+            "A": {
+              "label": "图卡1",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-a",
+                "alt": "上下都是十三格"
+              }
+            },
+            "B": {
+              "label": "图卡2",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-b",
+                "alt": "下排比上排多五格，有十八格"
+              }
+            },
+            "C": {
+              "label": "图卡3",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-c",
+                "alt": "上排十三格，下排八个实格和五格缺口"
+              }
+            }
+          }
+        },
+        {
+          "id": "q3",
+          "question": "手作展的方牌桌有二十八本册子。圆牌桌比它多七本。哪张图是圆牌桌的册子数？",
+          "skill": "合并等量段和多出的部分",
+          "answer": [
+            "A"
+          ],
+          "analysis": "圆牌桌有和方牌桌同样多的二十八本，再多七本。二十八加七等于三十五。",
+          "visual": {
+            "kind": "asset",
+            "image": "q3-conditions",
+            "alt": "方牌桌二十八本，圆牌桌多七本"
+          },
+          "options": {
+            "A": {
+              "label": "图卡1",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-a",
+                "alt": "三组十格和五格"
+              }
+            },
+            "B": {
+              "label": "图卡2",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-b",
+                "alt": "两组十格和一格"
+              }
+            },
+            "C": {
+              "label": "图卡3",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-c",
+                "alt": "七格"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "picture-check-b",
+      "type": "quiz",
+      "title": "算完用原条件检查",
+      "intro": [
+        "听我讲数量和哪一组要找，再选图。",
+        "没听清，点小喇叭就能重听。"
+      ],
+      "questions": [
+        {
+          "id": "q4",
+          "question": "第一辆车有二十一个座位。第二辆车比它少八个。哪张图是第二辆车的座位数？",
+          "skill": "求比参照量少几的目标数",
+          "answer": [
+            "B"
+          ],
+          "analysis": "从第一辆车的二十一个座位去掉相差的八个，剩下十三个，正好是第二辆车的座位数。",
+          "visual": {
+            "kind": "asset",
+            "image": "q4-conditions",
+            "alt": "第一辆二十一个，第二辆少八个"
+          },
+          "options": {
+            "A": {
+              "label": "图卡1",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-a",
+                "alt": "两组十格和九格"
+              }
+            },
+            "B": {
+              "label": "图卡2",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-b",
+                "alt": "一组十格和三格"
+              }
+            },
+            "C": {
+              "label": "图卡3",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-c",
+                "alt": "八格"
+              }
+            }
+          }
+        },
+        {
+          "id": "q5",
+          "question": "方牌柜三十四个零件，左圆牌多十二个，右三角牌少六个。哪张图对？",
+          "skill": "使用同一参照检查两个方向和差量",
+          "answer": [
+            "C"
+          ],
+          "analysis": "左边圆牌柜是三十四加十二，等于四十六。右边三角牌柜是三十四减六，等于二十八。两边都和方牌的三十四比。",
+          "visual": {
+            "kind": "asset",
+            "image": "q5-conditions",
+            "alt": "左边圆牌多十二个，中间方牌三十四个，右边三角牌少六个"
+          },
+          "options": {
+            "A": {
+              "label": "图卡1",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-a",
+                "alt": "圆牌二十八，方牌三十四，三角牌二十八"
+              }
+            },
+            "B": {
+              "label": "图卡2",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-b",
+                "alt": "圆牌二十八，方牌三十四，三角牌四十六"
+              }
+            },
+            "C": {
+              "label": "图卡3",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-c",
+                "alt": "圆牌四十六，方牌三十四，三角牌二十八"
+              }
+            }
+          }
+        },
+        {
+          "id": "q6",
+          "question": "方牌前排二十五面旗，三角牌后排少六面。后排算出十九面。哪图验算对？",
+          "skill": "核查结果的大小方向和差量",
+          "answer": [
+            "A"
+          ],
+          "analysis": "十九比二十五小，二十五减十九等于六。后排短六格的图，数量和相差量都对。",
+          "visual": {
+            "kind": "asset",
+            "image": "q6-conditions",
+            "alt": "方牌前排二十五面，三角牌后排试算十九面"
+          },
+          "options": {
+            "A": {
+              "label": "图卡1",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-a",
+                "alt": "后排十九格，比前排短六格"
+              }
+            },
+            "B": {
+              "label": "图卡2",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-b",
+                "alt": "后排二十格，比前排短五格"
+              }
+            },
+            "C": {
+              "label": "图卡3",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-c",
+                "alt": "后排三十一格，比前排长六格"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "recap-compare-with-one-group",
+      "type": "slide",
+      "title": "找参照，画一画，再检查",
+      "template": "picture-points",
+      "data": {
+        "title": "找参照，画一画，再检查",
+        "picture": "review-reference",
+        "points": [
+          "先找谁是已知的一组",
+          "画出多的一段或少的缺口",
+          "比方向，再查相差几"
+        ]
+      },
+      "script": [
+        {
+          "say": "剧场要开演了。回头看看，两扇窗口是怎么备好票签的？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "图里方牌是最上面的参照。圆牌多一段，三角牌短一截。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先找到已知数，再听清谁跟它比，求的是哪一组。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "图从同一头开始。多的，把同样多的一段和多出来的一段相加。"
+        },
+        {
+          "say": "少的，从已知的一整段减去少的那一截，剩下的是目标。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "算好再检查。比参照多，数应该更大。比参照少，数应该更小。"
+        },
+        {
+          "say": "把大数减小数，看看差几，和刚才听到的是不是一样。"
+        },
+        {
+          "say": "回家请大人摆一组小物件，再告诉你另一组多几个或少几个。"
+        },
+        {
+          "say": "你画两排，算完数实物检查。也可以让大人听你说说为什么这样算。"
+        }
+      ]
+    }
+  ]
+}

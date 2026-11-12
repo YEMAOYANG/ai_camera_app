@@ -1,0 +1,1283 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "一分钟",
+  "description": "听故事排先后、说实际与推想、认读书写，再和成人体验真实的一分钟。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小语老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Serena",
+      "avatar": "/avatars/teacher-2.png",
+      "color": "#D65A8C",
+      "persona": "用自然清楚的短句，带孩子看图理顺时间与动作。"
+    }
+  },
+  "images": {
+    "alarm-and-bed-board": {
+      "file": "assets/alarm-and-bed-board.png"
+    },
+    "morning-routine-board": {
+      "file": "assets/morning-routine-board.png"
+    },
+    "crossing-board": {
+      "file": "assets/crossing-board.png"
+    },
+    "bus-walking-board": {
+      "file": "assets/bus-walking-board.png"
+    },
+    "arriving-board": {
+      "file": "assets/arriving-board.png"
+    },
+    "route-rehearsal-board": {
+      "file": "assets/route-rehearsal-board.png"
+    },
+    "route-start": {
+      "file": "assets/route-start.png"
+    },
+    "if-earlier-board": {
+      "file": "assets/if-earlier-board.png"
+    },
+    "listening-words-board": {
+      "file": "assets/listening-words-board.png"
+    },
+    "words-start": {
+      "file": "assets/words-start.png"
+    },
+    "write-yuan-che-board": {
+      "file": "assets/write-yuan-che-board.png"
+    },
+    "write-deng-zhan-board": {
+      "file": "assets/write-deng-zhan-board.png"
+    },
+    "write-zuo-board": {
+      "file": "assets/write-zuo-board.png"
+    },
+    "write-lao-shi-board": {
+      "file": "assets/write-lao-shi-board.png"
+    },
+    "minute-experiment-board": {
+      "file": "assets/minute-experiment-board.png"
+    },
+    "minute-sticker": {
+      "file": "assets/minute-sticker.png"
+    },
+    "route-alarm-icon": {
+      "file": "assets/route-alarm-icon.png"
+    },
+    "route-rise-icon": {
+      "file": "assets/route-rise-icon.png"
+    },
+    "route-bag-icon": {
+      "file": "assets/route-bag-icon.png"
+    },
+    "route-curb-icon": {
+      "file": "assets/route-curb-icon.png"
+    },
+    "route-cross-icon": {
+      "file": "assets/route-cross-icon.png"
+    },
+    "route-bus-icon": {
+      "file": "assets/route-bus-icon.png"
+    },
+    "route-wait-icon": {
+      "file": "assets/route-wait-icon.png"
+    },
+    "route-walk-icon": {
+      "file": "assets/route-walk-icon.png"
+    },
+    "route-class-icon": {
+      "file": "assets/route-class-icon.png"
+    },
+    "route-rover": {
+      "file": "assets/route-rover.png"
+    },
+    "route-rover-pop": {
+      "file": "assets/route-rover-pop.png"
+    },
+    "word-boat": {
+      "file": "assets/word-boat.png"
+    },
+    "word-boat-pop": {
+      "file": "assets/word-boat-pop.png"
+    },
+    "route-backdrop": {
+      "file": "assets/route-backdrop.png"
+    },
+    "word-backdrop": {
+      "file": "assets/word-backdrop.png"
+    },
+    "alarm-word": {
+      "file": "assets/alarm-word.png"
+    },
+    "watch-word": {
+      "file": "assets/watch-word.png"
+    },
+    "sit-word": {
+      "file": "assets/sit-word.png"
+    },
+    "wait-word": {
+      "file": "assets/wait-word.png"
+    },
+    "back-carry": {
+      "file": "assets/back-carry.png"
+    },
+    "back-point": {
+      "file": "assets/back-point.png"
+    },
+    "front-carry": {
+      "file": "assets/front-carry.png"
+    },
+    "quiz-1-a": {
+      "file": "assets/quiz-1-a.png"
+    },
+    "quiz-1-b": {
+      "file": "assets/quiz-1-b.png"
+    },
+    "quiz-1-c": {
+      "file": "assets/quiz-1-c.png"
+    },
+    "quiz-2-a": {
+      "file": "assets/quiz-2-a.png"
+    },
+    "quiz-2-b": {
+      "file": "assets/quiz-2-b.png"
+    },
+    "quiz-2-c": {
+      "file": "assets/quiz-2-c.png"
+    },
+    "quiz-3-a": {
+      "file": "assets/quiz-3-a.png"
+    },
+    "quiz-3-b": {
+      "file": "assets/quiz-3-b.png"
+    },
+    "quiz-3-c": {
+      "file": "assets/quiz-3-c.png"
+    },
+    "quiz-4-a": {
+      "file": "assets/quiz-4-a.png"
+    },
+    "quiz-4-b": {
+      "file": "assets/quiz-4-b.png"
+    },
+    "quiz-4-c": {
+      "file": "assets/quiz-4-c.png"
+    },
+    "quiz-5-a": {
+      "file": "assets/quiz-5-a.png"
+    },
+    "quiz-5-b": {
+      "file": "assets/quiz-5-b.png"
+    },
+    "quiz-5-c": {
+      "file": "assets/quiz-5-c.png"
+    },
+    "quiz-6-a": {
+      "file": "assets/quiz-6-a.png"
+    },
+    "quiz-6-b": {
+      "file": "assets/quiz-6-b.png"
+    },
+    "quiz-6-c": {
+      "file": "assets/quiz-6-c.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "the-clock-and-the-seat",
+      "type": "slide",
+      "title": "闹钟响了，元元怎么想",
+      "template": "picture-points",
+      "data": {
+        "title": "闹钟响了，元元怎么想",
+        "picture": "alarm-and-bed-board",
+        "points": [
+          "钟 · 闹钟",
+          "再等一小会儿",
+          "坐起来"
+        ]
+      },
+      "script": [
+        {
+          "say": "小故事工坊有一组早晨图。先看看故事开头。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先找把元元叫醒的那一幕。"
+        },
+        {
+          "say": "床边响的是闹钟。找闹钟的钟，左边是金字旁。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "元元听见了，还想接着睡一分钟。"
+        },
+        {
+          "say": "被子还盖在身上。他觉得再等一会儿也来得及。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "接着找他从被子里坐起来的那一幕。"
+        },
+        {
+          "say": "早晨的事才开始做。看看这一步和刚才哪儿不同。"
+        }
+      ]
+    },
+    {
+      "key": "carry-the-bag",
+      "type": "slide",
+      "title": "洗脸、吃饭，再背书包",
+      "template": "picture-points",
+      "data": {
+        "title": "洗脸、吃饭，再背书包",
+        "picture": "morning-routine-board",
+        "points": [
+          "洗脸 · 吃早饭",
+          "背 · 第一声",
+          "后背 · 第四声"
+        ]
+      },
+      "script": [
+        {
+          "say": "元元起床后做了几件事？跟着图一张张看。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "他先去洗脸，再坐下来吃早饭。"
+        },
+        {
+          "say": "出门前的几件事都用时间。排图要照着先后。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "哪一幕是他驮着书包离开家？"
+        },
+        {
+          "say": "指背字。图里书包挂在身后，背书包的背读第一声。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "伸手摸摸肩膀下方。身体这边是后背。"
+        },
+        {
+          "say": "说到身体的这个部位，背读第四声。"
+        }
+      ]
+    },
+    {
+      "key": "wait-at-the-crossing",
+      "type": "slide",
+      "title": "路口为什么要等一下",
+      "template": "picture-points",
+      "data": {
+        "title": "路口为什么要等一下",
+        "picture": "crossing-board",
+        "points": [
+          "灯 · 红灯",
+          "等 · 第三声",
+          "信号允许再走",
+          "着急的语气"
+        ]
+      },
+      "script": [
+        {
+          "say": "到了路边，本来想过去，看看信号有什么变化。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "接下来找元元还停在路边的那一幕。"
+        },
+        {
+          "say": "绿灯变红了。指红灯的灯，左边是火，右边是丁。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "指等字，上面是竹字头。红灯亮着，他先停在路边等。"
+        },
+        {
+          "say": "路口的这段等候，用掉了一些时间。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "然后找确认能通行、才走过斑马线的图。"
+        },
+        {
+          "say": "亮起允许行走的绿灯，先看看安全，再过街。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "他着急又没办法。听我轻叹一声，逗号处歇一下。"
+        },
+        {
+          "say": "唉，我还站在路边，灯就变红了，要是早出门就好了。"
+        },
+        {
+          "say": "读到路边和变红了，各停一小下。跟老师试一遍。"
+        }
+      ]
+    },
+    {
+      "key": "bus-then-walking",
+      "type": "slide",
+      "title": "公交走了，元元怎么办",
+      "template": "picture-points",
+      "data": {
+        "title": "公交走了，元元怎么办",
+        "picture": "bus-walking-board",
+        "points": [
+          "错过公交",
+          "等啊等 · 啊",
+          "决定 · 决和定"
+        ]
+      },
+      "script": [
+        {
+          "say": "走过路口以后，元元以为自己快赶上公交了。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "哪一幕是元元还没到站，公交就开走了？"
+        },
+        {
+          "say": "他眼看就到站，还是错过了公交，心里更着急。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "接下来找他还在空空车站等待的图。"
+        },
+        {
+          "say": "看空车站。等啊等说等了好久，中间带口的啊读轻些。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "下一幕找他离开车站，沿人行道去学校。"
+        },
+        {
+          "say": "车还没来，他拿定主意，走着去学校。这叫决定。"
+        },
+        {
+          "say": "决定的决左边有两点，定上面是宝盖。指着两个字读。"
+        },
+        {
+          "say": "先找有两点的决，再找有宝盖的定。他决定怎么去？"
+        }
+      ]
+    },
+    {
+      "key": "the-classroom-clock",
+      "type": "slide",
+      "title": "到教室时，已经怎样了",
+      "template": "picture-points",
+      "data": {
+        "title": "到教室时，已经怎样了",
+        "picture": "arriving-board",
+        "points": [
+          "迟到 · 一位老师 · 手表",
+          "已经 · 已和经",
+          "两字看看",
+          "后悔与原因"
+        ]
+      },
+      "script": [
+        {
+          "say": "元元走到学校。看看教室里的人都在做什么。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "最后找元元走进已经开课的教室。"
+        },
+        {
+          "say": "指迟字，底下有走之。课已开始他才到，就是迟到。"
+        },
+        {
+          "say": "位有单人旁，数一位老师。指表，老师用手表看时间。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "指已经前面的已。课先开始了，元元后来才到。"
+        },
+        {
+          "say": "经左边是绞丝旁。指着经读已经上课，课先开始了。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "左图已的竖段向上多伸一截。右图己的口敞开。"
+        },
+        {
+          "say": "指着左图读已经，指着右图读自己。看清再读。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "多睡后，他等了灯、没赶上车，又走了一段路。"
+        },
+        {
+          "say": "一路多用了时间。老师看表，说他迟到二十分钟。"
+        },
+        {
+          "say": "我学他后悔地说。刚才不该接着睡，课已经开始了。"
+        },
+        {
+          "say": "句尾慢一点。路口还在着急，到校知道迟到了，就后悔。"
+        }
+      ]
+    },
+    {
+      "key": "put-the-pictures-in-order",
+      "type": "slide",
+      "title": "故事画面按什么顺序排",
+      "template": "picture-points",
+      "data": {
+        "title": "故事画面按什么顺序排",
+        "picture": "route-rehearsal-board",
+        "points": [
+          "出门以前",
+          "沿路和到校",
+          "接齐再去小旗"
+        ]
+      },
+      "script": [
+        {
+          "say": "要请伙伴听懂经过，就得把画面先后接起来。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "闹钟先响，元元后来才起床、背书包出门。"
+        },
+        {
+          "say": "哪一幕在早晨，哪一幕已经出了门？"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "沿路先到路口，接着到车站，最后走进教室。"
+        },
+        {
+          "say": "想想上一幅发生在哪儿，再听下一幕。"
+        },
+        {
+          "say": "先去亮起来的那幅图，接上它再往前。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "这一关画面都接齐了，开到小旗那格。"
+        },
+        {
+          "say": "故事画面按先后接起来了。"
+        }
+      ]
+    },
+    {
+      "key": "story-board-route",
+      "type": "interactive",
+      "title": "泡泡车排故事图",
+      "page": "story-board-route",
+      "widgetType": "game",
+      "startImage": "route-start",
+      "script": [
+        {
+          "say": "工坊要放元元的故事。来开泡泡车接画面。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#minute-route-listen"
+        },
+        {
+          "say": "先听一句。最早的一幕发生在起床以前。"
+        },
+        {
+          "highlight": "#minute-first-alarm"
+        },
+        {
+          "say": "这张画有叫醒元元的闹钟，先去这一格。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "用方向箭头开过去。第一张图会被接住。"
+        },
+        {
+          "say": "每接好一张再听下一幕，接齐后去小旗。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "我接一张就停。轮到你，车会回到起点。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "route-alarm": "the-clock-and-the-seat-3",
+        "route-rise": "the-clock-and-the-seat-9",
+        "route-bag": "carry-the-bag-6",
+        "route-curb": "wait-at-the-crossing-3",
+        "route-cross": "wait-at-the-crossing-9",
+        "route-miss-bus": "bus-then-walking-3",
+        "route-wait-bus": "bus-then-walking-6",
+        "route-walk": "bus-then-walking-9",
+        "route-class": "the-classroom-clock-3",
+        "route-hint": "put-the-pictures-in-order-7",
+        "route-help": "put-the-pictures-in-order-8",
+        "route-exit": "put-the-pictures-in-order-10",
+        "route-praise": "put-the-pictures-in-order-11"
+      }
+    },
+    {
+      "key": "if-another-minute",
+      "type": "slide",
+      "title": "要是早点，可能怎样",
+      "template": "picture-points",
+      "data": {
+        "title": "要是早点，可能怎样",
+        "picture": "if-earlier-board",
+        "points": [
+          "实际已经发生",
+          "要是 · 就",
+          "继续接着想",
+          "试说一句"
+        ]
+      },
+      "script": [
+        {
+          "say": "刚才听到实际经过。现在想一种可能的经过。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "他到路边时遇到红灯，后来没赶上公交。"
+        },
+        {
+          "say": "他走到学校，教室已经上课。这些真的发生了。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "可以想，要是早些出门，就可能及时走过路口。"
+        },
+        {
+          "say": "还要等信号允许，确认安全再过街。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "要是及时过了路口，就可能赶上那班公交。"
+        },
+        {
+          "say": "赶上车，也许就能按时到学校。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "要是用来先说条件，就接着说可能的结果。"
+        },
+        {
+          "say": "你接一句说给家人听。出门前也可以留足时间。"
+        }
+      ]
+    },
+    {
+      "key": "hear-the-picture-cue",
+      "type": "slide",
+      "title": "听同一个字，想一想动作",
+      "template": "picture-points",
+      "data": {
+        "title": "听同一个字，想一想动作",
+        "picture": "listening-words-board",
+        "points": [
+          "闹钟 · 手表",
+          "等 · 坐",
+          "背的两种意思",
+          "再听再配"
+        ]
+      },
+      "script": [
+        {
+          "say": "故事里用过的词，换一张图还能听懂吗？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "找叫人起床的闹钟，有两个铃铛。"
+        },
+        {
+          "say": "找戴在手腕上看时间的手表。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "找在空车站等公交的小朋友。"
+        },
+        {
+          "say": "找两腿弯下来、坐在长凳上的孩子。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "找用带子把篮筐背在身后的动作。"
+        },
+        {
+          "say": "找用手指一指自己后背的那幅图。"
+        },
+        {
+          "say": "找把篮筐用两手抱在身前的图。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "先重听一句，看看动作哪里不同。"
+        },
+        {
+          "say": "卡片慢一点了。对准亮起来的画再吹。"
+        },
+        {
+          "say": "你把听到的话和画面配好了。"
+        }
+      ]
+    },
+    {
+      "key": "catch-the-meaning",
+      "type": "interactive",
+      "title": "泡泡艇听词找画",
+      "page": "catch-the-meaning",
+      "widgetType": "game",
+      "startImage": "words-start",
+      "script": [
+        {
+          "say": "有几句声音找不到自己的图了。开艇帮忙吧。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#minute-word-listen"
+        },
+        {
+          "say": "先听，我们要找把人叫起来的闹钟。"
+        },
+        {
+          "highlight": "#minute-first-clock"
+        },
+        {
+          "say": "带两个小铃的是闹钟，戴手腕上的是手表。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "按左右箭头，把小艇移到闹钟图下方。"
+        },
+        {
+          "say": "船头对准后点圆钮，泡泡就会向上飞。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "我只接一张。轮到你再从第一轮开始。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "word-alarm": "hear-the-picture-cue-3",
+        "word-watch": "hear-the-picture-cue-4",
+        "word-wait": "hear-the-picture-cue-6",
+        "word-sit": "hear-the-picture-cue-7",
+        "word-carry-back": "hear-the-picture-cue-9",
+        "word-point-back": "hear-the-picture-cue-10",
+        "word-carry-front": "hear-the-picture-cue-11",
+        "word-hint": "hear-the-picture-cue-13",
+        "word-help": "hear-the-picture-cue-14",
+        "word-praise": "hear-the-picture-cue-15"
+      }
+    },
+    {
+      "key": "write-yuan-che",
+      "type": "slide",
+      "title": "元和车的最后一笔",
+      "template": "picture-points",
+      "data": {
+        "title": "元和车的最后一笔",
+        "picture": "write-yuan-che-board",
+        "points": [
+          "元 · 四笔",
+          "车 · 四笔",
+          "纸上照一照"
+        ]
+      },
+      "script": [
+        {
+          "say": "用田字格写元元的元，也写公交的车。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先写短横和长横，再写撇，最后写竖弯钩。"
+        },
+        {
+          "say": "末笔先往下，再转向右，最后向上收钩。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "先写横，再写撇折，第三笔横，第四笔竖。"
+        },
+        {
+          "say": "这是单独的车字。长竖穿过下面的一横。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "比比元末尾的钩和车最后一笔。"
+        },
+        {
+          "say": "在纸上各写一格，请大人看方向和先后。"
+        }
+      ]
+    },
+    {
+      "key": "write-deng-zhan",
+      "type": "slide",
+      "title": "灯和站的两边怎么摆",
+      "template": "picture-points",
+      "data": {
+        "title": "灯和站的两边怎么摆",
+        "picture": "write-deng-zhan-board",
+        "points": [
+          "灯 · 左火右丁",
+          "站 · 左立右占",
+          "两边留空"
+        ]
+      },
+      "script": [
+        {
+          "say": "两个字都是左右摆。看每个部件占哪边。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "火先点、撇，再写撇和点。左边收一点。"
+        },
+        {
+          "say": "右边丁先横，再竖钩。钩向左上收。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "左边立是点、横、点、撇、提。"
+        },
+        {
+          "say": "右边先竖、横，再写口的竖、横折、横。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "灯的右边较简单，火和丁之间留缝。"
+        },
+        {
+          "say": "站左边收一些，右边的口写稳。让大人看。"
+        }
+      ]
+    },
+    {
+      "key": "write-zuo",
+      "type": "slide",
+      "title": "坐字的底下怎么收",
+      "template": "picture-points",
+      "data": {
+        "title": "坐字的底下怎么收",
+        "picture": "write-zuo-board",
+        "points": [
+          "先写两组",
+          "再写下面",
+          "纸上试写"
+        ]
+      },
+      "script": [
+        {
+          "say": "看坐字上面的两个人。它们怎样摆在格里？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先写左边的撇、点，再写右边的撇、点。"
+        },
+        {
+          "say": "两边写得小些，中间留一点位置。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "接着写横、竖、横。竖从中间穿过。"
+        },
+        {
+          "say": "最后的横伸向两边，托住上面两组小笔画。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "看准中间位置，再在纸上写一个。"
+        },
+        {
+          "say": "请家人看看最后一横有没有托住字。"
+        }
+      ]
+    },
+    {
+      "key": "write-lao-shi",
+      "type": "slide",
+      "title": "老和师开头怎么写",
+      "template": "picture-points",
+      "data": {
+        "title": "老和师开头怎么写",
+        "picture": "write-lao-shi-board",
+        "points": [
+          "老 · 六笔",
+          "师 · 六笔",
+          "写好给人看"
+        ]
+      },
+      "script": [
+        {
+          "say": "老师的老和师，先用手指跟着笔画走。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先横、竖、横、撇。第五笔还是撇。"
+        },
+        {
+          "say": "最后竖弯钩，转到右边再向上收。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "师先写竖、撇，第一笔是竖。"
+        },
+        {
+          "say": "右边横、竖、横折钩、竖。最后一竖在中间。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "认清老师两个字，再在纸上各写一格。"
+        },
+        {
+          "say": "请大人看老的第五撇和师起笔的一竖。"
+        }
+      ]
+    },
+    {
+      "key": "try-a-real-minute",
+      "type": "slide",
+      "title": "一分钟，自己试一试",
+      "template": "picture-points",
+      "data": {
+        "title": "一分钟，自己试一试",
+        "picture": "minute-experiment-board",
+        "points": [
+          "大人负责计时",
+          "用平常的速度",
+          "响了才数",
+          "说实测结果"
+        ]
+      },
+      "script": [
+        {
+          "say": "故事里时间会过去。我们也试试真实的一分钟。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "请大人把计时器设为一分钟。说开始后再动。"
+        },
+        {
+          "say": "选室内空地方走一走，或者坐下用纸笔写字。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "走路就用平常速度，一步一步走。"
+        },
+        {
+          "say": "写字就写刚学的字，按原来的笔顺写。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "时间到了，大人喊停。数数实际走了几步。"
+        },
+        {
+          "say": "如果写字，就数写好的有几个。结果可以不同。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "对大人说，我一分钟走了几步，或写了几个字。"
+        },
+        {
+          "say": "把自己这次的数告诉家人。请大人帮你核一下。"
+        }
+      ]
+    },
+    {
+      "key": "picture-quiz",
+      "type": "quiz",
+      "title": "听老师说，再选图",
+      "intro": [
+        "听完问题，再选一张符合意思的图。"
+      ],
+      "questions": [
+        {
+          "id": "cause-before-result",
+          "question": "按故事排卡。哪件事发生在出门以前？",
+          "skill": "story-cause",
+          "answer": [
+            "B"
+          ],
+          "analysis": "闹钟响后又拉起被子，还没出门。车站和教室都在出门以后。",
+          "options": {
+            "A": {
+              "label": "错过公交",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-1-a",
+                "alt": "孩子在车站看见公交开走"
+              }
+            },
+            "B": {
+              "label": "还想再睡",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-1-b",
+                "alt": "闹钟响了，孩子在床上拉起被子"
+              }
+            },
+            "C": {
+              "label": "走进教室",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-1-c",
+                "alt": "孩子背书包来到正在上课的教室门口"
+              }
+            }
+          }
+        },
+        {
+          "id": "listen-to-the-word",
+          "question": "把水壶背在背上。哪张图做对了？",
+          "skill": "read-and-write",
+          "answer": [
+            "A"
+          ],
+          "analysis": "用带子把水壶驮在身后，是背在背上。这个动作的背读第一声。",
+          "options": {
+            "A": {
+              "label": "背在身后",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-2-a",
+                "alt": "肩带系在孩子背上，水壶在身体后面"
+              }
+            },
+            "B": {
+              "label": "拿在胸前",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-2-b",
+                "alt": "双手把水壶放在胸前"
+              }
+            },
+            "C": {
+              "label": "搁在桌上",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-2-c",
+                "alt": "孩子用手把水壶放到桌面"
+              }
+            }
+          }
+        },
+        {
+          "id": "which-already",
+          "question": "听，已经到了。已经用哪张字卡里的字？",
+          "skill": "read-and-write",
+          "answer": [
+            "C"
+          ],
+          "analysis": "已经写已。己用于自己，巳的形状又不同。",
+          "options": {
+            "A": {
+              "label": "己",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-3-a",
+                "alt": "自己的己，左侧末笔起点较低"
+              }
+            },
+            "B": {
+              "label": "巳",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-3-b",
+                "alt": "巳字，左上端封口"
+              }
+            },
+            "C": {
+              "label": "已",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-3-c",
+                "alt": "已经的已，左侧末笔向上伸到中间"
+              }
+            }
+          }
+        },
+        {
+          "id": "fresh-if-then",
+          "question": "要是你提早坐好，演出刚开始时会看到哪幅图？",
+          "skill": "conditional-speech",
+          "answer": [
+            "B"
+          ],
+          "analysis": "手把布帘拉开，小兔纸偶刚露面，是开场。两只纸偶在表演是开场以后。单看合着的帘子，分不清是演出前还是演出后。",
+          "options": {
+            "A": {
+              "label": "正在演",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-4-a",
+                "alt": "两个纸偶在开着的舞台上，观众在看"
+              }
+            },
+            "B": {
+              "label": "刚开场",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-4-b",
+                "alt": "两只手正在往两边拉开布帘"
+              }
+            },
+            "C": {
+              "label": "帘子合着",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-4-c",
+                "alt": "合着的布帘前面是空椅子"
+              }
+            }
+          }
+        },
+        {
+          "id": "first-strokes",
+          "question": "写元时，两横和一撇写好了。接着写哪笔？",
+          "skill": "read-and-write",
+          "answer": [
+            "C"
+          ],
+          "analysis": "最后写竖弯钩，先竖，再向右弯，末尾向上收钩。",
+          "options": {
+            "A": {
+              "label": "撇",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-5-a",
+                "alt": "从右上方向左下撇"
+              }
+            },
+            "B": {
+              "label": "竖弯",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-5-b",
+                "alt": "先竖再向右圆转，末端平直"
+              }
+            },
+            "C": {
+              "label": "竖弯钩",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-5-c",
+                "alt": "先竖再向右圆转，末端往上钩"
+              }
+            }
+          }
+        },
+        {
+          "id": "one-minute-trial",
+          "question": "想知道一分钟能摆几张卡。哪种做法合适？",
+          "skill": "one-minute-observation",
+          "answer": [
+            "A"
+          ],
+          "analysis": "请大人设一分钟，自己用平常速度摆，听到停后数已经摆好的卡。",
+          "options": {
+            "A": {
+              "label": "计时后数",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-6-a",
+                "alt": "大人有一分钟计时器，孩子摆好的图卡平排在桌面"
+              }
+            },
+            "B": {
+              "label": "只猜一猜",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-6-b",
+                "alt": "孩子坐在桌边想，图卡还叠在一起"
+              }
+            },
+            "C": {
+              "label": "随时停下",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-6-c",
+                "alt": "两人没有计时器，散开的图卡没有摆成一排"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "try-it-at-home",
+      "type": "slide",
+      "title": "带一张闹钟贴纸回家",
+      "template": "picture-points",
+      "data": {
+        "title": "带一张闹钟贴纸回家",
+        "picture": "minute-sticker",
+        "points": [
+          "说清实际",
+          "说一种可能",
+          "量自己的时间"
+        ]
+      },
+      "script": [
+        {
+          "say": "闹钟贴纸送给你。带着今天的故事和家人聊聊。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "想想元元先等灯、又错过车，最后走进教室。"
+        },
+        {
+          "say": "回纸书读六段，逗号歇一下，听出他的着急。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "挑一处，用要是和就，说可能的经过。"
+        },
+        {
+          "say": "再想一件早上可以提前准备的事。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "请大人计时，再做一次安全的室内活动。"
+        },
+        {
+          "say": "数自己的实际结果，说给家人听。"
+        }
+      ]
+    }
+  ]
+}

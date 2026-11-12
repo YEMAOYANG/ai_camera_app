@@ -1,0 +1,1028 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "认识人民币｜认一认、换一换",
+  "description": "在班级阅读节认识元、角、分，分组数清零钱，再试等额兑换。",
+  "grade": 1,
+  "roster": {
+    "math": {
+      "name": "小数老师",
+      "role": "teacher",
+      "gender": "male",
+      "voice": "Ethan",
+      "avatar": "/teachers/ashu-math-v1.png",
+      "color": "#53726a",
+      "persona": "用简短清楚的口语带孩子按单位读、分组数、核对等额换法。"
+    }
+  },
+  "images": {
+    "reading-fair-cover": {
+      "file": "assets/reading-fair-cover.png"
+    },
+    "reading-fair-table": {
+      "file": "assets/reading-fair-table.png"
+    },
+    "reading-fair-booth": {
+      "file": "assets/reading-fair-booth.png"
+    },
+    "book-cart": {
+      "file": "assets/book-cart.png"
+    },
+    "book-cart-moving": {
+      "file": "assets/book-cart-moving.png"
+    },
+    "book-badge": {
+      "file": "assets/book-badge.png"
+    },
+    "glass-marble": {
+      "file": "assets/glass-marble.png"
+    },
+    "same-one-yuan": {
+      "file": "assets/same-one-yuan.png"
+    },
+    "yuan-paper-range": {
+      "file": "assets/yuan-paper-range.png"
+    },
+    "coin-range": {
+      "file": "assets/coin-range.png"
+    },
+    "unmixed-start": {
+      "file": "assets/unmixed-start.png"
+    },
+    "yuan-jiao-boxes": {
+      "file": "assets/yuan-jiao-boxes.png"
+    },
+    "left-fifteen": {
+      "file": "assets/left-fifteen.png"
+    },
+    "right-fifteen": {
+      "file": "assets/right-fifteen.png"
+    },
+    "one-yuan": {
+      "file": "assets/one-yuan.png"
+    },
+    "ten-jiao": {
+      "file": "assets/ten-jiao.png"
+    },
+    "ten-fen": {
+      "file": "assets/ten-fen.png"
+    },
+    "five-and-five-fen": {
+      "file": "assets/five-and-five-fen.png"
+    },
+    "family-recap": {
+      "file": "assets/family-recap.png"
+    },
+    "sort-ny1": {
+      "file": "assets/sort-ny1.png"
+    },
+    "sort-cy1": {
+      "file": "assets/sort-cy1.png"
+    },
+    "sort-cj1": {
+      "file": "assets/sort-cj1.png"
+    },
+    "sort-ny5": {
+      "file": "assets/sort-ny5.png"
+    },
+    "sort-cj5": {
+      "file": "assets/sort-cj5.png"
+    },
+    "sort-cf5": {
+      "file": "assets/sort-cf5.png"
+    },
+    "sort-nj1": {
+      "file": "assets/sort-nj1.png"
+    },
+    "sort-cf2": {
+      "file": "assets/sort-cf2.png"
+    },
+    "sort-ny20": {
+      "file": "assets/sort-ny20.png"
+    },
+    "sort-ny10": {
+      "file": "assets/sort-ny10.png"
+    },
+    "order-7-yuan": {
+      "file": "assets/order-7-yuan.png"
+    },
+    "order-13-yuan": {
+      "file": "assets/order-13-yuan.png"
+    },
+    "order-one-yuan": {
+      "file": "assets/order-one-yuan.png"
+    },
+    "order-one-jiao": {
+      "file": "assets/order-one-jiao.png"
+    },
+    "order-twenty-jiao": {
+      "file": "assets/order-twenty-jiao.png"
+    },
+    "order-thirty-fen": {
+      "file": "assets/order-thirty-fen.png"
+    },
+    "target-7-yuan": {
+      "file": "assets/target-7-yuan.png"
+    },
+    "target-13-yuan": {
+      "file": "assets/target-13-yuan.png"
+    },
+    "target-6-yuan": {
+      "file": "assets/target-6-yuan.png"
+    },
+    "target-ten-jiao": {
+      "file": "assets/target-ten-jiao.png"
+    },
+    "target-ten-fen": {
+      "file": "assets/target-ten-fen.png"
+    },
+    "target-nine-jiao": {
+      "file": "assets/target-nine-jiao.png"
+    },
+    "target-two-yuan": {
+      "file": "assets/target-two-yuan.png"
+    },
+    "target-three-jiao": {
+      "file": "assets/target-three-jiao.png"
+    },
+    "target-two-jiao": {
+      "file": "assets/target-two-jiao.png"
+    },
+    "target-three-yuan": {
+      "file": "assets/target-three-yuan.png"
+    },
+    "rmb-q1-prompt": {
+      "file": "assets/rmb-q1-prompt.png"
+    },
+    "rmb-q1-a": {
+      "file": "assets/rmb-q1-a.png"
+    },
+    "rmb-q1-b": {
+      "file": "assets/rmb-q1-b.png"
+    },
+    "rmb-q1-c": {
+      "file": "assets/rmb-q1-c.png"
+    },
+    "rmb-q2-prompt": {
+      "file": "assets/rmb-q2-prompt.png"
+    },
+    "rmb-q2-a": {
+      "file": "assets/rmb-q2-a.png"
+    },
+    "rmb-q2-b": {
+      "file": "assets/rmb-q2-b.png"
+    },
+    "rmb-q2-c": {
+      "file": "assets/rmb-q2-c.png"
+    },
+    "rmb-q3-prompt": {
+      "file": "assets/rmb-q3-prompt.png"
+    },
+    "rmb-q3-a": {
+      "file": "assets/rmb-q3-a.png"
+    },
+    "rmb-q3-b": {
+      "file": "assets/rmb-q3-b.png"
+    },
+    "rmb-q3-c": {
+      "file": "assets/rmb-q3-c.png"
+    },
+    "rmb-q4-prompt": {
+      "file": "assets/rmb-q4-prompt.png"
+    },
+    "rmb-q4-a": {
+      "file": "assets/rmb-q4-a.png"
+    },
+    "rmb-q4-b": {
+      "file": "assets/rmb-q4-b.png"
+    },
+    "rmb-q4-c": {
+      "file": "assets/rmb-q4-c.png"
+    },
+    "rmb-q5-prompt": {
+      "file": "assets/rmb-q5-prompt.png"
+    },
+    "rmb-q5-a": {
+      "file": "assets/rmb-q5-a.png"
+    },
+    "rmb-q5-b": {
+      "file": "assets/rmb-q5-b.png"
+    },
+    "rmb-q5-c": {
+      "file": "assets/rmb-q5-c.png"
+    },
+    "rmb-q6-prompt": {
+      "file": "assets/rmb-q6-prompt.png"
+    },
+    "rmb-q6-a": {
+      "file": "assets/rmb-q6-a.png"
+    },
+    "rmb-q6-b": {
+      "file": "assets/rmb-q6-b.png"
+    },
+    "rmb-q6-c": {
+      "file": "assets/rmb-q6-c.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "notes-and-coins",
+      "type": "slide",
+      "title": "纸币和硬币都能表示金额",
+      "template": "two-columns",
+      "data": {
+        "title": "纸币和硬币都能表示金额",
+        "left": {
+          "heading": "班级阅读节",
+          "body": "准备零钱"
+        },
+        "left_picture": "reading-fair-cover",
+        "right": {
+          "heading": "同样是一元",
+          "body": "1 元纸币　1 元硬币"
+        },
+        "right_picture": "same-one-yuan"
+      },
+      "script": [
+        {
+          "say": "班级阅读节要开场了。我们帮忙把零钱整理好。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "大家在准备阅读节。我们用钱牌教具表示纸币和硬币。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "右边这幅图，左格是一张一元纸币，右格是一枚一元硬币。"
+        },
+        {
+          "say": "纸币教具是长方形，硬币教具是圆形。我们说一张纸币、一枚硬币。"
+        },
+        {
+          "say": "一张和一枚的样子不同。它们都写着一元，表示的金额一样。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "钱上标出的金额叫面额。把数字和后面的单位一起读。"
+        },
+        {
+          "say": "人民币有纸币和硬币。下一页，我们一起读教具上的面额。"
+        }
+      ]
+    },
+    {
+      "key": "read-number-and-unit",
+      "type": "slide",
+      "title": "把数字和单位一起读",
+      "template": "two-columns",
+      "data": {
+        "title": "把数字和单位一起读",
+        "left": {
+          "heading": "看纸币教具",
+          "body": "数字和单位一起读"
+        },
+        "left_picture": "yuan-paper-range",
+        "right": {
+          "heading": "看硬币教具",
+          "body": "元　角　分"
+        },
+        "right_picture": "coin-range"
+      },
+      "script": [
+        {
+          "say": "有的钱牌数字一样。跟着单位读，才能知道是多少钱。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "左图上排三张纸币，依次是一百元、五十元、二十元。"
+        },
+        {
+          "say": "下排三张，依次是十元、五元、一元。数字后面都是元。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "五元这张还写了伍圆。伍是大写的五，这里圆表示元。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "右图上排是一元、五角、一角。下排是五分、二分、一分。"
+        },
+        {
+          "say": "找数字一。上排最左边是一元，上排最右边是一角。"
+        },
+        {
+          "say": "下排最右边是一分。同样是数字一，单位变了，面额也变了。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "元、角、分都是人民币的单位。纸币教具也可以写一角。"
+        },
+        {
+          "say": "把钱牌分类时，盯住数字旁边的单位，跟同单位的放一起。"
+        },
+        {
+          "say": "读每张钱牌的单位。把元送去元盒，把角送去角盒。"
+        },
+        {
+          "say": "这关的数字都是五。请分别找到元盒、角盒和分盒。"
+        },
+        {
+          "say": "两个托盘都收元。绕开挡板，把每张钱牌推到对应的盒子。"
+        },
+        {
+          "say": "请看看钱牌的单位，再看盒子的单位。"
+        },
+        {
+          "say": "绕到钱牌背后，把它向同单位的盒子推过去。"
+        },
+        {
+          "say": "整理好了。每张钱牌和它进的盒子，单位都相同。"
+        }
+      ]
+    },
+    {
+      "key": "sort-the-change",
+      "type": "interactive",
+      "title": "把钱牌送到同单位的盒子",
+      "page": "sort-the-change",
+      "startImage": "reading-fair-table",
+      "widgetType": "learning-arcade",
+      "gameAudio": {
+        "sort-first": "read-number-and-unit-14",
+        "sort-two": "read-number-and-unit-15",
+        "sort-three": "read-number-and-unit-16",
+        "sort-hint": "read-number-and-unit-17",
+        "sort-help": "read-number-and-unit-18",
+        "sort-praise": "read-number-and-unit-19"
+      },
+      "script": [
+        {
+          "say": "把零钱按元、角、分分好。小书车会从后面推钱牌。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#first-money-card"
+        },
+        {
+          "say": "这张钱牌写一元。我们要找标着元的盒子。"
+        },
+        {
+          "highlight": "#first-unit-tray"
+        },
+        {
+          "say": "右边盒子的样牌写十元。数字不同，后面的单位都是元。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "小车在牌的左边。按一次右箭头，钱牌就推进盒子。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "第一张已经进去。演示停在这里。另一枚写一角。"
+        },
+        {
+          "say": "轮到你从头来。先读单位，绕到背后，把它推向合适的盒子。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ]
+    },
+    {
+      "key": "count-in-separate-trays",
+      "type": "slide",
+      "title": "先把同单位放在一起",
+      "template": "two-columns",
+      "data": {
+        "title": "先把同单位放在一起",
+        "left": {
+          "heading": "散放的钱牌",
+          "body": "先找单位"
+        },
+        "left_picture": "unmixed-start",
+        "right": {
+          "heading": "元一盒，角一盒",
+          "body": "25 元 2 角"
+        },
+        "right_picture": "yuan-jiao-boxes"
+      },
+      "script": [
+        {
+          "say": "分好盒以后，合起来是多少钱呢？先看看原来的四个钱牌。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "有一张二十元、一张五元，还有两枚一角。我们按单位分开。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "右图左盒都是元。二十元加五元，是二十五元。"
+        },
+        {
+          "say": "右盒都是角。两枚一角加在一起，是二角。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "先读二十五元，再读二角。合起来读二十五元二角。"
+        },
+        {
+          "say": "把元的和元的相加，角的和角的相加。下次碰到分也单独数。"
+        }
+      ]
+    },
+    {
+      "key": "equal-amount-different-groups",
+      "type": "slide",
+      "title": "换一种组合，金额一样",
+      "template": "two-columns",
+      "data": {
+        "title": "换一种组合，金额一样",
+        "left": {
+          "heading": "左边这一组",
+          "body": "10 元＋5 元＝15 元"
+        },
+        "left_picture": "left-fifteen",
+        "right": {
+          "heading": "右边这一组",
+          "body": "5 元＋5 元＋5 元＝15 元"
+        },
+        "right_picture": "right-fifteen"
+      },
+      "script": [
+        {
+          "say": "零钱台想把左边的两张，换成右边的三张。要先看什么呢？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "先算左边。一张十元加一张五元，合起来是十五元。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "左边总额是十五元。记住这个数，再去算右边。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "右边每张是五元。两个五元是十元，再加五元是十五元。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "右边也是十五元。两边单位都是元，合计也一样，可以这样换。"
+        },
+        {
+          "say": "张数可以变。换完要比较两边各有多少钱。"
+        }
+      ]
+    },
+    {
+      "key": "exchange-yuan-and-jiao",
+      "type": "slide",
+      "title": "一元换成十角",
+      "template": "two-columns",
+      "data": {
+        "title": "一元换成十角",
+        "left": {
+          "heading": "拿一枚一元",
+          "body": "1 元"
+        },
+        "left_picture": "one-yuan",
+        "right": {
+          "heading": "数十枚一角",
+          "body": "1 元＝10 角"
+        },
+        "right_picture": "ten-jiao"
+      },
+      "script": [
+        {
+          "say": "这一回要换成另一种单位。一元能换多少角呢？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "左边只有一枚，单位是元。它的面额是一元。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "右边每枚都是一角。上排五枚，下排五枚。"
+        },
+        {
+          "say": "五角加五角是十角。数到十，才够换左边的一元。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "一元等于十角。金额一样，所以可以换来换去。"
+        },
+        {
+          "say": "反过来，把十枚一角合成十角，也能换回一枚一元。"
+        }
+      ]
+    },
+    {
+      "key": "exchange-jiao-and-fen",
+      "type": "slide",
+      "title": "一角能换十枚一分",
+      "template": "two-columns",
+      "data": {
+        "title": "一角能换十枚一分",
+        "left": {
+          "heading": "一角和十枚一分",
+          "body": "1 角＝10 分"
+        },
+        "left_picture": "ten-fen",
+        "right": {
+          "heading": "还能怎样凑十分钱",
+          "body": "5 分＋5 分＝10 分"
+        },
+        "right_picture": "five-and-five-fen"
+      },
+      "script": [
+        {
+          "say": "接着看角和分。拿一枚一角，能换几枚一分呢？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "左图左格是一角。右格上排五枚一分，下排五枚一分。"
+        },
+        {
+          "say": "每枚是一分，十枚就是十分。一角和十分的金额相等。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "一角等于十分。反过来，十分也能换回一角。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "右图上排左边是一枚五分，其余五枚各是一分。"
+        },
+        {
+          "say": "五枚一分加起来也是五分。两份合成十分，也可以换回一角。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "换的时候，先认清要用元、角还是分，再把金额数到一样多。"
+        },
+        {
+          "say": "请找一组总额七元的钱牌。选好靶再发射。"
+        },
+        {
+          "say": "这次请找一组总额十三元的钱牌。"
+        },
+        {
+          "say": "一元换成角。请找总额相等的角币。"
+        },
+        {
+          "say": "一角换成分。请找总额相等的分币。"
+        },
+        {
+          "say": "两组十枚一角，换回以元为单位的钱。"
+        },
+        {
+          "say": "三组十枚一分，换回以角为单位的钱。"
+        },
+        {
+          "say": "先重听要换成哪种单位，再数靶上的每张或每枚。"
+        },
+        {
+          "say": "比一比总金额。看准亮一点的靶，再按发射钮。"
+        },
+        {
+          "say": "找到了。图靶上的单位和总金额都合适。"
+        }
+      ]
+    },
+    {
+      "key": "aim-for-the-same-value",
+      "type": "interactive",
+      "title": "把弹珠送到等额的图靶",
+      "page": "aim-for-the-same-value",
+      "startImage": "reading-fair-booth",
+      "widgetType": "learning-arcade",
+      "gameAudio": {
+        "order-7-yuan": "exchange-jiao-and-fen-12",
+        "order-13-yuan": "exchange-jiao-and-fen-13",
+        "order-one-yuan": "exchange-jiao-and-fen-14",
+        "order-one-jiao": "exchange-jiao-and-fen-15",
+        "order-twenty-jiao": "exchange-jiao-and-fen-16",
+        "order-thirty-fen": "exchange-jiao-and-fen-17",
+        "exchange-hint": "exchange-jiao-and-fen-18",
+        "exchange-help": "exchange-jiao-and-fen-19",
+        "exchange-praise": "exchange-jiao-and-fen-20"
+      },
+      "script": [
+        {
+          "say": "听要换多少和换成哪种单位，再找图靶。先看老师做一次。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#exchange-order"
+        },
+        {
+          "say": "左图说要七元。看上方每组钱牌，把面额合起来。"
+        },
+        {
+          "highlight": "#first-exchange-target"
+        },
+        {
+          "say": "中间是一张五元和两枚一元，五加一再加一是七元。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "弹珠现在朝着中间。按发射钮，送到七元的靶。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "中了。这个靶留下一个小书标记，表示这一组换对了。"
+        },
+        {
+          "say": "接下来你从头来。先听金额，再用左右箭头瞄准，最后发射。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ]
+    },
+    {
+      "key": "picture-quiz-one",
+      "type": "quiz",
+      "title": "看单位，认金额",
+      "intro": [
+        "听清楚每张钱牌的面额，再选合适的图。",
+        "听得不清楚，可以点小喇叭再听一次。"
+      ],
+      "questions": [
+        {
+          "id": "rmb-q1",
+          "question": "三枚硬币里，哪一枚的单位是元？",
+          "skill": "读数字和单位认面额",
+          "answer": [
+            "B"
+          ],
+          "analysis": "五角的单位是角，二分的单位是分。只有一元这枚的单位是元。",
+          "visual": {
+            "kind": "asset",
+            "image": "rmb-q1-prompt",
+            "alt": "五角、一元、二分三枚硬币教具"
+          },
+          "options": {
+            "A": {
+              "label": "图卡1",
+              "visual": {
+                "kind": "asset",
+                "image": "rmb-q1-a",
+                "alt": "五角"
+              }
+            },
+            "B": {
+              "label": "图卡2",
+              "visual": {
+                "kind": "asset",
+                "image": "rmb-q1-b",
+                "alt": "一元"
+              }
+            },
+            "C": {
+              "label": "图卡3",
+              "visual": {
+                "kind": "asset",
+                "image": "rmb-q1-c",
+                "alt": "二分"
+              }
+            }
+          }
+        },
+        {
+          "id": "rmb-q2",
+          "question": "盒里有十元、一元、五角和一角。合起来是多少钱？",
+          "skill": "按元和角分别合计",
+          "answer": [
+            "C"
+          ],
+          "analysis": "十元加一元是十一元。五角加一角是六角。一共十一元六角。",
+          "visual": {
+            "kind": "asset",
+            "image": "rmb-q2-prompt",
+            "alt": "十元、一元、五角、一角"
+          },
+          "options": {
+            "A": {
+              "label": "图卡1",
+              "visual": {
+                "kind": "asset",
+                "image": "rmb-q2-a",
+                "alt": "十一元五角"
+              }
+            },
+            "B": {
+              "label": "图卡2",
+              "visual": {
+                "kind": "asset",
+                "image": "rmb-q2-b",
+                "alt": "十六元一角"
+              }
+            },
+            "C": {
+              "label": "图卡3",
+              "visual": {
+                "kind": "asset",
+                "image": "rmb-q2-c",
+                "alt": "十一元六角"
+              }
+            }
+          }
+        },
+        {
+          "id": "rmb-q3",
+          "question": "桌上有五角、二分和一分。哪张图是它们的合计？",
+          "skill": "按角和分分别合计",
+          "answer": [
+            "A"
+          ],
+          "analysis": "角这一组是五角。二分加一分是三分。合起来是五角三分。",
+          "visual": {
+            "kind": "asset",
+            "image": "rmb-q3-prompt",
+            "alt": "五角、二分、一分"
+          },
+          "options": {
+            "A": {
+              "label": "图卡1",
+              "visual": {
+                "kind": "asset",
+                "image": "rmb-q3-a",
+                "alt": "五角三分"
+              }
+            },
+            "B": {
+              "label": "图卡2",
+              "visual": {
+                "kind": "asset",
+                "image": "rmb-q3-b",
+                "alt": "三角五分"
+              }
+            },
+            "C": {
+              "label": "图卡3",
+              "visual": {
+                "kind": "asset",
+                "image": "rmb-q3-c",
+                "alt": "八分"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "picture-quiz-two",
+      "type": "quiz",
+      "title": "看两边是不是一样多",
+      "intro": [
+        "这次要换钱牌。先算清两边分别有多少钱。",
+        "听好要换成的单位，再来选图。"
+      ],
+      "questions": [
+        {
+          "id": "rmb-q4",
+          "question": "想把一张五十元换成零钱，哪组的金额相同？",
+          "skill": "核对同单位兑换总额",
+          "answer": [
+            "B"
+          ],
+          "analysis": "二十元加二十元再加十元是五十元。其余两组是四十五元和六十元。",
+          "visual": {
+            "kind": "asset",
+            "image": "rmb-q4-prompt",
+            "alt": "一张五十元纸币教具"
+          },
+          "options": {
+            "A": {
+              "label": "图卡1",
+              "visual": {
+                "kind": "asset",
+                "image": "rmb-q4-a",
+                "alt": "两张二十元和一张五元"
+              }
+            },
+            "B": {
+              "label": "图卡2",
+              "visual": {
+                "kind": "asset",
+                "image": "rmb-q4-b",
+                "alt": "两张二十元和一张十元"
+              }
+            },
+            "C": {
+              "label": "图卡3",
+              "visual": {
+                "kind": "asset",
+                "image": "rmb-q4-c",
+                "alt": "三张二十元"
+              }
+            }
+          }
+        },
+        {
+          "id": "rmb-q5",
+          "question": "两枚一元要换成角币。哪一盒的金额正好一样？",
+          "skill": "把元换成角",
+          "answer": [
+            "C"
+          ],
+          "analysis": "一元能换十角。两枚一元要两组十角，所以要二十角。",
+          "visual": {
+            "kind": "asset",
+            "image": "rmb-q5-prompt",
+            "alt": "两枚一元硬币教具"
+          },
+          "options": {
+            "A": {
+              "label": "图卡1",
+              "visual": {
+                "kind": "asset",
+                "image": "rmb-q5-a",
+                "alt": "两枚一角"
+              }
+            },
+            "B": {
+              "label": "图卡2",
+              "visual": {
+                "kind": "asset",
+                "image": "rmb-q5-b",
+                "alt": "十枚一角"
+              }
+            },
+            "C": {
+              "label": "图卡3",
+              "visual": {
+                "kind": "asset",
+                "image": "rmb-q5-c",
+                "alt": "两组十枚一角"
+              }
+            }
+          }
+        },
+        {
+          "id": "rmb-q6",
+          "question": "把两枚一角换成分币，哪组金额一样多？",
+          "skill": "把角换成分",
+          "answer": [
+            "A"
+          ],
+          "analysis": "一角等于十分，两角等于二十分。四枚五分合起来也是二十分。",
+          "visual": {
+            "kind": "asset",
+            "image": "rmb-q6-prompt",
+            "alt": "两枚一角硬币教具"
+          },
+          "options": {
+            "A": {
+              "label": "图卡1",
+              "visual": {
+                "kind": "asset",
+                "image": "rmb-q6-a",
+                "alt": "四枚五分"
+              }
+            },
+            "B": {
+              "label": "图卡2",
+              "visual": {
+                "kind": "asset",
+                "image": "rmb-q6-b",
+                "alt": "两枚五分"
+              }
+            },
+            "C": {
+              "label": "图卡3",
+              "visual": {
+                "kind": "asset",
+                "image": "rmb-q6-c",
+                "alt": "四枚一分"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "exchange-with-family",
+      "type": "slide",
+      "title": "在家试两种等额换法",
+      "template": "picture-points",
+      "data": {
+        "title": "在家试两种等额换法",
+        "picture": "family-recap",
+        "points": [
+          "读数字和单位",
+          "同单位合在一起",
+          "换完金额相等"
+        ]
+      },
+      "script": [
+        {
+          "say": "阅读节的零钱整理好了。你能说说怎样看钱牌吗？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "图里左边是一元，中间是十枚一角，右边是两枚五分。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "读数字时带上单位。右边两枚写五分，先记住单位是分。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "两个五分是十分。十个一角是十角。各数各的单位。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "十分可以换一角，十角可以换一元。两边的金额要相等。"
+        },
+        {
+          "say": "回家请家人拿出零钱或教具。一起指着数字和单位说面额。"
+        },
+        {
+          "say": "试两种金额一样的换法。说清楚两边怎样加，再请家人帮你查。"
+        }
+      ]
+    }
+  ]
+}

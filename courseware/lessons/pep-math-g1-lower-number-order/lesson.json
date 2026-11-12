@@ -1,0 +1,1158 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "数的顺序",
+  "grade": 1,
+  "description": "排好1到100的票号，分清换行，沿横、竖、斜格找规律，用两条路线补全局部。",
+  "roster": {
+    "teacher": {
+      "name": "小数老师",
+      "role": "teacher",
+      "gender": "male",
+      "voice": "Ethan",
+      "avatar": "/avatars/teacher-1.png",
+      "color": "#286956",
+      "persona": "请孩子指着百数表说清走法，再验证一条不同的路。"
+    }
+  },
+  "images": {
+    "build-first-two-rows": {
+      "file": "assets/build-first-two-rows.png"
+    },
+    "cross-proven-66": {
+      "file": "assets/cross-proven-66.png"
+    },
+    "cross-two-checks": {
+      "file": "assets/cross-two-checks.png"
+    },
+    "first-ticket-row": {
+      "file": "assets/first-ticket-row.png"
+    },
+    "full-hundred-chart": {
+      "file": "assets/full-hundred-chart.png"
+    },
+    "home-draw-your-own": {
+      "file": "assets/home-draw-your-own.png"
+    },
+    "hop-proof-17": {
+      "file": "assets/hop-proof-17.png"
+    },
+    "hop-proof-18": {
+      "file": "assets/hop-proof-18.png"
+    },
+    "hop-proof-19": {
+      "file": "assets/hop-proof-19.png"
+    },
+    "hop-proof-59": {
+      "file": "assets/hop-proof-59.png"
+    },
+    "hop-proof-60": {
+      "file": "assets/hop-proof-60.png"
+    },
+    "hop-proof-61": {
+      "file": "assets/hop-proof-61.png"
+    },
+    "hop-proof-84": {
+      "file": "assets/hop-proof-84.png"
+    },
+    "hop-proof-85": {
+      "file": "assets/hop-proof-85.png"
+    },
+    "hop-proof-86": {
+      "file": "assets/hop-proof-86.png"
+    },
+    "hop-proof-87": {
+      "file": "assets/hop-proof-87.png"
+    },
+    "hop-ready": {
+      "file": "assets/hop-ready.png"
+    },
+    "left-diagonal-65": {
+      "file": "assets/left-diagonal-65.png"
+    },
+    "partner-new-fragment": {
+      "file": "assets/partner-new-fragment.png"
+    },
+    "q-diagonal-stem": {
+      "file": "assets/q-diagonal-stem.png"
+    },
+    "q-fragment-stem": {
+      "file": "assets/q-fragment-stem.png"
+    },
+    "q-horizontal-gap": {
+      "file": "assets/q-horizontal-gap.png"
+    },
+    "q-tens-a": {
+      "file": "assets/q-tens-a.png"
+    },
+    "q-tens-b": {
+      "file": "assets/q-tens-b.png"
+    },
+    "q-tens-c": {
+      "file": "assets/q-tens-c.png"
+    },
+    "q-tens-stem": {
+      "file": "assets/q-tens-stem.png"
+    },
+    "q-ticket-11": {
+      "file": "assets/q-ticket-11.png"
+    },
+    "q-ticket-13": {
+      "file": "assets/q-ticket-13.png"
+    },
+    "q-ticket-15": {
+      "file": "assets/q-ticket-15.png"
+    },
+    "q-ticket-25": {
+      "file": "assets/q-ticket-25.png"
+    },
+    "q-ticket-27": {
+      "file": "assets/q-ticket-27.png"
+    },
+    "q-ticket-35": {
+      "file": "assets/q-ticket-35.png"
+    },
+    "q-ticket-39": {
+      "file": "assets/q-ticket-39.png"
+    },
+    "q-ticket-47": {
+      "file": "assets/q-ticket-47.png"
+    },
+    "q-ticket-48": {
+      "file": "assets/q-ticket-48.png"
+    },
+    "q-ticket-81": {
+      "file": "assets/q-ticket-81.png"
+    },
+    "q-ticket-82": {
+      "file": "assets/q-ticket-82.png"
+    },
+    "q-ticket-92": {
+      "file": "assets/q-ticket-92.png"
+    },
+    "q-vertical-gap": {
+      "file": "assets/q-vertical-gap.png"
+    },
+    "q-wrap-a": {
+      "file": "assets/q-wrap-a.png"
+    },
+    "q-wrap-b": {
+      "file": "assets/q-wrap-b.png"
+    },
+    "q-wrap-c": {
+      "file": "assets/q-wrap-c.png"
+    },
+    "q-wrap-stem": {
+      "file": "assets/q-wrap-stem.png"
+    },
+    "right-diagonal-65": {
+      "file": "assets/right-diagonal-65.png"
+    },
+    "row-62-to-64": {
+      "file": "assets/row-62-to-64.png"
+    },
+    "row-middle-gap": {
+      "file": "assets/row-middle-gap.png"
+    },
+    "rule-down": {
+      "file": "assets/rule-down.png"
+    },
+    "rule-left": {
+      "file": "assets/rule-left.png"
+    },
+    "rule-right": {
+      "file": "assets/rule-right.png"
+    },
+    "rule-up": {
+      "file": "assets/rule-up.png"
+    },
+    "same-column-27": {
+      "file": "assets/same-column-27.png"
+    },
+    "same-column-zero": {
+      "file": "assets/same-column-zero.png"
+    },
+    "skip-a-ticket": {
+      "file": "assets/skip-a-ticket.png"
+    },
+    "three-digit-marks": {
+      "file": "assets/three-digit-marks.png"
+    },
+    "ticket-15": {
+      "file": "assets/ticket-15.png"
+    },
+    "ticket-16": {
+      "file": "assets/ticket-16.png"
+    },
+    "ticket-17": {
+      "file": "assets/ticket-17.png"
+    },
+    "ticket-18": {
+      "file": "assets/ticket-18.png"
+    },
+    "ticket-19": {
+      "file": "assets/ticket-19.png"
+    },
+    "ticket-20": {
+      "file": "assets/ticket-20.png"
+    },
+    "ticket-24": {
+      "file": "assets/ticket-24.png"
+    },
+    "ticket-26": {
+      "file": "assets/ticket-26.png"
+    },
+    "ticket-32": {
+      "file": "assets/ticket-32.png"
+    },
+    "ticket-34": {
+      "file": "assets/ticket-34.png"
+    },
+    "ticket-42": {
+      "file": "assets/ticket-42.png"
+    },
+    "ticket-46": {
+      "file": "assets/ticket-46.png"
+    },
+    "ticket-53": {
+      "file": "assets/ticket-53.png"
+    },
+    "ticket-56": {
+      "file": "assets/ticket-56.png"
+    },
+    "ticket-57": {
+      "file": "assets/ticket-57.png"
+    },
+    "ticket-58": {
+      "file": "assets/ticket-58.png"
+    },
+    "ticket-59": {
+      "file": "assets/ticket-59.png"
+    },
+    "ticket-60": {
+      "file": "assets/ticket-60.png"
+    },
+    "ticket-61": {
+      "file": "assets/ticket-61.png"
+    },
+    "ticket-62": {
+      "file": "assets/ticket-62.png"
+    },
+    "ticket-63": {
+      "file": "assets/ticket-63.png"
+    },
+    "ticket-67": {
+      "file": "assets/ticket-67.png"
+    },
+    "ticket-68": {
+      "file": "assets/ticket-68.png"
+    },
+    "ticket-78": {
+      "file": "assets/ticket-78.png"
+    },
+    "ticket-83": {
+      "file": "assets/ticket-83.png"
+    },
+    "ticket-84": {
+      "file": "assets/ticket-84.png"
+    },
+    "ticket-85": {
+      "file": "assets/ticket-85.png"
+    },
+    "ticket-86": {
+      "file": "assets/ticket-86.png"
+    },
+    "ticket-87": {
+      "file": "assets/ticket-87.png"
+    },
+    "ticket-88": {
+      "file": "assets/ticket-88.png"
+    },
+    "ticket-89": {
+      "file": "assets/ticket-89.png"
+    },
+    "tile-proof-34": {
+      "file": "assets/tile-proof-34.png"
+    },
+    "tile-proof-42": {
+      "file": "assets/tile-proof-42.png"
+    },
+    "tile-proof-53": {
+      "file": "assets/tile-proof-53.png"
+    },
+    "tile-proof-56": {
+      "file": "assets/tile-proof-56.png"
+    },
+    "tile-proof-67": {
+      "file": "assets/tile-proof-67.png"
+    },
+    "tile-proof-68": {
+      "file": "assets/tile-proof-68.png"
+    },
+    "tiles-ready": {
+      "file": "assets/tiles-ready.png"
+    },
+    "wrap-whole-rows": {
+      "file": "assets/wrap-whole-rows.png"
+    },
+    "zoom-four-pattern": {
+      "file": "assets/zoom-four-pattern.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "rack-of-hundred-tickets",
+      "type": "slide",
+      "title": "把展馆票号放回去",
+      "template": "two-columns",
+      "data": {
+        "title": "把展馆票号放回去",
+        "left": {
+          "heading": "风吹落了几张票",
+          "body": "十格一层，有的格子还空着。"
+        },
+        "left_picture": "first-ticket-row",
+        "right": {
+          "heading": "从第一格排起",
+          "body": "每层从左往右放十张。"
+        },
+        "right_picture": "build-first-two-rows"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "小展馆的门票被风吹乱了。我们来把票放回架上。"
+        },
+        {
+          "say": "最上层第一格放一号。指着一号往右接着数。"
+        },
+        {
+          "say": "一后面是二。接着三、四、五，数字一个接一个。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "一层刚好十格。第一层从一号排到十号。"
+        },
+        {
+          "say": "第一层满了，十一号从下面一层的左边开始。"
+        },
+        {
+          "say": "接着从十一数到二十。请你指着格子数一遍。"
+        }
+      ]
+    },
+    {
+      "key": "right-one-per-slot",
+      "type": "slide",
+      "title": "同一行，往右多一",
+      "template": "two-columns",
+      "data": {
+        "title": "同一行，往右多一",
+        "left": {
+          "heading": "从六十二出发",
+          "body": "向右一格，六十三。"
+        },
+        "left_picture": "row-62-to-64",
+        "right": {
+          "heading": "空票夹该放哪张",
+          "body": "左右的票都能帮忙核对。"
+        },
+        "right_picture": "row-middle-gap"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "来看这条架子。指着六十二，向右挪一格。"
+        },
+        {
+          "say": "沿红箭头到六十三。六十三比六十二多一。"
+        },
+        {
+          "say": "如果向左走一格，就回到六十二，少一。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "中间空着。左边六十二，右边六十四。"
+        },
+        {
+          "say": "从六十二往右数一个，是六十三。"
+        },
+        {
+          "say": "从六十四倒数一个，也是六十三。两边都对上。"
+        }
+      ]
+    },
+    {
+      "key": "next-row-start",
+      "type": "slide",
+      "title": "从一行末尾到下一行开头",
+      "template": "two-columns",
+      "data": {
+        "title": "从一行末尾到下一行开头",
+        "left": {
+          "heading": "完整的百数表",
+          "body": "十行，每行十格。最后一格是100。"
+        },
+        "left_picture": "full-hundred-chart",
+        "right": {
+          "heading": "换行的位置",
+          "body": "49、50、51紧接着数。"
+        },
+        "right_picture": "wrap-whole-rows"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "十层都放好了。每层十格，一共一百格。"
+        },
+        {
+          "say": "最上面从一开始，最后停在右下角的一百。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "数到四十九，再向右走一格，到五十。"
+        },
+        {
+          "say": "这层没有空位了。五十一回到下一层最左边。"
+        },
+        {
+          "say": "五十和五十一数起来紧挨着，格子却不挨着。"
+        },
+        {
+          "say": "倒数也一样。从五十一退到上一层末尾的五十。"
+        },
+        {
+          "say": "记住换行的位置，再来玩一段票号路。"
+        },
+        {
+          "say": "箭头向右。从十六往后，每次多一。"
+        },
+        {
+          "say": "从五十八往后数。遇到整十，也只多一。"
+        },
+        {
+          "say": "箭头向左。从八十八倒着数，每次少一。"
+        },
+        {
+          "say": "看这关的箭头，再从刚才的票号数。"
+        },
+        {
+          "say": "用手指着站稳的数，想紧接的一张。"
+        },
+        {
+          "say": "这一段票号的顺序都对上了。"
+        }
+      ]
+    },
+    {
+      "key": "counting-platforms",
+      "type": "interactive",
+      "title": "沿票号跳",
+      "widgetType": "courseware_game",
+      "page": "counting-platforms",
+      "startImage": "hop-ready",
+      "script": [
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#counting-direction"
+        },
+        {
+          "say": "箭头向右，这一关每次向后数一个。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "现在站在十六号台。要找紧挨着的下一张。"
+        },
+        {
+          "highlight": "#game-target"
+        },
+        {
+          "say": "下一张是十七号。看清台子再跳。"
+        },
+        {
+          "highlight": "#ticket-jump"
+        },
+        {
+          "say": "按住右箭头，同时点跳跃键。老师先跳一次。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "highlight": "#counting-result"
+        },
+        {
+          "say": "脚落在十七号。右边留下了十六到十七的图。"
+        },
+        {
+          "say": "交给你。重新从十六开始，只跳紧接着的票号。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "hop-forward": "next-row-start-9",
+        "hop-wrap": "next-row-start-10",
+        "hop-backward": "next-row-start-11",
+        "hop-hint": "next-row-start-12",
+        "hop-help": "next-row-start-13",
+        "hop-praise": "next-row-start-14"
+      }
+    },
+    {
+      "key": "down-by-one-row",
+      "type": "slide",
+      "title": "同一列，往下多十",
+      "template": "two-columns",
+      "data": {
+        "title": "同一列，往下多十",
+        "left": {
+          "heading": "27下面是37",
+          "body": "下楼一层，就多十。"
+        },
+        "left_picture": "same-column-27",
+        "right": {
+          "heading": "最右一列的个位",
+          "body": "70、80、90、100的个位都是0。"
+        },
+        "right_picture": "same-column-zero"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "换一种走法。指着二十七，正下方是哪格？"
+        },
+        {
+          "say": "下一层同一个位置是三十七。多了一整层的十张。"
+        },
+        {
+          "say": "再下去是四十七。个位一直是七。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "到最右一列看看。七十下面是八十。"
+        },
+        {
+          "say": "再到九十，再到一百。每次也多十。"
+        },
+        {
+          "say": "它们的个位都是零。往上一格就少十。"
+        }
+      ]
+    },
+    {
+      "key": "mark-a-digit-pattern",
+      "type": "slide",
+      "title": "给不同的数位做记号",
+      "template": "two-columns",
+      "data": {
+        "title": "给不同的数位做记号",
+        "left": {
+          "heading": "三种记号可以叠加",
+          "body": "短横、圆点和三角各记一种发现。"
+        },
+        "left_picture": "three-digit-marks",
+        "right": {
+          "heading": "看40和44的格子",
+          "body": "40在上一行末格，44可以有三种记号。"
+        },
+        "right_picture": "zoom-four-pattern"
+      },
+      "script": [
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "十位是四，给票号画短横。先找四十。"
+        },
+        {
+          "say": "四十在这一层最后。四十一到四十九在下一层。"
+        },
+        {
+          "say": "个位是四，用圆点记。四、十四、二十四排成一列。"
+        },
+        {
+          "say": "两位数的两个数字相同，用三角记。四十四也有。"
+        },
+        {
+          "say": "四十四能留下三个记号。说说每个记号记什么。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "第一行的一到九，只写个位。它们都是一位数。"
+        },
+        {
+          "say": "一百有三位。它末尾两个零，不算两位数的双号。"
+        }
+      ]
+    },
+    {
+      "key": "two-ways-down-diagonally",
+      "type": "slide",
+      "title": "斜着走，先拆成两步",
+      "template": "two-columns",
+      "data": {
+        "title": "斜着走，先拆成两步",
+        "left": {
+          "heading": "向下再向左",
+          "body": "65先到75，再到74。"
+        },
+        "left_picture": "left-diagonal-65",
+        "right": {
+          "heading": "向下再向右",
+          "body": "65先到75，再到76。"
+        },
+        "right_picture": "right-diagonal-65"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "从六十五斜着去左下格，可以拆成两步。"
+        },
+        {
+          "say": "先向下到七十五，多十；再向左到七十四，少一。"
+        },
+        {
+          "say": "算起来多九。你可以从七十四往回走来核对。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "去右下格也先到七十五。然后往右到七十六。"
+        },
+        {
+          "say": "多十，再多一。两步一共多十一。"
+        },
+        {
+          "say": "已经在最左边，就没有左下斜格。右边也一样。"
+        },
+        {
+          "say": "到底下一行不存在时，别把斜线接到表外。"
+        },
+        {
+          "say": "箭头朝下。落下的票要比底部配对票多十。"
+        },
+        {
+          "say": "箭头朝上。落下的票要比底部配对票少十。"
+        },
+        {
+          "say": "仍往上找。个位相同，还要正好少十。"
+        },
+        {
+          "say": "箭头又朝下。找正好多十的同列邻号。"
+        },
+        {
+          "say": "继续往下找。只配同列紧挨着的一格。"
+        },
+        {
+          "say": "先看这关的箭头朝上还是朝下。"
+        },
+        {
+          "say": "核对个位，再想移动一层会差多少。"
+        },
+        {
+          "say": "找到同一竖列上真正相邻的票号了。"
+        }
+      ]
+    },
+    {
+      "key": "match-the-next-floor",
+      "type": "interactive",
+      "title": "落牌找竖邻",
+      "widgetType": "courseware_game",
+      "page": "match-the-next-floor",
+      "startImage": "tiles-ready",
+      "script": [
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#floor-direction"
+        },
+        {
+          "say": "这次箭头朝下。在百数表同一列里，下楼多十。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "落下来的票是三十四。找它在表里正上方的邻号。"
+        },
+        {
+          "highlight": "#first-neighbor-ticket"
+        },
+        {
+          "say": "二十四往下多十，正好到三十四。"
+        },
+        {
+          "highlight": "#drop-ticket"
+        },
+        {
+          "say": "把落牌放到二十四旁边的空格，按快落键。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "highlight": "#floor-match-proof"
+        },
+        {
+          "say": "配好了。左边出现这两张票在百数表里的位置。"
+        },
+        {
+          "say": "换你选。看箭头，先在心里找竖列的邻号。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "tile-down": "two-ways-down-diagonally-9",
+        "tile-up": "two-ways-down-diagonally-10",
+        "tile-up-more": "two-ways-down-diagonally-11",
+        "tile-down-again": "two-ways-down-diagonally-12",
+        "tile-keep-down": "two-ways-down-diagonally-13",
+        "tile-hint": "two-ways-down-diagonally-14",
+        "tile-help": "two-ways-down-diagonally-15",
+        "tile-praise": "two-ways-down-diagonally-16"
+      }
+    },
+    {
+      "key": "rebuild-a-chart-fragment",
+      "type": "slide",
+      "title": "空格可以用两条路核对",
+      "template": "two-columns",
+      "data": {
+        "title": "空格可以用两条路核对",
+        "left": {
+          "heading": "一小块票架",
+          "body": "55在左上，要找右下格。"
+        },
+        "left_picture": "cross-two-checks",
+        "right": {
+          "heading": "把两条路线接起来",
+          "body": "两条路线都到66。"
+        },
+        "right_picture": "cross-proven-66"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "从整张表剪下一小块。现在要找右下角的票。"
+        },
+        {
+          "say": "看左上角五十五。你可以先横着走，也可以先竖着走。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "先右到五十六，多一。再下到六十六，多十。"
+        },
+        {
+          "say": "换一路。先下到六十五，多十。再右到六十六。"
+        },
+        {
+          "say": "两条路到了同一格，都算到六十六。"
+        },
+        {
+          "say": "只有表里真的有这两条路时，才这样核对。"
+        }
+      ]
+    },
+    {
+      "key": "take-turns-making-fragments",
+      "type": "slide",
+      "title": "给同桌做一块新票架",
+      "template": "two-columns",
+      "data": {
+        "title": "给同桌做一块新票架",
+        "left": {
+          "heading": "遮一小片",
+          "body": "围着已知的格留三到五格。"
+        },
+        "left_picture": "partner-new-fragment",
+        "right": {
+          "heading": "隔一格作个记号",
+          "body": "看21、23、25、27。"
+        },
+        "right_picture": "skip-a-ticket"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "这次换一块新的。看看七十七左边缺哪张。"
+        },
+        {
+          "say": "沿同一行退一个，是七十六。还能从上往下找。"
+        },
+        {
+          "say": "八十七左边是八十六。七十六下边也是八十六。"
+        },
+        {
+          "say": "你也挑几个真的相邻格，请伙伴来补。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "再试试隔一格做个记号。二十一、二十三。"
+        },
+        {
+          "say": "接下去二十五、二十七。标记每次跳过一个数。"
+        },
+        {
+          "say": "先一格一格数，再说你看到的票号队伍。"
+        }
+      ]
+    },
+    {
+      "key": "picture-quiz",
+      "type": "quiz",
+      "title": "给六张图补对票号",
+      "intro": [
+        "听清要走的方向。",
+        "找到图里已经知道的号码，再选。"
+      ],
+      "questions": [
+        {
+          "id": "find-the-horizontal-gap",
+          "question": "十二和十四之间，空格放哪张票？",
+          "skill": "同一行向右多1",
+          "visual": {
+            "kind": "asset",
+            "image": "q-horizontal-gap",
+            "alt": "十二右边空一格，再往右是十四"
+          },
+          "answer": [
+            "c"
+          ],
+          "analysis": "十二往右一格多一，是十三。十四往左一格少一，也得到十三。",
+          "options": {
+            "a": {
+              "label": "十五号",
+              "visual": {
+                "kind": "asset",
+                "image": "q-ticket-15",
+                "alt": "十五号"
+              }
+            },
+            "b": {
+              "label": "十一号",
+              "visual": {
+                "kind": "asset",
+                "image": "q-ticket-11",
+                "alt": "十一号"
+              }
+            },
+            "c": {
+              "label": "十三号",
+              "visual": {
+                "kind": "asset",
+                "image": "q-ticket-13",
+                "alt": "十三号"
+              }
+            }
+          }
+        },
+        {
+          "id": "fill-the-next-shelf",
+          "question": "同一竖列，三十八下方放哪张？",
+          "skill": "同一列向下多10",
+          "visual": {
+            "kind": "asset",
+            "image": "q-vertical-gap",
+            "alt": "同一竖列二十八、三十八，再向下是空格"
+          },
+          "answer": [
+            "a"
+          ],
+          "analysis": "同一竖列往下多十，三十八再多十是四十八。个位还是八。",
+          "options": {
+            "a": {
+              "label": "四十八号",
+              "visual": {
+                "kind": "asset",
+                "image": "q-ticket-48",
+                "alt": "四十八号"
+              }
+            },
+            "b": {
+              "label": "三十九号",
+              "visual": {
+                "kind": "asset",
+                "image": "q-ticket-39",
+                "alt": "三十九号"
+              }
+            },
+            "c": {
+              "label": "四十七号",
+              "visual": {
+                "kind": "asset",
+                "image": "q-ticket-47",
+                "alt": "四十七号"
+              }
+            }
+          }
+        },
+        {
+          "id": "continue-at-row-start",
+          "question": "这一行排到三十。下一张放在哪里？",
+          "skill": "数序跨行",
+          "visual": {
+            "kind": "asset",
+            "image": "q-wrap-stem",
+            "alt": "三十排在上一行最右边，下一行全空"
+          },
+          "answer": [
+            "b"
+          ],
+          "analysis": "三十往后数一个是三十一。上一行满了，三十一应该放在下一行的第一格。",
+          "options": {
+            "a": {
+              "label": "三十二放下行第二格",
+              "visual": {
+                "kind": "asset",
+                "image": "q-wrap-a",
+                "alt": "三十二放下行第二格"
+              }
+            },
+            "b": {
+              "label": "三十一放下行第一格",
+              "visual": {
+                "kind": "asset",
+                "image": "q-wrap-b",
+                "alt": "三十一放下行第一格"
+              }
+            },
+            "c": {
+              "label": "四十放下行最后一格",
+              "visual": {
+                "kind": "asset",
+                "image": "q-wrap-c",
+                "alt": "四十放下行最后一格"
+              }
+            }
+          }
+        },
+        {
+          "id": "spot-the-nine-in-tens",
+          "question": "哪张图标对了十位是九的号？",
+          "skill": "十位相同含整十位置",
+          "visual": {
+            "kind": "asset",
+            "image": "q-tens-stem",
+            "alt": "百数表八十一到一百的最后两行"
+          },
+          "answer": [
+            "c"
+          ],
+          "analysis": "九十在上一行的末格，九十一到九十九在下一行的前九格。一百的十位是零，不选。",
+          "options": {
+            "a": {
+              "label": "九十一到一百都画线",
+              "visual": {
+                "kind": "asset",
+                "image": "q-tens-a",
+                "alt": "九十一到一百都画线"
+              }
+            },
+            "b": {
+              "label": "八十一到九十都画线",
+              "visual": {
+                "kind": "asset",
+                "image": "q-tens-b",
+                "alt": "八十一到九十都画线"
+              }
+            },
+            "c": {
+              "label": "九十到九十九都画线",
+              "visual": {
+                "kind": "asset",
+                "image": "q-tens-c",
+                "alt": "九十到九十九都画线"
+              }
+            }
+          }
+        },
+        {
+          "id": "diagonal-left-down",
+          "question": "从七十三先往下，再往左，停在哪？",
+          "skill": "斜向下左格差9",
+          "visual": {
+            "kind": "asset",
+            "image": "q-diagonal-stem",
+            "alt": "从七十三所在格向下再向左的箭头"
+          },
+          "answer": [
+            "b"
+          ],
+          "analysis": "从七十三向下多十，到八十三。再向左少一，到八十二。",
+          "options": {
+            "a": {
+              "label": "八十一号",
+              "visual": {
+                "kind": "asset",
+                "image": "q-ticket-81",
+                "alt": "八十一号"
+              }
+            },
+            "b": {
+              "label": "八十二号",
+              "visual": {
+                "kind": "asset",
+                "image": "q-ticket-82",
+                "alt": "八十二号"
+              }
+            },
+            "c": {
+              "label": "九十二号",
+              "visual": {
+                "kind": "asset",
+                "image": "q-ticket-92",
+                "alt": "九十二号"
+              }
+            }
+          }
+        },
+        {
+          "id": "check-the-ticket-cross",
+          "question": "空格上面是十五，右边二十六。填几？",
+          "skill": "局部表双向核对",
+          "visual": {
+            "kind": "asset",
+            "image": "q-fragment-stem",
+            "alt": "空格上面十五、右边二十六"
+          },
+          "answer": [
+            "a"
+          ],
+          "analysis": "十五向下多十是二十五。二十六往左少一，也是二十五。两条路都能核对。",
+          "options": {
+            "a": {
+              "label": "二十五号",
+              "visual": {
+                "kind": "asset",
+                "image": "q-ticket-25",
+                "alt": "二十五号"
+              }
+            },
+            "b": {
+              "label": "三十五号",
+              "visual": {
+                "kind": "asset",
+                "image": "q-ticket-35",
+                "alt": "三十五号"
+              }
+            },
+            "c": {
+              "label": "二十七号",
+              "visual": {
+                "kind": "asset",
+                "image": "q-ticket-27",
+                "alt": "二十七号"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "explain-the-number-routes",
+      "type": "slide",
+      "title": "把你发现的路线讲给家人",
+      "template": "two-columns",
+      "data": {
+        "title": "把你发现的路线讲给家人",
+        "left": {
+          "heading": "回到完整票架",
+          "body": "横着、竖着、换行，走法不同。"
+        },
+        "left_picture": "full-hundred-chart",
+        "right": {
+          "heading": "给家人留空格",
+          "body": "画几格，留几张票号让家人猜。"
+        },
+        "right_picture": "home-draw-your-own"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "展馆的票号都放回来了。你能指着表说一条规律吗？"
+        },
+        {
+          "say": "一行里往右多一。走到行尾，下一张回到下一行左边。"
+        },
+        {
+          "say": "同一列向下多十。斜格要在表里，才能拆成两步。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "和家人画一小块票架，圈出三到五个相邻格。"
+        },
+        {
+          "say": "只写一两张已知票，再请对方补空格。"
+        },
+        {
+          "say": "你们可以各找一条路核对，也可以交换出题。"
+        },
+        {
+          "say": "把格子留在纸上。下次指着路线说你怎么找到的。"
+        }
+      ]
+    }
+  ]
+}

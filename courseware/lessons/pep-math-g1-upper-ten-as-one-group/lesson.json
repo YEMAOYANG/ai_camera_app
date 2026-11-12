@@ -1,0 +1,1002 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "10的再认识",
+  "description": "把十根小棒捆成一个十，学会在计数器上换位，用一和零读写十。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小数老师",
+      "role": "teacher",
+      "gender": "male",
+      "voice": "Ethan",
+      "avatar": "/teachers/ashu-math-v1.png",
+      "color": "#437763",
+      "persona": "让孩子逐件核数，再把实物、数位和数字连起来。"
+    }
+  },
+  "images": {
+    "packing-cover": {
+      "file": "assets/packing-cover.png"
+    },
+    "count-before": {
+      "file": "assets/count-before.png"
+    },
+    "count-after": {
+      "file": "assets/count-after.png"
+    },
+    "class-loose-ten": {
+      "file": "assets/class-loose-ten.png"
+    },
+    "class-bundle-ten": {
+      "file": "assets/class-bundle-ten.png"
+    },
+    "exchange-board": {
+      "file": "assets/exchange-board.png"
+    },
+    "position-pair": {
+      "file": "assets/position-pair.png"
+    },
+    "digits-board": {
+      "file": "assets/digits-board.png"
+    },
+    "q-stamp-packet": {
+      "file": "assets/q-stamp-packet.png"
+    },
+    "q-stamp-packet-a": {
+      "file": "assets/q-stamp-packet-a.png"
+    },
+    "q-stamp-packet-b": {
+      "file": "assets/q-stamp-packet-b.png"
+    },
+    "q-stamp-packet-c": {
+      "file": "assets/q-stamp-packet-c.png"
+    },
+    "q-seven-loose": {
+      "file": "assets/q-seven-loose.png"
+    },
+    "q-seven-loose-a": {
+      "file": "assets/q-seven-loose-a.png"
+    },
+    "q-seven-loose-b": {
+      "file": "assets/q-seven-loose-b.png"
+    },
+    "q-seven-loose-c": {
+      "file": "assets/q-seven-loose-c.png"
+    },
+    "q-ten-bead-trade": {
+      "file": "assets/q-ten-bead-trade.png"
+    },
+    "q-ten-bead-trade-a": {
+      "file": "assets/q-ten-bead-trade-a.png"
+    },
+    "q-ten-bead-trade-b": {
+      "file": "assets/q-ten-bead-trade-b.png"
+    },
+    "q-ten-bead-trade-c": {
+      "file": "assets/q-ten-bead-trade-c.png"
+    },
+    "q-one-on-the-right": {
+      "file": "assets/q-one-on-the-right.png"
+    },
+    "q-one-on-the-right-a": {
+      "file": "assets/q-one-on-the-right-a.png"
+    },
+    "q-one-on-the-right-b": {
+      "file": "assets/q-one-on-the-right-b.png"
+    },
+    "q-one-on-the-right-c": {
+      "file": "assets/q-one-on-the-right-c.png"
+    },
+    "q-keep-the-place": {
+      "file": "assets/q-keep-the-place.png"
+    },
+    "q-keep-the-place-a": {
+      "file": "assets/q-keep-the-place-a.png"
+    },
+    "q-keep-the-place-b": {
+      "file": "assets/q-keep-the-place-b.png"
+    },
+    "q-keep-the-place-c": {
+      "file": "assets/q-keep-the-place-c.png"
+    },
+    "q-two-known-digits": {
+      "file": "assets/q-two-known-digits.png"
+    },
+    "q-two-known-digits-a": {
+      "file": "assets/q-two-known-digits-a.png"
+    },
+    "q-two-known-digits-b": {
+      "file": "assets/q-two-known-digits-b.png"
+    },
+    "q-two-known-digits-c": {
+      "file": "assets/q-two-known-digits-c.png"
+    },
+    "marble-workshop": {
+      "file": "assets/marble-workshop.png"
+    },
+    "garden": {
+      "file": "assets/garden.png"
+    },
+    "sticker": {
+      "file": "assets/sticker.png"
+    },
+    "marble": {
+      "file": "assets/marble.png"
+    },
+    "rover": {
+      "file": "assets/rover.png"
+    },
+    "rover-pop": {
+      "file": "assets/rover-pop.png"
+    },
+    "glider": {
+      "file": "assets/glider.png"
+    },
+    "stick-loose-ten": {
+      "file": "assets/stick-loose-ten.png"
+    },
+    "stick-loose-nine": {
+      "file": "assets/stick-loose-nine.png"
+    },
+    "stick-loose-one": {
+      "file": "assets/stick-loose-one.png"
+    },
+    "stick-loose-two": {
+      "file": "assets/stick-loose-two.png"
+    },
+    "stick-loose-three": {
+      "file": "assets/stick-loose-three.png"
+    },
+    "stick-loose-four": {
+      "file": "assets/stick-loose-four.png"
+    },
+    "stick-loose-five": {
+      "file": "assets/stick-loose-five.png"
+    },
+    "stick-bundle": {
+      "file": "assets/stick-bundle.png"
+    },
+    "stick-bundle-one": {
+      "file": "assets/stick-bundle-one.png"
+    },
+    "stick-bundle-two": {
+      "file": "assets/stick-bundle-two.png"
+    },
+    "stick-bundle-three": {
+      "file": "assets/stick-bundle-three.png"
+    },
+    "stick-bundle-five": {
+      "file": "assets/stick-bundle-five.png"
+    },
+    "stick-bundle-six": {
+      "file": "assets/stick-bundle-six.png"
+    },
+    "ab-ten": {
+      "file": "assets/ab-ten.png"
+    },
+    "ab-one": {
+      "file": "assets/ab-one.png"
+    },
+    "ab-two": {
+      "file": "assets/ab-two.png"
+    },
+    "ab-three": {
+      "file": "assets/ab-three.png"
+    },
+    "ab-four": {
+      "file": "assets/ab-four.png"
+    },
+    "ab-five": {
+      "file": "assets/ab-five.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "empty-tray",
+      "title": "为什么一捆也能表示十？",
+      "type": "slide",
+      "template": "title-picture",
+      "data": {
+        "title": "为什么一捆也能表示十？",
+        "picture": "packing-cover",
+        "caption": "数一数　捆一捆　换一换"
+      },
+      "script": [
+        {
+          "say": "手作角要打包小棒。桌上有根绳，托盘怎么是空的？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "想一想，绳子围起来以后，包里会有多少根？"
+        },
+        {
+          "say": "小满问，拿来一捆，和拿来一根，是一回事吗？"
+        },
+        {
+          "say": "先别猜结果。伸出一根手指，想象它就是一根散棒。"
+        },
+        {
+          "say": "再比划一大圈，圈里的小棒要一根根数清楚。"
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "一根叫一个一。一捆有多少，要看里面装了多少。"
+        },
+        {
+          "say": "今天我们规定每捆装十根。少一根，绳子先别系。"
+        },
+        {
+          "say": "等打好一捆，再想办法用计数器记下来。"
+        }
+      ]
+    },
+    {
+      "key": "group-and-count",
+      "title": "先把十件圈出来",
+      "type": "slide",
+      "template": "two-columns",
+      "data": {
+        "title": "先把十件圈出来",
+        "left": {
+          "heading": "先逐个数",
+          "body": "每件只点一次。"
+        },
+        "right": {
+          "heading": "再圈十件",
+          "body": "先数圈内，再数圈外。"
+        },
+        "left_picture": "count-before",
+        "right_picture": "count-after"
+      },
+      "script": [
+        {
+          "say": "一堆圆片在等打包。怎样让伙伴很快看清我们数了多少？"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "先点左边的上排。点完这一小排，再到下排接着点。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "每碰一枚说一个数。你能指到数过的第十枚吗？"
+        },
+        {
+          "say": "数到五换下一排。先把下一排五枚也数完，正好十枚。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "先停一下。数过的和没数过的，要做个记号分开。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "等你确认这十枚一枚没漏，就把它们一起圈住。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "现在只数圈外。一、二、三、四，有四枚散片。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "这堆圆片就是一个十和四个一。圈里的十不用重新数。"
+        },
+        {
+          "say": "如果圈里少了一枚，它就还不是一个十。先点清楚再圈。"
+        }
+      ]
+    },
+    {
+      "key": "one-bundle",
+      "title": "十根松棒，换一捆",
+      "type": "slide",
+      "template": "two-columns",
+      "data": {
+        "title": "十根松棒，换一捆",
+        "left": {
+          "heading": "松开的十根",
+          "body": "一根就是一个一。"
+        },
+        "right": {
+          "heading": "系成一捆",
+          "body": "十个一是一个十。"
+        },
+        "left_picture": "class-loose-ten",
+        "right_picture": "class-bundle-ten"
+      },
+      "script": [
+        {
+          "say": "绳子马上要系上了。猜猜系完以后，小棒会少一根吗？"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "先分成两排点。上面五根，下面五根，正好十根。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "每根算一个一，这里一共有十个一。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "手指扫过每根棒，再确认一遍，十根都在。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "现在把这十根一起拢好，用绳子系成一捆。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "外面只有一捆，里面还是原来的十根。一捆就是一个十。"
+        },
+        {
+          "say": "想核对，就解开绳子再点一次。散开和捆好，数量一样。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "十个一是一个十。以后看到这一捆，可以直接记一个十。"
+        },
+        {
+          "say": "弹珠工坊会说好几种口令。先想想每句会指哪种图。"
+        },
+        {
+          "say": "找十根散开的小棒。每根算一个一。"
+        },
+        {
+          "say": "找整整一捆。它是一个十，旁边没有散棒。"
+        },
+        {
+          "say": "找一个十和两个一。一捆外面还要有两根。"
+        },
+        {
+          "say": "找一个十和六个一。看看捆外还剩几根。"
+        },
+        {
+          "say": "找一个十和一个一。要看捆外那一根。"
+        },
+        {
+          "say": "找一个十和五个一。圈里和圈外分开数。"
+        },
+        {
+          "say": "找十位一颗、个位空着的计数器。"
+        },
+        {
+          "say": "先听有没有一捆，再数旁边的散棒。"
+        },
+        {
+          "say": "亮起来的是这一回的图。数清了再瞄准。"
+        },
+        {
+          "say": "这几张图都找对啦。成组和散开的地方都看清了！"
+        }
+      ]
+    },
+    {
+      "key": "marble-pack",
+      "title": "弹珠找同量图卡",
+      "type": "interactive",
+      "page": "marble-pack",
+      "widgetType": "game",
+      "startImage": "marble-workshop",
+      "script": [
+        {
+          "say": "桌上有捆好的棒，也有松开的。弹珠该找哪一张？"
+        },
+        {
+          "setState": {
+            "pause": true,
+            "demo": true,
+            "level": 1
+          }
+        },
+        {
+          "highlight": "#demo-first-goal"
+        },
+        {
+          "say": "先听它找什么。没听清，点小喇叭重听。"
+        },
+        {
+          "highlight": "#demo-first-target"
+        },
+        {
+          "say": "我找松开的十根。用手指想一想，两排各有几个。"
+        },
+        {
+          "say": "捆好的那一张也有十根，可这个口令特意要松开的。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "用左右箭头让炮口对准图卡，按一下发射。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "命中符合口令的那张才算。看，弹珠接住了一张！"
+        },
+        {
+          "say": "现在换你。听清要散棒还是成捆，再数捆外有几个。"
+        },
+        {
+          "setState": {
+            "pause": false,
+            "demo": false,
+            "level": 1
+          }
+        }
+      ],
+      "gameAudio": {
+        "loose-ten": "one-bundle-16",
+        "bundle-ten": "one-bundle-17",
+        "bundle-two": "one-bundle-18",
+        "bundle-six": "one-bundle-19",
+        "bundle-one": "one-bundle-20",
+        "bundle-five": "one-bundle-21",
+        "counter-ten": "one-bundle-22",
+        "marble-hint": "one-bundle-23",
+        "marble-help": "one-bundle-24",
+        "marble-good": "one-bundle-25"
+      }
+    },
+    {
+      "key": "counter-exchange",
+      "title": "一颗珠怎么能表示十？",
+      "type": "slide",
+      "template": "picture-points",
+      "data": {
+        "title": "一颗珠怎么能表示十？",
+        "picture": "exchange-board",
+        "points": [
+          "右边个位，先有九颗",
+          "再来一颗，个位满十",
+          "左边十位换一颗"
+        ]
+      },
+      "script": [
+        {
+          "say": "小满问，装好一捆后，能不能只用一颗珠来记？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "看这个计数器。先找右边那根杆，再找它左边的杆。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "最右边是个位，每颗记一个一。右边现在有九颗。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "又来一个一。在右边添一颗，个位刚好有十颗。"
+        },
+        {
+          "say": "十个一可以换一个十。想想用哪一根杆记这个十。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "右边的十颗拿掉，左边十位放一颗。看，是换了个记法。"
+        },
+        {
+          "say": "这时个位是空的，十位一颗代表一个十，仍是原来的十。"
+        },
+        {
+          "say": "如果这颗珠只是放回右边，它就只表示一个一了。"
+        }
+      ]
+    },
+    {
+      "key": "read-the-places",
+      "title": "把零留下来",
+      "type": "slide",
+      "template": "two-columns",
+      "data": {
+        "title": "把零留下来",
+        "left": {
+          "heading": "一颗珠站哪边",
+          "body": "左边十位，右边个位。"
+        },
+        "right": {
+          "heading": "两个老朋友",
+          "body": "0到9用一个数字，10用1和0。"
+        },
+        "left_picture": "position-pair",
+        "right_picture": "digits-board"
+      },
+      "script": [
+        {
+          "say": "计数器只有一颗珠。标签该写一，还是写十呢？"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "先指最右边，那是个位。再指它左边，那是十位。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "看左图，珠在个位，是一个一。再看右图，珠在十位，是一个十。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "珠没变，位置变了，意思就变了。现在给右边这幅图写标签。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "只写一个一，就变成了一个一。十位的一后面要留个位。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "左边写一，记一个十。个位没有散棒，所以右边写零。"
+        },
+        {
+          "say": "零把个位留住，不能省。这样一就在十位上，合起来读十。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "零到九各用一个数字。十没有新符号，是把一和零放在一起。"
+        },
+        {
+          "say": "邮车要把散棒和成捆小棒送到相应的计数器。先听取送两步。"
+        },
+        {
+          "say": "先找一捆小棒。这一单要一个十，不是单独一根。"
+        },
+        {
+          "say": "送到左边十位有一颗、右边个位空着的站。"
+        },
+        {
+          "say": "找两根散棒，拿起这两个一。"
+        },
+        {
+          "say": "送到右边个位有两颗珠的站。左边十位空着。"
+        },
+        {
+          "say": "找三根散棒。只拿三个一。"
+        },
+        {
+          "say": "把三个一送到右边个位有三颗珠的站。"
+        },
+        {
+          "say": "取五根散棒。用手指一个一个点着数。"
+        },
+        {
+          "say": "找右边个位有五颗珠的站。左边十位空着。"
+        },
+        {
+          "say": "先看车装了没有，再重听这一步的口令。"
+        },
+        {
+          "say": "车慢下来了。看看发亮的站，等车道空了再走。"
+        },
+        {
+          "say": "这一批送对啦。每个数都到了合适的位置！"
+        }
+      ]
+    },
+    {
+      "key": "parcel-delivery",
+      "title": "小车送对数字站",
+      "type": "interactive",
+      "page": "parcel-delivery",
+      "widgetType": "game",
+      "startImage": "garden",
+      "script": [
+        {
+          "say": "手作角的邮车要出发啦。一捆棒应该送到哪一站？"
+        },
+        {
+          "setState": {
+            "pause": true,
+            "demo": true,
+            "level": 1
+          }
+        },
+        {
+          "highlight": "#demo-first-goal"
+        },
+        {
+          "say": "先看近处货牌，听它要的是一捆，还是几根散棒。"
+        },
+        {
+          "highlight": "#demo-first-target"
+        },
+        {
+          "say": "一捆要数作一个十。跟我用眼睛找系着绳的小棒。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "箭头移动小车。到牌子边上，按装卸键，我先取一单。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "拿到了就停。送货要看计数器，十位和个位别看反。"
+        },
+        {
+          "say": "换你了。先听取什么，再听送到哪。车道空了再过去。"
+        },
+        {
+          "setState": {
+            "pause": false,
+            "demo": false,
+            "level": 1
+          }
+        }
+      ],
+      "gameAudio": {
+        "pick-ten": "read-the-places-16",
+        "send-ten": "read-the-places-17",
+        "pick-two": "read-the-places-18",
+        "send-two": "read-the-places-19",
+        "pick-three": "read-the-places-20",
+        "send-three": "read-the-places-21",
+        "pick-five": "read-the-places-22",
+        "send-five": "read-the-places-23",
+        "delivery-hint": "read-the-places-24",
+        "delivery-help": "read-the-places-25",
+        "delivery-good": "read-the-places-26"
+      }
+    },
+    {
+      "key": "picture-check",
+      "title": "换几张新图来验货",
+      "type": "quiz",
+      "intro": [
+        "手作角换了一批图卡。听完题，看图选一张。",
+        "没听清，就点小喇叭再听一次。"
+      ],
+      "questions": [
+        {
+          "id": "stamp-packet",
+          "question": "每个方片算一个一。哪盒正好可以打成一个十？",
+          "skill": "核对刚好十个一",
+          "answer": [
+            "B"
+          ],
+          "analysis": "第二盒上面五个，下面五个，正好十个。九个还不够，十一个还多一个。",
+          "visual": {
+            "kind": "asset",
+            "image": "q-stamp-packet",
+            "alt": "方片打包装用的空托盘"
+          },
+          "options": {
+            "A": {
+              "label": "九个方片",
+              "visual": {
+                "kind": "asset",
+                "image": "q-stamp-packet-a",
+                "alt": "九个方片"
+              }
+            },
+            "B": {
+              "label": "十个方片",
+              "visual": {
+                "kind": "asset",
+                "image": "q-stamp-packet-b",
+                "alt": "十个方片"
+              }
+            },
+            "C": {
+              "label": "十一个方片",
+              "visual": {
+                "kind": "asset",
+                "image": "q-stamp-packet-c",
+                "alt": "十一个方片"
+              }
+            }
+          }
+        },
+        {
+          "id": "seven-loose",
+          "question": "十枚圆片已经圈好。请数一数，圈外还有几枚？",
+          "skill": "先圈十再数余量",
+          "answer": [
+            "C"
+          ],
+          "analysis": "圈里的十枚先不重数。圈外逐个点，有七枚，就是一个十和七个一。",
+          "visual": {
+            "kind": "asset",
+            "image": "q-seven-loose",
+            "alt": "十枚圈内圆片与圈外圆片"
+          },
+          "options": {
+            "A": {
+              "label": "六枚散片",
+              "visual": {
+                "kind": "asset",
+                "image": "q-seven-loose-a",
+                "alt": "六枚散片"
+              }
+            },
+            "B": {
+              "label": "八枚散片",
+              "visual": {
+                "kind": "asset",
+                "image": "q-seven-loose-b",
+                "alt": "八枚散片"
+              }
+            },
+            "C": {
+              "label": "七枚散片",
+              "visual": {
+                "kind": "asset",
+                "image": "q-seven-loose-c",
+                "alt": "七枚散片"
+              }
+            }
+          }
+        },
+        {
+          "id": "ten-bead-trade",
+          "question": "右边个位刚满十颗。换完一个十，哪张计数器对？",
+          "skill": "个位满十换十位一珠",
+          "answer": [
+            "A"
+          ],
+          "analysis": "个位十颗换成十位一颗。右边个位清空，左边十位才有一颗。",
+          "visual": {
+            "kind": "asset",
+            "image": "q-ten-bead-trade",
+            "alt": "两位计数器右杆暂时有十颗珠"
+          },
+          "options": {
+            "A": {
+              "label": "左十位一颗，右个位空",
+              "visual": {
+                "kind": "asset",
+                "image": "q-ten-bead-trade-a",
+                "alt": "左十位一颗，右个位空"
+              }
+            },
+            "B": {
+              "label": "左十位空，右个位一颗",
+              "visual": {
+                "kind": "asset",
+                "image": "q-ten-bead-trade-b",
+                "alt": "左十位空，右个位一颗"
+              }
+            },
+            "C": {
+              "label": "左十位空，右个位九颗",
+              "visual": {
+                "kind": "asset",
+                "image": "q-ten-bead-trade-c",
+                "alt": "左十位空，右个位九颗"
+              }
+            }
+          }
+        },
+        {
+          "id": "one-on-the-right",
+          "question": "珠在最右边的个位。哪张材料图和它一样多？",
+          "skill": "右边个位一珠表示一个一",
+          "answer": [
+            "B"
+          ],
+          "analysis": "右边个位的一颗只记一个一，所以是一枚散片。一捆十枚，要用十位的一颗珠来记。",
+          "visual": {
+            "kind": "asset",
+            "image": "q-one-on-the-right",
+            "alt": "计数器右杆一颗珠"
+          },
+          "options": {
+            "A": {
+              "label": "一盒十枚",
+              "visual": {
+                "kind": "asset",
+                "image": "q-one-on-the-right-a",
+                "alt": "一盒十枚"
+              }
+            },
+            "B": {
+              "label": "一枚散片",
+              "visual": {
+                "kind": "asset",
+                "image": "q-one-on-the-right-b",
+                "alt": "一枚散片"
+              }
+            },
+            "C": {
+              "label": "空托盘",
+              "visual": {
+                "kind": "asset",
+                "image": "q-one-on-the-right-c",
+                "alt": "空托盘"
+              }
+            }
+          }
+        },
+        {
+          "id": "keep-the-place",
+          "question": "左边十位有一颗，个位没有珠。空格里补哪张？",
+          "skill": "零作为个位占位",
+          "answer": [
+            "C"
+          ],
+          "analysis": "十位写一。个位没有一个一，右边写零，把个位留住。",
+          "visual": {
+            "kind": "asset",
+            "image": "q-keep-the-place",
+            "alt": "十位一珠，下写1。个位空，下是空格"
+          },
+          "options": {
+            "A": {
+              "label": "数字九",
+              "visual": {
+                "kind": "asset",
+                "image": "q-keep-the-place-a",
+                "alt": "数字九"
+              }
+            },
+            "B": {
+              "label": "数字一",
+              "visual": {
+                "kind": "asset",
+                "image": "q-keep-the-place-b",
+                "alt": "数字一"
+              }
+            },
+            "C": {
+              "label": "数字零",
+              "visual": {
+                "kind": "asset",
+                "image": "q-keep-the-place-c",
+                "alt": "数字零"
+              }
+            }
+          }
+        },
+        {
+          "id": "two-known-digits",
+          "question": "哪一对标签数量都对，左边用一个数字，右边用两个学过的数字？",
+          "skill": "区分一个数字与两个已有数字",
+          "answer": [
+            "A"
+          ],
+          "analysis": "八枚只用一个数字8。右盘是一盒十枚，要用学过的1和0写成10。只写1，表示一枚。",
+          "visual": {
+            "kind": "asset",
+            "image": "q-two-known-digits",
+            "alt": "八枚圆片和一盒满十圆片"
+          },
+          "options": {
+            "A": {
+              "label": "左8，右10",
+              "visual": {
+                "kind": "asset",
+                "image": "q-two-known-digits-a",
+                "alt": "左8，右10"
+              }
+            },
+            "B": {
+              "label": "左8，右1",
+              "visual": {
+                "kind": "asset",
+                "image": "q-two-known-digits-b",
+                "alt": "左8，右1"
+              }
+            },
+            "C": {
+              "label": "左0，右10",
+              "visual": {
+                "kind": "asset",
+                "image": "q-two-known-digits-c",
+                "alt": "左0，右10"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "close-tray",
+      "title": "一捆十，站对位",
+      "type": "slide",
+      "template": "summary",
+      "data": {
+        "title": "一捆十，站对位",
+        "items": [
+          "十个一是一个十",
+          "数位不同，意思不同",
+          "写10：左边1，右边0",
+          "和家人找一组十件"
+        ]
+      },
+      "script": [
+        {
+          "say": "打包桌要收好啦。还记得一捆和一根有什么不同吗？"
+        },
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "散棒一根是一个一。十根捆好叫一个十，根数没变。"
+        },
+        {
+          "say": "还有散棒，就先记一捆，再数外面剩了几根。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "计数器从右起是个位，再往左是十位。一颗珠站哪儿很重要。"
+        },
+        {
+          "say": "个位满十，换十位一颗，再把个位清空。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "一个十写作一和零。个位的零要留下，表示没有散件。"
+        },
+        {
+          "spotlight": "item-4"
+        },
+        {
+          "say": "回家和家人找一组十件。先一件件点准，再画下来。"
+        },
+        {
+          "say": "两只手也能数成一组。左手五根，右手五根，合起来正好十根。"
+        },
+        {
+          "say": "如果旁边还有散件，说说一组是多少，组外又有多少。"
+        },
+        {
+          "say": "让家人听听你的理由。下次换一组东西，你也能打包了。"
+        }
+      ]
+    }
+  ]
+}

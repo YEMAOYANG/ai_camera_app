@@ -1,7 +1,7 @@
 {
   "schemaVersion": "mira.courseware.lesson.v1",
   "title": "10的加、减法",
-  "description": "在灯牌工坊把两组灯片合成十、从整板移走一部分，再用图和算式讲清变化。",
+  "description": "在灯牌工坊里用十格灯片学十的加减：开碰碰车找凑十的好朋友，拉弹弓从十里拿走几盏，钓出一幅图的四道算式，切开等于目标数的算式灯泡。",
   "grade": 1,
   "roster": {
     "teacher": {
@@ -21,9 +21,6 @@
     "remove-contrast": {
       "file": "assets/remove-contrast.png"
     },
-    "equal-groups": {
-      "file": "assets/equal-groups.png"
-    },
     "variation": {
       "file": "assets/variation.png"
     },
@@ -39,28 +36,161 @@
     "empty-and-ten": {
       "file": "assets/empty-and-ten.png"
     },
-    "nine-and-one": {
-      "file": "assets/nine-and-one.png"
-    },
-    "take-nine": {
-      "file": "assets/take-nine.png"
-    },
-    "take-eight": {
-      "file": "assets/take-eight.png"
-    },
-    "take-one": {
-      "file": "assets/take-one.png"
-    },
-    "two-taken": {
-      "file": "assets/two-taken.png"
-    },
     "map-and-equal": {
       "file": "assets/map-and-equal.png"
+    },
+    "num-0": {
+      "glyph": {
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "0"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "num-2": {
+      "glyph": {
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "2"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "num-3": {
+      "glyph": {
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "3"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "num-4": {
+      "glyph": {
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "4"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "num-5": {
+      "glyph": {
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "5"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "num-6": {
+      "glyph": {
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "6"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "num-7": {
+      "glyph": {
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "7"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "num-8": {
+      "glyph": {
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "8"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "num-9": {
+      "glyph": {
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "9"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "num-10": {
+      "glyph": {
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "10"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "quiz-equal-bags": {
+      "file": "assets/quiz-equal-bags.png"
+    },
+    "quiz-ten": {
+      "file": "assets/quiz-ten.png"
+    },
+    "quiz-remove-one": {
+      "file": "assets/quiz-remove-one.png"
+    },
+    "quiz-remove-nine": {
+      "file": "assets/quiz-remove-nine.png"
+    },
+    "quiz-remove-eight": {
+      "file": "assets/quiz-remove-eight.png"
+    },
+    "quiz-round-cakes": {
+      "file": "assets/quiz-round-cakes.png"
     }
   },
   "scenes": [
     {
-      "key": "p01",
+      "key": "s01",
       "type": "slide",
       "title": "给展板装灯片",
       "template": "picture-points",
@@ -84,7 +214,7 @@
           "say": "我们把两组灯片装到同一块板上。"
         },
         {
-          "say": "图上的圆点代表灯片，每片只数一次。"
+          "say": "空展板正好能放十片灯片。"
         },
         {
           "spotlight": "point-2"
@@ -105,84 +235,93 @@
           "say": "已经装满的十片，是一个整体。"
         },
         {
-          "say": "从十片里拿走一组，盒里留下另一组。"
+          "say": "从十片里拿走一组，板上留下另一组。"
         },
         {
           "say": "这一课就用图来想加法和减法。"
+        },
+        {
+          "say": "等会儿我们开碰碰车、拉弹弓、钓鱼、切灯泡。"
         }
       ]
     },
     {
-      "key": "p02",
+      "key": "g02",
       "type": "interactive",
-      "title": "两组合成十",
-      "page": "p02",
-      "widgetType": "ten-join-parts",
+      "title": "碰碰车找朋友",
+      "page": "game-02",
+      "widgetType": "game",
       "startImage": "lamp-workshop",
       "script": [
         {
           "setState": {
-            "demo": true
+            "demo": true,
+            "level": 1
           }
         },
         {
-          "highlight": "#join-board"
+          "say": "先看老师的示范，蓝色的车是我的。"
         },
         {
-          "say": "这块灯板有十格，每格只装一片。"
+          "highlight": "#as10a-me"
         },
         {
-          "say": "已经放好两片，还有一组在板外。"
+          "say": "我的车顶上写着一个数。"
         },
         {
-          "highlight": "#join-cards"
+          "say": "别的车顶上也有数，要去找好朋友。"
         },
         {
-          "say": "把空格一格一格数，空着八格。"
+          "say": "两个数合起来是十，就是好朋友。"
         },
         {
-          "say": "八片那组能把这些空格刚好装满。"
+          "annotate": "#as10a-panel",
+          "content": "空着几格，好朋友就是几"
+        },
+        {
+          "say": "看左上角的十格，亮着的就是我的数。"
+        },
+        {
+          "say": "空着几格，还差几个，好朋友就是几。"
+        },
+        {
+          "say": "比如我是三，空着七格，就去碰七。"
+        },
+        {
+          "say": "三加七等于十，七加三也等于十。"
+        },
+        {
+          "say": "两个数换个位置，合起来还是十。"
+        },
+        {
+          "say": "小满：我的车是八，也去碰八号车吧？",
+          "by": "xiaoman"
+        },
+        {
+          "say": "八比十小，先数数还空着几格。"
+        },
+        {
+          "say": "八还差两个是十，要去碰二号车。"
+        },
+        {
+          "highlight": "#as10a-arena"
+        },
+        {
+          "say": "第三关还会遇到车顶写着零的车。"
+        },
+        {
+          "say": "按住屏幕拖一拖，车就开过去。轮到你啦！"
         },
         {
           "setState": {
-            "demoJoined": true
-          }
-        },
-        {
-          "highlight": "#join-equation"
-        },
-        {
-          "say": "二加八等于十，加号连接两组。"
-        },
-        {
-          "say": "十是合起来的总数，不能再加一次。"
-        },
-        {
-          "setState": {
-            "demoSwapped": true
-          }
-        },
-        {
-          "highlight": "#join-board"
-        },
-        {
-          "say": "把八片先放，再放两片，也有十片。"
-        },
-        {
-          "say": "先放哪组不同，两组的片数没变。"
-        },
-        {
-          "say": "轮到你，点一组刚好填满空格的灯片。"
-        },
-        {
-          "setState": {
-            "play": true
+            "demo": false,
+            "level": 1
           }
         }
       ]
     },
     {
-      "key": "p03",
+      "key": "s03",
       "type": "slide",
       "title": "十片能拿走不同的一组",
       "template": "picture-points",
@@ -232,76 +371,79 @@
       ]
     },
     {
-      "key": "p04",
+      "key": "g04",
       "type": "interactive",
-      "title": "整盒拿走一组",
-      "page": "p04",
-      "widgetType": "ten-remove-group",
+      "title": "弹弓打灯",
+      "page": "game-04",
+      "widgetType": "game",
       "startImage": "lamp-workshop",
       "script": [
         {
           "setState": {
-            "demo": true
+            "demo": true,
+            "level": 1
           }
         },
         {
-          "highlight": "#whole-box"
+          "say": "先看老师的示范，十盏灯都亮着。"
         },
         {
-          "say": "请看盒里，四片和六片共十片。"
+          "highlight": "#as10b-board"
         },
         {
-          "say": "十是原来的整盒，减号前面写十。"
+          "say": "拉开弹弓，瞄准，松手，小球就飞出去。"
         },
         {
-          "highlight": "#take-first"
+          "highlight": "#as10b-sling"
         },
         {
-          "say": "如果题目说取走四片，就找四片这组。"
+          "say": "打中一盏，那盏灯就灭了。"
+        },
+        {
+          "annotate": "#as10b-goal",
+          "content": "拿走几盏，就减几"
+        },
+        {
+          "say": "我先打灭一盏，就是从十盏里拿走一盏。"
+        },
+        {
+          "say": "打灭一盏后，数一数，还亮着九盏。"
+        },
+        {
+          "say": "减号后面的数，说的是拿走几盏。"
+        },
+        {
+          "say": "第二关换个说法，数一数还要留几盏。"
+        },
+        {
+          "say": "先想十减几是要留下的数，再动手。"
+        },
+        {
+          "say": "小满：要留几盏，就打灭几盏吗？",
+          "by": "xiaoman"
+        },
+        {
+          "say": "要留下的灯还亮着，打灭的是另一部分。"
+        },
+        {
+          "say": "第三关有蓝灯和绿灯，看清颜色再打。"
+        },
+        {
+          "say": "数清要打的那一组，再决定减去几。"
+        },
+        {
+          "say": "打多了不要紧，那盏灯会重新亮。轮到你啦！"
         },
         {
           "setState": {
-            "demoFirst": true
-          }
-        },
-        {
-          "highlight": "#removed-tray"
-        },
-        {
-          "say": "四片已经移到盒外，不算进剩下的。"
-        },
-        {
-          "say": "盒里留下六片，十减四等于六。"
-        },
-        {
-          "setState": {
-            "demoSecond": true
-          }
-        },
-        {
-          "highlight": "#take-equation"
-        },
-        {
-          "say": "换成取走六片，盒里只留下四片。"
-        },
-        {
-          "say": "十减六等于四，仍从十片开始。"
-        },
-        {
-          "say": "点减号后面那个数量的一组。"
-        },
-        {
-          "say": "遇到两组同样多，取走哪组都可以。"
-        },
-        {
-          "setState": {
-            "play": true
+            "demo": false,
+            "level": 1
           }
         }
       ]
     },
     {
-      "key": "p05",
+      "key": "s05",
       "type": "slide",
       "title": "一幅图可以写几道算式",
       "template": "picture-points",
@@ -369,76 +511,76 @@
       ]
     },
     {
-      "key": "p06",
+      "key": "g06",
       "type": "interactive",
-      "title": "给算式配动作图",
-      "page": "p06",
-      "widgetType": "ten-equation-actions",
+      "title": "钓鱼配算式",
+      "page": "game-06",
+      "widgetType": "game",
       "startImage": "lamp-workshop",
       "script": [
         {
           "setState": {
-            "demoJoin": true
+            "demo": true,
+            "level": 1
           }
         },
         {
-          "highlight": "#map-equation"
+          "say": "老师用一盏蓝灯、九盏绿灯的图示范。"
         },
         {
-          "say": "四加六等于十，说的是合并两组。"
+          "highlight": "#as10c-card"
         },
         {
-          "highlight": "#action-cards"
+          "say": "两部分合起来，一共是十盏。"
         },
         {
-          "say": "带加号的动作图，把四片和六片合到一起。"
+          "say": "合起来写加法：一加九，九加一。"
         },
         {
-          "say": "合好后十格都亮起来，整板是十片。"
+          "say": "从十盏里拿走一部分，写减法。"
+        },
+        {
+          "say": "拿走蓝灯是十减一，拿走绿灯是十减九。"
+        },
+        {
+          "annotate": "#as10c-slots",
+          "content": "一幅图：两道加法，两道减法"
+        },
+        {
+          "say": "右边四个格子，就等着这四道算式。"
+        },
+        {
+          "highlight": "#as10c-boat"
+        },
+        {
+          "say": "左右移动小船，点一下就放下鱼钩。"
+        },
+        {
+          "say": "只钓和图对得上的算式鱼。"
+        },
+        {
+          "say": "二加八也等于十，可图上不是二和八。"
+        },
+        {
+          "say": "小满：五盏蓝灯五盏绿灯，也写四道吧？",
+          "by": "xiaoman"
+        },
+        {
+          "say": "两边都是五，换位置还是五加五。"
+        },
+        {
+          "say": "所以只写一道加法、一道减法。轮到你啦！"
         },
         {
           "setState": {
-            "demoTake": true
-          }
-        },
-        {
-          "highlight": "#map-board"
-        },
-        {
-          "say": "换成十减四，就要先有整板十片。"
-        },
-        {
-          "say": "移出四片，那四个位置会空出来。"
-        },
-        {
-          "say": "没有被拿走的六片，是这道题的差。"
-        },
-        {
-          "setState": {
-            "demoOther": true
-          }
-        },
-        {
-          "highlight": "#map-equation"
-        },
-        {
-          "say": "十减六则取走六片，留下四片。"
-        },
-        {
-          "say": "别只看颜色，数清被移出的那一组。"
-        },
-        {
-          "say": "现在从三张动作图中选和算式相符的。"
-        },
-        {
-          "setState": {
-            "play": true
+            "demo": false,
+            "level": 1
           }
         }
       ]
     },
     {
-      "key": "p07",
+      "key": "s07",
       "type": "slide",
       "title": "十不变，两个部分会怎样",
       "template": "picture-points",
@@ -501,81 +643,73 @@
       ]
     },
     {
-      "key": "p08",
+      "key": "g08",
       "type": "interactive",
-      "title": "留下指定的灯片",
-      "page": "p08",
-      "widgetType": "ten-subtraction-unknown",
+      "title": "切灯泡",
+      "page": "game-08",
+      "widgetType": "game",
       "startImage": "lamp-workshop",
       "script": [
         {
           "setState": {
-            "demo": true
+            "demo": true,
+            "level": 1
           }
         },
         {
-          "highlight": "#remain-target"
+          "say": "老师先示范，飞起的灯泡上都有算式。"
         },
         {
-          "say": "我们要在十片里留下八片。"
+          "highlight": "#as10d-target"
         },
         {
-          "say": "先看目标图，空白格暂时不用管。"
+          "say": "上面写着：切出等于十的灯泡。"
         },
         {
-          "setState": {
-            "demoOne": true
-          }
+          "say": "先算一算，等于十的才切开。"
         },
         {
-          "highlight": "#remain-board"
+          "annotate": "#as10d-sky",
+          "content": "先算，再切"
         },
         {
-          "say": "拿走一片，只剩九片，比八还多一。"
+          "say": "三加七等于十，切！三加六是九，不切。"
         },
         {
-          "setState": {
-            "demoTwo": true
-          }
+          "say": "第二关看到零，先想它表示拿走了几盏。"
         },
         {
-          "highlight": "#missing-equation"
+          "say": "如果没有拿走，原来的灯还在不在？"
         },
         {
-          "say": "再拿走一片，留下的正好是八片。"
+          "say": "第三关要找的数会变，看清再切。"
         },
         {
-          "say": "一共取走两片，所以问号里填二。"
+          "highlight": "#as10d-score"
         },
         {
-          "say": "也能想二和八合成十，十减二剩八。"
+          "say": "十减三和十减七，拿走的可不是同一组。"
         },
         {
-          "setState": {
-            "demoAll": true
-          }
+          "say": "小满：我看到两个十，就想直接切。",
+          "by": "xiaoman"
         },
         {
-          "highlight": "#remain-target"
+          "say": "十盏全拿走了，一盏不剩，是零。"
         },
         {
-          "say": "要留零片，就把十片全部拿走。"
-        },
-        {
-          "say": "如果剩下的图不一样，就换一组来试。"
-        },
-        {
-          "say": "轮到你，点一组拿走，让两幅图一样。"
+          "say": "用手指划过灯泡就能切开。轮到你啦！"
         },
         {
           "setState": {
-            "play": true
+            "demo": false,
+            "level": 1
           }
         }
       ]
     },
     {
-      "key": "p09",
+      "key": "s09",
       "type": "slide",
       "title": "从生活画面里找算式",
       "template": "picture-points",
@@ -631,9 +765,9 @@
       ]
     },
     {
-      "key": "p10",
+      "key": "q10",
       "type": "quiz",
-      "title": "换场景小检查",
+      "title": "换场景小检查（一）",
       "intro": [
         "看图，听我把问题说完，再选图。",
         "每个小圆点代表题目里的一件物品。"
@@ -641,39 +775,42 @@
       "questions": [
         {
           "id": "ten-q1",
-          "question": "十支彩笔分两袋，左袋六支，右袋几支？",
+          "question": "十格板已摆六枚圆片。还要几枚才能摆满？",
           "skill": "由整体十和已知部分找另一部分",
           "options": {
             "A": {
               "label": "4",
               "visual": {
-                "kind": "quantity",
-                "count": 4
+                "kind": "asset",
+                "image": "num-4",
+                "alt": "数字4"
               }
             },
             "B": {
               "label": "6",
               "visual": {
-                "kind": "quantity",
-                "count": 6
+                "kind": "asset",
+                "image": "num-6",
+                "alt": "数字6"
               }
             },
             "C": {
               "label": "5",
               "visual": {
-                "kind": "quantity",
-                "count": 5
+                "kind": "asset",
+                "image": "num-5",
+                "alt": "数字5"
               }
             }
           },
           "answer": [
             "A"
           ],
-          "analysis": "六和四合成十，十减六还剩四，所以右袋有四支。",
+          "analysis": "十格板每格放一枚。已经摆了六枚，还空四格，所以再放四枚。",
           "visual": {
             "kind": "asset",
             "image": "six-plus-missing",
-            "alt": "十格里有六个数量点，还有四格未放"
+            "alt": "十格板已摆六枚圆片，其他格子空着"
           }
         },
         {
@@ -684,22 +821,25 @@
             "A": {
               "label": "8",
               "visual": {
-                "kind": "quantity",
-                "count": 8
+                "kind": "asset",
+                "image": "num-8",
+                "alt": "数字8"
               }
             },
             "B": {
               "label": "2",
               "visual": {
-                "kind": "quantity",
-                "count": 2
+                "kind": "asset",
+                "image": "num-2",
+                "alt": "数字2"
               }
             },
             "C": {
               "label": "3",
               "visual": {
-                "kind": "quantity",
-                "count": 3
+                "kind": "asset",
+                "image": "num-3",
+                "alt": "数字3"
               }
             }
           },
@@ -721,22 +861,25 @@
             "A": {
               "label": "10",
               "visual": {
-                "kind": "quantity",
-                "count": 10
+                "kind": "asset",
+                "image": "num-10",
+                "alt": "数字10"
               }
             },
             "B": {
               "label": "0",
               "visual": {
-                "kind": "quantity",
-                "count": 0
+                "kind": "asset",
+                "image": "num-0",
+                "alt": "数字0"
               }
             },
             "C": {
               "label": "5",
               "visual": {
-                "kind": "quantity",
-                "count": 5
+                "kind": "asset",
+                "image": "num-5",
+                "alt": "数字5"
               }
             }
           },
@@ -746,47 +889,60 @@
           "analysis": "两袋共十枚。哪袋被收起都只拿走五枚，十减五等于五。",
           "visual": {
             "kind": "asset",
-            "image": "equal-groups",
-            "alt": "两个数量相同的组，每组五个"
+            "image": "quiz-equal-bags",
+            "alt": "两个打开的袋子各有五枚棋子，右袋向上收起"
           }
         },
         {
           "id": "ten-q4",
-          "question": "空托盘放入十枚夹子，现在有几枚？",
+          "question": "上盘是空的，下盘有十枚圆片。合起来有几枚？",
           "skill": "理解零和十相加仍是十",
           "options": {
             "A": {
               "label": "10",
               "visual": {
-                "kind": "quantity",
-                "count": 10
+                "kind": "asset",
+                "image": "num-10",
+                "alt": "数字10"
               }
             },
             "B": {
               "label": "0",
               "visual": {
-                "kind": "quantity",
-                "count": 0
+                "kind": "asset",
+                "image": "num-0",
+                "alt": "数字0"
               }
             },
             "C": {
               "label": "9",
               "visual": {
-                "kind": "quantity",
-                "count": 9
+                "kind": "asset",
+                "image": "num-9",
+                "alt": "数字9"
               }
             }
           },
           "answer": [
             "A"
           ],
-          "analysis": "空托盘原来是零枚，零和十合起来还是十枚。",
+          "analysis": "空盘里是零枚。零枚和十枚合起来，一共十枚。",
           "visual": {
             "kind": "asset",
             "image": "empty-and-ten",
-            "alt": "上方空托盘，下方十个数量点"
+            "alt": "上面是空盘，下面盘里有十枚圆片"
           }
-        },
+        }
+      ]
+    },
+    {
+      "key": "q11",
+      "type": "quiz",
+      "title": "换场景小检查（二）",
+      "intro": [
+        "看清图和算式，听我把问题说完，再选图。"
+      ],
+      "questions": [
         {
           "id": "ten-q5",
           "question": "十减九等于一，哪张图画出了这个动作？",
@@ -796,24 +952,24 @@
               "label": "去掉一片",
               "visual": {
                 "kind": "asset",
-                "image": "take-one",
-                "alt": "十个点中划去一个"
+                "image": "quiz-remove-one",
+                "alt": "同一个十格板中划去一片"
               }
             },
             "B": {
               "label": "去掉九片",
               "visual": {
                 "kind": "asset",
-                "image": "take-nine",
-                "alt": "十个点中划去九个"
+                "image": "quiz-remove-nine",
+                "alt": "同一个十格板中划去九片"
               }
             },
             "C": {
               "label": "去掉八片",
               "visual": {
                 "kind": "asset",
-                "image": "take-eight",
-                "alt": "十个点中划去八个"
+                "image": "quiz-remove-eight",
+                "alt": "同一个十格板中划去八片"
               }
             }
           },
@@ -823,8 +979,8 @@
           "analysis": "十是原来的总数。要选划去九个、留一个的图。",
           "visual": {
             "kind": "asset",
-            "image": "nine-and-one",
-            "alt": "十个数量点，分成一和九两组"
+            "image": "quiz-ten",
+            "alt": "一个十格板中摆有十个圆片，每格一个"
           }
         },
         {
@@ -835,22 +991,25 @@
             "A": {
               "label": "2",
               "visual": {
-                "kind": "quantity",
-                "count": 2
+                "kind": "asset",
+                "image": "num-2",
+                "alt": "数字2"
               }
             },
             "B": {
               "label": "7",
               "visual": {
-                "kind": "quantity",
-                "count": 7
+                "kind": "asset",
+                "image": "num-7",
+                "alt": "数字7"
               }
             },
             "C": {
               "label": "8",
               "visual": {
-                "kind": "quantity",
-                "count": 8
+                "kind": "asset",
+                "image": "num-8",
+                "alt": "数字8"
               }
             }
           },
@@ -860,14 +1019,84 @@
           "analysis": "装袋的两块要从原来的十块中减掉，盘里还有八块。",
           "visual": {
             "kind": "asset",
-            "image": "two-taken",
-            "alt": "十个圆点中划去两个，剩八个未划"
+            "image": "quiz-round-cakes",
+            "alt": "左边盘里原有十块圆饼。箭头指向右边，两块在袋里，盘里剩下的用盖子盖住"
           }
+        },
+        {
+          "id": "ten-q7",
+          "question": "原来是二加八。交换顺序，现在算八加二，得数是多少？",
+          "skill": "交换两个加数的位置，和不变",
+          "options": {
+            "A": {
+              "label": "6",
+              "visual": {
+                "kind": "asset",
+                "image": "num-6",
+                "alt": "数字6"
+              }
+            },
+            "B": {
+              "label": "8",
+              "visual": {
+                "kind": "asset",
+                "image": "num-8",
+                "alt": "数字8"
+              }
+            },
+            "C": {
+              "label": "10",
+              "visual": {
+                "kind": "asset",
+                "image": "num-10",
+                "alt": "数字10"
+              }
+            }
+          },
+          "answer": [
+            "C"
+          ],
+          "analysis": "换的是两个加数的位置，合起来的数量没有变。八加二等于十。"
+        },
+        {
+          "id": "ten-q8",
+          "question": "篮里有七个橘子，又放进三个，一共有几个？",
+          "skill": "两部分合起来用加法求总数",
+          "options": {
+            "A": {
+              "label": "4",
+              "visual": {
+                "kind": "asset",
+                "image": "num-4",
+                "alt": "数字4"
+              }
+            },
+            "B": {
+              "label": "10",
+              "visual": {
+                "kind": "asset",
+                "image": "num-10",
+                "alt": "数字10"
+              }
+            },
+            "C": {
+              "label": "9",
+              "visual": {
+                "kind": "asset",
+                "image": "num-9",
+                "alt": "数字9"
+              }
+            }
+          },
+          "answer": [
+            "B"
+          ],
+          "analysis": "七个和三个合起来，七加三等于十，一共十个。"
         }
       ]
     },
     {
-      "key": "p11",
+      "key": "s12",
       "type": "slide",
       "title": "用分合想十的加减",
       "template": "summary",

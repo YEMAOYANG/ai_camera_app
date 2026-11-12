@@ -1,0 +1,995 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "我们的感觉器官｜单元回顾",
+  "description": "人教鄂教版一年级科学上册第二单元回顾。认识和保护感觉器官，拍下同一物体的两种视角，试着按不同标准分图卡。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小科老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Serena",
+      "avatar": "/avatars/teacher-2.png",
+      "color": "#287B94",
+      "persona": "用清楚自然的普通话带一年级孩子观察、分类、说出证据，提醒操作安全。"
+    }
+  },
+  "images": {
+    "apple-senses": {
+      "file": "assets/apple-senses.png"
+    },
+    "apple-side": {
+      "file": "assets/apple-side.png"
+    },
+    "apple-top": {
+      "file": "assets/apple-top.png"
+    },
+    "family-apple": {
+      "file": "assets/family-apple.png"
+    },
+    "observation-record": {
+      "file": "assets/observation-record.png"
+    },
+    "orchard-start": {
+      "file": "assets/orchard-start.png"
+    },
+    "orchard-sticker": {
+      "file": "assets/orchard-sticker.png"
+    },
+    "orchard-workbench": {
+      "file": "assets/orchard-workbench.png"
+    },
+    "q1-a": {
+      "file": "assets/q1-a.png"
+    },
+    "q1-b": {
+      "file": "assets/q1-b.png"
+    },
+    "q1-c": {
+      "file": "assets/q1-c.png"
+    },
+    "q1-scene": {
+      "file": "assets/q1-scene.png"
+    },
+    "q2-a": {
+      "file": "assets/q2-a.png"
+    },
+    "q2-b": {
+      "file": "assets/q2-b.png"
+    },
+    "q2-c": {
+      "file": "assets/q2-c.png"
+    },
+    "q3-a": {
+      "file": "assets/q3-a.png"
+    },
+    "q3-b": {
+      "file": "assets/q3-b.png"
+    },
+    "q3-c": {
+      "file": "assets/q3-c.png"
+    },
+    "q4-a": {
+      "file": "assets/q4-a.png"
+    },
+    "q4-b": {
+      "file": "assets/q4-b.png"
+    },
+    "q4-c": {
+      "file": "assets/q4-c.png"
+    },
+    "q5-a": {
+      "file": "assets/q5-a.png"
+    },
+    "q5-b": {
+      "file": "assets/q5-b.png"
+    },
+    "q5-c": {
+      "file": "assets/q5-c.png"
+    },
+    "q6-a": {
+      "file": "assets/q6-a.png"
+    },
+    "q6-b": {
+      "file": "assets/q6-b.png"
+    },
+    "q6-c": {
+      "file": "assets/q6-c.png"
+    },
+    "rectangle-apricot": {
+      "file": "assets/rectangle-apricot.png"
+    },
+    "round-apricot": {
+      "file": "assets/round-apricot.png"
+    },
+    "round-sage": {
+      "file": "assets/round-sage.png"
+    },
+    "round-sage-small": {
+      "file": "assets/round-sage-small.png"
+    },
+    "safety-actions": {
+      "file": "assets/safety-actions.png"
+    },
+    "senses-map": {
+      "file": "assets/senses-map.png"
+    },
+    "snake-body": {
+      "file": "assets/snake-body.png"
+    },
+    "snake-head": {
+      "file": "assets/snake-head.png"
+    },
+    "snake-start": {
+      "file": "assets/snake-start.png"
+    },
+    "snake-tail": {
+      "file": "assets/snake-tail.png"
+    },
+    "sort-by-color": {
+      "file": "assets/sort-by-color.png"
+    },
+    "sort-by-shape": {
+      "file": "assets/sort-by-shape.png"
+    },
+    "square-apricot": {
+      "file": "assets/square-apricot.png"
+    },
+    "square-sage": {
+      "file": "assets/square-sage.png"
+    },
+    "triangle-apricot": {
+      "file": "assets/triangle-apricot.png"
+    },
+    "triangle-apr-turn": {
+      "file": "assets/triangle-apr-turn.png"
+    },
+    "triangle-sage": {
+      "file": "assets/triangle-sage.png"
+    },
+    "unknown-jars": {
+      "file": "assets/unknown-jars.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "p01",
+      "type": "slide",
+      "title": "一颗苹果，五种帮手",
+      "template": "picture-points",
+      "data": {
+        "title": "一颗苹果，五种帮手",
+        "picture": "senses-map",
+        "points": [
+          "眼看颜色、形状和大小",
+          "耳听声音，鼻闻气味",
+          "舌尝味道",
+          "皮肤感觉粗糙、软硬、冷热"
+        ]
+      },
+      "script": [
+        {
+          "say": "一颗苹果放在桌上。只看一眼，能知道它摸起来什么样吗？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "我们来给这颗苹果找帮手。五种帮手，各有用处。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先用眼睛看。这一颗偏红，外边圆圆的。眼睛还会比大小。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "如果旁边的铃响了，耳朵帮你听见声音。"
+        },
+        {
+          "say": "苹果有气味，鼻子能闻到。你看照片时还闻不到。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "舌头能尝出味道。食物能不能吃，要先由大人确认。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "手轻轻碰上去，是手上的皮肤感觉到滑不滑。"
+        },
+        {
+          "say": "皮肤也能感觉软硬和冷热。你想知道哪一样，就找相应的帮手。"
+        }
+      ]
+    },
+    {
+      "key": "p02",
+      "type": "slide",
+      "title": "透明杯里的线索",
+      "template": "two-columns",
+      "data": {
+        "title": "透明杯里的线索",
+        "left": {
+          "heading": "已知线索",
+          "body": "听老师读线索"
+        },
+        "left_picture": "unknown-jars",
+        "right": {
+          "heading": "保护好帮手",
+          "body": "先停手，再找大人"
+        },
+        "right_picture": "safety-actions"
+      },
+      "script": [
+        {
+          "say": "四杯东西看起来都清清的。只用眼睛，分得清吗？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "屏幕里的四杯都由老师准备。听老师说已经知道的线索。"
+        },
+        {
+          "say": "有一杯是温水。大人说杯身温温的，哪位帮手能感觉到？"
+        },
+        {
+          "say": "皮肤能感觉温度。大人闻到一杯有白醋味，靠的是鼻子。"
+        },
+        {
+          "say": "大人说还有甜甜的糖水和咸咸的盐水。味道的线索来自舌头。"
+        },
+        {
+          "say": "我们在屏幕里只听这几条线索。家里看见不认识的液体，怎么办？"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "换成来路不明的液体，我先收手，后退一步，再叫大人来。"
+        },
+        {
+          "say": "脏手想揉眼时，先把手放下。这样少把脏东西带进眼睛。"
+        },
+        {
+          "say": "声音很响时，我把音量调低。离开太响的地方也能保护耳朵。"
+        },
+        {
+          "say": "耳朵和鼻孔里都别塞小东西。舌头和皮肤只接触大人确认安全的东西。"
+        },
+        {
+          "say": "我们先分清安全不安全，再想哪种感觉能帮忙。"
+        }
+      ]
+    },
+    {
+      "key": "p03",
+      "type": "slide",
+      "title": "同一颗苹果，换个方向看",
+      "template": "two-columns",
+      "data": {
+        "title": "同一颗苹果，换个方向看",
+        "left": {
+          "heading": "从侧面看",
+          "body": "先看整体轮廓"
+        },
+        "left_picture": "apple-side",
+        "right": {
+          "heading": "从上面看",
+          "body": "再找果柄周围"
+        },
+        "right_picture": "apple-top"
+      },
+      "script": [
+        {
+          "say": "同一颗苹果，换个方向看，会多看见哪一处？先猜一猜。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "我先用眼睛从侧面看整颗苹果。外轮廓鼓鼓的，果柄在顶上。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "我再把视线移到正上方。果柄在中间，旁边有一小圈浅凹。"
+        },
+        {
+          "say": "两张图左边都有一片浅色，还是这一颗苹果。"
+        },
+        {
+          "say": "想知道果皮滑不滑，请家长拿一颗洗净的苹果，用手轻轻摸。"
+        },
+        {
+          "say": "想知道有没有气味，用鼻子轻轻闻。照片会帮我们记下看见的样子。"
+        },
+        {
+          "say": "从侧面拍，留下整颗苹果的外轮廓。"
+        },
+        {
+          "say": "从上面拍，找中间的果柄和周围的小凹。"
+        },
+        {
+          "say": "先用箭头框住苹果，等看到的样子和上面小图一样，再按快门。"
+        },
+        {
+          "say": "等一下找出这两种看法，用快门把你真的拍到的图留下来。"
+        }
+      ]
+    },
+    {
+      "key": "p04",
+      "type": "interactive",
+      "title": "苹果快门侦探",
+      "page": "apple-camera",
+      "widgetType": "game",
+      "startImage": "orchard-start",
+      "script": [
+        {
+          "say": "同一颗苹果会换方向。想留下两张照片，什么时候该按快门？"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#camera-first-preview"
+        },
+        {
+          "say": "先看上面小图。第一张要从上面看到果柄和那一圈浅凹。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "我用箭头移虚线框，把苹果框在里面，画面才拍得进来。"
+        },
+        {
+          "highlight": "#game-target"
+        },
+        {
+          "say": "等苹果和上面的小图是同一种看法，再按圆圆的快门。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "我只拍一张。看，下边留住了我刚才拍到的苹果。"
+        },
+        {
+          "say": "轮到你啦！先框住苹果，再等它和小图是同一种看法。"
+        },
+        {
+          "say": "这两张照片会帮你说清楚，从哪边看，能看见哪一处。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "observationCard": {
+        "title": "同一颗苹果的两张照片",
+        "familyTask": "和家人看一颗洗净苹果的整体和果柄，用手轻摸果皮。画下看见的，请家人记下你说的触感，再提一个问题。",
+        "levels": [
+          {
+            "label": "先拍上面和侧面",
+            "trials": [
+              {
+                "id": "apple-views",
+                "label": "同一颗苹果的两种视角",
+                "top": {
+                  "apple-top": {
+                    "label": "从上方见果柄和浅凹",
+                    "image": "apple-top"
+                  }
+                },
+                "side": {
+                  "apple-side": {
+                    "label": "从侧面见整个轮廓",
+                    "image": "apple-side"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "label": "从侧面开始",
+            "trials": [
+              {
+                "id": "apple-views",
+                "label": "同一颗苹果的两种视角",
+                "top": {
+                  "apple-top": {
+                    "label": "从上方见果柄和浅凹",
+                    "image": "apple-top"
+                  }
+                },
+                "side": {
+                  "apple-side": {
+                    "label": "从侧面见整个轮廓",
+                    "image": "apple-side"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "label": "换方向连拍四张",
+            "trials": [
+              {
+                "id": "apple-views",
+                "label": "同一颗苹果的两种视角",
+                "top": {
+                  "apple-top": {
+                    "label": "从上方见果柄和浅凹",
+                    "image": "apple-top"
+                  }
+                },
+                "side": {
+                  "apple-side": {
+                    "label": "从侧面见整个轮廓",
+                    "image": "apple-side"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gameAudio": {
+        "photo-goal": "p03-12",
+        "photo-top": "p03-10",
+        "photo-side": "p03-9",
+        "photo-hint": "p03-11",
+        "photo-praise": "p07-3"
+      }
+    },
+    {
+      "key": "p05",
+      "type": "slide",
+      "title": "这一回，按哪一样分",
+      "template": "two-columns",
+      "data": {
+        "title": "这一回，按哪一样分",
+        "left": {
+          "heading": "先按形状",
+          "body": "圆片和圆片，方片和方片"
+        },
+        "left_picture": "sort-by-shape",
+        "right": {
+          "heading": "换成按颜色",
+          "body": "杏色和杏色，青绿和青绿"
+        },
+        "right_picture": "sort-by-color"
+      },
+      "script": [
+        {
+          "say": "桌上有杏色和青绿的卡片。刚分好一回，换个办法还会一样吗？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "第一回只看形状。我把一个杏色圆片和一个青绿圆片放在一处。"
+        },
+        {
+          "say": "这两张颜色不同，可外边都圆圆的，所以按形状能放一起。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "第二回只看颜色。我把杏色圆片和杏色方片放在一处。"
+        },
+        {
+          "say": "这两张形状不同，可都带杏色，所以按颜色能放一起。"
+        },
+        {
+          "say": "同样几张卡，换了分法，伙伴就换了。"
+        },
+        {
+          "say": "按形状找，给右边的卡片找一个同形伙伴。"
+        },
+        {
+          "say": "按颜色找，给右边的卡片找一个同色伙伴。"
+        },
+        {
+          "say": "还是按形状找，大小和方向可以不一样。"
+        },
+        {
+          "say": "找对伙伴啦！同一条规则能帮你找出好多伙伴。"
+        },
+        {
+          "say": "小蛇如果走偏了，按回转键能回安全起点。"
+        },
+        {
+          "say": "待会儿让小蛇找伙伴，先听清这回按形状，还是按颜色。"
+        }
+      ]
+    },
+    {
+      "key": "p06",
+      "type": "interactive",
+      "title": "图卡小蛇",
+      "page": "shape-snake",
+      "widgetType": "game",
+      "startImage": "snake-start",
+      "script": [
+        {
+          "say": "小蛇要找图卡伙伴。这一回，我们先看参照卡是什么形状。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#snake-first-sample"
+        },
+        {
+          "say": "右边是一个圆片。我们按形状找，颜色不同也能当伙伴。"
+        },
+        {
+          "highlight": "#snake-first-card"
+        },
+        {
+          "say": "看，前面的青绿片也是圆圆的。就是它，和参照卡一个形状。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "我点箭头带小蛇过去。碰到同形卡，它的身子就长一节。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "我只带它找这一张。身子长了，下次转弯要留点地方。"
+        },
+        {
+          "say": "轮到你啦。先听分法，再看右边的卡片，用箭头去找伙伴。"
+        },
+        {
+          "say": "找对伙伴，小蛇就会长一节。看看你找到几张。"
+        },
+        {
+          "say": "走偏了，按回转键就能回到安全起点。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "snake-shape": "p05-9",
+        "snake-color": "p05-10",
+        "snake-shape-again": "p05-11",
+        "snake-look": "p05-14",
+        "snake-hint": "p05-14",
+        "snake-praise": "p05-12",
+        "snake-reset": "p05-13"
+      }
+    },
+    {
+      "key": "p07",
+      "type": "slide",
+      "title": "照片会告诉我什么",
+      "template": "two-columns",
+      "data": {
+        "title": "照片会告诉我什么",
+        "left": {
+          "heading": "照片里看见",
+          "body": "同一颗果，两张图"
+        },
+        "left_picture": "observation-record",
+        "right": {
+          "heading": "实物上再找",
+          "body": "眼、皮肤和合适的工具"
+        },
+        "right_picture": "apple-senses"
+      },
+      "script": [
+        {
+          "say": "两张照片都有苹果。它们能回答什么，还有什么要另找线索？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "同一颗苹果的两个样子都拍到了，可以放在一起比一比。"
+        },
+        {
+          "say": "我指左边，侧看能看到鼓鼓的轮廓；指右边，俯看见果柄旁的小凹。"
+        },
+        {
+          "say": "现在只凭这两张照片，我还说不出它摸起来滑不滑。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "我先摸洗净苹果的果皮，手上的皮肤能帮我知道滑不滑。"
+        },
+        {
+          "say": "要是想看清果皮的小点，我把放大镜对着那一小块，细点看得大些。"
+        },
+        {
+          "say": "小满说：我看到这边有小点。另一边也有吗？",
+          "by": "xiaoman"
+        },
+        {
+          "say": "我等小满说完，再指出他说的这边。接下来转同一颗苹果，找另一边。"
+        },
+        {
+          "say": "把亲眼看见的画下来，再用一句话说你还想弄明白什么。"
+        }
+      ]
+    },
+    {
+      "key": "p08",
+      "type": "quiz",
+      "title": "听到、摸到和保护好",
+      "intro": [
+        "换几件新东西。听我说想知道什么，再选一张图。"
+      ],
+      "questions": [
+        {
+          "id": "sense-review-q1",
+          "question": "窗边的风铃响了。想听清它的声音，该用哪个帮手？",
+          "skill": "science-sense-for-sound",
+          "analysis": "耳朵能听到风铃的声音。眼睛能看风铃的样子，鼻子能闻气味。",
+          "answer": [
+            "B"
+          ],
+          "options": {
+            "A": {
+              "label": "用眼睛",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-a",
+                "alt": "一个清楚的眼睛近景，看到眼睑和眼珠"
+              }
+            },
+            "B": {
+              "label": "用耳朵",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-b",
+                "alt": "一个清楚的耳朵近景，看到耳廓"
+              }
+            },
+            "C": {
+              "label": "用鼻子",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-c",
+                "alt": "一个清楚的鼻子近景，看到鼻梁和两个鼻孔"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "q1-scene",
+            "alt": "窗边悬着一只小金属风铃"
+          }
+        },
+        {
+          "id": "sense-review-q2",
+          "question": "这两条毛巾颜色一样。想知道哪条摸起来粗一些，怎么做？",
+          "skill": "science-sense-for-texture",
+          "analysis": "用手分别轻摸两条毛巾。皮肤能帮我们比较表面摸起来粗还是滑。",
+          "answer": [
+            "C"
+          ],
+          "options": {
+            "A": {
+              "label": "用眼睛看",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-a",
+                "alt": "孩子用眼睛仔细看两条并排的青绿色毛巾，手放远"
+              }
+            },
+            "B": {
+              "label": "用鼻子闻",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-b",
+                "alt": "孩子低头闻两条青绿色毛巾，手放远"
+              }
+            },
+            "C": {
+              "label": "用手轻摸",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-c",
+                "alt": "同一个孩子的手指分别轻触并排两条青绿色毛巾"
+              }
+            }
+          }
+        },
+        {
+          "id": "sense-review-q3",
+          "question": "小音箱的声音太响了。哪种做法能保护耳朵？",
+          "skill": "science-protect-hearing",
+          "analysis": "把音量调低，耳朵听到的声音会小一些。把音量调高，或把耳朵凑近，都不是这个时候的好做法。",
+          "answer": [
+            "A"
+          ],
+          "options": {
+            "A": {
+              "label": "调小音量",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-a",
+                "alt": "同一个小音箱的音量滑块在左侧小扬声器图形旁"
+              }
+            },
+            "B": {
+              "label": "调大音量",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-b",
+                "alt": "同一个小音箱的音量滑块在右侧大扬声器图形旁"
+              }
+            },
+            "C": {
+              "label": "凑近听",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-c",
+                "alt": "孩子把耳朵靠近同一个小音箱，头与音箱之间留有间隙"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p09",
+      "type": "quiz",
+      "title": "安全观察与分一分",
+      "intro": [
+        "还有三次小挑战。听清线索，想好了再点图。"
+      ],
+      "questions": [
+        {
+          "id": "sense-review-q4",
+          "question": "院子里有个打开的瓶子，里面是什么不知道。哪种做法合适？",
+          "skill": "science-unknown-liquid-safety",
+          "analysis": "先让手离开瓶子，退开后叫大人来处理。来路不明的东西不要靠近鼻子，也不要放到嘴边。",
+          "answer": [
+            "C"
+          ],
+          "options": {
+            "A": {
+              "label": "凑过去闻",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-a",
+                "alt": "孩子把鼻子凑到打开的无字透明瓶口外，鼻与瓶口之间有间隙"
+              }
+            },
+            "B": {
+              "label": "拿来尝尝",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-b",
+                "alt": "孩子把同一个透明开口瓶拿到闭着的嘴旁，瓶口与嘴之间有间隙"
+              }
+            },
+            "C": {
+              "label": "退开找大人",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-c",
+                "alt": "同一个透明开口瓶留在原处，孩子离开瓶子，向走来的成人指出它"
+              }
+            }
+          }
+        },
+        {
+          "id": "sense-review-q5",
+          "question": "围巾上有很小的纹路。想看清那一处，哪件东西能帮你？",
+          "skill": "science-observe-tool-for-detail",
+          "analysis": "让放大镜对着围巾的小纹路，那一处看起来会大些。直尺主要用来量，望远镜适合看远处。",
+          "answer": [
+            "B"
+          ],
+          "options": {
+            "A": {
+              "label": "直尺",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-a",
+                "alt": "透明直尺放在青绿围巾边缘，围巾小花纹保持原大小"
+              }
+            },
+            "B": {
+              "label": "放大镜",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-b",
+                "alt": "放大镜的透明镜片对准同一块青绿围巾，小花纹在镜片里显得大一些"
+              }
+            },
+            "C": {
+              "label": "望远镜",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-c",
+                "alt": "同一块青绿围巾旁放着一个双筒望远镜，围巾小花纹保持原大小"
+              }
+            }
+          }
+        },
+        {
+          "id": "sense-review-q6",
+          "question": "这回只按形状分徽章。哪一图分得对？",
+          "skill": "science-classify-one-property",
+          "analysis": "每一堆的徽章外形都要一样。三角徽章在一堆，长方徽章在一堆，不用管颜色。",
+          "answer": [
+            "A"
+          ],
+          "options": {
+            "A": {
+              "label": "按形状分",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-a",
+                "alt": "左边两个不同颜色的三角徽章，右边两个不同颜色的长方徽章"
+              }
+            },
+            "B": {
+              "label": "按颜色分",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-b",
+                "alt": "左边是杏色三角和长方徽章，右边是青绿三角和长方徽章"
+              }
+            },
+            "C": {
+              "label": "没有同形分组",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-c",
+                "alt": "左右两边各有一个三角徽章和一个不同颜色的长方徽章"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p10",
+      "type": "slide",
+      "title": "和家人观察一颗苹果",
+      "template": "picture-points",
+      "data": {
+        "title": "和家人观察一颗苹果",
+        "picture": "family-apple",
+        "points": [
+          "洗净后，先看整颗和果柄",
+          "轻轻摸，画两条发现",
+          "说出方法，再提一问"
+        ]
+      },
+      "script": [
+        {
+          "say": "回到家，你能给家人当一次苹果观察员吗？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "请家人帮你挑一颗苹果，先洗干净。你也洗洗手。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "把苹果放在桌上，先看整颗。再换到上面看看果柄旁边。"
+        },
+        {
+          "say": "我用眼睛找颜色和小凹。你看见的样子，由你画下来。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "用手指轻轻摸果皮就行。苹果放稳，不用刀，也不用尝。"
+        },
+        {
+          "say": "第二格请家人记下你摸到的感觉。比如，我摸到这儿滑滑的。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "我用了什么方法，找到什么线索？对照你的两格说一说。"
+        },
+        {
+          "say": "家人要亲眼看你做、亲耳听你说，才能记下这一次真实发现。"
+        },
+        {
+          "say": "还有哪一处想再看看？把你的新问题留给下次。"
+        }
+      ]
+    },
+    {
+      "key": "p11",
+      "type": "slide",
+      "title": "我会观察，也会提问",
+      "template": "picture-points",
+      "data": {
+        "title": "我会观察，也会提问",
+        "picture": "senses-map",
+        "points": [
+          "找对感觉器官，保护好它",
+          "看清再记录，留一个新问题",
+          "一次选一条规则来分"
+        ]
+      },
+      "script": [
+        {
+          "say": "苹果观察员要收工啦。你会怎么跟家人说今天学会了什么？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "眼看、耳听、鼻闻、舌尝，皮肤会感觉。我们按要找的线索选帮手。"
+        },
+        {
+          "say": "遇到不认识的东西先停手，叫成人来。听见太响的声音可以走远。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "我拍下同一颗苹果的两个样子，再问另一边有没有小点。"
+        },
+        {
+          "say": "屏幕照片只记下这回练习。你真实说了什么、做得怎样，要等家人见过听过。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "要分图卡，我一次只选一条规则。换个标准，同一批卡还能重分。"
+        },
+        {
+          "say": "哪一件你已经会做了？哪一件想在家再试一次？"
+        },
+        {
+          "say": "带着你的新问题，下回继续观察吧。"
+        }
+      ]
+    }
+  ]
+}

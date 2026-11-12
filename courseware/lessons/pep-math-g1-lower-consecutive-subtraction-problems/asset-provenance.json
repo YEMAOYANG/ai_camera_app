@@ -1,0 +1,620 @@
+{
+  "schemaVersion": "mira.courseware.art-provenance.v1",
+  "atlas": {
+    "path": "art-source/packing-atlas.png",
+    "sha256": "8ddb6d7f94ee6b8eb048a4cf54f7cd251759de25c8a9f232eeb8ce80e8503e1f",
+    "bytes": 2310196,
+    "tool": "codex-builtin-imagegen",
+    "prompt": "Use case: illustration-story. Generate one original square 2×2 atlas of four separate pictures for a first-grade mathematics lesson about packing prop pieces backstage. Exactly equal quadrants, tiny plain cream gutter at both center lines, keep images safely within each cell. Flat cut-paper gouache, clean silhouettes, muted sage, warm yellow, terracotta and plum, warm school theatre atmosphere. No lettering, numbers, equation symbols, dots, countable sets of objects, printed textbook material or reference images. Top left: empty school theatre packing room, warm low stage, curtains at the sides, pale open central floor, natural light, no objects in center. Top right: one simple playful green toy packing trolley with shallow empty basket, terracotta handle and dark wheels, side angle, entirely visible on a warm light plain background. Bottom left: one cheerful oversized paper award rosette with blank central circle and two green ribbon tails, on a warm light plain background. Bottom right: a quiet school backstage pathway with soft shadows and light wood sides and lots of open floor, no objects or markings. No marks or elements suggesting specific mathematical quantities. Do not repeat any panel."
+  },
+  "diagramSource": {
+    "path": "art-source/diagrams.py",
+    "sha256": "a79363474ade62bc12d0f794f92343c21163d4e2e027426f323586e513caaab8",
+    "bytes": 10099
+  },
+  "font": {
+    "name": "Arial Bold",
+    "fallback": "Pillow default",
+    "sha256": "d72db21f9242aedd6b917d8549ad5921766b24d5f8d0becfda2ff4c620b3c2e0"
+  },
+  "assets": {
+    "packing-room": {
+      "path": "assets/packing-room.png",
+      "sha256": "0322af55508845637840e854dfd65df89b71988fb6d04e01833e39dcefe0c3b4",
+      "bytes": 507015,
+      "kind": "crop-of-codex-builtin-imagegen",
+      "crop": [
+        10,
+        10,
+        617,
+        617
+      ]
+    },
+    "pack-cart": {
+      "path": "assets/pack-cart.png",
+      "sha256": "d164409d37bcf7cb1dda51a48fca40649167ccd6e51e77828b49cc38a5737ca2",
+      "bytes": 485340,
+      "kind": "crop-of-codex-builtin-imagegen",
+      "crop": [
+        637,
+        10,
+        1244,
+        617
+      ]
+    },
+    "finish-sticker": {
+      "path": "assets/finish-sticker.png",
+      "sha256": "c1620202f014d930b3502fd2d8a7014d4541867708068776ce4a223644c2204f",
+      "bytes": 468043,
+      "kind": "crop-of-codex-builtin-imagegen",
+      "crop": [
+        10,
+        637,
+        617,
+        1244
+      ]
+    },
+    "backstage-path": {
+      "path": "assets/backstage-path.png",
+      "sha256": "4d1c30175cd98b5e8a31b3816424671609dc38aa57ba48e3e136d1444973de57",
+      "bytes": 515224,
+      "kind": "crop-of-codex-builtin-imagegen",
+      "crop": [
+        637,
+        637,
+        1244,
+        1244
+      ]
+    },
+    "token-badge": {
+      "path": "assets/token-badge.png",
+      "sha256": "5a1b2cd87f4d533c28fa2aca9b62887d12ed67ed8eb5d80e0381076eacecf952",
+      "bytes": 565,
+      "kind": "deterministic-quantity",
+      "size": [
+        96,
+        96
+      ],
+      "truth": {
+        "oneObject": true
+      }
+    },
+    "one-full-group": {
+      "path": "assets/one-full-group.png",
+      "sha256": "760a9977a3428bd72339722a73a01c2a37a3335b2b482108a0ccf44b177f17ae",
+      "bytes": 3715,
+      "kind": "deterministic-quantity",
+      "size": [
+        500,
+        340
+      ],
+      "truth": {
+        "count": 6
+      }
+    },
+    "circle-main": {
+      "path": "assets/circle-main.png",
+      "sha256": "944e613a29c4ccde03040ec66d2cea58dfd01528d95db4e45df2c6ecb0928f84",
+      "bytes": 3784,
+      "kind": "deterministic-quantity",
+      "size": [
+        790,
+        330
+      ],
+      "truth": {
+        "total": 22,
+        "size": 6
+      }
+    },
+    "arrow-main": {
+      "path": "assets/arrow-main.png",
+      "sha256": "c528376a4baf6fa23eaa07aa8650769f06f48adea7c125517c71ac98a32a8e7c",
+      "bytes": 6746,
+      "kind": "deterministic-quantity",
+      "size": [
+        825,
+        280
+      ],
+      "truth": {
+        "total": 22,
+        "size": 6
+      }
+    },
+    "stopping-main": {
+      "path": "assets/stopping-main.png",
+      "sha256": "73289f0a338a52514e7c3d74b756c8568ba2b7af34a03dc601aa05d6eb22f60c",
+      "bytes": 4430,
+      "kind": "deterministic-quantity",
+      "size": [
+        500,
+        350
+      ],
+      "truth": {
+        "full": 3,
+        "size": 6,
+        "remainder": 4
+      }
+    },
+    "zero-example": {
+      "path": "assets/zero-example.png",
+      "sha256": "53b2fd6326c52a3634a874e61f8df0f9d123a60495f404ef5d3025330d2da789",
+      "bytes": 4206,
+      "kind": "deterministic-quantity",
+      "size": [
+        790,
+        330
+      ],
+      "truth": {
+        "total": 16,
+        "size": 4
+      }
+    },
+    "addition-check": {
+      "path": "assets/addition-check.png",
+      "sha256": "057af54d89eb622f044a522df7677b10176b86c8268c0eb645f5c8e84599b1e0",
+      "bytes": 5899,
+      "kind": "deterministic-quantity",
+      "size": [
+        790,
+        330
+      ],
+      "truth": {
+        "total": 22,
+        "size": 6
+      }
+    },
+    "compare-example": {
+      "path": "assets/compare-example.png",
+      "sha256": "8fb69544c2be83067f7a8b85e84ca62491bb96cc07ddeb48a1a39155a6f3c1ff",
+      "bytes": 5460,
+      "kind": "deterministic-quantity",
+      "size": [
+        500,
+        355
+      ],
+      "truth": {
+        "total": 20,
+        "sizes": [
+          4,
+          7
+        ]
+      }
+    },
+    "catch-opening": {
+      "path": "assets/catch-opening.png",
+      "sha256": "4ac7b754e429d5050a215c37444d8dc11b271fd98ba9fee87b200b6b5992258c",
+      "bytes": 3858,
+      "kind": "deterministic-quantity",
+      "size": [
+        790,
+        330
+      ],
+      "truth": {
+        "total": 8,
+        "size": 3,
+        "remainder": 2
+      }
+    },
+    "route-opening": {
+      "path": "assets/route-opening.png",
+      "sha256": "ae15df56ff001883815524fdd3287769287129eff6da39ebdf551b635386a6f8",
+      "bytes": 5276,
+      "kind": "deterministic-quantity",
+      "size": [
+        750,
+        340
+      ],
+      "truth": {
+        "total": 17,
+        "size": 5
+      }
+    },
+    "station-0": {
+      "path": "assets/station-0.png",
+      "sha256": "54bd9a8db29c33ca93180ce7778b352fd26ba54575e3c8d6716c2ae150620a8c",
+      "bytes": 2065,
+      "kind": "deterministic-quantity",
+      "size": [
+        216,
+        216
+      ],
+      "truth": {
+        "count": 0
+      }
+    },
+    "station-2": {
+      "path": "assets/station-2.png",
+      "sha256": "4e4ba849c91631052e9511230bcb124434466c5e96b185c9919548c6cc0ded08",
+      "bytes": 1962,
+      "kind": "deterministic-quantity",
+      "size": [
+        216,
+        216
+      ],
+      "truth": {
+        "count": 2
+      }
+    },
+    "station-3": {
+      "path": "assets/station-3.png",
+      "sha256": "f029804a66feea7f02a1257580f36f5af2d41f8cb7ef18778e46c3f5bf6bed5c",
+      "bytes": 2129,
+      "kind": "deterministic-quantity",
+      "size": [
+        216,
+        216
+      ],
+      "truth": {
+        "count": 3
+      }
+    },
+    "station-5": {
+      "path": "assets/station-5.png",
+      "sha256": "3378e6a3478fcb5447a25b009eb621114cedf040a984d1d05a8484f1ed6fe59f",
+      "bytes": 2023,
+      "kind": "deterministic-quantity",
+      "size": [
+        216,
+        216
+      ],
+      "truth": {
+        "count": 5
+      }
+    },
+    "station-7": {
+      "path": "assets/station-7.png",
+      "sha256": "e49758f15d49163f180052788e9562fbb205d83a8bcfc01cc668d0ba63aa7d12",
+      "bytes": 1546,
+      "kind": "deterministic-quantity",
+      "size": [
+        216,
+        216
+      ],
+      "truth": {
+        "count": 7
+      }
+    },
+    "station-9": {
+      "path": "assets/station-9.png",
+      "sha256": "bcf20e55eee74822bd108479795a8dc847fea4dd7a1f0f0bdc5346b4d2783fe0",
+      "bytes": 2298,
+      "kind": "deterministic-quantity",
+      "size": [
+        216,
+        216
+      ],
+      "truth": {
+        "count": 9
+      }
+    },
+    "station-10": {
+      "path": "assets/station-10.png",
+      "sha256": "9343cb747bcdf5b16fe1a786614ea69d108412954b751625ebc781743a022516",
+      "bytes": 2381,
+      "kind": "deterministic-quantity",
+      "size": [
+        216,
+        216
+      ],
+      "truth": {
+        "count": 10
+      }
+    },
+    "station-12": {
+      "path": "assets/station-12.png",
+      "sha256": "2d8bba6af13d513a3e06b3202dbe222ca8b1325c5d4dfa0c72a12005c53e2f02",
+      "bytes": 2242,
+      "kind": "deterministic-quantity",
+      "size": [
+        216,
+        216
+      ],
+      "truth": {
+        "count": 12
+      }
+    },
+    "station-15": {
+      "path": "assets/station-15.png",
+      "sha256": "ded284be57079616b973a38443bcc343b87f67562020fa4466ac008687ffee59",
+      "bytes": 2288,
+      "kind": "deterministic-quantity",
+      "size": [
+        216,
+        216
+      ],
+      "truth": {
+        "count": 15
+      }
+    },
+    "station-21": {
+      "path": "assets/station-21.png",
+      "sha256": "af90c928dfaeb4679247bba043ff0cdb0f783ce372d2df3d4fa48dc306e82364",
+      "bytes": 2294,
+      "kind": "deterministic-quantity",
+      "size": [
+        216,
+        216
+      ],
+      "truth": {
+        "count": 21
+      }
+    },
+    "quiz-fixed-prompt": {
+      "path": "assets/quiz-fixed-prompt.png",
+      "sha256": "21631a0846f0919d7df098d350546ec5d7ca697a45b13a6407cb84209581fb45",
+      "bytes": 2064,
+      "kind": "deterministic-quantity",
+      "size": [
+        500,
+        340
+      ],
+      "truth": {
+        "count": 23
+      }
+    },
+    "quiz-fixed-group-a": {
+      "path": "assets/quiz-fixed-group-a.png",
+      "sha256": "c423145a4a355c6979f057834901cada16c941fe55899ec2f9afc044b56d4fab",
+      "bytes": 2500,
+      "kind": "deterministic-quantity",
+      "size": [
+        500,
+        350
+      ],
+      "truth": {
+        "option": 4,
+        "total": 23,
+        "size": 5
+      }
+    },
+    "quiz-fixed-group-b": {
+      "path": "assets/quiz-fixed-group-b.png",
+      "sha256": "3d07b5999c50887623e1513f0a301cbedaa8e57442ce535a0d94bcdc52e9937e",
+      "bytes": 3148,
+      "kind": "deterministic-quantity",
+      "size": [
+        500,
+        350
+      ],
+      "truth": {
+        "option": 5,
+        "total": 23,
+        "size": 5
+      }
+    },
+    "quiz-fixed-group-c": {
+      "path": "assets/quiz-fixed-group-c.png",
+      "sha256": "89159aa3efcd86567ec4c54fc8ea109c8e897d48e2f9cbc0b229ea75bf0318fc",
+      "bytes": 3487,
+      "kind": "deterministic-quantity",
+      "size": [
+        500,
+        350
+      ],
+      "truth": {
+        "option": 6,
+        "total": 23,
+        "size": 5
+      }
+    },
+    "quiz-second-remainder-a": {
+      "path": "assets/quiz-second-remainder-a.png",
+      "sha256": "4bbf12c7dde5212666ae4ab0cbbeb635be8d7cbdbb8074d9e102f30b97221bf9",
+      "bytes": 3932,
+      "kind": "deterministic-quantity",
+      "size": [
+        500,
+        340
+      ],
+      "truth": {
+        "option": 15,
+        "total": 29,
+        "size": 7,
+        "steps": 2
+      }
+    },
+    "quiz-second-remainder-b": {
+      "path": "assets/quiz-second-remainder-b.png",
+      "sha256": "e861ee5d59190d068fa5638d598fafd7211f8fd458d81cbebf5dedeea83a805a",
+      "bytes": 3794,
+      "kind": "deterministic-quantity",
+      "size": [
+        500,
+        340
+      ],
+      "truth": {
+        "option": 22,
+        "total": 29,
+        "size": 7,
+        "steps": 2
+      }
+    },
+    "quiz-second-remainder-c": {
+      "path": "assets/quiz-second-remainder-c.png",
+      "sha256": "68ec0735edf217f137fac005362da0733b4a794f6e00a0beda405c22a882efe1",
+      "bytes": 3029,
+      "kind": "deterministic-quantity",
+      "size": [
+        500,
+        340
+      ],
+      "truth": {
+        "option": 14,
+        "total": 29,
+        "size": 7,
+        "steps": 2
+      }
+    },
+    "quiz-stop-short-a": {
+      "path": "assets/quiz-stop-short-a.png",
+      "sha256": "5377182c667ba7cc5cf72e56d7eb89e9945ff6dce489235ae1b190fd73aa4328",
+      "bytes": 4350,
+      "kind": "deterministic-quantity",
+      "size": [
+        500,
+        350
+      ],
+      "truth": {
+        "option": [
+          4,
+          7
+        ],
+        "total": 31,
+        "size": 6
+      }
+    },
+    "quiz-stop-short-b": {
+      "path": "assets/quiz-stop-short-b.png",
+      "sha256": "3507e6bd29819c5e3bca321dfd8add9298be7f5b26e32d22890aeae7b106836a",
+      "bytes": 5889,
+      "kind": "deterministic-quantity",
+      "size": [
+        500,
+        350
+      ],
+      "truth": {
+        "option": [
+          6,
+          0
+        ],
+        "total": 31,
+        "size": 6
+      }
+    },
+    "quiz-stop-short-c": {
+      "path": "assets/quiz-stop-short-c.png",
+      "sha256": "d6cb47164cb58c2d69b30603872523ab26addb658ba76e3f9c85753ab346b065",
+      "bytes": 4434,
+      "kind": "deterministic-quantity",
+      "size": [
+        500,
+        350
+      ],
+      "truth": {
+        "option": [
+          5,
+          1
+        ],
+        "total": 31,
+        "size": 6
+      }
+    },
+    "quiz-stop-zero-a": {
+      "path": "assets/quiz-stop-zero-a.png",
+      "sha256": "254670578df81b71fe197b70a6b5155d8e063ec979a9142e1f76337df6b1bbd9",
+      "bytes": 5111,
+      "kind": "deterministic-quantity",
+      "size": [
+        500,
+        350
+      ],
+      "truth": {
+        "option": [
+          2,
+          6
+        ],
+        "total": 18,
+        "size": 6
+      }
+    },
+    "quiz-stop-zero-b": {
+      "path": "assets/quiz-stop-zero-b.png",
+      "sha256": "9ecf9780b75d6a07e41504779a7a345126299353ad4eb90929cb55af97fb62ee",
+      "bytes": 5114,
+      "kind": "deterministic-quantity",
+      "size": [
+        500,
+        350
+      ],
+      "truth": {
+        "option": [
+          3,
+          0
+        ],
+        "total": 18,
+        "size": 6
+      }
+    },
+    "quiz-stop-zero-c": {
+      "path": "assets/quiz-stop-zero-c.png",
+      "sha256": "053e47638f1e20a3336c38168071668ba6e2467f0ab82351a853e075e211fc00",
+      "bytes": 4944,
+      "kind": "deterministic-quantity",
+      "size": [
+        500,
+        350
+      ],
+      "truth": {
+        "option": [
+          3,
+          2
+        ],
+        "total": 18,
+        "size": 6
+      }
+    },
+    "quiz-compare-packs-a": {
+      "path": "assets/quiz-compare-packs-a.png",
+      "sha256": "9ca8ef97c794af0ba56e33a88c684a3503d442686a5e12917b8560a6a24faacb",
+      "bytes": 6597,
+      "kind": "deterministic-quantity",
+      "size": [
+        500,
+        355
+      ],
+      "truth": {
+        "option": [
+          4,
+          3
+        ],
+        "total": 24,
+        "sizes": [
+          6,
+          8
+        ]
+      }
+    },
+    "quiz-compare-packs-b": {
+      "path": "assets/quiz-compare-packs-b.png",
+      "sha256": "5ca91a08b0af04740a794201fb347e9f67a2990df7e8392844640f929759a191",
+      "bytes": 6587,
+      "kind": "deterministic-quantity",
+      "size": [
+        500,
+        355
+      ],
+      "truth": {
+        "option": [
+          3,
+          4
+        ],
+        "total": 24,
+        "sizes": [
+          6,
+          8
+        ]
+      }
+    },
+    "quiz-compare-packs-c": {
+      "path": "assets/quiz-compare-packs-c.png",
+      "sha256": "84926978b9ac3867c5aba02230e4bf29e2d5139b2a9fcb36279a319d4bb676d6",
+      "bytes": 6002,
+      "kind": "deterministic-quantity",
+      "size": [
+        500,
+        355
+      ],
+      "truth": {
+        "option": [
+          4,
+          4
+        ],
+        "total": 24,
+        "sizes": [
+          6,
+          8
+        ]
+      }
+    }
+  }
+}

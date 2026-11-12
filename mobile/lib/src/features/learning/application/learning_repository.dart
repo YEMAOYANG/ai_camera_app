@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -11,6 +13,25 @@ final learningRepositoryProvider = Provider<LearningGateway>((ref) {
 final parentLearningReportsRepositoryProvider =
     Provider<ParentLearningReportsGateway>((ref) {
       return LearningRepository(apiClient: ref.watch(apiClientProvider));
+    });
+
+typedef LearningObservationImageKey = ({
+  String childId,
+  String reportId,
+  String sha256,
+});
+
+final learningObservationImageProvider = FutureProvider.autoDispose
+    .family<Uint8List, LearningObservationImageKey>((ref, image) async {
+      final response = await ref
+          .watch(apiClientProvider)
+          .get(
+            '/learning/reports/${Uri.encodeComponent(image.reportId)}'
+            '/observation-images/${Uri.encodeComponent(image.sha256)}',
+            queryParameters: {'childId': image.childId},
+            options: Options(responseType: ResponseType.bytes),
+          );
+      return Uint8List.fromList(response.data as List<int>);
     });
 
 typedef LearningTodayRequestKey = ({String childId, String gradeCode});

@@ -1,0 +1,879 @@
+{
+  "schemaVersion": "mira.courseware.asset-layout.v1",
+  "background": {
+    "id": "gallery-stage",
+    "path": "art-source/theater.webp",
+    "sha256": "56f7ae6d839159b717400723dc64cff1dac31a0997c4e93e5638dfb503c35be8",
+    "bytes": 137612,
+    "sourceKind": "codex_builtin_imagegen_reused_public_backdrop",
+    "sourceFile": "output/courseware-production/classic-arcade-v3/assets/theater.webp",
+    "sourceManifest": "output/courseware-production/classic-arcade-v3/asset-sources.json",
+    "sourceManifestSha256": "01d4f3f836ac294d47bc31e1470dc15d11cf74ac120939f82d005e010aabdf40",
+    "originalImagegen": {
+      "path": "/Users/sqcopenclaw/.codex/generated_images/01a1bf78-0c06-7fe0-8877-bc245394cec3/exec-a6eff833-d457-4bc1-8a0c-f10c1143714e.png",
+      "sha256": "ad541553656a51da0a559efb0ee9f336a78eb0f0f2a052e263cda126e4b8603e",
+      "prompt": "Use case: stylized-concept. Art-direction matched landscape asset sheet for the Mira learning arcade. A perfectly regular 2x2 grid of four full-bleed wide rectangular illustrations with narrow straight warm-white cross gutter exactly at the midpoint; each will be cropped into a game asset. Top left: little midnight garden theater with dark spruce draped curtains and gold paper lanterns far to the edges, quiet flat pale warm parchment screen in the center, empty stage, no cast shadow or actors. Top right: top-down river irrigation garden with soft moss and turquoise at the edges, little canal stones and wetland flowers only at the margin, quiet teal open water in center, no characters or internal paths. Bottom left: an apricot sky and snowy blue-teal distant mountains, high alpine meadow and wispy clouds, empty central sky, no planes or landing pads. Bottom right: large single warm cream origami paper glider tilted pointing to the right, spruce green paper seam and persimmon accent, centered on a plain evenly flat contrasting warm plum ground, generous room around its entire silhouette. Matte gouache, fine dry paper grain, crisp cut-paper shapes, calm deep spruce shadows, warm cream, restrained apricot highlights, crafted storybook arcade art. No lettering, numbers, graphics, logo or watermark in any panel.",
+      "sourceCrop": [
+        0,
+        0,
+        881,
+        438
+      ]
+    }
+  },
+  "tool": {
+    "library": "Pillow",
+    "version": "11.2.1",
+    "crop": "equal grid cell, retain alpha≥64 connected components with at least 12 px; 5×5 mask dilation and original alpha retention; aspect-contained into 206×206 with 9 px padding",
+    "grid": [
+      4,
+      5
+    ],
+    "fitting": "centered contain with LANCZOS",
+    "backgroundFitting": "centered ImageOps.fit",
+    "quantizeScenes": "224-color MEDIANCUT, no dithering",
+    "pngEncoding": "optimize"
+  },
+  "master": "teaching-cutouts",
+  "grid": [
+    [
+      "orange-cat",
+      "yellow-house",
+      "yellow-box",
+      "blue-pencil"
+    ],
+    [
+      "red-pencil",
+      "blue-book",
+      "yellow-cat",
+      "black-cat"
+    ],
+    [
+      "blue-bird",
+      "red-book",
+      "red-ball",
+      "green-book"
+    ],
+    [
+      "green-ball",
+      "paint-blue-cat",
+      "paint-black-monkey",
+      "paint-five-color-monkey"
+    ],
+    [
+      "curtain-panels",
+      "apricot-lid",
+      "cream-kite",
+      null
+    ]
+  ],
+  "sourceCrops": {
+    "orange-cat": {
+      "row": 1,
+      "column": 1,
+      "rect": [
+        0,
+        0,
+        280,
+        280
+      ],
+      "opaqueBounds": [
+        36,
+        34,
+        232,
+        276
+      ],
+      "maskedBounds": [
+        34,
+        32,
+        234,
+        278
+      ],
+      "retainedComponentAreas": [
+        31177
+      ]
+    },
+    "yellow-house": {
+      "row": 1,
+      "column": 2,
+      "rect": [
+        280,
+        0,
+        561,
+        280
+      ],
+      "opaqueBounds": [
+        18,
+        40,
+        267,
+        264
+      ],
+      "maskedBounds": [
+        16,
+        38,
+        269,
+        266
+      ],
+      "retainedComponentAreas": [
+        38436
+      ]
+    },
+    "yellow-box": {
+      "row": 1,
+      "column": 3,
+      "rect": [
+        561,
+        0,
+        842,
+        280
+      ],
+      "opaqueBounds": [
+        17,
+        68,
+        273,
+        254
+      ],
+      "maskedBounds": [
+        15,
+        66,
+        275,
+        256
+      ],
+      "retainedComponentAreas": [
+        35408
+      ]
+    },
+    "blue-pencil": {
+      "row": 1,
+      "column": 4,
+      "rect": [
+        842,
+        0,
+        1122,
+        280
+      ],
+      "opaqueBounds": [
+        45,
+        37,
+        242,
+        271
+      ],
+      "maskedBounds": [
+        43,
+        35,
+        244,
+        273
+      ],
+      "retainedComponentAreas": [
+        13513
+      ]
+    },
+    "red-pencil": {
+      "row": 2,
+      "column": 1,
+      "rect": [
+        0,
+        280,
+        280,
+        561
+      ],
+      "opaqueBounds": [
+        55,
+        35,
+        252,
+        273
+      ],
+      "maskedBounds": [
+        53,
+        33,
+        254,
+        275
+      ],
+      "retainedComponentAreas": [
+        13836
+      ]
+    },
+    "blue-book": {
+      "row": 2,
+      "column": 2,
+      "rect": [
+        280,
+        280,
+        561,
+        561
+      ],
+      "opaqueBounds": [
+        23,
+        39,
+        263,
+        269
+      ],
+      "maskedBounds": [
+        21,
+        37,
+        265,
+        271
+      ],
+      "retainedComponentAreas": [
+        37975
+      ]
+    },
+    "yellow-cat": {
+      "row": 2,
+      "column": 3,
+      "rect": [
+        561,
+        280,
+        842,
+        561
+      ],
+      "opaqueBounds": [
+        26,
+        32,
+        224,
+        278
+      ],
+      "maskedBounds": [
+        24,
+        30,
+        226,
+        280
+      ],
+      "retainedComponentAreas": [
+        32026
+      ]
+    },
+    "black-cat": {
+      "row": 2,
+      "column": 4,
+      "rect": [
+        842,
+        280,
+        1122,
+        561
+      ],
+      "opaqueBounds": [
+        22,
+        34,
+        220,
+        278
+      ],
+      "maskedBounds": [
+        20,
+        32,
+        222,
+        280
+      ],
+      "retainedComponentAreas": [
+        32199
+      ]
+    },
+    "blue-bird": {
+      "row": 3,
+      "column": 1,
+      "rect": [
+        0,
+        561,
+        280,
+        841
+      ],
+      "opaqueBounds": [
+        24,
+        51,
+        271,
+        256
+      ],
+      "maskedBounds": [
+        22,
+        49,
+        273,
+        258
+      ],
+      "retainedComponentAreas": [
+        26788
+      ]
+    },
+    "red-book": {
+      "row": 3,
+      "column": 2,
+      "rect": [
+        280,
+        561,
+        561,
+        841
+      ],
+      "opaqueBounds": [
+        25,
+        31,
+        262,
+        253
+      ],
+      "maskedBounds": [
+        23,
+        29,
+        264,
+        255
+      ],
+      "retainedComponentAreas": [
+        36609
+      ]
+    },
+    "red-ball": {
+      "row": 3,
+      "column": 3,
+      "rect": [
+        561,
+        561,
+        842,
+        841
+      ],
+      "opaqueBounds": [
+        29,
+        39,
+        237,
+        252
+      ],
+      "maskedBounds": [
+        27,
+        37,
+        239,
+        254
+      ],
+      "retainedComponentAreas": [
+        34528
+      ]
+    },
+    "green-book": {
+      "row": 3,
+      "column": 4,
+      "rect": [
+        842,
+        561,
+        1122,
+        841
+      ],
+      "opaqueBounds": [
+        12,
+        31,
+        252,
+        255
+      ],
+      "maskedBounds": [
+        10,
+        29,
+        254,
+        257
+      ],
+      "retainedComponentAreas": [
+        37613
+      ]
+    },
+    "green-ball": {
+      "row": 4,
+      "column": 1,
+      "rect": [
+        0,
+        841,
+        280,
+        1122
+      ],
+      "opaqueBounds": [
+        36,
+        27,
+        247,
+        245
+      ],
+      "maskedBounds": [
+        34,
+        25,
+        249,
+        247
+      ],
+      "retainedComponentAreas": [
+        36078
+      ]
+    },
+    "paint-blue-cat": {
+      "row": 4,
+      "column": 2,
+      "rect": [
+        280,
+        841,
+        561,
+        1122
+      ],
+      "opaqueBounds": [
+        26,
+        12,
+        223,
+        252
+      ],
+      "maskedBounds": [
+        24,
+        10,
+        225,
+        254
+      ],
+      "retainedComponentAreas": [
+        31618
+      ]
+    },
+    "paint-black-monkey": {
+      "row": 4,
+      "column": 3,
+      "rect": [
+        561,
+        841,
+        842,
+        1122
+      ],
+      "opaqueBounds": [
+        14,
+        22,
+        258,
+        239
+      ],
+      "maskedBounds": [
+        12,
+        20,
+        260,
+        241
+      ],
+      "retainedComponentAreas": [
+        30030
+      ]
+    },
+    "paint-five-color-monkey": {
+      "row": 4,
+      "column": 4,
+      "rect": [
+        842,
+        841,
+        1122,
+        1122
+      ],
+      "opaqueBounds": [
+        8,
+        21,
+        254,
+        243
+      ],
+      "maskedBounds": [
+        6,
+        19,
+        256,
+        245
+      ],
+      "retainedComponentAreas": [
+        31260
+      ]
+    },
+    "curtain-panels": {
+      "row": 5,
+      "column": 1,
+      "rect": [
+        0,
+        1122,
+        280,
+        1402
+      ],
+      "opaqueBounds": [
+        31,
+        16,
+        260,
+        250
+      ],
+      "maskedBounds": [
+        29,
+        14,
+        262,
+        252
+      ],
+      "retainedComponentAreas": [
+        22905,
+        22874
+      ]
+    },
+    "apricot-lid": {
+      "row": 5,
+      "column": 2,
+      "rect": [
+        280,
+        1122,
+        561,
+        1402
+      ],
+      "opaqueBounds": [
+        13,
+        54,
+        258,
+        221
+      ],
+      "maskedBounds": [
+        11,
+        52,
+        260,
+        223
+      ],
+      "retainedComponentAreas": [
+        26454
+      ]
+    },
+    "cream-kite": {
+      "row": 5,
+      "column": 3,
+      "rect": [
+        561,
+        1122,
+        842,
+        1402
+      ],
+      "opaqueBounds": [
+        40,
+        1,
+        242,
+        260
+      ],
+      "maskedBounds": [
+        38,
+        0,
+        244,
+        262
+      ],
+      "retainedComponentAreas": [
+        17031
+      ]
+    }
+  },
+  "scenes": {
+    "workshop-cover": {
+      "size": [
+        832,
+        468
+      ],
+      "layers": [
+        {
+          "key": "orange-cat",
+          "center": [
+            316,
+            254
+          ],
+          "box": [
+            185,
+            205
+          ],
+          "placedRect": [
+            232,
+            152,
+            401,
+            357
+          ]
+        },
+        {
+          "key": "yellow-box",
+          "center": [
+            541,
+            265
+          ],
+          "box": [
+            203,
+            172
+          ],
+          "placedRect": [
+            440,
+            189,
+            643,
+            342
+          ]
+        }
+      ]
+    },
+    "paint-exhibit": {
+      "size": [
+        832,
+        468
+      ],
+      "layers": [
+        {
+          "key": "paint-blue-cat",
+          "center": [
+            223,
+            252
+          ],
+          "box": [
+            152,
+            180
+          ],
+          "placedRect": [
+            148,
+            162,
+            299,
+            342
+          ]
+        },
+        {
+          "key": "paint-black-monkey",
+          "center": [
+            420,
+            252
+          ],
+          "box": [
+            164,
+            176
+          ],
+          "placedRect": [
+            338,
+            178,
+            502,
+            326
+          ]
+        },
+        {
+          "key": "paint-five-color-monkey",
+          "center": [
+            617,
+            252
+          ],
+          "box": [
+            164,
+            176
+          ],
+          "placedRect": [
+            535,
+            178,
+            699,
+            327
+          ]
+        }
+      ]
+    },
+    "curtain-cat": {
+      "size": [
+        480,
+        480
+      ],
+      "layers": [
+        {
+          "key": "orange-cat",
+          "center": [
+            171,
+            278
+          ],
+          "box": [
+            240,
+            267
+          ],
+          "lightingBrightness": 0.21,
+          "placedRect": [
+            61,
+            145,
+            282,
+            412
+          ]
+        },
+        {
+          "key": "curtain-panels",
+          "center": [
+            236,
+            234
+          ],
+          "box": [
+            443,
+            432
+          ],
+          "placedRect": [
+            24,
+            18,
+            448,
+            450
+          ]
+        }
+      ]
+    },
+    "label-exhibit": {
+      "size": [
+        832,
+        468
+      ],
+      "layers": [
+        {
+          "key": "orange-cat",
+          "center": [
+            288,
+            248
+          ],
+          "box": [
+            165,
+            185
+          ],
+          "placedRect": [
+            212,
+            156,
+            365,
+            341
+          ]
+        },
+        {
+          "key": "yellow-box",
+          "center": [
+            547,
+            259
+          ],
+          "box": [
+            192,
+            163
+          ],
+          "placedRect": [
+            451,
+            187,
+            643,
+            332
+          ]
+        }
+      ]
+    },
+    "beat-curtain": {
+      "size": [
+        832,
+        468
+      ],
+      "layers": [
+        {
+          "key": "blue-bird",
+          "center": [
+            360,
+            269
+          ],
+          "box": [
+            153,
+            141
+          ],
+          "placedRect": [
+            284,
+            204,
+            437,
+            334
+          ]
+        },
+        {
+          "key": "apricot-lid",
+          "center": [
+            416,
+            257
+          ],
+          "box": [
+            284,
+            240
+          ],
+          "placedRect": [
+            274,
+            156,
+            558,
+            358
+          ]
+        }
+      ]
+    },
+    "guess-exhibit": {
+      "size": [
+        832,
+        468
+      ],
+      "layers": [
+        {
+          "key": "red-ball",
+          "center": [
+            229,
+            250
+          ],
+          "box": [
+            136,
+            139
+          ],
+          "placedRect": [
+            161,
+            181,
+            297,
+            320
+          ]
+        },
+        {
+          "key": "red-book",
+          "center": [
+            420,
+            251
+          ],
+          "box": [
+            150,
+            151
+          ],
+          "placedRect": [
+            345,
+            181,
+            495,
+            322
+          ]
+        },
+        {
+          "key": "green-book",
+          "center": [
+            609,
+            251
+          ],
+          "box": [
+            150,
+            151
+          ],
+          "placedRect": [
+            534,
+            181,
+            684,
+            322
+          ]
+        }
+      ]
+    },
+    "paper-workbench": {
+      "size": [
+        832,
+        468
+      ],
+      "layers": [
+        {
+          "key": "blue-bird",
+          "center": [
+            298,
+            254
+          ],
+          "box": [
+            175,
+            171
+          ],
+          "placedRect": [
+            211,
+            180,
+            386,
+            328
+          ]
+        },
+        {
+          "key": "cream-kite",
+          "center": [
+            542,
+            245
+          ],
+          "box": [
+            175,
+            220
+          ],
+          "placedRect": [
+            455,
+            136,
+            630,
+            354
+          ]
+        }
+      ]
+    }
+  }
+}

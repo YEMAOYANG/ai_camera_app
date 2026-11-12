@@ -1,0 +1,2719 @@
+{
+  "schemaVersion": "mira.courseware.asset-provenance.v1",
+  "atlasReceipts": {
+    "borrow-review-scenes": {
+      "path": "art-source/borrow-review-scenes.receipt.json",
+      "sha256": "8ed96c9e6b1968689985c799e439212e7b30e7a6c81865b3e1a8d79ba0bb1e42"
+    },
+    "borrow-review-sprites": {
+      "path": "art-source/borrow-review-sprites.receipt.json",
+      "sha256": "c9c16248cc7820a6d6e5c8eb9da7007ae0678085febf567b129a3de81928f38a"
+    }
+  },
+  "numberPlan": {
+    "table": [
+      [
+        [
+          10,
+          9
+        ],
+        [
+          10,
+          8
+        ],
+        [
+          10,
+          7
+        ],
+        [
+          10,
+          6
+        ],
+        [
+          10,
+          5
+        ],
+        [
+          10,
+          4
+        ],
+        [
+          10,
+          3
+        ],
+        [
+          10,
+          2
+        ],
+        [
+          10,
+          1
+        ]
+      ],
+      [
+        [
+          11,
+          9
+        ],
+        [
+          11,
+          8
+        ],
+        [
+          11,
+          7
+        ],
+        [
+          11,
+          6
+        ],
+        [
+          11,
+          5
+        ],
+        [
+          11,
+          4
+        ],
+        [
+          11,
+          3
+        ],
+        [
+          11,
+          2
+        ]
+      ],
+      [
+        [
+          12,
+          9
+        ],
+        [
+          12,
+          8
+        ],
+        [
+          12,
+          7
+        ],
+        [
+          12,
+          6
+        ],
+        [
+          12,
+          5
+        ],
+        [
+          12,
+          4
+        ],
+        [
+          12,
+          3
+        ]
+      ],
+      [
+        [
+          13,
+          9
+        ],
+        [
+          13,
+          8
+        ],
+        [
+          13,
+          7
+        ],
+        [
+          13,
+          6
+        ],
+        [
+          13,
+          5
+        ],
+        [
+          13,
+          4
+        ]
+      ],
+      [
+        [
+          14,
+          9
+        ],
+        [
+          14,
+          8
+        ],
+        [
+          14,
+          7
+        ],
+        [
+          14,
+          6
+        ],
+        [
+          14,
+          5
+        ]
+      ],
+      [
+        [
+          15,
+          9
+        ],
+        [
+          15,
+          8
+        ],
+        [
+          15,
+          7
+        ],
+        [
+          15,
+          6
+        ]
+      ],
+      [
+        [
+          16,
+          9
+        ],
+        [
+          16,
+          8
+        ],
+        [
+          16,
+          7
+        ]
+      ],
+      [
+        [
+          17,
+          9
+        ],
+        [
+          17,
+          8
+        ]
+      ],
+      [
+        [
+          18,
+          9
+        ]
+      ]
+    ],
+    "hops": [
+      {
+        "mode": "column",
+        "start": [
+          12,
+          8
+        ],
+        "route": [
+          [
+            13,
+            8
+          ],
+          [
+            14,
+            8
+          ],
+          [
+            15,
+            8
+          ]
+        ],
+        "distractors": [
+          [
+            13,
+            7
+          ],
+          [
+            14,
+            9
+          ]
+        ]
+      },
+      {
+        "mode": "row",
+        "start": [
+          15,
+          9
+        ],
+        "route": [
+          [
+            15,
+            8
+          ],
+          [
+            15,
+            7
+          ],
+          [
+            15,
+            6
+          ]
+        ],
+        "distractors": [
+          [
+            14,
+            8
+          ],
+          [
+            16,
+            7
+          ]
+        ]
+      },
+      {
+        "mode": "same-difference",
+        "start": [
+          11,
+          2
+        ],
+        "route": [
+          [
+            12,
+            3
+          ],
+          [
+            13,
+            4
+          ],
+          [
+            14,
+            5
+          ]
+        ],
+        "distractors": [
+          [
+            12,
+            4
+          ],
+          [
+            14,
+            7
+          ]
+        ]
+      }
+    ],
+    "puzzles": {
+      "part-5": {
+        "kind": "part",
+        "total": 11,
+        "known": 6,
+        "result": 5
+      },
+      "part-7": {
+        "kind": "part",
+        "total": 13,
+        "known": 6,
+        "result": 7
+      },
+      "plus-6": {
+        "kind": "plus",
+        "total": 15,
+        "known": 9,
+        "result": 6
+      },
+      "minus-14": {
+        "kind": "minus",
+        "taken": 8,
+        "left": 6,
+        "result": 14
+      },
+      "needed-9": {
+        "kind": "ignore",
+        "total": 16,
+        "known": 7,
+        "irrelevant": 3,
+        "result": 9
+      },
+      "compare-7": {
+        "kind": "compare",
+        "larger": 15,
+        "smaller": 8,
+        "result": 7
+      },
+      "steps-5": {
+        "kind": "steps",
+        "total": 15,
+        "taken": 8,
+        "extraTaken": 2,
+        "result": 5
+      }
+    },
+    "methods": {
+      "original": {
+        "total": 14,
+        "tray": 10,
+        "loose": 4,
+        "takenTray": 0,
+        "takenLoose": 0,
+        "taken": 0,
+        "left": 14
+      },
+      "breakTen": {
+        "total": 14,
+        "tray": 10,
+        "loose": 4,
+        "takenTray": 8,
+        "takenLoose": 0,
+        "taken": 8,
+        "left": 6
+      },
+      "toTen": {
+        "total": 14,
+        "tray": 10,
+        "loose": 4,
+        "takenTray": 0,
+        "takenLoose": 4,
+        "taken": 4,
+        "left": 10
+      },
+      "chain": {
+        "total": 14,
+        "tray": 10,
+        "loose": 4,
+        "takenTray": 4,
+        "takenLoose": 4,
+        "taken": 8,
+        "left": 6
+      }
+    }
+  },
+  "assets": {
+    "bookmark-missing": {
+      "path": "assets/bookmark-missing.png",
+      "sha256": "8c7911f44e0fab25e5a1586147bef9cf5fb3f353b55d7c23627f477b6127a3b1",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "find-the-relevant-part",
+        "move-to-the-right-result"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-bookmark": "fe6270a8cd80b277f3890958b8e761f0dfd9cfe846207645c3216b059de55f93",
+        "one-scissors": "15352a31775951eef1d09f50f16565cfe3cc43285f9e691f934d0aac99d608c7"
+      },
+      "quantity": {
+        "total": 16,
+        "known": 7,
+        "irrelevant": 3,
+        "left": 9
+      }
+    },
+    "break-eight": {
+      "path": "assets/break-eight.png",
+      "sha256": "9df83490137d916f1abcc765e8cb544d0a515eb0d22a21a98d36c3f85e3d4f49",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "three-ways-to-check"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-bookmark": "fe6270a8cd80b277f3890958b8e761f0dfd9cfe846207645c3216b059de55f93"
+      },
+      "quantity": {
+        "total": 14,
+        "tray": 10,
+        "loose": 4,
+        "takenTray": 8,
+        "takenLoose": 0,
+        "taken": 8,
+        "left": 6
+      }
+    },
+    "chain-eight": {
+      "path": "assets/chain-eight.png",
+      "sha256": "bf62337a8b6053e9c2d4396860c10ad80177ea1e58929cff67ffd02b0bb4032f",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "three-ways-to-check"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-bookmark": "fe6270a8cd80b277f3890958b8e761f0dfd9cfe846207645c3216b059de55f93"
+      },
+      "quantity": {
+        "total": 14,
+        "tray": 10,
+        "loose": 4,
+        "takenTray": 4,
+        "takenLoose": 4,
+        "taken": 8,
+        "left": 6
+      }
+    },
+    "check-six": {
+      "path": "assets/check-six.png",
+      "sha256": "250774f4382e12393936c102a211ea666356784ae1383d3973eb9d94bd69e245",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "infer-a-missing-number",
+        "restore-to-check"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-bookmark": "fe6270a8cd80b277f3890958b8e761f0dfd9cfe846207645c3216b059de55f93"
+      },
+      "quantity": {
+        "total": 14,
+        "known": 8,
+        "left": 6
+      }
+    },
+    "compare-fixed": {
+      "path": "assets/compare-fixed.png",
+      "sha256": "ef8c75c485205ac9f823158bfb957f8403dc8055463615b51bd9b3422a84071c",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "compare-differences"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-bookmark": "fe6270a8cd80b277f3890958b8e761f0dfd9cfe846207645c3216b059de55f93"
+      },
+      "quantity": {
+        "tasks": [
+          [
+            13,
+            5
+          ],
+          [
+            13,
+            6
+          ]
+        ],
+        "results": [
+          8,
+          7
+        ]
+      }
+    },
+    "compare-target-five": {
+      "path": "assets/compare-target-five.png",
+      "sha256": "b02fe241b42506d57c6327139709d4a6e6c59c6eec977260b61d070a507f6400",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "compare-differences"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-bookmark": "fe6270a8cd80b277f3890958b8e761f0dfd9cfe846207645c3216b059de55f93"
+      },
+      "quantity": {
+        "larger": 13,
+        "smaller": 8,
+        "difference": 5
+      }
+    },
+    "crate-compare-7": {
+      "path": "assets/crate-compare-7.png",
+      "sha256": "355f0a17f766b22863215c16768d21928e0a307c0992398a932bb483e471b066",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "move-to-the-right-result"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-bookmark": "fe6270a8cd80b277f3890958b8e761f0dfd9cfe846207645c3216b059de55f93"
+      },
+      "quantity": {
+        "kind": "compare",
+        "larger": 15,
+        "smaller": 8,
+        "result": 7
+      }
+    },
+    "crate-minus-14": {
+      "path": "assets/crate-minus-14.png",
+      "sha256": "92ad7e90b623ef38d7371ed452c46ad83f034b96da31c06cfedc928b0e8ed871",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "move-to-the-right-result"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-bookmark": "fe6270a8cd80b277f3890958b8e761f0dfd9cfe846207645c3216b059de55f93"
+      },
+      "quantity": {
+        "kind": "minus",
+        "taken": 8,
+        "left": 6,
+        "result": 14
+      }
+    },
+    "crate-needed-9": {
+      "path": "assets/crate-needed-9.png",
+      "sha256": "8727a65a626d91f217ae9f4c2df0abed66efdd5e4671b43c4e73124ed74edaed",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "move-to-the-right-result"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-bookmark": "fe6270a8cd80b277f3890958b8e761f0dfd9cfe846207645c3216b059de55f93",
+        "one-scissors": "15352a31775951eef1d09f50f16565cfe3cc43285f9e691f934d0aac99d608c7"
+      },
+      "quantity": {
+        "kind": "ignore",
+        "total": 16,
+        "known": 7,
+        "irrelevant": 3,
+        "result": 9
+      }
+    },
+    "crate-part-5": {
+      "path": "assets/crate-part-5.png",
+      "sha256": "8d39509a156e9a5b54f5a6daa95ea5590122a709d802d90400160ebf95328738",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "move-to-the-right-result"
+      ],
+      "derivativeConsumers": [
+        "depot-ready"
+      ],
+      "inputs": {
+        "single-bookmark": "fe6270a8cd80b277f3890958b8e761f0dfd9cfe846207645c3216b059de55f93"
+      },
+      "quantity": {
+        "kind": "part",
+        "total": 11,
+        "known": 6,
+        "result": 5
+      }
+    },
+    "crate-part-7": {
+      "path": "assets/crate-part-7.png",
+      "sha256": "27d3f069a9400f7519aeaefa980185284d932de99460f21fcaf728b2b0dec915",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "move-to-the-right-result"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-bookmark": "fe6270a8cd80b277f3890958b8e761f0dfd9cfe846207645c3216b059de55f93"
+      },
+      "quantity": {
+        "kind": "part",
+        "total": 13,
+        "known": 6,
+        "result": 7
+      }
+    },
+    "crate-plus-6": {
+      "path": "assets/crate-plus-6.png",
+      "sha256": "380837e6b23e1f94e924a56b318b9979df5a5aaf6c458b287f3b6dc49a8c240f",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "move-to-the-right-result"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-bookmark": "fe6270a8cd80b277f3890958b8e761f0dfd9cfe846207645c3216b059de55f93"
+      },
+      "quantity": {
+        "kind": "plus",
+        "total": 15,
+        "known": 9,
+        "result": 6
+      }
+    },
+    "crate-steps-5": {
+      "path": "assets/crate-steps-5.png",
+      "sha256": "391ba16ffbbcfcda72cdbf2746ae5e3472004c6b5ccf9555bdd0551f6d08c5a4",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "move-to-the-right-result"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-bookmark": "fe6270a8cd80b277f3890958b8e761f0dfd9cfe846207645c3216b059de55f93"
+      },
+      "quantity": {
+        "kind": "steps",
+        "total": 15,
+        "taken": 8,
+        "extraTaken": 2,
+        "result": 5
+      }
+    },
+    "depot-amount-14": {
+      "path": "assets/depot-amount-14.png",
+      "sha256": "c0e72834b29d5dc72eb02ad072a60a99c7bbfa84978813443e0ce736d054e0d5",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "move-to-the-right-result"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-bookmark": "fe6270a8cd80b277f3890958b8e761f0dfd9cfe846207645c3216b059de55f93"
+      },
+      "quantity": {
+        "count": 14
+      }
+    },
+    "depot-amount-5": {
+      "path": "assets/depot-amount-5.png",
+      "sha256": "66fb1b98cca1d8f559a8e1408bc1216520f7d9abd7150916b1df6829419e0d97",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "move-to-the-right-result"
+      ],
+      "derivativeConsumers": [
+        "depot-ready"
+      ],
+      "inputs": {
+        "single-bookmark": "fe6270a8cd80b277f3890958b8e761f0dfd9cfe846207645c3216b059de55f93"
+      },
+      "quantity": {
+        "count": 5
+      }
+    },
+    "depot-amount-6": {
+      "path": "assets/depot-amount-6.png",
+      "sha256": "fafcca65b658bf935ba6f782fc92054ac08b0174672fcca6de82f6843b2426fb",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "move-to-the-right-result"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-bookmark": "fe6270a8cd80b277f3890958b8e761f0dfd9cfe846207645c3216b059de55f93"
+      },
+      "quantity": {
+        "count": 6
+      }
+    },
+    "depot-amount-7": {
+      "path": "assets/depot-amount-7.png",
+      "sha256": "b0d85e79b2c532f7ddd23972f0e81118c18317b8b339f56950d44fccb457716d",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "move-to-the-right-result"
+      ],
+      "derivativeConsumers": [
+        "depot-ready"
+      ],
+      "inputs": {
+        "single-bookmark": "fe6270a8cd80b277f3890958b8e761f0dfd9cfe846207645c3216b059de55f93"
+      },
+      "quantity": {
+        "count": 7
+      }
+    },
+    "depot-amount-9": {
+      "path": "assets/depot-amount-9.png",
+      "sha256": "b9ddf96852b96688d09e3cceadb43808f48d0223fc46483464838660085ca2ef",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "move-to-the-right-result"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-bookmark": "fe6270a8cd80b277f3890958b8e761f0dfd9cfe846207645c3216b059de55f93"
+      },
+      "quantity": {
+        "count": 9
+      }
+    },
+    "depot-desk": {
+      "path": "assets/depot-desk.png",
+      "sha256": "067544808f35252f0dcecf0d81a7b864696b6148d57f485b437d6f444d0e37ca",
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/borrow-review-scenes.png",
+      "generatedSourceSha256": "3ce616e334f8be1721b2e7dd57e57bf3c1558c8ad1d9b23cf45cb36752c32750",
+      "sourceCrop": [
+        1032,
+        12,
+        1524,
+        503
+      ],
+      "promptSha256": "5c4c7cbb1fbe5be289cd43fffb5f9ba8180b90cbf743e7a6afb48e296a31fdad",
+      "usedBy": [
+        "move-to-the-right-result"
+      ],
+      "derivativeConsumers": []
+    },
+    "depot-ready": {
+      "path": "assets/depot-ready.png",
+      "sha256": "7c83bd8f39b6dda7187111256c0fad7c67531232515732b379d7f06377dddfa5",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "move-to-the-right-result"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "crate-part-5": "8d39509a156e9a5b54f5a6daa95ea5590122a709d802d90400160ebf95328738",
+        "depot-amount-5": "66fb1b98cca1d8f559a8e1408bc1216520f7d9abd7150916b1df6829419e0d97",
+        "depot-amount-7": "b0d85e79b2c532f7ddd23972f0e81118c18317b8b339f56950d44fccb457716d"
+      }
+    },
+    "diagonal-arrows": {
+      "path": "assets/diagonal-arrows.png",
+      "sha256": "e5cb5dfe60375d82451f573dcfef84a856b5184eb791b84e2297bdd38b8732fa",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "diagonal-keeps-the-difference"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {},
+      "quantity": {
+        "moves": "lower-left",
+        "sameResult": 7
+      }
+    },
+    "exhibit-rosette": {
+      "path": "assets/exhibit-rosette.png",
+      "sha256": "02517bc1303a36815952399426940873e6bf5ddd520ca9e61392b793f59d23bc",
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/borrow-review-sprites.png",
+      "generatedSourceSha256": "1ecc81fbf0017f5e5fbd79644699de6349c2fd1811d172ce3fe26e1cc84f2c70",
+      "sourceCrop": [
+        895,
+        862,
+        1161,
+        1210
+      ],
+      "promptSha256": "2a1690e9853917325698de9beaaa4733d8b5738a80d3df2a0038e47f605b9320",
+      "usedBy": [
+        "hop-along-the-table",
+        "move-to-the-right-result"
+      ],
+      "derivativeConsumers": []
+    },
+    "explorer-jump": {
+      "path": "assets/explorer-jump.png",
+      "sha256": "eea1e657e140f6073c52ba2945a65958b1ebd93ac95e84efd5de586b6ac4cd72",
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/borrow-review-sprites.png",
+      "generatedSourceSha256": "1ecc81fbf0017f5e5fbd79644699de6349c2fd1811d172ce3fe26e1cc84f2c70",
+      "sourceCrop": [
+        905,
+        38,
+        1181,
+        424
+      ],
+      "promptSha256": "2a1690e9853917325698de9beaaa4733d8b5738a80d3df2a0038e47f605b9320",
+      "usedBy": [
+        "hop-along-the-table"
+      ],
+      "derivativeConsumers": []
+    },
+    "explorer-stand": {
+      "path": "assets/explorer-stand.png",
+      "sha256": "eae65e2553b4e3ce964b2eea7910cd8a7473693632b43563d0e2a69966339a5e",
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/borrow-review-sprites.png",
+      "generatedSourceSha256": "1ecc81fbf0017f5e5fbd79644699de6349c2fd1811d172ce3fe26e1cc84f2c70",
+      "sourceCrop": [
+        111,
+        38,
+        322,
+        450
+      ],
+      "promptSha256": "2a1690e9853917325698de9beaaa4733d8b5738a80d3df2a0038e47f605b9320",
+      "usedBy": [
+        "hop-along-the-table"
+      ],
+      "derivativeConsumers": []
+    },
+    "explorer-walk": {
+      "path": "assets/explorer-walk.png",
+      "sha256": "62330e12252c730adc6503b4d294ff9b5c24cf56f8516fa36083ebfea350c0ac",
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/borrow-review-sprites.png",
+      "generatedSourceSha256": "1ecc81fbf0017f5e5fbd79644699de6349c2fd1811d172ce3fe26e1cc84f2c70",
+      "sourceCrop": [
+        503,
+        42,
+        760,
+        450
+      ],
+      "promptSha256": "2a1690e9853917325698de9beaaa4733d8b5738a80d3df2a0038e47f605b9320",
+      "usedBy": [
+        "hop-along-the-table"
+      ],
+      "derivativeConsumers": []
+    },
+    "family-number-story": {
+      "path": "assets/family-number-story.png",
+      "sha256": "b8fec3d57c2ee94d39093cc160a96f69019c76703f7af8e08d9dee0597deafa3",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "growth-and-family"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-bookmark": "fe6270a8cd80b277f3890958b8e761f0dfd9cfe846207645c3216b059de55f93"
+      },
+      "quantity": {
+        "total": 12,
+        "parts": [
+          5,
+          7
+        ]
+      }
+    },
+    "family-story": {
+      "path": "assets/family-story.png",
+      "sha256": "dc0e82bfb37b76db5f8d7a4c886075d174bfa904e41cffb9e6816023b3ea5f6b",
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/borrow-review-scenes.png",
+      "generatedSourceSha256": "3ce616e334f8be1721b2e7dd57e57bf3c1558c8ad1d9b23cf45cb36752c32750",
+      "sourceCrop": [
+        523,
+        519,
+        1015,
+        1010
+      ],
+      "promptSha256": "5c4c7cbb1fbe5be289cd43fffb5f9ba8180b90cbf743e7a6afb48e296a31fdad",
+      "usedBy": [],
+      "derivativeConsumers": [
+        "home-story"
+      ]
+    },
+    "fourteen-on-table": {
+      "path": "assets/fourteen-on-table.png",
+      "sha256": "cfdae1385f3f3f0c73e15a8f4bbbd5416a35d20fbe080b4f394db8724ca9cb50",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "review-at-the-exhibit"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-bookmark": "fe6270a8cd80b277f3890958b8e761f0dfd9cfe846207645c3216b059de55f93"
+      },
+      "quantity": {
+        "total": 14,
+        "tray": 10,
+        "loose": 4,
+        "takenTray": 0,
+        "takenLoose": 0,
+        "taken": 0,
+        "left": 14
+      }
+    },
+    "garden-hops": {
+      "path": "assets/garden-hops.png",
+      "sha256": "6fd58a91dc24d16eca407c044262174e18f3824e0b5cadab91f31a8b1fc66e42",
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/borrow-review-scenes.png",
+      "generatedSourceSha256": "3ce616e334f8be1721b2e7dd57e57bf3c1558c8ad1d9b23cf45cb36752c32750",
+      "sourceCrop": [
+        523,
+        12,
+        1015,
+        503
+      ],
+      "promptSha256": "5c4c7cbb1fbe5be289cd43fffb5f9ba8180b90cbf743e7a6afb48e296a31fdad",
+      "usedBy": [
+        "hop-along-the-table"
+      ],
+      "derivativeConsumers": []
+    },
+    "greenhouse-context": {
+      "path": "assets/greenhouse-context.png",
+      "sha256": "6f4fb1701152206ea8c7086bec9a23adf4ddcb50bd6aa4024a42f221610b2399",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [],
+      "derivativeConsumers": [
+        "q-plants-stem"
+      ],
+      "inputs": {
+        "greenhouse-window": "48fc955f53d7f8c9bee89806285ed79da983316f44790b973aef2546b6de09e5"
+      }
+    },
+    "greenhouse-window": {
+      "path": "assets/greenhouse-window.png",
+      "sha256": "48fc955f53d7f8c9bee89806285ed79da983316f44790b973aef2546b6de09e5",
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/borrow-review-scenes.png",
+      "generatedSourceSha256": "3ce616e334f8be1721b2e7dd57e57bf3c1558c8ad1d9b23cf45cb36752c32750",
+      "sourceCrop": [
+        1032,
+        519,
+        1524,
+        1010
+      ],
+      "promptSha256": "5c4c7cbb1fbe5be289cd43fffb5f9ba8180b90cbf743e7a6afb48e296a31fdad",
+      "usedBy": [],
+      "derivativeConsumers": [
+        "greenhouse-context"
+      ]
+    },
+    "home-story": {
+      "path": "assets/home-story.png",
+      "sha256": "869a4412e2fd7c0aa1849541f7f82abfff2910dca004baa68c0bd96f69294126",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "growth-and-family"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "family-story": "dc0e82bfb37b76db5f8d7a4c886075d174bfa904e41cffb9e6816023b3ea5f6b"
+      }
+    },
+    "hop-11-2": {
+      "path": "assets/hop-11-2.png",
+      "sha256": "a908c124b3838b2d71661aebdd1e020e9d38721adb06ca3a463d5f93e93f4d8a",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "hop-along-the-table"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {},
+      "quantity": {
+        "n": 11,
+        "k": 2
+      }
+    },
+    "hop-12-3": {
+      "path": "assets/hop-12-3.png",
+      "sha256": "bf966d378700dfe53085848ec0d28ea8df9da68b953116c09f36918e64ff65e0",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "hop-along-the-table"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {},
+      "quantity": {
+        "n": 12,
+        "k": 3
+      }
+    },
+    "hop-12-4": {
+      "path": "assets/hop-12-4.png",
+      "sha256": "e367778a4e408f2dbe78d5a0540dfac0b1b8d6d7e60e50b955553c7f500506c3",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "hop-along-the-table"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {},
+      "quantity": {
+        "n": 12,
+        "k": 4
+      }
+    },
+    "hop-12-8": {
+      "path": "assets/hop-12-8.png",
+      "sha256": "73202f0aef2e564454eae395e65c6ce12c131567b252e2bcd55136e35cf876c7",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "hop-along-the-table"
+      ],
+      "derivativeConsumers": [
+        "hop-ready"
+      ],
+      "inputs": {},
+      "quantity": {
+        "n": 12,
+        "k": 8
+      }
+    },
+    "hop-13-4": {
+      "path": "assets/hop-13-4.png",
+      "sha256": "4cc7e48eb32a1c78cae85de45b64810b48816f1f21d8cc20beb61589223322e0",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "hop-along-the-table"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {},
+      "quantity": {
+        "n": 13,
+        "k": 4
+      }
+    },
+    "hop-13-7": {
+      "path": "assets/hop-13-7.png",
+      "sha256": "99a2d6175ec793dcc28590e56f4b42f4eaa2669e78bf707dcf5818fcd79bfbf9",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "hop-along-the-table"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {},
+      "quantity": {
+        "n": 13,
+        "k": 7
+      }
+    },
+    "hop-13-8": {
+      "path": "assets/hop-13-8.png",
+      "sha256": "cec0c9f44039609020ba36dc176d2e4f9b17a8bbcecf5b4d26b9a5d4f6542e80",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "hop-along-the-table"
+      ],
+      "derivativeConsumers": [
+        "hop-ready"
+      ],
+      "inputs": {},
+      "quantity": {
+        "n": 13,
+        "k": 8
+      }
+    },
+    "hop-14-5": {
+      "path": "assets/hop-14-5.png",
+      "sha256": "8ae8fda3d34004b1f7c915c6f1c8eb6e156e5dc1a9ecd414a56cd4ec8d6c08c5",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "hop-along-the-table"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {},
+      "quantity": {
+        "n": 14,
+        "k": 5
+      }
+    },
+    "hop-14-7": {
+      "path": "assets/hop-14-7.png",
+      "sha256": "6ecb2b3d9ed48caf0251afc67ab81ace39993cf71b075d823d50fca6f6ca9076",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "hop-along-the-table"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {},
+      "quantity": {
+        "n": 14,
+        "k": 7
+      }
+    },
+    "hop-14-8": {
+      "path": "assets/hop-14-8.png",
+      "sha256": "02f58fdbec4c3a841fe5872c99c0ac0f1634cd039ffb09afa0f68e59ffe4c0d2",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "hop-along-the-table"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {},
+      "quantity": {
+        "n": 14,
+        "k": 8
+      }
+    },
+    "hop-14-9": {
+      "path": "assets/hop-14-9.png",
+      "sha256": "973791fe0b9176b9ef8f93e5d0046ad0a6eb26bdcce1481dcec66127aae93896",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "hop-along-the-table"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {},
+      "quantity": {
+        "n": 14,
+        "k": 9
+      }
+    },
+    "hop-15-6": {
+      "path": "assets/hop-15-6.png",
+      "sha256": "a19d8c6515cc255bc16cbd4bb76384e18ecd567cf0288e6804180553af7a9713",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "hop-along-the-table"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {},
+      "quantity": {
+        "n": 15,
+        "k": 6
+      }
+    },
+    "hop-15-7": {
+      "path": "assets/hop-15-7.png",
+      "sha256": "0f9ce7722a716b9d3f65c307715300fce3e82b6a0e6725d685487710abf6bb9a",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "hop-along-the-table"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {},
+      "quantity": {
+        "n": 15,
+        "k": 7
+      }
+    },
+    "hop-15-8": {
+      "path": "assets/hop-15-8.png",
+      "sha256": "48aba3d220ef124936396761d5661882ec0b6d155eb9c95a48191234597a53a2",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "hop-along-the-table"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {},
+      "quantity": {
+        "n": 15,
+        "k": 8
+      }
+    },
+    "hop-15-9": {
+      "path": "assets/hop-15-9.png",
+      "sha256": "dbf1c84ac69f90f600584a181256182fc8c76cea9439fbe6c3c481d5818a0e54",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "hop-along-the-table"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {},
+      "quantity": {
+        "n": 15,
+        "k": 9
+      }
+    },
+    "hop-16-7": {
+      "path": "assets/hop-16-7.png",
+      "sha256": "c846ad99429f6a5289a126acd4a4c2b215fe2f0d87a67bd3cde245708bf40800",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "hop-along-the-table"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {},
+      "quantity": {
+        "n": 16,
+        "k": 7
+      }
+    },
+    "hop-proof-12-3": {
+      "path": "assets/hop-proof-12-3.png",
+      "sha256": "d3d09ea4811c92ad69611f9a6c8d80a18c577744551258642cbe8c8763f877f0",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "hop-along-the-table"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-bookmark": "fe6270a8cd80b277f3890958b8e761f0dfd9cfe846207645c3216b059de55f93"
+      },
+      "quantity": {
+        "n": 12,
+        "k": 3,
+        "left": 9
+      }
+    },
+    "hop-proof-13-4": {
+      "path": "assets/hop-proof-13-4.png",
+      "sha256": "3e079b64b056d29189ccf8711810a1b5a47f3ac69a16d09aa829884fa4ab2069",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "hop-along-the-table"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-bookmark": "fe6270a8cd80b277f3890958b8e761f0dfd9cfe846207645c3216b059de55f93"
+      },
+      "quantity": {
+        "n": 13,
+        "k": 4,
+        "left": 9
+      }
+    },
+    "hop-proof-13-8": {
+      "path": "assets/hop-proof-13-8.png",
+      "sha256": "4d38a5a84561dbabaab5e2f10fd012c867ede92a11be03669063b894bcdb7406",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "hop-along-the-table"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-bookmark": "fe6270a8cd80b277f3890958b8e761f0dfd9cfe846207645c3216b059de55f93"
+      },
+      "quantity": {
+        "n": 13,
+        "k": 8,
+        "left": 5
+      }
+    },
+    "hop-proof-14-5": {
+      "path": "assets/hop-proof-14-5.png",
+      "sha256": "bed7baeb749e75671915f9ef237a8670a684ce20026f4133288dc772865cf055",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "hop-along-the-table"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-bookmark": "fe6270a8cd80b277f3890958b8e761f0dfd9cfe846207645c3216b059de55f93"
+      },
+      "quantity": {
+        "n": 14,
+        "k": 5,
+        "left": 9
+      }
+    },
+    "hop-proof-14-8": {
+      "path": "assets/hop-proof-14-8.png",
+      "sha256": "3c48ad06ba46d6e765ff4eb9368e47e42fdb99fce2beafee7b3dab89b52ee63b",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "hop-along-the-table"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-bookmark": "fe6270a8cd80b277f3890958b8e761f0dfd9cfe846207645c3216b059de55f93"
+      },
+      "quantity": {
+        "n": 14,
+        "k": 8,
+        "left": 6
+      }
+    },
+    "hop-proof-15-6": {
+      "path": "assets/hop-proof-15-6.png",
+      "sha256": "f3f7db6b86d17257487657998354359c07d2dbb2a6bbd487a01ab2fc76e17a68",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "hop-along-the-table"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-bookmark": "fe6270a8cd80b277f3890958b8e761f0dfd9cfe846207645c3216b059de55f93"
+      },
+      "quantity": {
+        "n": 15,
+        "k": 6,
+        "left": 9
+      }
+    },
+    "hop-proof-15-7": {
+      "path": "assets/hop-proof-15-7.png",
+      "sha256": "d91bab81456cc5dd99bf6f414dff7c4e8d666458c4b37676c0b451a11814627e",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "hop-along-the-table"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-bookmark": "fe6270a8cd80b277f3890958b8e761f0dfd9cfe846207645c3216b059de55f93"
+      },
+      "quantity": {
+        "n": 15,
+        "k": 7,
+        "left": 8
+      }
+    },
+    "hop-proof-15-8": {
+      "path": "assets/hop-proof-15-8.png",
+      "sha256": "d318c37e0b3f48aabccf527c2e74c657e01fcd738c08ac5d3e81b75a021c3740",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "hop-along-the-table"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-bookmark": "fe6270a8cd80b277f3890958b8e761f0dfd9cfe846207645c3216b059de55f93"
+      },
+      "quantity": {
+        "n": 15,
+        "k": 8,
+        "left": 7
+      }
+    },
+    "hop-ready": {
+      "path": "assets/hop-ready.png",
+      "sha256": "8e486655499e03845f926e6127d6710404457e30f8ac24cbe7a71bb47f6701b4",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "hop-along-the-table"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "rule-column": "cee82d751d864df70aea6dccc562e6eee5cd048ff44ca09a7a86e2860cb86c7d",
+        "hop-12-8": "73202f0aef2e564454eae395e65c6ce12c131567b252e2bcd55136e35cf876c7",
+        "hop-13-8": "cec0c9f44039609020ba36dc176d2e4f9b17a8bbcecf5b4d26b9a5d4f6542e80"
+      }
+    },
+    "library-opening": {
+      "path": "assets/library-opening.png",
+      "sha256": "ec1f62302ede9db5d56461299f5b695daeed4b82b75e3de74b74b3c141f39707",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "review-at-the-exhibit"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "reading-entrance": "0173e437958d7ae5673520df0c4e96e6913bcf0550d91df6d87cca439ed7b137",
+        "reading-kids": "40b51f122dce7409c6efd8bfba80526603fe9d0409c92c675e9c05f5d48f2f5e"
+      }
+    },
+    "line-with-middle": {
+      "path": "assets/line-with-middle.png",
+      "sha256": "429b7d9a8ac4c65050920b4113cd73e631d6b62796ab2fc25a57450c9e3bb219",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "two-steps-and-a-story"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {},
+      "quantity": {
+        "total": 14,
+        "left": 6,
+        "middle": 1,
+        "right": 7
+      }
+    },
+    "missing-eight": {
+      "path": "assets/missing-eight.png",
+      "sha256": "c8fd5528869b71b19aeb55970864a314c535859db3f2a2488919db9e296be19b",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "infer-a-missing-number"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-bookmark": "fe6270a8cd80b277f3890958b8e761f0dfd9cfe846207645c3216b059de55f93"
+      },
+      "quantity": {
+        "total": 13,
+        "left": 5,
+        "removed": 8
+      }
+    },
+    "one-potted-plant": {
+      "path": "assets/one-potted-plant.png",
+      "sha256": "c5ea7f13430f91f87bc7879b0d1b779fcf951f5516550fef580c7f97059d66bb",
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/borrow-review-sprites.png",
+      "generatedSourceSha256": "1ecc81fbf0017f5e5fbd79644699de6349c2fd1811d172ce3fe26e1cc84f2c70",
+      "sourceCrop": [
+        123,
+        869,
+        340,
+        1207
+      ],
+      "promptSha256": "2a1690e9853917325698de9beaaa4733d8b5738a80d3df2a0038e47f605b9320",
+      "usedBy": [],
+      "derivativeConsumers": [
+        "q-plants-a",
+        "q-plants-b",
+        "q-plants-c",
+        "q-plants-stem"
+      ]
+    },
+    "one-scissors": {
+      "path": "assets/one-scissors.png",
+      "sha256": "15352a31775951eef1d09f50f16565cfe3cc43285f9e691f934d0aac99d608c7",
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/borrow-review-sprites.png",
+      "generatedSourceSha256": "1ecc81fbf0017f5e5fbd79644699de6349c2fd1811d172ce3fe26e1cc84f2c70",
+      "sourceCrop": [
+        514,
+        870,
+        745,
+        1208
+      ],
+      "promptSha256": "2a1690e9853917325698de9beaaa4733d8b5738a80d3df2a0038e47f605b9320",
+      "usedBy": [],
+      "derivativeConsumers": [
+        "bookmark-missing",
+        "crate-needed-9",
+        "q-plants-stem"
+      ]
+    },
+    "part-not-total": {
+      "path": "assets/part-not-total.png",
+      "sha256": "911c119200f810c6a00f12bf1caf0d01243c4f293c63e9d640243c105dfd9d2e",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "find-the-relevant-part"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-bookmark": "fe6270a8cd80b277f3890958b8e761f0dfd9cfe846207645c3216b059de55f93"
+      },
+      "quantity": {
+        "total": 16,
+        "known": 7,
+        "left": 9
+      }
+    },
+    "q-borrow-a": {
+      "path": "assets/q-borrow-a.png",
+      "sha256": "44cfbc12abc9022c99a8dc9514000e543106d36d9c25b21737f958ac6e96ad62",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "picture-check"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-bookmark": "fe6270a8cd80b277f3890958b8e761f0dfd9cfe846207645c3216b059de55f93"
+      },
+      "quantity": {
+        "n": 14,
+        "k": 6,
+        "needsTen": true
+      }
+    },
+    "q-borrow-b": {
+      "path": "assets/q-borrow-b.png",
+      "sha256": "14323118f5e06bdbafcacc22286c58d369c1754a6475e93da31f1f2dd4a225c6",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "picture-check"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-bookmark": "fe6270a8cd80b277f3890958b8e761f0dfd9cfe846207645c3216b059de55f93"
+      },
+      "quantity": {
+        "n": 14,
+        "k": 4,
+        "needsTen": false
+      }
+    },
+    "q-borrow-c": {
+      "path": "assets/q-borrow-c.png",
+      "sha256": "53ca4653c5226d61c6032a4975a6cb59f9a23d7a222fe2349641bd46d6bbf708",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "picture-check"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-bookmark": "fe6270a8cd80b277f3890958b8e761f0dfd9cfe846207645c3216b059de55f93"
+      },
+      "quantity": {
+        "n": 14,
+        "k": 2,
+        "needsTen": false
+      }
+    },
+    "q-borrow-stem": {
+      "path": "assets/q-borrow-stem.png",
+      "sha256": "ad9d4272b26f7681016cedc87ad04d065c9741a6f132f6e5650ce20c7ca046ac",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "picture-check"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-bookmark": "fe6270a8cd80b277f3890958b8e761f0dfd9cfe846207645c3216b059de55f93"
+      },
+      "quantity": {
+        "total": 14
+      }
+    },
+    "q-col-a": {
+      "path": "assets/q-col-a.png",
+      "sha256": "eed1450e655336aab4e14ca7e3ae2f37851267005533d817ce206007a126a043",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "picture-check"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {},
+      "quantity": {
+        "n": 17,
+        "k": 9,
+        "left": 8
+      }
+    },
+    "q-col-b": {
+      "path": "assets/q-col-b.png",
+      "sha256": "98199672f9298537ebf1c3d541b066eaba3c401c400dc4c581062bd7a5db2bb9",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "picture-check"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {},
+      "quantity": {
+        "n": 17,
+        "k": 8,
+        "left": 9
+      }
+    },
+    "q-col-c": {
+      "path": "assets/q-col-c.png",
+      "sha256": "32c818241804e5c157f04c70b0400b125589be63f639c792fbb4a18c776a423c",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "picture-check"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {},
+      "quantity": {
+        "n": 16,
+        "k": 9,
+        "left": 7
+      }
+    },
+    "q-col-stem": {
+      "path": "assets/q-col-stem.png",
+      "sha256": "de93b9fcda1a4f7ef34a40ac823f400f560b1109d8eac8a40e7ea76cfe847e9b",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "picture-check"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {},
+      "quantity": {
+        "n": 16,
+        "k": 8,
+        "left": 8
+      }
+    },
+    "q-diag-a": {
+      "path": "assets/q-diag-a.png",
+      "sha256": "58f9733569c965a6905bcd34b7f3a819bc7a8fcaf8a8f6f42b3df1ac2c79029e",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "picture-check"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {},
+      "quantity": {
+        "n": 10,
+        "k": 5,
+        "left": 5
+      }
+    },
+    "q-diag-b": {
+      "path": "assets/q-diag-b.png",
+      "sha256": "3e3a3b1ebadcb2797e3ff959d32c791e9127c32fc409463c66e44faf5a2dfbb9",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "picture-check"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {},
+      "quantity": {
+        "n": 10,
+        "k": 4,
+        "left": 6
+      }
+    },
+    "q-diag-c": {
+      "path": "assets/q-diag-c.png",
+      "sha256": "cf580c593dbf32196dfd907b6e5cc2b0f158c41aefce4fc1f404c6e57db6d40b",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "picture-check"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {},
+      "quantity": {
+        "n": 10,
+        "k": 3,
+        "left": 7
+      }
+    },
+    "q-diag-stem": {
+      "path": "assets/q-diag-stem.png",
+      "sha256": "9d255df5260d7e62cbfc21f7dc9d379033b9bfee8aec56e0f63e163de4c3b2be",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "picture-check"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {},
+      "quantity": {
+        "n": 11,
+        "k": 5,
+        "left": 6
+      }
+    },
+    "q-line-a": {
+      "path": "assets/q-line-a.png",
+      "sha256": "a4f6c5e65b374ee7ff3a355de331b8728aaf3fbbc98e2632327c1d48e26a6c5d",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "picture-check"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {},
+      "quantity": {
+        "count": 8
+      }
+    },
+    "q-line-b": {
+      "path": "assets/q-line-b.png",
+      "sha256": "9fc111c66d1e9ff3dad2c9aa71d7a264cf3bdd2b8dde21bab945d5daa63abde8",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "picture-check"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {},
+      "quantity": {
+        "count": 9
+      }
+    },
+    "q-line-c": {
+      "path": "assets/q-line-c.png",
+      "sha256": "08ab0ecc1ce819840e6aeecb03b71ab931d3036bf8cc28873a5d2b74b54834fa",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "picture-check"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {},
+      "quantity": {
+        "count": 7
+      }
+    },
+    "q-line-stem": {
+      "path": "assets/q-line-stem.png",
+      "sha256": "cc0d0670c0b5ff7e0573b08a8f56b6e27a108982181aaf8307b8319e7f5f4c17",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "picture-check"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {},
+      "quantity": {
+        "total": 16,
+        "left": 7,
+        "middle": 1,
+        "right": 8
+      }
+    },
+    "q-plants-a": {
+      "path": "assets/q-plants-a.png",
+      "sha256": "0b48bfb3c4ddee4e9d7709055b97feb47616d331461979a505e68e251d154889",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "picture-check"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "one-potted-plant": "c5ea7f13430f91f87bc7879b0d1b779fcf951f5516550fef580c7f97059d66bb"
+      },
+      "quantity": {
+        "count": 4
+      }
+    },
+    "q-plants-b": {
+      "path": "assets/q-plants-b.png",
+      "sha256": "3d8349c67c749b443c32ed73372a8c90b1a7d3c621e53bbdc5bfa0e6d34c2c7b",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "picture-check"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "one-potted-plant": "c5ea7f13430f91f87bc7879b0d1b779fcf951f5516550fef580c7f97059d66bb"
+      },
+      "quantity": {
+        "count": 5
+      }
+    },
+    "q-plants-c": {
+      "path": "assets/q-plants-c.png",
+      "sha256": "ce93d5fda436cb01c18c1a355ce65db30c69f07672f56e9e7a576539458a14b3",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "picture-check"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "one-potted-plant": "c5ea7f13430f91f87bc7879b0d1b779fcf951f5516550fef580c7f97059d66bb"
+      },
+      "quantity": {
+        "count": 9
+      }
+    },
+    "q-plants-stem": {
+      "path": "assets/q-plants-stem.png",
+      "sha256": "e036eeedf07f57502d603286db647743b33054c5d1221700104f7863089a3b2a",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "picture-check"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "one-potted-plant": "c5ea7f13430f91f87bc7879b0d1b779fcf951f5516550fef580c7f97059d66bb",
+        "one-scissors": "15352a31775951eef1d09f50f16565cfe3cc43285f9e691f934d0aac99d608c7",
+        "greenhouse-context": "6f4fb1701152206ea8c7086bec9a23adf4ddcb50bd6aa4024a42f221610b2399"
+      },
+      "quantity": {
+        "total": 17,
+        "known": 8,
+        "irrelevant": 4,
+        "left": 9
+      }
+    },
+    "q-row-a": {
+      "path": "assets/q-row-a.png",
+      "sha256": "70151b6bb383031e3e6c3ce54f0f9f1a8bfe99781737b3125eff4f0cf160502e",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "picture-check"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-bookmark": "fe6270a8cd80b277f3890958b8e761f0dfd9cfe846207645c3216b059de55f93"
+      },
+      "quantity": {
+        "before": 7,
+        "after": 6,
+        "delta": -1
+      }
+    },
+    "q-row-b": {
+      "path": "assets/q-row-b.png",
+      "sha256": "83263ae85f4c49e492af2aac3b5bed84998270c28eb68fa3898af90df673d33f",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "picture-check"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-bookmark": "fe6270a8cd80b277f3890958b8e761f0dfd9cfe846207645c3216b059de55f93"
+      },
+      "quantity": {
+        "before": 7,
+        "after": 7,
+        "delta": 0
+      }
+    },
+    "q-row-c": {
+      "path": "assets/q-row-c.png",
+      "sha256": "6568062d956689232921e3d24d96168251302daccd8410a78d1f736bcc91a1a8",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "picture-check"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-bookmark": "fe6270a8cd80b277f3890958b8e761f0dfd9cfe846207645c3216b059de55f93"
+      },
+      "quantity": {
+        "before": 7,
+        "after": 8,
+        "delta": 1
+      }
+    },
+    "q-row-stem": {
+      "path": "assets/q-row-stem.png",
+      "sha256": "439a50310e8ec0a009a98c4fe829d9de3049a99aa86be4e2fc7208fa72f80a28",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "picture-check"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {},
+      "quantity": {
+        "start": [
+          16,
+          9
+        ],
+        "move": "right"
+      }
+    },
+    "reading-entrance": {
+      "path": "assets/reading-entrance.png",
+      "sha256": "0173e437958d7ae5673520df0c4e96e6913bcf0550d91df6d87cca439ed7b137",
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/borrow-review-scenes.png",
+      "generatedSourceSha256": "3ce616e334f8be1721b2e7dd57e57bf3c1558c8ad1d9b23cf45cb36752c32750",
+      "sourceCrop": [
+        14,
+        12,
+        506,
+        503
+      ],
+      "promptSha256": "5c4c7cbb1fbe5be289cd43fffb5f9ba8180b90cbf743e7a6afb48e296a31fdad",
+      "usedBy": [],
+      "derivativeConsumers": [
+        "library-opening"
+      ]
+    },
+    "reading-kids": {
+      "path": "assets/reading-kids.png",
+      "sha256": "40b51f122dce7409c6efd8bfba80526603fe9d0409c92c675e9c05f5d48f2f5e",
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/borrow-review-scenes.png",
+      "generatedSourceSha256": "3ce616e334f8be1721b2e7dd57e57bf3c1558c8ad1d9b23cf45cb36752c32750",
+      "sourceCrop": [
+        14,
+        519,
+        506,
+        1010
+      ],
+      "promptSha256": "5c4c7cbb1fbe5be289cd43fffb5f9ba8180b90cbf743e7a6afb48e296a31fdad",
+      "usedBy": [],
+      "derivativeConsumers": [
+        "library-opening"
+      ]
+    },
+    "rule-column": {
+      "path": "assets/rule-column.png",
+      "sha256": "cee82d751d864df70aea6dccc562e6eee5cd048ff44ca09a7a86e2860cb86c7d",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "hop-along-the-table"
+      ],
+      "derivativeConsumers": [
+        "hop-ready"
+      ],
+      "inputs": {},
+      "quantity": {
+        "mode": "column"
+      }
+    },
+    "rule-row": {
+      "path": "assets/rule-row.png",
+      "sha256": "907ae108e6e84ec34ec262a6cd716ee8403b77a989a74ef8891bcb4f9be94dbb",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "hop-along-the-table"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {},
+      "quantity": {
+        "mode": "row"
+      }
+    },
+    "rule-same-difference": {
+      "path": "assets/rule-same-difference.png",
+      "sha256": "c9361e09e77e5b6e95d3185e242be2b57b01614f8d5a04dfacafb24f4393bf11",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "hop-along-the-table"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {},
+      "quantity": {
+        "mode": "same-difference"
+      }
+    },
+    "same-column": {
+      "path": "assets/same-column.png",
+      "sha256": "14e0cae55f3a46bc4769a4f1fc5d8be171bb64d78722b14abcfc82a2843b01d5",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "read-row-and-column"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-bookmark": "fe6270a8cd80b277f3890958b8e761f0dfd9cfe846207645c3216b059de55f93"
+      },
+      "quantity": {
+        "mode": "column",
+        "rows": [
+          [
+            12,
+            9,
+            3
+          ],
+          [
+            13,
+            9,
+            4
+          ],
+          [
+            14,
+            9,
+            5
+          ]
+        ]
+      }
+    },
+    "same-diagonal": {
+      "path": "assets/same-diagonal.png",
+      "sha256": "2ad7dcc540305d87094502eca7f34a60f3d5a613d38042a3a44e7f148b92eac8",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "diagonal-keeps-the-difference"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-bookmark": "fe6270a8cd80b277f3890958b8e761f0dfd9cfe846207645c3216b059de55f93"
+      },
+      "quantity": {
+        "mode": "same-difference",
+        "rows": [
+          [
+            13,
+            6,
+            7
+          ],
+          [
+            14,
+            7,
+            7
+          ],
+          [
+            15,
+            8,
+            7
+          ]
+        ]
+      }
+    },
+    "same-row": {
+      "path": "assets/same-row.png",
+      "sha256": "a0faa9c561ebf832e1614ad3a8fa15025bc50a9824d55f069cb5b2e2d179016b",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "read-row-and-column"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-bookmark": "fe6270a8cd80b277f3890958b8e761f0dfd9cfe846207645c3216b059de55f93"
+      },
+      "quantity": {
+        "mode": "row",
+        "rows": [
+          [
+            12,
+            9,
+            3
+          ],
+          [
+            12,
+            8,
+            4
+          ],
+          [
+            12,
+            7,
+            5
+          ]
+        ]
+      }
+    },
+    "single-bookmark": {
+      "path": "assets/single-bookmark.png",
+      "sha256": "fe6270a8cd80b277f3890958b8e761f0dfd9cfe846207645c3216b059de55f93",
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/borrow-review-sprites.png",
+      "generatedSourceSha256": "1ecc81fbf0017f5e5fbd79644699de6349c2fd1811d172ce3fe26e1cc84f2c70",
+      "sourceCrop": [
+        952,
+        486,
+        1125,
+        791
+      ],
+      "promptSha256": "2a1690e9853917325698de9beaaa4733d8b5738a80d3df2a0038e47f605b9320",
+      "usedBy": [],
+      "derivativeConsumers": [
+        "bookmark-missing",
+        "break-eight",
+        "chain-eight",
+        "check-six",
+        "compare-fixed",
+        "compare-target-five",
+        "crate-compare-7",
+        "crate-minus-14",
+        "crate-needed-9",
+        "crate-part-5",
+        "crate-part-7",
+        "crate-plus-6",
+        "crate-steps-5",
+        "depot-amount-14",
+        "depot-amount-5",
+        "depot-amount-6",
+        "depot-amount-7",
+        "depot-amount-9",
+        "family-number-story",
+        "fourteen-on-table",
+        "hop-proof-12-3",
+        "hop-proof-13-4",
+        "hop-proof-13-8",
+        "hop-proof-14-5",
+        "hop-proof-14-8",
+        "hop-proof-15-6",
+        "hop-proof-15-7",
+        "hop-proof-15-8",
+        "missing-eight",
+        "part-not-total",
+        "q-borrow-a",
+        "q-borrow-b",
+        "q-borrow-c",
+        "q-borrow-stem",
+        "q-row-a",
+        "q-row-b",
+        "q-row-c",
+        "same-column",
+        "same-diagonal",
+        "same-row",
+        "two-operations"
+      ]
+    },
+    "table-all-45": {
+      "path": "assets/table-all-45.png",
+      "sha256": "72b8484c997be95b0ed34c8988fba6643f6e56f520a6f1863bc41c5a107e9193",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "check-the-whole-table",
+        "hop-along-the-table"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {},
+      "quantity": {
+        "cells": 45,
+        "missing": null,
+        "entries": [
+          [
+            [
+              10,
+              9
+            ],
+            [
+              10,
+              8
+            ],
+            [
+              10,
+              7
+            ],
+            [
+              10,
+              6
+            ],
+            [
+              10,
+              5
+            ],
+            [
+              10,
+              4
+            ],
+            [
+              10,
+              3
+            ],
+            [
+              10,
+              2
+            ],
+            [
+              10,
+              1
+            ]
+          ],
+          [
+            [
+              11,
+              9
+            ],
+            [
+              11,
+              8
+            ],
+            [
+              11,
+              7
+            ],
+            [
+              11,
+              6
+            ],
+            [
+              11,
+              5
+            ],
+            [
+              11,
+              4
+            ],
+            [
+              11,
+              3
+            ],
+            [
+              11,
+              2
+            ]
+          ],
+          [
+            [
+              12,
+              9
+            ],
+            [
+              12,
+              8
+            ],
+            [
+              12,
+              7
+            ],
+            [
+              12,
+              6
+            ],
+            [
+              12,
+              5
+            ],
+            [
+              12,
+              4
+            ],
+            [
+              12,
+              3
+            ]
+          ],
+          [
+            [
+              13,
+              9
+            ],
+            [
+              13,
+              8
+            ],
+            [
+              13,
+              7
+            ],
+            [
+              13,
+              6
+            ],
+            [
+              13,
+              5
+            ],
+            [
+              13,
+              4
+            ]
+          ],
+          [
+            [
+              14,
+              9
+            ],
+            [
+              14,
+              8
+            ],
+            [
+              14,
+              7
+            ],
+            [
+              14,
+              6
+            ],
+            [
+              14,
+              5
+            ]
+          ],
+          [
+            [
+              15,
+              9
+            ],
+            [
+              15,
+              8
+            ],
+            [
+              15,
+              7
+            ],
+            [
+              15,
+              6
+            ]
+          ],
+          [
+            [
+              16,
+              9
+            ],
+            [
+              16,
+              8
+            ],
+            [
+              16,
+              7
+            ]
+          ],
+          [
+            [
+              17,
+              9
+            ],
+            [
+              17,
+              8
+            ]
+          ],
+          [
+            [
+              18,
+              9
+            ]
+          ]
+        ]
+      }
+    },
+    "table-one-gap": {
+      "path": "assets/table-one-gap.png",
+      "sha256": "06b9c9fbca8b7a22330c8c596a04517cf8df54037eb9205450dfe59153259712",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "fill-the-table"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {},
+      "quantity": {
+        "cells": 45,
+        "missing": [
+          12,
+          6
+        ],
+        "entries": [
+          [
+            [
+              10,
+              9
+            ],
+            [
+              10,
+              8
+            ],
+            [
+              10,
+              7
+            ],
+            [
+              10,
+              6
+            ],
+            [
+              10,
+              5
+            ],
+            [
+              10,
+              4
+            ],
+            [
+              10,
+              3
+            ],
+            [
+              10,
+              2
+            ],
+            [
+              10,
+              1
+            ]
+          ],
+          [
+            [
+              11,
+              9
+            ],
+            [
+              11,
+              8
+            ],
+            [
+              11,
+              7
+            ],
+            [
+              11,
+              6
+            ],
+            [
+              11,
+              5
+            ],
+            [
+              11,
+              4
+            ],
+            [
+              11,
+              3
+            ],
+            [
+              11,
+              2
+            ]
+          ],
+          [
+            [
+              12,
+              9
+            ],
+            [
+              12,
+              8
+            ],
+            [
+              12,
+              7
+            ],
+            [
+              12,
+              6
+            ],
+            [
+              12,
+              5
+            ],
+            [
+              12,
+              4
+            ],
+            [
+              12,
+              3
+            ]
+          ],
+          [
+            [
+              13,
+              9
+            ],
+            [
+              13,
+              8
+            ],
+            [
+              13,
+              7
+            ],
+            [
+              13,
+              6
+            ],
+            [
+              13,
+              5
+            ],
+            [
+              13,
+              4
+            ]
+          ],
+          [
+            [
+              14,
+              9
+            ],
+            [
+              14,
+              8
+            ],
+            [
+              14,
+              7
+            ],
+            [
+              14,
+              6
+            ],
+            [
+              14,
+              5
+            ]
+          ],
+          [
+            [
+              15,
+              9
+            ],
+            [
+              15,
+              8
+            ],
+            [
+              15,
+              7
+            ],
+            [
+              15,
+              6
+            ]
+          ],
+          [
+            [
+              16,
+              9
+            ],
+            [
+              16,
+              8
+            ],
+            [
+              16,
+              7
+            ]
+          ],
+          [
+            [
+              17,
+              9
+            ],
+            [
+              17,
+              8
+            ]
+          ],
+          [
+            [
+              18,
+              9
+            ]
+          ]
+        ]
+      }
+    },
+    "trolley-idle": {
+      "path": "assets/trolley-idle.png",
+      "sha256": "42da7fcceabcd0a1e21c764728596e259502e267f90ca833cc9344d38e59c42e",
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/borrow-review-sprites.png",
+      "generatedSourceSha256": "1ecc81fbf0017f5e5fbd79644699de6349c2fd1811d172ce3fe26e1cc84f2c70",
+      "sourceCrop": [
+        83,
+        500,
+        381,
+        795
+      ],
+      "promptSha256": "2a1690e9853917325698de9beaaa4733d8b5738a80d3df2a0038e47f605b9320",
+      "usedBy": [
+        "move-to-the-right-result"
+      ],
+      "derivativeConsumers": []
+    },
+    "trolley-push": {
+      "path": "assets/trolley-push.png",
+      "sha256": "b2553c79bcf6a5ddcfbe06c2e4c9165b39fcefdad8ed4fe84df60714856e1834",
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/borrow-review-sprites.png",
+      "generatedSourceSha256": "1ecc81fbf0017f5e5fbd79644699de6349c2fd1811d172ce3fe26e1cc84f2c70",
+      "sourceCrop": [
+        460,
+        530,
+        806,
+        795
+      ],
+      "promptSha256": "2a1690e9853917325698de9beaaa4733d8b5738a80d3df2a0038e47f605b9320",
+      "usedBy": [
+        "move-to-the-right-result"
+      ],
+      "derivativeConsumers": []
+    },
+    "two-operations": {
+      "path": "assets/two-operations.png",
+      "sha256": "c9f461b77530b70c07b5f305fb2e8007927ff5ce42cd33fd81513eb7c4d61df6",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/review-diagrams.mjs",
+      "renderSourceSha256": "866ac62ac9a045eae8318340b5b0be9b17cda20db50f5e3c6ba857c02368067a",
+      "usedBy": [
+        "two-steps-and-a-story"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-bookmark": "fe6270a8cd80b277f3890958b8e761f0dfd9cfe846207645c3216b059de55f93"
+      },
+      "quantity": {
+        "first": [
+          8,
+          6,
+          14
+        ],
+        "second": [
+          14,
+          7,
+          7
+        ]
+      }
+    }
+  }
+}

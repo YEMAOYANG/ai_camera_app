@@ -1,0 +1,380 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "binding": {
+    "editionId": "smartedu-english-six-year-g1-upper-sync-af05bc77",
+    "revisionId": "20260928-metadata-1",
+    "unitId": "d29dd508-0e3b-3bcd-b26d-765c6af9e2db",
+    "nodeId": "f77069a7-a7ad-3e25-bb17-c6604fdf9de7",
+    "officialChapterId": "f77069a7-a7ad-3e25-bb17-c6604fdf9de7",
+    "officialMaterialId": "af05bc77-0902-9842-f1b5-37cdfad7c5c8",
+    "legacyActivityId": "8ae68b84-4a61-aae8-014a-6c4dcddc3dc4",
+    "lessonTitle": "Unit 1 How old are you?",
+    "unitTitle": "Module 9",
+    "subject": "english",
+    "gradeCode": "primary_1",
+    "volume": "upper",
+    "schoolSystem": "six_year",
+    "teachingRevision": "1"
+  },
+  "title": "Unit 1 How old are you?",
+  "authorModels": [
+    "gpt-6.1-sol"
+  ],
+  "officialNotesSha256": "bbcbad1c284079973b3f143045e9440da269d2026816bdb7a0a95dabb8e03375",
+  "catalogSha256": "1f04d478644e68af67bc264bf46227ece3d94d9c4070e8a8dd219846a48f4753",
+  "goals": [
+    "听懂 How old are you? 在问年龄，模仿并用 I’m 加数词作完整回答。",
+    "从实际听到的数词听辨年龄，尤其 six 与 nine。正确辨识年龄牌朝向，理解 too 表示同岁。",
+    "先找正在回答的人，再把听到的年龄和人物对应，不用外形猜。",
+    "在模拟采访中依次问姓名、问年龄，并分别给出对应回答。"
+  ],
+  "goalReferences": [
+    {
+      "id": "goal-1",
+      "goal": "听懂 How old are you? 在问年龄，模仿并用 I’m 加数词作完整回答。",
+      "pageRefs": [
+        50,
+        51,
+        52
+      ]
+    },
+    {
+      "id": "goal-2",
+      "goal": "从实际听到的数词听辨年龄，尤其 six 与 nine。正确辨识年龄牌朝向，理解 too 表示同岁。",
+      "pageRefs": [
+        50,
+        51
+      ]
+    },
+    {
+      "id": "goal-3",
+      "goal": "先找正在回答的人，再把听到的年龄和人物对应，不用外形猜。",
+      "pageRefs": [
+        50,
+        51
+      ]
+    },
+    {
+      "id": "goal-4",
+      "goal": "在模拟采访中依次问姓名、问年龄，并分别给出对应回答。",
+      "pageRefs": [
+        52
+      ]
+    }
+  ],
+  "scenes": [
+    {
+      "key": "meet-at-workshop",
+      "type": "slide",
+      "focus": "艺术社门口的小记者想问年龄，辨别问候、问名字和问年龄。听、跟说问龄及完整回答。",
+      "goals": [
+        "goal-1",
+        "goal-4"
+      ]
+    },
+    {
+      "key": "age-badge-direction",
+      "type": "slide",
+      "focus": "同一张六岁牌转倒后像九，先找下边标记，再信说话人听到的年龄，孩子用手比划摆正。",
+      "goals": [
+        "goal-2"
+      ]
+    },
+    {
+      "key": "hear-a-full-age",
+      "type": "slide",
+      "focus": "听完整回答，用数词决定年龄。3、10岁角色外形的反差用于拆除按身高猜测；听读 six、seven、nine 的差别。",
+      "goals": [
+        "goal-1",
+        "goal-2",
+        "goal-3"
+      ]
+    },
+    {
+      "key": "badge-marbles",
+      "type": "interactive",
+      "focus": "听年龄才知道该命中哪张牌；前移/瞄准和发射是实时操作。教师暂停首关讲目标，固定高亮一张牌，解除暂停只示范一击，回到首关清分交接。",
+      "game": {
+        "version": 1,
+        "entryPoint": "K.gameTemplates.magnetMarbles",
+        "ownerApprovedOn": "2026-11-09",
+        "example": "courseware/kit/examples/classic-arcade/magnet-marbles.json",
+        "approvalEvidence": {
+          "handover": "output/courseware-production/game-handover.json",
+          "preview": "output/courseware-production/classic-arcade-v2/index.html",
+          "recordedAt": "2026-11-09T17:19:29.434192+08:00",
+          "quote": "这几个游戏可以"
+        },
+        "teacherAnchors": [
+          "game-goal",
+          "game-player",
+          "game-target"
+        ],
+        "rule": "listen_match",
+        "goal": "同形牌靠听到的年龄来选择，正确命中才推进。",
+        "levels": [
+          "慢速、静止两靶，听six而非nine。",
+          "三张微动牌，依次听nine和seven。",
+          "四张牌和三条口令，移动更快且要途中修正。"
+        ]
+      },
+      "goals": [
+        "goal-2"
+      ]
+    },
+    {
+      "key": "listen-to-the-speaker",
+      "type": "slide",
+      "focus": "先找正在回答的人。两位说同一年龄时可用too；年龄不同则各说自己的数字。",
+      "goals": [
+        "goal-2",
+        "goal-3"
+      ]
+    },
+    {
+      "key": "interview-practice",
+      "type": "slide",
+      "focus": "一次采访里先问名字再问年龄，区分两句回答；让孩子与家人轮换。",
+      "goals": [
+        "goal-3",
+        "goal-4"
+      ]
+    },
+    {
+      "key": "interview-dispatch",
+      "type": "interactive",
+      "focus": "按听到的完整年龄回答拿对牌，再听指定的收件人送过去。过车道需要择时；问话者与收件人分开。教师暂停首关、固定目标、做一次取牌、清分交接。",
+      "game": {
+        "version": 1,
+        "entryPoint": "K.gameTemplates.listenDelivery",
+        "ownerApprovedOn": "2026-11-09",
+        "example": "courseware/kit/examples/classic-arcade/listen-delivery.json",
+        "approvalEvidence": {
+          "source": "ownerMessage",
+          "preview": "output/courseware-production/classic-arcade-v11/index.html",
+          "recordedAt": "2026-11-09T20:02:12+08:00",
+          "quote": "可以了，都标记为可用吧"
+        },
+        "teacherAnchors": [
+          "game-goal",
+          "game-player",
+          "game-target"
+        ],
+        "rule": "listen_pick_deliver",
+        "goal": "只有拿对年龄且送到正确头像才完成一单。",
+        "levels": [
+          "一条慢车道，送一位圆帽同学。",
+          "两条车道，中间有安全带，送耳机同学和围巾同学。",
+          "三条车道，按顺序处理三位新访客，干扰更多。"
+        ]
+      },
+      "goals": [
+        "goal-2",
+        "goal-3"
+      ]
+    },
+    {
+      "key": "picture-check",
+      "type": "quiz",
+      "focus": "原创美术馆登记情境与新数字。六题听音选图，图案和颜色无答案泄漏。",
+      "goals": [
+        "goal-1",
+        "goal-2",
+        "goal-3",
+        "goal-4"
+      ]
+    },
+    {
+      "key": "recap-workshop",
+      "type": "slide",
+      "focus": "回扣采访。问年龄、听数词、看说话人、换角色。让家人用虚构身份跟说。",
+      "goals": [
+        "goal-1",
+        "goal-2",
+        "goal-3",
+        "goal-4"
+      ]
+    }
+  ],
+  "quizPlan": [
+    {
+      "id": "age-question-meaning",
+      "goal": "goal-1",
+      "answer": "b",
+      "visualMeaning": "比较打招呼、指年龄牌、指有头像的姓名卡，只有B问年龄。",
+      "prompt": "How old are you? 这句话问什么？",
+      "skill": "听辨问年龄",
+      "analysis": "这句话问对方几岁。指年龄牌的采访图符合。挥手是招呼，头像卡提示在问名字。"
+    },
+    {
+      "id": "hear-eight",
+      "goal": "goal-2",
+      "answer": "c",
+      "visualMeaning": "新口令八岁。三张同形正向年龄牌中，只有C是8。",
+      "prompt": "I'm eight. 听到几岁？选那张牌。",
+      "skill": "听年龄回答找数字",
+      "analysis": "eight 是八。找到形状相同且下边线朝下的 8 岁牌。另两张是 7 和 9。"
+    },
+    {
+      "id": "upright-six",
+      "goal": "goal-2",
+      "answer": "a",
+      "visualMeaning": "A是下边标记在下的6，B是正向9，C整张6牌倒转。",
+      "prompt": "I'm six. 哪张牌摆正了，又和他说的一样？",
+      "skill": "听辨六和九并看方向",
+      "analysis": "six 是六岁。A 的六岁牌下边线朝下。B 正着是九，C 的六岁牌倒了。"
+    },
+    {
+      "id": "find-five-speaker",
+      "goal": "goal-3",
+      "answer": "b",
+      "visualMeaning": "在不同于游戏的美术馆场景听两人的年龄，选说五岁的角色。",
+      "prompt": "耳罩同学说 I'm four. 圆帽同学说 I'm five. 谁五岁？",
+      "skill": "把年龄对应到说话人",
+      "analysis": "说 five 的是戴圆帽的同学。他说的是五岁。戴耳罩的同学说的是四岁。"
+    },
+    {
+      "id": "same-age-too",
+      "goal": "goal-2",
+      "answer": "c",
+      "visualMeaning": "听两人都四岁，三组牌只有C两张都为4。",
+      "prompt": "I'm four. 另一人说 I'm four, too. 选两张牌。",
+      "skill": "理解 too 表示年龄相同",
+      "analysis": "两个人都说 four，就是两个四岁。too 在这里表示“也”，不用把年龄加起来。"
+    },
+    {
+      "id": "answer-after-name",
+      "goal": "goal-4",
+      "answer": "a",
+      "visualMeaning": "虚构采访中已经问过名字，现在问年龄。只有A是一位孩子在报年龄的图。",
+      "prompt": "名字问完了。How old are you? 哪张是在答年龄？",
+      "skill": "采访时分别回答姓名与年龄",
+      "analysis": "这次问的是几岁，回答要说 I’m 加年龄。举年龄牌的孩子在报年龄，另两张是说名字和打招呼。"
+    }
+  ],
+  "afterClassPractice": {
+    "description": "和家人用自选虚构人物轮流问姓名和年龄，用已经会的数词回答，不采集真实个人信息。",
+    "evidence": "待观察"
+  },
+  "weeklyQuestionSources": [
+    "听句子，辨别问年龄、问名字、问候。",
+    "听回答选年龄牌，听辨six和nine并注意牌的朝向。",
+    "听两人回答，找正在说话的人与他的年龄。",
+    "模拟采访将问名、问龄和各自回答对应。"
+  ],
+  "evidenceBoundaries": "复述、跟读、家人实践标待观察；课内只记录图题和真实游戏结果。不用公开人物的真实年龄。",
+  "gameCuePlan": {
+    "bindings": [
+      {
+        "scene": "badge-marbles",
+        "cue": "age-three",
+        "actionId": "hear-a-full-age-9"
+      },
+      {
+        "scene": "badge-marbles",
+        "cue": "age-six",
+        "actionId": "hear-a-full-age-10"
+      },
+      {
+        "scene": "badge-marbles",
+        "cue": "age-seven",
+        "actionId": "hear-a-full-age-11"
+      },
+      {
+        "scene": "badge-marbles",
+        "cue": "age-nine",
+        "actionId": "hear-a-full-age-12"
+      },
+      {
+        "scene": "badge-marbles",
+        "cue": "age-ten",
+        "actionId": "hear-a-full-age-13"
+      },
+      {
+        "scene": "badge-marbles",
+        "cue": "marble-hint",
+        "actionId": "hear-a-full-age-16"
+      },
+      {
+        "scene": "badge-marbles",
+        "cue": "marble-help",
+        "actionId": "hear-a-full-age-17"
+      },
+      {
+        "scene": "badge-marbles",
+        "cue": "marble-praise",
+        "actionId": "hear-a-full-age-18"
+      },
+      {
+        "scene": "interview-dispatch",
+        "cue": "age-three",
+        "actionId": "hear-a-full-age-9"
+      },
+      {
+        "scene": "interview-dispatch",
+        "cue": "age-six",
+        "actionId": "hear-a-full-age-10"
+      },
+      {
+        "scene": "interview-dispatch",
+        "cue": "age-seven",
+        "actionId": "hear-a-full-age-11"
+      },
+      {
+        "scene": "interview-dispatch",
+        "cue": "age-nine",
+        "actionId": "hear-a-full-age-12"
+      },
+      {
+        "scene": "interview-dispatch",
+        "cue": "age-ten",
+        "actionId": "hear-a-full-age-13"
+      },
+      {
+        "scene": "interview-dispatch",
+        "cue": "to-cap",
+        "actionId": "interview-practice-13"
+      },
+      {
+        "scene": "interview-dispatch",
+        "cue": "to-phones",
+        "actionId": "interview-practice-14"
+      },
+      {
+        "scene": "interview-dispatch",
+        "cue": "to-scarf",
+        "actionId": "interview-practice-15"
+      },
+      {
+        "scene": "interview-dispatch",
+        "cue": "to-headband",
+        "actionId": "interview-practice-16"
+      },
+      {
+        "scene": "interview-dispatch",
+        "cue": "to-bowtie",
+        "actionId": "interview-practice-17"
+      },
+      {
+        "scene": "interview-dispatch",
+        "cue": "to-glasses",
+        "actionId": "interview-practice-18"
+      },
+      {
+        "scene": "interview-dispatch",
+        "cue": "delivery-hint",
+        "actionId": "interview-practice-19"
+      },
+      {
+        "scene": "interview-dispatch",
+        "cue": "delivery-help",
+        "actionId": "interview-practice-20"
+      },
+      {
+        "scene": "interview-dispatch",
+        "cue": "delivery-praise",
+        "actionId": "interview-practice-21"
+      }
+    ]
+  }
+}

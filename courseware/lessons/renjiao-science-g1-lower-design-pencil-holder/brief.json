@@ -1,0 +1,194 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "设计制作笔筒",
+  "binding": {
+    "editionId": "smartedu-science-six-year-g1-lower-e231dd57",
+    "revisionId": "directory-359f40a6afba915101f297d3",
+    "nodeId": "378d5ccc-d812-4305-9b52-e1fc3c728b99",
+    "unitId": "0d3a4b18-821e-4949-ae08-414e58db0e6d"
+  },
+  "scenario": "画材角的同学要收起长尺、短笔和橡皮。先画一份能看懂的设计图，再用原创模型对照装入文具的状态。",
+  "goals": [
+    "从文具的实际需要观察笔筒的外形、结构、材料和用途，说清一处结构怎样方便收纳。",
+    "挑选可利用的干净材料，考虑稳定、容量、取用高度与分隔，用设计图表示材料和用途。",
+    "按设计图准备材料与工具并制作。若要改先在图上标记，较硬材料由成人处理。",
+    "把不同文具放进成品试用，用同一次试用的两个角度核对能否满足设计和取用需要。"
+  ],
+  "goalEvidence": [
+    {
+      "skill": "observe-form-use",
+      "target": "从文具的实际需要观察笔筒的外形、结构、材料和用途，说清一处结构怎样方便收纳。",
+      "source": "印58、第一课时课件3"
+    },
+    {
+      "skill": "choose-and-design",
+      "target": "挑选可利用的干净材料，考虑稳定、容量、取用高度与分隔，用设计图表示材料和用途。",
+      "source": "印59至60、第一课时教案3和任务2"
+    },
+    {
+      "skill": "make-from-plan",
+      "target": "按设计图准备材料与工具并制作。若要改先在图上标记，较硬材料由成人处理。",
+      "source": "印60至61、第二课时教案1至2"
+    },
+    {
+      "skill": "compare-actual-tryout",
+      "target": "把不同文具放进成品试用，用同一次试用的两个角度核对能否满足设计和取用需要。",
+      "source": "印61、第二课时课件6及9"
+    }
+  ],
+  "pageSequence": [
+    {
+      "key": "find-a-need",
+      "kind": "teaching",
+      "classHourId": "lesson_1",
+      "title": "先说要收好哪些文具"
+    },
+    {
+      "key": "look-at-parts",
+      "kind": "teaching",
+      "classHourId": "lesson_1",
+      "title": "观察结构和用途"
+    },
+    {
+      "key": "choose-materials",
+      "kind": "teaching",
+      "classHourId": "lesson_1",
+      "title": "选择相合的材料"
+    },
+    {
+      "key": "sort-parts",
+      "kind": "interactive",
+      "classHourId": "lesson_1",
+      "title": "送部件到对的用途图"
+    },
+    {
+      "key": "draw-plan",
+      "kind": "teaching",
+      "classHourId": "lesson_1",
+      "title": "用图标出材料和用途"
+    },
+    {
+      "key": "prepare-to-make",
+      "kind": "teaching",
+      "classHourId": "lesson_2",
+      "title": "对照设计图备料"
+    },
+    {
+      "key": "build-and-try",
+      "kind": "teaching",
+      "classHourId": "lesson_2",
+      "title": "照图制作再装文具试用"
+    },
+    {
+      "key": "take-two-views",
+      "kind": "interactive",
+      "classHourId": "lesson_2",
+      "title": "拍同一次试用的两个视角"
+    },
+    {
+      "key": "compare-photos",
+      "kind": "teaching",
+      "classHourId": "lesson_2",
+      "title": "拿照片查设计是否合用"
+    },
+    {
+      "key": "picture-check",
+      "kind": "quiz",
+      "classHourId": "lesson_2",
+      "title": "看新图选材料和做法"
+    },
+    {
+      "key": "family-observation",
+      "kind": "teaching",
+      "classHourId": "lesson_2",
+      "title": "回家试用并说说发现"
+    }
+  ],
+  "games": [
+    {
+      "page": "sort-parts",
+      "template": "sortingDepot",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.sortingDepot",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "classification",
+      "selection": "用结构功能图匹配原创材料卡。开放的筒壁、宽纸板底和竖直分隔位置清楚，由用途决定，颜色不泄露答案。",
+      "levels": [
+        "区别开放筒壁与完整底板。",
+        "按长短文具的用途选择分隔或不同高度件。",
+        "换摆位比较多格结构。"
+      ],
+      "demo": "圈任务需要、部件特征和托盘，实际推一件说反馈，然后复位。"
+    },
+    {
+      "page": "take-two-views",
+      "template": "shutterScout",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.shutterScout",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "observe_state",
+      "selection": "每轮装载状态固定，需从上方及侧方各拍一张。先听想看哪个特点，按快门取图；实际取齐才写入观察卡。",
+      "levels": [
+        "先看分隔，后看高低。",
+        "反转提示顺序，核对开口和露出。",
+        "同一笔筒装更多文具，用两视角核对新的摆放。"
+      ],
+      "demo": "圈预览、画面与镜头框，实际拍一次后暂停，交给孩子前清空。"
+    }
+  ],
+  "observationCard": {
+    "kind": "simulation",
+    "page": "take-two-views",
+    "successEvidence": "同一次试用的两张原创视角图须能明显区分；取齐后逐关记录，不纳入教师图。成课每张观察图在资产笔记标两处资料。",
+    "familyEvidence": "实际制作、装入文具和口头表达待观察。"
+  },
+  "quizPlan": [
+    {
+      "skill": "observe-form-use",
+      "task": "看新图，选能将长尺和短笔分开收纳的结构。",
+      "correctPosition": 2,
+      "rationale": "有适合高度的两个独立开口。"
+    },
+    {
+      "skill": "choose-and-design",
+      "task": "听短笔方便取用，选有低格的草图。",
+      "correctPosition": 1,
+      "rationale": "短笔从低格露出，容易抓取。"
+    },
+    {
+      "skill": "make-from-plan",
+      "task": "选与草图标出的材料相符的备料图。",
+      "correctPosition": 3,
+      "rationale": "底板、筒壁及分隔均与所画相符。"
+    },
+    {
+      "skill": "make-from-plan",
+      "task": "遇到需要剪较硬材料，选正确办法。",
+      "correctPosition": 2,
+      "rationale": "请成人处理，先在图上确认调整。"
+    },
+    {
+      "skill": "compare-actual-tryout",
+      "task": "两张同次照片，哪张能看出每格装了什么？",
+      "correctPosition": 1,
+      "rationale": "上方角度能看清各开口及格内物件。"
+    }
+  ],
+  "afterClass": {
+    "familyTask": "用清洁预裁纸材和家人画图、制作、放笔试。从上方和侧面各看一次，说出一处与设计相符的地方。",
+    "weeklyQuestionSource": [
+      "外形结构与用途",
+      "选材及草图",
+      "按图制作和安全",
+      "同次双视角初试"
+    ],
+    "evidence": "线上记录模拟操作和图题；家庭制作及口头说明待观察。"
+  },
+  "artAndLanguage": "自创画材角、结构图和两个有可见差异的角度，不复用教科书照片。物件钝边，图能表达形状、高度及装载，遮住非目标字后仍可听指令操作。",
+  "authoring": {
+    "sourceMode": "direct",
+    "authorModels": [
+      "gpt-6.1-sol"
+    ]
+  }
+}

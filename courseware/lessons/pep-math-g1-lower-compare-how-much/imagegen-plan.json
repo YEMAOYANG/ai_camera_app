@@ -1,0 +1,64 @@
+{
+  "schemaVersion": "mira.courseware.imagegen-plan.v1",
+  "mode": "builtin_native_imagegen",
+  "state": "planned_disk_hold",
+  "plates": [
+    {
+      "id": "greenhouse-landscapes",
+      "transparent": false,
+      "prompt": "四格同质温室叙事插画，严格四象限各自取用，留清楚安全区，无文字数字，无计数对象。细纸纹、哑光水粉、干净剪纸轮廓、松绿奶油、杏柿橙。 top-left: 晨光温室的广角，温室管理员与远处几辆空小推车，温暖，封面留主体。 top-right: 温室温柔的地面与远处空花架，安静分层侧景，中央和底部留足空间给游戏。 bottom-left: 藤架与斜射窗光，左下小盆栽，简明安静，中央留足空间给发射游戏。 bottom-right: 成人和孩子在窗边地板用手比划，温暖真实，家庭回顾。"
+    },
+    {
+      "id": "greenhouse-props",
+      "transparent": true,
+      "prompt": "五格独立道具，透明背景或统一可去底色。细纸纹、剪纸剪影、哑光水粉。角度与比例一致，各格安全间距大，无文字数字。 top-left: 暖杏色两轮空小车，侧视，静止。透明。 top-center: 同一车侧视，小轮滚动姿态，轮廓仍清楚。透明。 top-right: 单枚半透明琥珀玻璃弹珠，轻高光。透明。 bottom-left: 一枚发芽的种子贴纸，小绿叶，非文字。透明。 bottom-right: 一枚暖橙圆形收货贴纸，中心一片叶子。透明。 严格3列2行等分，底中格留空。"
+    }
+  ],
+  "plannedAssets": {
+    "cover-greenhouse": {
+      "file": "assets/cover-greenhouse.png",
+      "plate": "greenhouse-landscapes",
+      "cell": "top-left"
+    },
+    "depot-backdrop": {
+      "file": "assets/depot-backdrop.png",
+      "plate": "greenhouse-landscapes",
+      "cell": "top-right"
+    },
+    "aim-backdrop": {
+      "file": "assets/aim-backdrop.png",
+      "plate": "greenhouse-landscapes",
+      "cell": "bottom-left"
+    },
+    "family-greenhouse": {
+      "file": "assets/family-greenhouse.png",
+      "plate": "greenhouse-landscapes",
+      "cell": "bottom-right"
+    },
+    "cart-ready": {
+      "file": "assets/cart-ready.png",
+      "plate": "greenhouse-props",
+      "cell": "top-left"
+    },
+    "cart-push": {
+      "file": "assets/cart-push.png",
+      "plate": "greenhouse-props",
+      "cell": "top-center"
+    },
+    "seed-marble": {
+      "file": "assets/seed-marble.png",
+      "plate": "greenhouse-props",
+      "cell": "top-right"
+    },
+    "sprout-sticker": {
+      "file": "assets/sprout-sticker.png",
+      "plate": "greenhouse-props",
+      "cell": "bottom-left"
+    },
+    "ticket-sticker": {
+      "file": "assets/ticket-sticker.png",
+      "plate": "greenhouse-props",
+      "cell": "bottom-right"
+    }
+  }
+}

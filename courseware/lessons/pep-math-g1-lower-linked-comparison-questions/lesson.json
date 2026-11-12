@@ -1,0 +1,966 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "含相差数量关系的连续两问的问题",
+  "description": "看比较图先求缺少的一组，再把第一问的结果用到第二问。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小数老师",
+      "role": "teacher",
+      "gender": "male",
+      "voice": "Ethan",
+      "avatar": "/avatars/teacher-1.png",
+      "color": "#286956",
+      "persona": "带孩子看懂每个数表示的实际数量，沿着图解释两问怎样接起来。"
+    }
+  },
+  "images": {
+    "cart-loaded": {
+      "file": "assets/cart-loaded.png"
+    },
+    "cart-ready": {
+      "file": "assets/cart-ready.png"
+    },
+    "delivery-1": {
+      "file": "assets/delivery-1.png"
+    },
+    "delivery-3": {
+      "file": "assets/delivery-3.png"
+    },
+    "hop-1": {
+      "file": "assets/hop-1.png"
+    },
+    "hop-2": {
+      "file": "assets/hop-2.png"
+    },
+    "hop-3": {
+      "file": "assets/hop-3.png"
+    },
+    "maintenance-truck": {
+      "file": "assets/maintenance-truck.png"
+    },
+    "parcel-10": {
+      "file": "assets/parcel-10.png"
+    },
+    "parcel-12": {
+      "file": "assets/parcel-12.png"
+    },
+    "parcel-16": {
+      "file": "assets/parcel-16.png"
+    },
+    "parcel-19": {
+      "file": "assets/parcel-19.png"
+    },
+    "parcel-2": {
+      "file": "assets/parcel-2.png"
+    },
+    "parcel-23": {
+      "file": "assets/parcel-23.png"
+    },
+    "parcel-25": {
+      "file": "assets/parcel-25.png"
+    },
+    "parcel-29": {
+      "file": "assets/parcel-29.png"
+    },
+    "parcel-34": {
+      "file": "assets/parcel-34.png"
+    },
+    "parcel-7": {
+      "file": "assets/parcel-7.png"
+    },
+    "parcel-9": {
+      "file": "assets/parcel-9.png"
+    },
+    "patrol-delivery-landscape": {
+      "file": "assets/patrol-delivery-landscape.png"
+    },
+    "patrol-platform-landscape": {
+      "file": "assets/patrol-platform-landscape.png"
+    },
+    "patrol-sticker": {
+      "file": "assets/patrol-sticker.png"
+    },
+    "q1-a": {
+      "file": "assets/q1-a.png"
+    },
+    "q1-b": {
+      "file": "assets/q1-b.png"
+    },
+    "q1-c": {
+      "file": "assets/q1-c.png"
+    },
+    "q1": {
+      "file": "assets/q1.png"
+    },
+    "q2-a": {
+      "file": "assets/q2-a.png"
+    },
+    "q2-b": {
+      "file": "assets/q2-b.png"
+    },
+    "q2-c": {
+      "file": "assets/q2-c.png"
+    },
+    "q2": {
+      "file": "assets/q2.png"
+    },
+    "q3-a": {
+      "file": "assets/q3-a.png"
+    },
+    "q3-b": {
+      "file": "assets/q3-b.png"
+    },
+    "q3-c": {
+      "file": "assets/q3-c.png"
+    },
+    "q3": {
+      "file": "assets/q3.png"
+    },
+    "q4-a": {
+      "file": "assets/q4-a.png"
+    },
+    "q4-b": {
+      "file": "assets/q4-b.png"
+    },
+    "q4-c": {
+      "file": "assets/q4-c.png"
+    },
+    "q4": {
+      "file": "assets/q4.png"
+    },
+    "q5-a": {
+      "file": "assets/q5-a.png"
+    },
+    "q5-b": {
+      "file": "assets/q5-b.png"
+    },
+    "q5-c": {
+      "file": "assets/q5-c.png"
+    },
+    "q5": {
+      "file": "assets/q5.png"
+    },
+    "q6-a": {
+      "file": "assets/q6-a.png"
+    },
+    "q6-b": {
+      "file": "assets/q6-b.png"
+    },
+    "q6-c": {
+      "file": "assets/q6-c.png"
+    },
+    "q6": {
+      "file": "assets/q6.png"
+    },
+    "rabbit-jump": {
+      "file": "assets/rabbit-jump.png"
+    },
+    "rabbit-ready": {
+      "file": "assets/rabbit-ready.png"
+    },
+    "rabbit-run": {
+      "file": "assets/rabbit-run.png"
+    },
+    "station-12": {
+      "file": "assets/station-12.png"
+    },
+    "station-16": {
+      "file": "assets/station-16.png"
+    },
+    "station-19": {
+      "file": "assets/station-19.png"
+    },
+    "station-22": {
+      "file": "assets/station-22.png"
+    },
+    "station-23": {
+      "file": "assets/station-23.png"
+    },
+    "station-25": {
+      "file": "assets/station-25.png"
+    },
+    "station-34": {
+      "file": "assets/station-34.png"
+    },
+    "station-39": {
+      "file": "assets/station-39.png"
+    },
+    "story-compare": {
+      "file": "assets/story-compare.png"
+    },
+    "story-known": {
+      "file": "assets/story-known.png"
+    },
+    "story-left": {
+      "file": "assets/story-left.png"
+    },
+    "story-merge": {
+      "file": "assets/story-merge.png"
+    },
+    "story-missing": {
+      "file": "assets/story-missing.png"
+    },
+    "story-more-total": {
+      "file": "assets/story-more-total.png"
+    },
+    "story-more": {
+      "file": "assets/story-more.png"
+    },
+    "delivery-clue-1": {
+      "file": "assets/delivery-clue-1.png"
+    },
+    "delivery-clue-2": {
+      "file": "assets/delivery-clue-2.png"
+    },
+    "delivery-clue-3": {
+      "file": "assets/delivery-clue-3.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "what-is-missing",
+      "type": "slide",
+      "title": "要合在一起，还缺什么？",
+      "template": "two-columns",
+      "data": {
+        "title": "要合在一起，还缺什么？",
+        "left": {
+          "heading": "看两队的瓶子",
+          "body": "绿队 18，橙队少 7。"
+        },
+        "left_picture": "story-known",
+        "right": {
+          "heading": "合起来要两队的实数",
+          "body": "18＋□＝？"
+        },
+        "right_picture": "story-missing"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "溪边巡护站要把两队收来的瓶子合在一起。"
+        },
+        {
+          "say": "绿队收了十八个，橙队比绿队少七个。"
+        },
+        {
+          "say": "先指着图说，十八是绿队的瓶数。"
+        },
+        {
+          "say": "七是两队相差的个数。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "要知道一共有多少个，得知道两队各有多少。"
+        },
+        {
+          "say": "右边两条箭头都通向合计，哪一队还空着？"
+        },
+        {
+          "say": "第一问求橙队有多少个。第二问才求两队一共多少个。"
+        },
+        {
+          "say": "橙队的瓶数要先找出来，才能填上合计图的空位。"
+        },
+        {
+          "say": "绿队十二个，橙队少两个。先拿橙队的瓶数。"
+        },
+        {
+          "say": "绿队十六个，橙队多七个。先拿橙队的瓶数。"
+        }
+      ]
+    },
+    {
+      "key": "count-the-second-group",
+      "type": "slide",
+      "title": "先求橙队实有几个",
+      "template": "two-columns",
+      "data": {
+        "title": "先求橙队实有几个",
+        "left": {
+          "heading": "同一个起点对齐",
+          "body": "从左端对齐。"
+        },
+        "left_picture": "story-known",
+        "right": {
+          "heading": "从十八里面去掉相差的七",
+          "body": "18－7＝11"
+        },
+        "right_picture": "story-compare"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "把两队从同一个起点对齐，看看少的是哪一截。"
+        },
+        {
+          "say": "橙队少七个，它的这一排会短一些。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "绿队的十八个里，有一段和橙队一样长。"
+        },
+        {
+          "say": "绿队还多出右边这一截，正好七个。"
+        },
+        {
+          "say": "从十八里去掉多出的七个，就找到一样长的部分。"
+        },
+        {
+          "say": "十八减七等于十一，橙队有十一个瓶子。"
+        },
+        {
+          "say": "这样求的是橙队整排的瓶数。"
+        },
+        {
+          "say": "读结果要带单位，十一个瓶子。"
+        },
+        {
+          "say": "先找八，再找比八少三个的数，最后找两队合计。"
+        },
+        {
+          "say": "先找九，再找比九多四个的数，最后找两队合计。"
+        }
+      ]
+    },
+    {
+      "key": "move-the-first-result",
+      "type": "slide",
+      "title": "把第一问的结果放进第二问",
+      "template": "two-columns",
+      "data": {
+        "title": "把第一问的结果放进第二问",
+        "left": {
+          "heading": "第一问得到橙队十一",
+          "body": "橙队有 11 个。"
+        },
+        "left_picture": "story-compare",
+        "right": {
+          "heading": "绿队十八和橙队十一合起来",
+          "body": "18＋11＝29"
+        },
+        "right_picture": "story-merge"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "第一问刚算出的十一，是橙队实际收来的瓶数。"
+        },
+        {
+          "say": "用手指从左图的十一，找右图橙色的一排。"
+        },
+        {
+          "say": "右图橙色的十一和左图的是同一队。"
+        },
+        {
+          "say": "绿队原有的十八个，也要合进去。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "合计要把两队实际收来的瓶子合起来。"
+        },
+        {
+          "say": "十八加十一等于二十九，两队共二十九个瓶子。"
+        },
+        {
+          "say": "先算出橙队的十一，合计时才有两个实数。"
+        },
+        {
+          "say": "相差的七帮助我们找到十一，合计时只数两队的实数。"
+        },
+        {
+          "say": "先找二十，再找比二十多六个的数，最后找两队合计。"
+        },
+        {
+          "say": "两问接起来了，你找到了每一步该用的数。"
+        },
+        {
+          "say": "把手上的数和绿队十二个合起来，送到合计站。"
+        }
+      ]
+    },
+    {
+      "key": "jump-to-the-linked-counts",
+      "type": "interactive",
+      "title": "沿着两问的顺序跳",
+      "widgetType": "courseware_game",
+      "page": "jump-to-the-linked-counts",
+      "startImage": "hop-1",
+      "script": [
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#hop-problem"
+        },
+        {
+          "say": "这张图会留在原处。绿队八个，橙队比它少三个。"
+        },
+        {
+          "say": "跳台先找已经知道的绿队瓶数，再找橙队，最后找合计。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "小兔从旗子出发。老师先找写着八的台。"
+        },
+        {
+          "highlight": "#hop-first"
+        },
+        {
+          "say": "八是绿队实有的瓶数。向右跑起来，按跳跃，落到八上。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "highlight": "#hop-first"
+        },
+        {
+          "say": "落在八上了。从八里面减三，就知道橙队有几个。"
+        },
+        {
+          "say": "现在你从起点开始。想好下一个数再跳，踩错可以重来。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "hop-one": "count-the-second-group-11",
+        "hop-two": "count-the-second-group-12",
+        "hop-three": "move-the-first-result-11",
+        "hop-hint": "count-the-second-group-2",
+        "hop-help": "move-the-first-result-7",
+        "hop-praise": "move-the-first-result-12"
+      }
+    },
+    {
+      "key": "a-first-question-for-the-total",
+      "type": "slide",
+      "title": "从合计倒着想，先问什么？",
+      "template": "two-columns",
+      "data": {
+        "title": "从合计倒着想，先问什么？",
+        "left": {
+          "heading": "绿队二十一，橙队多八",
+          "body": "绿队 21，橙队多 8。"
+        },
+        "left_picture": "story-more",
+        "right": {
+          "heading": "两队数量齐了再求合计",
+          "body": "21＋29＝50"
+        },
+        "right_picture": "story-more-total"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "这一回绿队有二十一个瓶子，橙队比它多八个。"
+        },
+        {
+          "say": "如果只问两队一共有多少，先看看哪一队还空着。"
+        },
+        {
+          "say": "可以先问，橙队收了多少个瓶子？"
+        },
+        {
+          "say": "橙队有和绿队一样多的二十一个，还要添八个。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "二十一加八等于二十九，橙队有二十九个。"
+        },
+        {
+          "say": "现在两队的数都找到了，二十一加二十九等于五十。"
+        },
+        {
+          "say": "两队一共五十个瓶子。"
+        },
+        {
+          "say": "想出第一问，补上的正是合计时缺的橙队瓶数。"
+        },
+        {
+          "say": "另一题绿队十六个。加上手里的数再送。"
+        }
+      ]
+    },
+    {
+      "key": "carry-the-new-remaining-count",
+      "type": "slide",
+      "title": "把第一次剩余交给第二问",
+      "template": "two-columns",
+      "data": {
+        "title": "把第一次剩余交给第二问",
+        "left": {
+          "heading": "沿箭头看先后两次拿走",
+          "body": "57 → 39 → 25"
+        },
+        "left_picture": "story-left",
+        "right": {
+          "heading": "看另一道题先从哪里减",
+          "body": "先求拿走 9 枚后的数量。"
+        },
+        "right_picture": "delivery-3"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "原有五十七枚徽章，先拿十八枚，再拿十四枚。"
+        },
+        {
+          "say": "第一问是第一次拿走后还剩多少枚。"
+        },
+        {
+          "say": "从原来的五十七减去十八，第一次后剩三十九枚。"
+        },
+        {
+          "say": "第二次开始时，箱里装的是刚剩下的三十九枚。"
+        },
+        {
+          "say": "三十九减十四等于二十五，最后剩二十五枚。"
+        },
+        {
+          "say": "按箭头查一查，第一次剩下的数接到了第二次。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "要算第二次剩余，要从第一次剩下的数里再减。"
+        },
+        {
+          "say": "如果箱里有三十四枚，先拿走九枚，先问还剩多少枚。"
+        },
+        {
+          "say": "下一步从第一次的剩余里再拿走六枚，才是最后的剩余。"
+        },
+        {
+          "say": "每次拿走的数量都要对上它开始时箱里的数量。"
+        },
+        {
+          "say": "三十四枚徽章先拿走九枚。去拿第一次剩下的数。"
+        },
+        {
+          "say": "从手上的数再拿走六枚。送到最后剩余的站。"
+        }
+      ]
+    },
+    {
+      "key": "deliver-the-intermediate-result",
+      "type": "interactive",
+      "title": "把第一问的数送去接第二问",
+      "widgetType": "courseware_game",
+      "page": "deliver-the-intermediate-result",
+      "startImage": "delivery-1",
+      "script": [
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#delivery-problem"
+        },
+        {
+          "say": "绿队十二个，橙队少两个。车先拿橙队的实数。"
+        },
+        {
+          "highlight": "#delivery-first"
+        },
+        {
+          "say": "十二去掉相差的两个，橙队有十个。十号货就在车边。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "老师按一下包裹键，让车把这张十号货签拿起来。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "highlight": "#delivery-load"
+        },
+        {
+          "say": "货架里现在有十号签。这就是第一问的结果。"
+        },
+        {
+          "say": "用十和十二求合计，再把货送到合计站。"
+        },
+        {
+          "say": "轮到你了。先听清拿什么，有车就在草地等。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "pick-one": "what-is-missing-11",
+        "drop-one": "move-the-first-result-13",
+        "pick-two": "what-is-missing-12",
+        "drop-two": "a-first-question-for-the-total-11",
+        "pick-three": "carry-the-new-remaining-count-13",
+        "drop-three": "carry-the-new-remaining-count-14",
+        "delivery-hint": "tell-the-two-steps-9",
+        "delivery-help": "tell-the-two-steps-10",
+        "delivery-praise": "tell-the-two-steps-11"
+      }
+    },
+    {
+      "key": "picture-check-a",
+      "type": "quiz",
+      "title": "看图检查：先找哪一组",
+      "questions": [
+        {
+          "id": "missing-bird-group",
+          "question": "绿队十一只鸟，橙队少四只。求合计前，先找哪部分？",
+          "skill": "识别合计缺的实际量",
+          "visual": {
+            "kind": "asset",
+            "image": "q1",
+            "alt": "绿队看到十一只鸟，橙队比绿队少四只"
+          },
+          "options": {
+            "a": {
+              "label": "两队合起来的总数",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-a",
+                "alt": "两队合起来的总数"
+              }
+            },
+            "b": {
+              "label": "橙队整组的只数",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-b",
+                "alt": "橙队整组的只数"
+              }
+            },
+            "c": {
+              "label": "两队相差的只数",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-c",
+                "alt": "两队相差的只数"
+              }
+            }
+          },
+          "answer": [
+            "b"
+          ],
+          "analysis": "合计要用两队实际看到的只数。绿队有十一只，橙队的只数还要先算。"
+        },
+        {
+          "id": "fewer-square-tiles",
+          "question": "圆陶片十七块，方陶片少六块。方陶片有几块？",
+          "skill": "从参照量和差求实际量",
+          "visual": {
+            "kind": "asset",
+            "image": "q2",
+            "alt": "十七块圆陶片与方陶片，方陶片比圆陶片少六块"
+          },
+          "options": {
+            "a": {
+              "label": "二十三块方陶片",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-a",
+                "alt": "二十三块方陶片"
+              }
+            },
+            "b": {
+              "label": "六块方陶片",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-b",
+                "alt": "六块方陶片"
+              }
+            },
+            "c": {
+              "label": "十一块方陶片",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-c",
+                "alt": "十一块方陶片"
+              }
+            }
+          },
+          "answer": [
+            "c"
+          ],
+          "analysis": "圆陶片比方陶片多出来六块。从十七块里减去六块，方陶片有十一块。"
+        },
+        {
+          "id": "lanterns-use-the-first-result",
+          "question": "绿队十三盏，橙队多七盏，有二十盏。合计加哪两个数？",
+          "skill": "用第一问结果选第二问的数量",
+          "visual": {
+            "kind": "asset",
+            "image": "q3",
+            "alt": "绿队十三盏，橙队二十盏，橙队多七盏"
+          },
+          "options": {
+            "a": {
+              "label": "十三盏加二十盏",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-a",
+                "alt": "十三盏加二十盏"
+              }
+            },
+            "b": {
+              "label": "十三盏加七盏",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-b",
+                "alt": "十三盏加七盏"
+              }
+            },
+            "c": {
+              "label": "二十盏加七盏",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-c",
+                "alt": "二十盏加七盏"
+              }
+            }
+          },
+          "answer": [
+            "a"
+          ],
+          "analysis": "十三和二十分别是两队的实数。把它们相加，合计三十三盏。"
+        }
+      ],
+      "intro": [
+        "先听老师问的是哪个量。",
+        "再找和那个量对应的图。"
+      ]
+    },
+    {
+      "key": "picture-check-b",
+      "type": "quiz",
+      "title": "看图检查：第一问接第二问",
+      "questions": [
+        {
+          "id": "two-cases-of-pens",
+          "question": "绿盒二十二支笔，橙盒少九支。两盒合计几支？",
+          "skill": "比较后合计两组",
+          "visual": {
+            "kind": "asset",
+            "image": "q4",
+            "alt": "绿盒有二十二支，橙盒比绿盒少九支"
+          },
+          "options": {
+            "a": {
+              "label": "三十一支笔",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-a",
+                "alt": "三十一支笔"
+              }
+            },
+            "b": {
+              "label": "三十五支笔",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-b",
+                "alt": "三十五支笔"
+              }
+            },
+            "c": {
+              "label": "十三支笔",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-c",
+                "alt": "十三支笔"
+              }
+            }
+          },
+          "answer": [
+            "b"
+          ],
+          "analysis": "橙盒有十三支，因为二十二减九等于十三。二十二加十三等于三十五。"
+        },
+        {
+          "id": "tents-find-the-first-question",
+          "question": "溪边十九顶帐篷，树林多五顶。求合计前先问什么？",
+          "skill": "从合计倒推第一问",
+          "visual": {
+            "kind": "asset",
+            "image": "q5",
+            "alt": "溪边十九顶帐篷，树林里比溪边多五顶"
+          },
+          "options": {
+            "a": {
+              "label": "溪边有多少顶帐篷",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-a",
+                "alt": "溪边有多少顶帐篷"
+              }
+            },
+            "b": {
+              "label": "树林比溪边多几顶帐篷",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-b",
+                "alt": "树林比溪边多几顶帐篷"
+              }
+            },
+            "c": {
+              "label": "树林里一共有多少顶帐篷",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-c",
+                "alt": "树林里一共有多少顶帐篷"
+              }
+            }
+          },
+          "answer": [
+            "c"
+          ],
+          "analysis": "先问树林里有多少顶，能算出二十四顶。然后把溪边十九顶和树林二十四顶相加。"
+        },
+        {
+          "id": "buttons-remainders-in-order",
+          "question": "四十一枚纽扣，先拿十二枚，再拿八枚。各剩几枚？",
+          "skill": "两次拿走追踪中间剩余",
+          "visual": {
+            "kind": "asset",
+            "image": "q6",
+            "alt": "从四十一枚纽扣开始，沿两支箭头先拿走十二枚，再拿走八枚"
+          },
+          "options": {
+            "a": {
+              "label": "先剩二十九枚，后来剩二十一枚",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-a",
+                "alt": "先剩二十九枚，后来剩二十一枚"
+              }
+            },
+            "b": {
+              "label": "先剩二十九枚，后来剩三十三枚",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-b",
+                "alt": "先剩二十九枚，后来剩三十三枚"
+              }
+            },
+            "c": {
+              "label": "先剩二十一枚，后来剩二十九枚",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-c",
+                "alt": "先剩二十一枚，后来剩二十九枚"
+              }
+            }
+          },
+          "answer": [
+            "a"
+          ],
+          "analysis": "先用四十一减十二，剩二十九枚。再用二十九减八，最后剩二十一枚。"
+        }
+      ],
+      "intro": [
+        "用手指沿着箭头追一追。",
+        "想清哪一个数先算出来，再选图。"
+      ]
+    },
+    {
+      "key": "tell-the-two-steps",
+      "type": "slide",
+      "title": "说说两问为什么要这样接",
+      "template": "two-columns",
+      "data": {
+        "title": "说说两问为什么要这样接",
+        "left": {
+          "heading": "先找另一组，再把两组合起来",
+          "body": "11 接到合计。"
+        },
+        "left_picture": "story-merge",
+        "right": {
+          "heading": "先看剩下的，再从里面拿走",
+          "body": "39 接到第二次。"
+        },
+        "right_picture": "story-left"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "请指着橙色的一排说，十一是第一问得到的橙队瓶数。"
+        },
+        {
+          "say": "求两队合计时，这十一要和绿队的十八相加。"
+        },
+        {
+          "say": "两问各求一个量。第一问的结果是第二问要用的一个量。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "拿走两次，第一次剩下的数，就是第二次开始的数。"
+        },
+        {
+          "say": "说给家里人听，第二问要用刚算出的哪个数？"
+        },
+        {
+          "say": "摆两排瓶盖。先问另一排有几个，再问合计。"
+        },
+        {
+          "say": "先听清这一步求什么，再开到对应的数。"
+        },
+        {
+          "say": "看看亮起来的那一格。停稳，再按包裹键。"
+        },
+        {
+          "say": "第一问的数已经送到了下一问，用对了。"
+        }
+      ]
+    }
+  ]
+}

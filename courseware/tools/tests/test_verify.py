@@ -1,8 +1,12 @@
 import copy
+from contextlib import redirect_stderr
+import io
 import json
+import os
 from pathlib import Path
 import subprocess
 import tempfile
+from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 
@@ -84,6 +88,31 @@ class VerifyTests(unittest.TestCase):
     def test_notes_without_goals_cannot_be_checked_for_teaching(self):
         with self.assertRaises(ValueError):
             verify.build_requests(self.body, {'resources': {}}, teaching=True)
+
+    def test_teaching_requests_reject_nontext_objectives_before_building_any_batch(self):
+        for objectives in ([{'goal': 'count'}], ['count', {'goal': 'compare'}]):
+            notes = dict(self.notes, objectives=objectives)
+            with self.subTest(objectives=objectives), patch.object(verify, '_items') as collect_items:
+                with self.assertRaisesRegex(ValueError, 'objectives_invalid'):
+                    verify.build_requests(self.body, notes, teaching=True)
+                collect_items.assert_not_called()
+
+    def test_teaching_requests_and_receipt_cover_four_objectives_and_both_key_points(self):
+        objectives = ['count the objects', 'group into tens', 'compare the numbers', 'explain the comparison']
+        notes = dict(self.notes, objectives=objectives)
+        requests = verify.build_requests(self.body, notes, teaching=True)
+        teaching = requests[-1]
+        self.assertEqual(teaching['kind'], 'teaching')
+        expected = [('goal-1', objectives[0]), ('goal-2', objectives[1]),
+                    ('goal-3', objectives[2]), ('goal-4', objectives[3]),
+                    ('keyPoint', notes['keyPoint']), ('difficultPoint', notes['difficultPoint'])]
+        self.assertEqual([(item['id'], item['goal']) for item in teaching['items']], expected)
+        teaching_verdicts = [dict(id=ident, verdict='taught', taughtAt='1', issue=None) for ident, _ in expected]
+        verdicts = verify.run_requests(requests, self.teaching_runner(teaching_verdicts), model='v', effort='low')
+        receipt = verify.build_receipt(self.body, notes, requests, verdicts, self.answers,
+                                       model='v', effort='low', ran_at='now')
+        self.assertEqual(receipt['goalsChecked'], 6)
+        self.assertEqual(receipt['disagreements'], [])
 
     def test_disagreements(self):
         original = verify.run_requests(self.requests, self.runner, model='v', effort='low')
@@ -278,6 +307,85 @@ class VerifyTests(unittest.TestCase):
         self.assertNotIn(stderr, str(caught.exception))
         self.assertEqual(run.call_count, 2)
 
+
+    @patch('courseware.tools.verify.subprocess.run')
+    def test_review_floor_checks_workspace_before_creating_temporary_schema(self, run):
+        floor = 5 * 1024**3
+        with patch.dict(os.environ, {'MIRA_COURSEWARE_MIN_FREE_BYTES': str(floor)}), \
+                patch.object(verify.shutil, 'disk_usage', return_value=SimpleNamespace(free=floor - 1)), \
+                patch.object(verify.tempfile, 'TemporaryDirectory') as temporary:
+            with self.assertRaisesRegex(RuntimeError, f'requires at least {floor} bytes'):
+                verify.default_runner('prompt', verify._schema('speech'), 'model', 'low')
+        temporary.assert_not_called()
+        run.assert_not_called()
+
+    @patch('courseware.tools.verify.subprocess.run')
+    def test_review_floor_checks_actual_temp_directory_again_before_launch(self, run):
+        floor = 5 * 1024**3
+        checked_schema_dirs = []
+
+        def disk_usage(path):
+            if (Path(path) / 'schema.json').is_file():
+                checked_schema_dirs.append(Path(path))
+                return SimpleNamespace(free=floor - 1)
+            return SimpleNamespace(free=floor)
+
+        with patch.dict(os.environ, {'MIRA_COURSEWARE_MIN_FREE_BYTES': str(floor)}), \
+                patch.object(verify.shutil, 'disk_usage', side_effect=disk_usage):
+            with self.assertRaisesRegex(RuntimeError, f'requires at least {floor} bytes'):
+                verify.default_runner('prompt', verify._schema('speech'), 'model', 'low')
+        self.assertEqual(len(checked_schema_dirs), 1)
+        self.assertFalse(checked_schema_dirs[0].exists())
+        run.assert_not_called()
+
+    @patch('courseware.tools.verify.subprocess.run')
+    def test_review_floor_drop_after_failed_attempt_blocks_retry(self, run):
+        floor = 5 * 1024**3
+        free = floor
+
+        def disk_usage(path):
+            return SimpleNamespace(free=free)
+
+        def failed(command, **kwargs):
+            nonlocal free
+            free = floor - 1
+            raise subprocess.CalledProcessError(1, command)
+
+        run.side_effect = failed
+        with patch.dict(os.environ, {'MIRA_COURSEWARE_MIN_FREE_BYTES': str(floor)}), \
+                patch.object(verify.shutil, 'disk_usage', side_effect=disk_usage):
+            with self.assertRaisesRegex(RuntimeError, f'requires at least {floor} bytes'):
+                verify.default_runner('prompt', verify._schema('speech'), 'model', 'low')
+        run.assert_called_once()
+
+    @patch('courseware.tools.verify.subprocess.run')
+    def test_invalid_review_floor_fails_before_temporary_files_or_subprocess(self, run):
+        for value in ('', '5 GiB', str(2 * 1024**3 - 1)):
+            with self.subTest(value=value), patch.dict(os.environ, {'MIRA_COURSEWARE_MIN_FREE_BYTES': value}), \
+                    patch.object(verify.tempfile, 'TemporaryDirectory') as temporary:
+                with self.assertRaisesRegex(ValueError, 'MIRA_COURSEWARE_MIN_FREE_BYTES must be an integer'):
+                    verify.default_runner('prompt', verify._schema('speech'), 'model', 'low')
+                temporary.assert_not_called()
+        run.assert_not_called()
+
+    @patch('courseware.tools.verify.subprocess.run')
+    def test_cli_no_retry_uses_one_subprocess_and_unset_floor_skips_disk_checks(self, run):
+        run.side_effect = subprocess.CalledProcessError(1, ['codex'])
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            body, notes, output = (root / name for name in ('body.json', 'notes.json', 'verification.json'))
+            body.write_text(json.dumps(self.body), encoding='utf-8')
+            notes.write_text(json.dumps(self.notes), encoding='utf-8')
+            args = ['verify', '--body', str(body), '--notes', str(notes), '--out', str(output), '--no-retry']
+            with patch.dict(os.environ), patch('sys.argv', args), redirect_stderr(io.StringIO()), \
+                    patch.object(verify.shutil, 'disk_usage') as disk_usage:
+                os.environ.pop('MIRA_COURSEWARE_MIN_FREE_BYTES', None)
+                with self.assertRaises(SystemExit) as caught:
+                    verify.main()
+            self.assertEqual(caught.exception.code, 2)
+            self.assertFalse(output.exists())
+        run.assert_called_once()
+        disk_usage.assert_not_called()
 
 if __name__ == '__main__':
     unittest.main()

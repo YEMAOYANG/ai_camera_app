@@ -1,0 +1,1276 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "整理和复习｜20以内的退位减法",
+  "grade": 1,
+  "description": "回顾退位减法三种算法，补全45格表，沿横纵斜找规律，再用图片解决所求数量。",
+  "roster": {
+    "teacher": {
+      "name": "小数老师",
+      "role": "teacher",
+      "gender": "male",
+      "voice": "Ethan",
+      "avatar": "/avatars/teacher-1.png",
+      "color": "#286956",
+      "persona": "请孩子先指出图中有用的量，再讲清怎么变。"
+    }
+  },
+  "images": {
+    "bookmark-missing": {
+      "file": "assets/bookmark-missing.png"
+    },
+    "break-eight": {
+      "file": "assets/break-eight.png"
+    },
+    "chain-eight": {
+      "file": "assets/chain-eight.png"
+    },
+    "check-six": {
+      "file": "assets/check-six.png"
+    },
+    "compare-fixed": {
+      "file": "assets/compare-fixed.png"
+    },
+    "compare-target-five": {
+      "file": "assets/compare-target-five.png"
+    },
+    "crate-compare-7": {
+      "file": "assets/crate-compare-7.png"
+    },
+    "crate-minus-14": {
+      "file": "assets/crate-minus-14.png"
+    },
+    "crate-needed-9": {
+      "file": "assets/crate-needed-9.png"
+    },
+    "crate-part-5": {
+      "file": "assets/crate-part-5.png"
+    },
+    "crate-part-7": {
+      "file": "assets/crate-part-7.png"
+    },
+    "crate-plus-6": {
+      "file": "assets/crate-plus-6.png"
+    },
+    "crate-steps-5": {
+      "file": "assets/crate-steps-5.png"
+    },
+    "depot-amount-14": {
+      "file": "assets/depot-amount-14.png"
+    },
+    "depot-amount-5": {
+      "file": "assets/depot-amount-5.png"
+    },
+    "depot-amount-6": {
+      "file": "assets/depot-amount-6.png"
+    },
+    "depot-amount-7": {
+      "file": "assets/depot-amount-7.png"
+    },
+    "depot-amount-9": {
+      "file": "assets/depot-amount-9.png"
+    },
+    "depot-desk": {
+      "file": "assets/depot-desk.png"
+    },
+    "depot-ready": {
+      "file": "assets/depot-ready.png"
+    },
+    "diagonal-arrows": {
+      "file": "assets/diagonal-arrows.png"
+    },
+    "exhibit-rosette": {
+      "file": "assets/exhibit-rosette.png"
+    },
+    "explorer-jump": {
+      "file": "assets/explorer-jump.png"
+    },
+    "explorer-stand": {
+      "file": "assets/explorer-stand.png"
+    },
+    "explorer-walk": {
+      "file": "assets/explorer-walk.png"
+    },
+    "family-number-story": {
+      "file": "assets/family-number-story.png"
+    },
+    "fourteen-on-table": {
+      "file": "assets/fourteen-on-table.png"
+    },
+    "garden-hops": {
+      "file": "assets/garden-hops.png"
+    },
+    "home-story": {
+      "file": "assets/home-story.png"
+    },
+    "hop-11-2": {
+      "file": "assets/hop-11-2.png"
+    },
+    "hop-12-3": {
+      "file": "assets/hop-12-3.png"
+    },
+    "hop-12-4": {
+      "file": "assets/hop-12-4.png"
+    },
+    "hop-12-8": {
+      "file": "assets/hop-12-8.png"
+    },
+    "hop-13-4": {
+      "file": "assets/hop-13-4.png"
+    },
+    "hop-13-7": {
+      "file": "assets/hop-13-7.png"
+    },
+    "hop-13-8": {
+      "file": "assets/hop-13-8.png"
+    },
+    "hop-14-5": {
+      "file": "assets/hop-14-5.png"
+    },
+    "hop-14-7": {
+      "file": "assets/hop-14-7.png"
+    },
+    "hop-14-8": {
+      "file": "assets/hop-14-8.png"
+    },
+    "hop-14-9": {
+      "file": "assets/hop-14-9.png"
+    },
+    "hop-15-6": {
+      "file": "assets/hop-15-6.png"
+    },
+    "hop-15-7": {
+      "file": "assets/hop-15-7.png"
+    },
+    "hop-15-8": {
+      "file": "assets/hop-15-8.png"
+    },
+    "hop-15-9": {
+      "file": "assets/hop-15-9.png"
+    },
+    "hop-16-7": {
+      "file": "assets/hop-16-7.png"
+    },
+    "hop-proof-12-3": {
+      "file": "assets/hop-proof-12-3.png"
+    },
+    "hop-proof-13-4": {
+      "file": "assets/hop-proof-13-4.png"
+    },
+    "hop-proof-13-8": {
+      "file": "assets/hop-proof-13-8.png"
+    },
+    "hop-proof-14-5": {
+      "file": "assets/hop-proof-14-5.png"
+    },
+    "hop-proof-14-8": {
+      "file": "assets/hop-proof-14-8.png"
+    },
+    "hop-proof-15-6": {
+      "file": "assets/hop-proof-15-6.png"
+    },
+    "hop-proof-15-7": {
+      "file": "assets/hop-proof-15-7.png"
+    },
+    "hop-proof-15-8": {
+      "file": "assets/hop-proof-15-8.png"
+    },
+    "hop-ready": {
+      "file": "assets/hop-ready.png"
+    },
+    "library-opening": {
+      "file": "assets/library-opening.png"
+    },
+    "line-with-middle": {
+      "file": "assets/line-with-middle.png"
+    },
+    "missing-eight": {
+      "file": "assets/missing-eight.png"
+    },
+    "part-not-total": {
+      "file": "assets/part-not-total.png"
+    },
+    "q-borrow-a": {
+      "file": "assets/q-borrow-a.png"
+    },
+    "q-borrow-b": {
+      "file": "assets/q-borrow-b.png"
+    },
+    "q-borrow-c": {
+      "file": "assets/q-borrow-c.png"
+    },
+    "q-borrow-stem": {
+      "file": "assets/q-borrow-stem.png"
+    },
+    "q-col-a": {
+      "file": "assets/q-col-a.png"
+    },
+    "q-col-b": {
+      "file": "assets/q-col-b.png"
+    },
+    "q-col-c": {
+      "file": "assets/q-col-c.png"
+    },
+    "q-col-stem": {
+      "file": "assets/q-col-stem.png"
+    },
+    "q-diag-a": {
+      "file": "assets/q-diag-a.png"
+    },
+    "q-diag-b": {
+      "file": "assets/q-diag-b.png"
+    },
+    "q-diag-c": {
+      "file": "assets/q-diag-c.png"
+    },
+    "q-diag-stem": {
+      "file": "assets/q-diag-stem.png"
+    },
+    "q-line-a": {
+      "file": "assets/q-line-a.png"
+    },
+    "q-line-b": {
+      "file": "assets/q-line-b.png"
+    },
+    "q-line-c": {
+      "file": "assets/q-line-c.png"
+    },
+    "q-line-stem": {
+      "file": "assets/q-line-stem.png"
+    },
+    "q-plants-a": {
+      "file": "assets/q-plants-a.png"
+    },
+    "q-plants-b": {
+      "file": "assets/q-plants-b.png"
+    },
+    "q-plants-c": {
+      "file": "assets/q-plants-c.png"
+    },
+    "q-plants-stem": {
+      "file": "assets/q-plants-stem.png"
+    },
+    "q-row-a": {
+      "file": "assets/q-row-a.png"
+    },
+    "q-row-b": {
+      "file": "assets/q-row-b.png"
+    },
+    "q-row-c": {
+      "file": "assets/q-row-c.png"
+    },
+    "q-row-stem": {
+      "file": "assets/q-row-stem.png"
+    },
+    "rule-column": {
+      "file": "assets/rule-column.png"
+    },
+    "rule-row": {
+      "file": "assets/rule-row.png"
+    },
+    "rule-same-difference": {
+      "file": "assets/rule-same-difference.png"
+    },
+    "same-column": {
+      "file": "assets/same-column.png"
+    },
+    "same-diagonal": {
+      "file": "assets/same-diagonal.png"
+    },
+    "same-row": {
+      "file": "assets/same-row.png"
+    },
+    "table-all-45": {
+      "file": "assets/table-all-45.png"
+    },
+    "table-one-gap": {
+      "file": "assets/table-one-gap.png"
+    },
+    "trolley-idle": {
+      "file": "assets/trolley-idle.png"
+    },
+    "trolley-push": {
+      "file": "assets/trolley-push.png"
+    },
+    "two-operations": {
+      "file": "assets/two-operations.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "review-at-the-exhibit",
+      "type": "slide",
+      "title": "读书展要整理算式路标",
+      "template": "two-columns",
+      "data": {
+        "title": "读书展要整理算式路标",
+        "left": {
+          "heading": "两位小帮手",
+          "body": "一起清点展台的书签。"
+        },
+        "left_picture": "library-opening",
+        "right": {
+          "heading": "一组十和散的四张",
+          "body": "原有十四张，借走八张。"
+        },
+        "right_picture": "fourteen-on-table"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "社区读书展开门了。小禾和小满来帮忙。"
+        },
+        {
+          "say": "他们还要整理一条算式小路。先算一题热身。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "台上原有一组十张书签，旁边还有四张。"
+        },
+        {
+          "say": "十加四是十四。要给另一桌借走八张。"
+        },
+        {
+          "say": "要问余下多少，算十四减八。"
+        },
+        {
+          "say": "散的四张不够直接拿八张。你会怎样拿？"
+        },
+        {
+          "say": "想一想单元里学过的三种办法。"
+        }
+      ]
+    },
+    {
+      "key": "three-ways-to-check",
+      "type": "slide",
+      "title": "破十和连减，哪一步不同",
+      "template": "two-columns",
+      "data": {
+        "title": "破十和连减，哪一步不同",
+        "left": {
+          "heading": "从十里拿八",
+          "body": "十里余二，与散四合成六。"
+        },
+        "left_picture": "break-eight",
+        "right": {
+          "heading": "先拿散四",
+          "body": "回到十，再拿还差的四。"
+        },
+        "right_picture": "chain-eight"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "从一组十里借走八张，十里余两张。"
+        },
+        {
+          "say": "旁边四张没动。二加四，留下六张。"
+        },
+        {
+          "say": "破十拆开的是原来的十四，十和四分开。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "连减先拿散四。十四减四，先回到十。"
+        },
+        {
+          "say": "总共得拿八，还差四。再从十里借四。"
+        },
+        {
+          "say": "这回拆开的是要拿走的八，分成四和四。"
+        },
+        {
+          "say": "两种摆法都拿走八张，所以余量同样是六。"
+        }
+      ]
+    },
+    {
+      "key": "restore-to-check",
+      "type": "slide",
+      "title": "用加法检查余量",
+      "template": "title-picture",
+      "data": {
+        "title": "用加法检查余量",
+        "picture": "check-six",
+        "caption": "借走的和留下的，合回原来的总数。"
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "还可以把借走的和留下的合起来检查。"
+        },
+        {
+          "say": "第一排八张，是刚刚借出去的那部分。"
+        },
+        {
+          "say": "另一部分是六张。两份合起来，正好十四。"
+        },
+        {
+          "say": "会算八加六是十四，就能想十四减八等于六。"
+        },
+        {
+          "say": "这个办法叫想加算减，也能验证前两种。"
+        },
+        {
+          "say": "这三种方法都要弄清原来、借出和留下。"
+        },
+        {
+          "say": "会算了，就可以把这样的退位算式排起来。"
+        }
+      ]
+    },
+    {
+      "key": "fill-the-table",
+      "type": "slide",
+      "title": "找到退位减法表缺的一格",
+      "template": "title-picture",
+      "data": {
+        "title": "找到退位减法表缺的一格",
+        "picture": "table-one-gap",
+        "caption": "横看被减数，竖看减数。"
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "这张表从十开始。每一排左边都从减九起。"
+        },
+        {
+          "say": "先看第三排。这一排开头的原数都是十二。"
+        },
+        {
+          "say": "再看问号在第几列。往上找，都是减六。"
+        },
+        {
+          "say": "原数是十二，减数是六。缺的是哪张卡？"
+        },
+        {
+          "say": "十二的个位是二，不够减六，正好属于这张表。"
+        },
+        {
+          "say": "表上每一格，只放一张符合位置的卡。"
+        },
+        {
+          "say": "补对这一格，我们就能检查整张表。"
+        }
+      ]
+    },
+    {
+      "key": "check-the-whole-table",
+      "type": "slide",
+      "title": "看完整的四十五格",
+      "template": "title-picture",
+      "data": {
+        "title": "看完整的四十五格",
+        "picture": "table-all-45",
+        "caption": "从 10 减 9 到最后一格 18 减 9。"
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "刚才空的那一格补上十二减六。"
+        },
+        {
+          "say": "最上面一排是十减九到十减一，有九格。"
+        },
+        {
+          "say": "往下一排，原数多一。可放的卡少一张。"
+        },
+        {
+          "say": "到最后一排，只剩十八减九这一格。"
+        },
+        {
+          "say": "每排少一格。全部数一遍，共四十五格。"
+        },
+        {
+          "say": "十九减九的个位够减，属于另一类，不进这里。"
+        },
+        {
+          "say": "顺着一排、一列和斜线看，会有什么发现？"
+        }
+      ]
+    },
+    {
+      "key": "read-row-and-column",
+      "type": "slide",
+      "title": "一排和一列，哪个数不变",
+      "template": "two-columns",
+      "data": {
+        "title": "一排和一列，哪个数不变",
+        "left": {
+          "heading": "同一排往右",
+          "body": "原有十二不变，取走少一个。"
+        },
+        "left_picture": "same-row",
+        "right": {
+          "heading": "同一列往下",
+          "body": "取走九个不变，原有多一个。"
+        },
+        "right_picture": "same-column"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "先放大同一排。十二减九、减八、减七。"
+        },
+        {
+          "say": "原来的十二不变。往右每次少拿一个。"
+        },
+        {
+          "say": "没拿走的就多一个。差从三到四，再到五。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "同一列都是减九。原数十二、十三、十四。"
+        },
+        {
+          "say": "往下一格，原来多一个。拿走的九不变。"
+        },
+        {
+          "say": "原来多的那个留下来，差也每次多一个。"
+        },
+        {
+          "say": "两条路的差都变了。你能说出不变的数吗？"
+        }
+      ]
+    },
+    {
+      "key": "diagonal-keeps-the-difference",
+      "type": "slide",
+      "title": "往左下一格，差为什么不变",
+      "template": "two-columns",
+      "data": {
+        "title": "往左下一格，差为什么不变",
+        "left": {
+          "heading": "原来和拿走各多一",
+          "body": "三次留下的部分对齐。"
+        },
+        "left_picture": "same-diagonal",
+        "right": {
+          "heading": "找一条同差的斜线",
+          "body": "两种量一同加一，也可倒着一同减一。"
+        },
+        "right_picture": "diagonal-arrows"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "十三减六等于七。十四减七呢？"
+        },
+        {
+          "say": "原来的多一张，同时拿走的也多一张。"
+        },
+        {
+          "say": "多出来的那张正好被拿走，所以仍是七。"
+        },
+        {
+          "say": "十五减八也是这样。三排留下的一样多。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "回到表里，就是往左下一格。"
+        },
+        {
+          "say": "倒过来，原数和减数各少一，差也不变。"
+        },
+        {
+          "say": "下面按三种方向跳。每次都找紧接的一格。"
+        },
+        {
+          "say": "同一列往下，减数八不变，原数每次加一。"
+        },
+        {
+          "say": "同一排往右，原来的十五不变，少减一个。"
+        },
+        {
+          "say": "往左下走。原数和减数各加一，差不变。"
+        },
+        {
+          "say": "先想这条路的规律。"
+        },
+        {
+          "say": "沿小图的箭头走，看两个数怎样变。"
+        },
+        {
+          "say": "这一格接得上。可以继续走下一格。"
+        }
+      ]
+    },
+    {
+      "key": "hop-along-the-table",
+      "type": "interactive",
+      "title": "按减法表的规律跳",
+      "widgetType": "courseware_game",
+      "page": "hop-along-the-table",
+      "startImage": "hop-ready",
+      "script": [
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "say": "先听这一关的规律，再往下一张卡跳。"
+        },
+        {
+          "highlight": "#route-direction"
+        },
+        {
+          "say": "箭头朝下。这一列的减数八要一直不变。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "脚下是十二减八，下一格原数多一。"
+        },
+        {
+          "highlight": "#game-target"
+        },
+        {
+          "say": "找十三减八。这里的八还在原位。"
+        },
+        {
+          "highlight": "#jump-to-card"
+        },
+        {
+          "say": "按住右方向，点跳跃键。老师只跳这一格。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "脚真的落到这张卡，才把这一格点亮。"
+        },
+        {
+          "highlight": "#landed-quantity"
+        },
+        {
+          "say": "右边留下实际落到的算式和五张书签。"
+        },
+        {
+          "say": "到你。听清哪一条路，再选下一张卡。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "hop-column": "diagonal-keeps-the-difference-10",
+        "hop-row": "diagonal-keeps-the-difference-11",
+        "hop-diagonal": "diagonal-keeps-the-difference-12",
+        "hop-hint": "diagonal-keeps-the-difference-13",
+        "hop-help": "diagonal-keeps-the-difference-14",
+        "hop-praise": "diagonal-keeps-the-difference-15"
+      }
+    },
+    {
+      "key": "find-the-relevant-part",
+      "type": "slide",
+      "title": "哪两个量真的与问题有关",
+      "template": "two-columns",
+      "data": {
+        "title": "哪两个量真的与问题有关",
+        "left": {
+          "heading": "书签分两桌",
+          "body": "两桌一共十六张，一桌有七张。"
+        },
+        "left_picture": "bookmark-missing",
+        "right": {
+          "heading": "求的只是另一部分",
+          "body": "把找到的两份合回来复核。"
+        },
+        "right_picture": "part-not-total"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "两个展台一共十六张书签。左桌有七张。"
+        },
+        {
+          "say": "右桌要放几张？这个问题只问书签。"
+        },
+        {
+          "say": "桌边有三把剪刀。它不属于书签总量。"
+        },
+        {
+          "say": "所以用总的十六减已知的七，不用减三。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "十六减七是九。九就是右桌的那一部分。"
+        },
+        {
+          "say": "把左桌七张和右桌九张合起来，还是十六。"
+        },
+        {
+          "say": "先找问的量，再圈有用的两份信息。"
+        }
+      ]
+    },
+    {
+      "key": "infer-a-missing-number",
+      "type": "slide",
+      "title": "挡住一个数，怎样找出来",
+      "template": "two-columns",
+      "data": {
+        "title": "挡住一个数，怎样找出来",
+        "left": {
+          "heading": "知道总量和留下的",
+          "body": "十三去掉一些，留下五。"
+        },
+        "left_picture": "missing-eight",
+        "right": {
+          "heading": "加回去核对",
+          "body": "去掉的和留下的合回原来。"
+        },
+        "right_picture": "check-six"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "原来十三张，拿掉的数挡住了，留五张。"
+        },
+        {
+          "say": "五张和被拿走的一份，要拼成十三张。"
+        },
+        {
+          "say": "想五加几是十三？五加八，刚好十三。"
+        },
+        {
+          "say": "所以盖住的是八。十三减八也确实是五。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "回想另一张图。八和六合回十四。"
+        },
+        {
+          "say": "知道总量和一部分，就能找另一部分。"
+        },
+        {
+          "say": "数被盖住时，先问它是哪一份量。"
+        }
+      ]
+    },
+    {
+      "key": "compare-differences",
+      "type": "slide",
+      "title": "用表里的规律比两个差",
+      "template": "two-columns",
+      "data": {
+        "title": "用表里的规律比两个差",
+        "left": {
+          "heading": "同样多，少拿的多余",
+          "body": "同为十三，减五比减六余得多。"
+        },
+        "left_picture": "compare-fixed",
+        "right": {
+          "heading": "找两个数相差五",
+          "body": "把十三和八逐个对齐，剩下五个。"
+        },
+        "right_picture": "compare-target-five"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "两排原来都是十三。上排拿五，下排拿六。"
+        },
+        {
+          "say": "上排少拿一个，所以比下排多余一个。"
+        },
+        {
+          "say": "可以看规律，也可以算八和七再比较。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "如果要找相差五的一对，试十三和八。"
+        },
+        {
+          "say": "先一一对齐，长的一排多出五个。"
+        },
+        {
+          "say": "所以十三减八等于五。换一对也可以。"
+        },
+        {
+          "say": "下一关的箱子问的量不同，要先看清。"
+        },
+        {
+          "say": "看总量和已知部分，再算还缺多少。"
+        },
+        {
+          "say": "有个数遮住了，想它是哪一份量。"
+        },
+        {
+          "say": "找题里有用的量。两步题先算第一步。"
+        },
+        {
+          "say": "先找问题要的是哪一份量。"
+        },
+        {
+          "say": "再看图里有用的两个量，或者用加法检查。"
+        },
+        {
+          "say": "送到和所求量相同的格了。"
+        }
+      ]
+    },
+    {
+      "key": "move-to-the-right-result",
+      "type": "interactive",
+      "title": "把题图推到答案格",
+      "widgetType": "courseware_game",
+      "page": "move-to-the-right-result",
+      "startImage": "depot-ready",
+      "script": [
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "say": "题图画在箱上。先想箱上问哪一份量。"
+        },
+        {
+          "highlight": "#large-task-card"
+        },
+        {
+          "say": "第一张图一共十一，已经看到六个。"
+        },
+        {
+          "say": "十一减六是五，空位需要五个。"
+        },
+        {
+          "highlight": "#first-answer-dock"
+        },
+        {
+          "say": "找到五个的答案格。别推到七的格。"
+        },
+        {
+          "highlight": "#push-down-to-result"
+        },
+        {
+          "say": "绕到箱子上面，再向下推。老师只送一次。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "把算出的五和格里的书签数对一对，两边得一样多。"
+        },
+        {
+          "highlight": "#parked-amount"
+        },
+        {
+          "say": "送进五的格，右边是五张书签。"
+        },
+        {
+          "say": "到你。算出所求再找路，别急着推。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "push-part": "compare-differences-10",
+        "push-hidden": "compare-differences-11",
+        "push-relevant": "compare-differences-12",
+        "push-hint": "compare-differences-13",
+        "push-help": "compare-differences-14",
+        "push-praise": "compare-differences-15"
+      }
+    },
+    {
+      "key": "two-steps-and-a-story",
+      "type": "slide",
+      "title": "先算哪一步，别漏掉中间的人",
+      "template": "two-columns",
+      "data": {
+        "title": "先算哪一步，别漏掉中间的人",
+        "left": {
+          "heading": "先合，再取走",
+          "body": "两盒先合起来，才知道一共多少。"
+        },
+        "left_picture": "two-operations",
+        "right": {
+          "heading": "排队还要数自己",
+          "body": "中间的人也算在总数里。"
+        },
+        "right_picture": "line-with-middle"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "两盒有八张和六张。要先算合起来多少。"
+        },
+        {
+          "say": "八加六是十四。再从十四张里送七张。"
+        },
+        {
+          "say": "十四减七是七。两步的顺序不能反过来。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "再看队伍。十四人里，小满左边有六人。"
+        },
+        {
+          "say": "小满自己也在十四人里。左边和她共七人。"
+        },
+        {
+          "say": "十四减七，右边七人。别把小满漏了。"
+        },
+        {
+          "say": "用同样三个数，还能编自己的故事。"
+        }
+      ]
+    },
+    {
+      "key": "picture-check",
+      "type": "quiz",
+      "title": "听题找对数量和方向",
+      "intro": [
+        "听老师说清要找哪一个量。",
+        "看清箭头的方向，或者把有用的量圈起来。"
+      ],
+      "questions": [
+        {
+          "id": "only-borrowing",
+          "question": "一组十和散的四张。哪张卡要拆开一组十？",
+          "skill": "区分退位表范围",
+          "visual": {
+            "kind": "asset",
+            "image": "q-borrow-stem",
+            "alt": "一托十张书签，托外四张"
+          },
+          "answer": [
+            "a"
+          ],
+          "analysis": "散着的四张不够拿六张，需要从十里取。拿四张或两张，只用散的就够。",
+          "options": {
+            "a": {
+              "label": "十四减六",
+              "visual": {
+                "kind": "asset",
+                "image": "q-borrow-a",
+                "alt": "十四减六"
+              }
+            },
+            "b": {
+              "label": "十四减四",
+              "visual": {
+                "kind": "asset",
+                "image": "q-borrow-b",
+                "alt": "十四减四"
+              }
+            },
+            "c": {
+              "label": "十四减二",
+              "visual": {
+                "kind": "asset",
+                "image": "q-borrow-c",
+                "alt": "十四减二"
+              }
+            }
+          }
+        },
+        {
+          "id": "down-a-column",
+          "question": "减法表里，十六减八下边一格是哪张？",
+          "skill": "同列减数不变",
+          "visual": {
+            "kind": "asset",
+            "image": "q-col-stem",
+            "alt": "格内写十六减八"
+          },
+          "answer": [
+            "b"
+          ],
+          "analysis": "同一列减数八不变，往下一格原数多一。十六变成十七。",
+          "options": {
+            "a": {
+              "label": "十七减九",
+              "visual": {
+                "kind": "asset",
+                "image": "q-col-a",
+                "alt": "十七减九"
+              }
+            },
+            "b": {
+              "label": "十七减八",
+              "visual": {
+                "kind": "asset",
+                "image": "q-col-b",
+                "alt": "十七减八"
+              }
+            },
+            "c": {
+              "label": "十六减九",
+              "visual": {
+                "kind": "asset",
+                "image": "q-col-c",
+                "alt": "十六减九"
+              }
+            }
+          }
+        },
+        {
+          "id": "right-along-row",
+          "question": "从十六减九往右一格，余量怎样变？",
+          "skill": "同行差变大",
+          "visual": {
+            "kind": "asset",
+            "image": "q-row-stem",
+            "alt": "十六减九的卡片有向右箭头"
+          },
+          "answer": [
+            "c"
+          ],
+          "analysis": "同行的原数十六不变。向右少减一个，余量就多一个。",
+          "options": {
+            "a": {
+              "label": "余量少一",
+              "visual": {
+                "kind": "asset",
+                "image": "q-row-a",
+                "alt": "余量少一"
+              }
+            },
+            "b": {
+              "label": "余量相同",
+              "visual": {
+                "kind": "asset",
+                "image": "q-row-b",
+                "alt": "余量相同"
+              }
+            },
+            "c": {
+              "label": "余量多一",
+              "visual": {
+                "kind": "asset",
+                "image": "q-row-c",
+                "alt": "余量多一"
+              }
+            }
+          }
+        },
+        {
+          "id": "left-down-the-diagonal",
+          "question": "哪张卡和十一减五余得同样多？",
+          "skill": "同差斜线",
+          "visual": {
+            "kind": "asset",
+            "image": "q-diag-stem",
+            "alt": "十一减五这张算式卡"
+          },
+          "answer": [
+            "b"
+          ],
+          "analysis": "原数和取走的数各少一个。十一减五和十减四都得六。",
+          "options": {
+            "a": {
+              "label": "十减五",
+              "visual": {
+                "kind": "asset",
+                "image": "q-diag-a",
+                "alt": "十减五"
+              }
+            },
+            "b": {
+              "label": "十减四",
+              "visual": {
+                "kind": "asset",
+                "image": "q-diag-b",
+                "alt": "十减四"
+              }
+            },
+            "c": {
+              "label": "十减三",
+              "visual": {
+                "kind": "asset",
+                "image": "q-diag-c",
+                "alt": "十减三"
+              }
+            }
+          }
+        },
+        {
+          "id": "ignore-unrelated",
+          "question": "十七盆花，左边八盆。右边有几盆？",
+          "skill": "只找相关数量",
+          "visual": {
+            "kind": "asset",
+            "image": "q-plants-stem",
+            "alt": "共有十七个盆位，左边八盆，旁边另有四把剪刀"
+          },
+          "answer": [
+            "c"
+          ],
+          "analysis": "要求右边的花，从十七盆里减左边八盆，余九盆。剪刀不是花盆。",
+          "options": {
+            "a": {
+              "label": "四盆花",
+              "visual": {
+                "kind": "asset",
+                "image": "q-plants-a",
+                "alt": "四盆花"
+              }
+            },
+            "b": {
+              "label": "五盆花",
+              "visual": {
+                "kind": "asset",
+                "image": "q-plants-b",
+                "alt": "五盆花"
+              }
+            },
+            "c": {
+              "label": "九盆花",
+              "visual": {
+                "kind": "asset",
+                "image": "q-plants-c",
+                "alt": "九盆花"
+              }
+            }
+          }
+        },
+        {
+          "id": "line-needs-the-middle",
+          "question": "队伍十六人。标记孩子左边七人，右边几人？",
+          "skill": "两步找队列的未知部分",
+          "visual": {
+            "kind": "asset",
+            "image": "q-line-stem",
+            "alt": "十六人队伍，一个中间人用不同颜色标出，左边七人"
+          },
+          "answer": [
+            "a"
+          ],
+          "analysis": "左边七人，再加标记的这个孩子，一共八人。十六减八，右边八人。",
+          "options": {
+            "a": {
+              "label": "右边八人",
+              "visual": {
+                "kind": "asset",
+                "image": "q-line-a",
+                "alt": "右边八人"
+              }
+            },
+            "b": {
+              "label": "右边九人",
+              "visual": {
+                "kind": "asset",
+                "image": "q-line-b",
+                "alt": "右边九人"
+              }
+            },
+            "c": {
+              "label": "右边七人",
+              "visual": {
+                "kind": "asset",
+                "image": "q-line-c",
+                "alt": "右边七人"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "growth-and-family",
+      "type": "slide",
+      "title": "留一张自己的复习卡",
+      "template": "two-columns",
+      "data": {
+        "title": "留一张自己的复习卡",
+        "left": {
+          "heading": "跟家人摆一摆",
+          "body": "任选表里的一题，画两种算法。"
+        },
+        "left_picture": "home-story",
+        "right": {
+          "heading": "三个数讲个故事",
+          "body": "五和七拼成十二，也能反过来求部分。"
+        },
+        "right_picture": "family-number-story"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "回家选一道今天没演示的退位减法。"
+        },
+        {
+          "say": "用小物摆两种方法，再把两份加回去核对。"
+        },
+        {
+          "say": "指着表说一条规律。哪一个量不变？"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "试用五、七和十二，讲一个自己的故事。"
+        },
+        {
+          "say": "可以先说两份怎样合起来，再说知道一份怎样找另一份。"
+        },
+        {
+          "say": "把你会的做法画在一张纸上，和家人分享。"
+        }
+      ]
+    }
+  ]
+}

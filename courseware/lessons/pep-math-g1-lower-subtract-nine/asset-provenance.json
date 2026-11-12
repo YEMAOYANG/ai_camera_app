@@ -1,0 +1,1507 @@
+{
+  "schemaVersion": "mira.courseware.asset-provenance.v1",
+  "atlasReceipts": {
+    "lantern-festival-scenes": {
+      "path": "art-source/lantern-festival-scenes.receipt.json",
+      "sha256": "e13887af8b0676f2edc60dd619acf34217d483b5ec11ffda1446617738d2cc3a"
+    },
+    "lantern-festival-sprites": {
+      "path": "art-source/lantern-festival-sprites.receipt.json",
+      "sha256": "89f494f7ad3a44c7e6747f56729db8e4e52549ebcce822980681e4e89662a482"
+    }
+  },
+  "numberPlan": {
+    "worked": 14,
+    "tileTotals": [
+      11,
+      12,
+      13,
+      14,
+      15
+    ],
+    "quizTotals": [
+      16,
+      17,
+      18,
+      19
+    ]
+  },
+  "assets": {
+    "bring-five-together": {
+      "path": "assets/bring-five-together.png",
+      "sha256": "91a56d2514c47a84c248c5e13991e8275c37b947a487a93161c32f9a88e8f63c",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/quantity-diagrams.mjs",
+      "renderSourceSha256": "b1a25e7ec9c65c0b37313f200f3c8cfaa7321d49e4ffe40f123c6ec2e1f9d87f",
+      "usedBy": [
+        "add-back-to-check",
+        "first-break-ten"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-lantern": "0bc547ee3dd0153c167d8654ce85cdea041ace0a5399d6b9251a2f8ca1fcaee0"
+      },
+      "quantity": {
+        "total": 14,
+        "tray": 10,
+        "loose": 4,
+        "takenTray": 9,
+        "takenLoose": 0,
+        "taken": 9,
+        "left": 5
+      }
+    },
+    "compare-after-nine": {
+      "path": "assets/compare-after-nine.png",
+      "sha256": "35d23f159f3ac308aaebe7adc164960721a5d3518f7904fea3d71a5aa97d613c",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/quantity-diagrams.mjs",
+      "renderSourceSha256": "b1a25e7ec9c65c0b37313f200f3c8cfaa7321d49e4ffe40f123c6ec2e1f9d87f",
+      "usedBy": [
+        "one-more-left"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-lantern": "0bc547ee3dd0153c167d8654ce85cdea041ace0a5399d6b9251a2f8ca1fcaee0"
+      },
+      "quantity": {
+        "totals": [
+          11,
+          12,
+          13
+        ],
+        "taken": 9,
+        "remainders": [
+          2,
+          3,
+          4
+        ]
+      }
+    },
+    "delivery-empty": {
+      "path": "assets/delivery-empty.png",
+      "sha256": "162438f47b18db5be7e4464583b48804807fe5f7ee71b7766ea857e252517118",
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/lantern-festival-sprites.png",
+      "generatedSourceSha256": "5149339dc560bfd953cf89bf91ae79d444788bca7faa2f6ad007e1c4803dab7c",
+      "sourceCrop": [
+        605,
+        54,
+        929,
+        490
+      ],
+      "promptSha256": "1f825706956b31f246a3f684f617ef15a0cbe688b5e7f0f4d1c23f53b45b9647",
+      "usedBy": [
+        "return-the-quantity"
+      ],
+      "derivativeConsumers": []
+    },
+    "delivery-job-11": {
+      "path": "assets/delivery-job-11.png",
+      "sha256": "ff55ddb7b69b0c863d82a83e21eb952b905139ba3e428b0e8639029224bc0391",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/quantity-diagrams.mjs",
+      "renderSourceSha256": "b1a25e7ec9c65c0b37313f200f3c8cfaa7321d49e4ffe40f123c6ec2e1f9d87f",
+      "usedBy": [
+        "return-the-quantity"
+      ],
+      "derivativeConsumers": [
+        "delivery-ready"
+      ],
+      "inputs": {
+        "single-lantern": "0bc547ee3dd0153c167d8654ce85cdea041ace0a5399d6b9251a2f8ca1fcaee0"
+      },
+      "quantity": {
+        "total": 11,
+        "packed": 9,
+        "unfilled": 2
+      }
+    },
+    "delivery-job-12": {
+      "path": "assets/delivery-job-12.png",
+      "sha256": "b44fa2e8cf7c0406eae6e92f82d1212f6ddf3637d4d4a67cfbfd0772658d9c82",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/quantity-diagrams.mjs",
+      "renderSourceSha256": "b1a25e7ec9c65c0b37313f200f3c8cfaa7321d49e4ffe40f123c6ec2e1f9d87f",
+      "usedBy": [
+        "return-the-quantity"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-lantern": "0bc547ee3dd0153c167d8654ce85cdea041ace0a5399d6b9251a2f8ca1fcaee0"
+      },
+      "quantity": {
+        "total": 12,
+        "packed": 9,
+        "unfilled": 3
+      }
+    },
+    "delivery-job-13": {
+      "path": "assets/delivery-job-13.png",
+      "sha256": "49ee58c6d1f361648115f4d24c8161b43861c087003e8c165f19b94617b67d1c",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/quantity-diagrams.mjs",
+      "renderSourceSha256": "b1a25e7ec9c65c0b37313f200f3c8cfaa7321d49e4ffe40f123c6ec2e1f9d87f",
+      "usedBy": [
+        "return-the-quantity"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-lantern": "0bc547ee3dd0153c167d8654ce85cdea041ace0a5399d6b9251a2f8ca1fcaee0"
+      },
+      "quantity": {
+        "total": 13,
+        "packed": 9,
+        "unfilled": 4
+      }
+    },
+    "delivery-job-14": {
+      "path": "assets/delivery-job-14.png",
+      "sha256": "16bdc41c42e88033ce3cf207d54c7bd32d8cc5980e273fd8c1220a68730fa884",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/quantity-diagrams.mjs",
+      "renderSourceSha256": "b1a25e7ec9c65c0b37313f200f3c8cfaa7321d49e4ffe40f123c6ec2e1f9d87f",
+      "usedBy": [
+        "return-the-quantity"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-lantern": "0bc547ee3dd0153c167d8654ce85cdea041ace0a5399d6b9251a2f8ca1fcaee0"
+      },
+      "quantity": {
+        "total": 14,
+        "packed": 9,
+        "unfilled": 5
+      }
+    },
+    "delivery-job-15": {
+      "path": "assets/delivery-job-15.png",
+      "sha256": "f2235cc532375930bcdb362422262fabb45e5912785c9a33c1a3b420f9c3102e",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/quantity-diagrams.mjs",
+      "renderSourceSha256": "b1a25e7ec9c65c0b37313f200f3c8cfaa7321d49e4ffe40f123c6ec2e1f9d87f",
+      "usedBy": [
+        "return-the-quantity"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-lantern": "0bc547ee3dd0153c167d8654ce85cdea041ace0a5399d6b9251a2f8ca1fcaee0"
+      },
+      "quantity": {
+        "total": 15,
+        "packed": 9,
+        "unfilled": 6
+      }
+    },
+    "delivery-lane": {
+      "path": "assets/delivery-lane.png",
+      "sha256": "079921c544956dfc9e77c8955fc63fb4bd9b8e7fdbcf6802fac912a5fbc9d9d8",
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/lantern-festival-scenes.png",
+      "generatedSourceSha256": "f58214546bddba03420004b04f095d711dc00be0c07161662fbff643cab225a1",
+      "sourceCrop": [
+        1041,
+        18,
+        1518,
+        495
+      ],
+      "promptSha256": "a6c7fd339fbe38b7b186fc71f32afe6a3716546002ed2d8e5e58e2b4767fd6a8",
+      "usedBy": [
+        "return-the-quantity"
+      ],
+      "derivativeConsumers": []
+    },
+    "delivery-loaded": {
+      "path": "assets/delivery-loaded.png",
+      "sha256": "86c303b16197a15100cefcb5d77a048384b79b874eac528565b892d2f79bdef2",
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/lantern-festival-sprites.png",
+      "generatedSourceSha256": "5149339dc560bfd953cf89bf91ae79d444788bca7faa2f6ad007e1c4803dab7c",
+      "sourceCrop": [
+        1120,
+        54,
+        1445,
+        491
+      ],
+      "promptSha256": "1f825706956b31f246a3f684f617ef15a0cbe688b5e7f0f4d1c23f53b45b9647",
+      "usedBy": [
+        "return-the-quantity"
+      ],
+      "derivativeConsumers": []
+    },
+    "delivery-proof-11": {
+      "path": "assets/delivery-proof-11.png",
+      "sha256": "8437bc86e6d73e28821e93e2c970973a6be123326d480aa027ed5d83b4744977",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/quantity-diagrams.mjs",
+      "renderSourceSha256": "b1a25e7ec9c65c0b37313f200f3c8cfaa7321d49e4ffe40f123c6ec2e1f9d87f",
+      "usedBy": [
+        "return-the-quantity"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-lantern": "0bc547ee3dd0153c167d8654ce85cdea041ace0a5399d6b9251a2f8ca1fcaee0"
+      },
+      "quantity": {
+        "total": 11,
+        "packed": 9,
+        "left": 2
+      }
+    },
+    "delivery-proof-12": {
+      "path": "assets/delivery-proof-12.png",
+      "sha256": "5d1e34d6886bbf9db7b6f152294fc906ec9edd5c50cbeba833dfa89e14207c06",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/quantity-diagrams.mjs",
+      "renderSourceSha256": "b1a25e7ec9c65c0b37313f200f3c8cfaa7321d49e4ffe40f123c6ec2e1f9d87f",
+      "usedBy": [
+        "return-the-quantity"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-lantern": "0bc547ee3dd0153c167d8654ce85cdea041ace0a5399d6b9251a2f8ca1fcaee0"
+      },
+      "quantity": {
+        "total": 12,
+        "packed": 9,
+        "left": 3
+      }
+    },
+    "delivery-proof-13": {
+      "path": "assets/delivery-proof-13.png",
+      "sha256": "c455417dfcb3899b7c67842c59dfba45b783c7968131bbbcd6a1f6c5442b0e4e",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/quantity-diagrams.mjs",
+      "renderSourceSha256": "b1a25e7ec9c65c0b37313f200f3c8cfaa7321d49e4ffe40f123c6ec2e1f9d87f",
+      "usedBy": [
+        "return-the-quantity"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-lantern": "0bc547ee3dd0153c167d8654ce85cdea041ace0a5399d6b9251a2f8ca1fcaee0"
+      },
+      "quantity": {
+        "total": 13,
+        "packed": 9,
+        "left": 4
+      }
+    },
+    "delivery-proof-14": {
+      "path": "assets/delivery-proof-14.png",
+      "sha256": "6ce40c1042ce4ebc8cc12faa531cefd7ce7817c09a77a6f9086f5c8dc1c2d2cb",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/quantity-diagrams.mjs",
+      "renderSourceSha256": "b1a25e7ec9c65c0b37313f200f3c8cfaa7321d49e4ffe40f123c6ec2e1f9d87f",
+      "usedBy": [
+        "return-the-quantity"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-lantern": "0bc547ee3dd0153c167d8654ce85cdea041ace0a5399d6b9251a2f8ca1fcaee0"
+      },
+      "quantity": {
+        "total": 14,
+        "packed": 9,
+        "left": 5
+      }
+    },
+    "delivery-proof-15": {
+      "path": "assets/delivery-proof-15.png",
+      "sha256": "5deb29a1efad3b32f72e01cb8858222c4ae184e7d6833728df466bbe78f39b1a",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/quantity-diagrams.mjs",
+      "renderSourceSha256": "b1a25e7ec9c65c0b37313f200f3c8cfaa7321d49e4ffe40f123c6ec2e1f9d87f",
+      "usedBy": [
+        "return-the-quantity"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-lantern": "0bc547ee3dd0153c167d8654ce85cdea041ace0a5399d6b9251a2f8ca1fcaee0"
+      },
+      "quantity": {
+        "total": 15,
+        "packed": 9,
+        "left": 6
+      }
+    },
+    "delivery-ready": {
+      "path": "assets/delivery-ready.png",
+      "sha256": "2f206bbd2f2860079133642055246978d0ac8559e02992fc68c383b514763224",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/quantity-diagrams.mjs",
+      "renderSourceSha256": "b1a25e7ec9c65c0b37313f200f3c8cfaa7321d49e4ffe40f123c6ec2e1f9d87f",
+      "usedBy": [
+        "return-the-quantity"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "delivery-job-11": "ff55ddb7b69b0c863d82a83e21eb952b905139ba3e428b0e8639029224bc0391",
+        "tile-left-2": "39465ac1eff9c5a4edebdf5c86d63c96292a87b8d5479c71f33148b7dbb06c43",
+        "delivery-total-11": "cc3535f3abd9df9ab2e5a23381c006744412e95747ff343d24b2cc5337ba9d34"
+      }
+    },
+    "delivery-total-11": {
+      "path": "assets/delivery-total-11.png",
+      "sha256": "cc3535f3abd9df9ab2e5a23381c006744412e95747ff343d24b2cc5337ba9d34",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/quantity-diagrams.mjs",
+      "renderSourceSha256": "b1a25e7ec9c65c0b37313f200f3c8cfaa7321d49e4ffe40f123c6ec2e1f9d87f",
+      "usedBy": [
+        "return-the-quantity"
+      ],
+      "derivativeConsumers": [
+        "delivery-ready"
+      ],
+      "inputs": {
+        "single-lantern": "0bc547ee3dd0153c167d8654ce85cdea041ace0a5399d6b9251a2f8ca1fcaee0"
+      },
+      "quantity": {
+        "total": 11
+      }
+    },
+    "delivery-total-12": {
+      "path": "assets/delivery-total-12.png",
+      "sha256": "af2977dcdab8451cf13f62f7d5949f9de4a889ff75c34f40981913e65bcb3e12",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/quantity-diagrams.mjs",
+      "renderSourceSha256": "b1a25e7ec9c65c0b37313f200f3c8cfaa7321d49e4ffe40f123c6ec2e1f9d87f",
+      "usedBy": [
+        "return-the-quantity"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-lantern": "0bc547ee3dd0153c167d8654ce85cdea041ace0a5399d6b9251a2f8ca1fcaee0"
+      },
+      "quantity": {
+        "total": 12
+      }
+    },
+    "delivery-total-13": {
+      "path": "assets/delivery-total-13.png",
+      "sha256": "344e5454f0e8a6ef73e03a61051765cc114379a1da35cb834118720ed8185bb7",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/quantity-diagrams.mjs",
+      "renderSourceSha256": "b1a25e7ec9c65c0b37313f200f3c8cfaa7321d49e4ffe40f123c6ec2e1f9d87f",
+      "usedBy": [
+        "return-the-quantity"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-lantern": "0bc547ee3dd0153c167d8654ce85cdea041ace0a5399d6b9251a2f8ca1fcaee0"
+      },
+      "quantity": {
+        "total": 13
+      }
+    },
+    "delivery-total-14": {
+      "path": "assets/delivery-total-14.png",
+      "sha256": "3a31d00d73610b3d7039687e6e3ef0371261b27ed965cabca6e27edf2e04e7e2",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/quantity-diagrams.mjs",
+      "renderSourceSha256": "b1a25e7ec9c65c0b37313f200f3c8cfaa7321d49e4ffe40f123c6ec2e1f9d87f",
+      "usedBy": [
+        "return-the-quantity"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-lantern": "0bc547ee3dd0153c167d8654ce85cdea041ace0a5399d6b9251a2f8ca1fcaee0"
+      },
+      "quantity": {
+        "total": 14
+      }
+    },
+    "delivery-total-15": {
+      "path": "assets/delivery-total-15.png",
+      "sha256": "7ce31e0b5930466c1bfea6e9915841c28d0b1ee07927e61e26b447acc217fdc5",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/quantity-diagrams.mjs",
+      "renderSourceSha256": "b1a25e7ec9c65c0b37313f200f3c8cfaa7321d49e4ffe40f123c6ec2e1f9d87f",
+      "usedBy": [
+        "return-the-quantity"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-lantern": "0bc547ee3dd0153c167d8654ce85cdea041ace0a5399d6b9251a2f8ca1fcaee0"
+      },
+      "quantity": {
+        "total": 15
+      }
+    },
+    "family-count": {
+      "path": "assets/family-count.png",
+      "sha256": "e1187faf38f01d1007aaa9da191291365688e586aada4dfe3905ab85cd7758d1",
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/lantern-festival-scenes.png",
+      "generatedSourceSha256": "f58214546bddba03420004b04f095d711dc00be0c07161662fbff643cab225a1",
+      "sourceCrop": [
+        530,
+        527,
+        1008,
+        1002
+      ],
+      "promptSha256": "a6c7fd339fbe38b7b186fc71f32afe6a3716546002ed2d8e5e58e2b4767fd6a8",
+      "usedBy": [],
+      "derivativeConsumers": [
+        "home-counting"
+      ]
+    },
+    "festival-entrance": {
+      "path": "assets/festival-entrance.png",
+      "sha256": "e18d21e3babe134ec058c2e64f3d746904fe024f601358762adab426694de75c",
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/lantern-festival-scenes.png",
+      "generatedSourceSha256": "f58214546bddba03420004b04f095d711dc00be0c07161662fbff643cab225a1",
+      "sourceCrop": [
+        19,
+        18,
+        496,
+        495
+      ],
+      "promptSha256": "a6c7fd339fbe38b7b186fc71f32afe6a3716546002ed2d8e5e58e2b4767fd6a8",
+      "usedBy": [],
+      "derivativeConsumers": [
+        "festival-opening"
+      ]
+    },
+    "festival-kids": {
+      "path": "assets/festival-kids.png",
+      "sha256": "8cb6fd108b198578c20c9897ddd968eb137e3f4211e1414c7361f97f87d3ccc6",
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/lantern-festival-scenes.png",
+      "generatedSourceSha256": "f58214546bddba03420004b04f095d711dc00be0c07161662fbff643cab225a1",
+      "sourceCrop": [
+        19,
+        527,
+        496,
+        1002
+      ],
+      "promptSha256": "a6c7fd339fbe38b7b186fc71f32afe6a3716546002ed2d8e5e58e2b4767fd6a8",
+      "usedBy": [],
+      "derivativeConsumers": [
+        "festival-opening"
+      ]
+    },
+    "festival-opening": {
+      "path": "assets/festival-opening.png",
+      "sha256": "0ac18278b34ed634245a05001aff15636eb1fdd08b09d72c604698051d9bf6c8",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/quantity-diagrams.mjs",
+      "renderSourceSha256": "b1a25e7ec9c65c0b37313f200f3c8cfaa7321d49e4ffe40f123c6ec2e1f9d87f",
+      "usedBy": [
+        "festival-count"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "festival-entrance": "e18d21e3babe134ec058c2e64f3d746904fe024f601358762adab426694de75c",
+        "festival-kids": "8cb6fd108b198578c20c9897ddd968eb137e3f4211e1414c7361f97f87d3ccc6"
+      }
+    },
+    "festival-rosette": {
+      "path": "assets/festival-rosette.png",
+      "sha256": "f7b7fe331e7b2c15701436cfb62634e39282372f107e3e6bd91d9008b23cab68",
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/lantern-festival-sprites.png",
+      "generatedSourceSha256": "5149339dc560bfd953cf89bf91ae79d444788bca7faa2f6ad007e1c4803dab7c",
+      "sourceCrop": [
+        581,
+        540,
+        949,
+        994
+      ],
+      "promptSha256": "1f825706956b31f246a3f684f617ef15a0cbe688b5e7f0f4d1c23f53b45b9647",
+      "usedBy": [
+        "return-the-quantity"
+      ],
+      "derivativeConsumers": [
+        "q-sixteen-a",
+        "q-sixteen-b",
+        "q-sixteen-c",
+        "q-sixteen-start"
+      ]
+    },
+    "fourteen-before": {
+      "path": "assets/fourteen-before.png",
+      "sha256": "05fc0b1eff7e8fb4d50b97d9a151670ebaa24f3d475d954a9be7097d7def9ef0",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/quantity-diagrams.mjs",
+      "renderSourceSha256": "b1a25e7ec9c65c0b37313f200f3c8cfaa7321d49e4ffe40f123c6ec2e1f9d87f",
+      "usedBy": [
+        "festival-count",
+        "match-the-remainder"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-lantern": "0bc547ee3dd0153c167d8654ce85cdea041ace0a5399d6b9251a2f8ca1fcaee0"
+      },
+      "quantity": {
+        "total": 14,
+        "tray": 10,
+        "loose": 4,
+        "takenTray": 0,
+        "takenLoose": 0,
+        "taken": 0,
+        "left": 14
+      }
+    },
+    "home-counting": {
+      "path": "assets/home-counting.png",
+      "sha256": "bd269dc0337f68756a6f3da13d9897e85ccf551128efc7c39c9c01e8c076ef79",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/quantity-diagrams.mjs",
+      "renderSourceSha256": "b1a25e7ec9c65c0b37313f200f3c8cfaa7321d49e4ffe40f123c6ec2e1f9d87f",
+      "usedBy": [
+        "tell-it-at-home"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "family-count": "e1187faf38f01d1007aaa9da191291365688e586aada4dfe3905ab85cd7758d1",
+        "window-light": "7a37deae3f41fb28dd93c744a52dd3339bf25dd2b38b496ebb965ee174cb2ed0"
+      }
+    },
+    "join-fourteen": {
+      "path": "assets/join-fourteen.png",
+      "sha256": "21d79ee200eb970a0e137654a28fa35824cafb2ef61bccdd462f66a3ec79746d",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/quantity-diagrams.mjs",
+      "renderSourceSha256": "b1a25e7ec9c65c0b37313f200f3c8cfaa7321d49e4ffe40f123c6ec2e1f9d87f",
+      "usedBy": [
+        "add-back-to-check",
+        "return-the-quantity"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-lantern": "0bc547ee3dd0153c167d8654ce85cdea041ace0a5399d6b9251a2f8ca1fcaee0"
+      },
+      "quantity": {
+        "total": 14,
+        "packed": 9,
+        "left": 5
+      }
+    },
+    "lantern-workbench": {
+      "path": "assets/lantern-workbench.png",
+      "sha256": "56fbd864edcb1ab17cdd291d835d59f82d092ec1507c9c9a3cf5d87a654b2c40",
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/lantern-festival-scenes.png",
+      "generatedSourceSha256": "f58214546bddba03420004b04f095d711dc00be0c07161662fbff643cab225a1",
+      "sourceCrop": [
+        530,
+        18,
+        1008,
+        495
+      ],
+      "promptSha256": "a6c7fd339fbe38b7b186fc71f32afe6a3716546002ed2d8e5e58e2b4767fd6a8",
+      "usedBy": [
+        "match-the-remainder"
+      ],
+      "derivativeConsumers": []
+    },
+    "paper-spark": {
+      "path": "assets/paper-spark.png",
+      "sha256": "6c497ab03e363dec40b3c1a8ade25aa19a7cb7473e30bcc43254a4f84d35799b",
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/lantern-festival-sprites.png",
+      "generatedSourceSha256": "5149339dc560bfd953cf89bf91ae79d444788bca7faa2f6ad007e1c4803dab7c",
+      "sourceCrop": [
+        1101,
+        591,
+        1460,
+        939
+      ],
+      "promptSha256": "1f825706956b31f246a3f684f617ef15a0cbe688b5e7f0f4d1c23f53b45b9647",
+      "usedBy": [
+        "match-the-remainder"
+      ],
+      "derivativeConsumers": []
+    },
+    "passing-cart": {
+      "path": "assets/passing-cart.png",
+      "sha256": "e02de141d8c25814e89d987f7a3a5b529117695d2d3fb6bba38389d09965f3ca",
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/lantern-festival-sprites.png",
+      "generatedSourceSha256": "5149339dc560bfd953cf89bf91ae79d444788bca7faa2f6ad007e1c4803dab7c",
+      "sourceCrop": [
+        32,
+        631,
+        490,
+        966
+      ],
+      "promptSha256": "1f825706956b31f246a3f684f617ef15a0cbe688b5e7f0f4d1c23f53b45b9647",
+      "usedBy": [
+        "return-the-quantity"
+      ],
+      "derivativeConsumers": []
+    },
+    "q-compare-a": {
+      "path": "assets/q-compare-a.png",
+      "sha256": "b04d21b6118b3d9f45c4a88e4c0ab2418c11f50737aed38fb63fbd39113aeb66",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/quantity-diagrams.mjs",
+      "renderSourceSha256": "b1a25e7ec9c65c0b37313f200f3c8cfaa7321d49e4ffe40f123c6ec2e1f9d87f",
+      "usedBy": [
+        "picture-check"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {},
+      "quantity": {
+        "referenceLeft": 8,
+        "nextLeft": 9,
+        "extra": 1
+      }
+    },
+    "q-compare-b": {
+      "path": "assets/q-compare-b.png",
+      "sha256": "03e2835c76b068591c118a9b7ab7ec6758e840d8b06d4600cd63ff76ec2ecf4e",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/quantity-diagrams.mjs",
+      "renderSourceSha256": "b1a25e7ec9c65c0b37313f200f3c8cfaa7321d49e4ffe40f123c6ec2e1f9d87f",
+      "usedBy": [
+        "picture-check"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {},
+      "quantity": {
+        "referenceLeft": 8,
+        "nextLeft": 8,
+        "extra": 0
+      }
+    },
+    "q-compare-c": {
+      "path": "assets/q-compare-c.png",
+      "sha256": "c21f508131c173d0a7dda5ed5736bb596f487ea938744c9d94a13c37ee8f10a8",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/quantity-diagrams.mjs",
+      "renderSourceSha256": "b1a25e7ec9c65c0b37313f200f3c8cfaa7321d49e4ffe40f123c6ec2e1f9d87f",
+      "usedBy": [
+        "picture-check"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {},
+      "quantity": {
+        "referenceLeft": 8,
+        "nextLeft": 10,
+        "extra": 2
+      }
+    },
+    "q-compare-totals": {
+      "path": "assets/q-compare-totals.png",
+      "sha256": "1ecedcdc3fabed3759ff229a4621a343ad27a64bc1c7e7e9a795e46086ff0af1",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/quantity-diagrams.mjs",
+      "renderSourceSha256": "b1a25e7ec9c65c0b37313f200f3c8cfaa7321d49e4ffe40f123c6ec2e1f9d87f",
+      "usedBy": [
+        "picture-check"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {},
+      "quantity": {
+        "totals": [
+          17,
+          18
+        ],
+        "take": 9
+      }
+    },
+    "q-display-a": {
+      "path": "assets/q-display-a.png",
+      "sha256": "27aa72a95d267820939e9440fa55e5c5d7e541feccb968c11bea55ca39782de1",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/quantity-diagrams.mjs",
+      "renderSourceSha256": "b1a25e7ec9c65c0b37313f200f3c8cfaa7321d49e4ffe40f123c6ec2e1f9d87f",
+      "usedBy": [
+        "picture-check"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {},
+      "quantity": {
+        "count": 9
+      }
+    },
+    "q-display-b": {
+      "path": "assets/q-display-b.png",
+      "sha256": "c414c9ba0045de66afa56a642c0a7e4179611028558e7e07cbb29f7a19c82620",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/quantity-diagrams.mjs",
+      "renderSourceSha256": "b1a25e7ec9c65c0b37313f200f3c8cfaa7321d49e4ffe40f123c6ec2e1f9d87f",
+      "usedBy": [
+        "picture-check"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {},
+      "quantity": {
+        "count": 11
+      }
+    },
+    "q-display-c": {
+      "path": "assets/q-display-c.png",
+      "sha256": "cd040f185285c093177326e257f0954c7f426689fbd2d43d3bb027b8c48aa926",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/quantity-diagrams.mjs",
+      "renderSourceSha256": "b1a25e7ec9c65c0b37313f200f3c8cfaa7321d49e4ffe40f123c6ec2e1f9d87f",
+      "usedBy": [
+        "picture-check"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {},
+      "quantity": {
+        "count": 10
+      }
+    },
+    "q-display-slots": {
+      "path": "assets/q-display-slots.png",
+      "sha256": "43d163ebf4406b5c60f565f9a9a1db32bfeeb8aa57e4046cf0608fa818ca88f8",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/quantity-diagrams.mjs",
+      "renderSourceSha256": "b1a25e7ec9c65c0b37313f200f3c8cfaa7321d49e4ffe40f123c6ec2e1f9d87f",
+      "usedBy": [
+        "picture-check"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {},
+      "quantity": {
+        "capacities": [
+          10,
+          9
+        ],
+        "placed": 9,
+        "left": 10
+      }
+    },
+    "q-eighteen-a": {
+      "path": "assets/q-eighteen-a.png",
+      "sha256": "63945a9fa760e5c11cbab369e8c7f6fd34bc3a93e92c13a26b93dfdd6c4d707a",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/quantity-diagrams.mjs",
+      "renderSourceSha256": "b1a25e7ec9c65c0b37313f200f3c8cfaa7321d49e4ffe40f123c6ec2e1f9d87f",
+      "usedBy": [
+        "picture-check"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {},
+      "quantity": {
+        "first": 9,
+        "second": 8,
+        "total": 17
+      }
+    },
+    "q-eighteen-b": {
+      "path": "assets/q-eighteen-b.png",
+      "sha256": "2b048459c390e7a8efe7444d0f9c4ec91a1ffd1e9b2e05ab29ae146a2c37f02d",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/quantity-diagrams.mjs",
+      "renderSourceSha256": "b1a25e7ec9c65c0b37313f200f3c8cfaa7321d49e4ffe40f123c6ec2e1f9d87f",
+      "usedBy": [
+        "picture-check"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {},
+      "quantity": {
+        "first": 9,
+        "second": 9,
+        "total": 18
+      }
+    },
+    "q-eighteen-c": {
+      "path": "assets/q-eighteen-c.png",
+      "sha256": "db68764595b082c8713b96a7829ec9be4c1cd8e165f1f78952f45effae623654",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/quantity-diagrams.mjs",
+      "renderSourceSha256": "b1a25e7ec9c65c0b37313f200f3c8cfaa7321d49e4ffe40f123c6ec2e1f9d87f",
+      "usedBy": [
+        "picture-check"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {},
+      "quantity": {
+        "first": 9,
+        "second": 10,
+        "total": 19
+      }
+    },
+    "q-eighteen-total": {
+      "path": "assets/q-eighteen-total.png",
+      "sha256": "f7982cbd22a68b7fba1f73bc8bde89cf42034fc9ce01b60c687de52a9bc76898",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/quantity-diagrams.mjs",
+      "renderSourceSha256": "b1a25e7ec9c65c0b37313f200f3c8cfaa7321d49e4ffe40f123c6ec2e1f9d87f",
+      "usedBy": [
+        "picture-check"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {},
+      "quantity": {
+        "total": 18,
+        "packed": 9
+      }
+    },
+    "q-nineteen-a": {
+      "path": "assets/q-nineteen-a.png",
+      "sha256": "46fb56b7b7bed45c704291e52e41763356bf2d72dd60ec5785d7308c1ff9148c",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/quantity-diagrams.mjs",
+      "renderSourceSha256": "b1a25e7ec9c65c0b37313f200f3c8cfaa7321d49e4ffe40f123c6ec2e1f9d87f",
+      "usedBy": [
+        "picture-check"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {},
+      "quantity": {
+        "total": 19,
+        "tray": 10,
+        "loose": 9,
+        "takenTray": 0,
+        "takenLoose": 9,
+        "taken": 9,
+        "left": 10
+      }
+    },
+    "q-nineteen-b": {
+      "path": "assets/q-nineteen-b.png",
+      "sha256": "603d0ddf70750e38c91c3438d76235ac87a004b80ee93a86edc09319b9110ca3",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/quantity-diagrams.mjs",
+      "renderSourceSha256": "b1a25e7ec9c65c0b37313f200f3c8cfaa7321d49e4ffe40f123c6ec2e1f9d87f",
+      "usedBy": [
+        "picture-check"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {},
+      "quantity": {
+        "total": 19,
+        "tray": 10,
+        "loose": 9,
+        "takenTray": 1,
+        "takenLoose": 9,
+        "taken": 10,
+        "left": 9
+      }
+    },
+    "q-nineteen-c": {
+      "path": "assets/q-nineteen-c.png",
+      "sha256": "049f5ddeda0e4dbeaa2fbb780b63d54e41ce826c7b92e0dc27940518a13cf3b9",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/quantity-diagrams.mjs",
+      "renderSourceSha256": "b1a25e7ec9c65c0b37313f200f3c8cfaa7321d49e4ffe40f123c6ec2e1f9d87f",
+      "usedBy": [
+        "picture-check"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {},
+      "quantity": {
+        "total": 19,
+        "tray": 10,
+        "loose": 9,
+        "takenTray": 0,
+        "takenLoose": 8,
+        "taken": 8,
+        "left": 11
+      }
+    },
+    "q-nineteen-start": {
+      "path": "assets/q-nineteen-start.png",
+      "sha256": "073135c271a88ec697f48ff908cfa875803d34fe142de8ed1622ea8a354d5417",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/quantity-diagrams.mjs",
+      "renderSourceSha256": "b1a25e7ec9c65c0b37313f200f3c8cfaa7321d49e4ffe40f123c6ec2e1f9d87f",
+      "usedBy": [
+        "picture-check"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {},
+      "quantity": {
+        "total": 19,
+        "tray": 10,
+        "loose": 9,
+        "takenTray": 0,
+        "takenLoose": 0,
+        "taken": 0,
+        "left": 19
+      }
+    },
+    "q-seventeen-a": {
+      "path": "assets/q-seventeen-a.png",
+      "sha256": "f34a14be9032048099d5864d1ff804317bfa56c78fc1e7912ed31b74f7d0bc50",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/quantity-diagrams.mjs",
+      "renderSourceSha256": "b1a25e7ec9c65c0b37313f200f3c8cfaa7321d49e4ffe40f123c6ec2e1f9d87f",
+      "usedBy": [
+        "picture-check"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {},
+      "quantity": {
+        "trayRemainder": 1,
+        "loose": 6
+      }
+    },
+    "q-seventeen-b": {
+      "path": "assets/q-seventeen-b.png",
+      "sha256": "28d743f8f91119a946e978c7187c7311401ee234a05f997861b88ece39f0a2c8",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/quantity-diagrams.mjs",
+      "renderSourceSha256": "b1a25e7ec9c65c0b37313f200f3c8cfaa7321d49e4ffe40f123c6ec2e1f9d87f",
+      "usedBy": [
+        "picture-check"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {},
+      "quantity": {
+        "trayRemainder": 1,
+        "loose": 8
+      }
+    },
+    "q-seventeen-c": {
+      "path": "assets/q-seventeen-c.png",
+      "sha256": "a2f1d15fe2e99913f7c5b903eb0b6c2be4054fea3c0e5e94ccd1070d0d9923e1",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/quantity-diagrams.mjs",
+      "renderSourceSha256": "b1a25e7ec9c65c0b37313f200f3c8cfaa7321d49e4ffe40f123c6ec2e1f9d87f",
+      "usedBy": [
+        "picture-check"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {},
+      "quantity": {
+        "trayRemainder": 1,
+        "loose": 7
+      }
+    },
+    "q-seventeen-start": {
+      "path": "assets/q-seventeen-start.png",
+      "sha256": "b19dff82bc2b0ab78923a4fb635a670f3d4b9f7caa6edaa0beb87f5f5584e651",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/quantity-diagrams.mjs",
+      "renderSourceSha256": "b1a25e7ec9c65c0b37313f200f3c8cfaa7321d49e4ffe40f123c6ec2e1f9d87f",
+      "usedBy": [
+        "picture-check"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {},
+      "quantity": {
+        "total": 17,
+        "tray": 10,
+        "loose": 7,
+        "takenTray": 9,
+        "takenLoose": 0,
+        "taken": 9,
+        "left": 8
+      }
+    },
+    "q-sixteen-a": {
+      "path": "assets/q-sixteen-a.png",
+      "sha256": "de25677962f8ac230642a228a040a29e0434de923e736f9f4a68a141904f5069",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/quantity-diagrams.mjs",
+      "renderSourceSha256": "b1a25e7ec9c65c0b37313f200f3c8cfaa7321d49e4ffe40f123c6ec2e1f9d87f",
+      "usedBy": [
+        "picture-check"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "festival-rosette": "f7b7fe331e7b2c15701436cfb62634e39282372f107e3e6bd91d9008b23cab68"
+      },
+      "quantity": {
+        "count": 6
+      }
+    },
+    "q-sixteen-b": {
+      "path": "assets/q-sixteen-b.png",
+      "sha256": "c7204f090c0033130cf1b043a99c3226e64ef5d2151f879a167a9d623e1025c2",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/quantity-diagrams.mjs",
+      "renderSourceSha256": "b1a25e7ec9c65c0b37313f200f3c8cfaa7321d49e4ffe40f123c6ec2e1f9d87f",
+      "usedBy": [
+        "picture-check"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "festival-rosette": "f7b7fe331e7b2c15701436cfb62634e39282372f107e3e6bd91d9008b23cab68"
+      },
+      "quantity": {
+        "count": 7
+      }
+    },
+    "q-sixteen-c": {
+      "path": "assets/q-sixteen-c.png",
+      "sha256": "1bb415cef5a998eda53b17f79cde3ac9c63c41cb2d24dc2e0737586b0b848120",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/quantity-diagrams.mjs",
+      "renderSourceSha256": "b1a25e7ec9c65c0b37313f200f3c8cfaa7321d49e4ffe40f123c6ec2e1f9d87f",
+      "usedBy": [
+        "picture-check"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "festival-rosette": "f7b7fe331e7b2c15701436cfb62634e39282372f107e3e6bd91d9008b23cab68"
+      },
+      "quantity": {
+        "count": 8
+      }
+    },
+    "q-sixteen-start": {
+      "path": "assets/q-sixteen-start.png",
+      "sha256": "f0c04dfef127fdfba94be09be4445207cad01e4e52653100925acdd689a00784",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/quantity-diagrams.mjs",
+      "renderSourceSha256": "b1a25e7ec9c65c0b37313f200f3c8cfaa7321d49e4ffe40f123c6ec2e1f9d87f",
+      "usedBy": [
+        "picture-check"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "festival-rosette": "f7b7fe331e7b2c15701436cfb62634e39282372f107e3e6bd91d9008b23cab68"
+      },
+      "quantity": {
+        "total": 16,
+        "tray": 10,
+        "loose": 6,
+        "takenTray": 0,
+        "takenLoose": 0,
+        "taken": 0,
+        "left": 16
+      }
+    },
+    "single-lantern": {
+      "path": "assets/single-lantern.png",
+      "sha256": "0bc547ee3dd0153c167d8654ce85cdea041ace0a5399d6b9251a2f8ca1fcaee0",
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/lantern-festival-sprites.png",
+      "generatedSourceSha256": "5149339dc560bfd953cf89bf91ae79d444788bca7faa2f6ad007e1c4803dab7c",
+      "sourceCrop": [
+        106,
+        58,
+        422,
+        506
+      ],
+      "promptSha256": "1f825706956b31f246a3f684f617ef15a0cbe688b5e7f0f4d1c23f53b45b9647",
+      "usedBy": [],
+      "derivativeConsumers": [
+        "bring-five-together",
+        "compare-after-nine",
+        "delivery-job-11",
+        "delivery-job-12",
+        "delivery-job-13",
+        "delivery-job-14",
+        "delivery-job-15",
+        "delivery-proof-11",
+        "delivery-proof-12",
+        "delivery-proof-13",
+        "delivery-proof-14",
+        "delivery-proof-15",
+        "delivery-total-11",
+        "delivery-total-12",
+        "delivery-total-13",
+        "delivery-total-14",
+        "delivery-total-15",
+        "fourteen-before",
+        "join-fourteen",
+        "take-five-next",
+        "take-loose-first",
+        "take-nine-from-ten",
+        "tile-left-2",
+        "tile-left-3",
+        "tile-left-4",
+        "tile-left-5",
+        "tile-left-6",
+        "tile-state-11",
+        "tile-state-12",
+        "tile-state-13",
+        "tile-state-14",
+        "tile-state-15",
+        "why-one-extra"
+      ]
+    },
+    "spaces-between": {
+      "path": "assets/spaces-between.png",
+      "sha256": "0c47b2221bd3cea9d6052a7b81a6e6182a56543f14412b4660926c23c89d757f",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/quantity-diagrams.mjs",
+      "renderSourceSha256": "b1a25e7ec9c65c0b37313f200f3c8cfaa7321d49e4ffe40f123c6ec2e1f9d87f",
+      "usedBy": [
+        "tell-it-at-home"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {},
+      "quantity": {
+        "markers": 10,
+        "spaces": 9
+      }
+    },
+    "start-with-the-whole": {
+      "path": "assets/start-with-the-whole.png",
+      "sha256": "b32d03f7ec247f922d52c9f7e92d6810b6ff6a08bd0dae5b91ea017196897b83",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/quantity-diagrams.mjs",
+      "renderSourceSha256": "b1a25e7ec9c65c0b37313f200f3c8cfaa7321d49e4ffe40f123c6ec2e1f9d87f",
+      "usedBy": [
+        "apply-what-is-left"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {},
+      "quantity": {
+        "groups": [
+          6,
+          7
+        ],
+        "total": 13,
+        "taken": 9,
+        "left": 4
+      }
+    },
+    "take-five-next": {
+      "path": "assets/take-five-next.png",
+      "sha256": "5d3936c4efe6b6b030f741810096e1f3ffefd5e61c84b720cb7388f71b7cde8a",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/quantity-diagrams.mjs",
+      "renderSourceSha256": "b1a25e7ec9c65c0b37313f200f3c8cfaa7321d49e4ffe40f123c6ec2e1f9d87f",
+      "usedBy": [
+        "take-in-two"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-lantern": "0bc547ee3dd0153c167d8654ce85cdea041ace0a5399d6b9251a2f8ca1fcaee0"
+      },
+      "quantity": {
+        "total": 14,
+        "tray": 10,
+        "loose": 4,
+        "takenTray": 5,
+        "takenLoose": 4,
+        "taken": 9,
+        "left": 5
+      }
+    },
+    "take-loose-first": {
+      "path": "assets/take-loose-first.png",
+      "sha256": "91cb1cdefe314e9909b5583464d80880f6f8caaa3fbb99de8de1f6dafc8d0e56",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/quantity-diagrams.mjs",
+      "renderSourceSha256": "b1a25e7ec9c65c0b37313f200f3c8cfaa7321d49e4ffe40f123c6ec2e1f9d87f",
+      "usedBy": [
+        "take-in-two"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-lantern": "0bc547ee3dd0153c167d8654ce85cdea041ace0a5399d6b9251a2f8ca1fcaee0"
+      },
+      "quantity": {
+        "total": 14,
+        "tray": 10,
+        "loose": 4,
+        "takenTray": 0,
+        "takenLoose": 4,
+        "taken": 4,
+        "left": 10
+      }
+    },
+    "take-nine-from-ten": {
+      "path": "assets/take-nine-from-ten.png",
+      "sha256": "7a22b8c77b5a8c8b62cedb44da8300a20029e5b9a7b90667c57544b693d03e5a",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/quantity-diagrams.mjs",
+      "renderSourceSha256": "b1a25e7ec9c65c0b37313f200f3c8cfaa7321d49e4ffe40f123c6ec2e1f9d87f",
+      "usedBy": [
+        "first-break-ten"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-lantern": "0bc547ee3dd0153c167d8654ce85cdea041ace0a5399d6b9251a2f8ca1fcaee0"
+      },
+      "quantity": {
+        "total": 14,
+        "tray": 10,
+        "loose": 4,
+        "takenTray": 9,
+        "takenLoose": 0,
+        "taken": 9,
+        "left": 5
+      }
+    },
+    "tile-left-2": {
+      "path": "assets/tile-left-2.png",
+      "sha256": "39465ac1eff9c5a4edebdf5c86d63c96292a87b8d5479c71f33148b7dbb06c43",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/quantity-diagrams.mjs",
+      "renderSourceSha256": "b1a25e7ec9c65c0b37313f200f3c8cfaa7321d49e4ffe40f123c6ec2e1f9d87f",
+      "usedBy": [
+        "match-the-remainder",
+        "return-the-quantity"
+      ],
+      "derivativeConsumers": [
+        "delivery-ready",
+        "tiles-ready"
+      ],
+      "inputs": {
+        "single-lantern": "0bc547ee3dd0153c167d8654ce85cdea041ace0a5399d6b9251a2f8ca1fcaee0"
+      },
+      "quantity": {
+        "left": 2
+      }
+    },
+    "tile-left-3": {
+      "path": "assets/tile-left-3.png",
+      "sha256": "bd59844dee909bb386e5452a9ac8d29654a0bf8e4ece8db9cc9ce261d3723801",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/quantity-diagrams.mjs",
+      "renderSourceSha256": "b1a25e7ec9c65c0b37313f200f3c8cfaa7321d49e4ffe40f123c6ec2e1f9d87f",
+      "usedBy": [
+        "match-the-remainder",
+        "return-the-quantity"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-lantern": "0bc547ee3dd0153c167d8654ce85cdea041ace0a5399d6b9251a2f8ca1fcaee0"
+      },
+      "quantity": {
+        "left": 3
+      }
+    },
+    "tile-left-4": {
+      "path": "assets/tile-left-4.png",
+      "sha256": "47b381500697850bc145a74ec38b707a459f925c30d1c43b2ca5c82adb665612",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/quantity-diagrams.mjs",
+      "renderSourceSha256": "b1a25e7ec9c65c0b37313f200f3c8cfaa7321d49e4ffe40f123c6ec2e1f9d87f",
+      "usedBy": [
+        "match-the-remainder",
+        "return-the-quantity"
+      ],
+      "derivativeConsumers": [
+        "tiles-ready"
+      ],
+      "inputs": {
+        "single-lantern": "0bc547ee3dd0153c167d8654ce85cdea041ace0a5399d6b9251a2f8ca1fcaee0"
+      },
+      "quantity": {
+        "left": 4
+      }
+    },
+    "tile-left-5": {
+      "path": "assets/tile-left-5.png",
+      "sha256": "96a676977ff2731cac833cd1b858a244d5a2be6bf6ca954ddbda0578fd0cba75",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/quantity-diagrams.mjs",
+      "renderSourceSha256": "b1a25e7ec9c65c0b37313f200f3c8cfaa7321d49e4ffe40f123c6ec2e1f9d87f",
+      "usedBy": [
+        "match-the-remainder",
+        "return-the-quantity"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-lantern": "0bc547ee3dd0153c167d8654ce85cdea041ace0a5399d6b9251a2f8ca1fcaee0"
+      },
+      "quantity": {
+        "left": 5
+      }
+    },
+    "tile-left-6": {
+      "path": "assets/tile-left-6.png",
+      "sha256": "a65da7615e6f383b86ee135a7dce838f0b6e5e3e069f101b88d0235b47ad68ab",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/quantity-diagrams.mjs",
+      "renderSourceSha256": "b1a25e7ec9c65c0b37313f200f3c8cfaa7321d49e4ffe40f123c6ec2e1f9d87f",
+      "usedBy": [
+        "match-the-remainder",
+        "return-the-quantity"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-lantern": "0bc547ee3dd0153c167d8654ce85cdea041ace0a5399d6b9251a2f8ca1fcaee0"
+      },
+      "quantity": {
+        "left": 6
+      }
+    },
+    "tile-state-11": {
+      "path": "assets/tile-state-11.png",
+      "sha256": "9f6b5e692e0ab37d3b687a21011762e3f9a3096bf26197e242be01942cd7d976",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/quantity-diagrams.mjs",
+      "renderSourceSha256": "b1a25e7ec9c65c0b37313f200f3c8cfaa7321d49e4ffe40f123c6ec2e1f9d87f",
+      "usedBy": [
+        "match-the-remainder"
+      ],
+      "derivativeConsumers": [
+        "tiles-ready"
+      ],
+      "inputs": {
+        "single-lantern": "0bc547ee3dd0153c167d8654ce85cdea041ace0a5399d6b9251a2f8ca1fcaee0"
+      },
+      "quantity": {
+        "total": 11,
+        "tray": 10,
+        "loose": 1,
+        "takenTray": 9,
+        "takenLoose": 0,
+        "taken": 9,
+        "left": 2
+      }
+    },
+    "tile-state-12": {
+      "path": "assets/tile-state-12.png",
+      "sha256": "59b468fccdfa3f805f8218cd5c25dc0c0536820395b992029782834bce20d4e3",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/quantity-diagrams.mjs",
+      "renderSourceSha256": "b1a25e7ec9c65c0b37313f200f3c8cfaa7321d49e4ffe40f123c6ec2e1f9d87f",
+      "usedBy": [
+        "match-the-remainder"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-lantern": "0bc547ee3dd0153c167d8654ce85cdea041ace0a5399d6b9251a2f8ca1fcaee0"
+      },
+      "quantity": {
+        "total": 12,
+        "tray": 10,
+        "loose": 2,
+        "takenTray": 9,
+        "takenLoose": 0,
+        "taken": 9,
+        "left": 3
+      }
+    },
+    "tile-state-13": {
+      "path": "assets/tile-state-13.png",
+      "sha256": "338e9e98ea836496628c4137485c7f6e3e489da645392b1832aae928b11679ef",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/quantity-diagrams.mjs",
+      "renderSourceSha256": "b1a25e7ec9c65c0b37313f200f3c8cfaa7321d49e4ffe40f123c6ec2e1f9d87f",
+      "usedBy": [
+        "match-the-remainder"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-lantern": "0bc547ee3dd0153c167d8654ce85cdea041ace0a5399d6b9251a2f8ca1fcaee0"
+      },
+      "quantity": {
+        "total": 13,
+        "tray": 10,
+        "loose": 3,
+        "takenTray": 9,
+        "takenLoose": 0,
+        "taken": 9,
+        "left": 4
+      }
+    },
+    "tile-state-14": {
+      "path": "assets/tile-state-14.png",
+      "sha256": "98d5c48011d6aca6eaba503fbd46e639a72205fa1e2ff83635c62056b7161a1f",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/quantity-diagrams.mjs",
+      "renderSourceSha256": "b1a25e7ec9c65c0b37313f200f3c8cfaa7321d49e4ffe40f123c6ec2e1f9d87f",
+      "usedBy": [
+        "match-the-remainder"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-lantern": "0bc547ee3dd0153c167d8654ce85cdea041ace0a5399d6b9251a2f8ca1fcaee0"
+      },
+      "quantity": {
+        "total": 14,
+        "tray": 10,
+        "loose": 4,
+        "takenTray": 9,
+        "takenLoose": 0,
+        "taken": 9,
+        "left": 5
+      }
+    },
+    "tile-state-15": {
+      "path": "assets/tile-state-15.png",
+      "sha256": "6e687ab09797d4b7321753834017f7a4f9e2e5ecabdc41a59b5010a108a87a4a",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/quantity-diagrams.mjs",
+      "renderSourceSha256": "b1a25e7ec9c65c0b37313f200f3c8cfaa7321d49e4ffe40f123c6ec2e1f9d87f",
+      "usedBy": [
+        "match-the-remainder"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-lantern": "0bc547ee3dd0153c167d8654ce85cdea041ace0a5399d6b9251a2f8ca1fcaee0"
+      },
+      "quantity": {
+        "total": 15,
+        "tray": 10,
+        "loose": 5,
+        "takenTray": 9,
+        "takenLoose": 0,
+        "taken": 9,
+        "left": 6
+      }
+    },
+    "tiles-ready": {
+      "path": "assets/tiles-ready.png",
+      "sha256": "53a9465cb54c4b99fec36d8a50350c6903916afeec377afd7edad9074f245f51",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/quantity-diagrams.mjs",
+      "renderSourceSha256": "b1a25e7ec9c65c0b37313f200f3c8cfaa7321d49e4ffe40f123c6ec2e1f9d87f",
+      "usedBy": [
+        "match-the-remainder"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "tile-state-11": "9f6b5e692e0ab37d3b687a21011762e3f9a3096bf26197e242be01942cd7d976",
+        "tile-left-2": "39465ac1eff9c5a4edebdf5c86d63c96292a87b8d5479c71f33148b7dbb06c43",
+        "tile-left-4": "47b381500697850bc145a74ec38b707a459f925c30d1c43b2ca5c82adb665612"
+      }
+    },
+    "which-work-remains": {
+      "path": "assets/which-work-remains.png",
+      "sha256": "77fb986217f5fb5606634b0ab9dace579948f048228d7411ae70a3db9616076b",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/quantity-diagrams.mjs",
+      "renderSourceSha256": "b1a25e7ec9c65c0b37313f200f3c8cfaa7321d49e4ffe40f123c6ec2e1f9d87f",
+      "usedBy": [
+        "apply-what-is-left"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {},
+      "quantity": {
+        "total": 12,
+        "finished": 9,
+        "left": 3
+      }
+    },
+    "why-one-extra": {
+      "path": "assets/why-one-extra.png",
+      "sha256": "87eaced15fad615f037058f3351bde1a410f2d8166a825d8008889ac11968318",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/quantity-diagrams.mjs",
+      "renderSourceSha256": "b1a25e7ec9c65c0b37313f200f3c8cfaa7321d49e4ffe40f123c6ec2e1f9d87f",
+      "usedBy": [
+        "one-more-left"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-lantern": "0bc547ee3dd0153c167d8654ce85cdea041ace0a5399d6b9251a2f8ca1fcaee0"
+      },
+      "quantity": {
+        "total": 13,
+        "tray": 10,
+        "loose": 3,
+        "takenTray": 9,
+        "takenLoose": 0,
+        "taken": 9,
+        "left": 4
+      }
+    },
+    "window-light": {
+      "path": "assets/window-light.png",
+      "sha256": "7a37deae3f41fb28dd93c744a52dd3339bf25dd2b38b496ebb965ee174cb2ed0",
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/lantern-festival-scenes.png",
+      "generatedSourceSha256": "f58214546bddba03420004b04f095d711dc00be0c07161662fbff643cab225a1",
+      "sourceCrop": [
+        1041,
+        527,
+        1518,
+        1002
+      ],
+      "promptSha256": "a6c7fd339fbe38b7b186fc71f32afe6a3716546002ed2d8e5e58e2b4767fd6a8",
+      "usedBy": [],
+      "derivativeConsumers": [
+        "home-counting"
+      ]
+    }
+  }
+}

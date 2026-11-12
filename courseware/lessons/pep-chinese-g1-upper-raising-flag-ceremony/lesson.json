@@ -1,0 +1,1261 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "8 升国旗",
+  "description": "小语老师带孩子听完整国歌，看国旗徐徐升起并练习观礼，认读字词，练写五个字。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小语老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Serena",
+      "avatar": "/avatars/teacher-2.png",
+      "color": "#D65A8A",
+      "persona": "给一年级孩子讲清字音和字义，用生活画面解释儿歌并示范笔顺。"
+    }
+  },
+  "images": {
+    "flag-close": {
+      "file": "assets/flag-close.png"
+    },
+    "ceremony-school": {
+      "file": "assets/ceremony-school.png"
+    },
+    "rise-diagram": {
+      "file": "assets/rise-diagram.png"
+    },
+    "wave-diagram": {
+      "file": "assets/wave-diagram.png"
+    },
+    "frame-compare": {
+      "file": "assets/frame-compare.png"
+    },
+    "center-grid": {
+      "file": "assets/center-grid.png"
+    },
+    "five-grid": {
+      "file": "assets/five-grid.png"
+    },
+    "wind-grid": {
+      "file": "assets/wind-grid.png"
+    },
+    "upright-grid": {
+      "file": "assets/upright-grid.png"
+    },
+    "correct-grid": {
+      "file": "assets/correct-grid.png"
+    },
+    "museum-ribbon": {
+      "file": "assets/museum-ribbon.png"
+    },
+    "museum-flag": {
+      "file": "assets/museum-flag.png"
+    },
+    "museum-bunting": {
+      "file": "assets/museum-bunting.png"
+    },
+    "museum-rise": {
+      "file": "assets/museum-rise.png"
+    },
+    "museum-fall": {
+      "file": "assets/museum-fall.png"
+    },
+    "museum-still": {
+      "file": "assets/museum-still.png"
+    },
+    "museum-down": {
+      "file": "assets/museum-down.png"
+    },
+    "museum-away": {
+      "file": "assets/museum-away.png"
+    },
+    "museum-toward": {
+      "file": "assets/museum-toward.png"
+    },
+    "stroke-flat-end": {
+      "file": "assets/stroke-flat-end.png"
+    },
+    "stroke-up-hook": {
+      "file": "assets/stroke-up-hook.png"
+    },
+    "stroke-back-hook": {
+      "file": "assets/stroke-back-hook.png"
+    },
+    "leaf-card": {
+      "glyph": {
+        "layout": "rows",
+        "size": [
+          480,
+          480
+        ],
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "叶"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "group-card": {
+      "glyph": {
+        "layout": "rows",
+        "size": [
+          480,
+          480
+        ],
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "团"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "ask-card": {
+      "glyph": {
+        "layout": "rows",
+        "size": [
+          480,
+          480
+        ],
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "问"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "schoolyard-base": {
+      "file": "assets/schoolyard-base.png"
+    },
+    "ceremony-official-flag": {
+      "file": "assets/ceremony-flag.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "look-at-flag",
+      "type": "slide",
+      "title": "认出中国的国旗",
+      "template": "picture-points",
+      "data": {
+        "title": "认出中国的国旗",
+        "picture": "flag-close",
+        "points": [
+          "中国 zhōng guó",
+          "国旗 guó qí",
+          "五星红旗 wǔ xīng hóng qí"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "跟我读，中国。中国是我们国家的名字。"
+        },
+        {
+          "say": "中国的中，第一声。国，第二声。"
+        },
+        {
+          "say": "儿歌里的我们，说的是全体中国人。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "再读国旗。国旗是一面代表自己国家的旗。"
+        },
+        {
+          "say": "在学校升旗时，我们会看见中国的国旗。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "从红色旗面往靠旗杆的上边找，能看见黄星。"
+        },
+        {
+          "say": "先看一颗大的，再找围在旁边的四颗小星。"
+        },
+        {
+          "say": "红底上有这五颗星，所以它叫五星红旗。"
+        },
+        {
+          "say": "跟我连起来读，五星红旗。"
+        }
+      ]
+    },
+    {
+      "key": "read-first-five",
+      "type": "slide",
+      "title": "把五个字放回词里",
+      "template": "two-columns",
+      "data": {
+        "title": "把五个字放回词里",
+        "left": {
+          "heading": "升 shēng　中 zhōng",
+          "body": "升起　中国"
+        },
+        "left_picture": "rise-diagram",
+        "right": {
+          "heading": "国 guó　旗 qí　们 men",
+          "body": "国旗　我们"
+        },
+        "right_picture": "ceremony-school"
+      },
+      "script": [
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "升和中都读第一声，两个字形状不同。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "看旗在低处和高处的两张图。往上去，就是升。"
+        },
+        {
+          "say": "中的长竖穿过小框的正中间。用中间来记中。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "把升和起连成升起，把中和国连成中国。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "国，第二声。先找四边外框，再认里面的玉。"
+        },
+        {
+          "say": "旗，第二声。旗的左边能找到一个方。"
+        },
+        {
+          "say": "们，左边有单人旁，右边是门。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "图上升起的是国旗，把国和旗放一起读。"
+        },
+        {
+          "say": "一个孩子可以说我，这几个孩子可以说我们。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "我们里的们轻轻带过，先看字，再把词连读。"
+        },
+        {
+          "say": "用手遮住拼音，指着国旗、我们再读一遍。"
+        }
+      ]
+    },
+    {
+      "key": "whole-frame",
+      "type": "slide",
+      "title": "看四边围住什么",
+      "template": "two-columns",
+      "data": {
+        "title": "看四边围住什么",
+        "left": {
+          "heading": "国和回",
+          "body": "四边把里面围住"
+        },
+        "right": {
+          "heading": "叶",
+          "body": "口在字的一边"
+        },
+        "left_picture": "frame-compare",
+        "right_picture": "leaf-card"
+      },
+      "script": [
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "国的外面有四条边。沿着四条边看一圈。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "中间的玉留在四条边里面，一笔也没穿出去。"
+        },
+        {
+          "say": "把里面围住的这个外框，叫国字框。"
+        },
+        {
+          "say": "再看回。里面换成一个小口，四边仍围住它。"
+        },
+        {
+          "say": "所以要看四面怎么围，也要看里面还有什么。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "国和回里面的字形不同，外围是同一种偏旁。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "看看叶。它左边有一个小口，右边还有十。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "口只在叶的一侧，没把十围在里面。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "小口长得方，位置和作用却和国字框不同。"
+        }
+      ]
+    },
+    {
+      "key": "frame-crane",
+      "type": "interactive",
+      "title": "国字框运输站",
+      "page": "frame-crane",
+      "widgetType": "game",
+      "startImage": "ceremony-school",
+      "script": [
+        {
+          "say": "吊车一直沿轨道走。看准要送到哪辆字车。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1
+          }
+        },
+        {
+          "highlight": "#game-goal"
+        },
+        {
+          "say": "老师运的是外框。找四面围住里面的字车。"
+        },
+        {
+          "highlight": "#game-target"
+        },
+        {
+          "say": "小满说，中间也有方框，我想送给中。",
+          "by": "xiaoman"
+        },
+        {
+          "say": "中的竖穿过外面的方形。看国，玉留在框里面。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "等吊车移到国字上方，我按下放键，框牌就会落下来。"
+        },
+        {
+          "say": "下放的框牌留在车上，让我们看见送到了哪里。"
+        },
+        {
+          "say": "没对准就等它回来，车不用从头开。"
+        },
+        {
+          "say": "你也可以按空格。记住，等吊车对准了再放。"
+        },
+        {
+          "say": "轮到你。先看四边围住谁，再等吊车到上方。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1
+          }
+        }
+      ],
+      "gameAudio": {
+        "crane-goal": "whole-frame-7",
+        "crane-hint": "whole-frame-15",
+        "crane-hint2": "whole-frame-7",
+        "crane-praise": "whole-frame-5"
+      }
+    },
+    {
+      "key": "slow-rise-wind",
+      "type": "slide",
+      "title": "看旗杆，也看旗面",
+      "template": "two-columns",
+      "data": {
+        "title": "看旗杆，也看旗面",
+        "left": {
+          "heading": "徐徐升起",
+          "body": "从低处慢慢到高处"
+        },
+        "right": {
+          "heading": "迎风飘扬",
+          "body": "旗面在风中改变样子"
+        },
+        "left_picture": "rise-diagram",
+        "right_picture": "wave-diagram"
+      },
+      "script": [
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "国歌响起时，儿歌说国旗徐徐升起。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "先看旗靠旗杆的位置低，再看它到了高处。"
+        },
+        {
+          "say": "中间要过一会儿，一点一点往上，才是徐徐。"
+        },
+        {
+          "say": "徐徐说的是慢慢地。看到旗高，还要想它怎么上来。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "先找低处，再看向上移动，才看得出升起。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "风吹过来，旗面会展开，还会有弯弯的起伏。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "旗留在差不多一样高的地方，旗面仍在动。"
+        },
+        {
+          "say": "看同一面旗前后的样子，就懂得迎风飘扬。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "看升起找高低，看飘扬找旗面形状的变化。"
+        }
+      ]
+    },
+    {
+      "key": "face-the-flag",
+      "type": "slide",
+      "title": "看国旗时怎么站",
+      "template": "picture-points",
+      "data": {
+        "title": "看国旗时怎么站",
+        "picture": "ceremony-school",
+        "points": [
+          "身体面向国旗",
+          "站直站稳",
+          "眼睛望着国旗"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "升旗是一种庄重的仪式，大家认真看同一面旗。"
+        },
+        {
+          "say": "如果旗在身体左前方，把身体转向旗杆。"
+        },
+        {
+          "say": "向着国旗，就是把身体朝向它。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "再把身子站直，脚停在地上。这是立正。"
+        },
+        {
+          "say": "大家一起停下别的事，动作才能整齐而认真。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "接着把目光落在旗上，旗往上时眼睛也跟着看。"
+        },
+        {
+          "say": "书里戴红领巾的少先队员，还有人行队礼。"
+        },
+        {
+          "say": "朝向、站直、注视，都能表达对国旗的尊重。"
+        }
+      ]
+    },
+    {
+      "key": "flag-raising",
+      "type": "interactive",
+      "title": "和同学一起升国旗",
+      "page": "flag-raising",
+      "widgetType": "guided-media",
+      "script": [
+        {
+          "highlight": "#ceremony-flag"
+        },
+        {
+          "say": "你看，国旗还在低处。等国歌响起来，它会怎样走呢？"
+        },
+        {
+          "highlight": "#ceremony-rope"
+        },
+        {
+          "say": "这里拉一下旗绳，给升旗一个开始的信号。"
+        },
+        {
+          "say": "等我说完，向下拉一下绳子，也可以按升旗键。"
+        },
+        {
+          "highlight": "#ceremony-children"
+        },
+        {
+          "say": "听见国歌，就像图里的同学一样，面向国旗站直。"
+        },
+        {
+          "say": "眼睛跟着旗往上，看它从低处一点一点升到杆顶。"
+        },
+        {
+          "say": "这样慢慢升高，就是课文说的徐徐升起。"
+        },
+        {
+          "say": "等国歌奏完，再把你看见的变化讲给身边的大人听。"
+        },
+        {
+          "setState": {
+            "ceremonyReady": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "read-next-six",
+      "type": "slide",
+      "title": "再认六个字",
+      "template": "picture-points",
+      "data": {
+        "title": "再认六个字",
+        "picture": "ceremony-school",
+        "points": [
+          "声 shēng　起 qǐ",
+          "多 duō　么 me",
+          "向 xiàng　立 lì"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "听见唱歌叫歌声，听见拍手叫拍手声。"
+        },
+        {
+          "say": "两个词都有声，都是耳朵听见的。声，第一声。"
+        },
+        {
+          "say": "人从坐到站叫起来，旗从低到高叫升起。"
+        },
+        {
+          "say": "起，第三声。把声接在歌后，把起接在升后。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "看图，这几个孩子比一个人多。多，第一声。"
+        },
+        {
+          "say": "说多么美丽，是在说很美。么读得轻又短。"
+        },
+        {
+          "say": "问什么和夸多么，两个词的末尾都用么。"
+        },
+        {
+          "say": "跟我连着读，多么。把多读清，么轻轻带过。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "向，第四声。找旗在哪边，再说人朝哪儿。"
+        },
+        {
+          "say": "孩子站直停住，就是立正。立，第四声。"
+        },
+        {
+          "say": "回到图里读一读，向着国旗，站好立正。"
+        }
+      ]
+    },
+    {
+      "key": "listen-to-syllables",
+      "type": "slide",
+      "title": "把尾音和轻声读清",
+      "template": "picture-points",
+      "data": {
+        "title": "把尾音和轻声读清",
+        "picture": "ceremony-school",
+        "points": [
+          "中国　升起　歌声",
+          "我们　向着　多么",
+          "先看拼音，再看字读"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "听我读，中国。中开头时，舌尖轻轻翘一点。"
+        },
+        {
+          "say": "升、声也翘舌。跟我读，升起，歌声。"
+        },
+        {
+          "say": "中、升、声收尾时，声音往鼻子后面收。"
+        },
+        {
+          "say": "跟我慢读中、升、声，再回到词里读。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "我们、向着、多么，最后一个字都读得轻短。"
+        },
+        {
+          "say": "把我、向、多先读清，后面轻轻接上。"
+        },
+        {
+          "say": "听我连着读，我们，向着，多么。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "翻到课文这两页，遮住拼音，再指着词读。"
+        },
+        {
+          "say": "拿不准就移开手看拼音，先慢读，再连起来。"
+        },
+        {
+          "say": "读得清楚就好，轻声别读成重重的一拍。"
+        }
+      ]
+    },
+    {
+      "key": "read-five-lines",
+      "type": "slide",
+      "title": "用五句线索朗读和背诵",
+      "template": "picture-points",
+      "data": {
+        "title": "用五句线索朗读和背诵",
+        "picture": "ceremony-school",
+        "points": [
+          "第一句 · 旗是谁的",
+          "第二、三句 · 旗的变化",
+          "第四、五句 · 人的动作"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "翻到书上第七十九页，先用手指找到五句话。"
+        },
+        {
+          "say": "第一句前四个字连读，逗号后五个字连读。"
+        },
+        {
+          "say": "听老师读，五星红旗，我们的国旗。"
+        },
+        {
+          "say": "逗号短停，句号停久一点。说的是谁的旗。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "第二句和第三句都是四字接四字。"
+        },
+        {
+          "say": "国歌声中，徐徐升起。先听哪儿停，再跟着读。"
+        },
+        {
+          "say": "第三句的前半句看旗在风里动，后半句是在赞叹。"
+        },
+        {
+          "say": "别把每个字拖长。四个字一组，像说话那样读。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "第四句读身体朝哪儿，后半句读怎样站。"
+        },
+        {
+          "say": "第五句读眼睛往哪儿看，后半句读怎样敬礼。"
+        },
+        {
+          "say": "这两句也是四字接四字。先跟原书逐句朗读。"
+        },
+        {
+          "say": "试着合上书，用旗、变化、动作想起五句。"
+        },
+        {
+          "say": "想不起来就翻回去看，先说给大人听。"
+        }
+      ]
+    },
+    {
+      "key": "write-center-five",
+      "type": "slide",
+      "title": "把中和五写进田字格",
+      "template": "two-columns",
+      "data": {
+        "title": "把中和五写进田字格",
+        "left": {
+          "heading": "中",
+          "body": "最后一竖走竖中线"
+        },
+        "right": {
+          "heading": "五",
+          "body": "底横写得更长"
+        },
+        "left_picture": "center-grid",
+        "right_picture": "five-grid"
+      },
+      "script": [
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "中一共四笔。先写左边竖，再写横折。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "第三笔横把下面合上，最后才写中间的竖。"
+        },
+        {
+          "say": "这竖沿竖中线向下，穿过中间的框。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "在中间找好起点，左右才不会挤到一边。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "五也有四笔，第一笔先写短横。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "第二笔写竖，第三笔向右横着走，再折下来。"
+        },
+        {
+          "say": "第四笔写长横，把上面的部分稳稳托住。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "对照原书，在格子里写一遍，再请大人看。"
+        },
+        {
+          "say": "开小车时，从笔画起点出发，沿线一直走到尽头。"
+        },
+        {
+          "say": "先停一下，看清眼前这小段要往哪边走。"
+        },
+        {
+          "say": "转弯要跟着线走，别从斜着的近路穿过去。"
+        },
+        {
+          "say": "这一段走好了。看看，小车把走过的路留下来了。"
+        }
+      ]
+    },
+    {
+      "key": "write-wind",
+      "type": "slide",
+      "title": "风的横斜钩一笔连起来",
+      "template": "picture-points",
+      "data": {
+        "title": "风的横斜钩一笔连起来",
+        "picture": "wind-grid",
+        "points": [
+          "第一笔 · 撇",
+          "第二笔 · 横斜钩",
+          "第三、四笔 · 撇和点"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "风先写左边的一撇。上面窄一些，往左下撇开。"
+        },
+        {
+          "say": "左撇给中间留地方，也给下一笔留了起点。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "第二笔叫横斜钩，从上边向右写横。"
+        },
+        {
+          "say": "到右上转一下，接着向下斜，慢慢朝右弯。"
+        },
+        {
+          "say": "到右下，尾巴轻轻向上挑。这三段不抬笔。"
+        },
+        {
+          "say": "看第二笔的颜色，从横到钩是一条连着的路。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "第三笔写里面的撇，第四笔是往右下的点。"
+        },
+        {
+          "say": "里面两笔在外面两笔之间，别碰到右下的钩。"
+        },
+        {
+          "say": "用手在空中走一遍，再请大人看你写。"
+        }
+      ]
+    },
+    {
+      "key": "write-upright",
+      "type": "slide",
+      "title": "把立和正写稳",
+      "template": "two-columns",
+      "data": {
+        "title": "把立和正写稳",
+        "left": {
+          "heading": "立",
+          "body": "先写上面，长横收尾"
+        },
+        "right": {
+          "heading": "正",
+          "body": "看两竖和三个横"
+        },
+        "left_picture": "upright-grid",
+        "right_picture": "correct-grid"
+      },
+      "script": [
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "立一共五笔。先点，再横，然后点、撇。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "第一点在上部靠中间。第二个点落在左下些。"
+        },
+        {
+          "say": "右侧的撇向左下，和这个点一起留在两横之间。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "最后写长横。它比上面的横长，托住字。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "正也是五笔。先横，再从上横往下写中间的竖。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "第三笔从中间的竖往右写横。第四笔写左边竖。"
+        },
+        {
+          "say": "第五笔是底下的长横，把两竖都接住。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "正的三个横分开些。底横写稳，整个字就稳。"
+        }
+      ]
+    },
+    {
+      "key": "stroke-route",
+      "type": "interactive",
+      "title": "田字格笔画小车",
+      "page": "stroke-route",
+      "widgetType": "game",
+      "startImage": "ceremony-school",
+      "script": [
+        {
+          "say": "按住小车，沿着每一笔的路线开，别走斜近路。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1
+          }
+        },
+        {
+          "highlight": "#game-goal"
+        },
+        {
+          "say": "中有四笔。我先示范左边这一竖。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "我握住起点向下开，写完左竖才去写横折。"
+        },
+        {
+          "highlight": "#game-target"
+        },
+        {
+          "say": "小满说，我能先写中间的长竖吗？",
+          "by": "xiaoman"
+        },
+        {
+          "say": "中最后才写穿过字框的竖。先写竖就换了笔顺。"
+        },
+        {
+          "say": "走到这一笔的尽头再松手，看看留下的一小段。"
+        },
+        {
+          "say": "开偏了就回到小车停下的地方，顺着路接着走。"
+        },
+        {
+          "say": "也可以按方向键，让小车跟着你选的方向走。"
+        },
+        {
+          "say": "轮到你了。从左边第一笔起点握住小车。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1
+          }
+        }
+      ],
+      "gameAudio": {
+        "trace-goal": "write-center-five-15",
+        "trace-hint": "write-center-five-16",
+        "trace-hint2": "write-center-five-17",
+        "trace-praise": "write-center-five-18"
+      }
+    },
+    {
+      "key": "picture-check",
+      "type": "quiz",
+      "title": "小检查",
+      "intro": [
+        "老师把问题读给你听。",
+        "先听完，再看清图片。",
+        "选好以后，一起想想理由。"
+      ],
+      "questions": [
+        {
+          "id": "flag-from-exhibition",
+          "question": "小讲解员在展览里找中国的国旗。看哪张图？",
+          "skill": "辨认五星红旗和理解国旗的所指",
+          "answer": [
+            "B"
+          ],
+          "analysis": "中间的红色长方形，靠左上有一颗大黄星和四颗小黄星，是五星红旗。红绸带和彩旗串是装饰。",
+          "options": {
+            "A": {
+              "label": "弯弯的红绸带",
+              "visual": {
+                "kind": "asset",
+                "image": "museum-ribbon",
+                "alt": "弯弯的红绸带"
+              }
+            },
+            "B": {
+              "label": "展板上的五星红旗",
+              "visual": {
+                "kind": "asset",
+                "image": "museum-flag",
+                "alt": "展板上的五星红旗"
+              }
+            },
+            "C": {
+              "label": "彩色三角串旗",
+              "visual": {
+                "kind": "asset",
+                "image": "museum-bunting",
+                "alt": "彩色三角串旗"
+              }
+            }
+          }
+        },
+        {
+          "id": "frame-from-signs",
+          "question": "看展馆外的单字图，哪个字的外框围住了里面？",
+          "skill": "从四面包围的字形辨认国字框",
+          "answer": [
+            "C"
+          ],
+          "analysis": "团的四条边把才围住了。问的门字框下面开着，叶的口只在左边。",
+          "options": {
+            "A": {
+              "label": "问",
+              "visual": {
+                "kind": "asset",
+                "image": "ask-card",
+                "alt": "问"
+              }
+            },
+            "B": {
+              "label": "叶",
+              "visual": {
+                "kind": "asset",
+                "image": "leaf-card",
+                "alt": "叶"
+              }
+            },
+            "C": {
+              "label": "团",
+              "visual": {
+                "kind": "asset",
+                "image": "group-card",
+                "alt": "团"
+              }
+            }
+          }
+        },
+        {
+          "id": "second-photo-higher",
+          "question": "展馆外哪一组图先低后高，画出了旗在升起？",
+          "skill": "从连续位置变化理解升起",
+          "answer": [
+            "A"
+          ],
+          "analysis": "这一组先看到旗在低处，后来看到旗升到高处。一组前后一样高，另一组先高后低。",
+          "options": {
+            "A": {
+              "label": "先低后高的连续图",
+              "visual": {
+                "kind": "asset",
+                "image": "museum-rise",
+                "alt": "先低后高的连续图"
+              }
+            },
+            "B": {
+              "label": "先高后低的连续图",
+              "visual": {
+                "kind": "asset",
+                "image": "museum-fall",
+                "alt": "先高后低的连续图"
+              }
+            },
+            "C": {
+              "label": "同一高度的连续图",
+              "visual": {
+                "kind": "asset",
+                "image": "museum-still",
+                "alt": "同一高度的连续图"
+              }
+            }
+          }
+        },
+        {
+          "id": "watch-at-exhibition",
+          "question": "参观时遇到升旗，谁站直，眼睛也朝着国旗？",
+          "skill": "用方向、站姿和目光识别观礼动作",
+          "answer": [
+            "C"
+          ],
+          "analysis": "这个孩子站直，身体和眼睛都向着国旗。另一个孩子在看地面，还有一个转向了另一边。",
+          "options": {
+            "A": {
+              "label": "弯腰看地面的孩子",
+              "visual": {
+                "kind": "asset",
+                "image": "museum-down",
+                "alt": "弯腰看地面的孩子"
+              }
+            },
+            "B": {
+              "label": "背对旗帜的孩子",
+              "visual": {
+                "kind": "asset",
+                "image": "museum-away",
+                "alt": "背对旗帜的孩子"
+              }
+            },
+            "C": {
+              "label": "站直望向旗帜的孩子",
+              "visual": {
+                "kind": "asset",
+                "image": "museum-toward",
+                "alt": "站直望向旗帜的孩子"
+              }
+            }
+          }
+        },
+        {
+          "id": "wind-stroke-direction",
+          "question": "哪张图的箭头能连着走出风的第二笔？",
+          "skill": "辨认横斜钩的连续笔形和方向",
+          "answer": [
+            "B"
+          ],
+          "analysis": "横斜钩先往右写横，再斜向下弯，尾端往上钩，全程一笔。另两条没有钩或向另一边弯。",
+          "options": {
+            "A": {
+              "label": "没有钩的路线",
+              "visual": {
+                "kind": "asset",
+                "image": "stroke-flat-end",
+                "alt": "没有钩的路线"
+              }
+            },
+            "B": {
+              "label": "先横、向下斜、尾端上钩的路线",
+              "visual": {
+                "kind": "asset",
+                "image": "stroke-up-hook",
+                "alt": "先横、向下斜、尾端上钩的路线"
+              }
+            },
+            "C": {
+              "label": "向相反方向斜行的路线",
+              "visual": {
+                "kind": "asset",
+                "image": "stroke-back-hook",
+                "alt": "向相反方向斜行的路线"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "lesson-recap",
+      "type": "slide",
+      "title": "把今天学的事讲给大人听",
+      "template": "summary",
+      "data": {
+        "title": "把今天学的事讲给大人听",
+        "items": [
+          "五星红旗 · 中国的国旗",
+          "字音 · 轻声 · 国字框",
+          "看旗的高低和旗面的变化",
+          "面向国旗站直，注视国旗",
+          "五个书写字 · 横斜钩"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "记住红底、一颗大星和四颗小星。它是中国国旗。"
+        },
+        {
+          "say": "书里说的我们，是全体中国人。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "读中、升、声要翘舌、收好尾音。"
+        },
+        {
+          "say": "读我们、向着、多么，最后一个字轻一些。"
+        },
+        {
+          "say": "国字框四面围住里面，看看回也有外框。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "先看低到高，理解徐徐升起。再看旗面飘动。"
+        },
+        {
+          "say": "用旗、变化和动作的线索，把五句话顺着读。"
+        },
+        {
+          "spotlight": "item-4"
+        },
+        {
+          "say": "观礼时把身体朝向旗，站直，也把目光望向旗。"
+        },
+        {
+          "say": "试着借图片线索背课文，请大人听你背。"
+        },
+        {
+          "spotlight": "item-5"
+        },
+        {
+          "say": "写中、五、风、立、正。横斜钩在风的第二笔。"
+        },
+        {
+          "say": "请大人看你一笔连写横、斜、钩，再看写字顺序。"
+        }
+      ]
+    }
+  ],
+  "audio": {
+    "ceremony-anthem": {
+      "file": "assets/ceremony-anthem.wav",
+      "sha256": "c660a3e79b67a9dbe87ac50fb37e5131a5f106741963fcd9cfb8039b3c9e3ee2"
+    }
+  }
+}

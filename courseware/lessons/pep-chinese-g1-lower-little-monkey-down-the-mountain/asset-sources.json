@@ -1,0 +1,2488 @@
+{
+  "schemaVersion": "mira.courseware.asset-sources.v1",
+  "generatedBy": "codex_builtin_imagegen",
+  "atlases": [
+    {
+      "atlasId": "story-forest",
+      "generatedSource": "art-source/story-forest.png",
+      "generatedSourceSha256": "71352fd1b29efd2a7bf9a9b0828b130a470bd8ca4bba3fb40e000b684b889208",
+      "promptPath": "art-source/story-forest.prompt.txt",
+      "promptSha256": "74a7ff411822dbb075ac300f1db3c708799979a31edff3f4535f1a6946e108c2",
+      "size": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "atlasId": "actor-actions",
+      "generatedSource": "art-source/actor-actions.png",
+      "generatedSourceSha256": "fd3e3fd7bdb6428f4f5429510a2bea8a12463987e0f7204b91e0780bca037494",
+      "promptPath": "art-source/actor-actions.prompt.txt",
+      "promptSha256": "da28ecd3cc5a0a1c278e8456dc3148f4a8ade3d6fd50ab44fd432ac8586a7b7e",
+      "size": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "atlasId": "arcade-layers",
+      "generatedSource": "art-source/arcade-layers.png",
+      "generatedSourceSha256": "8d6ff026aeb4f19c49c5521f0ca3686e250fb04b10611d95a9d877b12a172c2b",
+      "promptPath": "art-source/arcade-layers.prompt.txt",
+      "promptSha256": "16ce3ac6701372590aa13f904178a5dcda7fbc05a9761a3495170ba65280fb9f",
+      "size": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "atlasId": "quiz-poses",
+      "generatedSource": "art-source/quiz-poses.png",
+      "generatedSourceSha256": "50538ee2cfddfdb0036fd1aec2c0415ff208e652088160155a4d3a8229a7f92a",
+      "promptPath": "art-source/quiz-poses.prompt.txt",
+      "promptSha256": "252c0ce73e9110861b0da29ef91301e2507981ed93787e85e8adf0fb3c30cc09",
+      "size": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "atlasId": "quiz-storybook",
+      "generatedSource": "art-source/quiz-storybook.png",
+      "generatedSourceSha256": "16fc335174b2c62df6146ea54f3b93668e7881fd8ad132d2e716a8a52042e9ac",
+      "promptPath": "art-source/quiz-storybook.prompt.txt",
+      "promptSha256": "d7f0e0d20db92c46fb89792d23c1604d4526ae5cffe216e0b314a760e08f5e96",
+      "size": [
+        1254,
+        1254
+      ]
+    }
+  ],
+  "assets": [
+    {
+      "assetKey": "act-ball-cup-icon",
+      "path": "assets/act-ball-cup-icon.png",
+      "sha256": "4b4a2a437083052a0a0264ee44d92a4a5353266e4f64376f9208deb72951a934",
+      "width": 398,
+      "height": 398,
+      "usedBy": [
+        "catch-the-action"
+      ],
+      "source": "Codex built-in image_gen",
+      "sourcePanel": "act-ball-cup-icon",
+      "atlasId": "actor-actions",
+      "generatedSource": "art-source/actor-actions.png",
+      "generatedSourceSha256": "fd3e3fd7bdb6428f4f5429510a2bea8a12463987e0f7204b91e0780bca037494",
+      "promptPath": "art-source/actor-actions.prompt.txt",
+      "promptSha256": "da28ecd3cc5a0a1c278e8456dc3148f4a8ade3d6fd50ab44fd432ac8586a7b7e",
+      "size": [
+        1254,
+        1254
+      ],
+      "sourceCrop": [
+        10,
+        846,
+        408,
+        1244
+      ]
+    },
+    {
+      "assetKey": "act-ball-hug-icon",
+      "path": "assets/act-ball-hug-icon.png",
+      "sha256": "6f954b9b2dd31ae0cfbe75942cb4da79d2012cf63da2b611b40e0ec468d2e8c7",
+      "width": 398,
+      "height": 398,
+      "usedBy": [
+        "catch-the-action"
+      ],
+      "source": "Codex built-in image_gen",
+      "sourcePanel": "act-ball-hug-icon",
+      "atlasId": "actor-actions",
+      "generatedSource": "art-source/actor-actions.png",
+      "generatedSourceSha256": "fd3e3fd7bdb6428f4f5429510a2bea8a12463987e0f7204b91e0780bca037494",
+      "promptPath": "art-source/actor-actions.prompt.txt",
+      "promptSha256": "da28ecd3cc5a0a1c278e8456dc3148f4a8ade3d6fd50ab44fd432ac8586a7b7e",
+      "size": [
+        1254,
+        1254
+      ],
+      "sourceCrop": [
+        846,
+        428,
+        1244,
+        826
+      ]
+    },
+    {
+      "assetKey": "act-ball-toss-icon",
+      "path": "assets/act-ball-toss-icon.png",
+      "sha256": "c9f4f12c35fbb0a75b511d75b78a07adc14f3c2dce4c41e417a7b9d91321e110",
+      "width": 398,
+      "height": 398,
+      "usedBy": [
+        "catch-the-action"
+      ],
+      "source": "Codex built-in image_gen",
+      "sourcePanel": "act-ball-toss-icon",
+      "atlasId": "actor-actions",
+      "generatedSource": "art-source/actor-actions.png",
+      "generatedSourceSha256": "fd3e3fd7bdb6428f4f5429510a2bea8a12463987e0f7204b91e0780bca037494",
+      "promptPath": "art-source/actor-actions.prompt.txt",
+      "promptSha256": "da28ecd3cc5a0a1c278e8456dc3148f4a8ade3d6fd50ab44fd432ac8586a7b7e",
+      "size": [
+        1254,
+        1254
+      ],
+      "sourceCrop": [
+        428,
+        846,
+        826,
+        1244
+      ]
+    },
+    {
+      "assetKey": "act-break-icon",
+      "path": "assets/act-break-icon.png",
+      "sha256": "e4cccc2396db59052f304c042e0b159bd8f59a846d31fb7fb1c883b25f9f482c",
+      "width": 398,
+      "height": 398,
+      "usedBy": [
+        "catch-the-action"
+      ],
+      "source": "Codex built-in image_gen",
+      "sourcePanel": "act-break-icon",
+      "atlasId": "actor-actions",
+      "generatedSource": "art-source/actor-actions.png",
+      "generatedSourceSha256": "fd3e3fd7bdb6428f4f5429510a2bea8a12463987e0f7204b91e0780bca037494",
+      "promptPath": "art-source/actor-actions.prompt.txt",
+      "promptSha256": "da28ecd3cc5a0a1c278e8456dc3148f4a8ade3d6fd50ab44fd432ac8586a7b7e",
+      "size": [
+        1254,
+        1254
+      ],
+      "sourceCrop": [
+        10,
+        10,
+        408,
+        408
+      ]
+    },
+    {
+      "assetKey": "act-cup-icon",
+      "path": "assets/act-cup-icon.png",
+      "sha256": "45021063ff2985cfc476b89e42988b9407fe2c9560c112b9f4f229c50a83ac0f",
+      "width": 398,
+      "height": 398,
+      "usedBy": [
+        "catch-the-action"
+      ],
+      "source": "Codex built-in image_gen",
+      "sourcePanel": "act-cup-icon",
+      "atlasId": "actor-actions",
+      "generatedSource": "art-source/actor-actions.png",
+      "generatedSourceSha256": "fd3e3fd7bdb6428f4f5429510a2bea8a12463987e0f7204b91e0780bca037494",
+      "promptPath": "art-source/actor-actions.prompt.txt",
+      "promptSha256": "da28ecd3cc5a0a1c278e8456dc3148f4a8ade3d6fd50ab44fd432ac8586a7b7e",
+      "size": [
+        1254,
+        1254
+      ],
+      "sourceCrop": [
+        10,
+        428,
+        408,
+        826
+      ]
+    },
+    {
+      "assetKey": "act-hug-icon",
+      "path": "assets/act-hug-icon.png",
+      "sha256": "46783f86db913281565c649b72a8d0b9bc663eac39974082e36054cee2571949",
+      "width": 398,
+      "height": 398,
+      "usedBy": [
+        "catch-the-action"
+      ],
+      "source": "Codex built-in image_gen",
+      "sourcePanel": "act-hug-icon",
+      "atlasId": "actor-actions",
+      "generatedSource": "art-source/actor-actions.png",
+      "generatedSourceSha256": "fd3e3fd7bdb6428f4f5429510a2bea8a12463987e0f7204b91e0780bca037494",
+      "promptPath": "art-source/actor-actions.prompt.txt",
+      "promptSha256": "da28ecd3cc5a0a1c278e8456dc3148f4a8ade3d6fd50ab44fd432ac8586a7b7e",
+      "size": [
+        1254,
+        1254
+      ],
+      "sourceCrop": [
+        428,
+        428,
+        826,
+        826
+      ]
+    },
+    {
+      "assetKey": "act-pick-icon",
+      "path": "assets/act-pick-icon.png",
+      "sha256": "a30f1f652e00868ed8683d11be7f06fc69eb5f4719b3e56e2451fc2f196c7f87",
+      "width": 398,
+      "height": 398,
+      "usedBy": [
+        "catch-the-action"
+      ],
+      "source": "Codex built-in image_gen",
+      "sourcePanel": "act-pick-icon",
+      "atlasId": "actor-actions",
+      "generatedSource": "art-source/actor-actions.png",
+      "generatedSourceSha256": "fd3e3fd7bdb6428f4f5429510a2bea8a12463987e0f7204b91e0780bca037494",
+      "promptPath": "art-source/actor-actions.prompt.txt",
+      "promptSha256": "da28ecd3cc5a0a1c278e8456dc3148f4a8ade3d6fd50ab44fd432ac8586a7b7e",
+      "size": [
+        1254,
+        1254
+      ],
+      "sourceCrop": [
+        428,
+        10,
+        826,
+        408
+      ]
+    },
+    {
+      "assetKey": "act-shoulder-icon",
+      "path": "assets/act-shoulder-icon.png",
+      "sha256": "37b88cec54e0dd2f69babe661581162c985f1b8c3b962866a64aae55aa331ef9",
+      "width": 398,
+      "height": 398,
+      "usedBy": [
+        "catch-the-action"
+      ],
+      "source": "Codex built-in image_gen",
+      "sourcePanel": "act-shoulder-icon",
+      "atlasId": "actor-actions",
+      "generatedSource": "art-source/actor-actions.png",
+      "generatedSourceSha256": "fd3e3fd7bdb6428f4f5429510a2bea8a12463987e0f7204b91e0780bca037494",
+      "promptPath": "art-source/actor-actions.prompt.txt",
+      "promptSha256": "da28ecd3cc5a0a1c278e8456dc3148f4a8ade3d6fd50ab44fd432ac8586a7b7e",
+      "size": [
+        1254,
+        1254
+      ],
+      "sourceCrop": [
+        846,
+        10,
+        1244,
+        408
+      ]
+    },
+    {
+      "assetKey": "action-backdrop",
+      "path": "assets/action-backdrop.png",
+      "sha256": "8361c5af997aaa1160957778e4a97bb77d3d2173f79d1db04cf3f274e94b34af",
+      "width": 398,
+      "height": 398,
+      "usedBy": [
+        "catch-the-action"
+      ],
+      "source": "Codex built-in image_gen",
+      "sourcePanel": "action-backdrop",
+      "atlasId": "arcade-layers",
+      "generatedSource": "art-source/arcade-layers.png",
+      "generatedSourceSha256": "8d6ff026aeb4f19c49c5521f0ca3686e250fb04b10611d95a9d877b12a172c2b",
+      "promptPath": "art-source/arcade-layers.prompt.txt",
+      "promptSha256": "16ce3ac6701372590aa13f904178a5dcda7fbc05a9761a3495170ba65280fb9f",
+      "size": [
+        1254,
+        1254
+      ],
+      "sourceCrop": [
+        428,
+        10,
+        826,
+        408
+      ]
+    },
+    {
+      "assetKey": "action-boat",
+      "path": "assets/action-boat.png",
+      "sha256": "613852db7aab7877eb475777a696e27164ff782b3cfc8007a170cc1b7c106b44",
+      "width": 398,
+      "height": 398,
+      "usedBy": [
+        "catch-the-action"
+      ],
+      "source": "Codex built-in image_gen",
+      "sourcePanel": "action-boat",
+      "atlasId": "arcade-layers",
+      "generatedSource": "art-source/arcade-layers.png",
+      "generatedSourceSha256": "8d6ff026aeb4f19c49c5521f0ca3686e250fb04b10611d95a9d877b12a172c2b",
+      "promptPath": "art-source/arcade-layers.prompt.txt",
+      "promptSha256": "16ce3ac6701372590aa13f904178a5dcda7fbc05a9761a3495170ba65280fb9f",
+      "size": [
+        1254,
+        1254
+      ],
+      "sourceCrop": [
+        846,
+        428,
+        1244,
+        826
+      ]
+    },
+    {
+      "assetKey": "action-boat-pop",
+      "path": "assets/action-boat-pop.png",
+      "sha256": "4a313190227d5f26b3483a0d0b340ed7e4294024fe36ad947999c88a66a54af9",
+      "width": 398,
+      "height": 398,
+      "usedBy": [
+        "catch-the-action"
+      ],
+      "source": "Codex built-in image_gen",
+      "sourcePanel": "action-boat-pop",
+      "atlasId": "arcade-layers",
+      "generatedSource": "art-source/arcade-layers.png",
+      "generatedSourceSha256": "8d6ff026aeb4f19c49c5521f0ca3686e250fb04b10611d95a9d877b12a172c2b",
+      "promptPath": "art-source/arcade-layers.prompt.txt",
+      "promptSha256": "16ce3ac6701372590aa13f904178a5dcda7fbc05a9761a3495170ba65280fb9f",
+      "size": [
+        1254,
+        1254
+      ],
+      "sourceCrop": [
+        10,
+        846,
+        408,
+        1244
+      ]
+    },
+    {
+      "assetKey": "action-start",
+      "path": "assets/action-start.png",
+      "sha256": "ae235806291209c41b266018534872b9bb2f18d6c6ea3a4588316c7b073dda62",
+      "width": 398,
+      "height": 398,
+      "usedBy": [
+        "catch-the-action"
+      ],
+      "source": "Codex built-in image_gen",
+      "sourcePanel": "action-start",
+      "atlasId": "arcade-layers",
+      "generatedSource": "art-source/arcade-layers.png",
+      "generatedSourceSha256": "8d6ff026aeb4f19c49c5521f0ca3686e250fb04b10611d95a9d877b12a172c2b",
+      "promptPath": "art-source/arcade-layers.prompt.txt",
+      "promptSha256": "16ce3ac6701372590aa13f904178a5dcda7fbc05a9761a3495170ba65280fb9f",
+      "size": [
+        1254,
+        1254
+      ],
+      "sourceCrop": [
+        846,
+        846,
+        1244,
+        1244
+      ]
+    },
+    {
+      "assetKey": "break-carry-board",
+      "path": "assets/break-carry-board.png",
+      "sha256": "8ca17920441371967a4abe7058afd8536b0ea32a80bb3180ede6b9711e3648a0",
+      "width": 512,
+      "height": 250,
+      "usedBy": [
+        "break-and-carry"
+      ],
+      "source": "composition of registered ImageGen panels",
+      "components": [
+        "break-corn",
+        "carry-corn"
+      ],
+      "sourcePanels": [
+        {
+          "panel": "break-corn",
+          "atlasId": "story-forest",
+          "generatedSource": "art-source/story-forest.png",
+          "generatedSourceSha256": "71352fd1b29efd2a7bf9a9b0828b130a470bd8ca4bba3fb40e000b684b889208",
+          "promptPath": "art-source/story-forest.prompt.txt",
+          "promptSha256": "74a7ff411822dbb075ac300f1db3c708799979a31edff3f4535f1a6946e108c2",
+          "size": [
+            1254,
+            1254
+          ],
+          "sourceCrop": [
+            323,
+            10,
+            617,
+            303
+          ]
+        },
+        {
+          "panel": "carry-corn",
+          "atlasId": "story-forest",
+          "generatedSource": "art-source/story-forest.png",
+          "generatedSourceSha256": "71352fd1b29efd2a7bf9a9b0828b130a470bd8ca4bba3fb40e000b684b889208",
+          "promptPath": "art-source/story-forest.prompt.txt",
+          "promptSha256": "74a7ff411822dbb075ac300f1db3c708799979a31edff3f4535f1a6946e108c2",
+          "size": [
+            1254,
+            1254
+          ],
+          "sourceCrop": [
+            637,
+            10,
+            930,
+            303
+          ]
+        }
+      ],
+      "composition": {
+        "columns": 2,
+        "tilePixels": 250,
+        "gapPixels": 12,
+        "background": "#fff2d9",
+        "fit": "contain"
+      }
+    },
+    {
+      "assetKey": "corn-stage",
+      "path": "assets/corn-stage.png",
+      "sha256": "010eed106624efaf867116b5d8360f9af7cbd518eefa8eb8626fe72c8457fd3f",
+      "width": 512,
+      "height": 250,
+      "usedBy": [
+        "corn-at-the-start"
+      ],
+      "source": "composition of registered ImageGen panels",
+      "components": [
+        "empty-house",
+        "corn-stage"
+      ],
+      "sourcePanels": [
+        {
+          "panel": "empty-house",
+          "atlasId": "story-forest",
+          "generatedSource": "art-source/story-forest.png",
+          "generatedSourceSha256": "71352fd1b29efd2a7bf9a9b0828b130a470bd8ca4bba3fb40e000b684b889208",
+          "promptPath": "art-source/story-forest.prompt.txt",
+          "promptSha256": "74a7ff411822dbb075ac300f1db3c708799979a31edff3f4535f1a6946e108c2",
+          "size": [
+            1254,
+            1254
+          ],
+          "sourceCrop": [
+            950,
+            637,
+            1244,
+            930
+          ]
+        },
+        {
+          "panel": "corn-stage",
+          "atlasId": "story-forest",
+          "generatedSource": "art-source/story-forest.png",
+          "generatedSourceSha256": "71352fd1b29efd2a7bf9a9b0828b130a470bd8ca4bba3fb40e000b684b889208",
+          "promptPath": "art-source/story-forest.prompt.txt",
+          "promptSha256": "74a7ff411822dbb075ac300f1db3c708799979a31edff3f4535f1a6946e108c2",
+          "size": [
+            1254,
+            1254
+          ],
+          "sourceCrop": [
+            10,
+            10,
+            303,
+            303
+          ]
+        }
+      ],
+      "composition": {
+        "columns": 2,
+        "tilePixels": 250,
+        "gapPixels": 12,
+        "background": "#fff2d9",
+        "fit": "contain"
+      }
+    },
+    {
+      "assetKey": "empty-handed-board",
+      "path": "assets/empty-handed-board.png",
+      "sha256": "e91ecabe556fc68d030bfbb669df23b393ea6d920fa1d107d2979fc79d993a9f",
+      "width": 1024,
+      "height": 247,
+      "usedBy": [
+        "why-empty"
+      ],
+      "source": "composition of registered ImageGen panels",
+      "components": [
+        "throw-corn",
+        "throw-peaches",
+        "rabbit-chase",
+        "empty-house"
+      ],
+      "sourcePanels": [
+        {
+          "panel": "throw-corn",
+          "atlasId": "story-forest",
+          "generatedSource": "art-source/story-forest.png",
+          "generatedSourceSha256": "71352fd1b29efd2a7bf9a9b0828b130a470bd8ca4bba3fb40e000b684b889208",
+          "promptPath": "art-source/story-forest.prompt.txt",
+          "promptSha256": "74a7ff411822dbb075ac300f1db3c708799979a31edff3f4535f1a6946e108c2",
+          "size": [
+            1254,
+            1254
+          ],
+          "sourceCrop": [
+            10,
+            323,
+            303,
+            617
+          ]
+        },
+        {
+          "panel": "throw-peaches",
+          "atlasId": "story-forest",
+          "generatedSource": "art-source/story-forest.png",
+          "generatedSourceSha256": "71352fd1b29efd2a7bf9a9b0828b130a470bd8ca4bba3fb40e000b684b889208",
+          "promptPath": "art-source/story-forest.prompt.txt",
+          "promptSha256": "74a7ff411822dbb075ac300f1db3c708799979a31edff3f4535f1a6946e108c2",
+          "size": [
+            1254,
+            1254
+          ],
+          "sourceCrop": [
+            10,
+            950,
+            303,
+            1244
+          ]
+        },
+        {
+          "panel": "rabbit-chase",
+          "atlasId": "story-forest",
+          "generatedSource": "art-source/story-forest.png",
+          "generatedSourceSha256": "71352fd1b29efd2a7bf9a9b0828b130a470bd8ca4bba3fb40e000b684b889208",
+          "promptPath": "art-source/story-forest.prompt.txt",
+          "promptSha256": "74a7ff411822dbb075ac300f1db3c708799979a31edff3f4535f1a6946e108c2",
+          "size": [
+            1254,
+            1254
+          ],
+          "sourceCrop": [
+            323,
+            637,
+            617,
+            930
+          ]
+        },
+        {
+          "panel": "empty-house",
+          "atlasId": "story-forest",
+          "generatedSource": "art-source/story-forest.png",
+          "generatedSourceSha256": "71352fd1b29efd2a7bf9a9b0828b130a470bd8ca4bba3fb40e000b684b889208",
+          "promptPath": "art-source/story-forest.prompt.txt",
+          "promptSha256": "74a7ff411822dbb075ac300f1db3c708799979a31edff3f4535f1a6946e108c2",
+          "size": [
+            1254,
+            1254
+          ],
+          "sourceCrop": [
+            950,
+            637,
+            1244,
+            930
+          ]
+        }
+      ],
+      "composition": {
+        "columns": 4,
+        "tilePixels": 250,
+        "gapPixels": 12,
+        "background": "#fff2d9",
+        "fit": "contain"
+      }
+    },
+    {
+      "assetKey": "first-three-route",
+      "path": "assets/first-three-route.png",
+      "sha256": "70b4b5dafc9b37cc050a9921d4c1d4ace450462f3ab540f77a11aaf386508080",
+      "width": 774,
+      "height": 250,
+      "usedBy": [
+        "order-first-places"
+      ],
+      "source": "composition of registered ImageGen panels",
+      "components": [
+        "corn-stage",
+        "peach-stage",
+        "melon-stage"
+      ],
+      "sourcePanels": [
+        {
+          "panel": "corn-stage",
+          "atlasId": "story-forest",
+          "generatedSource": "art-source/story-forest.png",
+          "generatedSourceSha256": "71352fd1b29efd2a7bf9a9b0828b130a470bd8ca4bba3fb40e000b684b889208",
+          "promptPath": "art-source/story-forest.prompt.txt",
+          "promptSha256": "74a7ff411822dbb075ac300f1db3c708799979a31edff3f4535f1a6946e108c2",
+          "size": [
+            1254,
+            1254
+          ],
+          "sourceCrop": [
+            10,
+            10,
+            303,
+            303
+          ]
+        },
+        {
+          "panel": "peach-stage",
+          "atlasId": "story-forest",
+          "generatedSource": "art-source/story-forest.png",
+          "generatedSourceSha256": "71352fd1b29efd2a7bf9a9b0828b130a470bd8ca4bba3fb40e000b684b889208",
+          "promptPath": "art-source/story-forest.prompt.txt",
+          "promptSha256": "74a7ff411822dbb075ac300f1db3c708799979a31edff3f4535f1a6946e108c2",
+          "size": [
+            1254,
+            1254
+          ],
+          "sourceCrop": [
+            950,
+            10,
+            1244,
+            303
+          ]
+        },
+        {
+          "panel": "melon-stage",
+          "atlasId": "story-forest",
+          "generatedSource": "art-source/story-forest.png",
+          "generatedSourceSha256": "71352fd1b29efd2a7bf9a9b0828b130a470bd8ca4bba3fb40e000b684b889208",
+          "promptPath": "art-source/story-forest.prompt.txt",
+          "promptSha256": "74a7ff411822dbb075ac300f1db3c708799979a31edff3f4535f1a6946e108c2",
+          "size": [
+            1254,
+            1254
+          ],
+          "sourceCrop": [
+            637,
+            323,
+            930,
+            617
+          ]
+        }
+      ],
+      "composition": {
+        "columns": 3,
+        "tilePixels": 250,
+        "gapPixels": 12,
+        "background": "#fff2d9",
+        "fit": "contain"
+      }
+    },
+    {
+      "assetKey": "home-retell-board",
+      "path": "assets/home-retell-board.png",
+      "sha256": "1da2d45bbc3999d1a441ddca1aeba94964dbea265016b682604885e8b6f28c8d",
+      "width": 294,
+      "height": 294,
+      "usedBy": [
+        "tell-a-new-trip"
+      ],
+      "source": "Codex built-in image_gen",
+      "sourcePanel": "home-retell-board",
+      "atlasId": "story-forest",
+      "generatedSource": "art-source/story-forest.png",
+      "generatedSourceSha256": "71352fd1b29efd2a7bf9a9b0828b130a470bd8ca4bba3fb40e000b684b889208",
+      "promptPath": "art-source/story-forest.prompt.txt",
+      "promptSha256": "74a7ff411822dbb075ac300f1db3c708799979a31edff3f4535f1a6946e108c2",
+      "size": [
+        1254,
+        1254
+      ],
+      "sourceCrop": [
+        950,
+        950,
+        1244,
+        1244
+      ]
+    },
+    {
+      "assetKey": "map-carry-icon",
+      "path": "assets/map-carry-icon.png",
+      "sha256": "4057ce2736b01227e4785e183044cac703a594e067211dcd28ddc78cef5c9e36",
+      "width": 256,
+      "height": 256,
+      "usedBy": [
+        "walk-the-stage-map"
+      ],
+      "source": "Codex built-in image_gen",
+      "sourcePanel": "cupped-peaches",
+      "derivation": "reduce to 256px for map cell",
+      "atlasId": "story-forest",
+      "generatedSource": "art-source/story-forest.png",
+      "generatedSourceSha256": "71352fd1b29efd2a7bf9a9b0828b130a470bd8ca4bba3fb40e000b684b889208",
+      "promptPath": "art-source/story-forest.prompt.txt",
+      "promptSha256": "74a7ff411822dbb075ac300f1db3c708799979a31edff3f4535f1a6946e108c2",
+      "size": [
+        1254,
+        1254
+      ],
+      "sourceCrop": [
+        950,
+        323,
+        1244,
+        617
+      ]
+    },
+    {
+      "assetKey": "map-chase-icon",
+      "path": "assets/map-chase-icon.png",
+      "sha256": "58e4566c11452eb40a8ff5a18251534760fca69520d8de78dba446f5c6ea5500",
+      "width": 256,
+      "height": 255,
+      "usedBy": [
+        "walk-the-stage-map"
+      ],
+      "source": "Codex built-in image_gen",
+      "sourcePanel": "rabbit-chase",
+      "derivation": "reduce to 256px for map cell",
+      "atlasId": "story-forest",
+      "generatedSource": "art-source/story-forest.png",
+      "generatedSourceSha256": "71352fd1b29efd2a7bf9a9b0828b130a470bd8ca4bba3fb40e000b684b889208",
+      "promptPath": "art-source/story-forest.prompt.txt",
+      "promptSha256": "74a7ff411822dbb075ac300f1db3c708799979a31edff3f4535f1a6946e108c2",
+      "size": [
+        1254,
+        1254
+      ],
+      "sourceCrop": [
+        323,
+        637,
+        617,
+        930
+      ]
+    },
+    {
+      "assetKey": "map-corn-icon",
+      "path": "assets/map-corn-icon.png",
+      "sha256": "e575279498ddf54dabe1eba4613f624b76632dc8f0d3c666bfd7d942f409b0f0",
+      "width": 256,
+      "height": 256,
+      "usedBy": [
+        "walk-the-stage-map"
+      ],
+      "source": "Codex built-in image_gen",
+      "sourcePanel": "corn-stage",
+      "derivation": "reduce to 256px for map cell",
+      "atlasId": "story-forest",
+      "generatedSource": "art-source/story-forest.png",
+      "generatedSourceSha256": "71352fd1b29efd2a7bf9a9b0828b130a470bd8ca4bba3fb40e000b684b889208",
+      "promptPath": "art-source/story-forest.prompt.txt",
+      "promptSha256": "74a7ff411822dbb075ac300f1db3c708799979a31edff3f4535f1a6946e108c2",
+      "size": [
+        1254,
+        1254
+      ],
+      "sourceCrop": [
+        10,
+        10,
+        303,
+        303
+      ]
+    },
+    {
+      "assetKey": "map-home-icon",
+      "path": "assets/map-home-icon.png",
+      "sha256": "2616f372d95f1fc00a941a78c3a4af20cbd57e06ed7a84da05de9ed27134424e",
+      "width": 256,
+      "height": 255,
+      "usedBy": [
+        "walk-the-stage-map"
+      ],
+      "source": "Codex built-in image_gen",
+      "sourcePanel": "empty-house",
+      "derivation": "reduce to 256px for map cell",
+      "atlasId": "story-forest",
+      "generatedSource": "art-source/story-forest.png",
+      "generatedSourceSha256": "71352fd1b29efd2a7bf9a9b0828b130a470bd8ca4bba3fb40e000b684b889208",
+      "promptPath": "art-source/story-forest.prompt.txt",
+      "promptSha256": "74a7ff411822dbb075ac300f1db3c708799979a31edff3f4535f1a6946e108c2",
+      "size": [
+        1254,
+        1254
+      ],
+      "sourceCrop": [
+        950,
+        637,
+        1244,
+        930
+      ]
+    },
+    {
+      "assetKey": "map-hug-icon",
+      "path": "assets/map-hug-icon.png",
+      "sha256": "d45f87ee396c33f960d423f40a04c4ab65219e39125eaa830a71b5ab0d6f3313",
+      "width": 256,
+      "height": 256,
+      "usedBy": [
+        "walk-the-stage-map"
+      ],
+      "source": "Codex built-in image_gen",
+      "sourcePanel": "hug-melon",
+      "derivation": "reduce to 256px for map cell",
+      "atlasId": "story-forest",
+      "generatedSource": "art-source/story-forest.png",
+      "generatedSourceSha256": "71352fd1b29efd2a7bf9a9b0828b130a470bd8ca4bba3fb40e000b684b889208",
+      "promptPath": "art-source/story-forest.prompt.txt",
+      "promptSha256": "74a7ff411822dbb075ac300f1db3c708799979a31edff3f4535f1a6946e108c2",
+      "size": [
+        1254,
+        1254
+      ],
+      "sourceCrop": [
+        10,
+        637,
+        303,
+        930
+      ]
+    },
+    {
+      "assetKey": "map-melon-icon",
+      "path": "assets/map-melon-icon.png",
+      "sha256": "7ee8a8fd08b1769d9786e7648f2a4b07ad28906194b5a350329bf4a9b6a1345e",
+      "width": 255,
+      "height": 256,
+      "usedBy": [
+        "walk-the-stage-map"
+      ],
+      "source": "Codex built-in image_gen",
+      "sourcePanel": "melon-stage",
+      "derivation": "reduce to 256px for map cell",
+      "atlasId": "story-forest",
+      "generatedSource": "art-source/story-forest.png",
+      "generatedSourceSha256": "71352fd1b29efd2a7bf9a9b0828b130a470bd8ca4bba3fb40e000b684b889208",
+      "promptPath": "art-source/story-forest.prompt.txt",
+      "promptSha256": "74a7ff411822dbb075ac300f1db3c708799979a31edff3f4535f1a6946e108c2",
+      "size": [
+        1254,
+        1254
+      ],
+      "sourceCrop": [
+        637,
+        323,
+        930,
+        617
+      ]
+    },
+    {
+      "assetKey": "map-peach-icon",
+      "path": "assets/map-peach-icon.png",
+      "sha256": "8120298b81ce98c7f9705e8f9631e54dc6040a9a141373609e50fecdd4e8eb22",
+      "width": 256,
+      "height": 255,
+      "usedBy": [
+        "walk-the-stage-map"
+      ],
+      "source": "Codex built-in image_gen",
+      "sourcePanel": "peach-stage",
+      "derivation": "reduce to 256px for map cell",
+      "atlasId": "story-forest",
+      "generatedSource": "art-source/story-forest.png",
+      "generatedSourceSha256": "71352fd1b29efd2a7bf9a9b0828b130a470bd8ca4bba3fb40e000b684b889208",
+      "promptPath": "art-source/story-forest.prompt.txt",
+      "promptSha256": "74a7ff411822dbb075ac300f1db3c708799979a31edff3f4535f1a6946e108c2",
+      "size": [
+        1254,
+        1254
+      ],
+      "sourceCrop": [
+        950,
+        10,
+        1244,
+        303
+      ]
+    },
+    {
+      "assetKey": "map-pick-icon",
+      "path": "assets/map-pick-icon.png",
+      "sha256": "0cc2ed7f90b97bb9428d5643a52c5dd47ff2425946e28187e0b9995208ae6635",
+      "width": 256,
+      "height": 256,
+      "usedBy": [
+        "walk-the-stage-map"
+      ],
+      "source": "Codex built-in image_gen",
+      "sourcePanel": "pick-peach",
+      "derivation": "reduce to 256px for map cell",
+      "atlasId": "story-forest",
+      "generatedSource": "art-source/story-forest.png",
+      "generatedSourceSha256": "71352fd1b29efd2a7bf9a9b0828b130a470bd8ca4bba3fb40e000b684b889208",
+      "promptPath": "art-source/story-forest.prompt.txt",
+      "promptSha256": "74a7ff411822dbb075ac300f1db3c708799979a31edff3f4535f1a6946e108c2",
+      "size": [
+        1254,
+        1254
+      ],
+      "sourceCrop": [
+        323,
+        323,
+        617,
+        617
+      ]
+    },
+    {
+      "assetKey": "map-throw-icon",
+      "path": "assets/map-throw-icon.png",
+      "sha256": "e595ca4689b15cbbfffb6f0cf27cafff7c6c8cceae9ee030b431a415c9cba285",
+      "width": 255,
+      "height": 256,
+      "usedBy": [
+        "walk-the-stage-map"
+      ],
+      "source": "Codex built-in image_gen",
+      "sourcePanel": "throw-corn",
+      "derivation": "reduce to 256px for map cell",
+      "atlasId": "story-forest",
+      "generatedSource": "art-source/story-forest.png",
+      "generatedSourceSha256": "71352fd1b29efd2a7bf9a9b0828b130a470bd8ca4bba3fb40e000b684b889208",
+      "promptPath": "art-source/story-forest.prompt.txt",
+      "promptSha256": "74a7ff411822dbb075ac300f1db3c708799979a31edff3f4535f1a6946e108c2",
+      "size": [
+        1254,
+        1254
+      ],
+      "sourceCrop": [
+        10,
+        323,
+        303,
+        617
+      ]
+    },
+    {
+      "assetKey": "map-woods-icon",
+      "path": "assets/map-woods-icon.png",
+      "sha256": "39c236ccbb1864c970960ac414c2ea99f8c194b722a0df428c38600fb6e8fabd",
+      "width": 256,
+      "height": 256,
+      "usedBy": [
+        "walk-the-stage-map"
+      ],
+      "source": "Codex built-in image_gen",
+      "sourcePanel": "rabbit-in-woods",
+      "derivation": "reduce to 256px for map cell",
+      "atlasId": "story-forest",
+      "generatedSource": "art-source/story-forest.png",
+      "generatedSourceSha256": "71352fd1b29efd2a7bf9a9b0828b130a470bd8ca4bba3fb40e000b684b889208",
+      "promptPath": "art-source/story-forest.prompt.txt",
+      "promptSha256": "74a7ff411822dbb075ac300f1db3c708799979a31edff3f4535f1a6946e108c2",
+      "size": [
+        1254,
+        1254
+      ],
+      "sourceCrop": [
+        637,
+        637,
+        930,
+        930
+      ]
+    },
+    {
+      "assetKey": "maze-backdrop",
+      "path": "assets/maze-backdrop.png",
+      "sha256": "616266ee052460c31a41a0c33cd65e875496b22ee13fa7d2758b6d77e1b2d19c",
+      "width": 398,
+      "height": 398,
+      "usedBy": [
+        "walk-the-stage-map"
+      ],
+      "source": "Codex built-in image_gen",
+      "sourcePanel": "maze-backdrop",
+      "atlasId": "arcade-layers",
+      "generatedSource": "art-source/arcade-layers.png",
+      "generatedSourceSha256": "8d6ff026aeb4f19c49c5521f0ca3686e250fb04b10611d95a9d877b12a172c2b",
+      "promptPath": "art-source/arcade-layers.prompt.txt",
+      "promptSha256": "16ce3ac6701372590aa13f904178a5dcda7fbc05a9761a3495170ba65280fb9f",
+      "size": [
+        1254,
+        1254
+      ],
+      "sourceCrop": [
+        10,
+        10,
+        408,
+        408
+      ]
+    },
+    {
+      "assetKey": "maze-rover",
+      "path": "assets/maze-rover.png",
+      "sha256": "57b31f524a7b169b584f17843da105c30cc9eb063c30ac2c719730641863598a",
+      "width": 398,
+      "height": 398,
+      "usedBy": [
+        "walk-the-stage-map"
+      ],
+      "source": "Codex built-in image_gen",
+      "sourcePanel": "maze-rover",
+      "atlasId": "arcade-layers",
+      "generatedSource": "art-source/arcade-layers.png",
+      "generatedSourceSha256": "8d6ff026aeb4f19c49c5521f0ca3686e250fb04b10611d95a9d877b12a172c2b",
+      "promptPath": "art-source/arcade-layers.prompt.txt",
+      "promptSha256": "16ce3ac6701372590aa13f904178a5dcda7fbc05a9761a3495170ba65280fb9f",
+      "size": [
+        1254,
+        1254
+      ],
+      "sourceCrop": [
+        10,
+        428,
+        408,
+        826
+      ]
+    },
+    {
+      "assetKey": "maze-rover-pop",
+      "path": "assets/maze-rover-pop.png",
+      "sha256": "5ba8e73d542378e3d9e44fe94ab4fcf43fa06bf08edcc320ac1ca7c0cea21ac1",
+      "width": 398,
+      "height": 398,
+      "usedBy": [
+        "walk-the-stage-map"
+      ],
+      "source": "Codex built-in image_gen",
+      "sourcePanel": "maze-rover-pop",
+      "atlasId": "arcade-layers",
+      "generatedSource": "art-source/arcade-layers.png",
+      "generatedSourceSha256": "8d6ff026aeb4f19c49c5521f0ca3686e250fb04b10611d95a9d877b12a172c2b",
+      "promptPath": "art-source/arcade-layers.prompt.txt",
+      "promptSha256": "16ce3ac6701372590aa13f904178a5dcda7fbc05a9761a3495170ba65280fb9f",
+      "size": [
+        1254,
+        1254
+      ],
+      "sourceCrop": [
+        428,
+        428,
+        826,
+        826
+      ]
+    },
+    {
+      "assetKey": "maze-start",
+      "path": "assets/maze-start.png",
+      "sha256": "c3f8b0f3d3e259b1a3dbfb234a10ec4410409d6f289a0dd4c73fc293454907e1",
+      "width": 398,
+      "height": 398,
+      "usedBy": [
+        "walk-the-stage-map"
+      ],
+      "source": "Codex built-in image_gen",
+      "sourcePanel": "maze-start",
+      "atlasId": "arcade-layers",
+      "generatedSource": "art-source/arcade-layers.png",
+      "generatedSourceSha256": "8d6ff026aeb4f19c49c5521f0ca3686e250fb04b10611d95a9d877b12a172c2b",
+      "promptPath": "art-source/arcade-layers.prompt.txt",
+      "promptSha256": "16ce3ac6701372590aa13f904178a5dcda7fbc05a9761a3495170ba65280fb9f",
+      "size": [
+        1254,
+        1254
+      ],
+      "sourceCrop": [
+        428,
+        846,
+        826,
+        1244
+      ]
+    },
+    {
+      "assetKey": "melon-stage",
+      "path": "assets/melon-stage.png",
+      "sha256": "c462cbe3aa1816acb894a6bb74acf7ac1c00a71b01f891afc4165e7cda3cf6d9",
+      "width": 512,
+      "height": 512,
+      "usedBy": [
+        "at-the-watermelon-patch"
+      ],
+      "source": "composition of registered ImageGen panels",
+      "components": [
+        "cupped-peaches",
+        "melon-stage",
+        "throw-peaches",
+        "hug-melon"
+      ],
+      "sourcePanels": [
+        {
+          "panel": "cupped-peaches",
+          "atlasId": "story-forest",
+          "generatedSource": "art-source/story-forest.png",
+          "generatedSourceSha256": "71352fd1b29efd2a7bf9a9b0828b130a470bd8ca4bba3fb40e000b684b889208",
+          "promptPath": "art-source/story-forest.prompt.txt",
+          "promptSha256": "74a7ff411822dbb075ac300f1db3c708799979a31edff3f4535f1a6946e108c2",
+          "size": [
+            1254,
+            1254
+          ],
+          "sourceCrop": [
+            950,
+            323,
+            1244,
+            617
+          ]
+        },
+        {
+          "panel": "melon-stage",
+          "atlasId": "story-forest",
+          "generatedSource": "art-source/story-forest.png",
+          "generatedSourceSha256": "71352fd1b29efd2a7bf9a9b0828b130a470bd8ca4bba3fb40e000b684b889208",
+          "promptPath": "art-source/story-forest.prompt.txt",
+          "promptSha256": "74a7ff411822dbb075ac300f1db3c708799979a31edff3f4535f1a6946e108c2",
+          "size": [
+            1254,
+            1254
+          ],
+          "sourceCrop": [
+            637,
+            323,
+            930,
+            617
+          ]
+        },
+        {
+          "panel": "throw-peaches",
+          "atlasId": "story-forest",
+          "generatedSource": "art-source/story-forest.png",
+          "generatedSourceSha256": "71352fd1b29efd2a7bf9a9b0828b130a470bd8ca4bba3fb40e000b684b889208",
+          "promptPath": "art-source/story-forest.prompt.txt",
+          "promptSha256": "74a7ff411822dbb075ac300f1db3c708799979a31edff3f4535f1a6946e108c2",
+          "size": [
+            1254,
+            1254
+          ],
+          "sourceCrop": [
+            10,
+            950,
+            303,
+            1244
+          ]
+        },
+        {
+          "panel": "hug-melon",
+          "atlasId": "story-forest",
+          "generatedSource": "art-source/story-forest.png",
+          "generatedSourceSha256": "71352fd1b29efd2a7bf9a9b0828b130a470bd8ca4bba3fb40e000b684b889208",
+          "promptPath": "art-source/story-forest.prompt.txt",
+          "promptSha256": "74a7ff411822dbb075ac300f1db3c708799979a31edff3f4535f1a6946e108c2",
+          "size": [
+            1254,
+            1254
+          ],
+          "sourceCrop": [
+            10,
+            637,
+            303,
+            930
+          ]
+        }
+      ],
+      "composition": {
+        "columns": 2,
+        "tilePixels": 250,
+        "gapPixels": 12,
+        "background": "#fff2d9",
+        "fit": "contain"
+      }
+    },
+    {
+      "assetKey": "monkey-sticker",
+      "path": "assets/monkey-sticker.png",
+      "sha256": "0031d667c6c2eb14ab1a5e9c2ae422aa531160a775d502aa9a910978b4d1c6e1",
+      "width": 398,
+      "height": 398,
+      "usedBy": [
+        "catch-the-action",
+        "walk-the-stage-map"
+      ],
+      "source": "Codex built-in image_gen",
+      "sourcePanel": "monkey-sticker",
+      "atlasId": "arcade-layers",
+      "generatedSource": "art-source/arcade-layers.png",
+      "generatedSourceSha256": "8d6ff026aeb4f19c49c5521f0ca3686e250fb04b10611d95a9d877b12a172c2b",
+      "promptPath": "art-source/arcade-layers.prompt.txt",
+      "promptSha256": "16ce3ac6701372590aa13f904178a5dcda7fbc05a9761a3495170ba65280fb9f",
+      "size": [
+        1254,
+        1254
+      ],
+      "sourceCrop": [
+        846,
+        10,
+        1244,
+        408
+      ]
+    },
+    {
+      "assetKey": "new-trip-practice",
+      "path": "assets/new-trip-practice.png",
+      "sha256": "50f7e7a057f11628909047e1b30dbf82ca4a2e20e3beeec1e71649bb1413bdbb",
+      "width": 294,
+      "height": 294,
+      "usedBy": [
+        "pick-a-goal"
+      ],
+      "source": "Codex built-in image_gen",
+      "sourcePanel": "new-trip-practice",
+      "atlasId": "story-forest",
+      "generatedSource": "art-source/story-forest.png",
+      "generatedSourceSha256": "71352fd1b29efd2a7bf9a9b0828b130a470bd8ca4bba3fb40e000b684b889208",
+      "promptPath": "art-source/story-forest.prompt.txt",
+      "promptSha256": "74a7ff411822dbb075ac300f1db3c708799979a31edff3f4535f1a6946e108c2",
+      "size": [
+        1254,
+        1254
+      ],
+      "sourceCrop": [
+        323,
+        950,
+        617,
+        1244
+      ]
+    },
+    {
+      "assetKey": "next-story-cuts",
+      "path": "assets/next-story-cuts.png",
+      "sha256": "b6efb07d666c1700a9c85d6e1dd9b9e456aa73868d337c691778b7f3a9d30ebb",
+      "width": 1024,
+      "height": 506,
+      "usedBy": [
+        "order-then-actions"
+      ],
+      "source": "composition of registered ImageGen panels",
+      "components": [
+        "throw-corn",
+        "pick-peach",
+        "cupped-peaches",
+        "hug-melon",
+        "rabbit-chase",
+        "rabbit-in-woods",
+        "empty-house"
+      ],
+      "sourcePanels": [
+        {
+          "panel": "throw-corn",
+          "atlasId": "story-forest",
+          "generatedSource": "art-source/story-forest.png",
+          "generatedSourceSha256": "71352fd1b29efd2a7bf9a9b0828b130a470bd8ca4bba3fb40e000b684b889208",
+          "promptPath": "art-source/story-forest.prompt.txt",
+          "promptSha256": "74a7ff411822dbb075ac300f1db3c708799979a31edff3f4535f1a6946e108c2",
+          "size": [
+            1254,
+            1254
+          ],
+          "sourceCrop": [
+            10,
+            323,
+            303,
+            617
+          ]
+        },
+        {
+          "panel": "pick-peach",
+          "atlasId": "story-forest",
+          "generatedSource": "art-source/story-forest.png",
+          "generatedSourceSha256": "71352fd1b29efd2a7bf9a9b0828b130a470bd8ca4bba3fb40e000b684b889208",
+          "promptPath": "art-source/story-forest.prompt.txt",
+          "promptSha256": "74a7ff411822dbb075ac300f1db3c708799979a31edff3f4535f1a6946e108c2",
+          "size": [
+            1254,
+            1254
+          ],
+          "sourceCrop": [
+            323,
+            323,
+            617,
+            617
+          ]
+        },
+        {
+          "panel": "cupped-peaches",
+          "atlasId": "story-forest",
+          "generatedSource": "art-source/story-forest.png",
+          "generatedSourceSha256": "71352fd1b29efd2a7bf9a9b0828b130a470bd8ca4bba3fb40e000b684b889208",
+          "promptPath": "art-source/story-forest.prompt.txt",
+          "promptSha256": "74a7ff411822dbb075ac300f1db3c708799979a31edff3f4535f1a6946e108c2",
+          "size": [
+            1254,
+            1254
+          ],
+          "sourceCrop": [
+            950,
+            323,
+            1244,
+            617
+          ]
+        },
+        {
+          "panel": "hug-melon",
+          "atlasId": "story-forest",
+          "generatedSource": "art-source/story-forest.png",
+          "generatedSourceSha256": "71352fd1b29efd2a7bf9a9b0828b130a470bd8ca4bba3fb40e000b684b889208",
+          "promptPath": "art-source/story-forest.prompt.txt",
+          "promptSha256": "74a7ff411822dbb075ac300f1db3c708799979a31edff3f4535f1a6946e108c2",
+          "size": [
+            1254,
+            1254
+          ],
+          "sourceCrop": [
+            10,
+            637,
+            303,
+            930
+          ]
+        },
+        {
+          "panel": "rabbit-chase",
+          "atlasId": "story-forest",
+          "generatedSource": "art-source/story-forest.png",
+          "generatedSourceSha256": "71352fd1b29efd2a7bf9a9b0828b130a470bd8ca4bba3fb40e000b684b889208",
+          "promptPath": "art-source/story-forest.prompt.txt",
+          "promptSha256": "74a7ff411822dbb075ac300f1db3c708799979a31edff3f4535f1a6946e108c2",
+          "size": [
+            1254,
+            1254
+          ],
+          "sourceCrop": [
+            323,
+            637,
+            617,
+            930
+          ]
+        },
+        {
+          "panel": "rabbit-in-woods",
+          "atlasId": "story-forest",
+          "generatedSource": "art-source/story-forest.png",
+          "generatedSourceSha256": "71352fd1b29efd2a7bf9a9b0828b130a470bd8ca4bba3fb40e000b684b889208",
+          "promptPath": "art-source/story-forest.prompt.txt",
+          "promptSha256": "74a7ff411822dbb075ac300f1db3c708799979a31edff3f4535f1a6946e108c2",
+          "size": [
+            1254,
+            1254
+          ],
+          "sourceCrop": [
+            637,
+            637,
+            930,
+            930
+          ]
+        },
+        {
+          "panel": "empty-house",
+          "atlasId": "story-forest",
+          "generatedSource": "art-source/story-forest.png",
+          "generatedSourceSha256": "71352fd1b29efd2a7bf9a9b0828b130a470bd8ca4bba3fb40e000b684b889208",
+          "promptPath": "art-source/story-forest.prompt.txt",
+          "promptSha256": "74a7ff411822dbb075ac300f1db3c708799979a31edff3f4535f1a6946e108c2",
+          "size": [
+            1254,
+            1254
+          ],
+          "sourceCrop": [
+            950,
+            637,
+            1244,
+            930
+          ]
+        }
+      ],
+      "composition": {
+        "columns": 4,
+        "tilePixels": 250,
+        "gapPixels": 12,
+        "background": "#fff2d9",
+        "fit": "contain"
+      }
+    },
+    {
+      "assetKey": "one-ball-action-board",
+      "path": "assets/one-ball-action-board.png",
+      "sha256": "7375ebad788eb7b5be6e25ddefc268c328303085c74be66d07ee706df7183508",
+      "width": 774,
+      "height": 250,
+      "usedBy": [
+        "one-ball-three-actions"
+      ],
+      "source": "composition of registered ImageGen panels",
+      "components": [
+        "act-ball-hug-icon",
+        "act-ball-cup-icon",
+        "act-ball-toss-icon"
+      ],
+      "sourcePanels": [
+        {
+          "panel": "act-ball-hug-icon",
+          "atlasId": "actor-actions",
+          "generatedSource": "art-source/actor-actions.png",
+          "generatedSourceSha256": "fd3e3fd7bdb6428f4f5429510a2bea8a12463987e0f7204b91e0780bca037494",
+          "promptPath": "art-source/actor-actions.prompt.txt",
+          "promptSha256": "da28ecd3cc5a0a1c278e8456dc3148f4a8ade3d6fd50ab44fd432ac8586a7b7e",
+          "size": [
+            1254,
+            1254
+          ],
+          "sourceCrop": [
+            846,
+            428,
+            1244,
+            826
+          ]
+        },
+        {
+          "panel": "act-ball-cup-icon",
+          "atlasId": "actor-actions",
+          "generatedSource": "art-source/actor-actions.png",
+          "generatedSourceSha256": "fd3e3fd7bdb6428f4f5429510a2bea8a12463987e0f7204b91e0780bca037494",
+          "promptPath": "art-source/actor-actions.prompt.txt",
+          "promptSha256": "da28ecd3cc5a0a1c278e8456dc3148f4a8ade3d6fd50ab44fd432ac8586a7b7e",
+          "size": [
+            1254,
+            1254
+          ],
+          "sourceCrop": [
+            10,
+            846,
+            408,
+            1244
+          ]
+        },
+        {
+          "panel": "act-ball-toss-icon",
+          "atlasId": "actor-actions",
+          "generatedSource": "art-source/actor-actions.png",
+          "generatedSourceSha256": "fd3e3fd7bdb6428f4f5429510a2bea8a12463987e0f7204b91e0780bca037494",
+          "promptPath": "art-source/actor-actions.prompt.txt",
+          "promptSha256": "da28ecd3cc5a0a1c278e8456dc3148f4a8ade3d6fd50ab44fd432ac8586a7b7e",
+          "size": [
+            1254,
+            1254
+          ],
+          "sourceCrop": [
+            428,
+            846,
+            826,
+            1244
+          ]
+        }
+      ],
+      "composition": {
+        "columns": 3,
+        "tilePixels": 250,
+        "gapPixels": 12,
+        "background": "#fff2d9",
+        "fit": "contain"
+      }
+    },
+    {
+      "assetKey": "peach-stage",
+      "path": "assets/peach-stage.png",
+      "sha256": "f48ca379c9d41e9eb64321d9ff4b663823558e360fb6759f397995afc8062fa8",
+      "width": 774,
+      "height": 250,
+      "usedBy": [
+        "under-the-peach-tree"
+      ],
+      "source": "composition of registered ImageGen panels",
+      "components": [
+        "peach-stage",
+        "throw-corn",
+        "pick-peach"
+      ],
+      "sourcePanels": [
+        {
+          "panel": "peach-stage",
+          "atlasId": "story-forest",
+          "generatedSource": "art-source/story-forest.png",
+          "generatedSourceSha256": "71352fd1b29efd2a7bf9a9b0828b130a470bd8ca4bba3fb40e000b684b889208",
+          "promptPath": "art-source/story-forest.prompt.txt",
+          "promptSha256": "74a7ff411822dbb075ac300f1db3c708799979a31edff3f4535f1a6946e108c2",
+          "size": [
+            1254,
+            1254
+          ],
+          "sourceCrop": [
+            950,
+            10,
+            1244,
+            303
+          ]
+        },
+        {
+          "panel": "throw-corn",
+          "atlasId": "story-forest",
+          "generatedSource": "art-source/story-forest.png",
+          "generatedSourceSha256": "71352fd1b29efd2a7bf9a9b0828b130a470bd8ca4bba3fb40e000b684b889208",
+          "promptPath": "art-source/story-forest.prompt.txt",
+          "promptSha256": "74a7ff411822dbb075ac300f1db3c708799979a31edff3f4535f1a6946e108c2",
+          "size": [
+            1254,
+            1254
+          ],
+          "sourceCrop": [
+            10,
+            323,
+            303,
+            617
+          ]
+        },
+        {
+          "panel": "pick-peach",
+          "atlasId": "story-forest",
+          "generatedSource": "art-source/story-forest.png",
+          "generatedSourceSha256": "71352fd1b29efd2a7bf9a9b0828b130a470bd8ca4bba3fb40e000b684b889208",
+          "promptPath": "art-source/story-forest.prompt.txt",
+          "promptSha256": "74a7ff411822dbb075ac300f1db3c708799979a31edff3f4535f1a6946e108c2",
+          "size": [
+            1254,
+            1254
+          ],
+          "sourceCrop": [
+            323,
+            323,
+            617,
+            617
+          ]
+        }
+      ],
+      "composition": {
+        "columns": 3,
+        "tilePixels": 250,
+        "gapPixels": 12,
+        "background": "#fff2d9",
+        "fit": "contain"
+      }
+    },
+    {
+      "assetKey": "practice-actions-board",
+      "path": "assets/practice-actions-board.png",
+      "sha256": "e8317bfe39606ef4e32a05eb919b48b0c8580e8786ad7fca318b0982050f94b1",
+      "width": 1024,
+      "height": 506,
+      "usedBy": [
+        "which-action"
+      ],
+      "source": "composition of registered ImageGen panels",
+      "components": [
+        "story-chair",
+        "act-break-icon",
+        "act-pick-icon",
+        "act-shoulder-icon",
+        "act-cup-icon",
+        "act-hug-icon",
+        "act-ball-toss-icon"
+      ],
+      "sourcePanels": [
+        {
+          "panel": "story-chair",
+          "atlasId": "actor-actions",
+          "generatedSource": "art-source/actor-actions.png",
+          "generatedSourceSha256": "fd3e3fd7bdb6428f4f5429510a2bea8a12463987e0f7204b91e0780bca037494",
+          "promptPath": "art-source/actor-actions.prompt.txt",
+          "promptSha256": "da28ecd3cc5a0a1c278e8456dc3148f4a8ade3d6fd50ab44fd432ac8586a7b7e",
+          "size": [
+            1254,
+            1254
+          ],
+          "sourceCrop": [
+            846,
+            846,
+            1244,
+            1244
+          ]
+        },
+        {
+          "panel": "act-break-icon",
+          "atlasId": "actor-actions",
+          "generatedSource": "art-source/actor-actions.png",
+          "generatedSourceSha256": "fd3e3fd7bdb6428f4f5429510a2bea8a12463987e0f7204b91e0780bca037494",
+          "promptPath": "art-source/actor-actions.prompt.txt",
+          "promptSha256": "da28ecd3cc5a0a1c278e8456dc3148f4a8ade3d6fd50ab44fd432ac8586a7b7e",
+          "size": [
+            1254,
+            1254
+          ],
+          "sourceCrop": [
+            10,
+            10,
+            408,
+            408
+          ]
+        },
+        {
+          "panel": "act-pick-icon",
+          "atlasId": "actor-actions",
+          "generatedSource": "art-source/actor-actions.png",
+          "generatedSourceSha256": "fd3e3fd7bdb6428f4f5429510a2bea8a12463987e0f7204b91e0780bca037494",
+          "promptPath": "art-source/actor-actions.prompt.txt",
+          "promptSha256": "da28ecd3cc5a0a1c278e8456dc3148f4a8ade3d6fd50ab44fd432ac8586a7b7e",
+          "size": [
+            1254,
+            1254
+          ],
+          "sourceCrop": [
+            428,
+            10,
+            826,
+            408
+          ]
+        },
+        {
+          "panel": "act-shoulder-icon",
+          "atlasId": "actor-actions",
+          "generatedSource": "art-source/actor-actions.png",
+          "generatedSourceSha256": "fd3e3fd7bdb6428f4f5429510a2bea8a12463987e0f7204b91e0780bca037494",
+          "promptPath": "art-source/actor-actions.prompt.txt",
+          "promptSha256": "da28ecd3cc5a0a1c278e8456dc3148f4a8ade3d6fd50ab44fd432ac8586a7b7e",
+          "size": [
+            1254,
+            1254
+          ],
+          "sourceCrop": [
+            846,
+            10,
+            1244,
+            408
+          ]
+        },
+        {
+          "panel": "act-cup-icon",
+          "atlasId": "actor-actions",
+          "generatedSource": "art-source/actor-actions.png",
+          "generatedSourceSha256": "fd3e3fd7bdb6428f4f5429510a2bea8a12463987e0f7204b91e0780bca037494",
+          "promptPath": "art-source/actor-actions.prompt.txt",
+          "promptSha256": "da28ecd3cc5a0a1c278e8456dc3148f4a8ade3d6fd50ab44fd432ac8586a7b7e",
+          "size": [
+            1254,
+            1254
+          ],
+          "sourceCrop": [
+            10,
+            428,
+            408,
+            826
+          ]
+        },
+        {
+          "panel": "act-hug-icon",
+          "atlasId": "actor-actions",
+          "generatedSource": "art-source/actor-actions.png",
+          "generatedSourceSha256": "fd3e3fd7bdb6428f4f5429510a2bea8a12463987e0f7204b91e0780bca037494",
+          "promptPath": "art-source/actor-actions.prompt.txt",
+          "promptSha256": "da28ecd3cc5a0a1c278e8456dc3148f4a8ade3d6fd50ab44fd432ac8586a7b7e",
+          "size": [
+            1254,
+            1254
+          ],
+          "sourceCrop": [
+            428,
+            428,
+            826,
+            826
+          ]
+        },
+        {
+          "panel": "act-ball-toss-icon",
+          "atlasId": "actor-actions",
+          "generatedSource": "art-source/actor-actions.png",
+          "generatedSourceSha256": "fd3e3fd7bdb6428f4f5429510a2bea8a12463987e0f7204b91e0780bca037494",
+          "promptPath": "art-source/actor-actions.prompt.txt",
+          "promptSha256": "da28ecd3cc5a0a1c278e8456dc3148f4a8ade3d6fd50ab44fd432ac8586a7b7e",
+          "size": [
+            1254,
+            1254
+          ],
+          "sourceCrop": [
+            428,
+            846,
+            826,
+            1244
+          ]
+        }
+      ],
+      "composition": {
+        "columns": 4,
+        "tilePixels": 250,
+        "gapPixels": 12,
+        "background": "#fff2d9",
+        "fit": "contain"
+      }
+    },
+    {
+      "assetKey": "quiz-1-a",
+      "path": "assets/quiz-1-a.png",
+      "sha256": "d4b7bcf0c0983f7c214e86788ce59e94ad564ed83ce8b2cdbb3a03c7ce6659ed",
+      "width": 774,
+      "height": 250,
+      "usedBy": [
+        "finish-reason"
+      ],
+      "source": "composition of registered ImageGen panels",
+      "components": [
+        "quiz-story-a1",
+        "quiz-story-a2",
+        "quiz-story-a3"
+      ],
+      "sourcePanels": [
+        {
+          "panel": "quiz-story-a1",
+          "atlasId": "quiz-storybook",
+          "generatedSource": "art-source/quiz-storybook.png",
+          "generatedSourceSha256": "16fc335174b2c62df6146ea54f3b93668e7881fd8ad132d2e716a8a52042e9ac",
+          "promptPath": "art-source/quiz-storybook.prompt.txt",
+          "promptSha256": "d7f0e0d20db92c46fb89792d23c1604d4526ae5cffe216e0b314a760e08f5e96",
+          "size": [
+            1254,
+            1254
+          ],
+          "sourceCrop": [
+            10,
+            10,
+            408,
+            408
+          ]
+        },
+        {
+          "panel": "quiz-story-a2",
+          "atlasId": "quiz-storybook",
+          "generatedSource": "art-source/quiz-storybook.png",
+          "generatedSourceSha256": "16fc335174b2c62df6146ea54f3b93668e7881fd8ad132d2e716a8a52042e9ac",
+          "promptPath": "art-source/quiz-storybook.prompt.txt",
+          "promptSha256": "d7f0e0d20db92c46fb89792d23c1604d4526ae5cffe216e0b314a760e08f5e96",
+          "size": [
+            1254,
+            1254
+          ],
+          "sourceCrop": [
+            428,
+            10,
+            826,
+            408
+          ]
+        },
+        {
+          "panel": "quiz-story-a3",
+          "atlasId": "quiz-storybook",
+          "generatedSource": "art-source/quiz-storybook.png",
+          "generatedSourceSha256": "16fc335174b2c62df6146ea54f3b93668e7881fd8ad132d2e716a8a52042e9ac",
+          "promptPath": "art-source/quiz-storybook.prompt.txt",
+          "promptSha256": "d7f0e0d20db92c46fb89792d23c1604d4526ae5cffe216e0b314a760e08f5e96",
+          "size": [
+            1254,
+            1254
+          ],
+          "sourceCrop": [
+            846,
+            10,
+            1244,
+            408
+          ]
+        }
+      ],
+      "composition": {
+        "columns": 3,
+        "tilePixels": 250,
+        "gapPixels": 12,
+        "background": "#fff2d9",
+        "fit": "contain"
+      }
+    },
+    {
+      "assetKey": "quiz-1-b",
+      "path": "assets/quiz-1-b.png",
+      "sha256": "3192673228be4c47c55c8b690648b4a77d10ba300eacfc079ffebb718df29a0f",
+      "width": 774,
+      "height": 250,
+      "usedBy": [
+        "finish-reason"
+      ],
+      "source": "composition of registered ImageGen panels",
+      "components": [
+        "quiz-story-b1",
+        "quiz-story-b2",
+        "quiz-story-b3"
+      ],
+      "sourcePanels": [
+        {
+          "panel": "quiz-story-b1",
+          "atlasId": "quiz-storybook",
+          "generatedSource": "art-source/quiz-storybook.png",
+          "generatedSourceSha256": "16fc335174b2c62df6146ea54f3b93668e7881fd8ad132d2e716a8a52042e9ac",
+          "promptPath": "art-source/quiz-storybook.prompt.txt",
+          "promptSha256": "d7f0e0d20db92c46fb89792d23c1604d4526ae5cffe216e0b314a760e08f5e96",
+          "size": [
+            1254,
+            1254
+          ],
+          "sourceCrop": [
+            10,
+            428,
+            408,
+            826
+          ]
+        },
+        {
+          "panel": "quiz-story-b2",
+          "atlasId": "quiz-storybook",
+          "generatedSource": "art-source/quiz-storybook.png",
+          "generatedSourceSha256": "16fc335174b2c62df6146ea54f3b93668e7881fd8ad132d2e716a8a52042e9ac",
+          "promptPath": "art-source/quiz-storybook.prompt.txt",
+          "promptSha256": "d7f0e0d20db92c46fb89792d23c1604d4526ae5cffe216e0b314a760e08f5e96",
+          "size": [
+            1254,
+            1254
+          ],
+          "sourceCrop": [
+            428,
+            428,
+            826,
+            826
+          ]
+        },
+        {
+          "panel": "quiz-story-b3",
+          "atlasId": "quiz-storybook",
+          "generatedSource": "art-source/quiz-storybook.png",
+          "generatedSourceSha256": "16fc335174b2c62df6146ea54f3b93668e7881fd8ad132d2e716a8a52042e9ac",
+          "promptPath": "art-source/quiz-storybook.prompt.txt",
+          "promptSha256": "d7f0e0d20db92c46fb89792d23c1604d4526ae5cffe216e0b314a760e08f5e96",
+          "size": [
+            1254,
+            1254
+          ],
+          "sourceCrop": [
+            846,
+            428,
+            1244,
+            826
+          ]
+        }
+      ],
+      "composition": {
+        "columns": 3,
+        "tilePixels": 250,
+        "gapPixels": 12,
+        "background": "#fff2d9",
+        "fit": "contain"
+      }
+    },
+    {
+      "assetKey": "quiz-1-c",
+      "path": "assets/quiz-1-c.png",
+      "sha256": "8f5ab02615b4c3c79c82731b7818f1d57a86669798af3fea6577a8c0e3b7dab1",
+      "width": 774,
+      "height": 250,
+      "usedBy": [
+        "finish-reason"
+      ],
+      "source": "composition of registered ImageGen panels",
+      "components": [
+        "quiz-story-c1",
+        "quiz-story-c2",
+        "quiz-story-c3"
+      ],
+      "sourcePanels": [
+        {
+          "panel": "quiz-story-c1",
+          "atlasId": "quiz-storybook",
+          "generatedSource": "art-source/quiz-storybook.png",
+          "generatedSourceSha256": "16fc335174b2c62df6146ea54f3b93668e7881fd8ad132d2e716a8a52042e9ac",
+          "promptPath": "art-source/quiz-storybook.prompt.txt",
+          "promptSha256": "d7f0e0d20db92c46fb89792d23c1604d4526ae5cffe216e0b314a760e08f5e96",
+          "size": [
+            1254,
+            1254
+          ],
+          "sourceCrop": [
+            10,
+            846,
+            408,
+            1244
+          ]
+        },
+        {
+          "panel": "quiz-story-c2",
+          "atlasId": "quiz-storybook",
+          "generatedSource": "art-source/quiz-storybook.png",
+          "generatedSourceSha256": "16fc335174b2c62df6146ea54f3b93668e7881fd8ad132d2e716a8a52042e9ac",
+          "promptPath": "art-source/quiz-storybook.prompt.txt",
+          "promptSha256": "d7f0e0d20db92c46fb89792d23c1604d4526ae5cffe216e0b314a760e08f5e96",
+          "size": [
+            1254,
+            1254
+          ],
+          "sourceCrop": [
+            428,
+            846,
+            826,
+            1244
+          ]
+        },
+        {
+          "panel": "quiz-story-c3",
+          "atlasId": "quiz-storybook",
+          "generatedSource": "art-source/quiz-storybook.png",
+          "generatedSourceSha256": "16fc335174b2c62df6146ea54f3b93668e7881fd8ad132d2e716a8a52042e9ac",
+          "promptPath": "art-source/quiz-storybook.prompt.txt",
+          "promptSha256": "d7f0e0d20db92c46fb89792d23c1604d4526ae5cffe216e0b314a760e08f5e96",
+          "size": [
+            1254,
+            1254
+          ],
+          "sourceCrop": [
+            846,
+            846,
+            1244,
+            1244
+          ]
+        }
+      ],
+      "composition": {
+        "columns": 3,
+        "tilePixels": 250,
+        "gapPixels": 12,
+        "background": "#fff2d9",
+        "fit": "contain"
+      }
+    },
+    {
+      "assetKey": "quiz-2-a",
+      "path": "assets/quiz-2-a.png",
+      "sha256": "e9329af3cbc563cb3a4567fc86f94080e9b442c9795d37803a5164bee510f472",
+      "width": 398,
+      "height": 398,
+      "usedBy": [
+        "carry-on-shoulder"
+      ],
+      "source": "Codex built-in image_gen",
+      "sourcePanel": "quiz-2-a",
+      "atlasId": "quiz-poses",
+      "generatedSource": "art-source/quiz-poses.png",
+      "generatedSourceSha256": "50538ee2cfddfdb0036fd1aec2c0415ff208e652088160155a4d3a8229a7f92a",
+      "promptPath": "art-source/quiz-poses.prompt.txt",
+      "promptSha256": "252c0ce73e9110861b0da29ef91301e2507981ed93787e85e8adf0fb3c30cc09",
+      "size": [
+        1254,
+        1254
+      ],
+      "sourceCrop": [
+        10,
+        10,
+        408,
+        408
+      ]
+    },
+    {
+      "assetKey": "quiz-2-b",
+      "path": "assets/quiz-2-b.png",
+      "sha256": "69a99309ccab74167b8e10466784f65308acea008a1fed9033884a7c0bfc057c",
+      "width": 398,
+      "height": 398,
+      "usedBy": [
+        "carry-on-shoulder"
+      ],
+      "source": "Codex built-in image_gen",
+      "sourcePanel": "quiz-2-b",
+      "atlasId": "quiz-poses",
+      "generatedSource": "art-source/quiz-poses.png",
+      "generatedSourceSha256": "50538ee2cfddfdb0036fd1aec2c0415ff208e652088160155a4d3a8229a7f92a",
+      "promptPath": "art-source/quiz-poses.prompt.txt",
+      "promptSha256": "252c0ce73e9110861b0da29ef91301e2507981ed93787e85e8adf0fb3c30cc09",
+      "size": [
+        1254,
+        1254
+      ],
+      "sourceCrop": [
+        428,
+        10,
+        826,
+        408
+      ]
+    },
+    {
+      "assetKey": "quiz-2-c",
+      "path": "assets/quiz-2-c.png",
+      "sha256": "66b209071f05374e316fb39871efb0e91c1405d89012f3487c3245710b449ef5",
+      "width": 398,
+      "height": 398,
+      "usedBy": [
+        "carry-on-shoulder"
+      ],
+      "source": "Codex built-in image_gen",
+      "sourcePanel": "quiz-2-c",
+      "atlasId": "quiz-poses",
+      "generatedSource": "art-source/quiz-poses.png",
+      "generatedSourceSha256": "50538ee2cfddfdb0036fd1aec2c0415ff208e652088160155a4d3a8229a7f92a",
+      "promptPath": "art-source/quiz-poses.prompt.txt",
+      "promptSha256": "252c0ce73e9110861b0da29ef91301e2507981ed93787e85e8adf0fb3c30cc09",
+      "size": [
+        1254,
+        1254
+      ],
+      "sourceCrop": [
+        846,
+        10,
+        1244,
+        408
+      ]
+    },
+    {
+      "assetKey": "quiz-3-a",
+      "path": "assets/quiz-3-a.png",
+      "sha256": "7b230db8dcf4cab56ab9faaeb13918e8cda864147d90c35129d546e83fe1f7b0",
+      "width": 398,
+      "height": 398,
+      "usedBy": [
+        "cup-the-pebbles"
+      ],
+      "source": "Codex built-in image_gen",
+      "sourcePanel": "quiz-3-a",
+      "atlasId": "quiz-poses",
+      "generatedSource": "art-source/quiz-poses.png",
+      "generatedSourceSha256": "50538ee2cfddfdb0036fd1aec2c0415ff208e652088160155a4d3a8229a7f92a",
+      "promptPath": "art-source/quiz-poses.prompt.txt",
+      "promptSha256": "252c0ce73e9110861b0da29ef91301e2507981ed93787e85e8adf0fb3c30cc09",
+      "size": [
+        1254,
+        1254
+      ],
+      "sourceCrop": [
+        10,
+        428,
+        408,
+        826
+      ]
+    },
+    {
+      "assetKey": "quiz-3-b",
+      "path": "assets/quiz-3-b.png",
+      "sha256": "f5229680be11e5053e53cace251a8d7da6ac329606fdb05056466b875b4999fe",
+      "width": 398,
+      "height": 398,
+      "usedBy": [
+        "cup-the-pebbles"
+      ],
+      "source": "Codex built-in image_gen",
+      "sourcePanel": "quiz-3-b",
+      "atlasId": "quiz-poses",
+      "generatedSource": "art-source/quiz-poses.png",
+      "generatedSourceSha256": "50538ee2cfddfdb0036fd1aec2c0415ff208e652088160155a4d3a8229a7f92a",
+      "promptPath": "art-source/quiz-poses.prompt.txt",
+      "promptSha256": "252c0ce73e9110861b0da29ef91301e2507981ed93787e85e8adf0fb3c30cc09",
+      "size": [
+        1254,
+        1254
+      ],
+      "sourceCrop": [
+        428,
+        428,
+        826,
+        826
+      ]
+    },
+    {
+      "assetKey": "quiz-3-c",
+      "path": "assets/quiz-3-c.png",
+      "sha256": "d85ddf2db36a47f1a493f4aeb530f52b24ad640f5c70b590b77eb7fa1e73d174",
+      "width": 398,
+      "height": 398,
+      "usedBy": [
+        "cup-the-pebbles"
+      ],
+      "source": "Codex built-in image_gen",
+      "sourcePanel": "quiz-3-c",
+      "atlasId": "quiz-poses",
+      "generatedSource": "art-source/quiz-poses.png",
+      "generatedSourceSha256": "50538ee2cfddfdb0036fd1aec2c0415ff208e652088160155a4d3a8229a7f92a",
+      "promptPath": "art-source/quiz-poses.prompt.txt",
+      "promptSha256": "252c0ce73e9110861b0da29ef91301e2507981ed93787e85e8adf0fb3c30cc09",
+      "size": [
+        1254,
+        1254
+      ],
+      "sourceCrop": [
+        846,
+        428,
+        1244,
+        826
+      ]
+    },
+    {
+      "assetKey": "quiz-4-a",
+      "path": "assets/quiz-4-a.png",
+      "sha256": "6586751cb3544bf77096eddacd81f6ae00ffa9ff75f6c4ff08af5467077f6b01",
+      "width": 330,
+      "height": 230,
+      "usedBy": [
+        "two-traits"
+      ],
+      "source": "course-specific semantic diagram",
+      "drawingSource": "diagrams.py",
+      "drawingSourceSha256": "12a092b83b053b17fa201a4165b74ff2ee220d165db0f1de0135b5e87092398a"
+    },
+    {
+      "assetKey": "quiz-4-b",
+      "path": "assets/quiz-4-b.png",
+      "sha256": "46915bd6d507f4341a6261c137cb4338f68716579ddba0acfa7801cfc464266a",
+      "width": 330,
+      "height": 230,
+      "usedBy": [
+        "two-traits"
+      ],
+      "source": "course-specific semantic diagram",
+      "drawingSource": "diagrams.py",
+      "drawingSourceSha256": "12a092b83b053b17fa201a4165b74ff2ee220d165db0f1de0135b5e87092398a"
+    },
+    {
+      "assetKey": "quiz-4-c",
+      "path": "assets/quiz-4-c.png",
+      "sha256": "dfe2cff558241d1f25befaed140af9010c4174a2191219d4b92ce40b7df99dc9",
+      "width": 330,
+      "height": 230,
+      "usedBy": [
+        "two-traits"
+      ],
+      "source": "course-specific semantic diagram",
+      "drawingSource": "diagrams.py",
+      "drawingSourceSha256": "12a092b83b053b17fa201a4165b74ff2ee220d165db0f1de0135b5e87092398a"
+    },
+    {
+      "assetKey": "quiz-5-a",
+      "path": "assets/quiz-5-a.png",
+      "sha256": "e503212bfecb949cc693c15a0d8c83f36f5127f996ab29bde3eab0bbd6e1c7fe",
+      "width": 308,
+      "height": 308,
+      "usedBy": [
+        "rabbit-final-dot"
+      ],
+      "source": "course-specific semantic diagram",
+      "drawingSource": "diagrams.py",
+      "drawingSourceSha256": "12a092b83b053b17fa201a4165b74ff2ee220d165db0f1de0135b5e87092398a"
+    },
+    {
+      "assetKey": "quiz-5-b",
+      "path": "assets/quiz-5-b.png",
+      "sha256": "ad75721e1a1d48e3e7b7a9b796520525b3f2cfac4540e0882976200a700ca762",
+      "width": 308,
+      "height": 308,
+      "usedBy": [
+        "rabbit-final-dot"
+      ],
+      "source": "course-specific semantic diagram",
+      "drawingSource": "diagrams.py",
+      "drawingSourceSha256": "12a092b83b053b17fa201a4165b74ff2ee220d165db0f1de0135b5e87092398a"
+    },
+    {
+      "assetKey": "quiz-5-c",
+      "path": "assets/quiz-5-c.png",
+      "sha256": "8bd605e1278838f5c96a7a1d13f437fb5df07216985fd4278ff1c86c0978c194",
+      "width": 308,
+      "height": 308,
+      "usedBy": [
+        "rabbit-final-dot"
+      ],
+      "source": "course-specific semantic diagram",
+      "drawingSource": "diagrams.py",
+      "drawingSourceSha256": "12a092b83b053b17fa201a4165b74ff2ee220d165db0f1de0135b5e87092398a"
+    },
+    {
+      "assetKey": "quiz-6-a",
+      "path": "assets/quiz-6-a.png",
+      "sha256": "de8a8f886fc980406f2216035c6070fe1ee6bcdfc15e54119e1f3ec3614b3af9",
+      "width": 398,
+      "height": 398,
+      "usedBy": [
+        "next-trip-goal"
+      ],
+      "source": "Codex built-in image_gen",
+      "sourcePanel": "quiz-6-a",
+      "atlasId": "quiz-poses",
+      "generatedSource": "art-source/quiz-poses.png",
+      "generatedSourceSha256": "50538ee2cfddfdb0036fd1aec2c0415ff208e652088160155a4d3a8229a7f92a",
+      "promptPath": "art-source/quiz-poses.prompt.txt",
+      "promptSha256": "252c0ce73e9110861b0da29ef91301e2507981ed93787e85e8adf0fb3c30cc09",
+      "size": [
+        1254,
+        1254
+      ],
+      "sourceCrop": [
+        10,
+        846,
+        408,
+        1244
+      ]
+    },
+    {
+      "assetKey": "quiz-6-b",
+      "path": "assets/quiz-6-b.png",
+      "sha256": "d8443fc1a3fb4531ccaedf5c838214745691c6935f0af56ed1b9a17dfb780496",
+      "width": 398,
+      "height": 398,
+      "usedBy": [
+        "next-trip-goal"
+      ],
+      "source": "Codex built-in image_gen",
+      "sourcePanel": "quiz-6-b",
+      "atlasId": "quiz-poses",
+      "generatedSource": "art-source/quiz-poses.png",
+      "generatedSourceSha256": "50538ee2cfddfdb0036fd1aec2c0415ff208e652088160155a4d3a8229a7f92a",
+      "promptPath": "art-source/quiz-poses.prompt.txt",
+      "promptSha256": "252c0ce73e9110861b0da29ef91301e2507981ed93787e85e8adf0fb3c30cc09",
+      "size": [
+        1254,
+        1254
+      ],
+      "sourceCrop": [
+        428,
+        846,
+        826,
+        1244
+      ]
+    },
+    {
+      "assetKey": "quiz-6-c",
+      "path": "assets/quiz-6-c.png",
+      "sha256": "c0b079586cefa01e012a8e4e16042477a5242bdd5b67b61858433c6e51520a51",
+      "width": 398,
+      "height": 398,
+      "usedBy": [
+        "next-trip-goal"
+      ],
+      "source": "Codex built-in image_gen",
+      "sourcePanel": "quiz-6-c",
+      "atlasId": "quiz-poses",
+      "generatedSource": "art-source/quiz-poses.png",
+      "generatedSourceSha256": "50538ee2cfddfdb0036fd1aec2c0415ff208e652088160155a4d3a8229a7f92a",
+      "promptPath": "art-source/quiz-poses.prompt.txt",
+      "promptSha256": "252c0ce73e9110861b0da29ef91301e2507981ed93787e85e8adf0fb3c30cc09",
+      "size": [
+        1254,
+        1254
+      ],
+      "sourceCrop": [
+        846,
+        846,
+        1244,
+        1244
+      ]
+    },
+    {
+      "assetKey": "rabbit-chase",
+      "path": "assets/rabbit-chase.png",
+      "sha256": "2039ab711568228ff854d7ca30f34a81de9533c19f187c5e0f018631182df2ae",
+      "width": 774,
+      "height": 250,
+      "usedBy": [
+        "rabbit-on-the-way"
+      ],
+      "source": "composition of registered ImageGen panels",
+      "components": [
+        "hug-melon",
+        "rabbit-chase",
+        "rabbit-in-woods"
+      ],
+      "sourcePanels": [
+        {
+          "panel": "hug-melon",
+          "atlasId": "story-forest",
+          "generatedSource": "art-source/story-forest.png",
+          "generatedSourceSha256": "71352fd1b29efd2a7bf9a9b0828b130a470bd8ca4bba3fb40e000b684b889208",
+          "promptPath": "art-source/story-forest.prompt.txt",
+          "promptSha256": "74a7ff411822dbb075ac300f1db3c708799979a31edff3f4535f1a6946e108c2",
+          "size": [
+            1254,
+            1254
+          ],
+          "sourceCrop": [
+            10,
+            637,
+            303,
+            930
+          ]
+        },
+        {
+          "panel": "rabbit-chase",
+          "atlasId": "story-forest",
+          "generatedSource": "art-source/story-forest.png",
+          "generatedSourceSha256": "71352fd1b29efd2a7bf9a9b0828b130a470bd8ca4bba3fb40e000b684b889208",
+          "promptPath": "art-source/story-forest.prompt.txt",
+          "promptSha256": "74a7ff411822dbb075ac300f1db3c708799979a31edff3f4535f1a6946e108c2",
+          "size": [
+            1254,
+            1254
+          ],
+          "sourceCrop": [
+            323,
+            637,
+            617,
+            930
+          ]
+        },
+        {
+          "panel": "rabbit-in-woods",
+          "atlasId": "story-forest",
+          "generatedSource": "art-source/story-forest.png",
+          "generatedSourceSha256": "71352fd1b29efd2a7bf9a9b0828b130a470bd8ca4bba3fb40e000b684b889208",
+          "promptPath": "art-source/story-forest.prompt.txt",
+          "promptSha256": "74a7ff411822dbb075ac300f1db3c708799979a31edff3f4535f1a6946e108c2",
+          "size": [
+            1254,
+            1254
+          ],
+          "sourceCrop": [
+            637,
+            637,
+            930,
+            930
+          ]
+        }
+      ],
+      "composition": {
+        "columns": 3,
+        "tilePixels": 250,
+        "gapPixels": 12,
+        "background": "#fff2d9",
+        "fit": "contain"
+      }
+    },
+    {
+      "assetKey": "same-prop-two-traits",
+      "path": "assets/same-prop-two-traits.png",
+      "sha256": "b7655fdc2e445b0a9bb41650d9a3fb4001ee073d1a7aa1a211e0a8a4eac397da",
+      "width": 774,
+      "height": 250,
+      "usedBy": [
+        "two-traits"
+      ],
+      "source": "composition of registered ImageGen panels",
+      "components": [
+        "peach-stage",
+        "melon-stage",
+        "scarf-example"
+      ],
+      "sourcePanels": [
+        {
+          "panel": "peach-stage",
+          "atlasId": "story-forest",
+          "generatedSource": "art-source/story-forest.png",
+          "generatedSourceSha256": "71352fd1b29efd2a7bf9a9b0828b130a470bd8ca4bba3fb40e000b684b889208",
+          "promptPath": "art-source/story-forest.prompt.txt",
+          "promptSha256": "74a7ff411822dbb075ac300f1db3c708799979a31edff3f4535f1a6946e108c2",
+          "size": [
+            1254,
+            1254
+          ],
+          "sourceCrop": [
+            950,
+            10,
+            1244,
+            303
+          ]
+        },
+        {
+          "panel": "melon-stage",
+          "atlasId": "story-forest",
+          "generatedSource": "art-source/story-forest.png",
+          "generatedSourceSha256": "71352fd1b29efd2a7bf9a9b0828b130a470bd8ca4bba3fb40e000b684b889208",
+          "promptPath": "art-source/story-forest.prompt.txt",
+          "promptSha256": "74a7ff411822dbb075ac300f1db3c708799979a31edff3f4535f1a6946e108c2",
+          "size": [
+            1254,
+            1254
+          ],
+          "sourceCrop": [
+            637,
+            323,
+            930,
+            617
+          ]
+        },
+        {
+          "panel": "scarf-example",
+          "atlasId": "story-forest",
+          "generatedSource": "art-source/story-forest.png",
+          "generatedSourceSha256": "71352fd1b29efd2a7bf9a9b0828b130a470bd8ca4bba3fb40e000b684b889208",
+          "promptPath": "art-source/story-forest.prompt.txt",
+          "promptSha256": "74a7ff411822dbb075ac300f1db3c708799979a31edff3f4535f1a6946e108c2",
+          "size": [
+            1254,
+            1254
+          ],
+          "sourceCrop": [
+            637,
+            950,
+            930,
+            1244
+          ]
+        }
+      ],
+      "composition": {
+        "columns": 3,
+        "tilePixels": 250,
+        "gapPixels": 12,
+        "background": "#fff2d9",
+        "fit": "contain"
+      }
+    },
+    {
+      "assetKey": "write-gao-xing",
+      "path": "assets/write-gao-xing.png",
+      "sha256": "fb917cc1e4c9b4bd04d37a5be00008d4072cf3e8301a5a650819fba2fa83aee0",
+      "width": 790,
+      "height": 430,
+      "usedBy": [
+        "write-gao-and-xing"
+      ],
+      "source": "course-specific semantic diagram",
+      "drawingSource": "diagrams.py",
+      "drawingSourceSha256": "12a092b83b053b17fa201a4165b74ff2ee220d165db0f1de0135b5e87092398a"
+    },
+    {
+      "assetKey": "write-gua-tu",
+      "path": "assets/write-gua-tu.png",
+      "sha256": "e1bd3c35c9693077c42204cd534d45b289ab374768fef36a6c373c74aa857c51",
+      "width": 790,
+      "height": 430,
+      "usedBy": [
+        "write-gua-and-tu"
+      ],
+      "source": "course-specific semantic diagram",
+      "drawingSource": "diagrams.py",
+      "drawingSourceSha256": "12a092b83b053b17fa201a4165b74ff2ee220d165db0f1de0135b5e87092398a"
+    },
+    {
+      "assetKey": "write-jin",
+      "path": "assets/write-jin.png",
+      "sha256": "f26d0a98508c23b369833423973a5153fa13e9a3377e120d6fbfda755393449e",
+      "width": 790,
+      "height": 324,
+      "usedBy": [
+        "write-jin"
+      ],
+      "source": "course-specific semantic diagram",
+      "drawingSource": "diagrams.py",
+      "drawingSourceSha256": "12a092b83b053b17fa201a4165b74ff2ee220d165db0f1de0135b5e87092398a"
+    },
+    {
+      "assetKey": "write-zhe-wang",
+      "path": "assets/write-zhe-wang.png",
+      "sha256": "79ff393dd03d2337171daeb530a163dafbfb9948f8426f8feb93dcabd32486c2",
+      "width": 790,
+      "height": 430,
+      "usedBy": [
+        "write-zhe-and-wang"
+      ],
+      "source": "course-specific semantic diagram",
+      "drawingSource": "diagrams.py",
+      "drawingSourceSha256": "12a092b83b053b17fa201a4165b74ff2ee220d165db0f1de0135b5e87092398a"
+    }
+  ]
+}

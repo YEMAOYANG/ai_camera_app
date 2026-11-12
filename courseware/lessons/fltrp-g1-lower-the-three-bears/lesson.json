@@ -1,0 +1,879 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "The Three Bears",
+  "description": "跟着森林木偶剧团认角色、听喜好，并把面条、床和回家离开的画面串起来。",
+  "grade": 1,
+  "roster": {
+    "mia": {
+      "name": "Mia 老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Jennifer",
+      "avatar": "/teachers/coco-english-v1.png",
+      "color": "#557B76",
+      "persona": "用清楚的英语短句和图画带一年级孩子听角色、听回答并复述故事。"
+    }
+  },
+  "images": {
+    "baby": {
+      "file": "assets/baby.png"
+    },
+    "baby-bed": {
+      "file": "assets/baby-bed.png"
+    },
+    "baby-noodles": {
+      "file": "assets/baby-noodles.png"
+    },
+    "bears-return": {
+      "file": "assets/bears-return.png"
+    },
+    "bed-owners": {
+      "file": "assets/bed-owners.png"
+    },
+    "bell": {
+      "file": "assets/bell.png"
+    },
+    "cart": {
+      "file": "assets/cart.png"
+    },
+    "cart-angle": {
+      "file": "assets/cart-angle.png"
+    },
+    "drum": {
+      "file": "assets/drum.png"
+    },
+    "empty-theatre": {
+      "file": "assets/empty-theatre.png"
+    },
+    "enter-house": {
+      "file": "assets/enter-house.png"
+    },
+    "father": {
+      "file": "assets/father.png"
+    },
+    "father-bed": {
+      "file": "assets/father-bed.png"
+    },
+    "forest-stage": {
+      "file": "assets/forest-stage.png"
+    },
+    "four-roles": {
+      "file": "assets/four-roles.png"
+    },
+    "game-props": {
+      "file": "assets/game-props.png"
+    },
+    "game-story": {
+      "file": "assets/game-story.png"
+    },
+    "girl-leaves": {
+      "file": "assets/girl-leaves.png"
+    },
+    "goldilocks": {
+      "file": "assets/goldilocks.png"
+    },
+    "kite": {
+      "file": "assets/kite.png"
+    },
+    "mother": {
+      "file": "assets/mother.png"
+    },
+    "mother-bed": {
+      "file": "assets/mother-bed.png"
+    },
+    "mother-noodles": {
+      "file": "assets/mother-noodles.png"
+    },
+    "noodle-owners": {
+      "file": "assets/noodle-owners.png"
+    },
+    "puppet-stage": {
+      "file": "assets/puppet-stage.png"
+    },
+    "quiz-order-a": {
+      "file": "assets/quiz-order-a.png"
+    },
+    "quiz-order-b": {
+      "file": "assets/quiz-order-b.png"
+    },
+    "quiz-order-c": {
+      "file": "assets/quiz-order-c.png"
+    },
+    "quiz-role-baby": {
+      "file": "assets/quiz-role-baby.png"
+    },
+    "quiz-role-father": {
+      "file": "assets/quiz-role-father.png"
+    },
+    "quiz-role-girl": {
+      "file": "assets/quiz-role-girl.png"
+    },
+    "quiz-scarf-a": {
+      "file": "assets/quiz-scarf-a.png"
+    },
+    "quiz-scarf-b": {
+      "file": "assets/quiz-scarf-b.png"
+    },
+    "quiz-scarf-c": {
+      "file": "assets/quiz-scarf-c.png"
+    },
+    "story-and-roleplay": {
+      "file": "assets/story-and-roleplay.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "characters",
+      "type": "slide",
+      "title": "四个角色进场",
+      "template": "picture-points",
+      "data": {
+        "title": "四个角色进场",
+        "picture": "four-roles",
+        "points": [
+          "Father Bear",
+          "Mother Bear",
+          "Baby Bear",
+          "Goldilocks"
+        ]
+      },
+      "script": [
+        {
+          "say": "森林木偶剧团要排戏。先帮我叫出四位演员吧。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "从左上开始看。三只熊和一个女孩都到了。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "绿背心的是熊爸爸。听，Father Bear。"
+        },
+        {
+          "say": "听见 Father Bear，就找宽肩膀的熊爸爸。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "橙围裙、叶子扣的是熊妈妈，Mother Bear。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "小小的条纹衣是小熊。听，Baby Bear。"
+        },
+        {
+          "say": "再听一遍 Baby Bear，手指能找到它吗？"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "金黄色短发的女孩叫 Goldilocks。"
+        },
+        {
+          "say": "有一张卡是女孩。听见 Goldilocks，就找她。"
+        }
+      ]
+    },
+    {
+      "key": "house",
+      "type": "slide",
+      "title": "谁进了熊家",
+      "template": "picture-points",
+      "data": {
+        "title": "谁进了熊家",
+        "picture": "enter-house",
+        "points": [
+          "门前是谁",
+          "这是熊家",
+          "她先进屋"
+        ]
+      },
+      "script": [
+        {
+          "say": "认出金发姑娘了。看看她手扶的是什么？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "她到了小屋门口，伸手推门。听说发生了什么。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "Goldilocks is at the door."
+        },
+        {
+          "say": "听见 Goldilocks，跟着画里的金发女孩看。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "这是三只熊住的小屋。她走进了熊家。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "First, she goes into the house."
+        },
+        {
+          "say": "First 是说先做什么。进屋以后才会看见道具。"
+        },
+        {
+          "say": "回到这一张图时，用手指门，想想故事从哪儿开始。"
+        }
+      ]
+    },
+    {
+      "key": "noodles",
+      "type": "slide",
+      "title": "同样是面条，主人不一样",
+      "template": "picture-points",
+      "data": {
+        "title": "同样是面条，主人不一样",
+        "picture": "noodle-owners",
+        "points": [
+          "noodles",
+          "听谁的",
+          "听她选哪碗"
+        ]
+      },
+      "script": [
+        {
+          "say": "有三碗道具面条。听见 noodles，就找弯弯的面。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "每只熊和自己的碗上下排在一起。先看熊，再看碗。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "碗边有褶的是熊爸爸的，双耳碗是熊妈妈的。"
+        },
+        {
+          "say": "小熊那碗有条纹。它也装的是 noodles。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "听到 Baby Bear 接着听到 noodles，就找小熊那碗。"
+        },
+        {
+          "say": "同样说面条，开头的人名帮你找对它属于谁。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "她不喜欢另外两碗，喜欢小熊那一碗。"
+        },
+        {
+          "say": "Next, she tastes the noodles."
+        },
+        {
+          "say": "Yes, Baby Bear's noodles, please."
+        },
+        {
+          "say": "Take them to Goldilocks."
+        },
+        {
+          "say": "排练再换一位客人。听熊妈妈要双耳碗。"
+        },
+        {
+          "say": "Yes, the bowl with two handles."
+        },
+        {
+          "say": "Take the bowl to Mother Bear."
+        },
+        {
+          "say": "现在你知道先听名字，还是先拿离手最近的碗？"
+        }
+      ]
+    },
+    {
+      "key": "beds",
+      "type": "slide",
+      "title": "先听问，再听她怎么答",
+      "template": "picture-points",
+      "data": {
+        "title": "先听问，再听她怎么答",
+        "picture": "bed-owners",
+        "points": [
+          "Do you like …?",
+          "No, I don’t.",
+          "Yes, I do."
+        ]
+      },
+      "script": [
+        {
+          "say": "道具换成三张床。听完问句先等对方的回答。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "宽方床头的床是熊爸爸的。圆床头的是熊妈妈的。"
+        },
+        {
+          "say": "小熊的床最小，床头有圆柱，毯子是条纹。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "Do you like this bed?"
+        },
+        {
+          "say": "这句在问喜不喜欢这张床。答的人要先想一想。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "No, I don't."
+        },
+        {
+          "say": "听到 No，先把问到的那件留在原处。"
+        },
+        {
+          "say": "故事里，女孩给熊爸爸和熊妈妈的床都答了不喜欢。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "Yes, I do."
+        },
+        {
+          "say": "Yes 是喜欢。故事里她只喜欢小熊的床。"
+        },
+        {
+          "say": "Then, she tries a bed."
+        },
+        {
+          "say": "No, not that bed. Yes, the small bed."
+        },
+        {
+          "say": "Take the bed to Goldilocks."
+        },
+        {
+          "say": "下一单是排练加的。熊爸爸听见条纹床先说 No。"
+        },
+        {
+          "say": "格子床的毯子是一格一格的。听他选择。"
+        },
+        {
+          "say": "No, not stripes. I like the plaid bed."
+        },
+        {
+          "say": "This one is for Father Bear."
+        }
+      ]
+    },
+    {
+      "key": "listen-props",
+      "type": "interactive",
+      "title": "听回答，给剧团送道具",
+      "page": "listen-props",
+      "widgetType": "courseware_game",
+      "startImage": "game-props",
+      "script": [
+        {
+          "say": "剧团要排戏。你愿意帮忙把听到的道具送对吗？"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "先找到开着的小车。开车时要留心路上的车。"
+        },
+        {
+          "highlight": "#game-target"
+        },
+        {
+          "say": "听到 Baby Bear，再听 noodles，就找条纹小碗。"
+        },
+        {
+          "say": "有人答 No，就先把那件留在原处。听到 Yes 才选。"
+        },
+        {
+          "highlight": "#delivery-destination"
+        },
+        {
+          "say": "对岸是金发姑娘的图站。碗拿到手才可以交。"
+        },
+        {
+          "say": "等会儿我们只示范拿一件，用包裹按钮把碗拿上车。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "看车装碗。等装好以后，再开到金发姑娘的图站。"
+        },
+        {
+          "say": "交接后回到第一关。你先重听，再试着送一次。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "delivery-goal": "recap-6",
+        "delivery-hint": "recap-7",
+        "delivery-help": "recap-8",
+        "delivery-praise": "recap-9",
+        "pick-noodles": "noodles-13",
+        "drop-noodles": "noodles-14",
+        "pick-small-bed": "beds-16",
+        "drop-small-bed": "beds-17",
+        "pick-plaid-bed": "beds-20",
+        "drop-plaid-bed": "beds-21",
+        "pick-handles": "noodles-16",
+        "drop-handles": "noodles-17"
+      }
+    },
+    {
+      "key": "return",
+      "type": "slide",
+      "title": "熊回来了，她离开",
+      "template": "picture-points",
+      "data": {
+        "title": "熊回来了，她离开",
+        "picture": "game-story",
+        "points": [
+          "熊回家",
+          "她害怕",
+          "她离开"
+        ]
+      },
+      "script": [
+        {
+          "say": "女孩先尝面条、再试床。你猜后来谁走到门口？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "左上那幅是她进屋；右上是她看面条时的画面。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "The bears come home."
+        },
+        {
+          "say": "看左下那幅。熊爸爸、熊妈妈和小熊回到了家。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "他们发现屋里的变化。女孩看到他们，有点害怕。"
+        },
+        {
+          "say": "听，scared，就是这里说的害怕。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "At last, Goldilocks leaves."
+        },
+        {
+          "say": "右下的女孩往外走。熊回家在前，她离开在后。"
+        },
+        {
+          "say": "两张门口图都像小屋。看清门边是谁，再说先后。"
+        }
+      ]
+    },
+    {
+      "key": "story-order",
+      "type": "interactive",
+      "title": "按听到的顺序连起画面",
+      "page": "story-order",
+      "widgetType": "courseware_game",
+      "startImage": "game-story",
+      "script": [
+        {
+          "say": "故事画卡散开了。先听第一句，你会开去哪张？"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "这辆小车会沿小路走。先听动作，再动方向键。"
+        },
+        {
+          "highlight": "#picture-station-guide"
+        },
+        {
+          "say": "右边大画卡是地图图站的小帮手，摆法会变化。"
+        },
+        {
+          "highlight": "#game-target"
+        },
+        {
+          "say": "听见 goes into the house，找女孩在门口那幅。"
+        },
+        {
+          "say": "面条站等下一句再去。顺序变了，故事也跟着变。"
+        },
+        {
+          "say": "我们只走到进屋这一站。听到下一句才找第二幅。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "等小车在门口站停住，再想想下一张该去哪儿。"
+        },
+        {
+          "say": "换你从起点做。听完这一次的动作，再选图站。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "enter-house": "house-10",
+        "taste-noodles": "noodles-12",
+        "try-bed": "beds-15",
+        "bears-return": "return-5",
+        "girl-leaves": "return-11",
+        "route-exit": "recap-17",
+        "route-hint": "recap-15",
+        "route-help": "recap-16",
+        "route-praise": "recap-18"
+      }
+    },
+    {
+      "key": "retell",
+      "type": "slide",
+      "title": "看图讲先后，交换说话角色",
+      "template": "title-picture",
+      "data": {
+        "title": "看图讲先后，交换说话角色",
+        "picture": "story-and-roleplay",
+        "caption": "进屋 → 面条 → 床 → 熊回家 → 离开"
+      },
+      "script": [
+        {
+          "say": "有些演员忘了上场顺序。我们从哪张画讲起？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "从左边门口看起。金发姑娘走进熊家的小屋。"
+        },
+        {
+          "say": "她先看面条，再去试床。请你沿着画用手指一指。"
+        },
+        {
+          "say": "看见三只熊回来，她害怕，就走出了小屋。"
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "说先、接着、最后，把五幅画按顺序串起来。"
+        },
+        {
+          "say": "看画卡下面的帽子。休息时，两个人拿它换着问。"
+        },
+        {
+          "say": "旁边还有鼓和风筝。听，drum，kite。"
+        },
+        {
+          "say": "你做问的人。Do you like this cap?"
+        },
+        {
+          "say": "大人听完来答。Yes, I do. 现在换你当回答的人。"
+        },
+        {
+          "say": "要是你不喜欢，可以说 No, I don't."
+        },
+        {
+          "say": "听清喜好以后，试试用一幅画把自己选的道具画下来。"
+        }
+      ]
+    },
+    {
+      "key": "picture-check",
+      "type": "quiz",
+      "title": "听一听，选一幅新图",
+      "intro": [
+        "我说完一句，你从三个图里选一幅。",
+        "慢慢看，听清人、物和先后，再点提交。"
+      ],
+      "questions": [
+        {
+          "id": "puppet-baby",
+          "question": "Which puppet is Baby Bear? 选图。",
+          "skill": "identify-story-roles",
+          "answer": [
+            "b"
+          ],
+          "analysis": "小熊个头小，穿着蓝绿色条纹衣服。绿色背心的大熊和金发女孩是另两个角色。",
+          "options": {
+            "a": {
+              "label": "绿背心大熊",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-role-father",
+                "alt": "绿背心的深棕大熊木偶"
+              }
+            },
+            "b": {
+              "label": "条纹衣小熊",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-role-baby",
+                "alt": "蓝绿色条纹衣的小熊木偶"
+              }
+            },
+            "c": {
+              "label": "金发女孩",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-role-girl",
+                "alt": "黄色短发、珊瑚色衣服的女孩木偶"
+              }
+            }
+          }
+        },
+        {
+          "id": "kite-not-drum",
+          "question": "No, not the drum. Yes, the kite. 选图。",
+          "skill": "listen-for-preference",
+          "answer": [
+            "a"
+          ],
+          "analysis": "先听到 No，鼓留在原处。接着听到 Yes 和 kite，选带尾巴的风筝。",
+          "options": {
+            "a": {
+              "label": "风筝",
+              "visual": {
+                "kind": "asset",
+                "image": "kite",
+                "alt": "有长尾巴和彩结的菱形风筝"
+              }
+            },
+            "b": {
+              "label": "鼓",
+              "visual": {
+                "kind": "asset",
+                "image": "drum",
+                "alt": "小鼓和两根鼓棒"
+              }
+            },
+            "c": {
+              "label": "铃",
+              "visual": {
+                "kind": "asset",
+                "image": "bell",
+                "alt": "带手柄的铃"
+              }
+            }
+          }
+        },
+        {
+          "id": "scarf-dialogue",
+          "question": "熊妈妈问喜欢她的围巾吗？女孩答 Yes, I do.",
+          "skill": "understand-preference-dialogue",
+          "answer": [
+            "c"
+          ],
+          "analysis": "先看问的人是熊妈妈，再看围巾和回答的人。女孩旁边完整的爱心表示她答了喜欢。",
+          "options": {
+            "a": {
+              "label": "熊爸爸问，女孩喜欢",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-scarf-a",
+                "alt": "熊爸爸、围巾、女孩，女孩旁边有完整爱心"
+              }
+            },
+            "b": {
+              "label": "熊妈妈问，女孩不喜欢",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-scarf-b",
+                "alt": "熊妈妈、围巾、女孩，女孩旁边的爱心画了叉"
+              }
+            },
+            "c": {
+              "label": "熊妈妈问，女孩喜欢",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-scarf-c",
+                "alt": "熊妈妈、围巾、女孩，女孩旁边有完整爱心"
+              }
+            }
+          }
+        },
+        {
+          "id": "return-before-leave",
+          "question": "三只熊回来了。接着金发姑娘离开。选出这样排的图。",
+          "skill": "sequence-story-events",
+          "answer": [
+            "b"
+          ],
+          "analysis": "沿箭头先看三只熊在门口，再看金发姑娘走远。这是回家和离开的先后。",
+          "options": {
+            "a": {
+              "label": "她离开，再见熊",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-order-a",
+                "alt": "从左到右：金发女孩走开，三只熊在门口"
+              }
+            },
+            "b": {
+              "label": "熊回来，她离开",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-order-b",
+                "alt": "从左到右：三只熊在门口，金发女孩走开"
+              }
+            },
+            "c": {
+              "label": "熊回来，她试床",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-order-c",
+                "alt": "从左到右：三只熊在门口，金发女孩坐在小床上"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "recap",
+      "type": "slide",
+      "title": "带着图回到纸书",
+      "template": "picture-points",
+      "data": {
+        "title": "带着图回到纸书",
+        "picture": "puppet-stage",
+        "points": [
+          "谁在说",
+          "听清肯否",
+          "按图说先后",
+          "和大人读"
+        ]
+      },
+      "script": [
+        {
+          "say": "木偶剧团排好啦。小熊的名字还记得吗？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "指条纹衣小熊，说 Baby Bear；指金发女孩，说 Goldilocks。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "听到谁的碗、谁的床，先找听到名字的那位。"
+        },
+        {
+          "say": "先听答复，再拿道具，送给对应的人。"
+        },
+        {
+          "say": "先停一停，重听是谁说、说的是哪一件。"
+        },
+        {
+          "say": "听肯定，再看看亮起的图站。"
+        },
+        {
+          "say": "你按听到的人和物送对了。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "Yes, I do. 表示喜欢。No, I don't. 表示不喜欢。"
+        },
+        {
+          "say": "跟大人拿两件家里的东西，一人问一人答。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "先走进屋，再看面条和床。熊回来以后，她离开。"
+        },
+        {
+          "say": "先听动作，再找那张画。"
+        },
+        {
+          "say": "可以看车边的大画卡，再想先去哪儿。"
+        },
+        {
+          "say": "Now go to the little flag."
+        },
+        {
+          "say": "你按顺序找齐了故事画卡。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "翻到纸书第七十二和七十三页，和大人读原故事。"
+        },
+        {
+          "say": "试着复述给大人听。请大人帮你看先后说对了吗？"
+        }
+      ]
+    }
+  ]
+}

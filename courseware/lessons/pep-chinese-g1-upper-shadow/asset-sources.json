@@ -1,0 +1,732 @@
+{
+  "schemaVersion": "mira.courseware.asset-sources.v1",
+  "inputs": {
+    "story": {
+      "source": "art-source/story-atlas.png",
+      "sha256": "fbcdd383bebe2aaf67414fc58386fa69ce241a83bff01f40f67c5537d2894f3d",
+      "original": "/Users/sqcopenclaw/.codex/generated_images/01a1c43e-b707-70d1-8436-005b59e5091d/exec-4482fba6-1724-449e-960f-ba5ff2cb35e8.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "generator": "Codex 内置 ImageGen",
+      "prompt": "Use case: illustration-story.\nAsset type: six separate original picture-book illustration tiles for an early grade Mandarin lesson about a shadow that accompanies you. Generate a single flat atlas with exactly 3 columns × 2 rows of equal square tiles. Each cell is full-bleed and self-contained. Grid boundaries at exactly one-third, two-thirds width and one-half height. Keep every subject at least 10% away from its cell edges. No visible seams needed but use distinct simple backgrounds per cell for cropping. No words, numbers, letters, borders or watermark anywhere. No shared objects crossing any cell edge.\nStyle: fine paper grain, matte gouache, clean cut-paper contours, deep pine green and warm cream, apricot and persimmon-orange accents. Light, restrained backgrounds. Simple large shapes so what happened is recognizable in a thumbnail, child-friendly without caricature. Keep the same main kid in the top three panels: cropped short dark hair, orange scarf, sea-green jacket, plain dark shorts, warm childlike face.\nTop left: at a courtyard entrance on a sunny day, this child pauses mid-step on a pale flat path. Clearly show the entire child head to both shoes and the dark coherent silhouette on the ground attached to their feet in front-right of the child. Show quiet warm plaster walls and a small deep-green open gate.\nTop middle: the same child gently bends a little to greet one small clearly black pet dog in profile. Show the four-legged dog and the child's fully visible legs, simple courtyard backdrop.\nTop right: the same child and a peer walk together on a pale path, same travel direction, expressive but relaxed, one shadow attached to each pair of feet, modest distance between the figures.\nBottom left: a NEW distinct pair of children, a kid with an apricot cap and a kid with a green backpack, walking in profile SIDE BY SIDE toward the RIGHT on a quiet cream garden path, both faces oriented right. Both full bodies are near each other and both in motion, no other people.\nBottom middle: same two new kids on a similar path, separated from one another, one visibly facing and walking LEFT and one visibly facing and walking RIGHT. Show an obvious gap between them and different directions. Both full bodies, no other people.\nBottom right: only two inanimate objects placed separately on one plain small bench, one orange cap and one neatly folded green umbrella, zero people, cream ground and muted green trees.\nConstraints: Use original compositions and character designs. Prioritize unmistakable shadow attachment or travel directions. Do not introduce extra props that compete with the subjects. Avoid photorealism, 3D, character overlap, complicated cast shadows, text or incidental symbols."
+    },
+    "sprites": {
+      "source": "art-source/sprites-atlas.png",
+      "sha256": "8edea0dfcc86c35b17612510d968a256c73e2d4325f0dee9fb242d43d05055b1",
+      "original": "/Users/sqcopenclaw/.codex/generated_images/01a1c43e-b707-70d1-8436-005b59e5091d/exec-00a05877-5e1b-46da-8cad-6f4085405eff.png",
+      "dimensions": [
+        1267,
+        1241
+      ],
+      "generator": "Codex 内置 ImageGen",
+      "prompt": "Use case: scientific-educational.\nAsset type: one transparent PNG sprite atlas with nine independent illustrations for a first-grade Mandarin shadow classroom. True transparent alpha background. Exactly 3 columns × 3 rows of equal square cells, with boundaries at thirds of width and height. One isolated illustration centered in each cell, occupy 62% of that cell, preserve empty alpha margins around every object; each will be cropped separately. No outlines, gridlines, backgrounds, cast shadows, labels, text, numbers or watermarks. All subjects use identical fine paper texture, matte gouache cut-paper contours, deep pine green, warm cream, apricot and persimmon orange. Strong color contrast and shape clarity when each icon is rendered at 32 pixels.\nRow 1 left: small friendly mint-green toy delivery cart in near side view, with two dark wheels, warm cream open cargo bed and single orange nose. Row 1 center: identical toy delivery cart viewed the same way, now carrying one neutral tan cube; preserve exact silhouette and palette. Row 1 right: one compact orange patrol toy truck in side view with a cream stripe, obviously distinct from mint delivery cart.\nRow 2 left: one sturdy apricot-colored flashlight with deep pine-green ring at the head, viewed from above, aimed upwards in the square, with no light beam. Row 2 center: one simple clearly recognizable fresh green maple leaf with pointed edges and small stem. Row 2 right: one brass handbell with warm orange wooden handle.\nRow 3 left: one muted persimmon rectangular paper bookmark with a single cream tassel, whole object. Row 3 center: one green paper person puppet with a cream head and two limbs per side, from directly overhead and pointed toward the TOP of the cell, a small nose pointing UP shows the face direction, its face and two tiny eyes oriented up; body perfectly upright, a simple classroom tabletop paper figurine suitable for composition into precise diagrams. Row 3 right: one miniature image of an adult hand doing a rabbit hand shadow gesture in front of a small cream rectangular tabletop shadow screen; show the dark unmistakable two-eared rabbit silhouette on the cream screen and the hand outside the screen at lower left. Keep this small illustration coherent and self-contained on true alpha.\nUse no extra decorations or particle effects. Keep the outline easy to crop."
+    },
+    "actor": {
+      "source": "art-source/actor.png",
+      "sha256": "ba735e15107afe00f64fd9d3baaa6b2a0613092069261b6f45c5674c76ec3845",
+      "atlas": "sprites",
+      "cell": [
+        3,
+        2
+      ],
+      "processing": "按透明轮廓裁切，保留透明边缘后缩放"
+    }
+  },
+  "assets": {
+    "yard": {
+      "file": "assets/yard.png",
+      "sha256": "7f9177d1b6f853f7e497178c4b9102dc3900787b1bb579d58510929c3e69f510",
+      "dimensions": [
+        480,
+        480
+      ],
+      "usedBy": [
+        "p01",
+        "p02"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "atlas": "story",
+      "cell": [
+        1,
+        1
+      ],
+      "processing": "独立格向内各裁5像素，最长边缩至480像素"
+    },
+    "dog": {
+      "file": "assets/dog.png",
+      "sha256": "e45b220cc67f226c58b35f7ad2dbb18a39cd7daad6122b664ba958dfedb8ffe9",
+      "dimensions": [
+        480,
+        480
+      ],
+      "usedBy": [
+        "p03"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "atlas": "story",
+      "cell": [
+        1,
+        2
+      ],
+      "processing": "独立格向内各裁5像素，最长边缩至480像素"
+    },
+    "friends": {
+      "file": "assets/friends.png",
+      "sha256": "e807ee8f3a71c8b8e144537dd0702efc069331f44e629d94a7f954e99cb24cd6",
+      "dimensions": [
+        480,
+        480
+      ],
+      "usedBy": [
+        "p06"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "atlas": "story",
+      "cell": [
+        1,
+        3
+      ],
+      "processing": "独立格向内各裁5像素，最长边缩至480像素"
+    },
+    "hand-shadow": {
+      "file": "assets/hand-shadow.png",
+      "sha256": "5c5d71147e636df569c5da09c443f49fa895c930596aec676e97c2b089bc39cf",
+      "dimensions": [
+        360,
+        322
+      ],
+      "usedBy": [
+        "p07"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "atlas": "sprites",
+      "cell": [
+        3,
+        3
+      ],
+      "processing": "按透明轮廓裁切并保留8像素边缘，保持原比例后缩放"
+    },
+    "rover": {
+      "file": "assets/rover.png",
+      "sha256": "988735c2e778837a68f5914d852f10439fb19c751f67f36c3ede02ec460bc3a1",
+      "dimensions": [
+        260,
+        202
+      ],
+      "usedBy": [
+        "p05"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "atlas": "sprites",
+      "cell": [
+        1,
+        1
+      ],
+      "processing": "按透明轮廓裁切并保留8像素边缘，保持原比例后缩放；按模板默认向右朝向水平翻转"
+    },
+    "rover-carry": {
+      "file": "assets/rover-carry.png",
+      "sha256": "ec76eaa276ab03f0bfcd85343153483ea6cee0d81fad329757f885588e2aa732",
+      "dimensions": [
+        260,
+        203
+      ],
+      "usedBy": [
+        "p05"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "atlas": "sprites",
+      "cell": [
+        1,
+        2
+      ],
+      "processing": "按透明轮廓裁切并保留8像素边缘，保持原比例后缩放；按模板默认向右朝向水平翻转"
+    },
+    "patrol": {
+      "file": "assets/patrol.png",
+      "sha256": "17f4aacf75d4e25eb1799686b17593479ef24d155351b54584de269ca4778114",
+      "dimensions": [
+        260,
+        232
+      ],
+      "usedBy": [
+        "p05"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "atlas": "sprites",
+      "cell": [
+        1,
+        3
+      ],
+      "processing": "按透明轮廓裁切并保留8像素边缘，保持原比例后缩放；按模板默认向右朝向水平翻转"
+    },
+    "lamp": {
+      "file": "assets/lamp.png",
+      "sha256": "ceb9dd62c05bc9cef27dc0a23dc630845172d1b03fa94a244da5ae62476e4c82",
+      "dimensions": [
+        139,
+        260
+      ],
+      "usedBy": [
+        "p07",
+        "shadow-q3"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "atlas": "sprites",
+      "cell": [
+        2,
+        1
+      ],
+      "processing": "按透明轮廓裁切并保留8像素边缘，保持原比例后缩放"
+    },
+    "leaf": {
+      "file": "assets/leaf.png",
+      "sha256": "c4cd76d38a3ad40a9bde5d9cd1164989eb3c19f31f17f1ed9c7397c243790c69",
+      "dimensions": [
+        238,
+        260
+      ],
+      "usedBy": [
+        "p05",
+        "shadow-q2"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "atlas": "sprites",
+      "cell": [
+        2,
+        2
+      ],
+      "processing": "按透明轮廓裁切并保留8像素边缘，保持原比例后缩放"
+    },
+    "bell": {
+      "file": "assets/bell.png",
+      "sha256": "1e02c32399dab5570bd4fdffa431ab35c2d5548850e9ba4ac8277dd61f366bbd",
+      "dimensions": [
+        167,
+        260
+      ],
+      "usedBy": [
+        "p05",
+        "shadow-q1"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "atlas": "sprites",
+      "cell": [
+        2,
+        3
+      ],
+      "processing": "按透明轮廓裁切并保留8像素边缘，保持原比例后缩放"
+    },
+    "bookmark": {
+      "file": "assets/bookmark.png",
+      "sha256": "b78aae0d2d82a928d960bac40f324be65b19033c2c80e7591a037218e10492d9",
+      "dimensions": [
+        206,
+        260
+      ],
+      "usedBy": [
+        "p05"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "atlas": "sprites",
+      "cell": [
+        3,
+        1
+      ],
+      "processing": "按透明轮廓裁切并保留8像素边缘，保持原比例后缩放"
+    },
+    "station-front": {
+      "file": "assets/station-front.png",
+      "sha256": "2f610b477be6c0fdcb4dc8c1cd61480a1131258c514c5861f55c756882ecfc7c",
+      "dimensions": [
+        320,
+        320
+      ],
+      "usedBy": [
+        "p05"
+      ],
+      "kind": "semantic_diagram",
+      "source": "diagrams.py",
+      "sourceSha256": "efa09eb60f73489fcc21acc8e95e86e2f1e132d1ac79613e61c419760304df8b",
+      "inputs": [
+        {
+          "file": "art-source/actor.png",
+          "sha256": "ba735e15107afe00f64fd9d3baaa6b2a0613092069261b6f45c5674c76ec3845"
+        }
+      ]
+    },
+    "station-back": {
+      "file": "assets/station-back.png",
+      "sha256": "1464db00d8bef69df2a9cee0fddf0ad2573815be5ba5d2adfdb6276a25280d64",
+      "dimensions": [
+        320,
+        320
+      ],
+      "usedBy": [
+        "p05"
+      ],
+      "kind": "semantic_diagram",
+      "source": "diagrams.py",
+      "sourceSha256": "efa09eb60f73489fcc21acc8e95e86e2f1e132d1ac79613e61c419760304df8b",
+      "inputs": [
+        {
+          "file": "art-source/actor.png",
+          "sha256": "ba735e15107afe00f64fd9d3baaa6b2a0613092069261b6f45c5674c76ec3845"
+        }
+      ]
+    },
+    "station-left": {
+      "file": "assets/station-left.png",
+      "sha256": "ce55495889c3dd2011d1a451d3cd343912fcc15f5f1617dacb7916d4bc375201",
+      "dimensions": [
+        320,
+        320
+      ],
+      "usedBy": [
+        "p05"
+      ],
+      "kind": "semantic_diagram",
+      "source": "diagrams.py",
+      "sourceSha256": "efa09eb60f73489fcc21acc8e95e86e2f1e132d1ac79613e61c419760304df8b",
+      "inputs": [
+        {
+          "file": "art-source/actor.png",
+          "sha256": "ba735e15107afe00f64fd9d3baaa6b2a0613092069261b6f45c5674c76ec3845"
+        }
+      ]
+    },
+    "station-right": {
+      "file": "assets/station-right.png",
+      "sha256": "685098f8911ff396405c5344a20de1964f2bb5ed5878d5d02b61a4550d0f5d1b",
+      "dimensions": [
+        320,
+        320
+      ],
+      "usedBy": [
+        "p05"
+      ],
+      "kind": "semantic_diagram",
+      "source": "diagrams.py",
+      "sourceSha256": "efa09eb60f73489fcc21acc8e95e86e2f1e132d1ac79613e61c419760304df8b",
+      "inputs": [
+        {
+          "file": "art-source/actor.png",
+          "sha256": "ba735e15107afe00f64fd9d3baaa6b2a0613092069261b6f45c5674c76ec3845"
+        }
+      ]
+    },
+    "direction-map": {
+      "file": "assets/direction-map.png",
+      "sha256": "200bf458a36dcd7f9d5b413e301a305cb4a16413bfa70a3932c6f57ed78e72ce",
+      "dimensions": [
+        420,
+        350
+      ],
+      "usedBy": [
+        "p04",
+        "p05"
+      ],
+      "kind": "semantic_diagram",
+      "source": "diagrams.py",
+      "sourceSha256": "efa09eb60f73489fcc21acc8e95e86e2f1e132d1ac79613e61c419760304df8b",
+      "inputs": [
+        {
+          "file": "art-source/actor.png",
+          "sha256": "ba735e15107afe00f64fd9d3baaa6b2a0613092069261b6f45c5674c76ec3845"
+        }
+      ]
+    },
+    "write-left-right": {
+      "file": "assets/write-left-right.png",
+      "sha256": "376feb523e494e92e825ba2ec58be48122035d9910bc071c929fdec8162a7541",
+      "dimensions": [
+        780,
+        552
+      ],
+      "usedBy": [
+        "p08"
+      ],
+      "kind": "semantic_diagram",
+      "source": "diagrams.py",
+      "sourceSha256": "efa09eb60f73489fcc21acc8e95e86e2f1e132d1ac79613e61c419760304df8b",
+      "inputs": []
+    },
+    "write-at-me": {
+      "file": "assets/write-at-me.png",
+      "sha256": "2575dc72a3d2ed1b2285dcce6d8e93254d1fd57354ac37a87568c56c95e970fc",
+      "dimensions": [
+        780,
+        552
+      ],
+      "usedBy": [
+        "p09"
+      ],
+      "kind": "semantic_diagram",
+      "source": "diagrams.py",
+      "sourceSha256": "efa09eb60f73489fcc21acc8e95e86e2f1e132d1ac79613e61c419760304df8b",
+      "inputs": []
+    },
+    "front-choice-a": {
+      "file": "assets/front-choice-a.png",
+      "sha256": "886318b7bf4420cdc1b524e4ad2d167ca75e5105b5c101dd880891dab663a597",
+      "dimensions": [
+        420,
+        350
+      ],
+      "usedBy": [
+        "shadow-q1"
+      ],
+      "kind": "semantic_diagram",
+      "source": "diagrams.py",
+      "sourceSha256": "efa09eb60f73489fcc21acc8e95e86e2f1e132d1ac79613e61c419760304df8b",
+      "inputs": [
+        {
+          "file": "art-source/actor.png",
+          "sha256": "ba735e15107afe00f64fd9d3baaa6b2a0613092069261b6f45c5674c76ec3845"
+        },
+        {
+          "file": "assets/bell.png",
+          "sha256": "1e02c32399dab5570bd4fdffa431ab35c2d5548850e9ba4ac8277dd61f366bbd"
+        }
+      ]
+    },
+    "front-choice-b": {
+      "file": "assets/front-choice-b.png",
+      "sha256": "1b87baaa22a7b8766ef8aafef35190d3e9a72508d2ca24b6a27b2755f5668611",
+      "dimensions": [
+        420,
+        350
+      ],
+      "usedBy": [
+        "shadow-q1"
+      ],
+      "kind": "semantic_diagram",
+      "source": "diagrams.py",
+      "sourceSha256": "efa09eb60f73489fcc21acc8e95e86e2f1e132d1ac79613e61c419760304df8b",
+      "inputs": [
+        {
+          "file": "art-source/actor.png",
+          "sha256": "ba735e15107afe00f64fd9d3baaa6b2a0613092069261b6f45c5674c76ec3845"
+        },
+        {
+          "file": "assets/bell.png",
+          "sha256": "1e02c32399dab5570bd4fdffa431ab35c2d5548850e9ba4ac8277dd61f366bbd"
+        }
+      ]
+    },
+    "front-choice-c": {
+      "file": "assets/front-choice-c.png",
+      "sha256": "1ad83b934ef931da3efab16711c1d42f52c9578b85549cc8c9aefa7bfec826d7",
+      "dimensions": [
+        420,
+        350
+      ],
+      "usedBy": [
+        "shadow-q1"
+      ],
+      "kind": "semantic_diagram",
+      "source": "diagrams.py",
+      "sourceSha256": "efa09eb60f73489fcc21acc8e95e86e2f1e132d1ac79613e61c419760304df8b",
+      "inputs": [
+        {
+          "file": "art-source/actor.png",
+          "sha256": "ba735e15107afe00f64fd9d3baaa6b2a0613092069261b6f45c5674c76ec3845"
+        },
+        {
+          "file": "assets/bell.png",
+          "sha256": "1e02c32399dab5570bd4fdffa431ab35c2d5548850e9ba4ac8277dd61f366bbd"
+        }
+      ]
+    },
+    "left-choice-a": {
+      "file": "assets/left-choice-a.png",
+      "sha256": "6e689ca7f12a9c60d4e6716a08c62c2d69f70581b2203bfad3f0e362956d7833",
+      "dimensions": [
+        420,
+        350
+      ],
+      "usedBy": [
+        "shadow-q2"
+      ],
+      "kind": "semantic_diagram",
+      "source": "diagrams.py",
+      "sourceSha256": "efa09eb60f73489fcc21acc8e95e86e2f1e132d1ac79613e61c419760304df8b",
+      "inputs": [
+        {
+          "file": "art-source/actor.png",
+          "sha256": "ba735e15107afe00f64fd9d3baaa6b2a0613092069261b6f45c5674c76ec3845"
+        },
+        {
+          "file": "assets/leaf.png",
+          "sha256": "c4cd76d38a3ad40a9bde5d9cd1164989eb3c19f31f17f1ed9c7397c243790c69"
+        }
+      ]
+    },
+    "left-choice-b": {
+      "file": "assets/left-choice-b.png",
+      "sha256": "43dff6b9b6de2c5e3d70076527fff13c0f895212a9f880aa3a443f31a6eda9be",
+      "dimensions": [
+        420,
+        350
+      ],
+      "usedBy": [
+        "shadow-q2"
+      ],
+      "kind": "semantic_diagram",
+      "source": "diagrams.py",
+      "sourceSha256": "efa09eb60f73489fcc21acc8e95e86e2f1e132d1ac79613e61c419760304df8b",
+      "inputs": [
+        {
+          "file": "art-source/actor.png",
+          "sha256": "ba735e15107afe00f64fd9d3baaa6b2a0613092069261b6f45c5674c76ec3845"
+        },
+        {
+          "file": "assets/leaf.png",
+          "sha256": "c4cd76d38a3ad40a9bde5d9cd1164989eb3c19f31f17f1ed9c7397c243790c69"
+        }
+      ]
+    },
+    "left-choice-c": {
+      "file": "assets/left-choice-c.png",
+      "sha256": "8a0c3a7500952e5d247b74fc670232feadeb284954e522e68b6e8c3ef6d2b704",
+      "dimensions": [
+        420,
+        350
+      ],
+      "usedBy": [
+        "shadow-q2"
+      ],
+      "kind": "semantic_diagram",
+      "source": "diagrams.py",
+      "sourceSha256": "efa09eb60f73489fcc21acc8e95e86e2f1e132d1ac79613e61c419760304df8b",
+      "inputs": [
+        {
+          "file": "art-source/actor.png",
+          "sha256": "ba735e15107afe00f64fd9d3baaa6b2a0613092069261b6f45c5674c76ec3845"
+        },
+        {
+          "file": "assets/leaf.png",
+          "sha256": "c4cd76d38a3ad40a9bde5d9cd1164989eb3c19f31f17f1ed9c7397c243790c69"
+        }
+      ]
+    },
+    "lamp-choice-a": {
+      "file": "assets/lamp-choice-a.png",
+      "sha256": "48929aa1db4c9a62ede798333a01fcf31a4c4d975b95795bfd6357fc5edf179b",
+      "dimensions": [
+        420,
+        290
+      ],
+      "usedBy": [
+        "shadow-q3"
+      ],
+      "kind": "semantic_diagram",
+      "source": "diagrams.py",
+      "sourceSha256": "efa09eb60f73489fcc21acc8e95e86e2f1e132d1ac79613e61c419760304df8b",
+      "inputs": [
+        {
+          "file": "assets/lamp.png",
+          "sha256": "ceb9dd62c05bc9cef27dc0a23dc630845172d1b03fa94a244da5ae62476e4c82"
+        }
+      ]
+    },
+    "lamp-choice-b": {
+      "file": "assets/lamp-choice-b.png",
+      "sha256": "d4fb900004ffc75c594bafc2bf9de784a610c1b518dbdb442f546ead948ebc23",
+      "dimensions": [
+        420,
+        290
+      ],
+      "usedBy": [
+        "shadow-q3"
+      ],
+      "kind": "semantic_diagram",
+      "source": "diagrams.py",
+      "sourceSha256": "efa09eb60f73489fcc21acc8e95e86e2f1e132d1ac79613e61c419760304df8b",
+      "inputs": [
+        {
+          "file": "assets/lamp.png",
+          "sha256": "ceb9dd62c05bc9cef27dc0a23dc630845172d1b03fa94a244da5ae62476e4c82"
+        }
+      ]
+    },
+    "lamp-choice-c": {
+      "file": "assets/lamp-choice-c.png",
+      "sha256": "34de60fb588c9acc44dcf259b9c86b8ba2f5abbed976924424447dfabd33804f",
+      "dimensions": [
+        420,
+        290
+      ],
+      "usedBy": [
+        "shadow-q3"
+      ],
+      "kind": "semantic_diagram",
+      "source": "diagrams.py",
+      "sourceSha256": "efa09eb60f73489fcc21acc8e95e86e2f1e132d1ac79613e61c419760304df8b",
+      "inputs": [
+        {
+          "file": "assets/lamp.png",
+          "sha256": "ceb9dd62c05bc9cef27dc0a23dc630845172d1b03fa94a244da5ae62476e4c82"
+        }
+      ]
+    },
+    "follow-choice-a": {
+      "file": "assets/follow-choice-a.png",
+      "sha256": "8488ba49256cef7d3f1be49ec73b671caade5e8f90a7cb2b12ee801d38e6a1a4",
+      "dimensions": [
+        480,
+        480
+      ],
+      "usedBy": [
+        "shadow-q4"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "atlas": "story",
+      "cell": [
+        2,
+        1
+      ],
+      "processing": "独立格向内各裁5像素，最长边缩至480像素"
+    },
+    "follow-choice-b": {
+      "file": "assets/follow-choice-b.png",
+      "sha256": "eb12fce0e9d6676627bf7c2b01478c0d4b844a203a7fbc7787aa56c7554edf44",
+      "dimensions": [
+        480,
+        480
+      ],
+      "usedBy": [
+        "shadow-q4"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "atlas": "story",
+      "cell": [
+        2,
+        2
+      ],
+      "processing": "独立格向内各裁5像素，最长边缩至480像素"
+    },
+    "follow-choice-c": {
+      "file": "assets/follow-choice-c.png",
+      "sha256": "da265900374ca60566bd07bd89669397bd2979cd419379bf6c080d5e60c416ff",
+      "dimensions": [
+        480,
+        480
+      ],
+      "usedBy": [
+        "shadow-q4"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "atlas": "story",
+      "cell": [
+        2,
+        3
+      ],
+      "processing": "独立格向内各裁5像素，最长边缩至480像素"
+    },
+    "radical-choice-a": {
+      "kind": "semantic_glyph",
+      "glyphSpec": {
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "影"
+              }
+            ]
+          }
+        ]
+      },
+      "renderer": "courseware/tools/glyph_picture.py",
+      "rendererSha256": "aca93f29c99390cad67b1c62ec860f80410f006bf4d364de2755b9d645fff5ef",
+      "usedBy": [
+        "shadow-q5"
+      ]
+    },
+    "radical-choice-b": {
+      "kind": "semantic_glyph",
+      "glyphSpec": {
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "狗"
+              }
+            ]
+          }
+        ]
+      },
+      "renderer": "courseware/tools/glyph_picture.py",
+      "rendererSha256": "aca93f29c99390cad67b1c62ec860f80410f006bf4d364de2755b9d645fff5ef",
+      "usedBy": [
+        "shadow-q5"
+      ]
+    },
+    "radical-choice-c": {
+      "kind": "semantic_glyph",
+      "glyphSpec": {
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "朋"
+              }
+            ]
+          }
+        ]
+      },
+      "renderer": "courseware/tools/glyph_picture.py",
+      "rendererSha256": "aca93f29c99390cad67b1c62ec860f80410f006bf4d364de2755b9d645fff5ef",
+      "usedBy": [
+        "shadow-q5"
+      ]
+    },
+    "stroke-choice-a": {
+      "file": "assets/stroke-choice-a.png",
+      "sha256": "52be45ff6b24adb10a34c6033af371adda02643c539cff03b3e9f8ff2798b366",
+      "dimensions": [
+        420,
+        290
+      ],
+      "usedBy": [
+        "shadow-q6"
+      ],
+      "kind": "semantic_diagram",
+      "source": "diagrams.py",
+      "sourceSha256": "efa09eb60f73489fcc21acc8e95e86e2f1e132d1ac79613e61c419760304df8b",
+      "inputs": []
+    },
+    "stroke-choice-b": {
+      "file": "assets/stroke-choice-b.png",
+      "sha256": "30d052d4ee056b669fbf8726d1e380e0b1b687812dfcac0f73ec475c679ed7c5",
+      "dimensions": [
+        420,
+        290
+      ],
+      "usedBy": [
+        "shadow-q6"
+      ],
+      "kind": "semantic_diagram",
+      "source": "diagrams.py",
+      "sourceSha256": "efa09eb60f73489fcc21acc8e95e86e2f1e132d1ac79613e61c419760304df8b",
+      "inputs": []
+    },
+    "stroke-choice-c": {
+      "file": "assets/stroke-choice-c.png",
+      "sha256": "0f28bfe11fc2f27633255f2a0472cdfbd1f3f99ee2fbd451f4eb6e81a1ad8697",
+      "dimensions": [
+        420,
+        290
+      ],
+      "usedBy": [
+        "shadow-q6"
+      ],
+      "kind": "semantic_diagram",
+      "source": "diagrams.py",
+      "sourceSha256": "efa09eb60f73489fcc21acc8e95e86e2f1e132d1ac79613e61c419760304df8b",
+      "inputs": []
+    }
+  }
+}

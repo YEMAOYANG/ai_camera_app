@@ -724,6 +724,8 @@ class _LearningReportDetail extends StatelessWidget {
                     ),
                   ),
               ],
+              for (final card in report.observationCards)
+                _ReportObservationCard(card: card, report: report),
               const SizedBox(height: 18),
               const Text('下一步建议', style: _titleStyle),
               const SizedBox(height: 7),
@@ -732,6 +734,76 @@ class _LearningReportDetail extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _ReportObservationCard extends StatelessWidget {
+  const _ReportObservationCard({required this.card, required this.report});
+
+  final LearningObservationCard card;
+  final LearningReport report;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 18),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('模拟观察记录卡', style: _titleStyle),
+          Text(card.title, style: _detailStyle),
+          for (final level in card.levels) ...[
+            const SizedBox(height: 10),
+            Text(level.label, style: _bodyStyle),
+            for (final trial in level.trials) ...[
+              Text(trial.label, style: _detailStyle),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(child: _view('从上看', trial.top)),
+                  const SizedBox(width: 10),
+                  Expanded(child: _view('从侧面看', trial.side)),
+                ],
+              ),
+            ],
+          ],
+          const SizedBox(height: 10),
+          const Text('口头描述 · 待观察', style: _detailStyle),
+          Text('亲子观察 · 待观察\n${card.familyTask}', style: _detailStyle),
+        ],
+      ),
+    );
+  }
+
+  Widget _view(String title, LearningObservationView view) {
+    final key = (
+      childId: report.childId,
+      reportId: report.id,
+      sha256: view.imageSha256,
+    );
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(title, style: _bodyStyle),
+        Consumer(
+          builder: (context, ref, child) => ref
+              .watch(learningObservationImageProvider(key))
+              .when(
+                data: (bytes) => Image.memory(
+                  bytes,
+                  height: 76,
+                  fit: BoxFit.contain,
+                  excludeFromSemantics: true,
+                  errorBuilder: (context, error, trace) =>
+                      const SizedBox.shrink(),
+                ),
+                loading: () => const SizedBox(height: 76),
+                error: (error, trace) => const SizedBox.shrink(),
+              ),
+        ),
+        Text(view.label, style: _detailStyle),
+      ],
     );
   }
 }

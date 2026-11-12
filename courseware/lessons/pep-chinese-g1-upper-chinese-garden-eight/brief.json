@@ -1,0 +1,254 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "语文园地八",
+  "binding": {
+    "editionId": "pep-chinese-g1-upper-2022-standard",
+    "revisionId": "20260924-directory-3",
+    "unitId": "unit-8-reading",
+    "nodeId": "u8-l4"
+  },
+  "scenario": "社区年节小展台。孩子帮老师整理字卡和祝福卡，看看风留下的线索，给布展小伙伴想办法，最后与家人共读。",
+  "goals": [
+    "借字形、字音和图认识六字，能区分上下、左右和独体字，并纸笔练写牛、羊、果、白。",
+    "在不同生活图中积累熟字词，选择对象并写或说一句合适的新年祝福。",
+    "按两种笔顺规则观察并练写月、风、小、水，借四个画面理解古诗写出的风。",
+    "围绕一个困难大胆说出办法与理由，听同伴说并能比较不同可行办法。",
+    "和家人用纸书按节奏共读春节童谣，问不懂的词并说童谣或自家经历。"
+  ],
+  "pageSequence": [
+    {
+      "key": "open-the-exhibit",
+      "kind": "teaching",
+      "plan": "打开小展台的一盒字卡，先请孩子观察几张字的分布，再点亮四项展台任务图。"
+    },
+    {
+      "key": "look-at-shapes",
+      "kind": "teaching",
+      "plan": "先借图、听音、看拼音认识六字，下一页再把字形分成三类。"
+    },
+    {
+      "key": "shape-rules",
+      "kind": "teaching",
+      "plan": "看花、作、口及结构块，说明上下、左右、独体，再听推盘的规则。"
+    },
+    {
+      "key": "move-character-crates",
+      "kind": "interactive",
+      "plan": "推动目标字牌到对应结构图的托盘，通关由结构和路线一起决定。托盘用图示位置，语音说明，不靠颜色暗示。"
+    },
+    {
+      "key": "write-four",
+      "kind": "teaching",
+      "plan": "牛、羊分栏逐步显示累计笔画，讲中竖和横长短，最后在纸上写。"
+    },
+    {
+      "key": "write-fruit-white",
+      "kind": "teaching",
+      "plan": "果、白分别亮累计笔画，解释第一笔和田字格位置，留纸笔练习。"
+    },
+    {
+      "key": "word-partners",
+      "kind": "teaching",
+      "plan": "用六组配图和语音读原书词的短组，换一个搭配，让孩子先猜后核对不同意思。"
+    },
+    {
+      "key": "look-for-words",
+      "kind": "teaching",
+      "plan": "用四张生活小图积累到处、四处、方向、地方，举例而不硬分近义词。"
+    },
+    {
+      "key": "send-a-wish",
+      "kind": "teaching",
+      "plan": "看两种收卡人和场合，老师写一句原创祝福，解释为何合适，孩子对家人说或写自己的句子。"
+    },
+    {
+      "key": "two-writing-rules",
+      "kind": "teaching",
+      "plan": "分别点亮月、风的累计笔画图，解释先外后内；第二条规则留下一页。"
+    },
+    {
+      "key": "write-middle-first",
+      "kind": "teaching",
+      "plan": "依次点亮小、水的累计笔画图，说明中间先写，再按顺序写两边。"
+    },
+    {
+      "key": "where-is-the-wind",
+      "kind": "teaching",
+      "plan": "用四幅全新图看诗中的秋叶、春花、江浪和竹枝。请孩子说看见什么和怎样想到风，再安排纸书读背。"
+    },
+    {
+      "key": "listen-to-scenes",
+      "kind": "interactive",
+      "plan": "听一个具体画面线索，实时移动小艇、瞄准并吹泡泡识别词语或风的场景。每轮只有一图与口令相合。"
+    },
+    {
+      "key": "help-a-friend",
+      "kind": "teaching",
+      "plan": "展台需要把一盒轻道具从一处搬到另一处。先看限制，再听两种都能用的办法和理由，留时间说自己的办法。"
+    },
+    {
+      "key": "listen-and-improve",
+      "kind": "teaching",
+      "plan": "两位原创角色轮流说方法并追问。教师分别亮出要解决的事、做法、理由，让孩子听后补充和改进。"
+    },
+    {
+      "key": "holiday-reading",
+      "kind": "teaching",
+      "plan": "与家人打开纸书的提示图。教师用原创短节奏示范如何接读与问词，再用几种节庆图帮助说各自家庭的经验。"
+    },
+    {
+      "key": "picture-check",
+      "kind": "quiz",
+      "plan": "九道新图题由教师读，测结构、词语场景、笔画先后、诗意画面、说办法和共读行为。实际口述和写字另由家人观察。"
+    },
+    {
+      "key": "wrap-up",
+      "kind": "teaching",
+      "plan": "依次回到六个栏目对应画面并回顾，安排写卡、纸笔、诗歌童谣和生活说办法。"
+    }
+  ],
+  "games": [
+    {
+      "page": "move-character-crates",
+      "template": "sortingDepot",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.sortingDepot",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "classification",
+      "selection": "目标字用规范字形绘制。托盘用整体形状、上下两块或左右两块作为分类提示。只有结构相合才能放入，还须走通推动路径。",
+      "levels": [
+        "两张外形对比明显的字牌，两个直路托盘。",
+        "三张字牌覆盖三类，托盘位置对调并增加一个拐角。",
+        "四或五张字牌，有相同结构的不同字，路线需先留空。"
+      ],
+      "demo": "点亮字形、托盘、路线和方向键，说清首张为何选该结构，示范一次推动再复位。目标、提示与纠错为预录。"
+    },
+    {
+      "page": "listen-to-scenes",
+      "template": "wordBubbles",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.wordBubbles",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "listen_match",
+      "selection": "同一轮两到三张不同图，孩子听具体语境后驾船和吹泡泡，只有命中与所说词或景象一致的图才得分。",
+      "levels": [
+        "两轮，词语选择果皮与树皮，图中只出现对应语境。",
+        "三轮，听熟字词语境或具体动作，使用不同的生活图。",
+        "三至四轮，在秋叶、江浪等原创新构图之间听清具体线索，处理近邻干扰。"
+      ],
+      "demo": "依次亮声音提示、图卡、移动和吹泡泡按钮，示范首个动作后清空。启用voiceLead、stepVoiceLead，正式音频覆盖目标、反馈和交接。"
+    }
+  ],
+  "quizPlan": [
+    {
+      "skill": "classify-characters",
+      "prompt": "看规范字“早”。哪张位置图能表示这个字的上下排法？",
+      "answer": "一块在上、一块在下的结构图",
+      "position": 1,
+      "rationale": "早的上面是日，下面是十。"
+    },
+    {
+      "skill": "classify-characters",
+      "prompt": "明字的两部分怎么排？选一张。",
+      "answer": "一块在左、一块在右的结构图",
+      "position": 3,
+      "rationale": "明的左边是日，右边是月。"
+    },
+    {
+      "skill": "words-and-greeting",
+      "prompt": "听“回来”。哪一张图画的是走回刚才出发的地方？",
+      "answer": "角色离开后朝原位置回去的连续图",
+      "position": 2,
+      "rationale": "回来指回到原来的地方。"
+    },
+    {
+      "skill": "words-and-greeting",
+      "prompt": "给刚认识的同学送一句新年祝福，选与收到的声音合适的一张图。",
+      "answer": "卡片递给同龄朋友，并由录音表达适合朋友的新年祝福",
+      "position": 1,
+      "rationale": "祝福要能送给当下的对象，先称呼，再表达心意。"
+    },
+    {
+      "skill": "stroke-order",
+      "prompt": "写山，哪一组图的笔顺对？",
+      "answer": "中间先亮，随后是左边和右边",
+      "position": 2,
+      "rationale": "山先写中间的竖，再写左侧带底边的一笔，最后写右竖。"
+    },
+    {
+      "skill": "stroke-order",
+      "prompt": "写用，哪一组图的笔顺对？",
+      "answer": "先写左撇和横折钩",
+      "position": 3,
+      "rationale": "用先写撇、横折钩，再写两横，最后写竖。"
+    },
+    {
+      "skill": "wind-scenes",
+      "prompt": "听描述“竹枝向一旁弯了”。选与诗里这种景象相合的一幅。",
+      "answer": "一片竹枝朝同一方向倾斜",
+      "position": 2,
+      "rationale": "可以通过竹枝的样子想到诗里的风。"
+    },
+    {
+      "skill": "say-a-plan",
+      "prompt": "怎么搬纸筒，才能让它们留在盘里？",
+      "answer": "用有边托盘留住三个纸筒",
+      "position": 1,
+      "rationale": "托盘的边可以挡住会滚的纸筒。说办法和理由留给家庭观察。"
+    },
+    {
+      "skill": "read-together",
+      "prompt": "共读时遇到没听过的词，哪组图画出了可以接着读的做法？",
+      "answer": "指给家人看，问清以后一起接着读",
+      "position": 3,
+      "rationale": "先交流不懂的地方，再把故事或童谣读下去。"
+    }
+  ],
+  "afterClass": {
+    "familyTask": "用合法纸书读背《风》、接读《春节童谣》并说自家经历。写一张新年卡，在田字格练例字，再挑一件生活小事交流办法与理由。",
+    "weeklyQuestionSource": [
+      "上下左右独体结构",
+      "熟字词的意思和祝福对象",
+      "先外后内及先中间后两边",
+      "诗意画面",
+      "说办法和理由",
+      "亲子共读行为"
+    ],
+    "evidence": "图题和游戏动作由系统记录，书写、祝福、朗读背诵和真实口语交流由家人观察。"
+  },
+  "artAndLanguage": "原创年节展台、人物和故事图；目标字、笔画与结构托盘由规范字形及代码绘制，其他要求由录音承担。古诗和童谣原文留合法纸书。",
+  "goalReferences": [
+    {
+      "skill": "classify-characters",
+      "target": "认识六字并判断上下、左右或独体。",
+      "source": "原书印101、第一课时课件6～25"
+    },
+    {
+      "skill": "words-and-greeting",
+      "target": "比较熟字词并给具体对象说或写一句祝福。",
+      "source": "原书印101～102、第一课时课件31～39"
+    },
+    {
+      "skill": "stroke-order",
+      "target": "观察教材四个生字及两种笔顺规则，留出纸笔练写。",
+      "source": "原书印101～102、第一课时课件26～30、第二课时5～17"
+    },
+    {
+      "skill": "wind-scenes",
+      "target": "看景象理解诗里怎样让读者感到风，回纸书读背。",
+      "source": "原书印102、第二课时课件19～35"
+    },
+    {
+      "skill": "say-a-plan",
+      "target": "看起因和结果，提出具体办法并说理由，理解同一问题可有多种可行办法。",
+      "source": "原书印103、第三课时课件4～16"
+    },
+    {
+      "skill": "read-together",
+      "target": "用轮流、接读、拍节奏和问词的方法与大人共读。",
+      "source": "原书印104、第四课时任务单1与课件18～19"
+    }
+  ],
+  "authoredBy": "Codex courseware",
+  "officialNotesSha256": "71ae4c952459e9150aad6b6a28d3060c91cd39f8f931d018b7e726700e29cb4d"
+}

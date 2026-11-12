@@ -1,0 +1,247 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "收纳物品",
+  "binding": {
+    "editionId": "smartedu-science-six-year-g1-lower-e231dd57",
+    "revisionId": "directory-359f40a6afba915101f297d3",
+    "nodeId": "82e37dad-f67a-4df7-b51e-54fa99ce34ca",
+    "unitId": "0d3a4b18-821e-4949-ae08-414e58db0e6d"
+  },
+  "goals": [
+    "能描述常见书包与简单布袋的结构、优点和适用任务，知道收纳用具的结构帮助完成某项用途。",
+    "能按用品用途、形状或取用需要给物品分组，根据给定书包的不同袋位收纳并说出试取理由。",
+    "能在生活场景选用挂、分格、装小盒和改变摆放方向等方法，使物品整齐、便于取用并较好利用空间。",
+    "能在成人陪同下观察并整理一小处，用实际取用、整齐和盒盖能否合上等证据比较方案。"
+  ],
+  "goalSources": [
+    "印54、教案2",
+    "印55、任务单2",
+    "印55–56、教案3",
+    "印56–57、课件15"
+  ],
+  "scenario": "原创松风校园阅读角与手作桌。从找一件用品出发，按任务给物品安排位置，再旋转小盒试盖、记录取用结果。",
+  "pageSequence": [
+    {
+      "key": "find-the-item",
+      "kind": "teaching",
+      "plan": "同一件用品散放和分类放对照，说明摆齐与能取用。"
+    },
+    {
+      "key": "bag-or-tote",
+      "kind": "teaching",
+      "plan": "有分袋的书包与大开口布袋，各自适合不同任务。"
+    },
+    {
+      "key": "pick-a-pocket",
+      "kind": "teaching",
+      "plan": "大册、常用小件和盖紧水瓶分别按这只包的袋位选，实际试取。"
+    },
+    {
+      "key": "carry-to-the-pocket",
+      "kind": "game",
+      "plan": "开小车选物件再送入合适袋位，错取、错送不计进度。"
+    },
+    {
+      "key": "storage-in-daily-life",
+      "kind": "teaching",
+      "plan": "按物件形状和取用需要选择挂、分格或装小盒。"
+    },
+    {
+      "key": "turn-and-fit",
+      "kind": "teaching",
+      "plan": "同一箱同样物件改方向以减少空隙，侧看盒盖能合。"
+    },
+    {
+      "key": "photograph-neat-storage",
+      "kind": "game",
+      "plan": "三件收纳样品的实际俯侧取景，记录位置、隔板和盖合结果。"
+    },
+    {
+      "key": "check-the-plan",
+      "kind": "teaching",
+      "plan": "说明看见的结构、模拟的结果和需要现实试取的差别。"
+    },
+    {
+      "key": "picture-quiz",
+      "kind": "quiz",
+      "plan": "新物件图检查袋位、分组、装箱、试取和用途。"
+    },
+    {
+      "key": "home-organize-observation",
+      "kind": "teaching",
+      "plan": "选小处前后比较，试取一件并据实画下。"
+    }
+  ],
+  "games": [
+    {
+      "page": "carry-to-the-pocket",
+      "template": "listenDelivery",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.listenDelivery",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "listen_pick_deliver",
+      "selection": "先看任务取对物品，再比较书包各袋结构送到合用袋位；规则区分同色不同形、能装与方便取。",
+      "levels": [
+        {
+          "orders": [
+            [
+              "画册",
+              "大袋"
+            ]
+          ]
+        },
+        {
+          "orders": [
+            [
+              "水瓶",
+              "侧网袋"
+            ],
+            [
+              "彩带卷",
+              "拉链袋"
+            ]
+          ]
+        },
+        {
+          "orders": [
+            [
+              "折地图",
+              "大袋"
+            ],
+            [
+              "彩带卷",
+              "拉链袋"
+            ],
+            [
+              "水瓶",
+              "侧网袋"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "page": "photograph-neat-storage",
+      "template": "shutterScout",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.shutterScout",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "observe_state",
+      "selection": "同一收纳样品真实取俯侧两个角度，上方看分区，侧方看瓶子和箱盖实际形态。",
+      "levels": [
+        {
+          "sample": "分袋书包",
+          "shotOrder": [
+            "top",
+            "side"
+          ]
+        },
+        {
+          "sample": "透明盖收纳箱",
+          "shotOrder": [
+            "side",
+            "top",
+            "side"
+          ]
+        },
+        {
+          "sample": "分格托盘",
+          "shotOrder": [
+            "top",
+            "side",
+            "top",
+            "side"
+          ]
+        }
+      ]
+    }
+  ],
+  "quiz": [
+    {
+      "id": "place-art-book",
+      "skill": "select-fit-by-structure",
+      "prompt": "美术课的硬纸板不能折。能平放到这只包的哪个袋位？",
+      "answer": "B",
+      "optionImages": [
+        "quiz-big-zip",
+        "quiz-big-pocket",
+        "quiz-big-mesh"
+      ]
+    },
+    {
+      "id": "get-stamp-ready",
+      "skill": "select-for-frequent-retrieval",
+      "prompt": "方印章每次都要拿。放在哪里能一伸手就取到？",
+      "answer": "A",
+      "optionImages": [
+        "quiz-stamp-accessible",
+        "quiz-stamp-buried",
+        "quiz-stamp-under-stack"
+      ]
+    },
+    {
+      "id": "sort-ruler-and-blocks",
+      "skill": "group-by-shape-and-use",
+      "prompt": "长刷子和短蜡笔想各放一格，选哪张？",
+      "answer": "C",
+      "optionImages": [
+        "quiz-sort-ruler-mixed",
+        "quiz-sort-ruler-hidden",
+        "quiz-sort-ruler-sorted"
+      ]
+    },
+    {
+      "id": "fit-both-pieces",
+      "skill": "change-orientation-for-fit",
+      "prompt": "要把两块新拼片装进扁盒。哪张都进了盒，也没重叠？",
+      "answer": "B",
+      "optionImages": [
+        "box-layout-overlap",
+        "box-layout-fit",
+        "box-layout-outside"
+      ]
+    },
+    {
+      "id": "find-the-flat-lid",
+      "skill": "observe-lid-clearance",
+      "prompt": "手作架上的三个新盒子，哪只盖子的两头都贴平？",
+      "answer": "C",
+      "optionImages": [
+        "lid-lifted-left",
+        "lid-lifted-right",
+        "lid-fits-both"
+      ]
+    },
+    {
+      "id": "try-to-retrieve",
+      "skill": "test-a-storage-plan",
+      "prompt": "想知道蓝蜡笔好不好找，接下来该怎么做？",
+      "answer": "A",
+      "optionImages": [
+        "quiz-retrieve-item",
+        "quiz-close-only",
+        "quiz-count-only"
+      ]
+    }
+  ],
+  "afterClass": {
+    "familyTask": "和大人找一处小桌角或一个自己的书包。先画原样，把安全小件分组归位，再试着找回一件常用物品。记录实际发现，别拍姓名或住址，不整理尖利物和重箱。",
+    "weeklyQuestionSource": [
+      "结构与功能",
+      "分类和袋位",
+      "空间与试盖",
+      "真实观察记录"
+    ]
+  },
+  "observationPlan": {
+    "scene": "photograph-neat-storage",
+    "trialId": "same-storage-two-views",
+    "simulatedResult": "普通输入完成三个样品后才输出各自两张；取用速度、实际重量、真实家庭整理均待观察。"
+  },
+  "mediaStatus": {
+    "art": "pending_formal_imagegen_disk_hold",
+    "build": "pending_registered_art",
+    "browser": "pending_disk_hold",
+    "voice": "pending_independent_review_and_authorization"
+  }
+}

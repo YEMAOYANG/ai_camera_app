@@ -1,0 +1,126 @@
+{
+  "schemaVersion": "mira.courseware.imagegen-plan.v1",
+  "mode": "codex_builtin_imagegen",
+  "plates": [
+    {
+      "id": "story-a",
+      "source": "assets/illustrations/source/story-a.png",
+      "originalFilename": "exec-8760419d-bba3-4918-aff8-f5b9d103ee86.png",
+      "columns": 2,
+      "rows": 3,
+      "transparent": false,
+      "cells": [
+        "cover-frame",
+        "hands-brain",
+        "coat-and-tools",
+        "story-action",
+        "cook-and-music",
+        "friends-and-crayons"
+      ],
+      "references": [],
+      "prompt": "Create ONE carefully laid out six-panel production contact sheet of classroom storybook illustrations for a Chinese first-grade lesson about thinking and doing. EXACT grid: two equal columns by three equal rows, each panel an independent landscape image, full-bleed paper background, regular rectangular boundaries at 50% width and 33.33% / 66.67% height. Square overall image, no decorative separators, no outlines around panels. Each panel's important content has 8% safe margin. No typography, alphabet, numerals, captions, logos or watermarks anywhere, including on signs and paper. Match a single approved visual style throughout: fine paper grain, matte gouache, clean layered cut-paper silhouettes, warm milky cream and deep pine green, muted persimmon/apricot details, gentle daylight, calm uncluttered background, foreground clear enough to read at 240 pixels wide.\n\nRecurring child: a Chinese first-grader boy with short straight black hair, a pine-green sweater and pale apricot work apron. Partner: a Chinese first-grader girl with dark bob and a muted apricot shirt. Keep these children consistent when pictured. Show gestures and physical contact clearly; only natural hand anatomy and plausible objects.\n\nTop left: on a low cream wooden craft table, the boy opens his hands just as a blank pale ochre tabletop card sign leans over and starts to fall sideways. The boy looks down with curious surprise. Focus on the blank card, tabletop and hands, with one paper strip nearby.\n\nTop right: same tabletop card task now solved. The boy calmly looks at the card's edge while his two natural hands work together: one steadies the upright blank tabletop card, the other presses its wide folded rear paper foot flat against the table. Side three-quarter view so the wide folded rear foot and its support relationship to the sign are very easy to see. One task, one child, hands and eyes cooperating.\n\nMiddle left: a tidy open cubby contains one single hanging forest-green jacket with a visible collar and sleeves. Beside it, on a little nearby shelf, a light sheet of paper and one thick apricot pencil are plainly visible. No people needed. Clear silhouettes, no clutter.\n\nMiddle right: the two recurring classmates have just arrived together at the low craft table. The girl approaches the edge of the table while the boy holds a wide folded support and a blank sign lies ready nearby. They exchange an interested look. The actions and tabletop are clear.\n\nBottom left: gentle paired vignettes in one panel with clean negative space between them. Left, a child's hands press and form one round ball of dough on a warm wooden board. Right, a different child at the same kind of desk quietly pencils a new tune on an unlettered sheet beside one small ukulele. Keep left and right actions equally large and clearly distinct.\n\nBottom right: the two recurring classmates sit together and share a single small open box of colored pencils, looking warmly at each other while both work on the same drawing. Give the box a visible warm-colored rim, no marks or printed text. Warm and quietly collaborative."
+    },
+    {
+      "id": "story-b",
+      "source": "assets/illustrations/source/story-b.png",
+      "originalFilename": "exec-c59f9875-a875-4a62-882c-b7287d3f6e3d.png",
+      "columns": 2,
+      "rows": 2,
+      "transparent": false,
+      "cells": [
+        "approaches-three",
+        "tool-bench",
+        "reading-together",
+        "tool-start"
+      ],
+      "references": [
+        "story-a"
+      ],
+      "prompt": "Generate one original 2-by-2 production plate, exactly four equal rectangular independent panels with boundaries precisely at the midpoint of the overall width and height. Overall canvas landscape aspect about 3:2, each panel about 3:2, no gutters or decorative borders. The attached Image 1 is ONLY a STYLE AND CHARACTER IDENTITY REFERENCE. Do not reuse its six illustrations. Match its fine paper grain, matte gouache, clean layered cut-paper silhouettes, warm milky cream, pine green, apricot, persimmon, daylight and clear visual storytelling. The short-haired first-grade boy has a dark-green sweater and cream apron. The first-grade girl has a dark bob and muted apricot shirt. Foreground should remain easily readable at 250 pixels wide. No text, letters, numerals, pseudo-writing, logos or watermark in any panel; all signs and book pages blank except large simple images.\n\nTOP LEFT: three small side-by-side moments inside this one landscape panel, on the same continuous neutral craft table, with clear breathing space between moments. The SAME blank ochre tabletop sign and same boy occur in all three. At far left he releases the vertical sign and it is visibly tipping because it has no back support. At center he thoughtfully looks at the sign lying flat, hands resting on the table, nothing moved. At far right he gently presses a broad folded cream paper support flat behind the upright sign, showing the sign stable. Same front three-quarter viewpoint; no thought bubbles, arrows or overlays.\n\nTOP RIGHT: top-down close view of a repair workbench separated by natural spacing into three tasks: a small teal picture frame lying flat on its face with no stand, a loose fan of white papers with corners lifting in a breeze, and a blank horizontal apricot folded tabletop sign. Make the three objects large and distinct, spread evenly across the panel. No tools or answers shown.\n\nBOTTOM LEFT: the first-grade boy sits with a kind parent in a quiet sunny reading nook, both looking at one open elementary paper textbook lying across the table. The boy traces across a page with one forefinger and his parent listens closely. Show broad blank cream pages with a simple tiny colored illustration, no visible glyphs. Warm and unhurried.\n\nBOTTOM RIGHT: friendly title art for a child-controlled repair delivery game, simple top-down three-quarter perspective. At bottom center a single round little apricot wooden repair cart with teal wheels and an empty cargo bed points toward the top across one muted gray tabletop toy road with pale dashed lane marks. One clear small triangular folded wedge and one spring paper binder clip are beside the cart on the near cream bank. On the opposite bank a teal picture frame lies flat. All elements big and legible, with no decorative child or extra tool."
+    },
+    {
+      "id": "environment",
+      "source": "assets/illustrations/source/environment.png",
+      "originalFilename": "exec-b941ab67-7c34-4b4f-a666-224469fc6662.png",
+      "columns": 1,
+      "rows": 3,
+      "transparent": false,
+      "cells": [
+        "tool-backdrop",
+        "bridge-backdrop",
+        "bridge-start"
+      ],
+      "references": [
+        "story-b"
+      ],
+      "prompt": "Make a single three-strip production plate, exactly three equal-height landscape scenes stacked vertically, full image portrait aspect approximately 2:3. Hard straight boundaries at exactly one-third and two-thirds of total height. No borders, gaps or writing. Reference Image 1 is a STYLE reference only, specifically fine paper grain, matte gouache, warm cream, deep pine greens and muted persimmon. Independently composed horizontal illustrations designed as small-scale first-grade game art.\n\nTOP strip: background for a tabletop repair-route game. Near-overhead viewpoint of a flat muted pine-green craft mat resting on warm cream paper. The broad center 80% is quiet almost uniform mid green with fine grain. At far outer edges only, subtly suggest corners of paper and a pencil container. The game draws its roads and tool icons separately; do not draw roads, vehicles or tools in the center.\n\nMIDDLE strip: background for a little rabbit bridge game. Calm storybook river meadow, flat softly textured muted green and blue-green. Very subtle rounded riverbank plants at far left and right. Keep the broad center neutral and open for a game overlay. Do not draw a bridge, blocks, characters or text in this strip.\n\nBOTTOM strip: clearly readable start-card scene for the bridge game. A small warm ivory rabbit with upright ears and a short persimmon scarf waits at the near left shore of a quiet blue-green stream. Across the middle is a broad simplified golden wooden footbridge with one visibly missing plank opening. One loose short golden wooden plank is visible next to the opening, not hovering. Muted neutral paper background, leave safe space around the rabbit and the opening. Show that a real bridge needs a piece before the rabbit crosses. No letters, numerals, symbols or UI."
+    },
+    {
+      "id": "props",
+      "source": "assets/illustrations/source/props.png",
+      "originalFilename": "exec-f1ede99b-57a0-467d-8de0-8f769cef7dd1.png",
+      "columns": 3,
+      "rows": 3,
+      "transparent": true,
+      "cells": [
+        "prop-brace",
+        "prop-clip",
+        "prop-marker",
+        "station-frame",
+        "station-papers",
+        "station-sign",
+        "q-raincoat",
+        "q-umbrella",
+        null
+      ],
+      "references": [
+        "story-b"
+      ],
+      "prompt": "Create ONE transparent PNG production sheet of eight separate cut-paper assets on a STRICT 3 columns × 3 rows equally sized imaginary grid, square overall. No cell dividers, no borders, absolutely no scene or background, genuine transparent alpha between and around the assets. All objects isolated at center of their own grid cell with at least 15% transparent gutter on each side. Nothing touches or crosses cells. Empty bottom right cell stays wholly transparent. Reference Image 1 is ONLY style and material reference: matte gouache, fine subtle paper grain, clean cut-paper silhouettes, warmly shaded edges, warm cream and pine green with apricot and persimmon accents. Each object recognizable at 45px game scale. No writing, letters, numerals or brand marks.\n\nTop row, left to right: one side-view golden cream triangular folded card-stock support wedge, open triangle clearly visible; one pine-green stationery binder clip with two arched metal handles; one thick short persimmon felt-tip marker with separate cap still fitted, simple diagonal presentation.\nMiddle row: one flat teal rectangular picture frame showing a tiny colored tree and sun drawing; three loose ivory sheets fanning slightly as a single icon, no holder and no writing; one blank ochre folded tabletop tent name card standing sideways, clearly a single sign, distinct from the side-view wedge.\nBottom row: one single mustard-yellow hooded child's raincoat, spread in silhouette with both sleeves, hood and visible closure; one open teal-and-cream umbrella with curved handle; entirely transparent empty ninth slot. Crisp visually simple silhouettes, absolutely no translucent floor shadow spilling between objects."
+    },
+    {
+      "id": "sprites",
+      "source": "assets/illustrations/source/sprites.png",
+      "originalFilename": "exec-0cda073b-aabb-42cb-95fa-d584eb531db4.png",
+      "columns": 3,
+      "rows": 2,
+      "transparent": true,
+      "cells": [
+        "tool-cart",
+        "tool-cart-lift",
+        "lane-cart",
+        "rabbit-ready",
+        "rabbit-hop",
+        "reward-sticker"
+      ],
+      "references": [
+        "story-b",
+        "environment"
+      ],
+      "prompt": "Make ONE production sprite sheet with transparent alpha. Exact arrangement is three equal columns by two equal rows, overall landscape; six independent isolated assets, each centered with generous transparent gap so it never touches cell edges or neighbors. No dividers, ground, background, pseudo-alpha checkerboard, text or numbers. Reference Image 1 is the STYLE AND CART IDENTITY reference (bottom right cart), reference Image 2 is the STYLE AND RABBIT IDENTITY reference (bottom strip rabbit). Recreate only matching game characters in a consistent side three-quarter view, not the original scene. Fine paper grain, matte gouache, clean cut-paper silhouettes, warm cream, pine green, muted persimmon; shapes should read clearly at small game scale.\n\nTOP LEFT: apricot wooden toy cart with teal wheels, cream hubcaps and a shallow open load bed, facing right. TOP MIDDLE: exactly the same apricot cart, wheels and orientation, very similar pose; the rear handle is slightly raised and the empty load bed is tipped a little as a loading animation pose. TOP RIGHT: a distinct small rounded teal toy transport trolley with two visible tan wheels, facing right; no cargo, appropriate as a moving obstacle on a tabletop road.\nBOTTOM LEFT: cream rabbit in a short burnt-orange scarf, facing right, sitting and waiting, full silhouette including both ears and little tail. BOTTOM MIDDLE: exactly the same rabbit, same size and scarf, side-on facing right in one recognizable hop pose with forepaws stretched forward and hind feet curled in, entirely separate from the sitting pose. BOTTOM RIGHT: one circular scalloped golden paper reward sticker, cream border, inside a simple tiny upright folded ochre tabletop card in front of two dark-green laurel leaves. Unlettered, no numbers or text. Preserve genuine transparency around every asset."
+    },
+    {
+      "id": "quiz",
+      "source": "assets/illustrations/source/quiz.png",
+      "originalFilename": "exec-8d788260-6627-448f-9b9b-71713d4407ca.png",
+      "columns": 3,
+      "rows": 3,
+      "transparent": false,
+      "cells": [
+        "q1-tape",
+        "q1-hang",
+        "q1-think",
+        "q2-point",
+        "q2-walk",
+        "q2-water",
+        "q6-deep",
+        "q6-press",
+        "q6-wait"
+      ],
+      "references": [
+        "story-a"
+      ],
+      "prompt": "Create ONE original assessment-art contact sheet with exact 3 columns × 3 rows, nine equal square independent tiles, strict boundaries at one-third and two-thirds in both axes. Square overall. No printed labels, text, alphabet, numbers, UI, symbols, watermarks, grid outlines or decorative margins. Each tile fills its full square with warm off-white paper and pale wood; keep foreground actions centrally framed with a safe margin so small crops do not cut arms or props. Image 1 is solely style and recurring character reference. Fine paper grain, matte gouache, clean layered cut-paper silhouettes, warm cream and pine green, muted persimmon. Design assessment pictures legible at 180px, foreground objects and gestures clear. For each row use the same child, exact objects, palette, background and angle. All three alternatives are equally polished; never give the correct one a highlight, border or decoration.\n\nTOP ROW: boy with pine-green sweater and pale apron, small PLAIN OCHRE rectangular wooden name tag with one visible round hole and a loop of brown cord, and a single fixed rounded metal wall hook above a low table. This is a HANGING tag, not a triangular tabletop sign. Left tile: boy presses tag flat against the wall below the hook with an obviously curling corner of loose paper tape; the cord is still lying on the table and hook is untouched. Center tile: boy's hand puts the cord LOOP, visibly passed through the tag hole, onto the single round wall hook; the tag is held hanging stably on that loop. Right tile: boy thoughtfully looks at the hook while the tag and loose cord are still flat on the table, both hands resting away from the tag. No readable name on the tag.\n\nMIDDLE ROW: dark-bob girl with muted apricot shirt, one small pine-green watering can with spout and a single broad-leaf plant in a clay pot. Left tile: she points to the plant while the watering can rests on the table. Center tile: she walks past carrying the watering can upright by its handle, no water falls and the plant is left on the table. Right tile: she actually tilts that can, with a clear small visible stream of water falling from spout into the plant's soil inside the pot. No other plant or object.\n\nBOTTOM ROW: boy in pine-green sweater, same visibly long-handled wooden ladle (round bowl and much longer narrow handle), same shallow flat cream dish, same deep pine-green cylindrical utensil crock. Left tile: he places the ladle upright inside the DEEP crock and the shallow empty plate is separate nearby. Center tile: he presses the ladle down with one palm in the same SHALLOW cream dish, with the long handle protruding far past the rim, the deep green crock untouched beside it. Right tile: he looks down thoughtfully, hands pulled back, the ladle lies slipped partly off the shallow dish with its handle clearly beyond the edge, deep green crock untouched nearby. Show a stable solution only in the left tile."
+    }
+  ]
+}

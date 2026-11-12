@@ -84,8 +84,7 @@ def _write_cache(cache_path, cache):
     temporary.replace(cache_path)
 
 
-def voice_lines(lines, media_dir, *, post, cache_path,
-                endpoint='http://127.0.0.1:3100', jobs=4, sleep=time.sleep):
+def _validate_lines(lines, jobs):
     voices = json.loads(Path(__file__).with_name('voices.json').read_text(encoding='utf-8'))
     allowed = {voice for group in voices.values() for voice in group}
     if not isinstance(lines, list) or not isinstance(jobs, int) or isinstance(jobs, bool) or jobs < 1:
@@ -102,6 +101,39 @@ def voice_lines(lines, media_dir, *, post, cache_path,
             raise VoiceError('voice_unknown', str(voice))
         seen.add(line_id)
 
+
+def _tts_payload(line):
+    return {'text': line['text'], 'audioId': line['id'],
+            'ttsProviderId': 'qwen-tts', 'ttsModelId': 'qwen3-tts-flash',
+            'ttsVoice': line['voice']}
+
+
+def _cache_key(line):
+    return f"{line['id']}|{line['voice']}|{line['text']}"
+
+
+def _cached_name(line, media_dir, cache, *, require_pcm=False):
+    name = cache.get(_cache_key(line))
+    pattern = rf"tts-{re.escape(line['id'])}-([0-9a-f]{{64}})\.wav"
+    match = re.fullmatch(pattern, name) if isinstance(name, str) else None
+    if not match:
+        return None
+    try:
+        data = (media_dir / name).read_bytes()
+        if hashlib.sha256(data).hexdigest() != match.group(1):
+            return None
+        if require_pcm:
+            _validate_wav(data)
+    except (OSError, VoiceError):
+        return None
+    return name
+
+
+def voice_lines(lines, media_dir, *, post, cache_path,
+                endpoint='http://127.0.0.1:3100', jobs=4, sleep=time.sleep, stop_on_error=False):
+    _validate_lines(lines, jobs)
+    if stop_on_error and jobs != 1:
+        raise VoiceError('arguments_invalid', 'stopping on voice errors requires one job')
     media_dir, cache_path = Path(media_dir), Path(cache_path)
     try:
         cache = json.loads(cache_path.read_text(encoding='utf-8'))
@@ -111,29 +143,21 @@ def voice_lines(lines, media_dir, *, post, cache_path,
         cache = {}
     files, pending = {}, []
     for line in lines:
-        key = f"{line['id']}|{line['voice']}|{line['text']}"
-        name = cache.get(key)
-        pattern = rf"tts-{re.escape(line['id'])}-([0-9a-f]{{64}})\.wav"
-        match = re.fullmatch(pattern, name) if isinstance(name, str) else None
-        try:
-            valid = match and hashlib.sha256((media_dir / name).read_bytes()).hexdigest() == match.group(1)
-        except OSError:
-            valid = False
-        if valid:
+        name = _cached_name(line, media_dir, cache)
+        if name:
             files[line['id']] = name
         else:
-            pending.append((line, key))
+            pending.append((line, _cache_key(line)))
     reused = len(files)
     cache_lock = Lock()
+    attempts = 1 if stop_on_error else len(RETRY_DELAYS) + 1
 
     def record(item):
         line, key = item
-        payload = {'text': line['text'], 'audioId': line['id'],
-                   'ttsProviderId': 'qwen-tts', 'ttsModelId': 'qwen3-tts-flash',
-                   'ttsVoice': line['voice']}
+        payload = _tts_payload(line)
         data = None
         error = None
-        for attempt in range(len(RETRY_DELAYS) + 1):
+        for attempt in range(attempts):
             try:
                 status, body = post(endpoint.rstrip('/') + '/api/generate/tts', payload)
                 if status != 200:
@@ -144,7 +168,7 @@ def voice_lines(lines, media_dir, *, post, cache_path,
             except Exception as exc:
                 data = None
                 error = f'{exc.args[0]}: {exc.args[1]}' if isinstance(exc, VoiceError) else str(exc)
-                if attempt < len(RETRY_DELAYS):
+                if attempt + 1 < attempts:
                     sleep(RETRY_DELAYS[attempt])
         if data is None:
             return key, None, error
@@ -171,8 +195,17 @@ def voice_lines(lines, media_dir, *, post, cache_path,
         except Exception as exc:
             return key, None, str(exc)
 
-    with ThreadPoolExecutor(max_workers=jobs) as executor:
-        outcomes = list(executor.map(record, pending))
+    if stop_on_error:
+        outcomes = []
+        for item in pending:
+            outcome = record(item)
+            outcomes.append(outcome)
+            _, _, error = outcome
+            if error is not None:
+                break
+    else:
+        with ThreadPoolExecutor(max_workers=jobs) as executor:
+            outcomes = list(executor.map(record, pending))
     failures = []
     for (line, _), (key, name, error) in zip(pending, outcomes):
         if error is not None:

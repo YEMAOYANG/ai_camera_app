@@ -1,0 +1,45 @@
+diff --git a/components/scene-renderers/quiz-reference-picture.module.css b/components/scene-renderers/quiz-reference-picture.module.css
+index 236a3ba..c95d569 100644
+--- a/components/scene-renderers/quiz-reference-picture.module.css
++++ b/components/scene-renderers/quiz-reference-picture.module.css
+@@ -91,3 +91,10 @@
+   max-height: none;
+   object-fit: contain;
+ }
++
++/* The picture viewer is portalled outside the compact quiz shell. */
++@media (max-width: 640px) and (max-height: 380px) and (orientation: landscape) {
++  :global(html[data-mira-student-theme='storybook']) .dialog {
++    --mira-classroom-secondary-size: 48px;
++  }
++}
+diff --git a/tests/scene-renderers/quiz-reference-picture-controls.test.ts b/tests/scene-renderers/quiz-reference-picture-controls.test.ts
+new file mode 100644
+index 0000000..f86e8cd
+--- /dev/null
++++ b/tests/scene-renderers/quiz-reference-picture-controls.test.ts
+@@ -0,0 +1,24 @@
++import { readFileSync } from 'node:fs';
++import postcss, { type AtRule } from 'postcss';
++import { expect, it } from 'vitest';
++import { CLASSROOM_TOUCH_CONTROL_SIZE } from '../../lib/ui/classroom-controls';
++
++it('keeps the portalled student picture controls at touch size on short landscape screens', () => {
++  const css = postcss.parse(readFileSync('components/scene-renderers/quiz-reference-picture.module.css', 'utf8'));
++  const sizeRules: { selector: string; query: string; size: string }[] = [];
++  css.walkRules((rule) => {
++    for (const declaration of rule.nodes) {
++      if (declaration.type !== 'decl' || declaration.prop !== '--mira-classroom-secondary-size') continue;
++      expect(rule.parent?.type).toBe('atrule');
++      const media = rule.parent as AtRule;
++      expect(media.name).toBe('media');
++      sizeRules.push({ selector: rule.selector, query: media.params, size: declaration.value });
++    }
++  });
++
++  expect(sizeRules).toEqual([{
++    selector: ":global(html[data-mira-student-theme='storybook']) .dialog",
++    query: '(max-width: 640px) and (max-height: 380px) and (orientation: landscape)',
++    size: CLASSROOM_TOUCH_CONTROL_SIZE + 'px',
++  }]);
++});

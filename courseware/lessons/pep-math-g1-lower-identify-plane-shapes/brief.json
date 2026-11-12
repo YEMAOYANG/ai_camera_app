@@ -1,0 +1,209 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "认识平面图形",
+  "binding": {
+    "editionId": "pep-math-g1-lower-2022-standard",
+    "revisionId": "directory-6205d2037284e91f10b25edd",
+    "unitId": "00dd71f6-4bed-412c-951d-dc049bd461b4",
+    "nodeId": "064c0399-e09b-462b-956f-f2165f0b3b54"
+  },
+  "scenario": "影印修补铺给便签做新印章。孩子先试着描出不同物件的一个面，再用同类轮廓给样本归位，最后做一枚自己看得懂的形状印记。",
+  "goals": [
+    "能从立体物体的一个平面描出轮廓，用同一个物体的不同面、球没有平面等情形分清物体和它的面。",
+    "能辨认长方形、正方形、平行四边形、三角形和圆，并按课上约定用直边、弯边、边数等线索说明分类。",
+    "面对方向、大小或颜色变化仍能辨认图形，能在生活图片中找出指定的面并指出依据。",
+    "能用直线段在点阵围出典型图形，解释为何这种围法围不出真正的圆，并用轮廓设计原创小画。"
+  ],
+  "pageSequence": [
+    {
+      "key": "open-the-shop",
+      "kind": "teaching",
+      "plan": "用原创修补铺讲找能贴平的一个面。"
+    },
+    {
+      "key": "outline-bench",
+      "kind": "teaching",
+      "plan": "教师把细长积木的一面压在纸上，用亮点沿边走一圈，再抬起比较另一面。并排对照圆罐的平底和圆球的剪影。"
+    },
+    {
+      "key": "round-face-or-ball",
+      "kind": "teaching",
+      "plan": "对照有圆平底的罐和球的外轮廓，说明实际可描面。"
+    },
+    {
+      "key": "five-families",
+      "kind": "teaching",
+      "plan": "先分直边和弯边，再数三角形的边与角，比较典型四边形。用旋转和同尺度叠合演示同一类，不把倾斜当作平行四边形的判据。"
+    },
+    {
+      "key": "look-past-tilt",
+      "kind": "teaching",
+      "plan": "对照旋转的正方形、长方形和无方角的平行四边形；解释样例托盘规则。"
+    },
+    {
+      "key": "shape-sample-shelves",
+      "kind": "interactive",
+      "plan": "在搬运站把不同方向、大小和颜色的轮廓推入同类样例托盘。推错形状不计，回退可重新找路。"
+    },
+    {
+      "key": "hidden-faces",
+      "kind": "teaching",
+      "plan": "在原创新物件图中描出指定平面的边，反查可描出同形的物件；用可见面核对，不凭物件名字或剪影猜。"
+    },
+    {
+      "key": "spotlight-match",
+      "kind": "interactive",
+      "plan": "听每次亮起的图形名，抓准摆荡时机松手，落在正确轮廓灯上。教师锚点与交接使用模板原有契约。"
+    },
+    {
+      "key": "pin-board",
+      "kind": "teaching",
+      "plan": "用代码示意在点阵以直线段围出转向的正方形和三角形，比较圆边与连接点的折线。随后示意在拼贴纸上从新物件描边组合图案。"
+    },
+    {
+      "key": "picture-check",
+      "kind": "quiz",
+      "plan": "六道新图配读题，覆盖面与物体、五形分类、方向变化、钉板与生活迁移。"
+    },
+    {
+      "key": "make-a-stamp-picture",
+      "kind": "teaching",
+      "plan": "把选实物平面、描一圈、找同形三个步骤再做一遍，留纸上图案给孩子实际完成并给家人说明。"
+    }
+  ],
+  "games": [
+    {
+      "page": "shape-sample-shelves",
+      "template": "sortingDepot",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.sortingDepot",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "classification",
+      "selection": "轮廓 token 使用可看清的不同变体，各组托盘配大样例图标；同组判分，颜色和转向不会固定在正确解。",
+      "levels": [
+        "慢速开阔区送圆、三角。",
+        "有一处转弯，送旋转的正方形、长方形、斜平行四边形。",
+        "三到四件混合跨关覆盖五类，需让路和看轮廓，不以颜色识别。"
+      ],
+      "demo": "教师依次亮任务、玩家和对应托盘，只演示推一格，正式开场重置。",
+      "teacherAnchors": [
+        "game-goal",
+        "game-player",
+        "game-target"
+      ]
+    },
+    {
+      "page": "spotlight-match",
+      "template": "fireflySwing",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.fireflySwing",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "shape_match",
+      "selection": "每次用准确的形状 token 与两盏灯做一项同形匹配。逐段配录音，同时保留清晰轮廓，不改两个灯只有一个命中的机制。",
+      "levels": [
+        "圆与三角。",
+        "正方形、斜平行四边形与长方形逐段比较。",
+        "混合识别，切换左右正确落点，覆盖五类。"
+      ],
+      "demo": "依次亮标准图、首盏正确灯牌和萤火虫，示范一次松手后清零。",
+      "teacherAnchors": [
+        "game-goal",
+        "game-player",
+        "game-target"
+      ]
+    }
+  ],
+  "quiz": [
+    {
+      "id": "flat-circle",
+      "skill": "从实物平面反查圆形",
+      "prompt": "要沿能贴平纸的面描圆，该拿哪一件？",
+      "answer": "q-flat-jar",
+      "position": 2,
+      "rationale": "圆罐有能贴平纸的圆底。球没有平面，木楔可描的这面是三角形。"
+    },
+    {
+      "id": "rotated-square",
+      "skill": "用等长边与方角辨认旋转的正方形",
+      "prompt": "哪张转过方向后还是正方形？",
+      "answer": "q-square",
+      "position": 1,
+      "rationale": "第一张虽然转过方向，四条边仍一样长，四个角也仍是方角。"
+    },
+    {
+      "id": "triangles-in-a-window",
+      "skill": "找三条直边和三个角",
+      "prompt": "哪扇小窗围出了三角形？",
+      "answer": "q-window-triangle",
+      "position": 3,
+      "rationale": "第三扇窗有三条直边和三个角。朝向变了，边数和角数没有变。"
+    },
+    {
+      "id": "which-flat-face",
+      "skill": "从长方形反查物件的平面",
+      "prompt": "要描出图中的细长长方形，选哪个物件？",
+      "answer": "q-face-long-box",
+      "position": 2,
+      "rationale": "细长纸盒的正面平平的，有四个方角，长和短的边与样子相符。"
+    },
+    {
+      "id": "straight-pegs",
+      "skill": "区分直线段和圆的弯边",
+      "prompt": "只用直线段连点，哪种图形不能原样围出？",
+      "answer": "q-pegs-circle",
+      "position": 3,
+      "rationale": "圆的边一直弯曲。用短直线围出的只能像圆，拐角还是在。"
+    },
+    {
+      "id": "slanted-sign",
+      "skill": "辨认斜的平行四边形样例",
+      "prompt": "哪张印模和标记是同类的斜四边形？",
+      "answer": "q-sign-good",
+      "position": 1,
+      "rationale": "第一张两组对边各自平行，而且没有方角。转斜的长方形仍有四个方角。"
+    }
+  ],
+  "afterClass": {
+    "familyTask": "找三件安全的家用物件，沿各自能贴平纸面的地方描出图形，组成自己取名的小画，指给家人看每个形状从哪里来。可用纸上点阵围出一种图形。",
+    "weeklyQuestionSource": [
+      "描面和反查物体",
+      "典型五形和非标准摆放",
+      "按形状分类与点阵围图",
+      "从生活图中说明辨形依据"
+    ],
+    "evidence": "线上只记选择和操作。实物描面、画图及说理由由成人观察。"
+  },
+  "artAndLanguage": "使用原创物件和代码绘制几何轮廓。任务和反馈配音，遮住非目标文字仍能认图和操作。示例不要画成同类固定同色。",
+  "goalSources": [
+    {
+      "skill": "flat-face",
+      "target": "能从立体物体的一个平面描出轮廓，用同一个物体的不同面、球没有平面等情形分清物体和它的面。",
+      "source": "印1、课件3～5与16～19"
+    },
+    {
+      "skill": "five-shapes",
+      "target": "能辨认长方形、正方形、平行四边形、三角形和圆，并按课上约定用直边、弯边、边数等线索说明分类。",
+      "source": "印1、课件6～8与教案2～3"
+    },
+    {
+      "skill": "invariant-shape",
+      "target": "面对方向、大小或颜色变化仍能辨认图形，能在生活图片中找出指定的面并指出依据。",
+      "source": "印1～2、课件9～14"
+    },
+    {
+      "skill": "pin-board",
+      "target": "能用直线段在点阵围出典型图形，解释为何这种围法围不出真正的圆，并用轮廓设计原创小画。",
+      "source": "印2和印6前两项、课件11～15和练习1"
+    }
+  ],
+  "authorship": {
+    "sourceMode": "direct",
+    "authorModels": [
+      "gpt-6.1-sol"
+    ]
+  },
+  "gameCatalog": {
+    "path": "courseware/kit/game_templates/catalog.json",
+    "sha256": "1f04d478644e68af67bc264bf46227ece3d94d9c4070e8a8dd219846a48f4753"
+  }
+}

@@ -1,0 +1,206 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "Unit 2 That is his car.",
+  "binding": {
+    "editionId": "smartedu-english-six-year-g1-upper-sync-af05bc77",
+    "revisionId": "20260928-metadata-1",
+    "nodeId": "0bfbef4a-6d5c-3807-8d1d-d6b41f824635",
+    "unitId": "0827b5f8-adbe-35aa-bdde-cb2d9326e900"
+  },
+  "scenario": "社区手作日的物品招领台。两位小帮手先听来访者说是谁的东西，再把物品还给每位主人，最后用自己的家庭小图做介绍。",
+  "goals": [
+    "听懂brother和sister，根据明确的家庭关系线索指认角色。",
+    "听懂his或her和物品词组成的短语，确认物品属于谁并完成指认、归类或连线。",
+    "从说话者的位置判断this或that，从物品拥有者判断his或her，尝试用完整句表达。",
+    "用节奏跟说复习词汇，再画或摆一张虚构家庭小图，向同伴介绍一位家人和其物品。"
+  ],
+  "pageSequence": [
+    {
+      "key": "return-desk",
+      "kind": "teaching",
+      "plan": "桌上有汽车玩具和书包。老师先问来访的人是谁，再通过示意家庭图找家人的关系。"
+    },
+    {
+      "key": "sibling-pictures",
+      "kind": "teaching",
+      "plan": "同一个孩子介绍兄弟和姐妹。先指说话者和家庭图中的关系，再亮出对应词和图，替换另一组图跟说。"
+    },
+    {
+      "key": "his-her-objects",
+      "kind": "teaching",
+      "plan": "先听物品名，再听his或her；两件外观相同的物品用原先的借还动作表明主人，通过画线演示活动3的听、匹配与说。"
+    },
+    {
+      "key": "sort-cues",
+      "kind": "teaching",
+      "plan": "练听物品及归属，说明归还时先听主人再看物；预录英语口令供游戏逐关重听。"
+    },
+    {
+      "key": "owner-depot",
+      "kind": "interactive",
+      "plan": "听招领口令、看人物与物件关联，把物品沿开放路线推到正确主人的收纳处。"
+    },
+    {
+      "key": "from-the-speaker",
+      "kind": "teaching",
+      "plan": "同一件东西的主人不变，请说话人换站位。比较完整句里的this或that，随后交换所指物品观察his或her何时变化。"
+    },
+    {
+      "key": "car-owner",
+      "kind": "teaching",
+      "plan": "同一幅招领场景区分爸爸的真车和本的玩具汽车，先有明确的主人，再用car或toy car描述。"
+    },
+    {
+      "key": "listen-cues",
+      "kind": "teaching",
+      "plan": "用同一说话人的近远位置替换ball、desk、pen。口令明确当轮主人，听完整英语短句判断物品和距离。"
+    },
+    {
+      "key": "listen-and-find",
+      "kind": "interactive",
+      "plan": "听完整的示范句或口令，按说话者站位和图示主人驾驶小艇，吹泡泡选对人物和物件组合。"
+    },
+    {
+      "key": "rhythm-turns",
+      "kind": "teaching",
+      "plan": "跟老师做一小段原创节奏口令，两轮替换亲属词和物件，给孩子等待跟说的时间。"
+    },
+    {
+      "key": "my-picture",
+      "kind": "teaching",
+      "plan": "老师画或摆一张虚构家庭小图，完整介绍一人和其物品。孩子换角色和物品后向身边的人介绍，纸书活动6仍可在纸上完成。"
+    },
+    {
+      "key": "picture-check",
+      "kind": "quiz",
+      "plan": "六道新图题由教师读题，以关系列图和实际位置检查听懂与应用。真实口语由家人观察。"
+    },
+    {
+      "key": "closing",
+      "kind": "teaching",
+      "plan": "看同一位主人与不同站位的对比图，回顾亲属词、说话者的远近、归属和完整介绍。"
+    }
+  ],
+  "games": [
+    {
+      "page": "owner-depot",
+      "template": "sortingDepot",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.sortingDepot",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "classification",
+      "selection": "听物品和主人线索，把物品推到主人的照片托盘。托盘配色相同，照片和关卡位置变化。路线可达，可以撤回。",
+      "levels": [
+        "开阔直路，书归Ben、笔归Lili。听完整英语短语，分别推到明确人物照片的托盘。",
+        "三件物品，桌子归Lili、书包和笔归Ben，交换托盘位置并绕过一个转角。",
+        "四件物品，桌子和书包归Ben、书和笔归Lili。人物和物品重新配对，规划推送先后。"
+      ],
+      "demo": "依次圈出本的照片、要推动的书和小车。首关只把书推给本，交接时复位物品并清空示范得分和连击。",
+      "example": "courseware/kit/examples/classic-arcade/sorting-depot.json"
+    },
+    {
+      "page": "listen-and-find",
+      "template": "wordBubbles",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.wordBubbles",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "listen_match",
+      "selection": "卡上保留同一说话者和大幅物品图，距离由空间布置呈现。老师读完整句，孩子凭物品词和this/that选择目标，物品归属另由上一游戏及后续图题独立检验。每个相邻回合保留刚命中的物品图原槽，避免得分星花指错。",
+      "levels": [
+        "两张低速图，听his book与this/that，以同一本书的距离为唯一差异。",
+        "三张图，从汽车玩具和球中听出所指物品，分辨近与远。",
+        "三张图，桌子、笔与其他图交错，连续四次根据完整句选物和距离。"
+      ],
+      "demo": "依次圈出图卡区、手边的书图和小艇。首关只命中一次，交接复位。关卡口令与逐步口令用预录音，启用voiceLead和stepVoiceLead。",
+      "example": "courseware/kit/examples/classic-arcade/word-bubbles.json"
+    }
+  ],
+  "quizPlan": [
+    {
+      "skill": "hear-sibling-words",
+      "prompt": "玛雅正在介绍自己的家人。This is my brother.",
+      "answer": "玛雅指向兄弟本的肖像",
+      "position": 2,
+      "rationale": "玛雅在介绍自己的家人。brother 指她的兄弟。图里她指着男孩本的照片。"
+    },
+    {
+      "skill": "identify-the-owner",
+      "prompt": "听玛雅介绍自己的姐妹，再找her bag。",
+      "answer": "莉莉的头像与她的书包相连",
+      "position": 1,
+      "rationale": "物品要是bag，并且要属于句子说到的那位女孩。"
+    },
+    {
+      "skill": "identify-the-owner",
+      "prompt": "听完一句介绍，选his ball。",
+      "answer": "本的头像与他的球相连",
+      "position": 3,
+      "rationale": "his提示球是介绍过的男孩的。"
+    },
+    {
+      "skill": "distance-and-ownership",
+      "prompt": "听她说That is his pencil。哪张图同时对上远近和主人？",
+      "answer": "爷爷的头像与远处的铅笔相连",
+      "position": 2,
+      "rationale": "that指说话者远处，his说明铅笔属于所说到的男性亲属。"
+    },
+    {
+      "skill": "distance-and-ownership",
+      "prompt": "书没换主人，说话者从近处走到远处。选两幅图关系始终对的那组。",
+      "answer": "第一幅离玛雅近，第二幅离玛雅远。两幅书都属于莉莉。",
+      "position": 1,
+      "rationale": "this换成that，her随原主人保留。"
+    },
+    {
+      "skill": "family-picture-talk",
+      "prompt": "听孩子介绍她的姐妹，再说出姐妹的物品。哪一幅小图与两句都相合？",
+      "answer": "孩子指身边的姐妹，再指出属于她的远处的书",
+      "position": 3,
+      "rationale": "先听介绍的是姐妹，再按that和her选对姐妹及远处的书。"
+    }
+  ],
+  "afterClass": {
+    "familyTask": "用纸偶或自画的虚构家庭图选一人一物，用两句英语介绍。换位置再试一次，由家人听清实际说出的句子。无需提供真实家庭照片。",
+    "weeklyQuestionSource": [
+      "听辨兄弟与姐妹称呼",
+      "从his和her及物品词推断归属",
+      "听辨远近和归属双线索",
+      "听两句对照家庭小图"
+    ],
+    "evidence": "图题与游戏动作由系统记录。家庭小图的实际介绍、跟说和亲子练习待观察。"
+  },
+  "artAndLanguage": "招领台、人物小图与物品用原创场景。用图示和动作建立归属；用录音给出完整目标与指令，遮住非目标文字后仍能判断。正式制作阶段核验两个游戏配置与运行交接。",
+  "goalEvidence": [
+    {
+      "skill": "hear-sibling-words",
+      "target": "听懂brother和sister，凭家庭关系辨认角色。",
+      "source": "原书印59活动1～2、外研社216263第1～5页"
+    },
+    {
+      "skill": "identify-the-owner",
+      "target": "把听到的his或her与物品词合在一起，找到正确的主人与物品。",
+      "source": "原书印59～60活动2～3、外研社216263第6～12页"
+    },
+    {
+      "skill": "distance-and-ownership",
+      "target": "听辨并尝试用this或that说远近，用his或her说物品归属。",
+      "source": "原书印59与61活动2、5、外研社216260第6～9页"
+    },
+    {
+      "skill": "family-picture-talk",
+      "target": "用图介绍一位家人和属于这位家人的一件东西。",
+      "source": "原书印60～61活动4～6、外研社216260第10～13页"
+    }
+  ],
+  "teacherCode": "mira_english_standard",
+  "authoring": {
+    "sourceMode": "direct",
+    "authorModels": [
+      "gpt-6.1-sol"
+    ]
+  },
+  "catalog": {
+    "path": "courseware/kit/game_templates/catalog.json",
+    "sha256": "1f04d478644e68af67bc264bf46227ece3d94d9c4070e8a8dd219846a48f4753"
+  }
+}

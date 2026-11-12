@@ -1,0 +1,1162 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "十几减8、7、6",
+  "description": "人教版一年级下册第二单元。用剧场灯片的订单解释破十、连减和想加算减。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小数老师",
+      "role": "teacher",
+      "gender": "male",
+      "voice": "Ethan",
+      "avatar": "/teachers/ashu-math-v1.png",
+      "color": "#437763",
+      "persona": "和孩子从图上找十和几个，边摆边说理由，最后合回原来的数。"
+    }
+  },
+  "images": {
+    "cover-theater": {
+      "file": "assets/cover-theater.png"
+    },
+    "catch-backdrop": {
+      "file": "assets/catch-backdrop.png"
+    },
+    "aim-backdrop": {
+      "file": "assets/aim-backdrop.png"
+    },
+    "family-theater": {
+      "file": "assets/family-theater.png"
+    },
+    "light-piece": {
+      "file": "assets/light-piece.png"
+    },
+    "catch-cart": {
+      "file": "assets/catch-cart.png"
+    },
+    "rosette-sticker": {
+      "file": "assets/rosette-sticker.png"
+    },
+    "game-marble": {
+      "file": "assets/game-marble.png"
+    },
+    "lantern-sticker": {
+      "file": "assets/lantern-sticker.png"
+    },
+    "fourteen-stock": {
+      "file": "assets/fourteen-stock.png"
+    },
+    "fourteen-break": {
+      "file": "assets/fourteen-break.png"
+    },
+    "fourteen-first-four": {
+      "file": "assets/fourteen-first-four.png"
+    },
+    "fourteen-next-four": {
+      "file": "assets/fourteen-next-four.png"
+    },
+    "sixteen-stock": {
+      "file": "assets/sixteen-stock.png"
+    },
+    "sixteen-break": {
+      "file": "assets/sixteen-break.png"
+    },
+    "twelve-stock": {
+      "file": "assets/twelve-stock.png"
+    },
+    "twelve-break": {
+      "file": "assets/twelve-break.png"
+    },
+    "q1-stimulus": {
+      "file": "assets/q1-stimulus.png"
+    },
+    "q2-a": {
+      "file": "assets/q2-a.png"
+    },
+    "q2-b": {
+      "file": "assets/q2-b.png"
+    },
+    "q2-c": {
+      "file": "assets/q2-c.png"
+    },
+    "q3-stimulus": {
+      "file": "assets/q3-stimulus.png"
+    },
+    "q6-stimulus": {
+      "file": "assets/q6-stimulus.png"
+    },
+    "fourteen-two-groups": {
+      "file": "assets/fourteen-two-groups.png"
+    },
+    "fifteen-take-apricot": {
+      "file": "assets/fifteen-take-apricot.png"
+    },
+    "fifteen-take-green": {
+      "file": "assets/fifteen-take-green.png"
+    },
+    "q1-a": {
+      "file": "assets/q1-a.png"
+    },
+    "q1-b": {
+      "file": "assets/q1-b.png"
+    },
+    "q1-c": {
+      "file": "assets/q1-c.png"
+    },
+    "q3-a": {
+      "file": "assets/q3-a.png"
+    },
+    "q3-b": {
+      "file": "assets/q3-b.png"
+    },
+    "q3-c": {
+      "file": "assets/q3-c.png"
+    },
+    "q4-a": {
+      "file": "assets/q4-a.png"
+    },
+    "q4-b": {
+      "file": "assets/q4-b.png"
+    },
+    "q4-c": {
+      "file": "assets/q4-c.png"
+    },
+    "q5-a": {
+      "file": "assets/q5-a.png"
+    },
+    "q5-b": {
+      "file": "assets/q5-b.png"
+    },
+    "q5-c": {
+      "file": "assets/q5-c.png"
+    },
+    "q5-stimulus": {
+      "file": "assets/q5-stimulus.png"
+    },
+    "q6-a": {
+      "file": "assets/q6-a.png"
+    },
+    "q6-b": {
+      "file": "assets/q6-b.png"
+    },
+    "q6-c": {
+      "file": "assets/q6-c.png"
+    },
+    "target-5": {
+      "file": "assets/target-5.png"
+    },
+    "target-6": {
+      "file": "assets/target-6.png"
+    },
+    "target-7": {
+      "file": "assets/target-7.png"
+    },
+    "target-8": {
+      "file": "assets/target-8.png"
+    },
+    "target-9": {
+      "file": "assets/target-9.png"
+    },
+    "order-14-8": {
+      "file": "assets/order-14-8.png"
+    },
+    "order-12-7": {
+      "file": "assets/order-12-7.png"
+    },
+    "order-15-8": {
+      "file": "assets/order-15-8.png"
+    },
+    "order-15-7": {
+      "file": "assets/order-15-7.png"
+    },
+    "order-11-6": {
+      "file": "assets/order-11-6.png"
+    },
+    "order-14-7": {
+      "file": "assets/order-14-7.png"
+    },
+    "order-16-8": {
+      "file": "assets/order-16-8.png"
+    },
+    "order-15-6": {
+      "file": "assets/order-15-6.png"
+    },
+    "q4-stimulus": {
+      "file": "assets/q4-stimulus.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "entry",
+      "type": "slide",
+      "title": "十几减8、7、6",
+      "template": "picture-points",
+      "data": {
+        "title": "十几减8、7、6",
+        "picture": "cover-theater",
+        "points": [
+          "先看一共有多少",
+          "听清要送多少",
+          "数还剩多少"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "你好，我是小数老师。我们到了社区小剧场。"
+        },
+        {
+          "say": "小满收到送灯片的订单。要先知道什么？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "灯片送出去以前，先数全部灯片。"
+        },
+        {
+          "say": "一共有十四片。先记住这个总数。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "第一张订单，要从十四片里送八片。"
+        },
+        {
+          "say": "送出去的这一部分，要从总数里减掉。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "没送出去的，留给剧场备用。"
+        },
+        {
+          "say": "用十四减八，就能算还有多少片。"
+        },
+        {
+          "say": "昨天学过从十几里拿九。今天把办法接过来。"
+        }
+      ]
+    },
+    {
+      "key": "see-fourteen",
+      "type": "slide",
+      "title": "一整十和另外四片",
+      "template": "picture-points",
+      "data": {
+        "title": "一整十和另外四片",
+        "picture": "fourteen-stock",
+        "points": [
+          "看整板",
+          "找零散",
+          "要送八片"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "这里的灯片怎样摆，能一眼看出有多少？"
+        },
+        {
+          "say": "看整板有两排，一排五片，刚好十片。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "十格板每格一片，已经放满。"
+        },
+        {
+          "say": "拿出一整板，就是拿出十片。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "旁边四片没放进十格板。"
+        },
+        {
+          "say": "十片和四片合起来，正好十四片。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "如果只拿旁边这四片，够送八片吗？"
+        },
+        {
+          "say": "四比八少，零散这边不够一次拿。"
+        },
+        {
+          "say": "整板有十片，可以从十片里面拿八片。"
+        }
+      ]
+    },
+    {
+      "key": "break-ten",
+      "type": "slide",
+      "title": "从整十里取八片",
+      "template": "two-columns",
+      "data": {
+        "title": "从整十里取八片",
+        "left": {
+          "heading": "原来有十四",
+          "body": "整板有十片。旁边有四片。"
+        },
+        "left_picture": "fourteen-stock",
+        "right": {
+          "heading": "把留下的合起来",
+          "body": "10 − 8 = 2。 2 + 4 = 6。"
+        },
+        "right_picture": "fourteen-break"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "小满问，拆开整板，会不会把旁边也拿走？"
+        },
+        {
+          "say": "十四片要送八片。你打算先动哪一边？"
+        },
+        {
+          "say": "先看十格板，十比八多，拿八片够。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "只动整板，旁边原来四片留在原处。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "图里打叉的是送出去的八片。"
+        },
+        {
+          "say": "十格板里，还有两片没打叉。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "再找找旁边。原来的四片一片也没动。"
+        },
+        {
+          "say": "整板剩两片，加上旁边四片，合六片。"
+        },
+        {
+          "say": "从十四片送走八片，还剩六片。"
+        },
+        {
+          "say": "先从十里面拿，再合余下的，叫破十法。"
+        }
+      ]
+    },
+    {
+      "key": "take-in-two-steps",
+      "type": "slide",
+      "title": "连减，两次拿够八片",
+      "template": "two-columns",
+      "data": {
+        "title": "连减，两次拿够八片",
+        "left": {
+          "heading": "先拿零散四片",
+          "body": "14 − 4 = 10。已经送出四片。"
+        },
+        "left_picture": "fourteen-first-four",
+        "right": {
+          "heading": "再从十里拿四片",
+          "body": "10 − 4 = 6。两次一共送出八片。"
+        },
+        "right_picture": "fourteen-next-four"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "整板可以先不碰吗？看看另一种办法。"
+        },
+        {
+          "say": "朵朵换个拿法。先拿靠手边的四片。"
+        },
+        {
+          "say": "十四片拿掉四片，桌上就剩十片。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "这一趟只送出四片，订单要八片。"
+        },
+        {
+          "say": "还差多少才送够？八减四，差四片。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "第二趟从整板里再拿四片。"
+        },
+        {
+          "say": "十里面拿走四片，还剩六片。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "第一次四片，第二次四片，合起来八片。"
+        },
+        {
+          "say": "这个办法叫连减。每次送多少要记清。"
+        },
+        {
+          "say": "跟破十法一样，十四片里都送走八片。"
+        },
+        {
+          "say": "拿法不同，最后都留下六片。"
+        }
+      ]
+    },
+    {
+      "key": "add-to-check",
+      "type": "slide",
+      "title": "把两部分合回总数",
+      "template": "picture-points",
+      "data": {
+        "title": "把两部分合回总数",
+        "picture": "fourteen-two-groups",
+        "points": [
+          "先看已知的一部分",
+          "试着合回十四",
+          "用加法想减法"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "现在要核对。留下的六片找对了吗？"
+        },
+        {
+          "say": "想想，送出的那一组是八片。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "左边杏色八片，表示已经送出的。"
+        },
+        {
+          "say": "用八加上留下的一组，应该凑回原来的数。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "右边松绿六片，是刚刚数出的差。"
+        },
+        {
+          "say": "八加六，正好十四，和原来的数一样。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "知道总数十四，已知一组八片。"
+        },
+        {
+          "say": "想八加几等于十四，缺的数就是留下的。"
+        },
+        {
+          "say": "这一招叫想加算减。你也可以用它检查。"
+        },
+        {
+          "say": "图上是总数和已知的一组。瞄准能凑回总数的图。"
+        },
+        {
+          "say": "把这两组想在一起，能不能凑回总数？"
+        },
+        {
+          "say": "先数已知的一组，再算还差多少。"
+        }
+      ]
+    },
+    {
+      "key": "send-seven",
+      "type": "slide",
+      "title": "从十六片送走七片",
+      "template": "two-columns",
+      "data": {
+        "title": "从十六片送走七片",
+        "left": {
+          "heading": "一整十加六片",
+          "body": "16 是 10 和 6。"
+        },
+        "left_picture": "sixteen-stock",
+        "right": {
+          "heading": "十里剩三片",
+          "body": "10 − 7 = 3。 3 + 6 = 9。"
+        },
+        "right_picture": "sixteen-break"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "小满指着旁边说，能不能先把六片都送出？"
+        },
+        {
+          "say": "来了第二张订单。十六片里要送七片。"
+        },
+        {
+          "say": "左边整板十片，旁边有六片。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "零散六片不够。我选破十，从整板一次就够取七片。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "也能先拿六再拿一。图上打叉的是整板的七片。"
+        },
+        {
+          "say": "整板原来十片，拿七片还剩三片。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "旁边六片一直没动。还要数进去。"
+        },
+        {
+          "say": "三片和六片合起来九片。"
+        },
+        {
+          "say": "所以十六减七等于九。"
+        },
+        {
+          "say": "把九片和送走的七片合回去，就是十六。"
+        }
+      ]
+    },
+    {
+      "key": "send-six",
+      "type": "slide",
+      "title": "从十二片送走六片",
+      "template": "two-columns",
+      "data": {
+        "title": "从十二片送走六片",
+        "left": {
+          "heading": "一整十加两片",
+          "body": "12 是 10 和 2。"
+        },
+        "left_picture": "twelve-stock",
+        "right": {
+          "heading": "两边一共余六片",
+          "body": "10 − 6 = 4。 4 + 2 = 6。"
+        },
+        "right_picture": "twelve-break"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "换成减六，刚才的办法还用得上吗？"
+        },
+        {
+          "say": "第三张订单，要从十二片送走六片。"
+        },
+        {
+          "say": "先问自己，旁边零散片够不够拿。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "旁边只有两片。可以改从十片里拿。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "十片里面拿出六片，十格板里还剩四片。"
+        },
+        {
+          "say": "旁边两片没动，也要数进去。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "板里四片，旁边两片，合起来六片。"
+        },
+        {
+          "say": "所以送出六片，备用也恰好六片。"
+        },
+        {
+          "say": "送出的和留下的合起来，又是十二片。"
+        },
+        {
+          "say": "总共十二片，左边送八片，余下放右边。"
+        },
+        {
+          "say": "总共十三片，左边送七片，余下放右边。"
+        },
+        {
+          "say": "总共十四片，左边送六片，余下放右边。"
+        },
+        {
+          "say": "看看落点，数清这串有几片。"
+        },
+        {
+          "say": "数这篮的空格，装不下就换篮。"
+        },
+        {
+          "say": "送的刚好够，留下的也都进了另一篮。"
+        }
+      ]
+    },
+    {
+      "key": "catch-and-split",
+      "type": "interactive",
+      "title": "接灯片，分进两篮",
+      "page": "catch-and-split",
+      "widgetType": "simulation",
+      "startImage": "catch-backdrop",
+      "script": [
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#first-order-basket"
+        },
+        {
+          "say": "杏色左篮要装八片，刚好够送出去。"
+        },
+        {
+          "say": "右边松绿篮，放剩下的灯片。"
+        },
+        {
+          "highlight": "#game-target"
+        },
+        {
+          "say": "第一串有四片，看落点在中间。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "小车在中间接。选好的篮下方有小箭头。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "灯片往下落，小车要在落点接住这一串。"
+        },
+        {
+          "say": "先等它落下来。我们已经选好了左篮。"
+        },
+        {
+          "say": "看这串四片会不会进左篮。接住后，再数还差几片。"
+        },
+        {
+          "say": "换你接。左右移动，按换篮键选另一边。"
+        },
+        {
+          "say": "送出的够了，剩下的都放备用篮。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "catch-eight": "send-six-14",
+        "catch-seven": "send-six-15",
+        "catch-six": "send-six-16",
+        "catch-hint": "send-six-17",
+        "catch-help": "send-six-18",
+        "catch-praise": "send-six-19"
+      }
+    },
+    {
+      "key": "same-whole-two-orders",
+      "type": "slide",
+      "title": "同样十五片，两张订单",
+      "template": "two-columns",
+      "data": {
+        "title": "同样十五片，两张订单",
+        "left": {
+          "heading": "送走八片",
+          "body": "15 − 8 = 7。留七片松绿。"
+        },
+        "left_picture": "fifteen-take-apricot",
+        "right": {
+          "heading": "送走七片",
+          "body": "15 − 7 = 8。留八片杏色。"
+        },
+        "right_picture": "fifteen-take-green"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "两张单都写十五片，为什么剩的不一样？"
+        },
+        {
+          "say": "柜里有十五片。杏色八片，松绿七片。"
+        },
+        {
+          "say": "第一张单，想要这八片杏色。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "从十五片去掉八片杏色，留七片松绿。"
+        },
+        {
+          "say": "十五减八等于七。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "第二张单，原来还是同样十五片。"
+        },
+        {
+          "say": "这回要送出去的是七片松绿。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "去掉松绿七片，备用篮留杏色八片。"
+        },
+        {
+          "say": "十五减七等于八。"
+        },
+        {
+          "say": "八加七都是十五，可以检查这两问。"
+        },
+        {
+          "say": "先看清送哪组，才能知道剩的是哪组。"
+        },
+        {
+          "say": "总数相同，也要看清楚已经知道的是哪组。"
+        },
+        {
+          "say": "总数有时会变。每一单都要重新看。"
+        },
+        {
+          "say": "每次都找到了能凑回总数的一组。"
+        }
+      ]
+    },
+    {
+      "key": "aim-to-restore",
+      "type": "interactive",
+      "title": "弹珠找另一组",
+      "page": "aim-to-restore",
+      "widgetType": "simulation",
+      "startImage": "aim-backdrop",
+      "script": [
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#order-card"
+        },
+        {
+          "say": "先看左边图。上面十片和四片，一共十四。"
+        },
+        {
+          "highlight": "#known-group"
+        },
+        {
+          "say": "下面知道一组是八片，另一组空着。"
+        },
+        {
+          "say": "想八加几等于十四。加六片正好。"
+        },
+        {
+          "highlight": "#first-remainder-target"
+        },
+        {
+          "say": "这个图有六片，能和八片合回十四。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "我先对准这张图，再让弹珠飞出去。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "留意弹珠飞向哪张图，再想它能和八片合成多少。"
+        },
+        {
+          "say": "轮到你了。先算合起来是多少，再发射。"
+        },
+        {
+          "say": "方向键可以瞄准，弹珠飞着时也能调整。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "aim-whole": "add-to-check-14",
+        "aim-two-parts": "same-whole-two-orders-16",
+        "aim-new-whole": "same-whole-two-orders-17",
+        "aim-hint": "add-to-check-15",
+        "aim-help": "add-to-check-16",
+        "aim-praise": "same-whole-two-orders-18"
+      }
+    },
+    {
+      "key": "six-picture-check",
+      "type": "quiz",
+      "title": "听订单，再选图",
+      "intro": [
+        "听清总数和送出去的一组。再想哪一部分留下。",
+        "拿不准时，看图重新数一遍。"
+      ],
+      "questions": [
+        {
+          "id": "combine-two-remainders",
+          "skill": "break-ten-and-add-ones",
+          "question": "有十三片灯片，送八片，留下哪一盘？",
+          "analysis": "十里取八剩二，原来三片没动。两片加三片，一共留下五片。",
+          "answer": [
+            "B"
+          ],
+          "options": {
+            "A": {
+              "label": "四片灯片",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-a",
+                "alt": "四片灯片"
+              }
+            },
+            "B": {
+              "label": "五片灯片",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-b",
+                "alt": "五片灯片"
+              }
+            },
+            "C": {
+              "label": "六片灯片",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-c",
+                "alt": "六片灯片"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "q1-stimulus",
+            "alt": "整板十片和旁边三片。"
+          }
+        },
+        {
+          "id": "mark-seven-in-ten",
+          "skill": "remove-seven-from-ten",
+          "question": "哪幅图从十格板取七片，还保留旁边的一片？",
+          "analysis": "整板里去掉七片，旁边一片不动。整板剩三片，合起来还有四片。",
+          "answer": [
+            "C"
+          ],
+          "options": {
+            "A": {
+              "label": "十格板划掉六片，旁边划掉一片",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-a",
+                "alt": "十格板划掉六片，旁边划掉一片"
+              }
+            },
+            "B": {
+              "label": "十格板划掉八片，旁边一片还在",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-b",
+                "alt": "十格板划掉八片，旁边一片还在"
+              }
+            },
+            "C": {
+              "label": "十格板划掉七片，旁边一片还在",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-c",
+                "alt": "十格板划掉七片，旁边一片还在"
+              }
+            }
+          }
+        },
+        {
+          "id": "finish-the-eight-order",
+          "skill": "subtract-in-two-steps",
+          "question": "照片墙要八张。十七张先拿外面七张，板里再拿几张？",
+          "analysis": "十七先减七，还剩十张。八张已拿七张，差一张，从整板再拿一张。",
+          "answer": [
+            "A"
+          ],
+          "options": {
+            "A": {
+              "label": "板里再拿一张圆贴",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-a",
+                "alt": "板里再拿一张圆贴"
+              }
+            },
+            "B": {
+              "label": "板里再拿八张圆贴",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-b",
+                "alt": "板里再拿八张圆贴"
+              }
+            },
+            "C": {
+              "label": "板里再拿两张圆贴",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-c",
+                "alt": "板里再拿两张圆贴"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "q3-stimulus",
+            "alt": "十格板十张圆贴都在，板外先拿掉的七张已划掉。"
+          }
+        },
+        {
+          "id": "green-group-leaves",
+          "skill": "same-whole-opposite-part",
+          "question": "一共十七片，送走松绿八片，留下哪组？",
+          "analysis": "十七片去掉松绿的八片，留在原处的是杏色九片。",
+          "answer": [
+            "C"
+          ],
+          "options": {
+            "A": {
+              "label": "松绿八片",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-a",
+                "alt": "松绿八片"
+              }
+            },
+            "B": {
+              "label": "杏色八片",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-b",
+                "alt": "杏色八片"
+              }
+            },
+            "C": {
+              "label": "杏色九片",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-c",
+                "alt": "杏色九片"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "q4-stimulus",
+            "alt": "左边杏色九片，右边松绿八片。"
+          }
+        },
+        {
+          "id": "blocks-still-in-the-box",
+          "skill": "subtract-six-and-find-remainder",
+          "question": "盒里有十三个积木，借出六个，还剩几个？",
+          "analysis": "从十个里借走六个还剩四个，原来的三个没动，合起来是七个。",
+          "answer": [
+            "A"
+          ],
+          "options": {
+            "A": {
+              "label": "七个积木",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-a",
+                "alt": "七个积木"
+              }
+            },
+            "B": {
+              "label": "四个积木",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-b",
+                "alt": "四个积木"
+              }
+            },
+            "C": {
+              "label": "六个积木",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-c",
+                "alt": "六个积木"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "q5-stimulus",
+            "alt": "盒中两行分别是七个和六个积木。"
+          }
+        },
+        {
+          "id": "restore-eleven",
+          "skill": "addition-check-for-subtraction",
+          "question": "手工课有十一颗珠子，穿了八颗。哪幅图能拼回原数？",
+          "analysis": "八颗加三颗正好十一。八加二少一颗，八加四多一颗。",
+          "answer": [
+            "B"
+          ],
+          "options": {
+            "A": {
+              "label": "已经穿好八颗，没穿的两颗",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-a",
+                "alt": "已经穿好八颗，没穿的两颗"
+              }
+            },
+            "B": {
+              "label": "已经穿好八颗，没穿的三颗",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-b",
+                "alt": "已经穿好八颗，没穿的三颗"
+              }
+            },
+            "C": {
+              "label": "已经穿好八颗，没穿的四颗",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-c",
+                "alt": "已经穿好八颗，没穿的四颗"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "q6-stimulus",
+            "alt": "十格板里的十颗珠子和旁边一颗，合起来十一颗。"
+          }
+        }
+      ]
+    },
+    {
+      "key": "tell-it-at-home",
+      "type": "slide",
+      "title": "把方法说给家人",
+      "template": "picture-points",
+      "data": {
+        "title": "把方法说给家人",
+        "picture": "family-theater",
+        "points": [
+          "从十里拿",
+          "也能分两次拿",
+          "合回去检查"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "小剧场的订单对上了。你最想用哪种办法？"
+        },
+        {
+          "say": "可以跟家人找一些一样大的安全积木。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先摆一整十和另外几个。"
+        },
+        {
+          "say": "拿八、七或六时，说清自己从哪里拿。"
+        },
+        {
+          "say": "从十里取，旁边零散没动。把两边剩下的合起来。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "你也可以先拿零散，再拿还差的。"
+        },
+        {
+          "say": "检查两次拿的合起来，刚好够订单。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "送出的那组加上留下的，应该是原数。"
+        },
+        {
+          "say": "换一个要送的数，再试一次。"
+        },
+        {
+          "say": "把自己的步骤和理由说给家人听。"
+        }
+      ]
+    }
+  ]
+}

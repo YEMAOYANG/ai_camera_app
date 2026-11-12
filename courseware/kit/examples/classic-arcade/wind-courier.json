@@ -1,0 +1,11 @@
+{
+  "template": "windCourier",
+  "title": "风翼邮差",
+  "sub": "看小旗的位置，借风飞进它上面或下面的站台。",
+  "art": {"backdrop": "alpine.webp", "sticker": "sticker.webp", "frames":["glider.webp"]},
+  "levels": [
+    {"speed":151,"tolerance":57,"legs":[{"ref":1,"shift":-1},{"ref":1,"shift":1}],"hints":["先找小旗，再看是上面还是下面。","亮起来的站台就是要飞去的地方。"]},
+    {"speed":198,"tolerance":48,"legs":[{"ref":0,"shift":1},{"ref":2,"shift":-1},{"ref":1,"shift":1}],"hints":["小旗换位置了，先看它在哪里。","亮起来的地方是这封信的站台。"]},
+    {"speed":239,"tolerance":40,"legs":[{"ref":1,"shift":-1},{"ref":0,"shift":1},{"ref":2,"shift":0}],"hints":["箭头朝前，就飞进小旗这一层。","飞慢一点，跟着亮起来的站台。"]}
+  ]
+}

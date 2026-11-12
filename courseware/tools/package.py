@@ -13,7 +13,7 @@ import shutil
 import sys
 from pathlib import Path
 
-from courseware.tools import check
+from courseware.tools import check, verify_delta, verify_presentation
 
 
 class PackageError(Exception):
@@ -23,6 +23,7 @@ class PackageError(Exception):
 MEDIA_REFERENCE = re.compile(
     r'/api/classroom-media/[A-Za-z0-9_-]+/(?:audio|media)/([A-Za-z0-9_.-]+)'
 )
+VERIFICATION_EVIDENCE = 'verification-evidence.json'
 
 
 def _load(path):
@@ -64,9 +65,43 @@ def _copy_referenced_media(body, source, destination):
         shutil.copyfile(source / name, destination / name)
 
 
+def _check_verification_evidence(build, body, notes, verification):
+    replayers = {verify_delta.EVIDENCE_SCHEMA: verify_delta.replay,
+                 verify_presentation.EVIDENCE_SCHEMA: verify_presentation.replay}
+    reference = verification.get('reusedEvidence')
+    path = build / VERIFICATION_EVIDENCE
+    if reference is None:
+        # A legacy direct review may leave an unused v1 sidecar.
+        if path.is_file():
+            try:
+                evidence = _load(path)
+            except PackageError:
+                return
+            schema = evidence.get('schemaVersion') if isinstance(evidence, dict) else None
+            if isinstance(schema, str) and schema in replayers:
+                raise PackageError('verification_evidence_changed', 'missing replay evidence reference')
+        return
+    evidence = _load(path)
+    if not isinstance(reference, dict) or reference.get('sha256') != check.body_hash(evidence):
+        raise PackageError('verification_evidence_changed', VERIFICATION_EVIDENCE)
+    schema = evidence.get('schemaVersion') if isinstance(evidence, dict) else None
+    reference_schema = reference.get('schemaVersion')
+    if any(isinstance(name, str) and name in replayers for name in (reference_schema, schema)):
+        try:
+            if reference_schema != schema:
+                raise ValueError('Verification replay schema differs from the supplied evidence')
+            verifier = verification['verifier']
+            rebuilt = replayers[schema](body, notes, build / 'media', evidence,
+                                       model=verifier['model'], effort=verifier['effort'])
+            if rebuilt != verification:
+                raise ValueError('The evidence does not reconstruct the supplied receipt')
+        except (OSError, ValueError, KeyError, TypeError) as exc:
+            raise PackageError('verification_evidence_changed', str(exc)) from exc
+
+
 def package_lesson(lesson_dir, build_dir, out_dir, *, edition_id, revision_id, node_id, teacher_code, author_models,
                    page_author_models=(), teaching_revision='1', g7_owner_quote=None,
-                   g7_confirmed_at=None):
+                   g7_confirmed_at=None, confirmation=None, student_activity_controls=False):
     """author_models wrote lines or questions and so may not verify them; page_author_models wrote only page code, which
     the verifier does not read, so one of them may verify. Both are recorded as authors."""
     lesson, build, out = Path(lesson_dir), Path(build_dir), Path(out_dir)
@@ -77,6 +112,8 @@ def package_lesson(lesson_dir, build_dir, out_dir, *, edition_id, revision_id, n
     roster, receipt = _load(build / 'roster.json'), _load(build / 'audit-receipt.json')
     play_receipt = _load(build / 'play-receipt.json')
     verification = _load(build / 'verification.json')
+    reused_evidence = verification.get('reusedEvidence')
+    _check_verification_evidence(build, body, notes, verification)
     if bool(g7_owner_quote) != bool(g7_confirmed_at):
         raise PackageError('g7_owner_waiver_invalid', 'owner quote and confirmation time are both required')
     waiver = None
@@ -112,10 +149,16 @@ def package_lesson(lesson_dir, build_dir, out_dir, *, edition_id, revision_id, n
     identity = {'editionId': edition_id, 'revisionId': revision_id, 'nodeId': node_id, 'teachingRevision': str(teaching_revision),
                 'title': title, 'objective': '；'.join(g.strip() for g in goals), 'teacherCode': teacher_code,
                 'authorModels': list(author_models) + [m for m in page_author_models if m not in author_models], 'estimatedMinutes': estimate_minutes(body)}
+    if confirmation is not None:
+        identity['confirmation'] = confirmation
+    if student_activity_controls:
+        identity['studentActivityControls'] = True
     out.mkdir(parents=True)
     _copy_referenced_media(body, build / 'media', out / 'media')
     for name in ('body.json', 'roster.json', 'audit-receipt.json', 'play-receipt.json', 'verification.json'):
         shutil.copyfile(build / name, out / name)
+    if reused_evidence is not None:
+        shutil.copyfile(build / VERIFICATION_EVIDENCE, out / VERIFICATION_EVIDENCE)
     for name in ('official-notes.json', 'brief.json'):
         shutil.copyfile(lesson / name, out / name)
     if waiver is not None:
@@ -137,15 +180,28 @@ def main(argv=None):
     parser.add_argument('--author-model', action='append', required=True, help='every model that wrote lines or questions')
     parser.add_argument('--page-author-model', action='append', default=[], help='every model that wrote only page code')
     parser.add_argument('--teaching-revision', default='1')
+    parser.add_argument('--owner-quote')
+    parser.add_argument('--confirmed-at')
+    parser.add_argument('--author-attestation')
     parser.add_argument('--waive-g7-owner-quote')
     parser.add_argument('--waive-g7-confirmed-at')
+    parser.add_argument('--student-activity-controls', action='store_true',
+                        help='request controls for approved templates, verified against the local source at G8')
     args = parser.parse_args(argv)
+    fields = (args.owner_quote, args.confirmed_at, args.author_attestation)
+    confirmation = None
+    if any(field is not None for field in fields):
+        if not all(field and field.strip() for field in fields):
+            parser.error('Provide --owner-quote, --confirmed-at and --author-attestation together.')
+        confirmation = {'userQuote': args.owner_quote, 'confirmedAt': args.confirmed_at,
+                        'confirmedBy': 'owner', 'authorAttestation': args.author_attestation}
     try:
         identity = package_lesson(args.lesson, args.build, args.out, edition_id=args.edition_id, revision_id=args.revision_id,
                                   node_id=args.node_id, teacher_code=args.teacher_code, author_models=args.author_model,
                                   page_author_models=args.page_author_model, teaching_revision=args.teaching_revision,
                                   g7_owner_quote=args.waive_g7_owner_quote,
-                                  g7_confirmed_at=args.waive_g7_confirmed_at)
+                                  g7_confirmed_at=args.waive_g7_confirmed_at, confirmation=confirmation,
+                                  student_activity_controls=args.student_activity_controls)
     except PackageError as exc:
         print(f'PackageError: {exc.args[0]}: {exc.args[1] if len(exc.args) > 1 else ""}', file=sys.stderr)
         return 1

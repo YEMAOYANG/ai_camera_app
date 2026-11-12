@@ -1,0 +1,941 @@
+{
+  "schemaVersion": "mira.courseware.asset-sources.v1",
+  "inputs": {
+    "story": {
+      "source": "art-source/story-atlas.png",
+      "sha256": "218a822e1a665c4242d308119ffaaecb881a87782f5c1a9703163d7a3edfd92c",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "generator": "Codex 内置 ImageGen",
+      "original": "/Users/sqcopenclaw/.codex/generated_images/01a1c43e-b707-70d1-8436-005b59e5091d/exec-0e9f44fc-b7b3-4d3e-9138-caaa7fdd6752.png",
+      "prompt": "Use case: original first-grade math storybook and game start card illustrations. Make one flat atlas of exactly 3 columns by 2 rows, six independent square panels, no spacing between panels and no objects crossing boundaries. Key subjects fully visible near each panel center, leave air at edges. No words, letters, numbers, symbols, printed labels, signs with marks, or watermark. Fine paper grain, matte gouache, clean cut-paper contours, deep pine green with warm cream, soft teal and apricot and persimmon orange. Simple calm paper backdrop, big shapes visible on a 90 pixel thumbnail, no photorealism or gradients.\nTOP LEFT: a cozy small neighborhood post booth with an open arched service window, a child with persimmon scarf and short dark hair presenting blank cream paper tickets to a friendly keeper with dark pine vest. One wooden counter, light warm scene, one teal parcel and one amber tray, clean visual focus on counting supplies.\nTOP MIDDLE: a very small friendly pine-green paper snake with round head, tiny apricot cheek spot, big simple dark eyes and an S-shaped body, approaching two blank apricot and ivory card tiles on a quiet low garden board beside the post booth. Center composition and generous margins. Keep the cards entirely blank; numeric dots added by code later.\nTOP RIGHT: a toy sorting machine with two narrow wooden vertical chutes and a simple unmarked amber square tile floating over a cream empty tray. Match the same post booth workshop. Side light, no complicated machinery, no text or symbols. All essential parts in middle.\nBOTTOM LEFT: warm overhead view of a blank rectangular recycled paper card clipped to a matte teal board, one tiny light apricot mail stamp shape with blank center in its corner, one pencil along the card, plenty of empty clean card surface. No writing and no ruled lines.\nBOTTOM MIDDLE: side view of a small green post cart with two wheels holding an open cream tray and moving gently on a quiet path toward the right, two simple tree silhouettes in far background. No characters, no numbers, no drawn arrows.\nBOTTOM RIGHT: original quiet close-up of a child and adult in profile at a warm cream desk, both pointing to a blank rectangular sheet of paper, inviting home practice, muted pine background. No writing.\nDo not imitate a published book or textbook. All six are original independent illustrations."
+    },
+    "sprites": {
+      "source": "art-source/sprites-atlas.png",
+      "sha256": "c380ff25f02dad6b443ccb1d244005581ffa8844786a8d90df2d82155be0ff25",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "generator": "Codex 内置 ImageGen",
+      "original": "/Users/sqcopenclaw/.codex/generated_images/01a1c43e-b707-70d1-8436-005b59e5091d/exec-4640795f-a5ae-4fca-9ac7-e1f0bfa3cdfe.png",
+      "prompt": "Use case: six independent original transparent PNG sprites for a first-grade post booth math game, in exactly 3 columns x 2 rows of equal square cells. Each sprite centered within its own cell at no more than 64 percent cell width and height, fully transparent gaps, no shapes touch boundaries, no grid or shadow. Fine paper grain, matte gouache, clean cut-paper contours, pine green and warm cream, muted sage and apricot and persimmon orange. Very clean and readable at 36 pixels. No words, numerals, arrows, printed marks, or watermark.\nTOP LEFT: cheerful deep pine-green snake head only, from top-leaning three-quarter view facing exactly RIGHT, small apricot cheek patches, simple dark eye and one curved mouth, short neck ends on the left for a body connector. Keep rounded nonthreatening.\nTOP MIDDLE: single sage green oval rounded snake body segment with one warm cream belly stripe and no face or tail, shape centered.\nTOP RIGHT: matching tapered sage green snake tail segment, thick rounded end on the LEFT and gentle taper toward the RIGHT, one cream belly stripe, no face.\nBOTTOM LEFT: exactly one small cream square perforated postage ticket with a large persimmon-orange five-point star at the center, one bold flat shape and clean border; star ticket will be repeatedly counted by the lesson.\nBOTTOM MIDDLE: exactly one small cream square perforated postage ticket, same size as bottom left, with a large simple deep-teal circle in the middle; circle ticket will be repeatedly counted in its own group.\nBOTTOM RIGHT: one larger friendly completion sticker, a warm cream badge with a small green postal cart and apricot star, isolated no background, bold clear silhouette. No letters or decorative particle effects.\nThe output must have genuine alpha transparency. All six sprites are separate, generous transparent margin to crop."
+    },
+    "star-stamp": {
+      "source": "art-source/star-stamp.png",
+      "sha256": "d5bbdcf780859ca3919af37ad1d72846137deda399c2c22d379363426a22ee42",
+      "dimensions": [
+        252,
+        264
+      ],
+      "atlas": "sprites",
+      "cell": [
+        2,
+        1
+      ],
+      "processing": "按透明轮廓留边裁切，缩至264像素"
+    },
+    "circle-stamp": {
+      "source": "art-source/circle-stamp.png",
+      "sha256": "cc74555399fb47165a35452084f6a567667558cf45779172b4e91ee23e101d6d",
+      "dimensions": [
+        254,
+        264
+      ],
+      "atlas": "sprites",
+      "cell": [
+        2,
+        2
+      ],
+      "processing": "按透明轮廓留边裁切，缩至264像素"
+    }
+  },
+  "assets": {
+    "post-booth": {
+      "sha256": "4057760e15bf3a5bfec6069b9f9de1bdb4709d4b87b99011cb3e754fa3886041",
+      "dimensions": [
+        460,
+        460
+      ],
+      "file": "assets/post-booth.png",
+      "usedBy": [
+        "open"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "atlas": "story",
+      "cell": [
+        1,
+        1
+      ],
+      "processing": "向内裁7像素，缩至460像素"
+    },
+    "snake-start": {
+      "sha256": "09ab4f1a2dbaa41cbf91e3fca445ad08dfe408629d7791d9f05296350be82a70",
+      "dimensions": [
+        460,
+        460
+      ],
+      "file": "assets/snake-start.png",
+      "usedBy": [
+        "compare-stamps"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "atlas": "story",
+      "cell": [
+        1,
+        2
+      ],
+      "processing": "向内裁7像素，缩至460像素"
+    },
+    "tile-start": {
+      "sha256": "eee94f5b00d20c2e6754a3dec74f44ff826d1c504d71e380c7004175f096d865",
+      "dimensions": [
+        460,
+        460
+      ],
+      "file": "assets/tile-start.png",
+      "usedBy": [
+        "fill-ten-trays"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "atlas": "story",
+      "cell": [
+        1,
+        3
+      ],
+      "processing": "向内裁7像素，缩至460像素"
+    },
+    "snake-head": {
+      "sha256": "2ffb6c95f018bf1531e50af91b4561a9c6ab133165395e81f63d18cb4cea8b5d",
+      "dimensions": [
+        264,
+        186
+      ],
+      "file": "assets/snake-head.png",
+      "usedBy": [
+        "compare-stamps"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "atlas": "sprites",
+      "cell": [
+        1,
+        1
+      ],
+      "processing": "按透明轮廓留边裁切，缩至264像素"
+    },
+    "snake-body": {
+      "sha256": "0142cae89e1866c2975b480065b04d7592695a1f8bef50020db2a359f79fc587",
+      "dimensions": [
+        264,
+        141
+      ],
+      "file": "assets/snake-body.png",
+      "usedBy": [
+        "compare-stamps"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "atlas": "sprites",
+      "cell": [
+        1,
+        2
+      ],
+      "processing": "按透明轮廓留边裁切，缩至264像素"
+    },
+    "snake-tail": {
+      "sha256": "ee32245fdba7ffc8916622977e192864b10476093fb5d5ea9e90184a141662ce",
+      "dimensions": [
+        264,
+        210
+      ],
+      "file": "assets/snake-tail.png",
+      "usedBy": [
+        "compare-stamps"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "atlas": "sprites",
+      "cell": [
+        1,
+        3
+      ],
+      "processing": "按透明轮廓留边裁切，缩至264像素"
+    },
+    "post-sticker": {
+      "sha256": "049ecbb432575181044fe0e66e441ecab729caba1dd37467996b21df625b2eed",
+      "dimensions": [
+        264,
+        259
+      ],
+      "file": "assets/post-sticker.png",
+      "usedBy": [
+        "compare-stamps",
+        "fill-ten-trays"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "atlas": "sprites",
+      "cell": [
+        2,
+        3
+      ],
+      "processing": "按透明轮廓留边裁切，缩至264像素"
+    },
+    "count-and-position": {
+      "sha256": "dc16cd2fdfe3fc9591e306ff8635ed59fe4c418f41f7fea4e9a7c0aea39de3a4",
+      "dimensions": [
+        787,
+        427
+      ],
+      "file": "assets/count-and-position.png",
+      "usedBy": [
+        "count-and-position"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "7a7ed3916729d8d8ea1d7c815dc3221bd6007e2f1547c5b72fe5a17d340a8d85",
+      "sources": [
+        "star-stamp",
+        "circle-stamp"
+      ]
+    },
+    "number-order": {
+      "sha256": "f3f26b0673328c4bd2c9a505e83d9d36e4d23283c9f396de579198c6bc309099",
+      "dimensions": [
+        797,
+        497
+      ],
+      "file": "assets/number-order.png",
+      "usedBy": [
+        "number-order"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "7a7ed3916729d8d8ea1d7c815dc3221bd6007e2f1547c5b72fe5a17d340a8d85",
+      "sources": []
+    },
+    "tens-and-ones": {
+      "sha256": "93c5d7578b106ec577c29b238685acc9268b09b11bc17c04829d5dc14c155ab6",
+      "dimensions": [
+        797,
+        477
+      ],
+      "file": "assets/tens-and-ones.png",
+      "usedBy": [
+        "tens-and-ones"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "7a7ed3916729d8d8ea1d7c815dc3221bd6007e2f1547c5b72fe5a17d340a8d85",
+      "sources": [
+        "star-stamp"
+      ]
+    },
+    "part-and-whole": {
+      "sha256": "13a6f2ed3302fb05870999475efb6cf965a6833e0df32ac98bb17f8e0e258a62",
+      "dimensions": [
+        690,
+        475
+      ],
+      "file": "assets/part-and-whole.png",
+      "usedBy": [
+        "part-and-whole"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "7a7ed3916729d8d8ea1d7c815dc3221bd6007e2f1547c5b72fe5a17d340a8d85",
+      "sources": [
+        "star-stamp",
+        "circle-stamp"
+      ]
+    },
+    "methods": {
+      "sha256": "1e6ad11b5112ea504332fc6cf4cdcdb584c78c023c0170691c3309ff2d248ee2",
+      "dimensions": [
+        797,
+        471
+      ],
+      "file": "assets/methods.png",
+      "usedBy": [
+        "methods"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "7a7ed3916729d8d8ea1d7c815dc3221bd6007e2f1547c5b72fe5a17d340a8d85",
+      "sources": []
+    },
+    "make-a-ten": {
+      "sha256": "963f87ce9f924e1dcaec7050b30e04cba0af271ad4d01fdb4d4ed9c8213fd5ce",
+      "dimensions": [
+        520,
+        285
+      ],
+      "file": "assets/make-a-ten.png",
+      "usedBy": [
+        "make-a-ten"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "7a7ed3916729d8d8ea1d7c815dc3221bd6007e2f1547c5b72fe5a17d340a8d85",
+      "sources": []
+    },
+    "knowledge-map": {
+      "sha256": "19b737c2529bb710b5e6edaace2ddeba5e620e5f8c12a33ca1b800bba8cbd282",
+      "dimensions": [
+        797,
+        507
+      ],
+      "file": "assets/knowledge-map.png",
+      "usedBy": [
+        "knowledge-map"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "7a7ed3916729d8d8ea1d7c815dc3221bd6007e2f1547c5b72fe5a17d340a8d85",
+      "sources": [
+        "star-stamp"
+      ]
+    },
+    "count-1": {
+      "sha256": "010d5ab386503b33240f392e925fe6063acf399ced6d9daf6c014b801d673777",
+      "dimensions": [
+        232,
+        176
+      ],
+      "file": "assets/count-1.png",
+      "usedBy": [
+        "fill-ten-trays"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "7a7ed3916729d8d8ea1d7c815dc3221bd6007e2f1547c5b72fe5a17d340a8d85",
+      "sources": []
+    },
+    "count-2": {
+      "sha256": "bec7710cb7153be090d29a0efacb5bd1cde5d920a813f050db83bab9289b4e17",
+      "dimensions": [
+        232,
+        176
+      ],
+      "file": "assets/count-2.png",
+      "usedBy": [
+        "fill-ten-trays"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "7a7ed3916729d8d8ea1d7c815dc3221bd6007e2f1547c5b72fe5a17d340a8d85",
+      "sources": []
+    },
+    "count-3": {
+      "sha256": "7a569e669453fe14d75668de4fda7ae0f9b884917e3ec4bc746a61974e60c2b9",
+      "dimensions": [
+        232,
+        176
+      ],
+      "file": "assets/count-3.png",
+      "usedBy": [
+        "compare-stamps",
+        "fill-ten-trays"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "7a7ed3916729d8d8ea1d7c815dc3221bd6007e2f1547c5b72fe5a17d340a8d85",
+      "sources": []
+    },
+    "count-4": {
+      "sha256": "78fbccb4d73fc4cd6e9824fe6a7a3276f4481658755d26b1b7f424b1fab5e2c8",
+      "dimensions": [
+        232,
+        176
+      ],
+      "file": "assets/count-4.png",
+      "usedBy": [
+        "compare-stamps",
+        "fill-ten-trays"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "7a7ed3916729d8d8ea1d7c815dc3221bd6007e2f1547c5b72fe5a17d340a8d85",
+      "sources": []
+    },
+    "count-5": {
+      "sha256": "c068d9c2b93b4ea68b8c4997c176044cf9fa85d5896f3379efc9140a75b1cc20",
+      "dimensions": [
+        232,
+        176
+      ],
+      "file": "assets/count-5.png",
+      "usedBy": [
+        "compare-stamps",
+        "fill-ten-trays"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "7a7ed3916729d8d8ea1d7c815dc3221bd6007e2f1547c5b72fe5a17d340a8d85",
+      "sources": []
+    },
+    "count-6": {
+      "sha256": "c71835d61f3a12a969afec1a2eb9297bfa140f87d6c2f532d19ead4f34e85ae2",
+      "dimensions": [
+        232,
+        176
+      ],
+      "file": "assets/count-6.png",
+      "usedBy": [
+        "compare-stamps",
+        "fill-ten-trays"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "7a7ed3916729d8d8ea1d7c815dc3221bd6007e2f1547c5b72fe5a17d340a8d85",
+      "sources": []
+    },
+    "count-7": {
+      "sha256": "79490fb13a46b5c8ea7034a5d08feb32b098c6c2ee5312a9fad5f87777bcf987",
+      "dimensions": [
+        232,
+        176
+      ],
+      "file": "assets/count-7.png",
+      "usedBy": [
+        "fill-ten-trays"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "7a7ed3916729d8d8ea1d7c815dc3221bd6007e2f1547c5b72fe5a17d340a8d85",
+      "sources": []
+    },
+    "count-8": {
+      "sha256": "5dba8a0dd34806be24c9891d055aa5c756a764e6c2a89fa94eaace915ce142dc",
+      "dimensions": [
+        232,
+        176
+      ],
+      "file": "assets/count-8.png",
+      "usedBy": [
+        "compare-stamps",
+        "fill-ten-trays"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "7a7ed3916729d8d8ea1d7c815dc3221bd6007e2f1547c5b72fe5a17d340a8d85",
+      "sources": []
+    },
+    "count-9": {
+      "sha256": "2d9fb44cf903d45d657c91e11b1b5617228f86dd007d808ca4212e4a10d3957c",
+      "dimensions": [
+        232,
+        176
+      ],
+      "file": "assets/count-9.png",
+      "usedBy": [
+        "compare-stamps",
+        "fill-ten-trays"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "7a7ed3916729d8d8ea1d7c815dc3221bd6007e2f1547c5b72fe5a17d340a8d85",
+      "sources": []
+    },
+    "count-10": {
+      "sha256": "aa117483defe92e98bda5d99e80498c06d9063defc53b2b56f4c12eca23f3d6e",
+      "dimensions": [
+        232,
+        176
+      ],
+      "file": "assets/count-10.png",
+      "usedBy": [
+        "fill-ten-trays"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "7a7ed3916729d8d8ea1d7c815dc3221bd6007e2f1547c5b72fe5a17d340a8d85",
+      "sources": []
+    },
+    "count-11": {
+      "sha256": "97fa2da99b2759326601384786477415f6aab7d79a5b5cc601b48ece08159f47",
+      "dimensions": [
+        232,
+        176
+      ],
+      "file": "assets/count-11.png",
+      "usedBy": [
+        "compare-stamps"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "7a7ed3916729d8d8ea1d7c815dc3221bd6007e2f1547c5b72fe5a17d340a8d85",
+      "sources": []
+    },
+    "count-12": {
+      "sha256": "338a88495959015e1d426c313871d0d98d6776ca7120b2df1d4e90fd99c2b01f",
+      "dimensions": [
+        232,
+        176
+      ],
+      "file": "assets/count-12.png",
+      "usedBy": [
+        "compare-stamps"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "7a7ed3916729d8d8ea1d7c815dc3221bd6007e2f1547c5b72fe5a17d340a8d85",
+      "sources": []
+    },
+    "count-13": {
+      "sha256": "f184ba7f7317d74c081c8a06befbd94c65025c9481ec855932e1a45e7fd1dfb4",
+      "dimensions": [
+        232,
+        176
+      ],
+      "file": "assets/count-13.png",
+      "usedBy": [
+        "compare-stamps"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "7a7ed3916729d8d8ea1d7c815dc3221bd6007e2f1547c5b72fe5a17d340a8d85",
+      "sources": []
+    },
+    "count-14": {
+      "sha256": "5902d45dd722f7820bb0dd898eab2190aacbfbaadd1f04f1ca90689d3795ec80",
+      "dimensions": [
+        232,
+        176
+      ],
+      "file": "assets/count-14.png",
+      "usedBy": [
+        "compare-stamps"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "7a7ed3916729d8d8ea1d7c815dc3221bd6007e2f1547c5b72fe5a17d340a8d85",
+      "sources": []
+    },
+    "count-15": {
+      "sha256": "e0a1160599b5e6f6482fa5113e2fffe79bc797993ca24c01e479413bca797cdd",
+      "dimensions": [
+        232,
+        176
+      ],
+      "file": "assets/count-15.png",
+      "usedBy": [
+        "compare-stamps"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "7a7ed3916729d8d8ea1d7c815dc3221bd6007e2f1547c5b72fe5a17d340a8d85",
+      "sources": []
+    },
+    "count-16": {
+      "sha256": "5481dd07a4fee1f2ec3ca71f26f4f241c80db9a3d45dc2c66385eb2f4bd430e1",
+      "dimensions": [
+        232,
+        176
+      ],
+      "file": "assets/count-16.png",
+      "usedBy": [
+        "compare-stamps"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "7a7ed3916729d8d8ea1d7c815dc3221bd6007e2f1547c5b72fe5a17d340a8d85",
+      "sources": []
+    },
+    "count-18": {
+      "sha256": "d978ea546a79c78765efbec6caa03d4f057f6a425c9526da6823db1b0b4be444",
+      "dimensions": [
+        232,
+        176
+      ],
+      "file": "assets/count-18.png",
+      "usedBy": [
+        "compare-stamps"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "7a7ed3916729d8d8ea1d7c815dc3221bd6007e2f1547c5b72fe5a17d340a8d85",
+      "sources": []
+    },
+    "quiz-1-a": {
+      "sha256": "b0fff9af2b0d3e75255e3f638677230e60aae44d0163459e9f278a68c109ab0c",
+      "dimensions": [
+        515,
+        275
+      ],
+      "file": "assets/quiz-1-a.png",
+      "usedBy": [
+        "number-ops-q1"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "7a7ed3916729d8d8ea1d7c815dc3221bd6007e2f1547c5b72fe5a17d340a8d85",
+      "sources": [
+        "star-stamp",
+        "circle-stamp"
+      ]
+    },
+    "quiz-1-b": {
+      "sha256": "c4283b607b6f8f2423c25bf1ed24ad150e073c76320caaf877206ccc7df3b319",
+      "dimensions": [
+        515,
+        275
+      ],
+      "file": "assets/quiz-1-b.png",
+      "usedBy": [
+        "number-ops-q1"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "7a7ed3916729d8d8ea1d7c815dc3221bd6007e2f1547c5b72fe5a17d340a8d85",
+      "sources": [
+        "star-stamp",
+        "circle-stamp"
+      ]
+    },
+    "quiz-1-c": {
+      "sha256": "4b7185b38e79739517c04e153c3f3f7270e72fa79800dc605dfa093c9556a091",
+      "dimensions": [
+        515,
+        275
+      ],
+      "file": "assets/quiz-1-c.png",
+      "usedBy": [
+        "number-ops-q1"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "7a7ed3916729d8d8ea1d7c815dc3221bd6007e2f1547c5b72fe5a17d340a8d85",
+      "sources": [
+        "star-stamp",
+        "circle-stamp"
+      ]
+    },
+    "quiz-2-a": {
+      "sha256": "cc47e439fcc027f3539f12ba979ceeb761cfeea209e55d321d5b8a4f0b4bf357",
+      "dimensions": [
+        494,
+        242
+      ],
+      "file": "assets/quiz-2-a.png",
+      "usedBy": [
+        "number-ops-q2"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "7a7ed3916729d8d8ea1d7c815dc3221bd6007e2f1547c5b72fe5a17d340a8d85",
+      "sources": [
+        "star-stamp"
+      ]
+    },
+    "quiz-2-b": {
+      "sha256": "0c5a6ce9df8bcc98cf358ea6b94a8ccb90edb85ac5e1d042ffe550c28ea42195",
+      "dimensions": [
+        494,
+        242
+      ],
+      "file": "assets/quiz-2-b.png",
+      "usedBy": [
+        "number-ops-q2"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "7a7ed3916729d8d8ea1d7c815dc3221bd6007e2f1547c5b72fe5a17d340a8d85",
+      "sources": [
+        "star-stamp"
+      ]
+    },
+    "quiz-2-c": {
+      "sha256": "0daba32bdc8cfab2e18dd19d73895a37240e0fce0367a404088b660dcacdc9bd",
+      "dimensions": [
+        494,
+        242
+      ],
+      "file": "assets/quiz-2-c.png",
+      "usedBy": [
+        "number-ops-q2"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "7a7ed3916729d8d8ea1d7c815dc3221bd6007e2f1547c5b72fe5a17d340a8d85",
+      "sources": [
+        "star-stamp"
+      ]
+    },
+    "quiz-3-a": {
+      "sha256": "bb6052558c4d216e45c17a0fe5aa70267a95afc19fe85df732625c024f9de98c",
+      "dimensions": [
+        460,
+        252
+      ],
+      "file": "assets/quiz-3-a.png",
+      "usedBy": [
+        "number-ops-q3"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "7a7ed3916729d8d8ea1d7c815dc3221bd6007e2f1547c5b72fe5a17d340a8d85",
+      "sources": []
+    },
+    "quiz-3-b": {
+      "sha256": "ae275839c4e2727a208a9ea0659c943ff314464d4870be6cffda8ef670a6b757",
+      "dimensions": [
+        460,
+        252
+      ],
+      "file": "assets/quiz-3-b.png",
+      "usedBy": [
+        "number-ops-q3"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "7a7ed3916729d8d8ea1d7c815dc3221bd6007e2f1547c5b72fe5a17d340a8d85",
+      "sources": []
+    },
+    "quiz-3-c": {
+      "sha256": "e3b674b5a00358892315c244887d1691008650745da356298715e9f2619426e0",
+      "dimensions": [
+        460,
+        252
+      ],
+      "file": "assets/quiz-3-c.png",
+      "usedBy": [
+        "number-ops-q3"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "7a7ed3916729d8d8ea1d7c815dc3221bd6007e2f1547c5b72fe5a17d340a8d85",
+      "sources": []
+    },
+    "quiz-4-a": {
+      "sha256": "2444e49d24107717560bf147f83e816b910e7232ff99298e2aced5ab922e2071",
+      "dimensions": [
+        470,
+        252
+      ],
+      "file": "assets/quiz-4-a.png",
+      "usedBy": [
+        "number-ops-q4"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "7a7ed3916729d8d8ea1d7c815dc3221bd6007e2f1547c5b72fe5a17d340a8d85",
+      "sources": []
+    },
+    "quiz-4-b": {
+      "sha256": "73a317e1a8b287513ccb06b6bd96b18f12ce0f694b7b74b249e30e8606db3ae1",
+      "dimensions": [
+        470,
+        252
+      ],
+      "file": "assets/quiz-4-b.png",
+      "usedBy": [
+        "number-ops-q4"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "7a7ed3916729d8d8ea1d7c815dc3221bd6007e2f1547c5b72fe5a17d340a8d85",
+      "sources": []
+    },
+    "quiz-4-c": {
+      "sha256": "55dd24684b1b21cedd3c8cb6acb825aa70fd8c5918148cba19a6d21b86bd08e6",
+      "dimensions": [
+        470,
+        252
+      ],
+      "file": "assets/quiz-4-c.png",
+      "usedBy": [
+        "number-ops-q4"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "7a7ed3916729d8d8ea1d7c815dc3221bd6007e2f1547c5b72fe5a17d340a8d85",
+      "sources": []
+    },
+    "quiz-5-a": {
+      "sha256": "9787a10dc06f3f4c217f55c06781cf19a3ad49ac58ccacb66a2d3099c69ea001",
+      "dimensions": [
+        470,
+        252
+      ],
+      "file": "assets/quiz-5-a.png",
+      "usedBy": [
+        "number-ops-q5"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "7a7ed3916729d8d8ea1d7c815dc3221bd6007e2f1547c5b72fe5a17d340a8d85",
+      "sources": []
+    },
+    "quiz-5-b": {
+      "sha256": "cb54ba02e856ce46de0f90b70357ae8019636233aa6fe75b82a554eb594f0bd2",
+      "dimensions": [
+        470,
+        252
+      ],
+      "file": "assets/quiz-5-b.png",
+      "usedBy": [
+        "number-ops-q5"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "7a7ed3916729d8d8ea1d7c815dc3221bd6007e2f1547c5b72fe5a17d340a8d85",
+      "sources": []
+    },
+    "quiz-5-c": {
+      "sha256": "d8dbfea162d7b110565c6521288337c8c0ee013e8970ffabd5c85d4ffd4410ae",
+      "dimensions": [
+        470,
+        252
+      ],
+      "file": "assets/quiz-5-c.png",
+      "usedBy": [
+        "number-ops-q5"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "7a7ed3916729d8d8ea1d7c815dc3221bd6007e2f1547c5b72fe5a17d340a8d85",
+      "sources": []
+    },
+    "quiz-6-a": {
+      "sha256": "8baeaf0f8d0883431165cf7cc4df968c702a1a13b807dffbe17379eac942645c",
+      "dimensions": [
+        470,
+        252
+      ],
+      "file": "assets/quiz-6-a.png",
+      "usedBy": [
+        "number-ops-q6"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "7a7ed3916729d8d8ea1d7c815dc3221bd6007e2f1547c5b72fe5a17d340a8d85",
+      "sources": [
+        "star-stamp"
+      ]
+    },
+    "quiz-6-b": {
+      "sha256": "f8f5acb96ea058c1dc4b405b47319fb778af1c49924c4861964e84c777b0fd89",
+      "dimensions": [
+        470,
+        252
+      ],
+      "file": "assets/quiz-6-b.png",
+      "usedBy": [
+        "number-ops-q6"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "7a7ed3916729d8d8ea1d7c815dc3221bd6007e2f1547c5b72fe5a17d340a8d85",
+      "sources": [
+        "star-stamp"
+      ]
+    },
+    "quiz-6-c": {
+      "sha256": "0689a606512f46db0d989bb37d44b2af8f552c949feab4af39da9167660d0af6",
+      "dimensions": [
+        470,
+        252
+      ],
+      "file": "assets/quiz-6-c.png",
+      "usedBy": [
+        "number-ops-q6"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "7a7ed3916729d8d8ea1d7c815dc3221bd6007e2f1547c5b72fe5a17d340a8d85",
+      "sources": [
+        "star-stamp"
+      ]
+    },
+    "quiz-7-a": {
+      "sha256": "44dbb2efaea5fdc914cc89072f5437ac7be90dd45268f815c525493387a97f86",
+      "dimensions": [
+        520,
+        285
+      ],
+      "file": "assets/quiz-7-a.png",
+      "usedBy": [
+        "number-ops-q7"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "7a7ed3916729d8d8ea1d7c815dc3221bd6007e2f1547c5b72fe5a17d340a8d85",
+      "sources": []
+    },
+    "quiz-7-b": {
+      "sha256": "dd9fa66b610aec9d48302000289997cd73a22235b958a6ba76c742738f994787",
+      "dimensions": [
+        520,
+        285
+      ],
+      "file": "assets/quiz-7-b.png",
+      "usedBy": [
+        "number-ops-q7"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "7a7ed3916729d8d8ea1d7c815dc3221bd6007e2f1547c5b72fe5a17d340a8d85",
+      "sources": []
+    },
+    "quiz-7-c": {
+      "sha256": "9903fabc3a9f448cac919166284c4cac1798aa6a0a368c27059f739a8d1d63dd",
+      "dimensions": [
+        520,
+        285
+      ],
+      "file": "assets/quiz-7-c.png",
+      "usedBy": [
+        "number-ops-q7"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "7a7ed3916729d8d8ea1d7c815dc3221bd6007e2f1547c5b72fe5a17d340a8d85",
+      "sources": []
+    },
+    "quiz-8-a": {
+      "sha256": "7185f1144d362ad207ef82f421016cc71c1d86c661fa198b84bc4a0fefa8ba92",
+      "dimensions": [
+        470,
+        230
+      ],
+      "file": "assets/quiz-8-a.png",
+      "usedBy": [
+        "number-ops-q8"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "7a7ed3916729d8d8ea1d7c815dc3221bd6007e2f1547c5b72fe5a17d340a8d85",
+      "sources": []
+    },
+    "quiz-8-b": {
+      "sha256": "a97800ead07ec2c56f404b6405ea9e447889e67b01f4e52aa3349637069a2a1a",
+      "dimensions": [
+        470,
+        230
+      ],
+      "file": "assets/quiz-8-b.png",
+      "usedBy": [
+        "number-ops-q8"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "7a7ed3916729d8d8ea1d7c815dc3221bd6007e2f1547c5b72fe5a17d340a8d85",
+      "sources": []
+    },
+    "quiz-8-c": {
+      "sha256": "3674a76100c2bdf82f0d6d09b06785281ca5f82e9896811db97a5702e666e21c",
+      "dimensions": [
+        470,
+        230
+      ],
+      "file": "assets/quiz-8-c.png",
+      "usedBy": [
+        "number-ops-q8"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "7a7ed3916729d8d8ea1d7c815dc3221bd6007e2f1547c5b72fe5a17d340a8d85",
+      "sources": []
+    }
+  }
+}

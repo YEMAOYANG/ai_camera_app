@@ -1,0 +1,200 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "解决问题",
+  "binding": {
+    "editionId": "pep-math-g1-upper-2022-standard",
+    "revisionId": "directory-ede7a8c63c337cf95a03fe79",
+    "unitId": "e3561735-f831-494f-ba43-370dccc3ff2a",
+    "nodeId": "35590aa5-150b-4b1c-a1d2-a83621299dd3"
+  },
+  "scenario": "植物展的陈列架上有两层盆栽，盆上挂叶形或水滴形小牌。展台管理员先按层数，再按牌的形状数，用两次结果核实登记。",
+  "goals": [
+    "在一组具体对象中听懂要求的整体，辨认可以按位置或一种特征观察。",
+    "按同一标准分成两部分，做到每个对象恰好落入一组，并用两部分相加求总数。",
+    "换一个观察标准得到另一个算式，解释两次都完整覆盖同一批对象，所以结果相同。",
+    "遇到混选导致重复、遗漏或两次和不同时，重新点数或换标准检查，并向家人讲生活中的例子。"
+  ],
+  "pageSequence": [
+    {
+      "key": "plant-exhibit",
+      "kind": "teaching",
+      "title": "植物展要数什么"
+    },
+    {
+      "key": "one-rule-at-a-time",
+      "kind": "teaching",
+      "title": "按架层分两组"
+    },
+    {
+      "key": "count-each-group",
+      "kind": "teaching",
+      "title": "把两组的数量合起来"
+    },
+    {
+      "key": "sorting-rules",
+      "kind": "teaching",
+      "title": "一次听清一条标准"
+    },
+    {
+      "key": "send-by-the-rule",
+      "kind": "interactive",
+      "title": "推盆牌到合适的托盘"
+    },
+    {
+      "key": "show-both-totals",
+      "kind": "teaching",
+      "title": "换一条标准再算"
+    },
+    {
+      "key": "same-whole",
+      "kind": "teaching",
+      "title": "两道算式，同一整架"
+    },
+    {
+      "key": "trace-the-double-count",
+      "kind": "teaching",
+      "title": "圈出数重和漏掉的盆"
+    },
+    {
+      "key": "matching-rules",
+      "kind": "teaching",
+      "title": "先对照每一盆"
+    },
+    {
+      "key": "recheck-by-matching",
+      "kind": "interactive",
+      "title": "发射种子，对上完整分组"
+    },
+    {
+      "key": "one-more-exhibit",
+      "kind": "teaching",
+      "title": "给小鸟摆件也算一算"
+    },
+    {
+      "key": "picture-check",
+      "kind": "quiz",
+      "title": "听一听，选一幅新图"
+    },
+    {
+      "key": "wrap-up",
+      "kind": "teaching",
+      "title": "在家试一组物件"
+    }
+  ],
+  "games": [
+    {
+      "page": "send-by-the-rule",
+      "template": "sortingDepot",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.sortingDepot",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "classification",
+      "selection": "小盆牌含相同的两种可观察属性；按口令确定本关看形状还是架层，只有符合当下标准的托盘能收，必须把所有牌各推一次。架层用固定来源标记保留。",
+      "levels": [
+        "两件盆牌，按架层分，宽通道。",
+        "三件盆牌，改按两种清晰牌形分，路线有转弯。",
+        "四至五件盆牌，每张兼有两种属性，目标颜色不暗示分组，路线需先留空。"
+      ],
+      "demo": "圈出当关规则、盆牌、上层托盘和小车，只送入一张牌后交接。"
+    },
+    {
+      "page": "recheck-by-matching",
+      "template": "magnetMarbles",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.magnetMarbles",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "pair_match",
+      "selection": "配对表按同一批可识别对象生成。另一种分组的正确靶须完整覆盖且总数相同；干扰至少一件重复或遗漏。要主动瞄准与发射，数量和标记由代码精确摆放。",
+      "levels": [
+        "同一架四盆，三个靶中找一张不重不漏的牌形分组。",
+        "三靶里找同一架完整的两种分组。",
+        "四靶里找完整的两种分组，识别数量一样但有重有漏的干扰。"
+      ],
+      "demo": "圈出原架、靶区、完整分组靶和发射器，只命中一次。左下保留命中的分组供核对。"
+    }
+  ],
+  "quizPlan": [
+    {
+      "skill": "choose-a-standard",
+      "prompt": "只数架上的小旗。哪幅图圈对了？",
+      "answer": "两层的五面小旗全部圈住，小鸟摆件没有圈",
+      "position": 1,
+      "rationale": "五面小旗都被圈到。小鸟摆件要留在圈外。"
+    },
+    {
+      "skill": "partition-and-sum",
+      "prompt": "上层六件，下层七件。哪幅图两层都数全了？",
+      "answer": "上层有六件，下层有七件",
+      "position": 3,
+      "rationale": "上层的六件和下层的七件都在，六加七等于十三。"
+    },
+    {
+      "skill": "partition-and-sum",
+      "prompt": "看左边原架。按圆牌和方牌分，哪幅图每件只进一组？",
+      "answer": "两个圆牌在一组，两个方牌在一组，四件都出现一次",
+      "position": 2,
+      "rationale": "圆牌全在同一组，方牌全在另一组，每件只出现一次。"
+    },
+    {
+      "skill": "two-views-same-total",
+      "prompt": "哪幅图用两种分法都数全了同一批？",
+      "answer": "同七件展品先按架层分三件和四件，再按牌形分两件和五件",
+      "position": 1,
+      "rationale": "按层三件加四件，按牌两件加五件。两次都数了同一批七件。"
+    },
+    {
+      "skill": "find-and-repair-a-count",
+      "prompt": "把上层和圆牌合起来。哪幅图圈对了重数和漏数？",
+      "answer": "双圈标上层圆牌，虚线圈标下层方牌",
+      "position": 2,
+      "rationale": "上层圆牌会数两次，下层方牌一次也没选到。"
+    },
+    {
+      "skill": "find-and-repair-a-count",
+      "prompt": "两次数出来不一样。哪幅图能帮你重查？",
+      "answer": "原来每件都有一次标记，再沿着两层完整点数",
+      "position": 3,
+      "rationale": "在原图每件标一次，按同一标准重分两组，再核算总数。"
+    }
+  ],
+  "afterClass": {
+    "familyTask": "找一批安全小物件，先按位置分一次，再按一个清楚的形状或标记分一次。每次摆出两组、说总量，并和家人互查。",
+    "weeklyQuestionSource": [
+      "识别所求的整体",
+      "依一条标准分组并相加",
+      "两种观察交叉验证",
+      "发现重复或遗漏并改正"
+    ],
+    "evidence": "线上记录题目和游戏动作，家人观察实际分组、口头说明与核查。"
+  },
+  "artAndLanguage": "原创展台和盆牌，精确对象数量、位置与分组标记由代码控制并逐图核查。录音给出题意，数字和加法式保留作目标。",
+  "goalEvidence": [
+    {
+      "skill": "choose-a-standard",
+      "target": "在新图听清要数的对象，选一种清楚的分组标准。",
+      "source": "原书印96阅读理解、课件3～6"
+    },
+    {
+      "skill": "partition-and-sum",
+      "target": "把每件放入恰好一组，准确数两部分并合起来。",
+      "source": "原书印96分析解答、教案2页"
+    },
+    {
+      "skill": "two-views-same-total",
+      "target": "换标准求同一总数，用两个不同算式交叉验证。",
+      "source": "原书印96回顾反思、课件11～15"
+    },
+    {
+      "skill": "find-and-repair-a-count",
+      "target": "看出跨标准混选、重复、遗漏或算错，说明如何重查。",
+      "source": "原书印98相应练习、教案2～4页"
+    }
+  ],
+  "teacherCode": "mira_math_clear",
+  "authoring": {
+    "sourceMode": "direct",
+    "authorModels": [
+      "gpt-6.1-sol"
+    ]
+  }
+}

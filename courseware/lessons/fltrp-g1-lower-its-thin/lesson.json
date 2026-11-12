@@ -1,0 +1,1073 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "Unit 2 It's thin.",
+  "grade": 1,
+  "description": "从农场照片听辨体形、大小与一只或一组，按两条线索找图，再试着画和说。",
+  "roster": {
+    "mia": {
+      "name": "Mia 老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Jennifer",
+      "avatar": "/teachers/coco-english-v1.png",
+      "color": "#557B76",
+      "persona": "听声、指图、一步一步帮孩子说清特点。"
+    }
+  },
+  "images": {
+    "farm-camera-sticker": {
+      "file": "assets/farm-camera-sticker.png"
+    },
+    "farm-ear-rabbit": {
+      "file": "assets/farm-ear-rabbit.png"
+    },
+    "farm-five-pigs": {
+      "file": "assets/farm-five-pigs.png"
+    },
+    "farm-lens-ball": {
+      "file": "assets/farm-lens-ball.png"
+    },
+    "farm-one-big": {
+      "file": "assets/farm-one-big.png"
+    },
+    "farm-one-black-little": {
+      "file": "assets/farm-one-black-little.png"
+    },
+    "farm-one-little": {
+      "file": "assets/farm-one-little.png"
+    },
+    "farm-pair-black-big": {
+      "file": "assets/farm-pair-black-big.png"
+    },
+    "farm-pair-black-little": {
+      "file": "assets/farm-pair-black-little.png"
+    },
+    "farm-pair-pink-big": {
+      "file": "assets/farm-pair-pink-big.png"
+    },
+    "farm-pair-pink-little": {
+      "file": "assets/farm-pair-pink-little.png"
+    },
+    "farm-photo-stage": {
+      "file": "assets/farm-photo-stage.png"
+    },
+    "farm-q-black-big": {
+      "file": "assets/farm-q-black-big.png"
+    },
+    "farm-q-ears-big": {
+      "file": "assets/farm-q-ears-big.png"
+    },
+    "farm-q-ears-feet": {
+      "file": "assets/farm-q-ears-feet.png"
+    },
+    "farm-q-ears-little": {
+      "file": "assets/farm-q-ears-little.png"
+    },
+    "farm-q-mixed-lamb": {
+      "file": "assets/farm-q-mixed-lamb.png"
+    },
+    "farm-q-one-duck": {
+      "file": "assets/farm-q-one-duck.png"
+    },
+    "farm-q-round-little": {
+      "file": "assets/farm-q-round-little.png"
+    },
+    "farm-q-round": {
+      "file": "assets/farm-q-round.png"
+    },
+    "farm-q-thin": {
+      "file": "assets/farm-q-thin.png"
+    },
+    "farm-q-two-big-black": {
+      "file": "assets/farm-q-two-big-black.png"
+    },
+    "farm-q-two-big-ducks": {
+      "file": "assets/farm-q-two-big-ducks.png"
+    },
+    "farm-q-two-black": {
+      "file": "assets/farm-q-two-black.png"
+    },
+    "farm-q-two-ducks": {
+      "file": "assets/farm-q-two-ducks.png"
+    },
+    "farm-q-two-white": {
+      "file": "assets/farm-q-two-white.png"
+    },
+    "farm-q-white-big": {
+      "file": "assets/farm-q-white-big.png"
+    },
+    "farm-q-white-little": {
+      "file": "assets/farm-q-white-little.png"
+    },
+    "farm-rover-flash": {
+      "file": "assets/farm-rover-flash.png"
+    },
+    "farm-rover": {
+      "file": "assets/farm-rover.png"
+    },
+    "farm-shape-fat": {
+      "file": "assets/farm-shape-fat.png"
+    },
+    "farm-shape-thin": {
+      "file": "assets/farm-shape-thin.png"
+    },
+    "farm-sounds": {
+      "file": "assets/farm-sounds.png"
+    },
+    "farm-two-big": {
+      "file": "assets/farm-two-big.png"
+    },
+    "farm-two-little": {
+      "file": "assets/farm-two-little.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "morning-sounds",
+      "type": "slide",
+      "title": "农场照片开张啦",
+      "template": "picture-points",
+      "data": {
+        "title": "农场照片开张啦",
+        "picture": "farm-sounds",
+        "points": [
+          "Moo!　奶牛",
+          "Chick, chick!　小鸡",
+          "Oink!　小猪",
+          "Woof!　小狗"
+        ]
+      },
+      "script": [
+        {
+          "say": "农场的照片还没挂好。先听一声，你猜哪只动物到了？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "四张都在这儿。听清一个声音，再伸手指。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "Moo, moo!"
+        },
+        {
+          "say": "找到花斑奶牛。我们学它叫两声。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "Chick, chick!"
+        },
+        {
+          "say": "是长着鸡冠的小鸡。你可以拍拍手，学这两声。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "Oink, oink!"
+        },
+        {
+          "say": "看卷尾巴。小猪到了。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "Woof, woof!"
+        },
+        {
+          "say": "小狗也来了。用两个拍子说给它听。"
+        },
+        {
+          "say": "Moo, moo. Turn and look."
+        },
+        {
+          "say": "Woof, woof. Point at the dog."
+        },
+        {
+          "say": "声音帮我们找动物。等会儿，再听一听照片里还有什么线索。"
+        }
+      ]
+    },
+    {
+      "key": "shape-not-size",
+      "type": "slide",
+      "title": "先看看身体是圆还是窄",
+      "template": "two-columns",
+      "data": {
+        "title": "先看看身体是圆还是窄",
+        "left": {
+          "heading": "fat",
+          "body": "身体圆鼓鼓。"
+        },
+        "left_picture": "farm-shape-fat",
+        "right": {
+          "heading": "thin",
+          "body": "身体比较窄。"
+        },
+        "right_picture": "farm-shape-thin"
+      },
+      "script": [
+        {
+          "say": "两只猪排在同一条线上。哪一只的肚子更圆？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "Look at this pig."
+        },
+        {
+          "say": "看看身体的轮廓。它肚子圆鼓鼓。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "It's fat."
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "这里的 fat 描述画里的这只猪很圆。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "现在看右边。鼻子到尾巴差不多长，身体却窄。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "It's very thin."
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "Thin 是瘦。加上 very，就是特别明显。"
+        },
+        {
+          "say": "Very thin."
+        },
+        {
+          "say": "圆不圆和整只占多大是两件事。"
+        }
+      ]
+    },
+    {
+      "key": "same-shape-two-sizes",
+      "type": "slide",
+      "title": "再比整只占多大",
+      "template": "two-columns",
+      "data": {
+        "title": "再比整只占多大",
+        "left": {
+          "heading": "big",
+          "body": "同样的形状，这只更大。"
+        },
+        "left_picture": "farm-one-big",
+        "right": {
+          "heading": "little",
+          "body": "同样的形状，这只更小。"
+        },
+        "right_picture": "farm-one-little"
+      },
+      "script": [
+        {
+          "say": "这次，两张图里的猪形状一样。我们看什么？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "从脚下同一条线看。左边这只占的地方多。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "It's big."
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "Big 说的是整只动物大。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "右边从鼻尖到尾巴也缩小了。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "It's little."
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "Little 说的是整只动物小。不是只看肚子。"
+        },
+        {
+          "say": "所以小小的一只猪，也可以胖乎乎。"
+        }
+      ]
+    },
+    {
+      "key": "one-or-many",
+      "type": "slide",
+      "title": "听清是在说一只还是一组",
+      "template": "two-columns",
+      "data": {
+        "title": "听清是在说一只还是一组",
+        "left": {
+          "heading": "It's…",
+          "body": "听到 It’s，看一只。"
+        },
+        "left_picture": "farm-one-little",
+        "right": {
+          "heading": "They're…",
+          "body": "听到 They’re，看一组。"
+        },
+        "right_picture": "farm-two-little"
+      },
+      "script": [
+        {
+          "say": "两张照片都拍了小猪。说一只和说一组，开头一样吗？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "Look at the pig."
+        },
+        {
+          "say": "听到 Look at，先找我指的对象。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "It's little. Look at one pig."
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "这里只指一只。It’s 是说这一只。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "右边有一只、两只。我指的是整个相框。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "They're little."
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "They’re 是说这一组。两只都小，这句话才合适。"
+        },
+        {
+          "say": "下张照片里，如果说的是一组大的，就用这一句。"
+        },
+        {
+          "say": "They're big."
+        },
+        {
+          "say": "再听一遍。先听说的是哪张照片。"
+        },
+        {
+          "say": "看看照片的轮廓和大小，再慢慢对准。"
+        },
+        {
+          "say": "你听对了，也把弹珠送到了对应照片。"
+        }
+      ]
+    },
+    {
+      "key": "aim-at-the-photo",
+      "type": "interactive",
+      "title": "弹珠照相台",
+      "page": "aim-at-the-photo",
+      "widgetType": "game",
+      "startImage": "farm-photo-stage",
+      "script": [
+        {
+          "say": "照片在上面。听到一句话，哪张照片应该亮起来？"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "pause": true,
+            "level": 1
+          }
+        },
+        {
+          "highlight": "#demo-aim-voice"
+        },
+        {
+          "say": "先听口令。没听清，可以点左下角的小喇叭。"
+        },
+        {
+          "highlight": "#game-target"
+        },
+        {
+          "say": "这里说一只特别瘦的猪。找身体最窄的那张。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "小弹珠从下面出发。先把虚线对准，再发射。"
+        },
+        {
+          "highlight": "#demo-aim-pad"
+        },
+        {
+          "say": "用箭头调整。弹珠在空中也能拐一点。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "你看，正确的照片贴上了相机贴纸。"
+        },
+        {
+          "say": "现在轮到你。先听，再对准，选对照片才能得分。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "pause": false,
+            "level": 1
+          }
+        }
+      ],
+      "gameAudio": {
+        "one-fat": "shape-not-size-6",
+        "one-thin": "shape-not-size-12",
+        "one-big": "same-shape-two-sizes-5",
+        "one-little": "same-shape-two-sizes-11",
+        "many-little": "one-or-many-12",
+        "many-big": "one-or-many-16",
+        "aim-hint": "one-or-many-17",
+        "aim-help": "one-or-many-18",
+        "aim-good": "one-or-many-19"
+      }
+    },
+    {
+      "key": "two-clue-photos",
+      "type": "slide",
+      "title": "同一组，找两条线索",
+      "template": "picture-points",
+      "data": {
+        "title": "同一组，找两条线索",
+        "picture": "farm-five-pigs",
+        "points": [
+          "先看整组，再找小的。",
+          "再看颜色，找黑色。",
+          "同一组要同时符合。",
+          "大小和颜色都要听清。"
+        ]
+      },
+      "script": [
+        {
+          "say": "这张照片里有五只猪。先圈心里要说的那一组。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "跟我从左往右看。五只都在相框里。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "有两只大，三只小。先看整只占多大。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "再看颜色。一只是黑色，四只是粉色。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "如果说这一组又小又黑，组里每只都要符合。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "只看小，会选到小粉猪。还要核对是不是黑色。"
+        }
+      ]
+    },
+    {
+      "key": "listen-to-two-clues",
+      "type": "slide",
+      "title": "两条都符合才留下",
+      "template": "two-columns",
+      "data": {
+        "title": "两条都符合才留下",
+        "left": {
+          "heading": "little and black",
+          "body": "又小又黑。"
+        },
+        "left_picture": "farm-pair-black-little",
+        "right": {
+          "heading": "big and black",
+          "body": "同是黑色，这组更大。"
+        },
+        "right_picture": "farm-pair-black-big"
+      },
+      "script": [
+        {
+          "say": "两个相框里都有黑猪。听到两条线索，该怎样选？"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "They're little and black."
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "先核对小。这组每只都小。再看颜色，也都是黑的。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "两条都对，这一组留下。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "They're big and black."
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "这组虽是黑色，却占了更大的地方。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "只符合一条，就先放回。接着换粉猪的照片听两句。"
+        },
+        {
+          "say": "They're little and pink."
+        },
+        {
+          "say": "They're big and pink."
+        },
+        {
+          "say": "取好后要听送到哪里。先听颜色，再听大小。"
+        },
+        {
+          "say": "我们等会儿会听到这些去展格的口令。"
+        },
+        {
+          "say": "回想刚听到的两条线索。"
+        },
+        {
+          "say": "看同一张照片，先比大小，再对颜色。"
+        },
+        {
+          "say": "两条线索都对，照片到位了。"
+        },
+        {
+          "say": "Find the frame with little black pigs."
+        },
+        {
+          "say": "Find the frame with big black pigs."
+        },
+        {
+          "say": "Find the frame with little pink pigs."
+        },
+        {
+          "say": "Find the frame with big pink pigs."
+        }
+      ]
+    },
+    {
+      "key": "deliver-the-photo",
+      "type": "interactive",
+      "title": "开相机车送照片",
+      "page": "deliver-the-photo",
+      "widgetType": "game",
+      "startImage": "farm-photo-stage",
+      "script": [
+        {
+          "say": "照片要送回展格。只有颜色一样，就能拿走吗？"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "pause": true,
+            "level": 1
+          }
+        },
+        {
+          "highlight": "#demo-little-black"
+        },
+        {
+          "say": "先听到小和黑。在同一张照片上核对两条线索。"
+        },
+        {
+          "say": "这张两只都是小黑猪，两条都符合。"
+        },
+        {
+          "highlight": "#demo-farm-frame"
+        },
+        {
+          "say": "取好后再听。开到对着同一张照片的展格。"
+        },
+        {
+          "highlight": "#demo-farm-pad"
+        },
+        {
+          "say": "箭头开车，停车再点装卸。过路时等小车过去。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "先只取这一张。车旁的小相框里出现了照片。"
+        },
+        {
+          "say": "现在你来。拿错先重听，不急着开过去。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "pause": false,
+            "level": 1
+          }
+        }
+      ],
+      "gameAudio": {
+        "pick-black-little": "listen-to-two-clues-3",
+        "pick-black-big": "listen-to-two-clues-9",
+        "pick-pink-little": "listen-to-two-clues-14",
+        "pick-pink-big": "listen-to-two-clues-15",
+        "drive-hint": "listen-to-two-clues-18",
+        "drive-help": "listen-to-two-clues-19",
+        "drive-good": "listen-to-two-clues-20",
+        "drop-black-little": "listen-to-two-clues-21",
+        "drop-black-big": "listen-to-two-clues-22",
+        "drop-pink-little": "listen-to-two-clues-23",
+        "drop-pink-big": "listen-to-two-clues-24"
+      }
+    },
+    {
+      "key": "point-to-the-ears",
+      "type": "slide",
+      "title": "画好以后，先指你要说的地方",
+      "template": "picture-points",
+      "data": {
+        "title": "画好以后，先指你要说的地方",
+        "picture": "farm-ear-rabbit",
+        "points": [
+          "指两只耳朵。",
+          "These are his ears.",
+          "They’re big."
+        ]
+      },
+      "script": [
+        {
+          "say": "如果我说大，说的是整只兔子，还是它的两只耳朵？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "看看我画的兔玩偶。先看手指想指哪里。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "我指两只耳朵。现在说的是耳朵这一组。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "These are his ears."
+        },
+        {
+          "say": "这样先说明我们在看耳朵。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "They're big. See the two ears?"
+        },
+        {
+          "say": "两只耳朵都大，所以用 They’re。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "我们玩一回说和猜。我来当孩子，指着兔子头上这一对。"
+        },
+        {
+          "say": "They're big."
+        },
+        {
+          "say": "我换成大人，看图猜：是它的两只大耳朵吗？"
+        },
+        {
+          "say": "我当孩子来确认：对，是它的两只耳朵。"
+        },
+        {
+          "say": "轮到你画啦。你和大人换着说、换着猜。"
+        }
+      ]
+    },
+    {
+      "key": "picture-check",
+      "type": "quiz",
+      "title": "听一听，选出新照片",
+      "intro": [
+        "来了一盒新照片。先听完整句，没听清可以重听。",
+        "有两条线索，就在同一张照片上逐条找。"
+      ],
+      "questions": [
+        {
+          "id": "hear-thin",
+          "question": "Look at the cat. It's thin.",
+          "skill": "听辨 thin 描述身体轮廓",
+          "answer": [
+            "B"
+          ],
+          "analysis": "看体形，只有中间的橘猫身体窄。右边整体小，肚子仍是圆的。",
+          "visual": {
+            "kind": "asset",
+            "image": "farm-camera-sticker",
+            "alt": "农场照片馆的相机贴纸"
+          },
+          "options": {
+            "A": {
+              "label": "圆腹橘猫",
+              "visual": {
+                "kind": "asset",
+                "image": "farm-q-round",
+                "alt": "圆腹橘猫"
+              }
+            },
+            "B": {
+              "label": "窄腹橘猫",
+              "visual": {
+                "kind": "asset",
+                "image": "farm-q-thin",
+                "alt": "窄腹橘猫"
+              }
+            },
+            "C": {
+              "label": "整体小的圆腹橘猫",
+              "visual": {
+                "kind": "asset",
+                "image": "farm-q-round-little",
+                "alt": "整体小的圆腹橘猫"
+              }
+            }
+          }
+        },
+        {
+          "id": "overall-little",
+          "question": "It's little. Find the lamb.",
+          "skill": "听辨 little 描述整体大小",
+          "answer": [
+            "C"
+          ],
+          "analysis": "三幅图共用底线和相框。右边白羊整体占的空间小；另两只都是较大的羊。",
+          "visual": {
+            "kind": "asset",
+            "image": "farm-camera-sticker",
+            "alt": "农场照片馆的相机贴纸"
+          },
+          "options": {
+            "A": {
+              "label": "一只较大的白羊",
+              "visual": {
+                "kind": "asset",
+                "image": "farm-q-white-big",
+                "alt": "一只较大的白羊"
+              }
+            },
+            "B": {
+              "label": "一只较大的黑羊",
+              "visual": {
+                "kind": "asset",
+                "image": "farm-q-black-big",
+                "alt": "一只较大的黑羊"
+              }
+            },
+            "C": {
+              "label": "一只较小的白羊",
+              "visual": {
+                "kind": "asset",
+                "image": "farm-q-white-little",
+                "alt": "一只较小的白羊"
+              }
+            }
+          }
+        },
+        {
+          "id": "they-are-little",
+          "question": "They're little. Find the ducks.",
+          "skill": "同时听辨一组与大小",
+          "answer": [
+            "A"
+          ],
+          "analysis": "They’re 说一组，little 说小。左边有两只小鸭，中间只有一只，右边两只都更大。",
+          "visual": {
+            "kind": "asset",
+            "image": "farm-camera-sticker",
+            "alt": "农场照片馆的相机贴纸"
+          },
+          "options": {
+            "A": {
+              "label": "两只小鸭",
+              "visual": {
+                "kind": "asset",
+                "image": "farm-q-two-ducks",
+                "alt": "两只小鸭"
+              }
+            },
+            "B": {
+              "label": "一只小鸭",
+              "visual": {
+                "kind": "asset",
+                "image": "farm-q-one-duck",
+                "alt": "一只小鸭"
+              }
+            },
+            "C": {
+              "label": "两只大鸭",
+              "visual": {
+                "kind": "asset",
+                "image": "farm-q-two-big-ducks",
+                "alt": "两只大鸭"
+              }
+            }
+          }
+        },
+        {
+          "id": "all-white",
+          "question": "They're white. Find the photo.",
+          "skill": "按颜色核对同一组",
+          "answer": [
+            "B"
+          ],
+          "analysis": "要核对组里的两只羊。中间两只都是白的；左边一黑一白，右边两只都黑。",
+          "visual": {
+            "kind": "asset",
+            "image": "farm-camera-sticker",
+            "alt": "农场照片馆的相机贴纸"
+          },
+          "options": {
+            "A": {
+              "label": "一只白羊和一只黑羊",
+              "visual": {
+                "kind": "asset",
+                "image": "farm-q-mixed-lamb",
+                "alt": "一只白羊和一只黑羊"
+              }
+            },
+            "B": {
+              "label": "两只白羊",
+              "visual": {
+                "kind": "asset",
+                "image": "farm-q-two-white",
+                "alt": "两只白羊"
+              }
+            },
+            "C": {
+              "label": "两只黑羊",
+              "visual": {
+                "kind": "asset",
+                "image": "farm-q-two-black",
+                "alt": "两只黑羊"
+              }
+            }
+          }
+        },
+        {
+          "id": "little-and-black",
+          "question": "They're black and little. Find them.",
+          "skill": "同一组同时符合两条外形线索",
+          "answer": [
+            "C"
+          ],
+          "analysis": "右边两只都小，而且都是黑色。左边黑但大，中间小但白。",
+          "visual": {
+            "kind": "asset",
+            "image": "farm-camera-sticker",
+            "alt": "农场照片馆的相机贴纸"
+          },
+          "options": {
+            "A": {
+              "label": "两只大黑羊",
+              "visual": {
+                "kind": "asset",
+                "image": "farm-q-two-big-black",
+                "alt": "两只大黑羊"
+              }
+            },
+            "B": {
+              "label": "两只小白羊",
+              "visual": {
+                "kind": "asset",
+                "image": "farm-q-two-white",
+                "alt": "两只小白羊"
+              }
+            },
+            "C": {
+              "label": "两只小黑羊",
+              "visual": {
+                "kind": "asset",
+                "image": "farm-q-two-black",
+                "alt": "两只小黑羊"
+              }
+            }
+          }
+        },
+        {
+          "id": "his-ears",
+          "question": "These are his ears. They're big.",
+          "skill": "先听清身体部位再核对大小",
+          "answer": [
+            "A"
+          ],
+          "analysis": "左边的圈指两只大耳朵。中间圈住了脚，右边圈着两只小耳朵。",
+          "visual": {
+            "kind": "asset",
+            "image": "farm-camera-sticker",
+            "alt": "农场照片馆的相机贴纸"
+          },
+          "options": {
+            "A": {
+              "label": "棕兔的两只大耳朵被圈出",
+              "visual": {
+                "kind": "asset",
+                "image": "farm-q-ears-big",
+                "alt": "棕兔的两只大耳朵被圈出"
+              }
+            },
+            "B": {
+              "label": "棕兔的两只脚被圈出",
+              "visual": {
+                "kind": "asset",
+                "image": "farm-q-ears-feet",
+                "alt": "棕兔的两只脚被圈出"
+              }
+            },
+            "C": {
+              "label": "棕兔的两只小耳朵被圈出",
+              "visual": {
+                "kind": "asset",
+                "image": "farm-q-ears-little",
+                "alt": "棕兔的两只小耳朵被圈出"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "closing",
+      "type": "slide",
+      "title": "把农场照片说给家人听",
+      "template": "summary",
+      "data": {
+        "title": "把农场照片说给家人听",
+        "items": [
+          "看身体，听 fat 或 thin。",
+          "比整体，听 big 或 little。",
+          "一只用 It’s，一组用 They’re。",
+          "两条线索都在同一组里核对。",
+          "画一个动物，指给家人看。"
+        ]
+      },
+      "script": [
+        {
+          "say": "农场照片都归位了。如果家人猜错了，你会怎么给线索？"
+        },
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "先看身体轮廓。胖瘦说的是形体，very 让意思更强。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "比整只占的地方，可以说大或小。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "先告诉家人，你在说一只还是一组。开头跟着换。"
+        },
+        {
+          "spotlight": "item-4"
+        },
+        {
+          "say": "两个特征都得对。别把一条放到别的照片上。"
+        },
+        {
+          "spotlight": "item-5"
+        },
+        {
+          "say": "回家画喜欢的动物。指一只、一组或两只耳朵，说一句。"
+        },
+        {
+          "say": "请家人猜一猜，再轮到你来猜。"
+        },
+        {
+          "say": "画画和开口说，请家人亲眼看、亲耳听。"
+        }
+      ]
+    }
+  ]
+}

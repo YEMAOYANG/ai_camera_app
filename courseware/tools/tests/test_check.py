@@ -55,6 +55,17 @@ class CheckTests(unittest.TestCase):
         self.notes['resources']['courseware']['pageRefs'] = []
         self.assertIn('notes_incomplete', codes(check_classroom(self.body, notes=self.notes)))
 
+    def test_teaching_notes_require_all_objectives_as_text(self):
+        self.assertIn('objectives_invalid', codes(check_classroom(self.body, notes=self.notes, teaching=True)))
+        notes = dict(self.notes, keyPoint='count', difficultPoint='explain')
+        for objectives in (None, [], 'count', ['count', ' '], ['count', {'goal': 'explain'}]):
+            with self.subTest(objectives=objectives):
+                issues = check_classroom(self.body, notes=dict(notes, objectives=objectives), teaching=True)
+                self.assertEqual([(i['gate'], i['severity']) for i in issues if i['code'] == 'objectives_invalid'],
+                                 [('G0', 'error')])
+        self.assertNotIn('objectives_invalid', codes(check_classroom(
+            self.body, notes=dict(notes, objectives=['count', 'explain']), teaching=True)))
+
     def test_notes_not_provided_needs_evidence(self):
         item = self.notes['resources']['afterClassExercise']
         item.update(status='not_provided', findings=[], pageRefs=[], evidence='lesson details sha256 ab12 lists no after-class exercise')

@@ -1,0 +1,82 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "认识人民币-认一认、换一换",
+  "binding": {
+    "editionId": "pep-math-g1-lower-2022-standard",
+    "revisionId": "directory-6205d2037284e91f10b25edd",
+    "unitId": "fdc950af-3aa4-4c77-a95f-fe523b226262",
+    "nodeId": "2a535411-8f67-4b89-abe2-626d93b3bb5a"
+  },
+  "scenario": "班级阅读节开场前，孩子帮忙整理零钱盒。先认面额，再把零散的零钱按单位数清楚，试试用另一组面额换出相同的金额。",
+  "goals": [
+    "能从数字和单位认出教材所示常见人民币面额，区分元、角、分以及纸币、硬币两种形态。",
+    "面对一组不同单位的金额，先把同单位的面额合在一起，再按单位顺序读出合计。",
+    "在同一个单位内用另一种面额组合等额兑换，能分别核对两边总额。",
+    "用成组图说明1元等于10角、1角等于10分，并能在简单图示中向两个方向兑换。"
+  ],
+  "goalEvidence": [
+    {"skill":"recognize-denomination","source":"印78、课件6至16、教案2至4、任务单1至2"},
+    {"skill":"count-by-unit","source":"印79页首、课件17、教案6"},
+    {"skill":"exchange-equal-value","source":"印79换一换、课件18至20、教案4至5、任务单2、课练1"},
+    {"skill":"exchange-adjacent-units","source":"印79两组兑换图、课件21至23、教案5、任务单2、课练1"}
+  ],
+  "pageSequence": [
+    {"key":"notes-and-coins","kind":"teaching","title":"纸币和硬币都能表示金额","plan":"展示阅读节的零钱盒和原创教学钱牌，按长方形纸币与圆形硬币分开。用同为1元的两种形态引导孩子看到外形可变、面额相同。"},
+    {"key":"read-number-and-unit","kind":"teaching","title":"把数字和单位一起读","plan":"从不同形态的元、角、分钱牌放大面额的位置。以1元、1角、1分并排辨别相同数字的不同单位。示意票面上也会用大写汉字表示面额，教师口头带读常见面额。"},
+    {"key":"sort-the-change","kind":"interactive","title":"把钱牌送到同单位的盒子","plan":"孩子把不同单位的图牌推入带样图的托盘。老师示范同为1的纸币与硬币，要跟着单位找盒子。"},
+    {"key":"count-in-separate-trays","kind":"teaching","title":"先把同单位放在一起","plan":"图中原有20元和5元、两枚1角。把20元和5元排到元盒，再把两枚1角排到角盒。逐组点亮25元和2角，合读25元2角。"},
+    {"key":"equal-amount-different-groups","kind":"teaching","title":"换一种组合，金额一样","plan":"用15元的两种组合示范等额。左边10元加5元，右边三张5元，分别圈起并算到15元，再把等号连到两个完整金额。"},
+    {"key":"exchange-yuan-and-jiao","kind":"teaching","title":"一元换成十角","plan":"将一枚1元与两排共十枚1角对齐。按次序点亮十格，再把十格合回1元，让孩子看到两个方向金额相同。"},
+    {"key":"exchange-jiao-and-fen","kind":"teaching","title":"一角能换十枚一分","plan":"一枚1角与十枚1分对齐。改用5分和5枚1分凑成同样的10分，再把合计放回1角的图框。"},
+    {"key":"aim-for-the-same-value","kind":"interactive","title":"把弹珠送到等额的图靶","plan":"孩子先听兑换要求，观察靶面有几张、几枚和单位，瞄准代表相同金额的一组再发射。"},
+    {"key":"picture-quiz-one","kind":"quiz","title":"看单位，认金额","plan":"老师预录逐题读小检查1至3，按单位识别并读出不同金额。"},
+    {"key":"picture-quiz-two","kind":"quiz","title":"看两边是不是一样多","plan":"老师预录逐题读小检查4至6，检查等额兑换及相邻单位。"},
+    {"key":"exchange-with-family","kind":"teaching","title":"在家试两种等额换法","plan":"回看面额、单位和两边总金额，让孩子和家人用实物或教具找两组相等的金额，口头解释如何检查。"}
+  ],
+  "games": [
+    {
+      "page": "sort-the-change",
+      "template": "sortingDepot",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.sortingDepot",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "classification",
+      "reason": "钱牌只有与托盘样图同单位才可入盘。牌与托盘样图采用不同面额或形态，位置换过后仍按单位判定。孩子还要绕开障碍，找能把钱牌推到盘里的方向。",
+      "levels": [
+        "1元纸币与1角硬币分送到带10元样牌和5角样牌的托盘，熟悉同数字要认单位，使用直通地板。",
+        "用5元纸币、5角硬币、5分硬币分类到三个不同单位的盒子，加入一次转向。",
+        "用1元硬币、1角纸币、2分硬币和20元纸币，元盒有两个同组托盘。更换托盘位置和样图，孩子在绕柱时安排推送次序。"
+      ],
+      "demo": "点亮目标图、搬运角色和托盘，实际把第一张牌送入一个同单位托盘即停，清空示范进度，用预录指令交接。"
+    },
+    {
+      "page": "aim-for-the-same-value",
+      "template": "magnetMarbles",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.magnetMarbles",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "pair_match",
+      "reason": "每个预录口令编号和一组等额面额图配对。靶面显示实际张数、枚数和单位，目标位置与道具颜色不提示答案。确定等额后仍须控制发射方向和飞行中的修正。",
+      "levels": [
+        "听7元和13元，分别匹配5元加两张1元、10元加三张1元。加上6元或14元干扰靶，漂移较小。",
+        "听把1元换成角和把1角换成分，分别匹配5角加五枚1角、5分加两枚2分再加1分。其他组合在数值或单位上有偏差，靶子缓慢移动。",
+        "听把两组十个1角换回元和把三组十个1分换回角，分别匹配两枚1元、三枚1角。加入把单位对调的干扰靶，增大漂移，孩子需要修正方向。"
+      ],
+      "demo": "点亮当前要找的金额、发射器和等额靶，完成一次有效发射就停。示范状态清空后由老师预录交接。"
+    }
+  ],
+  "quizPlan": [
+    {"skill":"recognize-denomination","task":"三枚硬币中，哪一枚的单位是元？","pictureOptions":["面额5角的圆钱牌","面额1元的圆钱牌","面额2分的圆钱牌"],"correctPosition":2,"rationale":"应把数字和单位一起看，三枚中只有1元的单位是元。"},
+    {"skill":"count-by-unit","task":"零钱盒里有10元、1元、5角和1角。一共是多少钱？","pictureOptions":["一组11元和一组5角","一组16元和一组1角","一组11元和一组6角"],"correctPosition":3,"rationale":"元盒10加1得11元，角盒5加1得6角，合读11元6角。"},
+    {"skill":"count-by-unit","task":"桌上有5角、2分和1分。选表示它们合计的图。","pictureOptions":["5角一组和3分一组","3角一组和5分一组","8分的一组"],"correctPosition":1,"rationale":"5角保持在角组，2分加1分得3分，一共5角3分。"},
+    {"skill":"exchange-equal-value","task":"拿一张50元去换零钱，哪一托盘的金额相同？","pictureOptions":["两张20元和一张5元","两张20元和一张10元","三张20元"],"correctPosition":2,"rationale":"20加20加10得50元，其余两盘分别是45元和60元。"},
+    {"skill":"exchange-adjacent-units","task":"把两枚1元换成以角计的零钱，哪一盒与它等额？","pictureOptions":["两枚1角","一组十枚1角","两组各十枚1角"],"correctPosition":3,"rationale":"每个1元换10角，两个1元要换20角。"},
+    {"skill":"exchange-adjacent-units","task":"有两枚1角，哪组分币正好能与它兑换？","pictureOptions":["四枚5分","两枚5分","四枚1分"],"correctPosition":1,"rationale":"两枚1角是20分，四枚5分的总值也是20分。"}
+  ],
+  "presentation": "课堂中使用原创教具式钱牌，以纸条和圆币形态、准确的面额数字及单位帮助辨认。元、角、分的符号属于本课内容。十格图和票枚数量用程序精确排布。老师预录指令、带读单位、解释每次核对金额的理由。遮住非目标文字仍可听题、看图和作答。",
+  "afterClass": {
+    "familyTask":"和家人找纸币或硬币，指着数字与单位说面额，再用家里的零钱或自制教具找两组等额金额。口头说明和实物观察待观察。",
+    "weeklyQuestionSource":["用数字和单位认面额","按单位分别合计","核对同单位等额组合","兑换元和角、角和分"],
+    "source":"印78至79、教案5至6、课件24至25、课练1"
+  }
+}

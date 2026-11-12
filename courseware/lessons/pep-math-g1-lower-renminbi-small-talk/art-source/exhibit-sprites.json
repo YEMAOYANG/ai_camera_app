@@ -1,0 +1,74 @@
+{
+  "source": "art-source/exhibit-sprites.png",
+  "sha256": "4798bb3ddc46d3413ea5393bea1abcdadfae7e72ad4a28afac93d61d188b2bbc",
+  "origin": "builtin-imagegen",
+  "prompt": "A transparent 3 column by 2 row sprite sheet, six isolated assets, one per equal cell with generous empty transparent padding. No background, shadow, outlines around cells, wording, letters, seals, or official money imagery. Matte hand-cut Chinese children's picture-book gouache, fine paper-grain texture, pine green, warm ivory and orange. Upper left: small childlike cream museum fox mascot wearing pine-green vest, strict right-facing side profile standing on two feet. Upper middle: exactly the same mascot and orientation running right, different lively foot pose. Upper right: exactly the same mascot jumping to the right with feet airborne, very clear silhouette. Lower left: single warm apricot glass marble with a little leaf caught in the middle, isolated circle, simple and large. Lower middle: one authentic-looking cowrie shell seen from the slit side, warm ivory shell with a dark small long central slit and fine shell ridges, no shadow. Lower right: one old plain bronze round token shown front-facing, a clearly square empty hole exactly at the center, weathered patina, without markings or readable text. Isolate all six cleanly so each can be cropped separately.",
+  "outputs": {
+    "fox-ready": {
+      "path": "assets/fox-ready.png",
+      "crop": [
+        0,
+        0,
+        512,
+        512
+      ],
+      "sha256": "97d69920dddf4d0facf8cd392855dfcaafcb5f3a32abbb600729d5d31f620e1e",
+      "bytes": 55058
+    },
+    "fox-run": {
+      "path": "assets/fox-run.png",
+      "crop": [
+        512,
+        0,
+        1024,
+        512
+      ],
+      "sha256": "449b6e7c559f9349b555748e01fdbbf35d29934e7ee44f8af2bc25f9d5629d5a",
+      "bytes": 69787
+    },
+    "fox-jump": {
+      "path": "assets/fox-jump.png",
+      "crop": [
+        1024,
+        0,
+        1536,
+        512
+      ],
+      "sha256": "371f5e0ccaa0cea90e4a42e53b5e81fe246b478ece4af2770595d7c4ec23defa",
+      "bytes": 73439
+    },
+    "leaf-marble": {
+      "path": "assets/leaf-marble.png",
+      "crop": [
+        0,
+        512,
+        512,
+        1024
+      ],
+      "sha256": "e2f41b913714236c80a44bbdb4d36a86b3e0ed58b7101cccd0aceefa291da385",
+      "bytes": 109469
+    },
+    "cowrie": {
+      "path": "assets/cowrie.png",
+      "crop": [
+        512,
+        512,
+        1024,
+        1024
+      ],
+      "sha256": "bc9c315a68e36b6a5ec38bac69900c21f326d2b091023c3e86484678206fb779",
+      "bytes": 73009
+    },
+    "square-hole-coin": {
+      "path": "assets/square-hole-coin.png",
+      "crop": [
+        1024,
+        512,
+        1536,
+        1024
+      ],
+      "sha256": "f21ea2945d11945603c10e7889488765f2593c3c1c52c42bc55d92aa92ba97cc",
+      "bytes": 107415
+    }
+  }
+}

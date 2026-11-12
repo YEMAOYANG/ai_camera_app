@@ -1,0 +1,1891 @@
+{
+  "schemaVersion": "mira.courseware.asset-sources.v1",
+  "assets": {
+    "theater-cover": {
+      "file": "assets/theater-cover.png",
+      "sha256": "e6a7c54981a5bfa5664e8382ec71e0ce449bf82800fb7250cbcee966374d59ab",
+      "bytes": 454351,
+      "pixels": [
+        480,
+        480
+      ],
+      "type": "imagegen_plate_crop",
+      "sourceAtlas": "art-source/puppet-theater-atlas.png",
+      "sourceAtlasSha256": "239c26def38a47f89f875472c7107c699ab30add56dcfb5b40a766d3cd45adde",
+      "sourceCropPx": [
+        13,
+        11,
+        502,
+        501
+      ],
+      "usedBy": [
+        "listen-for-the-target"
+      ],
+      "visualReview": "Original cut-paper scene inspected; browser rendering pending."
+    },
+    "theater-stage": {
+      "file": "assets/theater-stage.png",
+      "sha256": "d34d40694c251341cbe683bf6e076759dd4a81dc482cbd79434c2f52ea4a6624",
+      "bytes": 222692,
+      "pixels": [
+        480,
+        270
+      ],
+      "type": "imagegen_plate_crop",
+      "sourceAtlas": "art-source/puppet-theater-atlas.png",
+      "sourceAtlasSha256": "239c26def38a47f89f875472c7107c699ab30add56dcfb5b40a766d3cd45adde",
+      "sourceCropPx": [
+        524,
+        12,
+        1011,
+        500
+      ],
+      "usedBy": [
+        "arrange-prop-tiles"
+      ],
+      "visualReview": "Original cut-paper scene inspected; browser rendering pending."
+    },
+    "theater-path": {
+      "file": "assets/theater-path.png",
+      "sha256": "ab58bfa97f3e7f40d450d525dbfbb8e484c34865dfb7381149f8b044f9f659bd",
+      "bytes": 222813,
+      "pixels": [
+        480,
+        270
+      ],
+      "type": "imagegen_plate_crop",
+      "sourceAtlas": "art-source/puppet-theater-atlas.png",
+      "sourceAtlasSha256": "239c26def38a47f89f875472c7107c699ab30add56dcfb5b40a766d3cd45adde",
+      "sourceCropPx": [
+        1035,
+        12,
+        1523,
+        501
+      ],
+      "usedBy": [
+        "deliver-the-right-count"
+      ],
+      "visualReview": "Original cut-paper scene inspected; browser rendering pending."
+    },
+    "wood-cart": {
+      "file": "assets/wood-cart.png",
+      "sha256": "511d8e77060114819adfa35194f7e6b6d3fac6bf1f061ff5f464a886c79e8a60",
+      "bytes": 31315,
+      "pixels": [
+        180,
+        167
+      ],
+      "type": "imagegen_sprite_crop",
+      "sourceAtlas": "art-source/puppet-theater-sprites.png",
+      "sourceAtlasSha256": "b4be1d70df036f506a1e0cd926311af1f541077d4282058476cc6213a8a0a68e",
+      "sourceCropPx": [
+        40,
+        60,
+        671,
+        643
+      ],
+      "usedBy": [
+        "arrange-prop-tiles",
+        "deliver-the-right-count"
+      ],
+      "visualReview": "Original silhouette and alpha inspected; browser rendering pending."
+    },
+    "wood-cart-moving": {
+      "file": "assets/wood-cart-moving.png",
+      "sha256": "ab60f5da96930cb62461a601346d7cc07e25db02d10c1fb82d3de8058a37e1ef",
+      "bytes": 25442,
+      "pixels": [
+        180,
+        142
+      ],
+      "type": "imagegen_sprite_crop",
+      "sourceAtlas": "art-source/puppet-theater-sprites.png",
+      "sourceAtlasSha256": "b4be1d70df036f506a1e0cd926311af1f541077d4282058476cc6213a8a0a68e",
+      "sourceCropPx": [
+        683,
+        60,
+        1430,
+        655
+      ],
+      "usedBy": [
+        "deliver-the-right-count"
+      ],
+      "visualReview": "Original silhouette and alpha inspected; browser rendering pending."
+    },
+    "wood-van": {
+      "file": "assets/wood-van.png",
+      "sha256": "4fd71835d3e5128894c495a4ccc22becf676084ed80dcab53c347096a5dce4d7",
+      "bytes": 40332,
+      "pixels": [
+        180,
+        153
+      ],
+      "type": "imagegen_sprite_crop",
+      "sourceAtlas": "art-source/puppet-theater-sprites.png",
+      "sourceAtlasSha256": "b4be1d70df036f506a1e0cd926311af1f541077d4282058476cc6213a8a0a68e",
+      "sourceCropPx": [
+        1450,
+        65,
+        2163,
+        649
+      ],
+      "usedBy": [
+        "deliver-the-right-count"
+      ],
+      "visualReview": "Original silhouette and alpha inspected; browser rendering pending."
+    },
+    "known-row": {
+      "file": "assets/known-row.png",
+      "sha256": "1647cbbccbcf0256a2a1f320dfd08d94924d210ac0a9e6a50609e8d1ccca600c",
+      "bytes": 2595,
+      "pixels": [
+        780,
+        260
+      ],
+      "type": "program_drawn",
+      "source": "art-source/diagrams.py",
+      "sourceSha256": "23c7f4a203b7ec1d3a81dd44d7d08b9945858a24f019a849c8c27bee91c2357c",
+      "semantics": {
+        "kind": "aligned unit cells",
+        "rows": [
+          [
+            "square",
+            8,
+            0
+          ],
+          [
+            "round",
+            0,
+            0
+          ]
+        ],
+        "reference": 8,
+        "scale": 13,
+        "bracket": null,
+        "usedBy": [
+          "listen-for-the-target"
+        ]
+      },
+      "usedBy": [
+        "listen-for-the-target"
+      ],
+      "visualReview": "Exact equal-scale grid from integer data; browser rendering pending."
+    },
+    "same-and-extra": {
+      "file": "assets/same-and-extra.png",
+      "sha256": "c7ccbe5ea3a1bfb985e7e821ba98da0e6f04a68fc27f5b5bb6a83601383847ac",
+      "bytes": 4260,
+      "pixels": [
+        780,
+        260
+      ],
+      "type": "program_drawn",
+      "source": "art-source/diagrams.py",
+      "sourceSha256": "23c7f4a203b7ec1d3a81dd44d7d08b9945858a24f019a849c8c27bee91c2357c",
+      "semantics": {
+        "kind": "aligned unit cells",
+        "rows": [
+          [
+            "square",
+            8,
+            0
+          ],
+          [
+            "round",
+            13,
+            0
+          ]
+        ],
+        "reference": 8,
+        "scale": 13,
+        "bracket": [
+          1,
+          8,
+          13,
+          5
+        ],
+        "usedBy": [
+          "join-the-extra-row"
+        ]
+      },
+      "usedBy": [
+        "join-the-extra-row"
+      ],
+      "visualReview": "Exact equal-scale grid from integer data; browser rendering pending."
+    },
+    "whole-target-row": {
+      "file": "assets/whole-target-row.png",
+      "sha256": "73afed6299609c19df0365f790c4f5f4df9177176bdd128e7681a70cd951aa1e",
+      "bytes": 4553,
+      "pixels": [
+        780,
+        260
+      ],
+      "type": "program_drawn",
+      "source": "art-source/diagrams.py",
+      "sourceSha256": "23c7f4a203b7ec1d3a81dd44d7d08b9945858a24f019a849c8c27bee91c2357c",
+      "semantics": {
+        "kind": "aligned unit cells",
+        "rows": [
+          [
+            "square",
+            8,
+            0
+          ],
+          [
+            "round",
+            13,
+            0
+          ]
+        ],
+        "reference": 8,
+        "scale": 13,
+        "bracket": [
+          1,
+          0,
+          13,
+          13
+        ],
+        "usedBy": [
+          "join-the-extra-row"
+        ]
+      },
+      "usedBy": [
+        "join-the-extra-row"
+      ],
+      "visualReview": "Exact equal-scale grid from integer data; browser rendering pending."
+    },
+    "short-row-gap": {
+      "file": "assets/short-row-gap.png",
+      "sha256": "943b128899089f14b67e86417e6db776538f228a88b082c14321a6dcdae983d2",
+      "bytes": 4369,
+      "pixels": [
+        780,
+        260
+      ],
+      "type": "program_drawn",
+      "source": "art-source/diagrams.py",
+      "sourceSha256": "23c7f4a203b7ec1d3a81dd44d7d08b9945858a24f019a849c8c27bee91c2357c",
+      "semantics": {
+        "kind": "aligned unit cells",
+        "rows": [
+          [
+            "square",
+            16,
+            0
+          ],
+          [
+            "triangle",
+            10,
+            6
+          ]
+        ],
+        "reference": 16,
+        "scale": 16,
+        "bracket": [
+          1,
+          10,
+          16,
+          6
+        ],
+        "usedBy": [
+          "fold-away-the-gap"
+        ]
+      },
+      "usedBy": [
+        "fold-away-the-gap"
+      ],
+      "visualReview": "Exact equal-scale grid from integer data; browser rendering pending."
+    },
+    "short-row-whole": {
+      "file": "assets/short-row-whole.png",
+      "sha256": "88918521cab32cecc2474936b1fac2110f72a1c9a19e542d769eddab32c4d768",
+      "bytes": 4472,
+      "pixels": [
+        780,
+        260
+      ],
+      "type": "program_drawn",
+      "source": "art-source/diagrams.py",
+      "sourceSha256": "23c7f4a203b7ec1d3a81dd44d7d08b9945858a24f019a849c8c27bee91c2357c",
+      "semantics": {
+        "kind": "aligned unit cells",
+        "rows": [
+          [
+            "square",
+            16,
+            0
+          ],
+          [
+            "triangle",
+            10,
+            6
+          ]
+        ],
+        "reference": 16,
+        "scale": 16,
+        "bracket": [
+          1,
+          0,
+          10,
+          10
+        ],
+        "usedBy": [
+          "fold-away-the-gap"
+        ]
+      },
+      "usedBy": [
+        "fold-away-the-gap"
+      ],
+      "visualReview": "Exact equal-scale grid from integer data; browser rendering pending."
+    },
+    "window-with-more": {
+      "file": "assets/window-with-more.png",
+      "sha256": "1fd9b3e2b75da0c49c2191b484e3286ec04daebc486431db0f06ce89927d3c9d",
+      "bytes": 5213,
+      "pixels": [
+        780,
+        260
+      ],
+      "type": "program_drawn",
+      "source": "art-source/diagrams.py",
+      "sourceSha256": "23c7f4a203b7ec1d3a81dd44d7d08b9945858a24f019a849c8c27bee91c2357c",
+      "semantics": {
+        "kind": "aligned unit cells",
+        "rows": [
+          [
+            "square",
+            38,
+            0
+          ],
+          [
+            "round",
+            54,
+            0
+          ]
+        ],
+        "reference": 38,
+        "scale": 54,
+        "bracket": [
+          1,
+          38,
+          54,
+          16
+        ],
+        "usedBy": [
+          "keep-one-reference"
+        ]
+      },
+      "usedBy": [
+        "keep-one-reference"
+      ],
+      "visualReview": "Exact equal-scale grid from integer data; browser rendering pending."
+    },
+    "window-with-fewer": {
+      "file": "assets/window-with-fewer.png",
+      "sha256": "221b1b45f24d3340ab92e18d78d0645b43afa98ed09d48cc1ba1c1c6348bd8de",
+      "bytes": 5275,
+      "pixels": [
+        780,
+        260
+      ],
+      "type": "program_drawn",
+      "source": "art-source/diagrams.py",
+      "sourceSha256": "23c7f4a203b7ec1d3a81dd44d7d08b9945858a24f019a849c8c27bee91c2357c",
+      "semantics": {
+        "kind": "aligned unit cells",
+        "rows": [
+          [
+            "square",
+            38,
+            0
+          ],
+          [
+            "triangle",
+            29,
+            9
+          ]
+        ],
+        "reference": 38,
+        "scale": 54,
+        "bracket": [
+          1,
+          29,
+          38,
+          9
+        ],
+        "usedBy": [
+          "keep-one-reference"
+        ]
+      },
+      "usedBy": [
+        "keep-one-reference"
+      ],
+      "visualReview": "Exact equal-scale grid from integer data; browser rendering pending."
+    },
+    "review-reference": {
+      "file": "assets/review-reference.png",
+      "sha256": "a5b70230f6f8954bfc0de2e38cfd6799aa95aef4378c85434a54d02dd618e85b",
+      "bytes": 6474,
+      "pixels": [
+        780,
+        390
+      ],
+      "type": "program_drawn",
+      "source": "art-source/diagrams.py",
+      "sourceSha256": "23c7f4a203b7ec1d3a81dd44d7d08b9945858a24f019a849c8c27bee91c2357c",
+      "semantics": {
+        "kind": "aligned unit cells",
+        "rows": [
+          [
+            "square",
+            38,
+            0
+          ],
+          [
+            "round",
+            54,
+            0
+          ],
+          [
+            "triangle",
+            29,
+            9
+          ]
+        ],
+        "reference": 38,
+        "scale": 54,
+        "bracket": null,
+        "usedBy": [
+          "recap-compare-with-one-group"
+        ]
+      },
+      "usedBy": [
+        "recap-compare-with-one-group"
+      ],
+      "visualReview": "Exact equal-scale grid from integer data; browser rendering pending."
+    },
+    "tile-6-plus-2": {
+      "file": "assets/tile-6-plus-2.png",
+      "sha256": "6d97ff6b48a63055d08eb30963421b48aa565f730439cef5dea64e2c0ad70a9e",
+      "bytes": 5761,
+      "pixels": [
+        780,
+        275
+      ],
+      "type": "program_drawn",
+      "source": "art-source/diagrams.py",
+      "sourceSha256": "23c7f4a203b7ec1d3a81dd44d7d08b9945858a24f019a849c8c27bee91c2357c",
+      "semantics": {
+        "kind": "comparison order",
+        "reference": 6,
+        "signedGap": 2,
+        "usedBy": [
+          "arrange-prop-tiles"
+        ]
+      },
+      "usedBy": [
+        "arrange-prop-tiles"
+      ],
+      "visualReview": "Exact equal-scale grid from integer data; browser rendering pending."
+    },
+    "tile-9-plus-3": {
+      "file": "assets/tile-9-plus-3.png",
+      "sha256": "a8e4873a2fe5e184872c130c941fb80466e878c225dc1b218d710584d2a29786",
+      "bytes": 6231,
+      "pixels": [
+        780,
+        275
+      ],
+      "type": "program_drawn",
+      "source": "art-source/diagrams.py",
+      "sourceSha256": "23c7f4a203b7ec1d3a81dd44d7d08b9945858a24f019a849c8c27bee91c2357c",
+      "semantics": {
+        "kind": "comparison order",
+        "reference": 9,
+        "signedGap": 3,
+        "usedBy": [
+          "arrange-prop-tiles"
+        ]
+      },
+      "usedBy": [
+        "arrange-prop-tiles"
+      ],
+      "visualReview": "Exact equal-scale grid from integer data; browser rendering pending."
+    },
+    "tile-11-minus-2": {
+      "file": "assets/tile-11-minus-2.png",
+      "sha256": "fbe77fd5c7fbc8ed3d1e3a2460f6066a9f5df96b2a1014206322ba9b08efd806",
+      "bytes": 4666,
+      "pixels": [
+        780,
+        275
+      ],
+      "type": "program_drawn",
+      "source": "art-source/diagrams.py",
+      "sourceSha256": "23c7f4a203b7ec1d3a81dd44d7d08b9945858a24f019a849c8c27bee91c2357c",
+      "semantics": {
+        "kind": "comparison order",
+        "reference": 11,
+        "signedGap": -2,
+        "usedBy": [
+          "arrange-prop-tiles"
+        ]
+      },
+      "usedBy": [
+        "arrange-prop-tiles"
+      ],
+      "visualReview": "Exact equal-scale grid from integer data; browser rendering pending."
+    },
+    "tile-15-minus-7": {
+      "file": "assets/tile-15-minus-7.png",
+      "sha256": "7c9800c1a7b8e1aeae17b4e5904388c449efc9af47b47ab4be318da33cbb494d",
+      "bytes": 5432,
+      "pixels": [
+        780,
+        275
+      ],
+      "type": "program_drawn",
+      "source": "art-source/diagrams.py",
+      "sourceSha256": "23c7f4a203b7ec1d3a81dd44d7d08b9945858a24f019a849c8c27bee91c2357c",
+      "semantics": {
+        "kind": "comparison order",
+        "reference": 15,
+        "signedGap": -7,
+        "usedBy": [
+          "arrange-prop-tiles"
+        ]
+      },
+      "usedBy": [
+        "arrange-prop-tiles"
+      ],
+      "visualReview": "Exact equal-scale grid from integer data; browser rendering pending."
+    },
+    "tile-24-plus-7": {
+      "file": "assets/tile-24-plus-7.png",
+      "sha256": "65818d5ab11586eec18802ce2211a8f1f370235050b362df647234d738d3f83a",
+      "bytes": 5739,
+      "pixels": [
+        780,
+        275
+      ],
+      "type": "program_drawn",
+      "source": "art-source/diagrams.py",
+      "sourceSha256": "23c7f4a203b7ec1d3a81dd44d7d08b9945858a24f019a849c8c27bee91c2357c",
+      "semantics": {
+        "kind": "comparison order",
+        "reference": 24,
+        "signedGap": 7,
+        "usedBy": [
+          "arrange-prop-tiles"
+        ]
+      },
+      "usedBy": [
+        "arrange-prop-tiles"
+      ],
+      "visualReview": "Exact equal-scale grid from integer data; browser rendering pending."
+    },
+    "tile-26-minus-8": {
+      "file": "assets/tile-26-minus-8.png",
+      "sha256": "c17432766b4abc4f0881124cd5a185042e829200f643506d98b1fc1c61127e41",
+      "bytes": 7593,
+      "pixels": [
+        780,
+        275
+      ],
+      "type": "program_drawn",
+      "source": "art-source/diagrams.py",
+      "sourceSha256": "23c7f4a203b7ec1d3a81dd44d7d08b9945858a24f019a849c8c27bee91c2357c",
+      "semantics": {
+        "kind": "comparison order",
+        "reference": 26,
+        "signedGap": -8,
+        "usedBy": [
+          "arrange-prop-tiles"
+        ]
+      },
+      "usedBy": [
+        "arrange-prop-tiles"
+      ],
+      "visualReview": "Exact equal-scale grid from integer data; browser rendering pending."
+    },
+    "tile-total-8": {
+      "file": "assets/tile-total-8.png",
+      "sha256": "059ed0b541bffcf7096ff7e030070d1b7d64d2dd3064633df8be4772acdcfd4f",
+      "bytes": 3681,
+      "pixels": [
+        320,
+        320
+      ],
+      "type": "program_drawn",
+      "source": "art-source/diagrams.py",
+      "sourceSha256": "23c7f4a203b7ec1d3a81dd44d7d08b9945858a24f019a849c8c27bee91c2357c",
+      "semantics": {
+        "kind": "exact groups of ten and loose cells",
+        "value": 8,
+        "usedBy": [
+          "arrange-prop-tiles"
+        ]
+      },
+      "usedBy": [
+        "arrange-prop-tiles"
+      ],
+      "visualReview": "Exact equal-scale grid from integer data; browser rendering pending."
+    },
+    "tile-total-12": {
+      "file": "assets/tile-total-12.png",
+      "sha256": "ee0d56a686cc88fec5d5e68f6e95bdcc483be17f720e6b7aad93223482bdf9ee",
+      "bytes": 3541,
+      "pixels": [
+        320,
+        320
+      ],
+      "type": "program_drawn",
+      "source": "art-source/diagrams.py",
+      "sourceSha256": "23c7f4a203b7ec1d3a81dd44d7d08b9945858a24f019a849c8c27bee91c2357c",
+      "semantics": {
+        "kind": "exact groups of ten and loose cells",
+        "value": 12,
+        "usedBy": [
+          "arrange-prop-tiles"
+        ]
+      },
+      "usedBy": [
+        "arrange-prop-tiles"
+      ],
+      "visualReview": "Exact equal-scale grid from integer data; browser rendering pending."
+    },
+    "tile-total-9": {
+      "file": "assets/tile-total-9.png",
+      "sha256": "97b31c6a15328dc798985df74daa744ee337ef4e252eb6e27467edad38dc9701",
+      "bytes": 3540,
+      "pixels": [
+        320,
+        320
+      ],
+      "type": "program_drawn",
+      "source": "art-source/diagrams.py",
+      "sourceSha256": "23c7f4a203b7ec1d3a81dd44d7d08b9945858a24f019a849c8c27bee91c2357c",
+      "semantics": {
+        "kind": "exact groups of ten and loose cells",
+        "value": 9,
+        "usedBy": [
+          "arrange-prop-tiles"
+        ]
+      },
+      "usedBy": [
+        "arrange-prop-tiles"
+      ],
+      "visualReview": "Exact equal-scale grid from integer data; browser rendering pending."
+    },
+    "tile-total-31": {
+      "file": "assets/tile-total-31.png",
+      "sha256": "51ccb0765c59db5c9fe200d8fbf7e1adb258157df6d93a256a4a503d3fad285d",
+      "bytes": 4440,
+      "pixels": [
+        320,
+        320
+      ],
+      "type": "program_drawn",
+      "source": "art-source/diagrams.py",
+      "sourceSha256": "23c7f4a203b7ec1d3a81dd44d7d08b9945858a24f019a849c8c27bee91c2357c",
+      "semantics": {
+        "kind": "exact groups of ten and loose cells",
+        "value": 31,
+        "usedBy": [
+          "arrange-prop-tiles"
+        ]
+      },
+      "usedBy": [
+        "arrange-prop-tiles"
+      ],
+      "visualReview": "Exact equal-scale grid from integer data; browser rendering pending."
+    },
+    "tile-total-18": {
+      "file": "assets/tile-total-18.png",
+      "sha256": "d30df654073fcc72b42d884155dfcd4ed876dd29c7ea72edb0750b24e7c3c8ff",
+      "bytes": 4343,
+      "pixels": [
+        320,
+        320
+      ],
+      "type": "program_drawn",
+      "source": "art-source/diagrams.py",
+      "sourceSha256": "23c7f4a203b7ec1d3a81dd44d7d08b9945858a24f019a849c8c27bee91c2357c",
+      "semantics": {
+        "kind": "exact groups of ten and loose cells",
+        "value": 18,
+        "usedBy": [
+          "arrange-prop-tiles"
+        ]
+      },
+      "usedBy": [
+        "arrange-prop-tiles"
+      ],
+      "visualReview": "Exact equal-scale grid from integer data; browser rendering pending."
+    },
+    "delivery-5-plus-4": {
+      "file": "assets/delivery-5-plus-4.png",
+      "sha256": "fdd8edbe4b4dfab922a94b365782e42eb340b8ccf4249647c72d5a58381e70ee",
+      "bytes": 4921,
+      "pixels": [
+        780,
+        275
+      ],
+      "type": "program_drawn",
+      "source": "art-source/diagrams.py",
+      "sourceSha256": "23c7f4a203b7ec1d3a81dd44d7d08b9945858a24f019a849c8c27bee91c2357c",
+      "semantics": {
+        "kind": "comparison order",
+        "reference": 5,
+        "signedGap": 4,
+        "usedBy": [
+          "deliver-the-right-count"
+        ]
+      },
+      "usedBy": [
+        "deliver-the-right-count"
+      ],
+      "visualReview": "Exact equal-scale grid from integer data; browser rendering pending."
+    },
+    "delivery-10-minus-3": {
+      "file": "assets/delivery-10-minus-3.png",
+      "sha256": "8714a596f88e554cc1b13c7cddaa0864c0875d439d97ae8942be3ea2ac780963",
+      "bytes": 6258,
+      "pixels": [
+        780,
+        275
+      ],
+      "type": "program_drawn",
+      "source": "art-source/diagrams.py",
+      "sourceSha256": "23c7f4a203b7ec1d3a81dd44d7d08b9945858a24f019a849c8c27bee91c2357c",
+      "semantics": {
+        "kind": "comparison order",
+        "reference": 10,
+        "signedGap": -3,
+        "usedBy": [
+          "deliver-the-right-count"
+        ]
+      },
+      "usedBy": [
+        "deliver-the-right-count"
+      ],
+      "visualReview": "Exact equal-scale grid from integer data; browser rendering pending."
+    },
+    "delivery-18-minus-8": {
+      "file": "assets/delivery-18-minus-8.png",
+      "sha256": "47f7bc5453d07f533829fc27322815f6c997cdaa53eeb43053e6fe2b51295b68",
+      "bytes": 6889,
+      "pixels": [
+        780,
+        275
+      ],
+      "type": "program_drawn",
+      "source": "art-source/diagrams.py",
+      "sourceSha256": "23c7f4a203b7ec1d3a81dd44d7d08b9945858a24f019a849c8c27bee91c2357c",
+      "semantics": {
+        "kind": "comparison order",
+        "reference": 18,
+        "signedGap": -8,
+        "usedBy": [
+          "deliver-the-right-count"
+        ]
+      },
+      "usedBy": [
+        "deliver-the-right-count"
+      ],
+      "visualReview": "Exact equal-scale grid from integer data; browser rendering pending."
+    },
+    "delivery-23-plus-9": {
+      "file": "assets/delivery-23-plus-9.png",
+      "sha256": "d35792c607cc4a70918b7d6c725ea9fc4066a164c2ef60eb0da0ba745df7f9fd",
+      "bytes": 7329,
+      "pixels": [
+        780,
+        275
+      ],
+      "type": "program_drawn",
+      "source": "art-source/diagrams.py",
+      "sourceSha256": "23c7f4a203b7ec1d3a81dd44d7d08b9945858a24f019a849c8c27bee91c2357c",
+      "semantics": {
+        "kind": "comparison order",
+        "reference": 23,
+        "signedGap": 9,
+        "usedBy": [
+          "deliver-the-right-count"
+        ]
+      },
+      "usedBy": [
+        "deliver-the-right-count"
+      ],
+      "visualReview": "Exact equal-scale grid from integer data; browser rendering pending."
+    },
+    "delivery-27-minus-11": {
+      "file": "assets/delivery-27-minus-11.png",
+      "sha256": "9152d904024ff07680416ad90ef1786e0940ff79493a88cfa9b65f3552b5af8e",
+      "bytes": 5526,
+      "pixels": [
+        780,
+        275
+      ],
+      "type": "program_drawn",
+      "source": "art-source/diagrams.py",
+      "sourceSha256": "23c7f4a203b7ec1d3a81dd44d7d08b9945858a24f019a849c8c27bee91c2357c",
+      "semantics": {
+        "kind": "comparison order",
+        "reference": 27,
+        "signedGap": -11,
+        "usedBy": [
+          "deliver-the-right-count"
+        ]
+      },
+      "usedBy": [
+        "deliver-the-right-count"
+      ],
+      "visualReview": "Exact equal-scale grid from integer data; browser rendering pending."
+    },
+    "delivery-total-7": {
+      "file": "assets/delivery-total-7.png",
+      "sha256": "fe4d38e144e1bd92f1f78bca644ffda735b0ef09820ce2d1f957bd0252950842",
+      "bytes": 2225,
+      "pixels": [
+        320,
+        320
+      ],
+      "type": "program_drawn",
+      "source": "art-source/diagrams.py",
+      "sourceSha256": "23c7f4a203b7ec1d3a81dd44d7d08b9945858a24f019a849c8c27bee91c2357c",
+      "semantics": {
+        "kind": "exact groups of ten and loose cells",
+        "value": 7,
+        "usedBy": [
+          "deliver-the-right-count"
+        ]
+      },
+      "usedBy": [
+        "deliver-the-right-count"
+      ],
+      "visualReview": "Exact equal-scale grid from integer data; browser rendering pending."
+    },
+    "delivery-total-9": {
+      "file": "assets/delivery-total-9.png",
+      "sha256": "97b31c6a15328dc798985df74daa744ee337ef4e252eb6e27467edad38dc9701",
+      "bytes": 3540,
+      "pixels": [
+        320,
+        320
+      ],
+      "type": "program_drawn",
+      "source": "art-source/diagrams.py",
+      "sourceSha256": "23c7f4a203b7ec1d3a81dd44d7d08b9945858a24f019a849c8c27bee91c2357c",
+      "semantics": {
+        "kind": "exact groups of ten and loose cells",
+        "value": 9,
+        "usedBy": [
+          "deliver-the-right-count"
+        ]
+      },
+      "usedBy": [
+        "deliver-the-right-count"
+      ],
+      "visualReview": "Exact equal-scale grid from integer data; browser rendering pending."
+    },
+    "delivery-total-10": {
+      "file": "assets/delivery-total-10.png",
+      "sha256": "fc85f5649b4e633f3f596a86776de6d270fb369f98649c9f818a6764ae526070",
+      "bytes": 3755,
+      "pixels": [
+        320,
+        320
+      ],
+      "type": "program_drawn",
+      "source": "art-source/diagrams.py",
+      "sourceSha256": "23c7f4a203b7ec1d3a81dd44d7d08b9945858a24f019a849c8c27bee91c2357c",
+      "semantics": {
+        "kind": "exact groups of ten and loose cells",
+        "value": 10,
+        "usedBy": [
+          "deliver-the-right-count"
+        ]
+      },
+      "usedBy": [
+        "deliver-the-right-count"
+      ],
+      "visualReview": "Exact equal-scale grid from integer data; browser rendering pending."
+    },
+    "delivery-total-13": {
+      "file": "assets/delivery-total-13.png",
+      "sha256": "ad822d5908db7d87333dd0f9e037efccc30584fb89c33fb4e7a70b7dee6395a4",
+      "bytes": 4051,
+      "pixels": [
+        320,
+        320
+      ],
+      "type": "program_drawn",
+      "source": "art-source/diagrams.py",
+      "sourceSha256": "23c7f4a203b7ec1d3a81dd44d7d08b9945858a24f019a849c8c27bee91c2357c",
+      "semantics": {
+        "kind": "exact groups of ten and loose cells",
+        "value": 13,
+        "usedBy": [
+          "deliver-the-right-count"
+        ]
+      },
+      "usedBy": [
+        "deliver-the-right-count"
+      ],
+      "visualReview": "Exact equal-scale grid from integer data; browser rendering pending."
+    },
+    "delivery-total-16": {
+      "file": "assets/delivery-total-16.png",
+      "sha256": "ba7756a44022e99300a23af1fb46e2b65e3e879fac51b5d77dffd49bd215bd9d",
+      "bytes": 4192,
+      "pixels": [
+        320,
+        320
+      ],
+      "type": "program_drawn",
+      "source": "art-source/diagrams.py",
+      "sourceSha256": "23c7f4a203b7ec1d3a81dd44d7d08b9945858a24f019a849c8c27bee91c2357c",
+      "semantics": {
+        "kind": "exact groups of ten and loose cells",
+        "value": 16,
+        "usedBy": [
+          "deliver-the-right-count"
+        ]
+      },
+      "usedBy": [
+        "deliver-the-right-count"
+      ],
+      "visualReview": "Exact equal-scale grid from integer data; browser rendering pending."
+    },
+    "delivery-total-23": {
+      "file": "assets/delivery-total-23.png",
+      "sha256": "a61ee22c7404a15c56f686ae58bedc9d6acad0d97732f68f8dcf3db7c1aec2a5",
+      "bytes": 5375,
+      "pixels": [
+        320,
+        320
+      ],
+      "type": "program_drawn",
+      "source": "art-source/diagrams.py",
+      "sourceSha256": "23c7f4a203b7ec1d3a81dd44d7d08b9945858a24f019a849c8c27bee91c2357c",
+      "semantics": {
+        "kind": "exact groups of ten and loose cells",
+        "value": 23,
+        "usedBy": [
+          "deliver-the-right-count"
+        ]
+      },
+      "usedBy": [
+        "deliver-the-right-count"
+      ],
+      "visualReview": "Exact equal-scale grid from integer data; browser rendering pending."
+    },
+    "delivery-total-32": {
+      "file": "assets/delivery-total-32.png",
+      "sha256": "4b7cc2e7b57adce5a9b6707cb63d27631ac1d993e7092ceb6f8844e4e18162ea",
+      "bytes": 5528,
+      "pixels": [
+        320,
+        320
+      ],
+      "type": "program_drawn",
+      "source": "art-source/diagrams.py",
+      "sourceSha256": "23c7f4a203b7ec1d3a81dd44d7d08b9945858a24f019a849c8c27bee91c2357c",
+      "semantics": {
+        "kind": "exact groups of ten and loose cells",
+        "value": 32,
+        "usedBy": [
+          "deliver-the-right-count"
+        ]
+      },
+      "usedBy": [
+        "deliver-the-right-count"
+      ],
+      "visualReview": "Exact equal-scale grid from integer data; browser rendering pending."
+    },
+    "window-round": {
+      "file": "assets/window-round.png",
+      "sha256": "0c2c718121f8b0aad8afc59ece8881cfec61d2ff0cb4fec262c9c761958e46b7",
+      "bytes": 463,
+      "pixels": [
+        120,
+        120
+      ],
+      "type": "program_drawn",
+      "source": "art-source/diagrams.py",
+      "sourceSha256": "23c7f4a203b7ec1d3a81dd44d7d08b9945858a24f019a849c8c27bee91c2357c",
+      "semantics": {
+        "kind": "fixed geometric group marker",
+        "marker": "round",
+        "usedBy": [
+          "deliver-the-right-count"
+        ]
+      },
+      "usedBy": [
+        "deliver-the-right-count"
+      ],
+      "visualReview": "Exact equal-scale grid from integer data; browser rendering pending."
+    },
+    "window-triangle": {
+      "file": "assets/window-triangle.png",
+      "sha256": "c700a9cba6b16f2378bec197de5699b47f610a004b09292509c86f2bc6666ab1",
+      "bytes": 364,
+      "pixels": [
+        120,
+        120
+      ],
+      "type": "program_drawn",
+      "source": "art-source/diagrams.py",
+      "sourceSha256": "23c7f4a203b7ec1d3a81dd44d7d08b9945858a24f019a849c8c27bee91c2357c",
+      "semantics": {
+        "kind": "fixed geometric group marker",
+        "marker": "triangle",
+        "usedBy": [
+          "deliver-the-right-count"
+        ]
+      },
+      "usedBy": [
+        "deliver-the-right-count"
+      ],
+      "visualReview": "Exact equal-scale grid from integer data; browser rendering pending."
+    },
+    "q1-conditions": {
+      "file": "assets/q1-conditions.png",
+      "sha256": "f07a867c05bc7a8cd4f53fa2b5a0ec4b4dab52b16ecfdec4882dc0606c81daf9",
+      "bytes": 5524,
+      "pixels": [
+        500,
+        215
+      ],
+      "type": "program_drawn",
+      "source": "art-source/diagrams.py",
+      "sourceSha256": "23c7f4a203b7ec1d3a81dd44d7d08b9945858a24f019a849c8c27bee91c2357c",
+      "semantics": {
+        "kind": "given and comparison quantities",
+        "conditions": [
+          [
+            "square",
+            7,
+            ""
+          ],
+          [
+            "round",
+            4,
+            "+"
+          ]
+        ],
+        "usedBy": [
+          "q1"
+        ]
+      },
+      "usedBy": [
+        "q1"
+      ],
+      "visualReview": "Exact equal-scale grid from integer data; browser rendering pending."
+    },
+    "q2-conditions": {
+      "file": "assets/q2-conditions.png",
+      "sha256": "5326a27be24806c8676285e00969b7aeadb30ed418a7415f092974d596cc15be",
+      "bytes": 8032,
+      "pixels": [
+        500,
+        215
+      ],
+      "type": "program_drawn",
+      "source": "art-source/diagrams.py",
+      "sourceSha256": "23c7f4a203b7ec1d3a81dd44d7d08b9945858a24f019a849c8c27bee91c2357c",
+      "semantics": {
+        "kind": "given and comparison quantities",
+        "conditions": [
+          [
+            "square",
+            13,
+            ""
+          ],
+          [
+            "triangle",
+            5,
+            "−"
+          ]
+        ],
+        "usedBy": [
+          "q2"
+        ]
+      },
+      "usedBy": [
+        "q2"
+      ],
+      "visualReview": "Exact equal-scale grid from integer data; browser rendering pending."
+    },
+    "q3-conditions": {
+      "file": "assets/q3-conditions.png",
+      "sha256": "a8664ab96db27fb1472225ea227ea47e0d5208766a8bfca6a0cbab66a43e9960",
+      "bytes": 11178,
+      "pixels": [
+        500,
+        215
+      ],
+      "type": "program_drawn",
+      "source": "art-source/diagrams.py",
+      "sourceSha256": "23c7f4a203b7ec1d3a81dd44d7d08b9945858a24f019a849c8c27bee91c2357c",
+      "semantics": {
+        "kind": "given and comparison quantities",
+        "conditions": [
+          [
+            "square",
+            28,
+            ""
+          ],
+          [
+            "round",
+            7,
+            "+"
+          ]
+        ],
+        "usedBy": [
+          "q3"
+        ]
+      },
+      "usedBy": [
+        "q3"
+      ],
+      "visualReview": "Exact equal-scale grid from integer data; browser rendering pending."
+    },
+    "q4-conditions": {
+      "file": "assets/q4-conditions.png",
+      "sha256": "c092da170136af696c1747326ec60350ccb0dff58ed31cd1f574ce12da284ec4",
+      "bytes": 10106,
+      "pixels": [
+        500,
+        215
+      ],
+      "type": "program_drawn",
+      "source": "art-source/diagrams.py",
+      "sourceSha256": "23c7f4a203b7ec1d3a81dd44d7d08b9945858a24f019a849c8c27bee91c2357c",
+      "semantics": {
+        "kind": "given and comparison quantities",
+        "conditions": [
+          [
+            "square",
+            21,
+            ""
+          ],
+          [
+            "triangle",
+            8,
+            "−"
+          ]
+        ],
+        "usedBy": [
+          "q4"
+        ]
+      },
+      "usedBy": [
+        "q4"
+      ],
+      "visualReview": "Exact equal-scale grid from integer data; browser rendering pending."
+    },
+    "q5-conditions": {
+      "file": "assets/q5-conditions.png",
+      "sha256": "e07b3f3f4b57be10a2fb4784c95f539d8a795714b3b05771a832b1a3f3641ab9",
+      "bytes": 14996,
+      "pixels": [
+        750,
+        215
+      ],
+      "type": "program_drawn",
+      "source": "art-source/diagrams.py",
+      "sourceSha256": "23c7f4a203b7ec1d3a81dd44d7d08b9945858a24f019a849c8c27bee91c2357c",
+      "semantics": {
+        "kind": "given and comparison quantities",
+        "conditions": [
+          [
+            "round",
+            12,
+            "+"
+          ],
+          [
+            "square",
+            34,
+            ""
+          ],
+          [
+            "triangle",
+            6,
+            "−"
+          ]
+        ],
+        "usedBy": [
+          "q5"
+        ]
+      },
+      "usedBy": [
+        "q5"
+      ],
+      "visualReview": "Exact equal-scale grid from integer data; browser rendering pending."
+    },
+    "q6-conditions": {
+      "file": "assets/q6-conditions.png",
+      "sha256": "784b0abbe5a4770546ec7fe446084834c52114433c59d7a456e242745210f2db",
+      "bytes": 11735,
+      "pixels": [
+        500,
+        215
+      ],
+      "type": "program_drawn",
+      "source": "art-source/diagrams.py",
+      "sourceSha256": "23c7f4a203b7ec1d3a81dd44d7d08b9945858a24f019a849c8c27bee91c2357c",
+      "semantics": {
+        "kind": "given and comparison quantities",
+        "conditions": [
+          [
+            "square",
+            25,
+            ""
+          ],
+          [
+            "triangle",
+            19,
+            ""
+          ]
+        ],
+        "usedBy": [
+          "q6"
+        ]
+      },
+      "usedBy": [
+        "q6"
+      ],
+      "visualReview": "Exact equal-scale grid from integer data; browser rendering pending."
+    },
+    "q1-a": {
+      "file": "assets/q1-a.png",
+      "sha256": "c1fceb4c3e40d1272c9eb658e0852f1147e5e5db9815020ce7d355d0fdb7b5f8",
+      "bytes": 2690,
+      "pixels": [
+        780,
+        260
+      ],
+      "type": "program_drawn",
+      "source": "art-source/diagrams.py",
+      "sourceSha256": "23c7f4a203b7ec1d3a81dd44d7d08b9945858a24f019a849c8c27bee91c2357c",
+      "semantics": {
+        "kind": "aligned unit cells",
+        "rows": [
+          [
+            "square",
+            7,
+            0
+          ],
+          [
+            "round",
+            11,
+            0
+          ]
+        ],
+        "reference": 7,
+        "scale": 11,
+        "bracket": [
+          0,
+          0,
+          7,
+          null
+        ],
+        "usedBy": [
+          "q1"
+        ]
+      },
+      "usedBy": [
+        "q1"
+      ],
+      "visualReview": "Exact equal-scale grid from integer data; browser rendering pending."
+    },
+    "q1-b": {
+      "file": "assets/q1-b.png",
+      "sha256": "3f3103ad7c90b27c36b8eaac6ed2a6691c847eae27a84db3aa52bbe5bb52c2c5",
+      "bytes": 2684,
+      "pixels": [
+        780,
+        260
+      ],
+      "type": "program_drawn",
+      "source": "art-source/diagrams.py",
+      "sourceSha256": "23c7f4a203b7ec1d3a81dd44d7d08b9945858a24f019a849c8c27bee91c2357c",
+      "semantics": {
+        "kind": "aligned unit cells",
+        "rows": [
+          [
+            "square",
+            7,
+            0
+          ],
+          [
+            "round",
+            11,
+            0
+          ]
+        ],
+        "reference": 7,
+        "scale": 11,
+        "bracket": [
+          1,
+          0,
+          11,
+          null
+        ],
+        "usedBy": [
+          "q1"
+        ]
+      },
+      "usedBy": [
+        "q1"
+      ],
+      "visualReview": "Exact equal-scale grid from integer data; browser rendering pending."
+    },
+    "q1-c": {
+      "file": "assets/q1-c.png",
+      "sha256": "98b300f56de0dd24fe0adb3172e39a64716abb10077a514eb5bc04ec1c1480fd",
+      "bytes": 2663,
+      "pixels": [
+        780,
+        260
+      ],
+      "type": "program_drawn",
+      "source": "art-source/diagrams.py",
+      "sourceSha256": "23c7f4a203b7ec1d3a81dd44d7d08b9945858a24f019a849c8c27bee91c2357c",
+      "semantics": {
+        "kind": "aligned unit cells",
+        "rows": [
+          [
+            "square",
+            7,
+            0
+          ],
+          [
+            "round",
+            11,
+            0
+          ]
+        ],
+        "reference": 7,
+        "scale": 11,
+        "bracket": [
+          1,
+          7,
+          11,
+          null
+        ],
+        "usedBy": [
+          "q1"
+        ]
+      },
+      "usedBy": [
+        "q1"
+      ],
+      "visualReview": "Exact equal-scale grid from integer data; browser rendering pending."
+    },
+    "q2-a": {
+      "file": "assets/q2-a.png",
+      "sha256": "762933e8d5b8db50f1a5e6d63862bb29b5cac51b42ce64b1c7f64eb7b7f13924",
+      "bytes": 3795,
+      "pixels": [
+        780,
+        260
+      ],
+      "type": "program_drawn",
+      "source": "art-source/diagrams.py",
+      "sourceSha256": "23c7f4a203b7ec1d3a81dd44d7d08b9945858a24f019a849c8c27bee91c2357c",
+      "semantics": {
+        "kind": "aligned unit cells",
+        "rows": [
+          [
+            "square",
+            13,
+            0
+          ],
+          [
+            "triangle",
+            13,
+            0
+          ]
+        ],
+        "reference": 13,
+        "scale": 18,
+        "bracket": null,
+        "usedBy": [
+          "q2"
+        ]
+      },
+      "usedBy": [
+        "q2"
+      ],
+      "visualReview": "Exact equal-scale grid from integer data; browser rendering pending."
+    },
+    "q2-b": {
+      "file": "assets/q2-b.png",
+      "sha256": "fd80a644276c72c18c3ad2c89b0284971e575a7f784030d77dfbd4ab13cd12b0",
+      "bytes": 3945,
+      "pixels": [
+        780,
+        260
+      ],
+      "type": "program_drawn",
+      "source": "art-source/diagrams.py",
+      "sourceSha256": "23c7f4a203b7ec1d3a81dd44d7d08b9945858a24f019a849c8c27bee91c2357c",
+      "semantics": {
+        "kind": "aligned unit cells",
+        "rows": [
+          [
+            "square",
+            13,
+            0
+          ],
+          [
+            "triangle",
+            18,
+            0
+          ]
+        ],
+        "reference": 13,
+        "scale": 18,
+        "bracket": null,
+        "usedBy": [
+          "q2"
+        ]
+      },
+      "usedBy": [
+        "q2"
+      ],
+      "visualReview": "Exact equal-scale grid from integer data; browser rendering pending."
+    },
+    "q2-c": {
+      "file": "assets/q2-c.png",
+      "sha256": "53883b8228286ed192452911327289193ec0c7f3ac59f3b08a202d63d35b5560",
+      "bytes": 3730,
+      "pixels": [
+        780,
+        260
+      ],
+      "type": "program_drawn",
+      "source": "art-source/diagrams.py",
+      "sourceSha256": "23c7f4a203b7ec1d3a81dd44d7d08b9945858a24f019a849c8c27bee91c2357c",
+      "semantics": {
+        "kind": "aligned unit cells",
+        "rows": [
+          [
+            "square",
+            13,
+            0
+          ],
+          [
+            "triangle",
+            8,
+            5
+          ]
+        ],
+        "reference": 13,
+        "scale": 18,
+        "bracket": null,
+        "usedBy": [
+          "q2"
+        ]
+      },
+      "usedBy": [
+        "q2"
+      ],
+      "visualReview": "Exact equal-scale grid from integer data; browser rendering pending."
+    },
+    "q3-a": {
+      "file": "assets/q3-a.png",
+      "sha256": "8b7d2542bb8da90fa96fa3d943991ea64e0d6151419fdd69be64c4d894a2bada",
+      "bytes": 4512,
+      "pixels": [
+        500,
+        280
+      ],
+      "type": "program_drawn",
+      "source": "art-source/diagrams.py",
+      "sourceSha256": "23c7f4a203b7ec1d3a81dd44d7d08b9945858a24f019a849c8c27bee91c2357c",
+      "semantics": {
+        "kind": "exact groups of ten and loose cells",
+        "value": 35,
+        "usedBy": [
+          "q3"
+        ]
+      },
+      "usedBy": [
+        "q3"
+      ],
+      "visualReview": "Exact equal-scale grid from integer data; browser rendering pending."
+    },
+    "q3-b": {
+      "file": "assets/q3-b.png",
+      "sha256": "f343ed2d6a89629d9c520af202ef923d24a4dc553bb1b6491f71d53b7d9e70f2",
+      "bytes": 3088,
+      "pixels": [
+        500,
+        280
+      ],
+      "type": "program_drawn",
+      "source": "art-source/diagrams.py",
+      "sourceSha256": "23c7f4a203b7ec1d3a81dd44d7d08b9945858a24f019a849c8c27bee91c2357c",
+      "semantics": {
+        "kind": "exact groups of ten and loose cells",
+        "value": 21,
+        "usedBy": [
+          "q3"
+        ]
+      },
+      "usedBy": [
+        "q3"
+      ],
+      "visualReview": "Exact equal-scale grid from integer data; browser rendering pending."
+    },
+    "q3-c": {
+      "file": "assets/q3-c.png",
+      "sha256": "95dde7ab3e18ecdf17d4ca421fa7457c37bf4dc4adfb974dccac229b0c3f4762",
+      "bytes": 1939,
+      "pixels": [
+        500,
+        280
+      ],
+      "type": "program_drawn",
+      "source": "art-source/diagrams.py",
+      "sourceSha256": "23c7f4a203b7ec1d3a81dd44d7d08b9945858a24f019a849c8c27bee91c2357c",
+      "semantics": {
+        "kind": "exact groups of ten and loose cells",
+        "value": 7,
+        "usedBy": [
+          "q3"
+        ]
+      },
+      "usedBy": [
+        "q3"
+      ],
+      "visualReview": "Exact equal-scale grid from integer data; browser rendering pending."
+    },
+    "q4-a": {
+      "file": "assets/q4-a.png",
+      "sha256": "083cb23309ed522561badab978671cd81120cef2056574db0e69629061f4c0d5",
+      "bytes": 4270,
+      "pixels": [
+        500,
+        280
+      ],
+      "type": "program_drawn",
+      "source": "art-source/diagrams.py",
+      "sourceSha256": "23c7f4a203b7ec1d3a81dd44d7d08b9945858a24f019a849c8c27bee91c2357c",
+      "semantics": {
+        "kind": "exact groups of ten and loose cells",
+        "value": 29,
+        "usedBy": [
+          "q4"
+        ]
+      },
+      "usedBy": [
+        "q4"
+      ],
+      "visualReview": "Exact equal-scale grid from integer data; browser rendering pending."
+    },
+    "q4-b": {
+      "file": "assets/q4-b.png",
+      "sha256": "faa11f9791ed94afb25ab7dde465ecb26931773f64eccb15e50dc654df77d34d",
+      "bytes": 3229,
+      "pixels": [
+        500,
+        280
+      ],
+      "type": "program_drawn",
+      "source": "art-source/diagrams.py",
+      "sourceSha256": "23c7f4a203b7ec1d3a81dd44d7d08b9945858a24f019a849c8c27bee91c2357c",
+      "semantics": {
+        "kind": "exact groups of ten and loose cells",
+        "value": 13,
+        "usedBy": [
+          "q4"
+        ]
+      },
+      "usedBy": [
+        "q4"
+      ],
+      "visualReview": "Exact equal-scale grid from integer data; browser rendering pending."
+    },
+    "q4-c": {
+      "file": "assets/q4-c.png",
+      "sha256": "c5ef6cc772d6d32471f61fa3f3904a06f9ea0ec494930d28e1921605bb586eca",
+      "bytes": 2900,
+      "pixels": [
+        500,
+        280
+      ],
+      "type": "program_drawn",
+      "source": "art-source/diagrams.py",
+      "sourceSha256": "23c7f4a203b7ec1d3a81dd44d7d08b9945858a24f019a849c8c27bee91c2357c",
+      "semantics": {
+        "kind": "exact groups of ten and loose cells",
+        "value": 8,
+        "usedBy": [
+          "q4"
+        ]
+      },
+      "usedBy": [
+        "q4"
+      ],
+      "visualReview": "Exact equal-scale grid from integer data; browser rendering pending."
+    },
+    "q5-a": {
+      "file": "assets/q5-a.png",
+      "sha256": "98116382a187bf9f2c752371e272c74b40e879c50b6cab3af05d22dbd7b99602",
+      "bytes": 6414,
+      "pixels": [
+        780,
+        390
+      ],
+      "type": "program_drawn",
+      "source": "art-source/diagrams.py",
+      "sourceSha256": "23c7f4a203b7ec1d3a81dd44d7d08b9945858a24f019a849c8c27bee91c2357c",
+      "semantics": {
+        "kind": "aligned unit cells",
+        "rows": [
+          [
+            "round",
+            28,
+            0
+          ],
+          [
+            "square",
+            34,
+            0
+          ],
+          [
+            "triangle",
+            28,
+            0
+          ]
+        ],
+        "reference": 34,
+        "scale": 46,
+        "bracket": null,
+        "usedBy": [
+          "q5"
+        ]
+      },
+      "usedBy": [
+        "q5"
+      ],
+      "visualReview": "Exact equal-scale grid from integer data; browser rendering pending."
+    },
+    "q5-b": {
+      "file": "assets/q5-b.png",
+      "sha256": "b906c87d92e8c0a15dec8bfba79ae12a8ad86c966e5748daddad37ec64d64ca9",
+      "bytes": 6252,
+      "pixels": [
+        780,
+        390
+      ],
+      "type": "program_drawn",
+      "source": "art-source/diagrams.py",
+      "sourceSha256": "23c7f4a203b7ec1d3a81dd44d7d08b9945858a24f019a849c8c27bee91c2357c",
+      "semantics": {
+        "kind": "aligned unit cells",
+        "rows": [
+          [
+            "round",
+            28,
+            0
+          ],
+          [
+            "square",
+            34,
+            0
+          ],
+          [
+            "triangle",
+            46,
+            0
+          ]
+        ],
+        "reference": 34,
+        "scale": 46,
+        "bracket": null,
+        "usedBy": [
+          "q5"
+        ]
+      },
+      "usedBy": [
+        "q5"
+      ],
+      "visualReview": "Exact equal-scale grid from integer data; browser rendering pending."
+    },
+    "q5-c": {
+      "file": "assets/q5-c.png",
+      "sha256": "d6271d682b254972c2f056427d1ff00ce2872c0449b4fb8d057f5ee1c201a968",
+      "bytes": 6267,
+      "pixels": [
+        780,
+        390
+      ],
+      "type": "program_drawn",
+      "source": "art-source/diagrams.py",
+      "sourceSha256": "23c7f4a203b7ec1d3a81dd44d7d08b9945858a24f019a849c8c27bee91c2357c",
+      "semantics": {
+        "kind": "aligned unit cells",
+        "rows": [
+          [
+            "round",
+            46,
+            0
+          ],
+          [
+            "square",
+            34,
+            0
+          ],
+          [
+            "triangle",
+            28,
+            0
+          ]
+        ],
+        "reference": 34,
+        "scale": 46,
+        "bracket": null,
+        "usedBy": [
+          "q5"
+        ]
+      },
+      "usedBy": [
+        "q5"
+      ],
+      "visualReview": "Exact equal-scale grid from integer data; browser rendering pending."
+    },
+    "q6-a": {
+      "file": "assets/q6-a.png",
+      "sha256": "e7daa3d0753be9778227ae35ea190f34b2d7bb48fd5473328b60754774b8d9fd",
+      "bytes": 4658,
+      "pixels": [
+        780,
+        260
+      ],
+      "type": "program_drawn",
+      "source": "art-source/diagrams.py",
+      "sourceSha256": "23c7f4a203b7ec1d3a81dd44d7d08b9945858a24f019a849c8c27bee91c2357c",
+      "semantics": {
+        "kind": "aligned unit cells",
+        "rows": [
+          [
+            "square",
+            25,
+            0
+          ],
+          [
+            "triangle",
+            19,
+            6
+          ]
+        ],
+        "reference": 25,
+        "scale": 31,
+        "bracket": [
+          1,
+          19,
+          25,
+          6
+        ],
+        "usedBy": [
+          "q6"
+        ]
+      },
+      "usedBy": [
+        "q6"
+      ],
+      "visualReview": "Exact equal-scale grid from integer data; browser rendering pending."
+    },
+    "q6-b": {
+      "file": "assets/q6-b.png",
+      "sha256": "b7173cc299cc02216fd248a9ad936dc831bc224c3c1399c4b739022141533cc4",
+      "bytes": 4849,
+      "pixels": [
+        780,
+        260
+      ],
+      "type": "program_drawn",
+      "source": "art-source/diagrams.py",
+      "sourceSha256": "23c7f4a203b7ec1d3a81dd44d7d08b9945858a24f019a849c8c27bee91c2357c",
+      "semantics": {
+        "kind": "aligned unit cells",
+        "rows": [
+          [
+            "square",
+            25,
+            0
+          ],
+          [
+            "triangle",
+            20,
+            5
+          ]
+        ],
+        "reference": 25,
+        "scale": 31,
+        "bracket": [
+          1,
+          20,
+          25,
+          5
+        ],
+        "usedBy": [
+          "q6"
+        ]
+      },
+      "usedBy": [
+        "q6"
+      ],
+      "visualReview": "Exact equal-scale grid from integer data; browser rendering pending."
+    },
+    "q6-c": {
+      "file": "assets/q6-c.png",
+      "sha256": "84a47235df91bd31d64d185c5352a7873049a48b8aa22d987b92eb964a0da1d8",
+      "bytes": 4720,
+      "pixels": [
+        780,
+        260
+      ],
+      "type": "program_drawn",
+      "source": "art-source/diagrams.py",
+      "sourceSha256": "23c7f4a203b7ec1d3a81dd44d7d08b9945858a24f019a849c8c27bee91c2357c",
+      "semantics": {
+        "kind": "aligned unit cells",
+        "rows": [
+          [
+            "square",
+            25,
+            0
+          ],
+          [
+            "triangle",
+            31,
+            0
+          ]
+        ],
+        "reference": 25,
+        "scale": 31,
+        "bracket": [
+          1,
+          25,
+          31,
+          6
+        ],
+        "usedBy": [
+          "q6"
+        ]
+      },
+      "usedBy": [
+        "q6"
+      ],
+      "visualReview": "Exact equal-scale grid from integer data; browser rendering pending."
+    }
+  }
+}

@@ -1,0 +1,1003 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "Unit 2 It's an orange cat.",
+  "description": "在纸偶展览听清颜色和物名，练习猜测、确认和完整描述。",
+  "grade": 1,
+  "roster": {
+    "mia": {
+      "name": "Mia 老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Jennifer",
+      "avatar": "/teachers/coco-english-v1.png",
+      "color": "#557B76",
+      "persona": "用适合六岁孩子的短句教听辨颜色和物名，等孩子猜过再解释。"
+    }
+  },
+  "images": {
+    "workshop-cover": {
+      "file": "assets/workshop-cover.png"
+    },
+    "paint-exhibit": {
+      "file": "assets/paint-exhibit.png"
+    },
+    "curtain-cat": {
+      "file": "assets/curtain-cat.png"
+    },
+    "label-exhibit": {
+      "file": "assets/label-exhibit.png"
+    },
+    "beat-curtain": {
+      "file": "assets/beat-curtain.png"
+    },
+    "guess-exhibit": {
+      "file": "assets/guess-exhibit.png"
+    },
+    "paper-workbench": {
+      "file": "assets/paper-workbench.png"
+    },
+    "display-backdrop": {
+      "file": "assets/display-backdrop.png"
+    },
+    "maze-backdrop": {
+      "file": "assets/maze-backdrop.png"
+    },
+    "gallery-sticker": {
+      "file": "assets/gallery-sticker.png"
+    },
+    "amber-marble": {
+      "file": "assets/amber-marble.png"
+    },
+    "paper-rover": {
+      "file": "assets/paper-rover.png"
+    },
+    "paper-rover-bubble": {
+      "file": "assets/paper-rover-bubble.png"
+    },
+    "orange-cat": {
+      "file": "assets/orange-cat.png"
+    },
+    "yellow-house": {
+      "file": "assets/yellow-house.png"
+    },
+    "yellow-box": {
+      "file": "assets/yellow-box.png"
+    },
+    "blue-pencil": {
+      "file": "assets/blue-pencil.png"
+    },
+    "red-pencil": {
+      "file": "assets/red-pencil.png"
+    },
+    "blue-book": {
+      "file": "assets/blue-book.png"
+    },
+    "yellow-cat": {
+      "file": "assets/yellow-cat.png"
+    },
+    "black-cat": {
+      "file": "assets/black-cat.png"
+    },
+    "black-bird": {
+      "file": "assets/black-bird.png"
+    },
+    "yellow-bird": {
+      "file": "assets/yellow-bird.png"
+    },
+    "blue-bird": {
+      "file": "assets/blue-bird.png"
+    },
+    "red-book": {
+      "file": "assets/red-book.png"
+    },
+    "red-ball": {
+      "file": "assets/red-ball.png"
+    },
+    "green-book": {
+      "file": "assets/green-book.png"
+    },
+    "green-ball": {
+      "file": "assets/green-ball.png"
+    },
+    "quiz-white-cat": {
+      "file": "assets/quiz-white-cat.png"
+    },
+    "quiz-white-dog": {
+      "file": "assets/quiz-white-dog.png"
+    },
+    "quiz-black-dog": {
+      "file": "assets/quiz-black-dog.png"
+    },
+    "quiz-orange-kite": {
+      "file": "assets/quiz-orange-kite.png"
+    },
+    "quiz-orange-box": {
+      "file": "assets/quiz-orange-box.png"
+    },
+    "quiz-yellow-kite": {
+      "file": "assets/quiz-yellow-kite.png"
+    },
+    "quiz-green-box": {
+      "file": "assets/quiz-green-box.png"
+    },
+    "quiz-blue-house": {
+      "file": "assets/quiz-blue-house.png"
+    },
+    "quiz-green-house": {
+      "file": "assets/quiz-green-house.png"
+    },
+    "quiz-green-book": {
+      "file": "assets/quiz-green-book.png"
+    },
+    "quiz-yellow-book": {
+      "file": "assets/quiz-yellow-book.png"
+    },
+    "quiz-yellow-pencil": {
+      "file": "assets/quiz-yellow-pencil.png"
+    },
+    "quiz-red-bird": {
+      "file": "assets/quiz-red-bird.png"
+    },
+    "quiz-white-bird": {
+      "file": "assets/quiz-white-bird.png"
+    },
+    "quiz-blue-kite": {
+      "file": "assets/quiz-blue-kite.png"
+    },
+    "quiz-blue-ball": {
+      "file": "assets/quiz-blue-ball.png"
+    },
+    "quiz-green-kite": {
+      "file": "assets/quiz-green-kite.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "paint-show",
+      "type": "slide",
+      "title": "谁给纸偶换了颜色？",
+      "template": "picture-points",
+      "data": {
+        "title": "谁给纸偶换了颜色？",
+        "picture": "paint-exhibit",
+        "points": [
+          "blue cat",
+          "black monkey",
+          "同一只猴，五种颜色"
+        ]
+      },
+      "script": [
+        {
+          "say": "呀，纸偶展快开门了，谁刚换了新颜色？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "伸出一根手指，找找有尖耳朵和胡须的那张。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "它是一只猫，身上这一片是蓝色。"
+        },
+        {
+          "say": "A blue cat."
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "长尾巴这张是猴子。你看到什么颜色呢？"
+        },
+        {
+          "say": "A black monkey."
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "咦，猴子又换了一件五颜六色的衣服！"
+        },
+        {
+          "say": "红、蓝、白、黄、黑，原来的猴子还在呀。"
+        },
+        {
+          "say": "颜色能变，脸和长尾巴还告诉我们它是谁。"
+        }
+      ]
+    },
+    {
+      "key": "find-the-cat",
+      "type": "slide",
+      "title": "猫躲在帘子后",
+      "template": "two-columns",
+      "data": {
+        "title": "猫躲在帘子后",
+        "left": {
+          "heading": "帘子还合着",
+          "body": "Is it black?"
+        },
+        "right": {
+          "heading": "帘子拉开啦",
+          "body": "an orange cat"
+        },
+        "left_picture": "curtain-cat",
+        "right_picture": "orange-cat"
+      },
+      "script": [
+        {
+          "say": "先只看左边的帘缝。你会猜是什么颜色？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "把手放在眼睛上方，像我们正在往里瞧。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "先猜黑色也有道理。背光时，看着会暗一些。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "帘子一开，亮处的毛是橙色的。看清再改口。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "Is it black? No. It’s an orange cat."
+        },
+        {
+          "say": "A black cat."
+        },
+        {
+          "say": "刚才那句是在猜黑猫。现在你来指真正的橙猫。"
+        },
+        {
+          "say": "先看清再回答，帘子里的秘密就解开啦。"
+        }
+      ]
+    },
+    {
+      "key": "house-or-box",
+      "type": "slide",
+      "title": "两件黄东西",
+      "template": "two-columns",
+      "data": {
+        "title": "两件黄东西",
+        "left": {
+          "heading": "有屋顶和窗",
+          "body": "a yellow house"
+        },
+        "right": {
+          "heading": "有开口和折边",
+          "body": "a yellow box"
+        },
+        "left_picture": "yellow-house",
+        "right_picture": "yellow-box"
+      },
+      "script": [
+        {
+          "say": "展柜里来了两件黄东西，都是房子吗？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "伸手比个尖屋顶，再找找门和窗。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "这个有屋顶和门窗，是一座黄色的小房子。"
+        },
+        {
+          "say": "A yellow house."
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "Is it a yellow house?"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "它顶上敞着口，能放东西。原来这是盒子。"
+        },
+        {
+          "say": "No, it’s a yellow box."
+        },
+        {
+          "say": "耳朵听见 yellow，还得看清它到底是什么。"
+        }
+      ]
+    },
+    {
+      "key": "say-the-clues",
+      "type": "slide",
+      "title": "把两个线索说完整",
+      "template": "picture-points",
+      "data": {
+        "title": "把两个线索说完整",
+        "picture": "label-exhibit",
+        "points": [
+          "an orange cat",
+          "a yellow box",
+          "先说颜色，再说物名"
+        ]
+      },
+      "script": [
+        {
+          "say": "展牌掉下来啦。光说一个颜色，够用吗？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "看看橙猫和黄盒，物名和颜色都写进去才清楚。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "听 orange 开头的那个音，前面接 an。跟我连着说。"
+        },
+        {
+          "say": "An orange cat."
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "听 yellow 开头的声音。这一组前面用 a，跟我说。"
+        },
+        {
+          "say": "A yellow box."
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "两个语块都先放颜色，后说是什么。"
+        },
+        {
+          "say": "我给画桌上的两件蓝东西贴牌，你来伸手指。"
+        },
+        {
+          "say": "A blue pencil."
+        },
+        {
+          "say": "A blue book."
+        },
+        {
+          "say": "都听见蓝色，还要用最后一个词分开两件东西。"
+        },
+        {
+          "say": "听不清就重听，先找颜色，再听是什么。"
+        }
+      ]
+    },
+    {
+      "key": "listen-and-aim",
+      "type": "interactive",
+      "title": "听清再发射",
+      "page": "listen-and-aim",
+      "widgetType": "game",
+      "startImage": "workshop-cover",
+      "script": [
+        {
+          "say": "咦，画桌上的展品混在一起啦。我们要给它们找位置。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#demo-listen"
+        },
+        {
+          "say": "先听完颜色和物名。没听清，就点小喇叭。"
+        },
+        {
+          "highlight": "#demo-first-target"
+        },
+        {
+          "say": "A blue pencil. 蓝色，尖尖的铅笔。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "看虚线朝着它，按发射。偏一点也能用箭头挪回来。"
+        },
+        {
+          "say": "展品真摆好了！换你瞄准，颜色和物名都要听准。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "blue-pencil": "say-the-clues-13",
+        "blue-book": "say-the-clues-14",
+        "black-bird": "tap-a-beat-12",
+        "yellow-cat": "tap-a-beat-13",
+        "black-cat": "find-the-cat-12",
+        "green-ball": "gallery-recap-4",
+        "red-book": "gallery-recap-8",
+        "green-book": "gallery-recap-5",
+        "aim-hint": "say-the-clues-16",
+        "aim-help": "guess-two-ways-16",
+        "aim-praise": "gallery-recap-15"
+      }
+    },
+    {
+      "key": "tap-a-beat",
+      "type": "slide",
+      "title": "拍着节奏猜一猜",
+      "template": "picture-points",
+      "data": {
+        "title": "拍着节奏猜一猜",
+        "picture": "beat-curtain",
+        "points": [
+          "先猜一猜",
+          "听清回答",
+          "再跟一拍"
+        ]
+      },
+      "script": [
+        {
+          "say": "盖子后露出一点东西。你猜会是什么？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "手指点两下桌面，每听到一句再拍一下。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "Is it a cat?"
+        },
+        {
+          "say": "先问是不是猫，给伙伴留一拍回答。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "No, it isn’t."
+        },
+        {
+          "say": "听见 No，先别急，看看伙伴亮出的新图。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "给伙伴留一拍，听完回答再拍一下，把问答接起来。"
+        },
+        {
+          "say": "A black bird."
+        },
+        {
+          "say": "A yellow cat."
+        },
+        {
+          "say": "刚才露的是鸟翅膀。好，拍拍手把新发现说给伙伴！"
+        }
+      ]
+    },
+    {
+      "key": "guess-two-ways",
+      "type": "slide",
+      "title": "先问颜色，再猜是什么",
+      "template": "picture-points",
+      "data": {
+        "title": "先问颜色，再猜是什么",
+        "picture": "guess-exhibit",
+        "points": [
+          "问颜色，缩小范围",
+          "问物名，分清同色",
+          "听到 No，再改猜"
+        ]
+      },
+      "script": [
+        {
+          "say": "看展的伙伴藏起一张图，你只许先问一句，怎么问？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "先让眼睛找一找，这里有两样红东西。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "Is it red?"
+        },
+        {
+          "say": "Yes, it is. 听到肯定，先把绿色图放一边。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "红书和红球都还在。得用物名把它们分开。"
+        },
+        {
+          "say": "Is it a red book?"
+        },
+        {
+          "say": "No, it’s a red ball."
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "颜色猜对了，物名猜错了。再听伙伴换一轮。"
+        },
+        {
+          "say": "No, it’s a green book."
+        },
+        {
+          "say": "Is it a red book? Yes, it is."
+        },
+        {
+          "say": "听到 No，要等它把答案说完。Yes 表示猜对啦。"
+        },
+        {
+          "say": "同色还要找外形。慢一点，把两个线索对齐。"
+        },
+        {
+          "say": "动手指一指，问对第二个线索，藏图就找到了。"
+        },
+        {
+          "say": "等展品找齐，小车就能开到旗子旁啦。"
+        }
+      ]
+    },
+    {
+      "key": "guess-and-drive",
+      "type": "interactive",
+      "title": "听问答开泡泡车",
+      "page": "guess-and-drive",
+      "widgetType": "game",
+      "startImage": "workshop-cover",
+      "script": [
+        {
+          "say": "现在展品还要送过一条小路。猜错的图，车可不能收。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#demo-listen"
+        },
+        {
+          "say": "先听问句，更要听回答。它会告诉你哪张图才对。"
+        },
+        {
+          "highlight": "#demo-first-target"
+        },
+        {
+          "say": "Is it black? No, it's an orange cat."
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "方向键开车。拦路的碎墙可以用泡泡打通。"
+        },
+        {
+          "say": "星都找齐后再去旗子那里，下一趟交给你啦。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "maze-orange-cat": "find-the-cat-11",
+        "maze-yellow-box": "house-or-box-13",
+        "maze-red-ball": "guess-two-ways-10",
+        "maze-green-book": "guess-two-ways-13",
+        "maze-red-book": "guess-two-ways-14",
+        "maze-blue-book": "gallery-recap-9",
+        "maze-black-bird": "make-and-share-8",
+        "maze-blue-bird": "make-and-share-9",
+        "maze-exit": "guess-two-ways-18",
+        "maze-hint": "say-the-clues-16",
+        "maze-help": "guess-two-ways-16",
+        "maze-praise": "gallery-recap-15"
+      }
+    },
+    {
+      "key": "make-and-share",
+      "type": "slide",
+      "title": "做完给伙伴猜",
+      "template": "picture-points",
+      "data": {
+        "title": "做完给伙伴猜",
+        "picture": "paper-workbench",
+        "points": [
+          "先做一件",
+          "让伙伴来猜",
+          "用整句介绍"
+        ]
+      },
+      "script": [
+        {
+          "say": "呀，最后一张展台还空着，你想放什么作品？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "有翅膀的纸鸟和有长尾巴的风筝，你想做哪件？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "我们给纸鸟涂蓝，先看看翅膀和嘴像不像鸟。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "伙伴先猜黑鸟。我把两种回答都说一遍，你听哪句对。"
+        },
+        {
+          "say": "Is it a black bird? Yes, it is."
+        },
+        {
+          "say": "No, it’s a blue bird."
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "真是黑鸟才答 Yes。我们的蓝鸟，要用第二句。"
+        },
+        {
+          "say": "用两根手指做一对小翅膀，试着说给家人听。"
+        },
+        {
+          "say": "你藏作品，伙伴问，你答。换伙伴藏，你问，伙伴答。"
+        }
+      ]
+    },
+    {
+      "key": "picture-check",
+      "type": "quiz",
+      "title": "听音帮展品找位置",
+      "intro": [
+        "小展台换了新作品。听一句，选一张图。",
+        "没听清，可以按小喇叭再听一次。"
+      ],
+      "questions": [
+        {
+          "id": "white-dog",
+          "question": "听一听。A white dog.",
+          "skill": "hear-colour-and-animal",
+          "options": {
+            "a": {
+              "label": "白猫",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-white-cat",
+                "alt": "白猫"
+              }
+            },
+            "b": {
+              "label": "白狗",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-white-dog",
+                "alt": "白狗"
+              }
+            },
+            "c": {
+              "label": "黑狗",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-black-dog",
+                "alt": "黑狗"
+              }
+            }
+          },
+          "answer": [
+            "b"
+          ],
+          "analysis": "White 是白色，dog 是狗。选项里只有这一只既是白色又是狗。"
+        },
+        {
+          "id": "orange-kite",
+          "question": "It’s an orange kite.",
+          "skill": "hear-orange-description",
+          "options": {
+            "a": {
+              "label": "橙风筝",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-orange-kite",
+                "alt": "橙风筝"
+              }
+            },
+            "b": {
+              "label": "橙盒",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-orange-box",
+                "alt": "橙盒"
+              }
+            },
+            "c": {
+              "label": "黄风筝",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-yellow-kite",
+                "alt": "黄风筝"
+              }
+            }
+          },
+          "answer": [
+            "a"
+          ],
+          "analysis": "Orange 是橙色，kite 是风筝。橙盒的物名不同，黄风筝的颜色不同。"
+        },
+        {
+          "id": "green-house",
+          "question": "It’s a green house.",
+          "skill": "differentiate-house-and-box",
+          "options": {
+            "a": {
+              "label": "绿盒",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-green-box",
+                "alt": "绿盒"
+              }
+            },
+            "b": {
+              "label": "蓝房子",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-blue-house",
+                "alt": "蓝房子"
+              }
+            },
+            "c": {
+              "label": "绿房子",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-green-house",
+                "alt": "绿房子"
+              }
+            }
+          },
+          "answer": [
+            "c"
+          ],
+          "analysis": "Green 是绿色，house 是房子。看绿色的屋顶、门和窗。"
+        },
+        {
+          "id": "yellow-book",
+          "question": "Is it green? No, it’s a yellow book.",
+          "skill": "hear-colour-correction",
+          "options": {
+            "a": {
+              "label": "绿书",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-green-book",
+                "alt": "绿书"
+              }
+            },
+            "b": {
+              "label": "黄书",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-yellow-book",
+                "alt": "黄书"
+              }
+            },
+            "c": {
+              "label": "黄铅笔",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-yellow-pencil",
+                "alt": "黄铅笔"
+              }
+            }
+          },
+          "answer": [
+            "b"
+          ],
+          "analysis": "先听到猜绿色，No 把它改成黄色。物名还是书。黄铅笔虽然也是黄色，却不是书。"
+        },
+        {
+          "id": "white-bird",
+          "question": "Is it a white bird? Yes, it is.",
+          "skill": "confirm-colour-and-object",
+          "options": {
+            "a": {
+              "label": "红鸟",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-red-bird",
+                "alt": "红鸟"
+              }
+            },
+            "b": {
+              "label": "白猫",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-white-cat",
+                "alt": "白猫"
+              }
+            },
+            "c": {
+              "label": "白鸟",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-white-bird",
+                "alt": "白鸟"
+              }
+            }
+          },
+          "answer": [
+            "c"
+          ],
+          "analysis": "Yes 确认了问句。White bird 说的是白色的鸟。"
+        },
+        {
+          "id": "blue-kite",
+          "question": "Is it a ball? No, it’s a blue kite.",
+          "skill": "change-object-after-no",
+          "options": {
+            "a": {
+              "label": "蓝风筝",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-blue-kite",
+                "alt": "蓝风筝"
+              }
+            },
+            "b": {
+              "label": "蓝球",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-blue-ball",
+                "alt": "蓝球"
+              }
+            },
+            "c": {
+              "label": "绿风筝",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-green-kite",
+                "alt": "绿风筝"
+              }
+            }
+          },
+          "answer": [
+            "a"
+          ],
+          "analysis": "先猜球，No 后面改成风筝。蓝球的颜色对，物名错；绿风筝的物名对，颜色错。"
+        }
+      ],
+      "script": []
+    },
+    {
+      "key": "gallery-recap",
+      "type": "slide",
+      "title": "给下一班看展的小朋友",
+      "template": "summary",
+      "data": {
+        "title": "给下一班看展的小朋友",
+        "items": [
+          "耳朵找颜色",
+          "眼睛核对物名",
+          "把颜色和物名放进一句话",
+          "先问颜色，再问完整问题"
+        ]
+      },
+      "script": [
+        {
+          "say": "展览要交给下一班了，你想留哪几条提醒呢？"
+        },
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "先抓住颜色。同一个颜色，可能在好多东西上。"
+        },
+        {
+          "say": "A green ball."
+        },
+        {
+          "say": "A green book."
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "再听物名，对照外形。球是圆的，书有封面。"
+        },
+        {
+          "say": "A red book."
+        },
+        {
+          "say": "No, it’s a blue book."
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "完整介绍要两个线索。你还记得开头那只橙猫吗？"
+        },
+        {
+          "say": "It’s an orange cat."
+        },
+        {
+          "spotlight": "item-4"
+        },
+        {
+          "say": "先问颜色，再问物名。听到否定，再改不合的地方。"
+        },
+        {
+          "say": "两个线索一对上，展品就找到了。"
+        },
+        {
+          "say": "回家请家人藏件东西。轮流问，听完回答再猜。"
+        }
+      ]
+    }
+  ]
+}

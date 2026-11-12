@@ -1,0 +1,172 @@
+{
+  "schemaVersion": "mira.courseware.image-atlas-receipt.v1",
+  "atlasId": "theatre-sprites",
+  "background": "transparent",
+  "sheetPixels": [
+    1254,
+    1254
+  ],
+  "assets": [
+    {
+      "assetKey": "usher-stand",
+      "path": "assets/usher-stand.png",
+      "sha256": "c8f16e49bf50a73a9a6866eadf493a6d332b533eb504618317913d5c21bf4f4b",
+      "width": 312,
+      "height": 320,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/theatre-sprites.png",
+      "generatedSourceSha256": "70d7b413e65ee62e4fbb46539ab0b16d95151804b1fa427f8eb8d426580603a4",
+      "prompt": "Hard-alpha cleanup ONLY for the supplied exact transparent 3×3 sprite atlas. The seven original illustrated sprites are already correct and must stay the same in color, design, geometry, pose, relative scale and exact row-major position: top row three frames of the same boy, middle row one child and two colored flags, bottom-left a star, bottom middle and right empty. Remove all translucent white haze, colored glow, cast shadow, backfill, alpha noise and bright matte fringing around these silhouettes. Every background pixel, entire gutters and all square-cell edges must have alpha exactly zero. Only the sharp cut-paper bodies, flags and star remain with solid opacity and a narrow normal antialias edge. Keep no glow, blurred emission, paper behind the subjects, checkerboard, grid, typography, or extra assets. Keep three columns by three rows, exact original framing, and only clean the alpha mask.",
+      "promptSha256": "d4aa9bd517b5b4acbd8b6292ba02fb5d0e98587b649952ab342ed89b15b345a1",
+      "sourceCrop": [
+        0,
+        0,
+        418,
+        429
+      ],
+      "usedBy": [
+        "hop-between"
+      ],
+      "visualReview": "pending"
+    },
+    {
+      "assetKey": "usher-run",
+      "path": "assets/usher-run.png",
+      "sha256": "f54509326660a5b2e9a2016c7cc635f95514fc9fe7b9fc2c2147974168c06caf",
+      "width": 312,
+      "height": 320,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/theatre-sprites.png",
+      "generatedSourceSha256": "70d7b413e65ee62e4fbb46539ab0b16d95151804b1fa427f8eb8d426580603a4",
+      "prompt": "Hard-alpha cleanup ONLY for the supplied exact transparent 3×3 sprite atlas. The seven original illustrated sprites are already correct and must stay the same in color, design, geometry, pose, relative scale and exact row-major position: top row three frames of the same boy, middle row one child and two colored flags, bottom-left a star, bottom middle and right empty. Remove all translucent white haze, colored glow, cast shadow, backfill, alpha noise and bright matte fringing around these silhouettes. Every background pixel, entire gutters and all square-cell edges must have alpha exactly zero. Only the sharp cut-paper bodies, flags and star remain with solid opacity and a narrow normal antialias edge. Keep no glow, blurred emission, paper behind the subjects, checkerboard, grid, typography, or extra assets. Keep three columns by three rows, exact original framing, and only clean the alpha mask.",
+      "promptSha256": "d4aa9bd517b5b4acbd8b6292ba02fb5d0e98587b649952ab342ed89b15b345a1",
+      "sourceCrop": [
+        418,
+        0,
+        836,
+        429
+      ],
+      "usedBy": [
+        "hop-between"
+      ],
+      "visualReview": "pending"
+    },
+    {
+      "assetKey": "usher-hop",
+      "path": "assets/usher-hop.png",
+      "sha256": "7b5370e420d8ec87676161102929404d7387329a3b11faafee0586cf640be415",
+      "width": 312,
+      "height": 320,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/theatre-sprites.png",
+      "generatedSourceSha256": "70d7b413e65ee62e4fbb46539ab0b16d95151804b1fa427f8eb8d426580603a4",
+      "prompt": "Hard-alpha cleanup ONLY for the supplied exact transparent 3×3 sprite atlas. The seven original illustrated sprites are already correct and must stay the same in color, design, geometry, pose, relative scale and exact row-major position: top row three frames of the same boy, middle row one child and two colored flags, bottom-left a star, bottom middle and right empty. Remove all translucent white haze, colored glow, cast shadow, backfill, alpha noise and bright matte fringing around these silhouettes. Every background pixel, entire gutters and all square-cell edges must have alpha exactly zero. Only the sharp cut-paper bodies, flags and star remain with solid opacity and a narrow normal antialias edge. Keep no glow, blurred emission, paper behind the subjects, checkerboard, grid, typography, or extra assets. Keep three columns by three rows, exact original framing, and only clean the alpha mask.",
+      "promptSha256": "d4aa9bd517b5b4acbd8b6292ba02fb5d0e98587b649952ab342ed89b15b345a1",
+      "sourceCrop": [
+        836,
+        0,
+        1254,
+        429
+      ],
+      "usedBy": [
+        "hop-between"
+      ],
+      "visualReview": "pending"
+    },
+    {
+      "assetKey": "queue-child",
+      "path": "assets/queue-child.png",
+      "sha256": "f35ab1c1dae1668c3227e7d2099ff820ee3d29fa091c9b3bd25f202ffb044dfa",
+      "width": 313,
+      "height": 320,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/theatre-sprites.png",
+      "generatedSourceSha256": "70d7b413e65ee62e4fbb46539ab0b16d95151804b1fa427f8eb8d426580603a4",
+      "prompt": "Hard-alpha cleanup ONLY for the supplied exact transparent 3×3 sprite atlas. The seven original illustrated sprites are already correct and must stay the same in color, design, geometry, pose, relative scale and exact row-major position: top row three frames of the same boy, middle row one child and two colored flags, bottom-left a star, bottom middle and right empty. Remove all translucent white haze, colored glow, cast shadow, backfill, alpha noise and bright matte fringing around these silhouettes. Every background pixel, entire gutters and all square-cell edges must have alpha exactly zero. Only the sharp cut-paper bodies, flags and star remain with solid opacity and a narrow normal antialias edge. Keep no glow, blurred emission, paper behind the subjects, checkerboard, grid, typography, or extra assets. Keep three columns by three rows, exact original framing, and only clean the alpha mask.",
+      "promptSha256": "d4aa9bd517b5b4acbd8b6292ba02fb5d0e98587b649952ab342ed89b15b345a1",
+      "sourceCrop": [
+        0,
+        429,
+        418,
+        857
+      ],
+      "usedBy": [
+        "open",
+        "two-markers",
+        "draw-and-check"
+      ],
+      "visualReview": "pending"
+    },
+    {
+      "assetKey": "flag-blue",
+      "path": "assets/flag-blue.png",
+      "sha256": "67790422aa63ca792ee28dcae1f31a0c616f574094d7a981df2d80e188a5f4e8",
+      "width": 313,
+      "height": 320,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/theatre-sprites.png",
+      "generatedSourceSha256": "70d7b413e65ee62e4fbb46539ab0b16d95151804b1fa427f8eb8d426580603a4",
+      "prompt": "Hard-alpha cleanup ONLY for the supplied exact transparent 3×3 sprite atlas. The seven original illustrated sprites are already correct and must stay the same in color, design, geometry, pose, relative scale and exact row-major position: top row three frames of the same boy, middle row one child and two colored flags, bottom-left a star, bottom middle and right empty. Remove all translucent white haze, colored glow, cast shadow, backfill, alpha noise and bright matte fringing around these silhouettes. Every background pixel, entire gutters and all square-cell edges must have alpha exactly zero. Only the sharp cut-paper bodies, flags and star remain with solid opacity and a narrow normal antialias edge. Keep no glow, blurred emission, paper behind the subjects, checkerboard, grid, typography, or extra assets. Keep three columns by three rows, exact original framing, and only clean the alpha mask.",
+      "promptSha256": "d4aa9bd517b5b4acbd8b6292ba02fb5d0e98587b649952ab342ed89b15b345a1",
+      "sourceCrop": [
+        418,
+        429,
+        836,
+        857
+      ],
+      "usedBy": [
+        "two-markers",
+        "draw-and-check",
+        "hop-between"
+      ],
+      "visualReview": "pending"
+    },
+    {
+      "assetKey": "flag-orange",
+      "path": "assets/flag-orange.png",
+      "sha256": "fa383bb2b67418e067e28583141efb72fa19dc0c1246dce0d8a1b0a648c54f54",
+      "width": 313,
+      "height": 320,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/theatre-sprites.png",
+      "generatedSourceSha256": "70d7b413e65ee62e4fbb46539ab0b16d95151804b1fa427f8eb8d426580603a4",
+      "prompt": "Hard-alpha cleanup ONLY for the supplied exact transparent 3×3 sprite atlas. The seven original illustrated sprites are already correct and must stay the same in color, design, geometry, pose, relative scale and exact row-major position: top row three frames of the same boy, middle row one child and two colored flags, bottom-left a star, bottom middle and right empty. Remove all translucent white haze, colored glow, cast shadow, backfill, alpha noise and bright matte fringing around these silhouettes. Every background pixel, entire gutters and all square-cell edges must have alpha exactly zero. Only the sharp cut-paper bodies, flags and star remain with solid opacity and a narrow normal antialias edge. Keep no glow, blurred emission, paper behind the subjects, checkerboard, grid, typography, or extra assets. Keep three columns by three rows, exact original framing, and only clean the alpha mask.",
+      "promptSha256": "d4aa9bd517b5b4acbd8b6292ba02fb5d0e98587b649952ab342ed89b15b345a1",
+      "sourceCrop": [
+        836,
+        429,
+        1254,
+        857
+      ],
+      "usedBy": [
+        "two-markers",
+        "draw-and-check",
+        "hop-between"
+      ],
+      "visualReview": "pending"
+    },
+    {
+      "assetKey": "theatre-star",
+      "path": "assets/theatre-star.png",
+      "sha256": "34ddf43880041f7e28f71c4174c107ecf49d8ebd3becde6ff1d7599ce04bc904",
+      "width": 320,
+      "height": 304,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/theatre-sprites.png",
+      "generatedSourceSha256": "70d7b413e65ee62e4fbb46539ab0b16d95151804b1fa427f8eb8d426580603a4",
+      "prompt": "Hard-alpha cleanup ONLY for the supplied exact transparent 3×3 sprite atlas. The seven original illustrated sprites are already correct and must stay the same in color, design, geometry, pose, relative scale and exact row-major position: top row three frames of the same boy, middle row one child and two colored flags, bottom-left a star, bottom middle and right empty. Remove all translucent white haze, colored glow, cast shadow, backfill, alpha noise and bright matte fringing around these silhouettes. Every background pixel, entire gutters and all square-cell edges must have alpha exactly zero. Only the sharp cut-paper bodies, flags and star remain with solid opacity and a narrow normal antialias edge. Keep no glow, blurred emission, paper behind the subjects, checkerboard, grid, typography, or extra assets. Keep three columns by three rows, exact original framing, and only clean the alpha mask.",
+      "promptSha256": "d4aa9bd517b5b4acbd8b6292ba02fb5d0e98587b649952ab342ed89b15b345a1",
+      "sourceCrop": [
+        0,
+        857,
+        418,
+        1254
+      ],
+      "usedBy": [
+        "hop-between",
+        "match-the-middle"
+      ],
+      "visualReview": "pending"
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "template": "tideGates",
+  "draft": true,
+  "title": "潮汐分流",
+  "sub": "拨动水闸，让两个水箱都刚好装满。",
+  "art": {"backdrop": "wetland.webp", "sticker": "sticker.webp"},
+  "levels": [
+    {"capacity":[4,5],"drops":[2,1,3,1,2],"seconds":1.7,"hints":["水箱刚好装满才行。","先看看还空几格，再拨水闸。"]},
+    {"capacity":[6,6],"drops":[3,1,2,4,2],"seconds":1.28,"hints":["太快时可以按一下暂停标记。","看看后面还有几滴，留出空格。"]},
+    {"capacity":[8,9],"drops":[3,4,2,3,1,4],"seconds":0.93,"hints":["两边都装满才算成功。","先算一下两边各剩几格。"]}
+  ]
+}

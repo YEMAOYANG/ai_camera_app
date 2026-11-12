@@ -1,0 +1,154 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "lesson": "十几减8、7、6",
+  "binding": {
+    "editionId": "pep-math-g1-lower-2022-standard",
+    "revisionId": "directory-6205d2037284e91f10b25edd",
+    "nodeId": "db87c960-19b1-4a11-9ed1-52af170c31fa",
+    "unitId": "2eeba665-272f-4a55-b064-2be484fc77e4",
+    "lessonTitle": "十几减8、7、6",
+    "unitTitle": "二、20以内的退位减法",
+    "gradeCode": "primary_1",
+    "subject": "math",
+    "volume": "lower",
+    "schoolSystem": "six_year",
+    "classHours": [
+      "lesson_1"
+    ],
+    "teachingRevision": "1",
+    "classHour": "complete"
+  },
+  "teacherCode": "ethan",
+  "goals": [
+    "辨认总数、取走或已知的那一部分、还剩的一部分，把同一情境写成十几减8、7或6。",
+    "用一整十和零散几个表示十几。零散的不够时，从十里面取走8、7或6，再把十里剩的和未动的零散合起来。",
+    "用先减掉零散到10、再减还没取够的数，与从整十里取的办法比较，核对最后剩下的数量。",
+    "用减去的部分加上缺的部分等于总数来核对减法。对同一整体和两部分，看清去掉哪部分，就能找出另一部分。",
+    "在新数量图和订单里独立选择合适的方法并说明依据，回家可用安全物件向家人复述。"
+  ],
+  "story": "社区小剧场请孩子整理灯片，送出一部分，把没动的和剩下的放回备用格。再用加法校对清单。",
+  "pageOrder": [
+    {
+      "id": "entry",
+      "focus": "从灯片订单的总数、送出和剩下切入。"
+    },
+    {
+      "id": "see-fourteen",
+      "focus": "十格整板与四片零散，一共十四，为什么不能只从零散拿八。"
+    },
+    {
+      "id": "break-ten",
+      "focus": "八片从十格板取，板上余二，原来的四片保持。把二和四合成六。"
+    },
+    {
+      "id": "take-in-two-steps",
+      "focus": "同一件订单连减，先从零散拿四，再从整板拿另四，比较两条路径。"
+    },
+    {
+      "id": "add-to-check",
+      "focus": "八加六恢复十四。用其中一部分和总数求另一部分。"
+    },
+    {
+      "id": "send-seven",
+      "focus": "原创 16−7，把10−7的3和原6合成9。"
+    },
+    {
+      "id": "send-six",
+      "focus": "原创 12−6，板里余4，再加原2，核对答案6。"
+    },
+    {
+      "id": "catch-and-split",
+      "focus": "带两篮的小车接每一串。必须恰好分出订单的量，剩下的落到备用篮。"
+    },
+    {
+      "id": "same-whole-two-orders",
+      "focus": "8片杏色和7片松绿合成15，两张订单改变送出哪一组。"
+    },
+    {
+      "id": "aim-to-restore",
+      "focus": "瞄准能与已知组凑回总数的图靶，实际发射与调整轨迹。"
+    },
+    {
+      "id": "six-picture-check",
+      "focus": "从十取、合回零散、换两步、辨认同一整体两问、读图求差、用加法检查。"
+    },
+    {
+      "id": "tell-it-at-home",
+      "focus": "用纸片或相同积木说出怎样拿、剩多少、怎样复原。"
+    }
+  ],
+  "games": [
+    {
+      "page": "catch-and-split",
+      "template": "orchardCatch",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.orchardCatch",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "split_quantity",
+      "levels": [
+        "总12，送8，留4；从中心接第一串四片。",
+        "总13，送7，留6；需要在落点之间移动并切篮。",
+        "总14，送6，留8；整串组合与快落，不能多送。"
+      ],
+      "demo": "圈订单篮、首串与小车，讲明这串四片还不满订单，只示范首接一次。"
+    },
+    {
+      "page": "aim-to-restore",
+      "template": "magnetMarbles",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.magnetMarbles",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "pair_match",
+      "levels": [
+        "总14已知8、总12已知7。第一靶静止。",
+        "同一总量15分别已知8和7，接着总11已知6。轻漂移。",
+        "混合总14、16、15和12，已知7、8、6、7。靶漂移并加速。"
+      ],
+      "demo": "圈当前总数图、已知组和中间首靶，发一颗，交接从零开始。"
+    }
+  ],
+  "pictureQuiz": [
+    {
+      "skill": "破十后合余数",
+      "prompt": "有13片灯片，送8片，留下哪一盘？",
+      "answer": "B",
+      "truth": "10−8+3=5。"
+    },
+    {
+      "skill": "减7的数量图",
+      "prompt": "哪幅图从十格板取七片，还保留旁边的一片？",
+      "answer": "C",
+      "truth": "整板里去掉七片，旁边一片不动。整板剩三片，合起来还有四片。"
+    },
+    {
+      "skill": "先减零散连减",
+      "prompt": "照片墙要八张。十七张先拿外面七张，板里再拿几张？",
+      "answer": "A",
+      "truth": "十七先减七，还剩十张。八张已拿七张，差一张，从整板再拿一张。"
+    },
+    {
+      "skill": "同一整体两问",
+      "prompt": "一共十七片，送走松绿八片，留下哪组？",
+      "answer": "C",
+      "truth": "十七片去掉松绿的八片，留在原处的是杏色九片。"
+    },
+    {
+      "skill": "减6求未知部分",
+      "prompt": "盒里有十三个积木，借出六个，还剩几个？",
+      "answer": "A",
+      "truth": "从十个里借走六个还剩四个，原来的三个没动，合起来是七个。"
+    },
+    {
+      "skill": "用加法验算",
+      "prompt": "手工课有十一颗珠子，穿了八颗。哪幅图能拼回原数？",
+      "answer": "B",
+      "truth": "八颗加三颗正好十一。八加二少一颗，八加四多一颗。"
+    }
+  ],
+  "afterClass": {
+    "route": "和家人用相同大小的安全积木摆一个十和几个，任取8、7或6个，先说剩多少，再合回原来检查。印14–15保留合法纸书。",
+    "observation": "家庭口头解释及实物操作待观察。"
+  },
+  "weeklyQuestionSource": "六道原创图片题，正式 G7 合格并上架后由流水线登记候选。",
+  "evidenceBoundary": "不再教十几减9或减5、4、3、2，原书例图和印14–15综合练习留纸书。"
+}

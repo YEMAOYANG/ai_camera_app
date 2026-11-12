@@ -1,0 +1,185 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "图形的认识",
+  "binding": {
+    "editionId": "pep-math-g1-upper-2022-standard",
+    "revisionId": "directory-ede7a8c63c337cf95a03fe79",
+    "unitId": "198f382f-ded4-40ac-affe-a926f4577287",
+    "nodeId": "204c0d91-5317-458b-86fc-6f0df3577f66"
+  },
+  "scenario": "社区风筝展的积木观察台。孩子挑、推、拼积木，把缺一块的台座补完整。",
+  "goals": [
+    "从平面和曲面特征辨认长方体、正方体、圆柱和球，能用生活实物举例。",
+    "比较同一圆柱立放与侧放、球和有平面的积木，结合接触面说明滚动和站稳。",
+    "根据接触面的形状和大小，把短圆柱、正方体或长方体合成指定的新立体。",
+    "看清同样小正方体的前后与上下两层，补齐缺口拼搭，画图或用实物解释。"
+  ],
+  "goalReferences": [
+    {
+      "goal": "从平面和曲面特征辨认长方体、正方体、圆柱和球，能用生活实物举例。",
+      "pages": [
+        "印105下半",
+        "课件3～9"
+      ]
+    },
+    {
+      "goal": "比较同一圆柱立放与侧放、球和有平面的积木，结合接触面说明滚动和站稳。",
+      "pages": [
+        "印105下半",
+        "教学设计2、课件5～8"
+      ]
+    },
+    {
+      "goal": "根据接触面的形状和大小，把短圆柱、正方体或长方体合成指定的新立体。",
+      "pages": [
+        "印105下半",
+        "课件10～14"
+      ]
+    },
+    {
+      "goal": "看清同样小正方体的前后与上下两层，补齐缺口拼搭，画图或用实物解释。",
+      "pages": [
+        "印105下半",
+        "课件15～16、教学设计4"
+      ]
+    }
+  ],
+  "officialNotesSha256": "c1324be81dd44c04e5259718eb8c9215acb6e9a449a6b8eb1d3463943632523f",
+  "authoredBy": "Codex courseware",
+  "pageSequence": [
+    {
+      "key": "open-lab",
+      "kind": "teaching",
+      "plan": "搭社区风筝展的观察台。看完整作品，先猜哪些积木用在哪里。"
+    },
+    {
+      "key": "objects-around-us",
+      "kind": "teaching",
+      "plan": "对照四种全新生活实物，区分相似的立体和颜色、方向。"
+    },
+    {
+      "key": "flat-faces",
+      "kind": "teaching",
+      "plan": "逐一比较长扁盒和正方体，改变方向或颜色也看整体和平面。"
+    },
+    {
+      "key": "round-solids",
+      "kind": "teaching",
+      "plan": "比较圆柱的平圆面和弯侧面。用同一圆柱立与卧、球不同方向滚作对照。"
+    },
+    {
+      "key": "sort-solid-blocks",
+      "kind": "interactive",
+      "plan": "推动图卡到同类立体托盘，入口路线、形状和盘都要对。"
+    },
+    {
+      "key": "stack-a-cylinder",
+      "kind": "teaching",
+      "plan": "用同粗短柱的圆面对齐拼高，比较等粗但错位与粗细不同。"
+    },
+    {
+      "key": "build-a-long-block",
+      "kind": "teaching",
+      "plan": "同样小立方体换摆法，和另组小长方体接合成新的长方体。"
+    },
+    {
+      "key": "fill-two-layers",
+      "kind": "teaching",
+      "plan": "拆开两层看每层四块和前后位置，找到看不见的角并补完整。"
+    },
+    {
+      "key": "complete-the-solid",
+      "kind": "interactive",
+      "plan": "把落块移到能补齐底排透明缺口的图旁。得分后右侧保留刚拼成的准确立体。"
+    },
+    {
+      "key": "check-a-new-build",
+      "kind": "teaching",
+      "plan": "换一个积木件，先比缺口占的前后和上下位置，再检验拼后外形。"
+    },
+    {
+      "key": "picture-check",
+      "kind": "quiz",
+      "plan": "六道新图题，图和语音承载信息，正确选项均衡。"
+    },
+    {
+      "key": "review-and-build",
+      "kind": "teaching",
+      "plan": "回顾辨认、接触面、拼搭和检查，画一张有实物线索的知识图。"
+    }
+  ],
+  "games": [
+    {
+      "page": "sort-solid-blocks",
+      "template": "sortingDepot",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.sortingDepot",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "classification",
+      "selection": "箱和底图使用不同颜色和朝向，同类立体才停得进托盘。长方体盘用与正方体明显不同的长盒作参照。",
+      "levels": [
+        "长盒和方块，两条短路。",
+        "加入圆柱，转向仍要看整块。",
+        "混合四种立体，绕柱并规划推动顺序。"
+      ],
+      "demo": "依次亮起长盒、形状托盘和推车，示范首张后回到首关，清掉高亮。"
+    },
+    {
+      "page": "complete-the-solid",
+      "template": "fallingTiles",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.fallingTiles",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "pair_match",
+      "selection": "底牌画已有积木和所需的透明缺口。落块画可补的那一件，比较面、朝向、尺度和空位。匹配正确才消去该底牌。",
+      "levels": [
+        "两个不同粗细的短柱，找同粗端面。",
+        "配可补完整的长方体或正方体层。",
+        "含同样块数却不同排法的干扰；观察前后厚度与缺口。"
+      ],
+      "demo": "停在首关，依次点出落块、底排、等粗圆面，示范第一次对准后清空。"
+    }
+  ],
+  "quizPlan": [
+    {
+      "skill": "identify-solids",
+      "answerPosition": "B",
+      "plan": "在不同视角的长盒、方块和圆柱中挑所有面相同的方块。"
+    },
+    {
+      "skill": "identify-solids",
+      "answerPosition": "C",
+      "plan": "区分侧躺圆柱和球，找有两个一样圆平面的物体。"
+    },
+    {
+      "skill": "contact-surface",
+      "answerPosition": "A",
+      "plan": "同根圆柱，选把一端圆平面放在平桌的摆法。"
+    },
+    {
+      "skill": "stack-cylinders",
+      "answerPosition": "C",
+      "plan": "找同粗、同轴的两个短柱拼成一根整齐高柱。"
+    },
+    {
+      "skill": "cube-layers",
+      "answerPosition": "B",
+      "plan": "从同为八块但轮廓不同、或缺一层的图中挑两层各四块正方体。"
+    },
+    {
+      "skill": "fit-the-missing-part",
+      "answerPosition": "A",
+      "plan": "为原创立体积木缺口挑前后和上下位置都正合的补块。"
+    }
+  ],
+  "afterClass": {
+    "familyTask": "找两件安全实物比较平面和曲面，用积木搭一组，画知识图。请家人听解释，系统将真实动作和口述记待观察。",
+    "weeklyQuestionSource": [
+      "辨认四种立体",
+      "滚与站的接触面",
+      "合圆柱和长方体",
+      "两层八块与补缺口"
+    ]
+  },
+  "artAndLanguage": "立体模型和相接的面按精确坐标绘制。角色、背景和小车用内置 ImageGen。全部指令由数学老师口述，答案从图能分辨。"
+}

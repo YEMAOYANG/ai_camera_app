@@ -1,0 +1,112 @@
+{
+  "atlasId": "cotton-arcade-b",
+  "rows": 3,
+  "columns": 3,
+  "background": "transparent",
+  "assets": [
+    {
+      "assetKey": "sort-backdrop",
+      "description": "A WIDE opaque 16:9 unframed decorative landscape of a paper puppet theater, subtle dark pine-green open ground and muted cream curtains only at edges. The center remains empty and subdued for the game board. Transparency OUTSIDE the wide landscape rectangle only, with enough alpha margin.",
+      "usedBy": [
+        "纸偶配对背景"
+      ],
+      "crop": [
+        46,
+        90,
+        483,
+        331
+      ]
+    },
+    {
+      "assetKey": "hop-backdrop",
+      "description": "A WIDE opaque 16:9 low contrast paper stage landscape, warm cream air and distant muted green cotton field at far edges, blank middle and low background contrast for story platforms. No actor, platform or symbols. Transparency OUTSIDE the landscape only.",
+      "usedBy": [
+        "故事跳台背景"
+      ],
+      "crop": [
+        555,
+        94,
+        980,
+        325
+      ]
+    },
+    {
+      "assetKey": "cotton-sticker",
+      "description": "A single compact cut-paper reward sticker icon: round soft white cotton boll with simple pale-green leaves. The small ivory cotton remains opaque. Isolated sticker, true transparent surroundings.",
+      "usedBy": [
+        "游戏达成贴纸"
+      ],
+      "crop": [
+        1145,
+        98,
+        1418,
+        334
+      ]
+    },
+    {
+      "assetKey": "cotton-cart",
+      "description": "One orange-apricot little right-facing pick-up truck in flat side view, two dark wheels, open empty low bed, simple silhouette. Same fixed proportions, color and wheelbase as next cell, this is the resting pose. True transparent surroundings.",
+      "usedBy": [
+        "纸偶配对小车静止帧"
+      ],
+      "crop": [
+        82,
+        449,
+        446,
+        645
+      ]
+    },
+    {
+      "assetKey": "cotton-cart-move",
+      "description": "Exactly the same orange-apricot right-facing pick-up truck, two dark wheels and open empty bed at the same baseline and wheel locations, only cabin gently leaning forward to imply pushing. No streaks or extra objects. True transparent surroundings.",
+      "usedBy": [
+        "纸偶配对小车推动帧"
+      ],
+      "crop": [
+        588,
+        443,
+        956,
+        646
+      ]
+    },
+    {
+      "assetKey": "cotton-child-ready",
+      "description": "Right-facing early-grade child from full side view, with short dark bob, muted apricot scarf, pine-green pinafore, cream shirt, charcoal shoes. Neutral standing ready pose, hands at sides, both shoes same line. The same design repeats in next two cells. True transparent surroundings.",
+      "usedBy": [
+        "故事跳台站立帧"
+      ],
+      "crop": [
+        1173,
+        397,
+        1398,
+        674
+      ]
+    },
+    {
+      "assetKey": "cotton-child-run",
+      "description": "The SAME right-facing early-grade child in identical pine-green pinafore, muted apricot scarf, cream shirt and charcoal shoes. Exactly one running stride with scarf end pointing back. Render the entire silhouette. No motion marks. True transparent surroundings.",
+      "usedBy": [
+        "故事跳台行走帧"
+      ],
+      "crop": [
+        144,
+        728,
+        369,
+        1005
+      ]
+    },
+    {
+      "assetKey": "cotton-child-jump",
+      "description": "The SAME right-facing early-grade child in identical pine-green pinafore, muted apricot scarf, cream shirt and charcoal shoes. Small leap with both legs bent and clearly airborne. Render full silhouette, no ground line. True transparent surroundings.",
+      "usedBy": [
+        "故事跳台跳跃帧"
+      ],
+      "crop": [
+        657,
+        692,
+        882,
+        971
+      ]
+    }
+  ]
+}

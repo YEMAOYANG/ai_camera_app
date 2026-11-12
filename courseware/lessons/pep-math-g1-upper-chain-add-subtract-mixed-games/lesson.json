@@ -1,0 +1,835 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "连加、连减  加、减混合",
+  "description": "走进社区读书角，跟着两次借还学习连加、连减和加减混合，弄清第一步的得数怎样接到第二步。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小数老师",
+      "role": "teacher",
+      "gender": "male",
+      "voice": "Ethan",
+      "avatar": "/teachers/ashu-math-v1.png",
+      "color": "#4A90D9",
+      "persona": "用清楚的口语讲数量、动作和每一步算式的关系。"
+    }
+  },
+  "images": {
+    "reading-corner": {
+      "file": "assets/reading-corner.png"
+    },
+    "single-book": {
+      "file": "assets/single-book.png"
+    },
+    "add-inventory": {
+      "file": "assets/add-inventory.png"
+    },
+    "subtract-inventory": {
+      "file": "assets/subtract-inventory.png"
+    },
+    "plus-then-minus": {
+      "file": "assets/plus-then-minus.png"
+    },
+    "minus-then-plus": {
+      "file": "assets/minus-then-plus.png"
+    },
+    "chain-q1": {
+      "file": "assets/chain-q1.png"
+    },
+    "chain-q2": {
+      "file": "assets/chain-q2.png"
+    },
+    "chain-q3": {
+      "file": "assets/chain-q3.png"
+    },
+    "chain-q4": {
+      "file": "assets/chain-q4.png"
+    },
+    "chain-q5": {
+      "file": "assets/chain-q5.png"
+    },
+    "chain-q6": {
+      "file": "assets/chain-q6.png"
+    },
+    "num-2": {
+      "glyph": {
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "2"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "num-3": {
+      "glyph": {
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "3"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "num-4": {
+      "glyph": {
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "4"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "num-5": {
+      "glyph": {
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "5"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "num-6": {
+      "glyph": {
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "6"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "num-7": {
+      "glyph": {
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "7"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "num-8": {
+      "glyph": {
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "8"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "num-9": {
+      "glyph": {
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "9"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "scenes": [
+    {
+      "key": "s01",
+      "type": "slide",
+      "title": "书架接连添两次",
+      "template": "picture-points",
+      "data": {
+        "title": "书架接连添两次",
+        "picture": "add-inventory",
+        "points": [
+          "原有3本",
+          "先添1本，有4本",
+          "再添4本，有8本"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "这里是读书角，我们来数书架上的书。"
+        },
+        {
+          "say": "看第一格，书架上原来有三本。"
+        },
+        {
+          "say": "还回来的书也放上同一个书架。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "先还来一本，把它和原来的三本合起来。"
+        },
+        {
+          "say": "三加一等于四，书架上现在有四本。"
+        },
+        {
+          "say": "看第二格，这四本是第一次添完的数。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "再还来四本，就接着刚才的四本算。"
+        },
+        {
+          "say": "四加四等于八，第三格最后有八本。"
+        },
+        {
+          "say": "把这两步合写成三加一再加四。"
+        },
+        {
+          "say": "像这样接连加两次，叫作连加。"
+        }
+      ]
+    },
+    {
+      "key": "g02",
+      "type": "interactive",
+      "title": "运书跑酷",
+      "page": "g02",
+      "widgetType": "game",
+      "startImage": "reading-corner",
+      "script": [
+        {
+          "setState": {
+            "demo": true,
+            "level": 1
+          }
+        },
+        {
+          "highlight": "#game-goal"
+        },
+        {
+          "say": "先看我的示范，目标是把三批书送到读书角。"
+        },
+        {
+          "say": "图上三组圆点，告诉我们要接哪三批。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "篮子从空开始，第一批收下两本。"
+        },
+        {
+          "say": "又收两本，两批合起来就有四本。"
+        },
+        {
+          "annotate": "#game-target",
+          "content": "接住指定的书包，避开多余的一包"
+        },
+        {
+          "say": "最后再接一本，要从刚才的四本往上加。"
+        },
+        {
+          "say": "地上的包经过时，不跳就能接住。"
+        },
+        {
+          "say": "遇到高处该收的包，点一下跳起来接。"
+        },
+        {
+          "say": "小满：下一包来了，刚才收的就不用数了吧？",
+          "by": "xiaoman"
+        },
+        {
+          "say": "书还在同一个篮子里，刚才的数要带上。"
+        },
+        {
+          "say": "记住篮里已有多少，再去接下一包。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1
+          }
+        }
+      ]
+    },
+    {
+      "key": "s03",
+      "type": "slide",
+      "title": "书架接连少两次",
+      "template": "picture-points",
+      "data": {
+        "title": "书架接连少两次",
+        "picture": "subtract-inventory",
+        "points": [
+          "原有7本",
+          "先借走1本，剩6本",
+          "再借走3本，剩3本"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "现在书架上原来有七本书。"
+        },
+        {
+          "say": "我们数的是还留在书架上的书。"
+        },
+        {
+          "say": "已经借走的书，就不在这个书架里了。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "第一位读者借走一本，从七里拿走一。"
+        },
+        {
+          "say": "七减一得六，第二格还留着六本。"
+        },
+        {
+          "say": "六就是第一次借完时的书架数量。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "下一位再借三本，只能从这六本里拿。"
+        },
+        {
+          "say": "六减三得三，最后还有三本。"
+        },
+        {
+          "say": "七减一再减三，像这样接连减两次，叫连减。"
+        },
+        {
+          "say": "第二步如果还从七算，就把借走的书数回来了。"
+        }
+      ]
+    },
+    {
+      "key": "g04",
+      "type": "interactive",
+      "title": "瞄准熄书灯",
+      "page": "g04",
+      "widgetType": "game",
+      "startImage": "reading-corner",
+      "script": [
+        {
+          "setState": {
+            "demo": true,
+            "level": 1
+          }
+        },
+        {
+          "highlight": "#game-goal"
+        },
+        {
+          "say": "先看我的示范，一盏亮灯代表架上的一本书。"
+        },
+        {
+          "say": "借走一本，就熄灭代表这本书的灯。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "拉开弹弓，瞄准亮灯，松手就能打灭。"
+        },
+        {
+          "say": "我先借两本，所以打灭两盏灯。"
+        },
+        {
+          "annotate": "#game-target",
+          "content": "亮着的灯，就是架上剩下的书"
+        },
+        {
+          "say": "从六盏中打灭两盏，架上还亮四盏。"
+        },
+        {
+          "say": "检查以后，第二轮要接着这四盏数。"
+        },
+        {
+          "say": "小满：再借一本，也从原来的六本里拿吗？",
+          "by": "xiaoman"
+        },
+        {
+          "say": "第一次借走的已经离架，不能又算进去。"
+        },
+        {
+          "say": "只从仍亮的灯里打，再按下面的检查键。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1
+          }
+        }
+      ]
+    },
+    {
+      "key": "s05",
+      "type": "slide",
+      "title": "先借还是先还",
+      "template": "two-columns",
+      "data": {
+        "title": "先借还是先还",
+        "left": {
+          "heading": "先还后借",
+          "body": "5 + 3 − 1 = 7\n先算出 8，再从 8 减。"
+        },
+        "left_picture": "plus-then-minus",
+        "right": {
+          "heading": "先借后还",
+          "body": "5 − 1 + 3 = 7\n先算出 4，再用 4 加。"
+        },
+        "right_picture": "minus-then-plus"
+      },
+      "script": [
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "这两边原来都有五本，借还的先后不一样。"
+        },
+        {
+          "say": "看左边，先有人还三本，再有人借一本。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "还书要加，五加三，先有八本。"
+        },
+        {
+          "say": "接着从八本中借走一本，最后有七本。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "写算式时，还书的加号写在借书的减号前。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "再看右边，先借一本，后来才还三本。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "从五本里借走一本，第一步只剩四本。"
+        },
+        {
+          "say": "接着把三本添到四本上，最后也是七本。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "这一边先写减，再写加，顺序要跟事情一样。"
+        },
+        {
+          "say": "虽然最后都是七本，中间一个是八，一个是四。"
+        },
+        {
+          "say": "这类算式从左往右，算出前一步，再接着算。"
+        }
+      ]
+    },
+    {
+      "key": "g06",
+      "type": "interactive",
+      "title": "借还碰碰车",
+      "page": "g06",
+      "widgetType": "game",
+      "startImage": "reading-corner",
+      "script": [
+        {
+          "setState": {
+            "demo": true,
+            "level": 1
+          }
+        },
+        {
+          "highlight": "#game-goal"
+        },
+        {
+          "say": "先看示范，书架原来有四本书。"
+        },
+        {
+          "say": "目标上先亮减号，因为这一步先有人借书。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "借走一本，要从架上的四本里减去一本。"
+        },
+        {
+          "say": "算出架上现在有几本，再开车去碰那组。"
+        },
+        {
+          "annotate": "#game-stock",
+          "content": "书架先变一次，再做下一次"
+        },
+        {
+          "say": "碰对了，书架才会把这一本送出去。"
+        },
+        {
+          "say": "下一轮有人来还书，就从现在架上的数往上加。"
+        },
+        {
+          "say": "小满：看到加号，我想先做还书那一步。",
+          "by": "xiaoman"
+        },
+        {
+          "say": "先看哪件事先发生，不能先做后面的事。"
+        },
+        {
+          "say": "每次先看车上现在有几本，再看这一轮的变化。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1
+          }
+        }
+      ]
+    },
+    {
+      "key": "q07",
+      "type": "quiz",
+      "title": "换个地方算两步",
+      "intro": [
+        "听我读题，看看图里先变了什么。",
+        "数字卡片是选项，想好了再选一张。"
+      ],
+      "questions": [
+        {
+          "id": "chain-q1",
+          "question": "两颗蓝珠，加三颗绿珠，再加一颗红珠。一共几颗？",
+          "skill": "连加中的两次增加",
+          "analysis": "两颗加三颗，先得到五颗；再加一颗，共六颗。",
+          "answer": [
+            "A"
+          ],
+          "visual": {
+            "kind": "asset",
+            "image": "chain-q1",
+            "alt": "三格依次画两颗蓝珠、三颗绿珠和一颗红珠，两次都添进来"
+          },
+          "options": {
+            "A": {
+              "label": "6",
+              "visual": {
+                "kind": "asset",
+                "image": "num-6",
+                "alt": "数字6"
+              }
+            },
+            "B": {
+              "label": "5",
+              "visual": {
+                "kind": "asset",
+                "image": "num-5",
+                "alt": "数字5"
+              }
+            },
+            "C": {
+              "label": "4",
+              "visual": {
+                "kind": "asset",
+                "image": "num-4",
+                "alt": "数字4"
+              }
+            }
+          }
+        },
+        {
+          "id": "chain-q2",
+          "question": "九块积木，先拿一块，再拿四块。还剩几块？",
+          "skill": "连减用第一次剩下的数接着减",
+          "analysis": "九减一，先剩八块；从八块里再拿四块，还剩四块。",
+          "answer": [
+            "B"
+          ],
+          "visual": {
+            "kind": "asset",
+            "image": "chain-q2",
+            "alt": "开始九块积木，箭头后的两次变化分别拿走一块和四块"
+          },
+          "options": {
+            "A": {
+              "label": "5",
+              "visual": {
+                "kind": "asset",
+                "image": "num-5",
+                "alt": "数字5"
+              }
+            },
+            "B": {
+              "label": "4",
+              "visual": {
+                "kind": "asset",
+                "image": "num-4",
+                "alt": "数字4"
+              }
+            },
+            "C": {
+              "label": "8",
+              "visual": {
+                "kind": "asset",
+                "image": "num-8",
+                "alt": "数字8"
+              }
+            }
+          }
+        },
+        {
+          "id": "chain-q3",
+          "question": "桌上四支笔，添四支，再拿三支。最后几支？",
+          "skill": "根据动作顺序先加后减",
+          "analysis": "先添四支，四加四得八；再从八支里拿三支，剩五支。",
+          "answer": [
+            "C"
+          ],
+          "visual": {
+            "kind": "asset",
+            "image": "chain-q3",
+            "alt": "开始四支笔，接下来添四支，再拿走三支"
+          },
+          "options": {
+            "A": {
+              "label": "8",
+              "visual": {
+                "kind": "asset",
+                "image": "num-8",
+                "alt": "数字8"
+              }
+            },
+            "B": {
+              "label": "3",
+              "visual": {
+                "kind": "asset",
+                "image": "num-3",
+                "alt": "数字3"
+              }
+            },
+            "C": {
+              "label": "5",
+              "visual": {
+                "kind": "asset",
+                "image": "num-5",
+                "alt": "数字5"
+              }
+            }
+          }
+        },
+        {
+          "id": "chain-q4",
+          "question": "七张纸，用掉两张，再添四张。现在有几张？",
+          "skill": "根据动作顺序先减后加",
+          "analysis": "七减二，先剩五张；五加四得到九张。",
+          "answer": [
+            "A"
+          ],
+          "visual": {
+            "kind": "asset",
+            "image": "chain-q4",
+            "alt": "开始七张纸，接下来用掉两张，再添四张"
+          },
+          "options": {
+            "A": {
+              "label": "9",
+              "visual": {
+                "kind": "asset",
+                "image": "num-9",
+                "alt": "数字9"
+              }
+            },
+            "B": {
+              "label": "5",
+              "visual": {
+                "kind": "asset",
+                "image": "num-5",
+                "alt": "数字5"
+              }
+            },
+            "C": {
+              "label": "7",
+              "visual": {
+                "kind": "asset",
+                "image": "num-7",
+                "alt": "数字7"
+              }
+            }
+          }
+        },
+        {
+          "id": "chain-q5",
+          "question": "六枚棋子，先添三枚，再收两枚。第一步后有几枚？",
+          "skill": "辨认先增加的中间量",
+          "analysis": "第一步只算六加三，有九枚；收两枚是第二步。",
+          "answer": [
+            "B"
+          ],
+          "visual": {
+            "kind": "asset",
+            "image": "chain-q5",
+            "alt": "开始六枚棋子，接下来添三枚，第二步才拿走两枚"
+          },
+          "options": {
+            "A": {
+              "label": "7",
+              "visual": {
+                "kind": "asset",
+                "image": "num-7",
+                "alt": "数字7"
+              }
+            },
+            "B": {
+              "label": "9",
+              "visual": {
+                "kind": "asset",
+                "image": "num-9",
+                "alt": "数字9"
+              }
+            },
+            "C": {
+              "label": "6",
+              "visual": {
+                "kind": "asset",
+                "image": "num-6",
+                "alt": "数字6"
+              }
+            }
+          }
+        },
+        {
+          "id": "chain-q6",
+          "question": "五颗豆，先拿三颗，再放两颗。放豆前还剩几颗？",
+          "skill": "辨认先减少的中间量",
+          "analysis": "放回前只拿走三颗，五减三得二。四颗是第二步之后的数量。",
+          "answer": [
+            "C"
+          ],
+          "visual": {
+            "kind": "asset",
+            "image": "chain-q6",
+            "alt": "开始五颗豆，先拿三颗，第二步才放回两颗"
+          },
+          "options": {
+            "A": {
+              "label": "4",
+              "visual": {
+                "kind": "asset",
+                "image": "num-4",
+                "alt": "数字4"
+              }
+            },
+            "B": {
+              "label": "5",
+              "visual": {
+                "kind": "asset",
+                "image": "num-5",
+                "alt": "数字5"
+              }
+            },
+            "C": {
+              "label": "2",
+              "visual": {
+                "kind": "asset",
+                "image": "num-2",
+                "alt": "数字2"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "s08",
+      "type": "slide",
+      "title": "两步接起来",
+      "template": "summary",
+      "data": {
+        "title": "两步接起来",
+        "items": [
+          "连续添两次：先加，再加",
+          "连续拿两次：先减，再减",
+          "又添又拿：按事情的先后",
+          "把第一次变化后的数带到第二步"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "今天我们替读书角记下了书的两次变化。"
+        },
+        {
+          "say": "书一批接一批放上去，就先加一次，再加一次。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "书分两回借走，就先算第一次剩下多少。"
+        },
+        {
+          "say": "第二回只从还在架上的书里拿。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "有借也有还，得看哪件事先发生。"
+        },
+        {
+          "say": "先借就先减，先还就先加。"
+        },
+        {
+          "spotlight": "item-4"
+        },
+        {
+          "say": "这类两步算式，从左往右接着算。"
+        },
+        {
+          "say": "回家找几件小东西，摆出两次变化。"
+        },
+        {
+          "say": "把开始、第一次和最后画出来，说给家人听。"
+        }
+      ]
+    }
+  ]
+}

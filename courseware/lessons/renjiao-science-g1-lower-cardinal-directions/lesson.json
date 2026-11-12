@@ -1,0 +1,1075 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "东南西北",
+  "description": "在原创庭院用模型日影找方向、记录固定站点四方物品，再跟着方向标走两段路。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小科老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Serena",
+      "avatar": "/avatars/teacher-2.png",
+      "color": "#287B94",
+      "persona": "自然清楚地带孩子先猜、再看、说出发现。"
+    }
+  },
+  "images": {
+    "compass-badge": {
+      "file": "assets/compass-badge.png"
+    },
+    "court-east": {
+      "file": "assets/court-east.png"
+    },
+    "court-south": {
+      "file": "assets/court-south.png"
+    },
+    "court-west": {
+      "file": "assets/court-west.png"
+    },
+    "courtyard-camera": {
+      "file": "assets/courtyard-camera.png"
+    },
+    "elm-tree": {
+      "file": "assets/elm-tree.png"
+    },
+    "family-practice": {
+      "file": "assets/family-practice.png"
+    },
+    "fixed-clock": {
+      "file": "assets/fixed-clock.png"
+    },
+    "garden-gazebo": {
+      "file": "assets/garden-gazebo.png"
+    },
+    "maze-backdrop": {
+      "file": "assets/maze-backdrop.png"
+    },
+    "model-safety": {
+      "file": "assets/model-safety.png"
+    },
+    "oval-pond": {
+      "file": "assets/oval-pond.png"
+    },
+    "photo-backdrop": {
+      "file": "assets/photo-backdrop.png"
+    },
+    "photo-cover": {
+      "file": "assets/photo-cover.png"
+    },
+    "q1-a": {
+      "file": "assets/q1-a.png"
+    },
+    "q1-b": {
+      "file": "assets/q1-b.png"
+    },
+    "q1-c": {
+      "file": "assets/q1-c.png"
+    },
+    "q2-a": {
+      "file": "assets/q2-a.png"
+    },
+    "q2-b": {
+      "file": "assets/q2-b.png"
+    },
+    "q2-c": {
+      "file": "assets/q2-c.png"
+    },
+    "q3-a": {
+      "file": "assets/q3-a.png"
+    },
+    "q3-b": {
+      "file": "assets/q3-b.png"
+    },
+    "q3-c": {
+      "file": "assets/q3-c.png"
+    },
+    "q3-stimulus": {
+      "file": "assets/q3-stimulus.png"
+    },
+    "q4-a": {
+      "file": "assets/q4-a.png"
+    },
+    "q4-b": {
+      "file": "assets/q4-b.png"
+    },
+    "q4-c": {
+      "file": "assets/q4-c.png"
+    },
+    "q4-stimulus": {
+      "file": "assets/q4-stimulus.png"
+    },
+    "q5-a": {
+      "file": "assets/q5-a.png"
+    },
+    "q5-b": {
+      "file": "assets/q5-b.png"
+    },
+    "q5-c": {
+      "file": "assets/q5-c.png"
+    },
+    "q5-stimulus": {
+      "file": "assets/q5-stimulus.png"
+    },
+    "q6-a": {
+      "file": "assets/q6-a.png"
+    },
+    "q6-b": {
+      "file": "assets/q6-b.png"
+    },
+    "q6-c": {
+      "file": "assets/q6-c.png"
+    },
+    "q6-stimulus": {
+      "file": "assets/q6-stimulus.png"
+    },
+    "red-pennant": {
+      "file": "assets/red-pennant.png"
+    },
+    "rotated-compass": {
+      "file": "assets/rotated-compass.png"
+    },
+    "route-start": {
+      "file": "assets/route-start.png"
+    },
+    "route-trace": {
+      "file": "assets/route-trace.png"
+    },
+    "rover-idle": {
+      "file": "assets/rover-idle.png"
+    },
+    "rover-move": {
+      "file": "assets/rover-move.png"
+    },
+    "shadow-side-evening": {
+      "file": "assets/shadow-side-evening.png"
+    },
+    "shadow-side-morning": {
+      "file": "assets/shadow-side-morning.png"
+    },
+    "shadow-side-noon-model": {
+      "file": "assets/shadow-side-noon-model.png"
+    },
+    "shadow-top-evening": {
+      "file": "assets/shadow-top-evening.png"
+    },
+    "shadow-top-morning": {
+      "file": "assets/shadow-top-morning.png"
+    },
+    "shadow-top-noon-model": {
+      "file": "assets/shadow-top-noon-model.png"
+    },
+    "stone-bridge": {
+      "file": "assets/stone-bridge.png"
+    },
+    "vermilion-bench": {
+      "file": "assets/vermilion-bench.png"
+    },
+    "wind-chime": {
+      "file": "assets/wind-chime.png"
+    },
+    "yard-opening": {
+      "file": "assets/yard-opening.png"
+    },
+    "yard-two-pupils": {
+      "file": "assets/yard-two-pupils.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "same-place-different-views",
+      "title": "给客人画一张庭院图",
+      "type": "slide",
+      "template": "two-columns",
+      "data": {
+        "title": "给客人画一张庭院图",
+        "left": {
+          "heading": "朋友要来",
+          "body": "从红门进庭院"
+        },
+        "right": {
+          "heading": "先看两顶帽子",
+          "body": "同一件风铃"
+        },
+        "left_picture": "yard-opening",
+        "right_picture": "yard-two-pupils"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "小客人要来庭院看风铃。我们得给他画张图，让他能找到路。"
+        },
+        {
+          "say": "要是只说在我前面，他站得不一样，还能照着找到吗？"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "绿帽和黄帽都在庭院里。指一指图上的铜风铃。"
+        },
+        {
+          "say": "绿帽的箭头指着风铃，说风铃在他前面的那一侧。"
+        },
+        {
+          "say": "黄帽朝另一边。他换了站点，也换了看过去的方向。"
+        },
+        {
+          "say": "我们给场地找几个大家都能用的方向。先从日影找一条线索。"
+        }
+      ]
+    },
+    {
+      "key": "three-times-model",
+      "title": "在纸板上摆早晚模型",
+      "type": "slide",
+      "template": "two-columns",
+      "data": {
+        "title": "在纸板上摆早晚模型",
+        "left": {
+          "heading": "早晨模型",
+          "body": "光球靠东"
+        },
+        "right": {
+          "heading": "傍晚模型",
+          "body": "光球靠西"
+        },
+        "left_picture": "shadow-top-morning",
+        "right_picture": "shadow-top-evening"
+      },
+      "script": [
+        {
+          "say": "太阳早晨在东边一带升起，傍晚在西边一带落下。"
+        },
+        {
+          "say": "看这个小模型。黄木球表示光从哪里来，深色长条表示杆影。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "先猜早晨的影子伸向哪里。找一找中间这根杆的底座。"
+        },
+        {
+          "say": "光球摆在靠东的一侧。看影子，它从杆底伸向相对的一侧。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "傍晚的光球摆到靠西的一侧。同一根杆没有动，影子换边了。"
+        },
+        {
+          "say": "记下光球和影子在杆的两边。这个小模型在桌上就能比较。"
+        }
+      ]
+    },
+    {
+      "key": "model-noon-and-safety",
+      "title": "从侧面看，再说安全",
+      "type": "slide",
+      "template": "two-columns",
+      "data": {
+        "title": "从侧面看，再说安全",
+        "left": {
+          "heading": "示意地点的午间",
+          "body": "光球升高，摆在南侧"
+        },
+        "right": {
+          "heading": "到室外时",
+          "body": "只看地上的影子"
+        },
+        "left_picture": "shadow-side-noon-model",
+        "right_picture": "model-safety"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "这个模型里，午间把光球放高一些，摆在南边。我们换到侧面看。"
+        },
+        {
+          "say": "找找竖着的杆和地上短短的影子。影子从杆底朝北伸。"
+        },
+        {
+          "say": "这是模型场地的午间摆法。换个地方或日期，看到的情况可能不同。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "真正走到室外，用眼睛看地上的影子。不要抬头直视太阳。"
+        },
+        {
+          "say": "和大人在安全的地方停下来。指着地上的杆影，说影子朝哪边伸。"
+        },
+        {
+          "say": "顺着地上影子看，它的反方向就给出光从哪边来的线索。"
+        }
+      ]
+    },
+    {
+      "key": "classroom-directions",
+      "title": "把四个方向找全",
+      "type": "slide",
+      "template": "picture-points",
+      "data": {
+        "title": "把四个方向找全",
+        "picture": "fixed-clock",
+        "points": [
+          "先找到东",
+          "隔着中心找相对",
+          "顺着钟表箭头说"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "刚才我们有了辨方向的线索。现在把四个方向标在纸板上。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先把东放在这边。把手指放到标东的箭头上。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "从东穿过中心，到正对面是西。南和北也是面对面。"
+        },
+        {
+          "say": "把手指从南穿过纸板中心，正对面就是北。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "从东沿钟表指针转，一格一格是东、南、西、北，又回到东。"
+        },
+        {
+          "say": "试试从南开始。下一格西，再一格北，再一格东。"
+        }
+      ]
+    },
+    {
+      "key": "three-model-facings",
+      "title": "身体朝向可以换",
+      "type": "slide",
+      "template": "two-columns",
+      "data": {
+        "title": "身体朝向可以换",
+        "left": {
+          "heading": "人偶脸朝东",
+          "body": "前东后西"
+        },
+        "right": {
+          "heading": "人偶脸朝南",
+          "body": "前南后北"
+        },
+        "left_picture": "court-east",
+        "right_picture": "court-south"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "人偶站在圆垫上朝东。前面是东，身后就是相对的西。"
+        },
+        {
+          "say": "把脸和他的箭头朝同一边。自己的左手指北，右手指南。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "人偶原地转到朝南。前面变成南，身后变成北。"
+        },
+        {
+          "say": "再举两只手比一比。现在左手朝东，右手朝西。"
+        },
+        {
+          "say": "想一想，如果再转到朝西，北会在他哪一只手这边？"
+        },
+        {
+          "say": "先记下你的猜法。拍过照片后，我们再回到同一张圆垫。"
+        },
+        {
+          "say": "请从上面拍，等画面和小图是同一个角度。"
+        },
+        {
+          "say": "请从侧面拍，等画面和小图是同一个角度。"
+        },
+        {
+          "say": "看上面的小图，把这一角度的模型拍下来。"
+        },
+        {
+          "say": "先把整个模型画面放进虚线框。"
+        },
+        {
+          "say": "看上面的小图，再等画面换到相同的角度。"
+        }
+      ]
+    },
+    {
+      "key": "direction-photo-pairs",
+      "type": "interactive",
+      "title": "拍下庭院里的日影",
+      "widgetType": "game",
+      "page": "direction-photo-pairs",
+      "startImage": "photo-cover",
+      "script": [
+        {
+          "say": "我们把同一个时段的模型拍两种角度，看看影子指向哪里。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#photo-preview"
+        },
+        {
+          "say": "先看上面小图。第一张从上面拍，能看见杆和影子伸向哪边。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "我按箭头移动虚线框，把整个模型画面框进来。"
+        },
+        {
+          "highlight": "#game-target"
+        },
+        {
+          "say": "画面和小图一样了，我才按右下角的圆快门。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "下面留下一张照片。下一张要看新的小图，等它换到另一角度。"
+        },
+        {
+          "say": "轮到你啦。把两种角度都拍下来，再比较杆和影子。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "observationCard": {
+        "title": "同一庭院的模型日影",
+        "familyTask": "和家人在安全的空地停在同一站点，只观察地上影子。请大人帮忙用已知地标核对方向，再画下四个方向各有什么。实地结果等观察后再记。",
+        "levels": [
+          {
+            "label": "早晨模型",
+            "trials": [
+              {
+                "id": "one-model-two-views",
+                "label": "同一时段的模型和影子",
+                "top": {
+                  "shadow-top-morning": {
+                    "label": "黄球在东侧，杆影伸向西",
+                    "image": "shadow-top-morning"
+                  }
+                },
+                "side": {
+                  "shadow-side-morning": {
+                    "label": "黄球较低，杆影较长",
+                    "image": "shadow-side-morning"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "label": "示意地点的午间模型",
+            "trials": [
+              {
+                "id": "one-model-two-views",
+                "label": "同一时段的模型和影子",
+                "top": {
+                  "shadow-top-noon-model": {
+                    "label": "黄球在南侧，杆影伸向北",
+                    "image": "shadow-top-noon-model"
+                  }
+                },
+                "side": {
+                  "shadow-side-noon-model": {
+                    "label": "黄球摆得高，杆影较短",
+                    "image": "shadow-side-noon-model"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "label": "傍晚模型",
+            "trials": [
+              {
+                "id": "one-model-two-views",
+                "label": "同一时段的模型和影子",
+                "top": {
+                  "shadow-top-evening": {
+                    "label": "黄球在西侧，杆影伸向东",
+                    "image": "shadow-top-evening"
+                  }
+                },
+                "side": {
+                  "shadow-side-evening": {
+                    "label": "黄球较低，杆影在相对的一侧",
+                    "image": "shadow-side-evening"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gameAudio": {
+        "shadow-top": "three-model-facings-9",
+        "shadow-side": "three-model-facings-10",
+        "shadow-goal": "three-model-facings-11",
+        "shadow-hint": "three-model-facings-12",
+        "shadow-help": "three-model-facings-13",
+        "shadow-praise": "record-at-one-station-1"
+      }
+    },
+    {
+      "key": "record-at-one-station",
+      "title": "站在同一张垫上做记录",
+      "type": "slide",
+      "template": "two-columns",
+      "data": {
+        "title": "站在同一张垫上做记录",
+        "left": {
+          "heading": "绿帽脸朝东",
+          "body": "地标不挪"
+        },
+        "right": {
+          "heading": "绿帽转向西",
+          "body": "场地方向没变"
+        },
+        "left_picture": "court-east",
+        "right_picture": "court-west"
+      },
+      "script": [
+        {
+          "say": "同一时段的两种角度都拍到了。可以比一比影子和光球。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "在圆垫上不挪脚，记下北边榆树，东边风铃。"
+        },
+        {
+          "say": "再记下南边长椅，西边石凳。四样物品画在圆垫四周。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "现在绿帽朝西。身前是西边石凳，身后是东边风铃。"
+        },
+        {
+          "say": "北边的树在右手边，南边的长椅在左手边。"
+        },
+        {
+          "say": "树一直在同一张垫的北边。转身改变的是身体的前后左右。"
+        },
+        {
+          "say": "自己试说一次。先说站哪儿，再从那个站点说四方。"
+        }
+      ]
+    },
+    {
+      "key": "read-the-direction-mark",
+      "title": "沿着方向标找路",
+      "type": "slide",
+      "template": "two-columns",
+      "data": {
+        "title": "沿着方向标找路",
+        "left": {
+          "heading": "先看方向标",
+          "body": "这张图北朝上"
+        },
+        "right": {
+          "heading": "再分两段走",
+          "body": "先到树，再到桥"
+        },
+        "left_picture": "route-start",
+        "right_picture": "route-trace"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "拿到新地图，先找方向标。这张图的北指向上，东就指向右。"
+        },
+        {
+          "say": "从红色起点出发，要先到榆树，再到小石桥。用手指起点。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "从起点向北走到树。到了树，手指先停一下。"
+        },
+        {
+          "say": "第二段从树出发，向西走到石桥。看，路在树的左边。"
+        },
+        {
+          "say": "下一条路线也这样。先认方向标，再从现在的位置找下一站。"
+        },
+        {
+          "say": "从起点向东，开到风铃图那里。"
+        },
+        {
+          "say": "从风铃向北，开到长椅图那里。"
+        },
+        {
+          "say": "向东开，到小旗出口。"
+        },
+        {
+          "say": "从起点向北，开到榆树图那里。"
+        },
+        {
+          "say": "从榆树向西，开到水池图那里。"
+        },
+        {
+          "say": "从水池向南，开到小旗出口。"
+        },
+        {
+          "say": "从起点向西，开到凉亭图那里。"
+        },
+        {
+          "say": "从凉亭向南，开到小桥图那里。"
+        }
+      ]
+    },
+    {
+      "key": "follow-cardinal-route",
+      "type": "interactive",
+      "title": "按方向给庭院送信",
+      "widgetType": "game",
+      "page": "follow-cardinal-route",
+      "startImage": "route-start",
+      "script": [
+        {
+          "say": "庭院里有几条路。我们先认方向标，再听车要到哪一站。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#maze-compass"
+        },
+        {
+          "say": "方向标的东指向画面的右边，北指向画面上边。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "我的车在这儿。第一段从小车这里出发。"
+        },
+        {
+          "highlight": "#game-target"
+        },
+        {
+          "say": "听到向东去风铃，我用向右的箭头开到风铃图那里。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "到了第一站再停一下。下一段要从风铃这里重新找。"
+        },
+        {
+          "say": "轮到你啦。听清每一站再开车，没听清可以按喇叭重听。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "route-east-chime": "read-the-direction-mark-8",
+        "route-north-bench": "read-the-direction-mark-9",
+        "route-east-exit": "read-the-direction-mark-10",
+        "route-north-tree": "read-the-direction-mark-11",
+        "route-west-pond": "read-the-direction-mark-12",
+        "route-south-exit": "read-the-direction-mark-13",
+        "route-west-gazebo": "read-the-direction-mark-14",
+        "route-south-bridge": "read-the-direction-mark-15",
+        "route-hint": "compass-can-turn-9",
+        "route-help": "compass-can-turn-10",
+        "route-praise": "compass-can-turn-11"
+      }
+    },
+    {
+      "key": "compass-can-turn",
+      "title": "纸转了，先重看方向标",
+      "type": "slide",
+      "template": "picture-points",
+      "data": {
+        "title": "纸转了，先重看方向标",
+        "picture": "rotated-compass",
+        "points": [
+          "找标记",
+          "照着标记指方向",
+          "再想下一站"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "这张练习图的北箭头指向右边。请先找出这个方向标。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "平面图上的箭头告诉我们方向。这张图要按它来读。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "右边是北，和它相对的一侧是南。手指往左边点一下。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "这张图和刚才的游戏标法不同。换一张图，要先重新看方向标。"
+        },
+        {
+          "say": "先停一下，重听口令，再看方向标。"
+        },
+        {
+          "say": "到过一站后，从现在的位置找下一个方向。"
+        },
+        {
+          "say": "按方向标和口令到站，整条路走对了。"
+        }
+      ]
+    },
+    {
+      "key": "picture-quiz",
+      "type": "quiz",
+      "title": "方向记录员的图题",
+      "intro": [
+        "用新的庭院图试一试。先听问题，再用手指找方向或沿路走。"
+      ],
+      "questions": [
+        {
+          "id": "east-near-sun",
+          "skill": "cardinal-morning-model",
+          "question": "哪张图把早晨的光球摆在靠东的一边？",
+          "answer": [
+            "B"
+          ],
+          "analysis": "方向标的东指右。光球在杆的东侧，影子向相对的西侧伸。",
+          "options": {
+            "A": {
+              "label": "光球在西侧，影子朝东",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-a",
+                "alt": "光球在西侧，影子朝东"
+              }
+            },
+            "B": {
+              "label": "光球在东侧，影子朝西",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-b",
+                "alt": "光球在东侧，影子朝西"
+              }
+            },
+            "C": {
+              "label": "光球在南侧，影子朝北",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-c",
+                "alt": "光球在南侧，影子朝北"
+              }
+            }
+          }
+        },
+        {
+          "id": "safe-shadow",
+          "skill": "cardinal-safe-shadow",
+          "question": "哪张图是用地上的影子安全地找线索？",
+          "answer": [
+            "A"
+          ],
+          "analysis": "低头看地上的影子。到室外不能直视太阳，低头看书也看不到地上的影子。",
+          "options": {
+            "A": {
+              "label": "孩子低头指着地上杆影",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-a",
+                "alt": "孩子低头指着地上杆影"
+              }
+            },
+            "B": {
+              "label": "孩子抬头直视亮处",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-b",
+                "alt": "孩子抬头直视亮处"
+              }
+            },
+            "C": {
+              "label": "孩子低头看画册",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-c",
+                "alt": "孩子低头看画册"
+              }
+            }
+          }
+        },
+        {
+          "id": "opposites",
+          "skill": "cardinal-opposites",
+          "question": "凉亭在东，正对面的西边是哪样东西？",
+          "answer": [
+            "C"
+          ],
+          "analysis": "从东边凉亭穿过圆垫，到相对的一边是西。那里是小石桥。",
+          "options": {
+            "A": {
+              "label": "蓝水桶",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-a",
+                "alt": "蓝水桶"
+              }
+            },
+            "B": {
+              "label": "橙顶凉亭",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-b",
+                "alt": "橙顶凉亭"
+              }
+            },
+            "C": {
+              "label": "小石桥",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-c",
+                "alt": "小石桥"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "q3-stimulus",
+            "alt": "凉亭在圆垫右方，水桶在上方，石桥在左方，石凳在下方"
+          }
+        },
+        {
+          "id": "clockwise-from-south",
+          "skill": "cardinal-clockwise",
+          "question": "从南边顺着弯箭头转一格，会到哪件物品？",
+          "answer": [
+            "B"
+          ],
+          "analysis": "从南按顺时针往下一格是西，图中西边是蓝水桶。",
+          "options": {
+            "A": {
+              "label": "铜风铃",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-a",
+                "alt": "铜风铃"
+              }
+            },
+            "B": {
+              "label": "蓝水桶",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-b",
+                "alt": "蓝水桶"
+              }
+            },
+            "C": {
+              "label": "朱红长椅",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-c",
+                "alt": "朱红长椅"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "q4-stimulus",
+            "alt": "站点下方是南边的红长椅，弯箭头从下向图的左侧转，左侧蓝水桶"
+          }
+        },
+        {
+          "id": "turn-station",
+          "skill": "cardinal-fixed-station",
+          "question": "人偶原地转到朝西。哪张图里的水池还在北边？",
+          "answer": [
+            "C"
+          ],
+          "analysis": "原地转身时水池没挪动，仍在圆垫北边。人偶面向西时，北边在他的右手侧。",
+          "options": {
+            "A": {
+              "label": "面向西，水池在南边",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-a",
+                "alt": "面向西，水池在南边"
+              }
+            },
+            "B": {
+              "label": "面向西，水池在西边",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-b",
+                "alt": "面向西，水池在西边"
+              }
+            },
+            "C": {
+              "label": "面向西，水池在北边",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-c",
+                "alt": "面向西，水池在北边"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "q5-stimulus",
+            "alt": "圆垫上的人偶面向东，蓝水池在圆垫上方，方向标的北朝上"
+          }
+        },
+        {
+          "id": "route-two-stops",
+          "skill": "cardinal-route-two-stops",
+          "question": "看方向标。从红门出发，先向北走一段，再向东走一段。哪张图的箭头和口令一样？",
+          "answer": [
+            "A"
+          ],
+          "analysis": "图标的北朝上，先从红门向上走到水池。东朝右，再从水池向右到凉亭。",
+          "options": {
+            "A": {
+              "label": "红门向上到水池，再向右到凉亭",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-a",
+                "alt": "红门向上到水池，再向右到凉亭"
+              }
+            },
+            "B": {
+              "label": "红门向右到长椅，再向上到凉亭",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-b",
+                "alt": "红门向右到长椅，再向上到凉亭"
+              }
+            },
+            "C": {
+              "label": "红门向右到长椅，再向右",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-c",
+                "alt": "红门向右到长椅，再向右"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "q6-stimulus",
+            "alt": "方向标的北朝上，红门在池南，亭在池东，长椅在红门东侧"
+          }
+        }
+      ]
+    },
+    {
+      "key": "apply-at-home",
+      "title": "和家人去记录四个方向",
+      "type": "slide",
+      "template": "picture-points",
+      "data": {
+        "title": "和家人去记录四个方向",
+        "picture": "family-practice",
+        "points": [
+          "找方向线索",
+          "从一个点记录",
+          "读一条路线"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "方向记录员完成了任务。来看看今天的三个办法。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "和大人在安全地点停下。只看地上的影子，再用已知地标核对方向。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "选定一个站点。画下东、南、西、北各一件物品，转身再比一比。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "在纸上画两个新地点。给家人指方向，按次序说怎么去。"
+        },
+        {
+          "say": "家里的地标和影子要真的看到再记。阴天可以先用桌上的模型。"
+        },
+        {
+          "say": "下次见。试着用清楚的方向把别人带到正确的位置。"
+        }
+      ]
+    }
+  ]
+}

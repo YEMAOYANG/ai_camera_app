@@ -1,0 +1,83 @@
+{
+  "schemaVersion": "mira.courseware.asset-composition.v1",
+  "key": "read-two-panels",
+  "canvas": [
+    840,
+    600
+  ],
+  "background": "#fff2d7",
+  "inputs": {
+    "crescent-window": {
+      "file": "assets/illustrations/crescent-window.png",
+      "sha256": "ed384b2d33312bbf6e84f0c22952942ad6b9d6d479c60f55e698103989516216"
+    },
+    "curved-boat": {
+      "file": "assets/illustrations/curved-boat.png",
+      "sha256": "40c62bdfe60dd5bcde5d125f8d9c490fc0f7eca2d8ea43cd7cafc522359cb7a0"
+    },
+    "sky-imagination": {
+      "file": "assets/illustrations/sky-imagination.png",
+      "sha256": "294f8f4f9df2e2be93739c45f1e2bfbb8120489cd76361ecfee2dd4581570069"
+    }
+  },
+  "layers": [
+    {
+      "op": "roundrect",
+      "box": [
+        13,
+        67,
+        405,
+        533
+      ],
+      "radius": 22,
+      "fill": "#f9e8bc"
+    },
+    {
+      "op": "roundrect",
+      "box": [
+        427,
+        67,
+        827,
+        533
+      ],
+      "radius": 22,
+      "fill": "#f9e8bc"
+    },
+    {
+      "op": "asset",
+      "asset": "crescent-window",
+      "center": [
+        209,
+        192
+      ],
+      "size": [
+        365,
+        184
+      ]
+    },
+    {
+      "op": "asset",
+      "asset": "curved-boat",
+      "center": [
+        209,
+        409
+      ],
+      "size": [
+        365,
+        184
+      ]
+    },
+    {
+      "op": "asset",
+      "asset": "sky-imagination",
+      "center": [
+        627,
+        300
+      ],
+      "size": [
+        376,
+        446
+      ]
+    }
+  ]
+}

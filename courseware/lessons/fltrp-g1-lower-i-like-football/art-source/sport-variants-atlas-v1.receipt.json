@@ -1,0 +1,270 @@
+{
+  "schemaVersion": "mira.courseware.image-atlas-receipt.v1",
+  "atlasId": "sport-variants-atlas-v1",
+  "background": "transparent",
+  "sheetPixels": [
+    1263,
+    1246
+  ],
+  "assets": [
+    {
+      "assetKey": "sport-quiz-host",
+      "path": "assets/sport-quiz-host.png",
+      "sha256": "8abf04cce90fd4388d298bd876d87a5e80a08f6a9c5a2b91db73e0633fc2e443",
+      "width": 421,
+      "height": 425,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/sport-quiz-atlas-v1.png",
+      "generatedSourceSha256": "b6c22438ea78769a17296ecdef1bc500c558b97e96f789289c1ba4329e318df0",
+      "prompt": "Use case: scientific-educational. Asset type: nine transparent original cutouts for first-grade English picture-quiz alternatives. One exact square 3×3 production sprite atlas. Equal square cells, strict row-major order, each subject centered in its own cell with at least 13% clear margin on every edge. All nine cells must be occupied and distinct, with no objects crossing cell boundaries. Genuinely transparent alpha background throughout the entire sheet, including margins, no checkerboard, no grid lines, no colored cards, no ground shadow or background panel. Keep each object fully visible and legible at 45 px. Original educational art for age 6: matte gouache on fine paper grain, clean paper-cut silhouettes, warm cream and deep pine green with restrained apricot and persimmon. Large readable forms, charming but calm. No words, letters, numerals, logos, UI, watermarks, decorative scenery, or floating scraps. No existing characters or textbook imagery.\nRow 1 left to right: (1) front three-quarter head and shoulders of a six-year-old broadcaster with round face, short light-brown curls and dark teal T-shirt, no props; (2) head and shoulders of a different child with black hair in a high bun, lavender-purple T-shirt, no props; (3) head and shoulders of a different dark-skinned child with short black tight curls, warm apricot T-shirt, no props. Faces completely visible, same scale and framing, clearly different silhouettes.\nRow 2 left to right: (4) one deep red table tennis paddle beside one separate ivory-white ping-pong ball, large size contrast with a clear gap, no other object; (5) one six-year-old child alone beside one fully visible table-tennis table, holding one paddle, no second person; (6) two children facing each other and passing one orange basketball under a clearly visible single basketball hoop, no third child or second ball.\nRow 3 left to right: (7) exactly two children at opposite ends of one teal table-tennis table, playing with one red paddle each and one tiny white ball above the visible net, full figures and table, no third child; (8) exactly one classic white soccer ball with navy pentagons, no other equipment; (9) exactly one burnt-orange basketball with black curved seams, no other equipment. Action pictures must be readable without any text; keep players, equipment, and pose obvious and center them together as one group.",
+      "promptSha256": "80d0e1de86366ae3dc92cf761542d84890784e7cb8adbaa59693ff49d3b47ab8",
+      "sourceCrop": [
+        0,
+        0,
+        421,
+        425
+      ],
+      "usedBy": [
+        "quiz:one-speaker:A",
+        "quiz:one-speaker:B",
+        "quiz:one-speaker:C",
+        "quiz:other-pair:A",
+        "quiz:other-pair:B",
+        "quiz:other-pair:C",
+        "quiz:our-football:A",
+        "quiz:our-football:B",
+        "quiz:our-football:C",
+        "quiz:same-team:A",
+        "quiz:same-team:B",
+        "quiz:same-team:C",
+        "quiz:same-team:stem",
+        "quiz:two-sports:A",
+        "quiz:two-sports:B",
+        "quiz:two-sports:C"
+      ],
+      "visualReview": "pending"
+    },
+    {
+      "assetKey": "sport-quiz-player-a",
+      "path": "assets/sport-quiz-player-a.png",
+      "sha256": "fafe904fe3b0e9e30013c1283d9038879ecd8272dccd1fe2d62d1f7354f5cc87",
+      "width": 421,
+      "height": 425,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/sport-quiz-atlas-v1.png",
+      "generatedSourceSha256": "b6c22438ea78769a17296ecdef1bc500c558b97e96f789289c1ba4329e318df0",
+      "prompt": "Use case: scientific-educational. Asset type: nine transparent original cutouts for first-grade English picture-quiz alternatives. One exact square 3×3 production sprite atlas. Equal square cells, strict row-major order, each subject centered in its own cell with at least 13% clear margin on every edge. All nine cells must be occupied and distinct, with no objects crossing cell boundaries. Genuinely transparent alpha background throughout the entire sheet, including margins, no checkerboard, no grid lines, no colored cards, no ground shadow or background panel. Keep each object fully visible and legible at 45 px. Original educational art for age 6: matte gouache on fine paper grain, clean paper-cut silhouettes, warm cream and deep pine green with restrained apricot and persimmon. Large readable forms, charming but calm. No words, letters, numerals, logos, UI, watermarks, decorative scenery, or floating scraps. No existing characters or textbook imagery.\nRow 1 left to right: (1) front three-quarter head and shoulders of a six-year-old broadcaster with round face, short light-brown curls and dark teal T-shirt, no props; (2) head and shoulders of a different child with black hair in a high bun, lavender-purple T-shirt, no props; (3) head and shoulders of a different dark-skinned child with short black tight curls, warm apricot T-shirt, no props. Faces completely visible, same scale and framing, clearly different silhouettes.\nRow 2 left to right: (4) one deep red table tennis paddle beside one separate ivory-white ping-pong ball, large size contrast with a clear gap, no other object; (5) one six-year-old child alone beside one fully visible table-tennis table, holding one paddle, no second person; (6) two children facing each other and passing one orange basketball under a clearly visible single basketball hoop, no third child or second ball.\nRow 3 left to right: (7) exactly two children at opposite ends of one teal table-tennis table, playing with one red paddle each and one tiny white ball above the visible net, full figures and table, no third child; (8) exactly one classic white soccer ball with navy pentagons, no other equipment; (9) exactly one burnt-orange basketball with black curved seams, no other equipment. Action pictures must be readable without any text; keep players, equipment, and pose obvious and center them together as one group.",
+      "promptSha256": "80d0e1de86366ae3dc92cf761542d84890784e7cb8adbaa59693ff49d3b47ab8",
+      "sourceCrop": [
+        421,
+        0,
+        842,
+        425
+      ],
+      "usedBy": [
+        "quiz:one-speaker:A",
+        "quiz:one-speaker:B",
+        "quiz:one-speaker:C",
+        "quiz:other-pair:A",
+        "quiz:other-pair:B",
+        "quiz:other-pair:C",
+        "quiz:our-football:A",
+        "quiz:our-football:B",
+        "quiz:our-football:C",
+        "quiz:same-team:A",
+        "quiz:same-team:B",
+        "quiz:same-team:C",
+        "quiz:same-team:stem",
+        "quiz:two-sports:A",
+        "quiz:two-sports:B",
+        "quiz:two-sports:C",
+        "scene:sort-the-clubs"
+      ],
+      "visualReview": "pending"
+    },
+    {
+      "assetKey": "sport-quiz-player-b",
+      "path": "assets/sport-quiz-player-b.png",
+      "sha256": "7a7621a2db221cd7a45aa28843e55124ca5377b64a51882bdcbd8150d8eb0225",
+      "width": 421,
+      "height": 425,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/sport-quiz-atlas-v1.png",
+      "generatedSourceSha256": "b6c22438ea78769a17296ecdef1bc500c558b97e96f789289c1ba4329e318df0",
+      "prompt": "Use case: scientific-educational. Asset type: nine transparent original cutouts for first-grade English picture-quiz alternatives. One exact square 3×3 production sprite atlas. Equal square cells, strict row-major order, each subject centered in its own cell with at least 13% clear margin on every edge. All nine cells must be occupied and distinct, with no objects crossing cell boundaries. Genuinely transparent alpha background throughout the entire sheet, including margins, no checkerboard, no grid lines, no colored cards, no ground shadow or background panel. Keep each object fully visible and legible at 45 px. Original educational art for age 6: matte gouache on fine paper grain, clean paper-cut silhouettes, warm cream and deep pine green with restrained apricot and persimmon. Large readable forms, charming but calm. No words, letters, numerals, logos, UI, watermarks, decorative scenery, or floating scraps. No existing characters or textbook imagery.\nRow 1 left to right: (1) front three-quarter head and shoulders of a six-year-old broadcaster with round face, short light-brown curls and dark teal T-shirt, no props; (2) head and shoulders of a different child with black hair in a high bun, lavender-purple T-shirt, no props; (3) head and shoulders of a different dark-skinned child with short black tight curls, warm apricot T-shirt, no props. Faces completely visible, same scale and framing, clearly different silhouettes.\nRow 2 left to right: (4) one deep red table tennis paddle beside one separate ivory-white ping-pong ball, large size contrast with a clear gap, no other object; (5) one six-year-old child alone beside one fully visible table-tennis table, holding one paddle, no second person; (6) two children facing each other and passing one orange basketball under a clearly visible single basketball hoop, no third child or second ball.\nRow 3 left to right: (7) exactly two children at opposite ends of one teal table-tennis table, playing with one red paddle each and one tiny white ball above the visible net, full figures and table, no third child; (8) exactly one classic white soccer ball with navy pentagons, no other equipment; (9) exactly one burnt-orange basketball with black curved seams, no other equipment. Action pictures must be readable without any text; keep players, equipment, and pose obvious and center them together as one group.",
+      "promptSha256": "80d0e1de86366ae3dc92cf761542d84890784e7cb8adbaa59693ff49d3b47ab8",
+      "sourceCrop": [
+        842,
+        0,
+        1263,
+        425
+      ],
+      "usedBy": [
+        "quiz:one-speaker:A",
+        "quiz:one-speaker:B",
+        "quiz:one-speaker:C",
+        "quiz:other-pair:A",
+        "quiz:other-pair:B",
+        "quiz:other-pair:C",
+        "quiz:our-football:A",
+        "quiz:our-football:B",
+        "quiz:our-football:C",
+        "quiz:same-team:A",
+        "quiz:same-team:B",
+        "quiz:same-team:C",
+        "quiz:same-team:stem",
+        "quiz:two-sports:A",
+        "quiz:two-sports:B",
+        "quiz:two-sports:C"
+      ],
+      "visualReview": "pending"
+    },
+    {
+      "assetKey": "sport-quiz-paddle",
+      "path": "assets/sport-quiz-paddle.png",
+      "sha256": "285b055e267286c87f8db1c62b0b67670e7dd52351e3bcf6af5b07edfd034425",
+      "width": 375,
+      "height": 427,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/sport-quiz-atlas-v1.png",
+      "generatedSourceSha256": "b6c22438ea78769a17296ecdef1bc500c558b97e96f789289c1ba4329e318df0",
+      "prompt": "Use case: scientific-educational. Asset type: nine transparent original cutouts for first-grade English picture-quiz alternatives. One exact square 3×3 production sprite atlas. Equal square cells, strict row-major order, each subject centered in its own cell with at least 13% clear margin on every edge. All nine cells must be occupied and distinct, with no objects crossing cell boundaries. Genuinely transparent alpha background throughout the entire sheet, including margins, no checkerboard, no grid lines, no colored cards, no ground shadow or background panel. Keep each object fully visible and legible at 45 px. Original educational art for age 6: matte gouache on fine paper grain, clean paper-cut silhouettes, warm cream and deep pine green with restrained apricot and persimmon. Large readable forms, charming but calm. No words, letters, numerals, logos, UI, watermarks, decorative scenery, or floating scraps. No existing characters or textbook imagery.\nRow 1 left to right: (1) front three-quarter head and shoulders of a six-year-old broadcaster with round face, short light-brown curls and dark teal T-shirt, no props; (2) head and shoulders of a different child with black hair in a high bun, lavender-purple T-shirt, no props; (3) head and shoulders of a different dark-skinned child with short black tight curls, warm apricot T-shirt, no props. Faces completely visible, same scale and framing, clearly different silhouettes.\nRow 2 left to right: (4) one deep red table tennis paddle beside one separate ivory-white ping-pong ball, large size contrast with a clear gap, no other object; (5) one six-year-old child alone beside one fully visible table-tennis table, holding one paddle, no second person; (6) two children facing each other and passing one orange basketball under a clearly visible single basketball hoop, no third child or second ball.\nRow 3 left to right: (7) exactly two children at opposite ends of one teal table-tennis table, playing with one red paddle each and one tiny white ball above the visible net, full figures and table, no third child; (8) exactly one classic white soccer ball with navy pentagons, no other equipment; (9) exactly one burnt-orange basketball with black curved seams, no other equipment. Action pictures must be readable without any text; keep players, equipment, and pose obvious and center them together as one group.",
+      "promptSha256": "80d0e1de86366ae3dc92cf761542d84890784e7cb8adbaa59693ff49d3b47ab8",
+      "sourceCrop": [
+        0,
+        425,
+        375,
+        852
+      ],
+      "usedBy": [
+        "quiz:other-pair:A",
+        "quiz:other-pair:B",
+        "quiz:same-team:C",
+        "quiz:two-sports:C"
+      ],
+      "visualReview": "pending"
+    },
+    {
+      "assetKey": "sport-quiz-play-alone",
+      "path": "assets/sport-quiz-play-alone.png",
+      "sha256": "89bc314e7ca6040ff48455732a5ca6e0ee1b791fe0af3f489745d0c694b184e2",
+      "width": 448,
+      "height": 416,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/sport-quiz-atlas-v1.png",
+      "generatedSourceSha256": "b6c22438ea78769a17296ecdef1bc500c558b97e96f789289c1ba4329e318df0",
+      "prompt": "Use case: scientific-educational. Asset type: nine transparent original cutouts for first-grade English picture-quiz alternatives. One exact square 3×3 production sprite atlas. Equal square cells, strict row-major order, each subject centered in its own cell with at least 13% clear margin on every edge. All nine cells must be occupied and distinct, with no objects crossing cell boundaries. Genuinely transparent alpha background throughout the entire sheet, including margins, no checkerboard, no grid lines, no colored cards, no ground shadow or background panel. Keep each object fully visible and legible at 45 px. Original educational art for age 6: matte gouache on fine paper grain, clean paper-cut silhouettes, warm cream and deep pine green with restrained apricot and persimmon. Large readable forms, charming but calm. No words, letters, numerals, logos, UI, watermarks, decorative scenery, or floating scraps. No existing characters or textbook imagery.\nRow 1 left to right: (1) front three-quarter head and shoulders of a six-year-old broadcaster with round face, short light-brown curls and dark teal T-shirt, no props; (2) head and shoulders of a different child with black hair in a high bun, lavender-purple T-shirt, no props; (3) head and shoulders of a different dark-skinned child with short black tight curls, warm apricot T-shirt, no props. Faces completely visible, same scale and framing, clearly different silhouettes.\nRow 2 left to right: (4) one deep red table tennis paddle beside one separate ivory-white ping-pong ball, large size contrast with a clear gap, no other object; (5) one six-year-old child alone beside one fully visible table-tennis table, holding one paddle, no second person; (6) two children facing each other and passing one orange basketball under a clearly visible single basketball hoop, no third child or second ball.\nRow 3 left to right: (7) exactly two children at opposite ends of one teal table-tennis table, playing with one red paddle each and one tiny white ball above the visible net, full figures and table, no third child; (8) exactly one classic white soccer ball with navy pentagons, no other equipment; (9) exactly one burnt-orange basketball with black curved seams, no other equipment. Action pictures must be readable without any text; keep players, equipment, and pose obvious and center them together as one group.",
+      "promptSha256": "80d0e1de86366ae3dc92cf761542d84890784e7cb8adbaa59693ff49d3b47ab8",
+      "sourceCrop": [
+        375,
+        425,
+        835,
+        852
+      ],
+      "usedBy": [
+        "quiz:invite-partner:A"
+      ],
+      "visualReview": "pending"
+    },
+    {
+      "assetKey": "sport-quiz-play-basket",
+      "path": "assets/sport-quiz-play-basket.png",
+      "sha256": "669d7a1de470619fdcbc4199a4bed7919393bf1daad998fd5533cb355eb3e960",
+      "width": 428,
+      "height": 427,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/sport-quiz-atlas-v1.png",
+      "generatedSourceSha256": "b6c22438ea78769a17296ecdef1bc500c558b97e96f789289c1ba4329e318df0",
+      "prompt": "Use case: scientific-educational. Asset type: nine transparent original cutouts for first-grade English picture-quiz alternatives. One exact square 3×3 production sprite atlas. Equal square cells, strict row-major order, each subject centered in its own cell with at least 13% clear margin on every edge. All nine cells must be occupied and distinct, with no objects crossing cell boundaries. Genuinely transparent alpha background throughout the entire sheet, including margins, no checkerboard, no grid lines, no colored cards, no ground shadow or background panel. Keep each object fully visible and legible at 45 px. Original educational art for age 6: matte gouache on fine paper grain, clean paper-cut silhouettes, warm cream and deep pine green with restrained apricot and persimmon. Large readable forms, charming but calm. No words, letters, numerals, logos, UI, watermarks, decorative scenery, or floating scraps. No existing characters or textbook imagery.\nRow 1 left to right: (1) front three-quarter head and shoulders of a six-year-old broadcaster with round face, short light-brown curls and dark teal T-shirt, no props; (2) head and shoulders of a different child with black hair in a high bun, lavender-purple T-shirt, no props; (3) head and shoulders of a different dark-skinned child with short black tight curls, warm apricot T-shirt, no props. Faces completely visible, same scale and framing, clearly different silhouettes.\nRow 2 left to right: (4) one deep red table tennis paddle beside one separate ivory-white ping-pong ball, large size contrast with a clear gap, no other object; (5) one six-year-old child alone beside one fully visible table-tennis table, holding one paddle, no second person; (6) two children facing each other and passing one orange basketball under a clearly visible single basketball hoop, no third child or second ball.\nRow 3 left to right: (7) exactly two children at opposite ends of one teal table-tennis table, playing with one red paddle each and one tiny white ball above the visible net, full figures and table, no third child; (8) exactly one classic white soccer ball with navy pentagons, no other equipment; (9) exactly one burnt-orange basketball with black curved seams, no other equipment. Action pictures must be readable without any text; keep players, equipment, and pose obvious and center them together as one group.",
+      "promptSha256": "80d0e1de86366ae3dc92cf761542d84890784e7cb8adbaa59693ff49d3b47ab8",
+      "sourceCrop": [
+        835,
+        425,
+        1263,
+        852
+      ],
+      "usedBy": [
+        "quiz:invite-partner:B"
+      ],
+      "visualReview": "pending"
+    },
+    {
+      "assetKey": "sport-quiz-play-ping",
+      "path": "assets/sport-quiz-play-ping.png",
+      "sha256": "e03f5b4410ecbbc3a528b39011cfe96bad69f2353de84507f64527a830c92514",
+      "width": 446,
+      "height": 394,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/sport-quiz-atlas-v1.png",
+      "generatedSourceSha256": "b6c22438ea78769a17296ecdef1bc500c558b97e96f789289c1ba4329e318df0",
+      "prompt": "Use case: scientific-educational. Asset type: nine transparent original cutouts for first-grade English picture-quiz alternatives. One exact square 3×3 production sprite atlas. Equal square cells, strict row-major order, each subject centered in its own cell with at least 13% clear margin on every edge. All nine cells must be occupied and distinct, with no objects crossing cell boundaries. Genuinely transparent alpha background throughout the entire sheet, including margins, no checkerboard, no grid lines, no colored cards, no ground shadow or background panel. Keep each object fully visible and legible at 45 px. Original educational art for age 6: matte gouache on fine paper grain, clean paper-cut silhouettes, warm cream and deep pine green with restrained apricot and persimmon. Large readable forms, charming but calm. No words, letters, numerals, logos, UI, watermarks, decorative scenery, or floating scraps. No existing characters or textbook imagery.\nRow 1 left to right: (1) front three-quarter head and shoulders of a six-year-old broadcaster with round face, short light-brown curls and dark teal T-shirt, no props; (2) head and shoulders of a different child with black hair in a high bun, lavender-purple T-shirt, no props; (3) head and shoulders of a different dark-skinned child with short black tight curls, warm apricot T-shirt, no props. Faces completely visible, same scale and framing, clearly different silhouettes.\nRow 2 left to right: (4) one deep red table tennis paddle beside one separate ivory-white ping-pong ball, large size contrast with a clear gap, no other object; (5) one six-year-old child alone beside one fully visible table-tennis table, holding one paddle, no second person; (6) two children facing each other and passing one orange basketball under a clearly visible single basketball hoop, no third child or second ball.\nRow 3 left to right: (7) exactly two children at opposite ends of one teal table-tennis table, playing with one red paddle each and one tiny white ball above the visible net, full figures and table, no third child; (8) exactly one classic white soccer ball with navy pentagons, no other equipment; (9) exactly one burnt-orange basketball with black curved seams, no other equipment. Action pictures must be readable without any text; keep players, equipment, and pose obvious and center them together as one group.",
+      "promptSha256": "80d0e1de86366ae3dc92cf761542d84890784e7cb8adbaa59693ff49d3b47ab8",
+      "sourceCrop": [
+        0,
+        852,
+        446,
+        1246
+      ],
+      "usedBy": [
+        "quiz:invite-partner:C"
+      ],
+      "visualReview": "pending"
+    },
+    {
+      "assetKey": "sport-quiz-ball-football",
+      "path": "assets/sport-quiz-ball-football.png",
+      "sha256": "8f5e78856f4ab1afa57ab9690d63f3bb580c5f1ad2a1723ef1436a567e7b8b4d",
+      "width": 389,
+      "height": 394,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/sport-quiz-atlas-v1.png",
+      "generatedSourceSha256": "b6c22438ea78769a17296ecdef1bc500c558b97e96f789289c1ba4329e318df0",
+      "prompt": "Use case: scientific-educational. Asset type: nine transparent original cutouts for first-grade English picture-quiz alternatives. One exact square 3×3 production sprite atlas. Equal square cells, strict row-major order, each subject centered in its own cell with at least 13% clear margin on every edge. All nine cells must be occupied and distinct, with no objects crossing cell boundaries. Genuinely transparent alpha background throughout the entire sheet, including margins, no checkerboard, no grid lines, no colored cards, no ground shadow or background panel. Keep each object fully visible and legible at 45 px. Original educational art for age 6: matte gouache on fine paper grain, clean paper-cut silhouettes, warm cream and deep pine green with restrained apricot and persimmon. Large readable forms, charming but calm. No words, letters, numerals, logos, UI, watermarks, decorative scenery, or floating scraps. No existing characters or textbook imagery.\nRow 1 left to right: (1) front three-quarter head and shoulders of a six-year-old broadcaster with round face, short light-brown curls and dark teal T-shirt, no props; (2) head and shoulders of a different child with black hair in a high bun, lavender-purple T-shirt, no props; (3) head and shoulders of a different dark-skinned child with short black tight curls, warm apricot T-shirt, no props. Faces completely visible, same scale and framing, clearly different silhouettes.\nRow 2 left to right: (4) one deep red table tennis paddle beside one separate ivory-white ping-pong ball, large size contrast with a clear gap, no other object; (5) one six-year-old child alone beside one fully visible table-tennis table, holding one paddle, no second person; (6) two children facing each other and passing one orange basketball under a clearly visible single basketball hoop, no third child or second ball.\nRow 3 left to right: (7) exactly two children at opposite ends of one teal table-tennis table, playing with one red paddle each and one tiny white ball above the visible net, full figures and table, no third child; (8) exactly one classic white soccer ball with navy pentagons, no other equipment; (9) exactly one burnt-orange basketball with black curved seams, no other equipment. Action pictures must be readable without any text; keep players, equipment, and pose obvious and center them together as one group.",
+      "promptSha256": "80d0e1de86366ae3dc92cf761542d84890784e7cb8adbaa59693ff49d3b47ab8",
+      "sourceCrop": [
+        446,
+        852,
+        835,
+        1246
+      ],
+      "usedBy": [
+        "quiz:one-speaker:C",
+        "quiz:our-football:A",
+        "quiz:our-football:B",
+        "quiz:our-football:C",
+        "quiz:same-team:B",
+        "quiz:same-team:stem",
+        "quiz:two-sports:A",
+        "quiz:two-sports:B",
+        "quiz:two-sports:C"
+      ],
+      "visualReview": "pending"
+    },
+    {
+      "assetKey": "sport-quiz-ball-basketball",
+      "path": "assets/sport-quiz-ball-basketball.png",
+      "sha256": "1357ade651cb6d078bfd6aaa8c8b900cf945880a0e3146ed19dcd6ceeedbdddd",
+      "width": 428,
+      "height": 394,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/sport-quiz-atlas-v1.png",
+      "generatedSourceSha256": "b6c22438ea78769a17296ecdef1bc500c558b97e96f789289c1ba4329e318df0",
+      "prompt": "Use case: scientific-educational. Asset type: nine transparent original cutouts for first-grade English picture-quiz alternatives. One exact square 3×3 production sprite atlas. Equal square cells, strict row-major order, each subject centered in its own cell with at least 13% clear margin on every edge. All nine cells must be occupied and distinct, with no objects crossing cell boundaries. Genuinely transparent alpha background throughout the entire sheet, including margins, no checkerboard, no grid lines, no colored cards, no ground shadow or background panel. Keep each object fully visible and legible at 45 px. Original educational art for age 6: matte gouache on fine paper grain, clean paper-cut silhouettes, warm cream and deep pine green with restrained apricot and persimmon. Large readable forms, charming but calm. No words, letters, numerals, logos, UI, watermarks, decorative scenery, or floating scraps. No existing characters or textbook imagery.\nRow 1 left to right: (1) front three-quarter head and shoulders of a six-year-old broadcaster with round face, short light-brown curls and dark teal T-shirt, no props; (2) head and shoulders of a different child with black hair in a high bun, lavender-purple T-shirt, no props; (3) head and shoulders of a different dark-skinned child with short black tight curls, warm apricot T-shirt, no props. Faces completely visible, same scale and framing, clearly different silhouettes.\nRow 2 left to right: (4) one deep red table tennis paddle beside one separate ivory-white ping-pong ball, large size contrast with a clear gap, no other object; (5) one six-year-old child alone beside one fully visible table-tennis table, holding one paddle, no second person; (6) two children facing each other and passing one orange basketball under a clearly visible single basketball hoop, no third child or second ball.\nRow 3 left to right: (7) exactly two children at opposite ends of one teal table-tennis table, playing with one red paddle each and one tiny white ball above the visible net, full figures and table, no third child; (8) exactly one classic white soccer ball with navy pentagons, no other equipment; (9) exactly one burnt-orange basketball with black curved seams, no other equipment. Action pictures must be readable without any text; keep players, equipment, and pose obvious and center them together as one group.",
+      "promptSha256": "80d0e1de86366ae3dc92cf761542d84890784e7cb8adbaa59693ff49d3b47ab8",
+      "sourceCrop": [
+        835,
+        852,
+        1263,
+        1246
+      ],
+      "usedBy": [
+        "quiz:one-speaker:A",
+        "quiz:one-speaker:B",
+        "quiz:other-pair:C",
+        "quiz:same-team:A",
+        "quiz:two-sports:B"
+      ],
+      "visualReview": "pending"
+    }
+  ]
+}

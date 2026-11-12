@@ -1,0 +1,228 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "lesson": {
+    "editionId": "pep-math-g1-lower-2022-standard",
+    "revisionId": "directory-6205d2037284e91f10b25edd",
+    "nodeId": "574798d6-d2cc-4b85-82c9-81c477081bc4",
+    "unitId": "ac9164b9-5eba-4c7e-9436-214fc2df042b",
+    "subject": "math",
+    "officialActivityId": "2c31deaf-01fd-3df9-2d3b-258a91ab629a",
+    "lessonTitle": "口算加法-两位数加一位数和整十数（不进位）",
+    "unitTitle": "100以内的口算加、减法",
+    "gradeCode": "primary_1",
+    "volume": "lower",
+    "schoolSystem": "six_year"
+  },
+  "teacher": {
+    "code": "mira_math_standard",
+    "voice": "Ethan",
+    "gender": "male"
+  },
+  "goals": [
+    {
+      "id": "g-ones",
+      "goal": "理解两位数加一位数（个位相加不到十）时，几个一和几个一合在一起，原来的十不动。",
+      "pageRefs": [
+        "印43例1第1问",
+        "教案p2–3",
+        "课件p7–11",
+        "任务单p1"
+      ]
+    },
+    {
+      "id": "g-tens",
+      "goal": "两位数加整十数时，几个十和几个十合在一起，原来的个位不动。",
+      "pageRefs": [
+        "印43例1第2问",
+        "教案p3",
+        "课件p12–17",
+        "任务单p1"
+      ]
+    },
+    {
+      "id": "g-both",
+      "goal": "对照整捆、散根与数式，将相同计数单位分别相加，合并得到两位数加两位数的不进位结果。",
+      "pageRefs": [
+        "印44上部试一试",
+        "教案p3–4",
+        "课件p18",
+        "任务单p2"
+      ]
+    },
+    {
+      "id": "g-transfer",
+      "goal": "根据要合并的是哪些数量列加法，分清加几个一、几个十，比较写在前后不同的算式。",
+      "pageRefs": [
+        "印43例1及说一说",
+        "印44上部做一做",
+        "课件p19–24",
+        "作业p1"
+      ]
+    }
+  ],
+  "keyPoint": "把相同计数单位的个数相加，用整条十和散个一说明为什么。",
+  "difficultPoint": "分清加几个一和加几个十，能迁移到两个两位数分别合并十和一。",
+  "authoring": {
+    "method": "direct_authoring",
+    "author": "Codex GPT-6",
+    "nativeGenerationSubmitted": false,
+    "reviewedOfficialHours": [
+      "lesson_1"
+    ],
+    "gameTemplates": [
+      {
+        "id": "sortingDepot",
+        "version": 1,
+        "knowledgeRule": "classification",
+        "levels": 3,
+        "progression": "先推散面与整条分到不同托盘，再混合同一类不同数量和墙路。"
+      },
+      {
+        "id": "fallingTiles",
+        "version": 1,
+        "knowledgeRule": "pair_match",
+        "levels": 3,
+        "progression": "订单牌落到正确总数旁消除，先加几/加几十，再混入两位数和交换位置。"
+      }
+    ]
+  },
+  "pageSequence": [
+    {
+      "page": 1,
+      "type": "slide",
+      "title": "手工展收圆贴",
+      "play": "用已有、补上的两组发出两个问题，听清要合并什么。",
+      "pageRefs": [
+        "印43例1"
+      ]
+    },
+    {
+      "page": 2,
+      "type": "slide",
+      "title": "一条十枚，一枚就是一",
+      "play": "用整条十格和单枚圆贴分解两位数，指清十和一。",
+      "pageRefs": [
+        "印43例1"
+      ]
+    },
+    {
+      "page": 3,
+      "type": "slide",
+      "title": "加三枚散贴",
+      "play": "用相同的散个一合并后读出总数。",
+      "pageRefs": [
+        "印43例1第1问"
+      ]
+    },
+    {
+      "page": 4,
+      "type": "slide",
+      "title": "加三条整贴",
+      "play": "对照散贴与整条，整条走向十位，个位不动。",
+      "pageRefs": [
+        "印43例1第2问",
+        "印43说一说"
+      ]
+    },
+    {
+      "page": 5,
+      "type": "interactive",
+      "title": "整条散贴分开送",
+      "play": "从后面推，成条进十托盘，散贴进一托盘；逐关交叉路线和同类不同数量。",
+      "pageRefs": [
+        "印43说一说"
+      ]
+    },
+    {
+      "page": 6,
+      "type": "slide",
+      "title": "两边都有整条和散贴",
+      "play": "两个两位数分单位合并，个位不满十。",
+      "pageRefs": [
+        "印44上部试一试"
+      ]
+    },
+    {
+      "page": 7,
+      "type": "slide",
+      "title": "换个顺序，也要看单位",
+      "play": "比较一位数或整十数在前，分别认几个一或十。",
+      "pageRefs": [
+        "印44上部做一做"
+      ]
+    },
+    {
+      "page": 8,
+      "type": "interactive",
+      "title": "接住正确的总数",
+      "play": "滑动落下的订单牌，只有落到算对的结果旁才配对消除，三类逐关混合。",
+      "pageRefs": [
+        "印44上部做一做"
+      ]
+    },
+    {
+      "page": 9,
+      "type": "quiz",
+      "title": "手工展的新订单",
+      "play": "六题用新数值、独立图和可逐个数的模型。",
+      "pageRefs": [
+        "印43例1",
+        "印44上部"
+      ]
+    },
+    {
+      "page": 10,
+      "type": "slide",
+      "title": "回家说清楚哪一位变了",
+      "play": "两类比较与双单位合并，用家里的小物做一遍。",
+      "pageRefs": [
+        "印43说一说",
+        "课后练习p1"
+      ]
+    }
+  ],
+  "quiz": [
+    {
+      "id": "nrg-q1",
+      "skill": "两位数加一位数",
+      "correctPositionOneBased": 2
+    },
+    {
+      "id": "nrg-q2",
+      "skill": "两位数加整十数",
+      "correctPositionOneBased": 1
+    },
+    {
+      "id": "nrg-q3",
+      "skill": "两位数加两位数不进位",
+      "correctPositionOneBased": 3
+    },
+    {
+      "id": "nrg-q4",
+      "skill": "一位数在前的加法",
+      "correctPositionOneBased": 2
+    },
+    {
+      "id": "nrg-q5",
+      "skill": "比较个位和十位的变化",
+      "correctPositionOneBased": 3
+    },
+    {
+      "id": "nrg-q6",
+      "skill": "看图选择两组总数",
+      "correctPositionOneBased": 1
+    }
+  ],
+  "afterClass": {
+    "official": [
+      "在纸书印44例2前做比较",
+      "回家说同一数加几、几十和两位数"
+    ],
+    "atHome": "用纸画一条十格和散个圆点，拿一组数加几枚、再加几条，说说哪个数位变了。",
+    "weekly": "三种不进位加法和数位解释进入周题源。"
+  },
+  "artPlan": {
+    "status": "pending_builtin_imagegen_disk_hold",
+    "exactDiagrams": "底十教具、数字与数量卡按程序布置，装饰原画待内置图。"
+  }
+}

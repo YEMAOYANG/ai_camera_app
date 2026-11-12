@@ -1,0 +1,169 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "数与运算",
+  "binding": {
+    "editionId": "pep-math-g1-upper-2022-standard",
+    "revisionId": "directory-ede7a8c63c337cf95a03fe79",
+    "unitId": "198f382f-ded4-40ac-affe-a926f4577287",
+    "nodeId": "2eb14b17-e5f8-473d-95d3-05083e4960a5"
+  },
+  "goals": [
+    "用0～20范围内的例数说明数可以表示有几个和第几个，并能读写、逐一添一、排序和比较。",
+    "解释10个一是1个十，能用一捆十和散件或计数器说明十位、个位及20的组成。",
+    "用同一幅分组图说明两个部分合起来得总数，知道从总数去掉一部分能找另一部分，并说出对应的加、减法算式。",
+    "用数的组成、接着数和先凑成十再加剩余三种方法解释20以内的计算，在自己的知识图里连起认识数与计算。"
+  ],
+  "scenario": "社区邮亭整理星票。先用一张数卡认几件事，再把已经认出的数量画成收发知识图。",
+  "pageSequence": [
+    {
+      "key": "open",
+      "plan": "原创邮亭开场，让数字和手里的票对应。"
+    },
+    {
+      "key": "count-and-position",
+      "plan": "两种摆法是同样多，个数与数到第几个各表示什么。"
+    },
+    {
+      "key": "number-order",
+      "plan": "逐一添一读前后，数轴与同十位比较大小。"
+    },
+    {
+      "key": "tens-and-ones",
+      "plan": "把十个散件归为一捆，读写两位数；用两个十说明20。"
+    },
+    {
+      "key": "compare-stamps",
+      "plan": "听比较要求，操控小蛇寻找对应票数。"
+    },
+    {
+      "key": "part-and-whole",
+      "plan": "在一组实物图里写同图两加两减，明确部分和总数。"
+    },
+    {
+      "key": "methods",
+      "plan": "组成法与沿数轴接着数，用自己的话说为什么这样走。"
+    },
+    {
+      "key": "make-a-ten",
+      "plan": "用十格先补满十，余下数量接着加，移动箭头不重复计数。"
+    },
+    {
+      "key": "fill-ten-trays",
+      "plan": "落块选相邻互补数量，随着速度加快练三关。"
+    },
+    {
+      "key": "knowledge-map",
+      "plan": "用同一个数把个数、顺序、十和一、计算连起来。"
+    },
+    {
+      "key": "picture-check",
+      "plan": "原创数字、图题和解析，分别考查基数序数、数序、位值、比较、同图运算和凑十。"
+    },
+    {
+      "key": "closing",
+      "plan": "回顾自己的数卡，邀请家人听解释并补图。"
+    }
+  ],
+  "games": [
+    {
+      "page": "compare-stamps",
+      "template": "compareSnake",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.compareSnake",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "comparison",
+      "selection": "同一条移动和碰撞规则下，只有满足与参考量的关系才能吃到。十以内用点阵，超过10可用精确十格与散点组合。",
+      "levels": [
+        "以较少的点阵比较更多。",
+        "继续比较更少并转弯。",
+        "加入两位数分组或与参考量一样多，速度提高。"
+      ],
+      "demo": "先亮参考、合适的一组和蛇头，示范一次后清空交接。"
+    },
+    {
+      "page": "fill-ten-trays",
+      "template": "fallingTiles",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.fallingTiles",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "sum_pair",
+      "selection": "数字和点阵对应同量，只有相邻两组恰好合成10才被接收。保留可看到的已完成结果。",
+      "levels": [
+        "慢速接两个易辨组。",
+        "增加三组和底行顺序。",
+        "末关落块更快并更换三个互补对。"
+      ],
+      "demo": "亮十格目标、下落方块和对应底格，边说缺几枚边移动；完成一对后复位。"
+    }
+  ],
+  "quizPlan": [
+    {
+      "skill": "cardinal",
+      "prompt": "看左边七枚邮票。哪张右边和它一样多？",
+      "answer": "七枚",
+      "position": 3,
+      "rationale": "第一组有六枚，第二组有八枚。第三组虽然摆法不同，也有七枚。"
+    },
+    {
+      "skill": "ordinal",
+      "prompt": "从左边绿色箭头开始，哪张图圈出第三枚？",
+      "answer": "第三枚",
+      "position": 2,
+      "rationale": "从左向右数，一、二、三。第三枚只圈那一枚。"
+    },
+    {
+      "skill": "number-order",
+      "prompt": "柜台十六号往后添一张。下面哪张是它的下一号？",
+      "answer": "十七号",
+      "position": 1,
+      "rationale": "十六再添一是十七。沿箭头向右只走一格。"
+    },
+    {
+      "skill": "tens-and-ones",
+      "prompt": "哪张图用一捆十和散票摆出了十八？",
+      "answer": "十八",
+      "position": 2,
+      "rationale": "十格盒是一个十，外面八枚是八个一。一个十和八个一是十八。"
+    },
+    {
+      "skill": "compare-tens",
+      "prompt": "哪组比一捆十和三枚散票还多？",
+      "answer": "十六",
+      "position": 3,
+      "rationale": "三个选项都是一个十，就比散票。六枚比三枚多。"
+    },
+    {
+      "skill": "part-and-whole",
+      "prompt": "十四枚票里去掉八枚圆票。哪张剩下的星票数对？",
+      "answer": "六枚",
+      "position": 2,
+      "rationale": "总数十四去掉八，剩六枚星票。十四可以分成八和六。"
+    },
+    {
+      "skill": "make-a-ten",
+      "prompt": "算八加七，哪张把合适的票挪进十格，刚好装满？",
+      "answer": "挪两枚",
+      "position": 1,
+      "rationale": "八个已经在盒里，正好差两个。从七枚里挪两枚，外面还剩五枚。"
+    },
+    {
+      "skill": "counting-on",
+      "prompt": "从十一接着添三枚。每添一枚走一格，哪张图对？",
+      "answer": "落在十四",
+      "position": 3,
+      "rationale": "十一已经在起点。三步分别落在十二、十三、十四，答案十四。"
+    }
+  ],
+  "afterClass": {
+    "familyTask": "家人和孩子各选一个20以内的数。孩子画数量和组成，补一个前后关系及两条同图算式；家人请他用图说明，能听到的解释才记录。",
+    "weeklyQuestionSource": [
+      "个数和第几个",
+      "十与一、读写与数序",
+      "20以内比较",
+      "同图加减",
+      "凑十或接着数"
+    ],
+    "evidence": "线上记录图题与操作，纸笔知识图和口头说明待观察。"
+  },
+  "artAndReading": "原创邮亭和角色图使用内置 ImageGen。准确点数、十格、位值、数轴与运算箭头用代码绘制，遮住非目标文字仍能听题看图。"
+}

@@ -1,0 +1,1017 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "Numbers",
+  "description": "听辨一到十的英语数词，逐个核对拼贴数量，并用 How many? 展示作品。",
+  "grade": 1,
+  "roster": {
+    "mia": {
+      "name": "Mia 老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Jennifer",
+      "avatar": "/teachers/coco-english-v1.png",
+      "color": "#557B76",
+      "persona": "用自然短句带孩子听数、摆图和用英语问答。"
+    }
+  },
+  "images": {
+    "project-stage": {
+      "file": "assets/project-stage.png"
+    },
+    "project-board": {
+      "file": "assets/project-board.png"
+    },
+    "project-cart": {
+      "file": "assets/project-cart.png"
+    },
+    "project-cart-run": {
+      "file": "assets/project-cart-run.png"
+    },
+    "project-traffic": {
+      "file": "assets/project-traffic.png"
+    },
+    "project-sticker": {
+      "file": "assets/project-sticker.png"
+    },
+    "paper-star": {
+      "file": "assets/paper-star.png"
+    },
+    "paper-book": {
+      "file": "assets/paper-book.png"
+    },
+    "paper-ruler": {
+      "file": "assets/paper-ruler.png"
+    },
+    "cargo-book-2": {
+      "file": "assets/cargo-book-2.png"
+    },
+    "cargo-ruler-4": {
+      "file": "assets/cargo-ruler-4.png"
+    },
+    "display-book-2": {
+      "file": "assets/display-book-2.png"
+    },
+    "display-ruler-4": {
+      "file": "assets/display-ruler-4.png"
+    },
+    "cargo-ruler-5": {
+      "file": "assets/cargo-ruler-5.png"
+    },
+    "cargo-ruler-6": {
+      "file": "assets/cargo-ruler-6.png"
+    },
+    "cargo-book-4": {
+      "file": "assets/cargo-book-4.png"
+    },
+    "display-ruler-5": {
+      "file": "assets/display-ruler-5.png"
+    },
+    "display-ruler-6": {
+      "file": "assets/display-ruler-6.png"
+    },
+    "display-book-4": {
+      "file": "assets/display-book-4.png"
+    },
+    "cargo-leaf-9": {
+      "file": "assets/cargo-leaf-9.png"
+    },
+    "cargo-star-10": {
+      "file": "assets/cargo-star-10.png"
+    },
+    "cargo-ruler-7": {
+      "file": "assets/cargo-ruler-7.png"
+    },
+    "cargo-star-9": {
+      "file": "assets/cargo-star-9.png"
+    },
+    "display-leaf-9": {
+      "file": "assets/display-leaf-9.png"
+    },
+    "display-star-10": {
+      "file": "assets/display-star-10.png"
+    },
+    "display-ruler-7": {
+      "file": "assets/display-ruler-7.png"
+    },
+    "display-star-9": {
+      "file": "assets/display-star-9.png"
+    },
+    "strip-one-five": {
+      "file": "assets/strip-one-five.png"
+    },
+    "strip-six-ten": {
+      "file": "assets/strip-six-ten.png"
+    },
+    "collage-four-half": {
+      "file": "assets/collage-four-half.png"
+    },
+    "collage-four-full": {
+      "file": "assets/collage-four-full.png"
+    },
+    "teach-book-ruler": {
+      "file": "assets/teach-book-ruler.png"
+    },
+    "teach-books-three": {
+      "file": "assets/teach-books-three.png"
+    },
+    "show-five-left": {
+      "file": "assets/show-five-left.png"
+    },
+    "show-five-right": {
+      "file": "assets/show-five-right.png"
+    },
+    "q-eight-a": {
+      "file": "assets/q-eight-a.png"
+    },
+    "q-eight-b": {
+      "file": "assets/q-eight-b.png"
+    },
+    "q-eight-c": {
+      "file": "assets/q-eight-c.png"
+    },
+    "q-ten-a": {
+      "file": "assets/q-ten-a.png"
+    },
+    "q-ten-b": {
+      "file": "assets/q-ten-b.png"
+    },
+    "q-ten-c": {
+      "file": "assets/q-ten-c.png"
+    },
+    "q-six-a": {
+      "file": "assets/q-six-a.png"
+    },
+    "q-six-b": {
+      "file": "assets/q-six-b.png"
+    },
+    "q-six-c": {
+      "file": "assets/q-six-c.png"
+    },
+    "q-ruler-a": {
+      "file": "assets/q-ruler-a.png"
+    },
+    "q-ruler-b": {
+      "file": "assets/q-ruler-b.png"
+    },
+    "q-ruler-c": {
+      "file": "assets/q-ruler-c.png"
+    },
+    "q-book-a": {
+      "file": "assets/q-book-a.png"
+    },
+    "q-book-b": {
+      "file": "assets/q-book-b.png"
+    },
+    "q-book-c": {
+      "file": "assets/q-book-c.png"
+    },
+    "q-track-stem": {
+      "file": "assets/q-track-stem.png"
+    },
+    "q-track-a": {
+      "file": "assets/q-track-a.png"
+    },
+    "q-track-b": {
+      "file": "assets/q-track-b.png"
+    },
+    "q-track-c": {
+      "file": "assets/q-track-c.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "open-the-collage",
+      "type": "slide",
+      "title": "Project / Numbers",
+      "template": "title-picture",
+      "data": {
+        "title": "Project / Numbers",
+        "picture": "project-board",
+        "caption": "我的数字拼贴"
+      },
+      "script": [
+        {
+          "say": "社区展板空着一块。你愿意拿自己的小图把它补上吗？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "这张卡还没贴。先在心里挑一个一到十里的数。"
+        },
+        {
+          "say": "把同样多的小图放在卡上，每个小图都要看得清。"
+        },
+        {
+          "say": "同学来到展板前，可以指着这张卡，问有多少。"
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "How many?"
+        },
+        {
+          "say": "听到这句，先指着图数。数完，用英语说一共有几个。"
+        },
+        {
+          "say": "今天先练听和数，再试着贴一格，最后说给家人听。"
+        }
+      ]
+    },
+    {
+      "key": "one-through-ten",
+      "type": "slide",
+      "title": "听数词，指到数量图",
+      "template": "two-columns",
+      "data": {
+        "title": "听数词，指到数量图",
+        "left": {
+          "heading": "先听一到五",
+          "body": "指一张，再说一个数词。"
+        },
+        "right": {
+          "heading": "接着六到十",
+          "body": "一排一排点，每枚只数一次。"
+        },
+        "left_picture": "strip-one-five",
+        "right_picture": "strip-six-ten"
+      },
+      "script": [
+        {
+          "say": "听我念一个，你就指一张。怎么知道自己指对了？"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "先看星星卡。每一枚星星只用手指碰一次。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "One."
+        },
+        {
+          "say": "Two."
+        },
+        {
+          "say": "Three."
+        },
+        {
+          "say": "Four."
+        },
+        {
+          "say": "Five."
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "念到最后一个数词，就知道这张卡一共有几枚。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "再看书的卡片。书多了，可以从上到下一排一排数。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "Six."
+        },
+        {
+          "say": "Seven."
+        },
+        {
+          "say": "Eight."
+        },
+        {
+          "say": "Nine."
+        },
+        {
+          "say": "Ten."
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "最后一张有十本。排得紧一点或松一点，书的本数一样。"
+        },
+        {
+          "say": "没听清就跟我再念一次。听到哪个数，就数到哪个数。"
+        },
+        {
+          "say": "Two on the left. Three on the right."
+        },
+        {
+          "say": "Four on the left. Five on the right."
+        },
+        {
+          "say": "Seven on the left. Eight on the right."
+        }
+      ]
+    },
+    {
+      "key": "catch-and-fill",
+      "type": "interactive",
+      "title": "接贴图，补满两格",
+      "page": "catch-and-fill",
+      "widgetType": "game",
+      "startImage": "project-stage",
+      "script": [
+        {
+          "say": "小贴图从上面落下来。怎么让两张拼贴都正好填满？"
+        },
+        {
+          "setState": {
+            "pause": true,
+            "demo": true,
+            "level": 1
+          }
+        },
+        {
+          "highlight": "#demo-left-bin"
+        },
+        {
+          "say": "看左格，两个位置都要正好填满。"
+        },
+        {
+          "highlight": "#demo-right-bin"
+        },
+        {
+          "say": "再看右格，三个位置，一个也别空着。"
+        },
+        {
+          "say": "Two here, and three over there."
+        },
+        {
+          "highlight": "#demo-fall"
+        },
+        {
+          "say": "这次两枚星星一起下来。它们不能拆开，一起接。"
+        },
+        {
+          "highlight": "#demo-catch-pad"
+        },
+        {
+          "say": "左右箭头开车，回转键换篮。先用左边的篮。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "开到亮线下面，等贴图慢慢落下来。车停在亮线处。"
+        },
+        {
+          "say": "等这组贴图落进左篮，就看左边。两个位置各放一枚。"
+        },
+        {
+          "say": "接下来交给你。先听目标，看看篮里还有几个空位。"
+        },
+        {
+          "setState": {
+            "pause": false,
+            "demo": false,
+            "level": 1
+          }
+        }
+      ],
+      "gameAudio": {
+        "catch-two-three": "one-through-ten-23",
+        "catch-four-five": "one-through-ten-24",
+        "catch-seven-eight": "one-through-ten-25",
+        "catch-hint": "make-a-small-card-16",
+        "catch-help": "make-a-small-card-17",
+        "catch-good": "make-a-small-card-18"
+      }
+    },
+    {
+      "key": "make-a-small-card",
+      "type": "slide",
+      "title": "做一格数字拼贴",
+      "template": "two-columns",
+      "data": {
+        "title": "做一格数字拼贴",
+        "left": {
+          "heading": "先选数字四",
+          "body": "先摆两枚，看看还空几格。"
+        },
+        "right": {
+          "heading": "把每一格补好",
+          "body": "逐枚点数，再和卡上的数字比一比。"
+        },
+        "left_picture": "collage-four-half",
+        "right_picture": "collage-four-full"
+      },
+      "script": [
+        {
+          "say": "展板需要一格四枚的星星。你先帮我看，这张够了吗？"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "我选数字四。听清目标后，才开始拿贴图。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "左边先摆了两枚。用手指点过去，一枚，一个数。"
+        },
+        {
+          "say": "One. Two."
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "现在只到 Two，还有两个空位置。再拿两枚。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "把剩下两枚分开放好。家人指着卡问，How many?"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "One, two, three, four."
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "我每点一枚就念一个数。点完，我回答，Four."
+        },
+        {
+          "say": "听到的 Four、卡上的数字四、点出的四枚星星，说的是同一个数。"
+        },
+        {
+          "say": "先把小车开到亮线下面。"
+        },
+        {
+          "say": "先数空位置。一整串要放在同一个篮里。"
+        },
+        {
+          "say": "Well done! Both cards are full."
+        }
+      ]
+    },
+    {
+      "key": "only-this-kind",
+      "type": "slide",
+      "title": "听清要数哪一类",
+      "template": "two-columns",
+      "data": {
+        "title": "听清要数哪一类",
+        "left": {
+          "heading": "书和尺混在一起",
+          "body": "先听老师问什么。"
+        },
+        "right": {
+          "heading": "只数书",
+          "body": "手指跟着每本书走。"
+        },
+        "left_picture": "teach-book-ruler",
+        "right_picture": "teach-books-three"
+      },
+      "script": [
+        {
+          "say": "有人把书和尺放到同一张卡上。听到问题，要全都数吗？"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "我会问书有多少。你先看看书的封面和书脊。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "How many books?"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "听到 books，就看书。黄色长长的是尺，这次先放过。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "我们沿着三本书的边缘，按位置一个接一个点。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "One, two, three."
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "Three books."
+        },
+        {
+          "say": "问的是书，就只报书的本数。换问尺，我们再重新数尺。"
+        },
+        {
+          "say": "在展板前可以先问要数哪样，再用一个英语数词回答。"
+        },
+        {
+          "say": "Pick up two books."
+        },
+        {
+          "say": "Take them to card two."
+        },
+        {
+          "say": "Pick up five rulers."
+        },
+        {
+          "say": "Take them to card five."
+        },
+        {
+          "say": "Pick up six rulers."
+        },
+        {
+          "say": "Take them to card six."
+        },
+        {
+          "say": "先重听要取什么，再去找同样多的一组。"
+        },
+        {
+          "say": "先停在牌旁。听清这一站，再点装卸键。"
+        }
+      ]
+    },
+    {
+      "key": "deliver-collage-tiles",
+      "type": "interactive",
+      "title": "开小车送拼贴",
+      "page": "deliver-collage-tiles",
+      "widgetType": "game",
+      "startImage": "project-stage",
+      "script": [
+        {
+          "say": "小车要把拼贴送上展板。先拿哪一组，得听口令。"
+        },
+        {
+          "setState": {
+            "pause": true,
+            "demo": true,
+            "level": 1
+          }
+        },
+        {
+          "highlight": "#demo-book-pack"
+        },
+        {
+          "say": "Listen. Two books, please."
+        },
+        {
+          "say": "听到 Two 和 books，就找两本书。先看种类，再看数量。"
+        },
+        {
+          "highlight": "#demo-display"
+        },
+        {
+          "say": "前面的展格也有数字。拿好以后，下一条口令会告诉你去哪。"
+        },
+        {
+          "highlight": "#demo-drive-pad"
+        },
+        {
+          "say": "箭头开车。停在货牌旁，点方方的装卸键。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "我来取两本书。到货牌旁按下装卸键，再看右边的货格。"
+        },
+        {
+          "say": "现在你来试。先取好，再听要送到几号展格。"
+        },
+        {
+          "say": "过车道先等等。等路上空了，就往前开。"
+        },
+        {
+          "setState": {
+            "pause": false,
+            "demo": false,
+            "level": 1
+          }
+        }
+      ],
+      "gameAudio": {
+        "pick-books-two": "only-this-kind-16",
+        "send-two": "only-this-kind-17",
+        "pick-rulers-five": "only-this-kind-18",
+        "send-five": "only-this-kind-19",
+        "pick-rulers-six": "only-this-kind-20",
+        "send-six": "only-this-kind-21",
+        "deliver-hint": "only-this-kind-22",
+        "deliver-help": "only-this-kind-23",
+        "pick-leaves-nine": "show-and-ask-16",
+        "send-nine": "show-and-ask-17",
+        "pick-stars-ten": "show-and-ask-18",
+        "send-ten": "show-and-ask-19",
+        "pick-rulers-seven": "show-and-ask-20",
+        "send-seven": "show-and-ask-21",
+        "deliver-good": "show-and-ask-22"
+      }
+    },
+    {
+      "key": "show-and-ask",
+      "type": "slide",
+      "title": "给同伴看，交换问答",
+      "template": "two-columns",
+      "data": {
+        "title": "给同伴看，交换问答",
+        "left": {
+          "heading": "我来问",
+          "body": "How many?"
+        },
+        "right": {
+          "heading": "你来答",
+          "body": "数完再回答。"
+        },
+        "left_picture": "show-five-left",
+        "right_picture": "show-five-right"
+      },
+      "script": [
+        {
+          "say": "同伴到了展板前。两张卡的摆法不一样，数量也不同吗？"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "我指着这张叶子卡，请你数给我听。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "从这一边一枚一枚点。点过的叶子先别再点。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "How many?"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "先用手点一遍，再听我数。换了摆法，也只点每枚一次。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "One, two, three, four, five."
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "Five."
+        },
+        {
+          "say": "我们把卡片转个方向再点数，还是五枚。摆法变了，数量没变。"
+        },
+        {
+          "say": "你可以换成提问的人，请家人指着图回答。再一起数一次。"
+        },
+        {
+          "say": "Pick up nine leaves."
+        },
+        {
+          "say": "Take them to card nine."
+        },
+        {
+          "say": "Pick up ten stars."
+        },
+        {
+          "say": "Take them to card ten."
+        },
+        {
+          "say": "Pick up seven rulers."
+        },
+        {
+          "say": "Take them to card seven."
+        },
+        {
+          "say": "Well done! The card is ready to show."
+        }
+      ]
+    },
+    {
+      "key": "picture-check",
+      "type": "quiz",
+      "title": "新的数字展卡",
+      "intro": [
+        "展板换了新卡。听题，再看图选一张。",
+        "没听清，就点小喇叭再听一遍。"
+      ],
+      "questions": [
+        {
+          "id": "hear-eight",
+          "question": "Eight leaves. Find the card.",
+          "skill": "听辨 Eight 和八件",
+          "answer": [
+            "B"
+          ],
+          "analysis": "Eight 是八。每枚叶子数一次，第二张正好八枚。",
+          "visual": {
+            "kind": "asset",
+            "image": "project-board",
+            "alt": "一张尚未放贴图的展卡"
+          },
+          "options": {
+            "A": {
+              "label": "七枚叶子",
+              "visual": {
+                "kind": "asset",
+                "image": "q-eight-a",
+                "alt": "七枚叶子"
+              }
+            },
+            "B": {
+              "label": "八枚叶子",
+              "visual": {
+                "kind": "asset",
+                "image": "q-eight-b",
+                "alt": "八枚叶子"
+              }
+            },
+            "C": {
+              "label": "九枚叶子",
+              "visual": {
+                "kind": "asset",
+                "image": "q-eight-c",
+                "alt": "九枚叶子"
+              }
+            }
+          }
+        },
+        {
+          "id": "hear-ten",
+          "question": "Ten rulers. Find the card.",
+          "skill": "听辨 Ten 和十件",
+          "answer": [
+            "A"
+          ],
+          "analysis": "Ten 表示十。正确图两排各五把尺，每把只数一次。",
+          "visual": {
+            "kind": "asset",
+            "image": "project-board",
+            "alt": "一张尚未放贴图的展卡"
+          },
+          "options": {
+            "A": {
+              "label": "两排各五把尺，一共十把",
+              "visual": {
+                "kind": "asset",
+                "image": "q-ten-a",
+                "alt": "两排各五把尺，一共十把"
+              }
+            },
+            "B": {
+              "label": "九把尺",
+              "visual": {
+                "kind": "asset",
+                "image": "q-ten-b",
+                "alt": "九把尺"
+              }
+            },
+            "C": {
+              "label": "八把尺",
+              "visual": {
+                "kind": "asset",
+                "image": "q-ten-c",
+                "alt": "八把尺"
+              }
+            }
+          }
+        },
+        {
+          "id": "finish-six",
+          "question": "Make six. Which card is ready?",
+          "skill": "听目标后放够六枚",
+          "answer": [
+            "C"
+          ],
+          "analysis": "Six 是六。正确图是六枚叶子，分开摆，没有压在一起。",
+          "visual": {
+            "kind": "asset",
+            "image": "project-board",
+            "alt": "一张尚未放贴图的展卡"
+          },
+          "options": {
+            "A": {
+              "label": "五枚错开摆的叶子",
+              "visual": {
+                "kind": "asset",
+                "image": "q-six-a",
+                "alt": "五枚错开摆的叶子"
+              }
+            },
+            "B": {
+              "label": "七枚错开摆的叶子",
+              "visual": {
+                "kind": "asset",
+                "image": "q-six-b",
+                "alt": "七枚错开摆的叶子"
+              }
+            },
+            "C": {
+              "label": "六枚错开摆的叶子",
+              "visual": {
+                "kind": "asset",
+                "image": "q-six-c",
+                "alt": "六枚错开摆的叶子"
+              }
+            }
+          }
+        },
+        {
+          "id": "four-rulers",
+          "question": "How many rulers? Four. Find it.",
+          "skill": "只数所问的尺",
+          "answer": [
+            "B"
+          ],
+          "analysis": "听到 rulers，只数尺。正确图有四把尺，书不用算进去。",
+          "visual": {
+            "kind": "asset",
+            "image": "paper-ruler",
+            "alt": "一把尺的图，提示被问的种类"
+          },
+          "options": {
+            "A": {
+              "label": "三把尺、四本书",
+              "visual": {
+                "kind": "asset",
+                "image": "q-ruler-a",
+                "alt": "三把尺、四本书"
+              }
+            },
+            "B": {
+              "label": "四把尺、两本书",
+              "visual": {
+                "kind": "asset",
+                "image": "q-ruler-b",
+                "alt": "四把尺、两本书"
+              }
+            },
+            "C": {
+              "label": "五把尺、两本书",
+              "visual": {
+                "kind": "asset",
+                "image": "q-ruler-c",
+                "alt": "五把尺、两本书"
+              }
+            }
+          }
+        },
+        {
+          "id": "nine-books",
+          "question": "How many books? Nine. Find it.",
+          "skill": "听数量与类别并匹配",
+          "answer": [
+            "A"
+          ],
+          "analysis": "Nine 是九。正确图里有九本书和一把尺，只数书。",
+          "visual": {
+            "kind": "asset",
+            "image": "paper-book",
+            "alt": "一本书的图，提示被问的种类"
+          },
+          "options": {
+            "A": {
+              "label": "九本书和一把尺",
+              "visual": {
+                "kind": "asset",
+                "image": "q-book-a",
+                "alt": "九本书和一把尺"
+              }
+            },
+            "B": {
+              "label": "八本书和一把尺",
+              "visual": {
+                "kind": "asset",
+                "image": "q-book-b",
+                "alt": "八本书和一把尺"
+              }
+            },
+            "C": {
+              "label": "十本书",
+              "visual": {
+                "kind": "asset",
+                "image": "q-book-c",
+                "alt": "十本书"
+              }
+            }
+          }
+        },
+        {
+          "id": "count-each-once",
+          "question": "How many? Seven. 哪张图每枚只数一次？",
+          "skill": "逐件核对后用英语报数",
+          "answer": [
+            "C"
+          ],
+          "analysis": "第三张给七枚叶子各标了一次。第一张重复数一枚，第二张漏数一枚。",
+          "visual": {
+            "kind": "asset",
+            "image": "q-track-stem",
+            "alt": "一张有七枚叶子的展卡"
+          },
+          "options": {
+            "A": {
+              "label": "七枚叶子，有一枚标两次、另一枚未标",
+              "visual": {
+                "kind": "asset",
+                "image": "q-track-a",
+                "alt": "七枚叶子，有一枚标两次、另一枚未标"
+              }
+            },
+            "B": {
+              "label": "七枚叶子，只给六枚标记",
+              "visual": {
+                "kind": "asset",
+                "image": "q-track-b",
+                "alt": "七枚叶子，只给六枚标记"
+              }
+            },
+            "C": {
+              "label": "七枚叶子，每枚一个计数标记",
+              "visual": {
+                "kind": "asset",
+                "image": "q-track-c",
+                "alt": "七枚叶子，每枚一个计数标记"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "closing",
+      "type": "slide",
+      "title": "带一张自己的拼贴回家",
+      "template": "title-picture",
+      "data": {
+        "title": "带一张自己的拼贴回家",
+        "picture": "project-sticker",
+        "caption": "听数　摆图　逐个数　问答"
+      },
+      "script": [
+        {
+          "say": "今天展板补好了。回家做一张自己的卡，要从哪里开始？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "先挑一个数，拿纸片或小物件摆成一格。请家人帮你准备。"
+        },
+        {
+          "say": "一枚一枚地放开。每点到一枚，就说一个英语数词。"
+        },
+        {
+          "say": "把图轻轻换个位置，再数一遍。数量对了，就给家人看。"
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "请家人指你的卡问 How many? 你用英语说有几个。"
+        },
+        {
+          "say": "再换你问，家人来答。别忘了只数问题说到的那一类。"
+        },
+        {
+          "say": "我们能从线上看到你的游戏和选图。家里的作品，记得实际展示。"
+        }
+      ]
+    }
+  ]
+}

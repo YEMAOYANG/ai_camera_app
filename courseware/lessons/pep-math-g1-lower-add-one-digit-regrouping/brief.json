@@ -1,0 +1,195 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "两位数加一位数（进位）",
+  "binding": {
+    "editionId": "pep-math-g1-lower-2022-standard",
+    "revisionId": "directory-6205d2037284e91f10b25edd",
+    "unitId": "ac9164b9-5eba-4c7e-9436-214fc2df042b",
+    "nodeId": "8aa04122-1fbe-46b5-928c-55f28db3ce41"
+  },
+  "authoredBy": "Codex /root/how_old",
+  "officialNotesSha256": "468557d87dc6294afe2d90a6eaa0c6c06f9b4bf8d304d76c2a9670640f04c6f2",
+  "scenario": "社区阅读角的纸书签打包站。纸书签每满十张放进透明套，旧套不拆，散件放在十格托盘上检验后一起清点。",
+  "goals": [
+    "能把两位数分成整十和几个一，识别新增的一位数与原有个位表示相同计数单位。",
+    "能口述并图示先合个位、再把所得与原有整十合起来，正确口算需要进位的和。",
+    "能把十个一恰好换成一个十，说明总数没变、十位多1，并正确处理换完没有零散时的个位0。",
+    "能对照换组前后核查是否丢了新十或重复计数，交换两个加数的位置时仍先找两部分的个位。"
+  ],
+  "goalSources": [
+    {
+      "skill": "split-units",
+      "target": "能把两位数分成整十和几个一，识别新增的一位数与原有个位表示相同计数单位。",
+      "source": "印44下半、课件7～13"
+    },
+    {
+      "skill": "two-step-addition",
+      "target": "能口述并图示先合个位、再把所得与原有整十合起来，正确口算需要进位的和。",
+      "source": "印44下半、印45第1题、教案3～4"
+    },
+    {
+      "skill": "one-ten-exchange",
+      "target": "能把十个一恰好换成一个十，说明总数没变、十位多1，并正确处理换完没有零散时的个位0。",
+      "source": "印44下半及印45、课件14～22"
+    },
+    {
+      "skill": "carry-check",
+      "target": "能对照换组前后核查是否丢了新十或重复计数，交换两个加数的位置时仍先找两部分的个位。",
+      "source": "印45～46相关练习、任务单2"
+    }
+  ],
+  "pageSequence": [
+    {
+      "key": "unpack-the-ones",
+      "kind": "teaching",
+      "plan": "27＋6的原创书签情境，指出原套与两部分散件。"
+    },
+    {
+      "key": "fill-one-ten-frame",
+      "kind": "teaching",
+      "plan": "先把7张和6张散件合起来；十格满后剩3张。追踪换前与换后的件数。"
+    },
+    {
+      "key": "put-back-original-tens",
+      "kind": "teaching",
+      "plan": "把一套十张和余3张与原2套合并，两步式与实物同数。"
+    },
+    {
+      "key": "compare-the-frames",
+      "kind": "teaching",
+      "plan": "同一原数并列比较未满十和超过十。单纯不进位仅作对照。"
+    },
+    {
+      "key": "pair-loose-bookmarks",
+      "kind": "game",
+      "plan": "落下的散件与真实下格散件合到给定个位小计，画出满的一组和余数。"
+    },
+    {
+      "key": "just-one-full-tray",
+      "kind": "teaching",
+      "plan": "72＋8恰好满十，个位没有零散，写0。"
+    },
+    {
+      "key": "read-the-other-way",
+      "kind": "teaching",
+      "plan": "8＋56，用位置不同但计数单位相同的方式说明为什么仍先合两个个位。"
+    },
+    {
+      "key": "deliver-regrouped-bookmarks",
+      "kind": "game",
+      "plan": "把真实原套与两堆散件箱推入完整总数对应码头，用掉一组十后展示实际换组结果。"
+    },
+    {
+      "key": "audit-the-tens",
+      "kind": "teaching",
+      "plan": "追踪错误是漏掉新套还是把新套再加一次，实物总数核对。"
+    },
+    {
+      "key": "picture-check",
+      "kind": "quiz",
+      "plan": "六道原创新图覆盖满十判定、第一步、最终结果、恰满十、交换位置和漏十。"
+    },
+    {
+      "key": "show-your-family",
+      "kind": "teaching",
+      "plan": "从新题出发请家人用纸条或十格板摆、说两步、再用接着数核查。"
+    }
+  ],
+  "games": [
+    {
+      "page": "pair-loose-bookmarks",
+      "template": "fallingTiles",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.fallingTiles",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "sum_pair",
+      "selection": "底行旧散件卡与当前新增散件落块实际相加，只有等于本关给定个位小计的两张才能消除。错误不计分；实际换好的一套和余件显示在图上。",
+      "levels": [
+        "小计11，先慢落少量搭配。",
+        "小计13，换三组不同拆法。",
+        "小计16，缩短间隔，换位置与三组拆法。"
+      ],
+      "demo": "指新增散件落块、底行旧散件及目标小计，真实横移/落下接一组再复位。",
+      "teacherAnchors": [
+        "game-goal",
+        "game-player",
+        "game-target"
+      ]
+    },
+    {
+      "page": "deliver-regrouped-bookmarks",
+      "template": "sortingDepot",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.sortingDepot",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "classification",
+      "selection": "每箱带真实原套与两堆散件图。只让推入完整和相符的码头；误漏新十、误多加新十都拒绝。展示该箱换好的总量图。",
+      "levels": [
+        "分两箱辨十位变化。",
+        "加恰好满十，个位写0。",
+        "换箱位置及一位数在左，按总量做三次交付。"
+      ],
+      "demo": "指原套、两个散堆和可用码头，真推一箱到正确码头再复位。",
+      "teacherAnchors": [
+        "game-player",
+        "game-target"
+      ]
+    }
+  ],
+  "quiz": [
+    {
+      "id": "which-loose-groups-fill",
+      "skill": "判别满十",
+      "prompt": "哪一盒的两堆散书签合在一起，能装满一套？",
+      "answer": "58＋4",
+      "position": 2
+    },
+    {
+      "id": "which-is-the-first-sum",
+      "skill": "两堆同单位相加",
+      "prompt": "四十九加六，先合两堆散张。哪张只画了这一步的结果？",
+      "answer": "15",
+      "position": 1
+    },
+    {
+      "id": "which-is-the-final-picture",
+      "skill": "保留原有整十并计入新十",
+      "prompt": "六十七加五，选换好后总量的图。",
+      "answer": "72",
+      "position": 3
+    },
+    {
+      "id": "pick-the-full-tray-result",
+      "skill": "恰好满十、个位0",
+      "prompt": "五十四加六，哪张是装完的图？",
+      "answer": "60",
+      "position": 2
+    },
+    {
+      "id": "one-digit-on-the-left",
+      "skill": "加数交换与两步",
+      "prompt": "七加七十六，先合散张后全站共多少？",
+      "answer": "83",
+      "position": 1
+    },
+    {
+      "id": "find-the-lost-ten",
+      "skill": "核查错误位置",
+      "prompt": "六十五加八少算一套。哪张图把它补回来了？",
+      "answer": "73",
+      "position": 3
+    }
+  ],
+  "afterClass": {
+    "familyTask": "从一条新算式摆纸条，先合散件、够十就换套，再合原套。请家人接着数验一次，实际完成等待观察。",
+    "weeklyQuestionSource": [
+      "分原整十与两堆散件",
+      "两步进位",
+      "个位0",
+      "反序加数",
+      "验算漏十重十"
+    ],
+    "evidence": "课内保留真实对接记录，课外摆、画与口述等待实际观察。"
+  },
+  "artAndLanguage": "纸书签图采用精确代码生成，十格、原套、新套与残留件数和语音一致。遮住非目标文字仍靠图、数码和口令操作。阅读角开场、背景、小车动作和完成贴纸采用本课内置 ImageGen 素材，开场图故障时使用本课原精确图。"
+}

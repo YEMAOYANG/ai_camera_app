@@ -1,0 +1,164 @@
+{
+  "schemaVersion": "mira.courseware.offline-art-plan.v1",
+  "style": "原创儿童绘本，柔软纸纹，轮廓清楚，统一光源。每个透明图格留透空间，不照搬教材图。不生成图中的汉字。",
+  "atlases": [
+    {
+      "id": "emotion-and-cart",
+      "rows": 3,
+      "columns": 3,
+      "assets": [
+        [
+          "mood-happy",
+          "同一个九岁以下中国小女孩头像，开心，眼睛微弯自然笑。橘黄色上衣、齐耳短发。"
+        ],
+        [
+          "mood-angry",
+          "同一橘衣小女孩头像，眉头紧锁、小嘴合起，生气。不要红脸爆火。"
+        ],
+        [
+          "mood-scared",
+          "同一橘衣小女孩头像，眼睁大，肩稍缩，害怕。不要惊悚。"
+        ],
+        [
+          "mood-sad",
+          "同一橘衣小女孩头像，眼神向下，一滴泪，难过。"
+        ],
+        [
+          "quiz-face-happy",
+          "另一位齐肩头发淡绿上衣中国孩子，笑得开心。"
+        ],
+        [
+          "quiz-face-angry",
+          "同一淡绿衣孩子，眉紧嘴闭，生气。"
+        ],
+        [
+          "quiz-face-scared",
+          "同一淡绿衣孩子，肩缩、眼睁大，害怕。"
+        ],
+        [
+          "merge-cart",
+          "暖木色字片小推车，有木槽和轮子，不写字。"
+        ],
+        [
+          "merge-cart-hop",
+          "同一小车，轻轻跳起的姿态，保留木槽和轮子。"
+        ]
+      ]
+    },
+    {
+      "id": "classroom-and-objects",
+      "rows": 2,
+      "columns": 3,
+      "assets": [
+        [
+          "launch-ball",
+          "浅青色玻璃弹珠，清晰圆轮廓，微橘光，不带字。"
+        ],
+        [
+          "sticker",
+          "圆形小贴纸，一朵浅橙花和墨绿叶，亮边，不印字。"
+        ],
+        [
+          "rooster",
+          "一只独立的公鸡，全身雪白羽毛、红鸡冠和红肉垂，尾羽白，侧面完整。"
+        ],
+        [
+          "quiz-calf",
+          "一只小牛跑在草地上，膝腿看清，不见文字。"
+        ],
+        [
+          "quiz-entry",
+          "一个小朋友抬脚走进打开的木门，门内明显有空间。"
+        ],
+        [
+          "quiz-thunder",
+          "闪电照亮一扇窗，一个淡绿衣孩子缩在门后，安全温和表情，不写声音。"
+        ]
+      ]
+    },
+    {
+      "id": "season-stories",
+      "rows": 3,
+      "columns": 3,
+      "assets": [
+        [
+          "bear-spring",
+          "同一小熊看见枝头的浅粉花，四季框春，不直接照教材造型。"
+        ],
+        [
+          "bear-summer",
+          "同一小熊看见繁密的新绿叶，四季框夏。"
+        ],
+        [
+          "bear-autumn",
+          "同一小熊看见树枝上的红果，四季框秋。"
+        ],
+        [
+          "bear-winter",
+          "同一小熊看见冬天裸树枝上的鸟窝，有小鸟。"
+        ],
+        [
+          "quiz-bear-winter",
+          "另一个角度，雪地小熊看向树上，构图只给线索，树梢鸟窝不进入画面。"
+        ],
+        [
+          "quiz-bird-nest",
+          "原创近景，枝杈有鸟巢、一只成鸟和小鸟，冬天枝杈。"
+        ],
+        [
+          "quiz-red-fruit",
+          "红果秋天树枝的近景，少量金色秋叶。"
+        ],
+        [
+          "quiz-spring-bloom",
+          "春树花枝近景，浅粉花，浅青新叶。"
+        ],
+        [
+          "morning-courtyard",
+          "早晨暖色，传统小院人家两扇门刚打开，庭中有人开始一天的生活，突出天亮，无文字。"
+        ]
+      ]
+    }
+  ],
+  "compositions": {
+    "four-moods": {
+      "canvas": [
+        816,
+        260
+      ],
+      "sources": [
+        "mood-happy",
+        "mood-angry",
+        "mood-scared",
+        "mood-sad"
+      ],
+      "layout": [
+        1,
+        4
+      ],
+      "captionText": false
+    },
+    "bear-seasons": {
+      "canvas": [
+        860,
+        540
+      ],
+      "sources": [
+        "bear-spring",
+        "bear-summer",
+        "bear-autumn",
+        "bear-winter"
+      ],
+      "layout": [
+        2,
+        2
+      ],
+      "captionText": false
+    }
+  },
+  "stage": {
+    "key": "stage",
+    "description": "宽幅 1280×720，暖色的教室字片工坊，圆木桌、分隔小木架和空格子，左上或角落少量道具；中部空出给互动层。不出现可读字、人物或品牌。"
+  },
+  "typographicCards": "art-source/garden8-glyph-cards.json"
+}

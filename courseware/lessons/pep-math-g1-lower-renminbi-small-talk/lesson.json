@@ -1,0 +1,936 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "小讲堂",
+  "description": "围绕人民币选问题、看线索、整理发现，练习把研究过程说给别人听。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小数老师",
+      "role": "teacher",
+      "gender": "male",
+      "voice": "Ethan",
+      "avatar": "/avatars/teacher-1.png",
+      "color": "#286956",
+      "persona": "引导孩子指着真实图形与数量解释观察和思考过程。"
+    }
+  },
+  "images": {
+    "compose-eight": {
+      "file": "assets/compose-eight.png"
+    },
+    "compose-seven": {
+      "file": "assets/compose-seven.png"
+    },
+    "exhibit-1": {
+      "file": "assets/exhibit-1.png"
+    },
+    "exhibit-cover": {
+      "file": "assets/exhibit-cover.png"
+    },
+    "exhibit-sticker": {
+      "file": "assets/exhibit-sticker.png"
+    },
+    "fox-jump": {
+      "file": "assets/fox-jump.png"
+    },
+    "fox-ready": {
+      "file": "assets/fox-ready.png"
+    },
+    "fox-run": {
+      "file": "assets/fox-run.png"
+    },
+    "gallery-backdrop": {
+      "file": "assets/gallery-backdrop.png"
+    },
+    "gorges": {
+      "file": "assets/gorges.png"
+    },
+    "guilin": {
+      "file": "assets/guilin.png"
+    },
+    "hall": {
+      "file": "assets/hall.png"
+    },
+    "hall-reference": {
+      "file": "assets/hall-reference.png"
+    },
+    "historical-shapes": {
+      "file": "assets/historical-shapes.png"
+    },
+    "hop-clues-1": {
+      "file": "assets/hop-clues-1.png"
+    },
+    "hop-clues-2": {
+      "file": "assets/hop-clues-2.png"
+    },
+    "hop-clues-3": {
+      "file": "assets/hop-clues-3.png"
+    },
+    "landmark-gallery": {
+      "file": "assets/landmark-gallery.png"
+    },
+    "leaf-marble": {
+      "file": "assets/leaf-marble.png"
+    },
+    "marble-1": {
+      "file": "assets/marble-1.png"
+    },
+    "marble-10": {
+      "file": "assets/marble-10.png"
+    },
+    "marble-100": {
+      "file": "assets/marble-100.png"
+    },
+    "marble-20": {
+      "file": "assets/marble-20.png"
+    },
+    "marble-5": {
+      "file": "assets/marble-5.png"
+    },
+    "observe-together": {
+      "file": "assets/observe-together.png"
+    },
+    "potala": {
+      "file": "assets/potala.png"
+    },
+    "potala-quiz": {
+      "file": "assets/potala-quiz.png"
+    },
+    "q1-a": {
+      "file": "assets/q1-a.png"
+    },
+    "q1-b": {
+      "file": "assets/q1-b.png"
+    },
+    "q1-c": {
+      "file": "assets/q1-c.png"
+    },
+    "q1-stem": {
+      "file": "assets/q1-stem.png"
+    },
+    "q2-stem": {
+      "file": "assets/q2-stem.png"
+    },
+    "q3-c": {
+      "file": "assets/q3-c.png"
+    },
+    "q3-stem": {
+      "file": "assets/q3-stem.png"
+    },
+    "q4-a": {
+      "file": "assets/q4-a.png"
+    },
+    "q4-b": {
+      "file": "assets/q4-b.png"
+    },
+    "q4-c": {
+      "file": "assets/q4-c.png"
+    },
+    "q4-stem": {
+      "file": "assets/q4-stem.png"
+    },
+    "q5-a": {
+      "file": "assets/q5-a.png"
+    },
+    "q5-b": {
+      "file": "assets/q5-b.png"
+    },
+    "q5-c": {
+      "file": "assets/q5-c.png"
+    },
+    "q5-stem": {
+      "file": "assets/q5-stem.png"
+    },
+    "q6-a": {
+      "file": "assets/q6-a.png"
+    },
+    "q6-b": {
+      "file": "assets/q6-b.png"
+    },
+    "q6-c": {
+      "file": "assets/q6-c.png"
+    },
+    "questions-four": {
+      "file": "assets/questions-four.png"
+    },
+    "see-through": {
+      "file": "assets/see-through.png"
+    },
+    "series-study": {
+      "file": "assets/series-study.png"
+    },
+    "share-empty": {
+      "file": "assets/share-empty.png"
+    },
+    "share-steps": {
+      "file": "assets/share-steps.png"
+    },
+    "taishan": {
+      "file": "assets/taishan.png"
+    },
+    "touch-swatch": {
+      "file": "assets/touch-swatch.png"
+    },
+    "westlake": {
+      "file": "assets/westlake.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "choose-an-exhibit-question",
+      "type": "slide",
+      "title": "先挑一个想研究的问题",
+      "template": "two-columns",
+      "data": {
+        "title": "先挑一个想研究的问题",
+        "left": {
+          "heading": "从展品想到一个问题",
+          "body": "说清想查什么。"
+        },
+        "left_picture": "exhibit-cover",
+        "right": {
+          "heading": "四种可以查的线索",
+          "body": "挑一件和问题有关的。"
+        },
+        "right_picture": "questions-four"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "今天我们来做小小观察员。每个人选一个问题。"
+        },
+        {
+          "say": "我想查一张纸币背面画的建筑在哪里。"
+        },
+        {
+          "say": "我可以请老师或家人帮忙，找同一个地方的图片。"
+        },
+        {
+          "say": "把纸币背面的局部和找到的图片放在一起看。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "看展板，还有三个方向。以前的钱是什么样的？"
+        },
+        {
+          "say": "纸上的线索怎样看清？面额里的数字能怎样拼？"
+        },
+        {
+          "say": "先选一个自己最想查的。"
+        },
+        {
+          "say": "查什么，就找和它有关的图或物件。"
+        },
+        {
+          "say": "例如查建筑时，先看看屋顶、窗和柱子。"
+        }
+      ]
+    },
+    {
+      "key": "compare-a-back-design",
+      "type": "slide",
+      "title": "把背面图案和风景线索对一对",
+      "template": "two-columns",
+      "data": {
+        "title": "把背面图案和风景线索对一对",
+        "left": {
+          "heading": "先看一百元图例",
+          "body": "用柱子和长屋顶比对。"
+        },
+        "left_picture": "hall-reference",
+        "right": {
+          "heading": "再看看其他图例",
+          "body": "边听边在图卡上找。"
+        },
+        "right_picture": "landmark-gallery"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "这一百元样例的背面画的是人民大会堂。"
+        },
+        {
+          "say": "左边是建筑画，放大框里可以看清柱子。"
+        },
+        {
+          "say": "一根根柱子排成直线，上面连着一条长长的屋顶。"
+        },
+        {
+          "say": "两处有一样的柱列，才有线索把图对起来。"
+        },
+        {
+          "say": "一百元背面，先找排成一列的柱子。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "这组第五套图例里，五十元背面是布达拉宫。"
+        },
+        {
+          "say": "二十元背面，找水边一座座尖尖的山峰。"
+        },
+        {
+          "say": "这张图对应桂林山水，水边的山峰一座挨着一座。"
+        },
+        {
+          "say": "十元背面，找江水夹在高高山壁之间。"
+        },
+        {
+          "say": "江水穿过高山，这张图对应长江三峡。"
+        },
+        {
+          "say": "五元背面的地点，看看石阶和近处的松树。"
+        },
+        {
+          "say": "本课对照图用石阶和松树提示泰山。"
+        },
+        {
+          "say": "一元背面，找平静湖面和水里的小石塔。"
+        },
+        {
+          "say": "这张图对应杭州西湖的三潭印月。"
+        }
+      ]
+    },
+    {
+      "key": "aim-for-a-landmark",
+      "type": "interactive",
+      "title": "把线索送到能对上的风景图",
+      "widgetType": "courseware_game",
+      "page": "aim-for-a-landmark",
+      "startImage": "hall-reference",
+      "script": [
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#marble-clue"
+        },
+        {
+          "say": "一百元的线索卡上，有长屋顶和一排柱子。"
+        },
+        {
+          "highlight": "#marble-first"
+        },
+        {
+          "say": "中间图靶有一排柱子，像我们刚看的人民大会堂。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "弹珠已经对准中间。轻点发射，送到那张图上。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "highlight": "#marble-first"
+        },
+        {
+          "say": "弹珠碰到了柱列图。那块靶留下了一颗星。"
+        },
+        {
+          "say": "接下来换你。先听线索，再向左或向右瞄准。"
+        },
+        {
+          "say": "飞出去以后也能微调。没对上就再看一处特征。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "find-hall": "compare-a-back-design-6",
+        "find-guilin": "compare-a-back-design-9",
+        "find-gorges": "compare-a-back-design-11",
+        "find-taishan": "compare-a-back-design-13",
+        "find-westlake": "compare-a-back-design-15",
+        "find-hall-again": "organize-the-share-card-6",
+        "marble-hint": "organize-the-share-card-12",
+        "marble-help": "organize-the-share-card-13",
+        "marble-praise": "organize-the-share-card-14"
+      }
+    },
+    {
+      "key": "compare-examples-from-two-series",
+      "type": "slide",
+      "title": "看样式时，要看它是哪一套",
+      "template": "two-columns",
+      "data": {
+        "title": "看样式时，要看它是哪一套",
+        "left": {
+          "heading": "第四套和第五套图例",
+          "body": "观察展板上的数字和形状。"
+        },
+        "left_picture": "series-study",
+        "right": {
+          "heading": "更早的两种货币形状",
+          "body": "贝币和方孔圆钱。"
+        },
+        "right_picture": "historical-shapes"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "看左边这块展牌。第四套的样例里有二元。"
+        },
+        {
+          "say": "右边是第五套的二十元图例。二十元和二元是两个金额。"
+        },
+        {
+          "say": "在我们看的第五套图例里，找不到二元这一张。"
+        },
+        {
+          "say": "所以要连着套别说。可以说，第四套图例有二元。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "更早还有别的形状。左边这一件是贝币。"
+        },
+        {
+          "say": "右边是方孔圆钱。外面是圆形，中间有方孔。"
+        },
+        {
+          "say": "一个像小贝壳，一个像有方孔的圆片。"
+        },
+        {
+          "say": "想比较两件东西，先看它们的外形，再看展牌。"
+        }
+      ]
+    },
+    {
+      "key": "choose-how-to-observe",
+      "type": "slide",
+      "title": "先想想怎样让线索看得见",
+      "template": "two-columns",
+      "data": {
+        "title": "先想想怎样让线索看得见",
+        "left": {
+          "heading": "把练习纸片迎着光",
+          "body": "看透光处出现的图形。"
+        },
+        "left_picture": "see-through",
+        "right": {
+          "heading": "还可以转一转、摸一摸",
+          "body": "不同线索用不同办法。"
+        },
+        "right_picture": "observe-together"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "想看水印，可以让光穿过纸。"
+        },
+        {
+          "say": "把练习纸举到窗边，淡淡的叶形就显出来。"
+        },
+        {
+          "say": "这是练习示意图。看真实纸币样例时可以请大人帮忙。"
+        },
+        {
+          "say": "手在下边托稳，让光从后面照过来。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "有的样例上，转一转能看见数字或安全线变化。"
+        },
+        {
+          "say": "右边的练习条可以用手指轻轻摸一摸。"
+        },
+        {
+          "say": "触摸能帮我们找有些样例上的凸起。"
+        },
+        {
+          "say": "要看水印选透光，要感到凸起选触摸。"
+        },
+        {
+          "say": "先听要找哪种线索，再挑对应的办法。"
+        }
+      ]
+    },
+    {
+      "key": "combine-small-numbers",
+      "type": "slide",
+      "title": "用数字块拼出别的数",
+      "template": "two-columns",
+      "data": {
+        "title": "用数字块拼出别的数",
+        "left": {
+          "heading": "先用五和二",
+          "body": "两个数合成七。"
+        },
+        "left_picture": "compose-seven",
+        "right": {
+          "heading": "还可以加一个一",
+          "body": "七再加一得八。"
+        },
+        "right_picture": "compose-eight"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "纸币的面额会用到一、二、五、零这些数字。"
+        },
+        {
+          "say": "我们用数字块试试，一、二、五能拼出哪些数。"
+        },
+        {
+          "say": "先摆五，再放二。五加二等于七。"
+        },
+        {
+          "say": "看看两块都放进去了，读合计七。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "还可以在七的后面添上一。七加一等于八。"
+        },
+        {
+          "say": "这里的五、二、一都是数字块，拼的是合计数。"
+        },
+        {
+          "say": "二元是前面第四套样例的面额。两种图要分别读。"
+        },
+        {
+          "say": "从零开始，先加一，再加二，最后加五。"
+        },
+        {
+          "say": "换一组数字，先加二，再加五，再加二。"
+        },
+        {
+          "say": "这一关先加五，再依次加三个二。"
+        },
+        {
+          "say": "看看刚才的合计，再加下一块。"
+        },
+        {
+          "say": "亮台是这一步的合计，脚要落到台面上。"
+        },
+        {
+          "say": "每次加进一个数，你找对了新的合计。"
+        }
+      ]
+    },
+    {
+      "key": "hop-to-the-combined-count",
+      "type": "interactive",
+      "title": "按数字块的顺序跳到合计台",
+      "widgetType": "courseware_game",
+      "page": "hop-to-the-combined-count",
+      "startImage": "hop-clues-1",
+      "script": [
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#hop-clue"
+        },
+        {
+          "say": "图上排着一、二、五。我们从零开始。"
+        },
+        {
+          "say": "先加一，合计就变成一。要落到一号台。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "老师让小狐狸向右跑，同时按下跳跃。"
+        },
+        {
+          "highlight": "#hop-first"
+        },
+        {
+          "say": "跑的时间越长，落点越往右。盯住一号台。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "highlight": "#hop-first"
+        },
+        {
+          "say": "小狐狸落在一号台了，这一步已经把一加进去了。"
+        },
+        {
+          "say": "换你从零开始。每落稳一台，再想下一块要加几。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "hop-one": "combine-small-numbers-10",
+        "hop-two": "combine-small-numbers-11",
+        "hop-three": "combine-small-numbers-12",
+        "hop-hint": "combine-small-numbers-13",
+        "hop-help": "combine-small-numbers-14",
+        "hop-praise": "combine-small-numbers-15"
+      }
+    },
+    {
+      "key": "organize-the-share-card",
+      "type": "slide",
+      "title": "把问题、线索和发现摆成一张图",
+      "template": "two-columns",
+      "data": {
+        "title": "把问题、线索和发现摆成一张图",
+        "left": {
+          "heading": "把问题放在最前面",
+          "body": "我想查哪里。"
+        },
+        "left_picture": "exhibit-1",
+        "right": {
+          "heading": "接着说线索，再说发现",
+          "body": "指着三张卡讲。"
+        },
+        "right_picture": "share-steps"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "第一张放问题。我想知道一元背面的地方。"
+        },
+        {
+          "say": "第二张放看到的线索。我找到一张湖面图。"
+        },
+        {
+          "say": "两张图的水里都有小石塔，可以拿来对照。"
+        },
+        {
+          "say": "第三张放发现。这里是杭州西湖三潭印月。"
+        },
+        {
+          "say": "再找一百元背面的地点，看看哪张图有长柱列。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "你可以用同样的顺序讲一个自己的问题。"
+        },
+        {
+          "say": "先说想查什么，再说看到了什么，最后说发现。"
+        },
+        {
+          "say": "回想你做过的一件事。你找到了图，还是问了家人？"
+        },
+        {
+          "say": "把那件事画一画，或指着图讲给家人听。"
+        },
+        {
+          "say": "再听听线索，看哪张图有刚才说的特征。"
+        },
+        {
+          "say": "对照亮起来的图，瞄准那一块再发射。"
+        },
+        {
+          "say": "你用图里的特征找对了地点。"
+        }
+      ]
+    },
+    {
+      "key": "picture-quiz-one",
+      "type": "quiz",
+      "title": "找与问题有关的图",
+      "intro": [
+        "先听问题。",
+        "看清图里的线索，再选一张。"
+      ],
+      "questions": [
+        {
+          "id": "pick-evidence-for-an-unknown-building",
+          "skill": "选择与问题有关的线索",
+          "question": "想查背面画的是哪座建筑，先找哪组材料？",
+          "visual": {
+            "kind": "asset",
+            "image": "q1-stem",
+            "alt": "建筑局部加问号"
+          },
+          "options": {
+            "a": {
+              "label": "一组付款金额图",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-a",
+                "alt": "一组付款金额图"
+              }
+            },
+            "b": {
+              "label": "一张建筑局部和一张建筑对照图",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-b",
+                "alt": "一张建筑局部和一张建筑对照图"
+              }
+            },
+            "c": {
+              "label": "两盒数字牌",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-c",
+                "alt": "两盒数字牌"
+              }
+            }
+          },
+          "answer": [
+            "b"
+          ],
+          "analysis": "局部图和建筑图能拿来比较柱列、屋顶或外形，再找对应地点。"
+        },
+        {
+          "id": "match-potala-from-a-new-view",
+          "skill": "纸币背面图案和地点对应",
+          "question": "五十元图例的背面是布达拉宫。哪张图是它？",
+          "visual": {
+            "kind": "asset",
+            "image": "q2-stem",
+            "alt": "五十元面额展牌"
+          },
+          "options": {
+            "a": {
+              "label": "有石塔的西湖水面",
+              "visual": {
+                "kind": "asset",
+                "image": "westlake",
+                "alt": "有石塔的西湖水面"
+              }
+            },
+            "b": {
+              "label": "江水从高高的峡谷间经过",
+              "visual": {
+                "kind": "asset",
+                "image": "gorges",
+                "alt": "江水从高高的峡谷间经过"
+              }
+            },
+            "c": {
+              "label": "红白宫殿沿山坡层层展开",
+              "visual": {
+                "kind": "asset",
+                "image": "potala-quiz",
+                "alt": "红白宫殿沿山坡层层展开"
+              }
+            }
+          },
+          "answer": [
+            "c"
+          ],
+          "analysis": "布达拉宫是沿山坡层层展开的红白建筑。另两张分别有湖中石塔和峡谷江水。"
+        },
+        {
+          "id": "choose-the-action-for-a-watermark",
+          "skill": "选择对应的观察动作",
+          "question": "这张练习纸里有水印。哪种动作能看清它？",
+          "visual": {
+            "kind": "asset",
+            "image": "q3-stem",
+            "alt": "纸片上有淡淡的叶形和一个问号"
+          },
+          "options": {
+            "a": {
+              "label": "把纸片举在光前看",
+              "visual": {
+                "kind": "asset",
+                "image": "see-through",
+                "alt": "把纸片举在光前看"
+              }
+            },
+            "b": {
+              "label": "用指尖摸纸片上的凸纹",
+              "visual": {
+                "kind": "asset",
+                "image": "touch-swatch",
+                "alt": "用指尖摸纸片上的凸纹"
+              }
+            },
+            "c": {
+              "label": "把三块数字牌排成一行",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-c",
+                "alt": "把三块数字牌排成一行"
+              }
+            }
+          },
+          "answer": [
+            "a"
+          ],
+          "analysis": "让光透过纸片，水印更容易看清。"
+        }
+      ]
+    },
+    {
+      "key": "picture-quiz-two",
+      "type": "quiz",
+      "title": "比较样例并整理发现",
+      "intro": [
+        "想一想你要比较什么。",
+        "也可以用手指沿着图上的顺序找。"
+      ],
+      "questions": [
+        {
+          "id": "choose-two-different-series",
+          "skill": "区分不同套别与同套样例",
+          "question": "想看两套纸币样式有什么不同，先拿哪两张样例？",
+          "visual": {
+            "kind": "asset",
+            "image": "q4-stem",
+            "alt": "两个等着放入样例的空位"
+          },
+          "options": {
+            "a": {
+              "label": "第四套同一张样例的两面",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-a",
+                "alt": "第四套同一张样例的两面"
+              }
+            },
+            "b": {
+              "label": "第四套样例和第五套样例",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-b",
+                "alt": "第四套样例和第五套样例"
+              }
+            },
+            "c": {
+              "label": "同一套的两张一样的样例",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-c",
+                "alt": "同一套的两张一样的样例"
+              }
+            }
+          },
+          "answer": [
+            "b"
+          ],
+          "analysis": "要比较不同套别，样例要分别来自第四套和第五套。"
+        },
+        {
+          "id": "compose-twelve-from-small-blocks",
+          "skill": "用数字块拼成指定合计",
+          "question": "要用数字块拼出十二，哪一组正好？",
+          "visual": {
+            "kind": "asset",
+            "image": "q5-stem",
+            "alt": "目标数十二"
+          },
+          "options": {
+            "a": {
+              "label": "五、五、一",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-a",
+                "alt": "五、五、一"
+              }
+            },
+            "b": {
+              "label": "五、五、五",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-b",
+                "alt": "五、五、五"
+              }
+            },
+            "c": {
+              "label": "五、五、二",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-c",
+                "alt": "五、五、二"
+              }
+            }
+          },
+          "answer": [
+            "c"
+          ],
+          "analysis": "五加五等于十，十再加二，正好是十二。"
+        },
+        {
+          "id": "put-a-sharing-card-in-order",
+          "skill": "按问题、线索、发现整理分享",
+          "question": "小讲堂要讲一次完整的研究。哪张分享卡适合照着讲？",
+          "visual": {
+            "kind": "asset",
+            "image": "share-empty",
+            "alt": "三张空白分享卡依次用箭头连接"
+          },
+          "options": {
+            "a": {
+              "label": "问题图、两张对照图、发现图",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-a",
+                "alt": "问题图、两张对照图、发现图"
+              }
+            },
+            "b": {
+              "label": "发现图、问题图、两张对照图",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-b",
+                "alt": "发现图、问题图、两张对照图"
+              }
+            },
+            "c": {
+              "label": "两张对照图、发现图、问题图",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-c",
+                "alt": "两张对照图、发现图、问题图"
+              }
+            }
+          },
+          "answer": [
+            "a"
+          ],
+          "analysis": "先说明想查什么，再指着线索图，最后说你发现了什么。"
+        }
+      ]
+    }
+  ]
+}

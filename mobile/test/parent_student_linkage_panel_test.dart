@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -217,18 +218,85 @@ void main() {
       expect(find.text('继续下一能力点。'), findsOneWidget);
     },
   );
+
+  testWidgets(
+    'science report separates simulated views from real observations',
+    (tester) async {
+      await _usePhoneViewport(tester);
+      final observedImages = <LearningObservationImageKey>{};
+      final sha = 'a' * 64;
+      final report = LearningReport.fromJson({
+        'id': 'report-1',
+        'childId': 'child-1',
+        'subjectLabel': '科学',
+        'summary': '已完成小检查',
+        'observationCards': [
+          {
+            'kind': 'simulation',
+            'title': '看看杯口',
+            'familyTask': '和家人看看家里的杯子',
+            'levels': [
+              {
+                'label': '第一关',
+                'trials': [
+                  {
+                    'label': '放好杯子',
+                    'top': {'label': '杯口是圆的', 'imageSha256': sha},
+                    'side': {'label': '杯子稳稳站着', 'imageSha256': sha},
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      });
+      await _pumpPanel(
+        tester,
+        student: _FakeStudentAccessRepository(
+          onList: (_) async => _authorizationList(),
+        ),
+        reports: _FakeReportsGateway(
+          onList: (_) async => _reportPage(),
+          onDetail: ({required childId, required reportId}) async => report,
+        ),
+        observationImage: (key) async {
+          observedImages.add(key);
+          throw StateError('unavailable in fixture');
+        },
+      );
+      await tester.tap(
+        find.byKey(const ValueKey('openStudentAccessManagement')),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('learningReport-report-1')));
+      await tester.pumpAndSettle();
+      expect(find.text('模拟观察记录卡'), findsOneWidget);
+      expect(find.text('杯口是圆的'), findsOneWidget);
+      expect(find.text('杯子稳稳站着'), findsOneWidget);
+      expect(find.text('口头描述 · 待观察'), findsOneWidget);
+      expect(find.textContaining('和家人看看家里的杯子'), findsOneWidget);
+      expect(observedImages, {
+        (childId: 'child-1', reportId: 'report-1', sha256: sha),
+      });
+    },
+  );
 }
 
 Future<void> _pumpPanel(
   WidgetTester tester, {
   required StudentAccessRepository student,
   required ParentLearningReportsGateway reports,
+  Future<Uint8List> Function(LearningObservationImageKey)? observationImage,
 }) {
   return tester.pumpWidget(
     ProviderScope(
       overrides: [
         studentAccessRepositoryProvider.overrideWithValue(student),
         parentLearningReportsRepositoryProvider.overrideWithValue(reports),
+        if (observationImage != null)
+          learningObservationImageProvider.overrideWith(
+            (ref, key) => observationImage(key),
+          ),
       ],
       child: const MaterialApp(
         home: Scaffold(

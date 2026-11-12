@@ -1,0 +1,256 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "lesson": {
+    "editionId": "smartedu-english-six-year-g1-lower-sync-c8ae9406",
+    "revisionId": "directory-057e330e9b4c19ff0e6ab21e",
+    "nodeId": "0885a1ea-95c9-31ff-8781-cd89f28fa914",
+    "unitId": "4b46b93a-cc18-3483-b67b-688b159fcc0e",
+    "subject": "english",
+    "officialActivityId": "8aee80ce-63c9-a084-0163-cd9decf70e04",
+    "lessonTitle": "Unit 1",
+    "unitTitle": "Review Module",
+    "gradeCode": "primary_1",
+    "volume": "lower",
+    "schoolSystem": "six_year"
+  },
+  "teacher": {
+    "code": "mira_english_standard",
+    "voice": "Jennifer",
+    "gender": "female"
+  },
+  "goals": [
+    {
+      "id": "job",
+      "goal": "听人物与职业线索，选对应图；知道人物后再用 He’s a… 或 She’s a… 介绍。",
+      "pageRefs": [
+        "印62活动1–2",
+        "王琳教案p3–4",
+        "王琳课件p12–18"
+      ]
+    },
+    {
+      "id": "body",
+      "goal": "听 How many…? 先认身体部位，再在想象生物图上逐个数；复习 This is my… 和 These are my… 。",
+      "pageRefs": [
+        "印63活动3",
+        "王琳教案p2–3",
+        "王琳课件p7–10"
+      ]
+    },
+    {
+      "id": "guess",
+      "goal": "凭形状、声音或动作线索，用 Is it a…? 问并听懂 Yes, it is. / No, it isn’t. 。",
+      "pageRefs": [
+        "印63活动4",
+        "王琳教案p4",
+        "王琳课件p19–22"
+      ]
+    },
+    {
+      "id": "favourite",
+      "goal": "听清 Do you like…? 与最喜欢动物的问法，答与问题相合；根据图向家人做短介绍。",
+      "pageRefs": [
+        "印63活动4",
+        "王琳教案p4–5",
+        "王琳课件p23–28"
+      ]
+    }
+  ],
+  "keyPoint": "把职业、身体部位数量、动物猜测和喜好问答各配上正确的语音与图。",
+  "difficultPoint": "问几个时只数指定的一种；猜动物的问答与问喜好用不同回答。",
+  "authoring": {
+    "method": "direct_authoring",
+    "author": "Codex GPT-6",
+    "nativeGenerationSubmitted": false,
+    "reviewedOfficialHours": [
+      "第一课时"
+    ],
+    "gameTemplates": [
+      {
+        "id": "listenDelivery",
+        "version": 1,
+        "knowledgeRule": "listen_pick_deliver",
+        "levels": 3,
+        "progression": "先听选正确职业用品，再听人物送对；逐关加相近工作物件、不同人物及车道。"
+      },
+      {
+        "id": "magnetMarbles",
+        "version": 1,
+        "knowledgeRule": "listen_match",
+        "levels": 3,
+        "progression": "先以同部位不同数辨图，再加同数不同部位与复数，末关要修正移动靶。"
+      }
+    ]
+  },
+  "pageSequence": [
+    {
+      "page": 1,
+      "type": "slide",
+      "title": "谁来社区展示日",
+      "play": "以虚构家庭介绍卡引题，先听说哪位人物。",
+      "bookActivities": [
+        1,
+        2
+      ]
+    },
+    {
+      "page": 2,
+      "type": "slide",
+      "title": "先听人，再听工作",
+      "play": "对照两位人物与工作画面，练 He’s a… 和 She’s a… 。",
+      "bookActivities": [
+        1,
+        2
+      ]
+    },
+    {
+      "page": 3,
+      "type": "slide",
+      "title": "听一段小广播",
+      "play": "听两个示例，先找人物再选职业线索；另准备取货和送达的短口令。",
+      "bookActivities": [
+        1,
+        2
+      ]
+    },
+    {
+      "page": 4,
+      "type": "interactive",
+      "title": "送对职业图卡",
+      "play": "职业与人物各由语音确认，先拿用品再跨车道交到指定角色。",
+      "bookActivities": [
+        1,
+        2
+      ]
+    },
+    {
+      "page": 5,
+      "type": "slide",
+      "title": "这是什么部位",
+      "play": "用纸偶对照一个头、一双脚，复现单数/复数。",
+      "bookActivities": [
+        3
+      ]
+    },
+    {
+      "page": 6,
+      "type": "slide",
+      "title": "只数刚才问的部位",
+      "play": "先听身体部位，再按顺序点数，加入同数不同部位的比较。",
+      "bookActivities": [
+        3
+      ]
+    },
+    {
+      "page": 7,
+      "type": "interactive",
+      "title": "把弹珠送到对应图",
+      "play": "沿移动轨瞄准，一条身体部位和数量线索决定靶卡，错卡不进度。",
+      "bookActivities": [
+        3
+      ]
+    },
+    {
+      "page": 8,
+      "type": "slide",
+      "title": "猜动物，要问对",
+      "play": "用动作和形状先猜动物，练 Is it a…? 和肯否回答。",
+      "bookActivities": [
+        4
+      ]
+    },
+    {
+      "page": 9,
+      "type": "slide",
+      "title": "你喜欢，最喜欢呢",
+      "play": "分别答是否喜欢和具体最喜欢的动物；用自己可选的答案。",
+      "bookActivities": [
+        4
+      ]
+    },
+    {
+      "page": 10,
+      "type": "quiz",
+      "title": "听完选一张新图",
+      "play": "八题检职业、数量、问答理解，使用全新组合和素材。",
+      "bookActivities": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "page": 11,
+      "type": "slide",
+      "title": "带一张介绍卡回家",
+      "play": "回顾三类知识，并请家人听一段人物/身体/动物介绍。",
+      "bookActivities": [
+        1,
+        2,
+        3,
+        4
+      ]
+    }
+  ],
+  "quiz": [
+    {
+      "id": "review-one-q1",
+      "skill": "听辨职业",
+      "correctPositionOneBased": 2
+    },
+    {
+      "id": "review-one-q2",
+      "skill": "人物与职业线索",
+      "correctPositionOneBased": 1
+    },
+    {
+      "id": "review-one-q3",
+      "skill": "同类身体部位点数",
+      "correctPositionOneBased": 3
+    },
+    {
+      "id": "review-one-q4",
+      "skill": "听清名词和数量",
+      "correctPositionOneBased": 2
+    },
+    {
+      "id": "review-one-q5",
+      "skill": "动物确认问答",
+      "correctPositionOneBased": 3
+    },
+    {
+      "id": "review-one-q6",
+      "skill": "动物线索和身份",
+      "correctPositionOneBased": 1
+    },
+    {
+      "id": "review-one-q7",
+      "skill": "听最喜欢的动物",
+      "correctPositionOneBased": 2
+    },
+    {
+      "id": "review-one-q8",
+      "skill": "听喜欢和最喜欢",
+      "correctPositionOneBased": 3
+    }
+  ],
+  "afterClass": {
+    "official": [
+      "练习册及线上练习只见提示",
+      "回纸书听辨、点数、问答"
+    ],
+    "atHome": "选虚构人物和纸偶做介绍，请家人听。再问家人最喜欢的动物。不要求真实照片、录音或上传。",
+    "weekly": "职业与人物、身体部位和数量、动物识别与喜好进入周题源。"
+  },
+  "artPlan": {
+    "status": "waiting_disk_for_builtin_imagegen",
+    "assets": [
+      "社区小舞台背景和道具一板",
+      "职业用品和虚构角色透明图一板",
+      "动物独立题源一板",
+      "纸偶身体部位一板，代码保证数量和间距"
+    ],
+    "reuseOfficialArtwork": false
+  }
+}

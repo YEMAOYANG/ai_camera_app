@@ -1,0 +1,308 @@
+{
+  "schemaVersion": "mira.courseware.asset-composition.v1",
+  "key": "delivery-start",
+  "canvas": [
+    1280,
+    720
+  ],
+  "background": "#fff2d7",
+  "inputs": {
+    "delivery-backdrop": {
+      "file": "assets/illustrations/snake-backdrop.png",
+      "sha256": "6b405976d42b439891894d6d72d36512ef4438df7017e270e383506fd3c8d688"
+    },
+    "delivery-glider": {
+      "file": "assets/delivery-glider.png",
+      "sha256": "221a3f0a3ee668a6d47b9a6d2f8fbb6cb056e6a0c380716b385640ae7be077bc"
+    },
+    "recipient-turtle": {
+      "file": "assets/recipient-turtle.png",
+      "sha256": "3e40189f0da6be0949a5cf5ec4d783a48ae1145fabfb59a2be75ebcaf55c9a07"
+    },
+    "recipient-rabbit": {
+      "file": "assets/recipient-rabbit.png",
+      "sha256": "a9dc88cd738357ff6452e9bf41d43f08a4978c0ae18050d572cf822690082a9f"
+    },
+    "parcel-green-leaf": {
+      "file": "assets/parcel-green-leaf.png",
+      "sha256": "1e1b6a42f63f13e7f51d2d693a7b428da870e8e6f6438f5120ba52af1890b6df"
+    },
+    "parcel-yellow-leaf": {
+      "file": "assets/parcel-yellow-leaf.png",
+      "sha256": "00b922d178b19898f8a8cababcef5bbb33b8c0bcc46438c7d291d001bf3ff9e3"
+    },
+    "delivery-cart": {
+      "file": "assets/delivery-cart.png",
+      "sha256": "bd170ff20bd2314802630637e221e971d194b56d092cb1bfbd1186207bf61695"
+    }
+  },
+  "layers": [
+    {
+      "op": "background",
+      "asset": "delivery-backdrop"
+    },
+    {
+      "op": "roundrect",
+      "box": [
+        128,
+        259,
+        1152,
+        442
+      ],
+      "radius": 36,
+      "fill": "#687c6f"
+    },
+    {
+      "op": "line",
+      "points": [
+        [
+          180,
+          349
+        ],
+        [
+          225,
+          349
+        ]
+      ],
+      "fill": "#f8e9c9",
+      "width": 8
+    },
+    {
+      "op": "line",
+      "points": [
+        [
+          284,
+          349
+        ],
+        [
+          329,
+          349
+        ]
+      ],
+      "fill": "#f8e9c9",
+      "width": 8
+    },
+    {
+      "op": "line",
+      "points": [
+        [
+          388,
+          349
+        ],
+        [
+          433,
+          349
+        ]
+      ],
+      "fill": "#f8e9c9",
+      "width": 8
+    },
+    {
+      "op": "line",
+      "points": [
+        [
+          492,
+          349
+        ],
+        [
+          537,
+          349
+        ]
+      ],
+      "fill": "#f8e9c9",
+      "width": 8
+    },
+    {
+      "op": "line",
+      "points": [
+        [
+          596,
+          349
+        ],
+        [
+          641,
+          349
+        ]
+      ],
+      "fill": "#f8e9c9",
+      "width": 8
+    },
+    {
+      "op": "line",
+      "points": [
+        [
+          700,
+          349
+        ],
+        [
+          745,
+          349
+        ]
+      ],
+      "fill": "#f8e9c9",
+      "width": 8
+    },
+    {
+      "op": "line",
+      "points": [
+        [
+          804,
+          349
+        ],
+        [
+          849,
+          349
+        ]
+      ],
+      "fill": "#f8e9c9",
+      "width": 8
+    },
+    {
+      "op": "line",
+      "points": [
+        [
+          908,
+          349
+        ],
+        [
+          953,
+          349
+        ]
+      ],
+      "fill": "#f8e9c9",
+      "width": 8
+    },
+    {
+      "op": "line",
+      "points": [
+        [
+          1012,
+          349
+        ],
+        [
+          1057,
+          349
+        ]
+      ],
+      "fill": "#f8e9c9",
+      "width": 8
+    },
+    {
+      "op": "asset",
+      "asset": "delivery-glider",
+      "center": [
+        975,
+        349
+      ],
+      "size": [
+        174,
+        174
+      ]
+    },
+    {
+      "op": "roundrect",
+      "box": [
+        365,
+        63,
+        555,
+        248
+      ],
+      "radius": 24,
+      "fill": "#fff0ce"
+    },
+    {
+      "op": "roundrect",
+      "box": [
+        726,
+        63,
+        916,
+        248
+      ],
+      "radius": 24,
+      "fill": "#fff0ce"
+    },
+    {
+      "op": "roundrect",
+      "box": [
+        365,
+        467,
+        555,
+        652
+      ],
+      "radius": 24,
+      "fill": "#fff0ce"
+    },
+    {
+      "op": "roundrect",
+      "box": [
+        726,
+        467,
+        916,
+        652
+      ],
+      "radius": 24,
+      "fill": "#fff0ce"
+    },
+    {
+      "op": "asset",
+      "asset": "recipient-turtle",
+      "center": [
+        460,
+        151
+      ],
+      "size": [
+        184,
+        184
+      ]
+    },
+    {
+      "op": "asset",
+      "asset": "recipient-rabbit",
+      "center": [
+        820,
+        151
+      ],
+      "size": [
+        184,
+        184
+      ]
+    },
+    {
+      "op": "asset",
+      "asset": "parcel-green-leaf",
+      "center": [
+        460,
+        560
+      ],
+      "size": [
+        174,
+        174
+      ]
+    },
+    {
+      "op": "asset",
+      "asset": "parcel-yellow-leaf",
+      "center": [
+        820,
+        560
+      ],
+      "size": [
+        174,
+        174
+      ]
+    },
+    {
+      "op": "asset",
+      "asset": "delivery-cart",
+      "center": [
+        641,
+        578
+      ],
+      "size": [
+        176,
+        176
+      ]
+    }
+  ],
+  "paletteColors": 256
+}

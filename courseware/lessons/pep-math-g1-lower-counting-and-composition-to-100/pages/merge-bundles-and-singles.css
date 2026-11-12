@@ -1,0 +1,18 @@
+#merge-order-strip {
+  display: grid;
+  grid-auto-rows: 61px;
+  gap: 5px;
+  box-sizing: border-box;
+  padding: 7px;
+  border-radius: 14px;
+  border: 2px solid #6c8b72;
+  background: #fff2d6ed;
+}
+#merge-order-strip img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+#merge-order-strip img[hidden] {
+  display: none;
+}

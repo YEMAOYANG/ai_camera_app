@@ -1,0 +1,569 @@
+{
+  "schemaVersion": "mira.courseware.asset-provenance.v1",
+  "atlasReceipts": {
+    "tool-orthogonal-views": {
+      "path": "art-source/tool-orthogonal-views.receipt.json",
+      "sha256": "8542cfc91781a4216e9059fd5593acb756c68eb85ae16154fa4189dd07892748"
+    },
+    "transfer-picture-check": {
+      "path": "art-source/transfer-picture-check.receipt.json",
+      "sha256": "3ff6d9ab8468bc80b7bbaf56e1ebf3cf2f8fc5dd4c3b984f436aed3c4edc93d8"
+    },
+    "workshop-and-tools": {
+      "path": "art-source/workshop-and-tools.receipt.json",
+      "sha256": "f946ab1d98aa165f98fec5c86fcd4a9fff9a5c1f02b86040b3554813c88b1e8d"
+    }
+  },
+  "assets": {
+    "circle-task": {
+      "path": "assets/circle-task.png",
+      "sha256": "f5abc0076e768856165f43279351889a82a46cfac67646bb1da391892a51fd58",
+      "bytes": 6094,
+      "usedBy": [
+        "round-label"
+      ],
+      "source": "deterministic lesson artwork",
+      "renderSource": "art-source/tool-diagrams.mjs",
+      "renderSourceSha256": "a83b0dd64e2e6c7a3079236b552ec911b2d473d49f2029b233a582c397e4a718"
+    },
+    "driver-icon": {
+      "path": "assets/driver-icon.png",
+      "sha256": "204708ecffcef0e6c945ae6fd72c9dea6748ba482362018fbee391d7592abcf0",
+      "bytes": 140467,
+      "usedBy": [
+        "sort-tools"
+      ],
+      "source": "deterministic lesson artwork",
+      "renderSource": "art-source/tool-diagrams.mjs",
+      "renderSourceSha256": "a83b0dd64e2e6c7a3079236b552ec911b2d473d49f2029b233a582c397e4a718",
+      "input": "art-source/tool-orthogonal-views.png",
+      "inputSha256": "de505633f5b2c8a6475f8d67319b18ab99b769287a32ba0822a68e3f99905bca",
+      "sourceCrop": [
+        1197,
+        175,
+        1591,
+        330
+      ]
+    },
+    "driver-side": {
+      "path": "assets/driver-side.png",
+      "sha256": "7c8838ed50103c6b6d2033ce9d46f7d15b56a867b596ca1b028fac91592fd6c9",
+      "bytes": 115502,
+      "usedBy": [
+        "tool-camera"
+      ],
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/tool-orthogonal-views.png",
+      "generatedSourceSha256": "de505633f5b2c8a6475f8d67319b18ab99b769287a32ba0822a68e3f99905bca",
+      "promptSha256": "8fbe4db377688855fbd73f94fad92e4a6625a2b0fab8032cfdebfaa10d2aa411",
+      "sourceCrop": [
+        1196,
+        636,
+        1755,
+        809
+      ]
+    },
+    "driver-top": {
+      "path": "assets/driver-top.png",
+      "sha256": "3f5532f7ecf407cc0a063a562cabf6b9dead848535b110b61c3d396ae4f2b60a",
+      "bytes": 125516,
+      "usedBy": [
+        "compare-tool-ends",
+        "tool-camera"
+      ],
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/tool-orthogonal-views.png",
+      "generatedSourceSha256": "de505633f5b2c8a6475f8d67319b18ab99b769287a32ba0822a68e3f99905bca",
+      "promptSha256": "8fbe4db377688855fbd73f94fad92e4a6625a2b0fab8032cfdebfaa10d2aa411",
+      "sourceCrop": [
+        1197,
+        168,
+        1755,
+        346
+      ]
+    },
+    "long-tongs-grip": {
+      "path": "assets/long-tongs-grip.png",
+      "sha256": "6c32b69394bb33dcb3b1eea23fe0dc4eefccf8cd8671983c1d9a67aaa23aeeae",
+      "bytes": 235006,
+      "usedBy": [
+        "test-and-improve"
+      ],
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/workshop-and-tools.png",
+      "generatedSourceSha256": "30fdb6d20ea52b3e498261ce362d265fc6375f36ef4d153e9d89fb52446692e6",
+      "promptSha256": "668c4fc7b8a6877dc58723c83801d43e6b6b03344c1af17a2832a451c93a0508",
+      "sourceCrop": [
+        846,
+        7,
+        1251,
+        411
+      ]
+    },
+    "paper-cut-task": {
+      "path": "assets/paper-cut-task.png",
+      "sha256": "cfe2312ec1bc87a59621a58a0bfc29e2a0f945f6c434815700f4a63812a28451",
+      "bytes": 226720,
+      "usedBy": [
+        "sort-tools"
+      ],
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/workshop-and-tools.png",
+      "generatedSourceSha256": "30fdb6d20ea52b3e498261ce362d265fc6375f36ef4d153e9d89fb52446692e6",
+      "promptSha256": "668c4fc7b8a6877dc58723c83801d43e6b6b03344c1af17a2832a451c93a0508",
+      "sourceCrop": [
+        427,
+        422,
+        835,
+        820
+      ]
+    },
+    "paper-scoop": {
+      "path": "assets/paper-scoop.png",
+      "sha256": "8325f62505e1e9702128053d1783d150d4f9292d5bc1728210d0889dbe9023cb",
+      "bytes": 214049,
+      "usedBy": [
+        "paper-scoop"
+      ],
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/workshop-and-tools.png",
+      "generatedSourceSha256": "30fdb6d20ea52b3e498261ce362d265fc6375f36ef4d153e9d89fb52446692e6",
+      "promptSha256": "668c4fc7b8a6877dc58723c83801d43e6b6b03344c1af17a2832a451c93a0508",
+      "sourceCrop": [
+        846,
+        832,
+        1251,
+        1238
+      ]
+    },
+    "q-bag-changed": {
+      "path": "assets/q-bag-changed.png",
+      "sha256": "0451e562ea15afbf25dac54c8f2702ec186f37d1b5b19e853d5796a4c5a41d04",
+      "bytes": 237002,
+      "usedBy": [
+        "bag-question"
+      ],
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/transfer-picture-check.png",
+      "generatedSourceSha256": "9519318f2620d176f0c6e3f757972f1fdbaf274af97f2b73903764096e316dac",
+      "promptSha256": "a6db329f9e0e829054b2330837aa0e77b1bab3302f4fcd6df76048229eec5ad9",
+      "sourceCrop": [
+        1030,
+        689,
+        1524,
+        1011
+      ]
+    },
+    "q-bag-fair": {
+      "path": "assets/q-bag-fair.png",
+      "sha256": "90f29557dda42d123068513ed8c2d73e2fa8f94498d09bbb450c4647d63a0e06",
+      "bytes": 229788,
+      "usedBy": [
+        "bag-question"
+      ],
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/transfer-picture-check.png",
+      "generatedSourceSha256": "9519318f2620d176f0c6e3f757972f1fdbaf274af97f2b73903764096e316dac",
+      "promptSha256": "a6db329f9e0e829054b2330837aa0e77b1bab3302f4fcd6df76048229eec5ad9",
+      "sourceCrop": [
+        520,
+        689,
+        1015,
+        1011
+      ]
+    },
+    "q-bag-same-position": {
+      "path": "assets/q-bag-same-position.png",
+      "sha256": "d8bdb17689ae4de8b7899ceec15cfc7eceba735fe62dd9e185a942b43686f681",
+      "bytes": 166222,
+      "usedBy": [
+        "bag-question"
+      ],
+      "source": "deterministic lesson artwork",
+      "renderSource": "art-source/tool-diagrams.mjs",
+      "renderSourceSha256": "a83b0dd64e2e6c7a3079236b552ec911b2d473d49f2029b233a582c397e4a718",
+      "input": "assets/q-bag-fair.png",
+      "inputSha256": "90f29557dda42d123068513ed8c2d73e2fa8f94498d09bbb450c4647d63a0e06",
+      "sourceCrop": [
+        0,
+        0,
+        236,
+        322
+      ]
+    },
+    "q-clip-back": {
+      "path": "assets/q-clip-back.png",
+      "sha256": "d392304dbff82cc3296ef75162c0264db8299f8652cdb5258bcf32805e08a362",
+      "bytes": 233938,
+      "usedBy": [
+        "clip-contact"
+      ],
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/transfer-picture-check.png",
+      "generatedSourceSha256": "9519318f2620d176f0c6e3f757972f1fdbaf274af97f2b73903764096e316dac",
+      "promptSha256": "a6db329f9e0e829054b2330837aa0e77b1bab3302f4fcd6df76048229eec5ad9",
+      "sourceCrop": [
+        12,
+        350,
+        505,
+        674
+      ]
+    },
+    "q-clip-side": {
+      "path": "assets/q-clip-side.png",
+      "sha256": "832dbb2451e9d6a8d9d42af310854718cab564364ac0e27b0f59198c675770b6",
+      "bytes": 215820,
+      "usedBy": [
+        "clip-contact"
+      ],
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/transfer-picture-check.png",
+      "generatedSourceSha256": "9519318f2620d176f0c6e3f757972f1fdbaf274af97f2b73903764096e316dac",
+      "promptSha256": "a6db329f9e0e829054b2330837aa0e77b1bab3302f4fcd6df76048229eec5ad9",
+      "sourceCrop": [
+        1030,
+        12,
+        1524,
+        333
+      ]
+    },
+    "q-clip-top": {
+      "path": "assets/q-clip-top.png",
+      "sha256": "a4910e84e9551b065b0c661531574c68d32d03a53448faf7389fb05db6f2f699",
+      "bytes": 224242,
+      "usedBy": [
+        "clip-contact"
+      ],
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/transfer-picture-check.png",
+      "generatedSourceSha256": "9519318f2620d176f0c6e3f757972f1fdbaf274af97f2b73903764096e316dac",
+      "promptSha256": "a6db329f9e0e829054b2330837aa0e77b1bab3302f4fcd6df76048229eec5ad9",
+      "sourceCrop": [
+        520,
+        12,
+        1015,
+        333
+      ]
+    },
+    "q-drawer-changed": {
+      "path": "assets/q-drawer-changed.png",
+      "sha256": "ce47a9326e2db07e36541c39bd7ae53b1eea255ff9f36139bd99cd497e093518",
+      "bytes": 240503,
+      "usedBy": [
+        "drawer-comparison"
+      ],
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/transfer-picture-check.png",
+      "generatedSourceSha256": "9519318f2620d176f0c6e3f757972f1fdbaf274af97f2b73903764096e316dac",
+      "promptSha256": "a6db329f9e0e829054b2330837aa0e77b1bab3302f4fcd6df76048229eec5ad9",
+      "sourceCrop": [
+        1030,
+        350,
+        1524,
+        674
+      ]
+    },
+    "q-drawer-color": {
+      "path": "assets/q-drawer-color.png",
+      "sha256": "fa4bdd3e29666225874c1abbf0bc66524aed3ffe2206f22856256a1e5011791e",
+      "bytes": 228348,
+      "usedBy": [
+        "drawer-comparison"
+      ],
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/transfer-picture-check.png",
+      "generatedSourceSha256": "9519318f2620d176f0c6e3f757972f1fdbaf274af97f2b73903764096e316dac",
+      "promptSha256": "a6db329f9e0e829054b2330837aa0e77b1bab3302f4fcd6df76048229eec5ad9",
+      "sourceCrop": [
+        12,
+        689,
+        505,
+        1011
+      ]
+    },
+    "q-drawer-fair": {
+      "path": "assets/q-drawer-fair.png",
+      "sha256": "afff7af6c7fcef26147ead408aba064e9b4ddd4205402d48ca95c5cb8e6c1097",
+      "bytes": 245119,
+      "usedBy": [
+        "drawer-comparison"
+      ],
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/transfer-picture-check.png",
+      "generatedSourceSha256": "9519318f2620d176f0c6e3f757972f1fdbaf274af97f2b73903764096e316dac",
+      "promptSha256": "a6db329f9e0e829054b2330837aa0e77b1bab3302f4fcd6df76048229eec5ad9",
+      "sourceCrop": [
+        520,
+        350,
+        1015,
+        674
+      ]
+    },
+    "q-paper-tray": {
+      "path": "assets/q-paper-tray.png",
+      "sha256": "f06c7cad77d325ed81ff26dbe9b9f8f4f59e89959b24e5e3c24be2180cd4dfc5",
+      "bytes": 237031,
+      "usedBy": [
+        "paper-scoop"
+      ],
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/transfer-picture-check.png",
+      "generatedSourceSha256": "9519318f2620d176f0c6e3f757972f1fdbaf274af97f2b73903764096e316dac",
+      "promptSha256": "a6db329f9e0e829054b2330837aa0e77b1bab3302f4fcd6df76048229eec5ad9",
+      "sourceCrop": [
+        12,
+        12,
+        505,
+        333
+      ]
+    },
+    "q-slot-cross": {
+      "path": "assets/q-slot-cross.png",
+      "sha256": "9c06c5974b10f97395e7b7b67de6ff449902e06cde97f67a98035278e617e042",
+      "bytes": 6505,
+      "usedBy": [
+        "matching-screw-tip"
+      ],
+      "source": "deterministic lesson artwork",
+      "renderSource": "art-source/tool-diagrams.mjs",
+      "renderSourceSha256": "a83b0dd64e2e6c7a3079236b552ec911b2d473d49f2029b233a582c397e4a718"
+    },
+    "q-tip-cross": {
+      "path": "assets/q-tip-cross.png",
+      "sha256": "d5acef6b21516bee6ab74bebdb77ee281823caf7864fe43470203024a80e2069",
+      "bytes": 6607,
+      "usedBy": [
+        "matching-screw-tip"
+      ],
+      "source": "deterministic lesson artwork",
+      "renderSource": "art-source/tool-diagrams.mjs",
+      "renderSourceSha256": "a83b0dd64e2e6c7a3079236b552ec911b2d473d49f2029b233a582c397e4a718"
+    },
+    "q-tip-flat": {
+      "path": "assets/q-tip-flat.png",
+      "sha256": "cacc07f94185ead6bb3d00f1f79fd42133eef4ab8e522a53e96c68bfb552f36f",
+      "bytes": 6694,
+      "usedBy": [
+        "matching-screw-tip"
+      ],
+      "source": "deterministic lesson artwork",
+      "renderSource": "art-source/tool-diagrams.mjs",
+      "renderSourceSha256": "a83b0dd64e2e6c7a3079236b552ec911b2d473d49f2029b233a582c397e4a718"
+    },
+    "q-tip-hex": {
+      "path": "assets/q-tip-hex.png",
+      "sha256": "ce788c49b333076a0ed0c7e4bd5aaf2e6cc1147345c5688f60bb8eab3e6fde70",
+      "bytes": 8451,
+      "usedBy": [
+        "matching-screw-tip"
+      ],
+      "source": "deterministic lesson artwork",
+      "renderSource": "art-source/tool-diagrams.mjs",
+      "renderSourceSha256": "a83b0dd64e2e6c7a3079236b552ec911b2d473d49f2029b233a582c397e4a718"
+    },
+    "ring-in-box": {
+      "path": "assets/ring-in-box.png",
+      "sha256": "69916a2ca6f76e5c2a729ad91a974aaa117fc6bc5594dbaf6f1a619078d85f39",
+      "bytes": 224554,
+      "usedBy": [
+        "draw-a-solution",
+        "open",
+        "sort-tools"
+      ],
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/workshop-and-tools.png",
+      "generatedSourceSha256": "30fdb6d20ea52b3e498261ce362d265fc6375f36ef4d153e9d89fb52446692e6",
+      "promptSha256": "668c4fc7b8a6877dc58723c83801d43e6b6b03344c1af17a2832a451c93a0508",
+      "sourceCrop": [
+        10,
+        7,
+        417,
+        411
+      ]
+    },
+    "scissors": {
+      "path": "assets/scissors.png",
+      "sha256": "568d8c96a2a01207c8df31f04763fc2b278830efbe018f59c72ef24e73ca20e6",
+      "bytes": 201714,
+      "usedBy": [
+        "paper-scoop",
+        "round-label",
+        "sort-tools",
+        "why-tools"
+      ],
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/workshop-and-tools.png",
+      "generatedSourceSha256": "30fdb6d20ea52b3e498261ce362d265fc6375f36ef4d153e9d89fb52446692e6",
+      "promptSha256": "668c4fc7b8a6877dc58723c83801d43e6b6b03344c1af17a2832a451c93a0508",
+      "sourceCrop": [
+        10,
+        422,
+        417,
+        820
+      ]
+    },
+    "screw-task": {
+      "path": "assets/screw-task.png",
+      "sha256": "318741be09b4d79e76bc975d23ca87dfc1fe52df304a4acecb7c8e814c63be6b",
+      "bytes": 219448,
+      "usedBy": [
+        "sort-tools"
+      ],
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/workshop-and-tools.png",
+      "generatedSourceSha256": "30fdb6d20ea52b3e498261ce362d265fc6375f36ef4d153e9d89fb52446692e6",
+      "promptSha256": "668c4fc7b8a6877dc58723c83801d43e6b6b03344c1af17a2832a451c93a0508",
+      "sourceCrop": [
+        846,
+        422,
+        1251,
+        820
+      ]
+    },
+    "short-tongs-miss": {
+      "path": "assets/short-tongs-miss.png",
+      "sha256": "c1875c5f3b4b0f31e2bcfa72858cd812ff1391cd71c2cbf71c457f90d02fd593",
+      "bytes": 230269,
+      "usedBy": [
+        "test-and-improve"
+      ],
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/workshop-and-tools.png",
+      "generatedSourceSha256": "30fdb6d20ea52b3e498261ce362d265fc6375f36ef4d153e9d89fb52446692e6",
+      "promptSha256": "668c4fc7b8a6877dc58723c83801d43e6b6b03344c1af17a2832a451c93a0508",
+      "sourceCrop": [
+        427,
+        7,
+        835,
+        411
+      ]
+    },
+    "short-tongs": {
+      "path": "assets/short-tongs.png",
+      "sha256": "9bea6cd320054052afdc1203374975fee1c530fd0a14eaacd897aa5df0ed8fcc",
+      "bytes": 202139,
+      "usedBy": [
+        "paper-scoop",
+        "round-label"
+      ],
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/workshop-and-tools.png",
+      "generatedSourceSha256": "30fdb6d20ea52b3e498261ce362d265fc6375f36ef4d153e9d89fb52446692e6",
+      "promptSha256": "668c4fc7b8a6877dc58723c83801d43e6b6b03344c1af17a2832a451c93a0508",
+      "sourceCrop": [
+        427,
+        832,
+        835,
+        1238
+      ]
+    },
+    "stencil-side": {
+      "path": "assets/stencil-side.png",
+      "sha256": "4ab0e22251d64fa1cf229627fab779153787d516a8374d050b2e985ee3e50b55",
+      "bytes": 65842,
+      "usedBy": [
+        "tool-camera",
+        "what-to-look-for"
+      ],
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/tool-orthogonal-views.png",
+      "generatedSourceSha256": "de505633f5b2c8a6475f8d67319b18ab99b769287a32ba0822a68e3f99905bca",
+      "promptSha256": "8fbe4db377688855fbd73f94fad92e4a6625a2b0fab8032cfdebfaa10d2aa411",
+      "sourceCrop": [
+        20,
+        688,
+        580,
+        802
+      ]
+    },
+    "stencil-top": {
+      "path": "assets/stencil-top.png",
+      "sha256": "255908bd996b392f55c226f390f895bc4446ab22eaba20f802a5570f68cca156",
+      "bytes": 166507,
+      "usedBy": [
+        "round-label",
+        "sort-tools",
+        "tool-camera",
+        "what-to-look-for"
+      ],
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/tool-orthogonal-views.png",
+      "generatedSourceSha256": "de505633f5b2c8a6475f8d67319b18ab99b769287a32ba0822a68e3f99905bca",
+      "promptSha256": "8fbe4db377688855fbd73f94fad92e4a6625a2b0fab8032cfdebfaa10d2aa411",
+      "sourceCrop": [
+        20,
+        122,
+        580,
+        378
+      ]
+    },
+    "tongs-side": {
+      "path": "assets/tongs-side.png",
+      "sha256": "8f0f4fc8c546152515030bbafc5d5e4d465e3c493f48bd7481c3e641fa703218",
+      "bytes": 111588,
+      "usedBy": [
+        "tool-camera"
+      ],
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/tool-orthogonal-views.png",
+      "generatedSourceSha256": "de505633f5b2c8a6475f8d67319b18ab99b769287a32ba0822a68e3f99905bca",
+      "promptSha256": "8fbe4db377688855fbd73f94fad92e4a6625a2b0fab8032cfdebfaa10d2aa411",
+      "sourceCrop": [
+        610,
+        626,
+        1165,
+        799
+      ]
+    },
+    "tongs-top": {
+      "path": "assets/tongs-top.png",
+      "sha256": "4c478dd2c50aeecc3d91f9795c19e872b3b6ad092d39256ab2474210fdc98bf9",
+      "bytes": 164311,
+      "usedBy": [
+        "compare-tool-ends",
+        "sort-tools",
+        "tool-camera"
+      ],
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/tool-orthogonal-views.png",
+      "generatedSourceSha256": "de505633f5b2c8a6475f8d67319b18ab99b769287a32ba0822a68e3f99905bca",
+      "promptSha256": "8fbe4db377688855fbd73f94fad92e4a6625a2b0fab8032cfdebfaa10d2aa411",
+      "sourceCrop": [
+        611,
+        126,
+        1165,
+        367
+      ]
+    },
+    "triangle-task": {
+      "path": "assets/triangle-task.png",
+      "sha256": "d61bd2a8c1acd890e3014a8a76a088563f1e9601a641efa97879c80e09dbdf76",
+      "bytes": 5502,
+      "usedBy": [
+        "sort-tools"
+      ],
+      "source": "deterministic lesson artwork",
+      "renderSource": "art-source/tool-diagrams.mjs",
+      "renderSourceSha256": "a83b0dd64e2e6c7a3079236b552ec911b2d473d49f2029b233a582c397e4a718"
+    },
+    "workshop-cart": {
+      "path": "assets/workshop-cart.png",
+      "sha256": "25b42b60a26c618bc1f11fab347a92c9fef0ef276f369f7685ea1259d5622a11",
+      "bytes": 226467,
+      "usedBy": [
+        "sort-tools"
+      ],
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/workshop-and-tools.png",
+      "generatedSourceSha256": "30fdb6d20ea52b3e498261ce362d265fc6375f36ef4d153e9d89fb52446692e6",
+      "promptSha256": "668c4fc7b8a6877dc58723c83801d43e6b6b03344c1af17a2832a451c93a0508",
+      "sourceCrop": [
+        10,
+        832,
+        417,
+        1238
+      ]
+    }
+  },
+  "review": "逐图与教材及相关配套页的人工对照已写入 official-notes.json。运行中的小屏状态待浏览器和实音验收。"
+}

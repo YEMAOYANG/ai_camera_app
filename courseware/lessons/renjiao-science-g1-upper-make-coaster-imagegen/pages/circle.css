@@ -1,0 +1,23 @@
+/* Keep the finished drawing and the trial's two views visible until the next round. */
+#ready img.pic {
+  object-fit: contain;
+  background: #fff8e9;
+}
+#gcard:has(#g-next), #finish {
+  background: transparent;
+  justify-content: flex-start;
+  padding-left: 44px;
+}
+#gcard:has(#g-next) .card, #finish .card {
+  width: 350px;
+  padding: 26px 20px 30px;
+}
+#gcard:has(#g-next) h1, #finish h1 {
+  font-size: 36px;
+}
+#gcard:has(#g-next) p, #finish p {
+  font-size: 24px;
+}
+#gcard .gstars {
+  font-size: 57px;
+}

@@ -1,0 +1,20 @@
+<section id="ceremony-activity" data-guided-media-activity data-phase="locked" aria-labelledby="ceremony-title">
+  <img id="ceremony-yard" src="__IMG:schoolyard-base__" alt="" draggable="false">
+  <div id="ceremony-line" aria-hidden="true"></div>
+  <img id="ceremony-flag" src="__IMG:ceremony-official-flag__" alt="中华人民共和国国旗" draggable="false">
+  <div id="ceremony-children" aria-hidden="true"></div>
+  <div id="ceremony-rope" data-media-gesture aria-hidden="true">
+    <span class="ceremony-grip">
+      <svg viewBox="0 0 40 40" focusable="false" aria-hidden="true">
+        <path d="M20 7v25m-10-9 10 9 10-9" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </span>
+  </div>
+  <div class="ceremony-heading">
+    <h1 id="ceremony-title">升国旗</h1>
+    <p id="ceremony-status" role="status">先听老师讲，再来升旗。</p>
+  </div>
+  <button type="button" id="ceremony-start" data-media-trigger disabled>升旗</button>
+  <p id="ceremony-done" data-media-completion hidden>国旗已升到旗杆顶端。</p>
+  <audio id="ceremony-anthem" data-guided-media preload="metadata" src="__AUDIO:ceremony-anthem__"></audio>
+</section>

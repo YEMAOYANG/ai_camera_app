@@ -1,0 +1,41 @@
+#trace-controls { position: absolute; inset: -86px -24px -82px; z-index: 8; pointer-events: none; }
+#trace-controls[hidden] { display: none; }
+#trace-controls button {
+  width: 96px;
+  height: 96px;
+  border: 3px solid #afcfc7;
+  border-radius: 22px;
+  background: #275649;
+  color: #fffaed;
+  font: 750 38px/1 sans-serif;
+  cursor: pointer;
+  pointer-events: auto;
+  touch-action: none;
+}
+#trace-controls button:active { background: #39806b; }
+#trace-controls button:focus-visible { outline: 5px solid #ffbf59; }
+#trace-replay { position: absolute; top: 24px; right: 236px; }
+#trace-music { position: absolute; top: 24px; right: 132px; }
+#trace-score {
+  position: absolute;
+  left: 170px;
+  top: 35px;
+  padding: 9px 12px;
+  border-radius: 16px;
+  background: #fffaf0;
+  color: #25453b;
+  font: 750 24px/1.2 sans-serif;
+}
+.trace-pad {
+  position: absolute;
+  top: 344px;
+  left: 110px;
+  display: grid;
+  grid-template-columns: repeat(3, 96px);
+  grid-template-rows: repeat(2, 96px);
+  gap: 9px;
+}
+[data-trace-direction="up"] { grid-area: 1 / 2; }
+[data-trace-direction="left"] { grid-area: 2 / 1; }
+[data-trace-direction="down"] { grid-area: 2 / 2; }
+[data-trace-direction="right"] { grid-area: 2 / 3; }

@@ -1,0 +1,486 @@
+{
+  "schemaVersion": "mira.courseware.asset-layout.v1",
+  "master": "quiz-cutouts",
+  "grid": [
+    [
+      "quiz-white-cat",
+      "quiz-white-dog",
+      "quiz-black-dog",
+      "quiz-orange-kite"
+    ],
+    [
+      "quiz-orange-box",
+      "quiz-yellow-kite",
+      "quiz-green-box",
+      "quiz-blue-house"
+    ],
+    [
+      "quiz-green-house",
+      "quiz-green-book",
+      "quiz-yellow-book",
+      "quiz-yellow-pencil"
+    ],
+    [
+      "quiz-red-bird",
+      "quiz-white-bird",
+      "quiz-blue-kite",
+      "quiz-blue-ball"
+    ],
+    [
+      "quiz-green-kite",
+      null,
+      null,
+      null
+    ]
+  ],
+  "columnBoundaries": [
+    0,
+    282,
+    560,
+    840,
+    1122
+  ],
+  "rowBoundaries": [
+    0,
+    307,
+    598,
+    850,
+    1120,
+    1402
+  ],
+  "boundaryRationale": "若干物品的脚和风筝尾越过等分格线，按母图可见留白调整边界，使每个独立物件完整且不带邻格。",
+  "tool": {
+    "library": "Pillow",
+    "version": "11.2.1",
+    "crop": "retain alpha≥64 connected components with at least 12 px; 5×5 mask dilation and original alpha retention; aspect-contained into 206×206 with 9 px padding",
+    "resample": "LANCZOS",
+    "pngEncoding": "optimize"
+  },
+  "sourceCrops": {
+    "quiz-white-cat": {
+      "row": 1,
+      "column": 1,
+      "rect": [
+        0,
+        0,
+        282,
+        307
+      ],
+      "opaqueBounds": [
+        55,
+        39,
+        247,
+        291
+      ],
+      "maskedBounds": [
+        53,
+        37,
+        249,
+        293
+      ],
+      "retainedComponentAreas": [
+        30177
+      ]
+    },
+    "quiz-white-dog": {
+      "row": 1,
+      "column": 2,
+      "rect": [
+        282,
+        0,
+        560,
+        307
+      ],
+      "opaqueBounds": [
+        40,
+        49,
+        247,
+        289
+      ],
+      "maskedBounds": [
+        38,
+        47,
+        249,
+        291
+      ],
+      "retainedComponentAreas": [
+        34274
+      ]
+    },
+    "quiz-black-dog": {
+      "row": 1,
+      "column": 3,
+      "rect": [
+        560,
+        0,
+        840,
+        307
+      ],
+      "opaqueBounds": [
+        35,
+        47,
+        242,
+        288
+      ],
+      "maskedBounds": [
+        33,
+        45,
+        244,
+        290
+      ],
+      "retainedComponentAreas": [
+        34475
+      ]
+    },
+    "quiz-orange-kite": {
+      "row": 1,
+      "column": 4,
+      "rect": [
+        840,
+        0,
+        1122,
+        307
+      ],
+      "opaqueBounds": [
+        48,
+        34,
+        242,
+        296
+      ],
+      "maskedBounds": [
+        46,
+        32,
+        244,
+        298
+      ],
+      "retainedComponentAreas": [
+        19653
+      ]
+    },
+    "quiz-orange-box": {
+      "row": 2,
+      "column": 1,
+      "rect": [
+        0,
+        307,
+        282,
+        598
+      ],
+      "opaqueBounds": [
+        23,
+        52,
+        270,
+        253
+      ],
+      "maskedBounds": [
+        21,
+        50,
+        272,
+        255
+      ],
+      "retainedComponentAreas": [
+        35370
+      ]
+    },
+    "quiz-yellow-kite": {
+      "row": 2,
+      "column": 2,
+      "rect": [
+        282,
+        307,
+        560,
+        598
+      ],
+      "opaqueBounds": [
+        56,
+        16,
+        246,
+        277
+      ],
+      "maskedBounds": [
+        54,
+        14,
+        248,
+        279
+      ],
+      "retainedComponentAreas": [
+        19177
+      ]
+    },
+    "quiz-green-box": {
+      "row": 2,
+      "column": 3,
+      "rect": [
+        560,
+        307,
+        840,
+        598
+      ],
+      "opaqueBounds": [
+        11,
+        55,
+        256,
+        253
+      ],
+      "maskedBounds": [
+        9,
+        53,
+        258,
+        255
+      ],
+      "retainedComponentAreas": [
+        34808
+      ]
+    },
+    "quiz-blue-house": {
+      "row": 2,
+      "column": 4,
+      "rect": [
+        840,
+        307,
+        1122,
+        598
+      ],
+      "opaqueBounds": [
+        10,
+        39,
+        250,
+        250
+      ],
+      "maskedBounds": [
+        8,
+        37,
+        252,
+        252
+      ],
+      "retainedComponentAreas": [
+        37449
+      ]
+    },
+    "quiz-green-house": {
+      "row": 3,
+      "column": 1,
+      "rect": [
+        0,
+        598,
+        282,
+        850
+      ],
+      "opaqueBounds": [
+        33,
+        20,
+        269,
+        228
+      ],
+      "maskedBounds": [
+        31,
+        18,
+        271,
+        230
+      ],
+      "retainedComponentAreas": [
+        35918
+      ]
+    },
+    "quiz-green-book": {
+      "row": 3,
+      "column": 2,
+      "rect": [
+        282,
+        598,
+        560,
+        850
+      ],
+      "opaqueBounds": [
+        33,
+        14,
+        253,
+        238
+      ],
+      "maskedBounds": [
+        31,
+        12,
+        255,
+        240
+      ],
+      "retainedComponentAreas": [
+        35717
+      ]
+    },
+    "quiz-yellow-book": {
+      "row": 3,
+      "column": 3,
+      "rect": [
+        560,
+        598,
+        840,
+        850
+      ],
+      "opaqueBounds": [
+        30,
+        15,
+        248,
+        235
+      ],
+      "maskedBounds": [
+        28,
+        13,
+        250,
+        237
+      ],
+      "retainedComponentAreas": [
+        34751
+      ]
+    },
+    "quiz-yellow-pencil": {
+      "row": 3,
+      "column": 4,
+      "rect": [
+        840,
+        598,
+        1122,
+        850
+      ],
+      "opaqueBounds": [
+        37,
+        15,
+        232,
+        238
+      ],
+      "maskedBounds": [
+        35,
+        13,
+        234,
+        240
+      ],
+      "retainedComponentAreas": [
+        12362
+      ]
+    },
+    "quiz-red-bird": {
+      "row": 4,
+      "column": 1,
+      "rect": [
+        0,
+        850,
+        282,
+        1120
+      ],
+      "opaqueBounds": [
+        32,
+        43,
+        269,
+        242
+      ],
+      "maskedBounds": [
+        30,
+        41,
+        271,
+        244
+      ],
+      "retainedComponentAreas": [
+        22167
+      ]
+    },
+    "quiz-white-bird": {
+      "row": 4,
+      "column": 2,
+      "rect": [
+        282,
+        850,
+        560,
+        1120
+      ],
+      "opaqueBounds": [
+        26,
+        42,
+        264,
+        245
+      ],
+      "maskedBounds": [
+        24,
+        40,
+        266,
+        247
+      ],
+      "retainedComponentAreas": [
+        22309
+      ]
+    },
+    "quiz-blue-kite": {
+      "row": 4,
+      "column": 3,
+      "rect": [
+        560,
+        850,
+        840,
+        1120
+      ],
+      "opaqueBounds": [
+        53,
+        17,
+        244,
+        263
+      ],
+      "maskedBounds": [
+        51,
+        15,
+        246,
+        265
+      ],
+      "retainedComponentAreas": [
+        18012
+      ]
+    },
+    "quiz-blue-ball": {
+      "row": 4,
+      "column": 4,
+      "rect": [
+        840,
+        850,
+        1122,
+        1120
+      ],
+      "opaqueBounds": [
+        25,
+        33,
+        234,
+        244
+      ],
+      "maskedBounds": [
+        23,
+        31,
+        236,
+        246
+      ],
+      "retainedComponentAreas": [
+        34589
+      ]
+    },
+    "quiz-green-kite": {
+      "row": 5,
+      "column": 1,
+      "rect": [
+        0,
+        1120,
+        282,
+        1402
+      ],
+      "opaqueBounds": [
+        63,
+        12,
+        259,
+        264
+      ],
+      "maskedBounds": [
+        61,
+        10,
+        261,
+        266
+      ],
+      "retainedComponentAreas": [
+        18633
+      ]
+    }
+  }
+}

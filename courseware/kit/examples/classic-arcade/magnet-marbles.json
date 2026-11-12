@@ -1,0 +1,11 @@
+{
+  "template": "magnetMarbles",
+  "title": "磁力弹珠",
+  "sub": "瞄准，发射！弹珠飞出去，还能用方向键拐弯。",
+  "art": {"backdrop": "marble-workshop.webp", "sticker": "sticker.webp", "frames":["marble.webp"]},
+  "levels": [
+    {"total":10,"speed":386,"drift":0,"queue":[4,8,7],"targets":[{"x":383,"value":3},{"x":553,"value":2},{"x":694,"value":6},{"x":859,"value":5}],"hints":["看看哪两颗能凑成十。","目标亮了，飞到一半也能拐弯。"]},
+    {"total":10,"speed":483,"drift":15,"queue":[9,2,5],"targets":[{"x":354,"value":5},{"x":517,"value":4},{"x":674,"value":1},{"x":836,"value":8}],"hints":["弹珠还没撞上，能再拐一点。","看亮起来的目标，再发射。"]},
+    {"total":10,"speed":585,"drift":29,"queue":[6,1,3,8],"targets":[{"x":367,"value":9},{"x":507,"value":2},{"x":649,"value":4},{"x":790,"value":6},{"x":931,"value":7}],"hints":["目标也在动，先瞄准再出手。","亮的那颗能配成一对。"]}
+  ]
+}

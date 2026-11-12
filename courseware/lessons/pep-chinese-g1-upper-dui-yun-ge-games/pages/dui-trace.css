@@ -1,0 +1,50 @@
+#gcard, #finish {
+  justify-content: flex-end;
+  background: rgba(255, 248, 231, 0.08);
+  padding-inline: 24px;
+}
+
+#gcard .card, #finish .card {
+  width: 360px;
+  padding-inline: 22px;
+}
+
+#gcard h1, #finish h1 { font-size: 46px; }
+
+#ready .btn.xl, #gcard .btn.xl, #finish .btn.xl { min-height: 94px; }
+#finish .dui-reward { display:block; width:160px; height:104px; object-fit:contain; margin:0 auto 10px; }
+#ready .pic { object-fit:contain; }
+
+#ready .dui-opening {
+  position: relative;
+  width: 560px;
+  height: 315px;
+  overflow: hidden;
+  border: 4px solid var(--line);
+  border-radius: 26px;
+  margin: 0 auto 10px;
+}
+.dui-opening img { object-fit: contain; }
+.dui-opening img[hidden] { display: none; }
+.dui-opening .dui-opening-scene {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.dui-opening-trace { background: #f9efd2; }
+.dui-opening-trace .dui-opening-scene { object-fit: fill; }
+.dui-opening-stroke {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.dui-opening-car {
+  position: absolute;
+  left: 164px;
+  top: 185px;
+  width: 82px;
+  height: 54px;
+}

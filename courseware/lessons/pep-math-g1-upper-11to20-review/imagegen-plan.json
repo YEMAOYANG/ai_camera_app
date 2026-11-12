@@ -1,0 +1,134 @@
+{
+  "atlasId": "museum-atlas",
+  "rows": 3,
+  "columns": 3,
+  "background": "transparent",
+  "assets": [
+    {
+      "assetKey": "museum-entry",
+      "description": "暖色展馆入口，有门和展示台",
+      "usedBy": [
+        "open-map"
+      ],
+      "crop": [
+        51,
+        48,
+        463,
+        353
+      ]
+    },
+    {
+      "assetKey": "depot-backdrop",
+      "description": "绿色储藏间，安静浅色中心",
+      "usedBy": [
+        "depot"
+      ],
+      "crop": [
+        494,
+        49,
+        906,
+        353
+      ]
+    },
+    {
+      "assetKey": "route-backdrop",
+      "description": "薄荷色展厅，安静中心",
+      "usedBy": [
+        "route-by-result"
+      ],
+      "crop": [
+        937,
+        48,
+        1349,
+        353
+      ]
+    },
+    {
+      "assetKey": "rover-idle",
+      "description": "橘色小车，静止帧",
+      "usedBy": [
+        "depot",
+        "route-by-result"
+      ],
+      "crop": [
+        52,
+        423,
+        446,
+        714
+      ]
+    },
+    {
+      "assetKey": "rover-moving",
+      "description": "同一辆车，行动帧",
+      "usedBy": [
+        "depot",
+        "route-by-result"
+      ],
+      "crop": [
+        495,
+        423,
+        898,
+        716
+      ]
+    },
+    {
+      "assetKey": "exhibit-flag",
+      "description": "橘色展位旗",
+      "usedBy": [
+        "depot",
+        "route-by-result",
+        "between-stops",
+        "finish-map"
+      ],
+      "crop": [
+        1037,
+        405,
+        1304,
+        717
+      ]
+    },
+    {
+      "assetKey": "blank-label",
+      "description": "单张木展品卡，由代码逐个计数",
+      "usedBy": [
+        "estimate-bundle",
+        "depot",
+        "calculate-from-groups",
+        "picture-check.q1",
+        "finish-map"
+      ],
+      "crop": [
+        77,
+        775,
+        427,
+        1086
+      ]
+    },
+    {
+      "assetKey": "wood-badge",
+      "description": "单个木徽，由代码逐个计数",
+      "usedBy": [
+        "picture-check.q5"
+      ],
+      "crop": [
+        493,
+        792,
+        904,
+        1078
+      ]
+    },
+    {
+      "assetKey": "paper-button",
+      "description": "单个纸扣，由代码逐个计数",
+      "usedBy": [
+        "picture-check.q4"
+      ],
+      "crop": [
+        982,
+        770,
+        1308,
+        1096
+      ]
+    }
+  ]
+}

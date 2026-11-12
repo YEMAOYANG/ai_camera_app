@@ -1,0 +1,150 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "lesson": "解决问题",
+  "binding": {
+    "editionId": "pep-math-g1-lower-2022-standard",
+    "revisionId": "directory-6205d2037284e91f10b25edd",
+    "nodeId": "f8a0cc09-7003-4abc-a346-aef8c7fc5223",
+    "unitId": "2eeba665-272f-4a55-b064-2be484fc77e4",
+    "lessonTitle": "解决问题",
+    "unitTitle": "二、20以内的退位减法",
+    "gradeCode": "primary_1",
+    "subject": "math",
+    "volume": "lower",
+    "schoolSystem": "six_year",
+    "classHours": [
+      "lesson_1"
+    ],
+    "teachingRevision": "1",
+    "classHour": "complete"
+  },
+  "teacherCode": "ethan",
+  "goals": [
+    "先听清或说清问题问的是哪件物品、哪个范围和哪一部分，再从题里挑可用的条件。",
+    "把总量和已知的一个部分画在同一整体图中，区分同单位但不属于所问整体的量，以及人数、天数等无关线索。",
+    "用总量减去已知部分求另一部分，说清所得是在问的那一组，并带上对应单位。",
+    "把答案和已知部分合回来，核对是否等于原总量，同时检查答的是原来的问题。",
+    "在另一道生活题中说明同一线索是否有用取决于所问的对象和范围，能口头提出含一个无关线索的问题。"
+  ],
+  "story": "图书角备好叶纹和波纹书签。管理员给出许多真实消息，请孩子先找这个问题用得到的，再送出正确的数量。",
+  "pageOrder": [
+    {
+      "id": "entry",
+      "focus": "一共有15张两种书签，叶纹7张，三人参加；先听要找波纹几张。"
+    },
+    {
+      "id": "ask-first",
+      "focus": "区分所求的物品与范围，挑总量和已知部分。人数留在图外。"
+    },
+    {
+      "id": "draw-the-whole",
+      "focus": "完整书签条与叶纹已知部分，波纹未知放在同一整体内，画出15−7。"
+    },
+    {
+      "id": "check-the-answer",
+      "focus": "去掉7张叶纹剩8张波纹；由7加8合回15，核对所问与单位。"
+    },
+    {
+      "id": "sort-the-clues",
+      "focus": "实推线索卡，按这个问题的范围选要用和先放旁边。三关混入人数、收纳盘、隔壁架同类书签。"
+    },
+    {
+      "id": "what-was-borrowed",
+      "focus": "原来14张标签，借过两天，留6张，求借出8张；不同于只问剩下。"
+    },
+    {
+      "id": "same-unit-new-scope",
+      "focus": "只问这架的波纹书签；隔壁架4张同单位书签不用。改问隔壁架，4张立即有用。"
+    },
+    {
+      "id": "deliver-the-missing",
+      "focus": "看问题、总数与已知部分，实际驾驶选择差值包并送给问题所指货盘。"
+    },
+    {
+      "id": "read-listen-check",
+      "focus": "用图和口头归纳问什么、找什么、怎么画与合回。"
+    },
+    {
+      "id": "six-picture-check",
+      "focus": "选择条件、求未知、排除同单位干扰、求已用、加法核对、切换所问范围。"
+    },
+    {
+      "id": "tell-it-at-home",
+      "focus": "用真实家庭安全物品编一题，有总数、已知部分和一条本问无关线索。"
+    }
+  ],
+  "games": [
+    {
+      "page": "sort-the-clues",
+      "template": "sortingDepot",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.sortingDepot",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "classification",
+      "levels": [
+        "本架一共12张，7张叶纹，3名孩子来帮忙；问波纹。",
+        "原有15张标签，剩8张，桌上有2个空盘；问已借。",
+        "本架14张，其中6张叶纹；隔壁架5张波纹、3名孩子；仍问本架波纹。"
+      ],
+      "demo": "圈当前问题卡、总数线索、放大镜托盘、小车。只把第一条总数推入一次。"
+    },
+    {
+      "page": "deliver-the-missing",
+      "template": "listenDelivery",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.listenDelivery",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "listen_pick_deliver",
+      "levels": [
+        "看同架总14、叶纹8，选6张给波纹盘。",
+        "总14已知波纹6求叶纹8；总16标签留7求已借9。",
+        "三单依次用13−5、15−6、12−8，按不同所求范围选对数量并穿过变速路线。"
+      ],
+      "demo": "圈左边关系图、首个货包和目的盘，小车只拿对的首包，交给孩子前清空。"
+    }
+  ],
+  "pictureQuiz": [
+    {
+      "skill": "按问题选择条件",
+      "answer": "A",
+      "design": "印章桌。印章贴11枚，其中月纹7枚，另有3个空盘。选择总量与月纹两条线索。",
+      "question": "两种贴纸十一枚，月纹七枚，空盘三个。星纹用哪两条？"
+    },
+    {
+      "skill": "用总量减已知部分",
+      "answer": "B",
+      "design": "风筝挂签13张，叶纹7张，晾晒2天。用13减7，得6张波纹挂签。",
+      "question": "两种风筝挂签十三张，七张叶纹，晾两天。波纹几张？"
+    },
+    {
+      "skill": "辨别同单位外部量",
+      "answer": "C",
+      "design": "圆顶帐篷12张签，其中叶纹3张。尖顶帐篷另有波纹4张。只求圆顶帐篷波纹9张。",
+      "question": "圆顶十二张，三张叶纹。尖顶波纹四张。圆顶波纹几张？"
+    },
+    {
+      "skill": "总量减剩下求已用",
+      "answer": "B",
+      "design": "演出票原有17张，剩9张，演出三天。问发出多少张票，算17减9得8。",
+      "question": "原有十七张演出票，演了三天，剩九张。发出几张？"
+    },
+    {
+      "skill": "加回去核对",
+      "answer": "A",
+      "design": "贺卡贴纸共11枚，月纹5枚。选择月纹5枚和星纹6枚正好合回11的图。",
+      "question": "贺卡两种贴纸共十一枚，五枚月纹。哪两组合回？"
+    },
+    {
+      "skill": "根据所问范围换条件",
+      "answer": "C",
+      "design": "圆顶入口18张，其中叶纹9张；尖顶入口有7张波纹入场签。问题指尖顶入口，直接数出7张。",
+      "question": "问尖顶入口的入场签，那里有几张波纹的？"
+    }
+  ],
+  "afterClass": {
+    "route": "家长和孩子从真实安全物件挑一个有总数和已知部分的问题，再加一个与问题无关的真实线索。画图、解答、合回检查。原教材练一练继续使用合法纸书。",
+    "observation": "家庭口头题和画图待观察。"
+  },
+  "weeklyQuestionSource": "六道原创图片题候选，正式审核与上架后自动进入周练。",
+  "evidenceBoundary": "课件与练习原图不进入孩子端。印16算法、印20全单元复习分属邻课。"
+}

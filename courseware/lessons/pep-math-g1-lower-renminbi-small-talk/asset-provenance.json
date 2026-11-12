@@ -1,0 +1,709 @@
+{
+  "schemaVersion": "mira.courseware.asset-provenance.v1",
+  "assets": {
+    "compose-eight": {
+      "path": "assets/compose-eight.png",
+      "sha256": "3546b886ba47ec1f503e64f63d2663bd2258472efd9d6bf2b74936c869a83b84",
+      "usedBy": [
+        "combine-small-numbers"
+      ],
+      "source": "exact-lesson-diagram",
+      "renderSource": "diagrams.py",
+      "renderSourceSha256": "9a9ce86a5fd5689f1a11ab7701e40a5ada49b0f01400047de24d260aea49ebac"
+    },
+    "compose-seven": {
+      "path": "assets/compose-seven.png",
+      "sha256": "0274f436bc0eded1627a36e78c8c1986981e4c5960d219430360fc80b83ebd47",
+      "usedBy": [
+        "combine-small-numbers"
+      ],
+      "source": "exact-lesson-diagram",
+      "renderSource": "diagrams.py",
+      "renderSourceSha256": "9a9ce86a5fd5689f1a11ab7701e40a5ada49b0f01400047de24d260aea49ebac"
+    },
+    "cowrie": {
+      "path": "assets/cowrie.png",
+      "sha256": "bc9c315a68e36b6a5ec38bac69900c21f326d2b091023c3e86484678206fb779",
+      "usedBy": [
+        "historical-shapes",
+        "questions-four"
+      ],
+      "source": "builtin-imagegen",
+      "original": "art-source/exhibit-sprites.png",
+      "originalSha256": "4798bb3ddc46d3413ea5393bea1abcdadfae7e72ad4a28afac93d61d188b2bbc",
+      "crop": [
+        512,
+        512,
+        1024,
+        1024
+      ]
+    },
+    "exhibit-1": {
+      "path": "assets/exhibit-1.png",
+      "sha256": "08d690332cb250dd8fe6fb951d488c4ebfa6b7f150ebd5f1806c283d1f3f7c59",
+      "usedBy": [
+        "organize-the-share-card"
+      ],
+      "source": "exact-lesson-diagram",
+      "renderSource": "diagrams.py",
+      "renderSourceSha256": "9a9ce86a5fd5689f1a11ab7701e40a5ada49b0f01400047de24d260aea49ebac"
+    },
+    "exhibit-cover": {
+      "path": "assets/exhibit-cover.png",
+      "sha256": "e10da09dc92ac2c401e3cd5ba88a7916343193dc629a5230fdc0145dfde25cc0",
+      "usedBy": [
+        "aim-for-a-landmark",
+        "choose-an-exhibit-question",
+        "hop-to-the-combined-count"
+      ],
+      "source": "builtin-imagegen",
+      "original": "art-source/exhibit-plates.png",
+      "originalSha256": "9671ab570afdfcd3638db784f0703d31b78f76d310d75ce4996f8a5963d024e5",
+      "crop": [
+        0,
+        0,
+        512,
+        512
+      ]
+    },
+    "exhibit-sticker": {
+      "path": "assets/exhibit-sticker.png",
+      "sha256": "dc1642734f9870e64eaa73102bc945133d3e35ecbf1536e7e7b29bea892ca381",
+      "usedBy": [
+        "aim-for-a-landmark",
+        "hop-to-the-combined-count"
+      ],
+      "source": "exact-lesson-diagram",
+      "renderSource": "diagrams.py",
+      "renderSourceSha256": "9a9ce86a5fd5689f1a11ab7701e40a5ada49b0f01400047de24d260aea49ebac"
+    },
+    "fox-jump": {
+      "path": "assets/fox-jump.png",
+      "sha256": "371f5e0ccaa0cea90e4a42e53b5e81fe246b478ece4af2770595d7c4ec23defa",
+      "usedBy": [
+        "hop-to-the-combined-count"
+      ],
+      "source": "builtin-imagegen",
+      "original": "art-source/exhibit-sprites.png",
+      "originalSha256": "4798bb3ddc46d3413ea5393bea1abcdadfae7e72ad4a28afac93d61d188b2bbc",
+      "crop": [
+        1024,
+        0,
+        1536,
+        512
+      ]
+    },
+    "fox-ready": {
+      "path": "assets/fox-ready.png",
+      "sha256": "97d69920dddf4d0facf8cd392855dfcaafcb5f3a32abbb600729d5d31f620e1e",
+      "usedBy": [
+        "hop-to-the-combined-count"
+      ],
+      "source": "builtin-imagegen",
+      "original": "art-source/exhibit-sprites.png",
+      "originalSha256": "4798bb3ddc46d3413ea5393bea1abcdadfae7e72ad4a28afac93d61d188b2bbc",
+      "crop": [
+        0,
+        0,
+        512,
+        512
+      ]
+    },
+    "fox-run": {
+      "path": "assets/fox-run.png",
+      "sha256": "449b6e7c559f9349b555748e01fdbbf35d29934e7ee44f8af2bc25f9d5629d5a",
+      "usedBy": [
+        "hop-to-the-combined-count"
+      ],
+      "source": "builtin-imagegen",
+      "original": "art-source/exhibit-sprites.png",
+      "originalSha256": "4798bb3ddc46d3413ea5393bea1abcdadfae7e72ad4a28afac93d61d188b2bbc",
+      "crop": [
+        512,
+        0,
+        1024,
+        512
+      ]
+    },
+    "gallery-backdrop": {
+      "path": "assets/gallery-backdrop.png",
+      "sha256": "540b4792b8af08d90f11c2e88f90945f70219ca24ac77224b4c127bdcf798495",
+      "usedBy": [
+        "aim-for-a-landmark",
+        "hop-to-the-combined-count"
+      ],
+      "source": "builtin-imagegen",
+      "original": "art-source/exhibit-plates.png",
+      "originalSha256": "9671ab570afdfcd3638db784f0703d31b78f76d310d75ce4996f8a5963d024e5",
+      "crop": [
+        512,
+        0,
+        1024,
+        512
+      ]
+    },
+    "gorges": {
+      "path": "assets/gorges.png",
+      "sha256": "85144d9d4489216faff9e265e8ce6ab37a190a7f14c2dc130bc43466fcbb153a",
+      "usedBy": [
+        "aim-for-a-landmark",
+        "landmark-gallery",
+        "marble-10",
+        "match-potala-from-a-new-view"
+      ],
+      "source": "builtin-imagegen",
+      "original": "art-source/landmark-plates.png",
+      "originalSha256": "6cde78d3a5384bf862d46f83f64fdc8ba90b545817dde383d9f670051969ea85",
+      "crop": [
+        0,
+        512,
+        512,
+        1024
+      ]
+    },
+    "guilin": {
+      "path": "assets/guilin.png",
+      "sha256": "78f62b91ea0953a25dea67c42a548b7e45fd46c631b4ee7a38cedf6317014b86",
+      "usedBy": [
+        "aim-for-a-landmark",
+        "landmark-gallery",
+        "marble-20",
+        "questions-four"
+      ],
+      "source": "builtin-imagegen",
+      "original": "art-source/landmark-plates.png",
+      "originalSha256": "6cde78d3a5384bf862d46f83f64fdc8ba90b545817dde383d9f670051969ea85",
+      "crop": [
+        1024,
+        0,
+        1536,
+        512
+      ]
+    },
+    "hall-reference": {
+      "path": "assets/hall-reference.png",
+      "sha256": "1b77f8e4070f23f475bd7fb61e449fa904cbf5f2b231af032c1b4e4f2e6a9f5e",
+      "usedBy": [
+        "aim-for-a-landmark",
+        "compare-a-back-design"
+      ],
+      "source": "exact-lesson-diagram",
+      "renderSource": "diagrams.py",
+      "renderSourceSha256": "9a9ce86a5fd5689f1a11ab7701e40a5ada49b0f01400047de24d260aea49ebac"
+    },
+    "hall": {
+      "path": "assets/hall.png",
+      "sha256": "1c9a43af7044ed560ab79b3b9db758156c6c90a689d8e75dc7b1debbc4233b7a",
+      "usedBy": [
+        "aim-for-a-landmark",
+        "hall-reference",
+        "marble-100",
+        "q1-b"
+      ],
+      "source": "builtin-imagegen",
+      "original": "art-source/landmark-plates.png",
+      "originalSha256": "6cde78d3a5384bf862d46f83f64fdc8ba90b545817dde383d9f670051969ea85",
+      "crop": [
+        0,
+        0,
+        512,
+        512
+      ]
+    },
+    "historical-shapes": {
+      "path": "assets/historical-shapes.png",
+      "sha256": "d41d8ed99764153eb65fc78d2fdadd4a23b34ee631f82059eb37d4ed42315b13",
+      "usedBy": [
+        "compare-examples-from-two-series"
+      ],
+      "source": "exact-lesson-diagram",
+      "renderSource": "diagrams.py",
+      "renderSourceSha256": "9a9ce86a5fd5689f1a11ab7701e40a5ada49b0f01400047de24d260aea49ebac"
+    },
+    "hop-clues-1": {
+      "path": "assets/hop-clues-1.png",
+      "sha256": "536ee077f1c5d3bcf2de0d36af077096ae493f0918e05572114a12e7d3d3df98",
+      "usedBy": [
+        "hop-to-the-combined-count"
+      ],
+      "source": "exact-lesson-diagram",
+      "renderSource": "diagrams.py",
+      "renderSourceSha256": "9a9ce86a5fd5689f1a11ab7701e40a5ada49b0f01400047de24d260aea49ebac"
+    },
+    "hop-clues-2": {
+      "path": "assets/hop-clues-2.png",
+      "sha256": "1b7f5bed115dbc22b2c07a2853bbdf94d7d6673a8d66cd9d4dce0ec609892998",
+      "usedBy": [
+        "hop-to-the-combined-count"
+      ],
+      "source": "exact-lesson-diagram",
+      "renderSource": "diagrams.py",
+      "renderSourceSha256": "9a9ce86a5fd5689f1a11ab7701e40a5ada49b0f01400047de24d260aea49ebac"
+    },
+    "hop-clues-3": {
+      "path": "assets/hop-clues-3.png",
+      "sha256": "9b6543281d811a285bd84e250d8653576a147db0082728083fa4730645974796",
+      "usedBy": [
+        "hop-to-the-combined-count"
+      ],
+      "source": "exact-lesson-diagram",
+      "renderSource": "diagrams.py",
+      "renderSourceSha256": "9a9ce86a5fd5689f1a11ab7701e40a5ada49b0f01400047de24d260aea49ebac"
+    },
+    "landmark-gallery": {
+      "path": "assets/landmark-gallery.png",
+      "sha256": "5fb08f4710c32e0e8a42a0b4785ba14d434734fa7438191d555d16c43d2c7719",
+      "usedBy": [
+        "compare-a-back-design"
+      ],
+      "source": "exact-lesson-diagram",
+      "renderSource": "diagrams.py",
+      "renderSourceSha256": "9a9ce86a5fd5689f1a11ab7701e40a5ada49b0f01400047de24d260aea49ebac"
+    },
+    "leaf-marble": {
+      "path": "assets/leaf-marble.png",
+      "sha256": "e2f41b913714236c80a44bbdb4d36a86b3e0ed58b7101cccd0aceefa291da385",
+      "usedBy": [
+        "aim-for-a-landmark"
+      ],
+      "source": "builtin-imagegen",
+      "original": "art-source/exhibit-sprites.png",
+      "originalSha256": "4798bb3ddc46d3413ea5393bea1abcdadfae7e72ad4a28afac93d61d188b2bbc",
+      "crop": [
+        0,
+        512,
+        512,
+        1024
+      ]
+    },
+    "marble-1": {
+      "path": "assets/marble-1.png",
+      "sha256": "fe0eb623dabf853b9ef2a718c24953fcda3c031bcaeb78c4535e1aa00785e758",
+      "usedBy": [
+        "aim-for-a-landmark"
+      ],
+      "source": "exact-lesson-diagram",
+      "renderSource": "diagrams.py",
+      "renderSourceSha256": "9a9ce86a5fd5689f1a11ab7701e40a5ada49b0f01400047de24d260aea49ebac"
+    },
+    "marble-10": {
+      "path": "assets/marble-10.png",
+      "sha256": "d097f6a32e5177f2c2244978f78ba61c76acebc8afc3c3449013e14d5f69198f",
+      "usedBy": [
+        "aim-for-a-landmark"
+      ],
+      "source": "exact-lesson-diagram",
+      "renderSource": "diagrams.py",
+      "renderSourceSha256": "9a9ce86a5fd5689f1a11ab7701e40a5ada49b0f01400047de24d260aea49ebac"
+    },
+    "marble-100": {
+      "path": "assets/marble-100.png",
+      "sha256": "db8bbf4a4bd3d531e999a35d9a448fb68c9868069d85cf4c88cba101efa1cf11",
+      "usedBy": [
+        "aim-for-a-landmark"
+      ],
+      "source": "exact-lesson-diagram",
+      "renderSource": "diagrams.py",
+      "renderSourceSha256": "9a9ce86a5fd5689f1a11ab7701e40a5ada49b0f01400047de24d260aea49ebac"
+    },
+    "marble-20": {
+      "path": "assets/marble-20.png",
+      "sha256": "56bf49b0fd9f8d2959462077eb2a1ae2dfc68320cdfc570add3413e26cc1064d",
+      "usedBy": [
+        "aim-for-a-landmark"
+      ],
+      "source": "exact-lesson-diagram",
+      "renderSource": "diagrams.py",
+      "renderSourceSha256": "9a9ce86a5fd5689f1a11ab7701e40a5ada49b0f01400047de24d260aea49ebac"
+    },
+    "marble-5": {
+      "path": "assets/marble-5.png",
+      "sha256": "2f104668a13d345b8efb596ecc636dd9908e305f7dad879ce691a7e32d4e05fd",
+      "usedBy": [
+        "aim-for-a-landmark"
+      ],
+      "source": "exact-lesson-diagram",
+      "renderSource": "diagrams.py",
+      "renderSourceSha256": "9a9ce86a5fd5689f1a11ab7701e40a5ada49b0f01400047de24d260aea49ebac"
+    },
+    "observe-together": {
+      "path": "assets/observe-together.png",
+      "sha256": "21d9f95d0a5f1e06eeb80fcf4c5171a06537f4a218df1f074234f0ce6c3ac8e9",
+      "usedBy": [
+        "choose-how-to-observe"
+      ],
+      "source": "exact-lesson-diagram",
+      "renderSource": "diagrams.py",
+      "renderSourceSha256": "9a9ce86a5fd5689f1a11ab7701e40a5ada49b0f01400047de24d260aea49ebac"
+    },
+    "potala-quiz": {
+      "path": "assets/potala-quiz.png",
+      "sha256": "a1967fa751663eac0f38bf03436a1c0989cf125ac23a4a7f0c854a9b1ccd5800",
+      "usedBy": [
+        "match-potala-from-a-new-view",
+        "q6-a",
+        "q6-b",
+        "q6-c"
+      ],
+      "source": "builtin-imagegen",
+      "original": "art-source/exhibit-plates.png",
+      "originalSha256": "9671ab570afdfcd3638db784f0703d31b78f76d310d75ce4996f8a5963d024e5",
+      "crop": [
+        1024,
+        0,
+        1536,
+        512
+      ]
+    },
+    "potala": {
+      "path": "assets/potala.png",
+      "sha256": "e534e3bc6f74b42a700088eb6448d7a2da043e237d6fdffb82b7518516410f38",
+      "usedBy": [
+        "aim-for-a-landmark",
+        "landmark-gallery",
+        "q6-a",
+        "q6-b",
+        "q6-c"
+      ],
+      "source": "builtin-imagegen",
+      "original": "art-source/landmark-plates.png",
+      "originalSha256": "6cde78d3a5384bf862d46f83f64fdc8ba90b545817dde383d9f670051969ea85",
+      "crop": [
+        512,
+        0,
+        1024,
+        512
+      ]
+    },
+    "q1-a": {
+      "path": "assets/q1-a.png",
+      "sha256": "8889219896e7264a24c84c467668e9494ca431dc1d77dd5c5fc2187e2c687249",
+      "usedBy": [
+        "pick-evidence-for-an-unknown-building"
+      ],
+      "source": "exact-lesson-diagram",
+      "renderSource": "diagrams.py",
+      "renderSourceSha256": "9a9ce86a5fd5689f1a11ab7701e40a5ada49b0f01400047de24d260aea49ebac"
+    },
+    "q1-b": {
+      "path": "assets/q1-b.png",
+      "sha256": "44c106f5ee4c458077799a870a515ae242c8661a67fe863db275c9541041cf46",
+      "usedBy": [
+        "pick-evidence-for-an-unknown-building"
+      ],
+      "source": "exact-lesson-diagram",
+      "renderSource": "diagrams.py",
+      "renderSourceSha256": "9a9ce86a5fd5689f1a11ab7701e40a5ada49b0f01400047de24d260aea49ebac"
+    },
+    "q1-c": {
+      "path": "assets/q1-c.png",
+      "sha256": "5e916efe5c07f6070dc9a4af719793ad97bea1261e42e2a2dfbfa520c903dc03",
+      "usedBy": [
+        "pick-evidence-for-an-unknown-building"
+      ],
+      "source": "exact-lesson-diagram",
+      "renderSource": "diagrams.py",
+      "renderSourceSha256": "9a9ce86a5fd5689f1a11ab7701e40a5ada49b0f01400047de24d260aea49ebac"
+    },
+    "q1-stem": {
+      "path": "assets/q1-stem.png",
+      "sha256": "a5c8723a907a16d7e9e4c7700190e4b0ce88f2bb7471dbaea8487e24b7b12b12",
+      "usedBy": [
+        "pick-evidence-for-an-unknown-building"
+      ],
+      "source": "exact-lesson-diagram",
+      "renderSource": "diagrams.py",
+      "renderSourceSha256": "9a9ce86a5fd5689f1a11ab7701e40a5ada49b0f01400047de24d260aea49ebac"
+    },
+    "q2-stem": {
+      "path": "assets/q2-stem.png",
+      "sha256": "379267d895d1fb99448798179e13e241b30c0a4eca3e7d6e55acb52e3725b71a",
+      "usedBy": [
+        "match-potala-from-a-new-view"
+      ],
+      "source": "exact-lesson-diagram",
+      "renderSource": "diagrams.py",
+      "renderSourceSha256": "9a9ce86a5fd5689f1a11ab7701e40a5ada49b0f01400047de24d260aea49ebac"
+    },
+    "q3-c": {
+      "path": "assets/q3-c.png",
+      "sha256": "66ba6a36f45c4aac839f5840d050193ddd97e9d2602c293acb37992968267837",
+      "usedBy": [
+        "choose-the-action-for-a-watermark"
+      ],
+      "source": "exact-lesson-diagram",
+      "renderSource": "diagrams.py",
+      "renderSourceSha256": "9a9ce86a5fd5689f1a11ab7701e40a5ada49b0f01400047de24d260aea49ebac"
+    },
+    "q3-stem": {
+      "path": "assets/q3-stem.png",
+      "sha256": "053e5f364e81d85b249b07a2f0d6fad25c3fb50c8bac7e45cb775c294843d557",
+      "usedBy": [
+        "choose-the-action-for-a-watermark"
+      ],
+      "source": "exact-lesson-diagram",
+      "renderSource": "diagrams.py",
+      "renderSourceSha256": "9a9ce86a5fd5689f1a11ab7701e40a5ada49b0f01400047de24d260aea49ebac"
+    },
+    "q4-a": {
+      "path": "assets/q4-a.png",
+      "sha256": "d63fb970244e1f7064f834f4496677b7b85a0cc0783d46bcb7d19495d1ab4719",
+      "usedBy": [
+        "choose-two-different-series"
+      ],
+      "source": "exact-lesson-diagram",
+      "renderSource": "diagrams.py",
+      "renderSourceSha256": "9a9ce86a5fd5689f1a11ab7701e40a5ada49b0f01400047de24d260aea49ebac"
+    },
+    "q4-b": {
+      "path": "assets/q4-b.png",
+      "sha256": "418b00a18ebc52ff8d6d6e380dad2e830733e85b0945c1cc6539e8b4446b104e",
+      "usedBy": [
+        "choose-two-different-series"
+      ],
+      "source": "exact-lesson-diagram",
+      "renderSource": "diagrams.py",
+      "renderSourceSha256": "9a9ce86a5fd5689f1a11ab7701e40a5ada49b0f01400047de24d260aea49ebac"
+    },
+    "q4-c": {
+      "path": "assets/q4-c.png",
+      "sha256": "b72575eb7b395c21aa59765710ea7e0f7ae7a78c354e3d84ac2a9e5ad2b331c1",
+      "usedBy": [
+        "choose-two-different-series"
+      ],
+      "source": "exact-lesson-diagram",
+      "renderSource": "diagrams.py",
+      "renderSourceSha256": "9a9ce86a5fd5689f1a11ab7701e40a5ada49b0f01400047de24d260aea49ebac"
+    },
+    "q4-stem": {
+      "path": "assets/q4-stem.png",
+      "sha256": "bd6e137d3e909bb34ddedbd59b83fa50aed82eceaee9606ae46de03817c2e750",
+      "usedBy": [
+        "choose-two-different-series"
+      ],
+      "source": "exact-lesson-diagram",
+      "renderSource": "diagrams.py",
+      "renderSourceSha256": "9a9ce86a5fd5689f1a11ab7701e40a5ada49b0f01400047de24d260aea49ebac"
+    },
+    "q5-a": {
+      "path": "assets/q5-a.png",
+      "sha256": "4257a22cc3ebbeeffaca3f8fb29bb8e388fb3661eeaf4ae609b55cad4ed749b9",
+      "usedBy": [
+        "compose-twelve-from-small-blocks"
+      ],
+      "source": "exact-lesson-diagram",
+      "renderSource": "diagrams.py",
+      "renderSourceSha256": "9a9ce86a5fd5689f1a11ab7701e40a5ada49b0f01400047de24d260aea49ebac"
+    },
+    "q5-b": {
+      "path": "assets/q5-b.png",
+      "sha256": "92c29443a28b92440b88f19227bd183095137c12478cc908dae78af2f2e33af9",
+      "usedBy": [
+        "compose-twelve-from-small-blocks"
+      ],
+      "source": "exact-lesson-diagram",
+      "renderSource": "diagrams.py",
+      "renderSourceSha256": "9a9ce86a5fd5689f1a11ab7701e40a5ada49b0f01400047de24d260aea49ebac"
+    },
+    "q5-c": {
+      "path": "assets/q5-c.png",
+      "sha256": "fce1bb98e4efb4a3544b803084a9922dd392183de2613b60cccb885e25687cd5",
+      "usedBy": [
+        "compose-twelve-from-small-blocks"
+      ],
+      "source": "exact-lesson-diagram",
+      "renderSource": "diagrams.py",
+      "renderSourceSha256": "9a9ce86a5fd5689f1a11ab7701e40a5ada49b0f01400047de24d260aea49ebac"
+    },
+    "q5-stem": {
+      "path": "assets/q5-stem.png",
+      "sha256": "1b203d19c2a6d8201ee8a1edf3f6acf91f5ef9deb26e157d587b2a53386a9f36",
+      "usedBy": [
+        "compose-twelve-from-small-blocks"
+      ],
+      "source": "exact-lesson-diagram",
+      "renderSource": "diagrams.py",
+      "renderSourceSha256": "9a9ce86a5fd5689f1a11ab7701e40a5ada49b0f01400047de24d260aea49ebac"
+    },
+    "q6-a": {
+      "path": "assets/q6-a.png",
+      "sha256": "56b1c72b956021ea56987ed1b3c347f443e15a0e0446d4d75b0062e99b16eb52",
+      "usedBy": [
+        "put-a-sharing-card-in-order"
+      ],
+      "source": "exact-lesson-diagram",
+      "renderSource": "diagrams.py",
+      "renderSourceSha256": "9a9ce86a5fd5689f1a11ab7701e40a5ada49b0f01400047de24d260aea49ebac"
+    },
+    "q6-b": {
+      "path": "assets/q6-b.png",
+      "sha256": "cc4237f3c54166ba2bf9a67a2dfd0ee78223876eec6bae74a483e4338e82712a",
+      "usedBy": [
+        "put-a-sharing-card-in-order"
+      ],
+      "source": "exact-lesson-diagram",
+      "renderSource": "diagrams.py",
+      "renderSourceSha256": "9a9ce86a5fd5689f1a11ab7701e40a5ada49b0f01400047de24d260aea49ebac"
+    },
+    "q6-c": {
+      "path": "assets/q6-c.png",
+      "sha256": "e87f36c2304516f74e3c77a90a319496ac73aa30cdb1cfe19086953c249e62a1",
+      "usedBy": [
+        "put-a-sharing-card-in-order"
+      ],
+      "source": "exact-lesson-diagram",
+      "renderSource": "diagrams.py",
+      "renderSourceSha256": "9a9ce86a5fd5689f1a11ab7701e40a5ada49b0f01400047de24d260aea49ebac"
+    },
+    "questions-four": {
+      "path": "assets/questions-four.png",
+      "sha256": "78a6b2d53cd475650e7e3ca571eb6e0aebef1c9923afd145a2a9d6b04dbc5247",
+      "usedBy": [
+        "choose-an-exhibit-question"
+      ],
+      "source": "exact-lesson-diagram",
+      "renderSource": "diagrams.py",
+      "renderSourceSha256": "9a9ce86a5fd5689f1a11ab7701e40a5ada49b0f01400047de24d260aea49ebac"
+    },
+    "see-through": {
+      "path": "assets/see-through.png",
+      "sha256": "1bdf796984025e35fc1210013f18acb4f81af77a7638e1efa149c6b1f17f65c0",
+      "usedBy": [
+        "choose-how-to-observe",
+        "choose-the-action-for-a-watermark",
+        "questions-four"
+      ],
+      "source": "builtin-imagegen",
+      "original": "art-source/exhibit-plates.png",
+      "originalSha256": "9671ab570afdfcd3638db784f0703d31b78f76d310d75ce4996f8a5963d024e5",
+      "crop": [
+        0,
+        512,
+        512,
+        1024
+      ]
+    },
+    "series-study": {
+      "path": "assets/series-study.png",
+      "sha256": "d44c73323ce6a21c6c8cb2a5edfd08c422f8966ddc97fdc83a4ba637d43509af",
+      "usedBy": [
+        "compare-examples-from-two-series"
+      ],
+      "source": "exact-lesson-diagram",
+      "renderSource": "diagrams.py",
+      "renderSourceSha256": "9a9ce86a5fd5689f1a11ab7701e40a5ada49b0f01400047de24d260aea49ebac"
+    },
+    "share-empty": {
+      "path": "assets/share-empty.png",
+      "sha256": "d65e9305b93a9004394990ffa7eb64ce44929e32824feb54447e331fe49ef995",
+      "usedBy": [
+        "put-a-sharing-card-in-order"
+      ],
+      "source": "exact-lesson-diagram",
+      "renderSource": "diagrams.py",
+      "renderSourceSha256": "9a9ce86a5fd5689f1a11ab7701e40a5ada49b0f01400047de24d260aea49ebac"
+    },
+    "share-steps": {
+      "path": "assets/share-steps.png",
+      "sha256": "601cbc12621fee98c15f54ed9f955ef2633296c99d24a5a50455543cca0299bf",
+      "usedBy": [
+        "organize-the-share-card"
+      ],
+      "source": "exact-lesson-diagram",
+      "renderSource": "diagrams.py",
+      "renderSourceSha256": "9a9ce86a5fd5689f1a11ab7701e40a5ada49b0f01400047de24d260aea49ebac"
+    },
+    "square-hole-coin": {
+      "path": "assets/square-hole-coin.png",
+      "sha256": "f21ea2945d11945603c10e7889488765f2593c3c1c52c42bc55d92aa92ba97cc",
+      "usedBy": [
+        "historical-shapes"
+      ],
+      "source": "builtin-imagegen",
+      "original": "art-source/exhibit-sprites.png",
+      "originalSha256": "4798bb3ddc46d3413ea5393bea1abcdadfae7e72ad4a28afac93d61d188b2bbc",
+      "crop": [
+        1024,
+        512,
+        1536,
+        1024
+      ]
+    },
+    "taishan": {
+      "path": "assets/taishan.png",
+      "sha256": "052d9b3d7c73d27f98700a3b8c279e1dc3c272490063eb403cd0d48908d3d90f",
+      "usedBy": [
+        "aim-for-a-landmark",
+        "landmark-gallery",
+        "marble-5"
+      ],
+      "source": "builtin-imagegen",
+      "original": "art-source/landmark-plates.png",
+      "originalSha256": "6cde78d3a5384bf862d46f83f64fdc8ba90b545817dde383d9f670051969ea85",
+      "crop": [
+        512,
+        512,
+        1024,
+        1024
+      ]
+    },
+    "tilt-swatch": {
+      "path": "assets/tilt-swatch.png",
+      "sha256": "4c33a1e7963c7a44091bbfc3bd14981502c95d2000ac3b7a60abc44b41949141",
+      "usedBy": [
+        "observe-together"
+      ],
+      "source": "builtin-imagegen",
+      "original": "art-source/exhibit-plates.png",
+      "originalSha256": "9671ab570afdfcd3638db784f0703d31b78f76d310d75ce4996f8a5963d024e5",
+      "crop": [
+        512,
+        512,
+        1024,
+        1024
+      ]
+    },
+    "touch-swatch": {
+      "path": "assets/touch-swatch.png",
+      "sha256": "731560955f3bb23f0a040699fdaed748495015b143f79bbd208b4b5c1006dade",
+      "usedBy": [
+        "choose-the-action-for-a-watermark",
+        "observe-together"
+      ],
+      "source": "builtin-imagegen",
+      "original": "art-source/exhibit-plates.png",
+      "originalSha256": "9671ab570afdfcd3638db784f0703d31b78f76d310d75ce4996f8a5963d024e5",
+      "crop": [
+        1024,
+        512,
+        1536,
+        1024
+      ]
+    },
+    "westlake": {
+      "path": "assets/westlake.png",
+      "sha256": "1233d15642c84d2235dfb192a4beb35a6a64b7f5a0f7f6e0fa10da2c419542ac",
+      "usedBy": [
+        "aim-for-a-landmark",
+        "exhibit-1",
+        "landmark-gallery",
+        "marble-1",
+        "match-potala-from-a-new-view",
+        "share-steps"
+      ],
+      "source": "builtin-imagegen",
+      "original": "art-source/landmark-plates.png",
+      "originalSha256": "6cde78d3a5384bf862d46f83f64fdc8ba90b545817dde383d9f670051969ea85",
+      "crop": [
+        1024,
+        512,
+        1536,
+        1024
+      ]
+    }
+  },
+  "musicAndEffects": {
+    "source": "courseware/kit/game.py and courseware/kit/game_templates/classic.js",
+    "license": "repository synthesis"
+  }
+}

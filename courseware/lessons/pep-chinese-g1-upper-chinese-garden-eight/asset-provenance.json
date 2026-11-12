@@ -1,0 +1,1918 @@
+{
+  "schemaVersion": "mira.courseware.asset-provenance.v1",
+  "atlasReceipts": {
+    "exhibit-game-sprites": {
+      "path": "art-source/exhibit-game-sprites.receipt.json",
+      "sha256": "eca305de7e154b57f073455027d05e9904a117deccf37851df0450fdb956c270"
+    },
+    "letters-and-wishes": {
+      "path": "art-source/letters-and-wishes.receipt.json",
+      "sha256": "49784a9e53b6fb7777c6b7c0887da0d622840a63ffc5761f832d1df2a4b26609"
+    },
+    "new-check-scenes": {
+      "path": "art-source/new-check-scenes.receipt.json",
+      "sha256": "e734c585bb73614c403bfc67931c01f15024873b2b5952afc1b995b440d8456f"
+    },
+    "plans-and-reading": {
+      "path": "art-source/plans-and-reading.receipt.json",
+      "sha256": "874c4ae953c3ed50230ba108c2d9134e6763bd740c1a8b750ca0b3dab0917f76"
+    },
+    "wind-and-words": {
+      "path": "art-source/wind-and-words.receipt.json",
+      "sha256": "c3a272d602aca17c958c0a5ca996e6ffb0ff5d4eef00e917270a47e745080335"
+    },
+    "word-corners": {
+      "path": "art-source/word-corners.receipt.json",
+      "sha256": "2c4ea8258fdc811ae2a69691e7b1d1a919bafedb4c3c70501868f1bf5e5b9049"
+    }
+  },
+  "diagramFont": {
+    "family": "Songti SC Bold",
+    "collectionIndex": 1,
+    "sha256": "dd2f0628d302f322a2e9c3cf3253d5e73f418275e1f1421c84a7c65ce5a87777"
+  },
+  "assets": {
+    "addition-groups": {
+      "path": "assets/addition-groups.png",
+      "sha256": "79d77aae27fa7456ce6adb9f41bfe46a30f0232a25d77642ee32e222d9a8bbf7",
+      "bytes": 1034,
+      "source": "deterministic teaching diagram",
+      "renderSource": "art-source/garden_diagrams.py",
+      "renderSourceSha256": "2589ccadffc472c9145736acb008fb388fafe5c6c162d3419dd1badc42f021d1",
+      "inputs": {},
+      "visualReview": "shape and scene placement reviewed",
+      "usedBy": [],
+      "derivativeConsumers": [
+        "word-samples-a"
+      ]
+    },
+    "answer-teacher": {
+      "path": "assets/answer-teacher.png",
+      "sha256": "81d675d9ffb64ef105982948131a99577f52195996f19764e780f753e4a77d84",
+      "width": 387,
+      "height": 390,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/wind-and-words.png",
+      "generatedSourceSha256": "d6661d0c96eeb7d0c0bd6af49e0ceea4587ee1b7022cca08a10b1582e7ede005",
+      "promptSha256": "7db1cf3dd029b5d45d9f46dbf0730029cec6270f98d803b15dfd1d35f5b0ddcc",
+      "sourceCrop": [
+        430,
+        846,
+        825,
+        1244
+      ],
+      "receipt": "art-source/wind-and-words.receipt.json",
+      "bytes": 244686,
+      "visualReview": "atlas crop reviewed",
+      "usedBy": [
+        "listen-to-scenes"
+      ],
+      "derivativeConsumers": [
+        "word-samples-b"
+      ]
+    },
+    "assemble": {
+      "path": "assets/assemble.png",
+      "sha256": "ead68dfd3a4622b26e1492a799a501ecfd8745ce5262386e8a37c3da4ac3ad80",
+      "width": 390,
+      "height": 387,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/letters-and-wishes.png",
+      "generatedSourceSha256": "01998b88cc753eb73daff570dd5e74e17df7ad420d118cc10802b42d99f6bcf5",
+      "promptSha256": "b50a252e39b61eea62816b7221a5962499c4db056598e3bff9af027a3b52ea0a",
+      "sourceCrop": [
+        424,
+        428,
+        823,
+        824
+      ],
+      "receipt": "art-source/letters-and-wishes.receipt.json",
+      "bytes": 240368,
+      "visualReview": "atlas crop reviewed",
+      "usedBy": [],
+      "derivativeConsumers": [
+        "recognition-chart"
+      ]
+    },
+    "autumn-gust": {
+      "path": "assets/autumn-gust.png",
+      "sha256": "13a23051e4606d47561e78f7eec63af4ed8861b7038adaed9d8148af9779a974",
+      "width": 389,
+      "height": 390,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/wind-and-words.png",
+      "generatedSourceSha256": "d6661d0c96eeb7d0c0bd6af49e0ceea4587ee1b7022cca08a10b1582e7ede005",
+      "promptSha256": "7db1cf3dd029b5d45d9f46dbf0730029cec6270f98d803b15dfd1d35f5b0ddcc",
+      "sourceCrop": [
+        10,
+        9,
+        406,
+        406
+      ],
+      "receipt": "art-source/wind-and-words.receipt.json",
+      "bytes": 278928,
+      "visualReview": "atlas crop reviewed",
+      "usedBy": [],
+      "derivativeConsumers": [
+        "game-autumn-gust",
+        "wind-scenes"
+      ]
+    },
+    "bamboo-gust": {
+      "path": "assets/bamboo-gust.png",
+      "sha256": "8ba258dd9d6bfe823ed603f6e31efd7af9438f8f14d013361b3be6cf740551ea",
+      "width": 390,
+      "height": 389,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/wind-and-words.png",
+      "generatedSourceSha256": "d6661d0c96eeb7d0c0bd6af49e0ceea4587ee1b7022cca08a10b1582e7ede005",
+      "promptSha256": "7db1cf3dd029b5d45d9f46dbf0730029cec6270f98d803b15dfd1d35f5b0ddcc",
+      "sourceCrop": [
+        10,
+        429,
+        406,
+        824
+      ],
+      "receipt": "art-source/wind-and-words.receipt.json",
+      "bytes": 294986,
+      "visualReview": "atlas crop reviewed",
+      "usedBy": [],
+      "derivativeConsumers": [
+        "game-bamboo-gust",
+        "wind-scenes"
+      ]
+    },
+    "bell": {
+      "path": "assets/bell.png",
+      "sha256": "9a5cf1e6e64c235a296fd83d485d039ed8237e531767a0c2a0ed73399c4446a1",
+      "width": 390,
+      "height": 386,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/letters-and-wishes.png",
+      "generatedSourceSha256": "01998b88cc753eb73daff570dd5e74e17df7ad420d118cc10802b42d99f6bcf5",
+      "promptSha256": "b50a252e39b61eea62816b7221a5962499c4db056598e3bff9af027a3b52ea0a",
+      "sourceCrop": [
+        840,
+        428,
+        1240,
+        824
+      ],
+      "receipt": "art-source/letters-and-wishes.receipt.json",
+      "bytes": 234423,
+      "visualReview": "atlas crop reviewed",
+      "usedBy": [],
+      "derivativeConsumers": [
+        "recognition-chart"
+      ]
+    },
+    "boat-blow": {
+      "path": "assets/boat-blow.png",
+      "sha256": "c3423e4bb650e538fe378e8da7e0372092caba880f61fe09522e855541f1ea69",
+      "width": 260,
+      "height": 228,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/exhibit-game-sprites.png",
+      "generatedSourceSha256": "17be7d4e20e74261cc48678f0c040cc6bfae250d4e257467d7f5dbb5ea20a69f",
+      "promptSha256": "a543fd02c6f4195cbb659c6cc72991b08158e28d63695e11868b0613c729dc33",
+      "sourceCrop": [
+        521,
+        550,
+        1008,
+        977
+      ],
+      "receipt": "art-source/exhibit-game-sprites.receipt.json",
+      "bytes": 63233,
+      "visualReview": "atlas crop reviewed",
+      "usedBy": [
+        "listen-to-scenes"
+      ],
+      "derivativeConsumers": []
+    },
+    "boat-rest": {
+      "path": "assets/boat-rest.png",
+      "sha256": "b61df7e942650432a6e30bddc55baff00ca7c2a34238fa2cd319be52d4c8ff3d",
+      "width": 260,
+      "height": 231,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/exhibit-game-sprites.png",
+      "generatedSourceSha256": "17be7d4e20e74261cc48678f0c040cc6bfae250d4e257467d7f5dbb5ea20a69f",
+      "promptSha256": "a543fd02c6f4195cbb659c6cc72991b08158e28d63695e11868b0613c729dc33",
+      "sourceCrop": [
+        10,
+        550,
+        490,
+        977
+      ],
+      "receipt": "art-source/exhibit-game-sprites.receipt.json",
+      "bytes": 62429,
+      "visualReview": "atlas crop reviewed",
+      "usedBy": [
+        "listen-to-scenes"
+      ],
+      "derivativeConsumers": []
+    },
+    "bubbles-open": {
+      "path": "assets/bubbles-open.png",
+      "sha256": "ac9ffd0996869aa6d9d83b36118993a215f46f160917b7d197c6c42dda7091bc",
+      "bytes": 151325,
+      "source": "deterministic teaching diagram",
+      "renderSource": "art-source/garden_diagrams.py",
+      "renderSourceSha256": "2589ccadffc472c9145736acb008fb388fafe5c6c162d3419dd1badc42f021d1",
+      "inputs": {
+        "fruit-peel": "2ea38f8f90732b3470f8ab08d332741a10aed608778b799fc482ccb6e63cfdb2",
+        "tree-bark": "30f24d4efe99ecd8feaf54ed4bdcdfc02902a26f221c253c92216be4208947e3",
+        "skiff": "71f66a9f39be87d0b8e435d17b07f42de2501d2690b4c0afb6b27d86028b05b5"
+      },
+      "visualReview": "shape and scene placement reviewed",
+      "usedBy": [
+        "listen-to-scenes"
+      ],
+      "derivativeConsumers": []
+    },
+    "cart-push": {
+      "path": "assets/cart-push.png",
+      "sha256": "3332901f73002251110fa2f5e6755fc1ef2c7e56012cffe02e5db7547a6c4958",
+      "width": 256,
+      "height": 260,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/exhibit-game-sprites.png",
+      "generatedSourceSha256": "17be7d4e20e74261cc48678f0c040cc6bfae250d4e257467d7f5dbb5ea20a69f",
+      "promptSha256": "a543fd02c6f4195cbb659c6cc72991b08158e28d63695e11868b0613c729dc33",
+      "sourceCrop": [
+        542,
+        44,
+        1002,
+        511
+      ],
+      "receipt": "art-source/exhibit-game-sprites.receipt.json",
+      "bytes": 73482,
+      "visualReview": "atlas crop reviewed",
+      "usedBy": [
+        "move-character-crates"
+      ],
+      "derivativeConsumers": []
+    },
+    "cart-rest": {
+      "path": "assets/cart-rest.png",
+      "sha256": "9aabeded7e32e79528fc5df930e93005f52b74868ea13364706ea3ec618e1c63",
+      "width": 256,
+      "height": 260,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/exhibit-game-sprites.png",
+      "generatedSourceSha256": "17be7d4e20e74261cc48678f0c040cc6bfae250d4e257467d7f5dbb5ea20a69f",
+      "promptSha256": "a543fd02c6f4195cbb659c6cc72991b08158e28d63695e11868b0613c729dc33",
+      "sourceCrop": [
+        30,
+        44,
+        490,
+        511
+      ],
+      "receipt": "art-source/exhibit-game-sprites.receipt.json",
+      "bytes": 75687,
+      "visualReview": "atlas crop reviewed",
+      "usedBy": [
+        "move-character-crates"
+      ],
+      "derivativeConsumers": [
+        "move-open"
+      ]
+    },
+    "character-assemble": {
+      "path": "assets/character-assemble.png",
+      "sha256": "b91d5bf9c25830d5f1b532181b90cb95a6fbd8ad8b716cd073b40c1eb29f0a92",
+      "bytes": 5231,
+      "source": "deterministic teaching diagram",
+      "renderSource": "art-source/garden_diagrams.py",
+      "renderSourceSha256": "2589ccadffc472c9145736acb008fb388fafe5c6c162d3419dd1badc42f021d1",
+      "inputs": {},
+      "visualReview": "shape and scene placement reviewed",
+      "usedBy": [
+        "move-character-crates"
+      ],
+      "derivativeConsumers": []
+    },
+    "character-bell": {
+      "path": "assets/character-bell.png",
+      "sha256": "81d06c846f53d528978c160606d432a73f9b30f56643fe7b49747087318eb050",
+      "bytes": 3809,
+      "source": "deterministic teaching diagram",
+      "renderSource": "art-source/garden_diagrams.py",
+      "renderSourceSha256": "2589ccadffc472c9145736acb008fb388fafe5c6c162d3419dd1badc42f021d1",
+      "inputs": {},
+      "visualReview": "shape and scene placement reviewed",
+      "usedBy": [
+        "move-character-crates"
+      ],
+      "derivativeConsumers": []
+    },
+    "character-bright": {
+      "path": "assets/character-bright.png",
+      "sha256": "10eaf131aa32d2bee1147db9ed1de4745ceb181db83cdb2cb21b50ea787a1b69",
+      "bytes": 3853,
+      "source": "deterministic teaching diagram",
+      "renderSource": "art-source/garden_diagrams.py",
+      "renderSourceSha256": "2589ccadffc472c9145736acb008fb388fafe5c6c162d3419dd1badc42f021d1",
+      "inputs": {},
+      "visualReview": "shape and scene placement reviewed",
+      "usedBy": [
+        "picture-check:structure-bright"
+      ],
+      "derivativeConsumers": []
+    },
+    "character-dawn": {
+      "path": "assets/character-dawn.png",
+      "sha256": "93c1d51bfba9367109916e6f3b063cfd2416d1fb3b39ea46b832a5d3b5babfce",
+      "bytes": 2081,
+      "source": "deterministic teaching diagram",
+      "renderSource": "art-source/garden_diagrams.py",
+      "renderSourceSha256": "2589ccadffc472c9145736acb008fb388fafe5c6c162d3419dd1badc42f021d1",
+      "inputs": {},
+      "visualReview": "shape and scene placement reviewed",
+      "usedBy": [
+        "move-character-crates"
+      ],
+      "derivativeConsumers": []
+    },
+    "character-early": {
+      "path": "assets/character-early.png",
+      "sha256": "1d9008faba8654d79d7737ccca274031aef0a2731cbae6b3f833b1bd1e03514b",
+      "bytes": 2306,
+      "source": "deterministic teaching diagram",
+      "renderSource": "art-source/garden_diagrams.py",
+      "renderSourceSha256": "2589ccadffc472c9145736acb008fb388fafe5c6c162d3419dd1badc42f021d1",
+      "inputs": {},
+      "visualReview": "shape and scene placement reviewed",
+      "usedBy": [
+        "picture-check:structure-early"
+      ],
+      "derivativeConsumers": []
+    },
+    "character-fruit": {
+      "path": "assets/character-fruit.png",
+      "sha256": "84f096abf9129d735c3c6dc8290312b94795035ce94354f4ee3bf50c387fb472",
+      "bytes": 4131,
+      "source": "deterministic teaching diagram",
+      "renderSource": "art-source/garden_diagrams.py",
+      "renderSourceSha256": "2589ccadffc472c9145736acb008fb388fafe5c6c162d3419dd1badc42f021d1",
+      "inputs": {},
+      "visualReview": "shape and scene placement reviewed",
+      "usedBy": [
+        "move-character-crates"
+      ],
+      "derivativeConsumers": []
+    },
+    "character-leaf": {
+      "path": "assets/character-leaf.png",
+      "sha256": "b3b5c61583cf6774ff7cb4ea052d85fc43475191ec0060f85aec8c6844f058ef",
+      "bytes": 2446,
+      "source": "deterministic teaching diagram",
+      "renderSource": "art-source/garden_diagrams.py",
+      "renderSourceSha256": "2589ccadffc472c9145736acb008fb388fafe5c6c162d3419dd1badc42f021d1",
+      "inputs": {},
+      "visualReview": "shape and scene placement reviewed",
+      "usedBy": [
+        "move-character-crates"
+      ],
+      "derivativeConsumers": []
+    },
+    "character-only": {
+      "path": "assets/character-only.png",
+      "sha256": "86587ca0658be00658f27ba32cf7f246360f44fe7d392a3578ca4c33503462ba",
+      "bytes": 3544,
+      "source": "deterministic teaching diagram",
+      "renderSource": "art-source/garden_diagrams.py",
+      "renderSourceSha256": "2589ccadffc472c9145736acb008fb388fafe5c6c162d3419dd1badc42f021d1",
+      "inputs": {},
+      "visualReview": "shape and scene placement reviewed",
+      "usedBy": [
+        "move-character-crates"
+      ],
+      "derivativeConsumers": [
+        "move-open"
+      ]
+    },
+    "character-ox": {
+      "path": "assets/character-ox.png",
+      "sha256": "4b49c651b15e2fb92269133f24d291fc63211f0edec15a37341a74ccf5607baa",
+      "bytes": 2790,
+      "source": "deterministic teaching diagram",
+      "renderSource": "art-source/garden_diagrams.py",
+      "renderSourceSha256": "2589ccadffc472c9145736acb008fb388fafe5c6c162d3419dd1badc42f021d1",
+      "inputs": {},
+      "visualReview": "shape and scene placement reviewed",
+      "usedBy": [
+        "move-character-crates"
+      ],
+      "derivativeConsumers": []
+    },
+    "character-sheep": {
+      "path": "assets/character-sheep.png",
+      "sha256": "b5de0f47b599c06ecfad956605b86d062d6e9e77991fd455a31e6b543e6c3a67",
+      "bytes": 3301,
+      "source": "deterministic teaching diagram",
+      "renderSource": "art-source/garden_diagrams.py",
+      "renderSourceSha256": "2589ccadffc472c9145736acb008fb388fafe5c6c162d3419dd1badc42f021d1",
+      "inputs": {},
+      "visualReview": "shape and scene placement reviewed",
+      "usedBy": [
+        "move-character-crates"
+      ],
+      "derivativeConsumers": []
+    },
+    "character-white": {
+      "path": "assets/character-white.png",
+      "sha256": "4e27827f1d230749dd9dc9938e68077786b961e647fdeb65bd3706eb19575a14",
+      "bytes": 2270,
+      "source": "deterministic teaching diagram",
+      "renderSource": "art-source/garden_diagrams.py",
+      "renderSourceSha256": "2589ccadffc472c9145736acb008fb388fafe5c6c162d3419dd1badc42f021d1",
+      "inputs": {},
+      "visualReview": "shape and scene placement reviewed",
+      "usedBy": [
+        "move-character-crates"
+      ],
+      "derivativeConsumers": []
+    },
+    "claws": {
+      "path": "assets/claws.png",
+      "sha256": "5ba538c0e34c04285536549740921b55eb720cf8b6260bc0bc60e5de0dce2a27",
+      "width": 388,
+      "height": 390,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/letters-and-wishes.png",
+      "generatedSourceSha256": "01998b88cc753eb73daff570dd5e74e17df7ad420d118cc10802b42d99f6bcf5",
+      "promptSha256": "b50a252e39b61eea62816b7221a5962499c4db056598e3bff9af027a3b52ea0a",
+      "sourceCrop": [
+        840,
+        7,
+        1240,
+        409
+      ],
+      "receipt": "art-source/letters-and-wishes.receipt.json",
+      "bytes": 239662,
+      "visualReview": "atlas crop reviewed",
+      "usedBy": [],
+      "derivativeConsumers": [
+        "recognition-chart"
+      ]
+    },
+    "clip-idea": {
+      "path": "assets/clip-idea.png",
+      "sha256": "12825d682247b30867fa167fbbc61b02496ae92735458f922286c673f3e6efd9",
+      "width": 390,
+      "height": 389,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/word-corners.png",
+      "generatedSourceSha256": "1e58695195b2f5949834bdd4f773730da1118022200ce5a47c94a759300d4ad2",
+      "promptSha256": "407fc89591d00dbbdf65ffacb1bb94118c8aac92bfb6d00bf863ee8321fe4819",
+      "sourceCrop": [
+        14,
+        14,
+        406,
+        405
+      ],
+      "receipt": "art-source/word-corners.receipt.json",
+      "bytes": 271485,
+      "visualReview": "atlas crop reviewed",
+      "usedBy": [],
+      "derivativeConsumers": [
+        "word-samples-a"
+      ]
+    },
+    "cow": {
+      "path": "assets/cow.png",
+      "sha256": "ecf2b0d277e6fdb737c5486a9c28aafdbcb6867d44a528a067a61852b0b08844",
+      "width": 388,
+      "height": 390,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/letters-and-wishes.png",
+      "generatedSourceSha256": "01998b88cc753eb73daff570dd5e74e17df7ad420d118cc10802b42d99f6bcf5",
+      "promptSha256": "b50a252e39b61eea62816b7221a5962499c4db056598e3bff9af027a3b52ea0a",
+      "sourceCrop": [
+        7,
+        7,
+        407,
+        409
+      ],
+      "receipt": "art-source/letters-and-wishes.receipt.json",
+      "bytes": 243300,
+      "visualReview": "atlas crop reviewed",
+      "usedBy": [],
+      "derivativeConsumers": [
+        "recognition-chart"
+      ]
+    },
+    "crate-problem": {
+      "path": "assets/crate-problem.png",
+      "sha256": "6cb228cf6835aa51486a4060c3ea641352bc9a0e391cbaaed7edc2d0d11f2487",
+      "width": 382,
+      "height": 390,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/plans-and-reading.png",
+      "generatedSourceSha256": "349f945668c154a9f2720d1608e3b5e9d92305074d9944a77396bbddfdd4940c",
+      "promptSha256": "ffa2109e70eca5f5d14105f9020201690a70d9976335b0e2d1e696a6ef52ec81",
+      "sourceCrop": [
+        7,
+        7,
+        404,
+        412
+      ],
+      "receipt": "art-source/plans-and-reading.receipt.json",
+      "bytes": 262895,
+      "visualReview": "atlas crop reviewed",
+      "usedBy": [
+        "help-a-friend"
+      ],
+      "derivativeConsumers": []
+    },
+    "dawn": {
+      "path": "assets/dawn.png",
+      "sha256": "034b167d2ac851653a08274588c590c532f7039c8e8b17e766c880e4ab7e3e41",
+      "width": 390,
+      "height": 386,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/letters-and-wishes.png",
+      "generatedSourceSha256": "01998b88cc753eb73daff570dd5e74e17df7ad420d118cc10802b42d99f6bcf5",
+      "promptSha256": "b50a252e39b61eea62816b7221a5962499c4db056598e3bff9af027a3b52ea0a",
+      "sourceCrop": [
+        7,
+        428,
+        407,
+        824
+      ],
+      "receipt": "art-source/letters-and-wishes.receipt.json",
+      "bytes": 242566,
+      "visualReview": "atlas crop reviewed",
+      "usedBy": [],
+      "derivativeConsumers": [
+        "recognition-chart"
+      ]
+    },
+    "exhibit-counter": {
+      "path": "assets/exhibit-counter.png",
+      "sha256": "b03ba87997cb09e82299922c49f22e3519a96784fba96b46831edac584fa08e8",
+      "width": 387,
+      "height": 390,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/wind-and-words.png",
+      "generatedSourceSha256": "d6661d0c96eeb7d0c0bd6af49e0ceea4587ee1b7022cca08a10b1582e7ede005",
+      "promptSha256": "7db1cf3dd029b5d45d9f46dbf0730029cec6270f98d803b15dfd1d35f5b0ddcc",
+      "sourceCrop": [
+        849,
+        846,
+        1244,
+        1244
+      ],
+      "receipt": "art-source/wind-and-words.receipt.json",
+      "bytes": 242697,
+      "visualReview": "atlas crop reviewed",
+      "usedBy": [
+        "listen-to-scenes",
+        "move-character-crates"
+      ],
+      "derivativeConsumers": []
+    },
+    "exhibit-place": {
+      "path": "assets/exhibit-place.png",
+      "sha256": "6197b282560d8cc74967f39fc43b5d50dd5d60b4f580a156a49828611435b947",
+      "width": 389,
+      "height": 390,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/word-corners.png",
+      "generatedSourceSha256": "1e58695195b2f5949834bdd4f773730da1118022200ce5a47c94a759300d4ad2",
+      "promptSha256": "407fc89591d00dbbdf65ffacb1bb94118c8aac92bfb6d00bf863ee8321fe4819",
+      "sourceCrop": [
+        14,
+        845,
+        406,
+        1238
+      ],
+      "receipt": "art-source/word-corners.receipt.json",
+      "bytes": 278473,
+      "visualReview": "atlas crop reviewed",
+      "usedBy": [
+        "open-the-exhibit"
+      ],
+      "derivativeConsumers": [
+        "word-samples-c"
+      ]
+    },
+    "flowers-everywhere": {
+      "path": "assets/flowers-everywhere.png",
+      "sha256": "1269cdeabc6cdd428e62ae523b24bb9d7aebcab939a6f1586e00e876d116c106",
+      "width": 389,
+      "height": 390,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/word-corners.png",
+      "generatedSourceSha256": "1e58695195b2f5949834bdd4f773730da1118022200ce5a47c94a759300d4ad2",
+      "promptSha256": "407fc89591d00dbbdf65ffacb1bb94118c8aac92bfb6d00bf863ee8321fe4819",
+      "sourceCrop": [
+        14,
+        429,
+        406,
+        822
+      ],
+      "receipt": "art-source/word-corners.receipt.json",
+      "bytes": 261614,
+      "visualReview": "atlas crop reviewed",
+      "usedBy": [],
+      "derivativeConsumers": [
+        "word-samples-c"
+      ]
+    },
+    "fruit-peel": {
+      "path": "assets/fruit-peel.png",
+      "sha256": "2ea38f8f90732b3470f8ab08d332741a10aed608778b799fc482ccb6e63cfdb2",
+      "width": 390,
+      "height": 390,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/wind-and-words.png",
+      "generatedSourceSha256": "d6661d0c96eeb7d0c0bd6af49e0ceea4587ee1b7022cca08a10b1582e7ede005",
+      "promptSha256": "7db1cf3dd029b5d45d9f46dbf0730029cec6270f98d803b15dfd1d35f5b0ddcc",
+      "sourceCrop": [
+        430,
+        429,
+        825,
+        824
+      ],
+      "receipt": "art-source/wind-and-words.receipt.json",
+      "bytes": 268411,
+      "visualReview": "atlas crop reviewed",
+      "usedBy": [
+        "listen-to-scenes"
+      ],
+      "derivativeConsumers": [
+        "bubbles-open",
+        "word-samples-a"
+      ]
+    },
+    "game-autumn-gust": {
+      "path": "assets/game-autumn-gust.png",
+      "sha256": "61af7671469b4bb3331b5f3fa1b6ad8d42ee05120b3b2870a2f59de872d75fbd",
+      "bytes": 112493,
+      "source": "deterministic teaching diagram",
+      "renderSource": "art-source/garden_diagrams.py",
+      "renderSourceSha256": "2589ccadffc472c9145736acb008fb388fafe5c6c162d3419dd1badc42f021d1",
+      "inputs": {
+        "autumn-gust": "13a23051e4606d47561e78f7eec63af4ed8861b7038adaed9d8148af9779a974"
+      },
+      "visualReview": "shape and scene placement reviewed",
+      "usedBy": [
+        "listen-to-scenes"
+      ],
+      "derivativeConsumers": []
+    },
+    "game-bamboo-gust": {
+      "path": "assets/game-bamboo-gust.png",
+      "sha256": "01956b9564795f687844c4f109385a167c0d88b20eeb5b58c14fbca383db387d",
+      "bytes": 120248,
+      "source": "deterministic teaching diagram",
+      "renderSource": "art-source/garden_diagrams.py",
+      "renderSourceSha256": "2589ccadffc472c9145736acb008fb388fafe5c6c162d3419dd1badc42f021d1",
+      "inputs": {
+        "bamboo-gust": "8ba258dd9d6bfe823ed603f6e31efd7af9438f8f14d013361b3be6cf740551ea"
+      },
+      "visualReview": "shape and scene placement reviewed",
+      "usedBy": [
+        "listen-to-scenes"
+      ],
+      "derivativeConsumers": []
+    },
+    "game-river-waves": {
+      "path": "assets/game-river-waves.png",
+      "sha256": "d81e63032d8e2e47ba571fe2becc649fad68905e622eaca9b2a31cf14dcc5a99",
+      "bytes": 115496,
+      "source": "deterministic teaching diagram",
+      "renderSource": "art-source/garden_diagrams.py",
+      "renderSourceSha256": "2589ccadffc472c9145736acb008fb388fafe5c6c162d3419dd1badc42f021d1",
+      "inputs": {
+        "river-waves": "fce9bb236b5a366f999d7577891aeeaa511bad8d336280187bbf4825e5957c86"
+      },
+      "visualReview": "shape and scene placement reviewed",
+      "usedBy": [
+        "listen-to-scenes"
+      ],
+      "derivativeConsumers": []
+    },
+    "garden-paths": {
+      "path": "assets/garden-paths.png",
+      "sha256": "538999bb2fcc950830eb3c522581697f91746e623de49f19d954b1585ccfc595",
+      "width": 390,
+      "height": 389,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/word-corners.png",
+      "generatedSourceSha256": "1e58695195b2f5949834bdd4f773730da1118022200ce5a47c94a759300d4ad2",
+      "promptSha256": "407fc89591d00dbbdf65ffacb1bb94118c8aac92bfb6d00bf863ee8321fe4819",
+      "sourceCrop": [
+        845,
+        429,
+        1239,
+        822
+      ],
+      "receipt": "art-source/word-corners.receipt.json",
+      "bytes": 271335,
+      "visualReview": "atlas crop reviewed",
+      "usedBy": [],
+      "derivativeConsumers": [
+        "path-direction"
+      ]
+    },
+    "greet-grandma": {
+      "path": "assets/greet-grandma.png",
+      "sha256": "5b501a4430df6b14dc70c9658c072ad555d54ab0618882004c7acebf9bcd4d6f",
+      "width": 384,
+      "height": 390,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/letters-and-wishes.png",
+      "generatedSourceSha256": "01998b88cc753eb73daff570dd5e74e17df7ad420d118cc10802b42d99f6bcf5",
+      "promptSha256": "b50a252e39b61eea62816b7221a5962499c4db056598e3bff9af027a3b52ea0a",
+      "sourceCrop": [
+        7,
+        842,
+        407,
+        1248
+      ],
+      "receipt": "art-source/letters-and-wishes.receipt.json",
+      "bytes": 269734,
+      "visualReview": "atlas crop reviewed",
+      "usedBy": [
+        "send-a-wish"
+      ],
+      "derivativeConsumers": []
+    },
+    "greet-schoolmate": {
+      "path": "assets/greet-schoolmate.png",
+      "sha256": "7b2f3033c0937a17b909b9cd552fa1aaa2fb309777ae7534f30f200907111706",
+      "width": 383,
+      "height": 390,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/letters-and-wishes.png",
+      "generatedSourceSha256": "01998b88cc753eb73daff570dd5e74e17df7ad420d118cc10802b42d99f6bcf5",
+      "promptSha256": "b50a252e39b61eea62816b7221a5962499c4db056598e3bff9af027a3b52ea0a",
+      "sourceCrop": [
+        424,
+        842,
+        823,
+        1248
+      ],
+      "receipt": "art-source/letters-and-wishes.receipt.json",
+      "bytes": 267394,
+      "visualReview": "atlas crop reviewed",
+      "usedBy": [
+        "send-a-wish"
+      ],
+      "derivativeConsumers": []
+    },
+    "holiday-crafts": {
+      "path": "assets/holiday-crafts.png",
+      "sha256": "de20cd15c5d4ff161f8fb687f7b195610272706d0f1b546aff4ae3844b35ddaf",
+      "width": 390,
+      "height": 389,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/word-corners.png",
+      "generatedSourceSha256": "1e58695195b2f5949834bdd4f773730da1118022200ce5a47c94a759300d4ad2",
+      "promptSha256": "407fc89591d00dbbdf65ffacb1bb94118c8aac92bfb6d00bf863ee8321fe4819",
+      "sourceCrop": [
+        845,
+        845,
+        1239,
+        1238
+      ],
+      "receipt": "art-source/word-corners.receipt.json",
+      "bytes": 277308,
+      "visualReview": "atlas crop reviewed",
+      "usedBy": [
+        "holiday-reading",
+        "wrap-up"
+      ],
+      "derivativeConsumers": []
+    },
+    "lantern-sticker": {
+      "path": "assets/lantern-sticker.png",
+      "sha256": "69f343f36e1540d514a4d40f23f6a56f3963944d5ed6cea2bc59ce75945f529e",
+      "width": 256,
+      "height": 260,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/exhibit-game-sprites.png",
+      "generatedSourceSha256": "17be7d4e20e74261cc48678f0c040cc6bfae250d4e257467d7f5dbb5ea20a69f",
+      "promptSha256": "a543fd02c6f4195cbb659c6cc72991b08158e28d63695e11868b0613c729dc33",
+      "sourceCrop": [
+        1054,
+        44,
+        1514,
+        511
+      ],
+      "receipt": "art-source/exhibit-game-sprites.receipt.json",
+      "bytes": 59282,
+      "visualReview": "atlas crop reviewed",
+      "usedBy": [
+        "move-character-crates"
+      ],
+      "derivativeConsumers": []
+    },
+    "lift-together": {
+      "path": "assets/lift-together.png",
+      "sha256": "2947b622adb6db9234e1a7856c066631b2499e5069d15f14eba19b058cce5a11",
+      "width": 388,
+      "height": 390,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/plans-and-reading.png",
+      "generatedSourceSha256": "349f945668c154a9f2720d1608e3b5e9d92305074d9944a77396bbddfdd4940c",
+      "promptSha256": "ffa2109e70eca5f5d14105f9020201690a70d9976335b0e2d1e696a6ef52ec81",
+      "sourceCrop": [
+        422,
+        7,
+        825,
+        412
+      ],
+      "receipt": "art-source/plans-and-reading.receipt.json",
+      "bytes": 265187,
+      "visualReview": "atlas crop reviewed",
+      "usedBy": [
+        "listen-and-improve"
+      ],
+      "derivativeConsumers": []
+    },
+    "many-lanterns": {
+      "path": "assets/many-lanterns.png",
+      "sha256": "c56f46be8b3d0024385996b35182323b8df10836e07cae0d0a60518758e1b0a5",
+      "width": 390,
+      "height": 388,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/word-corners.png",
+      "generatedSourceSha256": "1e58695195b2f5949834bdd4f773730da1118022200ce5a47c94a759300d4ad2",
+      "promptSha256": "407fc89591d00dbbdf65ffacb1bb94118c8aac92bfb6d00bf863ee8321fe4819",
+      "sourceCrop": [
+        430,
+        14,
+        823,
+        405
+      ],
+      "receipt": "art-source/word-corners.receipt.json",
+      "bytes": 269119,
+      "visualReview": "atlas crop reviewed",
+      "usedBy": [
+        "listen-to-scenes"
+      ],
+      "derivativeConsumers": [
+        "word-samples-b"
+      ]
+    },
+    "move-open": {
+      "path": "assets/move-open.png",
+      "sha256": "c69716053f4dc8e5a2e6f5b37f21a6966135617cba18ad7e2ec0cc1e3ddc0cd0",
+      "bytes": 37706,
+      "source": "deterministic teaching diagram",
+      "renderSource": "art-source/garden_diagrams.py",
+      "renderSourceSha256": "2589ccadffc472c9145736acb008fb388fafe5c6c162d3419dd1badc42f021d1",
+      "inputs": {
+        "cart-rest": "9aabeded7e32e79528fc5df930e93005f52b74868ea13364706ea3ec618e1c63",
+        "character-only": "86587ca0658be00658f27ba32cf7f246360f44fe7d392a3578ca4c33503462ba",
+        "structure-up": "8e3d8986e5abe3957010d26b2294df69df4a8650a1d314b0adae1be74d3cf1e7",
+        "structure-whole": "578e2abd7e5f8a61a61c80fe1178a623890a5a7c3c6bbe481b10fd748bc3c6a8"
+      },
+      "visualReview": "shape and scene placement reviewed",
+      "usedBy": [
+        "move-character-crates"
+      ],
+      "derivativeConsumers": []
+    },
+    "path-direction": {
+      "path": "assets/path-direction.png",
+      "sha256": "86abb85f15a44986c6f988a8d866f8b51f48a185960cff15e27d74fbd1c88c71",
+      "bytes": 237009,
+      "source": "deterministic teaching diagram",
+      "renderSource": "art-source/garden_diagrams.py",
+      "renderSourceSha256": "2589ccadffc472c9145736acb008fb388fafe5c6c162d3419dd1badc42f021d1",
+      "inputs": {
+        "garden-paths": "538999bb2fcc950830eb3c522581697f91746e623de49f19d954b1585ccfc595"
+      },
+      "visualReview": "shape and scene placement reviewed",
+      "usedBy": [],
+      "derivativeConsumers": [
+        "word-samples-c"
+      ]
+    },
+    "push-cart": {
+      "path": "assets/push-cart.png",
+      "sha256": "7162d56d2e6b82848877c53323a35410342bc5c8e155cf401497281fe25be739",
+      "width": 382,
+      "height": 390,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/plans-and-reading.png",
+      "generatedSourceSha256": "349f945668c154a9f2720d1608e3b5e9d92305074d9944a77396bbddfdd4940c",
+      "promptSha256": "ffa2109e70eca5f5d14105f9020201690a70d9976335b0e2d1e696a6ef52ec81",
+      "sourceCrop": [
+        841,
+        7,
+        1238,
+        412
+      ],
+      "receipt": "art-source/plans-and-reading.receipt.json",
+      "bytes": 255942,
+      "visualReview": "atlas crop reviewed",
+      "usedBy": [
+        "listen-and-improve"
+      ],
+      "derivativeConsumers": []
+    },
+    "q-ask-while-reading": {
+      "path": "assets/q-ask-while-reading.png",
+      "sha256": "7e8437e3c1f3b8749314d74380a06310326d10962215ae2ed962d5685e7d110d",
+      "width": 378,
+      "height": 390,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/plans-and-reading.png",
+      "generatedSourceSha256": "349f945668c154a9f2720d1608e3b5e9d92305074d9944a77396bbddfdd4940c",
+      "promptSha256": "ffa2109e70eca5f5d14105f9020201690a70d9976335b0e2d1e696a6ef52ec81",
+      "sourceCrop": [
+        7,
+        841,
+        404,
+        1251
+      ],
+      "receipt": "art-source/plans-and-reading.receipt.json",
+      "bytes": 273016,
+      "visualReview": "atlas crop reviewed",
+      "usedBy": [
+        "picture-check:ask-together"
+      ],
+      "derivativeConsumers": []
+    },
+    "q-bent-bamboo": {
+      "path": "assets/q-bent-bamboo.png",
+      "sha256": "10cf48f1b89635a363e47899e1c2df56aaead9bf0c7ee5ad4218136dc881d3d7",
+      "width": 366,
+      "height": 390,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/new-check-scenes.png",
+      "generatedSourceSha256": "24160aa87b92bb151b01ea33dd2b5a578744cedf73bf5e10ba4bda7be61315be",
+      "promptSha256": "9f8cd611ca2c8fe1dbbe555a2dbbd7f3c23b49ac7bf57096fed5ec8bf188c256",
+      "sourceCrop": [
+        9,
+        813,
+        410,
+        1240
+      ],
+      "receipt": "art-source/new-check-scenes.receipt.json",
+      "bytes": 273537,
+      "visualReview": "atlas crop reviewed",
+      "usedBy": [
+        "picture-check:see-bamboo-gust"
+      ],
+      "derivativeConsumers": []
+    },
+    "q-close-book": {
+      "path": "assets/q-close-book.png",
+      "sha256": "7a54041e1970020317ba243b1eb747e3130e7c12e13e4dc9edfb9e0afad31a03",
+      "width": 378,
+      "height": 390,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/plans-and-reading.png",
+      "generatedSourceSha256": "349f945668c154a9f2720d1608e3b5e9d92305074d9944a77396bbddfdd4940c",
+      "promptSha256": "ffa2109e70eca5f5d14105f9020201690a70d9976335b0e2d1e696a6ef52ec81",
+      "sourceCrop": [
+        841,
+        841,
+        1238,
+        1251
+      ],
+      "receipt": "art-source/plans-and-reading.receipt.json",
+      "bytes": 271261,
+      "visualReview": "atlas crop reviewed",
+      "usedBy": [
+        "picture-check:ask-together"
+      ],
+      "derivativeConsumers": []
+    },
+    "q-mountain-correct": {
+      "path": "assets/q-mountain-correct.png",
+      "sha256": "327aacb91ba936a8ae0d5cc1c0c8ebfce695f04da42a42b3f9bac217640995da",
+      "bytes": 1211,
+      "source": "deterministic teaching diagram",
+      "renderSource": "art-source/garden_diagrams.py",
+      "renderSourceSha256": "2589ccadffc472c9145736acb008fb388fafe5c6c162d3419dd1badc42f021d1",
+      "inputs": {},
+      "visualReview": "shape and scene placement reviewed",
+      "usedBy": [
+        "picture-check:write-mountain"
+      ],
+      "derivativeConsumers": []
+    },
+    "q-mountain-left-first": {
+      "path": "assets/q-mountain-left-first.png",
+      "sha256": "b7d1c2c3d42e88ebac45cf60ac74d99b9714f54eea8dee6bfb4a493f9cc9d5ca",
+      "bytes": 1258,
+      "source": "deterministic teaching diagram",
+      "renderSource": "art-source/garden_diagrams.py",
+      "renderSourceSha256": "2589ccadffc472c9145736acb008fb388fafe5c6c162d3419dd1badc42f021d1",
+      "inputs": {},
+      "visualReview": "shape and scene placement reviewed",
+      "usedBy": [
+        "picture-check:write-mountain"
+      ],
+      "derivativeConsumers": []
+    },
+    "q-mountain-right-first": {
+      "path": "assets/q-mountain-right-first.png",
+      "sha256": "72f64f14034721e68420290e52712fa20cfad20410b1f00d30417a1f2dd8a234",
+      "bytes": 1224,
+      "source": "deterministic teaching diagram",
+      "renderSource": "art-source/garden_diagrams.py",
+      "renderSourceSha256": "2589ccadffc472c9145736acb008fb388fafe5c6c162d3419dd1badc42f021d1",
+      "inputs": {},
+      "visualReview": "shape and scene placement reviewed",
+      "usedBy": [
+        "picture-check:write-mountain"
+      ],
+      "derivativeConsumers": []
+    },
+    "q-read-alone": {
+      "path": "assets/q-read-alone.png",
+      "sha256": "8c4f1b8ea9c5aee9f8555d0f10c3e6233585934948f80e74566c7492ecadb952",
+      "width": 383,
+      "height": 390,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/plans-and-reading.png",
+      "generatedSourceSha256": "349f945668c154a9f2720d1608e3b5e9d92305074d9944a77396bbddfdd4940c",
+      "promptSha256": "ffa2109e70eca5f5d14105f9020201690a70d9976335b0e2d1e696a6ef52ec81",
+      "sourceCrop": [
+        422,
+        841,
+        825,
+        1251
+      ],
+      "receipt": "art-source/plans-and-reading.receipt.json",
+      "bytes": 260263,
+      "visualReview": "atlas crop reviewed",
+      "usedBy": [
+        "picture-check:ask-together"
+      ],
+      "derivativeConsumers": []
+    },
+    "q-return-away": {
+      "path": "assets/q-return-away.png",
+      "sha256": "a4b5db3bfbc255da239711bd1fad696bf18fa430527a6f57bd00bfe0cb867895",
+      "bytes": 119551,
+      "source": "deterministic teaching diagram",
+      "renderSource": "art-source/garden_diagrams.py",
+      "renderSourceSha256": "2589ccadffc472c9145736acb008fb388fafe5c6c162d3419dd1badc42f021d1",
+      "inputs": {
+        "q-walk-away": "b7781ffe93f46d3f2bdc1d12d8f936eae161eb8cbd4fca22f648c4f4ee07a8f2"
+      },
+      "visualReview": "shape and scene placement reviewed",
+      "usedBy": [
+        "picture-check:meaning-return"
+      ],
+      "derivativeConsumers": []
+    },
+    "q-return-back": {
+      "path": "assets/q-return-back.png",
+      "sha256": "5b40099214697ff6592956a37e15f64964e0975e066b5c2d4a90fb4cc1b6cda1",
+      "bytes": 232459,
+      "source": "deterministic teaching diagram",
+      "renderSource": "art-source/garden_diagrams.py",
+      "renderSourceSha256": "2589ccadffc472c9145736acb008fb388fafe5c6c162d3419dd1badc42f021d1",
+      "inputs": {
+        "q-walk-away": "b7781ffe93f46d3f2bdc1d12d8f936eae161eb8cbd4fca22f648c4f4ee07a8f2",
+        "q-walk-back": "2c593af2cb761e49aa00e9116256e740c8eb2fc036d2a973d8f41fd85abc7466"
+      },
+      "visualReview": "shape and scene placement reviewed",
+      "usedBy": [
+        "picture-check:meaning-return"
+      ],
+      "derivativeConsumers": []
+    },
+    "q-return-stay": {
+      "path": "assets/q-return-stay.png",
+      "sha256": "56a3156759b364c103071d354772c72c8da4068483336df81a75529d2bd0d20d",
+      "bytes": 233683,
+      "source": "deterministic teaching diagram",
+      "renderSource": "art-source/garden_diagrams.py",
+      "renderSourceSha256": "2589ccadffc472c9145736acb008fb388fafe5c6c162d3419dd1badc42f021d1",
+      "inputs": {
+        "q-walk-away": "b7781ffe93f46d3f2bdc1d12d8f936eae161eb8cbd4fca22f648c4f4ee07a8f2",
+        "q-sit-still": "aad291b446ac638b5fa1368b97ba2832ea4d91f0d4005b9bdc15a8489c602506"
+      },
+      "visualReview": "shape and scene placement reviewed",
+      "usedBy": [
+        "picture-check:meaning-return"
+      ],
+      "derivativeConsumers": []
+    },
+    "q-sit-still": {
+      "path": "assets/q-sit-still.png",
+      "sha256": "aad291b446ac638b5fa1368b97ba2832ea4d91f0d4005b9bdc15a8489c602506",
+      "width": 390,
+      "height": 386,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/new-check-scenes.png",
+      "generatedSourceSha256": "24160aa87b92bb151b01ea33dd2b5a578744cedf73bf5e10ba4bda7be61315be",
+      "promptSha256": "9f8cd611ca2c8fe1dbbe555a2dbbd7f3c23b49ac7bf57096fed5ec8bf188c256",
+      "sourceCrop": [
+        845,
+        11,
+        1245,
+        407
+      ],
+      "receipt": "art-source/new-check-scenes.receipt.json",
+      "bytes": 285089,
+      "visualReview": "atlas crop reviewed",
+      "usedBy": [],
+      "derivativeConsumers": [
+        "q-return-stay"
+      ]
+    },
+    "q-still-bamboo": {
+      "path": "assets/q-still-bamboo.png",
+      "sha256": "25f9ea6207ec4ff0d1e04e6589035def4e8148a03b459b0d51fe5791be6be6c5",
+      "width": 366,
+      "height": 390,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/new-check-scenes.png",
+      "generatedSourceSha256": "24160aa87b92bb151b01ea33dd2b5a578744cedf73bf5e10ba4bda7be61315be",
+      "promptSha256": "9f8cd611ca2c8fe1dbbe555a2dbbd7f3c23b49ac7bf57096fed5ec8bf188c256",
+      "sourceCrop": [
+        427,
+        813,
+        828,
+        1240
+      ],
+      "receipt": "art-source/new-check-scenes.receipt.json",
+      "bytes": 272079,
+      "visualReview": "atlas crop reviewed",
+      "usedBy": [
+        "picture-check:see-bamboo-gust"
+      ],
+      "derivativeConsumers": []
+    },
+    "q-tubes-fall": {
+      "path": "assets/q-tubes-fall.png",
+      "sha256": "8aec186899ce46d2226b30ad4fa4d56155c58f74c89218ea8787784a2534c185",
+      "width": 390,
+      "height": 385,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/plans-and-reading.png",
+      "generatedSourceSha256": "349f945668c154a9f2720d1608e3b5e9d92305074d9944a77396bbddfdd4940c",
+      "promptSha256": "ffa2109e70eca5f5d14105f9020201690a70d9976335b0e2d1e696a6ef52ec81",
+      "sourceCrop": [
+        422,
+        427,
+        825,
+        825
+      ],
+      "receipt": "art-source/plans-and-reading.receipt.json",
+      "bytes": 238371,
+      "visualReview": "atlas crop reviewed",
+      "usedBy": [
+        "picture-check:choose-practical-plan"
+      ],
+      "derivativeConsumers": []
+    },
+    "q-tubes-rim": {
+      "path": "assets/q-tubes-rim.png",
+      "sha256": "f92494ba08e1988da640eb9073590b0804d6dcbd24f2f3e91828a344ceac82c1",
+      "width": 389,
+      "height": 390,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/plans-and-reading.png",
+      "generatedSourceSha256": "349f945668c154a9f2720d1608e3b5e9d92305074d9944a77396bbddfdd4940c",
+      "promptSha256": "ffa2109e70eca5f5d14105f9020201690a70d9976335b0e2d1e696a6ef52ec81",
+      "sourceCrop": [
+        7,
+        427,
+        404,
+        825
+      ],
+      "receipt": "art-source/plans-and-reading.receipt.json",
+      "bytes": 249230,
+      "visualReview": "atlas crop reviewed",
+      "usedBy": [
+        "picture-check:choose-practical-plan"
+      ],
+      "derivativeConsumers": []
+    },
+    "q-tubes-slip": {
+      "path": "assets/q-tubes-slip.png",
+      "sha256": "8263db4afe1ae02ea23248907e79f345cea19eef530ec249dc35399701cb01a0",
+      "width": 389,
+      "height": 390,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/plans-and-reading.png",
+      "generatedSourceSha256": "349f945668c154a9f2720d1608e3b5e9d92305074d9944a77396bbddfdd4940c",
+      "promptSha256": "ffa2109e70eca5f5d14105f9020201690a70d9976335b0e2d1e696a6ef52ec81",
+      "sourceCrop": [
+        841,
+        427,
+        1238,
+        825
+      ],
+      "receipt": "art-source/plans-and-reading.receipt.json",
+      "bytes": 258572,
+      "visualReview": "atlas crop reviewed",
+      "usedBy": [
+        "picture-check:choose-practical-plan"
+      ],
+      "derivativeConsumers": []
+    },
+    "q-use-correct": {
+      "path": "assets/q-use-correct.png",
+      "sha256": "2a632f5e24835134020fabb3c0ee1aa621eb6d44ba81cf058425a8e5b6bc0ce7",
+      "bytes": 2690,
+      "source": "deterministic teaching diagram",
+      "renderSource": "art-source/garden_diagrams.py",
+      "renderSourceSha256": "2589ccadffc472c9145736acb008fb388fafe5c6c162d3419dd1badc42f021d1",
+      "inputs": {},
+      "visualReview": "shape and scene placement reviewed",
+      "usedBy": [
+        "picture-check:write-use"
+      ],
+      "derivativeConsumers": []
+    },
+    "q-use-inside-first": {
+      "path": "assets/q-use-inside-first.png",
+      "sha256": "66d618d3fa41398e0efaf52bb234c47f68dcc36972f41580844ac0bbb098de86",
+      "bytes": 2463,
+      "source": "deterministic teaching diagram",
+      "renderSource": "art-source/garden_diagrams.py",
+      "renderSourceSha256": "2589ccadffc472c9145736acb008fb388fafe5c6c162d3419dd1badc42f021d1",
+      "inputs": {},
+      "visualReview": "shape and scene placement reviewed",
+      "usedBy": [
+        "picture-check:write-use"
+      ],
+      "derivativeConsumers": []
+    },
+    "q-use-middle-first": {
+      "path": "assets/q-use-middle-first.png",
+      "sha256": "a18c2493529983141acd797ca1928bd4ca7ff7f5d9c011f91afa2291832d0eb4",
+      "bytes": 2529,
+      "source": "deterministic teaching diagram",
+      "renderSource": "art-source/garden_diagrams.py",
+      "renderSourceSha256": "2589ccadffc472c9145736acb008fb388fafe5c6c162d3419dd1badc42f021d1",
+      "inputs": {},
+      "visualReview": "shape and scene placement reviewed",
+      "usedBy": [
+        "picture-check:write-use"
+      ],
+      "derivativeConsumers": []
+    },
+    "q-walk-away": {
+      "path": "assets/q-walk-away.png",
+      "sha256": "b7781ffe93f46d3f2bdc1d12d8f936eae161eb8cbd4fca22f648c4f4ee07a8f2",
+      "width": 390,
+      "height": 385,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/new-check-scenes.png",
+      "generatedSourceSha256": "24160aa87b92bb151b01ea33dd2b5a578744cedf73bf5e10ba4bda7be61315be",
+      "promptSha256": "9f8cd611ca2c8fe1dbbe555a2dbbd7f3c23b49ac7bf57096fed5ec8bf188c256",
+      "sourceCrop": [
+        9,
+        11,
+        410,
+        407
+      ],
+      "receipt": "art-source/new-check-scenes.receipt.json",
+      "bytes": 283469,
+      "visualReview": "atlas crop reviewed",
+      "usedBy": [],
+      "derivativeConsumers": [
+        "q-return-away",
+        "q-return-back",
+        "q-return-stay"
+      ]
+    },
+    "q-walk-back": {
+      "path": "assets/q-walk-back.png",
+      "sha256": "2c593af2cb761e49aa00e9116256e740c8eb2fc036d2a973d8f41fd85abc7466",
+      "width": 390,
+      "height": 385,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/new-check-scenes.png",
+      "generatedSourceSha256": "24160aa87b92bb151b01ea33dd2b5a578744cedf73bf5e10ba4bda7be61315be",
+      "promptSha256": "9f8cd611ca2c8fe1dbbe555a2dbbd7f3c23b49ac7bf57096fed5ec8bf188c256",
+      "sourceCrop": [
+        427,
+        11,
+        828,
+        407
+      ],
+      "receipt": "art-source/new-check-scenes.receipt.json",
+      "bytes": 282884,
+      "visualReview": "atlas crop reviewed",
+      "usedBy": [],
+      "derivativeConsumers": [
+        "q-return-back"
+      ]
+    },
+    "q-walnut-leaves": {
+      "path": "assets/q-walnut-leaves.png",
+      "sha256": "512fd32ccc1da76773d9e6b61ea82b88753114c7cb6e4f8a01248fd4aaa3ff32",
+      "width": 365,
+      "height": 390,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/new-check-scenes.png",
+      "generatedSourceSha256": "24160aa87b92bb151b01ea33dd2b5a578744cedf73bf5e10ba4bda7be61315be",
+      "promptSha256": "9f8cd611ca2c8fe1dbbe555a2dbbd7f3c23b49ac7bf57096fed5ec8bf188c256",
+      "sourceCrop": [
+        845,
+        813,
+        1245,
+        1240
+      ],
+      "receipt": "art-source/new-check-scenes.receipt.json",
+      "bytes": 266530,
+      "visualReview": "atlas crop reviewed",
+      "usedBy": [
+        "picture-check:see-bamboo-gust"
+      ],
+      "derivativeConsumers": []
+    },
+    "q-wish-dog": {
+      "path": "assets/q-wish-dog.png",
+      "sha256": "5527f9274ec832c5148984ba7b3615cc62a039f8e817e0e4218c334b5d8acc69",
+      "width": 390,
+      "height": 358,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/new-check-scenes.png",
+      "generatedSourceSha256": "24160aa87b92bb151b01ea33dd2b5a578744cedf73bf5e10ba4bda7be61315be",
+      "promptSha256": "9f8cd611ca2c8fe1dbbe555a2dbbd7f3c23b49ac7bf57096fed5ec8bf188c256",
+      "sourceCrop": [
+        845,
+        426,
+        1245,
+        793
+      ],
+      "receipt": "art-source/new-check-scenes.receipt.json",
+      "bytes": 256523,
+      "visualReview": "atlas crop reviewed",
+      "usedBy": [
+        "picture-check:wish-recipient"
+      ],
+      "derivativeConsumers": []
+    },
+    "q-wish-elder": {
+      "path": "assets/q-wish-elder.png",
+      "sha256": "cf5e2d4f56c104b2ee95f9ad14d200a7adc6a5c2acd62f958f4dc24319afae47",
+      "width": 390,
+      "height": 357,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/new-check-scenes.png",
+      "generatedSourceSha256": "24160aa87b92bb151b01ea33dd2b5a578744cedf73bf5e10ba4bda7be61315be",
+      "promptSha256": "9f8cd611ca2c8fe1dbbe555a2dbbd7f3c23b49ac7bf57096fed5ec8bf188c256",
+      "sourceCrop": [
+        427,
+        426,
+        828,
+        793
+      ],
+      "receipt": "art-source/new-check-scenes.receipt.json",
+      "bytes": 259908,
+      "visualReview": "atlas crop reviewed",
+      "usedBy": [
+        "picture-check:wish-recipient"
+      ],
+      "derivativeConsumers": []
+    },
+    "q-wish-peer": {
+      "path": "assets/q-wish-peer.png",
+      "sha256": "2113a1b0f5462bfaa37f782065b6f35c8075c790a3bbcf148a48130964ac1bcf",
+      "width": 390,
+      "height": 357,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/new-check-scenes.png",
+      "generatedSourceSha256": "24160aa87b92bb151b01ea33dd2b5a578744cedf73bf5e10ba4bda7be61315be",
+      "promptSha256": "9f8cd611ca2c8fe1dbbe555a2dbbd7f3c23b49ac7bf57096fed5ec8bf188c256",
+      "sourceCrop": [
+        9,
+        426,
+        410,
+        793
+      ],
+      "receipt": "art-source/new-check-scenes.receipt.json",
+      "bytes": 253844,
+      "visualReview": "atlas crop reviewed",
+      "usedBy": [
+        "picture-check:wish-recipient"
+      ],
+      "derivativeConsumers": []
+    },
+    "reading-together": {
+      "path": "assets/reading-together.png",
+      "sha256": "f747db0675ab255defaddbc032ad77aba47980f8084edf1febfee57e83c16ca2",
+      "width": 390,
+      "height": 390,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/word-corners.png",
+      "generatedSourceSha256": "1e58695195b2f5949834bdd4f773730da1118022200ce5a47c94a759300d4ad2",
+      "promptSha256": "407fc89591d00dbbdf65ffacb1bb94118c8aac92bfb6d00bf863ee8321fe4819",
+      "sourceCrop": [
+        430,
+        845,
+        823,
+        1238
+      ],
+      "receipt": "art-source/word-corners.receipt.json",
+      "bytes": 276800,
+      "visualReview": "atlas crop reviewed",
+      "usedBy": [
+        "holiday-reading"
+      ],
+      "derivativeConsumers": []
+    },
+    "recognition-chart": {
+      "path": "assets/recognition-chart.png",
+      "sha256": "ae90699663f44d2db759c8964794a4825a061a57b21f99094d9cb95159117909",
+      "bytes": 254022,
+      "source": "deterministic teaching diagram",
+      "renderSource": "art-source/garden_diagrams.py",
+      "renderSourceSha256": "2589ccadffc472c9145736acb008fb388fafe5c6c162d3419dd1badc42f021d1",
+      "inputs": {
+        "cow": "ecf2b0d277e6fdb737c5486a9c28aafdbcb6867d44a528a067a61852b0b08844",
+        "sheep": "a99380dfadd7c4497c91390b2f093a94d6a6aa99142203c2aa4b9e4de31416e7",
+        "claws": "5ba538c0e34c04285536549740921b55eb720cf8b6260bc0bc60e5de0dce2a27",
+        "dawn": "034b167d2ac851653a08274588c590c532f7039c8e8b17e766c880e4ab7e3e41",
+        "assemble": "ead68dfd3a4622b26e1492a799a501ecfd8745ce5262386e8a37c3da4ac3ad80",
+        "bell": "9a5cf1e6e64c235a296fd83d485d039ed8237e531767a0c2a0ed73399c4446a1"
+      },
+      "visualReview": "shape and scene placement reviewed",
+      "usedBy": [
+        "look-at-shapes"
+      ],
+      "derivativeConsumers": []
+    },
+    "return-to-door": {
+      "path": "assets/return-to-door.png",
+      "sha256": "b14680552aac8e62ac8729cc329c536d5bc980656542dd3dbbe50787034c42f1",
+      "width": 388,
+      "height": 390,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/wind-and-words.png",
+      "generatedSourceSha256": "d6661d0c96eeb7d0c0bd6af49e0ceea4587ee1b7022cca08a10b1582e7ede005",
+      "promptSha256": "7db1cf3dd029b5d45d9f46dbf0730029cec6270f98d803b15dfd1d35f5b0ddcc",
+      "sourceCrop": [
+        10,
+        846,
+        406,
+        1244
+      ],
+      "receipt": "art-source/wind-and-words.receipt.json",
+      "bytes": 262492,
+      "visualReview": "atlas crop reviewed",
+      "usedBy": [
+        "listen-to-scenes"
+      ],
+      "derivativeConsumers": [
+        "word-samples-b"
+      ]
+    },
+    "ripple-sticker": {
+      "path": "assets/ripple-sticker.png",
+      "sha256": "5bd6f706ddc7386db13956a5affac06c04e8268dbd80db3d141262037189dc1f",
+      "width": 260,
+      "height": 234,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/exhibit-game-sprites.png",
+      "generatedSourceSha256": "17be7d4e20e74261cc48678f0c040cc6bfae250d4e257467d7f5dbb5ea20a69f",
+      "promptSha256": "a543fd02c6f4195cbb659c6cc72991b08158e28d63695e11868b0613c729dc33",
+      "sourceCrop": [
+        1045,
+        550,
+        1520,
+        977
+      ],
+      "receipt": "art-source/exhibit-game-sprites.receipt.json",
+      "bytes": 88508,
+      "visualReview": "atlas crop reviewed",
+      "usedBy": [
+        "listen-to-scenes"
+      ],
+      "derivativeConsumers": []
+    },
+    "river-waves": {
+      "path": "assets/river-waves.png",
+      "sha256": "fce9bb236b5a366f999d7577891aeeaa511bad8d336280187bbf4825e5957c86",
+      "width": 388,
+      "height": 390,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/wind-and-words.png",
+      "generatedSourceSha256": "d6661d0c96eeb7d0c0bd6af49e0ceea4587ee1b7022cca08a10b1582e7ede005",
+      "promptSha256": "7db1cf3dd029b5d45d9f46dbf0730029cec6270f98d803b15dfd1d35f5b0ddcc",
+      "sourceCrop": [
+        849,
+        9,
+        1244,
+        406
+      ],
+      "receipt": "art-source/wind-and-words.receipt.json",
+      "bytes": 288962,
+      "visualReview": "atlas crop reviewed",
+      "usedBy": [],
+      "derivativeConsumers": [
+        "game-river-waves",
+        "wind-scenes"
+      ]
+    },
+    "search-around": {
+      "path": "assets/search-around.png",
+      "sha256": "e90a74572036f3f1e7a99ccd9eb7da207bcbfc6843f38afbc8803001728d20bc",
+      "width": 390,
+      "height": 390,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/word-corners.png",
+      "generatedSourceSha256": "1e58695195b2f5949834bdd4f773730da1118022200ce5a47c94a759300d4ad2",
+      "promptSha256": "407fc89591d00dbbdf65ffacb1bb94118c8aac92bfb6d00bf863ee8321fe4819",
+      "sourceCrop": [
+        430,
+        429,
+        823,
+        822
+      ],
+      "receipt": "art-source/word-corners.receipt.json",
+      "bytes": 310399,
+      "visualReview": "atlas crop reviewed",
+      "usedBy": [],
+      "derivativeConsumers": [
+        "word-samples-c"
+      ]
+    },
+    "sheep": {
+      "path": "assets/sheep.png",
+      "sha256": "a99380dfadd7c4497c91390b2f093a94d6a6aa99142203c2aa4b9e4de31416e7",
+      "width": 387,
+      "height": 390,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/letters-and-wishes.png",
+      "generatedSourceSha256": "01998b88cc753eb73daff570dd5e74e17df7ad420d118cc10802b42d99f6bcf5",
+      "promptSha256": "b50a252e39b61eea62816b7221a5962499c4db056598e3bff9af027a3b52ea0a",
+      "sourceCrop": [
+        424,
+        7,
+        823,
+        409
+      ],
+      "receipt": "art-source/letters-and-wishes.receipt.json",
+      "bytes": 233103,
+      "visualReview": "atlas crop reviewed",
+      "usedBy": [],
+      "derivativeConsumers": [
+        "recognition-chart"
+      ]
+    },
+    "skiff": {
+      "path": "assets/skiff.png",
+      "sha256": "71f66a9f39be87d0b8e435d17b07f42de2501d2690b4c0afb6b27d86028b05b5",
+      "width": 384,
+      "height": 390,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/letters-and-wishes.png",
+      "generatedSourceSha256": "01998b88cc753eb73daff570dd5e74e17df7ad420d118cc10802b42d99f6bcf5",
+      "promptSha256": "b50a252e39b61eea62816b7221a5962499c4db056598e3bff9af027a3b52ea0a",
+      "sourceCrop": [
+        840,
+        842,
+        1240,
+        1248
+      ],
+      "receipt": "art-source/letters-and-wishes.receipt.json",
+      "bytes": 224456,
+      "visualReview": "atlas crop reviewed",
+      "usedBy": [],
+      "derivativeConsumers": [
+        "bubbles-open"
+      ]
+    },
+    "spring-blossoms": {
+      "path": "assets/spring-blossoms.png",
+      "sha256": "2c2f6d38f4c842eb97499655f60992659f3bccffdf87c88f01aee08404e8c1cd",
+      "width": 388,
+      "height": 390,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/wind-and-words.png",
+      "generatedSourceSha256": "d6661d0c96eeb7d0c0bd6af49e0ceea4587ee1b7022cca08a10b1582e7ede005",
+      "promptSha256": "7db1cf3dd029b5d45d9f46dbf0730029cec6270f98d803b15dfd1d35f5b0ddcc",
+      "sourceCrop": [
+        430,
+        9,
+        825,
+        406
+      ],
+      "receipt": "art-source/wind-and-words.receipt.json",
+      "bytes": 283570,
+      "visualReview": "atlas crop reviewed",
+      "usedBy": [
+        "listen-to-scenes"
+      ],
+      "derivativeConsumers": [
+        "wind-scenes"
+      ]
+    },
+    "stop-at-rope": {
+      "path": "assets/stop-at-rope.png",
+      "sha256": "fc7f63a13f43cf652ed9fb3cc2cbadd2b0aef67da79ca8aac43815151d8f9e50",
+      "width": 390,
+      "height": 387,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/word-corners.png",
+      "generatedSourceSha256": "1e58695195b2f5949834bdd4f773730da1118022200ce5a47c94a759300d4ad2",
+      "promptSha256": "407fc89591d00dbbdf65ffacb1bb94118c8aac92bfb6d00bf863ee8321fe4819",
+      "sourceCrop": [
+        845,
+        14,
+        1239,
+        405
+      ],
+      "receipt": "art-source/word-corners.receipt.json",
+      "bytes": 275677,
+      "visualReview": "atlas crop reviewed",
+      "usedBy": [
+        "listen-to-scenes"
+      ],
+      "derivativeConsumers": [
+        "word-samples-b"
+      ]
+    },
+    "structure-examples": {
+      "path": "assets/structure-examples.png",
+      "sha256": "db8caca16b5b7ef1a21637ad3f7413b490ef57c07570143ed5575217c79d2a89",
+      "bytes": 7960,
+      "source": "deterministic teaching diagram",
+      "renderSource": "art-source/garden_diagrams.py",
+      "renderSourceSha256": "2589ccadffc472c9145736acb008fb388fafe5c6c162d3419dd1badc42f021d1",
+      "inputs": {},
+      "visualReview": "shape and scene placement reviewed",
+      "usedBy": [
+        "move-character-crates",
+        "shape-rules"
+      ],
+      "derivativeConsumers": []
+    },
+    "structure-side": {
+      "path": "assets/structure-side.png",
+      "sha256": "ef82fb795d1e7aed05b54a41b0e69a3aeaab37589671c3366bada6d540de3fdb",
+      "bytes": 581,
+      "source": "deterministic teaching diagram",
+      "renderSource": "art-source/garden_diagrams.py",
+      "renderSourceSha256": "2589ccadffc472c9145736acb008fb388fafe5c6c162d3419dd1badc42f021d1",
+      "inputs": {},
+      "visualReview": "shape and scene placement reviewed",
+      "usedBy": [
+        "move-character-crates",
+        "picture-check:structure-bright",
+        "picture-check:structure-early"
+      ],
+      "derivativeConsumers": []
+    },
+    "structure-up": {
+      "path": "assets/structure-up.png",
+      "sha256": "8e3d8986e5abe3957010d26b2294df69df4a8650a1d314b0adae1be74d3cf1e7",
+      "bytes": 607,
+      "source": "deterministic teaching diagram",
+      "renderSource": "art-source/garden_diagrams.py",
+      "renderSourceSha256": "2589ccadffc472c9145736acb008fb388fafe5c6c162d3419dd1badc42f021d1",
+      "inputs": {},
+      "visualReview": "shape and scene placement reviewed",
+      "usedBy": [
+        "move-character-crates",
+        "picture-check:structure-bright",
+        "picture-check:structure-early"
+      ],
+      "derivativeConsumers": [
+        "move-open"
+      ]
+    },
+    "structure-whole": {
+      "path": "assets/structure-whole.png",
+      "sha256": "578e2abd7e5f8a61a61c80fe1178a623890a5a7c3c6bbe481b10fd748bc3c6a8",
+      "bytes": 518,
+      "source": "deterministic teaching diagram",
+      "renderSource": "art-source/garden_diagrams.py",
+      "renderSourceSha256": "2589ccadffc472c9145736acb008fb388fafe5c6c162d3419dd1badc42f021d1",
+      "inputs": {},
+      "visualReview": "shape and scene placement reviewed",
+      "usedBy": [
+        "move-character-crates",
+        "picture-check:structure-bright",
+        "picture-check:structure-early"
+      ],
+      "derivativeConsumers": [
+        "move-open"
+      ]
+    },
+    "tree-bark": {
+      "path": "assets/tree-bark.png",
+      "sha256": "30f24d4efe99ecd8feaf54ed4bdcdfc02902a26f221c253c92216be4208947e3",
+      "width": 390,
+      "height": 390,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/wind-and-words.png",
+      "generatedSourceSha256": "d6661d0c96eeb7d0c0bd6af49e0ceea4587ee1b7022cca08a10b1582e7ede005",
+      "promptSha256": "7db1cf3dd029b5d45d9f46dbf0730029cec6270f98d803b15dfd1d35f5b0ddcc",
+      "sourceCrop": [
+        849,
+        429,
+        1244,
+        824
+      ],
+      "receipt": "art-source/wind-and-words.receipt.json",
+      "bytes": 304168,
+      "visualReview": "atlas crop reviewed",
+      "usedBy": [
+        "listen-to-scenes"
+      ],
+      "derivativeConsumers": [
+        "bubbles-open",
+        "word-samples-a"
+      ]
+    },
+    "wind-scenes": {
+      "path": "assets/wind-scenes.png",
+      "sha256": "02fc427aca5ad443f7c2db930b00b972234e308c0bd14ad13bad8b122bd22b11",
+      "bytes": 459374,
+      "source": "deterministic teaching diagram",
+      "renderSource": "art-source/garden_diagrams.py",
+      "renderSourceSha256": "2589ccadffc472c9145736acb008fb388fafe5c6c162d3419dd1badc42f021d1",
+      "inputs": {
+        "autumn-gust": "13a23051e4606d47561e78f7eec63af4ed8861b7038adaed9d8148af9779a974",
+        "spring-blossoms": "2c2f6d38f4c842eb97499655f60992659f3bccffdf87c88f01aee08404e8c1cd",
+        "river-waves": "fce9bb236b5a366f999d7577891aeeaa511bad8d336280187bbf4825e5957c86",
+        "bamboo-gust": "8ba258dd9d6bfe823ed603f6e31efd7af9438f8f14d013361b3be6cf740551ea"
+      },
+      "visualReview": "shape and scene placement reviewed",
+      "usedBy": [
+        "where-is-the-wind"
+      ],
+      "derivativeConsumers": []
+    },
+    "word-samples-a": {
+      "path": "assets/word-samples-a.png",
+      "sha256": "aad730bb2a00fe6081760059f1b2b1736fe18ce5143c542e7034e8f3e320c807",
+      "bytes": 255748,
+      "source": "deterministic teaching diagram",
+      "renderSource": "art-source/garden_diagrams.py",
+      "renderSourceSha256": "2589ccadffc472c9145736acb008fb388fafe5c6c162d3419dd1badc42f021d1",
+      "inputs": {
+        "fruit-peel": "2ea38f8f90732b3470f8ab08d332741a10aed608778b799fc482ccb6e63cfdb2",
+        "tree-bark": "30f24d4efe99ecd8feaf54ed4bdcdfc02902a26f221c253c92216be4208947e3",
+        "addition-groups": "79d77aae27fa7456ce6adb9f41bfe46a30f0232a25d77642ee32e222d9a8bbf7",
+        "clip-idea": "12825d682247b30867fa167fbbc61b02496ae92735458f922286c673f3e6efd9"
+      },
+      "visualReview": "shape and scene placement reviewed",
+      "usedBy": [
+        "word-partners"
+      ],
+      "derivativeConsumers": []
+    },
+    "word-samples-b": {
+      "path": "assets/word-samples-b.png",
+      "sha256": "a926fad910e2ceb4499fa350951ae2383ddc39eef36438794ea8f8250ee4bcd7",
+      "bytes": 307737,
+      "source": "deterministic teaching diagram",
+      "renderSource": "art-source/garden_diagrams.py",
+      "renderSourceSha256": "2589ccadffc472c9145736acb008fb388fafe5c6c162d3419dd1badc42f021d1",
+      "inputs": {
+        "return-to-door": "b14680552aac8e62ac8729cc329c536d5bc980656542dd3dbbe50787034c42f1",
+        "answer-teacher": "81d675d9ffb64ef105982948131a99577f52195996f19764e780f753e4a77d84",
+        "many-lanterns": "c56f46be8b3d0024385996b35182323b8df10836e07cae0d0a60518758e1b0a5",
+        "stop-at-rope": "fc7f63a13f43cf652ed9fb3cc2cbadd2b0aef67da79ca8aac43815151d8f9e50"
+      },
+      "visualReview": "shape and scene placement reviewed",
+      "usedBy": [
+        "word-partners"
+      ],
+      "derivativeConsumers": []
+    },
+    "word-samples-c": {
+      "path": "assets/word-samples-c.png",
+      "sha256": "aa6d8c8ea5aa42016729d1ea3b219626633631ae2711592ce07af54f145cbda1",
+      "bytes": 335262,
+      "source": "deterministic teaching diagram",
+      "renderSource": "art-source/garden_diagrams.py",
+      "renderSourceSha256": "2589ccadffc472c9145736acb008fb388fafe5c6c162d3419dd1badc42f021d1",
+      "inputs": {
+        "flowers-everywhere": "1269cdeabc6cdd428e62ae523b24bb9d7aebcab939a6f1586e00e876d116c106",
+        "search-around": "e90a74572036f3f1e7a99ccd9eb7da207bcbfc6843f38afbc8803001728d20bc",
+        "path-direction": "86abb85f15a44986c6f988a8d866f8b51f48a185960cff15e27d74fbd1c88c71",
+        "exhibit-place": "6197b282560d8cc74967f39fc43b5d50dd5d60b4f580a156a49828611435b947"
+      },
+      "visualReview": "shape and scene placement reviewed",
+      "usedBy": [
+        "look-for-words"
+      ],
+      "derivativeConsumers": []
+    },
+    "write-fruit": {
+      "path": "assets/write-fruit.png",
+      "sha256": "ae2e0cf199e0a4b8d475f218e1f0a5e7867700981a7d86457cdad5aeb4159ba3",
+      "bytes": 3035,
+      "source": "deterministic teaching diagram",
+      "renderSource": "art-source/garden_diagrams.py",
+      "renderSourceSha256": "2589ccadffc472c9145736acb008fb388fafe5c6c162d3419dd1badc42f021d1",
+      "inputs": {},
+      "visualReview": "shape and scene placement reviewed",
+      "usedBy": [
+        "write-fruit-white"
+      ],
+      "derivativeConsumers": []
+    },
+    "write-moon": {
+      "path": "assets/write-moon.png",
+      "sha256": "708b73e4f674751ffb2800194e4a86efe7320707240578aaae3dc77652f911a0",
+      "bytes": 1792,
+      "source": "deterministic teaching diagram",
+      "renderSource": "art-source/garden_diagrams.py",
+      "renderSourceSha256": "2589ccadffc472c9145736acb008fb388fafe5c6c162d3419dd1badc42f021d1",
+      "inputs": {},
+      "visualReview": "shape and scene placement reviewed",
+      "usedBy": [
+        "two-writing-rules"
+      ],
+      "derivativeConsumers": []
+    },
+    "write-ox": {
+      "path": "assets/write-ox.png",
+      "sha256": "205758f1ac0a41ed18af20447f7e098451ddb8803a68e6feec22f468c632c88d",
+      "bytes": 1547,
+      "source": "deterministic teaching diagram",
+      "renderSource": "art-source/garden_diagrams.py",
+      "renderSourceSha256": "2589ccadffc472c9145736acb008fb388fafe5c6c162d3419dd1badc42f021d1",
+      "inputs": {},
+      "visualReview": "shape and scene placement reviewed",
+      "usedBy": [
+        "write-four"
+      ],
+      "derivativeConsumers": []
+    },
+    "write-sheep": {
+      "path": "assets/write-sheep.png",
+      "sha256": "d630f645fe5e20e11d4689290c534c769fee05dbd7253351e6c36408eeee4a82",
+      "bytes": 2427,
+      "source": "deterministic teaching diagram",
+      "renderSource": "art-source/garden_diagrams.py",
+      "renderSourceSha256": "2589ccadffc472c9145736acb008fb388fafe5c6c162d3419dd1badc42f021d1",
+      "inputs": {},
+      "visualReview": "shape and scene placement reviewed",
+      "usedBy": [
+        "write-four"
+      ],
+      "derivativeConsumers": []
+    },
+    "write-small": {
+      "path": "assets/write-small.png",
+      "sha256": "b06a3e016b7911ad662a6a4f1a5b9909ed4500b0f892893eb83ca29e8ef33020",
+      "bytes": 1576,
+      "source": "deterministic teaching diagram",
+      "renderSource": "art-source/garden_diagrams.py",
+      "renderSourceSha256": "2589ccadffc472c9145736acb008fb388fafe5c6c162d3419dd1badc42f021d1",
+      "inputs": {},
+      "visualReview": "shape and scene placement reviewed",
+      "usedBy": [
+        "write-middle-first"
+      ],
+      "derivativeConsumers": []
+    },
+    "write-water": {
+      "path": "assets/write-water.png",
+      "sha256": "822eafadf5e19ad6796b0df69c11f2785717e001927dab16a4df9a6478ee9489",
+      "bytes": 2114,
+      "source": "deterministic teaching diagram",
+      "renderSource": "art-source/garden_diagrams.py",
+      "renderSourceSha256": "2589ccadffc472c9145736acb008fb388fafe5c6c162d3419dd1badc42f021d1",
+      "inputs": {},
+      "visualReview": "shape and scene placement reviewed",
+      "usedBy": [
+        "write-middle-first"
+      ],
+      "derivativeConsumers": []
+    },
+    "write-white": {
+      "path": "assets/write-white.png",
+      "sha256": "4a07c334c009d0d1f5c0ac509df4a4a5f7e0e35c78735d5744c4beb8aeba3ae3",
+      "bytes": 2435,
+      "source": "deterministic teaching diagram",
+      "renderSource": "art-source/garden_diagrams.py",
+      "renderSourceSha256": "2589ccadffc472c9145736acb008fb388fafe5c6c162d3419dd1badc42f021d1",
+      "inputs": {},
+      "visualReview": "shape and scene placement reviewed",
+      "usedBy": [
+        "write-fruit-white"
+      ],
+      "derivativeConsumers": []
+    },
+    "write-wind": {
+      "path": "assets/write-wind.png",
+      "sha256": "383a0519eded898bc8968448ce0c7537ec41b08b5a6831cc26e3a1263f543fb1",
+      "bytes": 2299,
+      "source": "deterministic teaching diagram",
+      "renderSource": "art-source/garden_diagrams.py",
+      "renderSourceSha256": "2589ccadffc472c9145736acb008fb388fafe5c6c162d3419dd1badc42f021d1",
+      "inputs": {},
+      "visualReview": "shape and scene placement reviewed",
+      "usedBy": [
+        "two-writing-rules"
+      ],
+      "derivativeConsumers": []
+    }
+  },
+  "scope": "核对源图、字形、逐笔累计图和课页对应；小屏和配音交接单独验收。"
+}

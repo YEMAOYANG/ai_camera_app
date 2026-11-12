@@ -1,0 +1,1051 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "Unit 2 They're little and cute.",
+  "description": "在原创玩具动物展里观察大小和动作，理解两条线索及肯定、否定问答，再向家人介绍玩具。",
+  "grade": 1,
+  "roster": {
+    "mia": {
+      "name": "Mia 老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Jennifer",
+      "avatar": "/teachers/coco-english-v1.png",
+      "color": "#557B76",
+      "persona": "用自然的中英文短句带孩子看图、听线索、说一问一答。"
+    }
+  },
+  "images": {
+    "bear-lifts": {
+      "file": "assets/bear-lifts.png"
+    },
+    "bubble-boat": {
+      "file": "assets/bubble-boat.png"
+    },
+    "bubble-boat-action": {
+      "file": "assets/bubble-boat-action.png"
+    },
+    "elephants-big": {
+      "file": "assets/elephants-big.png"
+    },
+    "exhibit-car": {
+      "file": "assets/exhibit-car.png"
+    },
+    "exhibit-car-action": {
+      "file": "assets/exhibit-car-action.png"
+    },
+    "exhibit-map": {
+      "file": "assets/exhibit-map.png"
+    },
+    "exhibit-pond": {
+      "file": "assets/exhibit-pond.png"
+    },
+    "exhibit-sticker": {
+      "file": "assets/exhibit-sticker.png"
+    },
+    "giraffes-tall": {
+      "file": "assets/giraffes-tall.png"
+    },
+    "horses-big": {
+      "file": "assets/horses-big.png"
+    },
+    "horses-big-ground": {
+      "file": "assets/horses-big-ground.png"
+    },
+    "horses-big-lift": {
+      "file": "assets/horses-big-lift.png"
+    },
+    "horses-little": {
+      "file": "assets/horses-little.png"
+    },
+    "horses-small-lift": {
+      "file": "assets/horses-small-lift.png"
+    },
+    "monkey-box-stays": {
+      "file": "assets/monkey-box-stays.png"
+    },
+    "open-exhibit": {
+      "file": "assets/open-exhibit.png"
+    },
+    "pandas-big-lift": {
+      "file": "assets/pandas-big-lift.png"
+    },
+    "pandas-little": {
+      "file": "assets/pandas-little.png"
+    },
+    "pandas-little-ground": {
+      "file": "assets/pandas-little-ground.png"
+    },
+    "pandas-little-lift": {
+      "file": "assets/pandas-little-lift.png"
+    },
+    "q1-cats-ground": {
+      "file": "assets/q1-cats-ground.png"
+    },
+    "q1-dogs-ground": {
+      "file": "assets/q1-dogs-ground.png"
+    },
+    "q1-dogs-lift": {
+      "file": "assets/q1-dogs-lift.png"
+    },
+    "q2-elephants-big-ground": {
+      "file": "assets/q2-elephants-big-ground.png"
+    },
+    "q2-elephants-big-lift": {
+      "file": "assets/q2-elephants-big-lift.png"
+    },
+    "q2-elephants-small-lift": {
+      "file": "assets/q2-elephants-small-lift.png"
+    },
+    "q3-elephants-low": {
+      "file": "assets/q3-elephants-low.png"
+    },
+    "q3-giraffes-tall": {
+      "file": "assets/q3-giraffes-tall.png"
+    },
+    "q3-rabbits-low": {
+      "file": "assets/q3-rabbits-low.png"
+    },
+    "q4-elephants-little": {
+      "file": "assets/q4-elephants-little.png"
+    },
+    "q4-horses-big": {
+      "file": "assets/q4-horses-big.png"
+    },
+    "q4-tigers-big": {
+      "file": "assets/q4-tigers-big.png"
+    },
+    "q5-cats-ground": {
+      "file": "assets/q5-cats-ground.png"
+    },
+    "q5-tigers-ground": {
+      "file": "assets/q5-tigers-ground.png"
+    },
+    "q5-tigers-lift": {
+      "file": "assets/q5-tigers-lift.png"
+    },
+    "q6-cats-big": {
+      "file": "assets/q6-cats-big.png"
+    },
+    "q6-rabbits-big": {
+      "file": "assets/q6-rabbits-big.png"
+    },
+    "q6-rabbits-little": {
+      "file": "assets/q6-rabbits-little.png"
+    },
+    "quiz-stem-1": {
+      "file": "assets/quiz-stem-1.png"
+    },
+    "quiz-stem-2": {
+      "file": "assets/quiz-stem-2.png"
+    },
+    "quiz-stem-3": {
+      "file": "assets/quiz-stem-3.png"
+    },
+    "quiz-stem-4": {
+      "file": "assets/quiz-stem-4.png"
+    },
+    "quiz-stem-5": {
+      "file": "assets/quiz-stem-5.png"
+    },
+    "quiz-stem-6": {
+      "file": "assets/quiz-stem-6.png"
+    },
+    "rabbits-little": {
+      "file": "assets/rabbits-little.png"
+    },
+    "snakes-long": {
+      "file": "assets/snakes-long.png"
+    },
+    "workshop-finale": {
+      "file": "assets/workshop-finale.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "exhibit-welcome",
+      "type": "slide",
+      "title": "玩具动物展要开门了",
+      "template": "title-picture",
+      "data": {
+        "title": "玩具动物展要开门了",
+        "picture": "open-exhibit",
+        "caption": "Toy animals"
+      },
+      "script": [
+        {
+          "say": "玩具动物展快开门了。你想帮哪只玩具做介绍？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "门口有玩具熊、长颈鹿和小马。先看看它们长什么样。"
+        },
+        {
+          "say": "有的个头高，有的个头小。"
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "Toy animals."
+        },
+        {
+          "say": "我们还可以看看它们做了什么。"
+        },
+        {
+          "say": "只看大小，就能知道谁抬得动积木吗？"
+        },
+        {
+          "say": "进去看看。等会儿你来给玩具找展位。"
+        }
+      ]
+    },
+    {
+      "key": "see-strong",
+      "type": "slide",
+      "title": "积木离开地面了吗",
+      "template": "two-columns",
+      "data": {
+        "title": "积木离开地面了吗",
+        "left": {
+          "heading": "玩具猴试一试",
+          "body": "It isn’t strong."
+        },
+        "left_picture": "monkey-box-stays",
+        "right": {
+          "heading": "玩具熊试一试",
+          "body": "It’s strong."
+        },
+        "right_picture": "bear-lifts"
+      },
+      "script": [
+        {
+          "say": "同一块积木，玩具猴和玩具熊都要试着抬。你猜结果怎样？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "先看左边，积木还贴着地面。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "It isn’t strong."
+        },
+        {
+          "say": "这句说的是左边这只玩具在这次试举里的表现。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "右边抬起来了，积木下面能看见一段空隙。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "It’s strong."
+        },
+        {
+          "say": "strong 可以说有力气。看动作，光看个头还不够。"
+        },
+        {
+          "say": "请你用手比一比，哪边的积木离开了地面？"
+        }
+      ]
+    },
+    {
+      "key": "two-groups-of-horses",
+      "type": "slide",
+      "title": "两群马站在同一条线上",
+      "template": "two-columns",
+      "data": {
+        "title": "两群马站在同一条线上",
+        "left": {
+          "heading": "小马这一组",
+          "body": "They’re little and cute."
+        },
+        "left_picture": "horses-little",
+        "right": {
+          "heading": "母马这一组",
+          "body": "They’re big."
+        },
+        "right_picture": "horses-big"
+      },
+      "script": [
+        {
+          "say": "两组都长着马鬃。哪一组个头小一点？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "先看脚下。它们都站在同一条线上。"
+        },
+        {
+          "say": "左边是小马。"
+        },
+        {
+          "say": "Baby horses."
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "They’re little and cute."
+        },
+        {
+          "say": "我说它们小，也觉得它们很可爱。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "右边是母马。脚下那条线一样高，身体明显更大。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "They’re big."
+        },
+        {
+          "say": "你可以听出我在说哪一组。"
+        },
+        {
+          "say": "Find the little horses."
+        },
+        {
+          "say": "Find the big horses."
+        }
+      ]
+    },
+    {
+      "key": "two-traits",
+      "type": "slide",
+      "title": "两条线索都要对",
+      "template": "two-columns",
+      "data": {
+        "title": "两条线索都要对",
+        "left": {
+          "heading": "个头大，也抬起来了",
+          "body": "They’re big and strong."
+        },
+        "left_picture": "horses-big-lift",
+        "right": {
+          "heading": "个头大，积木还在地上",
+          "body": "The box stays down."
+        },
+        "right_picture": "horses-big-ground"
+      },
+      "script": [
+        {
+          "say": "这两组的个头都大。我说 big and strong，要找哪一组？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "左边的木箱抬起来了。再看这两匹马的个头，也大。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "They’re big and strong."
+        },
+        {
+          "say": "and 把两条线索连起来，说的都是左边这一组。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "右边也大。看箱底，这一组没有把它抬起来。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "They’re big. The box stays down."
+        },
+        {
+          "say": "只听大，会选到两边。两条都对，才选左边。"
+        },
+        {
+          "say": "没接到先停一下。再听一遍，看看是哪一条还没对上。"
+        }
+      ]
+    },
+    {
+      "key": "small-can-lift",
+      "type": "slide",
+      "title": "小个头也能举起积木",
+      "template": "two-columns",
+      "data": {
+        "title": "小个头也能举起积木",
+        "left": {
+          "heading": "小，也抬起来了",
+          "body": "They’re little and strong."
+        },
+        "left_picture": "pandas-little-lift",
+        "right": {
+          "heading": "小，积木还在地上",
+          "body": "The box stays down."
+        },
+        "right_picture": "pandas-little-ground"
+      },
+      "script": [
+        {
+          "say": "两张卡上的玩具熊猫都小。是不是两张都能配 strong？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "先看左边。两只都小，但积木底下留了空。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "They’re little and strong."
+        },
+        {
+          "say": "个头小和有力气，也能在同一组身上看见。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "再看右边，同样小。积木还挨着地面。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "The little pandas keep the box down."
+        },
+        {
+          "say": "找图时先听个头，再看箱底，不用先猜哪组厉害。"
+        },
+        {
+          "say": "图卡亮了。把小艇移到它的正下方，再吹泡泡。"
+        },
+        {
+          "say": "这张图卡配对成功啦。"
+        }
+      ]
+    },
+    {
+      "key": "listen-for-traits",
+      "type": "interactive",
+      "title": "听线索，吹泡泡",
+      "page": "listen-for-traits",
+      "startImage": "exhibit-pond",
+      "widgetType": "learning-arcade",
+      "gameAudio": {
+        "little-horses": "two-groups-of-horses-14",
+        "big-horses": "two-groups-of-horses-15",
+        "big-and-strong": "two-traits-5",
+        "box-down-big": "two-traits-10",
+        "trait-hint": "two-traits-12",
+        "little-and-strong": "small-can-lift-5",
+        "box-down-little": "small-can-lift-10",
+        "trait-help": "small-can-lift-12",
+        "trait-praise": "small-can-lift-13"
+      },
+      "script": [
+        {
+          "say": "两组马都在等泡泡。老师的口令里，是大马还是小马？"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#bubble-replay-anchor"
+        },
+        {
+          "say": "老师先示范第一个泡泡。点喇叭，听到要找小马。"
+        },
+        {
+          "highlight": "#first-toy-picture"
+        },
+        {
+          "say": "左边两只小马脚下有同一条线，个头确实更小。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "用箭头把小艇移到图卡下面，再点圆圈吹泡泡。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "看泡泡上去。对准那张图，接到第一张就停。"
+        },
+        {
+          "say": "后面可能还有第二条线索。两条都对，再吹泡泡。轮到你。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ]
+    },
+    {
+      "key": "answer-the-question",
+      "type": "slide",
+      "title": "问的是哪一条",
+      "template": "two-columns",
+      "data": {
+        "title": "问的是哪一条",
+        "left": {
+          "heading": "问母马这一组",
+          "body": "Yes, they are."
+        },
+        "left_picture": "horses-big",
+        "right": {
+          "heading": "问小马这一组",
+          "body": "No, they aren’t."
+        },
+        "right_picture": "horses-little"
+      },
+      "script": [
+        {
+          "say": "我现在只问大不大。同一个问题，两组能答一样吗？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "先指左边这组大马。"
+        },
+        {
+          "say": "Are they big?"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "Yes, they are."
+        },
+        {
+          "say": "问的确实符合，就用 Yes 回答。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "换成这组小马，问题还是问大不大。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "Are they big? No, they aren’t."
+        },
+        {
+          "say": "No 只说它们不符合刚问的那条。还可以再问一条。"
+        },
+        {
+          "say": "Are they big? Yes, they are."
+        },
+        {
+          "say": "Yes 和 No 要听清。别把问句里的 big 当成最后答案。"
+        }
+      ]
+    },
+    {
+      "key": "ask-another-clue",
+      "type": "slide",
+      "title": "再问一个线索",
+      "template": "two-columns",
+      "data": {
+        "title": "再问一个线索",
+        "left": {
+          "heading": "看高度",
+          "body": "Are they tall?"
+        },
+        "left_picture": "giraffes-tall",
+        "right": {
+          "heading": "看耳朵",
+          "body": "They have long ears."
+        },
+        "right_picture": "rabbits-little"
+      },
+      "script": [
+        {
+          "say": "我把玩具图分成两组。猜前先问一个你能从图上看的特点。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "这一组伸长脖子，和地线一比，明显更高。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "Are they tall? Yes, they are."
+        },
+        {
+          "say": "你只听到 Yes 时，要回想问的是 tall。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "再看另一组，个头小，但耳朵很长。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "No, they aren’t tall. Long ears!"
+        },
+        {
+          "say": "两条一起听，就能从高的图里排除，再找长耳朵。"
+        },
+        {
+          "say": "Look up! Tall toys."
+        },
+        {
+          "say": "Look down! Small toys."
+        },
+        {
+          "say": "下面再换几组。先问是不是，再听下一条。"
+        },
+        {
+          "say": "Are they horses? No. They’re little."
+        },
+        {
+          "say": "Are they elephants? Yes, they are."
+        },
+        {
+          "say": "Are they pandas? No. They’re horses."
+        },
+        {
+          "say": "Are they long? Yes, they are."
+        },
+        {
+          "say": "Go to the flag."
+        },
+        {
+          "say": "听完再动。先看看前面的问句，答案是肯定还是否定。"
+        },
+        {
+          "say": "图标亮起来啦。把车开到那张图，再找下一张。"
+        },
+        {
+          "say": "展位找到了，路也走对了。"
+        }
+      ]
+    },
+    {
+      "key": "route-to-the-exhibit",
+      "type": "interactive",
+      "title": "听问答，开车去展位",
+      "page": "route-to-the-exhibit",
+      "startImage": "exhibit-map",
+      "widgetType": "learning-arcade",
+      "gameAudio": {
+        "maze-not-big": "answer-the-question-11",
+        "maze-yes-big": "answer-the-question-13",
+        "maze-yes-tall": "ask-another-clue-5",
+        "maze-long-ears": "ask-another-clue-10",
+        "maze-not-horses": "ask-another-clue-15",
+        "maze-yes-elephants": "ask-another-clue-16",
+        "maze-not-pandas": "ask-another-clue-17",
+        "maze-yes-long": "ask-another-clue-18",
+        "maze-exit": "ask-another-clue-19",
+        "maze-hint": "ask-another-clue-20",
+        "maze-help": "ask-another-clue-21",
+        "maze-praise": "ask-another-clue-22"
+      },
+      "script": [
+        {
+          "say": "先去哪组玩具的展位？要听完问题和回答才能开车。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#maze-sound"
+        },
+        {
+          "say": "我听到问大不大，回答是否定。先排除大的一组。"
+        },
+        {
+          "highlight": "#maze-first-card"
+        },
+        {
+          "say": "老师只示范第一站。看旁边大图，我找这组小兔。"
+        },
+        {
+          "highlight": "#maze-first-tile"
+        },
+        {
+          "say": "地图上也有同样的兔子图，往它那边开。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "这辆小车听你的箭头。我们只走到第一张图。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "到了第一站就停。下一次先听新问答，再开车。"
+        },
+        {
+          "say": "图标都找齐以后才去小旗。准备好，换你来开。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ]
+    },
+    {
+      "key": "picture-check",
+      "type": "quiz",
+      "title": "换一场展览，听图小检查",
+      "intro": [
+        "听老师说话，再选相符的图。",
+        "没听清可以点小喇叭。"
+      ],
+      "questions": [
+        {
+          "id": "cute-q1",
+          "question": "They’re strong.",
+          "skill": "按可见动作理解 strong",
+          "answer": [
+            "B"
+          ],
+          "analysis": "第二张的箱子底下有空，说明这组把箱子抬起来了。其余两组的箱子还贴着地面。",
+          "visual": {
+            "kind": "asset",
+            "image": "quiz-stem-1",
+            "alt": "新展区的听题图标"
+          },
+          "options": {
+            "A": {
+              "label": "图卡1",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-dogs-ground",
+                "alt": "一对小狗木玩具，木箱在地面"
+              }
+            },
+            "B": {
+              "label": "图卡2",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-dogs-lift",
+                "alt": "一对小狗木玩具，把木箱抬离地面"
+              }
+            },
+            "C": {
+              "label": "图卡3",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-cats-ground",
+                "alt": "一对小猫木玩具，木箱在地面"
+              }
+            }
+          }
+        },
+        {
+          "id": "cute-q2",
+          "question": "They’re big and strong.",
+          "skill": "听懂同一组两条描述",
+          "answer": [
+            "A"
+          ],
+          "analysis": "第一组个头大，也把木箱抬离地面。第二组只有大，第三组抬起了箱子但个头小。",
+          "visual": {
+            "kind": "asset",
+            "image": "quiz-stem-2",
+            "alt": "新展区的听题图标"
+          },
+          "options": {
+            "A": {
+              "label": "图卡1",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-elephants-big-lift",
+                "alt": "两只大木象，抬起箱子"
+              }
+            },
+            "B": {
+              "label": "图卡2",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-elephants-big-ground",
+                "alt": "两只大木象，箱子在地面"
+              }
+            },
+            "C": {
+              "label": "图卡3",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-elephants-small-lift",
+                "alt": "两只小木象，抬起箱子"
+              }
+            }
+          }
+        },
+        {
+          "id": "cute-q3",
+          "question": "Are they tall? Yes, they are.",
+          "skill": "听肯定回答选择图片",
+          "answer": [
+            "C"
+          ],
+          "analysis": "Yes 表示符合刚问的 tall。比较同一地线，长颈鹿这一组明显高过另外两组。",
+          "visual": {
+            "kind": "asset",
+            "image": "quiz-stem-3",
+            "alt": "新展区的听题图标"
+          },
+          "options": {
+            "A": {
+              "label": "图卡1",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-rabbits-low",
+                "alt": "两只矮小兔，站在同样地线"
+              }
+            },
+            "B": {
+              "label": "图卡2",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-elephants-low",
+                "alt": "两只矮小象，站在同样地线"
+              }
+            },
+            "C": {
+              "label": "图卡3",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-giraffes-tall",
+                "alt": "两只明显较高的长颈鹿"
+              }
+            }
+          }
+        },
+        {
+          "id": "cute-q4",
+          "question": "Are they big? No, they aren’t.",
+          "skill": "听否定回答排除图片",
+          "answer": [
+            "B"
+          ],
+          "analysis": "问的是大不大，No 排除了个头大的两组。第二组小象对照同一标记明显小。",
+          "visual": {
+            "kind": "asset",
+            "image": "quiz-stem-4",
+            "alt": "新展区的听题图标"
+          },
+          "options": {
+            "A": {
+              "label": "图卡1",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-horses-big",
+                "alt": "两匹大木马"
+              }
+            },
+            "B": {
+              "label": "图卡2",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-elephants-little",
+                "alt": "两只小木象"
+              }
+            },
+            "C": {
+              "label": "图卡3",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-tigers-big",
+                "alt": "两只大木虎"
+              }
+            }
+          }
+        },
+        {
+          "id": "cute-q5",
+          "question": "Are they strong? No. They’re tigers.",
+          "skill": "结合否定和种类线索猜一组",
+          "answer": [
+            "C"
+          ],
+          "analysis": "两条都要核对。第一组虎抬了箱子，第二组箱子在地面但它们是猫，第三组两条都符合。",
+          "visual": {
+            "kind": "asset",
+            "image": "quiz-stem-5",
+            "alt": "新展区的听题图标"
+          },
+          "options": {
+            "A": {
+              "label": "图卡1",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-tigers-lift",
+                "alt": "两只木虎，把箱子抬离地面"
+              }
+            },
+            "B": {
+              "label": "图卡2",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-cats-ground",
+                "alt": "两只木猫，箱子还在地面"
+              }
+            },
+            "C": {
+              "label": "图卡3",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-tigers-ground",
+                "alt": "两只木虎，箱子还在地面"
+              }
+            }
+          }
+        },
+        {
+          "id": "cute-q6",
+          "question": "They’re big. They have long ears.",
+          "skill": "把可见的大小和耳朵长度合起来听",
+          "answer": [
+            "A"
+          ],
+          "analysis": "第一组木兔个头大，耳朵也长。第二组耳朵长但小；第三组个头大，耳朵短。",
+          "visual": {
+            "kind": "asset",
+            "image": "quiz-stem-6",
+            "alt": "新展区的听题图标"
+          },
+          "options": {
+            "A": {
+              "label": "图卡1",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-rabbits-big",
+                "alt": "两只大木兔，长耳朵"
+              }
+            },
+            "B": {
+              "label": "图卡2",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-rabbits-little",
+                "alt": "两只小木兔，长耳朵"
+              }
+            },
+            "C": {
+              "label": "图卡3",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-cats-big",
+                "alt": "两只大木猫，短耳朵"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "exhibit-at-home",
+      "type": "slide",
+      "title": "把玩具介绍给家人",
+      "template": "picture-points",
+      "data": {
+        "title": "把玩具介绍给家人",
+        "picture": "workshop-finale",
+        "points": [
+          "Look closely.",
+          "Are they big?",
+          "They’re little and cute."
+        ]
+      },
+      "script": [
+        {
+          "say": "展览要关门了。回家以后，你想把哪组玩具介绍给家人？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "找两只同类玩具，或者自己画两只。"
+        },
+        {
+          "say": "我来演家人，指着左边两只小马来问。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "Are they big?"
+        },
+        {
+          "say": "我换成孩子。看，它们的个头小。"
+        },
+        {
+          "say": "所以我回答 No。"
+        },
+        {
+          "say": "No, they aren’t."
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "还是指着左边这两只，用 and 把两个特点连起来。"
+        },
+        {
+          "say": "They’re little and cute."
+        },
+        {
+          "say": "你指一组，请家人问。你来答，再说两个特点。"
+        },
+        {
+          "say": "纸书第三十五到三十七页，还可以跟读、说说玩具。"
+        }
+      ]
+    }
+  ]
+}

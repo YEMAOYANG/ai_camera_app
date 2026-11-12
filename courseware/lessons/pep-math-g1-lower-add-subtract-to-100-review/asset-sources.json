@@ -1,0 +1,784 @@
+{
+  "schemaVersion": "mira.courseware.asset-sources.v1",
+  "generatedBy": "codex_builtin_imagegen",
+  "imagegenPlan": "imagegen-plan.json",
+  "diagramProgram": {
+    "path": "diagrams.py",
+    "sha256": "f0dc548fd1059dd935886a7cefc89c0d661ba65bbd08e0848062231d6874f118"
+  },
+  "plates": {
+    "radio-studio": {
+      "source": "assets/source/radio-studio-atlas.png",
+      "sourceSha256": "d5f4d844535157c7b9ae2aee374c44b7629f95e87fa59d0d39304e45f2ae1eaa",
+      "width": 1254,
+      "height": 1254
+    }
+  },
+  "assets": {
+    "cover": {
+      "path": "assets/cover.png",
+      "sha256": "c0f1abfb20790ffb925304baaa2ffd41f731ff9e772c2d8b5167af3fe9025520",
+      "width": 621,
+      "height": 621,
+      "source": "radio-studio",
+      "includesAtlasSprites": false,
+      "uses": [
+        "map-start",
+        "match-picture-result",
+        "recap-map",
+        "send-cards"
+      ]
+    },
+    "sort-backdrop": {
+      "path": "assets/sort-backdrop.png",
+      "sha256": "63d02c7f518c21e8b7266b3e189c081f4aad98921e181734dac86c0472262409",
+      "width": 960,
+      "height": 540,
+      "source": "radio-studio",
+      "includesAtlasSprites": false,
+      "uses": [
+        "send-cards"
+      ]
+    },
+    "match-backdrop": {
+      "path": "assets/match-backdrop.png",
+      "sha256": "99d93bf3dee797267850163163e517c3fdfa42c21840ea75beb99f035b6deb39",
+      "width": 960,
+      "height": 540,
+      "source": "radio-studio",
+      "includesAtlasSprites": false,
+      "uses": [
+        "match-picture-result"
+      ]
+    },
+    "trolley": {
+      "path": "assets/trolley.png",
+      "sha256": "31e78c6a1b9af813bdb9386203dd29338d2e7b6ad846a29ce55ef2f197f9674b",
+      "width": 227,
+      "height": 162,
+      "source": "radio-studio",
+      "includesAtlasSprites": false,
+      "uses": [
+        "send-cards"
+      ]
+    },
+    "microphone": {
+      "path": "assets/microphone.png",
+      "sha256": "33852db189fa014722edd2d51df965d3f0294f8d027f77df0432b6d3accf82b5",
+      "width": 102,
+      "height": 181,
+      "source": "radio-studio",
+      "includesAtlasSprites": false,
+      "uses": [
+        "match-picture-result",
+        "send-cards"
+      ]
+    },
+    "ticket": {
+      "path": "assets/ticket.png",
+      "sha256": "f982046f028f9d9d1bff8b46dff4004f4ea508f1af106ba12a2ff6466c32cb43",
+      "width": 191,
+      "height": 110,
+      "source": "radio-studio",
+      "includesAtlasSprites": false,
+      "uses": [
+        "match-picture-result"
+      ]
+    },
+    "sort-board": {
+      "path": "assets/sort-board.png",
+      "sha256": "97f82b79b6ae80bd6c05252bbc4a788807f2d154dd7895095ddbed8f0fa14c67",
+      "width": 860,
+      "height": 570,
+      "source": "diagrams.py",
+      "includesAtlasSprites": false,
+      "uses": [
+        "sort-by-operation"
+      ]
+    },
+    "digits-board": {
+      "path": "assets/digits-board.png",
+      "sha256": "c9c768e1e2a6f9098a4191164c1a9ce33c3fa96237ae22c49fc20cac6527e5fb",
+      "width": 860,
+      "height": 570,
+      "source": "diagrams.py",
+      "includesAtlasSprites": false,
+      "uses": [
+        "change-criteria"
+      ]
+    },
+    "place-board": {
+      "path": "assets/place-board.png",
+      "sha256": "11ac3beb20f6d2c20bdcfc3e37448ca2c7eeacdb39acccc00d597a745953b81f",
+      "width": 860,
+      "height": 570,
+      "source": "diagrams.py",
+      "includesAtlasSprites": false,
+      "uses": [
+        "same-place"
+      ]
+    },
+    "exchange-board": {
+      "path": "assets/exchange-board.png",
+      "sha256": "1a9a1214c0c155f3614e021e2271f760802127a88c6e19e24ff10d4e9be82026",
+      "width": 860,
+      "height": 570,
+      "source": "diagrams.py",
+      "includesAtlasSprites": false,
+      "uses": [
+        "carry-and-uncarry"
+      ]
+    },
+    "ticket-teach": {
+      "path": "assets/ticket-teach.png",
+      "sha256": "87d94a456f2ff8815980dfe1ba97146dc8c218df090728b47a6d478cb7875ccc",
+      "width": 620,
+      "height": 330,
+      "source": "diagrams.py",
+      "includesAtlasSprites": true,
+      "uses": [
+        "real-situations"
+      ]
+    },
+    "trips-teach": {
+      "path": "assets/trips-teach.png",
+      "sha256": "8376c95370724be0a80d45f1979582f3e00679465b7e0e9d100d8a8743eaea27",
+      "width": 620,
+      "height": 330,
+      "source": "diagrams.py",
+      "includesAtlasSprites": true,
+      "uses": [
+        "one-or-several"
+      ]
+    },
+    "capacity-teach": {
+      "path": "assets/capacity-teach.png",
+      "sha256": "a90e26110bc6f2ba9afa64524b12719263dc96e3cff995bcc00a21f5421b85bb",
+      "width": 620,
+      "height": 330,
+      "source": "diagrams.py",
+      "includesAtlasSprites": true,
+      "uses": [
+        "capacity-limit"
+      ]
+    },
+    "compare-board": {
+      "path": "assets/compare-board.png",
+      "sha256": "1bfedf74b08a134e73ae2c567a695fd3cabefa772605e9e420d2bf4584daee80",
+      "width": 620,
+      "height": 330,
+      "source": "diagrams.py",
+      "includesAtlasSprites": false,
+      "uses": [
+        "check-with-compare"
+      ]
+    },
+    "sort-rule-ops": {
+      "path": "assets/sort-rule-ops.png",
+      "sha256": "4493e13b8cef600bd108bfd015844cad959eaa7a6efdc131fe815a0cf6180258",
+      "width": 400,
+      "height": 194,
+      "source": "diagrams.py",
+      "includesAtlasSprites": false,
+      "uses": [
+        "send-cards"
+      ]
+    },
+    "sort-rule-carry": {
+      "path": "assets/sort-rule-carry.png",
+      "sha256": "981385c8e0c8fb4dbd19e43103e5ef4754594076d4eae3dcd05c0168f1ec3cd0",
+      "width": 400,
+      "height": 194,
+      "source": "diagrams.py",
+      "includesAtlasSprites": false,
+      "uses": [
+        "send-cards",
+        "sorting-rules"
+      ]
+    },
+    "sort-rule-borrow": {
+      "path": "assets/sort-rule-borrow.png",
+      "sha256": "ef1cd6a2d07d338970bb9e4e904790258050f39d64ebd9326a32c17d9a1fbcae",
+      "width": 400,
+      "height": 194,
+      "source": "diagrams.py",
+      "includesAtlasSprites": false,
+      "uses": [
+        "send-cards"
+      ]
+    },
+    "dock-plus": {
+      "path": "assets/dock-plus.png",
+      "sha256": "f05f334987f67df3856bd25cc78cf127bd89eee6ba3f183381907eee5175ffb2",
+      "width": 230,
+      "height": 230,
+      "source": "diagrams.py",
+      "includesAtlasSprites": false,
+      "uses": [
+        "send-cards"
+      ]
+    },
+    "dock-minus": {
+      "path": "assets/dock-minus.png",
+      "sha256": "8dd2cf66a1d7f601ebf0dc1e1ac505853e33781c0c0a9ca5b4db725cf6a026e7",
+      "width": 230,
+      "height": 230,
+      "source": "diagrams.py",
+      "includesAtlasSprites": false,
+      "uses": [
+        "send-cards"
+      ]
+    },
+    "dock-carry": {
+      "path": "assets/dock-carry.png",
+      "sha256": "f5350036d67d918057bd975d9eb9362fb07b2d3d188ba1a0a4812004d37e07d8",
+      "width": 230,
+      "height": 230,
+      "source": "diagrams.py",
+      "includesAtlasSprites": false,
+      "uses": [
+        "send-cards"
+      ]
+    },
+    "dock-keep-add": {
+      "path": "assets/dock-keep-add.png",
+      "sha256": "7731bcc99bf4fde2514225be96f2ca400164c9b3835a1816838ae09a0a115c4f",
+      "width": 230,
+      "height": 230,
+      "source": "diagrams.py",
+      "includesAtlasSprites": false,
+      "uses": [
+        "send-cards"
+      ]
+    },
+    "dock-borrow": {
+      "path": "assets/dock-borrow.png",
+      "sha256": "ae127a00c2328d171033ac0e34dfbbbeb641bcf30bbfb448926b92d2b9d19e20",
+      "width": 230,
+      "height": 230,
+      "source": "diagrams.py",
+      "includesAtlasSprites": false,
+      "uses": [
+        "send-cards"
+      ]
+    },
+    "dock-keep-sub": {
+      "path": "assets/dock-keep-sub.png",
+      "sha256": "9b5fd16fa9e537c5dd0b10674f660f4a69cbf3a441d4354f30b69a60a230cc65",
+      "width": 230,
+      "height": 230,
+      "source": "diagrams.py",
+      "includesAtlasSprites": false,
+      "uses": [
+        "send-cards"
+      ]
+    },
+    "add-26-3": {
+      "path": "assets/add-26-3.png",
+      "sha256": "ff2d3899fb466fd48625824c25be8a0c9b3a96c5fd096e8d5efc866a6adbc6f3",
+      "width": 224,
+      "height": 224,
+      "source": "diagrams.py",
+      "includesAtlasSprites": false,
+      "uses": [
+        "send-cards"
+      ]
+    },
+    "sub-57-3": {
+      "path": "assets/sub-57-3.png",
+      "sha256": "3d500c084a2a4ae7fb7054ba42b6f8d0733a75659831dc76e3dfa0b6d9654725",
+      "width": 224,
+      "height": 224,
+      "source": "diagrams.py",
+      "includesAtlasSprites": false,
+      "uses": [
+        "send-cards"
+      ]
+    },
+    "add-29-6": {
+      "path": "assets/add-29-6.png",
+      "sha256": "e74a86e056abc57046453628f807a210373416e8546a160208fe128f66fdf067",
+      "width": 224,
+      "height": 224,
+      "source": "diagrams.py",
+      "includesAtlasSprites": false,
+      "uses": [
+        "send-cards"
+      ]
+    },
+    "add-43-4": {
+      "path": "assets/add-43-4.png",
+      "sha256": "e8dea7d43b7d4ce0f35a751cfe92d8549355fd85f586747ba562184fa89c4163",
+      "width": 224,
+      "height": 224,
+      "source": "diagrams.py",
+      "includesAtlasSprites": false,
+      "uses": [
+        "send-cards"
+      ]
+    },
+    "add-56-7": {
+      "path": "assets/add-56-7.png",
+      "sha256": "f46b89fdb4420d2ac52bbba584a13946e0f027618deaba9755f87363d82d8cc4",
+      "width": 224,
+      "height": 224,
+      "source": "diagrams.py",
+      "includesAtlasSprites": false,
+      "uses": [
+        "send-cards"
+      ]
+    },
+    "sub-42-5": {
+      "path": "assets/sub-42-5.png",
+      "sha256": "785b16ba03fb4f6c4361eb4545bfa11b6c83809ff753ece42b304c8129727658",
+      "width": 224,
+      "height": 224,
+      "source": "diagrams.py",
+      "includesAtlasSprites": false,
+      "uses": [
+        "send-cards"
+      ]
+    },
+    "sub-65-4": {
+      "path": "assets/sub-65-4.png",
+      "sha256": "6f2f207fc2695135c50c264f72b4c640cc6f76f27ec156037d0716cdaefa759d",
+      "width": 224,
+      "height": 224,
+      "source": "diagrams.py",
+      "includesAtlasSprites": false,
+      "uses": [
+        "send-cards"
+      ]
+    },
+    "sub-71-6": {
+      "path": "assets/sub-71-6.png",
+      "sha256": "8343926418f131060e07e30b8cadc2a99f076248b514d80a4eb4f0888b478c51",
+      "width": 224,
+      "height": 224,
+      "source": "diagrams.py",
+      "includesAtlasSprites": false,
+      "uses": [
+        "send-cards"
+      ]
+    },
+    "sub-49-8": {
+      "path": "assets/sub-49-8.png",
+      "sha256": "cb1ff508037a5eee474114e421ae763cdd6fce9cf8813e00c7e3b45004205fff",
+      "width": 224,
+      "height": 224,
+      "source": "diagrams.py",
+      "includesAtlasSprites": false,
+      "uses": [
+        "send-cards"
+      ]
+    },
+    "more-tens": {
+      "path": "assets/more-tens.png",
+      "sha256": "5848920db9791177e2c09a988255481c30444f476fa4164cc0aa0dc0f8df4a1f",
+      "width": 620,
+      "height": 330,
+      "source": "diagrams.py",
+      "includesAtlasSprites": false,
+      "uses": [
+        "match-picture-result",
+        "match-rules"
+      ]
+    },
+    "more-ones": {
+      "path": "assets/more-ones.png",
+      "sha256": "e26076b23b002375d0643d243e9ff771c159064de64c1f7e96e1ab569e8f86c6",
+      "width": 620,
+      "height": 330,
+      "source": "diagrams.py",
+      "includesAtlasSprites": false,
+      "uses": [
+        "match-picture-result"
+      ]
+    },
+    "carry-first": {
+      "path": "assets/carry-first.png",
+      "sha256": "5a28fa38bd89b3e90e57a298248777469d7a4d3643b3688fcacbf3c7a6bffab6",
+      "width": 620,
+      "height": 330,
+      "source": "diagrams.py",
+      "includesAtlasSprites": false,
+      "uses": [
+        "match-picture-result"
+      ]
+    },
+    "carry-next": {
+      "path": "assets/carry-next.png",
+      "sha256": "85164528d3cbde63cad956e034f88db3ec935148fc5999cd7c400659f68580c5",
+      "width": 620,
+      "height": 330,
+      "source": "diagrams.py",
+      "includesAtlasSprites": false,
+      "uses": [
+        "match-picture-result"
+      ]
+    },
+    "borrow-first": {
+      "path": "assets/borrow-first.png",
+      "sha256": "a3740fe2d8470728aec3ff6cda94c653825d116e38df132eec27ca642381a3fe",
+      "width": 620,
+      "height": 330,
+      "source": "diagrams.py",
+      "includesAtlasSprites": false,
+      "uses": [
+        "match-picture-result"
+      ]
+    },
+    "borrow-next": {
+      "path": "assets/borrow-next.png",
+      "sha256": "e474cd26a2d879a1f47f14519d3c9126566886e1306e7f844f6a835cb893d8ee",
+      "width": 620,
+      "height": 330,
+      "source": "diagrams.py",
+      "includesAtlasSprites": false,
+      "uses": [
+        "match-picture-result"
+      ]
+    },
+    "value-48": {
+      "path": "assets/value-48.png",
+      "sha256": "b2507a0cdf25ec80f5b341fe3b95beedf81fe8c7b77c8e838097bf2489b966fe",
+      "width": 396,
+      "height": 246,
+      "source": "diagrams.py",
+      "includesAtlasSprites": false,
+      "uses": [
+        "match-picture-result"
+      ]
+    },
+    "value-58": {
+      "path": "assets/value-58.png",
+      "sha256": "7ca8810fb40f39b7fae6dd81733534ada274a8c46bfaac598e858773d84d3870",
+      "width": 396,
+      "height": 246,
+      "source": "diagrams.py",
+      "includesAtlasSprites": false,
+      "uses": [
+        "match-picture-result"
+      ]
+    },
+    "value-39": {
+      "path": "assets/value-39.png",
+      "sha256": "832e5509ff0a762d9fb3ea66b90f4113bd576cd12f04321a45f02ffd8686fcb3",
+      "width": 396,
+      "height": 246,
+      "source": "diagrams.py",
+      "includesAtlasSprites": false,
+      "uses": [
+        "match-picture-result"
+      ]
+    },
+    "value-40": {
+      "path": "assets/value-40.png",
+      "sha256": "c3970ad8f710dc5ae6d9a6554bdd281eb1242326d6e4174bab4c513772821635",
+      "width": 396,
+      "height": 246,
+      "source": "diagrams.py",
+      "includesAtlasSprites": false,
+      "uses": [
+        "match-picture-result"
+      ]
+    },
+    "value-36": {
+      "path": "assets/value-36.png",
+      "sha256": "11f06a0e375e7f5be3ccf56322a3974fe2ce94cc2176a99d046366804611512e",
+      "width": 396,
+      "height": 246,
+      "source": "diagrams.py",
+      "includesAtlasSprites": false,
+      "uses": [
+        "match-picture-result"
+      ]
+    },
+    "value-46": {
+      "path": "assets/value-46.png",
+      "sha256": "533b8ac3b6eaddd56e6654353bc0897d399d15b1ce1c9b9dd109ca238cee0720",
+      "width": 396,
+      "height": 246,
+      "source": "diagrams.py",
+      "includesAtlasSprites": false,
+      "uses": [
+        "match-picture-result"
+      ]
+    },
+    "value-54": {
+      "path": "assets/value-54.png",
+      "sha256": "e94231a1552649b6fc180c1e44c85d5934ce0d5cb3afdae244d61fd0c047373d",
+      "width": 396,
+      "height": 246,
+      "source": "diagrams.py",
+      "includesAtlasSprites": false,
+      "uses": [
+        "match-picture-result"
+      ]
+    },
+    "value-64": {
+      "path": "assets/value-64.png",
+      "sha256": "b90060340c00d49fac31569ad91c61b8847c8eea1b4daeb2f65f761fa934f6db",
+      "width": 396,
+      "height": 246,
+      "source": "diagrams.py",
+      "includesAtlasSprites": false,
+      "uses": [
+        "match-picture-result"
+      ]
+    },
+    "value-43": {
+      "path": "assets/value-43.png",
+      "sha256": "b8d2eba7e0f95de4c122b7e52ab5dcd08a2464e8307df5f8532890a2b04ff9d1",
+      "width": 396,
+      "height": 246,
+      "source": "diagrams.py",
+      "includesAtlasSprites": false,
+      "uses": [
+        "match-picture-result"
+      ]
+    },
+    "value-53": {
+      "path": "assets/value-53.png",
+      "sha256": "f6def18a9c7a6ee37e1bc421118b0bb3c3406e1c2831728175c6c2ff3c818681",
+      "width": 396,
+      "height": 246,
+      "source": "diagrams.py",
+      "includesAtlasSprites": false,
+      "uses": [
+        "match-picture-result"
+      ]
+    },
+    "value-63": {
+      "path": "assets/value-63.png",
+      "sha256": "41471495a6e67186e3e4208ebcf58d16aa1a5cf489368ac397521e7e1960f2cd",
+      "width": 396,
+      "height": 246,
+      "source": "diagrams.py",
+      "includesAtlasSprites": false,
+      "uses": [
+        "match-picture-result"
+      ]
+    },
+    "value-68": {
+      "path": "assets/value-68.png",
+      "sha256": "50de0b303f5e63fb8c06e4350bde65bfe9e82c7c5d2125c05523be9576774597",
+      "width": 396,
+      "height": 246,
+      "source": "diagrams.py",
+      "includesAtlasSprites": false,
+      "uses": [
+        "match-picture-result"
+      ]
+    },
+    "value-78": {
+      "path": "assets/value-78.png",
+      "sha256": "e1f81837c2ba64ccfe1a38548fd97dba73ef235561e630604361f422a1955392",
+      "width": 396,
+      "height": 246,
+      "source": "diagrams.py",
+      "includesAtlasSprites": false,
+      "uses": [
+        "match-picture-result"
+      ]
+    },
+    "q1-a": {
+      "path": "assets/q1-a.png",
+      "sha256": "a91c7f0ba3a99f5c4ab70dcaf170f1e1917980990a5e0fdfd4e372b64f0c7894",
+      "width": 620,
+      "height": 330,
+      "source": "diagrams.py",
+      "includesAtlasSprites": false,
+      "uses": [
+        "picture-check/identify-carry/A"
+      ]
+    },
+    "q1-b": {
+      "path": "assets/q1-b.png",
+      "sha256": "5f83a06db524f4d28d4f0d719cf17b0496c688d28f0c241999589d04763cbc39",
+      "width": 620,
+      "height": 330,
+      "source": "diagrams.py",
+      "includesAtlasSprites": false,
+      "uses": [
+        "picture-check/identify-carry/B"
+      ]
+    },
+    "q1-c": {
+      "path": "assets/q1-c.png",
+      "sha256": "abbee5f83ee83a28c93bb99c41e6147e073d4886605ba28b4e9b460b7917f2b4",
+      "width": 620,
+      "height": 330,
+      "source": "diagrams.py",
+      "includesAtlasSprites": false,
+      "uses": [
+        "picture-check/identify-carry/C"
+      ]
+    },
+    "q2-a": {
+      "path": "assets/q2-a.png",
+      "sha256": "b862febf1cfae042a6585ec8f1bdd2b400688e15d523dcfd73dbae2f2c595c1f",
+      "width": 620,
+      "height": 330,
+      "source": "diagrams.py",
+      "includesAtlasSprites": false,
+      "uses": [
+        "picture-check/add-two-tens/A"
+      ]
+    },
+    "q2-b": {
+      "path": "assets/q2-b.png",
+      "sha256": "ca078405c842c68c4dcdecfcddf0fa0de4c9abce8aa92f5ffef5e4c674c335c8",
+      "width": 620,
+      "height": 330,
+      "source": "diagrams.py",
+      "includesAtlasSprites": false,
+      "uses": [
+        "picture-check/add-two-tens/B"
+      ]
+    },
+    "q2-c": {
+      "path": "assets/q2-c.png",
+      "sha256": "0f3fa4896dabfb1edb180e10893d52277a0da3ca8f10c94e48612f431dfc5d9b",
+      "width": 620,
+      "height": 330,
+      "source": "diagrams.py",
+      "includesAtlasSprites": false,
+      "uses": [
+        "picture-check/add-two-tens/C"
+      ]
+    },
+    "q3-a": {
+      "path": "assets/q3-a.png",
+      "sha256": "ba1697d56a9f01bcba2aa6f3d33d0b70b2c72c22b9cd20314d237944535ee4cd",
+      "width": 620,
+      "height": 330,
+      "source": "diagrams.py",
+      "includesAtlasSprites": false,
+      "uses": [
+        "picture-check/borrow-and-remove/A"
+      ]
+    },
+    "q3-b": {
+      "path": "assets/q3-b.png",
+      "sha256": "0df1bef271b2cd9302d3d1470f598afbd87cd126e901250b7f4496aaee753f2e",
+      "width": 620,
+      "height": 330,
+      "source": "diagrams.py",
+      "includesAtlasSprites": false,
+      "uses": [
+        "picture-check/borrow-and-remove/B"
+      ]
+    },
+    "q3-c": {
+      "path": "assets/q3-c.png",
+      "sha256": "9602e4e06211b8c188cfff052beb95ff6c5212150683e165108a2b355bfcd3ce",
+      "width": 620,
+      "height": 330,
+      "source": "diagrams.py",
+      "includesAtlasSprites": false,
+      "uses": [
+        "picture-check/borrow-and-remove/C"
+      ]
+    },
+    "q4-a": {
+      "path": "assets/q4-a.png",
+      "sha256": "cddfcdb3ecb646c051fe4be1cef0d2bd9f526c4c0b16739a1dc91af00a87ae47",
+      "width": 620,
+      "height": 330,
+      "source": "diagrams.py",
+      "includesAtlasSprites": true,
+      "uses": [
+        "picture-check/find-missing-tickets/A"
+      ]
+    },
+    "q4-b": {
+      "path": "assets/q4-b.png",
+      "sha256": "1743e7788b632e3de7b6fa89320a3d5576343d521b97f54dfeef65681f54b0fd",
+      "width": 620,
+      "height": 330,
+      "source": "diagrams.py",
+      "includesAtlasSprites": true,
+      "uses": [
+        "picture-check/find-missing-tickets/B"
+      ]
+    },
+    "q4-c": {
+      "path": "assets/q4-c.png",
+      "sha256": "923fcbe583b2a68e5209e6b84e9a5dc4c04ed5170443cc5275539f4913b5c4af",
+      "width": 620,
+      "height": 330,
+      "source": "diagrams.py",
+      "includesAtlasSprites": true,
+      "uses": [
+        "picture-check/find-missing-tickets/C"
+      ]
+    },
+    "q5-a": {
+      "path": "assets/q5-a.png",
+      "sha256": "7e7c6f3c7e4e6635eeb40e7d545126c411cc2cd21a3024be637f800b95d2a0f8",
+      "width": 620,
+      "height": 330,
+      "source": "diagrams.py",
+      "includesAtlasSprites": true,
+      "uses": [
+        "picture-check/move-all-boxes/A"
+      ]
+    },
+    "q5-b": {
+      "path": "assets/q5-b.png",
+      "sha256": "fc4eb4c9e3bd8c765ebbe54af36db4709c17d4ea5a23564e68a8d64d20846cc5",
+      "width": 620,
+      "height": 330,
+      "source": "diagrams.py",
+      "includesAtlasSprites": true,
+      "uses": [
+        "picture-check/move-all-boxes/B"
+      ]
+    },
+    "q5-c": {
+      "path": "assets/q5-c.png",
+      "sha256": "c0547188ad37c978d3a8f2b53d77b802380698feb493e8ee73c38053c63a0e5b",
+      "width": 620,
+      "height": 330,
+      "source": "diagrams.py",
+      "includesAtlasSprites": true,
+      "uses": [
+        "picture-check/move-all-boxes/C"
+      ]
+    },
+    "q6-a": {
+      "path": "assets/q6-a.png",
+      "sha256": "b8750a8b14108bad59115d140ab54c6e179fabe31e8a5590b43bf6de3f3168f5",
+      "width": 620,
+      "height": 330,
+      "source": "diagrams.py",
+      "includesAtlasSprites": true,
+      "uses": [
+        "picture-check/compare-with-capacity/A"
+      ]
+    },
+    "q6-b": {
+      "path": "assets/q6-b.png",
+      "sha256": "4c22683931d3b4e741f3f9f67e1212b7419d9ac5f12a2f62b0ee9e85efa255c1",
+      "width": 620,
+      "height": 330,
+      "source": "diagrams.py",
+      "includesAtlasSprites": true,
+      "uses": [
+        "picture-check/compare-with-capacity/B"
+      ]
+    },
+    "q6-c": {
+      "path": "assets/q6-c.png",
+      "sha256": "f901a2387fb30d806ba1576795fbf158727d4a9ab92076901b3fb940b13caf63",
+      "width": 620,
+      "height": 330,
+      "source": "diagrams.py",
+      "includesAtlasSprites": true,
+      "uses": [
+        "picture-check/compare-with-capacity/C"
+      ]
+    }
+  }
+}

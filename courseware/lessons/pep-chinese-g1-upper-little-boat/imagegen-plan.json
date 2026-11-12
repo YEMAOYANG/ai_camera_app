@@ -1,0 +1,1565 @@
+{
+  "schemaVersion": "mira.courseware.imagegen-plan.v1",
+  "lesson": "pep-chinese-g1-upper-little-boat",
+  "status": "formal_art_and_prevoice_browser_checks_complete",
+  "mode": "codex_builtin_imagegen",
+  "sharedPrompt": "原创一年级中文课堂画面，细纸纹、哑光水粉、干净的剪纸轮廓，深松绿与暖奶油底，少量杏色和柿橙。仅在夜空主题使用低饱和深蓝。主体完整、背景安静、小屏可辨。不要文字、数字、标志、水印、教材原图风格或既有角色。透明件保留真实 alpha。",
+  "requests": [
+    {
+      "key": "crescent-window",
+      "file": "assets/illustrations/crescent-window.png",
+      "pages": [
+        "p01"
+      ],
+      "playbackSize": [
+        1000,
+        500
+      ],
+      "transparent": false,
+      "prompt": "傍晚从窗内向外看，一轮弯月在画面中央，亮面宽度清楚，完整弧线与两个尖端一眼可辨。窗框只在边缘，深蓝夜空安静，窗外无船。",
+      "referenceKeys": [],
+      "status": "integrated",
+      "actualReferenceKeys": [
+        "curved-boat"
+      ],
+      "source": "assets/illustrations/source/crescent-window.png",
+      "sourceSha256": "afd815b72cc951fa92aac63aa44854867d39e1930e1fd2eb3deef377ff137b8d",
+      "sourceSize": [
+        1774,
+        887
+      ],
+      "sha256": "ed384b2d33312bbf6e84f0c22952942ad6b9d6d479c60f55e698103989516216",
+      "actualPrompt": "原创一年级中文课堂画面，细纸纹、哑光水粉、干净的剪纸轮廓，深松绿与暖奶油底，少量杏色和柿橙。仅在夜空主题使用低饱和深蓝。主体完整、背景安静、小屏可辨。不要文字、数字、标志、水印、教材原图风格或既有角色。透明件保留真实 alpha。\n傍晚从窗内向外看，一轮弯月在画面中央，亮面宽度清楚，完整弧线与两个尖端一眼可辨。窗框只在边缘，深蓝夜空安静，窗外无船。\n2:1横图。参照图只用于弧线朝向和画风：在没有文字的深靛蓝夜空正中，一轮浅奶杏色的向上开口的宽弯月，左右两尖都向上，最下方中段是连贯向下的外弧。画出不遮住月亮的窗框细边。全画只有一轮月，不画舟、水或人。",
+      "generationId": "exec-f70a7e61-7db1-4976-9794-4bb5e010a30d",
+      "playbackBytes": 699823
+    },
+    {
+      "key": "curved-boat",
+      "file": "assets/illustrations/curved-boat.png",
+      "pages": [
+        "p01"
+      ],
+      "playbackSize": [
+        1000,
+        500
+      ],
+      "transparent": false,
+      "prompt": "安静水面上的一艘短小木舟，略俯侧视，船底明显弯起，船首与船尾各收尖。完整显出两端，不画遮住端头的桨、帆、人物；水线淡。",
+      "referenceKeys": [],
+      "status": "integrated",
+      "source": "assets/illustrations/source/curved-boat.png",
+      "sourceSha256": "394d6f6ea84e223a3291c5385c2bab83065748eb0d93c378373f32d8e5e89ec3",
+      "sourceSize": [
+        1774,
+        887
+      ],
+      "sha256": "40c62bdfe60dd5bcde5d125f8d9c490fc0f7eca2d8ea43cd7cafc522359cb7a0",
+      "actualPrompt": "原创一年级中文课堂画面，细纸纹、哑光水粉、干净的剪纸轮廓，深松绿与暖奶油底，少量杏色和柿橙。仅在夜空主题使用低饱和深蓝。主体完整、背景安静、小屏可辨。不要文字、数字、标志、水印、教材原图风格或既有角色。透明件保留真实 alpha。\n安静水面上的一艘短小木舟，略俯侧视，船底明显弯起，船首与船尾各收尖。完整显出两端，不画遮住端头的桨、帆、人物；水线淡。\n横图 2:1。单艘低矮短木舟朝左，接近侧面稍俯视，船身整体明显向上弯，两个船端在左、右清楚向上挑尖，像一笔宽 U；留出安全边距，不加星星月亮，水面不遮轮廓。",
+      "generationId": "exec-227634bb-52de-4ad0-9724-8e94fd3e22e8",
+      "playbackBytes": 735380
+    },
+    {
+      "key": "boat-word-view",
+      "file": "assets/illustrations/curved-boat.png",
+      "pages": [
+        "p02"
+      ],
+      "playbackSize": [
+        840,
+        600
+      ],
+      "transparent": false,
+      "prompt": "一艘短小木舟的清楚侧上视图，船身横放，低弯的底边连到向上收尖的两端，远近轮廓不打架。船身左右各留空，水线柔和，主体占宽80%。",
+      "referenceKeys": [
+        "curved-boat"
+      ],
+      "status": "integrated",
+      "sourceType": "codex_builtin_imagegen",
+      "source": "assets/illustrations/source/curved-boat.png",
+      "sourceSha256": "394d6f6ea84e223a3291c5385c2bab83065748eb0d93c378373f32d8e5e89ec3",
+      "sha256": "40c62bdfe60dd5bcde5d125f8d9c490fc0f7eca2d8ea43cd7cafc522359cb7a0",
+      "reusedSourceAssetKey": "curved-boat",
+      "playbackBytes": 735380
+    },
+    {
+      "key": "word-moon-boat",
+      "file": "assets/illustrations/word-moon-boat.png",
+      "pages": [
+        "p03"
+      ],
+      "playbackSize": [
+        840,
+        600
+      ],
+      "transparent": false,
+      "prompt": "两个同等显眼的独立小景横向排列，左为安静夜空中的弯月，右为停在水面上的小船。两景间距宽，绝不叠在一起。",
+      "referenceKeys": [
+        "crescent-window",
+        "curved-boat"
+      ],
+      "status": "integrated",
+      "sourceType": "deterministic_composition_of_codex_imagegen",
+      "source": "art-source/word-moon-boat-composition.json",
+      "sourceSha256": "9796d353bae20800a2257ed0cccdbbaac6fb41096ddd3dc98a5716463b5991f2",
+      "sha256": "456a68b11b3115f2a55e235fd78e69d72da3d24b1a40c62b815e5434c3e4be2d",
+      "playbackBytes": 205250,
+      "compositionInputKeys": [
+        "crescent-window",
+        "curved-boat"
+      ]
+    },
+    {
+      "key": "room-pinwheel",
+      "file": "assets/room-pinwheel.png",
+      "pages": [
+        "p04"
+      ],
+      "playbackSize": [
+        840,
+        600
+      ],
+      "transparent": false,
+      "prompt": "暖色小屋室内，墙壁和窗框完整。单个纸风车插在窗边低搁板上的小花盆里，有把柄和四叶折纸轮廓。边上有空敞口盒子，风车和盒子分开，家具简洁。",
+      "referenceKeys": [],
+      "status": "integrated",
+      "sourceType": "codex_builtin_imagegen_atlas_crop",
+      "source": "art-source/p04-p05-p14-room-and-knit.png",
+      "sourceSha256": "5c9cd2237bce1d82b922aa9d6a3853cbb8c4362ff17009abe7e9a8ac0013ecd5",
+      "sha256": "45b88a9c7abf0a4cf7591e3fafd470c5745c597a0b328a3a88bd1904c2c6e198",
+      "atlasId": "p04-p05-p14-room-and-knit",
+      "sourceCrop": [
+        0,
+        0,
+        627,
+        627
+      ],
+      "playbackBytes": 553105
+    },
+    {
+      "key": "plain-door",
+      "file": "assets/plain-door.png",
+      "pages": [
+        "p05"
+      ],
+      "playbackSize": [
+        1000,
+        500
+      ],
+      "transparent": false,
+      "prompt": "正视一扇略打开的木门，外门框左右竖边和上横边清楚，一个小孩从门缝探头。门框比背景深，地板浅色，不出现文字或教学习字描红。",
+      "referenceKeys": [],
+      "status": "integrated",
+      "sourceType": "codex_builtin_imagegen_atlas_crop",
+      "source": "art-source/p04-p05-p14-room-and-knit.png",
+      "sourceSha256": "5c9cd2237bce1d82b922aa9d6a3853cbb8c4362ff17009abe7e9a8ac0013ecd5",
+      "sha256": "ca8d356a91bbb13d6e9a7def5ee1571f813e1cdf2e11c3792cd402f454183d10",
+      "atlasId": "p04-p05-p14-room-and-knit",
+      "sourceCrop": [
+        627,
+        0,
+        1254,
+        627
+      ],
+      "playbackBytes": 536775
+    },
+    {
+      "key": "parcel-phrases",
+      "file": "assets/illustrations/parcel-phrases.png",
+      "pages": [
+        "p07"
+      ],
+      "playbackSize": [
+        840,
+        600
+      ],
+      "transparent": false,
+      "prompt": "邮包台上整齐摊开红针织围巾和蓝针织围巾两件，色彩纯正，蓝圆帽在围巾后上方但不遮挡，单片黄叶在左边。主体物之间有空白，画面物件完整。",
+      "referenceKeys": [],
+      "status": "integrated",
+      "sourceType": "deterministic_composition_of_codex_imagegen",
+      "source": "art-source/parcel-phrases-composition.json",
+      "sourceSha256": "d5a78aa9582d7035b46fd437b6c0e2ec2c7349a19844743d5ad3e0f4c54aa763",
+      "sha256": "c351059d242744e955fadda0d400f442469698ebcada89c59124fbd6b3dbdc4f",
+      "playbackBytes": 167644,
+      "compositionInputKeys": [
+        "parcel-yellow-leaf",
+        "parcel-red-scarf",
+        "parcel-blue-scarf",
+        "parcel-blue-cap",
+        "recipient-rabbit",
+        "recipient-turtle",
+        "recipient-cat"
+      ]
+    },
+    {
+      "key": "sky-imagination",
+      "file": "assets/illustrations/sky-imagination.png",
+      "pages": [
+        "p09"
+      ],
+      "playbackSize": [
+        840,
+        600
+      ],
+      "transparent": false,
+      "prompt": "原创童诗想象场景。穿暖杏色外套、短黑发的孩子坐在一弯月亮船里，抬头朝上方亮亮的星点看。天空清楚是深蓝，没有海面、云端人物或交通工具。月亮两尖都完整，小星明暗和大小有变化，孩子侧脸看向星点。",
+      "referenceKeys": [],
+      "status": "integrated",
+      "source": "assets/illustrations/source/sky-imagination.png",
+      "sourceSha256": "85ff74933ed0ba69714fb4f48b56a8682c8e8767018b6a955d5f54f67113a65e",
+      "sourceSize": [
+        1484,
+        1060
+      ],
+      "sha256": "294f8f4f9df2e2be93739c45f1e2bfbb8120489cd76361ecfee2dd4581570069",
+      "actualPrompt": "原创一年级中文课堂画面，细纸纹、哑光水粉、干净的剪纸轮廓，深松绿与暖奶油底，少量杏色和柿橙。仅在夜空主题使用低饱和深蓝。主体完整、背景安静、小屏可辨。不要文字、数字、标志、水印、教材原图风格或既有角色。透明件保留真实 alpha。\n原创童诗想象场景。穿暖杏色外套、短黑发的孩子坐在一弯月亮船里，抬头朝上方亮亮的星点看。天空清楚是深蓝，没有海面、云端人物或交通工具。月亮两尖都完整，小星明暗和大小有变化，孩子侧脸看向星点。\n横图 7:5。参考图只取低饱和靛蓝夜色、向上开口的奶杏弯月和哑光细纸纹，不要窗框。全图重点是一艘由弯月形体本身组成的想象月亮船，里面一位原创短黑发孩子抬头看向上方几颗星点。孩子不坐在额外木船里，也不要月牙背后再画月。保持月的两尖与孩子完整。",
+      "actualReferenceKeys": [
+        "crescent-window"
+      ],
+      "generationId": "exec-522334e5-f900-448f-a43a-2b6dc7a5cb55",
+      "playbackBytes": 635911
+    },
+    {
+      "key": "read-two-panels",
+      "file": "assets/illustrations/read-two-panels.png",
+      "pages": [
+        "p10"
+      ],
+      "playbackSize": [
+        840,
+        600
+      ],
+      "transparent": false,
+      "prompt": "双幅安静纸书记忆线索图。左半是完整弯月和完整水上小船隔空并排，只强调两者弧线和两尖；右半是杏色外套短黑发孩子坐在月亮船上望深蓝夜空星点。清楚分开两组，独立插画构图，四周留白。",
+      "referenceKeys": [
+        "sky-imagination",
+        "curved-boat"
+      ],
+      "status": "integrated",
+      "sourceType": "deterministic_composition_of_codex_imagegen",
+      "source": "art-source/read-two-panels-composition.json",
+      "sourceSha256": "b4c38458bbf29397e8b2c2ddd96446ea7ac1c2f55309f2661933508d5f91036d",
+      "sha256": "d249dfc04203945a5b11f890923535a2d3f1203c859ca0db661786ec25763e99",
+      "playbackBytes": 317709,
+      "compositionInputKeys": [
+        "crescent-window",
+        "curved-boat",
+        "sky-imagination"
+      ]
+    },
+    {
+      "key": "snake-start",
+      "file": "assets/illustrations/snake-start.png",
+      "pages": [
+        "p06"
+      ],
+      "playbackSize": [
+        1280,
+        720
+      ],
+      "transparent": false,
+      "prompt": "游戏开场一幕，松绿小蛇头朝向右边，同一画面摆清楚右上的完整弯月参照、前方尖头小船与远一些的圆形圆盘。主体各完整且不遮叠，小蛇面前有清楚转弯空间，不画符号、箭头、文字或界面边框。",
+      "referenceKeys": [
+        "snake-head",
+        "shape-moon",
+        "shape-boat",
+        "shape-disc"
+      ],
+      "status": "integrated",
+      "sourceType": "deterministic_composition_of_codex_imagegen",
+      "source": "assets/illustrations/source/snake-start-composition.json",
+      "sourceSha256": "33c17458041eff130da991e71928de64bb0caa155e512b302b724d397e8b49c6",
+      "sha256": "549322f19bebaa17e7073fd41812ee2d65f7e4ea72bebdfdae4f7aefb35daebb",
+      "playbackBytes": 1158956,
+      "compositionInputKeys": [
+        "snake-backdrop",
+        "snake-tail",
+        "snake-body",
+        "snake-head",
+        "shape-moon",
+        "shape-boat",
+        "shape-disc"
+      ]
+    },
+    {
+      "key": "snake-backdrop",
+      "file": "assets/illustrations/snake-backdrop.png",
+      "pages": [
+        "p06"
+      ],
+      "playbackSize": [
+        1280,
+        720
+      ],
+      "transparent": false,
+      "prompt": "俯视安静纸纹花园，松绿深浅层次。中心是可覆盖大棋盘的低对比干净平面，只在四角点少量植物。无方格、道具、道路、光纹或人物；四边可见。",
+      "referenceKeys": [],
+      "status": "integrated",
+      "source": "assets/illustrations/source/snake-backdrop.png",
+      "sourceSha256": "ae039b410f9cd5fb8653bc727c46651c1dc9554be5a167af023ca61c53476c1c",
+      "sourceSize": [
+        1672,
+        941
+      ],
+      "sha256": "6b405976d42b439891894d6d72d36512ef4438df7017e270e383506fd3c8d688",
+      "actualPrompt": "横图 16:9，原创细纸纹与哑光水粉剪纸。俯视安静纸纹花园，松绿深浅层次。中心是可覆盖大棋盘的低对比干净平面，只在四角点少量植物。无方格、道具、道路、光纹或人物；四边可见。 中央86%连续无界线，较淡的低饱和松绿色底，色差小。少量角落植物远离中间，不在中央做框、光斑、地砖或道具。严禁文字数字。",
+      "generationId": "exec-c1204bb6-719a-4dad-adc7-21e7f4e8aedc",
+      "playbackBytes": 1218985
+    },
+    {
+      "key": "snake-head",
+      "file": "assets/illustrations/snake-head.png",
+      "pages": [
+        "p06"
+      ],
+      "playbackSize": [
+        300,
+        300
+      ],
+      "transparent": true,
+      "prompt": "单一幼儿友好绿色小蛇头，严格向右，左右两侧比例适合程序转向，剪纸圆形头部占画幅约75%，短小豆眼，后缘与身体片段可拼接。",
+      "referenceKeys": [],
+      "status": "integrated",
+      "source": "assets/illustrations/source/p06-snake-atlas.png",
+      "sourceSha256": "d4d7a1dc30713b6160eb6f021f65839fc48b28f33200e19e2306ffd1224cd9a9",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "sourceCropBox": [
+        0,
+        0,
+        627,
+        627
+      ],
+      "atlasKey": "p06-snake-atlas",
+      "sha256": "143d2882d8f594d7fa7f3a467e59dcd5c9960e78189f5901116af8766008e0f2",
+      "actualPrompt": "一张真透明 RGBA 小游戏图集，方形 2列 × 2行，四个精确同尺寸方格，图中不画格或文字。每个资产在自己的格子居中，隔开10%以上透明边。固定次序为左上、右上、左下、右下：1. 单一幼儿友好绿色小蛇头，严格向右，左右两侧比例适合程序转向，剪纸圆形头部占画幅约75%，短小豆眼，后缘与身体片段可拼接。 2. 一个松绿色蛇身片段，正向右的侧视厚度与头部一致，半圆接头，主体居中，两端都不画脸或尾巴。 3. 一个松绿色蛇尾片段，宽端在右能接身体，向左渐细，厚度与蛇身体一致，边缘完整，主体居中。 4. 一枚杏色和深松绿的月亮小舟贴纸，弯月与尖头小船形成一个明快轮廓，留透明边，不画文字和数字。 绿色蛇头在右端有豆眼，鼻朝右；身片段是单个同色半圆接头的椭圆短节；尾片段粗端在右，左尖；三片同高度、中心同一垂直位置、色彩一致，无眼或斑点乱入身体。参考只给右下角贴纸的月形；只要三枚蛇片和一枚小舟贴纸，背景和格间都透明。原创细纸纹、哑光水粉、松绿、奶油与杏色。",
+      "generationId": "exec-9d695fd4-3fff-4b97-9998-059365405518",
+      "playbackBytes": 63769,
+      "actualReferenceKeys": []
+    },
+    {
+      "key": "snake-body",
+      "file": "assets/illustrations/snake-body.png",
+      "pages": [
+        "p06"
+      ],
+      "playbackSize": [
+        300,
+        300
+      ],
+      "transparent": true,
+      "prompt": "一个松绿色蛇身片段，正向右的侧视厚度与头部一致，半圆接头，主体居中，两端都不画脸或尾巴。",
+      "referenceKeys": [
+        "snake-head"
+      ],
+      "status": "integrated",
+      "source": "assets/illustrations/source/p06-snake-atlas.png",
+      "sourceSha256": "d4d7a1dc30713b6160eb6f021f65839fc48b28f33200e19e2306ffd1224cd9a9",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "sourceCropBox": [
+        627,
+        0,
+        1254,
+        627
+      ],
+      "atlasKey": "p06-snake-atlas",
+      "sha256": "38897438f7de146406b23febacb8c567a297b6715c4a1860b975f8612a1c43ed",
+      "actualPrompt": "一张真透明 RGBA 小游戏图集，方形 2列 × 2行，四个精确同尺寸方格，图中不画格或文字。每个资产在自己的格子居中，隔开10%以上透明边。固定次序为左上、右上、左下、右下：1. 单一幼儿友好绿色小蛇头，严格向右，左右两侧比例适合程序转向，剪纸圆形头部占画幅约75%，短小豆眼，后缘与身体片段可拼接。 2. 一个松绿色蛇身片段，正向右的侧视厚度与头部一致，半圆接头，主体居中，两端都不画脸或尾巴。 3. 一个松绿色蛇尾片段，宽端在右能接身体，向左渐细，厚度与蛇身体一致，边缘完整，主体居中。 4. 一枚杏色和深松绿的月亮小舟贴纸，弯月与尖头小船形成一个明快轮廓，留透明边，不画文字和数字。 绿色蛇头在右端有豆眼，鼻朝右；身片段是单个同色半圆接头的椭圆短节；尾片段粗端在右，左尖；三片同高度、中心同一垂直位置、色彩一致，无眼或斑点乱入身体。参考只给右下角贴纸的月形；只要三枚蛇片和一枚小舟贴纸，背景和格间都透明。原创细纸纹、哑光水粉、松绿、奶油与杏色。",
+      "generationId": "exec-9d695fd4-3fff-4b97-9998-059365405518",
+      "playbackBytes": 48016,
+      "actualReferenceKeys": []
+    },
+    {
+      "key": "snake-tail",
+      "file": "assets/illustrations/snake-tail.png",
+      "pages": [
+        "p06"
+      ],
+      "playbackSize": [
+        300,
+        300
+      ],
+      "transparent": true,
+      "prompt": "一个松绿色蛇尾片段，宽端在右能接身体，向左渐细，厚度与蛇身体一致，边缘完整，主体居中。",
+      "referenceKeys": [
+        "snake-body"
+      ],
+      "status": "integrated",
+      "source": "assets/illustrations/source/p06-snake-atlas.png",
+      "sourceSha256": "d4d7a1dc30713b6160eb6f021f65839fc48b28f33200e19e2306ffd1224cd9a9",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "sourceCropBox": [
+        0,
+        627,
+        627,
+        1254
+      ],
+      "atlasKey": "p06-snake-atlas",
+      "sha256": "34643b2b7e43e54263e611f9ce847237a991f9064bc8245c3ad75ebd47db0511",
+      "actualPrompt": "一张真透明 RGBA 小游戏图集，方形 2列 × 2行，四个精确同尺寸方格，图中不画格或文字。每个资产在自己的格子居中，隔开10%以上透明边。固定次序为左上、右上、左下、右下：1. 单一幼儿友好绿色小蛇头，严格向右，左右两侧比例适合程序转向，剪纸圆形头部占画幅约75%，短小豆眼，后缘与身体片段可拼接。 2. 一个松绿色蛇身片段，正向右的侧视厚度与头部一致，半圆接头，主体居中，两端都不画脸或尾巴。 3. 一个松绿色蛇尾片段，宽端在右能接身体，向左渐细，厚度与蛇身体一致，边缘完整，主体居中。 4. 一枚杏色和深松绿的月亮小舟贴纸，弯月与尖头小船形成一个明快轮廓，留透明边，不画文字和数字。 绿色蛇头在右端有豆眼，鼻朝右；身片段是单个同色半圆接头的椭圆短节；尾片段粗端在右，左尖；三片同高度、中心同一垂直位置、色彩一致，无眼或斑点乱入身体。参考只给右下角贴纸的月形；只要三枚蛇片和一枚小舟贴纸，背景和格间都透明。原创细纸纹、哑光水粉、松绿、奶油与杏色。",
+      "generationId": "exec-9d695fd4-3fff-4b97-9998-059365405518",
+      "playbackBytes": 38794,
+      "actualReferenceKeys": []
+    },
+    {
+      "key": "shape-moon",
+      "file": "assets/illustrations/shape-moon.png",
+      "pages": [
+        "p06"
+      ],
+      "playbackSize": [
+        300,
+        300
+      ],
+      "transparent": true,
+      "prompt": "单一奶杏色弯月剪纸，形状宽、连贯的外弧和内弧，两端清楚收尖。保证两个尖端在缩到32像素时还能分辨，不附星星或面孔。",
+      "referenceKeys": [],
+      "status": "integrated",
+      "source": "assets/illustrations/source/shape-moon.png",
+      "sourceSha256": "7bcfc8b3340550e6df82dbd713db7a5dd87d11ea163892629b999c20fabf5682",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "sha256": "498d6023444811e62f281c2a50760ef6ad2bb30c728ba95e458b7a50965b5714",
+      "actualPrompt": "原创一年级中文课堂画面，细纸纹、哑光水粉、干净的剪纸轮廓，深松绿与暖奶油底，少量杏色和柿橙。仅在夜空主题使用低饱和深蓝。主体完整、背景安静、小屏可辨。不要文字、数字、标志、水印、教材原图风格或既有角色。透明件保留真实 alpha。\n单一奶杏色弯月剪纸，形状宽、连贯的外弧和内弧，两端清楚收尖。保证两个尖端在缩到32像素时还能分辨，不附星星或面孔。\n方图真透明。呈 U 型的单一暖杏宽弯月剪影，开口向上，左、右两个角都露全，留四周10%以上的透明边，纯剪纸形；不画星星、眼睛、轮廓投影、底板或纹样。保证在34像素保有两尖。",
+      "generationId": "exec-8d50a2be-a88b-450a-8bc3-0956db09280d",
+      "playbackBytes": 33255
+    },
+    {
+      "key": "shape-boat",
+      "file": "assets/illustrations/shape-boat.png",
+      "pages": [
+        "p06"
+      ],
+      "playbackSize": [
+        300,
+        300
+      ],
+      "transparent": true,
+      "prompt": "单一木舟侧影，形状借鉴弯月的下弧，左右两个端头向上清楚收尖。主体橙棕，侧面内部只用一块明暗色，背景透明，不附水、桨、帆。",
+      "referenceKeys": [
+        "curved-boat",
+        "shape-moon"
+      ],
+      "status": "integrated",
+      "source": "assets/illustrations/source/p06-shape-atlas-clean.png",
+      "sourceSha256": "9182289a967eb433bccab742c4b7719aac39b4b168bbc0a9381f9a81afc8a5d6",
+      "sourceSize": [
+        1536,
+        1024
+      ],
+      "sourceCropBox": [
+        0,
+        0,
+        512,
+        512
+      ],
+      "atlasKey": "p06-shape-atlas-clean",
+      "sha256": "0afb9d7a54d37d17aaa81fa554fb1fffe16535b324a691d144f4c2a80e7c273d",
+      "actualPrompt": "Edit the supplied transparent 3-column-by-2-row sprite sheet. This is a background-extraction correction only. Preserve the same six clear object silhouettes and same locations, including the two pointed ends, orientation, scale, and hand-cut paper texture. Delete all fuzzy surrounding orange light, soft gradients, colored glow, cast shadows, and rim glow. Only the hard-edged six paper objects remain, solid opaque interiors with slight normal edge antialiasing only. Everywhere outside their hard silhouettes is exactly empty, true zero-alpha including the whole gutters. Flat matte paper, no light emission. No colored halo, drop shadows, gradients, panels, black fill, paper background, or checkerboard. Do not add or remove shapes. Keep same 3:2 landscape and 6 exact cells.",
+      "generationId": "exec-dae3b62b-9748-433b-a3ee-ff0e6dd2bcc9",
+      "playbackBytes": 20213,
+      "halfTilePlacement": [
+        14,
+        16
+      ]
+    },
+    {
+      "key": "shape-crescent-side",
+      "file": "assets/illustrations/shape-crescent-side.png",
+      "pages": [
+        "p06"
+      ],
+      "playbackSize": [
+        300,
+        300
+      ],
+      "transparent": true,
+      "prompt": "只旋转参考弯月的朝向，让两端改朝右上，两个尖端都完整；颜色和剪纸边相同，不新增道具。",
+      "referenceKeys": [
+        "shape-moon"
+      ],
+      "status": "integrated",
+      "source": "assets/illustrations/source/p06-shape-atlas-clean.png",
+      "sourceSha256": "9182289a967eb433bccab742c4b7719aac39b4b168bbc0a9381f9a81afc8a5d6",
+      "sourceSize": [
+        1536,
+        1024
+      ],
+      "sourceCropBox": [
+        512,
+        0,
+        1024,
+        512
+      ],
+      "atlasKey": "p06-shape-atlas-clean",
+      "sha256": "7c983b5796bb882e65cd809e4417711b84553963c9215656364305f7ad06487e",
+      "actualPrompt": "Edit the supplied transparent 3-column-by-2-row sprite sheet. This is a background-extraction correction only. Preserve the same six clear object silhouettes and same locations, including the two pointed ends, orientation, scale, and hand-cut paper texture. Delete all fuzzy surrounding orange light, soft gradients, colored glow, cast shadows, and rim glow. Only the hard-edged six paper objects remain, solid opaque interiors with slight normal edge antialiasing only. Everywhere outside their hard silhouettes is exactly empty, true zero-alpha including the whole gutters. Flat matte paper, no light emission. No colored halo, drop shadows, gradients, panels, black fill, paper background, or checkerboard. Do not add or remove shapes. Keep same 3:2 landscape and 6 exact cells.",
+      "generationId": "exec-dae3b62b-9748-433b-a3ee-ff0e6dd2bcc9",
+      "playbackBytes": 27169,
+      "halfTilePlacement": [
+        12,
+        23
+      ]
+    },
+    {
+      "key": "shape-boat-side",
+      "file": "assets/illustrations/shape-boat-side.png",
+      "pages": [
+        "p06"
+      ],
+      "playbackSize": [
+        300,
+        300
+      ],
+      "transparent": true,
+      "prompt": "同样完整尖头木舟剪纸朝向旋转约35度，仍从侧面看清左右两头尖与下弧，边缘留空。",
+      "referenceKeys": [
+        "shape-boat"
+      ],
+      "status": "integrated",
+      "source": "assets/illustrations/source/p06-shape-atlas-clean.png",
+      "sourceSha256": "9182289a967eb433bccab742c4b7719aac39b4b168bbc0a9381f9a81afc8a5d6",
+      "sourceSize": [
+        1536,
+        1024
+      ],
+      "sourceCropBox": [
+        1024,
+        0,
+        1536,
+        512
+      ],
+      "atlasKey": "p06-shape-atlas-clean",
+      "sha256": "28f6cde254a70f35c6818564455c045cab670c31611c3eb914c2ae8018ecce8a",
+      "actualPrompt": "Edit the supplied transparent 3-column-by-2-row sprite sheet. This is a background-extraction correction only. Preserve the same six clear object silhouettes and same locations, including the two pointed ends, orientation, scale, and hand-cut paper texture. Delete all fuzzy surrounding orange light, soft gradients, colored glow, cast shadows, and rim glow. Only the hard-edged six paper objects remain, solid opaque interiors with slight normal edge antialiasing only. Everywhere outside their hard silhouettes is exactly empty, true zero-alpha including the whole gutters. Flat matte paper, no light emission. No colored halo, drop shadows, gradients, panels, black fill, paper background, or checkerboard. Do not add or remove shapes. Keep same 3:2 landscape and 6 exact cells.",
+      "generationId": "exec-dae3b62b-9748-433b-a3ee-ff0e6dd2bcc9",
+      "playbackBytes": 22803,
+      "halfTilePlacement": [
+        28,
+        30
+      ]
+    },
+    {
+      "key": "shape-disc",
+      "file": "assets/illustrations/shape-disc.png",
+      "pages": [
+        "p06"
+      ],
+      "playbackSize": [
+        300,
+        300
+      ],
+      "transparent": true,
+      "prompt": "单一杏色的圆盘剪纸，正对画面，圆周完整，没有一点尖角或不圆弧面，不画花纹。",
+      "referenceKeys": [],
+      "status": "integrated",
+      "source": "assets/illustrations/source/p06-shape-atlas-clean.png",
+      "sourceSha256": "9182289a967eb433bccab742c4b7719aac39b4b168bbc0a9381f9a81afc8a5d6",
+      "sourceSize": [
+        1536,
+        1024
+      ],
+      "sourceCropBox": [
+        0,
+        512,
+        512,
+        1024
+      ],
+      "atlasKey": "p06-shape-atlas-clean",
+      "sha256": "5557c22a168634aed3b21c60ff2cf5b6de4edece9891f6fd4641ce2571173817",
+      "actualPrompt": "Edit the supplied transparent 3-column-by-2-row sprite sheet. This is a background-extraction correction only. Preserve the same six clear object silhouettes and same locations, including the two pointed ends, orientation, scale, and hand-cut paper texture. Delete all fuzzy surrounding orange light, soft gradients, colored glow, cast shadows, and rim glow. Only the hard-edged six paper objects remain, solid opaque interiors with slight normal edge antialiasing only. Everywhere outside their hard silhouettes is exactly empty, true zero-alpha including the whole gutters. Flat matte paper, no light emission. No colored halo, drop shadows, gradients, panels, black fill, paper background, or checkerboard. Do not add or remove shapes. Keep same 3:2 landscape and 6 exact cells.",
+      "generationId": "exec-dae3b62b-9748-433b-a3ee-ff0e6dd2bcc9",
+      "playbackBytes": 48352,
+      "halfTilePlacement": [
+        24,
+        22
+      ]
+    },
+    {
+      "key": "shape-rounded",
+      "file": "assets/illustrations/shape-rounded.png",
+      "pages": [
+        "p06"
+      ],
+      "playbackSize": [
+        300,
+        300
+      ],
+      "transparent": true,
+      "prompt": "一片弯弯的宽木片，像弧形手把，明确两端都钝圆，边缘只有圆角，不出现尖头。与尖木舟在低清晰度小图上有明显区别。",
+      "referenceKeys": [],
+      "status": "integrated",
+      "source": "assets/illustrations/source/p06-shape-atlas-clean.png",
+      "sourceSha256": "9182289a967eb433bccab742c4b7719aac39b4b168bbc0a9381f9a81afc8a5d6",
+      "sourceSize": [
+        1536,
+        1024
+      ],
+      "sourceCropBox": [
+        512,
+        512,
+        1024,
+        1024
+      ],
+      "atlasKey": "p06-shape-atlas-clean",
+      "sha256": "e2bf956593fa19104680802e5e5945cab7e14fb9d6952bfbb716c8bb80396519",
+      "actualPrompt": "Edit the supplied transparent 3-column-by-2-row sprite sheet. This is a background-extraction correction only. Preserve the same six clear object silhouettes and same locations, including the two pointed ends, orientation, scale, and hand-cut paper texture. Delete all fuzzy surrounding orange light, soft gradients, colored glow, cast shadows, and rim glow. Only the hard-edged six paper objects remain, solid opaque interiors with slight normal edge antialiasing only. Everywhere outside their hard silhouettes is exactly empty, true zero-alpha including the whole gutters. Flat matte paper, no light emission. No colored halo, drop shadows, gradients, panels, black fill, paper background, or checkerboard. Do not add or remove shapes. Keep same 3:2 landscape and 6 exact cells.",
+      "generationId": "exec-dae3b62b-9748-433b-a3ee-ff0e6dd2bcc9",
+      "playbackBytes": 21257,
+      "halfTilePlacement": [
+        24,
+        28
+      ]
+    },
+    {
+      "key": "shape-straight",
+      "file": "assets/illustrations/shape-straight.png",
+      "pages": [
+        "p06"
+      ],
+      "playbackSize": [
+        300,
+        300
+      ],
+      "transparent": true,
+      "prompt": "一个细长橙棕纸梭，两端都尖，连接尖端的轮廓全为明显直线，绝无弯弧。纯色剪纸，不画桨或其他配件。",
+      "referenceKeys": [],
+      "status": "integrated",
+      "source": "assets/illustrations/source/p06-shape-atlas-clean.png",
+      "sourceSha256": "9182289a967eb433bccab742c4b7719aac39b4b168bbc0a9381f9a81afc8a5d6",
+      "sourceSize": [
+        1536,
+        1024
+      ],
+      "sourceCropBox": [
+        1024,
+        512,
+        1536,
+        1024
+      ],
+      "atlasKey": "p06-shape-atlas-clean",
+      "sha256": "fe387c34255de26540a5461479ee6e061b8d6ff4ed8e1e834c545dd62b0b3a49",
+      "actualPrompt": "Edit the supplied transparent 3-column-by-2-row sprite sheet. This is a background-extraction correction only. Preserve the same six clear object silhouettes and same locations, including the two pointed ends, orientation, scale, and hand-cut paper texture. Delete all fuzzy surrounding orange light, soft gradients, colored glow, cast shadows, and rim glow. Only the hard-edged six paper objects remain, solid opaque interiors with slight normal edge antialiasing only. Everywhere outside their hard silhouettes is exactly empty, true zero-alpha including the whole gutters. Flat matte paper, no light emission. No colored halo, drop shadows, gradients, panels, black fill, paper background, or checkerboard. Do not add or remove shapes. Keep same 3:2 landscape and 6 exact cells.",
+      "generationId": "exec-dae3b62b-9748-433b-a3ee-ff0e6dd2bcc9",
+      "playbackBytes": 12458,
+      "halfTilePlacement": [
+        26,
+        24
+      ]
+    },
+    {
+      "key": "delivery-start",
+      "file": "assets/illustrations/delivery-start.png",
+      "pages": [
+        "p08"
+      ],
+      "playbackSize": [
+        1280,
+        720
+      ],
+      "transparent": false,
+      "prompt": "跨道邮车开始画：下方有一辆暖橙小车，近岸并列一片黄叶和一片绿叶，远岸分开放兔子和乌龟的清楚头像标志。两岸之间一条温和清楚的道路，没有车撞、人物过街或任何文字，目标图在560宽缩图仍清楚。",
+      "referenceKeys": [
+        "delivery-cart",
+        "parcel-yellow-leaf",
+        "parcel-green-leaf",
+        "recipient-rabbit",
+        "recipient-turtle"
+      ],
+      "status": "integrated",
+      "sourceType": "deterministic_composition_of_codex_imagegen",
+      "source": "art-source/delivery-start-composition.json",
+      "sourceSha256": "7b032bec6e80f31df3fef896fb5a3bcf3ded8cd42a4e6dacaac06d89f4bccf0e",
+      "sha256": "a4752d752ba953af90e4f100fdc0476200f9963ee1be28cf680bcc7c54df9db3",
+      "playbackBytes": 545350,
+      "compositionInputKeys": [
+        "delivery-backdrop",
+        "delivery-glider",
+        "recipient-turtle",
+        "recipient-rabbit",
+        "parcel-green-leaf",
+        "parcel-yellow-leaf",
+        "delivery-cart"
+      ]
+    },
+    {
+      "key": "delivery-backdrop",
+      "file": "assets/illustrations/snake-backdrop.png",
+      "pages": [
+        "p08"
+      ],
+      "playbackSize": [
+        1280,
+        720
+      ],
+      "transparent": false,
+      "prompt": "静静的小邮站俯视背景，边缘松绿纸纹草坡，角落有低对比灌木，中心和底部安静，留给棋盘和按钮。不画车道或物品。",
+      "referenceKeys": [],
+      "status": "integrated",
+      "sourceType": "codex_builtin_imagegen",
+      "source": "assets/illustrations/source/snake-backdrop.png",
+      "sourceSha256": "ae039b410f9cd5fb8653bc727c46651c1dc9554be5a167af023ca61c53476c1c",
+      "sha256": "6b405976d42b439891894d6d72d36512ef4438df7017e270e383506fd3c8d688",
+      "reusedSourceAssetKey": "snake-backdrop",
+      "playbackBytes": 1218985
+    },
+    {
+      "key": "delivery-cart",
+      "file": "assets/delivery-cart.png",
+      "pages": [
+        "p08"
+      ],
+      "playbackSize": [
+        300,
+        300
+      ],
+      "transparent": true,
+      "prompt": "单一暖橙色玩具邮车，干净的斜上侧视，朝右，车后载货箱敞开可见，主体居中对称，四轮协调，无字和标志。",
+      "referenceKeys": [],
+      "status": "integrated",
+      "sourceType": "codex_builtin_imagegen_atlas_crop",
+      "source": "art-source/p08-post-vehicles-and-recipients.png",
+      "sourceSha256": "08a7609a7f0be5700fd2fe89955a982f3ee4cefd4655a69e501dd59dd7957e44",
+      "sha256": "bd170ff20bd2314802630637e221e971d194b56d092cb1bfbd1186207bf61695",
+      "atlasId": "p08-post-vehicles-and-recipients",
+      "sourceCrop": [
+        0,
+        0,
+        512,
+        512
+      ],
+      "playbackBytes": 73464
+    },
+    {
+      "key": "delivery-cart-load",
+      "file": "assets/delivery-cart-load.png",
+      "pages": [
+        "p08"
+      ],
+      "playbackSize": [
+        300,
+        300
+      ],
+      "transparent": true,
+      "prompt": "同一邮车同一角度、画幅、车轮位置，后箱举起小挡板，区别清楚但车的锚点不动。箱里不画具体物品，由游戏另显拿到的货物。",
+      "referenceKeys": [
+        "delivery-cart"
+      ],
+      "status": "integrated",
+      "sourceType": "codex_builtin_imagegen_atlas_crop",
+      "source": "art-source/p08-post-vehicles-and-recipients.png",
+      "sourceSha256": "08a7609a7f0be5700fd2fe89955a982f3ee4cefd4655a69e501dd59dd7957e44",
+      "sha256": "c5e65b5d21f0df59b043a5f2fa5eeb9d3ce4829800d2ef7729a0689b25793f29",
+      "atlasId": "p08-post-vehicles-and-recipients",
+      "sourceCrop": [
+        512,
+        0,
+        1024,
+        512
+      ],
+      "playbackBytes": 74654
+    },
+    {
+      "key": "delivery-glider",
+      "file": "assets/delivery-glider.png",
+      "pages": [
+        "p08"
+      ],
+      "playbackSize": [
+        300,
+        300
+      ],
+      "transparent": true,
+      "prompt": "单一在小邮站车道上滑过的奶油杏色纸质慢行车，严格向右，主体横向，轮子清楚。形状和邮车有显著区别，不画场景。",
+      "referenceKeys": [],
+      "status": "integrated",
+      "sourceType": "codex_builtin_imagegen_atlas_crop",
+      "source": "art-source/p08-post-vehicles-and-recipients.png",
+      "sourceSha256": "08a7609a7f0be5700fd2fe89955a982f3ee4cefd4655a69e501dd59dd7957e44",
+      "sha256": "221a3f0a3ee668a6d47b9a6d2f8fbb6cb056e6a0c380716b385640ae7be077bc",
+      "atlasId": "p08-post-vehicles-and-recipients",
+      "sourceCrop": [
+        1024,
+        0,
+        1536,
+        512
+      ],
+      "playbackBytes": 74862
+    },
+    {
+      "key": "parcel-yellow-leaf",
+      "file": "assets/parcel-yellow-leaf.png",
+      "pages": [
+        "p08"
+      ],
+      "playbackSize": [
+        300,
+        300
+      ],
+      "transparent": true,
+      "prompt": "单一完整的亮金黄色落叶，俯视，短叶柄和清楚的叶片外形。画面内没有第二片叶子。",
+      "referenceKeys": [],
+      "status": "integrated",
+      "sourceType": "codex_builtin_imagegen_atlas_crop",
+      "source": "art-source/p08-parcels-and-yarn.png",
+      "sourceSha256": "4641ad47aff7dc8345da95b3f3ba108b7444af8cd922a72bfe9318645547995a",
+      "sha256": "00b922d178b19898f8a8cababcef5bbb33b8c0bcc46438c7d291d001bf3ff9e3",
+      "atlasId": "p08-parcels-and-yarn",
+      "sourceCrop": [
+        0,
+        0,
+        512,
+        512
+      ],
+      "playbackBytes": 54239
+    },
+    {
+      "key": "parcel-green-leaf",
+      "file": "assets/parcel-green-leaf.png",
+      "pages": [
+        "p08"
+      ],
+      "playbackSize": [
+        300,
+        300
+      ],
+      "transparent": true,
+      "prompt": "与黄叶相同的一片落叶、同样大小和方向，只换为纯绿色，保留短叶柄和完整轮廓。",
+      "referenceKeys": [
+        "parcel-yellow-leaf"
+      ],
+      "status": "integrated",
+      "sourceType": "codex_builtin_imagegen_atlas_crop",
+      "source": "art-source/p08-parcels-and-yarn.png",
+      "sourceSha256": "4641ad47aff7dc8345da95b3f3ba108b7444af8cd922a72bfe9318645547995a",
+      "sha256": "1e1b6a42f63f13e7f51d2d693a7b428da870e8e6f6438f5120ba52af1890b6df",
+      "atlasId": "p08-parcels-and-yarn",
+      "sourceCrop": [
+        512,
+        0,
+        1008,
+        512
+      ],
+      "playbackBytes": 64556
+    },
+    {
+      "key": "parcel-red-scarf",
+      "file": "assets/parcel-red-scarf.png",
+      "pages": [
+        "p08"
+      ],
+      "playbackSize": [
+        300,
+        300
+      ],
+      "transparent": true,
+      "prompt": "单一鲜红针织围巾，摊展，柔软长条，左右有短流苏。小图能一眼看出长条。",
+      "referenceKeys": [],
+      "status": "integrated",
+      "sourceType": "codex_builtin_imagegen_atlas_crop",
+      "source": "art-source/p08-parcels-and-yarn.png",
+      "sourceSha256": "4641ad47aff7dc8345da95b3f3ba108b7444af8cd922a72bfe9318645547995a",
+      "sha256": "3fe10a9468795a1ae29fa5a0a8b33253943abc83257d37cfd26211b2a2e9f45f",
+      "atlasId": "p08-parcels-and-yarn",
+      "sourceCrop": [
+        1008,
+        0,
+        1536,
+        512
+      ],
+      "playbackBytes": 53975
+    },
+    {
+      "key": "parcel-blue-scarf",
+      "file": "assets/parcel-blue-scarf.png",
+      "pages": [
+        "p08"
+      ],
+      "playbackSize": [
+        300,
+        300
+      ],
+      "transparent": true,
+      "prompt": "与红围巾相同外形、角度与大小，颜色改成纯蓝色，保留短流苏，画面无其他物件。",
+      "referenceKeys": [
+        "parcel-red-scarf"
+      ],
+      "status": "integrated",
+      "sourceType": "codex_builtin_imagegen_atlas_crop",
+      "source": "art-source/p08-parcels-and-yarn.png",
+      "sourceSha256": "4641ad47aff7dc8345da95b3f3ba108b7444af8cd922a72bfe9318645547995a",
+      "sha256": "1a8eddf9f772cb0164b25cfb660e0c9178de55a212c5053df277e498d4514e9e",
+      "atlasId": "p08-parcels-and-yarn",
+      "sourceCrop": [
+        0,
+        512,
+        512,
+        1024
+      ],
+      "playbackBytes": 55220
+    },
+    {
+      "key": "parcel-blue-cap",
+      "file": "assets/parcel-blue-cap.png",
+      "pages": [
+        "p08"
+      ],
+      "playbackSize": [
+        300,
+        300
+      ],
+      "transparent": true,
+      "prompt": "单一纯蓝圆帽，边上有圆帽檐，体量和蓝围巾相近但轮廓圆。不含帽徽、耳朵或衣服。",
+      "referenceKeys": [
+        "parcel-blue-scarf"
+      ],
+      "status": "integrated",
+      "sourceType": "codex_builtin_imagegen_atlas_crop",
+      "source": "art-source/p08-parcels-and-yarn.png",
+      "sourceSha256": "4641ad47aff7dc8345da95b3f3ba108b7444af8cd922a72bfe9318645547995a",
+      "sha256": "42bb492bb6d04bbe8826d4ce326bb601ff22ede10cb93ce50fef688ae5d079ab",
+      "atlasId": "p08-parcels-and-yarn",
+      "sourceCrop": [
+        512,
+        512,
+        1024,
+        1024
+      ],
+      "playbackBytes": 116074
+    },
+    {
+      "key": "recipient-rabbit",
+      "file": "assets/recipient-rabbit.png",
+      "pages": [
+        "p08"
+      ],
+      "playbackSize": [
+        300,
+        300
+      ],
+      "transparent": true,
+      "prompt": "单一浅杏色兔头圆牌的图案，只画易认的两条长耳、圆脸、小鼻子。干净近景，形状辨认不靠文字。",
+      "referenceKeys": [],
+      "status": "integrated",
+      "sourceType": "codex_builtin_imagegen_atlas_crop",
+      "source": "art-source/p08-post-vehicles-and-recipients.png",
+      "sourceSha256": "08a7609a7f0be5700fd2fe89955a982f3ee4cefd4655a69e501dd59dd7957e44",
+      "sha256": "a9dc88cd738357ff6452e9bf41d43f08a4978c0ae18050d572cf822690082a9f",
+      "atlasId": "p08-post-vehicles-and-recipients",
+      "sourceCrop": [
+        0,
+        512,
+        512,
+        1024
+      ],
+      "playbackBytes": 78902
+    },
+    {
+      "key": "recipient-turtle",
+      "file": "assets/recipient-turtle.png",
+      "pages": [
+        "p08"
+      ],
+      "playbackSize": [
+        300,
+        300
+      ],
+      "transparent": true,
+      "prompt": "单一绿色小乌龟标志，侧视全身，硬壳和短腿清楚，头部朝右。缩图第一眼能看见壳。",
+      "referenceKeys": [],
+      "status": "integrated",
+      "sourceType": "codex_builtin_imagegen_atlas_crop",
+      "source": "art-source/p08-post-vehicles-and-recipients.png",
+      "sourceSha256": "08a7609a7f0be5700fd2fe89955a982f3ee4cefd4655a69e501dd59dd7957e44",
+      "sha256": "3e40189f0da6be0949a5cf5ec4d783a48ae1145fabfb59a2be75ebcaf55c9a07",
+      "atlasId": "p08-post-vehicles-and-recipients",
+      "sourceCrop": [
+        512,
+        512,
+        1024,
+        1024
+      ],
+      "playbackBytes": 74340
+    },
+    {
+      "key": "recipient-cat",
+      "file": "assets/recipient-cat.png",
+      "pages": [
+        "p08"
+      ],
+      "playbackSize": [
+        300,
+        300
+      ],
+      "transparent": true,
+      "prompt": "单一暖橙小猫头像，尖耳和长胡须清楚，主体居中，不画颈圈或字。",
+      "referenceKeys": [],
+      "status": "integrated",
+      "sourceType": "codex_builtin_imagegen_atlas_crop",
+      "source": "art-source/p08-post-vehicles-and-recipients.png",
+      "sourceSha256": "08a7609a7f0be5700fd2fe89955a982f3ee4cefd4655a69e501dd59dd7957e44",
+      "sha256": "21216f56b1201f9330f137cac73c4c765ba5932d72ef0382cfd474180b9def03",
+      "atlasId": "p08-post-vehicles-and-recipients",
+      "sourceCrop": [
+        1024,
+        512,
+        1536,
+        1024
+      ],
+      "playbackBytes": 83490
+    },
+    {
+      "key": "boat-reward",
+      "file": "assets/illustrations/boat-reward.png",
+      "pages": [
+        "p06",
+        "p08"
+      ],
+      "playbackSize": [
+        300,
+        300
+      ],
+      "transparent": true,
+      "prompt": "一枚杏色和深松绿的月亮小舟贴纸，弯月与尖头小船形成一个明快轮廓，留透明边，不画文字和数字。",
+      "referenceKeys": [],
+      "status": "integrated",
+      "source": "assets/illustrations/source/p06-snake-atlas.png",
+      "sourceSha256": "d4d7a1dc30713b6160eb6f021f65839fc48b28f33200e19e2306ffd1224cd9a9",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "sourceCropBox": [
+        627,
+        627,
+        1254,
+        1254
+      ],
+      "atlasKey": "p06-snake-atlas",
+      "sha256": "fe08445eaed02dc296990a1a30c914c2a83d96ced9a650ea9ad66e9cba227b46",
+      "actualPrompt": "一张真透明 RGBA 小游戏图集，方形 2列 × 2行，四个精确同尺寸方格，图中不画格或文字。每个资产在自己的格子居中，隔开10%以上透明边。固定次序为左上、右上、左下、右下：1. 单一幼儿友好绿色小蛇头，严格向右，左右两侧比例适合程序转向，剪纸圆形头部占画幅约75%，短小豆眼，后缘与身体片段可拼接。 2. 一个松绿色蛇身片段，正向右的侧视厚度与头部一致，半圆接头，主体居中，两端都不画脸或尾巴。 3. 一个松绿色蛇尾片段，宽端在右能接身体，向左渐细，厚度与蛇身体一致，边缘完整，主体居中。 4. 一枚杏色和深松绿的月亮小舟贴纸，弯月与尖头小船形成一个明快轮廓，留透明边，不画文字和数字。 绿色蛇头在右端有豆眼，鼻朝右；身片段是单个同色半圆接头的椭圆短节；尾片段粗端在右，左尖；三片同高度、中心同一垂直位置、色彩一致，无眼或斑点乱入身体。参考只给右下角贴纸的月形；只要三枚蛇片和一枚小舟贴纸，背景和格间都透明。原创细纸纹、哑光水粉、松绿、奶油与杏色。",
+      "generationId": "exec-9d695fd4-3fff-4b97-9998-059365405518",
+      "playbackBytes": 54494,
+      "actualReferenceKeys": [
+        "shape-moon"
+      ]
+    },
+    {
+      "key": "q-drum-beside",
+      "file": "assets/q-drum-beside.png",
+      "pages": [
+        "p14"
+      ],
+      "playbackSize": [
+        480,
+        360
+      ],
+      "transparent": false,
+      "prompt": "暖奶油背景，稍俯视一只矮而宽、敞口的杏色编织篮和一只小小的红边圆鼓。整个鼓紧靠篮子右侧在篮外，鼓与篮子分别有独立地面接触影。光照、相机、大小一致，鼓不带鼓棒，篮与鼓各只一个。",
+      "referenceKeys": [],
+      "status": "integrated",
+      "sourceType": "codex_builtin_imagegen_atlas_crop",
+      "source": "art-source/p14-position-and-gaze.png",
+      "sourceSha256": "eda2bf62fe84052f0f308270defff8cd8efb55ce6cdedf1c94fc0f65b9702539",
+      "sha256": "ced9c2841667e6b288329a2164e381a55c2374ce48a432b60cfe2eda090b3f52",
+      "atlasId": "p14-position-and-gaze",
+      "sourceCrop": [
+        0,
+        0,
+        512,
+        512
+      ],
+      "playbackBytes": 303863
+    },
+    {
+      "key": "q-drum-behind",
+      "file": "assets/q-drum-behind.png",
+      "pages": [
+        "p14"
+      ],
+      "playbackSize": [
+        480,
+        360
+      ],
+      "transparent": false,
+      "prompt": "暖奶油背景，稍俯视一只矮而宽、敞口的杏色编织篮和一只小小的红边圆鼓。鼓在篮子后方，略偏右让鼓和篮都可辨，篮背与鼓的底部有清楚的前后遮挡，篮口明显空着。光照、相机、大小一致，鼓不带鼓棒，篮与鼓各只一个。",
+      "referenceKeys": [
+        "q-drum-beside"
+      ],
+      "status": "integrated",
+      "sourceType": "codex_builtin_imagegen_atlas_crop",
+      "source": "art-source/p14-position-and-gaze.png",
+      "sourceSha256": "eda2bf62fe84052f0f308270defff8cd8efb55ce6cdedf1c94fc0f65b9702539",
+      "sha256": "f602d136bf66cc63ac58ca36ea9305d8f4a32b282c55261012723dead5bdc1bb",
+      "atlasId": "p14-position-and-gaze",
+      "sourceCrop": [
+        512,
+        0,
+        1024,
+        512
+      ],
+      "playbackBytes": 306848
+    },
+    {
+      "key": "q-drum-inside",
+      "file": "assets/q-drum-inside.png",
+      "pages": [
+        "p14"
+      ],
+      "playbackSize": [
+        480,
+        360
+      ],
+      "transparent": false,
+      "prompt": "暖奶油背景，稍俯视一只矮而宽、敞口的杏色编织篮和一只小小的红边圆鼓。鼓完全放进篮口并低于篮沿，篮框的内侧与篮前部包住小鼓，可从俯视清楚看见鼓面和周围的篮内壁。光照、相机、大小一致，鼓不带鼓棒，篮与鼓各只一个。",
+      "referenceKeys": [
+        "q-drum-beside"
+      ],
+      "status": "integrated",
+      "sourceType": "codex_builtin_imagegen_atlas_crop",
+      "source": "art-source/p14-position-and-gaze.png",
+      "sourceSha256": "eda2bf62fe84052f0f308270defff8cd8efb55ce6cdedf1c94fc0f65b9702539",
+      "sha256": "bff0a893d27b51c51b2d8349f49885cab859264424af9109ec35bd74d317bb46",
+      "atlasId": "p14-position-and-gaze",
+      "sourceCrop": [
+        1024,
+        0,
+        1536,
+        512
+      ],
+      "playbackBytes": 302962
+    },
+    {
+      "key": "q-blue-knit",
+      "file": "assets/q-blue-knit.png",
+      "pages": [
+        "p14"
+      ],
+      "playbackSize": [
+        480,
+        360
+      ],
+      "transparent": false,
+      "prompt": "一条平展的蓝色针织围巾，角度为斜俯视，色彩中等饱和，横长而有简单流苏。暖奶油底，周围无其他物件。这条是新款，和邮车游戏中的角度、纹理不同。",
+      "referenceKeys": [],
+      "status": "integrated",
+      "sourceType": "codex_builtin_imagegen_atlas_crop",
+      "source": "art-source/p04-p05-p14-room-and-knit.png",
+      "sourceSha256": "5c9cd2237bce1d82b922aa9d6a3853cbb8c4362ff17009abe7e9a8ac0013ecd5",
+      "sha256": "739d7bd9ec5016a322ad322c612afd3bc93e8bdcb33cb5b1d1f3771956437d64",
+      "atlasId": "p04-p05-p14-room-and-knit",
+      "sourceCrop": [
+        0,
+        627,
+        627,
+        1254
+      ],
+      "playbackBytes": 333069
+    },
+    {
+      "key": "q-green-knit",
+      "file": "assets/q-green-knit.png",
+      "pages": [
+        "p14"
+      ],
+      "playbackSize": [
+        480,
+        360
+      ],
+      "transparent": false,
+      "prompt": "与蓝色针织围巾完全同款、同角度同尺度，绿色清楚均匀。暖奶油底，周围无其他物件。",
+      "referenceKeys": [
+        "q-blue-knit"
+      ],
+      "status": "integrated",
+      "sourceType": "codex_builtin_imagegen_atlas_crop",
+      "source": "art-source/p04-p05-p14-room-and-knit.png",
+      "sourceSha256": "5c9cd2237bce1d82b922aa9d6a3853cbb8c4362ff17009abe7e9a8ac0013ecd5",
+      "sha256": "5134977195adf7130a878b552d4ef80dd9b58df09d29c91282f35a6b9b26c6b7",
+      "atlasId": "p04-p05-p14-room-and-knit",
+      "sourceCrop": [
+        627,
+        627,
+        1254,
+        1254
+      ],
+      "playbackBytes": 331758
+    },
+    {
+      "key": "q-green-yarn",
+      "file": "assets/illustrations/q-green-yarn.png",
+      "pages": [
+        "p14"
+      ],
+      "playbackSize": [
+        480,
+        360
+      ],
+      "transparent": false,
+      "prompt": "单一清楚的绿色毛线团，圆球形，线端只短短露一点，颜色与绿围巾一致，奶油底上不画其他物件。",
+      "referenceKeys": [
+        "q-green-knit"
+      ],
+      "status": "integrated",
+      "sourceType": "deterministic_composition_of_codex_imagegen",
+      "source": "art-source/q-green-yarn-composition.json",
+      "sourceSha256": "729812f5cd52c8afddbf61294be550ad5e3b794d1c0b0e1519993f8cadb0cbe8",
+      "sha256": "0e49b81423732f7027e2ec6deaba633d5dc2ec0e8556b1ca17991d0bd6c5ec07",
+      "atlasId": "p08-parcels-and-yarn",
+      "sourceCrop": [
+        1024,
+        512,
+        1536,
+        1024
+      ],
+      "playbackBytes": 99068,
+      "compositionInputKeys": [
+        "yarn-atlas-crop"
+      ]
+    },
+    {
+      "key": "q-water-reflection",
+      "file": "assets/q-water-reflection.png",
+      "pages": [
+        "p14"
+      ],
+      "playbackSize": [
+        480,
+        360
+      ],
+      "transparent": false,
+      "prompt": "在河边的短黑发孩子明确低头向下看水。几粒微光点出现在水面反光里，构图看得出水面和地面，背景星空仅留模糊一角，不要直接在头顶画星。",
+      "referenceKeys": [],
+      "status": "integrated",
+      "sourceType": "codex_builtin_imagegen_atlas_crop",
+      "source": "art-source/p14-position-and-gaze.png",
+      "sourceSha256": "eda2bf62fe84052f0f308270defff8cd8efb55ce6cdedf1c94fc0f65b9702539",
+      "sha256": "041e4e62fb71c30235b8302adaa0d38b942b862d9ab187da0b28415e3d03a1a1",
+      "atlasId": "p14-position-and-gaze",
+      "sourceCrop": [
+        0,
+        512,
+        512,
+        1024
+      ],
+      "playbackBytes": 338707
+    },
+    {
+      "key": "q-day-clouds",
+      "file": "assets/q-day-clouds.png",
+      "pages": [
+        "p14"
+      ],
+      "playbackSize": [
+        480,
+        360
+      ],
+      "transparent": false,
+      "prompt": "同一孩子在白天抬头，看见白云浮在明亮的浅蓝色天空。孩子的眼睛与脸朝向白云，不画任何星点。",
+      "referenceKeys": [
+        "q-water-reflection"
+      ],
+      "status": "integrated",
+      "sourceType": "codex_builtin_imagegen_atlas_crop",
+      "source": "art-source/p14-position-and-gaze.png",
+      "sourceSha256": "eda2bf62fe84052f0f308270defff8cd8efb55ce6cdedf1c94fc0f65b9702539",
+      "sha256": "ab039461ac60e8322a7d57b4dba9b07d40bac952b636421e2d6a6f008fe21d3d",
+      "atlasId": "p14-position-and-gaze",
+      "sourceCrop": [
+        512,
+        512,
+        1024,
+        1024
+      ],
+      "playbackBytes": 318492
+    },
+    {
+      "key": "q-window-stars",
+      "file": "assets/q-window-stars.png",
+      "pages": [
+        "p14"
+      ],
+      "playbackSize": [
+        480,
+        360
+      ],
+      "transparent": false,
+      "prompt": "同一孩子站在室内窗边，抬起脸望窗外夜空中清楚的几个星点。窗框和孩子脸的方向一目了然，夜蓝天空与室内暖色对照，无水面或白云。",
+      "referenceKeys": [
+        "q-water-reflection"
+      ],
+      "status": "integrated",
+      "sourceType": "codex_builtin_imagegen_atlas_crop",
+      "source": "art-source/p14-position-and-gaze.png",
+      "sourceSha256": "eda2bf62fe84052f0f308270defff8cd8efb55ce6cdedf1c94fc0f65b9702539",
+      "sha256": "90fcb97bca9c8098641be6655e196028f7418de5c4272de2ee1acf61a625ac9d",
+      "atlasId": "p14-position-and-gaze",
+      "sourceCrop": [
+        1024,
+        512,
+        1536,
+        1024
+      ],
+      "playbackBytes": 316714
+    }
+  ],
+  "codeAssets": {
+    "radical-flash": {
+      "file": "assets/code/radical-flash.png",
+      "pages": [
+        "p05"
+      ],
+      "playbackSize": [
+        960,
+        480
+      ],
+      "sourcePlan": "用规范楷体或项目字形矢量绘制闪，外框门用橙色，人用深绿，保持规范部件位置。显示同一字整体，保留可编辑路径和来源；不用教材像素。",
+      "status": "integrated",
+      "source": "art-source/diagrams/radical-flash.svg",
+      "sourceSha256": "15d9efd0b1022a7856c87d1f0be5e27a4ef7507d7bd059e443d65670652af34b",
+      "sha256": "4ef7f395251d91f05ad2421d6d4ccc4ba4ea2cc466a582c8b39a0c5b735451c4",
+      "sourceType": "deterministic_semantic_diagram"
+    },
+    "strokes-moon": {
+      "file": "assets/code/strokes-moon.png",
+      "pages": [
+        "p11"
+      ],
+      "playbackSize": [
+        960,
+        480
+      ],
+      "sourcePlan": "按印84和两课时任务单02核对月（撇、横折钩、横、横）；每格累积前笔，当前笔用柿橙着色。4步，超过四步时用双行田格，版面小屏仍清楚。用项目可溯源笔画数据，保存可编辑 SVG。",
+      "status": "integrated",
+      "source": "art-source/diagrams/strokes-moon.svg",
+      "sourceSha256": "facdd7b309a7b2c98a7689544b83eca92f4128e9ecf32bd8a11b5b213b74dce9",
+      "sha256": "38d6e263b5631e75332559244e04c3db67ff9c544a3ca3230a300afcbbd9e8e1",
+      "sourceType": "deterministic_semantic_diagram"
+    },
+    "strokes-child": {
+      "file": "assets/code/strokes-child.png",
+      "pages": [
+        "p11"
+      ],
+      "playbackSize": [
+        960,
+        480
+      ],
+      "sourcePlan": "按印84和两课时任务单02核对儿（撇、竖弯钩）；每格累积前笔，当前笔用柿橙着色。2步，超过四步时用双行田格，版面小屏仍清楚。用项目可溯源笔画数据，保存可编辑 SVG。",
+      "status": "integrated",
+      "source": "art-source/diagrams/strokes-child.svg",
+      "sourceSha256": "f92751c65ff0f4ce393e3714e90076217a32210382169749d351f0f7a49f0970",
+      "sha256": "af32f303c1ab4eaf3071900727b968ec0a0ee4d587e902239b3da753d67d45a7",
+      "sourceType": "deterministic_semantic_diagram"
+    },
+    "strokes-head": {
+      "file": "assets/code/strokes-head.png",
+      "pages": [
+        "p12"
+      ],
+      "playbackSize": [
+        840,
+        600
+      ],
+      "sourcePlan": "按印84和两课时任务单02核对头（点、点、横、撇、点）；每格累积前笔，当前笔用柿橙着色。5步，超过四步时用双行田格，版面小屏仍清楚。用项目可溯源笔画数据，保存可编辑 SVG。",
+      "status": "integrated",
+      "source": "art-source/diagrams/strokes-head.svg",
+      "sourceSha256": "6b463e639b6bb86eb370467ff2d3b484b130da999aa9898fbba4210afe04f111",
+      "sha256": "914e01c7337e2b5334660f0d214c480e3bb64c880ca017e6132c465a3376fb26",
+      "sourceType": "deterministic_semantic_diagram"
+    },
+    "strokes-inside": {
+      "file": "assets/code/strokes-inside.png",
+      "pages": [
+        "p13"
+      ],
+      "playbackSize": [
+        960,
+        480
+      ],
+      "sourcePlan": "按印84和两课时任务单02核对里（竖、横折、横、横、竖、横、横）；每格累积前笔，当前笔用柿橙着色。7步，超过四步时用双行田格，版面小屏仍清楚。用项目可溯源笔画数据，保存可编辑 SVG。",
+      "status": "integrated",
+      "source": "art-source/diagrams/strokes-inside.svg",
+      "sourceSha256": "82136d8b3c41c5edf9e632528fed357fa4df4960bf9001043597203410be975d",
+      "sha256": "4e6860b503b2e8635adafdf90cafd4c5b6c59e8ab28f8c7068cdecc0e7b7c258",
+      "sourceType": "deterministic_semantic_diagram"
+    },
+    "strokes-see": {
+      "file": "assets/code/strokes-see.png",
+      "pages": [
+        "p13"
+      ],
+      "playbackSize": [
+        960,
+        480
+      ],
+      "sourcePlan": "按印84和两课时任务单02核对见（竖、横折、撇、竖弯钩）；每格累积前笔，当前笔用柿橙着色。4步，超过四步时用双行田格，版面小屏仍清楚。用项目可溯源笔画数据，保存可编辑 SVG。",
+      "status": "integrated",
+      "source": "art-source/diagrams/strokes-see.svg",
+      "sourceSha256": "6fa9f93765695c1d13822c061bc97d9979171550a2b0b9600603970d9eb0adbf",
+      "sha256": "5ea57c906947d8a0222b6656f202a878ab6901bedc8fcc96c10448586843ad74",
+      "sourceType": "deterministic_semantic_diagram"
+    },
+    "q-gourd-shape": {
+      "file": "assets/code/q-gourd-shape.png",
+      "pages": [
+        "p14"
+      ],
+      "playbackSize": [
+        480,
+        360
+      ],
+      "sourcePlan": "同色剪纸的精确轮廓。双端圆弧的葫芦轮廓。同角度、同占屏尺寸和背景，不用阴影提示答案。",
+      "status": "integrated",
+      "source": "art-source/diagrams/q-gourd-shape.svg",
+      "sourceSha256": "4f78949b42298763a45e46ac54ddea15f772904967ea752ce1307fda89d347f8",
+      "sha256": "729fc0fa1192721fd1c6e457ce558a86ada0db4746a727dabddcdb3454dc1aec",
+      "sourceType": "deterministic_semantic_diagram"
+    },
+    "q-pod-shape": {
+      "file": "assets/code/q-pod-shape.png",
+      "pages": [
+        "p14"
+      ],
+      "playbackSize": [
+        480,
+        360
+      ],
+      "sourcePlan": "同色剪纸的精确轮廓。下轮廓为明显弧线、两端均收尖的豆荚剪纸。同角度、同占屏尺寸和背景，不用阴影提示答案。",
+      "status": "integrated",
+      "source": "art-source/diagrams/q-pod-shape.svg",
+      "sourceSha256": "2495b68c3a4a87ce1f13c4fc6bfdc203016fd45f1a083f0fef7ae617c3f5d23d",
+      "sha256": "49f94fd6f57d03e845fabe842271dbb9c28d1ce2f1ccedce99333ea52e5ef3f7",
+      "sourceType": "deterministic_semantic_diagram"
+    },
+    "q-straight-shape": {
+      "file": "assets/code/q-straight-shape.png",
+      "pages": [
+        "p14"
+      ],
+      "playbackSize": [
+        480,
+        360
+      ],
+      "sourcePlan": "同色剪纸的精确轮廓。由直线拼成、左右两端为尖角的细长梭形。同角度、同占屏尺寸和背景，不用阴影提示答案。",
+      "status": "integrated",
+      "source": "art-source/diagrams/q-straight-shape.svg",
+      "sourceSha256": "a73f7da85e0857703f065bc630bf2e7d6c7dfbfd27792b0abeae8e97f45503ae",
+      "sha256": "2f53932e618eb3f6aa6bc52e054ade0004a56d1957bfb98a78ad82febc2cf6da",
+      "sourceType": "deterministic_semantic_diagram"
+    },
+    "q-word-flash": {
+      "file": "assets/code/q-word-flash.png",
+      "pages": [
+        "p14"
+      ],
+      "playbackSize": [
+        480,
+        360
+      ],
+      "sourcePlan": "同字号规范单字卡闪，黑字居中，不标拼音、不改变答案的颜色。字形用已有字形工具或可编辑矢量来源。",
+      "status": "integrated",
+      "source": "art-source/diagrams/glyph-cards.json",
+      "sourceSha256": "6598a947d2aec441a0c27a749347344960222e0cd734e30064b4779a993e3490",
+      "sha256": "bb48024e9ad9407699ba7affd2e185201a66280c515f1796085242e0ca105417",
+      "sourceType": "deterministic_glyph_card"
+    },
+    "q-word-together": {
+      "file": "assets/code/q-word-together.png",
+      "pages": [
+        "p14"
+      ],
+      "playbackSize": [
+        480,
+        360
+      ],
+      "sourcePlan": "同字号规范单字卡同，黑字居中，不标拼音、不改变答案的颜色。字形用已有字形工具或可编辑矢量来源。",
+      "status": "integrated",
+      "source": "art-source/diagrams/glyph-cards.json",
+      "sourceSha256": "6598a947d2aec441a0c27a749347344960222e0cd734e30064b4779a993e3490",
+      "sha256": "b09b0308ede063c5ebc1f3f5e2dfbfc64ba45bfcfaede6b2f00c254940568965",
+      "sourceType": "deterministic_glyph_card"
+    },
+    "q-word-sun": {
+      "file": "assets/code/q-word-sun.png",
+      "pages": [
+        "p14"
+      ],
+      "playbackSize": [
+        480,
+        360
+      ],
+      "sourcePlan": "同字号规范单字卡日，黑字居中，不标拼音、不改变答案的颜色。字形用已有字形工具或可编辑矢量来源。",
+      "status": "integrated",
+      "source": "art-source/diagrams/glyph-cards.json",
+      "sourceSha256": "6598a947d2aec441a0c27a749347344960222e0cd734e30064b4779a993e3490",
+      "sha256": "66f50c8a8fbdeab58f4fb165455d3209a3de08a43e72c0b9cd23cd562c3b5598",
+      "sourceType": "deterministic_glyph_card"
+    },
+    "q-see-hook": {
+      "file": "assets/code/q-see-hook.png",
+      "pages": [
+        "p14"
+      ],
+      "playbackSize": [
+        480,
+        360
+      ],
+      "sourcePlan": "同样的田字格与近景局部，统一线宽和颜色。路线先竖向下，再向右弯，末端向上有钩；起点小实心点，终点同样大小方向箭头。正确路线对照印84的见末笔。",
+      "status": "integrated",
+      "source": "art-source/diagrams/q-see-hook.svg",
+      "sourceSha256": "87e0ab1e3bba3d1f52a0526efe3b37e0e4873955eafe5f3e95bdd2b6249fdf21",
+      "sha256": "0b8a4b7243de6a12ae9f008880fd0889c29d73915bd5bc4a694821c4d851ef12",
+      "sourceType": "deterministic_semantic_diagram"
+    },
+    "q-see-no-hook": {
+      "file": "assets/code/q-see-no-hook.png",
+      "pages": [
+        "p14"
+      ],
+      "playbackSize": [
+        480,
+        360
+      ],
+      "sourcePlan": "同样的田字格与近景局部，统一线宽和颜色。路线先竖向下，再向右弯，右边收笔无钩；起点小实心点，终点同样大小方向箭头。正确路线对照印84的见末笔。",
+      "status": "integrated",
+      "source": "art-source/diagrams/q-see-no-hook.svg",
+      "sourceSha256": "fd490e111d296c1ac485a0f33dfec8d97720e98cc91c7e24335661d3b4b2d81b",
+      "sha256": "6ea1211a5283c269e9922e9700198eead59378e04ec0789faecbe5f74a0165df",
+      "sourceType": "deterministic_semantic_diagram"
+    },
+    "q-see-no-vertical": {
+      "file": "assets/code/q-see-no-vertical.png",
+      "pages": [
+        "p14"
+      ],
+      "playbackSize": [
+        480,
+        360
+      ],
+      "sourcePlan": "同样的田字格与近景局部，统一线宽和颜色。路线开头直接向右画弯，不先走向下的竖段；末端有向上钩；起点小实心点，终点同样大小方向箭头。正确路线对照印84的见末笔。",
+      "status": "integrated",
+      "source": "art-source/diagrams/q-see-no-vertical.svg",
+      "sourceSha256": "4aa1297c1ab3290eb4617d130d0b77aa951dc66db835809e92a4cc843ce3d307",
+      "sha256": "e0513bc42c301f4553420131b88c6a1d27ba358ab06a2f342d9f32af70339057",
+      "sourceType": "deterministic_semantic_diagram"
+    }
+  },
+  "qa": [
+    "每张正式插画留图源、提示、播放图与SHA； code 保留矢量或算法和准确来源。",
+    "确认形状目标确实同时弯和两尖，另两种干扰明确只满足其一；游戏图卡实测逻辑宽65–68px与640×360半缩。",
+    "开始卡全幅16:9在560×315验证，游戏正常帧与动作帧的有效主体原地对齐，测试错图和丢图回退，页总图小于3MB。",
+    "笔顺验册印84及任务单；三张小测位置图用同尺度，背景不指答案；星空题的头向和视线能独立辨清；图题测96px。",
+    "固定师生交接截图检查，不遮文字也不泄漏目标。"
+  ]
+}

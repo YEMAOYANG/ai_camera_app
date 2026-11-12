@@ -1,0 +1,696 @@
+{
+  "schemaVersion": "mira.courseware.asset-sources.v2",
+  "sourceLesson": "renjiao-science-g1-upper-make-coaster-arcade",
+  "artPolicy": "Codex built-in imagegen for original illustrations; exact diagram sources render from SVG or the interactive canvas.",
+  "assets": [
+    {
+      "id": "circle-methods",
+      "file": "circle-methods.png",
+      "sceneKeys": [
+        "circle-tools"
+      ],
+      "questionIds": [],
+      "drawingSource": "diagrams/circle-methods.svg",
+      "drawingSourceSha256": "96f17e503082133564ffd5249d9a2407556c8b33270c9f3ec4055cc62c8e51e0",
+      "meaning": "并排说明按住圆盖沿边、固定两支笔间距、定线头并保持绳长；笔尖落在准确的示意边界。",
+      "sha256": "26eaec28178cfa51031156d2987e1f175e929dfae92988994fd7381afe6ada83",
+      "kind": "precision_diagram"
+    },
+    {
+      "id": "compass-equal",
+      "file": "compass-equal.png",
+      "sceneKeys": [],
+      "questionIds": [
+        "coaster-circle"
+      ],
+      "drawingSource": "diagrams/compass-equal.svg",
+      "drawingSourceSha256": "a4c4bc4201fe95c5b4af8b6e7ec64fcb295504b184d6f383c13733065aea2cd7",
+      "meaning": "同样的距离",
+      "sha256": "97dc8568440f259a4b0f978ef376ffd857239ae728fca18f818c7313055bdd94",
+      "kind": "precision_diagram"
+    },
+    {
+      "id": "compass-long",
+      "file": "compass-long.png",
+      "sceneKeys": [],
+      "questionIds": [
+        "coaster-circle"
+      ],
+      "drawingSource": "diagrams/compass-long.svg",
+      "drawingSourceSha256": "0ade6004021872215273b129b29087731222bbed75966715d96001e0ede3dd4c",
+      "meaning": "更大的笔尖距离",
+      "sha256": "b6c37432416e3179dbb8ff0326ae509a41eacb0074bb675c27271efdcfbccab6",
+      "kind": "precision_diagram"
+    },
+    {
+      "id": "compass-reference",
+      "file": "compass-reference.png",
+      "sceneKeys": [],
+      "questionIds": [
+        "coaster-circle"
+      ],
+      "drawingSource": "diagrams/compass-reference.svg",
+      "drawingSourceSha256": "a0e6db20f56b57f5a43beb6880c53bd893438b19e9c261d540c1086ac38c1713",
+      "meaning": "原两笔尖距离",
+      "sha256": "c9703317e8f5762592dde66b6b8cd48092170026108c7acdcbc277767d00a7eb",
+      "kind": "precision_diagram"
+    },
+    {
+      "id": "compass-short",
+      "file": "compass-short.png",
+      "sceneKeys": [],
+      "questionIds": [
+        "coaster-circle"
+      ],
+      "drawingSource": "diagrams/compass-short.svg",
+      "drawingSourceSha256": "fd2e3fc895f09880dd9abbbe535feb1c76942b37fcda8abe3685e26a040e86b6",
+      "meaning": "更小的笔尖距离",
+      "sha256": "f8dac90797df8006ee4ba630f33ff7c3e7fee06fd8a1fdd7ea52f227b3755b09",
+      "kind": "precision_diagram"
+    },
+    {
+      "id": "cut-corner",
+      "file": "cut-corner.png",
+      "sceneKeys": [],
+      "questionIds": [
+        "coaster-cut"
+      ],
+      "drawingSource": "diagrams/cut-corner.svg",
+      "drawingSourceSha256": "00ecc8c602b8b256560801e4fd032e26777e01ecaa591c221e5d559f2cee0077",
+      "meaning": "红线在底部与圆线相切，只剪下一条纸边，圆形仍连在纸上。",
+      "sha256": "ccb3a7d4aaec57cf686ed05d6918e086d9315eb84071a62cdaf9f9ce92a0f51b",
+      "kind": "precision_diagram"
+    },
+    {
+      "id": "cut-cross",
+      "file": "cut-cross.png",
+      "sceneKeys": [],
+      "questionIds": [
+        "coaster-cut"
+      ],
+      "drawingSource": "diagrams/cut-cross.svg",
+      "drawingSourceSha256": "5f788eccb0448fcdfeac3246fdf95a2f67cb5ab7ecf0f2e94e74a467a868f8bb",
+      "meaning": "红色剪路穿过圆内部",
+      "sha256": "f26c81a9597f073b347ff5fa2a2820a05494c0f8c007ebbbe739e4cf3f0242e2",
+      "kind": "precision_diagram"
+    },
+    {
+      "id": "cut-edge",
+      "file": "cut-edge.png",
+      "sceneKeys": [],
+      "questionIds": [
+        "coaster-cut"
+      ],
+      "drawingSource": "diagrams/cut-edge.svg",
+      "drawingSourceSha256": "99aa1ad1d88751a5b73841ab6be5ddbe483c6911bd56acde6e10ed629ac731fb",
+      "meaning": "红色剪路从纸边进入后闭合沿圆线",
+      "sha256": "8a798a0b47082bc5d17571ed6961363d1a7fb4954e5bb1c7de794ea79bc49068",
+      "kind": "precision_diagram"
+    },
+    {
+      "id": "cut-method",
+      "file": "cut-method.png",
+      "sceneKeys": [
+        "cut"
+      ],
+      "questionIds": [],
+      "drawingSource": "diagrams/cut-method.svg",
+      "drawingSourceSha256": "3a235dbf1426f3081e328dc936787462b39f4f34632b7fad91cb432b64fcc290",
+      "meaning": "纸边到圆线、沿圆线继续剪、留下完整的圆后再装饰。",
+      "sha256": "89d0be80fb028633d57c065979983b0a12c830dbf7fc00e3697a6711c3b92a4f",
+      "kind": "precision_diagram"
+    },
+    {
+      "id": "flat-comparison",
+      "file": "flat-comparison.png",
+      "sceneKeys": [
+        "test"
+      ],
+      "questionIds": [],
+      "drawingSource": "diagrams/flat-comparison.svg",
+      "drawingSourceSha256": "ef4ace90c22ce3d84acba8139b77f56b852e9b8e5ea0b07f097ddacb940ab3e8",
+      "meaning": "上排从上看两张一样大的杯垫均覆盖空杯底，下排侧视对照左图右边翘起、右图整面铺平。",
+      "sha256": "ebf20103ebd1897265ad196d03790c97ad4566eea71ddd5fe0f5d92c87da9251",
+      "kind": "precision_diagram"
+    },
+    {
+      "id": "lint-plan",
+      "file": "lint-plan.png",
+      "sceneKeys": [
+        "transfer"
+      ],
+      "questionIds": [],
+      "drawingSource": "diagrams/lint-plan.svg",
+      "drawingSourceSha256": "def9a97301c2243bd13e971eed166a70fdcbbc15e3358443f15e6b3de6636c35",
+      "meaning": "从左到右比较衣物上散开的毛、小粘板粘面朝下按角落、纸筒外侧带胶沿布面滚动。",
+      "sha256": "ad06c6951abb47a469878c8e2f928fcb92f1b42262159c9d12e2dceeeb0950c4",
+      "kind": "precision_diagram"
+    },
+    {
+      "id": "paper",
+      "file": "paper-display-736.png",
+      "sceneKeys": [],
+      "questionIds": [
+        "coaster-material"
+      ],
+      "kind": "illustration",
+      "provider": "Codex built-in imagegen",
+      "receiptPath": "asset-receipts/paper.json",
+      "receiptSha256": "e6d55da53a17dd2f232b4f6cdb1688ae82a06996f767923ab5148e4bfdbb00cc",
+      "sha256": "e943f66eaa92cccc49111f6fa658ffd9f15b97f6be2931a1c56d5d1c9c160edb",
+      "dimensions": {
+        "width": 736,
+        "height": 736
+      },
+      "imagegenOriginal": {
+        "file": "paper.png",
+        "sha256": "1d7b1ebab32684dba6beffc76f983d751a4f1b5e47c2fd38c5ad6f5f837afe8c",
+        "dimensions": {
+          "width": 1254,
+          "height": 1254
+        },
+        "byteSize": 2268121
+      },
+      "displayDerivative": {
+        "tool": "ffmpeg version 8.1",
+        "transform": "whole-frame Lanczos scale; no crop or recoloring",
+        "filter": "scale=736:736:flags=lanczos+accurate_rnd,setsar=1",
+        "pixelFormat": "rgb24",
+        "byteSize": 707461
+      }
+    },
+    {
+      "id": "pencil",
+      "file": "pencil-display-736.png",
+      "sceneKeys": [],
+      "questionIds": [
+        "coaster-material"
+      ],
+      "kind": "illustration",
+      "provider": "Codex built-in imagegen",
+      "receiptPath": "asset-receipts/pencil.json",
+      "receiptSha256": "fc599b21e37e82321f4453caefc13057766b57784865bd6901d802b855807045",
+      "sha256": "290f33bb3f49fc09574938d4026dacc9b4c6629d225364c5ca921a9713441de8",
+      "dimensions": {
+        "width": 736,
+        "height": 736
+      },
+      "imagegenOriginal": {
+        "file": "pencil.png",
+        "sha256": "e7a2d5cbca346e85923b5d3ab5a74ae8b54004ede341ef517f8daa2d925e2cc2",
+        "dimensions": {
+          "width": 1254,
+          "height": 1254
+        },
+        "byteSize": 2245313
+      },
+      "displayDerivative": {
+        "tool": "ffmpeg version 8.1",
+        "transform": "whole-frame Lanczos scale; no crop or recoloring",
+        "filter": "scale=736:736:flags=lanczos+accurate_rnd,setsar=1",
+        "pixelFormat": "rgb24",
+        "byteSize": 773980
+      }
+    },
+    {
+      "id": "pillow-fibers",
+      "file": "pillow-fibers.png",
+      "sceneKeys": [],
+      "questionIds": [
+        "coaster-transfer"
+      ],
+      "drawingSource": "diagrams/pillow-fibers.svg",
+      "drawingSourceSha256": "adc41a013b020a0ed4ac4c49d78c2a70a056687841faefd664637eed74871261",
+      "meaning": "靠垫表面可见三根毛，给出接触位置。",
+      "sha256": "10d172947bb36d5b2e899d6bb0e9bdfbf2a2160acf8c8bfae704dfb5dc15773c",
+      "kind": "precision_diagram"
+    },
+    {
+      "id": "pot-flat",
+      "file": "pot-flat.png",
+      "sceneKeys": [],
+      "questionIds": [
+        "coaster-retest"
+      ],
+      "drawingSource": "diagrams/pot-flat.svg",
+      "drawingSourceSha256": "d60b85077b45983786cdee9322fede123161548a308cfcb9208644f421b8d679",
+      "meaning": "同宽而平整",
+      "sha256": "7c11d87eddc28ce0673919b101fa508a304aad5dbdb72eec17cc6fb270fcfa4f",
+      "kind": "precision_diagram"
+    },
+    {
+      "id": "pot-large",
+      "file": "pot-large.png",
+      "sceneKeys": [],
+      "questionIds": [
+        "coaster-retest"
+      ],
+      "drawingSource": "diagrams/pot-large.svg",
+      "drawingSourceSha256": "90dd69b0011124d1e9fe63694628400be1afcc51bcaf1d06f0a0602dd4fe2834",
+      "meaning": "更宽但仍翘起",
+      "sha256": "f8fb16d7d6663887924f6126b3a5c4542eb0445bb57e171cd687c19bbb03d1f2",
+      "kind": "precision_diagram"
+    },
+    {
+      "id": "pot-reference",
+      "file": "pot-reference.png",
+      "sceneKeys": [],
+      "questionIds": [
+        "coaster-retest"
+      ],
+      "drawingSource": "diagrams/pot-reference.svg",
+      "drawingSourceSha256": "207894d053d67acbfeff6af1e01fc3d00683478f39dc7884bed18367d8ff31e7",
+      "meaning": "原盆底放得下，右边翘起",
+      "sha256": "93021a92f451565965f4d827550fae33dd0165574dd11c548636c0c31d58938f",
+      "kind": "precision_diagram"
+    },
+    {
+      "id": "pot-small",
+      "file": "pot-small.png",
+      "sceneKeys": [],
+      "questionIds": [
+        "coaster-retest"
+      ],
+      "drawingSource": "diagrams/pot-small.svg",
+      "drawingSourceSha256": "abab1836b4ca1ec1dc38319e1bdc518122dadca69a9dc5daf1f8414e45564738",
+      "meaning": "平整但盆底越过两边",
+      "sha256": "960927c354d112894f38f2edc421066f305f6f63ea08cd9e9e6a6a1a350bf406",
+      "kind": "precision_diagram"
+    },
+    {
+      "id": "roller-ends",
+      "file": "roller-ends.png",
+      "sceneKeys": [],
+      "questionIds": [
+        "coaster-transfer"
+      ],
+      "drawingSource": "diagrams/roller-ends.svg",
+      "drawingSourceSha256": "b20fa4b2e47bf8a7ae878153d592ab520c288defdaa1e3c24e902cf74ccbc141",
+      "meaning": "粘面只在两个端口",
+      "sha256": "75bd53b8f1eccf3f13bf164b32d4215d2888b355be9dde18236d2c93aa9bbece",
+      "kind": "precision_diagram"
+    },
+    {
+      "id": "roller-in",
+      "file": "roller-in.png",
+      "sceneKeys": [],
+      "questionIds": [
+        "coaster-transfer"
+      ],
+      "drawingSource": "diagrams/roller-in.svg",
+      "drawingSourceSha256": "f088691afc98279568c843e8cb3bc381d32efc873bf7e1e00e9a4edcbe9b3f72",
+      "meaning": "胶贴在内壁",
+      "sha256": "77c456f6d4635b47c9e51ea27d22e1c949d9441c0e6690f56bf77cbd809c1fb6",
+      "kind": "precision_diagram"
+    },
+    {
+      "id": "roller-out",
+      "file": "roller-out.png",
+      "sceneKeys": [],
+      "questionIds": [
+        "coaster-transfer"
+      ],
+      "drawingSource": "diagrams/roller-out.svg",
+      "drawingSourceSha256": "f3f2dc3b92e39ce53c7ae4e2056d378efdc9fe9cce6638c316fe458c64a6ff32",
+      "meaning": "粘面露在外圈",
+      "sha256": "44593a15975848c3085adbc437a91db6d472130edd9332228ceb99056c4dc27b",
+      "kind": "precision_diagram"
+    },
+    {
+      "id": "round-lid",
+      "file": "round-lid-display-400.png",
+      "sceneKeys": [
+        "circle"
+      ],
+      "questionIds": [],
+      "kind": "illustration",
+      "provider": "Codex built-in imagegen",
+      "receiptPath": "asset-receipts/round-lid.json",
+      "receiptSha256": "b0b43e0e9c9a5d0e5bccd0dac565d70d2272c92e64eb271a92429a4e6e54ce03",
+      "sha256": "18204faa3b83b0858ad88a28e979d400bf2163c13407049a782b4c396cc78754",
+      "dimensions": {
+        "width": 400,
+        "height": 400
+      },
+      "imagegenOriginal": {
+        "file": "round-lid.png",
+        "sha256": "287f435d0ab064c3ebcaf9fbd07d3eb05b721e37fe289b3fbcf1098759e4d8b2",
+        "dimensions": {
+          "width": 1254,
+          "height": 1254
+        },
+        "byteSize": 1966376
+      },
+      "displayDerivative": {
+        "tool": "ffmpeg version 8.1",
+        "transform": "whole-frame Lanczos scale; no crop or recoloring",
+        "filter": "scale=400:400:flags=lanczos+accurate_rnd,setsar=1",
+        "pixelFormat": "rgb24",
+        "byteSize": 191445
+      }
+    },
+    {
+      "id": "scissors",
+      "file": "scissors-display-736.png",
+      "sceneKeys": [],
+      "questionIds": [
+        "coaster-material"
+      ],
+      "kind": "illustration",
+      "provider": "Codex built-in imagegen",
+      "receiptPath": "asset-receipts/scissors.json",
+      "receiptSha256": "2b4e5cb206aab8ebea2c8eb71b93e1466a686586f5b414dcd3ade30ec3180915",
+      "sha256": "ce19376d9d698c1f5b86b59851422e4641ba080aeb1aadafa6b50cfe4a53400a",
+      "dimensions": {
+        "width": 736,
+        "height": 736
+      },
+      "imagegenOriginal": {
+        "file": "scissors.png",
+        "sha256": "6101bdabd9798cfc1c7d2e303eaebdb8bc1ff9de567ea17517b912c33f73181c",
+        "dimensions": {
+          "width": 1254,
+          "height": 1254
+        },
+        "byteSize": 2072878
+      },
+      "displayDerivative": {
+        "tool": "ffmpeg version 8.1",
+        "transform": "whole-frame Lanczos scale; no crop or recoloring",
+        "filter": "scale=736:736:flags=lanczos+accurate_rnd,setsar=1",
+        "pixelFormat": "rgb24",
+        "byteSize": 714930
+      }
+    },
+    {
+      "id": "string",
+      "file": "string-display-704.png",
+      "sceneKeys": [
+        "circle"
+      ],
+      "questionIds": [],
+      "kind": "illustration",
+      "provider": "Codex built-in imagegen",
+      "receiptPath": "asset-receipts/string.json",
+      "receiptSha256": "2923c9755cbd2da26575be6f69557308a4917bfc200599ab6c8e67372962a11a",
+      "sha256": "71d5413acf57395e2cdd2b222fea981ddbc146502be5bf8ea6a63f09f355359c",
+      "dimensions": {
+        "width": 704,
+        "height": 396
+      },
+      "imagegenOriginal": {
+        "file": "string.png",
+        "sha256": "c0344e52b1ca8fbd6779707d8107180de737c041e7bbd4a4c4f8ff1489c9d302",
+        "dimensions": {
+          "width": 1672,
+          "height": 941
+        },
+        "byteSize": 2221793
+      },
+      "displayDerivative": {
+        "tool": "ffmpeg version 8.1",
+        "transform": "whole-frame Lanczos scale; no crop or recoloring",
+        "filter": "scale=704:396:flags=lanczos+accurate_rnd,setsar=1",
+        "pixelFormat": "rgb24",
+        "byteSize": 389461
+      }
+    },
+    {
+      "id": "wide-coaster",
+      "file": "wide-coaster-display-400.png",
+      "sceneKeys": [
+        "cup"
+      ],
+      "questionIds": [],
+      "kind": "illustration",
+      "provider": "Codex built-in imagegen",
+      "receiptPath": "asset-receipts/wide-coaster.json",
+      "receiptSha256": "dfa2a7d290419fe25065fbc1a935181a6c485660e17c6344d571add5b22e56f6",
+      "sha256": "dd6b6322ac19c843d3c6586d6d5ee3a1de77ef6167edf963393a2e93bc461f79",
+      "dimensions": {
+        "width": 400,
+        "height": 400
+      },
+      "imagegenOriginal": {
+        "file": "wide-coaster.png",
+        "sha256": "e856004bd2d9b3be669cf072898eedb89f9f0966ee4c83cec6df74106ab4c73c",
+        "dimensions": {
+          "width": 1254,
+          "height": 1254
+        },
+        "byteSize": 2126498
+      },
+      "displayDerivative": {
+        "tool": "ffmpeg version 8.1",
+        "transform": "whole-frame Lanczos scale; no crop or recoloring",
+        "filter": "scale=400:400:flags=lanczos+accurate_rnd,setsar=1",
+        "pixelFormat": "rgb24",
+        "byteSize": 198492
+      }
+    },
+    {
+      "id": "workshop",
+      "file": "workshop-display-1280.png",
+      "sceneKeys": [
+        "bench",
+        "recap",
+        "circle",
+        "cup"
+      ],
+      "questionIds": [],
+      "kind": "illustration",
+      "provider": "Codex built-in imagegen",
+      "receiptPath": "asset-receipts/workshop.json",
+      "receiptSha256": "c6b5b8d629a78bdb5006107ddd509e128d03a6b96a69fa9475bd4a37e5f841e0",
+      "sha256": "12c33bf4eb11e71c92a018d1017324624e91974fef337ed8721c5e7bd1570fe5",
+      "dimensions": {
+        "width": 1280,
+        "height": 720
+      },
+      "imagegenOriginal": {
+        "file": "workshop.png",
+        "sha256": "0625c6630b6de7c4fdeccb4ce2eb2dfa58e625c90b21fcb75a17ebe16acb2a00",
+        "dimensions": {
+          "width": 1672,
+          "height": 941
+        },
+        "byteSize": 2569331
+      },
+      "displayDerivative": {
+        "tool": "ffmpeg version 8.1",
+        "transform": "whole-frame Lanczos scale; no crop or recoloring",
+        "filter": "scale=1280:720:flags=lanczos+accurate_rnd,setsar=1",
+        "pixelFormat": "rgb24",
+        "byteSize": 1517463
+      }
+    },
+    {
+      "id": "observe-narrow-top",
+      "file": "observe-narrow-top.png",
+      "sceneKeys": [
+        "cup"
+      ],
+      "questionIds": [],
+      "drawingSource": "diagrams/observe-narrow-top.svg",
+      "drawingSourceSha256": "d0355beaafd69cdf22f72abda5ab888ed44c949ccdad026b4b931fc1584dbfb9",
+      "meaning": "俯看：杯底伸出了垫子的边。",
+      "sha256": "bc273ab7ac86f2b920469326d014097d4caa3d79f0e00eec597349e600865215",
+      "kind": "precision_diagram",
+      "dimensions": {
+        "width": 460,
+        "height": 420
+      },
+      "drawingFrom": {
+        "gameSource": "pages/cup.js",
+        "gameSourceSha256": "4c44254114e7182fecf10f53026d77bb9caa74d70a95ca390e79b51164555221",
+        "material": "narrow",
+        "cupBaseRadius": 51,
+        "matRadius": 37,
+        "flat": true,
+        "view": "top"
+      }
+    },
+    {
+      "id": "observe-narrow-side",
+      "file": "observe-narrow-side.png",
+      "sceneKeys": [
+        "cup"
+      ],
+      "questionIds": [],
+      "drawingSource": "diagrams/observe-narrow-side.svg",
+      "drawingSourceSha256": "3a9b32d6af88dcd2ef046ea3b06bdce3a78aa403bd51db85f1ead4e75d53b989",
+      "meaning": "侧看：垫子的边平贴着桌面。",
+      "sha256": "cd392bd020bca805d436e91d75af4882050e985030a247add5ba8d476772a418",
+      "kind": "precision_diagram",
+      "dimensions": {
+        "width": 460,
+        "height": 320
+      },
+      "drawingFrom": {
+        "gameSource": "pages/cup.js",
+        "gameSourceSha256": "4c44254114e7182fecf10f53026d77bb9caa74d70a95ca390e79b51164555221",
+        "material": "narrow",
+        "cupBaseRadius": 51,
+        "matRadius": 37,
+        "flat": true,
+        "view": "side"
+      }
+    },
+    {
+      "id": "observe-curled-top",
+      "file": "observe-curled-top.png",
+      "sceneKeys": [
+        "cup"
+      ],
+      "questionIds": [],
+      "drawingSource": "diagrams/observe-curled-top.svg",
+      "drawingSourceSha256": "5df16b144f69eb284d218bacc615547ac8f2f8c22ad8a7f22d09ac959a6e3648",
+      "meaning": "俯看：整个杯底都在垫子范围内。",
+      "sha256": "af1b8746334cf61c60cab2a76f8b1d9c9743371b5fec745ee8e7fc991b5d61de",
+      "kind": "precision_diagram",
+      "dimensions": {
+        "width": 460,
+        "height": 420
+      },
+      "drawingFrom": {
+        "gameSource": "pages/cup.js",
+        "gameSourceSha256": "4c44254114e7182fecf10f53026d77bb9caa74d70a95ca390e79b51164555221",
+        "material": "curled",
+        "cupBaseRadius": 51,
+        "matRadius": 80,
+        "flat": false,
+        "view": "top"
+      }
+    },
+    {
+      "id": "observe-curled-side",
+      "file": "observe-curled-side.png",
+      "sceneKeys": [
+        "cup"
+      ],
+      "questionIds": [],
+      "drawingSource": "diagrams/observe-curled-side.svg",
+      "drawingSourceSha256": "c2db104f9187dd7d0006254f2d6e6577044d9eadd4243c4bcabd485dd9659e1c",
+      "meaning": "侧看：垫子的边翘了起来。",
+      "sha256": "04f88a0e8a0b4c212017e45f4b02ea927566307956fc0253dbcf7400df09e2e7",
+      "kind": "precision_diagram",
+      "dimensions": {
+        "width": 460,
+        "height": 320
+      },
+      "drawingFrom": {
+        "gameSource": "pages/cup.js",
+        "gameSourceSha256": "4c44254114e7182fecf10f53026d77bb9caa74d70a95ca390e79b51164555221",
+        "material": "curled",
+        "cupBaseRadius": 51,
+        "matRadius": 80,
+        "flat": false,
+        "view": "side"
+      }
+    },
+    {
+      "id": "observe-mixed-top",
+      "file": "observe-mixed-top.png",
+      "sceneKeys": [
+        "cup"
+      ],
+      "questionIds": [],
+      "drawingSource": "diagrams/observe-mixed-top.svg",
+      "drawingSourceSha256": "f3f70b848b390609df061cadba8c33470e614707e087bfde1f6f3af2cfabc412",
+      "meaning": "俯看：杯底伸出了垫子的边。",
+      "sha256": "fee2cd33e81ebd87b1e80980a6fef489a49e6841f093bef4ea559435c79d8603",
+      "kind": "precision_diagram",
+      "dimensions": {
+        "width": 460,
+        "height": 420
+      },
+      "drawingFrom": {
+        "gameSource": "pages/cup.js",
+        "gameSourceSha256": "4c44254114e7182fecf10f53026d77bb9caa74d70a95ca390e79b51164555221",
+        "material": "mixed",
+        "cupBaseRadius": 51,
+        "matRadius": 38,
+        "flat": false,
+        "view": "top"
+      }
+    },
+    {
+      "id": "observe-mixed-side",
+      "file": "observe-mixed-side.png",
+      "sceneKeys": [
+        "cup"
+      ],
+      "questionIds": [],
+      "drawingSource": "diagrams/observe-mixed-side.svg",
+      "drawingSourceSha256": "a4b850c5e5d22eda31499ea82dd499deef8358c18a37485be1e9fa0598fbaad1",
+      "meaning": "侧看：垫子的边翘了起来。",
+      "sha256": "1ec904e902ee9fdb772aa9bf8ad0b3341c8e34e65e2b63cd02178c668c81df70",
+      "kind": "precision_diagram",
+      "dimensions": {
+        "width": 460,
+        "height": 320
+      },
+      "drawingFrom": {
+        "gameSource": "pages/cup.js",
+        "gameSourceSha256": "4c44254114e7182fecf10f53026d77bb9caa74d70a95ca390e79b51164555221",
+        "material": "mixed",
+        "cupBaseRadius": 51,
+        "matRadius": 38,
+        "flat": false,
+        "view": "side"
+      }
+    },
+    {
+      "id": "observe-ready-top",
+      "file": "observe-ready-top.png",
+      "sceneKeys": [
+        "cup"
+      ],
+      "questionIds": [],
+      "drawingSource": "diagrams/observe-ready-top.svg",
+      "drawingSourceSha256": "f07fa4422f56fdf6413988a5e5cfdf2c58db54242427eb806874e7fd8d69d4d6",
+      "meaning": "俯看：整个杯底都在垫子范围内。",
+      "sha256": "08aed964f415d130153e7a8707a22cac52571c3c65de51f8252054b19233129a",
+      "kind": "precision_diagram",
+      "dimensions": {
+        "width": 460,
+        "height": 420
+      },
+      "drawingFrom": {
+        "gameSource": "pages/cup.js",
+        "gameSourceSha256": "4c44254114e7182fecf10f53026d77bb9caa74d70a95ca390e79b51164555221",
+        "material": "ready",
+        "cupBaseRadius": 51,
+        "matRadius": 80,
+        "flat": true,
+        "view": "top"
+      }
+    },
+    {
+      "id": "observe-ready-side",
+      "file": "observe-ready-side.png",
+      "sceneKeys": [
+        "cup"
+      ],
+      "questionIds": [],
+      "drawingSource": "diagrams/observe-ready-side.svg",
+      "drawingSourceSha256": "3ccd5d0abf4bd4d7db5f0db64a5ad7b1cbc36a6018cf8c8b3c37f4379857230d",
+      "meaning": "侧看：垫子的边平贴着桌面。",
+      "sha256": "63e9f68e8c817094d2dbb3778d69d7563f43378d6b7fe4baf5878b13dbac3231",
+      "kind": "precision_diagram",
+      "dimensions": {
+        "width": 460,
+        "height": 320
+      },
+      "drawingFrom": {
+        "gameSource": "pages/cup.js",
+        "gameSourceSha256": "4c44254114e7182fecf10f53026d77bb9caa74d70a95ca390e79b51164555221",
+        "material": "ready",
+        "cupBaseRadius": 51,
+        "matRadius": 80,
+        "flat": true,
+        "view": "side"
+      }
+    }
+  ]
+}

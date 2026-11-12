@@ -1,0 +1,246 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "小猴子下山",
+  "binding": {
+    "editionId": "pep-chinese-g1-lower-2022-standard",
+    "revisionId": "directory-b30168cf88d5ee5709335698",
+    "nodeId": "551f3375-7be0-4ce4-a3f3-c069936cb593",
+    "unitId": "e7efd7e6-2a62-4a7b-9ebc-c8a5632c5f11"
+  },
+  "scenario": "山脚影偶戏的故事卡没排好。小导演跟着地点、物品和动作把故事讲回来，然后用新道具练动作词和续编。",
+  "goals": [
+    "借图按顺序复述五段，用到哪儿、看见什么、做了什么说明空手回家的原因。",
+    "看动作分辨掰、扛、扔、摘、捧、抱，并用其中几个词在新场景各说一句；用又……又……描述两个共同特征。",
+    "在故事中认读十三个字，辨结的语音，按规范练写高、兴、着、往、瓜、兔、进。",
+    "在原创续编中先想一个目标，再根据它作选择，向家人说出自己的理由。"
+  ],
+  "goalSources": [
+    {
+      "skill": "story-cause",
+      "target": "借图按顺序复述五段，用到哪儿、看见什么、做了什么说明空手回家的原因。",
+      "source": "印90～92、两课时教案和第二课时课件14～19"
+    },
+    {
+      "skill": "verb-and-description",
+      "target": "看动作分辨掰、扛、扔、摘、捧、抱，并用其中几个词在新场景各说一句；用又……又……描述两个共同特征。",
+      "source": "印90～92、第一课时课件9～13、第二课时课件14～15"
+    },
+    {
+      "skill": "recognize-and-write",
+      "target": "在故事中认读十三个字，辨结的语音，按规范练写高、兴、着、往、瓜、兔、进。",
+      "source": "印92、两课时写字示范、GF 0023—2020"
+    },
+    {
+      "skill": "choose-a-goal",
+      "target": "在原创续编中先想一个目标，再根据它作选择，向家人说出自己的理由。",
+      "source": "印92拓展、第二课时教案3与课后练习1"
+    }
+  ],
+  "pageSequence": [
+    {
+      "key": "corn-at-the-start",
+      "kind": "teaching",
+      "plan": "先看空手结尾与玉米地开场。指小猴、块的土字旁和结的绞丝旁，听两种读音。"
+    },
+    {
+      "key": "break-and-carry",
+      "kind": "teaching",
+      "plan": "用掰玉米、肩扛两画指掰、扛、往、兴的字形或读音，示范高兴的语气。"
+    },
+    {
+      "key": "under-the-peach-tree",
+      "kind": "teaching",
+      "plan": "从见桃、扔玉米到摘桃，依画指棵、满和两个提手旁动词。"
+    },
+    {
+      "key": "at-the-watermelon-patch",
+      "kind": "teaching",
+      "plan": "依画看捧桃、见瓜、丢桃、抱瓜，指捧的提手旁，对比掌托与臂围。"
+    },
+    {
+      "key": "rabbit-on-the-way",
+      "kind": "teaching",
+      "plan": "看见兔子后放下瓜、向前追，指追的走之，接到小兔进树林。"
+    },
+    {
+      "key": "why-empty",
+      "kind": "teaching",
+      "plan": "依次连起三次放弃和没追到兔子的结果，用原创复述示范结尾停连。"
+    },
+    {
+      "key": "two-traits",
+      "kind": "teaching",
+      "plan": "两处特点说的是同一样东西"
+    },
+    {
+      "key": "order-first-places",
+      "kind": "teaching",
+      "plan": "给场记留一张路线表"
+    },
+    {
+      "key": "order-then-actions",
+      "kind": "teaching",
+      "plan": "同一地点，也要分清先后"
+    },
+    {
+      "key": "walk-the-stage-map",
+      "kind": "game",
+      "plan": "泡泡车给故事排顺序"
+    },
+    {
+      "key": "which-action",
+      "kind": "teaching",
+      "plan": "小演员怎么拿道具"
+    },
+    {
+      "key": "one-ball-three-actions",
+      "kind": "teaching",
+      "plan": "同一个软布球，三种拿法"
+    },
+    {
+      "key": "catch-the-action",
+      "kind": "game",
+      "plan": "泡泡艇接动作"
+    },
+    {
+      "key": "write-gao-and-xing",
+      "kind": "teaching",
+      "plan": "高和兴怎么写得稳"
+    },
+    {
+      "key": "write-zhe-and-wang",
+      "kind": "teaching",
+      "plan": "着和往，认清两边"
+    },
+    {
+      "key": "write-gua-and-tu",
+      "kind": "teaching",
+      "plan": "瓜的提和兔的点"
+    },
+    {
+      "key": "write-jin",
+      "kind": "teaching",
+      "plan": "进字先写井，再写走之"
+    },
+    {
+      "key": "pick-a-goal",
+      "kind": "teaching",
+      "plan": "第二次下山，先选一个目标"
+    },
+    {
+      "key": "picture-quiz",
+      "kind": "quiz",
+      "plan": "听题，把画面找回来"
+    },
+    {
+      "key": "tell-a-new-trip",
+      "kind": "teaching",
+      "plan": "带一条路线回去讲"
+    }
+  ],
+  "games": [
+    {
+      "page": "walk-the-stage-map",
+      "template": "bubbleMaze",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.bubbleMaze",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "listen_order",
+      "selection": "棋盘上实际移动影偶场记到不同镜头。route 指定真实前后次序，用 listenOnly 隐藏当前 ID，老师逐段说线索，语义图卡让孩子辨别，已到镜头按顺序保留。树林场是镜头收录，控制角色是场记。",
+      "levels": [
+        "按玉米地、桃树下、瓜地的顺序收录三站，再去小旗，首图相距两格。",
+        "录桃树下扔玉米、从枝头摘桃、手掌托桃到瓜地；加岔路和横向巡游。",
+        "录抱瓜往回、扔瓜追兔、兔进树林、空手回家四格；增加挡板与巡游。"
+      ],
+      "demo": "依次指起点、角色与第一幅地点图。实走到首图后停住，确认图卡已记录，再清零交孩子。",
+      "teacherAnchors": [
+        "monkey-maze-listen",
+        "monkey-maze-first",
+        "game-player"
+      ]
+    },
+    {
+      "page": "catch-the-action",
+      "template": "wordBubbles",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.wordBubbles",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "listen_match",
+      "selection": "每轮真人录音点明动作，rounds 指定唯一对应图。前后两格或动作线清楚表现放下、取下和持物位置；使用新物件并加同道具不同动作的干扰。横移瞄准、发泡命中当前语义才得分，失败后可重听。",
+      "levels": [
+        "慢速两图，分辨掰开软道具与从枝上摘布花。",
+        "三图分辨扛纸卷、双手捧小袋、双臂抱靠垫。",
+        "同一软布球的抱、捧、扔用动作轨迹区分，混入新一轮的摘和扛。"
+      ],
+      "demo": "指当前口令对应动作、泡泡艇和发射，真实打中一次停在接住图卡结果，再清零正式开始。",
+      "teacherAnchors": [
+        "monkey-action-listen",
+        "monkey-action-first",
+        "game-player"
+      ]
+    }
+  ],
+  "quiz": [
+    {
+      "id": "finish-reason",
+      "skill": "story-cause",
+      "prompt": "故事海报最后画小猴空着手，哪组小画能说清楚为什么？",
+      "answer": "扔下瓜没追到",
+      "position": 2,
+      "rationale": "它把先前拿到的东西一次次扔下，最后没追到兔子，所以空着手回家。"
+    },
+    {
+      "id": "carry-on-shoulder",
+      "skill": "shoulder-carry",
+      "prompt": "小演员要把软泡沫木条扛到布景边。哪幅动作图符合这句话？",
+      "answer": "用肩托木条",
+      "position": 1,
+      "rationale": "扛时用肩托住物件。这幅图的长木条放在肩上。"
+    },
+    {
+      "id": "cup-the-pebbles",
+      "skill": "cup-and-hug",
+      "prompt": "两手捧着几枚纸做的小石头。哪幅图动作相符？",
+      "answer": "手掌托纸石头",
+      "position": 3,
+      "rationale": "捧主要是双手从下面托住。掌心朝上，纸石头放在手心里。"
+    },
+    {
+      "id": "two-traits",
+      "skill": "two-traits-one-object",
+      "prompt": "看左边的气球。哪张图里它比右边的小，而且是圆的？",
+      "answer": "小而圆",
+      "position": 2,
+      "rationale": "左边的气球比右边的小，外形也是圆的。又小又圆要同时符合。"
+    },
+    {
+      "id": "rabbit-final-dot",
+      "skill": "rabbit-last-stroke",
+      "prompt": "田字格里的兔只差最后一笔。哪张图画对了这笔？",
+      "answer": "右下一点",
+      "position": 1,
+      "rationale": "兔的最后一笔是点，落在右下。"
+    },
+    {
+      "id": "next-trip-goal",
+      "skill": "choose-a-goal",
+      "prompt": "小猴答应把花带回家，半路看到好看的叶子。哪幅图能完成约定？",
+      "answer": "带花回家",
+      "position": 3,
+      "rationale": "约好把花带回家。它可以看看叶子，仍带着原来的花回去。"
+    }
+  ],
+  "afterClass": {
+    "familyTask": "陪孩子朗读纸书，按地点和动作口述。用家中软道具做两个动作词，各说一句；续编第二次下山，先定目标，再讲做了什么。",
+    "weeklyQuestionSource": [
+      "情节次序及空手因果",
+      "动词区别",
+      "又……又……双特点",
+      "认字与规范书写",
+      "有目标的选择"
+    ],
+    "evidence": "线上只记录操作和选图。朗读、动作表达、写字与口头续编由成人观察，报告记待观察。"
+  },
+  "artAndLanguage": "原创山脚影偶戏、动物与植物，不沿用教材插图。保持前后动作一致；扛、捧、抱用肩、掌、手臂区分。田字格用代码精准画，听词、顺序与提示都录音，非目标文字遮住仍能操作。",
+  "officialNotesSha256": "75e5199c141da6ac26a4f055d3e42f16fae1a63fd21af3a6ed67c23927844124"
+}

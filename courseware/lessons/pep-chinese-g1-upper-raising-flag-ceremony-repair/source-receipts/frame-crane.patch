@@ -1,0 +1,8 @@
+--- a/courseware/lessons/pep-chinese-g1-upper-raising-flag-ceremony/pages/frame-crane.js
++++ b/courseware/lessons/pep-chinese-g1-upper-raising-flag-ceremony/pages/frame-crane.js
+@@ -149,4 +149,5 @@
+   }
+ };
+ 
++crane.demoOnce = true;
+ K.game(crane);

@@ -1,0 +1,908 @@
+{
+  "schemaVersion": "mira.courseware.asset-sources.v1",
+  "assets": {
+    "turn-to-fit-model": {
+      "file": "assets/turn-to-fit-model.png",
+      "sha256": "80d3c0b653aa56c2a3b661b1d00992e04c0ed1135f0168b8554d55aae97c4bb9",
+      "kind": "deterministic-lesson-diagram",
+      "source": "diagrams/render.py",
+      "sourceSha256": "82311115c704281d77481443119d106bdc499a002eec1f9643533c3afd092ff8",
+      "usedBy": [
+        "turn-and-fit"
+      ]
+    },
+    "test-the-lid-model": {
+      "file": "assets/test-the-lid-model.png",
+      "sha256": "86b300a1fd48d736669ca594985f0ef7e10192f94fa89b251da0389099230701",
+      "kind": "deterministic-lesson-diagram",
+      "source": "diagrams/render.py",
+      "sourceSha256": "82311115c704281d77481443119d106bdc499a002eec1f9643533c3afd092ff8",
+      "usedBy": [
+        "turn-and-fit"
+      ]
+    },
+    "box-layout-overlap": {
+      "file": "assets/box-layout-overlap.png",
+      "sha256": "442af2aec114eadad5c4cd31b6089901b62f3ece8406e510567f7102c4709e11",
+      "kind": "deterministic-lesson-diagram",
+      "source": "diagrams/render.py",
+      "sourceSha256": "82311115c704281d77481443119d106bdc499a002eec1f9643533c3afd092ff8",
+      "usedBy": [
+        "picture-quiz"
+      ]
+    },
+    "box-layout-fit": {
+      "file": "assets/box-layout-fit.png",
+      "sha256": "f348d0567ee73f25d71933e4d92079982c256d8b7b5c2c75c136c3119947f73d",
+      "kind": "deterministic-lesson-diagram",
+      "source": "diagrams/render.py",
+      "sourceSha256": "82311115c704281d77481443119d106bdc499a002eec1f9643533c3afd092ff8",
+      "usedBy": [
+        "picture-quiz"
+      ]
+    },
+    "box-layout-outside": {
+      "file": "assets/box-layout-outside.png",
+      "sha256": "e0db7f9d7e06393fd94d349e0fe43d887baa8c042577527f4773d59a21e4afcb",
+      "kind": "deterministic-lesson-diagram",
+      "source": "diagrams/render.py",
+      "sourceSha256": "82311115c704281d77481443119d106bdc499a002eec1f9643533c3afd092ff8",
+      "usedBy": [
+        "picture-quiz"
+      ]
+    },
+    "lid-lifted-left": {
+      "file": "assets/lid-lifted-left.png",
+      "sha256": "11e8d742289bdbb3b3df56848119834391e8e83b7b61018ca632dc957cb8c542",
+      "kind": "deterministic-lesson-diagram",
+      "source": "diagrams/render.py",
+      "sourceSha256": "82311115c704281d77481443119d106bdc499a002eec1f9643533c3afd092ff8",
+      "usedBy": [
+        "picture-quiz"
+      ]
+    },
+    "lid-lifted-right": {
+      "file": "assets/lid-lifted-right.png",
+      "sha256": "eff6be9fbe4bc144ece4d000c1bab181a6d0eeb4ae2a30610063cb62159395b6",
+      "kind": "deterministic-lesson-diagram",
+      "source": "diagrams/render.py",
+      "sourceSha256": "82311115c704281d77481443119d106bdc499a002eec1f9643533c3afd092ff8",
+      "usedBy": [
+        "picture-quiz"
+      ]
+    },
+    "lid-fits-both": {
+      "file": "assets/lid-fits-both.png",
+      "sha256": "2827e834f7df90eaae66cdd6bdee366cda7b68149948d6d67e13e5024f62d8d2",
+      "kind": "deterministic-lesson-diagram",
+      "source": "diagrams/render.py",
+      "sourceSha256": "82311115c704281d77481443119d106bdc499a002eec1f9643533c3afd092ff8",
+      "usedBy": [
+        "picture-quiz"
+      ]
+    },
+    "quiz-big-zip": {
+      "file": "assets/quiz-big-zip.png",
+      "sha256": "8c331d1d312a006a0421462e8354516a6b420a8038b272a06b2fbda9546e1ec6",
+      "kind": "codex-imagegen-atlas-crop",
+      "source": "art-source/new-bag-and-stamp-questions.png",
+      "sourceSha256": "1e2e54f1724c339d95308e1bf2bc0cdfa893456d879e7213ae7cab3e3b362496",
+      "sourceCrop": [
+        0,
+        0,
+        425,
+        450
+      ],
+      "receipt": "art-source/new-bag-and-stamp-questions.receipt.json",
+      "receiptSha256": "be9c810889fbe23ece4aa6f104e2d3ce88081d656c7f1d6dc36b0d1c91a8952c",
+      "promptSha256": "a317e2c8ebd9325e5d75fba236239673334069ce08538bd29e5f99eb56ac7286",
+      "usedBy": [
+        "picture-quiz"
+      ]
+    },
+    "quiz-big-pocket": {
+      "file": "assets/quiz-big-pocket.png",
+      "sha256": "050c0e785820f8a86a92ede685bdd37aa7479ab2bc42a5fd863b1fefa673d038",
+      "kind": "codex-imagegen-atlas-crop",
+      "source": "art-source/new-bag-and-stamp-questions.png",
+      "sourceSha256": "1e2e54f1724c339d95308e1bf2bc0cdfa893456d879e7213ae7cab3e3b362496",
+      "sourceCrop": [
+        425,
+        0,
+        835,
+        450
+      ],
+      "receipt": "art-source/new-bag-and-stamp-questions.receipt.json",
+      "receiptSha256": "be9c810889fbe23ece4aa6f104e2d3ce88081d656c7f1d6dc36b0d1c91a8952c",
+      "promptSha256": "a317e2c8ebd9325e5d75fba236239673334069ce08538bd29e5f99eb56ac7286",
+      "usedBy": [
+        "picture-quiz"
+      ]
+    },
+    "quiz-big-mesh": {
+      "file": "assets/quiz-big-mesh.png",
+      "sha256": "a7e05b4d2283c6a948a002c3e4b91a9778736f353e5a81f8946718a164ae144e",
+      "kind": "codex-imagegen-atlas-crop",
+      "source": "art-source/new-bag-and-stamp-questions.png",
+      "sourceSha256": "1e2e54f1724c339d95308e1bf2bc0cdfa893456d879e7213ae7cab3e3b362496",
+      "sourceCrop": [
+        835,
+        0,
+        1263,
+        450
+      ],
+      "receipt": "art-source/new-bag-and-stamp-questions.receipt.json",
+      "receiptSha256": "be9c810889fbe23ece4aa6f104e2d3ce88081d656c7f1d6dc36b0d1c91a8952c",
+      "promptSha256": "a317e2c8ebd9325e5d75fba236239673334069ce08538bd29e5f99eb56ac7286",
+      "usedBy": [
+        "picture-quiz"
+      ]
+    },
+    "quiz-stamp-accessible": {
+      "file": "assets/quiz-stamp-accessible.png",
+      "sha256": "9e14b8544cb7fb87d23bf711c82016227339f74612a5b0441ea131e46d729f40",
+      "kind": "codex-imagegen-atlas-crop",
+      "source": "art-source/new-bag-and-stamp-questions.png",
+      "sourceSha256": "1e2e54f1724c339d95308e1bf2bc0cdfa893456d879e7213ae7cab3e3b362496",
+      "sourceCrop": [
+        0,
+        450,
+        425,
+        852
+      ],
+      "receipt": "art-source/new-bag-and-stamp-questions.receipt.json",
+      "receiptSha256": "be9c810889fbe23ece4aa6f104e2d3ce88081d656c7f1d6dc36b0d1c91a8952c",
+      "promptSha256": "a317e2c8ebd9325e5d75fba236239673334069ce08538bd29e5f99eb56ac7286",
+      "usedBy": [
+        "picture-quiz"
+      ]
+    },
+    "quiz-stamp-buried": {
+      "file": "assets/quiz-stamp-buried.png",
+      "sha256": "b783f9f992ea2a9a1b353c4ebcdf78347aa7b30e140c7eedceb4210b0fb89bd1",
+      "kind": "codex-imagegen-atlas-crop",
+      "source": "art-source/new-bag-and-stamp-questions.png",
+      "sourceSha256": "1e2e54f1724c339d95308e1bf2bc0cdfa893456d879e7213ae7cab3e3b362496",
+      "sourceCrop": [
+        425,
+        450,
+        835,
+        852
+      ],
+      "receipt": "art-source/new-bag-and-stamp-questions.receipt.json",
+      "receiptSha256": "be9c810889fbe23ece4aa6f104e2d3ce88081d656c7f1d6dc36b0d1c91a8952c",
+      "promptSha256": "a317e2c8ebd9325e5d75fba236239673334069ce08538bd29e5f99eb56ac7286",
+      "usedBy": [
+        "picture-quiz"
+      ]
+    },
+    "quiz-stamp-under-stack": {
+      "file": "assets/quiz-stamp-under-stack.png",
+      "sha256": "dbcb9ff26db5c0eed9c964620d6c4cf8954131b457651e7ce838a244c669e665",
+      "kind": "codex-imagegen-atlas-crop",
+      "source": "art-source/new-bag-and-stamp-questions.png",
+      "sourceSha256": "1e2e54f1724c339d95308e1bf2bc0cdfa893456d879e7213ae7cab3e3b362496",
+      "sourceCrop": [
+        835,
+        450,
+        1263,
+        852
+      ],
+      "receipt": "art-source/new-bag-and-stamp-questions.receipt.json",
+      "receiptSha256": "be9c810889fbe23ece4aa6f104e2d3ce88081d656c7f1d6dc36b0d1c91a8952c",
+      "promptSha256": "a317e2c8ebd9325e5d75fba236239673334069ce08538bd29e5f99eb56ac7286",
+      "usedBy": [
+        "picture-quiz"
+      ]
+    },
+    "home-organize-plan": {
+      "file": "assets/home-organize-plan.png",
+      "sha256": "d80b2d83657a26f139e56f356f2d06cacacd89d4769380ffb21b99d99507bf91",
+      "kind": "codex-imagegen-atlas-crop",
+      "source": "art-source/new-bag-and-stamp-questions.png",
+      "sourceSha256": "1e2e54f1724c339d95308e1bf2bc0cdfa893456d879e7213ae7cab3e3b362496",
+      "sourceCrop": [
+        0,
+        852,
+        425,
+        1246
+      ],
+      "receipt": "art-source/new-bag-and-stamp-questions.receipt.json",
+      "receiptSha256": "be9c810889fbe23ece4aa6f104e2d3ce88081d656c7f1d6dc36b0d1c91a8952c",
+      "promptSha256": "a317e2c8ebd9325e5d75fba236239673334069ce08538bd29e5f99eb56ac7286",
+      "usedBy": [
+        "home-organize-observation"
+      ]
+    },
+    "quiz-sort-ruler-mixed": {
+      "file": "assets/quiz-sort-ruler-mixed.png",
+      "sha256": "4df6228b350cf1a0a0f4afd737387b92354904cc3a1a9e22708c628f01d85cc9",
+      "kind": "codex-imagegen-atlas-crop",
+      "source": "art-source/new-divider-and-retrieval-questions.cream.png",
+      "sourceSha256": "a85661499ef99514bab32ded5cefa36e2f7836b685ea1969279e0fa0ea146090",
+      "sourceCrop": [
+        3,
+        3,
+        509,
+        509
+      ],
+      "receipt": "art-source/new-divider-and-retrieval-questions.receipt.json",
+      "receiptSha256": "114a2996447d336b9c7822aa93fbf2393f50574cef013244ab59cc273e9e93a8",
+      "promptSha256": "fc6711275db410c614d7d8ac29c6d021fb7db017dc31c8f80ec8f61cc6971171",
+      "usedBy": [
+        "picture-quiz"
+      ],
+      "originalToolOutput": "art-source/new-divider-and-retrieval-questions.png",
+      "originalToolOutputSha256": "e10409155ce9b922a36a2e42a87d95d0d008b10cd4a1f9b0a1b9a2e4f388394d",
+      "sourceProcessing": "original alpha composited over opaque lesson cream #fff2de before cell extraction"
+    },
+    "quiz-sort-ruler-hidden": {
+      "file": "assets/quiz-sort-ruler-hidden.png",
+      "sha256": "92fece9f2810355ca70a82a2ba09d09b6c7b6681ba48cc927fea4ff8f89dcbd6",
+      "kind": "codex-imagegen-atlas-crop",
+      "source": "art-source/new-divider-and-retrieval-questions.cream.png",
+      "sourceSha256": "a85661499ef99514bab32ded5cefa36e2f7836b685ea1969279e0fa0ea146090",
+      "sourceCrop": [
+        515,
+        3,
+        1021,
+        509
+      ],
+      "receipt": "art-source/new-divider-and-retrieval-questions.receipt.json",
+      "receiptSha256": "114a2996447d336b9c7822aa93fbf2393f50574cef013244ab59cc273e9e93a8",
+      "promptSha256": "fc6711275db410c614d7d8ac29c6d021fb7db017dc31c8f80ec8f61cc6971171",
+      "usedBy": [
+        "picture-quiz"
+      ],
+      "originalToolOutput": "art-source/new-divider-and-retrieval-questions.png",
+      "originalToolOutputSha256": "e10409155ce9b922a36a2e42a87d95d0d008b10cd4a1f9b0a1b9a2e4f388394d",
+      "sourceProcessing": "original alpha composited over opaque lesson cream #fff2de before cell extraction"
+    },
+    "quiz-sort-ruler-sorted": {
+      "file": "assets/quiz-sort-ruler-sorted.png",
+      "sha256": "54b7b6b27dce6b3b5e1d9eaa51d311406b1b946e623e92a73a43d891bb31db2f",
+      "kind": "codex-imagegen-atlas-crop",
+      "source": "art-source/new-divider-and-retrieval-questions.cream.png",
+      "sourceSha256": "a85661499ef99514bab32ded5cefa36e2f7836b685ea1969279e0fa0ea146090",
+      "sourceCrop": [
+        1027,
+        3,
+        1533,
+        509
+      ],
+      "receipt": "art-source/new-divider-and-retrieval-questions.receipt.json",
+      "receiptSha256": "114a2996447d336b9c7822aa93fbf2393f50574cef013244ab59cc273e9e93a8",
+      "promptSha256": "fc6711275db410c614d7d8ac29c6d021fb7db017dc31c8f80ec8f61cc6971171",
+      "usedBy": [
+        "picture-quiz"
+      ],
+      "originalToolOutput": "art-source/new-divider-and-retrieval-questions.png",
+      "originalToolOutputSha256": "e10409155ce9b922a36a2e42a87d95d0d008b10cd4a1f9b0a1b9a2e4f388394d",
+      "sourceProcessing": "original alpha composited over opaque lesson cream #fff2de before cell extraction"
+    },
+    "quiz-retrieve-item": {
+      "file": "assets/quiz-retrieve-item.png",
+      "sha256": "cc366df36a66e6a0d8c0f3ada09f97a155720a016546efac44249b35fd62dd22",
+      "kind": "codex-imagegen-atlas-crop",
+      "source": "art-source/new-divider-and-retrieval-questions.cream.png",
+      "sourceSha256": "a85661499ef99514bab32ded5cefa36e2f7836b685ea1969279e0fa0ea146090",
+      "sourceCrop": [
+        3,
+        515,
+        509,
+        1021
+      ],
+      "receipt": "art-source/new-divider-and-retrieval-questions.receipt.json",
+      "receiptSha256": "114a2996447d336b9c7822aa93fbf2393f50574cef013244ab59cc273e9e93a8",
+      "promptSha256": "fc6711275db410c614d7d8ac29c6d021fb7db017dc31c8f80ec8f61cc6971171",
+      "usedBy": [
+        "picture-quiz"
+      ],
+      "originalToolOutput": "art-source/new-divider-and-retrieval-questions.png",
+      "originalToolOutputSha256": "e10409155ce9b922a36a2e42a87d95d0d008b10cd4a1f9b0a1b9a2e4f388394d",
+      "sourceProcessing": "original alpha composited over opaque lesson cream #fff2de before cell extraction"
+    },
+    "quiz-close-only": {
+      "file": "assets/quiz-close-only.png",
+      "sha256": "b1604e3627e960e17f73a941061e7e48923bb61c3b02588cec7b5364ffd09ecd",
+      "kind": "codex-imagegen-atlas-crop",
+      "source": "art-source/new-divider-and-retrieval-questions.cream.png",
+      "sourceSha256": "a85661499ef99514bab32ded5cefa36e2f7836b685ea1969279e0fa0ea146090",
+      "sourceCrop": [
+        515,
+        515,
+        1021,
+        1021
+      ],
+      "receipt": "art-source/new-divider-and-retrieval-questions.receipt.json",
+      "receiptSha256": "114a2996447d336b9c7822aa93fbf2393f50574cef013244ab59cc273e9e93a8",
+      "promptSha256": "fc6711275db410c614d7d8ac29c6d021fb7db017dc31c8f80ec8f61cc6971171",
+      "usedBy": [
+        "picture-quiz"
+      ],
+      "originalToolOutput": "art-source/new-divider-and-retrieval-questions.png",
+      "originalToolOutputSha256": "e10409155ce9b922a36a2e42a87d95d0d008b10cd4a1f9b0a1b9a2e4f388394d",
+      "sourceProcessing": "original alpha composited over opaque lesson cream #fff2de before cell extraction"
+    },
+    "quiz-count-only": {
+      "file": "assets/quiz-count-only.png",
+      "sha256": "ab7fac9c00bc1697550c40e03f9bbbf41ed7d6ec91141453ad498c0009f9e34a",
+      "kind": "codex-imagegen-atlas-crop",
+      "source": "art-source/new-divider-and-retrieval-questions.cream.png",
+      "sourceSha256": "a85661499ef99514bab32ded5cefa36e2f7836b685ea1969279e0fa0ea146090",
+      "sourceCrop": [
+        1027,
+        515,
+        1533,
+        1021
+      ],
+      "receipt": "art-source/new-divider-and-retrieval-questions.receipt.json",
+      "receiptSha256": "114a2996447d336b9c7822aa93fbf2393f50574cef013244ab59cc273e9e93a8",
+      "promptSha256": "fc6711275db410c614d7d8ac29c6d021fb7db017dc31c8f80ec8f61cc6971171",
+      "usedBy": [
+        "picture-quiz"
+      ],
+      "originalToolOutput": "art-source/new-divider-and-retrieval-questions.png",
+      "originalToolOutputSha256": "e10409155ce9b922a36a2e42a87d95d0d008b10cd4a1f9b0a1b9a2e4f388394d",
+      "sourceProcessing": "original alpha composited over opaque lesson cream #fff2de before cell extraction"
+    },
+    "delivery-album": {
+      "file": "assets/delivery-album.png",
+      "sha256": "cc4a2a911c4076189fe73943546b8179a254016c50c409cdc94188f98568ac52",
+      "kind": "codex-imagegen-atlas-crop",
+      "source": "art-source/pocket-road-object-icons.png",
+      "sourceSha256": "bf58f88a82bd06259f708b3dbad65e9f144429b085f3ac5e81e10377dd8c7081",
+      "sourceCrop": [
+        0,
+        0,
+        420,
+        410
+      ],
+      "receipt": "art-source/pocket-road-object-icons.receipt.json",
+      "receiptSha256": "bf7b9a4e06a1dd0a11fa2efa6648cee48cf0453eb770323f5ac7e3251611cc30",
+      "promptSha256": "1756288670cc6477158d3fe2bb67dec25dc26e4e10c9354becb8da42b229deb4",
+      "usedBy": [
+        "carry-to-the-pocket"
+      ]
+    },
+    "delivery-eraser": {
+      "file": "assets/delivery-eraser.png",
+      "sha256": "80f4396de54741f0a1347293bb435d570a6176966894d8fddb4fa0ba9602ddc1",
+      "kind": "codex-imagegen-atlas-crop",
+      "source": "art-source/pocket-road-object-icons.png",
+      "sourceSha256": "bf58f88a82bd06259f708b3dbad65e9f144429b085f3ac5e81e10377dd8c7081",
+      "sourceCrop": [
+        420,
+        0,
+        815,
+        410
+      ],
+      "receipt": "art-source/pocket-road-object-icons.receipt.json",
+      "receiptSha256": "bf7b9a4e06a1dd0a11fa2efa6648cee48cf0453eb770323f5ac7e3251611cc30",
+      "promptSha256": "1756288670cc6477158d3fe2bb67dec25dc26e4e10c9354becb8da42b229deb4",
+      "usedBy": [
+        "carry-to-the-pocket"
+      ]
+    },
+    "delivery-bottle": {
+      "file": "assets/delivery-bottle.png",
+      "sha256": "b76b2ad9c021dae652ce4b65948b9ec55b56de2dfe106739a99649809a5aad7b",
+      "kind": "codex-imagegen-atlas-crop",
+      "source": "art-source/pocket-road-object-icons.png",
+      "sourceSha256": "bf58f88a82bd06259f708b3dbad65e9f144429b085f3ac5e81e10377dd8c7081",
+      "sourceCrop": [
+        815,
+        0,
+        1269,
+        410
+      ],
+      "receipt": "art-source/pocket-road-object-icons.receipt.json",
+      "receiptSha256": "bf7b9a4e06a1dd0a11fa2efa6648cee48cf0453eb770323f5ac7e3251611cc30",
+      "promptSha256": "1756288670cc6477158d3fe2bb67dec25dc26e4e10c9354becb8da42b229deb4",
+      "usedBy": [
+        "carry-to-the-pocket",
+        "pick-a-pocket"
+      ]
+    },
+    "delivery-tape": {
+      "file": "assets/delivery-tape.png",
+      "sha256": "ca01beca8e1554cd11e2e146fb087271c612391a3338d8fdf78e6c4c09c2730c",
+      "kind": "codex-imagegen-atlas-crop",
+      "source": "art-source/pocket-road-object-icons.png",
+      "sourceSha256": "bf58f88a82bd06259f708b3dbad65e9f144429b085f3ac5e81e10377dd8c7081",
+      "sourceCrop": [
+        0,
+        410,
+        420,
+        808
+      ],
+      "receipt": "art-source/pocket-road-object-icons.receipt.json",
+      "receiptSha256": "bf7b9a4e06a1dd0a11fa2efa6648cee48cf0453eb770323f5ac7e3251611cc30",
+      "promptSha256": "1756288670cc6477158d3fe2bb67dec25dc26e4e10c9354becb8da42b229deb4",
+      "usedBy": [
+        "carry-to-the-pocket"
+      ]
+    },
+    "delivery-map": {
+      "file": "assets/delivery-map.png",
+      "sha256": "51b32657849983da0bc308db094daeeeda00a66235b2f5add2467e7bf3fd4f5e",
+      "kind": "codex-imagegen-atlas-crop",
+      "source": "art-source/pocket-road-object-icons.png",
+      "sourceSha256": "bf58f88a82bd06259f708b3dbad65e9f144429b085f3ac5e81e10377dd8c7081",
+      "sourceCrop": [
+        420,
+        410,
+        815,
+        808
+      ],
+      "receipt": "art-source/pocket-road-object-icons.receipt.json",
+      "receiptSha256": "bf7b9a4e06a1dd0a11fa2efa6648cee48cf0453eb770323f5ac7e3251611cc30",
+      "promptSha256": "1756288670cc6477158d3fe2bb67dec25dc26e4e10c9354becb8da42b229deb4",
+      "usedBy": [
+        "carry-to-the-pocket"
+      ]
+    },
+    "pocket-main": {
+      "file": "assets/pocket-main.png",
+      "sha256": "ae87051f3e4f3b4396b5ede1dd862fa36be83d7f63991167595551fca5cbc001",
+      "kind": "codex-imagegen-atlas-crop",
+      "source": "art-source/pocket-road-object-icons.png",
+      "sourceSha256": "bf58f88a82bd06259f708b3dbad65e9f144429b085f3ac5e81e10377dd8c7081",
+      "sourceCrop": [
+        815,
+        410,
+        1269,
+        808
+      ],
+      "receipt": "art-source/pocket-road-object-icons.receipt.json",
+      "receiptSha256": "bf7b9a4e06a1dd0a11fa2efa6648cee48cf0453eb770323f5ac7e3251611cc30",
+      "promptSha256": "1756288670cc6477158d3fe2bb67dec25dc26e4e10c9354becb8da42b229deb4",
+      "usedBy": [
+        "carry-to-the-pocket",
+        "pick-a-pocket"
+      ]
+    },
+    "pocket-zip": {
+      "file": "assets/pocket-zip.png",
+      "sha256": "0dc4b8644cd493a2abbc8dde0942c938d37b91969fcf068777eca9f6f83a673b",
+      "kind": "codex-imagegen-atlas-crop",
+      "source": "art-source/pocket-road-object-icons.png",
+      "sourceSha256": "bf58f88a82bd06259f708b3dbad65e9f144429b085f3ac5e81e10377dd8c7081",
+      "sourceCrop": [
+        0,
+        808,
+        420,
+        1240
+      ],
+      "receipt": "art-source/pocket-road-object-icons.receipt.json",
+      "receiptSha256": "bf7b9a4e06a1dd0a11fa2efa6648cee48cf0453eb770323f5ac7e3251611cc30",
+      "promptSha256": "1756288670cc6477158d3fe2bb67dec25dc26e4e10c9354becb8da42b229deb4",
+      "usedBy": [
+        "carry-to-the-pocket",
+        "pick-a-pocket"
+      ]
+    },
+    "pocket-side": {
+      "file": "assets/pocket-side.png",
+      "sha256": "a0fee7b9f086374fec160b8d475cebb35af2f729366dae4e9dd49f83cd7431d1",
+      "kind": "codex-imagegen-atlas-crop",
+      "source": "art-source/pocket-road-object-icons.png",
+      "sourceSha256": "bf58f88a82bd06259f708b3dbad65e9f144429b085f3ac5e81e10377dd8c7081",
+      "sourceCrop": [
+        420,
+        808,
+        815,
+        1240
+      ],
+      "receipt": "art-source/pocket-road-object-icons.receipt.json",
+      "receiptSha256": "bf7b9a4e06a1dd0a11fa2efa6648cee48cf0453eb770323f5ac7e3251611cc30",
+      "promptSha256": "1756288670cc6477158d3fe2bb67dec25dc26e4e10c9354becb8da42b229deb4",
+      "usedBy": [
+        "carry-to-the-pocket",
+        "pick-a-pocket"
+      ]
+    },
+    "storage-camera-table": {
+      "file": "assets/storage-camera-table.png",
+      "sha256": "2c13ff80ec12b019f14c289a6886428c22a243946d4089c4308b971e4d3abbd3",
+      "kind": "codex-imagegen-atlas-crop",
+      "source": "art-source/pocket-road-object-icons.png",
+      "sourceSha256": "bf58f88a82bd06259f708b3dbad65e9f144429b085f3ac5e81e10377dd8c7081",
+      "sourceCrop": [
+        815,
+        808,
+        1269,
+        1240
+      ],
+      "receipt": "art-source/pocket-road-object-icons.receipt.json",
+      "receiptSha256": "bf7b9a4e06a1dd0a11fa2efa6648cee48cf0453eb770323f5ac7e3251611cc30",
+      "promptSha256": "1756288670cc6477158d3fe2bb67dec25dc26e4e10c9354becb8da42b229deb4",
+      "usedBy": [
+        "photograph-neat-storage"
+      ]
+    },
+    "storage-top-bag": {
+      "file": "assets/storage-top-bag.png",
+      "sha256": "9e744655cbc76b3b8feccdea631d961acf1415ee5ad98552bb1911e02fe779ad",
+      "kind": "codex-imagegen-atlas-crop",
+      "source": "art-source/same-organizer-two-views.png",
+      "sourceSha256": "4fde3b56ed2d5e041088840f926a8527c66342a87de35837b3fc3795dddd3dd8",
+      "sourceCrop": [
+        0,
+        0,
+        512,
+        532
+      ],
+      "receipt": "art-source/same-organizer-two-views.receipt.json",
+      "receiptSha256": "14b07059fea5103de3b1f66649737d2aa2adadd5ad04d452d2be2651eb1bc976",
+      "promptSha256": "0d54e5b9c82dcde5b41871358e6c937a0aa81b1ce5afd1a4e7740c7cd0281323",
+      "usedBy": [
+        "photograph-neat-storage",
+        "check-the-plan"
+      ]
+    },
+    "storage-top-toybox": {
+      "file": "assets/storage-top-toybox.png",
+      "sha256": "b39db072148d9259f21fc38ecf5ce13c7ef9901f5f60f28f707be02621a1f845",
+      "kind": "codex-imagegen-atlas-crop",
+      "source": "art-source/same-organizer-two-views.png",
+      "sourceSha256": "4fde3b56ed2d5e041088840f926a8527c66342a87de35837b3fc3795dddd3dd8",
+      "sourceCrop": [
+        512,
+        0,
+        1009,
+        532
+      ],
+      "receipt": "art-source/same-organizer-two-views.receipt.json",
+      "receiptSha256": "14b07059fea5103de3b1f66649737d2aa2adadd5ad04d452d2be2651eb1bc976",
+      "promptSha256": "0d54e5b9c82dcde5b41871358e6c937a0aa81b1ce5afd1a4e7740c7cd0281323",
+      "usedBy": [
+        "photograph-neat-storage",
+        "check-the-plan"
+      ]
+    },
+    "storage-top-tray": {
+      "file": "assets/storage-top-tray.png",
+      "sha256": "3d85e8dcfc0d1b688fc1c2182487cc691ae9040bb55cec92003cd39221e401b3",
+      "kind": "codex-imagegen-atlas-crop",
+      "source": "art-source/same-organizer-two-views.png",
+      "sourceSha256": "4fde3b56ed2d5e041088840f926a8527c66342a87de35837b3fc3795dddd3dd8",
+      "sourceCrop": [
+        1009,
+        0,
+        1536,
+        532
+      ],
+      "receipt": "art-source/same-organizer-two-views.receipt.json",
+      "receiptSha256": "14b07059fea5103de3b1f66649737d2aa2adadd5ad04d452d2be2651eb1bc976",
+      "promptSha256": "0d54e5b9c82dcde5b41871358e6c937a0aa81b1ce5afd1a4e7740c7cd0281323",
+      "usedBy": [
+        "photograph-neat-storage",
+        "check-the-plan"
+      ]
+    },
+    "storage-side-bag": {
+      "file": "assets/storage-side-bag.png",
+      "sha256": "080dceca72350276331b8b82c77fa1b21b6abd822951c924f45e091015013c96",
+      "kind": "codex-imagegen-atlas-crop",
+      "source": "art-source/same-organizer-two-views.png",
+      "sourceSha256": "4fde3b56ed2d5e041088840f926a8527c66342a87de35837b3fc3795dddd3dd8",
+      "sourceCrop": [
+        0,
+        532,
+        512,
+        1024
+      ],
+      "receipt": "art-source/same-organizer-two-views.receipt.json",
+      "receiptSha256": "14b07059fea5103de3b1f66649737d2aa2adadd5ad04d452d2be2651eb1bc976",
+      "promptSha256": "0d54e5b9c82dcde5b41871358e6c937a0aa81b1ce5afd1a4e7740c7cd0281323",
+      "usedBy": [
+        "photograph-neat-storage",
+        "check-the-plan"
+      ]
+    },
+    "storage-side-toybox": {
+      "file": "assets/storage-side-toybox.png",
+      "sha256": "3bdf0af24f5ee62e986f344941b7a45d2ca2c057b2e2b820908fbb344e7cd1e9",
+      "kind": "codex-imagegen-atlas-crop",
+      "source": "art-source/same-organizer-two-views.png",
+      "sourceSha256": "4fde3b56ed2d5e041088840f926a8527c66342a87de35837b3fc3795dddd3dd8",
+      "sourceCrop": [
+        512,
+        532,
+        1009,
+        1024
+      ],
+      "receipt": "art-source/same-organizer-two-views.receipt.json",
+      "receiptSha256": "14b07059fea5103de3b1f66649737d2aa2adadd5ad04d452d2be2651eb1bc976",
+      "promptSha256": "0d54e5b9c82dcde5b41871358e6c937a0aa81b1ce5afd1a4e7740c7cd0281323",
+      "usedBy": [
+        "photograph-neat-storage",
+        "check-the-plan"
+      ]
+    },
+    "storage-side-tray": {
+      "file": "assets/storage-side-tray.png",
+      "sha256": "10b57e2b967cc75ea15bdb912c788cb0d86d7461c9613d81cc16a68f3ff9df81",
+      "kind": "codex-imagegen-atlas-crop",
+      "source": "art-source/same-organizer-two-views.png",
+      "sourceSha256": "4fde3b56ed2d5e041088840f926a8527c66342a87de35837b3fc3795dddd3dd8",
+      "sourceCrop": [
+        1009,
+        532,
+        1536,
+        1024
+      ],
+      "receipt": "art-source/same-organizer-two-views.receipt.json",
+      "receiptSha256": "14b07059fea5103de3b1f66649737d2aa2adadd5ad04d452d2be2651eb1bc976",
+      "promptSha256": "0d54e5b9c82dcde5b41871358e6c937a0aa81b1ce5afd1a4e7740c7cd0281323",
+      "usedBy": [
+        "photograph-neat-storage",
+        "check-the-plan"
+      ]
+    },
+    "storage-cart-idle": {
+      "file": "assets/storage-cart-idle.png",
+      "sha256": "46d2a9876abf9b4fad94dbd656731c69df7c30c51828cd185f51925955c7c7c0",
+      "kind": "codex-imagegen-atlas-crop",
+      "source": "art-source/workroom-and-route.png",
+      "sourceSha256": "255b725bda51d43ab8b57cfda21ab81ac081da5ebd95ae4eb3e589ac0d10cb15",
+      "sourceCrop": [
+        0,
+        0,
+        425,
+        418
+      ],
+      "receipt": "art-source/workroom-and-route.receipt.json",
+      "receiptSha256": "337daf0c29e16d5538e8766490e9e9bf1d62e70d27587fa32d4a73f69ee6f0d6",
+      "promptSha256": "eee86e53963fa0aeaa12a37afd39b30e4b2e6f7e36e6ff074fee9f67b99d875d",
+      "usedBy": [
+        "carry-to-the-pocket"
+      ]
+    },
+    "storage-cart-loaded": {
+      "file": "assets/storage-cart-loaded.png",
+      "sha256": "66caec24a40ceb127cc71abab0df68e40aef6cf35a990dacb6005ba5a3b2b01f",
+      "kind": "codex-imagegen-atlas-crop",
+      "source": "art-source/workroom-and-route.png",
+      "sourceSha256": "255b725bda51d43ab8b57cfda21ab81ac081da5ebd95ae4eb3e589ac0d10cb15",
+      "sourceCrop": [
+        425,
+        0,
+        844,
+        418
+      ],
+      "receipt": "art-source/workroom-and-route.receipt.json",
+      "receiptSha256": "337daf0c29e16d5538e8766490e9e9bf1d62e70d27587fa32d4a73f69ee6f0d6",
+      "promptSha256": "eee86e53963fa0aeaa12a37afd39b30e4b2e6f7e36e6ff074fee9f67b99d875d",
+      "usedBy": [
+        "carry-to-the-pocket"
+      ]
+    },
+    "lane-paper-cart": {
+      "file": "assets/lane-paper-cart.png",
+      "sha256": "d629f87c9a1b678a8124f20dd8c9a9eee1d1709a2f876a58003b306093e6f7e2",
+      "kind": "codex-imagegen-atlas-crop",
+      "source": "art-source/workroom-and-route.png",
+      "sourceSha256": "255b725bda51d43ab8b57cfda21ab81ac081da5ebd95ae4eb3e589ac0d10cb15",
+      "sourceCrop": [
+        844,
+        0,
+        1312,
+        418
+      ],
+      "receipt": "art-source/workroom-and-route.receipt.json",
+      "receiptSha256": "337daf0c29e16d5538e8766490e9e9bf1d62e70d27587fa32d4a73f69ee6f0d6",
+      "promptSha256": "eee86e53963fa0aeaa12a37afd39b30e4b2e6f7e36e6ff074fee9f67b99d875d",
+      "usedBy": [
+        "carry-to-the-pocket"
+      ]
+    },
+    "pocket-road-background": {
+      "file": "assets/pocket-road-background.png",
+      "sha256": "aa4c6b948a9a4d79c851a775600219ce0543bfd068203a739261de90e0529596",
+      "kind": "codex-imagegen-atlas-crop",
+      "source": "art-source/workroom-and-route.png",
+      "sourceSha256": "255b725bda51d43ab8b57cfda21ab81ac081da5ebd95ae4eb3e589ac0d10cb15",
+      "sourceCrop": [
+        0,
+        418,
+        425,
+        768
+      ],
+      "receipt": "art-source/workroom-and-route.receipt.json",
+      "receiptSha256": "337daf0c29e16d5538e8766490e9e9bf1d62e70d27587fa32d4a73f69ee6f0d6",
+      "promptSha256": "eee86e53963fa0aeaa12a37afd39b30e4b2e6f7e36e6ff074fee9f67b99d875d",
+      "usedBy": [
+        "carry-to-the-pocket"
+      ]
+    },
+    "desk-unfiled": {
+      "file": "assets/desk-unfiled.png",
+      "sha256": "c917608d1cb732b0e42d7b3660db0f6cc27c3a6558a1a4125ecc751c6b600eeb",
+      "kind": "codex-imagegen-atlas-crop",
+      "source": "art-source/workroom-and-route.png",
+      "sourceSha256": "255b725bda51d43ab8b57cfda21ab81ac081da5ebd95ae4eb3e589ac0d10cb15",
+      "sourceCrop": [
+        425,
+        418,
+        844,
+        768
+      ],
+      "receipt": "art-source/workroom-and-route.receipt.json",
+      "receiptSha256": "337daf0c29e16d5538e8766490e9e9bf1d62e70d27587fa32d4a73f69ee6f0d6",
+      "promptSha256": "eee86e53963fa0aeaa12a37afd39b30e4b2e6f7e36e6ff074fee9f67b99d875d",
+      "usedBy": [
+        "find-the-item"
+      ]
+    },
+    "desk-sorted": {
+      "file": "assets/desk-sorted.png",
+      "sha256": "151a5cc1c507248f5a2d690b1542973e326deba7765abc185c9d7d815a550583",
+      "kind": "codex-imagegen-atlas-crop",
+      "source": "art-source/workroom-and-route.png",
+      "sourceSha256": "255b725bda51d43ab8b57cfda21ab81ac081da5ebd95ae4eb3e589ac0d10cb15",
+      "sourceCrop": [
+        844,
+        418,
+        1312,
+        768
+      ],
+      "receipt": "art-source/workroom-and-route.receipt.json",
+      "receiptSha256": "337daf0c29e16d5538e8766490e9e9bf1d62e70d27587fa32d4a73f69ee6f0d6",
+      "promptSha256": "eee86e53963fa0aeaa12a37afd39b30e4b2e6f7e36e6ff074fee9f67b99d875d",
+      "usedBy": [
+        "find-the-item"
+      ]
+    },
+    "large-open-tote": {
+      "file": "assets/large-open-tote.png",
+      "sha256": "23871849d5f0c498dfcb7df69cdfe1d78c5d5b203af30cbd21129625bf4d2b72",
+      "kind": "codex-imagegen-atlas-crop",
+      "source": "art-source/workroom-and-route.png",
+      "sourceSha256": "255b725bda51d43ab8b57cfda21ab81ac081da5ebd95ae4eb3e589ac0d10cb15",
+      "sourceCrop": [
+        0,
+        768,
+        425,
+        1199
+      ],
+      "receipt": "art-source/workroom-and-route.receipt.json",
+      "receiptSha256": "337daf0c29e16d5538e8766490e9e9bf1d62e70d27587fa32d4a73f69ee6f0d6",
+      "promptSha256": "eee86e53963fa0aeaa12a37afd39b30e4b2e6f7e36e6ff074fee9f67b99d875d",
+      "usedBy": [
+        "bag-or-tote"
+      ]
+    },
+    "split-schoolbag": {
+      "file": "assets/split-schoolbag.png",
+      "sha256": "a41760658e1043d8551a0eb42503bff884ff4e7bd2c8bdd9199a847aeec781d6",
+      "kind": "codex-imagegen-atlas-crop",
+      "source": "art-source/workroom-and-route.png",
+      "sourceSha256": "255b725bda51d43ab8b57cfda21ab81ac081da5ebd95ae4eb3e589ac0d10cb15",
+      "sourceCrop": [
+        425,
+        768,
+        844,
+        1199
+      ],
+      "receipt": "art-source/workroom-and-route.receipt.json",
+      "receiptSha256": "337daf0c29e16d5538e8766490e9e9bf1d62e70d27587fa32d4a73f69ee6f0d6",
+      "promptSha256": "eee86e53963fa0aeaa12a37afd39b30e4b2e6f7e36e6ff074fee9f67b99d875d",
+      "usedBy": [
+        "bag-or-tote"
+      ]
+    },
+    "life-storage-choices": {
+      "file": "assets/life-storage-choices.png",
+      "sha256": "56ef055b0a04f7cb14ddd922c9326999524e98993f2f0d3e4c28e98e93b7bf55",
+      "kind": "codex-imagegen-atlas-crop",
+      "source": "art-source/workroom-and-route.png",
+      "sourceSha256": "255b725bda51d43ab8b57cfda21ab81ac081da5ebd95ae4eb3e589ac0d10cb15",
+      "sourceCrop": [
+        844,
+        768,
+        1312,
+        1199
+      ],
+      "receipt": "art-source/workroom-and-route.receipt.json",
+      "receiptSha256": "337daf0c29e16d5538e8766490e9e9bf1d62e70d27587fa32d4a73f69ee6f0d6",
+      "promptSha256": "eee86e53963fa0aeaa12a37afd39b30e4b2e6f7e36e6ff074fee9f67b99d875d",
+      "usedBy": [
+        "storage-in-daily-life"
+      ]
+    },
+    "storage-observer-camera": {
+      "file": "assets/storage-observer-camera.png",
+      "sha256": "9fce8579a5a3fadfda252f90b8c849781a2dbe7593bc23fbeb6c5fa0dfdf0cae",
+      "kind": "reused-registered-codex-imagegen",
+      "source": "courseware/lessons/renjiao-science-g1-lower-metals/assets/metal-observation-camera.png",
+      "sourceSha256": "9fce8579a5a3fadfda252f90b8c849781a2dbe7593bc23fbeb6c5fa0dfdf0cae",
+      "generatedSource": "courseware/lessons/renjiao-science-g1-lower-metals/art-source/metal-orthographic-views.png",
+      "generatedSourceSha256": "9ee47628ed62ef55c58c0011a5a12bc3ca8a54680fa4c604485d9aaed9ab36b2",
+      "sourceReceipt": "courseware/lessons/renjiao-science-g1-lower-metals/art-source/metal-orthographic-views.receipt.json",
+      "sourceReceiptSha256": "e976cf520357218b9c0cf6abc069daf72637c2bfcb460097f73129afb8728eff",
+      "sourceAssetKey": "metal-observation-camera",
+      "usedBy": [
+        "photograph-neat-storage"
+      ]
+    },
+    "pocket-guide": {
+      "file": "assets/pocket-guide.png",
+      "sha256": "78c13548c8d932eaab269793761e358740d456ff34f16250ae42c6ebc37cfaed",
+      "kind": "composition-of-registered-artwork",
+      "source": "diagrams/compose.py",
+      "sourceSha256": "89babf3105f306a02da89b34f0a64acb4074bd29ce4710ab9af4503ca232ea4d",
+      "usedBy": [
+        "pick-a-pocket"
+      ],
+      "inputs": {
+        "pocket-main": "ae87051f3e4f3b4396b5ede1dd862fa36be83d7f63991167595551fca5cbc001",
+        "pocket-zip": "0dc4b8644cd493a2abbc8dde0942c938d37b91969fcf068777eca9f6f83a673b",
+        "pocket-side": "a0fee7b9f086374fec160b8d475cebb35af2f729366dae4e9dd49f83cd7431d1"
+      }
+    },
+    "pocket-delivery-cover": {
+      "file": "assets/pocket-delivery-cover.png",
+      "sha256": "a811837d7429e0cdd462f987ccbcfc9d065fb81e46dedafe38f22ae7af7cd3b9",
+      "kind": "composition-of-registered-artwork",
+      "source": "diagrams/compose.py",
+      "sourceSha256": "89babf3105f306a02da89b34f0a64acb4074bd29ce4710ab9af4503ca232ea4d",
+      "usedBy": [
+        "carry-to-the-pocket"
+      ],
+      "inputs": {
+        "pocket-road-background": "aa4c6b948a9a4d79c851a775600219ce0543bfd068203a739261de90e0529596",
+        "storage-cart-idle": "46d2a9876abf9b4fad94dbd656731c69df7c30c51828cd185f51925955c7c7c0",
+        "delivery-album": "cc4a2a911c4076189fe73943546b8179a254016c50c409cdc94188f98568ac52",
+        "pocket-main": "ae87051f3e4f3b4396b5ede1dd862fa36be83d7f63991167595551fca5cbc001"
+      }
+    },
+    "storage-badge": {
+      "file": "assets/storage-badge.png",
+      "sha256": "57a32c664400d1d189d513513e812818ddc1320dec7757046b93a418760cc711",
+      "kind": "composition-of-registered-artwork",
+      "source": "diagrams/compose.py",
+      "sourceSha256": "89babf3105f306a02da89b34f0a64acb4074bd29ce4710ab9af4503ca232ea4d",
+      "usedBy": [
+        "carry-to-the-pocket"
+      ],
+      "inputs": {
+        "delivery-album": "cc4a2a911c4076189fe73943546b8179a254016c50c409cdc94188f98568ac52"
+      }
+    },
+    "storage-photo-cover": {
+      "file": "assets/storage-photo-cover.png",
+      "sha256": "9088fb161246e93962da41bce640e9708d38b656ef7a883acb030bba878a602e",
+      "kind": "composition-of-registered-artwork",
+      "source": "diagrams/compose.py",
+      "sourceSha256": "89babf3105f306a02da89b34f0a64acb4074bd29ce4710ab9af4503ca232ea4d",
+      "usedBy": [
+        "photograph-neat-storage"
+      ],
+      "inputs": {
+        "storage-top-bag": "9e744655cbc76b3b8feccdea631d961acf1415ee5ad98552bb1911e02fe779ad",
+        "storage-side-bag": "080dceca72350276331b8b82c77fa1b21b6abd822951c924f45e091015013c96",
+        "storage-observer-camera": "9fce8579a5a3fadfda252f90b8c849781a2dbe7593bc23fbeb6c5fa0dfdf0cae"
+      }
+    },
+    "storage-record-example": {
+      "file": "assets/storage-record-example.png",
+      "sha256": "86c085a5ec0efe2accab8eee9a43ffbd5e4430f7ae8ab17de8c7c1347bdb01b0",
+      "kind": "composition-of-registered-artwork",
+      "source": "diagrams/compose.py",
+      "sourceSha256": "89babf3105f306a02da89b34f0a64acb4074bd29ce4710ab9af4503ca232ea4d",
+      "usedBy": [
+        "check-the-plan"
+      ],
+      "inputs": {
+        "storage-top-bag": "9e744655cbc76b3b8feccdea631d961acf1415ee5ad98552bb1911e02fe779ad",
+        "storage-top-toybox": "b39db072148d9259f21fc38ecf5ce13c7ef9901f5f60f28f707be02621a1f845",
+        "storage-top-tray": "3d85e8dcfc0d1b688fc1c2182487cc691ae9040bb55cec92003cd39221e401b3",
+        "storage-side-bag": "080dceca72350276331b8b82c77fa1b21b6abd822951c924f45e091015013c96",
+        "storage-side-toybox": "3bdf0af24f5ee62e986f344941b7a45d2ca2c057b2e2b820908fbb344e7cd1e9",
+        "storage-side-tray": "10b57e2b967cc75ea15bdb912c788cb0d86d7461c9613d81cc16a68f3ff9df81"
+      }
+    }
+  }
+}

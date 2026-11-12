@@ -1,0 +1,14 @@
+.classic-arcade #ready .pic { object-fit: contain; background: #f7e3bd; }
+.classic-arcade .arc-key[data-arc-input="action"] { font-size: 32px; }
+.classic-arcade #finish .card { width: 856px; padding: 22px 36px 26px; }
+.classic-arcade #finish .big img { width: 98px; height: 98px; border-radius: 20px; }
+.classic-arcade #finish h1 { margin-top: 0; }
+.classic-arcade #finish .card > p { margin: 7px 0 12px; }
+.coaster-observation { margin: 0 0 16px; }
+.coaster-observation figcaption { color: #314b40; font-size: 27px; font-weight: 800; margin-bottom: 5px; }
+.coaster-observation canvas { display: block; width: 744px; height: 186px; margin: 0 auto; }
+.classic-arcade #finish .coaster-observation-foot { margin: 3px 0 0; font-size: 22px; }
+/* The paused cup and its first mat share the same fixed demonstration column. */
+#coaster-cup-first-drop { left: 313px; top: 60px; width: 182px; height: 274px; }
+/* Inset within the first-trial result, relative to #play's (24, 86) inset. */
+#coaster-cup-first-result { left: 928px; top: 124px; width: 270px; height: 136px; }

@@ -1,0 +1,807 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "学习准备",
+  "description": "按本校作息提前回班，从自己的座位整理学具，等轮到自己再开口。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小数老师",
+      "role": "teacher",
+      "gender": "male",
+      "voice": "Ethan",
+      "avatar": "/teachers/ashu-math-v1.png",
+      "color": "#4A90D9",
+      "persona": "用清楚简短的生活例子教一年级数学。"
+    }
+  },
+  "images": {
+    "book-back-right": {
+      "file": "assets/book-back-right.png"
+    },
+    "book-front-left": {
+      "file": "assets/book-front-left.png"
+    },
+    "book-front-right": {
+      "file": "assets/book-front-right.png"
+    },
+    "class-ready": {
+      "file": "assets/playback/class-ready.png"
+    },
+    "desk-lesson": {
+      "file": "assets/desk-lesson.png"
+    },
+    "keep-play": {
+      "file": "assets/playback/keep-play.png"
+    },
+    "listen": {
+      "file": "assets/playback/listen.png"
+    },
+    "math-book": {
+      "file": "assets/playback/math-book.png"
+    },
+    "missing-notebook": {
+      "file": "assets/missing-notebook.png"
+    },
+    "notebook-ahead": {
+      "file": "assets/notebook-ahead.png"
+    },
+    "notebook-behind": {
+      "file": "assets/notebook-behind.png"
+    },
+    "notebook-beside": {
+      "file": "assets/notebook-beside.png"
+    },
+    "notebook": {
+      "file": "assets/playback/notebook.png"
+    },
+    "pencil-case": {
+      "file": "assets/playback/pencil-case.png"
+    },
+    "quiz-interrupt": {
+      "file": "assets/playback/quiz-interrupt.png"
+    },
+    "quiz-return": {
+      "file": "assets/playback/quiz-return.png"
+    },
+    "quiz-stay": {
+      "file": "assets/playback/quiz-stay.png"
+    },
+    "quiz-wait": {
+      "file": "assets/playback/quiz-wait.png"
+    },
+    "raise-hand": {
+      "file": "assets/playback/raise-hand.png"
+    },
+    "speak-turn": {
+      "file": "assets/playback/speak-turn.png"
+    },
+    "turn-lesson": {
+      "file": "assets/turn-lesson.png"
+    },
+    "walk-class": {
+      "file": "assets/playback/walk-class.png"
+    },
+    "time-lesson": {
+      "file": "assets/time-lesson.png"
+    },
+    "school-bell": {
+      "file": "assets/playback/school-bell.png"
+    },
+    "prep-backup-walk-class": {
+      "file": "assets/game-fallback/walk-class.png"
+    },
+    "prep-backup-keep-play": {
+      "file": "assets/game-fallback/keep-play.png"
+    },
+    "prep-backup-class-ready": {
+      "file": "assets/game-fallback/class-ready.png"
+    },
+    "prep-backup-school-bell": {
+      "file": "assets/game-fallback/school-bell.png"
+    },
+    "prep-backup-math-book": {
+      "file": "assets/game-fallback/math-book.png"
+    },
+    "prep-backup-pencil-case": {
+      "file": "assets/game-fallback/pencil-case.png"
+    },
+    "prep-backup-notebook": {
+      "file": "assets/game-fallback/notebook.png"
+    },
+    "prep-backup-desk-lesson": {
+      "file": "assets/game-fallback/desk-lesson.png"
+    },
+    "prep-backup-listen": {
+      "file": "assets/game-fallback/listen.png"
+    },
+    "prep-backup-raise-hand": {
+      "file": "assets/game-fallback/raise-hand.png"
+    },
+    "prep-backup-speak-turn": {
+      "file": "assets/game-fallback/speak-turn.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "s01",
+      "type": "slide",
+      "title": "听到上课铃",
+      "template": "picture-points",
+      "data": {
+        "title": "听到上课铃",
+        "picture": "time-lesson",
+        "points": [
+          "看本校作息，提前回班",
+          "还在外面，听铃就回班",
+          "回到座位安静坐好"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "你知道，学校什么时候上课吗？"
+        },
+        {
+          "say": "上课时间写在作息表上。书里举的是八点半。"
+        },
+        {
+          "say": "你几点上课，要看自己学校的作息表。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "小满还在走廊喝水，忽然听见本班的上课铃。"
+        },
+        {
+          "say": "他把水杯盖好。铃是在叫我们回班上课。"
+        },
+        {
+          "say": "这就回自己的教室，能和大家一起开始。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "回到座位，小满轻轻坐好。"
+        },
+        {
+          "say": "学具一摆齐，小满就能安心等老师开课了。"
+        }
+      ]
+    },
+    {
+      "key": "g02",
+      "type": "interactive",
+      "title": "铃响走回班",
+      "page": "g02",
+      "widgetType": "custom",
+      "startImage": "walk-class",
+      "script": [
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#game-goal"
+        },
+        {
+          "say": "小同学还在操场，什么时候该往回走呢？"
+        },
+        {
+          "say": "先盯着上面的铃，想想你在学校听过什么。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "听见叮当，看到铃旁亮了，再按住走道。"
+        },
+        {
+          "say": "按住有课桌的那条路。松手，小同学就停下。"
+        },
+        {
+          "highlight": "#game-target"
+        },
+        {
+          "say": "到教室啦！本班要上课了，进去坐好。"
+        },
+        {
+          "say": "另一边是操场。现在要上课，我们先回班。"
+        },
+        {
+          "say": "小满：铃还没响，我想先往前走。",
+          "by": "xiaoman"
+        },
+        {
+          "say": "平时按本校作息提前回班坐好。还在外面听见铃，就像游戏里那样马上走回去。"
+        },
+        {
+          "say": "轮到你啦。听到铃，再认准有课桌的门。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ]
+    },
+    {
+      "key": "s03",
+      "type": "slide",
+      "title": "坐好再看方位",
+      "template": "picture-points",
+      "data": {
+        "title": "坐好再看方位",
+        "picture": "desk-lesson",
+        "points": [
+          "备齐三样数学用品",
+          "坐在椅子上看左右",
+          "朝桌面分清前和后"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "数学课快开始了，你知道该拿哪三样吗？"
+        },
+        {
+          "say": "数学书用来看题，练习本用来写和画。"
+        },
+        {
+          "say": "笔在文具盒里。三样摆齐，用时就好找。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "想象自己坐在图里的椅子上，面朝桌面。"
+        },
+        {
+          "say": "左手这一边是你的左边，右手边是右边。"
+        },
+        {
+          "say": "看，数学书在左手这边，所以在你的左边。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "桌面离椅子远的那边是前面，近的是后面。"
+        },
+        {
+          "say": "练习本在右边又靠近椅子，就在桌面右后方。"
+        },
+        {
+          "say": "从自己的椅子看，就能说清每样东西在哪儿。"
+        }
+      ]
+    },
+    {
+      "key": "g04",
+      "type": "interactive",
+      "title": "桌面滑滑车",
+      "page": "g04",
+      "widgetType": "custom",
+      "startImage": "class-ready",
+      "script": [
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#game-goal"
+        },
+        {
+          "say": "小桌图里的数学书，摆在椅子的哪一边呢？"
+        },
+        {
+          "say": "把自己想成坐在椅子上，面对桌面看一看。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "数学书在左前方。我按住书，往左前方滑。"
+        },
+        {
+          "say": "对上小桌图里的位置，松手，书就停稳了。"
+        },
+        {
+          "highlight": "#game-target"
+        },
+        {
+          "say": "看这本书，在左手边，还离椅子远一些。"
+        },
+        {
+          "say": "这就是左前方。照小桌图摆，拿的时候好找。"
+        },
+        {
+          "say": "小满：站到桌子对面，还是这个左边吗？",
+          "by": "xiaoman"
+        },
+        {
+          "say": "转到对面，左右就换了。我们从自己的座位看。"
+        },
+        {
+          "say": "现在你来摆。小桌图换了，也先找椅子。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ]
+    },
+    {
+      "key": "s05",
+      "type": "slide",
+      "title": "举手、等到、再说",
+      "template": "picture-points",
+      "data": {
+        "title": "举手、等到、再说",
+        "picture": "turn-lesson",
+        "points": [
+          "先举手，表示想说",
+          "等到老师点，再开口",
+          "同伴说时，安静听"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "想说自己喜欢的校园植物，能马上喊出来吗？"
+        },
+        {
+          "say": "想发言先举手，让老师看见。"
+        },
+        {
+          "say": "举起手就停一停，让老师知道我想说。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "同伴在说时，先听完，再接着说。"
+        },
+        {
+          "say": "等到老师点你，再把你的想法说清楚。"
+        },
+        {
+          "say": "一个人讲完再换下一个，大家就都能听清。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "和同桌说时，先听清大家在说哪件事。"
+        },
+        {
+          "say": "轮到你，用身边伙伴听得清的声音就好。"
+        },
+        {
+          "say": "想补充也等同桌讲完，再说说你的发现。"
+        }
+      ]
+    },
+    {
+      "key": "g06",
+      "type": "interactive",
+      "title": "轮到我来传话",
+      "page": "g06",
+      "widgetType": "custom",
+      "startImage": "listen",
+      "script": [
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#game-target"
+        },
+        {
+          "say": "同学还在说，你能看出现在该听谁吗？"
+        },
+        {
+          "say": "看看谁头顶有话泡，我们等它收起来。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "他讲完，我在自己的图上往上滑，举手。"
+        },
+        {
+          "say": "举起手就停一停，让老师知道我想说。"
+        },
+        {
+          "highlight": "#game-goal"
+        },
+        {
+          "say": "等老师把话泡递给你，才轮到你说。"
+        },
+        {
+          "say": "拿到话泡，再沿桌边划给亮着的伙伴。"
+        },
+        {
+          "say": "小满：我都举手啦，可以马上说吗？",
+          "by": "xiaoman"
+        },
+        {
+          "say": "再等等，老师点到你，别人的话就不会被打断。"
+        },
+        {
+          "say": "换你试试。先听完，举手，等到你再传话。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ]
+    },
+    {
+      "key": "q07",
+      "type": "quiz",
+      "title": "换个情境试一试",
+      "intro": [
+        "先听我把题目说完，再看看图。",
+        "想好以后，点一张最合适的图。"
+      ],
+      "questions": [
+        {
+          "id": "prep-q1",
+          "question": "小芸在连廊看雨。听到本班的上课铃，她该去哪儿？",
+          "skill": "按本班上课信号行动",
+          "analysis": "上课铃提醒本班要上课。小芸该走进教室，回到自己的座位。",
+          "answer": [
+            "B"
+          ],
+          "options": {
+            "A": {
+              "label": "到操场踢球",
+              "visual": {
+                "kind": "asset",
+                "image": "keep-play",
+                "alt": "一个孩子在操场踢球"
+              }
+            },
+            "B": {
+              "label": "进教室",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-return",
+                "alt": "孩子朝打开的教室门走，门内有课桌和同学"
+              }
+            },
+            "C": {
+              "label": "去滑滑梯",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-stay",
+                "alt": "孩子坐在操场的滑梯上"
+              }
+            }
+          }
+        },
+        {
+          "id": "prep-q2",
+          "question": "数学课要开始了。桌上已经有两样用品，还缺哪样？",
+          "skill": "备齐数学用品",
+          "analysis": "图上已经有数学书和文具盒，还要把练习本放好。",
+          "answer": [
+            "C"
+          ],
+          "visual": {
+            "kind": "asset",
+            "image": "missing-notebook",
+            "alt": "从椅子看桌面，桌上是一本蓝绿数学书和一个黄色文具盒"
+          },
+          "options": {
+            "A": {
+              "label": "数学书",
+              "visual": {
+                "kind": "asset",
+                "image": "math-book",
+                "alt": "蓝绿色硬皮数学书"
+              }
+            },
+            "B": {
+              "label": "文具盒",
+              "visual": {
+                "kind": "asset",
+                "image": "pencil-case",
+                "alt": "装着笔的黄色文具盒"
+              }
+            },
+            "C": {
+              "label": "练习本",
+              "visual": {
+                "kind": "asset",
+                "image": "notebook",
+                "alt": "红色薄练习本"
+              }
+            }
+          }
+        },
+        {
+          "id": "prep-q3",
+          "question": "从椅子往前看，哪幅图的数学书在桌面右后方？",
+          "skill": "从自己的座位辨认右后方",
+          "analysis": "从椅子朝桌面看，靠你的右手是右边，离椅子近是桌面的后边。",
+          "answer": [
+            "A"
+          ],
+          "options": {
+            "A": {
+              "label": "数学书在右后方",
+              "visual": {
+                "kind": "asset",
+                "image": "book-back-right",
+                "alt": "从椅子朝桌面看，数学书在靠右、离椅子近的地方"
+              }
+            },
+            "B": {
+              "label": "数学书在左前方",
+              "visual": {
+                "kind": "asset",
+                "image": "book-front-left",
+                "alt": "从椅子朝桌面看，数学书在靠左、离椅子远的地方"
+              }
+            },
+            "C": {
+              "label": "数学书在右前方",
+              "visual": {
+                "kind": "asset",
+                "image": "book-front-right",
+                "alt": "从椅子朝桌面看，数学书在靠右、离椅子远的地方"
+              }
+            }
+          }
+        },
+        {
+          "id": "prep-q4",
+          "question": "哪幅图把两样学具前后排成一列，练习本离椅子更近？",
+          "skill": "从自己的座位辨认前后",
+          "analysis": "从椅子朝桌面看，文具盒在前、练习本在后，练习本离你的座位更近。",
+          "answer": [
+            "C"
+          ],
+          "options": {
+            "A": {
+              "label": "练习本离椅子更远",
+              "visual": {
+                "kind": "asset",
+                "image": "notebook-ahead",
+                "alt": "红色练习本比黄色文具盒离椅子远"
+              }
+            },
+            "B": {
+              "label": "练习本和文具盒并排",
+              "visual": {
+                "kind": "asset",
+                "image": "notebook-beside",
+                "alt": "红色练习本和黄色文具盒左右并排"
+              }
+            },
+            "C": {
+              "label": "练习本离椅子更近",
+              "visual": {
+                "kind": "asset",
+                "image": "notebook-behind",
+                "alt": "红色练习本在黄色文具盒后面，更靠近椅子"
+              }
+            }
+          }
+        },
+        {
+          "id": "prep-q5",
+          "question": "老师请大家说最喜欢的课间活动。还没点到小宇，他怎样示意想说？",
+          "skill": "用举手表示想发言",
+          "analysis": "举手是告诉老师自己想说。等老师点到，才开口讲。",
+          "answer": [
+            "A"
+          ],
+          "options": {
+            "A": {
+              "label": "先举手",
+              "visual": {
+                "kind": "asset",
+                "image": "raise-hand",
+                "alt": "孩子坐在课桌前，嘴闭着，举起右手"
+              }
+            },
+            "B": {
+              "label": "把手放在桌上",
+              "visual": {
+                "kind": "asset",
+                "image": "class-ready",
+                "alt": "同学都把双手放在课桌附近，没人举手"
+              }
+            }
+          }
+        },
+        {
+          "id": "prep-q6",
+          "question": "同桌正拿着书讲故事。哪幅图里，小芸在安静听同桌讲？",
+          "skill": "先听完再补充",
+          "analysis": "同桌张开嘴在讲，小芸合着嘴听。等同桌讲完，她再接着说。",
+          "answer": [
+            "B"
+          ],
+          "options": {
+            "A": {
+              "label": "两个人同时开口",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-interrupt",
+                "alt": "拿书的孩子张开嘴，旁边的女孩也张开嘴"
+              }
+            },
+            "B": {
+              "label": "看着同桌听",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-wait",
+                "alt": "同桌张口说话，旁边女孩合着嘴看向他"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "s08",
+      "type": "slide",
+      "title": "今天准备好了吗",
+      "template": "summary",
+      "data": {
+        "title": "今天准备好了吗",
+        "items": [
+          "按本校作息提前回班",
+          "从自己的座位看，用品摆整齐",
+          "想发言先举手，等点到",
+          "听完同伴的话，再轮流说"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "明天几点上课？先去找找本校的作息表。"
+        },
+        {
+          "say": "平时按本校作息提前回班坐好。还在外面听见铃，就像游戏里那样马上走回去。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "数学书、练习本和文具盒，三样摆齐。"
+        },
+        {
+          "say": "从自己的座位看，说说每样东西摆在哪边。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "想发言先举手，让老师看见。"
+        },
+        {
+          "say": "等到老师点你，再把你的想法说清楚。"
+        },
+        {
+          "spotlight": "item-4"
+        },
+        {
+          "say": "同伴在说时，先听完，再接着说。"
+        },
+        {
+          "say": "回家跟家人摆一次学具，说说你怎么摆的。"
+        },
+        {
+          "say": "再看看作息表，找一项跟幼儿园不同的安排。"
+        }
+      ]
+    }
+  ],
+  "audio": {
+    "prep-g02-goal": {
+      "file": "assets/game-voice/prep-g02-goal.wav",
+      "sha256": "03200d707bba0adc992726846ddb1ab6e77d080e58b7bd9d4a03ad14e4f7765f"
+    },
+    "prep-g02-challenge": {
+      "file": "assets/game-voice/prep-g02-challenge.wav",
+      "sha256": "c8e0b43e619011513d7d267892649e718f5711434540d99111bd18ab1440d52b"
+    },
+    "prep-g02-hint": {
+      "file": "assets/game-voice/prep-g02-hint.wav",
+      "sha256": "8fad13061ad3177991002299dd13ddb98b198d84d087c69187880496eeeb92cc"
+    },
+    "prep-g02-hint2": {
+      "file": "assets/game-voice/prep-g02-hint2.wav",
+      "sha256": "a50781c13fa4394dc33db48546380a6af1569455afc2af2fb6613e73b6dfc670"
+    },
+    "prep-g02-praise": {
+      "file": "assets/game-voice/prep-g02-praise.wav",
+      "sha256": "9aa954331993557703397cc6a737fdb4b201a835381dd122a066013d5dca5407"
+    },
+    "prep-g04-goal": {
+      "file": "assets/game-voice/prep-g04-goal.wav",
+      "sha256": "370cfed8cbd9d0ceee49fcc885669c662bfcf08d98ab0ce2484846033b243743"
+    },
+    "prep-g04-challenge": {
+      "file": "assets/game-voice/prep-g04-challenge.wav",
+      "sha256": "d1403b3e0b9cef8889dc13a76e1235cc09331dff7c08e4bd2c663706eb345dbd"
+    },
+    "prep-g04-hint": {
+      "file": "assets/game-voice/prep-g04-hint.wav",
+      "sha256": "b1b5c59af127685d140b5494a0e6240c4573fca8cb2e403cf95b7be43c29b620"
+    },
+    "prep-g04-hint2": {
+      "file": "assets/game-voice/prep-g04-hint2.wav",
+      "sha256": "c4eba37bbb7b2eccc1a69c4f0562c4bd3507840aa7ede56d03278779ea98348e"
+    },
+    "prep-g04-praise": {
+      "file": "assets/game-voice/prep-g04-praise.wav",
+      "sha256": "1fd1a2efb7fb242908ad2edf2667cebd279d46fbf79dd1b37629942c8067968a"
+    },
+    "prep-g06-goal": {
+      "file": "assets/game-voice/prep-g06-goal.wav",
+      "sha256": "6315e6d2a37c5a9bf5dd38255ed8a52886df5e34a9ed84f1cfc7db2f786fdd8e"
+    },
+    "prep-g06-challenge": {
+      "file": "assets/game-voice/prep-g06-challenge.wav",
+      "sha256": "683e594392c96abcc04cef4620f6a2825b5607a359fb20f5f7b37cc0f5bdcc63"
+    },
+    "prep-g06-hint": {
+      "file": "assets/game-voice/prep-g06-hint.wav",
+      "sha256": "ebaa9948748649d663db43e034bce9f0ac16c5776eed15be6e73e96a3c11bd40"
+    },
+    "prep-g06-hint2": {
+      "file": "assets/game-voice/prep-g06-hint2.wav",
+      "sha256": "aaddcf67c24f3422264448708a3477c5804100aea43181f530fbc54fc7410cdd"
+    },
+    "prep-g06-praise": {
+      "file": "assets/game-voice/prep-g06-praise.wav",
+      "sha256": "d0888fcb915a39d382391b7c2385c1b85a44422476472ef6a4a3e950eebf4fa8"
+    },
+    "prep-g02-door-hint": {
+      "file": "assets/game-voice/prep-g02-door-hint.wav",
+      "sha256": "2b17cc4677ff0304e105590ea7f60ee56173867aa6449b18f9e70027fe19789b"
+    },
+    "prep-g02-door-hint2": {
+      "file": "assets/game-voice/prep-g02-door-hint2.wav",
+      "sha256": "77bb865fcba3ffc1800ef6a656d0c9d59763f55ed537fb69c4c5070334e8408d"
+    }
+  }
+}

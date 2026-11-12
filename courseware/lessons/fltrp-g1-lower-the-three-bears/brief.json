@@ -1,0 +1,166 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "The Three Bears",
+  "binding": {
+    "editionId": "smartedu-english-six-year-g1-lower-sync-c8ae9406",
+    "revisionId": "directory-057e330e9b4c19ff0e6ab21e",
+    "nodeId": "7e982435-3d12-31d5-963c-06dbf0c6a232",
+    "unitId": "1295fa95-ae09-3c8b-b15b-bf396becb024"
+  },
+  "scenario": "森林木偶剧团排练。老师用独立绘制的故事提纲指认原书次序，再用原创道具练听喜好和先后。",
+  "goals": [
+    "看图听懂 Father Bear、Mother Bear、Baby Bear 和 Goldilocks 分别指谁。",
+    "在面条与床的图画里听清东西属于谁，按肯定或否定的录音识别正确物品。",
+    "理解 Do you like …? 与肯定、否定简答的关系，能在原创情境中听答选图、交换角色。",
+    "按图听出到熊家、面条、床、三只熊回来和金发姑娘离开的先后。"
+  ],
+  "pageSequence": [
+    {
+      "key": "characters",
+      "kind": "teaching",
+      "title": "四个角色进场"
+    },
+    {
+      "key": "house",
+      "kind": "teaching",
+      "title": "谁进了熊家"
+    },
+    {
+      "key": "noodles",
+      "kind": "teaching",
+      "title": "同样是面条，主人不一样"
+    },
+    {
+      "key": "beds",
+      "kind": "teaching",
+      "title": "先听问，再听她怎么答"
+    },
+    {
+      "key": "listen-props",
+      "kind": "interactive",
+      "title": "听回答，给剧团送道具"
+    },
+    {
+      "key": "return",
+      "kind": "teaching",
+      "title": "熊回来了，她离开"
+    },
+    {
+      "key": "story-order",
+      "kind": "interactive",
+      "title": "按听到的顺序连起画面"
+    },
+    {
+      "key": "retell",
+      "kind": "teaching",
+      "title": "看图讲先后，交换说话角色"
+    },
+    {
+      "key": "picture-check",
+      "kind": "quiz",
+      "title": "听一听，选一幅新图"
+    },
+    {
+      "key": "recap",
+      "kind": "teaching",
+      "title": "带着图回到纸书"
+    }
+  ],
+  "games": [
+    {
+      "page": "listen-props",
+      "template": "listenDelivery",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.listenDelivery",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "listen_pick_deliver",
+      "selection": "听清候选物品、回答肯否及收件角色。否定的物品留在取货处，听到下一句肯定才确定另一件。",
+      "levels": [
+        "两幅同类图，按肯定答复取送。",
+        "用否定排除一件，再按肯定答复取送。",
+        "两位收件者分别作答，调换候选和站位。"
+      ],
+      "demo": "圈听到的人和物，示范一次正确取件、说原因，然后复位。"
+    },
+    {
+      "page": "story-order",
+      "template": "bubbleMaze",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.bubbleMaze",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "ordered_route",
+      "selection": "原创事件画成大图站，听两到四条线索依序过站；同角色的不同事件要能用动作或场景区分。",
+      "levels": [
+        "两幅清楚不同的事件图。",
+        "三幅图带分岔，先进入、再看物品、最后会合。",
+        "三至四幅图调换站位，仍依听到的顺序过站。"
+      ],
+      "demo": "指小车、第一幅图与后续图，走到第一站暂停，说下一步怎么找；交给孩子前复位。"
+    }
+  ],
+  "quizPlan": [
+    {
+      "skill": "identify-story-roles",
+      "prompt": "听角色名称，从新画的熊家图里找角色。",
+      "position": 2,
+      "rationale": "录音点名小熊，图里的金发女孩不是小熊。"
+    },
+    {
+      "skill": "listen-for-preference",
+      "prompt": "听女孩先否定一件、再肯定一件，选她喜欢的原创道具。",
+      "position": 1,
+      "rationale": "肯定说到的物品才是目标。"
+    },
+    {
+      "skill": "understand-preference-dialogue",
+      "prompt": "听两位角色一问一答，找对话对应的图。",
+      "position": 3,
+      "rationale": "要同时匹配问的东西、答的人和肯否。"
+    },
+    {
+      "skill": "sequence-story-events",
+      "prompt": "听简短复述，选择符合原书先后的连环图。",
+      "position": 2,
+      "rationale": "熊回来后女孩才害怕离开。"
+    }
+  ],
+  "afterClass": {
+    "familyTask": "家人陪用合法纸书共读印72至73，按画面讲先后，再拿两件家中道具交换问答。",
+    "weeklyQuestionSource": [
+      "角色与物品归属",
+      "听肯否选图",
+      "新情境排序"
+    ],
+    "evidence": "线上记录图题与操作，实际共读、口语和摆图待观察。"
+  },
+  "goalEvidence": [
+    {
+      "skill": "identify-story-roles",
+      "target": "看图听懂 Father Bear、Mother Bear、Baby Bear 和 Goldilocks 分别指谁。",
+      "source": "印72第一、二组图"
+    },
+    {
+      "skill": "listen-for-preference",
+      "target": "在面条与床的图画里听清东西属于谁，按肯定或否定的录音识别正确物品。",
+      "source": "印72第三组图与印73第一组图"
+    },
+    {
+      "skill": "understand-preference-dialogue",
+      "target": "理解 Do you like …? 与肯定、否定简答的关系，能在原创情境中听答选图、交换角色。",
+      "source": "印73第一组问答"
+    },
+    {
+      "skill": "sequence-story-events",
+      "target": "按图听出到熊家、面条、床、三只熊回来和金发姑娘离开的先后。",
+      "source": "印72至73各组图顺序"
+    }
+  ],
+  "artAndLanguage": "图与道具原创；同类物品靠不同轮廓与标记区分。指令由录音承担，遮住非目标字仍可听懂并操作。",
+  "teacherCode": "mira_english_standard",
+  "authoring": {
+    "sourceMode": "direct",
+    "authorModels": [
+      "gpt-6.1-sol"
+    ]
+  }
+}

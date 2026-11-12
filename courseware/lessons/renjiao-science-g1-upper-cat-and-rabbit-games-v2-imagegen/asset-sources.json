@@ -1,0 +1,693 @@
+{
+  "schemaVersion": "mira.courseware.asset-sources.v1",
+  "assets": {
+    "cat-gray": {
+      "file": "assets/cat-gray.png",
+      "sha256": "74b90c6442ffdb8928d58699b1bdf6d92878de626633c231de1079ee355cb285",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "origin": "Codex 内置 imagegen 首张风格样板，完整自然灰白家猫，未改变文件字节。",
+      "mode": "builtin-imagegen",
+      "toolOutput": "/Users/sqcopenclaw/.codex/generated_images/01a1bef3-5ff7-71d2-bee4-63f4ce2b0b33/exec-7b24248e-70a1-47c8-8855-f6676c68e7b7.png",
+      "generatedAt": "2026-11-09T08:16:15.472351+00:00",
+      "prompt": "imagegen-plan.json#cat-gray",
+      "promptSha256": "3faaf4dfdf338e68f4b50cad28534fc2322c064dbfb81c11c3260ecf9e8b5b0f",
+      "usedBy": [
+        "lens.canvasOrStart",
+        "quick-check.look-at-tail.stem"
+      ],
+      "staticReview": {
+        "fullFigure": "两耳完整，四脚分别可辨，尾根和弯尾尖完整，头朝左。暖白留白与真实结构合格。",
+        "estimatedEarsInNormalizedView": [
+          194,
+          32,
+          140,
+          90
+        ],
+        "withinLegacyEarCrop": [
+          70,
+          8,
+          352,
+          224
+        ],
+        "smallScreenFullFigurePixels": [
+          282,
+          158.5
+        ],
+        "smallScreenRecordPixels": [
+          150.5,
+          95.5
+        ],
+        "visualAssessment": "现阶段原图和对照几何合格；搭配兔图后的最终小屏实玩待观察。",
+        "calibratedEarCrop": [
+          88,
+          8,
+          352,
+          224
+        ]
+      }
+    },
+    "rabbit-white": {
+      "file": "assets/rabbit-white.png",
+      "sha256": "95107d88cc7d9e4d5fd988f1abbf7eb359de8be324a211cf30c8a13dc235539d",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "origin": "Codex 内置 imagegen 以本课灰白猫只参考纸色、画风和视角，重新绘制白兔全身。",
+      "mode": "builtin-imagegen",
+      "toolOutput": "/Users/sqcopenclaw/.codex/generated_images/01a1bef3-5ff7-71d2-bee4-63f4ce2b0b33/exec-adb91653-429d-4124-9172-9f088e93d8de.png",
+      "generatedAt": "2026-11-09T08:18:35.947893+00:00",
+      "referenceAsset": "cat-gray",
+      "referenceSha256": "74b90c6442ffdb8928d58699b1bdf6d92878de626633c231de1079ee355cb285",
+      "prompt": "imagegen-plan.json#rabbit-white",
+      "promptSha256": "f44d233a89c7fe2a6c9292db69f3dfe241d579b4a181bac34061b9f83fb7eb98",
+      "usedBy": [
+        "lens.canvasOrStart"
+      ],
+      "staticReview": {
+        "fullFigure": "长耳、短团尾、前后肢的不同体态均完整；白毛与底色有自然阴影分界。",
+        "estimatedEarsInNormalizedView": [
+          271,
+          24,
+          142,
+          157
+        ],
+        "calibratedEarCrop": [
+          170,
+          8,
+          352,
+          224
+        ],
+        "estimatedTailInNormalizedView": [
+          714,
+          281,
+          58,
+          86
+        ],
+        "visualAssessment": "两张配对原图和等倍率几何已看。完整游戏小屏待观察。"
+      }
+    },
+    "cat-orange": {
+      "file": "assets/cat-orange.png",
+      "sha256": "c14b0c28ac1ef0837e01f33f09d981d2fece993fff184411bf630ffb1867b587",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "origin": "Codex 内置 imagegen 原始输出，保留字节。",
+      "mode": "builtin-imagegen",
+      "toolOutput": "/Users/sqcopenclaw/.codex/generated_images/01a1bef3-5ff7-71d2-bee4-63f4ce2b0b33/exec-3e576638-a449-4736-9c47-f1182b283d4d.png",
+      "generatedAt": "2026-11-09T08:19:18.477061+00:00",
+      "prompt": "imagegen-plan.json#cat-orange",
+      "promptSha256": "05ee91d0da0e0e2bbc6555a30be69791640fbeee8018b5262afe74a64f225cc9",
+      "usedBy": [
+        "compare.left_picture",
+        "lens.canvasOrStart",
+        "quick-check.before-snack.stem"
+      ],
+      "staticReview": {
+        "fullFigure": "橘白毛和独立弯垂长尾清晰，头左、四脚自然分离，耳、尾完整，纸色和光线接灰白猫。",
+        "estimatedTailInNormalizedView": [
+          671,
+          207,
+          204,
+          228
+        ],
+        "intendedUse": "第二关比较长弯尾及小检查生活场景。放大窗需略增加纵向裁切范围。"
+      },
+      "referenceAsset": "cat-gray",
+      "referenceSha256": "74b90c6442ffdb8928d58699b1bdf6d92878de626633c231de1079ee355cb285"
+    },
+    "rabbit-brown": {
+      "file": "assets/rabbit-brown.png",
+      "sha256": "dcc525ce1ca8de76a1e95c3dea3a8cea73f68dfbbe9a7ce082111019ae1c80a4",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "origin": "Codex 内置 imagegen 原始输出，保留字节。",
+      "mode": "builtin-imagegen",
+      "toolOutput": "/Users/sqcopenclaw/.codex/generated_images/01a1bef3-5ff7-71d2-bee4-63f4ce2b0b33/exec-30f0a8af-80f3-45bf-80b2-f72be41d6ea2.png",
+      "generatedAt": "2026-11-09T08:20:24.240702+00:00",
+      "prompt": "imagegen-plan.json#rabbit-brown",
+      "promptSha256": "c000617883c737703fd0c1b449ec9df8820ffaeda8b8c66dc623fb6fd3fb8119",
+      "usedBy": [
+        "compare.right_picture",
+        "lens.canvasOrStart"
+      ],
+      "staticReview": {
+        "fullFigure": "栗棕兔蹲姿自然，两个长耳、分别露出的前后脚及与棕毛区分的浅色短团尾完整。全身朝左，第二关运行时镜转朝右。",
+        "estimatedTailInNormalizedView": [
+          740,
+          294,
+          50,
+          91
+        ],
+        "estimatedMirroredTailInNormalizedView": [
+          234,
+          294,
+          50,
+          91
+        ]
+      },
+      "referenceAsset": "rabbit-white",
+      "referenceSha256": "95107d88cc7d9e4d5fd988f1abbf7eb359de8be324a211cf30c8a13dc235539d"
+    },
+    "table-bare": {
+      "file": "assets/table-bare.png",
+      "sha256": "12dedcaa6718f7fbaaa71c78c1dba785a1330c8eb0ae1a626a8ebca6d05730d9",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "origin": "Codex 内置 imagegen 原始输出，保留字节。",
+      "mode": "builtin-imagegen",
+      "toolOutput": "/Users/sqcopenclaw/.codex/generated_images/01a1bef3-5ff7-71d2-bee4-63f4ce2b0b33/exec-7f250d2f-3234-4606-ae76-f5bb97dec542.png",
+      "generatedAt": "2026-11-09T08:22:04.064078+00:00",
+      "prompt": "imagegen-plan.json#table-bare",
+      "promptSha256": "10478e15ce4aa92269ea408c4185727938274b0ad3243ecde498df2dfc73b128",
+      "usedBy": [
+        "soft-pad.left_picture",
+        "quiet.canvasOrStart",
+        "quick-check.softer-step.A"
+      ],
+      "staticReview": {
+        "contact": "两枚完整指尖都清楚触裸木桌，无物挡住。手指弯法、板面水平线、桌纹和右上手腕的位置可作为加海绵图的精确参照。",
+        "photoStyle": "暖白背景、浅木桌，材质在小缩略中仍可辨。",
+        "inspectedThumbnailPixels": [
+          84,
+          84
+        ]
+      },
+      "referenceAsset": "cat-gray",
+      "referenceSha256": "74b90c6442ffdb8928d58699b1bdf6d92878de626633c231de1079ee355cb285"
+    },
+    "table-soft": {
+      "file": "assets/table-soft.png",
+      "sha256": "5c0d700aa7e9507407ebee37be84a3056227ce5b11abde3d53ef930ca36218f1",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "origin": "Codex 内置 imagegen 原始输出，保留字节。",
+      "mode": "builtin-imagegen",
+      "toolOutput": "/Users/sqcopenclaw/.codex/generated_images/01a1bef3-5ff7-71d2-bee4-63f4ce2b0b33/exec-b8f15327-2cb8-477e-98a7-7c4517231fe0.png",
+      "generatedAt": "2026-11-09T08:22:41.249248+00:00",
+      "prompt": "imagegen-plan.json#table-soft",
+      "promptSha256": "bd281a8c7f26845b87e24463361ce0441886b44c57613f657938e0ee106678a8",
+      "usedBy": [
+        "soft-pad.right_picture",
+        "quiet.canvasOrStart",
+        "quick-check.softer-step.C"
+      ],
+      "staticReview": {
+        "contact": "同一画布、右上进入的手、指间距和浅木桌，与裸桌图对应。两枚指尖清楚接在黄海绵上，海绵孔洞和厚边清楚，其他部位没有新物件。",
+        "pairComparison": "图像只表示接触条件。实验模型的同高落点和波纹由画布记录。",
+        "inspectedThumbnailPixels": [
+          84,
+          84
+        ]
+      },
+      "referenceAsset": "table-bare",
+      "referenceSha256": "12dedcaa6718f7fbaaa71c78c1dba785a1330c8eb0ae1a626a8ebca6d05730d9"
+    },
+    "station": {
+      "file": "assets/station.png",
+      "sha256": "7153e97ebfe8b6c5ea410ac6ca585ef368282ca2f2921d33b69dade69f2503b8",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "origin": "Codex 内置 imagegen 原始输出，保留字节。",
+      "mode": "builtin-imagegen",
+      "toolOutput": "/Users/sqcopenclaw/.codex/generated_images/01a1bef3-5ff7-71d2-bee4-63f4ce2b0b33/exec-7fa785dc-798f-41d7-a2c3-577c1d5e9c82.png",
+      "generatedAt": "2026-11-09T08:23:31.023984+00:00",
+      "prompt": "imagegen-plan.json#station",
+      "promptSha256": "7e279436d274f87663ef83e4f980f7855513b077e3c1c01a5a7de998be3c8646",
+      "usedBy": [
+        "order.picture",
+        "lens.canvasOrStart"
+      ],
+      "staticReview": {
+        "scene": "一大一小坐在左侧、女孩手留在空白画本上，两动物在各自坐垫上休息，双方保持距离。完整场景干净，猫短尖耳、白兔长耳和团尾清楚。",
+        "additionalReference": "rabbit-white"
+      },
+      "referenceAsset": "cat-orange",
+      "referenceSha256": "c14b0c28ac1ef0837e01f33f09d981d2fece993fff184411bf630ffb1867b587",
+      "additionalReferenceAssets": [
+        {
+          "key": "rabbit-white",
+          "sha256": "95107d88cc7d9e4d5fd988f1abbf7eb359de8be324a211cf30c8a13dc235539d",
+          "role": "character_reference"
+        }
+      ]
+    },
+    "cat-tail": {
+      "file": "assets/cat-tail.png",
+      "sha256": "aab9984819a783da6ca1965407d933a4bea292ec17b5c791defb606638eafd31",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "origin": "Codex 内置 imagegen 原始输出，保留字节。",
+      "mode": "builtin-imagegen",
+      "toolOutput": "/Users/sqcopenclaw/.codex/generated_images/01a1bef3-5ff7-71d2-bee4-63f4ce2b0b33/exec-1b3d066b-ce8f-484d-b987-0e38e31d1db4.png",
+      "generatedAt": "2026-11-09T08:24:11.349183+00:00",
+      "prompt": "imagegen-plan.json#cat-tail",
+      "promptSha256": "4669188e64161af6e1ded407a36ce835104e1fa6d9a88a557180d43dc6b629ff",
+      "usedBy": [
+        "quick-check.look-at-tail.A"
+      ],
+      "staticReview": {
+        "quiz": "左侧橘猫后躯与尾根相连，独立的一条长弯尾，白尾尖完整，其他肢体没有抢主体。小检查用独立近照，不是对照台答图。",
+        "inspectedThumbnailPixels": [
+          90,
+          90
+        ]
+      },
+      "referenceAsset": "cat-orange",
+      "referenceSha256": "c14b0c28ac1ef0837e01f33f09d981d2fece993fff184411bf630ffb1867b587"
+    },
+    "cat-ear": {
+      "file": "assets/cat-ear.png",
+      "sha256": "d65bd2af32cecd6e73c9cc498ddab9ec52e4dc7643d861d85765667dafb5ef61",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "origin": "Codex 内置 imagegen 原始输出，保留字节。",
+      "mode": "builtin-imagegen",
+      "toolOutput": "/Users/sqcopenclaw/.codex/generated_images/01a1bef3-5ff7-71d2-bee4-63f4ce2b0b33/exec-d4899fd4-1036-4bda-a5ea-25bfbcef8b75.png",
+      "generatedAt": "2026-11-09T08:24:44.424504+00:00",
+      "prompt": "imagegen-plan.json#cat-ear",
+      "promptSha256": "97527e8c85d0c9881e91d6917b8756e192696b190bb291b92b590f4c5555b8df",
+      "usedBy": [
+        "quick-check.look-at-tail.B"
+      ],
+      "staticReview": {
+        "quiz": "耳尖、耳廓、耳根与橘猫一只眼和额头连在一起，单一三角猫耳完整、与尾和肉垫可以分辨。",
+        "inspectedThumbnailPixels": [
+          90,
+          90
+        ]
+      },
+      "referenceAsset": "cat-orange",
+      "referenceSha256": "c14b0c28ac1ef0837e01f33f09d981d2fece993fff184411bf630ffb1867b587"
+    },
+    "pad": {
+      "file": "assets/pad.png",
+      "sha256": "2ab01991247a70aebcf01a122250247656d951cb5cd92cbb3628327bf2e67582",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "origin": "Codex 内置 imagegen 原始输出，保留字节。",
+      "mode": "builtin-imagegen",
+      "toolOutput": "/Users/sqcopenclaw/.codex/generated_images/01a1bef3-5ff7-71d2-bee4-63f4ce2b0b33/exec-d2e9a5d2-a54f-4328-8443-724ad3a559e0.png",
+      "generatedAt": "2026-11-09T08:25:23.455916+00:00",
+      "prompt": "imagegen-plan.json#pad",
+      "promptSha256": "78df4d0660801b31efddee2cace574087d663ceac2e6da1322bdea73f73f78e9",
+      "usedBy": [
+        "quick-check.look-at-tail.C"
+      ],
+      "staticReview": {
+        "quiz": "真实橘白猫前爪掌面，四个趾垫、中央掌垫及柔毛清楚，不见伸出爪尖或人手。与耳、尾三图的小检查角色一致。",
+        "inspectedThumbnailPixels": [
+          90,
+          90
+        ]
+      },
+      "referenceAsset": "cat-orange",
+      "referenceSha256": "c14b0c28ac1ef0837e01f33f09d981d2fece993fff184411bf630ffb1867b587"
+    },
+    "cat-eyes": {
+      "file": "assets/cat-eyes.png",
+      "sha256": "667a5361c2630a56e69cbf199942bd75e7b7492cc5c6aa71f141ba969997b3da",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "origin": "Codex 内置 imagegen 原始输出，保留字节。",
+      "mode": "builtin-imagegen",
+      "toolOutput": "/Users/sqcopenclaw/.codex/generated_images/01a1bef3-5ff7-71d2-bee4-63f4ce2b0b33/exec-44b7fd3a-2c76-4fe1-aa53-d2d423080965.png",
+      "generatedAt": "2026-11-09T08:27:50.031697+00:00",
+      "prompt": "imagegen-plan.json#cat-eyes",
+      "promptSha256": "47908562b7f5bbb1e95d8451e4a17876e428cf1a6b99928c8669adc4f7e94f0e",
+      "usedBy": [
+        "cat-special.right_picture"
+      ],
+      "staticReview": {
+        "lecture": "左右同一猫脸同视角，左边明亮、黑瞳孔细竖，右边柔暗、黑瞳孔宽近圆且仍有虹膜边。四只眼处在同高度；窄与宽的差别在小屏图幅仍明显。",
+        "inspectedThumbnailPixels": [
+          230,
+          129
+        ]
+      },
+      "referenceAsset": "cat-gray",
+      "referenceSha256": "74b90c6442ffdb8928d58699b1bdf6d92878de626633c231de1079ee355cb285"
+    },
+    "climb-pair": {
+      "file": "assets/climb-pair.png",
+      "sha256": "b87c3e250a4ab9833e4e2b9f9fde7b97119635d3b414e118a9e03602e42db921",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "origin": "Codex 内置 imagegen 原始输出，保留字节。",
+      "mode": "builtin-imagegen",
+      "toolOutput": "/Users/sqcopenclaw/.codex/generated_images/01a1bef3-5ff7-71d2-bee4-63f4ce2b0b33/exec-00b548a4-50c6-4072-8df1-11f07071d46d.png",
+      "generatedAt": "2026-11-09T08:28:29.403773+00:00",
+      "prompt": "imagegen-plan.json#climb-pair",
+      "promptSha256": "8f3f1a6a16c4ff7cd87042be242d093a2e3d22ccb67dee8349d173caaf593e69",
+      "usedBy": [
+        "cat-special.left_picture"
+      ],
+      "staticReview": {
+        "lecture": "左图前爪在离地很近的粗树干上，后脚及地面可见；右图同灰白脚背的三枚浅色弯爪勾住粗树皮，无肉垫和危险。主体近照对小屏仍有足够反差。",
+        "inspectedThumbnailPixels": [
+          230,
+          129
+        ]
+      },
+      "referenceAsset": "cat-gray",
+      "referenceSha256": "74b90c6442ffdb8928d58699b1bdf6d92878de626633c231de1079ee355cb285"
+    },
+    "rabbit-move": {
+      "file": "assets/rabbit-move.png",
+      "sha256": "0d9ae356126040673d4d7518dec900457cacc1031e6b419c9b873577429f4ff3",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "origin": "Codex 内置 imagegen 原始输出，保留字节。",
+      "mode": "builtin-imagegen",
+      "toolOutput": "/Users/sqcopenclaw/.codex/generated_images/01a1bef3-5ff7-71d2-bee4-63f4ce2b0b33/exec-cd09d375-3c15-4154-a0d7-e682ad079b42.png",
+      "generatedAt": "2026-11-09T08:29:06.110605+00:00",
+      "prompt": "imagegen-plan.json#rabbit-move",
+      "promptSha256": "450ad2f74ffcfea8cb985b3a73f95e1f0edb0ab8064ce704b99c031a27338c74",
+      "usedBy": [
+        "rabbit-special.left_picture"
+      ],
+      "staticReview": {
+        "lecture": "左边完整留出短尾、屈曲后腿和贴地长后脚；右边同一棕兔做低空小跳，前脚前伸、两只后脚向后伸，地面投影和距离可见。",
+        "inspectedThumbnailPixels": [
+          230,
+          129
+        ]
+      },
+      "referenceAsset": "rabbit-brown",
+      "referenceSha256": "dcc525ce1ca8de76a1e95c3dea3a8cea73f68dfbbe9a7ce082111019ae1c80a4"
+    },
+    "cat-walk": {
+      "file": "assets/cat-walk.png",
+      "sha256": "706fe21e1a14efff17d98826d497bd7736dfd0a7c71447141035dafd9d25e64a",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "origin": "Codex 内置 imagegen 原始输出，保留字节。",
+      "mode": "builtin-imagegen",
+      "toolOutput": "/Users/sqcopenclaw/.codex/generated_images/01a1bef3-5ff7-71d2-bee4-63f4ce2b0b33/exec-0deebab5-01c4-48e1-9f01-7ea48a95430e.png",
+      "generatedAt": "2026-11-09T08:29:58.422689+00:00",
+      "prompt": "imagegen-plan.json#cat-walk",
+      "promptSha256": "2a27bf745d044fe24b5b73d98cd711e2f46d7ce46d6cc8d6a88a7ec12812775c",
+      "usedBy": [
+        "quick-check.softer-step.stem"
+      ],
+      "staticReview": {
+        "quiz": "平坦浅木板、一只前脚抬起、其他脚在地板旁，侧影有自然慢步动作。耳、四肢和尾部均完整，图中没有提示答案的海绵或波纹。",
+        "inspectedThumbnailPixels": [
+          90,
+          90
+        ]
+      },
+      "referenceAsset": "cat-orange",
+      "referenceSha256": "c14b0c28ac1ef0837e01f33f09d981d2fece993fff184411bf630ffb1867b587"
+    },
+    "rabbit-ear": {
+      "file": "assets/rabbit-ear.png",
+      "sha256": "a629482e5f2a11f40c014dc7657ac5b984ed5a3de05516ee62dfcfe111695989",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "origin": "Codex 内置 imagegen 原始输出，保留字节。",
+      "mode": "builtin-imagegen",
+      "toolOutput": "/Users/sqcopenclaw/.codex/generated_images/01a1bef3-5ff7-71d2-bee4-63f4ce2b0b33/exec-93338167-12ff-4304-93b2-ac77d266ee84.png",
+      "generatedAt": "2026-11-09T08:30:58.509587+00:00",
+      "prompt": "imagegen-plan.json#rabbit-ear",
+      "promptSha256": "c03e07d5853d6c99bf3d8c43b3cbdb422146ea3b8408a45123bd60dc21f9f812",
+      "usedBy": [
+        "rabbit-special.right_picture",
+        "quick-check.first-listen.stem"
+      ],
+      "staticReview": {
+        "lectureAndQuiz": "两只长耳完整留白，淡粉耳内和白毛分界清楚，耳根连在真实白兔头上。近景重点是耳部，没有提示某一听法的手或纸卷。",
+        "inspectedThumbnailPixels": [
+          90,
+          90
+        ]
+      },
+      "referenceAsset": "rabbit-white",
+      "referenceSha256": "95107d88cc7d9e4d5fd988f1abbf7eb359de8be324a211cf30c8a13dc235539d"
+    },
+    "listen-bare": {
+      "file": "assets/listen-bare.png",
+      "sha256": "13ec4b5e5083b43738f4957257698d26abbd5766226b32602da58ed4c6cbebc2",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "origin": "Codex 内置 imagegen 原始输出，保留字节。",
+      "mode": "builtin-imagegen",
+      "toolOutput": "/Users/sqcopenclaw/.codex/generated_images/01a1bef3-5ff7-71d2-bee4-63f4ce2b0b33/exec-6300c6ff-de34-4e93-9ceb-8c629cd014a5.png",
+      "generatedAt": "2026-11-09T08:33:44.212043+00:00",
+      "prompt": "imagegen-plan.json#listen-bare",
+      "promptSha256": "dbee4ce9507141cd27f53691137cc9f322bc01319be2d6f781b3110d3ec6226e",
+      "usedBy": [
+        "quick-check.first-listen.B",
+        "listen-strip"
+      ],
+      "staticReview": {
+        "lectureAndQuiz": "成年老师穿浅黄短袖，正侧角度近侧耳清楚，两手落桌，耳旁没有物品。课堂背景中的器具无文字，三图对照需保持同场景。",
+        "inspectedThumbnailPixels": [
+          90,
+          90
+        ]
+      }
+    },
+    "listen-cup": {
+      "file": "assets/listen-cup.png",
+      "sha256": "167617f1d16a8a6a1bcfd5f1b0f8b34e34e06d6b0412a837051bd61b2737bb57",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "origin": "Codex 内置 imagegen 原始输出，保留字节。",
+      "mode": "builtin-imagegen",
+      "toolOutput": "/Users/sqcopenclaw/.codex/generated_images/01a1bef3-5ff7-71d2-bee4-63f4ce2b0b33/exec-d5becd44-ee46-41f0-b26d-2f94fcf90a23.png",
+      "generatedAt": "2026-11-09T08:34:55.471354+00:00",
+      "prompt": "imagegen-plan.json#listen-cup",
+      "promptSha256": "c148f68738cf73bcee7c3d036221db1527182ecbae26dfecd57157859a4bd3e4",
+      "usedBy": [
+        "quick-check.softer-step.B",
+        "quick-check.first-listen.A",
+        "listen-strip"
+      ],
+      "staticReview": {
+        "lectureAndQuiz": "同一成年老师、同桌和同照明。画面右耳清楚，手掌弯成半杯在耳后，另一手在桌，动作与直接听可分。",
+        "inspectedThumbnailPixels": [
+          90,
+          90
+        ]
+      },
+      "referenceAsset": "listen-bare",
+      "referenceSha256": "13ec4b5e5083b43738f4957257698d26abbd5766226b32602da58ed4c6cbebc2"
+    },
+    "listen-cone": {
+      "file": "assets/listen-cone.png",
+      "sha256": "6ca97424547179b99f18d4b23eab074bf560fc92ac013d7a7c21a34bde44f80b",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "origin": "Codex 内置 imagegen 原始输出，保留字节。",
+      "mode": "builtin-imagegen",
+      "toolOutput": "/Users/sqcopenclaw/.codex/generated_images/01a1bef3-5ff7-71d2-bee4-63f4ce2b0b33/exec-b150f0f4-3139-42ca-801e-2ef67ed6d342.png",
+      "generatedAt": "2026-11-09T08:36:06.525373+00:00",
+      "prompt": "imagegen-plan.json#listen-cone",
+      "promptSha256": "0db5ad2fe43a894417b030d02cf38da9dc19e1aff0b1c480581f8b9a4c318fea",
+      "usedBy": [
+        "quick-check.first-listen.C",
+        "listen-strip"
+      ],
+      "staticReview": {
+        "lectureAndQuiz": "与直接听同一成年老师、背景、桌面和坐姿。纸卷小口停在可见耳外，宽口向右、内腔可见，嘴眼都未被遮。不会误读成望远镜或喇叭。",
+        "inspectedThumbnailPixels": [
+          90,
+          90
+        ]
+      },
+      "referenceAsset": "listen-bare",
+      "referenceSha256": "13ec4b5e5083b43738f4957257698d26abbd5766226b32602da58ed4c6cbebc2"
+    },
+    "wash": {
+      "file": "assets/wash.png",
+      "sha256": "85c9c87d874a1f93a16cbfc654a8f662da433ed3d3f424d52233a8ae95df1902",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "origin": "Codex 内置 imagegen 原始输出，保留字节。",
+      "mode": "builtin-imagegen",
+      "toolOutput": "/Users/sqcopenclaw/.codex/generated_images/01a1bef3-5ff7-71d2-bee4-63f4ce2b0b33/exec-0e66cdba-8bc3-4df9-bee3-6d84bc2aae60.png",
+      "generatedAt": "2026-11-09T08:36:53.517363+00:00",
+      "prompt": "imagegen-plan.json#wash",
+      "promptSha256": "0036787ad3e8b849c45c6eda408685fd08684cace9d362aa2b842c0bb23caf54",
+      "usedBy": [
+        "quick-check.before-snack.A",
+        "care-strip"
+      ],
+      "staticReview": {
+        "quiz": "水龙头、两只互相揉搓的手、肥皂泡和清水同时可见，不和另两种做法混淆。",
+        "inspectedThumbnailPixels": [
+          90,
+          90
+        ]
+      }
+    },
+    "gloves": {
+      "file": "assets/gloves.png",
+      "sha256": "95070ef6a341aa259d37f2704cb4608172e28d2bf3f82cae0c51b06009cf326e",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "origin": "Codex 内置 imagegen 原始输出，保留字节。",
+      "mode": "builtin-imagegen",
+      "toolOutput": "/Users/sqcopenclaw/.codex/generated_images/01a1bef3-5ff7-71d2-bee4-63f4ce2b0b33/exec-ddf66632-3317-4c27-a5ed-b9e0b22475e6.png",
+      "generatedAt": "2026-11-09T08:37:45.955272+00:00",
+      "prompt": "imagegen-plan.json#gloves",
+      "promptSha256": "03280eb7b05fc6f8ad09a8aae9229e9a7561b29714354016458b5a5493b0c370",
+      "usedBy": [
+        "quick-check.before-snack.B",
+        "care-strip"
+      ],
+      "staticReview": {
+        "quiz": "两只浅绿家务手套、短刷和宠物碗都清楚。画面没有水龙头、动物或药品，明确是清理用具。",
+        "inspectedThumbnailPixels": [
+          90,
+          90
+        ]
+      },
+      "referenceAsset": "wash",
+      "referenceSha256": "85c9c87d874a1f93a16cbfc654a8f662da433ed3d3f424d52233a8ae95df1902"
+    },
+    "tell-adult": {
+      "file": "assets/tell-adult.png",
+      "sha256": "d28e6e68d9ea90670e2df13cc86f907865fbefba2a0765f9cbbcba4e98022166",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "origin": "Codex 内置 imagegen 原始输出，保留字节。",
+      "mode": "builtin-imagegen",
+      "toolOutput": "/Users/sqcopenclaw/.codex/generated_images/01a1bef3-5ff7-71d2-bee4-63f4ce2b0b33/exec-a78be805-fbce-4424-8abd-609332f241b1.png",
+      "generatedAt": "2026-11-09T08:38:41.083606+00:00",
+      "prompt": "imagegen-plan.json#tell-adult",
+      "promptSha256": "dacb86354ab30e0d6b0610d437b918ee058e29256372d1217fdaaedc3afde331",
+      "usedBy": [
+        "quick-check.before-snack.C",
+        "care-strip"
+      ],
+      "staticReview": {
+        "quiz": "穿蓝衣的孩子张开一只手给蹲下的家长看，家长看向掌心；没有动物、伤口或医疗操作。与洗手和戴手套清理明显不同。",
+        "inspectedThumbnailPixels": [
+          90,
+          90
+        ]
+      }
+    },
+    "listen-strip": {
+      "file": "assets/listen-strip.png",
+      "sha256": "a3d3415464ca2e398f0fb0b19885acc871c979901eb3c1c9ebdd2361cba43a20",
+      "dimensions": [
+        1032,
+        356
+      ],
+      "origin": "把三个内置 imagegen 原图等宽等高拼排，保留画风和画面证据。",
+      "mode": "composition-of-builtin-imagegen",
+      "source": "compose_pictures.py",
+      "usedBy": [
+        "listen.picture"
+      ],
+      "inputs": [
+        {
+          "key": "listen-bare",
+          "file": "assets/listen-bare.png",
+          "sha256": "13ec4b5e5083b43738f4957257698d26abbd5766226b32602da58ed4c6cbebc2"
+        },
+        {
+          "key": "listen-cup",
+          "file": "assets/listen-cup.png",
+          "sha256": "167617f1d16a8a6a1bcfd5f1b0f8b34e34e06d6b0412a837051bd61b2737bb57"
+        },
+        {
+          "key": "listen-cone",
+          "file": "assets/listen-cone.png",
+          "sha256": "6ca97424547179b99f18d4b23eab074bf560fc92ac013d7a7c21a34bde44f80b"
+        }
+      ],
+      "staticReview": {
+        "orderedComparison": true,
+        "smallThumbnailReadable": true,
+        "inspectedThumbnailPixels": [
+          300,
+          103
+        ]
+      }
+    },
+    "care-strip": {
+      "file": "assets/care-strip.png",
+      "sha256": "e60efc28418a881b84f108e499ec3551b7c15211ebdb69e44d49518376986b14",
+      "dimensions": [
+        1032,
+        356
+      ],
+      "origin": "把三个内置 imagegen 原图等宽等高拼排，保留画风和画面证据。",
+      "mode": "composition-of-builtin-imagegen",
+      "source": "compose_pictures.py",
+      "usedBy": [
+        "care.picture"
+      ],
+      "inputs": [
+        {
+          "key": "wash",
+          "file": "assets/wash.png",
+          "sha256": "85c9c87d874a1f93a16cbfc654a8f662da433ed3d3f424d52233a8ae95df1902"
+        },
+        {
+          "key": "gloves",
+          "file": "assets/gloves.png",
+          "sha256": "95070ef6a341aa259d37f2704cb4608172e28d2bf3f82cae0c51b06009cf326e"
+        },
+        {
+          "key": "tell-adult",
+          "file": "assets/tell-adult.png",
+          "sha256": "d28e6e68d9ea90670e2df13cc86f907865fbefba2a0765f9cbbcba4e98022166"
+        }
+      ],
+      "staticReview": {
+        "orderedComparison": true,
+        "smallThumbnailReadable": true,
+        "inspectedThumbnailPixels": [
+          300,
+          103
+        ]
+      }
+    }
+  }
+}

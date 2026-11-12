@@ -1,0 +1,11 @@
+{
+  "template": "fireflySwing",
+  "title": "萤火虫荡星灯",
+  "sub": "让萤火虫转起来，瞄着灯的方向松手。",
+  "art": {"backdrop": "night-garden.webp", "sticker": "sticker.webp", "frames":["firefly-folded.webp","firefly-flying.webp"]},
+  "levels": [
+    {"omega":1.75,"legs":[{"goal":"●","targets":[{"x":409,"y":244,"value":"●"},{"x":409,"y":432,"value":"◆"}]},{"goal":"◆","targets":[{"x":678,"y":248,"value":"●"},{"x":678,"y":440,"value":"◆"}]}],"hints":["看虚线朝哪儿，再松手。","先等虚线朝亮灯的方向。"]},
+    {"omega":2.37,"legs":[{"goal":"◆","targets":[{"x":385,"y":225,"value":"◆"},{"x":406,"y":445,"value":"●"}]},{"goal":"▲","targets":[{"x":642,"y":235,"value":"▲"},{"x":642,"y":463,"value":"◆"}]},{"goal":"◆","targets":[{"x":914,"y":249,"value":"▲"},{"x":906,"y":449,"value":"◆"}]}],"hints":["方向不对，可以换个方向荡。","看亮起来的灯，虚线对齐再松手。"]},
+    {"omega":3.01,"legs":[{"goal":"▲","targets":[{"x":371,"y":232,"value":"●"},{"x":372,"y":467,"value":"▲"}]},{"goal":"●","targets":[{"x":604,"y":222,"value":"●"},{"x":623,"y":465,"value":"▲"}]},{"goal":"◆","targets":[{"x":855,"y":239,"value":"▲"},{"x":839,"y":433,"value":"◆"}]},{"goal":"▲","targets":[{"x":1080,"y":225,"value":"▲"},{"x":1103,"y":451,"value":"◆"}]}],"hints":["下一站会换，瞧瞧上面的图形。","等虚线朝亮灯，时机到了再松手。"]}
+  ]
+}

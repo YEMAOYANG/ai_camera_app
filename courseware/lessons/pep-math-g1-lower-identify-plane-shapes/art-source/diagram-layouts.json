@@ -1,0 +1,177 @@
+{
+  "block-first-face": {
+    "operation": "orthographic highlighted block face to tracing",
+    "frontWidth": 220,
+    "frontHeight": 97,
+    "paperOutline": "rect",
+    "depth": 135,
+    "traceScale": 0.76
+  },
+  "block-other-face": {
+    "operation": "orthographic highlighted block face to tracing",
+    "frontWidth": 135,
+    "frontHeight": 97,
+    "paperOutline": "short",
+    "depth": 220,
+    "traceScale": 0.76
+  },
+  "cylinder-sphere": {
+    "operation": "round flat base compared with sphere",
+    "cylinder": "round flat bottom",
+    "sphere": "no planar face",
+    "tracedOutline": "circle"
+  },
+  "shape-families": {
+    "operation": "representatives of five geometric classes",
+    "subjects": [
+      "circle-ref",
+      "triangle-ref",
+      "square-ref",
+      "rect-ref",
+      "slant-ref"
+    ]
+  },
+  "compare-corners": {
+    "operation": "exact rotations and corner comparison",
+    "variants": [
+      [
+        "square",
+        39
+      ],
+      [
+        "rectangle",
+        -34
+      ],
+      [
+        "slant",
+        0
+      ]
+    ],
+    "cornerMarksOn": [
+      "square",
+      "rectangle"
+    ]
+  },
+  "wedge-trace": {
+    "operation": "flat triangular face to traced triangle",
+    "front": [
+      [
+        75,
+        233
+      ],
+      [
+        262.2,
+        233
+      ],
+      [
+        125.7,
+        79.6
+      ]
+    ],
+    "traceScale": 0.78
+  },
+  "choose-a-face": {
+    "operation": "separate target print outlines"
+  },
+  "pin-board-lines": {
+    "operation": "straight segments on lattice",
+    "grid": [
+      12,
+      5
+    ],
+    "square": [
+      [
+        1,
+        2
+      ],
+      [
+        3,
+        0
+      ],
+      [
+        5,
+        2
+      ],
+      [
+        3,
+        4
+      ]
+    ],
+    "triangle": [
+      [
+        8,
+        1
+      ],
+      [
+        7,
+        4
+      ],
+      [
+        11,
+        3
+      ]
+    ]
+  },
+  "curve-and-segments": {
+    "operation": "exact circle compared to an eight-segment polygon",
+    "segments": 8
+  },
+  "stamp-picture": {
+    "operation": "compose original boat picture from exact outlines",
+    "objects": [
+      "circle",
+      "triangle",
+      "parallelogram",
+      "rectangle"
+    ]
+  },
+  "q-flat-ball": {
+    "operation": "draw exact geometric solid and visible face",
+    "solid": "ball"
+  },
+  "q-flat-jar": {
+    "operation": "draw exact geometric solid and visible face",
+    "solid": "jar"
+  },
+  "q-flat-wedge": {
+    "operation": "draw exact geometric solid and visible face",
+    "solid": "wedge"
+  },
+  "q-face-square-box": {
+    "operation": "draw exact geometric solid and visible face",
+    "solid": "cube"
+  },
+  "q-face-long-box": {
+    "operation": "draw exact geometric solid and visible face",
+    "solid": "long"
+  },
+  "q-face-tin": {
+    "operation": "draw exact geometric solid and visible face",
+    "solid": "tin"
+  },
+  "q-circle-paper": {
+    "operation": "draw target circle on tracing paper"
+  },
+  "q-long-paper": {
+    "operation": "draw target long rectangle on tracing paper",
+    "aspect": [
+      257,
+      83
+    ],
+    "traceScale": 0.66
+  },
+  "q-pin-board": {
+    "operation": "straight segment on fresh lattice",
+    "grid": [
+      8,
+      5
+    ]
+  },
+  "q-turn-reference": {
+    "operation": "unrotated square and rotation arrow",
+    "side": 167
+  },
+  "q-windows-board": {
+    "operation": "three independent window outlines"
+  }
+}

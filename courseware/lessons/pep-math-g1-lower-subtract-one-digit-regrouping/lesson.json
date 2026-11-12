@@ -1,0 +1,1217 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "两位数减一位数（退位）",
+  "description": "人教版一年级下册。用原创彩杯借用站解释个位不够时如何换一个十并核对余量。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小数老师",
+      "role": "teacher",
+      "gender": "male",
+      "voice": "Ethan",
+      "avatar": "/teachers/ashu-math-v1.png",
+      "color": "#437763",
+      "persona": "用成盒的十与散杯解释退位，先保住总量，再按要求拿走并检查。"
+    }
+  },
+  "images": {
+    "ten-and-one-cups": {
+      "file": "assets/ten-and-one-cups.png"
+    },
+    "stock-43": {
+      "file": "assets/stock-43.png"
+    },
+    "compare-43-take2": {
+      "file": "assets/compare-43-take2.png"
+    },
+    "compare-43-take8": {
+      "file": "assets/compare-43-take8.png"
+    },
+    "exchanged-43": {
+      "file": "assets/exchanged-43.png"
+    },
+    "taken-43-8": {
+      "file": "assets/taken-43-8.png"
+    },
+    "remaining-35": {
+      "file": "assets/remaining-35.png"
+    },
+    "round-43-to-40": {
+      "file": "assets/round-43-to-40.png"
+    },
+    "round-40-to-35": {
+      "file": "assets/round-40-to-35.png"
+    },
+    "from-open-ten-43": {
+      "file": "assets/from-open-ten-43.png"
+    },
+    "compensate-43": {
+      "file": "assets/compensate-43.png"
+    },
+    "round-70-before": {
+      "file": "assets/round-70-before.png"
+    },
+    "round-70-after": {
+      "file": "assets/round-70-after.png"
+    },
+    "check-35-and-8": {
+      "file": "assets/check-35-and-8.png"
+    },
+    "wrong-unmoved-tens": {
+      "file": "assets/wrong-unmoved-tens.png"
+    },
+    "slide-order-42": {
+      "file": "assets/slide-order-42.png"
+    },
+    "slide-order-31": {
+      "file": "assets/slide-order-31.png"
+    },
+    "slide-order-46": {
+      "file": "assets/slide-order-46.png"
+    },
+    "slide-order-60": {
+      "file": "assets/slide-order-60.png"
+    },
+    "slide-order-54": {
+      "file": "assets/slide-order-54.png"
+    },
+    "slide-order-77": {
+      "file": "assets/slide-order-77.png"
+    },
+    "closed-ten": {
+      "file": "assets/closed-ten.png"
+    },
+    "loose-0": {
+      "file": "assets/loose-0.png"
+    },
+    "loose-1": {
+      "file": "assets/loose-1.png"
+    },
+    "loose-2": {
+      "file": "assets/loose-2.png"
+    },
+    "loose-4": {
+      "file": "assets/loose-4.png"
+    },
+    "loose-6": {
+      "file": "assets/loose-6.png"
+    },
+    "loose-7": {
+      "file": "assets/loose-7.png"
+    },
+    "loose-10": {
+      "file": "assets/loose-10.png"
+    },
+    "loose-11": {
+      "file": "assets/loose-11.png"
+    },
+    "loose-12": {
+      "file": "assets/loose-12.png"
+    },
+    "loose-14": {
+      "file": "assets/loose-14.png"
+    },
+    "loose-16": {
+      "file": "assets/loose-16.png"
+    },
+    "loose-17": {
+      "file": "assets/loose-17.png"
+    },
+    "order-51-minus6": {
+      "file": "assets/order-51-minus6.png"
+    },
+    "order-52-minus6": {
+      "file": "assets/order-52-minus6.png"
+    },
+    "order-65-minus9": {
+      "file": "assets/order-65-minus9.png"
+    },
+    "order-70-minus4": {
+      "file": "assets/order-70-minus4.png"
+    },
+    "order-84-minus8": {
+      "file": "assets/order-84-minus8.png"
+    },
+    "answer-5": {
+      "file": "assets/answer-5.png"
+    },
+    "answer-6": {
+      "file": "assets/answer-6.png"
+    },
+    "answer-45": {
+      "file": "assets/answer-45.png"
+    },
+    "answer-46": {
+      "file": "assets/answer-46.png"
+    },
+    "answer-50": {
+      "file": "assets/answer-50.png"
+    },
+    "answer-55": {
+      "file": "assets/answer-55.png"
+    },
+    "answer-56": {
+      "file": "assets/answer-56.png"
+    },
+    "answer-66": {
+      "file": "assets/answer-66.png"
+    },
+    "answer-76": {
+      "file": "assets/answer-76.png"
+    },
+    "answer-86": {
+      "file": "assets/answer-86.png"
+    },
+    "q1-stimulus": {
+      "file": "assets/q1-stimulus.png"
+    },
+    "q1-a": {
+      "file": "assets/q1-a.png"
+    },
+    "q1-b": {
+      "file": "assets/q1-b.png"
+    },
+    "q1-c": {
+      "file": "assets/q1-c.png"
+    },
+    "q2-stimulus": {
+      "file": "assets/q2-stimulus.png"
+    },
+    "q2-a": {
+      "file": "assets/q2-a.png"
+    },
+    "q2-b": {
+      "file": "assets/q2-b.png"
+    },
+    "q2-c": {
+      "file": "assets/q2-c.png"
+    },
+    "q3-stimulus": {
+      "file": "assets/q3-stimulus.png"
+    },
+    "q3-a": {
+      "file": "assets/q3-a.png"
+    },
+    "q3-b": {
+      "file": "assets/q3-b.png"
+    },
+    "q3-c": {
+      "file": "assets/q3-c.png"
+    },
+    "q4-stimulus": {
+      "file": "assets/q4-stimulus.png"
+    },
+    "q4-a": {
+      "file": "assets/q4-a.png"
+    },
+    "q4-b": {
+      "file": "assets/q4-b.png"
+    },
+    "q4-c": {
+      "file": "assets/q4-c.png"
+    },
+    "q5-stimulus": {
+      "file": "assets/q5-stimulus.png"
+    },
+    "q5-a": {
+      "file": "assets/q5-a.png"
+    },
+    "q5-b": {
+      "file": "assets/q5-b.png"
+    },
+    "q5-c": {
+      "file": "assets/q5-c.png"
+    },
+    "q6-stimulus": {
+      "file": "assets/q6-stimulus.png"
+    },
+    "q6-a": {
+      "file": "assets/q6-a.png"
+    },
+    "q6-b": {
+      "file": "assets/q6-b.png"
+    },
+    "q6-c": {
+      "file": "assets/q6-c.png"
+    },
+    "cover-cups": {
+      "file": "assets/cover-cups.png"
+    },
+    "slide-backdrop": {
+      "file": "assets/slide-backdrop.png"
+    },
+    "aim-backdrop": {
+      "file": "assets/aim-backdrop.png"
+    },
+    "family-cups": {
+      "file": "assets/family-cups.png"
+    },
+    "cup-helper": {
+      "file": "assets/cup-helper.png"
+    },
+    "cup-hop": {
+      "file": "assets/cup-hop.png"
+    },
+    "cup-marble": {
+      "file": "assets/cup-marble.png"
+    },
+    "cup-slide-award": {
+      "file": "assets/cup-slide-award.png"
+    },
+    "cup-aim-award": {
+      "file": "assets/cup-aim-award.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "open-the-cup-station",
+      "type": "slide",
+      "title": "两位数减一位数（退位）",
+      "template": "two-columns",
+      "data": {
+        "title": "两位数减一位数（退位）",
+        "left": {
+          "heading": "野餐用品站",
+          "body": "今天要借出彩杯。"
+        },
+        "left_picture": "cover-cups",
+        "right": {
+          "heading": "一盒装十个",
+          "body": "散杯一个一个取。"
+        },
+        "right_picture": "ten-and-one-cups"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "你好，我是小数老师。野餐用品站正在发彩杯。"
+        },
+        {
+          "say": "小葵要借几个，可桌上的散杯不够。怎么办？"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "看这一盒，从左边数，十个彩杯正好装满。"
+        },
+        {
+          "say": "右边有一个散杯。一盒是一个十，一杯是一个一。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "箱里可以整盒放，也可以拆开一个个拿。"
+        },
+        {
+          "say": "只要拆好后重新数一遍，就知道总数还是原来的。"
+        },
+        {
+          "say": "待会儿我们先看借走多少，再想要不要拆一盒。"
+        },
+        {
+          "say": "跟我来，先查第一张借用单。"
+        }
+      ]
+    },
+    {
+      "key": "when-the-ones-are-not-enough",
+      "type": "slide",
+      "title": "先看散杯够不够",
+      "template": "two-columns",
+      "data": {
+        "title": "先看散杯够不够",
+        "left": {
+          "heading": "四十三里借走两个",
+          "body": "三个散杯够拿两个。"
+        },
+        "left_picture": "compare-43-take2",
+        "right": {
+          "heading": "四十三里借走八个",
+          "body": "三个散杯不够拿八个。"
+        },
+        "right_picture": "compare-43-take8"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "四盒各十个，另外三个散杯，合起来四十三。"
+        },
+        {
+          "say": "先有人借两个。你能直接从散杯里拿出来吗？"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "三个够拿两个，留下一个，四盒也都留着。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "现在从原样再试。另一张单要借八个。"
+        },
+        {
+          "say": "桌上只有三个散杯。拿完三个，还差五个。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "个位的三个一不够减八，得从整盒想办法。"
+        },
+        {
+          "say": "如果刚好借三个，就用完原有散杯。四盒都留着。"
+        },
+        {
+          "say": "请你指给我看，这两张图哪一张需要拆盒。"
+        }
+      ]
+    },
+    {
+      "key": "exchange-one-box-without-losing-cups",
+      "type": "slide",
+      "title": "拆一盒，杯子的总数仍是四十三",
+      "template": "two-columns",
+      "data": {
+        "title": "拆一盒，杯子的总数仍是四十三",
+        "left": {
+          "heading": "拆以前",
+          "body": "四盒和三个散杯。"
+        },
+        "left_picture": "stock-43",
+        "right": {
+          "heading": "拆一盒以后",
+          "body": "三盒和十三个散杯。"
+        },
+        "right_picture": "exchanged-43"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "我们拿一整盒来拆。先看拆之前有哪些杯。"
+        },
+        {
+          "say": "四盒是四个十，右边三个散杯表示三个一。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "从四盒里只拆一盒，先把其他三盒留在一旁。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "这一盒里有十个，拆开就是十个散杯。"
+        },
+        {
+          "say": "和原先的三个放到一起，散杯变成十三个。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "这时数整盒，有三盒。数散杯，有十三个。"
+        },
+        {
+          "say": "三十和十三加起来，还是四十三。现在只是换了摆法。"
+        },
+        {
+          "say": "这样个位就够拿八个了。下一页我们真的把八个拿走。"
+        }
+      ]
+    },
+    {
+      "key": "remove-from-the-expanded-ones",
+      "type": "slide",
+      "title": "从十三个散杯里借走八个",
+      "template": "two-columns",
+      "data": {
+        "title": "从十三个散杯里借走八个",
+        "left": {
+          "heading": "在散杯里取走八个",
+          "body": "13减8，散着剩5。"
+        },
+        "left_picture": "taken-43-8",
+        "right": {
+          "heading": "合起剩下的杯",
+          "body": "30加5，剩35。"
+        },
+        "right_picture": "remaining-35"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "刚拆开以后，右边散杯有十三个。借用单要八个。"
+        },
+        {
+          "say": "请看虚线圈，里面八个就是这一回要带走的。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "十三减八等于五。没被圈进去的是五个散杯。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "还要看没拆的三盒。每盒十个，三盒是三十。"
+        },
+        {
+          "say": "把三盒和五个散杯合起来，就是三十五。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "所以四十三减八等于三十五。"
+        },
+        {
+          "say": "先换一个十，再在散杯里减，最后把没动的整盒算进去。"
+        },
+        {
+          "say": "你也可以用手从原来的四盒，指到留下的三盒。"
+        },
+        {
+          "say": "四十二个杯里要借七个。先拆一盒，把十个和原来两个散杯放在一起。"
+        },
+        {
+          "say": "两张借用单各拆一盒。看看哪一张有一个散杯，哪一张有六个。"
+        },
+        {
+          "say": "这回有整十和两个带散杯的数。原来空着的盘也能接拆出的十个。"
+        },
+        {
+          "say": "只选要拆的一盒，其他整盒留着。和原有散杯对一对。"
+        },
+        {
+          "say": "按方向让盒子牌和散杯牌在同一条路上，再让它们碰头。"
+        },
+        {
+          "say": "新的一排散杯已经合好，旁边未拆的整盒还在。"
+        }
+      ]
+    },
+    {
+      "key": "slide-an-open-box-to-the-singles",
+      "type": "interactive",
+      "title": "把一盒换成十个散杯",
+      "page": "slide-an-open-box-to-the-singles",
+      "widgetType": "simulation",
+      "startImage": "slide-backdrop",
+      "script": [
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#exchange-order-guide"
+        },
+        {
+          "say": "这张单原有四十二个，要借七个。原来的两个散杯不够。"
+        },
+        {
+          "highlight": "#first-box"
+        },
+        {
+          "say": "这一盒准备拆开。它能换成十个散杯。"
+        },
+        {
+          "highlight": "#first-singles"
+        },
+        {
+          "say": "这张是原来的两个散杯。十个和两个合成十二个。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "看我按左箭头，两张卡在同一路上碰头。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "看盒里的十个杯沿滑道合进散杯盘。"
+        },
+        {
+          "highlight": "#first-shelf"
+        },
+        {
+          "say": "架子上出现十二个散杯，左边还有三整盒。"
+        },
+        {
+          "say": "接下来你来换。按箭头滑，回转键可以重来这一关。"
+        },
+        {
+          "say": "这一页先做拆盒。总量仍等于刚才的整盒加散杯。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "slide-first": "remove-from-the-expanded-ones-13",
+        "slide-two": "remove-from-the-expanded-ones-14",
+        "slide-zero": "remove-from-the-expanded-ones-15",
+        "slide-hint": "remove-from-the-expanded-ones-16",
+        "slide-help": "remove-from-the-expanded-ones-17",
+        "slide-praise": "remove-from-the-expanded-ones-18"
+      }
+    },
+    {
+      "key": "first-step-back-to-a-ten",
+      "type": "slide",
+      "title": "先减到整十，再减剩下的",
+      "template": "two-columns",
+      "data": {
+        "title": "先减到整十，再减剩下的",
+        "left": {
+          "heading": "先减掉原来的三个",
+          "body": "43减3，来到40。"
+        },
+        "left_picture": "round-43-to-40",
+        "right": {
+          "heading": "还要拿走五个",
+          "body": "40减5，得到35。"
+        },
+        "right_picture": "round-40-to-35"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "还是借八个。刚才我们先拆盒，也可以先走到整十。"
+        },
+        {
+          "say": "从四十三先拿走三个散杯。这样到四十。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "原来要借八个。已经拿走三个，还欠五个。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "从四十还要拿五个。四盒里拆开一盒，再取五个。"
+        },
+        {
+          "say": "剩三盒五个，就是三十五。请沿箭头再走一遍。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "三加五刚好是八，所以两次一共拿走八个。"
+        },
+        {
+          "say": "这样走到的三十五，和先拆盒再从十三个里拿的结果一样。"
+        },
+        {
+          "say": "想一想，第一步为什么走三格？正好把散杯拿完。"
+        }
+      ]
+    },
+    {
+      "key": "check-by-ten-and-compensation",
+      "type": "slide",
+      "title": "从一个十里算，也能复核",
+      "template": "two-columns",
+      "data": {
+        "title": "从一个十里算，也能复核",
+        "left": {
+          "heading": "从拆开的十个里减",
+          "body": "十减八余2，和原有33合成35。"
+        },
+        "left_picture": "from-open-ten-43",
+        "right": {
+          "heading": "先按十减，再补回",
+          "body": "43减10是33，多减的2补回来。"
+        },
+        "right_picture": "compensate-43"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "还有一种想法。把四十三分成三十三和一盒十个。"
+        },
+        {
+          "say": "先从拆开的十个里借走八个。那盒还剩两个。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "把那两个放回三十三这一份，一共三十五。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "也可以先按借走一整盒来算。四十三减十得三十三。"
+        },
+        {
+          "say": "实际借八个。按十个算，多拿走了两个。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "把多减的两个补回来，三十三加二就是三十五。"
+        },
+        {
+          "say": "左图直接从拆开的十个里拿八个。右图是先估作减十，再修正。"
+        },
+        {
+          "say": "无论走哪条路，真正借走的都只有八个。"
+        }
+      ]
+    },
+    {
+      "key": "there-are-no-loose-cups-yet",
+      "type": "slide",
+      "title": "整十也能拆出散杯",
+      "template": "two-columns",
+      "data": {
+        "title": "整十也能拆出散杯",
+        "left": {
+          "heading": "七十个，散杯盘空",
+          "body": "从7盒里拿一盒拆。"
+        },
+        "left_picture": "round-70-before",
+        "right": {
+          "heading": "拆一盒再取6个",
+          "body": "6盒加4个，剩64。"
+        },
+        "right_picture": "round-70-after"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "新单从七十个杯借六个。看见的是七盒整盒。"
+        },
+        {
+          "say": "散杯盘是空的，个位上一个散杯也没有。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "要借六个，先从七盒里拆开一盒。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "一盒拆成十个散杯，左边保留六盒。"
+        },
+        {
+          "say": "从十个里拿走六个，散杯还剩四个。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "六盒六十个，加四个是六十四。"
+        },
+        {
+          "say": "所以七十减六等于六十四。零个散杯也可以靠拆一盒解决。"
+        },
+        {
+          "say": "想一想，剩下的四个散杯是从哪里来的？"
+        },
+        {
+          "say": "原有五十一个杯，借走六个。看拆开一盒后真正留下的。"
+        },
+        {
+          "say": "原有五十二个，这次借六个。核对剩下的整盒和散杯。"
+        },
+        {
+          "say": "换新单。原有六十五个，借走九个。重新数真正剩下的杯。"
+        },
+        {
+          "say": "原有七十个，借四个。散杯是拆一盒得到的。"
+        },
+        {
+          "say": "原有八十四个，借八个。先找拆开的那盒，再看余下的。"
+        },
+        {
+          "say": "虚线里是借走的杯子。再看留在原盘的。"
+        },
+        {
+          "say": "数有几盒没有拆，再数没借走的散杯。瞄准同样多的牌。"
+        },
+        {
+          "say": "命中的牌和留下的杯一样多，核对好了。"
+        }
+      ]
+    },
+    {
+      "key": "aim-at-the-actual-remainder",
+      "type": "interactive",
+      "title": "发射到实际留下的数量",
+      "page": "aim-at-the-actual-remainder",
+      "widgetType": "simulation",
+      "startImage": "aim-backdrop",
+      "script": [
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#active-removal"
+        },
+        {
+          "say": "这张单原有五十一个，要借六个。先拆一盒。"
+        },
+        {
+          "say": "五盒留下四整盒。十个散杯和原来一个合成十一个。"
+        },
+        {
+          "highlight": "#game-target"
+        },
+        {
+          "say": "拿走六个，散杯余五个。四盒和五个，找四十五。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "我按向右瞄准，再按发射。看弹珠飞向哪张。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "飞行时也能用左右箭头微调。我们等弹珠碰到那张牌。"
+        },
+        {
+          "highlight": "#accepted-remainder"
+        },
+        {
+          "say": "命中四十五，右边留下核对过的数量。"
+        },
+        {
+          "say": "现在换你操作。每次先听原有多少、借走多少。"
+        },
+        {
+          "say": "同一张数量牌换到下一单，可能就成了不同的选择。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "aim-first": "there-are-no-loose-cups-yet-13",
+        "aim-fifty-two": "there-are-no-loose-cups-yet-14",
+        "aim-sixty-five": "there-are-no-loose-cups-yet-15",
+        "aim-seventy": "there-are-no-loose-cups-yet-16",
+        "aim-eighty-four": "there-are-no-loose-cups-yet-17",
+        "aim-hint": "there-are-no-loose-cups-yet-18",
+        "aim-help": "there-are-no-loose-cups-yet-19",
+        "aim-praise": "there-are-no-loose-cups-yet-20"
+      }
+    },
+    {
+      "key": "check-with-the-removed-part",
+      "type": "slide",
+      "title": "把拿走的放回去查一遍",
+      "template": "two-columns",
+      "data": {
+        "title": "把拿走的放回去查一遍",
+        "left": {
+          "heading": "留下三十五，拿走八个",
+          "body": "35加8应回到43。"
+        },
+        "left_picture": "check-35-and-8",
+        "right": {
+          "heading": "看十位是否少一盒",
+          "body": "拆盒后的整盒是三盒。"
+        },
+        "right_picture": "wrong-unmoved-tens"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "我们回头查四十三减八。把借走的八个杯放回。"
+        },
+        {
+          "say": "三十五和八合起来，应当回到原来的四十三。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "三十五加八正好四十三，数量能对上。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "有同学记了五个散杯，整盒却还画四盒。"
+        },
+        {
+          "say": "数一数。四盒和五个是四十五，比原来的还多。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "想想拆盒那一步。四盒拆一盒以后，留下三盒。"
+        },
+        {
+          "say": "所以留下的是三盒五个，三十五。"
+        },
+        {
+          "say": "先看个位够不够，再查拆开以后十位有几盒。"
+        }
+      ]
+    },
+    {
+      "key": "picture-quiz",
+      "type": "quiz",
+      "title": "听题，查一查怎么拆",
+      "intro": [
+        "先看散杯够不够。再看看有没有拆过一盒。",
+        "可以点小喇叭重听题目。"
+      ],
+      "questions": [
+        {
+          "id": "choose-the-short-ones",
+          "skill": "decide-if-regrouping",
+          "question": "每盘都要取五个。哪一盘需要拆一盒？",
+          "analysis": "六十八有八个散杯，六十五有五个，都够。六十一只有一个散杯，要拆盒。",
+          "answer": [
+            "B"
+          ],
+          "visual": {
+            "kind": "asset",
+            "image": "q1-stimulus",
+            "alt": "借用单要取五个散杯。"
+          },
+          "options": {
+            "A": {
+              "label": "六盒和八个散杯",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-a",
+                "alt": "六盒和八个散杯"
+              }
+            },
+            "B": {
+              "label": "六盒和一个散杯",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-b",
+                "alt": "六盒和一个散杯"
+              }
+            },
+            "C": {
+              "label": "六盒和五个散杯",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-c",
+                "alt": "六盒和五个散杯"
+              }
+            }
+          }
+        },
+        {
+          "id": "swap-one-ten-keep-fifty-three",
+          "skill": "exchange-one-ten",
+          "question": "五十三个杯，拆开一盒后是哪张图？",
+          "analysis": "五盒拆一盒留下四盒，三个散杯再加拆出的十个，得到十三个。",
+          "answer": [
+            "A"
+          ],
+          "visual": {
+            "kind": "asset",
+            "image": "q2-stimulus",
+            "alt": "原有五盒和三个散杯，一共53。"
+          },
+          "options": {
+            "A": {
+              "label": "四盒和十三个散杯",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-a",
+                "alt": "四盒和十三个散杯"
+              }
+            },
+            "B": {
+              "label": "五盒和十三个散杯",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-b",
+                "alt": "五盒和十三个散杯"
+              }
+            },
+            "C": {
+              "label": "四盒和三个散杯",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-c",
+                "alt": "四盒和三个散杯"
+              }
+            }
+          }
+        },
+        {
+          "id": "take-nine-from-forty-seven",
+          "skill": "calculate-with-regrouping",
+          "question": "四十七个里借走九个。还剩多少？",
+          "analysis": "拆一盒以后有三盒十七个散杯。十七减九剩八，加上三盒就是三十八。",
+          "answer": [
+            "C"
+          ],
+          "visual": {
+            "kind": "asset",
+            "image": "q3-stimulus",
+            "alt": "原有47，要借走9。"
+          },
+          "options": {
+            "A": {
+              "label": "四盒和八个散杯",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-a",
+                "alt": "四盒和八个散杯"
+              }
+            },
+            "B": {
+              "label": "只有八个散杯",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-b",
+                "alt": "只有八个散杯"
+              }
+            },
+            "C": {
+              "label": "三盒和八个散杯",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-c",
+                "alt": "三盒和八个散杯"
+              }
+            }
+          }
+        },
+        {
+          "id": "seventy-three-from-eighty",
+          "skill": "subtract-from-a-round-ten",
+          "question": "八十个杯借走七个，剩哪一盘？",
+          "analysis": "八盒拆一盒，保留七盒。十个散杯借七个，剩三个，所以是七十三。",
+          "answer": [
+            "B"
+          ],
+          "visual": {
+            "kind": "asset",
+            "image": "q4-stimulus",
+            "alt": "原有八盒，散杯盘空着，借用单要七个。"
+          },
+          "options": {
+            "A": {
+              "label": "八盒和三个散杯",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-a",
+                "alt": "八盒和三个散杯"
+              }
+            },
+            "B": {
+              "label": "七盒和三个散杯",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-b",
+                "alt": "七盒和三个散杯"
+              }
+            },
+            "C": {
+              "label": "只有三个散杯",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-c",
+                "alt": "只有三个散杯"
+              }
+            }
+          }
+        },
+        {
+          "id": "stop-at-sixty-first",
+          "skill": "split-the-removed-number",
+          "question": "六十二减八，要先到六十。选哪条路？",
+          "analysis": "从六十二到六十先减二。八减去二还剩六，再向左六格到五十四。",
+          "answer": [
+            "C"
+          ],
+          "visual": {
+            "kind": "asset",
+            "image": "q5-stimulus",
+            "alt": "起点62，要求先到60，两步一共减8。"
+          },
+          "options": {
+            "A": {
+              "label": "先减六再减二",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-a",
+                "alt": "先减六再减二"
+              }
+            },
+            "B": {
+              "label": "一步减八",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-b",
+                "alt": "一步减八"
+              }
+            },
+            "C": {
+              "label": "先减二到六十再减六",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-c",
+                "alt": "先减二到六十再减六"
+              }
+            }
+          }
+        },
+        {
+          "id": "return-the-extra-two",
+          "skill": "compensation",
+          "question": "七十五减八，先减了十。接下来怎么算？",
+          "analysis": "先减十得到六十五。实际只减八，多减两个，补回两个得到六十七。",
+          "answer": [
+            "A"
+          ],
+          "visual": {
+            "kind": "asset",
+            "image": "q6-stimulus",
+            "alt": "七十五先减十，已经来到六十五。"
+          },
+          "options": {
+            "A": {
+              "label": "六十五再加二",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-a",
+                "alt": "六十五再加二"
+              }
+            },
+            "B": {
+              "label": "六十五再减二",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-b",
+                "alt": "六十五再减二"
+              }
+            },
+            "C": {
+              "label": "停在六十五",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-c",
+                "alt": "停在六十五"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "tell-the-family-about-one-ten",
+      "type": "slide",
+      "title": "和家人说说拆盒的办法",
+      "template": "picture-points",
+      "data": {
+        "title": "和家人说说拆盒的办法",
+        "picture": "family-cups",
+        "points": [
+          "先看散杯够不够",
+          "一盒换成十个",
+          "拿走后再查"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "你今天给野餐用品站帮了忙。还记得散杯不够怎么办吗？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "请家人和你拿安全的大纸片。一叠十张，散着单放。"
+        },
+        {
+          "say": "选一题散片刚好够，一题不够。指一指哪题要拆一叠。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "拆一叠就变成十张。数拆以前和拆以后，一样多。"
+        },
+        {
+          "say": "把它和原有散片放一起，按借用单拿走几张。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "数完剩下的，把拿走的再放回去检查。"
+        },
+        {
+          "say": "也可以抽数字卡，编一道新的两位数减一位数。"
+        },
+        {
+          "say": "请家人听你讲什么时候需要拆一叠，为什么。下次见。"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,69 @@
+{
+  "schemaVersion": "mira.courseware.lesson-picture-pairs.v1",
+  "width": 1104,
+  "height": 424,
+  "sourceType": "registered_codex_illustrations",
+  "algorithm": "Fit each registered PNG without crop into a neutral side-by-side card. Identical frame size and no printed label or decorative answer cue.",
+  "pairs": {
+    "quiz-pair-cat-match": [
+      "quiz-cat",
+      "quiz-cat"
+    ],
+    "quiz-pair-cat-different": [
+      "quiz-cat",
+      "quiz-monkey"
+    ],
+    "quiz-pair-dog-match": [
+      "quiz-dog",
+      "quiz-dog"
+    ],
+    "quiz-pair-dog-different": [
+      "quiz-dog",
+      "quiz-monster"
+    ]
+  },
+  "gamePairs": {
+    "canvas": [
+      1104,
+      424
+    ],
+    "backgroundRgb": [
+      242,
+      234,
+      222
+    ],
+    "boxes": [
+      [
+        16,
+        14,
+        528,
+        396
+      ],
+      [
+        560,
+        14,
+        528,
+        396
+      ]
+    ],
+    "fit": "RGB Lanczos contain, centered, uncropped",
+    "pairs": {
+      "game-pair-dog": [
+        "dog",
+        "dog"
+      ],
+      "game-pair-monkey": [
+        "dog",
+        "monkey"
+      ],
+      "game-pair-dog-kite": [
+        "dog",
+        "dog-kite"
+      ],
+      "game-pair-cat": [
+        "dog",
+        "cat"
+      ]
+    }
+  }
+}

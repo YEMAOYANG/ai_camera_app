@@ -1,0 +1,76 @@
+{
+  "schemaVersion": "mira.courseware.imagegen-plan.v1",
+  "state": "generated_registered",
+  "officialReferencesAttached": false,
+  "recordedAt": "2026-11-10T23:18:14.229846+00:00",
+  "runs": [
+    {
+      "generator": "Codex built-in imagegen",
+      "requestedTransparency": true,
+      "source": "art-source/puppet-theater-atlas.png",
+      "sourceNativePath": "/Users/sqcopenclaw/.codex/generated_images/01a1c77a-d547-72b1-a262-029c7f4a40e5/exec-c979087d-3a9c-4c1d-bffc-e59613fbc953.png",
+      "sourcePixels": [
+        1536,
+        1024
+      ],
+      "sourceSha256": "239c26def38a47f89f875472c7107c699ab30add56dcfb5b40a766d3cd45adde",
+      "prompt": "Create a single original horizontal 3 by 2 atlas, exactly six separate equally sized landscape rectangles arranged in three columns and two rows. Entire canvas 1536x1024 or similar 3:2 aspect. Equal cell divisions at x=1/3 and x=2/3, y=1/2. Keep a wide gutter and no artwork crossings; every motif important part centered well inside its own cell. This is for a Chinese elementary math lesson about puppet theater prop quantities. Use warm tactile premium cut-paper theater diorama, hand-painted matte gouache paper fibers, calm pine greens, cream, apricot, and warm dark wood. Absolutely no letters, numbers, printed words, mathematical symbols, arrows, diagrams, or rows of countable props. TOP LEFT: bright cover image of children helping with a little handmade woodland puppet theatre, pine curtain and a friendly fox hand puppet; composition clear even at 450px. TOP CENTER: a calm and empty puppet theater stage background, beige open central area, forest green curtain edges, subtle wood floor, no characters or goods. TOP RIGHT: a calm outdoor theater backstage path background, bright cream central ground with a few green bushes on distant outer edges, no lane markings, no characters or goods, low contrast so placed controls remain clear. BOTTOM LEFT: a compact handmade wooden toy utility pushcart facing right, green side panel and cream wheels, isolated center on fully transparent surroundings, side view. BOTTOM CENTER: matching wooden utility pushcart, facing right, tiny apricot scarf/ribbon fluttering from rear and slightly tilted forward to imply motion, isolated on fully transparent surroundings, side view. BOTTOM RIGHT: matching wooden toy toy-troupe van facing right with deep muted teal side panel and cream wheels, isolated on fully transparent surroundings, side view. Top row scenes should fill their own cells to the margins but must never bleed into other cells. Bottom row objects each fit comfortably within the middle 65 percent of their own cell, plenty of clear transparent space around them. Use distinctly handmade but easily readable silhouettes. All six subjects must be entirely separate. This is new original material, independent of any reference or textbook page.",
+      "promptSha256": "a6a2310f4ffc567ebf35b021894cca5a4e23d4f0af5c20c10bc699a61bf9743b",
+      "assets": {
+        "theater-cover": [
+          13,
+          11,
+          502,
+          501
+        ],
+        "theater-stage": [
+          524,
+          12,
+          1011,
+          500
+        ],
+        "theater-path": [
+          1035,
+          12,
+          1523,
+          501
+        ]
+      },
+      "rejectedRegions": "The lower cells baked in checkerboard; kept only the three original scenic plates."
+    },
+    {
+      "generator": "Codex built-in imagegen",
+      "requestedTransparency": true,
+      "source": "art-source/puppet-theater-sprites.png",
+      "sourceNativePath": "/Users/sqcopenclaw/.codex/generated_images/01a1c77a-d547-72b1-a262-029c7f4a40e5/exec-54dbae1c-ab97-4766-823c-b292287cd753.png",
+      "sourcePixels": [
+        2172,
+        724
+      ],
+      "sourceSha256": "b4be1d70df036f506a1e0cd926311af1f541077d4282058476cc6213a8a0a68e",
+      "prompt": "Edit this illustrated atlas into a new asset containing only three clean isolated game sprites, one row of three, all aligned, each centered in its own third. Use the three existing sprites from the bottom row in order: pine green wooden utility cart, the matching cart with the little orange ribbon, and the pine green toy van. Remove all three top-row scenes, all grid boundaries and gutters and all backdrop, including the visible imitation checkerboard; put sprites on real fully transparent alpha (pixel opacity 0 outside sprite silhouettes) across the entire rest of the canvas. Do not draw a checker pattern at all. No gradient, shadow, fake matte, frame, numbers or lettering. Crop at wide horizontal 3:1 or 3:2. Three sprites with enough separation and room around them to crop independently. Match the same tactile matte gouache and wood. Preserve side-view orientation facing right and the original silhouettes.",
+      "promptSha256": "2fd24df1bd437252a06c943e0750d0b2d7f746639a9dec065c9bffacbe2e39bf",
+      "assets": {
+        "wood-cart": [
+          40,
+          60,
+          671,
+          643
+        ],
+        "wood-cart-moving": [
+          683,
+          60,
+          1430,
+          655
+        ],
+        "wood-van": [
+          1450,
+          65,
+          2163,
+          649
+        ]
+      },
+      "reference": "art-source/puppet-theater-atlas.png"
+    }
+  ]
+}

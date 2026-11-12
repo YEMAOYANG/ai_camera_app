@@ -1,0 +1,1108 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "对韵歌",
+  "description": "看图认字、给天气与动植物找对子，听句尾的节奏，再沿提笔路线开车。课后请家人一起读、背、写。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小语老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Serena",
+      "avatar": "/avatars/teacher-2.png",
+      "color": "#D65A8A",
+      "persona": "亲切清楚的女老师，带孩子看图认字、拍手对读。"
+    }
+  },
+  "images": {
+    "duet": {
+      "file": "assets/playback/duet.png"
+    },
+    "rain": {
+      "file": "assets/playback/rain.png"
+    },
+    "wind": {
+      "file": "assets/playback/wind.png"
+    },
+    "flower": {
+      "file": "assets/playback/flower.png"
+    },
+    "tree": {
+      "file": "assets/playback/tree.png"
+    },
+    "bird": {
+      "file": "assets/playback/bird.png"
+    },
+    "insect": {
+      "file": "assets/playback/insect.png"
+    },
+    "landscape": {
+      "file": "assets/playback/landscape.png"
+    },
+    "q-rain": {
+      "file": "assets/playback/q-rain.png"
+    },
+    "q-wind": {
+      "file": "assets/playback/q-wind.png"
+    },
+    "q-park": {
+      "file": "assets/playback/q-park.png"
+    },
+    "q-flower": {
+      "file": "assets/playback/q-flower.png"
+    },
+    "q-bug": {
+      "file": "assets/playback/q-bug.png"
+    },
+    "q-bird": {
+      "file": "assets/playback/q-bird.png"
+    },
+    "q-valley": {
+      "file": "assets/playback/q-valley.png"
+    },
+    "write-three": {
+      "glyph": {
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "云"
+              },
+              {
+                "glyph": "雨"
+              },
+              {
+                "glyph": "虫"
+              }
+            ]
+          }
+        ],
+        "size": [
+          510,
+          236
+        ]
+      }
+    },
+    "write-two": {
+      "glyph": {
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "山"
+              },
+              {
+                "glyph": "水"
+              }
+            ]
+          }
+        ],
+        "size": [
+          510,
+          236
+        ]
+      }
+    },
+    "glyph-rain": {
+      "glyph": {
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "雨"
+              }
+            ]
+          }
+        ],
+        "size": [
+          510,
+          236
+        ]
+      }
+    },
+    "glyph-wind": {
+      "glyph": {
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "风"
+              }
+            ]
+          }
+        ],
+        "size": [
+          510,
+          236
+        ]
+      }
+    },
+    "glyph-bug": {
+      "glyph": {
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "虫"
+              }
+            ]
+          }
+        ],
+        "size": [
+          510,
+          236
+        ]
+      }
+    },
+    "glyph-green": {
+      "glyph": {
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "绿"
+              }
+            ]
+          }
+        ],
+        "size": [
+          510,
+          236
+        ]
+      }
+    },
+    "glyph-clear": {
+      "glyph": {
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "清"
+              }
+            ]
+          }
+        ],
+        "size": [
+          510,
+          236
+        ]
+      }
+    },
+    "glyph-peach": {
+      "glyph": {
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "桃"
+              }
+            ]
+          }
+        ],
+        "size": [
+          510,
+          236
+        ]
+      }
+    },
+    "glyph-red": {
+      "glyph": {
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "红"
+              }
+            ]
+          }
+        ],
+        "size": [
+          510,
+          236
+        ]
+      }
+    },
+    "catch-scene": {
+      "file": "assets/game-candidate/catch-scene.png"
+    },
+    "catch-basket": {
+      "file": "assets/game-candidate/catch-basket.png"
+    },
+    "trace-scene": {
+      "file": "assets/game-candidate/trace-scene.png"
+    },
+    "trace-car": {
+      "file": "assets/game-candidate/trace-car.png"
+    },
+    "dui-backup-rain": {
+      "file": "assets/game-candidate/dui-backup-rain.png"
+    },
+    "dui-backup-wind": {
+      "file": "assets/game-candidate/dui-backup-wind.png"
+    },
+    "dui-backup-flower": {
+      "file": "assets/game-candidate/dui-backup-flower.png"
+    },
+    "dui-backup-tree": {
+      "file": "assets/game-candidate/dui-backup-tree.png"
+    },
+    "dui-backup-bird": {
+      "file": "assets/game-candidate/dui-backup-bird.png"
+    },
+    "dui-backup-insect": {
+      "file": "assets/game-candidate/dui-backup-insect.png"
+    },
+    "dui-backup-catch-basket": {
+      "file": "assets/game-candidate/dui-backup-catch-basket.png"
+    },
+    "dui-backup-trace-car": {
+      "file": "assets/game-candidate/dui-backup-trace-car.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "p01",
+      "type": "slide",
+      "title": "一人说，一人接",
+      "template": "picture-points",
+      "data": {
+        "title": "一人说，一人接",
+        "picture": "duet",
+        "points": [
+          "对　duì　成对、对子",
+          "歌　gē　唱歌、儿歌",
+          "《对韵歌》"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "看，两个小朋友面对面，一个拍完，一个接上。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "对读第四声。一个人说，另一个人接，就能对着说。"
+        },
+        {
+          "say": "一双鞋有两只，凑在一起，也可以说是一对鞋。"
+        },
+        {
+          "say": "看对字，左边是又，右边是寸。再读一遍对子。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "歌读第一声。听到有人唱，就可以说在唱歌。"
+        },
+        {
+          "say": "儿歌的最后一个字也是歌，指着它说一遍。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "今天读对韵歌。一对一对接，读起来像拍手一样。"
+        }
+      ]
+    },
+    {
+      "key": "p02",
+      "type": "slide",
+      "title": "看天气，认雨和风",
+      "template": "two-columns",
+      "data": {
+        "title": "看天气，认雨和风",
+        "left": {
+          "heading": "雨　yǔ",
+          "body": "小水滴从天上落下"
+        },
+        "left_picture": "rain",
+        "right": {
+          "heading": "风　fēng",
+          "body": "旗子被风吹动"
+        },
+        "right_picture": "wind"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "看见小水滴从天上落下来，我们就说下雨了。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "雨读第三声，雨滴的第一个字就是这个雨。"
+        },
+        {
+          "say": "天上有云，也会下雨。云和雨都能让我们想到天气。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "再看飘起来的小旗。风吹来了，旗子动起来。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "风读第一声，吹风的风就是这个字。"
+        },
+        {
+          "say": "下雪和刮风也都和天气有关，所以能在歌里对起来。"
+        }
+      ]
+    },
+    {
+      "key": "p03",
+      "type": "slide",
+      "title": "给花和虫找同类",
+      "template": "two-columns",
+      "data": {
+        "title": "给花和虫找同类",
+        "left": {
+          "heading": "花和树",
+          "body": "都属于植物"
+        },
+        "left_picture": "flower",
+        "right": {
+          "heading": "虫　chóng",
+          "body": "鸟和虫都是动物"
+        },
+        "right_picture": "insect"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "这是一朵花。树和花一样，都属于植物。"
+        },
+        {
+          "say": "把花跟树放在一起想，就找到了同一类的对子。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "这是一只蝉，蝉是一种虫。图里它停在叶子上。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "虫读第二声。小虫的最后一个字就是虫。"
+        },
+        {
+          "say": "小鸟和虫都属于动物，也能对起来。"
+        },
+        {
+          "say": "先看它们是哪一类，再配对子。光看颜色容易找错。"
+        },
+        {
+          "say": "看托盘里的图，从图卡后面推，把同类放一起。"
+        },
+        {
+          "say": "推错先退一步，看看它们是不是同一类。"
+        },
+        {
+          "say": "同类图卡放到一起，就各自回家啦。"
+        }
+      ]
+    },
+    {
+      "key": "p04",
+      "type": "slide",
+      "title": "走进山水春景",
+      "template": "picture-points",
+      "data": {
+        "title": "走进山水春景",
+        "picture": "landscape",
+        "points": [
+          "清　qīng　清水、山清",
+          "绿　lǜ　柳叶绿",
+          "桃　táo　桃树、桃花",
+          "红　hóng　花是浅红的"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "沿着水往远处看，山和水挨在一幅画里。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "清读第一声。能看清水里的石头，就能说水清。"
+        },
+        {
+          "say": "清水的清在前面。山清水秀是在夸山水清秀好看。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "看柳树垂下的叶子，这是绿色。绿读第四声。"
+        },
+        {
+          "say": "绿的左边是绞丝旁。认颜色，再看看字的左边。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "看那棵开着粉红花的桃树。桃花的桃读第二声。"
+        },
+        {
+          "say": "桃树是树，桃花是它开的花。两词都从桃字起头。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "红读第二声。桃花是浅红的，也可以说桃红。"
+        },
+        {
+          "say": "红的左边也有绞丝旁。绿和红说的是不同颜色。"
+        },
+        {
+          "say": "柳叶绿，桃花红，这两种颜色在春天的画里相对。"
+        }
+      ]
+    },
+    {
+      "key": "p04a",
+      "type": "slide",
+      "title": "找找绿和红的左边",
+      "template": "two-columns",
+      "data": {
+        "title": "找找绿和红的左边",
+        "left": {
+          "heading": "绿　lǜ",
+          "body": "绿色　左边纟，右边录"
+        },
+        "left_picture": "glyph-green",
+        "right": {
+          "heading": "红　hóng",
+          "body": "红色　左边纟，右边工"
+        },
+        "right_picture": "glyph-red"
+      },
+      "script": [
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "回想那排柳叶，它们的颜色可以叫绿色。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "看绿字左边的小块，它有一个名字，叫绞丝旁。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "红也说颜色。看到红花，想一想花是什么色。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "再指红的左边，你会发现也是同样的绞丝旁。"
+        },
+        {
+          "say": "比一比右边，两个字右边长得不一样。"
+        },
+        {
+          "say": "先找相同的左边，再看不同的右边，就能认出它们。"
+        }
+      ]
+    },
+    {
+      "key": "p05",
+      "type": "slide",
+      "title": "两边数一数",
+      "template": "picture-points",
+      "data": {
+        "title": "两边数一数",
+        "picture": "duet",
+        "points": [
+          "一字对一字",
+          "两字对两字",
+          "还要想想意思"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "老师先说山，你接水。两边各一字，各拍一下。"
+        },
+        {
+          "say": "听我念，山对水。中间的对把两边接起来。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "再听青山对清水。青山两个字，清水也两个字。"
+        },
+        {
+          "say": "把青山和清水分别连着读，每边拍两下就合拍。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "青山对水，意思有关，可是一边两字一边一字。"
+        },
+        {
+          "say": "改成青山对清水，两边字数一样，意思也能对上。"
+        },
+        {
+          "say": "这首歌里的对子，先数两边的字，再想意思。"
+        },
+        {
+          "say": "看清落下的图，把它移到能配对的图旁。"
+        },
+        {
+          "say": "先看图是什么，再找意思配得上的一张。"
+        },
+        {
+          "say": "两张图接得上，就配成一对啦。"
+        }
+      ]
+    },
+    {
+      "key": "p06",
+      "type": "interactive",
+      "title": "落块接对子",
+      "page": "dui-falling-tiles",
+      "widgetType": "courseware_game",
+      "script": [
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "一张花图要落下来。它会跟底下哪张图成一对？"
+        },
+        {
+          "highlight": "#game-goal"
+        },
+        {
+          "by": "xiaoman",
+          "say": "小满问：风吹得花会动，它们就配一对吗？"
+        },
+        {
+          "say": "会一起出现，还要看它们的意思能不能搭上。"
+        },
+        {
+          "highlight": "#demo-tree"
+        },
+        {
+          "say": "花和树都是植物。这一回，我给花找树作搭档。"
+        },
+        {
+          "say": "我按右键，让花到树旁边，再按落下键。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "花落到树旁，就配上了。压在树上可不行。"
+        },
+        {
+          "say": "换你试。先想哪张图能接，再移到它旁边。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "pair-goal": "p05-11",
+        "pair-hint": "p05-12",
+        "pair-help": "p03-9",
+        "pair-praise": "p05-13"
+      }
+    },
+    {
+      "key": "p07",
+      "type": "slide",
+      "title": "听句尾，跟着读",
+      "template": "picture-points",
+      "data": {
+        "title": "听句尾，跟着读",
+        "picture": "landscape",
+        "points": [
+          "人教版一年级上册第73页",
+          "逗号轻停，句号停一停",
+          "风、虫、红：听收尾",
+          "看四段图意，接读和试背"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "这四行出自人教版一年级上册《对韵歌》。"
+        },
+        {
+          "say": "翻到第七十三页。用手指着字，听我读一遍。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "一个词连起来读。逗号轻停，句号停得久一点。"
+        },
+        {
+          "say": "云对雨，雪对风。"
+        },
+        {
+          "say": "花对树，鸟对虫。"
+        },
+        {
+          "say": "山清对水秀，"
+        },
+        {
+          "say": "柳绿对桃红。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "听第一、第二和最后一行的句尾，风、虫、红。"
+        },
+        {
+          "say": "这三个字开头不同，收尾的声音很像，这就叫押韵。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "先想天气，再想花树鸟虫，然后想山和水。"
+        },
+        {
+          "say": "最后想柳叶和桃花的颜色，四行画面就接上了。"
+        },
+        {
+          "say": "用这四幅画面帮自己记。试着和家人轮流接读。"
+        },
+        {
+          "say": "请大人听听，字音、停顿和四行的顺序对不对。"
+        }
+      ]
+    },
+    {
+      "key": "p08",
+      "type": "slide",
+      "title": "先写云、雨、虫",
+      "template": "picture-points",
+      "data": {
+        "title": "先写云、雨、虫",
+        "picture": "write-three",
+        "points": [
+          "云：两横下面写撇折",
+          "雨：里面一竖四点",
+          "虫：第五笔是提",
+          "提：左下起笔，往右上轻收"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "先看书上第七十三页的格子，找到云、雨、虫。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "写云先两横，第二横长一些，下面写撇折和点。"
+        },
+        {
+          "say": "先把两横排稳，下面两笔就有地方落。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "雨先写横、竖、横折钩，再写里面的一竖。"
+        },
+        {
+          "say": "最后写左边两点、右边两点，给四点留出位置。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "虫先写竖、横折、横，上面像一个扁口。"
+        },
+        {
+          "say": "中间再写一竖，接着向右上写提，最后写点。"
+        },
+        {
+          "say": "写到提时，手从左下往右上走，末尾轻一点。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "看老师用手在空中写。左下起，往右上轻轻收。"
+        },
+        {
+          "say": "跟着比一笔，再在纸上写虫，请大人看看方向。"
+        }
+      ]
+    },
+    {
+      "key": "p09",
+      "type": "interactive",
+      "title": "推车送图卡",
+      "page": "dui-sorting-depot",
+      "widgetType": "courseware_game",
+      "script": [
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#demo-flower"
+        },
+        {
+          "say": "花图卡在路上。小车要把它送到哪个托盘？"
+        },
+        {
+          "by": "xiaoman",
+          "say": "小满问：风吹过花，我送去有风图的托盘吗？"
+        },
+        {
+          "highlight": "#demo-plant-dock"
+        },
+        {
+          "say": "花和树才是同一类。看树图，这里是植物的托盘。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "小车停在花图后面。我向右推，送它到树那边。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "送到了，花卡就留在托盘里。雨和风也能放一类。"
+        },
+        {
+          "say": "换你推。先看托盘是哪一类，再开到图卡后面。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "depot-goal": "p03-10",
+        "depot-hint": "p03-11",
+        "depot-help": "p03-9",
+        "depot-praise": "p03-12"
+      }
+    },
+    {
+      "key": "p10",
+      "type": "slide",
+      "title": "看清山和水",
+      "template": "picture-points",
+      "data": {
+        "title": "看清山和水",
+        "picture": "write-two",
+        "points": [
+          "山：先中间，后两边",
+          "水：先中间竖钩"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "翻到第七十三页，看看山和水在格子里的位置。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "山先写中间的竖，再写左边折向右的竖折。"
+        },
+        {
+          "say": "最后写右边的一竖。中间一竖最高，像山峰。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "水先写中间的竖钩，再写左边的横撇。"
+        },
+        {
+          "say": "右边先写撇，最后写捺。让左右都留得下笔画。"
+        },
+        {
+          "say": "照书上的逐笔小样各写一遍，请大人看看顺序。"
+        }
+      ]
+    },
+    {
+      "key": "p11",
+      "type": "quiz",
+      "title": "小检查：换个地方找对子",
+      "intro": [
+        "我说问题，你看图回答。",
+        "换了新的画面，还能用刚学的办法。"
+      ],
+      "questions": [
+        {
+          "id": "dui-rain-window",
+          "question": "小水滴从窗外落下。哪个字写的是这种天气？",
+          "skill": "借图认雨",
+          "answer": [
+            "B"
+          ],
+          "analysis": "玻璃上有一颗颗水滴，是雨落下的样子。下雨的雨就是这张字卡。",
+          "options": {
+            "A": {
+              "label": "风",
+              "visual": {
+                "kind": "asset",
+                "image": "glyph-wind",
+                "alt": "风"
+              }
+            },
+            "B": {
+              "label": "雨",
+              "visual": {
+                "kind": "asset",
+                "image": "glyph-rain",
+                "alt": "雨"
+              }
+            },
+            "C": {
+              "label": "虫",
+              "visual": {
+                "kind": "asset",
+                "image": "glyph-bug",
+                "alt": "虫"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "q-rain",
+            "alt": "窗玻璃上的雨滴"
+          }
+        },
+        {
+          "id": "dui-duck-companion",
+          "question": "这次是小鸭。哪张图也画着动物，能和它对？",
+          "skill": "找同类对子",
+          "answer": [
+            "C"
+          ],
+          "analysis": "小鸭是动物，瓢虫也是动物。向日葵是植物，窗上的雨滴和天气有关。",
+          "options": {
+            "A": {
+              "label": "向日葵",
+              "visual": {
+                "kind": "asset",
+                "image": "q-flower",
+                "alt": "向日葵"
+              }
+            },
+            "B": {
+              "label": "窗上雨滴",
+              "visual": {
+                "kind": "asset",
+                "image": "q-rain",
+                "alt": "窗上雨滴"
+              }
+            },
+            "C": {
+              "label": "瓢虫",
+              "visual": {
+                "kind": "asset",
+                "image": "q-bug",
+                "alt": "瓢虫"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "q-bird",
+            "alt": "一只黄色小鸭"
+          }
+        },
+        {
+          "id": "dui-clear-valley",
+          "question": "哪幅图有青山和清亮的水，像课文里的景色？",
+          "skill": "理解山水景色",
+          "answer": [
+            "A"
+          ],
+          "analysis": "山谷里的河水清亮，两旁有绿色山坡。这幅图同时有山和水。",
+          "options": {
+            "A": {
+              "label": "绿山间的清亮河水",
+              "visual": {
+                "kind": "asset",
+                "image": "q-valley",
+                "alt": "绿山间的清亮河水"
+              }
+            },
+            "B": {
+              "label": "风吹起红围巾",
+              "visual": {
+                "kind": "asset",
+                "image": "q-wind",
+                "alt": "风吹起红围巾"
+              }
+            },
+            "C": {
+              "label": "小朋友在公园长椅上看书",
+              "visual": {
+                "kind": "asset",
+                "image": "q-park",
+                "alt": "小朋友在公园长椅上看书"
+              }
+            }
+          }
+        },
+        {
+          "id": "dui-thread-side",
+          "question": "哪个字的左边是绞丝旁？",
+          "skill": "识别绞丝旁",
+          "answer": [
+            "B"
+          ],
+          "analysis": "绿的左边是绞丝旁，清的左边是三点水，桃的左边是木字旁。",
+          "options": {
+            "A": {
+              "label": "清",
+              "visual": {
+                "kind": "asset",
+                "image": "glyph-clear",
+                "alt": "清"
+              }
+            },
+            "B": {
+              "label": "绿",
+              "visual": {
+                "kind": "asset",
+                "image": "glyph-green",
+                "alt": "绿"
+              }
+            },
+            "C": {
+              "label": "桃",
+              "visual": {
+                "kind": "asset",
+                "image": "glyph-peach",
+                "alt": "桃"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p12",
+      "type": "slide",
+      "title": "把四行歌带回家",
+      "template": "summary",
+      "data": {
+        "title": "把四行歌带回家",
+        "items": [
+          "认字：借图、词和拼音，回看前五页",
+          "对子：意思相连、字数相同",
+          "句尾：听风、虫、红的收尾",
+          "回原书第73页：对读、背诵、写字"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "先看图说词，比如看到水滴，就想起雨滴的雨。"
+        },
+        {
+          "say": "用拼音帮忙认字音，看到绿和红还能找绞丝旁。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "一对词的意思要搭得上，字数也要数一数。"
+        },
+        {
+          "say": "回想天气、花树鸟虫，再想到山水和柳桃的颜色。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "念到风、虫、红时听听收尾，接着读就像一首歌。"
+        },
+        {
+          "spotlight": "item-4"
+        },
+        {
+          "say": "回到第七十三页，先读完四行，再请家人听你试背。"
+        },
+        {
+          "say": "写云、雨、虫、山、水，虫的提从左下往右上。"
+        },
+        {
+          "say": "写完用书上的范字对一对，请家人看看笔顺。"
+        }
+      ]
+    }
+  ]
+}

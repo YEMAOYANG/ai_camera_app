@@ -1,0 +1,212 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "用“大得多”“大一些”说一说",
+  "binding": {
+    "editionId": "pep-math-g1-lower-2022-standard",
+    "revisionId": "directory-6205d2037284e91f10b25edd",
+    "nodeId": "c0a1512b-d857-4b19-8aba-4f0bc17bb924",
+    "unitId": "acfb0386-a55f-4542-9d5d-619a3e2d9023"
+  },
+  "scenario": "温室要给四辆小车配相同规格的种植块。孩子把已有的块数摆上同一条刻度轨道，给仓库报是多一些、多得多、少一些还是少得多。",
+  "goals": [
+    "在同一条等距数线上借整十定位并按从小到大排列100以内几个数。",
+    "对同一参照先判断左或右、再观察远或近，用大得多、大一些、小得多、小一些描述，并在调换参照时换方向词。",
+    "把数的大小和间隔用于具体数量，选择多得多、多一些、少得多、少一些并说清谁和谁比。",
+    "根据一个或两个清楚的比较条件在候选数量中选合适值，用原条件逐条回看。"
+  ],
+  "goalSources": [
+    {
+      "skill": "place-and-order",
+      "target": "在同一条等距数线上借整十定位并按从小到大排列100以内几个数。",
+      "source": "印34例6，课件2～11，任务单1"
+    },
+    {
+      "skill": "direction-and-distance",
+      "target": "对同一参照先判断左或右、再观察远或近，用大得多、大一些、小得多、小一些描述，并在调换参照时换方向词。",
+      "source": "印34例6，课件12～16，教学设计2～3"
+    },
+    {
+      "skill": "quantities-and-language",
+      "target": "把数的大小和间隔用于具体数量，选择多得多、多一些、少得多、少一些并说清谁和谁比。",
+      "source": "印34做一做，课件17～20，课后练习1"
+    },
+    {
+      "skill": "check-candidates",
+      "target": "根据一个或两个清楚的比较条件在候选数量中选合适值，用原条件逐条回看。",
+      "source": "印34做一做，课件17～23，教学设计4～6"
+    }
+  ],
+  "pageSequence": [
+    {
+      "key": "park-the-number-carts",
+      "kind": "teaching",
+      "plan": "先从一条0～100等距轨道看整十刻度，指最左和最右。把24、29、74、78分别放上正确小格，按从小到大沿轨道读。"
+    },
+    {
+      "key": "short-and-long-to-the-right",
+      "kind": "teaching",
+      "plan": "以24为基准，29在右近处，74在右远处。用等比例高亮区间对照大一些和大得多。"
+    },
+    {
+      "key": "change-the-reference",
+      "kind": "teaching",
+      "plan": "让74先和24比，描述大得多；再让74和78比，描述小一些。两次使用同一条等距轨道。"
+    },
+    {
+      "key": "reverse-which-one-speaks",
+      "kind": "teaching",
+      "plan": "把说话者换成较小一辆，近距示例用29和24，远距用74和24。方向变，原高亮条长度不变；引出小一些和小得多。"
+    },
+    {
+      "key": "same-blocks-more-or-fewer",
+      "kind": "teaching",
+      "plan": "把刻度的近远换成十连块与散块。物件数量的表达用多一些、多得多、少一些、少得多。四个方向和长短图标同时给录音。"
+    },
+    {
+      "key": "deliver-the-comparison-badges",
+      "kind": "game",
+      "plan": "真实推运两数量卡。按主角和参照的方向、跨度放入方向与距离都相符的盘。"
+    },
+    {
+      "key": "choose-the-possible-total",
+      "kind": "teaching",
+      "plan": "候选用相同规格的装箱图显示。先说参照、排除方向错误，再在同方向两张图里辨别明显远近。"
+    },
+    {
+      "key": "check-two-clues",
+      "kind": "teaching",
+      "plan": "先看两满盘加两散块得到22，在同刻度标22与76。目标比22多得多且比76少一些。候选25、73、79，73逐条核对，另外两项各有失败理由。"
+    },
+    {
+      "key": "aim-at-the-matching-quantity",
+      "kind": "game",
+      "plan": "听清参照、方向和程度，左右瞄准并发射，碰到正确数量牌才计分。后关同一单听到两条比较并逐条核验。"
+    },
+    {
+      "key": "estimate-with-the-same-scale",
+      "kind": "teaching",
+      "plan": "一架同规格托盘已排17块，另一架有六个满盘及两散块。用十格图先估明显多得多，再数图核对，保持刻度和物件规格一致。"
+    },
+    {
+      "key": "picture-quiz",
+      "kind": "quiz",
+      "plan": "六道新情境，选项以方向短长、清楚的图、可核数的数量或位置表达。所有题由老师先读。"
+    },
+    {
+      "key": "say-who-you-are-comparing",
+      "kind": "teaching",
+      "plan": "回顾先找参照、再看左右和远近；向家人用四种词讲同一实物组，与家人换个视角重说。"
+    }
+  ],
+  "games": [
+    {
+      "page": "deliver-the-comparison-badges",
+      "template": "sortingDepot",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.sortingDepot",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "classification",
+      "selection": "两数量卡片固定主角和参照的形状标记，卡面给两数量与等刻度缩图。每个 sample 托盘图标用方向箭头和长短两类跨度表示四组，group 固定在本关给出的明显情境。数线间隔按量比例，图标不靠颜色区分；真实移动到符号盘才记分。",
+      "levels": [
+        "两件同方向有明显近远：27与参照25是多一些，71与参照25是多得多。",
+        "三件区分增减方向：46比参照50少一些，13比参照50少得多，54比参照50多一些。",
+        "四件绕障碍，基准52，55多一些、97多得多、48少一些、11少得多。各组匹配一个托盘。"
+      ],
+      "demo": "指主角标记、参照和两个方向距离符号，真实推一次、核实落盘后复位。",
+      "teacherAnchors": [
+        "badge-rules",
+        "first-compared-card",
+        "first-comparison-dock",
+        "game-player"
+      ]
+    },
+    {
+      "page": "aim-at-the-matching-quantity",
+      "template": "magnetMarbles",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.magnetMarbles",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "pair_match",
+      "selection": "每轮听参照、方向和跨度；先筛掉任何方向不符的候选，再在每条参照对应的剩余候选里比较明显的近远。同一订单必须满足全部线索。题图用精确刻度、十格条和数字；真实发射命中有效靶才计分。",
+      "levels": [
+        "参照26，要多得多，72正确，30和19作区分；一发，低漂移。",
+        "先问比65少一些，61正确、21明显更少；再问比41多一些，45正确、83明显更多。同屏靶用四个值，成功牌被收走。",
+        "先问比34多得多且比90少一些，86正确，36近而92超过第二参照；再问比57少得多且比12多一些，15正确，56太近且9低于第二参照。两发间另读全线索。"
+      ],
+      "demo": "指参照和有声提示、弹珠、正确靶，真正瞄一次并发射，停留复述后复位交接。",
+      "teacherAnchors": [
+        "current-clue",
+        "game-player",
+        "game-target"
+      ]
+    }
+  ],
+  "quiz": [
+    {
+      "id": "short-right-gap",
+      "skill": "小幅增大",
+      "prompt": "18在这里，23在它右边一小段。哪张路线图说明了23跟18比的情况？",
+      "answer": "从18向右短跳到23的图。",
+      "position": 2,
+      "rationale": "在右边说明较大，间隔短，23比18大一些。"
+    },
+    {
+      "id": "long-left-gap",
+      "skill": "大幅减小",
+      "prompt": "在同一条数线上，33跟81比。选一张画对方向和距离的图。",
+      "answer": "从81向左跨过很长一段到33的图。",
+      "position": 1,
+      "rationale": "33在81左侧，间隔很远，所以33比81小得多。"
+    },
+    {
+      "id": "switch-the-near-pair",
+      "skill": "换参照仍是同一跨度",
+      "prompt": "原先说53比49大一些。把49放在先说的位置，哪张图表示得对？",
+      "answer": "从53向左短跳到49的图。",
+      "position": 3,
+      "rationale": "同一对数仍相近。换成49跟53比，方向变成较小。"
+    },
+    {
+      "id": "a-few-extra-clips",
+      "skill": "生活数量多一些",
+      "prompt": "这一盘有32枚夹子。要挑比它多一些的一盘，你选哪盘？",
+      "answer": "有35枚的盘。",
+      "position": 2,
+      "rationale": "35比32只多一点，82远多，28较少。三盘图用相同的十格底盘。"
+    },
+    {
+      "id": "order-the-photo-tickets",
+      "skill": "按数线顺序排列",
+      "prompt": "这些票是95、16、58、39。沿同一条数线从左到右，哪幅图排对？",
+      "answer": "16、39、58、95依次摆放的图。",
+      "position": 1,
+      "rationale": "从左到右逐渐增大，位置和标签都要吻合。"
+    },
+    {
+      "id": "both-delivery-clues",
+      "skill": "同时检查两条描述",
+      "prompt": "要选比42组多得多、又比88组少一些的一盘。哪盘合适？",
+      "answer": "85组的盘。",
+      "position": 3,
+      "rationale": "85比42多得多，也比88少一点。44离42近，89已经比88多。"
+    }
+  ],
+  "afterClass": {
+    "familyTask": "请成人和孩子找三组同类安全小物，固定一组作参照，孩子把另外两组的数量放到同一条手绘数线上，说清多或少以及接近或相差多。再换参照说一次。",
+    "weeklyQuestionSource": [
+      "定位和从小到大排序",
+      "左右方向和远近程度",
+      "换参照或换说话顺序",
+      "数量多与少",
+      "两条条件同时核查"
+    ],
+    "evidence": "课堂记录推运、发射和图题结果；家庭摆数线、找参照和口述由成人观察，记录待观察。"
+  },
+  "artAndLanguage": "所有刻度间隔、数值、成十条、方向和距离箭头由代码精确画。比较两边用同一物件规格和同一比例，图标由箭头方向和长短同时表示；色彩只辅助。角色、背景和种植块原型可生成。录音先说参照，再说方向和程度，遮去非目标文字后照样能操作。",
+  "authoring": {
+    "mode": "direct",
+    "model": "gpt-6.1-sol",
+    "bookAndCompanionScope": "印34整课、印35～36相关数线练习与一课时35页官方配套。"
+  },
+  "officialNotesSha256": "168cdd53bf506286702fc3badeadc7216ded895613ef2d07b54a53459406cd27"
+}

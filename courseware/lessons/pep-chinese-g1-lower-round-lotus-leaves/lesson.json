@@ -1,0 +1,1071 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "荷叶圆圆",
+  "description": "在荷塘故事展里听动作、找角色和想象，练六个字、两个叠词和纸书背诵。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小语老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Serena",
+      "avatar": "/avatars/teacher-2.png",
+      "color": "#D65A8A",
+      "persona": "用清楚自然的普通话带一年级孩子看图识字、学动作和读故事。"
+    }
+  },
+  "images": {
+    "pond-open": {
+      "file": "assets/pond-open.png"
+    },
+    "drop-on-leaf": {
+      "file": "assets/drop-on-leaf.png"
+    },
+    "dragonfly-on-leaf": {
+      "file": "assets/dragonfly-on-leaf.png"
+    },
+    "frog-on-leaf": {
+      "file": "assets/frog-on-leaf.png"
+    },
+    "fish-under-leaf": {
+      "file": "assets/fish-under-leaf.png"
+    },
+    "description-desk": {
+      "file": "assets/description-desk.png"
+    },
+    "drop-icon": {
+      "file": "assets/drop-icon.png"
+    },
+    "fly-icon": {
+      "file": "assets/fly-icon.png"
+    },
+    "frog-icon": {
+      "file": "assets/frog-icon.png"
+    },
+    "fish-icon": {
+      "file": "assets/fish-icon.png"
+    },
+    "cradle-icon": {
+      "file": "assets/cradle-icon.png"
+    },
+    "pad-icon": {
+      "file": "assets/pad-icon.png"
+    },
+    "stage-icon": {
+      "file": "assets/stage-icon.png"
+    },
+    "shade-icon": {
+      "file": "assets/shade-icon.png"
+    },
+    "lotus-sticker": {
+      "file": "assets/lotus-sticker.png"
+    },
+    "pond-cart": {
+      "file": "assets/pond-cart.png"
+    },
+    "pond-cart-flag": {
+      "file": "assets/pond-cart-flag.png"
+    },
+    "pond-marble": {
+      "file": "assets/pond-marble.png"
+    },
+    "frog-fish": {
+      "file": "assets/frog-fish.png"
+    },
+    "role-start": {
+      "file": "assets/role-start.png"
+    },
+    "writing-one": {
+      "file": "assets/writing-one.png"
+    },
+    "motion-grid": {
+      "file": "assets/motion-grid.png"
+    },
+    "marble-start": {
+      "file": "assets/marble-start.png"
+    },
+    "writing-two": {
+      "file": "assets/writing-two.png"
+    },
+    "reading-cards": {
+      "file": "assets/reading-cards.png"
+    },
+    "quiz-1-a": {
+      "file": "assets/quiz-1-a.png"
+    },
+    "quiz-1-b": {
+      "file": "assets/quiz-1-b.png"
+    },
+    "quiz-1-c": {
+      "file": "assets/quiz-1-c.png"
+    },
+    "quiz-2-a": {
+      "file": "assets/quiz-2-a.png"
+    },
+    "quiz-2-b": {
+      "file": "assets/quiz-2-b.png"
+    },
+    "quiz-2-c": {
+      "file": "assets/quiz-2-c.png"
+    },
+    "quiz-3-a": {
+      "file": "assets/quiz-3-a.png"
+    },
+    "quiz-3-b": {
+      "file": "assets/quiz-3-b.png"
+    },
+    "quiz-3-c": {
+      "file": "assets/quiz-3-c.png"
+    },
+    "quiz-4-a": {
+      "file": "assets/quiz-4-a.png"
+    },
+    "quiz-4-b": {
+      "file": "assets/quiz-4-b.png"
+    },
+    "quiz-4-c": {
+      "file": "assets/quiz-4-c.png"
+    },
+    "quiz-5-a": {
+      "file": "assets/quiz-5-a.png"
+    },
+    "quiz-5-b": {
+      "file": "assets/quiz-5-b.png"
+    },
+    "quiz-5-c": {
+      "file": "assets/quiz-5-c.png"
+    },
+    "quiz-6-a": {
+      "file": "assets/quiz-6-a.png"
+    },
+    "quiz-6-b": {
+      "file": "assets/quiz-6-b.png"
+    },
+    "quiz-6-c": {
+      "file": "assets/quiz-6-c.png"
+    },
+    "quiz-7-a": {
+      "file": "assets/quiz-7-a.png"
+    },
+    "quiz-7-b": {
+      "file": "assets/quiz-7-b.png"
+    },
+    "quiz-7-c": {
+      "file": "assets/quiz-7-c.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "pond-open",
+      "type": "slide",
+      "title": "荷塘里这一片是什么",
+      "template": "picture-points",
+      "data": {
+        "title": "荷塘里这一片是什么",
+        "picture": "pond-open",
+        "points": [
+          "先看形状",
+          "再看颜色",
+          "同一片叶子"
+        ]
+      },
+      "script": [
+        {
+          "say": "池边展览要开门。谁能给这片叶子说两个特点？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "顺着外边看，叶子的轮廓像个圆盘。"
+        },
+        {
+          "say": "说它圆圆的，就是让人想到它的形状。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "再看看叶面的颜色。绿绿的，说的是颜色。"
+        },
+        {
+          "say": "一个词说样子，一个词说颜色，都来自图。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "水珠、蜻蜓、青蛙和小鱼也来逛荷塘。"
+        },
+        {
+          "say": "同一片叶子，在它们心里会像不同的东西。"
+        }
+      ]
+    },
+    {
+      "key": "drop-on-the-leaf",
+      "type": "slide",
+      "title": "水珠把哪儿当成小床",
+      "template": "picture-points",
+      "data": {
+        "title": "水珠把哪儿当成小床",
+        "picture": "drop-on-leaf",
+        "points": [
+          "水珠 · 珠",
+          "亮晶晶 · 亮和晶",
+          "摇篮 · 摇和篮"
+        ]
+      },
+      "script": [
+        {
+          "say": "小水珠找了个地方歇一会儿。它坐着还是躺着？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "它靠着叶面躺下来。水珠的珠读第一声。"
+        },
+        {
+          "say": "水聚成一小颗，图里这颗亮亮的，就叫水珠。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "光在珠子上闪，像眼睛在眨。可以说亮晶晶。"
+        },
+        {
+          "say": "亮读第四声，晶读第一声。晶字里有三个日。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "想一想生活中的摇篮，里面能躺，轻轻摇。"
+        },
+        {
+          "say": "摇和篮都读第二声。小水珠想把叶子当摇篮。"
+        },
+        {
+          "say": "看见它躺着，就懂它为什么想到了这张小床。"
+        }
+      ]
+    },
+    {
+      "key": "dragonfly-lands",
+      "type": "slide",
+      "title": "小蜻蜓在哪儿停下来",
+      "template": "picture-points",
+      "data": {
+        "title": "小蜻蜓在哪儿停下来",
+        "picture": "dragonfly-on-leaf",
+        "points": [
+          "停机坪 · 停和坪",
+          "展开 · 展",
+          "透明的翅膀"
+        ]
+      },
+      "script": [
+        {
+          "say": "小蜻蜓飞累了。它找哪块地方落脚？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "脚站到叶面上，它停下来了。停读第二声。"
+        },
+        {
+          "say": "飞机落到宽平的地方停住，那儿叫停机坪。"
+        },
+        {
+          "say": "坪也读第二声，和停一样，读完带一点后鼻音。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "小蜻蜓的翅膀往两边打开，这个动作叫展开。"
+        },
+        {
+          "say": "展读第三声。你也能把两条胳膊向旁边伸开。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "隔着翅膀还能隐约看见后面，图上画出了透明。"
+        },
+        {
+          "say": "透读第四声。听老师把这两个字连起来读。翅膀。"
+        },
+        {
+          "say": "叶面让它落下休息，所以它想到了停机坪。"
+        }
+      ]
+    },
+    {
+      "key": "frog-and-fish",
+      "type": "slide",
+      "title": "谁在叶上，谁在叶下",
+      "template": "picture-points",
+      "data": {
+        "title": "谁在叶上，谁在叶下",
+        "picture": "frog-fish",
+        "points": [
+          "青蛙蹲在上面",
+          "小鱼在下面游",
+          "一朵朵 · 朵"
+        ]
+      },
+      "script": [
+        {
+          "say": "你听到有人唱歌。它是在叶面上，还是叶面下？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "我学青蛙，轻快地读。哇，这片绿叶是我的小歌台！"
+        },
+        {
+          "say": "停一拍，再读动作。青蛙在叶上蹲稳，张嘴唱起来。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "再往下看，小鱼在叶子下面游来游去。"
+        },
+        {
+          "say": "叶子在小鱼头顶，像撑开的伞，它就想到凉伞。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "水边溅起的小水花像一小簇花，可以说一朵朵。"
+        },
+        {
+          "say": "朵读第三声。花一朵，几处水花就像一朵朵。"
+        },
+        {
+          "say": "先看这位角色，再推到它想象的物件旁。"
+        },
+        {
+          "say": "想想它在叶子上边或下边做了什么。"
+        },
+        {
+          "say": "看一眼发亮的地方，给推车留出空格。"
+        }
+      ]
+    },
+    {
+      "key": "role-depot",
+      "type": "interactive",
+      "title": "把角色牌推到展位",
+      "page": "role-depot",
+      "widgetType": "game",
+      "startImage": "role-start",
+      "script": [
+        {
+          "say": "展览的角色牌乱了。小水珠的牌送到哪个展位？"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#lotus-first-role"
+        },
+        {
+          "say": "先看这一颗水珠。它在叶子上躺着休息。"
+        },
+        {
+          "highlight": "#lotus-first-cradle"
+        },
+        {
+          "say": "这边是能躺的小摇篮，水珠把叶子想成它。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "开小车到牌的后面，按箭头把牌往前推。"
+        },
+        {
+          "say": "只在同一个方向推。推偏了可以退一步再试。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "我把水珠牌送好就停。你从第一关重新开。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        },
+        {
+          "say": "先看看这位朋友做什么，再去找它的展位。"
+        }
+      ],
+      "gameAudio": {
+        "sort-goal": "frog-and-fish-11",
+        "sort-hint": "frog-and-fish-12",
+        "sort-help": "frog-and-fish-13",
+        "sort-praise": "closing-5"
+      }
+    },
+    {
+      "key": "first-writing",
+      "type": "slide",
+      "title": "机、台、伞，怎样在格里站好",
+      "template": "picture-points",
+      "data": {
+        "title": "机、台、伞，怎样在格里站好",
+        "picture": "writing-one",
+        "points": [
+          "机 · 左窄右宽",
+          "台 · 注意中线",
+          "伞 · 撇捺舒展"
+        ]
+      },
+      "script": [
+        {
+          "say": "展签要写三个字，怎样让它们在格里坐稳？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "机是左右结构。左边木高一些，右边几低一点。"
+        },
+        {
+          "say": "给右边留位置，木旁的末笔收成点。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "台是上下结构。上部的撇折从竖中线附近开始。"
+        },
+        {
+          "say": "下面的口居中，把上下两部分对整齐。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "伞上面的撇和捺向两边伸开，像撑开的伞面。"
+        },
+        {
+          "say": "末笔竖沿着竖中线下去。请大人看你的纸笔字。"
+        }
+      ]
+    },
+    {
+      "key": "motion-meaning",
+      "type": "slide",
+      "title": "一句话怎么配动作",
+      "template": "picture-points",
+      "data": {
+        "title": "一句话怎么配动作",
+        "picture": "motion-grid",
+        "points": [
+          "躺 · 身体靠着",
+          "立和展 · 身体站稳",
+          "蹲、游 · 位置不同",
+          "按意思停一下"
+        ]
+      },
+      "script": [
+        {
+          "say": "展签上的字不会动。怎样让听的人想出动作？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "躺下来时，身体靠着。水珠的故事图就这样画。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "立是站住。展翅是翅膀向两边打开。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "蹲下时弯腿，青蛙待在叶面上。"
+        },
+        {
+          "say": "小鱼游的时候，身体在叶子的下边。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "听我说新句子。纸船绕过木桥，慢慢漂到岸边。"
+        },
+        {
+          "say": "绕过桥是一组，漂到岸边是下一组，停一点再读。"
+        },
+        {
+          "say": "找躺在叶面上休息的画面。"
+        },
+        {
+          "say": "找站在叶上、把翅膀往两边展的画面。"
+        },
+        {
+          "say": "找弯着腿蹲在叶面上唱的画面。"
+        },
+        {
+          "say": "找在叶子下面游的画面。"
+        },
+        {
+          "say": "先把老师的话重听一遍，再看角色的身体。"
+        },
+        {
+          "say": "动作图亮起来了，对着它慢一点发射。"
+        }
+      ]
+    },
+    {
+      "key": "pond-marbles",
+      "type": "interactive",
+      "title": "听动作发射露珠弹",
+      "page": "pond-marbles",
+      "widgetType": "game",
+      "startImage": "marble-start",
+      "script": [
+        {
+          "say": "要给一幅图配上动作。先听声音还是先发弹珠？"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#lotus-listen-mark"
+        },
+        {
+          "say": "先听动作。这一轮找在叶面上躺着的画面。"
+        },
+        {
+          "highlight": "#lotus-first-action"
+        },
+        {
+          "say": "这一幅里身体靠着叶子，和躺的意思对得上。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "按左右钮转方向，瞄好，再按带箭头的发射钮。"
+        },
+        {
+          "say": "弹珠在路上时，也能轻轻按方向钮调整。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "我配好第一幅就停。等画面回去，你来听新一轮。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        },
+        {
+          "say": "先听明白，再对着图发，拿不准可以重听。"
+        }
+      ],
+      "gameAudio": {
+        "listen-lie": "motion-meaning-12",
+        "listen-spread": "motion-meaning-13",
+        "listen-crouch": "motion-meaning-14",
+        "listen-swim": "motion-meaning-15",
+        "action-hint": "motion-meaning-16",
+        "action-help": "motion-meaning-17",
+        "action-praise": "closing-6"
+      }
+    },
+    {
+      "key": "second-writing",
+      "type": "slide",
+      "title": "朵的转弯末尾有没有钩",
+      "template": "picture-points",
+      "data": {
+        "title": "朵的转弯末尾有没有钩",
+        "picture": "writing-two",
+        "points": [
+          "朵 · 横折弯",
+          "美 · 撇捺打开",
+          "唱 · 左窄右宽"
+        ]
+      },
+      "script": [
+        {
+          "say": "写展签遇到一个小转弯，朵的第二笔怎样收？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先写一小横，折下来，再圆圆地转向右。"
+        },
+        {
+          "say": "到右端，笔尖轻轻往回收，不向上挑。这笔叫横折弯。"
+        },
+        {
+          "say": "木的横靠近横中线。最后撇捺向左右打开。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "美上边点和撇要小，竖靠中线。下边撇捺伸展开。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "唱左边是口，要写窄。右边上下两个日。"
+        },
+        {
+          "say": "上面的日略小，下面的日稍大。写在纸上看看。"
+        }
+      ]
+    },
+    {
+      "key": "two-descriptions",
+      "type": "slide",
+      "title": "给一样东西说两个特点",
+      "template": "picture-points",
+      "data": {
+        "title": "给一样东西说两个特点",
+        "picture": "description-desk",
+        "points": [
+          "先选一样东西",
+          "一个词说形状",
+          "另一个词说颜色"
+        ]
+      },
+      "script": [
+        {
+          "say": "桌上有丝带和毛线球，要写哪一样的展签？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先选蓝丝带。从头到尾看，它是一条长带子。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "形状可以说长长的。长长的是形状。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "颜色说蓝蓝的。蓝蓝的，别人就知道是哪条。"
+        },
+        {
+          "say": "把两个词接起来，说这条丝带长长的、蓝蓝的。"
+        },
+        {
+          "say": "换毛线球，再说圆圆的、黄黄的。每个词说一件事。"
+        },
+        {
+          "say": "挑你身边的东西，先看看，再给它说两个特点。"
+        }
+      ]
+    },
+    {
+      "key": "paper-reading",
+      "type": "slide",
+      "title": "把四张图带回纸书",
+      "template": "picture-points",
+      "data": {
+        "title": "把四张图带回纸书",
+        "picture": "reading-cards",
+        "points": [
+          "先找角色",
+          "再找它想到的物件",
+          "最后回到动作",
+          "读过再试背"
+        ]
+      },
+      "script": [
+        {
+          "say": "合上纸书，还能用图想起四位朋友的故事吗？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先指一张角色图，说出谁来了。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "再想它把荷叶看成什么，说出它心里的物件。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "接着说它在哪里做了什么。上面、下面不能混。"
+        },
+        {
+          "say": "换一句新例子。小青蛙蹲稳了，放开嗓子唱。"
+        },
+        {
+          "say": "蹲稳和唱分两小组，读的时候在中间停一点。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "回纸书读原文。先看图读准，再试着背给家人听。"
+        },
+        {
+          "say": "可以一人读角色的话，一人读它接着做的事。"
+        }
+      ]
+    },
+    {
+      "key": "picture-check",
+      "type": "quiz",
+      "title": "听完再挑一张图",
+      "intro": [
+        "听一听动作和特点，再看看哪幅图合适。"
+      ],
+      "questions": [
+        {
+          "id": "lotus-q1",
+          "question": "要表演小水珠。哪件道具能表现它把荷叶当成的东西？",
+          "skill": "story-relation",
+          "answer": [
+            "B"
+          ],
+          "analysis": "小水珠在叶子上躺着，想到的是能躺下休息的摇篮。",
+          "options": {
+            "A": {
+              "label": "凉伞",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-1-a",
+                "alt": "道具箱前摆着撑开的绿伞"
+              }
+            },
+            "B": {
+              "label": "摇篮",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-1-b",
+                "alt": "道具箱前摆着带弯底和小毯子的空摇篮"
+              }
+            },
+            "C": {
+              "label": "歌台",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-1-c",
+                "alt": "道具箱前摆着一个有麦克风的圆台"
+              }
+            }
+          }
+        },
+        {
+          "id": "lotus-q2",
+          "question": "哪张图能表现蜻蜓想象的地方？",
+          "skill": "story-relation",
+          "answer": [
+            "C"
+          ],
+          "analysis": "蜻蜓站在叶上展开翅膀，想象荷叶像让飞机停下来的停机坪。",
+          "options": {
+            "A": {
+              "label": "带麦克风的台",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-2-a",
+                "alt": "彩色展签旁有圆形台面和麦克风"
+              }
+            },
+            "B": {
+              "label": "会摇的床",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-2-b",
+                "alt": "彩色展签旁有一只带弯底的摇篮"
+              }
+            },
+            "C": {
+              "label": "让飞机停的地方",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-2-c",
+                "alt": "彩色展签旁有小直升机停在有边线的平地上"
+              }
+            }
+          }
+        },
+        {
+          "id": "lotus-q3",
+          "question": "哪张图贴出了小鱼在故事里的位置？",
+          "skill": "above-and-below",
+          "answer": [
+            "A"
+          ],
+          "analysis": "小鱼在叶子的下边游。叶在上，小鱼在下，像有一把伞。",
+          "options": {
+            "A": {
+              "label": "小鱼在叶下",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-3-a",
+                "alt": "一片架起的绿叶在上，鱼在它正下方"
+              }
+            },
+            "B": {
+              "label": "小鱼在叶上",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-3-b",
+                "alt": "鱼贴在绿色叶冠上方"
+              }
+            },
+            "C": {
+              "label": "小鱼在旁边",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-3-c",
+                "alt": "鱼贴在叶冠右边，和叶冠差不多一样高"
+              }
+            }
+          }
+        },
+        {
+          "id": "lotus-q4",
+          "question": "透过哪张小窗，还能看清后面的叶子？",
+          "skill": "word-in-context",
+          "answer": [
+            "B"
+          ],
+          "analysis": "中间的小窗挡着叶子时，叶子的形状仍能看见，这个窗面是透明的。",
+          "options": {
+            "A": {
+              "label": "米色厚纸",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-4-a",
+                "alt": "米色厚纸盖在叶子上，只看见四周露出的叶尖"
+              }
+            },
+            "B": {
+              "label": "透明小窗",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-4-b",
+                "alt": "浅蓝窗片遮住一部分叶子，窗片里的叶形仍清楚"
+              }
+            },
+            "C": {
+              "label": "绿纸板",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-4-c",
+                "alt": "深绿不透明板挡住中间一片，板里看不到叶纹"
+              }
+            }
+          }
+        },
+        {
+          "id": "lotus-q5",
+          "question": "展览要一件圆圆的、紫紫的道具。哪张图合适？",
+          "skill": "two-descriptions",
+          "answer": [
+            "C"
+          ],
+          "analysis": "圆圆的说外形，紫紫的说颜色。紫球同时有这两个特点。",
+          "options": {
+            "A": {
+              "label": "橙球",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-5-a",
+                "alt": "桌上是一个圆圆的橙色小球"
+              }
+            },
+            "B": {
+              "label": "橙丝带",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-5-b",
+                "alt": "桌上是一条长长的橙色丝带"
+              }
+            },
+            "C": {
+              "label": "紫球",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-5-c",
+                "alt": "桌上是一个圆圆的紫色小球"
+              }
+            }
+          }
+        },
+        {
+          "id": "lotus-q6",
+          "question": "看三张笔画图。哪张画的是朵字的第二笔？",
+          "skill": "stroke",
+          "answer": [
+            "A"
+          ],
+          "analysis": "这一笔叫横折弯，短横后向下折，再向右圆弯，末尾没有钩。",
+          "options": {
+            "A": {
+              "label": "横折弯",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-6-a",
+                "alt": "先横、折下，再圆转向右，末尾没有向上的钩"
+              }
+            },
+            "B": {
+              "label": "带钩的弯",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-6-b",
+                "alt": "先横、折下，再圆转向右，末尾明显向上钩"
+              }
+            },
+            "C": {
+              "label": "只有折",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-6-c",
+                "alt": "先横再折下，没有继续向右的弯"
+              }
+            }
+          }
+        },
+        {
+          "id": "lotus-q7",
+          "question": "按课文里的先后给小青蛙排动作。哪张排对了？",
+          "skill": "ordered-actions",
+          "answer": [
+            "B"
+          ],
+          "analysis": "先把腿弯下去蹲稳，再张嘴唱。声音说的先后，要和图对起来。",
+          "options": {
+            "A": {
+              "label": "先唱再蹲",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-7-a",
+                "alt": "左边嘴张开唱，右边收嘴蹲下"
+              }
+            },
+            "B": {
+              "label": "先蹲再唱",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-7-b",
+                "alt": "左边闭嘴弯腿蹲，右边蹲着张开嘴唱"
+              }
+            },
+            "C": {
+              "label": "先蹲再跳",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-7-c",
+                "alt": "左边闭嘴蹲下，右边离开地面向上跳"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "closing",
+      "type": "slide",
+      "title": "把荷塘故事带回家",
+      "template": "summary",
+      "data": {
+        "title": "把荷塘故事带回家",
+        "items": [
+          "看叶子的形状和颜色",
+          "角色、称呼和动作",
+          "字的结构和横折弯",
+          "用两个词介绍东西",
+          "回到纸书"
+        ]
+      },
+      "script": [
+        {
+          "say": "池边展览要收起来了。你想带走哪一种记法？"
+        },
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "先看真实的形状和颜色，再挑词说给别人听。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "你把角色和它想象的东西放对了。"
+        },
+        {
+          "say": "你听清动作，再给画面找到了合适的声音。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "先看结构，再写字。朵的第二笔转弯后没有钩。"
+        },
+        {
+          "spotlight": "item-4"
+        },
+        {
+          "say": "找一样东西，用两个合适的词说它的特点。"
+        },
+        {
+          "spotlight": "item-5"
+        },
+        {
+          "say": "带着角色图回纸书读，再把喜欢的一段背给家人。"
+        }
+      ]
+    }
+  ]
+}

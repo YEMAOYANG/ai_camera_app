@@ -1,0 +1,23 @@
+#cv.classic-arcade #ready .pic { object-fit: contain; }
+#gudong-filmstrip {
+  position: absolute;
+  top: 143px;
+  left: 1041px;
+  width: 122px;
+  padding: 6px 9px;
+  display: grid;
+  gap: 5px;
+  border: 3px solid #e9c384;
+  border-radius: 13px;
+  background: #2a4d41;
+  pointer-events: none;
+}
+#gudong-filmstrip img {
+  width: 100%;
+  height: 68px;
+  object-fit: cover;
+  border: 2px solid #f4d29a;
+  border-radius: 6px;
+}
+#gudong-filmstrip:empty,
+#cv:has(#ready:not(.gone), #finish:not(.gone)) #gudong-filmstrip { display: none; }

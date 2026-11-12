@@ -1,0 +1,60 @@
+{
+  "template": "bumper",
+  "title": "碰碰车",
+  "levels": [
+    {
+      "name": "第 1 关",
+      "rounds": [
+        {
+          "hint": "再看看目标。",
+          "hint2": "慢一点再试。",
+          "goal": {
+            "count": 3
+          },
+          "options": [
+            4,
+            3
+          ],
+          "answer": 1
+        }
+      ]
+    },
+    {
+      "name": "第 2 关",
+      "rounds": [
+        {
+          "hint": "再看看目标。",
+          "hint2": "慢一点再试。",
+          "goal": {
+            "count": 4
+          },
+          "options": [
+            4,
+            5,
+            6
+          ],
+          "answer": 0
+        }
+      ]
+    },
+    {
+      "name": "第 3 关",
+      "rounds": [
+        {
+          "hint": "再看看目标。",
+          "hint2": "慢一点再试。",
+          "goal": {
+            "count": 6
+          },
+          "options": [
+            4,
+            5,
+            6,
+            7
+          ],
+          "answer": 2
+        }
+      ]
+    }
+  ]
+}

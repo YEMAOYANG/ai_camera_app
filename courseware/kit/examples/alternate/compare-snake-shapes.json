@@ -1,0 +1,241 @@
+{
+  "template": "compareSnake",
+  "title": "转一转，图形还一样",
+  "art": {
+    "backdrop": "garden.webp",
+    "sticker": "sticker.webp",
+    "frames": [
+      "snake-head.webp",
+      "snake-body.webp",
+      "snake-tail.webp"
+    ]
+  },
+  "levels": [
+    {
+      "start": "triangle-a",
+      "seconds": 0.76,
+      "groups": {
+        "triangle-a": "triangle",
+        "triangle-b": "triangle",
+        "square": "square",
+        "rectangle": "rectangle",
+        "circle": "circle"
+      },
+      "diagrams": {
+        "triangle-a": {
+          "kind": "triangle",
+          "degrees": 0
+        },
+        "triangle-b": {
+          "kind": "triangle",
+          "degrees": 180
+        },
+        "square": {
+          "kind": "square",
+          "degrees": 45
+        },
+        "rectangle": {
+          "kind": "rectangle",
+          "degrees": 0
+        },
+        "circle": {
+          "kind": "circle",
+          "degrees": 0
+        }
+      },
+      "walls": [],
+      "rounds": [
+        {
+          "relation": "match",
+          "foods": [
+            [
+              5,
+              3,
+              "triangle-b"
+            ],
+            [
+              7,
+              4,
+              "circle"
+            ]
+          ]
+        }
+      ],
+      "hints": [
+        "看看边和角，再和右边的图形比一比。",
+        "慢一点，亮起来的是同一种图形。"
+      ]
+    },
+    {
+      "start": "square",
+      "seconds": 0.64,
+      "groups": {
+        "triangle-a": "triangle",
+        "triangle-b": "triangle",
+        "square": "square",
+        "rectangle": "rectangle",
+        "circle": "circle"
+      },
+      "diagrams": {
+        "triangle-a": {
+          "kind": "triangle",
+          "degrees": 0
+        },
+        "triangle-b": {
+          "kind": "triangle",
+          "degrees": 180
+        },
+        "square": {
+          "kind": "square",
+          "degrees": 45
+        },
+        "rectangle": {
+          "kind": "rectangle",
+          "degrees": 0
+        },
+        "circle": {
+          "kind": "circle",
+          "degrees": 0
+        }
+      },
+      "walls": [
+        [
+          4,
+          2
+        ]
+      ],
+      "rounds": [
+        {
+          "relation": "match",
+          "foods": [
+            [
+              5,
+              3,
+              "square"
+            ],
+            [
+              7,
+              4,
+              "rectangle"
+            ]
+          ]
+        },
+        {
+          "relation": "match",
+          "foods": [
+            [
+              3,
+              2,
+              "square"
+            ],
+            [
+              7,
+              2,
+              "triangle-a"
+            ]
+          ]
+        }
+      ],
+      "hints": [
+        "看看边和角，再和右边的图形比一比。",
+        "慢一点，亮起来的是同一种图形。"
+      ]
+    },
+    {
+      "start": "triangle-b",
+      "seconds": 0.49,
+      "groups": {
+        "triangle-a": "triangle",
+        "triangle-b": "triangle",
+        "square": "square",
+        "rectangle": "rectangle",
+        "circle": "circle"
+      },
+      "diagrams": {
+        "triangle-a": {
+          "kind": "triangle",
+          "degrees": 0
+        },
+        "triangle-b": {
+          "kind": "triangle",
+          "degrees": 180
+        },
+        "square": {
+          "kind": "square",
+          "degrees": 45
+        },
+        "rectangle": {
+          "kind": "rectangle",
+          "degrees": 0
+        },
+        "circle": {
+          "kind": "circle",
+          "degrees": 0
+        }
+      },
+      "walls": [
+        [
+          4,
+          2
+        ],
+        [
+          6,
+          3
+        ]
+      ],
+      "rounds": [
+        {
+          "relation": "match",
+          "foods": [
+            [
+              5,
+              3,
+              "triangle-a"
+            ],
+            [
+              7,
+              4,
+              "square"
+            ]
+          ]
+        },
+        {
+          "relation": "match",
+          "foods": [
+            [
+              3,
+              2,
+              "triangle-b"
+            ],
+            [
+              7,
+              2,
+              "circle"
+            ]
+          ]
+        },
+        {
+          "relation": "match",
+          "foods": [
+            [
+              7,
+              1,
+              "triangle-a"
+            ],
+            [
+              2,
+              4,
+              "rectangle"
+            ]
+          ]
+        }
+      ],
+      "hints": [
+        "看看边和角，再和右边的图形比一比。",
+        "慢一点，亮起来的是同一种图形。"
+      ]
+    }
+  ],
+  "sub": "看参照卡，找同一种图形。图形转个方向也算。",
+  "voiceLead": true
+}

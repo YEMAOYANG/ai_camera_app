@@ -2340,7 +2340,9 @@ class LearningRepository:
     ) -> DatabaseRow | None:
         return conn.execute(
             """
-            SELECT report.*, course.title AS course_title
+            SELECT report.*, course.title AS course_title,
+                   CASE WHEN report.subject = 'science' THEN course.content_json END AS observation_course_json,
+                   CASE WHEN report.subject = 'science' THEN session.runtime_state_json END AS observation_runtime_json
             FROM learning_reports AS report
             JOIN learning_sessions AS session
               ON session.id = report.session_id

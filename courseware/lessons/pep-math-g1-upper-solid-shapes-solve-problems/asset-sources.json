@@ -1,0 +1,866 @@
+{
+  "schemaVersion": "mira.courseware.asset-sources.v1",
+  "assets": {
+    "ball-support": {
+      "file": "assets/ball-support.png",
+      "sha256": "d86053c9cd7f25aa89fe5efba14cefaa95d5cb49454fdf7fcce35cbb75236b5c",
+      "usedBy": [
+        "p07"
+      ],
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "db9c2972d42f4f94c237e2f94da754d41bfabb7e66bc55cd3efd9eda357bb8ad",
+      "description": "本课原创几何图，精确表达立体图形、摆放方向、材料数量、接触位置或同起线高度。"
+    },
+    "base-comparison": {
+      "file": "assets/base-comparison.png",
+      "sha256": "4fd6d2cb0fc8dd97683ce471b621c3224108ee989e4c1a9ef5b30560490bd83f",
+      "usedBy": [
+        "p06"
+      ],
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "db9c2972d42f4f94c237e2f94da754d41bfabb7e66bc55cd3efd9eda357bb8ad",
+      "description": "本课原创几何图，精确表达立体图形、摆放方向、材料数量、接触位置或同起线高度。"
+    },
+    "bench-model": {
+      "file": "assets/bench-model.png",
+      "sha256": "f10778bbd8686ebd80b06b4cf5727bd1d6173fc82dbe8c5c89fc522be2e0ce99",
+      "usedBy": [
+        "p01"
+      ],
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "db9c2972d42f4f94c237e2f94da754d41bfabb7e66bc55cd3efd9eda357bb8ad",
+      "description": "本课原创几何图，精确表达立体图形、摆放方向、材料数量、接触位置或同起线高度。"
+    },
+    "height-comparison": {
+      "file": "assets/height-comparison.png",
+      "sha256": "cbd6b41b34a30e0dd53e8950326f09746d72a8b34d1f11e110f26594bc691b87",
+      "usedBy": [
+        "p08",
+        "p11"
+      ],
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "db9c2972d42f4f94c237e2f94da754d41bfabb7e66bc55cd3efd9eda357bb8ad",
+      "description": "本课原创几何图，精确表达立体图形、摆放方向、材料数量、接触位置或同起线高度。"
+    },
+    "material-tray": {
+      "file": "assets/material-tray.png",
+      "sha256": "26d5ca1f48f96c4a393d661eaa875951acd47d689e817c8308b86e2190279e40",
+      "usedBy": [
+        "p02"
+      ],
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "db9c2972d42f4f94c237e2f94da754d41bfabb7e66bc55cd3efd9eda357bb8ad",
+      "description": "本课原创几何图，精确表达立体图形、摆放方向、材料数量、接触位置或同起线高度。"
+    },
+    "q1-a": {
+      "file": "assets/q1-a.png",
+      "sha256": "ade2fd59f81f42cdd167a7bde9dcd9d3bbe4fbb6da687438783748b6c1cb6eff",
+      "usedBy": [
+        "p09"
+      ],
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "db9c2972d42f4f94c237e2f94da754d41bfabb7e66bc55cd3efd9eda357bb8ad",
+      "description": "本课原创几何图，精确表达立体图形、摆放方向、材料数量、接触位置或同起线高度。"
+    },
+    "q1-b": {
+      "file": "assets/q1-b.png",
+      "sha256": "3beec81562b6f459cb4b95d7bdbdd7d0f674fe161b3eff2442eb740f218201f7",
+      "usedBy": [
+        "p09"
+      ],
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "db9c2972d42f4f94c237e2f94da754d41bfabb7e66bc55cd3efd9eda357bb8ad",
+      "description": "本课原创几何图，精确表达立体图形、摆放方向、材料数量、接触位置或同起线高度。"
+    },
+    "q1-c": {
+      "file": "assets/q1-c.png",
+      "sha256": "cc808df576bcd49e21e08e98bd448e9edf473d06b6ae948030143d87975d67c3",
+      "usedBy": [
+        "p09"
+      ],
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "db9c2972d42f4f94c237e2f94da754d41bfabb7e66bc55cd3efd9eda357bb8ad",
+      "description": "本课原创几何图，精确表达立体图形、摆放方向、材料数量、接触位置或同起线高度。"
+    },
+    "q2-a": {
+      "file": "assets/q2-a.png",
+      "sha256": "194f4464a0070dbcfdc63d79c17b9853b1c35e05191f79caf21300a9bba0c33b",
+      "usedBy": [
+        "p09"
+      ],
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "db9c2972d42f4f94c237e2f94da754d41bfabb7e66bc55cd3efd9eda357bb8ad",
+      "description": "本课原创几何图，精确表达立体图形、摆放方向、材料数量、接触位置或同起线高度。"
+    },
+    "q2-b": {
+      "file": "assets/q2-b.png",
+      "sha256": "9af6c696b547bb4b67e9376d5a7f372b9cb16df35f108295e34271364ecddbf6",
+      "usedBy": [
+        "p09"
+      ],
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "db9c2972d42f4f94c237e2f94da754d41bfabb7e66bc55cd3efd9eda357bb8ad",
+      "description": "本课原创几何图，精确表达立体图形、摆放方向、材料数量、接触位置或同起线高度。"
+    },
+    "q2-c": {
+      "file": "assets/q2-c.png",
+      "sha256": "49fa83ceaaaaeffaf20246de25eaeee79e1996121541083b16d84c8e3426192f",
+      "usedBy": [
+        "p09"
+      ],
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "db9c2972d42f4f94c237e2f94da754d41bfabb7e66bc55cd3efd9eda357bb8ad",
+      "description": "本课原创几何图，精确表达立体图形、摆放方向、材料数量、接触位置或同起线高度。"
+    },
+    "q3-a": {
+      "file": "assets/q3-a.png",
+      "sha256": "5bff0bf84ef351cf17a01c65541376acc9be4b05a5bb2644bbf3fe98e81f17e1",
+      "usedBy": [
+        "p09"
+      ],
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "db9c2972d42f4f94c237e2f94da754d41bfabb7e66bc55cd3efd9eda357bb8ad",
+      "description": "本课原创几何图，精确表达立体图形、摆放方向、材料数量、接触位置或同起线高度。"
+    },
+    "q3-b": {
+      "file": "assets/q3-b.png",
+      "sha256": "75cd172d5c76094ece12fe952eff0e293a0d893b244dfdf60e5345a654fe1226",
+      "usedBy": [
+        "p09"
+      ],
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "db9c2972d42f4f94c237e2f94da754d41bfabb7e66bc55cd3efd9eda357bb8ad",
+      "description": "本课原创几何图，精确表达立体图形、摆放方向、材料数量、接触位置或同起线高度。"
+    },
+    "q3-c": {
+      "file": "assets/q3-c.png",
+      "sha256": "5ef52d40287e04c9cfc09a2bc354686609e8378c8fca2cf45aa1decb60428e7f",
+      "usedBy": [
+        "p09"
+      ],
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "db9c2972d42f4f94c237e2f94da754d41bfabb7e66bc55cd3efd9eda357bb8ad",
+      "description": "本课原创几何图，精确表达立体图形、摆放方向、材料数量、接触位置或同起线高度。"
+    },
+    "q4-a": {
+      "file": "assets/q4-a.png",
+      "sha256": "c740e00d6936c562bd26fb2a2d86652518d0f4a53ec0f5f42dd9c4a56dbacd24",
+      "usedBy": [
+        "p10"
+      ],
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "db9c2972d42f4f94c237e2f94da754d41bfabb7e66bc55cd3efd9eda357bb8ad",
+      "description": "本课原创几何图，精确表达立体图形、摆放方向、材料数量、接触位置或同起线高度。"
+    },
+    "q4-b": {
+      "file": "assets/q4-b.png",
+      "sha256": "920adfbe5580b5878839bb39001f63c7f63209f29c7e345bbefa882a2c20b9e5",
+      "usedBy": [
+        "p10"
+      ],
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "db9c2972d42f4f94c237e2f94da754d41bfabb7e66bc55cd3efd9eda357bb8ad",
+      "description": "本课原创几何图，精确表达立体图形、摆放方向、材料数量、接触位置或同起线高度。"
+    },
+    "q4-c": {
+      "file": "assets/q4-c.png",
+      "sha256": "3be8a52cb456bc4342ce90f4b307a59b0ca46065d7ba4b96161d68e22743cb8c",
+      "usedBy": [
+        "p10"
+      ],
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "db9c2972d42f4f94c237e2f94da754d41bfabb7e66bc55cd3efd9eda357bb8ad",
+      "description": "本课原创几何图，精确表达立体图形、摆放方向、材料数量、接触位置或同起线高度。"
+    },
+    "q4-stimulus": {
+      "file": "assets/q4-stimulus.png",
+      "sha256": "b6eb876ea3d59d6d82d12a37b4db1496df274699978675d17868ad65c91c66fd",
+      "usedBy": [
+        "p10"
+      ],
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "db9c2972d42f4f94c237e2f94da754d41bfabb7e66bc55cd3efd9eda357bb8ad",
+      "description": "本课原创几何图，精确表达立体图形、摆放方向、材料数量、接触位置或同起线高度。"
+    },
+    "q5-a": {
+      "file": "assets/q5-a.png",
+      "sha256": "76b0388f902c874b729904f65c1456ac1b88927396c21f04076ebdc29d01c3e2",
+      "usedBy": [
+        "p10"
+      ],
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "db9c2972d42f4f94c237e2f94da754d41bfabb7e66bc55cd3efd9eda357bb8ad",
+      "description": "本课原创几何图，精确表达立体图形、摆放方向、材料数量、接触位置或同起线高度。"
+    },
+    "q5-b": {
+      "file": "assets/q5-b.png",
+      "sha256": "d9ac19bdf1aee533af572d6481deba9cfea2cf7243a64a40a8bf62272f97c942",
+      "usedBy": [
+        "p10"
+      ],
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "db9c2972d42f4f94c237e2f94da754d41bfabb7e66bc55cd3efd9eda357bb8ad",
+      "description": "本课原创几何图，精确表达立体图形、摆放方向、材料数量、接触位置或同起线高度。"
+    },
+    "q5-c": {
+      "file": "assets/q5-c.png",
+      "sha256": "ca4aff5c90124ef656396949bf95152e2fdcbb3a18955f2959dc7f87e53a0cc2",
+      "usedBy": [
+        "p10"
+      ],
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "db9c2972d42f4f94c237e2f94da754d41bfabb7e66bc55cd3efd9eda357bb8ad",
+      "description": "本课原创几何图，精确表达立体图形、摆放方向、材料数量、接触位置或同起线高度。"
+    },
+    "q5-compare": {
+      "file": "assets/q5-compare.png",
+      "sha256": "6b085ea2a29053133d0b53e08d865de781a1900003258565e20a900ddd34688b",
+      "usedBy": [
+        "p10"
+      ],
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "db9c2972d42f4f94c237e2f94da754d41bfabb7e66bc55cd3efd9eda357bb8ad",
+      "description": "本课原创几何图，精确表达立体图形、摆放方向、材料数量、接触位置或同起线高度。"
+    },
+    "q6-a": {
+      "file": "assets/q6-a.png",
+      "sha256": "6964577e87d6d12a2fcb42afd65cb9d658955db1b08e0da759db8fa8760f5e62",
+      "usedBy": [
+        "p10"
+      ],
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "db9c2972d42f4f94c237e2f94da754d41bfabb7e66bc55cd3efd9eda357bb8ad",
+      "description": "本课原创几何图，精确表达立体图形、摆放方向、材料数量、接触位置或同起线高度。"
+    },
+    "q6-b": {
+      "file": "assets/q6-b.png",
+      "sha256": "492649d81473939ed2a3468902e17a38313ab1855c20215747562b840d519e26",
+      "usedBy": [
+        "p10"
+      ],
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "db9c2972d42f4f94c237e2f94da754d41bfabb7e66bc55cd3efd9eda357bb8ad",
+      "description": "本课原创几何图，精确表达立体图形、摆放方向、材料数量、接触位置或同起线高度。"
+    },
+    "q6-c": {
+      "file": "assets/q6-c.png",
+      "sha256": "59545fc363bd2f750b59ef45f40fcf159415325de727a8e90a386a7def102769",
+      "usedBy": [
+        "p10"
+      ],
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "db9c2972d42f4f94c237e2f94da754d41bfabb7e66bc55cd3efd9eda357bb8ad",
+      "description": "本课原创几何图，精确表达立体图形、摆放方向、材料数量、接触位置或同起线高度。"
+    },
+    "remaining-six": {
+      "file": "assets/remaining-six.png",
+      "sha256": "083bb3f303097390b8cec332f84f8e2507c7e77b23e874b089810eb53c9bfe31",
+      "usedBy": [
+        "p07"
+      ],
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "db9c2972d42f4f94c237e2f94da754d41bfabb7e66bc55cd3efd9eda357bb8ad",
+      "description": "本课原创几何图，精确表达立体图形、摆放方向、材料数量、接触位置或同起线高度。"
+    },
+    "roll-flat": {
+      "file": "assets/roll-flat.png",
+      "sha256": "8d0b56d45640d212a6937d60fc461748865f846155101f90f90021bb8d0e3d95",
+      "usedBy": [
+        "p04"
+      ],
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "db9c2972d42f4f94c237e2f94da754d41bfabb7e66bc55cd3efd9eda357bb8ad",
+      "description": "本课原创几何图，精确表达立体图形、摆放方向、材料数量、接触位置或同起线高度。"
+    },
+    "roll-side-rails": {
+      "file": "assets/roll-side-rails.png",
+      "sha256": "cfcaefa670c32d19c88c51147f6131e59bc7e3b45a7617c0e0945c29edf27fb3",
+      "usedBy": [
+        "p04"
+      ],
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "db9c2972d42f4f94c237e2f94da754d41bfabb7e66bc55cd3efd9eda357bb8ad",
+      "description": "本课原创几何图，精确表达立体图形、摆放方向、材料数量、接触位置或同起线高度。"
+    },
+    "hop-edge-board": {
+      "file": "assets/hop-edge-board.png",
+      "sha256": "0c0cf5a26ba8d221d4a9a7f722518d9a4d066dbf294502fc889c9ee45e773497",
+      "usedBy": [
+        "p03"
+      ],
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "db9c2972d42f4f94c237e2f94da754d41bfabb7e66bc55cd3efd9eda357bb8ad",
+      "spec": {
+        "shape": "cuboid",
+        "size": [
+          4.8,
+          3.1,
+          1.2
+        ],
+        "color": "琥珀色",
+        "axes": [
+          0,
+          2,
+          1
+        ]
+      },
+      "dimensions": [
+        120,
+        96
+      ],
+      "declaredAt": "brief.json:pageSequence.p03.game.artPlan",
+      "description": "统一尺度、透明底与共用桌面线的原创积木姿态图。"
+    },
+    "hop-edge-brick": {
+      "file": "assets/hop-edge-brick.png",
+      "sha256": "84aee1b9de45ecc1911ce0746263dad9a63c2cb3bcf20019cfa35cf6caf368ae",
+      "usedBy": [
+        "p03"
+      ],
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "db9c2972d42f4f94c237e2f94da754d41bfabb7e66bc55cd3efd9eda357bb8ad",
+      "spec": {
+        "shape": "cuboid",
+        "size": [
+          3.9,
+          2.2,
+          1.1
+        ],
+        "color": "青绿色",
+        "axes": [
+          0,
+          2,
+          1
+        ]
+      },
+      "dimensions": [
+        120,
+        96
+      ],
+      "declaredAt": "brief.json:pageSequence.p03.game.artPlan",
+      "description": "统一尺度、透明底与共用桌面线的原创积木姿态图。"
+    },
+    "hop-end-board": {
+      "file": "assets/hop-end-board.png",
+      "sha256": "2dda07165119fc74f0bf717549116c9db16f370df068d9a5842738e355b938d1",
+      "usedBy": [
+        "p03"
+      ],
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "db9c2972d42f4f94c237e2f94da754d41bfabb7e66bc55cd3efd9eda357bb8ad",
+      "spec": {
+        "shape": "cuboid",
+        "size": [
+          4.8,
+          3.1,
+          1.2
+        ],
+        "color": "琥珀色",
+        "axes": [
+          2,
+          1,
+          0
+        ]
+      },
+      "dimensions": [
+        120,
+        96
+      ],
+      "declaredAt": "brief.json:pageSequence.p03.game.artPlan",
+      "description": "统一尺度、透明底与共用桌面线的原创积木姿态图。"
+    },
+    "hop-end-brick": {
+      "file": "assets/hop-end-brick.png",
+      "sha256": "ead01897ce61e1d12adc731d90051fd00455387d959aab239472f80d6f97c153",
+      "usedBy": [
+        "p03"
+      ],
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "db9c2972d42f4f94c237e2f94da754d41bfabb7e66bc55cd3efd9eda357bb8ad",
+      "spec": {
+        "shape": "cuboid",
+        "size": [
+          3.9,
+          2.2,
+          1.1
+        ],
+        "color": "青绿色",
+        "axes": [
+          2,
+          1,
+          0
+        ]
+      },
+      "dimensions": [
+        120,
+        96
+      ],
+      "declaredAt": "brief.json:pageSequence.p03.game.artPlan",
+      "description": "统一尺度、透明底与共用桌面线的原创积木姿态图。"
+    },
+    "hop-end-case": {
+      "file": "assets/hop-end-case.png",
+      "sha256": "2fa4ccbc6c6c9445101c69ae55c237427a6c3ac2de8feb9b73c8ef54fd04ac71",
+      "usedBy": [
+        "p03"
+      ],
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "db9c2972d42f4f94c237e2f94da754d41bfabb7e66bc55cd3efd9eda357bb8ad",
+      "spec": {
+        "shape": "cuboid",
+        "size": [
+          5.0,
+          2.8,
+          1.3
+        ],
+        "color": "淡紫色",
+        "axes": [
+          2,
+          1,
+          0
+        ]
+      },
+      "dimensions": [
+        120,
+        96
+      ],
+      "declaredAt": "brief.json:pageSequence.p03.game.artPlan",
+      "description": "统一尺度、透明底与共用桌面线的原创积木姿态图。"
+    },
+    "hop-side-cylinder": {
+      "file": "assets/hop-side-cylinder.png",
+      "sha256": "ea53fe5607e1eb50ab2750ecac061159f3f11a60973689d8649833b491b43ef9",
+      "usedBy": [
+        "p03"
+      ],
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "db9c2972d42f4f94c237e2f94da754d41bfabb7e66bc55cd3efd9eda357bb8ad",
+      "spec": {
+        "shape": "cylinder",
+        "diameter": 2.0,
+        "axialLength": 2.7,
+        "orientation": "side",
+        "surface": "曲面",
+        "color": "淡蓝色"
+      },
+      "dimensions": [
+        120,
+        96
+      ],
+      "declaredAt": "brief.json:pageSequence.p03.game.artPlan",
+      "description": "统一尺度、透明底与共用桌面线的原创积木姿态图。"
+    },
+    "hop-upright-cylinder": {
+      "file": "assets/hop-upright-cylinder.png",
+      "sha256": "100d60e0e70fad874626327e1563897fd443598deb13e98abdd4864d073713c7",
+      "usedBy": [
+        "p03"
+      ],
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "db9c2972d42f4f94c237e2f94da754d41bfabb7e66bc55cd3efd9eda357bb8ad",
+      "spec": {
+        "shape": "cylinder",
+        "diameter": 2.0,
+        "axialLength": 2.7,
+        "orientation": "upright",
+        "surface": "圆面",
+        "color": "淡蓝色"
+      },
+      "dimensions": [
+        120,
+        96
+      ],
+      "declaredAt": "brief.json:pageSequence.p03.game.artPlan",
+      "description": "统一尺度、透明底与共用桌面线的原创积木姿态图。"
+    },
+    "hop-wide-board": {
+      "file": "assets/hop-wide-board.png",
+      "sha256": "ad5c98b79f0fa8aa214c8d5490d637b27d8bd532335367c110c54030529af2d2",
+      "usedBy": [
+        "p03"
+      ],
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "db9c2972d42f4f94c237e2f94da754d41bfabb7e66bc55cd3efd9eda357bb8ad",
+      "spec": {
+        "shape": "cuboid",
+        "size": [
+          4.8,
+          3.1,
+          1.2
+        ],
+        "color": "琥珀色",
+        "axes": [
+          0,
+          1,
+          2
+        ]
+      },
+      "dimensions": [
+        120,
+        96
+      ],
+      "declaredAt": "brief.json:pageSequence.p03.game.artPlan",
+      "description": "统一尺度、透明底与共用桌面线的原创积木姿态图。"
+    },
+    "hop-wide-brick": {
+      "file": "assets/hop-wide-brick.png",
+      "sha256": "e0946bbff1d9adb87ee1b707caab528e7fca6af16c43462e63cbd05963277aeb",
+      "usedBy": [
+        "p03"
+      ],
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "db9c2972d42f4f94c237e2f94da754d41bfabb7e66bc55cd3efd9eda357bb8ad",
+      "spec": {
+        "shape": "cuboid",
+        "size": [
+          3.9,
+          2.2,
+          1.1
+        ],
+        "color": "青绿色",
+        "axes": [
+          0,
+          1,
+          2
+        ]
+      },
+      "dimensions": [
+        120,
+        96
+      ],
+      "declaredAt": "brief.json:pageSequence.p03.game.artPlan",
+      "description": "统一尺度、透明底与共用桌面线的原创积木姿态图。"
+    },
+    "hop-wide-case": {
+      "file": "assets/hop-wide-case.png",
+      "sha256": "e81a4401b672f36cd9ab7ec23ab639c0a4bbc153469b53400672d4654d295851",
+      "usedBy": [
+        "p03"
+      ],
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "db9c2972d42f4f94c237e2f94da754d41bfabb7e66bc55cd3efd9eda357bb8ad",
+      "spec": {
+        "shape": "cuboid",
+        "size": [
+          5.0,
+          2.8,
+          1.3
+        ],
+        "color": "淡紫色",
+        "axes": [
+          0,
+          1,
+          2
+        ]
+      },
+      "dimensions": [
+        120,
+        96
+      ],
+      "declaredAt": "brief.json:pageSequence.p03.game.artPlan",
+      "description": "统一尺度、透明底与共用桌面线的原创积木姿态图。"
+    },
+    "hop-rabbit-ready": {
+      "file": "assets/hop-rabbit-ready.png",
+      "sha256": "8eec14c5203eda90860eb34ba7b9fdc96a70c149d3d1640f6e1862fed2610b1d",
+      "usedBy": [
+        "p03",
+        "p05"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "tool": "Codex built-in imagegen",
+      "prompt": "Use case: stylized-concept. A real transparent RGBA sprite sheet, three equal columns and two equal rows, with six fully isolated sprites, every sprite centered in its own cell with generous transparent gaps and similar size; do not touch one another; no shadows outside silhouettes. Top row three animation frames of the exact same cinnamon rabbit with teal scarf facing right, first resting on all fours, second running with front paws out, third airborne with knees tucked. Bottom row exact positions: first a compact round vermilion bubble rover top-down seen from overhead, its bubble nozzle points RIGHT; second the SAME rover with two pearly bubbles immediately to its right (nozzle points RIGHT); third a single illustrated golden star-shaped collector sticker with embossed paper petals but no text. Premium storybook arcade: matte gouache, fine paper grain, clean cut paper edges, charcoal teal shadows, warm cream, deep spruce, apricot and persimmon highlights. No labels, marks, boxes, ground, background, logos or text. Every sprite entirely visible.",
+      "sourceOriginalPath": "/Users/sqcopenclaw/.codex/generated_images/01a1bf78-0c06-7fe0-8877-bc245394cec3/exec-00dcd8f8-2185-492f-81ff-73754de5dc8b.png",
+      "sourceOriginalSha256": "72badede9f926c6be6c58daa9f00645f8b2f85d244108fd4c1514851d4ba8c31",
+      "sourceManifest": "output/courseware-production/classic-arcade-v3/asset-sources.json",
+      "sourceManifestSha256": "01d4f3f836ac294d47bc31e1470dc15d11cf74ac120939f82d005e010aabdf40",
+      "approvedTemplate": {
+        "id": "platformHop",
+        "version": 1,
+        "approvedOn": "2026-11-09",
+        "preview": "output/courseware-production/classic-arcade-v3/platform-hop.html"
+      },
+      "playbackDerivation": {
+        "kind": "webp-to-png-exact-decoded-rgba",
+        "input": "output/courseware-production/classic-arcade-v3/assets/rabbit-ready.webp",
+        "inputSha256": "68e5b555795266eed4adbaedb756ef624d357c1f60ff775028f726394c3a9ad3",
+        "originalCrop": [
+          45,
+          50,
+          480,
+          470
+        ],
+        "size": [
+          300,
+          290
+        ],
+        "decodedRgbaSha256": "e5c542eaa5ffdb1d259978e07686b44fbed9df1a32218ea233432ab175f0865e",
+        "alphaSha256": "f568a6146cadc86855e66926b781676a5fbb17f848040309cd622845b908b7ac"
+      },
+      "description": "沿用获批跳台模板的原生 ImageGen 兔子帧或星花贴纸。原图裁切按公用素材清单记录。"
+    },
+    "hop-rabbit-run": {
+      "file": "assets/hop-rabbit-run.png",
+      "sha256": "6ed1cf53fe256a1773be19ad86b2044be76a3e7424442189948682195b338999",
+      "usedBy": [
+        "p03",
+        "p05"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "tool": "Codex built-in imagegen",
+      "prompt": "Use case: stylized-concept. A real transparent RGBA sprite sheet, three equal columns and two equal rows, with six fully isolated sprites, every sprite centered in its own cell with generous transparent gaps and similar size; do not touch one another; no shadows outside silhouettes. Top row three animation frames of the exact same cinnamon rabbit with teal scarf facing right, first resting on all fours, second running with front paws out, third airborne with knees tucked. Bottom row exact positions: first a compact round vermilion bubble rover top-down seen from overhead, its bubble nozzle points RIGHT; second the SAME rover with two pearly bubbles immediately to its right (nozzle points RIGHT); third a single illustrated golden star-shaped collector sticker with embossed paper petals but no text. Premium storybook arcade: matte gouache, fine paper grain, clean cut paper edges, charcoal teal shadows, warm cream, deep spruce, apricot and persimmon highlights. No labels, marks, boxes, ground, background, logos or text. Every sprite entirely visible.",
+      "sourceOriginalPath": "/Users/sqcopenclaw/.codex/generated_images/01a1bf78-0c06-7fe0-8877-bc245394cec3/exec-00dcd8f8-2185-492f-81ff-73754de5dc8b.png",
+      "sourceOriginalSha256": "72badede9f926c6be6c58daa9f00645f8b2f85d244108fd4c1514851d4ba8c31",
+      "sourceManifest": "output/courseware-production/classic-arcade-v3/asset-sources.json",
+      "sourceManifestSha256": "01d4f3f836ac294d47bc31e1470dc15d11cf74ac120939f82d005e010aabdf40",
+      "approvedTemplate": {
+        "id": "platformHop",
+        "version": 1,
+        "approvedOn": "2026-11-09",
+        "preview": "output/courseware-production/classic-arcade-v3/platform-hop.html"
+      },
+      "playbackDerivation": {
+        "kind": "webp-to-png-exact-decoded-rgba",
+        "input": "output/courseware-production/classic-arcade-v3/assets/rabbit-run.webp",
+        "inputSha256": "b34aa6fb9af69bb6dc211095415ce601786760ad533b668cb66a75e66ec7cc3b",
+        "originalCrop": [
+          560,
+          62,
+          989,
+          473
+        ],
+        "size": [
+          300,
+          287
+        ],
+        "decodedRgbaSha256": "f17ce8d446a6268024a8fce3d1913b6cb3b822f6ca31dee8e0149d9db54e154a",
+        "alphaSha256": "23465fd9c3b8b10595ab471ee9724135c58abafc56bd0b89afb387e508271f3f"
+      },
+      "description": "沿用获批跳台模板的原生 ImageGen 兔子帧或星花贴纸。原图裁切按公用素材清单记录。"
+    },
+    "hop-rabbit-jump": {
+      "file": "assets/hop-rabbit-jump.png",
+      "sha256": "77d118c63513c762db984ba89503ea5b45787f5d1eb0f9f2717ec4566975daf2",
+      "usedBy": [
+        "p03"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "tool": "Codex built-in imagegen",
+      "prompt": "Use case: stylized-concept. A real transparent RGBA sprite sheet, three equal columns and two equal rows, with six fully isolated sprites, every sprite centered in its own cell with generous transparent gaps and similar size; do not touch one another; no shadows outside silhouettes. Top row three animation frames of the exact same cinnamon rabbit with teal scarf facing right, first resting on all fours, second running with front paws out, third airborne with knees tucked. Bottom row exact positions: first a compact round vermilion bubble rover top-down seen from overhead, its bubble nozzle points RIGHT; second the SAME rover with two pearly bubbles immediately to its right (nozzle points RIGHT); third a single illustrated golden star-shaped collector sticker with embossed paper petals but no text. Premium storybook arcade: matte gouache, fine paper grain, clean cut paper edges, charcoal teal shadows, warm cream, deep spruce, apricot and persimmon highlights. No labels, marks, boxes, ground, background, logos or text. Every sprite entirely visible.",
+      "sourceOriginalPath": "/Users/sqcopenclaw/.codex/generated_images/01a1bf78-0c06-7fe0-8877-bc245394cec3/exec-00dcd8f8-2185-492f-81ff-73754de5dc8b.png",
+      "sourceOriginalSha256": "72badede9f926c6be6c58daa9f00645f8b2f85d244108fd4c1514851d4ba8c31",
+      "sourceManifest": "output/courseware-production/classic-arcade-v3/asset-sources.json",
+      "sourceManifestSha256": "01d4f3f836ac294d47bc31e1470dc15d11cf74ac120939f82d005e010aabdf40",
+      "approvedTemplate": {
+        "id": "platformHop",
+        "version": 1,
+        "approvedOn": "2026-11-09",
+        "preview": "output/courseware-production/classic-arcade-v3/platform-hop.html"
+      },
+      "playbackDerivation": {
+        "kind": "webp-to-png-exact-decoded-rgba",
+        "input": "output/courseware-production/classic-arcade-v3/assets/rabbit-jump.webp",
+        "inputSha256": "cbcd50ad9c7fd36e8babb8b056f1295ec52baee54a3d7e2591f13a7293f5b567",
+        "originalCrop": [
+          1055,
+          29,
+          1508,
+          411
+        ],
+        "size": [
+          300,
+          253
+        ],
+        "decodedRgbaSha256": "3b71c0c43658b5c396d5be5dc49c5167271d08e57533c8230602e1acdf5cec67",
+        "alphaSha256": "d15df851ea29c812130ff1a9641de1815216ae1de4ee84ca2447a453d16bc61a"
+      },
+      "description": "沿用获批跳台模板的原生 ImageGen 兔子帧或星花贴纸。原图裁切按公用素材清单记录。"
+    },
+    "hop-sticker": {
+      "file": "assets/hop-sticker.png",
+      "sha256": "8d15cc6348c7ca2ca94d459d99e55fab5ad0b47fb352e4e5d802f8010c276ce2",
+      "usedBy": [
+        "p03",
+        "p05"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "tool": "Codex built-in imagegen",
+      "prompt": "Use case: stylized-concept. A real transparent RGBA sprite sheet, three equal columns and two equal rows, with six fully isolated sprites, every sprite centered in its own cell with generous transparent gaps and similar size; do not touch one another; no shadows outside silhouettes. Top row three animation frames of the exact same cinnamon rabbit with teal scarf facing right, first resting on all fours, second running with front paws out, third airborne with knees tucked. Bottom row exact positions: first a compact round vermilion bubble rover top-down seen from overhead, its bubble nozzle points RIGHT; second the SAME rover with two pearly bubbles immediately to its right (nozzle points RIGHT); third a single illustrated golden star-shaped collector sticker with embossed paper petals but no text. Premium storybook arcade: matte gouache, fine paper grain, clean cut paper edges, charcoal teal shadows, warm cream, deep spruce, apricot and persimmon highlights. No labels, marks, boxes, ground, background, logos or text. Every sprite entirely visible.",
+      "sourceOriginalPath": "/Users/sqcopenclaw/.codex/generated_images/01a1bf78-0c06-7fe0-8877-bc245394cec3/exec-00dcd8f8-2185-492f-81ff-73754de5dc8b.png",
+      "sourceOriginalSha256": "72badede9f926c6be6c58daa9f00645f8b2f85d244108fd4c1514851d4ba8c31",
+      "sourceManifest": "output/courseware-production/classic-arcade-v3/asset-sources.json",
+      "sourceManifestSha256": "01d4f3f836ac294d47bc31e1470dc15d11cf74ac120939f82d005e010aabdf40",
+      "approvedTemplate": {
+        "id": "platformHop",
+        "version": 1,
+        "approvedOn": "2026-11-09",
+        "preview": "output/courseware-production/classic-arcade-v3/platform-hop.html"
+      },
+      "playbackDerivation": {
+        "kind": "webp-to-png-exact-decoded-rgba",
+        "input": "output/courseware-production/classic-arcade-v3/assets/sticker.webp",
+        "inputSha256": "1d31f346ac58e9cc148ab253b33de05978cd7585a7c7454ba089c8da810789cf",
+        "originalCrop": [
+          1057,
+          544,
+          1510,
+          953
+        ],
+        "size": [
+          300,
+          271
+        ],
+        "decodedRgbaSha256": "1749aa662e64421dd030bb469194312ccfec778990d36358f035b44a8e86bfa0",
+        "alphaSha256": "5c687a8d5c741b3cbc13dd37e7de85533ffc469074ba4bbd9cdf8fcbced0c079"
+      },
+      "description": "沿用获批跳台模板的原生 ImageGen 兔子帧或星花贴纸。原图裁切按公用素材清单记录。"
+    },
+    "hop-workbench": {
+      "file": "assets/hop-workbench.png",
+      "sha256": "7f38de97856354e24623e2b216a9a5bc39cccdc1a0bcc03c424fd2d4dce0dca2",
+      "usedBy": [
+        "p03",
+        "p05"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "tool": "Codex built-in image_gen.imagegen",
+      "prompt": "Use case: precise-object-edit. Image 1 is the exact background to revise. Remove all three round raised wooden podiums (left, large middle, right) and their shadows completely. Continue the existing single uninterrupted pale flat cream wooden table surface across the entire lower quarter, level and quiet, without any visible raised object, outline, disk, ellipse, circles, furniture, blocks, steps, platform, cast shadow or marks. Keep all art above the flat tabletop the same: cream paper texture, distant pine green foliage at the two edges, apricot blossom corners, bright empty center, matte gouache and landscape 16:9. The gameplay renders all actual platforms and objects separately. No words, letters, numerals, logos, characters or watermark. Opaque backdrop.",
+      "sourceOriginalPath": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-f1e1472b-59fc-4b56-9457-06646ca615e2.png",
+      "sourceOriginalSha256": "0df9a32233fbac00d848fd18f715be968f2dc01be69dbeacf54fc97e026d8c45",
+      "generationReference": {
+        "file": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-3022fa29-d37a-463d-8cb6-5a8aaf7efcd6.png",
+        "sha256": "c97f47d5b9079276d34066524810ceb482d239a6d0ac179097c95d5b00e4260c",
+        "kind": "imagegen-edit-reference"
+      },
+      "playbackDerivation": {
+        "kind": "centered-aspect-fit-lanczos-png",
+        "sourceSize": [
+          1672,
+          941
+        ],
+        "size": [
+          1280,
+          720
+        ],
+        "pillowVersion": "13.0.0",
+        "bytes": 1046539
+      },
+      "description": "奶油色平桌面连贯，花枝和绿叶只在边缘，无文字或凸起物。真正的积木台由游戏渲染。"
+    },
+    "depot-flat": {
+      "file": "assets/depot-flat.png",
+      "sha256": "e80ef5edd96db6e5a3f0ca7575f38c21ad7465d447f6a42b444a94c6edc93754",
+      "usedBy": [
+        "p05"
+      ],
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "db9c2972d42f4f94c237e2f94da754d41bfabb7e66bc55cd3efd9eda357bb8ad",
+      "description": "球在平板上，四周没有侧挡。"
+    },
+    "depot-rails": {
+      "file": "assets/depot-rails.png",
+      "sha256": "9c7b73afb2c58d63216eb317c135649df4fe0d1594414f85c468bc0320a40b01",
+      "usedBy": [
+        "p05"
+      ],
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "db9c2972d42f4f94c237e2f94da754d41bfabb7e66bc55cd3efd9eda357bb8ad",
+      "description": "两个侧挡位于相对的两边，沿长条方向仍有出口。"
+    },
+    "depot-row": {
+      "file": "assets/depot-row.png",
+      "sha256": "9415497ce2751a88cde35805ecfb66941cf97851ed1c067b9033e5affd17b3cc",
+      "usedBy": [
+        "p05"
+      ],
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "db9c2972d42f4f94c237e2f94da754d41bfabb7e66bc55cd3efd9eda357bb8ad",
+      "description": "三根同高积木排成一线，球处在中间，横向没有分开的支点。"
+    },
+    "depot-cradle": {
+      "file": "assets/depot-cradle.png",
+      "sha256": "d79e00de8ab549448495f134f686bd62fd70680e44634759d0b62ffe10334fb6",
+      "usedBy": [
+        "p05"
+      ],
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "db9c2972d42f4f94c237e2f94da754d41bfabb7e66bc55cd3efd9eda357bb8ad",
+      "description": "原课三根等高长条分布在球心周围，围出可托球的开口。"
+    },
+    "depot-cradle-turn": {
+      "file": "assets/depot-cradle-turn.png",
+      "sha256": "e01084a14b353a19d0ab37be83ab2264320d46bfa8325fc8cfa672bd08397880",
+      "usedBy": [
+        "p05"
+      ],
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "db9c2972d42f4f94c237e2f94da754d41bfabb7e66bc55cd3efd9eda357bb8ad",
+      "description": "同一三点支架在桌面转过直角，支点间距、承托和高度保持。"
+    },
+    "depot-roll-mark": {
+      "file": "assets/depot-roll-mark.png",
+      "sha256": "d5de9ec2b7c22b1e237e163fd0bd4176004319df563b9da9b078ff3d649caf6d",
+      "usedBy": [
+        "p05"
+      ],
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "db9c2972d42f4f94c237e2f94da754d41bfabb7e66bc55cd3efd9eda357bb8ad",
+      "description": "球和向外的方向箭头，指认可能滚出的分类托盘。"
+    },
+    "depot-hold-mark": {
+      "file": "assets/depot-hold-mark.png",
+      "sha256": "83992761718f5bc1dea15ee857adb37435a950f501c6907d0e9bd847e80582a6",
+      "usedBy": [
+        "p05"
+      ],
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "db9c2972d42f4f94c237e2f94da754d41bfabb7e66bc55cd3efd9eda357bb8ad",
+      "description": "转过方向的同一三点支架，指认从下方托球的分类托盘。"
+    }
+  }
+}

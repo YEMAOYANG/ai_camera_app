@@ -1,0 +1,31 @@
+#tile-proof {
+  position: absolute;
+  left: 33px;
+  top: 194px;
+  width: 330px;
+  padding: 10px;
+  box-sizing: border-box;
+  border: 5px solid #2d5b47;
+  border-radius: 22px;
+  background: #fff6e6;
+  pointer-events: none;
+  z-index: 2;
+}
+#tile-proof[hidden] { display: none; }
+#tile-proof img { display: block; width: 100%; height: auto; border-radius: 8px; }
+#tile-proof-result {
+  display: block;
+  padding: 8px 0 2px;
+  color: #204337;
+  text-align: center;
+  font-size: 34px;
+  font-weight: 800;
+}
+#tile-proof-result:empty { display: none; }
+.tile-finish-totals {
+  margin: 6px auto 14px;
+  color: #204337;
+  font-size: 42px;
+  font-weight: 850;
+  letter-spacing: .05em;
+}

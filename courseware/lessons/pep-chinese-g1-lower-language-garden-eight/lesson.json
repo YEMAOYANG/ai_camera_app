@@ -1,0 +1,1168 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "语文园地八",
+  "grade": 1,
+  "description": "加减部件、分辨形近字，听说心情，回到纸书读诗和故事。",
+  "images": {
+    "garden8-bear-seasons": {
+      "file": "assets/garden8-bear-seasons.png"
+    },
+    "garden8-four-grid": {
+      "file": "assets/garden8-four-grid.png"
+    },
+    "garden8-four-moods": {
+      "file": "assets/garden8-four-moods.png"
+    },
+    "garden8-join-parts": {
+      "file": "assets/garden8-join-parts.png"
+    },
+    "garden8-launch-ball": {
+      "file": "assets/garden8-launch-ball.png"
+    },
+    "garden8-look-jade-main": {
+      "file": "assets/garden8-look-jade-main.png"
+    },
+    "garden8-look-knife-strength": {
+      "file": "assets/garden8-look-knife-strength.png"
+    },
+    "garden8-look-noon-cow": {
+      "file": "assets/garden8-look-noon-cow.png"
+    },
+    "garden8-look-person-enter": {
+      "file": "assets/garden8-look-person-enter.png"
+    },
+    "garden8-merge-cart": {
+      "file": "assets/garden8-merge-cart.png"
+    },
+    "garden8-merge-cart-hop": {
+      "file": "assets/garden8-merge-cart-hop.png"
+    },
+    "garden8-mood-angry": {
+      "file": "assets/garden8-mood-angry.png"
+    },
+    "garden8-mood-happy": {
+      "file": "assets/garden8-mood-happy.png"
+    },
+    "garden8-mood-sad": {
+      "file": "assets/garden8-mood-sad.png"
+    },
+    "garden8-mood-scared": {
+      "file": "assets/garden8-mood-scared.png"
+    },
+    "garden8-morning-courtyard": {
+      "file": "assets/garden8-morning-courtyard.png"
+    },
+    "garden8-quiz-bear-winter": {
+      "file": "assets/garden8-quiz-bear-winter.png"
+    },
+    "garden8-quiz-bird-nest": {
+      "file": "assets/garden8-quiz-bird-nest.png"
+    },
+    "garden8-quiz-calf": {
+      "file": "assets/garden8-quiz-calf.png"
+    },
+    "garden8-quiz-entry": {
+      "file": "assets/garden8-quiz-entry.png"
+    },
+    "garden8-quiz-face-angry": {
+      "file": "assets/garden8-quiz-face-angry.png"
+    },
+    "garden8-quiz-face-happy": {
+      "file": "assets/garden8-quiz-face-happy.png"
+    },
+    "garden8-quiz-face-scared": {
+      "file": "assets/garden8-quiz-face-scared.png"
+    },
+    "garden8-quiz-glyph-big": {
+      "file": "assets/garden8-quiz-glyph-big.png"
+    },
+    "garden8-quiz-glyph-cow": {
+      "file": "assets/garden8-quiz-glyph-cow.png"
+    },
+    "garden8-quiz-glyph-cross": {
+      "file": "assets/garden8-quiz-glyph-cross.png"
+    },
+    "garden8-quiz-glyph-enter": {
+      "file": "assets/garden8-quiz-glyph-enter.png"
+    },
+    "garden8-quiz-glyph-father": {
+      "file": "assets/garden8-quiz-glyph-father.png"
+    },
+    "garden8-quiz-glyph-half": {
+      "file": "assets/garden8-quiz-glyph-half.png"
+    },
+    "garden8-quiz-glyph-noon": {
+      "file": "assets/garden8-quiz-glyph-noon.png"
+    },
+    "garden8-quiz-glyph-person": {
+      "file": "assets/garden8-quiz-glyph-person.png"
+    },
+    "garden8-quiz-glyph-ticket": {
+      "file": "assets/garden8-quiz-glyph-ticket.png"
+    },
+    "garden8-quiz-pair-fat": {
+      "file": "assets/garden8-quiz-pair-fat.png"
+    },
+    "garden8-quiz-pair-mouth": {
+      "file": "assets/garden8-quiz-pair-mouth.png"
+    },
+    "garden8-quiz-pair-now": {
+      "file": "assets/garden8-quiz-pair-now.png"
+    },
+    "garden8-quiz-red-fruit": {
+      "file": "assets/garden8-quiz-red-fruit.png"
+    },
+    "garden8-quiz-school-tree": {
+      "file": "assets/garden8-quiz-school-tree.png"
+    },
+    "garden8-quiz-spring-bloom": {
+      "file": "assets/garden8-quiz-spring-bloom.png"
+    },
+    "garden8-quiz-thunder": {
+      "file": "assets/garden8-quiz-thunder.png"
+    },
+    "garden8-quiz-word-shelf": {
+      "file": "assets/garden8-quiz-word-shelf.png"
+    },
+    "garden8-rooster": {
+      "file": "assets/garden8-rooster.png"
+    },
+    "garden8-sentence-grid": {
+      "file": "assets/garden8-sentence-grid.png"
+    },
+    "garden8-stage": {
+      "file": "assets/garden8-stage.png"
+    },
+    "garden8-sticker": {
+      "file": "assets/garden8-sticker.png"
+    },
+    "garden8-take-parts": {
+      "file": "assets/garden8-take-parts.png"
+    }
+  },
+  "roster": {
+    "teacher": {
+      "name": "小语老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Serena",
+      "avatar": "/avatars/teacher-2.png",
+      "color": "#D65A8A",
+      "persona": "带孩子看清关键笔形，用短句和具体场景表达，再回到纸书。"
+    }
+  },
+  "scenes": [
+    {
+      "key": "join-parts",
+      "type": "slide",
+      "title": "把两块部件合成一个字",
+      "template": "picture-points",
+      "data": {
+        "title": "把两块部件合成一个字",
+        "picture": "garden8-join-parts",
+        "points": [
+          "口和少，合成吵。",
+          "王和见，合成现。",
+          "丁和页，合成顶。",
+          "月和半，合成胖。"
+        ]
+      },
+      "script": [
+        {
+          "say": "字片桌上有好几块部件。摆对地方，两块能成一个字。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "看清每块在成品的哪一边。我们从第一组看起。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "口放左边，少放右边，合成吵。大声争执是吵架。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "左边是王旁，右边是见。合起来是现在的现。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "丁放在左，页放在右，成了屋顶的顶。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "月在左，半在右，拼成胖。它说的是形体。"
+        },
+        {
+          "say": "字片要找对搭档，还要看成品里两边怎么排。"
+        },
+        {
+          "say": "有的字也能去掉一部分，留下另一个字。"
+        }
+      ]
+    },
+    {
+      "key": "take-a-part-away",
+      "type": "slide",
+      "title": "拿掉一部分，再认留下的字",
+      "template": "picture-points",
+      "data": {
+        "title": "拿掉一部分，再认留下的字",
+        "picture": "garden8-take-parts",
+        "points": [
+          "飘去掉风，剩票。",
+          "房去掉方，剩户。",
+          "校去掉木，剩交。",
+          "爸去掉巴，剩父。"
+        ]
+      },
+      "script": [
+        {
+          "say": "找剩下的字时，先指清要拿走的是哪一块。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "图上的灰块准备拿走。眼睛看还留在格里的字。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "飘的右边是风。去掉右边的风，左边留下票。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "房的方在下面。拿掉方，上面是户。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "从学校的校拿走左边木，右边剩交通的交。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "爸的巴在下面。去掉巴，上面留下父亲的父。"
+        },
+        {
+          "say": "把拿走的那块放回原位，还能拼回刚才的字。"
+        },
+        {
+          "say": "找口和少，再找王旁和见，看看能拼出什么字。"
+        },
+        {
+          "say": "看目标格。拼顶、拼胖，再把票和风拼回去。"
+        },
+        {
+          "say": "看清横着摆还是上下叠，帮剩下的字找部件。"
+        },
+        {
+          "say": "看看还差哪块，先让两块落在同一排或同一列。"
+        },
+        {
+          "say": "沿着亮箭头试一次，别急着把所有字片挤到一起。"
+        },
+        {
+          "say": "目标格收齐了。每个字的部件都找对了。"
+        }
+      ]
+    },
+    {
+      "key": "observe-the-grid",
+      "type": "slide",
+      "title": "在田字格里观察四个字",
+      "template": "picture-points",
+      "data": {
+        "title": "在田字格里观察四个字",
+        "picture": "garden8-four-grid",
+        "points": [
+          "页　看上下的大小。",
+          "交　看下边撇捺。",
+          "户　看顶上的点和左下的撇。",
+          "父　看两组向两边伸开的笔画。"
+        ]
+      },
+      "script": [
+        {
+          "say": "请翻到纸书的田字格。先看字在格子里怎样站稳。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "中间的两条虚线帮我们看左右和上下的位置。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "页的上面短一些，下面更长。看它有没有偏到一边。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "交的下面撇和捺往两边伸。留心它们伸开的位置。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "户的点在上方，长撇往左下伸。两边留白不同。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "父的下半部分撇捺交叉。看看交叉处在格子哪里。"
+        },
+        {
+          "say": "照纸书每个试写一个。再和样字比位置。"
+        },
+        {
+          "say": "请大人看你写的字，尤其看看有没有挤到格线外。"
+        }
+      ]
+    },
+    {
+      "key": "look-for-a-stroke",
+      "type": "slide",
+      "title": "午和牛、刀和力，只差一点形",
+      "template": "two-columns",
+      "data": {
+        "title": "午和牛、刀和力，只差一点形",
+        "left": {
+          "heading": "午 / 牛",
+          "body": "看竖有没有冒过上横。"
+        },
+        "left_picture": "garden8-look-noon-cow",
+        "right": {
+          "heading": "刀 / 力",
+          "body": "看撇的头有没有露出来。"
+        },
+        "right_picture": "garden8-look-knife-strength"
+      },
+      "script": [
+        {
+          "say": "两对字长得像。先找哪一笔不同，再想你听见的词。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "午和牛都有一竖。用手指在格子上找竖的上头。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "午的竖不冒过上面那横，牛的竖冒出来。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "听到午睡想午，听到小牛想牛。换过去，意思就变了。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "刀和力都像带一个钩。把眼睛移到撇的上头。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "力的撇上头露出来，刀的撇不露头。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "刀可以切菜。用力抬箱子，说的是力气的力。"
+        },
+        {
+          "say": "碰到形近字，就先比字形，再把字放进词里听一听。"
+        }
+      ]
+    },
+    {
+      "key": "check-position-and-meaning",
+      "type": "slide",
+      "title": "人和入、玉和主，看笔画在哪",
+      "template": "two-columns",
+      "data": {
+        "title": "人和入、玉和主，看笔画在哪",
+        "left": {
+          "heading": "人 / 入",
+          "body": "看上头是哪一笔。"
+        },
+        "left_picture": "garden8-look-person-enter",
+        "right": {
+          "heading": "玉 / 主",
+          "body": "看那一点在什么地方。"
+        },
+        "right_picture": "garden8-look-jade-main"
+      },
+      "script": [
+        {
+          "say": "有两对字笔画都差不多，先不要凭整个轮廓猜。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "人和入都像两笔支起来。看看最高处是哪一笔。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "人是撇头高，入是捺头高。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "一个人说的是人。走进大门，说的是进入的入。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "玉和主都有一点。看点是在字头，还是在里面。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "主的一点在最上边，玉的一点在里面靠右。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "玉石用玉。主人用主。把点搬错，意思就换了。"
+        },
+        {
+          "say": "找到区别，再想整个词。两次检查都对，再选。"
+        }
+      ]
+    },
+    {
+      "key": "slide-word-parts",
+      "type": "interactive",
+      "title": "滑字片，给部件找搭档",
+      "page": "slide-word-parts",
+      "widgetType": "game",
+      "startImage": "garden8-stage",
+      "script": [
+        {
+          "say": "字片在小格子里。要拼对部件，才能把字收进右边。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "pause": true,
+            "level": 1
+          }
+        },
+        {
+          "highlight": "#game-target"
+        },
+        {
+          "say": "右边空格先等着吵和现。我们看看吵还差哪两块。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "这排有口和少。它们在一排，能滑到一块。"
+        },
+        {
+          "highlight": "#demo-merge-controls"
+        },
+        {
+          "say": "点左箭头，整盘字片都朝左滑。看看字片怎样碰头。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "合成的字进了收藏格。口和少配成的是吵。"
+        },
+        {
+          "say": "现在轮到你。撞上不搭的字片，不会合成目标。"
+        },
+        {
+          "say": "去掉过的部件也能拼回去。先找同伴，再换方向。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "pause": false,
+            "level": 1
+          }
+        }
+      ],
+      "gameAudio": {
+        "merge-first": "take-a-part-away-13",
+        "merge-next": "take-a-part-away-14",
+        "merge-last": "take-a-part-away-15",
+        "merge-hint": "take-a-part-away-16",
+        "merge-help": "take-a-part-away-17",
+        "merge-good": "take-a-part-away-18"
+      }
+    },
+    {
+      "key": "events-and-feelings",
+      "type": "slide",
+      "title": "先想发生了什么，再说心情",
+      "template": "picture-points",
+      "data": {
+        "title": "先想发生了什么，再说心情",
+        "picture": "garden8-four-moods",
+        "points": [
+          "高兴　可能笑起来。",
+          "生气　可能皱眉。",
+          "害怕　可能往后躲。",
+          "难过　可能低下头。"
+        ]
+      },
+      "script": [
+        {
+          "say": "同一个人会有不同的心情。脸和动作能给我们线索。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "别只看嘴。也想想这个时候发生了什么。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "盼了很久的事成了。她拍手笑起来，可能很高兴。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "别人故意弄坏她的作品。她皱眉说别这样，可能在生气。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "听见突然的大响动，她缩到大人身后，可能有些害怕。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "她想念走远的朋友，抱着照片掉泪，可能很难过。"
+        },
+        {
+          "say": "表情不只一种意思。要把事情和动作放一起想。"
+        },
+        {
+          "say": "下一站会听到几张没有写字的心情卡。先来练习听线索。"
+        },
+        {
+          "say": "盼了好久的风筝飞起来了，她拍着手笑。"
+        },
+        {
+          "say": "她的好朋友搬远了。她抱着照片掉泪。"
+        },
+        {
+          "say": "有人故意撕坏她的画。她皱眉握紧拳。"
+        },
+        {
+          "say": "楼道突然一声响。她躲在门后不敢走。"
+        },
+        {
+          "say": "小苗终于长出了新叶，她跳起来招手。"
+        },
+        {
+          "say": "有人抢走她正用的球。她皱眉说别抢。"
+        },
+        {
+          "say": "窗外突然一声雷。她一缩，躲到大人身后。"
+        },
+        {
+          "say": "心爱的纸船泡坏了。她低着头擦眼泪。"
+        },
+        {
+          "say": "想一想先发生什么，再想她做了什么。"
+        },
+        {
+          "say": "重听，等靶慢一点，看看亮起来的表情。"
+        },
+        {
+          "say": "找到啦。你听见了哪一条线索？"
+        }
+      ]
+    },
+    {
+      "key": "say-it-then-write",
+      "type": "slide",
+      "title": "先说事情和心情，再把它写下来",
+      "template": "picture-points",
+      "data": {
+        "title": "先说事情和心情，再把它写下来",
+        "picture": "garden8-sentence-grid",
+        "points": [
+          "第一步，先说发生的事。",
+          "第二步，再说我的感受。",
+          "第三步，写下来，读回去。"
+        ]
+      },
+      "script": [
+        {
+          "say": "雨停了，我很高兴。先把事情和感受说清楚。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "看看这张格子纸。开头先留两格。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先写雨停了。别人听见这句，才知道事情是什么。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "接着写我很高兴。这里用逗号把两部分分开。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "句末放句号。标点和字各占一格，写完读一遍。"
+        },
+        {
+          "say": "有字不会写，先请大人帮你查字典，再接着写。"
+        },
+        {
+          "say": "想一件自己的事。先说给家人听，再试着写下来。"
+        }
+      ]
+    },
+    {
+      "key": "aim-for-feelings",
+      "type": "interactive",
+      "title": "听情境，瞄准可能的心情",
+      "page": "aim-for-feelings",
+      "widgetType": "game",
+      "startImage": "garden8-stage",
+      "script": [
+        {
+          "say": "没有写字的心情卡在前面。听完事情，再选一张。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "pause": true,
+            "level": 1
+          }
+        },
+        {
+          "highlight": "#game-target"
+        },
+        {
+          "say": "她等到风筝飞了，还拍着手笑。这张笑脸对应高兴。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "看弹珠上方的虚线。让它朝向这张图，照片会轻轻动。"
+        },
+        {
+          "highlight": "#demo-mood-controls"
+        },
+        {
+          "say": "按左右箭头调方向，瞄准再按发射。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "我打中了。先听事情，再看动作，就找到这张。"
+        },
+        {
+          "say": "现在你来。两张脸很像时，可以点喇叭重听。"
+        },
+        {
+          "say": "要是第一次没中，先重听，不着急猜。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "pause": false,
+            "level": 1
+          }
+        }
+      ],
+      "gameAudio": {
+        "hear-happy-a": "events-and-feelings-14",
+        "hear-sad-a": "events-and-feelings-15",
+        "hear-angry-a": "events-and-feelings-16",
+        "hear-scared-a": "events-and-feelings-17",
+        "hear-happy-b": "events-and-feelings-18",
+        "hear-angry-b": "events-and-feelings-19",
+        "hear-scared-b": "events-and-feelings-20",
+        "hear-sad-b": "events-and-feelings-21",
+        "mood-hint": "events-and-feelings-22",
+        "mood-help": "events-and-feelings-23",
+        "mood-good": "events-and-feelings-24"
+      }
+    },
+    {
+      "key": "read-the-rooster",
+      "type": "slide",
+      "title": "打开纸书读《画鸡》",
+      "template": "two-columns",
+      "data": {
+        "title": "打开纸书读《画鸡》",
+        "left": {
+          "heading": "看外形",
+          "body": "红冠和白羽。"
+        },
+        "left_picture": "garden8-rooster",
+        "right": {
+          "heading": "想声音",
+          "body": "公鸡一叫，早晨热闹起来。"
+        },
+        "right_picture": "garden8-morning-courtyard"
+      },
+      "script": [
+        {
+          "say": "翻到纸书日积月累。题目是画鸡，明代唐寅写的。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "先看这只公鸡。头上红红的是鸡冠，身上羽毛是白的。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "冠在这里是头顶像帽子的东西。请在纸书指给大人看。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "先找头顶，再找身上。这样读到两个颜色就能想出画面。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "读到后两句，想象公鸡叫了一声，院子里怎样变热闹。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "画面里原来很安静。公鸡的叫声让我们想到天亮了。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "可以跟大人对照纸书读。读一句，停一下，看看图。"
+        },
+        {
+          "say": "用手指出一句里让你看见颜色，或让你想到声音的地方。"
+        }
+      ]
+    },
+    {
+      "key": "read-the-bear",
+      "type": "slide",
+      "title": "跟家人读《小熊住山洞》",
+      "template": "picture-points",
+      "data": {
+        "title": "跟家人读《小熊住山洞》",
+        "picture": "garden8-bear-seasons",
+        "points": [
+          "春天，树上开花。",
+          "夏天，满树绿叶。",
+          "秋天，树上结果。",
+          "冬天，树上有鸟的家。"
+        ]
+      },
+      "script": [
+        {
+          "say": "打开共读故事。小熊为什么劝爸爸别砍树？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "跟大人一页一页读。每遇到一个季节，就找一张图。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "春天小熊先看到花。他觉得留着树还能看到花开。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "夏天他又舍不得绿叶。请指出图里和春天不一样的地方。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "秋天果子挂在树上。小熊还有理由不砍这棵树。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "冬天他想到树上的鸟家。要是树没了，鸟住哪儿？"
+        },
+        {
+          "say": "后来他们一直住山洞。动物送花和果子表示感谢。"
+        },
+        {
+          "say": "合上纸书试着讲一季。为什么留下树，请家人听你说。"
+        }
+      ]
+    },
+    {
+      "key": "picture-check",
+      "type": "quiz",
+      "title": "看新图，听一句再选",
+      "intro": [
+        "先听清要找什么，再在图里找线索。",
+        "两个字很像，看看关键那一笔。"
+      ],
+      "questions": [
+        {
+          "id": "parts-for-xian",
+          "question": "想拼现在的现。哪一组字片能拼出来？",
+          "skill": "听词义匹配能组成目标字的两个部件",
+          "answer": [
+            "B"
+          ],
+          "analysis": "现的左边是王旁，右边是见。口少会成吵，月半会成胖。",
+          "visual": {
+            "kind": "asset",
+            "image": "garden8-quiz-word-shelf",
+            "alt": "字片盒和空收藏格"
+          },
+          "options": {
+            "A": {
+              "label": "口与少",
+              "visual": {
+                "kind": "asset",
+                "image": "garden8-quiz-pair-mouth",
+                "alt": "口与少"
+              }
+            },
+            "B": {
+              "label": "王旁与见",
+              "visual": {
+                "kind": "asset",
+                "image": "garden8-quiz-pair-now",
+                "alt": "王旁与见"
+              }
+            },
+            "C": {
+              "label": "月与半",
+              "visual": {
+                "kind": "asset",
+                "image": "garden8-quiz-pair-fat",
+                "alt": "月与半"
+              }
+            }
+          }
+        },
+        {
+          "id": "remove-from-school",
+          "question": "学校的校，去掉左边木，还剩哪个字？",
+          "skill": "看部件位置和减字后保留的形状",
+          "answer": [
+            "C"
+          ],
+          "analysis": "校左边是木，右边是交。只去木，留下交。",
+          "visual": {
+            "kind": "asset",
+            "image": "garden8-quiz-school-tree",
+            "alt": "校字卡旁有可拿开的木字片"
+          },
+          "options": {
+            "A": {
+              "label": "票",
+              "visual": {
+                "kind": "asset",
+                "image": "garden8-quiz-glyph-ticket",
+                "alt": "票"
+              }
+            },
+            "B": {
+              "label": "父",
+              "visual": {
+                "kind": "asset",
+                "image": "garden8-quiz-glyph-father",
+                "alt": "父"
+              }
+            },
+            "C": {
+              "label": "交",
+              "visual": {
+                "kind": "asset",
+                "image": "garden8-quiz-glyph-cross",
+                "alt": "交"
+              }
+            }
+          }
+        },
+        {
+          "id": "small-calf",
+          "question": "草地上跑来一头小牛。小牛的牛选哪个？",
+          "skill": "午/牛的竖与词义双核",
+          "answer": [
+            "A"
+          ],
+          "analysis": "牛的竖冒过上横，和小牛这个词一致。午是午睡的午。",
+          "visual": {
+            "kind": "asset",
+            "image": "garden8-quiz-calf",
+            "alt": "草地上跑来一头小牛"
+          },
+          "options": {
+            "A": {
+              "label": "牛",
+              "visual": {
+                "kind": "asset",
+                "image": "garden8-quiz-glyph-cow",
+                "alt": "牛"
+              }
+            },
+            "B": {
+              "label": "午",
+              "visual": {
+                "kind": "asset",
+                "image": "garden8-quiz-glyph-noon",
+                "alt": "午"
+              }
+            },
+            "C": {
+              "label": "半",
+              "visual": {
+                "kind": "asset",
+                "image": "garden8-quiz-glyph-half",
+                "alt": "半"
+              }
+            }
+          }
+        },
+        {
+          "id": "enter-the-room",
+          "question": "门打开了。要说走进去，进入的入选哪个？",
+          "skill": "在听到词和场景后分辨人/入",
+          "answer": [
+            "B"
+          ],
+          "analysis": "进门是进入，入字的捺头高；人字的撇头高。",
+          "visual": {
+            "kind": "asset",
+            "image": "garden8-quiz-entry",
+            "alt": "一个小朋友正走进开着的门"
+          },
+          "options": {
+            "A": {
+              "label": "人",
+              "visual": {
+                "kind": "asset",
+                "image": "garden8-quiz-glyph-person",
+                "alt": "人"
+              }
+            },
+            "B": {
+              "label": "入",
+              "visual": {
+                "kind": "asset",
+                "image": "garden8-quiz-glyph-enter",
+                "alt": "入"
+              }
+            },
+            "C": {
+              "label": "大",
+              "visual": {
+                "kind": "asset",
+                "image": "garden8-quiz-glyph-big",
+                "alt": "大"
+              }
+            }
+          }
+        },
+        {
+          "id": "heard-thunder",
+          "question": "雷声响起，小宁躲到门后。她可能是什么心情？",
+          "skill": "用事件和动作辨害怕",
+          "answer": [
+            "C"
+          ],
+          "analysis": "突然响雷时躲起来，比高兴或生气更像害怕。",
+          "visual": {
+            "kind": "asset",
+            "image": "garden8-quiz-thunder",
+            "alt": "闪电照亮窗，小宁缩在门后"
+          },
+          "options": {
+            "A": {
+              "label": "高兴的表情",
+              "visual": {
+                "kind": "asset",
+                "image": "garden8-quiz-face-happy",
+                "alt": "高兴的表情"
+              }
+            },
+            "B": {
+              "label": "生气的表情",
+              "visual": {
+                "kind": "asset",
+                "image": "garden8-quiz-face-angry",
+                "alt": "生气的表情"
+              }
+            },
+            "C": {
+              "label": "害怕的表情",
+              "visual": {
+                "kind": "asset",
+                "image": "garden8-quiz-face-scared",
+                "alt": "害怕的表情"
+              }
+            }
+          }
+        },
+        {
+          "id": "winter-nest",
+          "question": "冬天小熊为什么劝爸爸留下树？",
+          "skill": "从共读情节选出相符的冬天证据",
+          "answer": [
+            "A"
+          ],
+          "analysis": "树上是小鸟的家。冬天小熊怕鸟没家，才劝爸爸把树留下。",
+          "visual": {
+            "kind": "asset",
+            "image": "garden8-quiz-bear-winter",
+            "alt": "雪地里小熊看着一棵树"
+          },
+          "options": {
+            "A": {
+              "label": "树杈里有鸟窝和小鸟",
+              "visual": {
+                "kind": "asset",
+                "image": "garden8-quiz-bird-nest",
+                "alt": "树杈里有鸟窝和小鸟"
+              }
+            },
+            "B": {
+              "label": "秋树结了红果",
+              "visual": {
+                "kind": "asset",
+                "image": "garden8-quiz-red-fruit",
+                "alt": "秋树结了红果"
+              }
+            },
+            "C": {
+              "label": "春树开满花",
+              "visual": {
+                "kind": "asset",
+                "image": "garden8-quiz-spring-bloom",
+                "alt": "春树开满花"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "closing",
+      "type": "slide",
+      "title": "把今天的发现说给家人听",
+      "template": "summary",
+      "data": {
+        "title": "把今天的发现说给家人听",
+        "items": [
+          "部件拼上或拿走，字会变。",
+          "形近字先看形，再用词来核。",
+          "先说事情和心情，再写一句。",
+          "打开纸书读《画鸡》和小熊的故事。"
+        ]
+      },
+      "script": [
+        {
+          "say": "今天我们在字片、表情和纸书里找了很多线索。"
+        },
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "加上或去掉一块，都要认清原来的位置。看剩下什么。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "两字长得像，就比竖、撇、捺或点。还要把它放进词里。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "心情不用猜自己对不对。先讲一件事，再说我当时怎样。"
+        },
+        {
+          "say": "自己试写一句。读给家人听，看看格子和标点。"
+        },
+        {
+          "spotlight": "item-4"
+        },
+        {
+          "say": "在纸书里找鸡冠和白羽，再说小熊冬天看见了什么。"
+        },
+        {
+          "say": "朗读、练字和讲故事，请家人亲耳听、亲眼看。"
+        }
+      ]
+    }
+  ]
+}

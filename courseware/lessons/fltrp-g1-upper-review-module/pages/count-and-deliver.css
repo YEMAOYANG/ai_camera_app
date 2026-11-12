@@ -1,0 +1,18 @@
+#listen-claps {
+  position: absolute;
+  z-index: 6;
+  left: 1082px;
+  top: 362px;
+  width: 116px;
+  height: 106px;
+  padding: 5px;
+  border: 4px solid #326450;
+  border-radius: 22px;
+  background: #fff3d6;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+#listen-claps[hidden] { display: none; }
+#listen-claps:disabled { opacity: .62; cursor: default; }
+#listen-claps:focus-visible { outline: 5px solid #d67338; outline-offset: 3px; }
+#listen-claps img { width: 100%; height: 100%; border-radius: 14px; object-fit: cover; }

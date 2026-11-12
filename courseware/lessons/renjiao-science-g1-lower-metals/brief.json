@@ -1,0 +1,231 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "金属",
+  "binding": {
+    "editionId": "smartedu-science-six-year-g1-lower-e231dd57",
+    "revisionId": "directory-359f40a6afba915101f297d3",
+    "nodeId": "731a2304-b8ef-4b7c-8b8f-0ecefa8dee72",
+    "unitId": "634de0db-e962-4954-9be8-abfd7415579e"
+  },
+  "goals": [
+    "能指认铁、铜、铝等常见金属的已知物件或样品，知道同为金属也会有颜色、形变难易等差异。",
+    "知道磨、弯、敲、锤分别看或听什么，能比较这次选定的铜铁铝样本并如实记录，工具由成人示范。",
+    "能根据部件的任务比较材料是否适合，使用经证实的证据解释一种金属的用处。",
+    "初步知道有些物品使用合金，能给出课内有依据的一个例子。"
+  ],
+  "goalSources": [
+    "印40–42、课件1.4",
+    "印41、教案1.2–3、任务单1.1",
+    "印42、教案2.2",
+    "印43–44、任务单2.1–2"
+  ],
+  "scenario": "原创松风校园器材观察台。从不同样条的相同条件比较取证，再用证据给器材部件找合适材料。",
+  "pageSequence": [
+    {
+      "key": "metal-at-school",
+      "kind": "teaching",
+      "plan": "校园器材的已知金属部件，引出铜铁铝及外观线索。"
+    },
+    {
+      "key": "polish-a-patch",
+      "kind": "teaching",
+      "plan": "成人磨样条同一端，前后看亮斑与颜色。"
+    },
+    {
+      "key": "bend-the-same-way",
+      "kind": "teaching",
+      "plan": "样本条件近似，方法相同，比形状和费力程度。"
+    },
+    {
+      "key": "listen-and-flatten",
+      "kind": "teaching",
+      "plan": "悬挂样片的敲声与锤后可见的扁薄分别记录。"
+    },
+    {
+      "key": "sort-metal-evidence",
+      "kind": "game",
+      "plan": "按证据来源，把现象卡推回正确操作台。"
+    },
+    {
+      "key": "photograph-metal-samples",
+      "kind": "game",
+      "plan": "记录同一已处理样条的俯面亮区和侧面形变，三组真实操作。"
+    },
+    {
+      "key": "compare-the-records",
+      "kind": "teaching",
+      "plan": "用记录区分共性、差异和仍待观察的信息。"
+    },
+    {
+      "key": "metal-fits-the-job",
+      "kind": "teaching",
+      "plan": "按具体部件任务和已知样本说明选材。"
+    },
+    {
+      "key": "meet-an-alloy",
+      "kind": "teaching",
+      "plan": "按可靠来源认识青铜、不锈钢、铝合金车架。"
+    },
+    {
+      "key": "picture-quiz",
+      "kind": "quiz",
+      "plan": "新观察对象与器材情境，区分证据方法和用途。"
+    },
+    {
+      "key": "home-metal-observation",
+      "kind": "teaching",
+      "plan": "与成人观察无尖边冷样品、查材料标识，未知留空。"
+    }
+  ],
+  "games": [
+    {
+      "page": "sort-metal-evidence",
+      "template": "sortingDepot",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.sortingDepot",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "classification",
+      "selection": "方法台和结果卡按观察关系配对，规则区分敲声和锤后形变，不把游戏音效当实物声音。",
+      "levels": [
+        [
+          "磨亮处",
+          "敲击声"
+        ],
+        [
+          "向上弯",
+          "锤扁",
+          "向下弯"
+        ],
+        [
+          "磨前后",
+          "敲击声",
+          "锤扁",
+          "弯曲"
+        ]
+      ]
+    },
+    {
+      "page": "photograph-metal-samples",
+      "template": "shutterScout",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.shutterScout",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "observe_state",
+      "selection": "三种样条逐件实拍俯侧，保留同一件的可见光泽和弯折结果图。角度和亮区为模拟，不作材料测量。",
+      "levels": [
+        {
+          "sample": "铜样条",
+          "shotOrder": [
+            "top",
+            "side"
+          ]
+        },
+        {
+          "sample": "铁样条",
+          "shotOrder": [
+            "side",
+            "top",
+            "side"
+          ]
+        },
+        {
+          "sample": "铝样条",
+          "shotOrder": [
+            "top",
+            "side",
+            "top",
+            "side"
+          ]
+        }
+      ]
+    }
+  ],
+  "quiz": [
+    {
+      "id": "where-is-the-copper",
+      "skill": "known-copper-component",
+      "prompt": "这段线已确认有铜芯。哪张图圈出铜芯？",
+      "answer": "B",
+      "optionImages": [
+        "quiz-wire-coating",
+        "quiz-wire-core",
+        "quiz-wire-gap"
+      ]
+    },
+    {
+      "id": "same-bend-conditions",
+      "skill": "fair-bend-comparison",
+      "prompt": "哪组样条一样长、一样粗，也从同一处压？",
+      "answer": "A",
+      "optionImages": [
+        "fair-setup-quiz",
+        "unequal-length-quiz",
+        "unequal-pressure-quiz"
+      ]
+    },
+    {
+      "id": "choose-to-listen",
+      "skill": "choose-method-for-evidence",
+      "prompt": "要听金属片发出的声音，哪种方法合适？",
+      "answer": "C",
+      "optionImages": [
+        "quiz-polish-tile",
+        "quiz-bend-short-strip",
+        "quiz-tap-hanging-tile"
+      ]
+    },
+    {
+      "id": "see-the-thin-tip",
+      "skill": "side-view-shape-change",
+      "prompt": "哪张侧面图能看出样条的末端变薄了？",
+      "answer": "B",
+      "optionImages": [
+        "quiz-tip-top",
+        "quiz-tip-side",
+        "quiz-tip-straight"
+      ]
+    },
+    {
+      "id": "choose-a-pin",
+      "skill": "material-for-a-function",
+      "prompt": "玩具风轮要用硬圆杆撑住。选哪一根？",
+      "answer": "C",
+      "optionImages": [
+        "quiz-soft-cord",
+        "quiz-paper-roll",
+        "quiz-solid-metal-pin"
+      ]
+    },
+    {
+      "id": "alloy-kitchen-tool",
+      "skill": "recognize-a-known-alloy",
+      "prompt": "不锈钢勺、铜线和铁棒，哪件用了合金？",
+      "answer": "A",
+      "optionImages": [
+        "quiz-stainless-spoon",
+        "quiz-known-copper-coil",
+        "quiz-known-iron-rod"
+      ]
+    }
+  ],
+  "afterClass": {
+    "familyTask": "和大人挑一件熟悉、冷却、无尖边的物品，找出一处可能用金属的部件。画它并记下一条可见线索，再请大人查看标识或说明。没查明的种类留空。家庭只观察，不磨、不敲、不用锤子。",
+    "weeklyQuestionSource": [
+      "常见金属",
+      "四种观察方法与记录",
+      "用处和选材",
+      "初步认识合金"
+    ]
+  },
+  "observationPlan": {
+    "scene": "photograph-metal-samples",
+    "trialId": "same-metal-two-views",
+    "simulatedResult": "同一处理后样条的俯视亮区和侧视形变。完成真实操作三关才导出；敲声、手感、家庭真实观察待记录。"
+  },
+  "mediaStatus": {
+    "art": "55_registered_49_scientific_two_source_offline_checked",
+    "build": "pending_prevoice_exact_build",
+    "browser": "pending_scheduled_browser",
+    "voice": "pending_independent_review_and_authorization"
+  }
+}

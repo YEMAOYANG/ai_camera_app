@@ -1,0 +1,298 @@
+{
+  "schemaVersion": "mira.courseware.imagegen-plan.v1",
+  "status": "awaiting_local_disk",
+  "format": "codex_builtin_imagegen_atlases",
+  "style": "原创纸偶小剧场。细纸纹、哑光水粉、干净剪纸轮廓，深松绿和暖奶油底，杏色和柿橙点缀。背景安静、主体大、格间安全留白，纸偶剪影完整，无字无号无标识，不使用教材插图。斑点题恰好几个点由代码控制。",
+  "continuity": "棉花角色始终以白棉、绿叶和暖杏小面庞呈现。老师的戏偶示范用新姿态，不生成书中文字。游戏小平台使用贴近角色和动作的横向裁片，素材底不参与猜答案。",
+  "atlases": [
+    {
+      "id": "cotton-story",
+      "grid": [
+        4,
+        4
+      ],
+      "panels": [
+        {
+          "key": "cotton-opening",
+          "scene": "纸偶小剧场，一株拟人棉花有低垂叶子和困惑的表情。前景下垂叶上有几只浅黄绿小椭圆蚜虫，枝头还没有白棉絮。小台边有一盆不同植物。不要画出版插画"
+        },
+        {
+          "key": "aphids-on-leaves",
+          "scene": "棉花叶近景，小椭圆形的浅黄绿蚜虫成群聚在同一叶上，女孩形状的纸偶在旁低头"
+        },
+        {
+          "key": "swallow-paper-stage",
+          "scene": "新舞台，燕子以叉尾飞来，低头棉花在下方相望，远背景很轻"
+        },
+        {
+          "key": "woodpecker-paper-stage",
+          "scene": "黑白有小红冠的啄木鸟贴树干，一侧有木纹的剖开树干，小虫在树干里面，右下有棉花角色"
+        },
+        {
+          "key": "frog-paper-stage",
+          "scene": "绿蛙向棉花姑娘跳来，后方分开可见稻苗与浅水，叶片不和稻苗重合"
+        },
+        {
+          "key": "helper-on-leaf",
+          "scene": "深绿棉花叶上圆形橙红小瓢虫与小浅黄绿蚜虫相对，俯侧视只显示看不全的背面，避免生成错数背点"
+        },
+        {
+          "key": "cotton-recovered",
+          "scene": "同一棉花纸偶挺直、笑脸，展开碧绿叶片、枝头显出白棉絮，叶上没有虫"
+        },
+        {
+          "key": "read-ask",
+          "scene": "后台同一演员指空木铃架，请面对面的伙伴帮忙，眼神着急又礼貌"
+        },
+        {
+          "key": "read-reply",
+          "scene": "同一小演员正在收好纸偶，用空手指向门旁另一伙伴"
+        },
+        {
+          "key": "read-wonder",
+          "scene": "同一演员掀开一小角蓝布，探头露出惊奇，露出半只木铃"
+        },
+        {
+          "key": "read-glad",
+          "scene": "同一演员举起木铃，笑容轻快，蓝布安静放在一旁"
+        },
+        {
+          "key": "cotton-family",
+          "scene": "大人和孩子并排坐读纸书，桌面放剪纸棉花和动物纸偶，无教材文字"
+        },
+        {
+          "key": "color-green-paper",
+          "scene": "单张鲜碧绿剪纸，大块纯色，边缘和淡奶油纸底清楚"
+        },
+        {
+          "key": "color-white-scarf",
+          "scene": "一条雪白围巾，折痕有淡蓝阴影，与暖纸底区分"
+        },
+        {
+          "key": "color-red-flag",
+          "scene": "一面火红小纸彩旗在木棒上，同样淡奶油底，无符号"
+        },
+        {
+          "key": "sick-stage-prop",
+          "scene": "单片萎下的棉花叶纸偶和一两只淡黄绿色小虫，近处无天空或动物"
+        }
+      ]
+    },
+    {
+      "id": "cotton-arcade",
+      "grid": [
+        4,
+        4
+      ],
+      "panels": [
+        {
+          "key": "sort-backdrop",
+          "scene": "无字纸偶小剧场的安静空台，松绿地面，奶油色帘边，中间空出地图"
+        },
+        {
+          "key": "cotton-cart",
+          "scene": "薄荷单色底，独立杏色小货车游戏精灵，右向简洁，能看见空车斗"
+        },
+        {
+          "key": "cotton-cart-move",
+          "scene": "同一小车的推动帧，车头略前倾，外轮廓和车轮位置一致"
+        },
+        {
+          "key": "cotton-sticker",
+          "scene": "薄荷单色底一枚独立的圆棉花贴纸，白色棉絮和淡绿叶"
+        },
+        {
+          "key": "puppet-swallow",
+          "scene": "单张插画卡，燕子剪影侧飞，尾巴深叉清楚，不画天空外物"
+        },
+        {
+          "key": "puppet-woodpecker",
+          "scene": "单张插画卡，红冠黑白啄木鸟，长直尖嘴，侧身站"
+        },
+        {
+          "key": "puppet-frog",
+          "scene": "单张插画卡，蹲着的青蛙，后腿和眼睛辨认明确"
+        },
+        {
+          "key": "puppet-ladybug",
+          "scene": "单张插画卡，瓢虫侧面剪影，从侧后只看一侧的部分斑点，不展示整背数"
+        },
+        {
+          "key": "dock-sky",
+          "scene": "只有蓝色空中和一只正在空中飞的小黑虫，白云在边，不画燕子"
+        },
+        {
+          "key": "dock-trunk",
+          "scene": "粗树干的剖开近景，一只小虫在木质内部的孔道，不放树叶、不画啄木鸟"
+        },
+        {
+          "key": "dock-paddy",
+          "scene": "水面上有成行稻苗，浅水中一只虫小小的影子，不画青蛙"
+        },
+        {
+          "key": "dock-leaf",
+          "scene": "单片带叶脉的棉花叶正面，几个蚜虫趴在叶上，暖色空底，不画瓢虫"
+        },
+        {
+          "key": "hop-backdrop",
+          "scene": "横向留空的小剧场跑跳场，边缘低饱和棉田景，中央不画角色"
+        },
+        {
+          "key": "cotton-child-ready",
+          "scene": "薄荷单色底，右向短发小演员，杏围巾和松绿围裙，准备动作，游戏精灵"
+        },
+        {
+          "key": "cotton-child-run",
+          "scene": "同一小演员右向迈步，围巾尾略扬，游戏精灵，不画其它物件"
+        },
+        {
+          "key": "cotton-child-jump",
+          "scene": "同一小演员右向跳跃，两脚离地，游戏精灵，不画地面"
+        }
+      ]
+    },
+    {
+      "id": "cotton-quiz",
+      "grid": [
+        4,
+        4
+      ],
+      "panels": [
+        {
+          "key": "quiz-1-a",
+          "scene": "远处空中几只飞虫，棉花叶面干净。本组视角和大小一致。与课堂画的构图不同。"
+        },
+        {
+          "key": "quiz-1-b",
+          "scene": "从叶背斜看一组小蚜虫趴在棉花叶上。本组视角和大小一致。与课堂画的构图不同。"
+        },
+        {
+          "key": "quiz-1-c",
+          "scene": "稻苗和水面附近有小虫，画面没有棉花叶。本组视角和大小一致。与课堂画的构图不同。"
+        },
+        {
+          "key": "quiz-2-a",
+          "scene": "转头停在竖树干边的啄木鸟新姿态。本组视角和大小一致。与课堂画的构图不同。"
+        },
+        {
+          "key": "quiz-2-b",
+          "scene": "燕子飞过画面，叉尾清楚。本组视角和大小一致。与课堂画的构图不同。"
+        },
+        {
+          "key": "quiz-2-c",
+          "scene": "绿色青蛙站在水田的小泥坡。本组视角和大小一致。与课堂画的构图不同。"
+        },
+        {
+          "key": "quiz-4-a",
+          "scene": "小演员背对同伴，已经把船放回箱子。本组视角和大小一致。与课堂画的构图不同。"
+        },
+        {
+          "key": "quiz-4-b",
+          "scene": "小演员面向同伴，指向桌边够不到的纸船。本组视角和大小一致。与课堂画的构图不同。"
+        },
+        {
+          "key": "quiz-4-c",
+          "scene": "小演员已接过同伴递来的船，双手在胸前致谢。本组视角和大小一致。与课堂画的构图不同。"
+        },
+        {
+          "key": "quiz-5-a",
+          "scene": "同样形状的鲜红色布灯笼。本组视角和大小一致。与课堂画的构图不同。"
+        },
+        {
+          "key": "quiz-5-b",
+          "scene": "同样形状的松绿色布灯笼。本组视角和大小一致。与课堂画的构图不同。"
+        },
+        {
+          "key": "quiz-5-c",
+          "scene": "同样形状的雪白色布灯笼。本组视角和大小一致。与课堂画的构图不同。"
+        },
+        {
+          "key": "quiz-7-a",
+          "scene": "棉花姑娘低头，垂叶有小蚜虫。本组视角和大小一致。与课堂画的构图不同。"
+        },
+        {
+          "key": "quiz-7-b",
+          "scene": "绿叶展开，枝头洁白棉花露出来，棉花姑娘笑。本组视角和大小一致。与课堂画的构图不同。"
+        },
+        {
+          "key": "quiz-7-c",
+          "scene": "一个满是稻苗的水田，青蛙在水边，不出现棉花姑娘。本组视角和大小一致。与课堂画的构图不同。"
+        },
+        {
+          "key": "scroll-cotton",
+          "scene": "薄荷底单张卷起来一角的米白纸牌，上面一片细绿叶轮廓，无字无号码，居中清楚"
+        }
+      ]
+    }
+  ],
+  "compositions": {
+    "helper-leaf-and-spots": [
+      "helper-on-leaf",
+      "seven-spots-board"
+    ],
+    "cotton-before-after": [
+      "cotton-opening",
+      "cotton-recovered"
+    ],
+    "reader-voices": [
+      "read-ask",
+      "read-reply",
+      "read-wonder",
+      "read-glad"
+    ],
+    "new-colors-board": [
+      "color-green-paper",
+      "color-white-scarf",
+      "color-red-flag"
+    ],
+    "locations-board": [
+      "dock-sky",
+      "dock-trunk",
+      "dock-paddy",
+      "dock-leaf"
+    ],
+    "plot-cards": [
+      "sick-stage-prop",
+      "swallow-paper-stage",
+      "woodpecker-paper-stage",
+      "frog-paper-stage",
+      "helper-on-leaf",
+      "cotton-recovered"
+    ],
+    "sort-start": [
+      "cotton-cart",
+      "puppet-swallow",
+      "dock-sky",
+      "puppet-woodpecker",
+      "dock-trunk"
+    ],
+    "hop-start": [
+      "cotton-child-jump",
+      "sick-stage-prop",
+      "swallow-paper-stage",
+      "woodpecker-paper-stage"
+    ]
+  },
+  "platformIconSources": {
+    "hop-aphids": "aphids-on-leaves",
+    "hop-swallow": "swallow-paper-stage",
+    "hop-woodpecker": "woodpecker-paper-stage",
+    "hop-frog": "frog-paper-stage",
+    "hop-ladybug": "helper-on-leaf",
+    "hop-end": "cotton-recovered"
+  },
+  "codeDrawn": [
+    "write-ta-jiu",
+    "write-hai-gan",
+    "write-kong-xing",
+    "write-shen",
+    "seven-spots-board",
+    "hop-spots",
+    "quiz-3-a",
+    "quiz-3-b",
+    "quiz-3-c",
+    "quiz-6-a",
+    "quiz-6-b",
+    "quiz-6-c"
+  ]
+}

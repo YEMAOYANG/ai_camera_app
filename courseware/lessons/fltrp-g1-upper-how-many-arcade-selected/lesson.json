@@ -1,0 +1,1021 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "Unit 1 How many?｜数数小码头",
+  "description": "外研社一年级起点上册 Module 8 Unit 1。听懂一到十的英语数词，用 How many? 问数量，再一件一件数。",
+  "grade": 1,
+  "roster": {
+    "mia": {
+      "name": "Mia 老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Jennifer",
+      "avatar": "/teachers/coco-english-v1.png",
+      "color": "#557B76",
+      "persona": "在原创小码头情境中听数、指图和数实物，用孩子听得懂的话解释怎样数。"
+    }
+  },
+  "images": {
+    "harbor-three": {
+      "file": "assets/harbor-three.png"
+    },
+    "four-boats": {
+      "file": "assets/four-boats.png"
+    },
+    "four-boats-tagged": {
+      "file": "assets/four-boats-tagged.png"
+    },
+    "boats-one-four": {
+      "file": "assets/boats-one-four.png"
+    },
+    "boats-five-seven": {
+      "file": "assets/boats-five-seven.png"
+    },
+    "boats-eight-ten": {
+      "file": "assets/boats-eight-ten.png"
+    },
+    "six-boats-line": {
+      "file": "assets/six-boats-line.png"
+    },
+    "six-boats-pairs": {
+      "file": "assets/six-boats-pairs.png"
+    },
+    "shells-4": {
+      "file": "assets/shells-4.png"
+    },
+    "shells-5": {
+      "file": "assets/shells-5.png"
+    },
+    "shells-6": {
+      "file": "assets/shells-6.png"
+    },
+    "shells-7": {
+      "file": "assets/shells-7.png"
+    },
+    "shells-8": {
+      "file": "assets/shells-8.png"
+    },
+    "shells-9": {
+      "file": "assets/shells-9.png"
+    },
+    "shells-10": {
+      "file": "assets/shells-10.png"
+    },
+    "digit-1": {
+      "glyph": {
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "1"
+              }
+            ]
+          }
+        ],
+        "size": [
+          480,
+          240
+        ]
+      }
+    },
+    "digit-2": {
+      "glyph": {
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "2"
+              }
+            ]
+          }
+        ],
+        "size": [
+          480,
+          240
+        ]
+      }
+    },
+    "digit-3": {
+      "glyph": {
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "3"
+              }
+            ]
+          }
+        ],
+        "size": [
+          480,
+          240
+        ]
+      }
+    },
+    "digit-6": {
+      "glyph": {
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "6"
+              }
+            ]
+          }
+        ],
+        "size": [
+          480,
+          240
+        ]
+      }
+    },
+    "digit-8": {
+      "glyph": {
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "8"
+              }
+            ]
+          }
+        ],
+        "size": [
+          480,
+          240
+        ]
+      }
+    },
+    "digit-9": {
+      "glyph": {
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "9"
+              }
+            ]
+          }
+        ],
+        "size": [
+          480,
+          240
+        ]
+      }
+    },
+    "digit-10": {
+      "glyph": {
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "10"
+              }
+            ]
+          }
+        ],
+        "size": [
+          480,
+          240
+        ]
+      }
+    },
+    "game-harbor": {
+      "file": "assets/game-harbor.png"
+    },
+    "game-rover": {
+      "file": "assets/game-rover.png"
+    },
+    "game-rover-pop": {
+      "file": "assets/game-rover-pop.png"
+    },
+    "game-shell": {
+      "file": "assets/game-shell.png"
+    },
+    "boat-target-1": {
+      "file": "assets/boat-target-1.png"
+    },
+    "boat-target-2": {
+      "file": "assets/boat-target-2.png"
+    },
+    "boat-target-3": {
+      "file": "assets/boat-target-3.png"
+    },
+    "boat-target-4": {
+      "file": "assets/boat-target-4.png"
+    },
+    "boat-target-6": {
+      "file": "assets/boat-target-6.png"
+    },
+    "boat-target-8": {
+      "file": "assets/boat-target-8.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "harbor-call",
+      "type": "slide",
+      "title": "小船到了多少只？",
+      "template": "title-picture",
+      "data": {
+        "title": "小船到了多少只？",
+        "picture": "harbor-three",
+        "caption": "How many?"
+      },
+      "script": [
+        {
+          "say": "嘘，小码头来了一队船。值班员在等我们报数呢。"
+        },
+        {
+          "say": "她问 How many? 你觉得她想知道什么？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "先伸出一根手指，从左边开始，指给我看。"
+        },
+        {
+          "say": "One, two, three."
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "How many? 她问的是有多少只小船。"
+        },
+        {
+          "say": "数到最后一只，听见的是 three。"
+        },
+        {
+          "say": "Three! 我们报三只，值班员就知道来了几只啦。"
+        },
+        {
+          "say": "听准啦！"
+        }
+      ]
+    },
+    {
+      "key": "tag-boats",
+      "type": "slide",
+      "title": "给每只船留一个记号",
+      "template": "two-columns",
+      "data": {
+        "title": "给每只船留一个记号",
+        "left": {
+          "heading": "还没数",
+          "body": "从左边开始"
+        },
+        "right": {
+          "heading": "数过了",
+          "body": "最后报总数"
+        },
+        "left_picture": "four-boats",
+        "right_picture": "four-boats-tagged"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "又有一队船来啦。有两只挨得近，会不会数乱呢？"
+        },
+        {
+          "say": "朵朵问，我刚指的是哪一只呀？",
+          "by": "duoduo"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "左边这只是起点。用手指沿着船队慢慢走。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "Count and say. 指一只，说一个数，再留个记号。"
+        },
+        {
+          "say": "One, two, three, four."
+        },
+        {
+          "say": "看见记号就知道已经数过了，手指接着往前走。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "最后一只标着四，所以整队有四只。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "再数一遍吧。"
+        }
+      ]
+    },
+    {
+      "key": "one-to-four",
+      "type": "slide",
+      "title": "小船一只只进港",
+      "template": "picture-points",
+      "data": {
+        "title": "小船一只只进港",
+        "picture": "boats-one-four",
+        "points": [
+          "1   one",
+          "2   two",
+          "3   three",
+          "4   four"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "四组船都排好啦。听见数词，就找船一样多的那一行。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "One."
+        },
+        {
+          "say": "听见 one，找数字一，再点一下这一只船。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "Two."
+        },
+        {
+          "say": "两只船来了！听见 two，就指数字二，再轻拍两下。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "Three."
+        },
+        {
+          "say": "Three 对上数字三。比刚才多来一只，现在有三只。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "Four."
+        },
+        {
+          "say": "听到 four，找数字四。四只船都点到，才数完呀。"
+        },
+        {
+          "say": "我来做一遍给你看。听见 two，我先指数字二。"
+        },
+        {
+          "say": "再逐只点，一只、两只。Two、数字二和两只船，这就对上啦。"
+        },
+        {
+          "say": "没听清？再听一次。"
+        },
+        {
+          "say": "慢一点，先看亮处。"
+        }
+      ]
+    },
+    {
+      "key": "five-to-seven",
+      "type": "slide",
+      "title": "大一点的船队来了",
+      "template": "picture-points",
+      "data": {
+        "title": "大一点的船队来了",
+        "picture": "boats-five-seven",
+        "points": [
+          "5   five",
+          "6   six",
+          "7   seven"
+        ]
+      },
+      "script": [
+        {
+          "say": "咦，这次的船队长一些。数到第四只，手指该往哪儿走？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "顺着这一行继续指，遇到一只新船才说下一个数。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "Five."
+        },
+        {
+          "say": "四只后再来一只，正好五只。听见 five，找数字五。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "Six."
+        },
+        {
+          "say": "听到 six，指数字六。五只后再数一只，正好六只。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "Seven."
+        },
+        {
+          "say": "Seven 对上数字七。这一排数到末尾，一共七只。"
+        },
+        {
+          "say": "跟我拍三下，每下说一个词。Five, six, seven."
+        },
+        {
+          "say": "要是少指一只，耳朵听到的数词也会跟着少一步。"
+        }
+      ]
+    },
+    {
+      "key": "eight-to-ten",
+      "type": "slide",
+      "title": "快数到十啦",
+      "template": "picture-points",
+      "data": {
+        "title": "快数到十啦",
+        "picture": "boats-eight-ten",
+        "points": [
+          "8   eight",
+          "9   nine",
+          "10   ten"
+        ]
+      },
+      "script": [
+        {
+          "say": "码头上只剩三队船了。数到九时，哪队还要接着数呢？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "先找每队最左边的船，眼睛跟着手指走。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "Eight."
+        },
+        {
+          "say": "听见 eight，就找数字八。这一队刚好八只船。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "Nine."
+        },
+        {
+          "say": "数完八再指一只，就是九只。听见 nine，找数字九。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "Ten."
+        },
+        {
+          "say": "Ten 对上数字十。点到最后一只，整队有十只船。"
+        },
+        {
+          "say": "请你用两只手张开十根手指，跟我说一声 ten。"
+        },
+        {
+          "say": "三队都数过一遍了。下次听见 ten，你知道该找哪队啦。"
+        }
+      ]
+    },
+    {
+      "key": "listen-and-steer",
+      "type": "interactive",
+      "title": "泡泡车找号码星",
+      "page": "listen-and-steer",
+      "widgetType": "game",
+      "startImage": "harbor-three",
+      "script": [
+        {
+          "say": "码头的号码星散开啦。耳朵听见的数，就是车要去的地方。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1
+          }
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "看这辆泡泡车，按箭头，它就会朝那边开。"
+        },
+        {
+          "highlight": "#game-target"
+        },
+        {
+          "say": "这回我听见 one。门边的一号星，就跟 one 对上了。"
+        },
+        {
+          "say": "遇到会碎的砖，按圆圆的键喷泡泡，路就开啦。"
+        },
+        {
+          "highlight": "#game-goal"
+        },
+        {
+          "say": "没听清就点小喇叭。新口令一来，耳朵要重新听。"
+        },
+        {
+          "say": "把车交给你啦。先找星星，找齐了再开到小旗旁。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1
+          }
+        }
+      ],
+      "gameAudio": {
+        "word-one": "one-to-four-4",
+        "word-three": "one-to-four-10",
+        "word-four": "one-to-four-13",
+        "word-five": "five-to-seven-5",
+        "word-six": "five-to-seven-8",
+        "word-seven": "five-to-seven-11",
+        "word-nine": "eight-to-ten-8",
+        "word-ten": "eight-to-ten-11",
+        "maze-hint": "one-to-four-17",
+        "maze-help": "one-to-four-18",
+        "maze-praise": "harbor-call-10",
+        "maze-exit": "harbor-recap-10"
+      }
+    },
+    {
+      "key": "count-after-moving",
+      "type": "slide",
+      "title": "小船换队形",
+      "template": "two-columns",
+      "data": {
+        "title": "小船换队形",
+        "left": {
+          "heading": "排成一行",
+          "body": "每只船数一次"
+        },
+        "right": {
+          "heading": "分成三排",
+          "body": "每排接着数"
+        },
+        "left_picture": "six-boats-line",
+        "right_picture": "six-boats-pairs"
+      },
+      "script": [
+        {
+          "say": "风来了，小船把长队变成了短短的三排。"
+        },
+        {
+          "say": "小满说，我刚指过的船还在呢！",
+          "by": "xiaoman"
+        },
+        {
+          "say": "两边的船一样多吗？先猜一猜，手指准备好。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "先数这一行。One, two, three, four, five, six."
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "现在从上往下数。每排从左边开始。"
+        },
+        {
+          "say": "One, two, three, four, five, six."
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "换到下一排，接着报后面的数，整队才数得全。"
+        },
+        {
+          "say": "我来问 How many? 你可以先自己答一声。"
+        },
+        {
+          "say": "Six! 两边都数到六。船换了地方，每一只都还在。"
+        },
+        {
+          "say": "看亮处，慢慢数。"
+        },
+        {
+          "say": "船都到啦！"
+        }
+      ]
+    },
+    {
+      "key": "cargo-count",
+      "type": "interactive",
+      "title": "贝壳送船队",
+      "page": "cargo-count",
+      "widgetType": "game",
+      "startImage": "harbor-three",
+      "script": [
+        {
+          "say": "贝壳飞出去还能拐弯。它要送到哪队船呢？"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1
+          }
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "听见 two，我们就找正好两只船的那队。"
+        },
+        {
+          "highlight": "#game-target"
+        },
+        {
+          "say": "手指一只点一下。数完第二只，正好是 two。"
+        },
+        {
+          "say": "用左右键瞄准，再按发射。飞起来也能转一点。"
+        },
+        {
+          "highlight": "#game-goal"
+        },
+        {
+          "say": "送到一队，就听下一道口令。没数清，可以先等等。"
+        },
+        {
+          "say": "轮到你啦。耳朵听，手指数，再把贝壳送过去。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1
+          }
+        }
+      ],
+      "gameAudio": {
+        "word-one": "one-to-four-4",
+        "word-two": "one-to-four-7",
+        "word-three": "one-to-four-10",
+        "word-four": "one-to-four-13",
+        "word-six": "five-to-seven-8",
+        "word-eight": "eight-to-ten-5",
+        "count-hint": "tag-boats-13",
+        "count-help": "count-after-moving-13",
+        "count-praise": "count-after-moving-14"
+      }
+    },
+    {
+      "key": "finger-turn",
+      "type": "slide",
+      "title": "把码头搬到手指上",
+      "template": "steps",
+      "data": {
+        "title": "把码头搬到手指上",
+        "steps": [
+          "问有多少",
+          "一个一个数",
+          "用最后的数回答"
+        ]
+      },
+      "script": [
+        {
+          "say": "没有小船也能当值班员。把你的一只手借给我吧！"
+        },
+        {
+          "spotlight": "step-1"
+        },
+        {
+          "say": "请伸三根手指。我先来问，How many?"
+        },
+        {
+          "spotlight": "step-2"
+        },
+        {
+          "say": "Count! 用另一只手点这三根，弯着的手指休息。"
+        },
+        {
+          "say": "One, two, three."
+        },
+        {
+          "spotlight": "step-3"
+        },
+        {
+          "say": "最后点到第三根。Three! 这就是伸出来的总数。"
+        },
+        {
+          "say": "现在请大人伸手指，换你来问。你们可以轮流当值班员。"
+        },
+        {
+          "say": "数漏了就从头点一遍。发音也可以请身边的大人帮你听。"
+        }
+      ]
+    },
+    {
+      "key": "shell-stall-check",
+      "type": "quiz",
+      "title": "贝壳摊的小检查",
+      "intro": [
+        "我们来到贝壳摊啦。听清再选，想重听就点小喇叭。"
+      ],
+      "questions": [
+        {
+          "id": "hear-eight",
+          "question": "仔细听。Eight. 找到这张号码牌。",
+          "skill": "number-word-digit",
+          "options": {
+            "a": {
+              "label": "6",
+              "visual": {
+                "kind": "asset",
+                "image": "digit-6",
+                "alt": "数字6"
+              }
+            },
+            "b": {
+              "label": "8",
+              "visual": {
+                "kind": "asset",
+                "image": "digit-8",
+                "alt": "数字8"
+              }
+            },
+            "c": {
+              "label": "9",
+              "visual": {
+                "kind": "asset",
+                "image": "digit-9",
+                "alt": "数字9"
+              }
+            }
+          },
+          "answer": [
+            "b"
+          ],
+          "analysis": "Eight 是八。八对应数字 8。"
+        },
+        {
+          "id": "shell-seven",
+          "question": "Seven. 哪盘贝壳正好这么多？",
+          "skill": "number-word-quantity",
+          "options": {
+            "a": {
+              "label": "七枚贝壳",
+              "visual": {
+                "kind": "asset",
+                "image": "shells-7",
+                "alt": "七枚分开放置的贝壳"
+              }
+            },
+            "b": {
+              "label": "六枚贝壳",
+              "visual": {
+                "kind": "asset",
+                "image": "shells-6",
+                "alt": "六枚分开放置的贝壳"
+              }
+            },
+            "c": {
+              "label": "八枚贝壳",
+              "visual": {
+                "kind": "asset",
+                "image": "shells-8",
+                "alt": "八枚分开放置的贝壳"
+              }
+            }
+          },
+          "answer": [
+            "a"
+          ],
+          "analysis": "Seven 是七。把这盘贝壳逐个数，最后一枚数到 seven，所以选有七枚的图。"
+        },
+        {
+          "id": "count-nine",
+          "question": "How many? 数完这盘贝壳，选一张号码牌。",
+          "skill": "how-many-count",
+          "options": {
+            "a": {
+              "label": "8",
+              "visual": {
+                "kind": "asset",
+                "image": "digit-8",
+                "alt": "数字8"
+              }
+            },
+            "b": {
+              "label": "10",
+              "visual": {
+                "kind": "asset",
+                "image": "digit-10",
+                "alt": "数字10"
+              }
+            },
+            "c": {
+              "label": "9",
+              "visual": {
+                "kind": "asset",
+                "image": "digit-9",
+                "alt": "数字9"
+              }
+            }
+          },
+          "answer": [
+            "c"
+          ],
+          "analysis": "每枚贝壳点一次。最后一枚数到 nine，所以总共九枚，选数字 9。",
+          "visual": {
+            "kind": "asset",
+            "image": "shells-9",
+            "alt": "一盘分开放置的贝壳"
+          }
+        },
+        {
+          "id": "hear-two",
+          "question": "听好。Two. 哪张牌对得上？",
+          "skill": "number-word-digit",
+          "options": {
+            "a": {
+              "label": "3",
+              "visual": {
+                "kind": "asset",
+                "image": "digit-3",
+                "alt": "数字3"
+              }
+            },
+            "b": {
+              "label": "1",
+              "visual": {
+                "kind": "asset",
+                "image": "digit-1",
+                "alt": "数字1"
+              }
+            },
+            "c": {
+              "label": "2",
+              "visual": {
+                "kind": "asset",
+                "image": "digit-2",
+                "alt": "数字2"
+              }
+            }
+          },
+          "answer": [
+            "c"
+          ],
+          "analysis": "Two 是二，选数字 2。"
+        },
+        {
+          "id": "shell-five",
+          "question": "Five. 哪一盘里有这么多贝壳？",
+          "skill": "number-word-quantity",
+          "options": {
+            "a": {
+              "label": "四枚贝壳",
+              "visual": {
+                "kind": "asset",
+                "image": "shells-4",
+                "alt": "四枚分开放置的贝壳"
+              }
+            },
+            "b": {
+              "label": "五枚贝壳",
+              "visual": {
+                "kind": "asset",
+                "image": "shells-5",
+                "alt": "五枚分开放置的贝壳"
+              }
+            },
+            "c": {
+              "label": "六枚贝壳",
+              "visual": {
+                "kind": "asset",
+                "image": "shells-6",
+                "alt": "六枚分开放置的贝壳"
+              }
+            }
+          },
+          "answer": [
+            "b"
+          ],
+          "analysis": "Five 是五。这盘的最后一枚数到 five，刚好五枚。"
+        },
+        {
+          "id": "count-ten",
+          "question": "How many? 一枚一枚数完，再选号码牌。",
+          "skill": "how-many-count",
+          "options": {
+            "a": {
+              "label": "10",
+              "visual": {
+                "kind": "asset",
+                "image": "digit-10",
+                "alt": "数字10"
+              }
+            },
+            "b": {
+              "label": "9",
+              "visual": {
+                "kind": "asset",
+                "image": "digit-9",
+                "alt": "数字9"
+              }
+            },
+            "c": {
+              "label": "8",
+              "visual": {
+                "kind": "asset",
+                "image": "digit-8",
+                "alt": "数字8"
+              }
+            }
+          },
+          "answer": [
+            "a"
+          ],
+          "analysis": "上下两排每排五枚。数完上面一排，再接着数下面，最后到 ten，总共十枚。",
+          "visual": {
+            "kind": "asset",
+            "image": "shells-10",
+            "alt": "分两排放置的一盘贝壳"
+          }
+        }
+      ]
+    },
+    {
+      "key": "harbor-recap",
+      "type": "slide",
+      "title": "给下一班值班员的话",
+      "template": "summary",
+      "data": {
+        "title": "给下一班值班员的话",
+        "items": [
+          "听数词，找数码和对应的数量",
+          "How many? 问有多少",
+          "逐个点数，最后一个数词报总数"
+        ]
+      },
+      "script": [
+        {
+          "say": "下一班值班员来啦。你想把哪几招教给她？"
+        },
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "耳朵听到 six，就找数字六，也可以找六只小船。"
+        },
+        {
+          "say": "你可以请家人说一个数词，再用手指找号码牌。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "想知道一共有多少，可以开口问 How many?"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "回答前先逐个点数。已经指过的就往前走。"
+        },
+        {
+          "say": "最后说到几，整队就有几只。现在换家人当值班员吧。"
+        },
+        {
+          "say": "开到小旗旁。"
+        },
+        {
+          "say": "再听一次那声 How many? 这回你知道怎么帮她了。"
+        }
+      ]
+    }
+  ]
+}

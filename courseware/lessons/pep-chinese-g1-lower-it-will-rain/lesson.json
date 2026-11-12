@@ -1,0 +1,1122 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "要下雨了",
+  "description": "听动物对话、找故事线索、用图片复述，再试一试六个字和不同说话口气。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小语老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Serena",
+      "avatar": "/avatars/teacher-2.png",
+      "color": "#D65A8A",
+      "persona": "用自然普通话带一年级孩子从动作图和角色对话里找线索。"
+    }
+  },
+  "images": {
+    "rabbit-clouds": {
+      "file": "assets/rabbit-clouds.png"
+    },
+    "overcast": {
+      "file": "assets/overcast.png"
+    },
+    "wet-leaf": {
+      "file": "assets/wet-leaf.png"
+    },
+    "free-time": {
+      "file": "assets/free-time.png"
+    },
+    "stuffy": {
+      "file": "assets/stuffy.png"
+    },
+    "rush": {
+      "file": "assets/rush.png"
+    },
+    "news": {
+      "file": "assets/news.png"
+    },
+    "water-surface": {
+      "file": "assets/water-surface.png"
+    },
+    "bend": {
+      "file": "assets/bend.png"
+    },
+    "bright": {
+      "file": "assets/bright.png"
+    },
+    "dry-leaf": {
+      "file": "assets/dry-leaf.png"
+    },
+    "busy": {
+      "file": "assets/busy.png"
+    },
+    "stand": {
+      "file": "assets/stand.png"
+    },
+    "bird-icon": {
+      "file": "assets/bird-icon.png"
+    },
+    "fish-icon": {
+      "file": "assets/fish-icon.png"
+    },
+    "ant-icon": {
+      "file": "assets/ant-icon.png"
+    },
+    "rain-icon": {
+      "file": "assets/rain-icon.png"
+    },
+    "weather-boat": {
+      "file": "assets/weather-boat.png"
+    },
+    "weather-boat-pop": {
+      "file": "assets/weather-boat-pop.png"
+    },
+    "maze-rover": {
+      "file": "assets/maze-rover.png"
+    },
+    "maze-rover-pop": {
+      "file": "assets/maze-rover-pop.png"
+    },
+    "game-sticker": {
+      "file": "assets/game-sticker.png"
+    },
+    "weather-backdrop": {
+      "file": "assets/weather-backdrop.png"
+    },
+    "maze-backdrop": {
+      "file": "assets/maze-backdrop.png"
+    },
+    "low-flight-board": {
+      "file": "assets/low-flight-board.png"
+    },
+    "fish-water-board": {
+      "file": "assets/fish-water-board.png"
+    },
+    "message-board": {
+      "file": "assets/message-board.png"
+    },
+    "rain-result-board": {
+      "file": "assets/rain-result-board.png"
+    },
+    "weather-game-start": {
+      "file": "assets/weather-game-start.png"
+    },
+    "maze-game-start": {
+      "file": "assets/maze-game-start.png"
+    },
+    "write-this-look-card": {
+      "file": "assets/write-this-look-card.png"
+    },
+    "write-fish-surface-card": {
+      "file": "assets/write-fish-surface-card.png"
+    },
+    "write-ask-add-card": {
+      "file": "assets/write-ask-add-card.png"
+    },
+    "voice-practice-board": {
+      "file": "assets/voice-practice-board.png"
+    },
+    "rain-sticker": {
+      "file": "assets/rain-sticker.png"
+    },
+    "quiz-1-a": {
+      "file": "assets/quiz-1-a.png"
+    },
+    "quiz-1-b": {
+      "file": "assets/quiz-1-b.png"
+    },
+    "quiz-1-c": {
+      "file": "assets/quiz-1-c.png"
+    },
+    "quiz-2-a": {
+      "file": "assets/quiz-2-a.png"
+    },
+    "quiz-2-b": {
+      "file": "assets/quiz-2-b.png"
+    },
+    "quiz-2-c": {
+      "file": "assets/quiz-2-c.png"
+    },
+    "quiz-3-a": {
+      "file": "assets/quiz-3-a.png"
+    },
+    "quiz-3-b": {
+      "file": "assets/quiz-3-b.png"
+    },
+    "quiz-3-c": {
+      "file": "assets/quiz-3-c.png"
+    },
+    "quiz-4-a": {
+      "file": "assets/quiz-4-a.png"
+    },
+    "quiz-4-b": {
+      "file": "assets/quiz-4-b.png"
+    },
+    "quiz-4-c": {
+      "file": "assets/quiz-4-c.png"
+    },
+    "quiz-5-a": {
+      "file": "assets/quiz-5-a.png"
+    },
+    "quiz-5-b": {
+      "file": "assets/quiz-5-b.png"
+    },
+    "quiz-5-c": {
+      "file": "assets/quiz-5-c.png"
+    },
+    "quiz-6-a": {
+      "file": "assets/quiz-6-a.png"
+    },
+    "quiz-6-b": {
+      "file": "assets/quiz-6-b.png"
+    },
+    "quiz-6-c": {
+      "file": "assets/quiz-6-c.png"
+    },
+    "word-practice-board": {
+      "file": "assets/word-practice-board.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "clouds-before-rain",
+      "type": "slide",
+      "title": "天色变了，小兔看见什么",
+      "template": "picture-points",
+      "data": {
+        "title": "天色变了，小兔看见什么",
+        "picture": "rabbit-clouds",
+        "points": [
+          "阴沉沉",
+          "弯腰",
+          "要下雨了"
+        ]
+      },
+      "script": [
+        {
+          "say": "雨声剧场要开场了。第一幕，小兔在草地上忙着。"
+        },
+        {
+          "say": "抬头看看，天空的颜色和晴天有什么不同？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "几层灰云压在天上，光线暗下来，可以说天空阴沉沉。"
+        },
+        {
+          "say": "阴读第一声，沉读第二声。阴沉沉说的是天色暗。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "把手伸向脚边，身体从腰这儿弯下去，这就叫弯腰。"
+        },
+        {
+          "say": "腰和要听着有点像。腰读第一声，快要的要读第四声。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "快要下雨，是雨还没落下。看看草地，还没雨点。"
+        },
+        {
+          "say": "小兔想知道是不是快下雨，接着去听谁的说法？"
+        }
+      ]
+    },
+    {
+      "key": "swallow-answer",
+      "type": "slide",
+      "title": "燕子怎么飞得这样低",
+      "template": "picture-points",
+      "data": {
+        "title": "燕子怎么飞得这样低",
+        "picture": "low-flight-board",
+        "points": [
+          "低飞",
+          "潮湿 · 忙",
+          "呀 · 呢"
+        ]
+      },
+      "script": [
+        {
+          "say": "第一位遇到的是燕子。看一眼燕子的位置，再看草尖。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "燕子掠过草尖，离地不高，小兔想问个明白。"
+        },
+        {
+          "say": "书里的燕子说，小虫飞不高，它贴近地面追虫。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "按故事里的说法，雨前空气潮湿，小虫翅膀沾了水汽。"
+        },
+        {
+          "say": "潮湿是有湿气。燕子忙着捉虫。忙指有事做，读第二声。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "老师换一句问话给你听。小船怎么停住了呀？"
+        },
+        {
+          "say": "呀轻轻收住，语气还带着疑问，等别人回答。"
+        },
+        {
+          "say": "好热闹呢！这个呢也轻轻读，整句话是在表达惊喜。"
+        }
+      ]
+    },
+    {
+      "key": "fish-answer",
+      "type": "slide",
+      "title": "小鱼在水面的哪一边",
+      "template": "picture-points",
+      "data": {
+        "title": "小鱼在水面的哪一边",
+        "picture": "fish-water-board",
+        "points": [
+          "面 · 水面 · 闷",
+          "空气 · 有空",
+          "吗 · 吧"
+        ]
+      },
+      "script": [
+        {
+          "say": "小兔还拿不准。到了池边，它看见鱼游近水面。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "水和空气相接的一层叫水面。水面的面读第四声。"
+        },
+        {
+          "say": "故事里鱼觉得水里闷，要上来透气。闷读第一声。"
+        },
+        {
+          "say": "屋里闷热，小朋友都擦汗了。找这样的图。"
+        },
+        {
+          "say": "请找水面。看看小船刚好停在水的哪一层。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "空气的空是第一声。有空的空是第四声，指有时间。"
+        },
+        {
+          "say": "忙完就有空玩一会儿。听前后的词，就能分清。"
+        },
+        {
+          "say": "手上的事情已经做完，现在有空了。找这张图。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "小鱼提醒小兔回家。听个新问题。你听见风声了吗？"
+        },
+        {
+          "say": "吗轻轻读，表示问。咱们回屋吧，吧也轻读，表示提议。"
+        }
+      ]
+    },
+    {
+      "key": "send-news",
+      "type": "slide",
+      "title": "消息从池边传到谁那儿",
+      "template": "picture-points",
+      "data": {
+        "title": "消息从池边传到谁那儿",
+        "picture": "message-board",
+        "points": [
+          "消 · 息",
+          "小兔告诉蚂蚁",
+          "连忙"
+        ]
+      },
+      "script": [
+        {
+          "say": "小兔听了小鱼的提醒，带着这件新听到的事往家跑。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "听来的事情转告给别人，就把消息传了出去。"
+        },
+        {
+          "say": "消读第一声。息单读第一声，在消息里读轻声。"
+        },
+        {
+          "say": "一人把刚听来的消息告诉同伴。哪张图是这样？"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "小兔听过燕子和鱼，把快下雨的消息告诉路上的蚂蚁。"
+        },
+        {
+          "say": "蚂蚁忙着搬东西。再看小兔下一步往哪儿去。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "小兔听了这些线索，接着把脚步加快，赶回家去。"
+        },
+        {
+          "say": "连忙就是赶紧去做。听到敲门声，她连忙跑去开门。"
+        },
+        {
+          "say": "听到提醒，孩子连忙跑去拿书包。找动作快的那一张。"
+        }
+      ]
+    },
+    {
+      "key": "rain-then",
+      "type": "slide",
+      "title": "先找线索，再看雨落下来",
+      "template": "picture-points",
+      "data": {
+        "title": "先找线索，再看雨落下来",
+        "picture": "rain-result-board",
+        "points": [
+          "先听说 · 再相信",
+          "雷声后落雨",
+          "故事里的观察",
+          "接齐再去小旗"
+        ]
+      },
+      "script": [
+        {
+          "say": "剧场最后一幕到了。刚才小兔还在问，现在呢？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先找小兔遇到的第一位，想想它在草尖附近看到谁。"
+        },
+        {
+          "say": "下一位是在池边遇到的，想想谁游到水面。"
+        },
+        {
+          "say": "现在找小兔离开池边后遇到的一位。它正忙着搬东西。"
+        },
+        {
+          "say": "先是燕子低飞，再是鱼到水面，接着蚂蚁搬东西。"
+        },
+        {
+          "say": "线索接上了，小兔从拿不准，变成赶回去告诉家人。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "最后到了哪一幕？听见雷声后，想想天空落下了什么。"
+        },
+        {
+          "say": "小兔还在赶路时，听到了雷声。后面真的下起了雨。"
+        },
+        {
+          "say": "先听见线索，再看见下雨。用先、接着、最后讲清楚。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "前几幕给小兔线索。最后见到雨点，才知道雨已下了。"
+        },
+        {
+          "say": "生活里看到这些动物动作，可以先看天气，再判断。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "复述完，就能开泡泡车给这些画面排队。"
+        },
+        {
+          "say": "想想小兔上一幕在哪儿，接着遇见谁。可以重听。"
+        },
+        {
+          "say": "看看变亮的线索图，收下它，再听下一幕。"
+        },
+        {
+          "say": "这关的片段已经收齐。把泡泡车开到小旗那格。"
+        }
+      ]
+    },
+    {
+      "key": "match-a-voice",
+      "type": "slide",
+      "title": "先听词，再认画面",
+      "template": "picture-points",
+      "data": {
+        "title": "先听词，再认画面",
+        "picture": "word-practice-board",
+        "points": [
+          "看光线",
+          "看叶面",
+          "看动作"
+        ]
+      },
+      "script": [
+        {
+          "say": "眼前每对图都很像。我们听一个词，给它配一幅画。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "晴天有明亮的太阳。几层深灰云出现时，光线就暗了。"
+        },
+        {
+          "say": "找天空阴沉沉的图。云很厚，光线暗。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "两片叶子形状相像。带小水珠的叶子是湿的。"
+        },
+        {
+          "say": "哪张图让你想到潮湿？找一找叶面上有小水珠的那张。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "孩子捡东西时会弯腰。拿到手以后，再站直。"
+        },
+        {
+          "say": "找孩子弯腰拾起围巾的画面。看腰是怎样弯的。"
+        },
+        {
+          "say": "第一遍没听清，还可以再听。我们马上用泡泡艇配画。"
+        },
+        {
+          "say": "你把听到的词和画面配对了。"
+        },
+        {
+          "say": "图卡会慢一点。对准发亮的图再吹泡泡。"
+        },
+        {
+          "say": "没接住先重听。比一比两张图，再开船。"
+        }
+      ]
+    },
+    {
+      "key": "listen-for-weather-words",
+      "type": "interactive",
+      "title": "泡泡艇听词找图",
+      "page": "listen-for-weather-words",
+      "widgetType": "game",
+      "startImage": "weather-game-start",
+      "script": [
+        {
+          "say": "剧场要给听到的词配画。你愿意开小艇试试吗？"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#weather-listen-mark"
+        },
+        {
+          "say": "先听口令。这一回找的是天空阴沉沉的样子。"
+        },
+        {
+          "highlight": "#weather-first-cloud"
+        },
+        {
+          "say": "这张灰云很厚，天光很暗。亮太阳的那张是另一种天气。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "用两边的箭头把艇开到那张画的下面，船头就对上了。"
+        },
+        {
+          "say": "对好船头，点圆圆的泡泡键，等泡泡飘过去。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "我演一次就停。轮到你时从头开船，没接住可以先重听。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "word-dark": "match-a-voice-4",
+        "word-wet": "match-a-voice-7",
+        "word-surface": "fish-answer-6",
+        "word-stuffy": "fish-answer-5",
+        "word-rush": "send-news-12",
+        "word-bend": "match-a-voice-10",
+        "word-news": "send-news-5",
+        "word-free": "fish-answer-10",
+        "word-hint": "match-a-voice-14",
+        "word-hint-again": "match-a-voice-13",
+        "word-praise": "match-a-voice-12"
+      }
+    },
+    {
+      "key": "choose-the-scene",
+      "type": "interactive",
+      "title": "泡泡车串起故事",
+      "page": "choose-the-scene",
+      "widgetType": "game",
+      "startImage": "maze-game-start",
+      "script": [
+        {
+          "say": "想给伙伴看故事。请开泡泡车按先后带回画面。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#maze-listen-mark"
+        },
+        {
+          "say": "先听第一个提示。小兔遇到的头一位是谁？"
+        },
+        {
+          "highlight": "#maze-first-swallow"
+        },
+        {
+          "say": "看，这张图里燕子贴近草尖飞。先到燕子这一站。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "按箭头开到那一格。橙色软挡板能用泡泡打开。"
+        },
+        {
+          "say": "每接一幕再听下一句。接齐了，才开去小旗。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "我只接第一幕就停。你来时从起点重新开。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "maze-begin": "rain-then-3",
+        "maze-after-bird": "rain-then-4",
+        "maze-after-fish": "rain-then-5",
+        "maze-after-ant": "rain-then-9",
+        "maze-exit": "rain-then-19",
+        "maze-hint": "rain-then-17",
+        "maze-hint-again": "rain-then-18",
+        "maze-praise": "listen-and-retell-9"
+      }
+    },
+    {
+      "key": "write-this-look",
+      "type": "slide",
+      "title": "写好这和看",
+      "template": "picture-points",
+      "data": {
+        "title": "写好这和看",
+        "picture": "write-this-look-card",
+        "points": [
+          "这 · 先文，后走之",
+          "看 · 先上，后目",
+          "纸上试一格"
+        ]
+      },
+      "script": [
+        {
+          "say": "来给剧场做字卡。这和看的长笔能帮字站稳。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "这先写文，再写走之底。文先写点、横、撇、点。"
+        },
+        {
+          "say": "走之底写点、横折折撇、捺。平捺向右托住文。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "看先写上面。短撇、两横，再把长撇伸向左下。"
+        },
+        {
+          "say": "再写目，竖、横折、横、横、横。里边两横隔开。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "看图里的橙色笔画和位置，再在纸上试。"
+        },
+        {
+          "say": "请家人看看，走之底托住文了吗？目里的横挤吗？"
+        }
+      ]
+    },
+    {
+      "key": "write-fish-surface",
+      "type": "slide",
+      "title": "写好鱼和面",
+      "template": "picture-points",
+      "data": {
+        "title": "写好鱼和面",
+        "picture": "write-fish-surface-card",
+        "points": [
+          "鱼 · 最后一横",
+          "面 · 先横，再撇",
+          "纸上比一比"
+        ]
+      },
+      "script": [
+        {
+          "say": "鱼到了水面。分开看两个字，留心最后一笔。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先撇、横撇。再写田，竖、横折、横、竖、横。"
+        },
+        {
+          "say": "田的竖在中间。最后一笔长横，另写在田下边。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "面先写最上面的一横，从横的中部下面起笔向左下撇。"
+        },
+        {
+          "say": "再写左竖、横折、两竖、两横，最后一横封底。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "鱼有长横在下面，面有一横在上面，位置看仔细。"
+        },
+        {
+          "say": "纸上试一试。给家人看，你给里面留了多少空隙。"
+        }
+      ]
+    },
+    {
+      "key": "write-ask-add",
+      "type": "slide",
+      "title": "两个口放在哪儿",
+      "template": "picture-points",
+      "data": {
+        "title": "两个口放在哪儿",
+        "picture": "write-ask-add-card",
+        "points": [
+          "问 · 先框，后口",
+          "加 · 先力，后口",
+          "比较口的位置"
+        ]
+      },
+      "script": [
+        {
+          "say": "问和加都有个口。看看图，两个口待在一样的位置吗？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "问先写门字框。笔顺是点、竖、横折钩。"
+        },
+        {
+          "say": "再写口，竖、横折、横。小口在框里靠中间。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "加左边写力，先写横折钩，再写撇。"
+        },
+        {
+          "say": "右边写口，竖、横折、横。口小些，靠近力。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "问的口在里面，加的口在右边。说给家人听。"
+        },
+        {
+          "say": "纸上各写一个，再指给家人看，你把小口放到哪儿了。"
+        }
+      ]
+    },
+    {
+      "key": "read-with-voices",
+      "type": "slide",
+      "title": "换口气读一句",
+      "template": "picture-points",
+      "data": {
+        "title": "换口气读一句",
+        "picture": "voice-practice-board",
+        "points": [
+          "疑问",
+          "提醒",
+          "惊喜 · 着急"
+        ]
+      },
+      "script": [
+        {
+          "say": "听老师换口气说话。留心句尾和说得重的字。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "纸船漂到桥下了吗？我是想问伙伴，还在等他回答。"
+        },
+        {
+          "say": "句尾有问号，吗读轻一点，让人听出你是在问。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "地上有水，走慢些吧。逗号停一下，再提醒。"
+        },
+        {
+          "say": "把走慢些读清楚。吧轻轻收住，提醒听起来更亲切。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "呀，窗边一下子来了两只鸟！感叹号这儿，读出惊喜。"
+        },
+        {
+          "say": "看右图，她着急地喊。哎呀，雨下大了，快进屋！"
+        },
+        {
+          "say": "把快字读重些，读出着急。再去纸书换角色读。"
+        }
+      ]
+    },
+    {
+      "key": "picture-check",
+      "type": "quiz",
+      "title": "听老师说，给故事选画面",
+      "intro": [
+        "一题一题听，想清楚以后选一张图。"
+      ],
+      "questions": [
+        {
+          "id": "which-action-helps",
+          "question": "小虫贴近草尖飞。哪幅图里的燕子能跟着小虫捉食？",
+          "skill": "extract-evidence",
+          "answer": [
+            "B"
+          ],
+          "analysis": "小虫就在草尖上方，燕子贴着草尖飞，才跟得上故事里飞不高的小虫。",
+          "options": {
+            "A": {
+              "label": "高处飞",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-1-a",
+                "alt": "燕子在草地上方很远的天空飞"
+              }
+            },
+            "B": {
+              "label": "贴着草飞",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-1-b",
+                "alt": "燕子贴着草尖追小虫"
+              }
+            },
+            "C": {
+              "label": "在树枝上",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-1-c",
+                "alt": "燕子站在树枝上"
+              }
+            }
+          }
+        },
+        {
+          "id": "fish-near-surface",
+          "question": "小鱼说待在下面闷。哪张图是它游到水面来透气？",
+          "skill": "extract-evidence",
+          "answer": [
+            "A"
+          ],
+          "analysis": "水面在水和空气相接的地方。鱼头紧贴水面那一幅，才是它游了上来。",
+          "options": {
+            "A": {
+              "label": "鱼到水面",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-2-a",
+                "alt": "橙鱼头靠水面，水线上有一圈波纹"
+              }
+            },
+            "B": {
+              "label": "鱼在水底",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-2-b",
+                "alt": "橙鱼在最深处的石子旁"
+              }
+            },
+            "C": {
+              "label": "鱼在水中间",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-2-c",
+                "alt": "橙鱼离水面还有一大段"
+              }
+            }
+          }
+        },
+        {
+          "id": "who-heard-the-news",
+          "question": "小兔从池边往家跑，先把刚听到的消息告诉路上谁？",
+          "skill": "story-order",
+          "answer": [
+            "C"
+          ],
+          "analysis": "小鱼提醒小兔之后，小兔在往家走的路上把消息先告诉了搬东西的蚂蚁。",
+          "options": {
+            "A": {
+              "label": "告诉燕子",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-3-a",
+                "alt": "小兔朝停在石头上的燕子讲话"
+              }
+            },
+            "B": {
+              "label": "告诉小鱼",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-3-b",
+                "alt": "小兔朝水边的橙鱼讲话"
+              }
+            },
+            "C": {
+              "label": "告诉蚂蚁",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-3-c",
+                "alt": "小兔弯腰朝背着小包的蚂蚁讲话"
+              }
+            }
+          }
+        },
+        {
+          "id": "when-free",
+          "question": "听我说，有空来听故事。这里的有空，说的是哪幅图？",
+          "skill": "word-context",
+          "answer": [
+            "B"
+          ],
+          "analysis": "这里是有时间的意思。画画的事已经做完，才有空过来。空在这个词里读第四声。",
+          "options": {
+            "A": {
+              "label": "还在忙",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-4-a",
+                "alt": "女孩手里拿笔在桌边涂画，手上的事还没做完"
+              }
+            },
+            "B": {
+              "label": "做完能歇",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-4-b",
+                "alt": "画收好，桌面空出来，女孩坐下休息"
+              }
+            },
+            "C": {
+              "label": "扇一扇",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-4-c",
+                "alt": "女孩在窗前扇扇子，有两道气流"
+              }
+            }
+          }
+        },
+        {
+          "id": "question-voice",
+          "question": "听，纸船漂到哪儿了呀？哪一幅图里的人也在问伙伴？",
+          "skill": "role-intonation",
+          "answer": [
+            "A"
+          ],
+          "analysis": "孩子朝伙伴摊开双手，神情疑惑，像在发问。举船欢呼和伸手提醒是另外两种口气。",
+          "options": {
+            "A": {
+              "label": "问伙伴",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-5-a",
+                "alt": "一个孩子朝伙伴摊开双手，露出疑惑的表情"
+              }
+            },
+            "B": {
+              "label": "举船欢呼",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-5-b",
+                "alt": "一个孩子高兴地举着红色纸船"
+              }
+            },
+            "C": {
+              "label": "提醒停步",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-5-c",
+                "alt": "一个孩子伸手提醒伙伴别走进水洼"
+              }
+            }
+          }
+        },
+        {
+          "id": "write-wen",
+          "question": "写问的时候，口在门字框哪里才合适？",
+          "skill": "write-six",
+          "answer": [
+            "C"
+          ],
+          "analysis": "小口写在门字框里靠中间，两边留一点空。挤到边上或移到框外都不合适。",
+          "options": {
+            "A": {
+              "label": "挤在一边",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-6-a",
+                "alt": "口挤到门字框的左边"
+              }
+            },
+            "B": {
+              "label": "放在框外",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-6-b",
+                "alt": "小口落在门字框外面的右边"
+              }
+            },
+            "C": {
+              "label": "框内居中",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-6-c",
+                "alt": "口小而清楚，落在门字框里面靠中间"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "listen-and-retell",
+      "type": "slide",
+      "title": "把雨声剧场带回家",
+      "template": "picture-points",
+      "data": {
+        "title": "把雨声剧场带回家",
+        "picture": "rain-sticker",
+        "points": [
+          "三条线索",
+          "小兔怎么想",
+          "和家人换角色"
+        ]
+      },
+      "script": [
+        {
+          "say": "小伞贴纸送给你。把今天找到的线索连起来。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先说燕子贴近草尖捉虫，再说鱼来到水面透气。"
+        },
+        {
+          "say": "接着是小兔告诉蚂蚁消息，蚂蚁那会儿正忙着搬东西。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "小兔先想问清楚。多听了几条，就跑去告诉家人。"
+        },
+        {
+          "say": "最后响起雷声，雨点落下来。故事接完整了。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "这段故事的画面按先后接上了。"
+        },
+        {
+          "say": "选一段纸书对话，轮流做小兔、燕子、小鱼或蚂蚁。"
+        },
+        {
+          "say": "问句等对方答，提醒说清楚。再选两个字写给家人看。"
+        }
+      ]
+    }
+  ]
+}

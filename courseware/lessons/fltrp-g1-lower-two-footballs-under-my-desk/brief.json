@@ -1,0 +1,249 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "lesson": {
+    "editionId": "smartedu-english-six-year-g1-lower-sync-c8ae9406",
+    "revisionId": "directory-057e330e9b4c19ff0e6ab21e",
+    "nodeId": "450ced2f-2bc4-3baf-8521-07ad0e231720",
+    "unitId": "c4f01db5-7a93-3c42-a559-bff19502f64b",
+    "subject": "english",
+    "lessonTitle": "Unit 2 There are two footballs under my desk.",
+    "unitTitle": "Module 8",
+    "gradeCode": "primary_1",
+    "volume": "lower",
+    "schoolSystem": "six_year"
+  },
+  "teacher": {
+    "code": "mira_english_standard",
+    "voice": "Jennifer",
+    "gender": "female"
+  },
+  "goals": [
+    {
+      "id": "g-where",
+      "goal": "结合参照物听懂 under 与 on：位置要相对桌面或椅面看，不能只凭球在整张图里高或低。",
+      "pageRefs": [
+        "印47 活动1–2",
+        "印48 活动3",
+        "印49 活动6",
+        "外研218255 p1、5–7",
+        "外研218231 p1"
+      ]
+    },
+    {
+      "id": "g-balls",
+      "goal": "凭外形和口令识别 football、basketball 与 ping-pong ball，逐一数清同一处的一组。",
+      "pageRefs": [
+        "印47 活动2",
+        "外研218247 p4–11"
+      ]
+    },
+    {
+      "id": "g-exists",
+      "goal": "同种物品只有一件时听说 There is，看到两件或更多用 There are 并数清楚；在话里补上实际地点。",
+      "pageRefs": [
+        "印47 活动1–2",
+        "印48 活动3",
+        "印49 活动6",
+        "外研218247 p16–21",
+        "外研218231 p1、3–4"
+      ]
+    },
+    {
+      "id": "g-do",
+      "goal": "听熟悉的穿戴指令做动作，并试着摆好或画出物品，用一句话让家人找到。",
+      "pageRefs": [
+        "印48 活动4",
+        "印49 活动5–6",
+        "外研218255 p6–7",
+        "外研218224 p25、31"
+      ]
+    }
+  ],
+  "keyPoint": "听清球类、数量和位置，用 There are 表达同一处有多个物品。",
+  "difficultPoint": "同一种球同样多时仍要看参照物与相对位置；看到一件与多件时切换 There is/There are。",
+  "authoring": {
+    "method": "direct_authoring",
+    "author": "Codex GPT-6",
+    "nativeGenerationSubmitted": false,
+    "reviewedOfficialHours": [
+      "publisher_module8_period_2"
+    ],
+    "gameTemplates": [
+      {
+        "id": "wordBubbles",
+        "version": 1,
+        "knowledgeRule": "listen_match",
+        "levels": 3,
+        "progression": "同量同类辨上下；再辨球类；最后同时核对数量、球类与参照物。"
+      },
+      {
+        "id": "listenDelivery",
+        "version": 1,
+        "knowledgeRule": "listen_pick_deliver",
+        "levels": 3,
+        "progression": "数量与球类控制装载，听参照物与相对位置选择可辨图标的不同送达车道。"
+      }
+    ]
+  },
+  "pageSequence": [
+    {
+      "page": 1,
+      "type": "slide",
+      "title": "球滚到哪儿了",
+      "play": "原创器材角设悬念，先找参照物。",
+      "bookActivities": [
+        1,
+        2
+      ]
+    },
+    {
+      "page": 2,
+      "type": "slide",
+      "title": "听出三种球",
+      "play": "用球纹与大小对照足球、篮球、乒乓球。",
+      "bookActivities": [
+        2
+      ]
+    },
+    {
+      "page": 3,
+      "type": "slide",
+      "title": "桌面上与桌子下",
+      "play": "同一张桌、同样的球作 on/under 对照。",
+      "bookActivities": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "type": "slide",
+      "title": "球在箱子里面",
+      "play": "比较三只与五只的开口箱图，看箱沿遮挡并复现 in。",
+      "bookActivities": [
+        1,
+        2,
+        3
+      ],
+      "page": 4
+    },
+    {
+      "page": 5,
+      "type": "slide",
+      "title": "一只和两只怎么说",
+      "play": "用同一把椅子的独立例图数清楚，再区分 There is 和 There are。",
+      "bookActivities": [
+        2,
+        6
+      ]
+    },
+    {
+      "page": 6,
+      "type": "interactive",
+      "title": "听完整句话再碰泡泡",
+      "play": "大图泡泡呈现不同球类、只数、家具位置，完整口令决定能否过关。",
+      "bookActivities": [
+        2,
+        3
+      ]
+    },
+    {
+      "page": 7,
+      "type": "slide",
+      "title": "听口令，做一个动作",
+      "play": "用原创图示范一个 Put on your hat 的动作，接纸书穿戴，再用 Pick up 过渡到送球。",
+      "bookActivities": [
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "type": "slide",
+      "title": "先听拿什么，再听放在哪儿",
+      "play": "按先拿后放练习，孩子在口令里听清球种、数量与参照位置。",
+      "bookActivities": [
+        2,
+        3,
+        6
+      ],
+      "page": 8
+    },
+    {
+      "page": 9,
+      "type": "interactive",
+      "title": "送到图上指定的地方",
+      "play": "按原创新口令装对球组，送到正确参照位置图标，再重听核对。",
+      "bookActivities": [
+        2,
+        3,
+        6
+      ]
+    },
+    {
+      "page": 10,
+      "type": "quiz",
+      "title": "听完再找新图",
+      "play": "独立六题检球、数、方位、单复数。",
+      "bookActivities": [
+        1,
+        2,
+        3,
+        6
+      ]
+    },
+    {
+      "page": 11,
+      "type": "slide",
+      "title": "自己摆一摆，说一说",
+      "play": "把一件或几件物品摆在安全可见的位置，说给家人听；书中活动留给纸书。",
+      "bookActivities": [
+        4,
+        5,
+        6
+      ]
+    }
+  ],
+  "quiz": [
+    {
+      "id": "gear-q1",
+      "skill": "球类词汇",
+      "correctPositionOneBased": 2
+    },
+    {
+      "id": "gear-q2",
+      "skill": "同球同量辨on/under",
+      "correctPositionOneBased": 1
+    },
+    {
+      "id": "gear-q3",
+      "skill": "一件和多件",
+      "correctPositionOneBased": 3
+    },
+    {
+      "id": "gear-q4",
+      "skill": "同量球类位置一起核",
+      "correctPositionOneBased": 2
+    },
+    {
+      "id": "gear-q5",
+      "skill": "参照物桌椅区分",
+      "correctPositionOneBased": 3
+    },
+    {
+      "id": "gear-q6",
+      "skill": "in 和 on",
+      "correctPositionOneBased": 1
+    }
+  ],
+  "afterClass": {
+    "official": [
+      "回纸书听读",
+      "用 There are… 问答",
+      "摆放或画图后介绍"
+    ],
+    "inLesson": "原创图、听辨游戏与六道小检查。",
+    "atHome": "在看得见的地方摆一件或几件轻物，用一条句子让家人找，不要求录音。",
+    "weekly": "球类、数量、位置和 There is/There are 进入周题源。"
+  }
+}

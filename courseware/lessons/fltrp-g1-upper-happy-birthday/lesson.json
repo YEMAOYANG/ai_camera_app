@@ -1,0 +1,883 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "Unit 2 Happy birthday!",
+  "description": "听清祝福对象、礼物和说话顺序，在派对里练习送礼和感谢。",
+  "grade": 1,
+  "roster": {
+    "mia": {
+      "name": "Mia 老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Jennifer",
+      "avatar": "/teachers/coco-english-v1.png",
+      "color": "#557B76",
+      "persona": "和孩子在生活情境里听清、想一想，再说完整的话。"
+    }
+  },
+  "images": {
+    "party-cover": {
+      "file": "assets/party-cover.png"
+    },
+    "gift-pen": {
+      "file": "assets/gift-pen.png"
+    },
+    "gift-pencil": {
+      "file": "assets/gift-pencil.png"
+    },
+    "gift-ball": {
+      "file": "assets/gift-ball.png"
+    },
+    "gift-book": {
+      "file": "assets/gift-book.png"
+    },
+    "gift-bag": {
+      "file": "assets/gift-bag.png"
+    },
+    "boat-opening": {
+      "file": "assets/boat-opening.png"
+    },
+    "boat-backdrop": {
+      "file": "assets/boat-backdrop.png"
+    },
+    "boat-idle": {
+      "file": "assets/boat-idle.png"
+    },
+    "boat-blow": {
+      "file": "assets/boat-blow.png"
+    },
+    "birthday-sticker": {
+      "file": "assets/birthday-sticker.png"
+    },
+    "role-wish": {
+      "file": "assets/role-wish.png"
+    },
+    "role-give": {
+      "file": "assets/role-give.png"
+    },
+    "role-thanks": {
+      "file": "assets/role-thanks.png"
+    },
+    "role-welcome": {
+      "file": "assets/role-welcome.png"
+    },
+    "maze-opening": {
+      "file": "assets/maze-opening.png"
+    },
+    "maze-backdrop": {
+      "file": "assets/maze-backdrop.png"
+    },
+    "maze-rover": {
+      "file": "assets/maze-rover.png"
+    },
+    "maze-bubble": {
+      "file": "assets/maze-bubble.png"
+    },
+    "rhythm-table": {
+      "file": "assets/rhythm-table.png"
+    },
+    "age-two": {
+      "file": "assets/age-two.png"
+    },
+    "age-four": {
+      "file": "assets/age-four.png"
+    },
+    "age-five": {
+      "file": "assets/age-five.png"
+    },
+    "age-eight": {
+      "file": "assets/age-eight.png"
+    },
+    "quiz-wish-farewell": {
+      "file": "assets/quiz-wish-farewell.png"
+    },
+    "quiz-wish-birthday": {
+      "file": "assets/quiz-wish-birthday.png"
+    },
+    "quiz-wish-hello": {
+      "file": "assets/quiz-wish-hello.png"
+    },
+    "quiz-thank-baker": {
+      "file": "assets/quiz-thank-baker.png"
+    },
+    "quiz-thank-giver": {
+      "file": "assets/quiz-thank-giver.png"
+    },
+    "quiz-thank-celebrant": {
+      "file": "assets/quiz-thank-celebrant.png"
+    },
+    "quiz-item-eraser": {
+      "file": "assets/quiz-item-eraser.png"
+    },
+    "quiz-item-pencil": {
+      "file": "assets/quiz-item-pencil.png"
+    },
+    "quiz-item-pen": {
+      "file": "assets/quiz-item-pen.png"
+    },
+    "quiz-welcome-giver": {
+      "file": "assets/quiz-welcome-giver-handoff.png"
+    },
+    "quiz-welcome-receiver": {
+      "file": "assets/quiz-welcome-receiver.png"
+    },
+    "quiz-welcome-bystander": {
+      "file": "assets/quiz-welcome-bystander.png"
+    },
+    "quiz-book-reading": {
+      "file": "assets/quiz-book-reading.png"
+    },
+    "quiz-book-giving": {
+      "file": "assets/quiz-book-giving.png"
+    },
+    "quiz-book-pointing": {
+      "file": "assets/quiz-book-pointing.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "party-message",
+      "type": "slide",
+      "title": "生日派对说什么",
+      "template": "picture-points",
+      "data": {
+        "title": "生日派对说什么",
+        "picture": "party-cover",
+        "points": [
+          "听谁过生日",
+          "祝对方生日快乐",
+          "先感谢，再说清名字"
+        ]
+      },
+      "script": [
+        {
+          "say": "彩带挂好了。看到蛋糕，你猜该说什么？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "今天是小鹿的生日。你看，他的帽子歪了一点。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "我先问名字。戴生日帽的说，他叫 Bo。"
+        },
+        {
+          "say": "听本人怎么说，才能把祝福送对人。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "见面可以说 Hello。过生日，换成 Happy birthday!"
+        },
+        {
+          "say": "轮到你啦。对着小鹿说 Happy birthday!"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "我把小鹿叫成 Jo 了。听听他怎么答。"
+        },
+        {
+          "say": "Thank you! I’m Bo."
+        },
+        {
+          "say": "他先谢谢，再告诉我名字。那我再祝一次。"
+        },
+        {
+          "say": "Happy birthday, Bo!"
+        },
+        {
+          "say": "现在祝福送对啦。收到祝福，记得说 Thank you."
+        }
+      ]
+    },
+    {
+      "key": "choose-the-present",
+      "type": "slide",
+      "title": "礼物里是笔还是铅笔？",
+      "template": "two-columns",
+      "data": {
+        "title": "礼物里是笔还是铅笔？",
+        "left": {
+          "heading": "笔",
+          "body": "pen"
+        },
+        "right": {
+          "heading": "铅笔",
+          "body": "pencil"
+        },
+        "left_picture": "gift-pen",
+        "right_picture": "gift-pencil"
+      },
+      "script": [
+        {
+          "say": "盒子里有一支笔。你猜是铅笔，还是用墨水的笔？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "这支有笔帽。听 pen，指这支笔。"
+        },
+        {
+          "say": "A pen for you."
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "这一支削过，露出木尖。它是 pencil。"
+        },
+        {
+          "say": "A pencil for you."
+        },
+        {
+          "say": "两个词开头像。听完 pencil 多出来的声音再选。"
+        },
+        {
+          "say": "把东西递给对方，礼物名放在 for you 前面。"
+        },
+        {
+          "say": "轮到你。先指铅笔，再跟我说整句。"
+        },
+        {
+          "say": "A pencil for you!"
+        },
+        {
+          "say": "换成球，名字跟着换。听我说。"
+        },
+        {
+          "say": "A ball for you."
+        },
+        {
+          "say": "书也能送。听我说。"
+        },
+        {
+          "say": "A book for you."
+        },
+        {
+          "say": "还有书包，也把它的名字放进句子。"
+        },
+        {
+          "say": "A schoolbag for you."
+        },
+        {
+          "say": "擦掉铅笔印的小橡皮，是 eraser。"
+        },
+        {
+          "say": "递橡皮时，可以说 An eraser for you."
+        },
+        {
+          "say": "先重听，找老师说到的那样礼物。"
+        },
+        {
+          "say": "亮起来的是这件，等船对正再吹。"
+        },
+        {
+          "say": "听清了，泡泡送到对应的礼物啦！"
+        },
+        {
+          "say": "盖上盒子前，跟我再听一遍 pen 和 pencil。"
+        }
+      ]
+    },
+    {
+      "key": "gift-boat",
+      "type": "interactive",
+      "title": "礼物泡泡艇",
+      "widgetType": "courseware_game",
+      "page": "gift-boat",
+      "startImage": "boat-opening",
+      "script": [
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "say": "小艇能吹泡泡。两张礼物图，哪张是老师要的？"
+        },
+        {
+          "highlight": "#demo-boat-listen"
+        },
+        {
+          "say": "先听这一轮。听到 pen，找有笔帽的那支。"
+        },
+        {
+          "highlight": "#demo-boat-pen"
+        },
+        {
+          "say": "我先找到笔。长得像的铅笔，要听完整词才分得开。"
+        },
+        {
+          "highlight": "#demo-boat-start"
+        },
+        {
+          "say": "按箭头移动小艇。对正图片，再按空格或泡泡键。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "看，泡泡飞到了笔那边，礼物留在泡泡里。"
+        },
+        {
+          "say": "轮到你啦。先听清，再让小艇对准礼物。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "gift-pen": "choose-the-present-4",
+        "gift-pencil": "choose-the-present-7",
+        "gift-ball": "choose-the-present-13",
+        "gift-book": "choose-the-present-15",
+        "gift-bag": "choose-the-present-17",
+        "boat-hint": "choose-the-present-20",
+        "boat-help": "choose-the-present-21",
+        "boat-praise": "choose-the-present-22"
+      }
+    },
+    {
+      "key": "whose-turn",
+      "type": "slide",
+      "title": "谢谢以后谁来接？",
+      "template": "two-columns",
+      "data": {
+        "title": "谢谢以后谁来接？",
+        "left": {
+          "heading": "收礼的松鼠",
+          "body": "接住礼物"
+        },
+        "right": {
+          "heading": "送礼的小兔",
+          "body": "听见感谢"
+        },
+        "left_picture": "role-thanks",
+        "right_picture": "role-welcome"
+      },
+      "script": [
+        {
+          "say": "小兔刚送出一颗球。下一句该谁说？你先猜。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "松鼠接过礼物，说 Thank you. 这是在谢谢小兔。"
+        },
+        {
+          "say": "松鼠说完了。小兔这时怎么接？"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "小兔说 You’re welcome. 是在说不用谢。"
+        },
+        {
+          "say": "他等对方先谢谢，才这样回。两人说的句子不一样。"
+        },
+        {
+          "say": "换你试一试。我递礼物，你说 Thank you."
+        },
+        {
+          "say": "现在反过来。你送我礼物，我说 Thank you."
+        },
+        {
+          "say": "轮到你回 You’re welcome. 说完咱们就接上啦。"
+        },
+        {
+          "say": "从头走一遍：先祝福，再递礼，接着谢谢和回应。"
+        },
+        {
+          "say": "Happy birthday! 找祝福的蛋糕站。"
+        },
+        {
+          "say": "A ball for you. 找把礼物递出去的图。"
+        },
+        {
+          "say": "Thank you. 找抱着礼物的收礼人。"
+        },
+        {
+          "say": "You’re welcome. 找摊开手的送礼人。"
+        },
+        {
+          "say": "话说完啦。开到小旗边。"
+        },
+        {
+          "say": "先重听这句话，再想是谁在做什么。"
+        },
+        {
+          "say": "看看亮起的图。走到那一站。"
+        },
+        {
+          "say": "每句话都送到该去的地方啦！"
+        }
+      ]
+    },
+    {
+      "key": "party-maze",
+      "type": "interactive",
+      "title": "生日话语小车",
+      "widgetType": "courseware_game",
+      "page": "party-maze",
+      "startImage": "maze-opening",
+      "script": [
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "say": "礼物车要走过几站。先听，这一站该去哪里？"
+        },
+        {
+          "highlight": "#demo-maze-player"
+        },
+        {
+          "say": "这辆车听你的。按住箭头，就能往那边开。"
+        },
+        {
+          "highlight": "#demo-maze-blessing"
+        },
+        {
+          "say": "先听到生日祝福。我先到有蛋糕的祝福站。"
+        },
+        {
+          "say": "别急着开到旗子那儿，按说话的先后找图。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "看，车在祝福站停了一下，第一句话送到啦。"
+        },
+        {
+          "say": "遇到挡路的软墙，可以用泡泡键打开。"
+        },
+        {
+          "say": "现在换你开车。每到一站，先听下一句。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "maze-bless": "whose-turn-12",
+        "maze-give": "whose-turn-13",
+        "maze-thanks": "whose-turn-14",
+        "maze-welcome": "whose-turn-15",
+        "maze-exit": "whose-turn-16",
+        "maze-hint": "whose-turn-17",
+        "maze-help": "whose-turn-18",
+        "maze-praise": "whose-turn-19"
+      }
+    },
+    {
+      "key": "rhythm-wishes",
+      "type": "slide",
+      "title": "把祝福拍进节拍",
+      "template": "picture-points",
+      "data": {
+        "title": "把祝福拍进节拍",
+        "picture": "rhythm-table",
+        "points": [
+          "慢慢听 birthday",
+          "听一听 thank",
+          "边拍边说祝福"
+        ]
+      },
+      "script": [
+        {
+          "say": "有人开始拍手了。你能让祝福也跟上节拍吗？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "先跟我慢慢念，再把一句祝福连起来。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "Birthday. 听 day 前轻轻的气声。Birthday."
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "Thank. 听开头那一下，是同一个声音。Thank."
+        },
+        {
+          "say": "跟我慢慢念：Thank. Birthday. 听听那一下。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "现在双手轻拍，跟我说。Happy birthday to you!"
+        },
+        {
+          "say": "轮到你了，边拍边把这一句说完整。"
+        },
+        {
+          "say": "听到有人祝福你，也可以说 Thank you."
+        },
+        {
+          "say": "想唱整首，可以和家人跟着教材唱。"
+        }
+      ]
+    },
+    {
+      "key": "birthday-badges",
+      "type": "slide",
+      "title": "年龄胸签给谁？",
+      "template": "two-columns",
+      "data": {
+        "title": "年龄胸签给谁？",
+        "left": {
+          "heading": "纸冠同学",
+          "body": "听本人怎么说"
+        },
+        "right": {
+          "heading": "发带同学",
+          "body": "换人就重新听"
+        },
+        "left_picture": "age-five",
+        "right_picture": "age-eight"
+      },
+      "script": [
+        {
+          "say": "派对上有两张年龄胸签。能只看个子猜吗？"
+        },
+        {
+          "say": "先听本人怎么说。还记得怎么问年龄吗？"
+        },
+        {
+          "say": "How old are you?"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "先听纸冠同学的完整回答。I’m five."
+        },
+        {
+          "say": "Five 是五岁。五这张，配给刚才说话的人。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "现在换发带同学。听她自己说。I’m eight."
+        },
+        {
+          "say": "Eight 是八岁。她拿八，不跟着上一位拿五。"
+        },
+        {
+          "say": "轮到你用假年龄答。说 I’m，再接自己的数。"
+        },
+        {
+          "say": "你听清本人，胸签就不会送错啦。"
+        }
+      ]
+    },
+    {
+      "key": "picture-check",
+      "type": "quiz",
+      "title": "听一听，选一选",
+      "intro": [
+        "听完老师的话再选图。想重听，就点小喇叭。"
+      ],
+      "questions": [
+        {
+          "id": "wish-in-context",
+          "question": "Happy birthday! 选说这句话的场景。",
+          "skill": "辨认生日祝福",
+          "answer": [
+            "b"
+          ],
+          "analysis": "有蛋糕和生日小寿星的是生日祝福。另两幅分别是出门告别和图书角见面。",
+          "options": {
+            "a": {
+              "label": "拿行李挥手告别",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-wish-farewell",
+                "alt": "拿行李挥手告别"
+              }
+            },
+            "b": {
+              "label": "花房里给小寿星过生日",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-wish-birthday",
+                "alt": "花房里给小寿星过生日"
+              }
+            },
+            "c": {
+              "label": "图书角两人普通见面",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-wish-hello",
+                "alt": "图书角两人普通见面"
+              }
+            }
+          }
+        },
+        {
+          "id": "birthday-thanks-speaker",
+          "question": "朋友刚送来生日祝福。谁该说 Thank you?",
+          "skill": "辨认收到生日祝福的人",
+          "answer": [
+            "c"
+          ],
+          "analysis": "有纸冠、坐在生日蛋糕旁的孩子收到祝福，应该说 Thank you。送卡的孩子和做点心的人没有收到这句祝福。",
+          "options": {
+            "a": {
+              "label": "拿搅拌勺的点心师",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-thank-baker",
+                "alt": "拿搅拌勺的点心师"
+              }
+            },
+            "b": {
+              "label": "递出卡片的朋友",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-thank-giver",
+                "alt": "递出卡片的朋友"
+              }
+            },
+            "c": {
+              "label": "纸冠孩子在生日蛋糕旁",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-thank-celebrant",
+                "alt": "纸冠孩子在生日蛋糕旁"
+              }
+            }
+          }
+        },
+        {
+          "id": "listen-eraser-present",
+          "question": "An eraser for you. 听清送的是哪一样？",
+          "skill": "听赠礼整句辨认物品",
+          "answer": [
+            "a"
+          ],
+          "analysis": "eraser 是橡皮。铅笔有木尖，笔能用墨水写字。",
+          "options": {
+            "a": {
+              "label": "带蓝绿色纸套的橡皮",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-item-eraser",
+                "alt": "带蓝绿色纸套的橡皮"
+              }
+            },
+            "b": {
+              "label": "露木尖的黄色铅笔",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-item-pencil",
+                "alt": "露木尖的黄色铅笔"
+              }
+            },
+            "c": {
+              "label": "深红笔身、黑色笔帽的墨水笔",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-item-pen",
+                "alt": "深红笔身、黑色笔帽的墨水笔"
+              }
+            }
+          }
+        },
+        {
+          "id": "welcome-after-thanks",
+          "question": "发带同学说 Thank you. 现在谁说 You’re welcome?",
+          "skill": "听致谢后找送礼者",
+          "answer": [
+            "a"
+          ],
+          "analysis": "发带同学接到礼物，已经说了谢谢。条纹袖同学双手把同一个礼盒递给她，所以由他回不用谢。相机同学只是旁观。",
+          "options": {
+            "a": {
+              "label": "条纹袖同学双手递出礼盒",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-welcome-giver",
+                "alt": "条纹袖同学双手递出礼盒"
+              }
+            },
+            "b": {
+              "label": "发带同学抱着礼物",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-welcome-receiver",
+                "alt": "发带同学抱着礼物"
+              }
+            },
+            "c": {
+              "label": "拿相机的旁观同学",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-welcome-bystander",
+                "alt": "拿相机的旁观同学"
+              }
+            }
+          }
+        },
+        {
+          "id": "actually-give-book",
+          "question": "A book for you. 哪幅图是在把书送给对方？",
+          "skill": "辨别赠礼用语和物品转交",
+          "answer": [
+            "b"
+          ],
+          "analysis": "说 for you 是送给你。两人的手一起碰着正在交接的书才是递给对方。另两幅是自己看书和指着桌上的书。",
+          "options": {
+            "a": {
+              "label": "孩子自己拿着书阅读",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-book-reading",
+                "alt": "孩子自己拿着书阅读"
+              }
+            },
+            "b": {
+              "label": "一本书从一人手中递到另一人手里",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-book-giving",
+                "alt": "一本书从一人手中递到另一人手里"
+              }
+            },
+            "c": {
+              "label": "孩子只指桌上的书",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-book-pointing",
+                "alt": "孩子只指桌上的书"
+              }
+            }
+          }
+        },
+        {
+          "id": "birthday-age-badge",
+          "question": "小寿星说 I’m four. 哪张是她的年龄胸签？",
+          "skill": "听年龄回答找同一数字",
+          "answer": [
+            "c"
+          ],
+          "analysis": "four 是四。要配给小寿星的是数字4胸签，另外是数字8和2。",
+          "options": {
+            "a": {
+              "label": "数字8胸签",
+              "visual": {
+                "kind": "asset",
+                "image": "age-eight",
+                "alt": "数字8胸签"
+              }
+            },
+            "b": {
+              "label": "数字2胸签",
+              "visual": {
+                "kind": "asset",
+                "image": "age-two",
+                "alt": "数字2胸签"
+              }
+            },
+            "c": {
+              "label": "数字4胸签",
+              "visual": {
+                "kind": "asset",
+                "image": "age-four",
+                "alt": "数字4胸签"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "finish-around-table",
+      "type": "slide",
+      "title": "把生日祝福带回家",
+      "template": "summary",
+      "data": {
+        "title": "把生日祝福带回家",
+        "items": [
+          "见到小寿星，说生日祝福",
+          "把礼物的名字说进整句",
+          "收礼说谢谢，送礼接一句",
+          "生日歌轻轻唱，年龄听本人"
+        ]
+      },
+      "script": [
+        {
+          "say": "桌上留着一张空贺卡。你想送给谁呢？"
+        },
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "先想清祝福谁，再说 Happy birthday!"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "把你送的东西放进句子。比如 A card for you."
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "收卡的人说 Thank you. 送卡的人回 You’re welcome."
+        },
+        {
+          "spotlight": "item-4"
+        },
+        {
+          "say": "可以拍一拍唱祝福。想知道几岁，就听本人说。"
+        },
+        {
+          "say": "回家画张卡，选一位家人或朋友来演。"
+        },
+        {
+          "say": "你先送，他来收。再换一回，看看谁先开口。"
+        },
+        {
+          "say": "那张空白贺卡，现在就有你的心意啦。"
+        }
+      ]
+    }
+  ]
+}

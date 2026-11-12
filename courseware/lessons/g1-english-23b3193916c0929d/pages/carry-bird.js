@@ -1,0 +1,51 @@
+K.ready({title:'把道具送到正确的场景',sub:'先拿道具，再把它送到听见的那一幅图。'});
+
+const delivery = K.game(K.gameTemplates.listenDelivery({
+  voiceLead:true,
+  stepVoiceLead:true,
+  doneText:'每件道具都找到了听见的位置。',
+  art:{
+    backdrop:'__IMG:stage-backdrop__',
+    frames:['__IMG:wagon-idle__','__IMG:wagon-move__','__IMG:passing-wagon__'],
+    sticker:'__IMG:wing-sticker__',
+    icons:{
+      bird:'__IMG:bird-prop__',cat:'__IMG:cat-prop__',
+      'bird-in':'__IMG:bird-in__','bird-on':'__IMG:bird-on__','bird-under':'__IMG:bird-under__',
+      'cat-in-bag':'__IMG:cat-in-bag__','cat-on-stool':'__IMG:cat-on-stool__',
+      'bird-in-box':'__IMG:bird-in-box__'
+    }
+  },
+  cues:[
+    {goal:'carry-bird-in',hint:'carry-hint',hint2:'carry-help',praise:'carry-praise',
+      steps:['carry-bird-in','bird-in-hat']},
+    {goal:'carry-cat-bag',hint:'carry-hint',hint2:'carry-help',praise:'carry-praise',
+      steps:['carry-cat-bag','cat-in-bag','carry-bird-on','bird-on-hat']},
+    {goal:'carry-bird-under',hint:'carry-hint',hint2:'carry-help',praise:'carry-praise',
+      steps:['carry-bird-under','bird-under-hat','carry-cat-stool','cat-on-stool','carry-bird-box','bird-in-box']}
+  ],
+  levels:[
+    {
+      pickup:[['bird',4],['cat',7]],
+      drop:[['bird-in',2],['bird-on',5],['bird-under',7]],
+      orders:[['bird','bird-in']],step:.34,
+      lanes:[{row:2,phase:.5,speed:.9,spacing:5.4}],
+      hints:['先看看听见的是小鸟还是猫。','按一下拿好，再看帽子的开口。']
+    },
+    {
+      pickup:[['cat',2],['bird',6]],
+      drop:[['cat-in-bag',1],['bird-on',4],['bird-in',7]],
+      orders:[['cat','cat-in-bag'],['bird','bird-on']],step:.29,
+      lanes:[{row:1,phase:.1,speed:1.0,spacing:5.4},{row:3,phase:1.7,speed:-.9,spacing:5.2}],
+      hints:['听清是包还是帽子。','先停一停，等小车过去，再开向图。']
+    },
+    {
+      pickup:[['bird',1],['cat',7]],
+      drop:[['cat-on-stool',1],['bird-in-box',3],['bird-under',5],['bird-on',8]],
+      orders:[['bird','bird-under'],['cat','cat-on-stool'],['bird','bird-in-box']],step:.25,
+      lanes:[{row:1,phase:1.2,speed:-1.2,spacing:5.4},{row:3,phase:.6,speed:1.3,spacing:5.6}],
+      hints:['听清哪件道具，又到了哪里。','回头看看手里的道具，再对照上边的图。']
+    }
+  ]
+}));
+delivery.follow('#first-bird-pickup', () => ({x:602,y:497,w:76,h:78}));
+delivery.follow('#first-hat-delivery', () => ({x:430,y:153,w:76,h:78}));

@@ -8,6 +8,11 @@ import { createTextbookMediaCache } from "./textbook-media-cache.mjs";
 const DEFAULT_MAX_BODY_BYTES = 25 * 1024 * 1024;
 const MAX_ACTIVITY_STATE_BODY_BYTES = 384 * 1024;
 const MAX_RUNTIME_AUDIO_BYTES = 16 * 1024 * 1024;
+const STUDENT_ACTIVITY_CONTROLS_V1_TEMPLATES = new Set([
+  'sortingDepot', 'bubbleMaze', 'magnetMarbles', 'platformHop',
+  'shutterScout', 'listenDelivery', 'fallingTiles', 'compareSnake',
+  'slideMerge', 'fireflySwing', 'orchardCatch', 'wordBubbles',
+]);
 const RUNTIME_COOKIE = "mira_openmaic_runtime";
 const CLASSROOM_COOKIE_PREFIX = `${RUNTIME_COOKIE}_classroom_`;
 const CLASSROOM_ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,159}$/;
@@ -540,9 +545,12 @@ async function handleTextbookRequest(request, response, url, runtime, runtimeTok
     // these exact reviewed bytes inside the authenticated snapshot instead
     // of relaxing iframe isolation or exposing a public media route.
     const verifiedAssets = new Map();
+    const publishedScenes = result.success === true && result.classroom?.stage?.id === runtime.classroomId
+      ? scenes : [];
     await Promise.all((selected ? [selected] : scenes).map(async scene => {
       // This is delivery metadata, never an authored assertion of ownership.
       delete scene.miraPageNarration;
+      bindTextbookStudentActivityControls(scene, runtime, publishedScenes);
       bindTextbookActivityPersistence(scene, runtime);
       if (scene.miraActivity || scene.type !== 'interactive' || typeof scene.content?.html !== 'string') return;
       const embedded = runtime.media.filter(media => scene.content.html.includes(media.path));
@@ -615,6 +623,28 @@ function textbookPageSummary(scene) {
     ).map(([script]) => script).join('');
   }
   return { id, stageId, order, title, type, outlineId, miraActivity, content, miraPageSummary: true };
+}
+
+function bindTextbookStudentActivityControls(scene, runtime, publishedScenes) {
+  delete scene.miraStudentActivityControls;
+  const contract = runtime.studentActivityControls;
+  if (contract?.schemaVersion !== 'mira.textbook.student-activity-controls.v1'
+      || runtime.purpose !== 'fixed_textbook' || typeof runtime.classroomId !== 'string'
+      || !/^tbpub_[a-f0-9]{24}$/.test(runtime.classroomId) || scene.stageId !== runtime.classroomId
+      || typeof runtime.releaseSha256 !== 'string' || !/^[a-f0-9]{64}$/.test(runtime.releaseSha256)
+      || typeof scene.id !== 'string' || !/^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/.test(scene.id)
+      || scene.miraPageSummary || scene.miraActivity || scene.type !== 'interactive'
+      || scene.content?.type !== 'interactive' || typeof scene.content.html !== 'string' || !scene.content.html.trim()
+      || !Array.isArray(contract.scenes)
+      || publishedScenes.filter(item => item?.id === scene.id).length !== 1) return;
+  const matches = contract.scenes.filter(item => item?.sceneId === scene.id);
+  if (matches.length !== 1) return;
+  const { template, version, contentSha256 } = matches[0];
+  if (!STUDENT_ACTIVITY_CONTROLS_V1_TEMPLATES.has(template) || version !== 1
+      || typeof contentSha256 !== 'string' || !/^[a-f0-9]{64}$/.test(contentSha256)
+      || createHash('sha256').update(scene.content.html, 'utf8').digest('hex') !== contentSha256) return;
+  scene.miraStudentActivityControls = { schemaVersion: contract.schemaVersion,
+    releaseSha256: runtime.releaseSha256, contentSha256, template, version };
 }
 
 /** Bind only the authenticated release's exact cue/text/media relationship.
@@ -1130,6 +1160,7 @@ export function injectRuntimeAudioBindings(raw, runtime, manifest) {
     ) {
       return runtimeAudioBindingError();
     }
+    delete scene.miraStudentActivityControls;
     let sceneSpeechCount = 0;
     for (const action of scene.actions) {
       if (action?.type !== "speech") continue;

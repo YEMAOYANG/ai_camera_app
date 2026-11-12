@@ -1,0 +1,49 @@
+#cv.classic-arcade #ready .pic {
+  object-fit: contain;
+}
+
+#garden-facing {
+  left: 607px;
+  top: 315px;
+  width: 66px;
+  height: 65px;
+  display: grid;
+  place-items: center;
+  background: #fff1cc;
+  border: 3px solid #7e9b6c;
+  border-radius: 12px;
+}
+
+#garden-facing img {
+  width: 55px;
+  height: 55px;
+  object-fit: contain;
+}
+
+#garden-compass {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 3;
+  color: #18392d;
+  font-size: 25px;
+  font-weight: 800;
+}
+
+#garden-compass span {
+  position: absolute;
+}
+
+#cv:has(#ready:not(.gone), #finish:not(.gone)) #garden-compass {
+  visibility: hidden;
+}
+
+#garden-compass span:nth-child(1) {
+  left: 628px;
+  top: 158px;
+  color: #fff1cc;
+  line-height: 24px;
+}
+#garden-compass span:nth-child(2) { left: 958px; top: 333px; }
+#garden-compass span:nth-child(3) { left: 628px; top: 583px; }
+#garden-compass span:nth-child(4) { left: 293px; top: 333px; }

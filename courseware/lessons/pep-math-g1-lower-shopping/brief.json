@@ -1,0 +1,85 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "买卖我做主",
+  "binding": {
+    "editionId": "pep-math-g1-lower-2022-standard",
+    "revisionId": "directory-6205d2037284e91f10b25edd",
+    "unitId": "fdc950af-3aa4-4c77-a95f-fe523b226262",
+    "nodeId": "66072519-5aa1-49ce-b4fc-921bdbc6f6c0"
+  },
+  "scenario": "班级手作展开设模拟摊位。孩子轮流扮演买家和卖家，用教学钱牌付钱、找零和记账，再根据预算为同学配两件手作。",
+  "goals": [
+    "能说出模拟购物中买家和卖家各要做什么，并能区分记录单中的物品、价格、付款和找零。",
+    "能看价格选择正好付款的组合，或从实付金额减价格得到找零，并以价格加找零回查。",
+    "能从两件商品的价格求总支出，能按给定金额试配两件商品并核对每组是否符合要求。",
+    "能用一张模拟买入或卖出记录单复述一次买卖，说明实际消费与交给卖家的付款金额各指什么。"
+  ],
+  "goalEvidence": [
+    {"skill":"read-a-market-record","source":"印80购物准备和记录单、课件5至10、教案2至3、任务单1至2"},
+    {"skill":"pay-and-make-change","source":"印81上半、课件11至14、教案3"},
+    {"skill":"combine-and-budget","source":"印81上半、课件15至22、教案4至5"},
+    {"skill":"explain-a-market-record","source":"印80记录单与印81上半幸福分享、课件10及15、任务单2、课练1"}
+  ],
+  "pageSequence": [
+    {"key":"prepare-the-class-stall","kind":"teaching","title":"摊主和买家要准备什么","plan":"用教室手作展图表现卖家放好作品、摆标价与准备零钱，买家看价格、想买什么并备好模拟钱牌。老师逐一指向实物图、标价牌和两种角色。"},
+    {"key":"pay-the-exact-price","kind":"teaching","title":"付的钱正好等于价格","plan":"木夹标4元6角。用四张1元、一枚5角和一枚1角付4元6角。依次点亮价格、付款和空零钱盘，记找零为0。"},
+    {"key":"make-change-as-the-seller","kind":"teaching","title":"收进多少，该找回多少","plan":"徽章标7元，买家付10元。用对齐条表示从10元里留下7元，找回3元。再把7元和3元合回10元检查，逐项放入卖出记录单。"},
+    {"key":"deliver-the-change","kind":"interactive","title":"挑出找零，再送给买家","plan":"每轮听到商品价格、实际付款和买家图。先驾驶小车到金额正确的零钱袋，再避开过道里的移动道具送到对应买家。"},
+    {"key":"add-prices-on-the-record","kind":"teaching","title":"从价格栏算一共花多少","plan":"纸风车6元3角、彩纸盒5元2角。用两条图标对齐两项价格，加得11元5角。点亮价格和付款的不同列，解释总支出来自实际价格。"},
+    {"key":"two-items-fit-the-budget","kind":"teaching","title":"哪两件加起来正好够","plan":"预算14元，四件手作标4、6、8、10元。先固定一件按顺序试，再换起点检查。把4与10和6与8分别用14元框圈好，指出两种都符合。"},
+    {"key":"fit-two-on-the-budget","kind":"interactive","title":"让两件手作凑成指定金额","plan":"手作卡沿格子下落，孩子看每件价格，将卡落到能和邻格手作凑到目标金额的一侧。"},
+    {"key":"picture-quiz-one","kind":"quiz","title":"看价格、付款和找零","plan":"老师预录逐题读小检查1至3。用清楚的物件图、金额钱牌和记录格表现各字段。"},
+    {"key":"picture-quiz-two","kind":"quiz","title":"按预算选，按记录算","plan":"老师预录逐题读小检查4至6，核查合计、两件凑金额和记账。"},
+    {"key":"say-what-happened","kind":"teaching","title":"看着记录讲一次买卖","plan":"用徽章的模拟卖出单，依次指向物件、价格、付款和找零，让孩子给家人说明每格的意思。教师带读一遍再安排家庭观察。"}
+  ],
+  "games": [
+    {
+      "page": "deliver-the-change",
+      "template": "listenDelivery",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.listenDelivery",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "listen_pick_deliver",
+      "reason": "订单的取货条件是付款减价格所得的找零。每袋用图牌显示确切金额，放错袋无法取货。孩子还要控制方向和时机穿过过道，并将该袋送给当前买家图对应的终点。",
+      "levels": [
+        "售6元手作、收10元，取4元零钱袋，另放6元干扰。单车道移动较慢。",
+        "两单依次为售11元收20元、售5元收5元，分别取9元和0元空袋。另放5元袋，增加转向和两条移动道具。",
+        "两单为售13元收20元、售17元收20元，分别取7元和3元，另放13元及17元袋。不同买家收袋，过道更紧凑。"
+      ],
+      "demo": "依次点亮价格和付款图、驾驶角色及零钱袋。实际拿到第一袋时停止示范并复位，再预录交接取袋、过道和交付任务。"
+    },
+    {
+      "page": "fit-two-on-the-budget",
+      "template": "fallingTiles",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.fallingTiles",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "sum_pair",
+      "reason": "相邻卡片只有两项价格的和等于预算才会配成一对。商品图与金额清楚对应。即使两组都能凑到预算，孩子仍需及时横移和选落点。",
+      "levels": [
+        "目标12元，4元与8元、5元与7元可配对。少量卡片慢速下落，先看相邻位置。",
+        "目标18元，7元与11元、8元与10元可配对，另有看起来相近的干扰价。缩短下落时间。",
+        "目标21元，9元与12元、6元与15元、8元与13元可配对，连续处理多张卡片，并把不同组合分开记。"
+      ],
+      "demo": "高亮预算图、正在下落的卡和可配的邻格，实际移动并完成一对，马上停止。交接前清空配对和落块进度。"
+    }
+  ],
+  "quizPlan": [
+    {"skill":"pay-and-make-change","task":"纸扇标价4元3角。哪一盘的钱正好够付？","pictureOptions":["四张1元加两枚1角","四张1元加三枚1角","四张1元加一枚5角"],"correctPosition":2,"rationale":"四张1元共4元，三枚1角共3角，合为4元3角。"},
+    {"skill":"pay-and-make-change","task":"手工船卖14元，买家付20元。卖家应找回多少钱？","pictureOptions":["4元的一袋","14元的一袋","6元的一袋"],"correctPosition":3,"rationale":"20减14得6元，14元和6元正好合成20元。"},
+    {"skill":"read-a-market-record","task":"模拟记录单上，纸偶标7元5角，买家付10元，找回2元5角。哪格表示实际花的钱？","pictureOptions":["标价牌配7元5角的格","买家交给摊主10元的格","摊主交回2元5角的格"],"correctPosition":1,"rationale":"实际支出等于价格，10元减去找回的2元5角也是7元5角。"},
+    {"skill":"combine-and-budget","task":"一枚布贴4元4角，一张贺卡3元2角，两件一共花多少？","pictureOptions":["6元7角的合计框","7元6角的合计框","7元2角的合计框"],"correctPosition":2,"rationale":"元部分4加3得7元，角部分4加2得6角，合为7元6角。"},
+    {"skill":"combine-and-budget","task":"四件小手作分别是5元、6元、10元、11元。每次选两件，哪张图里的两种配法都正好花16元？","pictureOptions":["一组5和10，另一组6和11","一组5和11，另一组5和10","一组5和11，另一组6和10"],"correctPosition":3,"rationale":"5加11与6加10都等于16，5加10为15，6加11为17。"},
+    {"skill":"explain-a-market-record","task":"小灯笼标9元，买家付9元。选符合这次卖出情况的记录图。","pictureOptions":["小灯笼标价9元、实付9元、零钱盘为空","小灯笼标价9元、实付9元、找回1元","小灯笼标价9元、实付10元、零钱盘为空"],"correctPosition":1,"rationale":"付款与价格同为9元，找零为0元。"}
+  ],
+  "presentation": "使用原创手作展插图、角色、摊位与模拟钱牌。商品和金额保持同框，付出和找回的方向用图画箭头表达。每次只高亮正在讲解的字段。教师预录读题、玩法、反馈与重听，遮住非目标文字仍能认图和完成操作。",
+  "evidence": {
+    "inClass": "学习报告可记录孩子在数字摊位实际完成的模拟付款、找零、配对、图题与记录操作。",
+    "realWorld": "真实付款、找零核查、纸笔记录和口头解释由家长现场观察，课堂记录将这些事项标为待观察。"
+  },
+  "afterClass": {
+    "familyTask":"和家人做一次纸上买卖并交换角色。遇到家庭原有的线下购物，可由家长陪同看一看一件商品的价格、实付和找零。真实交易与口头说明待观察。",
+    "weeklyQuestionSource":["识别四个记录字段","正好付款与从实付减价格求找零","用两件商品价格求总支出","有序试配两件恰好达到预算"],
+    "source":"印80至81上半、教案3至5、课件23至25、任务单2、课练1"
+  }
+}

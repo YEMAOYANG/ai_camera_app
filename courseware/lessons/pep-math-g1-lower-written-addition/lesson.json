@@ -1,0 +1,951 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "笔算加法",
+  "description": "清点两箱徽章，学会按相同数位对齐，从个位加起，满十进一。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小数老师",
+      "role": "teacher",
+      "gender": "male",
+      "voice": "Ethan",
+      "avatar": "/avatars/teacher-1.png",
+      "color": "#157a70",
+      "persona": "温和清楚地领着孩子摆徽章、说算理、写竖式。"
+    }
+  },
+  "images": {
+    "alignment-board": {
+      "file": "assets/alignment-board.png"
+    },
+    "apron-marble": {
+      "file": "assets/apron-marble.png"
+    },
+    "badge-sticker": {
+      "file": "assets/badge-sticker.png"
+    },
+    "closing-board": {
+      "file": "assets/closing-board.png"
+    },
+    "diagnosis-board": {
+      "file": "assets/diagnosis-board.png"
+    },
+    "dock-full": {
+      "file": "assets/dock-full.png"
+    },
+    "dock-under": {
+      "file": "assets/dock-under.png"
+    },
+    "exchange-board": {
+      "file": "assets/exchange-board.png"
+    },
+    "no-carry-board": {
+      "file": "assets/no-carry-board.png"
+    },
+    "p14-21": {
+      "file": "assets/p14-21.png"
+    },
+    "p23-44": {
+      "file": "assets/p23-44.png"
+    },
+    "p27-16": {
+      "file": "assets/p27-16.png"
+    },
+    "p29-34": {
+      "file": "assets/p29-34.png"
+    },
+    "p46-14": {
+      "file": "assets/p46-14.png"
+    },
+    "p9-53": {
+      "file": "assets/p9-53.png"
+    },
+    "pushcart-rest": {
+      "file": "assets/pushcart-rest.png"
+    },
+    "pushcart-roll": {
+      "file": "assets/pushcart-roll.png"
+    },
+    "quiz-1-a": {
+      "file": "assets/quiz-1-a.png"
+    },
+    "quiz-1-b": {
+      "file": "assets/quiz-1-b.png"
+    },
+    "quiz-1-c": {
+      "file": "assets/quiz-1-c.png"
+    },
+    "quiz-1-context": {
+      "file": "assets/quiz-1-context.png"
+    },
+    "quiz-2-a": {
+      "file": "assets/quiz-2-a.png"
+    },
+    "quiz-2-b": {
+      "file": "assets/quiz-2-b.png"
+    },
+    "quiz-2-c": {
+      "file": "assets/quiz-2-c.png"
+    },
+    "quiz-2-context": {
+      "file": "assets/quiz-2-context.png"
+    },
+    "quiz-3-a": {
+      "file": "assets/quiz-3-a.png"
+    },
+    "quiz-3-b": {
+      "file": "assets/quiz-3-b.png"
+    },
+    "quiz-3-c": {
+      "file": "assets/quiz-3-c.png"
+    },
+    "quiz-3-context": {
+      "file": "assets/quiz-3-context.png"
+    },
+    "quiz-4-a": {
+      "file": "assets/quiz-4-a.png"
+    },
+    "quiz-4-b": {
+      "file": "assets/quiz-4-b.png"
+    },
+    "quiz-4-c": {
+      "file": "assets/quiz-4-c.png"
+    },
+    "quiz-4-context": {
+      "file": "assets/quiz-4-context.png"
+    },
+    "quiz-5-a": {
+      "file": "assets/quiz-5-a.png"
+    },
+    "quiz-5-b": {
+      "file": "assets/quiz-5-b.png"
+    },
+    "quiz-5-c": {
+      "file": "assets/quiz-5-c.png"
+    },
+    "quiz-5-context": {
+      "file": "assets/quiz-5-context.png"
+    },
+    "result-35": {
+      "file": "assets/result-35.png"
+    },
+    "result-37": {
+      "file": "assets/result-37.png"
+    },
+    "result-43": {
+      "file": "assets/result-43.png"
+    },
+    "result-50": {
+      "file": "assets/result-50.png"
+    },
+    "result-53": {
+      "file": "assets/result-53.png"
+    },
+    "result-60": {
+      "file": "assets/result-60.png"
+    },
+    "result-62": {
+      "file": "assets/result-62.png"
+    },
+    "result-63": {
+      "file": "assets/result-63.png"
+    },
+    "result-67": {
+      "file": "assets/result-67.png"
+    },
+    "sort-3-4": {
+      "file": "assets/sort-3-4.png"
+    },
+    "sort-4-5": {
+      "file": "assets/sort-4-5.png"
+    },
+    "sort-6-2": {
+      "file": "assets/sort-6-2.png"
+    },
+    "sort-6-4": {
+      "file": "assets/sort-6-4.png"
+    },
+    "sort-7-2": {
+      "file": "assets/sort-7-2.png"
+    },
+    "sort-8-5": {
+      "file": "assets/sort-8-5.png"
+    },
+    "sort-8-6": {
+      "file": "assets/sort-8-6.png"
+    },
+    "workshop-cover": {
+      "file": "assets/workshop-cover.png"
+    },
+    "workshop-floor": {
+      "file": "assets/workshop-floor.png"
+    },
+    "zero-single-board": {
+      "file": "assets/zero-single-board.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "two-crates",
+      "type": "slide",
+      "title": "清点巡展徽章",
+      "template": "picture-points",
+      "data": {
+        "title": "清点巡展徽章",
+        "picture": "workshop-cover",
+        "points": [
+          "两箱合并",
+          "整条和散枚",
+          "写成一张记录"
+        ]
+      },
+      "script": [
+        {
+          "say": "社区巡展要开门了。桌上两箱徽章，一共有多少枚？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "我们要把两箱合到一起，所以这一次用加法。"
+        },
+        {
+          "say": "每箱各有自己的徽章，合并时两箱都要算。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "先找装满的条，一整条里面正好有十枚。"
+        },
+        {
+          "say": "盒里没装进条的，我们一枚一枚数，叫散枚。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "徽章摆得多，清点时怎样写下来才不容易漏？"
+        },
+        {
+          "say": "我们做一张分两列的记录，再用图检查。"
+        }
+      ]
+    },
+    {
+      "key": "same-column",
+      "type": "slide",
+      "title": "相同数位对齐",
+      "template": "picture-points",
+      "data": {
+        "title": "相同数位对齐",
+        "picture": "alignment-board",
+        "points": [
+          "左边整条",
+          "右边散枚",
+          "十对十，个对个"
+        ]
+      },
+      "script": [
+        {
+          "say": "看记录板。为什么两箱的徽章都分成左右两边？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "上面左边有两条，下面左边有四条。"
+        },
+        {
+          "say": "两条就是两个十，四条就是四个十。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "上面右边有一枚，下面右边有三枚。"
+        },
+        {
+          "say": "这些是单个的一，放在个位这一列。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "把二和四写在同一列，因为它们都数整条。"
+        },
+        {
+          "say": "把一和三写在另一列，因为它们都数散枚。"
+        },
+        {
+          "say": "十位和十位对齐，个位和个位对齐。"
+        }
+      ]
+    },
+    {
+      "key": "no-carry",
+      "type": "slide",
+      "title": "不进位，怎样记",
+      "template": "picture-points",
+      "data": {
+        "title": "不进位，怎样记",
+        "picture": "no-carry-board",
+        "points": [
+          "个位先写4",
+          "十位再写6",
+          "六条四枚"
+        ]
+      },
+      "script": [
+        {
+          "say": "二十一加四十三。竖着写好了，你想先记哪一列？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先算个位，一枚加三枚是四枚，还装不满一条。"
+        },
+        {
+          "say": "把四写在横线下面，仍然对准个位。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "再算十位，两条加四条是六条。"
+        },
+        {
+          "say": "没有新的整条，十位就写六。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "六条是六十，添上四枚，一共六十四枚。"
+        },
+        {
+          "say": "摆出来和竖式一样，说明这张记录写对了。"
+        }
+      ]
+    },
+    {
+      "key": "carry-workshop",
+      "type": "slide",
+      "title": "十枚换一条",
+      "template": "picture-points",
+      "data": {
+        "title": "十枚换一条",
+        "picture": "exchange-board",
+        "points": [
+          "8枚和4枚",
+          "十枚换一条",
+          "十位只加一次"
+        ]
+      },
+      "script": [
+        {
+          "say": "如果换成二十八加五十四，散枚会比十枚多吗？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先算个位，八枚加四枚，一共十二枚。"
+        },
+        {
+          "say": "图里先用十格装十枚，格子外还留两枚。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "这一格是一枚，十格装满就是十枚。"
+        },
+        {
+          "say": "十枚合成一条，沿箭头挪走，个位留下两枚。"
+        },
+        {
+          "say": "把二写在个位，十位旁记小一，记住新的一条。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "十位原有两条和五条，再加刚换的一条。"
+        },
+        {
+          "say": "小一在这里是一个十，只加这一次，就成八条。"
+        },
+        {
+          "say": "八条和两枚，一共八十二枚。"
+        },
+        {
+          "say": "先写十位，碰到进一得改。先算个位更方便。"
+        },
+        {
+          "say": "把两行散枚合起来数，想想能不能装满一条。"
+        },
+        {
+          "say": "要是没看清，先数上面，再接着数下面。"
+        },
+        {
+          "say": "在十格里一格放一枚。够十枚，就能装成一条。"
+        },
+        {
+          "say": "每张卡都能用同一个办法来检查。"
+        },
+        {
+          "say": "够十枚就换一条，多出的散枚仍留在个位。"
+        }
+      ]
+    },
+    {
+      "key": "sort-by-ones",
+      "type": "interactive",
+      "title": "徽章小车分仓",
+      "page": "sort-by-ones",
+      "widgetType": "game",
+      "startImage": "workshop-cover",
+      "script": [
+        {
+          "say": "两行散枚能装满一条吗？先看小车要推的这张卡。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#game-target"
+        },
+        {
+          "say": "这张上面有三枚，下面有四枚，合起来是七枚。"
+        },
+        {
+          "say": "一条要装十枚，七枚还填不满十格。"
+        },
+        {
+          "highlight": "#sort-first-dock"
+        },
+        {
+          "say": "带空格的托盘收装不满一条的卡，就推到这里。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "方向键让小车走，站到卡后面才能往前推。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "看小车怎样靠近卡片，只把这一张推到托盘。"
+        },
+        {
+          "say": "卡片要进对仓才计分。听见提示时可以再试。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        },
+        {
+          "say": "轮到你。先数图，再推卡，箭头是小车要走的方向。"
+        }
+      ],
+      "gameAudio": {
+        "sort-goal": "carry-workshop-14",
+        "sort-goal-two": "carry-workshop-18",
+        "sort-goal-three": "carry-workshop-6",
+        "sort-hint": "carry-workshop-15",
+        "sort-help": "carry-workshop-16",
+        "sort-praise": "carry-workshop-17"
+      }
+    },
+    {
+      "key": "zero-and-single",
+      "type": "slide",
+      "title": "个位要留好位置",
+      "template": "picture-points",
+      "data": {
+        "title": "个位要留好位置",
+        "picture": "zero-single-board",
+        "points": [
+          "正好满十",
+          "没有散枚写0",
+          "一位数写在个位"
+        ]
+      },
+      "script": [
+        {
+          "say": "散枚刚好十枚，换走后，个位要空着吗？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "左边是三十七加四十三，七枚加三枚正好满十。"
+        },
+        {
+          "say": "这十枚换成一条，十位就有八条。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "个位没剩散枚，就在个位写零。"
+        },
+        {
+          "say": "八后面的零占住个位，八才表示八个十。"
+        },
+        {
+          "say": "漏掉零就变成八，和八条徽章对不上。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "右边是七加六十五。七只有七个一，写在五上面。"
+        },
+        {
+          "say": "七加五得十二，进一，个位写二。"
+        },
+        {
+          "say": "六条再加新的一条，就是七条，合起来是七十二。"
+        },
+        {
+          "say": "一位数写在第一行或第二行，都要和个位对齐。"
+        },
+        {
+          "say": "左图有两组，先合并散枚，再合并整条。"
+        },
+        {
+          "say": "散枚凑满十时，记住新的一条，只加一次。"
+        },
+        {
+          "say": "散枚恰好换完，找没有散枚、个位是零的图。"
+        },
+        {
+          "say": "一位数是散枚，和另外一组的散枚一起数。"
+        },
+        {
+          "say": "下一张还是先看两组，再找合并后的总量。"
+        },
+        {
+          "say": "没对准时，先核对新整条和剩下的散枚。"
+        },
+        {
+          "say": "先数散枚再数整条，就能用图验算。"
+        },
+        {
+          "say": "看看换走十枚之后，个位还剩多少。"
+        }
+      ]
+    },
+    {
+      "key": "pair-check",
+      "type": "interactive",
+      "title": "弹珠找总量",
+      "page": "pair-check",
+      "widgetType": "game",
+      "startImage": "workshop-cover",
+      "script": [
+        {
+          "say": "左边又有两组徽章。弹珠该发向哪张总量图？"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#marble-badge-card"
+        },
+        {
+          "say": "上面一条四枚，下面两条一枚。"
+        },
+        {
+          "say": "四枚加一枚得五枚，合起来还不满十。"
+        },
+        {
+          "say": "一条加两条是三条，所以是三十五枚。"
+        },
+        {
+          "highlight": "#marble-first-target"
+        },
+        {
+          "say": "中间是三条和五枚，这张图和两组的总量相同。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "箭头调方向，对准这张图，再按发射键。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "看弹珠沿着指向飞，碰到对的图才会亮。"
+        },
+        {
+          "say": "老师只示范这一张，别的图留给你自己判断。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        },
+        {
+          "say": "轮到你。先看左边的新卡，再决定朝哪里发射。"
+        }
+      ],
+      "gameAudio": {
+        "match-goal": "zero-and-single-14",
+        "match-carry": "zero-and-single-15",
+        "match-zero": "zero-and-single-21",
+        "match-single": "zero-and-single-17",
+        "match-next": "zero-and-single-18",
+        "match-hint": "zero-and-single-19",
+        "match-help": "carry-workshop-16",
+        "match-praise": "zero-and-single-20"
+      }
+    },
+    {
+      "key": "diagnose",
+      "type": "slide",
+      "title": "找出三张错账",
+      "template": "picture-points",
+      "data": {
+        "title": "找出三张错账",
+        "picture": "diagnosis-board",
+        "points": [
+          "一位数放错列",
+          "少加一个十",
+          "个位漏写0"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "左边是三张错账，右边有整条和散枚。我们逐行核对。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "第一行是二十二加六。圈里的六错写在十位。"
+        },
+        {
+          "say": "六是散枚，要移回个位。右图的两条没有变。"
+        },
+        {
+          "say": "两枚加六枚得八枚，两条八枚就是二十八。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "第二行是二十六加三十七。圈里只写了五个十。"
+        },
+        {
+          "say": "六枚加七枚是十三枚。十枚换一条，余三枚。"
+        },
+        {
+          "say": "五条加新的一条。右图六条和三枚，是六十三。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "第三行是三十二加二十八。左边只写了一个六。"
+        },
+        {
+          "say": "两枚加八枚恰好换一条。右图六条，没有散枚。"
+        },
+        {
+          "say": "六写在十位，个位写零。六条是六十，不是六枚。"
+        },
+        {
+          "say": "写完竖式，数数图里的整条和散枚，就能查出错。"
+        }
+      ]
+    },
+    {
+      "key": "picture-check",
+      "type": "quiz",
+      "title": "听题看图，查一查账",
+      "intro": [
+        "每道题先听老师问什么，再看徽章图选一张。"
+      ],
+      "questions": [
+        {
+          "id": "badge-add-q1",
+          "question": "二十五和三十一合在一起，哪张竖式对齐，得数也对？",
+          "skill": "align-place-values",
+          "answer": [
+            "B"
+          ],
+          "analysis": "二和三都在十位，五和一都在个位。五条和六枚是五十六。",
+          "visual": {
+            "kind": "asset",
+            "image": "quiz-1-context",
+            "alt": "两排徽章，每排分整十条和散枚"
+          },
+          "options": {
+            "A": {
+              "label": "第二行错移一列的竖式",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-1-a",
+                "alt": "第二行错移一列的竖式"
+              }
+            },
+            "B": {
+              "label": "相同数位对齐，五十六",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-1-b",
+                "alt": "相同数位对齐，五十六"
+              }
+            },
+            "C": {
+              "label": "对齐但误写成五十五",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-1-c",
+                "alt": "对齐但误写成五十五"
+              }
+            }
+          }
+        },
+        {
+          "id": "badge-add-q2",
+          "question": "三十八加二十七，散枚换一条后，哪张图对？",
+          "skill": "regroup-ten-ones",
+          "answer": [
+            "A"
+          ],
+          "analysis": "八枚和七枚共十五枚，换一条还剩五枚；三条加两条再加一条，得六十五。",
+          "visual": {
+            "kind": "asset",
+            "image": "quiz-2-context",
+            "alt": "两排徽章，每排分整十条和散枚"
+          },
+          "options": {
+            "A": {
+              "label": "六条五枚",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-2-a",
+                "alt": "六条五枚"
+              }
+            },
+            "B": {
+              "label": "五条五枚",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-2-b",
+                "alt": "五条五枚"
+              }
+            },
+            "C": {
+              "label": "七条五枚",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-2-c",
+                "alt": "七条五枚"
+              }
+            }
+          }
+        },
+        {
+          "id": "badge-add-q3",
+          "question": "四十四加二十六，散枚正好换完，哪张结果图对？",
+          "skill": "zero-and-single-digit",
+          "answer": [
+            "C"
+          ],
+          "analysis": "四枚加六枚正好换一条。四条、两条和新的一条共七条，个位写零，是七十。",
+          "visual": {
+            "kind": "asset",
+            "image": "quiz-3-context",
+            "alt": "两排徽章，每排分整十条和散枚"
+          },
+          "options": {
+            "A": {
+              "label": "没有整条，有七枚散枚",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-3-a",
+                "alt": "没有整条，有七枚散枚"
+              }
+            },
+            "B": {
+              "label": "六条，没有散枚",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-3-b",
+                "alt": "六条，没有散枚"
+              }
+            },
+            "C": {
+              "label": "七条，没有散枚",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-3-c",
+                "alt": "七条，没有散枚"
+              }
+            }
+          }
+        },
+        {
+          "id": "badge-add-q4",
+          "question": "六加五十七，哪一张把第一行的六写在了个位？",
+          "skill": "zero-and-single-digit",
+          "answer": [
+            "B"
+          ],
+          "analysis": "六个一应和七个一对齐。六加七得十三，写三进一，结果六十三。",
+          "visual": {
+            "kind": "asset",
+            "image": "quiz-4-context",
+            "alt": "两排徽章，每排分整十条和散枚"
+          },
+          "options": {
+            "A": {
+              "label": "六写在十位",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-4-a",
+                "alt": "六写在十位"
+              }
+            },
+            "B": {
+              "label": "六和七在同一列",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-4-b",
+                "alt": "六和七在同一列"
+              }
+            },
+            "C": {
+              "label": "六写在十位的左边",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-4-c",
+                "alt": "六写在十位的左边"
+              }
+            }
+          }
+        },
+        {
+          "id": "badge-add-q5",
+          "question": "三十六加十八，有人写成四十四。哪张图对？",
+          "skill": "choose-sum-and-diagnose",
+          "answer": [
+            "A"
+          ],
+          "analysis": "六枚和八枚合起来是十四枚，换一条余四枚。三条加一条再加新的一条，得五十四。",
+          "visual": {
+            "kind": "asset",
+            "image": "quiz-5-context",
+            "alt": "两排整条和散枚，旁边有一张写成四十四的竖式"
+          },
+          "options": {
+            "A": {
+              "label": "五条四枚",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-5-a",
+                "alt": "五条四枚"
+              }
+            },
+            "B": {
+              "label": "四条四枚",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-5-b",
+                "alt": "四条四枚"
+              }
+            },
+            "C": {
+              "label": "六条四枚",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-5-c",
+                "alt": "六条四枚"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "take-home",
+      "type": "slide",
+      "title": "告诉家人小1从哪来",
+      "template": "picture-points",
+      "data": {
+        "title": "告诉家人小1从哪来",
+        "picture": "closing-board",
+        "points": [
+          "同数位对齐",
+          "个位先算，满十进1",
+          "摆一摆，讲给家人听"
+        ]
+      },
+      "script": [
+        {
+          "say": "巡展的徽章账收好了。小一为什么写在十位旁边？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先把一枚一枚的写在个位，装满的条写在十位。"
+        },
+        {
+          "say": "即使有一个数只有一位，也靠个位写。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "从个位加起，满十枚装一条，在十位记小一。"
+        },
+        {
+          "say": "十位要加这条一次。散枚换光了，个位要写零。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "回家找两组小物件，画整条和散枚，写一次竖式。"
+        },
+        {
+          "say": "请把小一怎么来的说给家人听，再请家人帮你看。"
+        },
+        {
+          "say": "我们等你下次带来自己的清点办法。"
+        }
+      ]
+    }
+  ]
+}

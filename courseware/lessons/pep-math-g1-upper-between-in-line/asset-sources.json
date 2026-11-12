@@ -1,0 +1,1430 @@
+{
+  "schemaVersion": "mira.courseware.asset-sources.v1",
+  "lesson": "解决问题｜两人之间",
+  "atlasSources": {
+    "theatre-sprites-initial": {
+      "path": "art-source/theatre-sprites-initial.png",
+      "sha256": "5ca72afb56d8d551678056abf68fd72a6a58eed9bafc62b98c00e0670772882a",
+      "originPath": "/Users/sqcopenclaw/.codex/generated_images/01a1c43e-779d-76c1-9193-2b50ab5e491a/exec-20cc65b4-1bab-4c0d-a0a5-55106125073b.png",
+      "prompt": "Create one genuinely transparent 3×3 production sprite atlas for an original Chinese first-grade math lesson set at a community shadow theatre. Square sheet with exactly nine equal square cells, strict thirds and no visible grid. True transparent alpha between every object and at outer margins. Seven isolated occupied cells and two fully empty cells in exact row-major order. Row 1 col 1: friendly Chinese boy stage helper in a simple pine-green short jacket, cream shirt and apricot trousers, facing to the right in profile/three-quarter view, calmly standing, one foot lightly ahead. Row 1 col 2: precisely the same boy, costume, view, facial proportions, baseline, head size and scale, in a running pose facing right. Row 1 col 3: precisely the same boy facing right in a small upward jump, both knees tucked a little and one arm balancing, no flying trail or shadow; preserve the same body proportions and scale. Row 2 col 1: only one different child in a muted sage-green coat, viewed simply from the front, relaxed stance with arms down, easy to repeat as an exact counted group; full body complete. Row 2 col 2: one medium saturated blue triangular upright pennant on a short dark pine-green post, no flag writing. Row 2 col 3: one identically sized bright persimmon-orange triangular upright pennant on the same post, exactly same silhouette, distinct color. Row 3 col 1: one warm honey-colored five-point paper star sticker with a thin pine-green border, one cream edge accent, no face or text. Row 3 col 2 and col 3 must be completely empty alpha zero. Clean matte gouache with fine paper grain inside the opaque silhouettes, simple neat cut-paper edges, warmly illustrated, readable at 26–36 px. Exact 13% true transparent safety around each object. No letters, numbers, textures in gutters, shadows, glows, blur, extras, borders, checkerboards or watermarks.",
+      "promptSha256": "6cda5bfb42774034791ebbb8857e9d525c82192b0a5c4b801135ab41f0fa072a",
+      "status": "rejected_alpha_glow"
+    },
+    "theatre-sprites": {
+      "path": "art-source/theatre-sprites.png",
+      "sha256": "70d7b413e65ee62e4fbb46539ab0b16d95151804b1fa427f8eb8d426580603a4",
+      "originPath": "/Users/sqcopenclaw/.codex/generated_images/01a1c43e-779d-76c1-9193-2b50ab5e491a/exec-f35e7521-1a94-4fa6-a68d-9e59d16bdd47.png",
+      "prompt": "Hard-alpha cleanup ONLY for the supplied exact transparent 3×3 sprite atlas. The seven original illustrated sprites are already correct and must stay the same in color, design, geometry, pose, relative scale and exact row-major position: top row three frames of the same boy, middle row one child and two colored flags, bottom-left a star, bottom middle and right empty. Remove all translucent white haze, colored glow, cast shadow, backfill, alpha noise and bright matte fringing around these silhouettes. Every background pixel, entire gutters and all square-cell edges must have alpha exactly zero. Only the sharp cut-paper bodies, flags and star remain with solid opacity and a narrow normal antialias edge. Keep no glow, blurred emission, paper behind the subjects, checkerboard, grid, typography, or extra assets. Keep three columns by three rows, exact original framing, and only clean the alpha mask.",
+      "promptSha256": "d4aa9bd517b5b4acbd8b6292ba02fb5d0e98587b649952ab342ed89b15b345a1",
+      "referenceKey": "theatre-sprites-initial",
+      "receipt": "art-source/theatre-sprites.receipt.json",
+      "receiptSha256": "96f874cd55246eec214d2f99d2bee74592fbf7657d2299c9060583115706e568",
+      "plan": "art-source/theatre-sprites.plan.json"
+    },
+    "theatre-rooms": {
+      "path": "art-source/theatre-rooms.png",
+      "sha256": "4c04fbdbcbb0a16e8fc5fbe70bd172dca5343aeb571173209ba8fe201df6a10a",
+      "originPath": "/Users/sqcopenclaw/.codex/generated_images/01a1c43e-779d-76c1-9193-2b50ab5e491a/exec-535262d9-babd-4004-9c45-97db50e1a152.png",
+      "prompt": "Make one original opaque background sheet for a first-grade math lesson in a Chinese community shadow theatre. Two independent equally tall wide scenes stacked vertically, exactly at the halfway line, approximate overall aspect 8:9 so each half is widescreen 16:9. Each half a complete flat illustration at its own framing; a crop of the top or bottom half must read naturally. No blank gaps, visible panel borders, frames, lettering, numbers, logos, banners with writing, characters, audience, or figures anywhere. Style in both halves: fine paper grain, matte gouache, neat cut-paper shapes, dark pine green, warm cream, restrained persimmon and apricot. Calm low detail, strong soft central emptiness for game objects. Top scene: entrance to a small community shadow-theatre lobby, distant folded pine-green curtain and a hint of warm empty light through the doorway high at the far left, muted matte pale sage floor from midline down, middle area unobstructed, small wall details only at outer edges. Bottom scene: a different quiet backstage sorting room, seen straight on, pale warm cream and muted amber tones, narrow pine-green shelving and soft fabric only on far left and far right edges, center 70 percent open neutral cream-olive wall, center bottom unobstructed for a dark game board. Keep major motifs away from the shared boundary and lateral crop edges. Original book illustration, low contrast backgrounds for small-screen readability. No human or animal silhouettes, no counting objects in a line, no objects with numbers, no front focal point, no floor grids, no decorative dust particles.",
+      "promptSha256": "636f42018bfee1c358b291a7f69d43ddb7d213e946f3967a8f0c48e0ec324985"
+    }
+  },
+  "assets": [
+    {
+      "key": "usher-stand",
+      "file": "assets/usher-stand.png",
+      "uses": [
+        "hop-between"
+      ],
+      "sourceType": "codex_builtin_imagegen_atlas_crop",
+      "source": "art-source/theatre-sprites.png",
+      "sourceSha256": "70d7b413e65ee62e4fbb46539ab0b16d95151804b1fa427f8eb8d426580603a4",
+      "sha256": "c8f16e49bf50a73a9a6866eadf493a6d332b533eb504618317913d5c21bf4f4b",
+      "sourceCrop": [
+        0,
+        0,
+        418,
+        429
+      ],
+      "atlasId": "theatre-sprites",
+      "playbackDerivative": {
+        "size": [
+          312,
+          320
+        ],
+        "bytes": 64659,
+        "mode": "RGBA"
+      }
+    },
+    {
+      "key": "usher-run",
+      "file": "assets/usher-run.png",
+      "uses": [
+        "hop-between"
+      ],
+      "sourceType": "codex_builtin_imagegen_atlas_crop",
+      "source": "art-source/theatre-sprites.png",
+      "sourceSha256": "70d7b413e65ee62e4fbb46539ab0b16d95151804b1fa427f8eb8d426580603a4",
+      "sha256": "f54509326660a5b2e9a2016c7cc635f95514fc9fe7b9fc2c2147974168c06caf",
+      "sourceCrop": [
+        418,
+        0,
+        836,
+        429
+      ],
+      "atlasId": "theatre-sprites",
+      "playbackDerivative": {
+        "size": [
+          312,
+          320
+        ],
+        "bytes": 78838,
+        "mode": "RGBA"
+      }
+    },
+    {
+      "key": "usher-hop",
+      "file": "assets/usher-hop.png",
+      "uses": [
+        "hop-between"
+      ],
+      "sourceType": "codex_builtin_imagegen_atlas_crop",
+      "source": "art-source/theatre-sprites.png",
+      "sourceSha256": "70d7b413e65ee62e4fbb46539ab0b16d95151804b1fa427f8eb8d426580603a4",
+      "sha256": "7b5370e420d8ec87676161102929404d7387329a3b11faafee0586cf640be415",
+      "sourceCrop": [
+        836,
+        0,
+        1254,
+        429
+      ],
+      "atlasId": "theatre-sprites",
+      "playbackDerivative": {
+        "size": [
+          312,
+          320
+        ],
+        "bytes": 70585,
+        "mode": "RGBA"
+      }
+    },
+    {
+      "key": "queue-child",
+      "file": "assets/queue-child.png",
+      "uses": [
+        "open",
+        "two-markers",
+        "draw-and-check"
+      ],
+      "sourceType": "codex_builtin_imagegen_atlas_crop",
+      "source": "art-source/theatre-sprites.png",
+      "sourceSha256": "70d7b413e65ee62e4fbb46539ab0b16d95151804b1fa427f8eb8d426580603a4",
+      "sha256": "f35ab1c1dae1668c3227e7d2099ff820ee3d29fa091c9b3bd25f202ffb044dfa",
+      "sourceCrop": [
+        0,
+        429,
+        418,
+        857
+      ],
+      "atlasId": "theatre-sprites",
+      "playbackDerivative": {
+        "size": [
+          313,
+          320
+        ],
+        "bytes": 75547,
+        "mode": "RGBA"
+      }
+    },
+    {
+      "key": "flag-blue",
+      "file": "assets/flag-blue.png",
+      "uses": [
+        "two-markers",
+        "draw-and-check",
+        "hop-between"
+      ],
+      "sourceType": "codex_builtin_imagegen_atlas_crop",
+      "source": "art-source/theatre-sprites.png",
+      "sourceSha256": "70d7b413e65ee62e4fbb46539ab0b16d95151804b1fa427f8eb8d426580603a4",
+      "sha256": "67790422aa63ca792ee28dcae1f31a0c616f574094d7a981df2d80e188a5f4e8",
+      "sourceCrop": [
+        418,
+        429,
+        836,
+        857
+      ],
+      "atlasId": "theatre-sprites",
+      "playbackDerivative": {
+        "size": [
+          313,
+          320
+        ],
+        "bytes": 44172,
+        "mode": "RGBA"
+      }
+    },
+    {
+      "key": "flag-orange",
+      "file": "assets/flag-orange.png",
+      "uses": [
+        "two-markers",
+        "draw-and-check",
+        "hop-between"
+      ],
+      "sourceType": "codex_builtin_imagegen_atlas_crop",
+      "source": "art-source/theatre-sprites.png",
+      "sourceSha256": "70d7b413e65ee62e4fbb46539ab0b16d95151804b1fa427f8eb8d426580603a4",
+      "sha256": "fa383bb2b67418e067e28583141efb72fa19dc0c1246dce0d8a1b0a648c54f54",
+      "sourceCrop": [
+        836,
+        429,
+        1254,
+        857
+      ],
+      "atlasId": "theatre-sprites",
+      "playbackDerivative": {
+        "size": [
+          313,
+          320
+        ],
+        "bytes": 40709,
+        "mode": "RGBA"
+      }
+    },
+    {
+      "key": "theatre-star",
+      "file": "assets/theatre-star.png",
+      "uses": [
+        "hop-between",
+        "match-the-middle"
+      ],
+      "sourceType": "codex_builtin_imagegen_atlas_crop",
+      "source": "art-source/theatre-sprites.png",
+      "sourceSha256": "70d7b413e65ee62e4fbb46539ab0b16d95151804b1fa427f8eb8d426580603a4",
+      "sha256": "34ddf43880041f7e28f71c4174c107ecf49d8ebd3becde6ff1d7599ce04bc904",
+      "sourceCrop": [
+        0,
+        857,
+        418,
+        1254
+      ],
+      "atlasId": "theatre-sprites",
+      "playbackDerivative": {
+        "size": [
+          320,
+          304
+        ],
+        "bytes": 83714,
+        "mode": "RGBA"
+      }
+    },
+    {
+      "key": "theatre-lobby",
+      "file": "assets/theatre-lobby.png",
+      "uses": [
+        "open",
+        "hop-between"
+      ],
+      "sourceType": "codex_builtin_imagegen_atlas_crop",
+      "source": "art-source/theatre-rooms.png",
+      "sourceSha256": "4c04fbdbcbb0a16e8fc5fbe70bd172dca5343aeb571173209ba8fe201df6a10a",
+      "sha256": "e0be1f16c4030ceada1f060f707aede72b1f5a1aa307aabc2270b36e42414bf5",
+      "sourceCrop": [
+        0,
+        0,
+        1182,
+        665
+      ],
+      "atlasId": "theatre-rooms",
+      "playbackDerivative": {
+        "size": [
+          1280,
+          720
+        ],
+        "bytes": 656963,
+        "mode": "P"
+      }
+    },
+    {
+      "key": "theatre-workroom",
+      "file": "assets/theatre-workroom.png",
+      "uses": [
+        "match-the-middle"
+      ],
+      "sourceType": "codex_builtin_imagegen_atlas_crop",
+      "source": "art-source/theatre-rooms.png",
+      "sourceSha256": "4c04fbdbcbb0a16e8fc5fbe70bd172dca5343aeb571173209ba8fe201df6a10a",
+      "sha256": "59a97d4139a813ef46d083a9ea8983dcffaab4cadb84db7adb625af25235cc90",
+      "sourceCrop": [
+        0,
+        665,
+        1182,
+        1330
+      ],
+      "atlasId": "theatre-rooms",
+      "playbackDerivative": {
+        "size": [
+          1280,
+          720
+        ],
+        "bytes": 722282,
+        "mode": "P"
+      }
+    },
+    {
+      "key": "theatre-queue-open",
+      "file": "assets/theatre-queue-open.png",
+      "uses": [
+        "open"
+      ],
+      "sourceType": "deterministic_semantic_diagram_with_registered_art",
+      "source": "art-source/position-diagrams.json",
+      "sourceSha256": "200490b1e157c9767977d1991aa090cc7af9d9396e5e6719ae777e3b84468518",
+      "sourceKey": "theatre-queue-open",
+      "sha256": "51121bbb518560e3de6ea8c7e56e64b860809c96ca728832d5244dd200f0c8ae",
+      "playbackDerivative": {
+        "size": [
+          1000,
+          500
+        ],
+        "bytes": 61553
+      }
+    },
+    {
+      "key": "queue-8-13",
+      "file": "assets/queue-8-13.png",
+      "uses": [
+        "two-markers"
+      ],
+      "sourceType": "deterministic_semantic_diagram_with_registered_art",
+      "source": "art-source/position-diagrams.json",
+      "sourceSha256": "200490b1e157c9767977d1991aa090cc7af9d9396e5e6719ae777e3b84468518",
+      "sourceKey": "queue-8-13",
+      "sha256": "379f7e0b8889b29aec9310cc6473e0ed775cd10ff2a687051880c8874c846b7c",
+      "playbackDerivative": {
+        "size": [
+          1000,
+          400
+        ],
+        "bytes": 19412
+      }
+    },
+    {
+      "key": "queue-to-dots",
+      "file": "assets/queue-to-dots.png",
+      "uses": [
+        "draw-and-check"
+      ],
+      "sourceType": "deterministic_semantic_diagram_with_registered_art",
+      "source": "art-source/position-diagrams.json",
+      "sourceSha256": "200490b1e157c9767977d1991aa090cc7af9d9396e5e6719ae777e3b84468518",
+      "sourceKey": "queue-to-dots",
+      "sha256": "258e35b37372d701e5264f56d53e42d94b770e2ccde05975b3411aed524b4615",
+      "playbackDerivative": {
+        "size": [
+          1000,
+          500
+        ],
+        "bytes": 31304
+      }
+    },
+    {
+      "key": "adjacent-and-reverse",
+      "file": "assets/adjacent-and-reverse.png",
+      "uses": [
+        "edges-and-empty"
+      ],
+      "sourceType": "deterministic_semantic_diagram_with_registered_art",
+      "source": "art-source/position-diagrams.json",
+      "sourceSha256": "200490b1e157c9767977d1991aa090cc7af9d9396e5e6719ae777e3b84468518",
+      "sourceKey": "adjacent-and-reverse",
+      "sha256": "f48e0e5b6fea66e40155130e41d707d61251ca1b3af587d4d5614421cd090406",
+      "playbackDerivative": {
+        "size": [
+          1000,
+          500
+        ],
+        "bytes": 26837
+      }
+    },
+    {
+      "key": "photos-include",
+      "file": "assets/photos-include.png",
+      "uses": [
+        "from-through"
+      ],
+      "sourceType": "deterministic_semantic_diagram_with_registered_art",
+      "source": "art-source/position-diagrams.json",
+      "sourceSha256": "200490b1e157c9767977d1991aa090cc7af9d9396e5e6719ae777e3b84468518",
+      "sourceKey": "photos-include",
+      "sha256": "9611382d7d7f3cc904c4fed9530c12d3c99a137626886df2f48424d5276b27cc",
+      "playbackDerivative": {
+        "size": [
+          1000,
+          420
+        ],
+        "bytes": 6906
+      }
+    },
+    {
+      "key": "floor-transfer",
+      "file": "assets/floor-transfer.png",
+      "uses": [
+        "new-places"
+      ],
+      "sourceType": "deterministic_semantic_diagram_with_registered_art",
+      "source": "art-source/position-diagrams.json",
+      "sourceSha256": "200490b1e157c9767977d1991aa090cc7af9d9396e5e6719ae777e3b84468518",
+      "sourceKey": "floor-transfer",
+      "sha256": "4af88e70a762cc38ae39c728c31088a976902da9e489503acc4b02c3c4801642",
+      "playbackDerivative": {
+        "size": [
+          860,
+          600
+        ],
+        "bytes": 8436
+      }
+    },
+    {
+      "key": "recap-dots",
+      "file": "assets/recap-dots.png",
+      "uses": [
+        "recap"
+      ],
+      "sourceType": "deterministic_semantic_diagram_with_registered_art",
+      "source": "art-source/position-diagrams.json",
+      "sourceSha256": "200490b1e157c9767977d1991aa090cc7af9d9396e5e6719ae777e3b84468518",
+      "sourceKey": "recap-dots",
+      "sha256": "b30d8c8334143a3fbc2ff4a3309a9c6499d8246bb7693e5d5bd78c33b65443b8",
+      "playbackDerivative": {
+        "size": [
+          1000,
+          400
+        ],
+        "bytes": 6440
+      }
+    },
+    {
+      "key": "hop-start",
+      "file": "assets/hop-start.png",
+      "uses": [
+        "hop-between"
+      ],
+      "sourceType": "deterministic_semantic_diagram_with_registered_art",
+      "source": "art-source/position-diagrams.json",
+      "sourceSha256": "200490b1e157c9767977d1991aa090cc7af9d9396e5e6719ae777e3b84468518",
+      "sourceKey": "hop-start",
+      "sha256": "fd560706aee7fddbabef22fdc3dd7a17d57bb7c0b3f44c24bba3a85971e84840",
+      "playbackDerivative": {
+        "size": [
+          1280,
+          720
+        ],
+        "bytes": 614177
+      }
+    },
+    {
+      "key": "tiles-start",
+      "file": "assets/tiles-start.png",
+      "uses": [
+        "match-the-middle"
+      ],
+      "sourceType": "deterministic_semantic_diagram_with_registered_art",
+      "source": "art-source/position-diagrams.json",
+      "sourceSha256": "200490b1e157c9767977d1991aa090cc7af9d9396e5e6719ae777e3b84468518",
+      "sourceKey": "tiles-start",
+      "sha256": "be6c0ce20a956c1fe22df9c9b659aa9f0fd461d0b0bf3d1f9afc453f0af920ce",
+      "playbackDerivative": {
+        "size": [
+          1280,
+          720
+        ],
+        "bytes": 437858
+      }
+    },
+    {
+      "key": "hop-flags-5-9",
+      "file": "assets/hop-flags-5-9.png",
+      "uses": [
+        "hop-between"
+      ],
+      "sourceType": "deterministic_semantic_diagram_with_registered_art",
+      "source": "art-source/position-diagrams.json",
+      "sourceSha256": "200490b1e157c9767977d1991aa090cc7af9d9396e5e6719ae777e3b84468518",
+      "sourceKey": "hop-flags-5-9",
+      "sha256": "322620a6e37a98284929aa6c9c3f213cd75eca998adf2724c3c52e5f0310e40d",
+      "playbackDerivative": {
+        "size": [
+          560,
+          240
+        ],
+        "bytes": 4863
+      }
+    },
+    {
+      "key": "hop-flags-8-14",
+      "file": "assets/hop-flags-8-14.png",
+      "uses": [
+        "hop-between"
+      ],
+      "sourceType": "deterministic_semantic_diagram_with_registered_art",
+      "source": "art-source/position-diagrams.json",
+      "sourceSha256": "200490b1e157c9767977d1991aa090cc7af9d9396e5e6719ae777e3b84468518",
+      "sourceKey": "hop-flags-8-14",
+      "sha256": "a804b9896d261362e4d5ae65ebf3baedb7c8ed7a4eadf508a88f77c1c0eae708",
+      "playbackDerivative": {
+        "size": [
+          560,
+          240
+        ],
+        "bytes": 4659
+      }
+    },
+    {
+      "key": "hop-flags-12-18",
+      "file": "assets/hop-flags-12-18.png",
+      "uses": [
+        "hop-between"
+      ],
+      "sourceType": "deterministic_semantic_diagram_with_registered_art",
+      "source": "art-source/position-diagrams.json",
+      "sourceSha256": "200490b1e157c9767977d1991aa090cc7af9d9396e5e6719ae777e3b84468518",
+      "sourceKey": "hop-flags-12-18",
+      "sha256": "f2781cfa20b17787a51bd97b6eb7e55275b8616f4bebc5adb1a280c72f514325",
+      "playbackDerivative": {
+        "size": [
+          560,
+          240
+        ],
+        "bytes": 5574
+      }
+    },
+    {
+      "key": "platform-flag-5",
+      "file": "assets/platform-flag-5.png",
+      "uses": [
+        "hop-between"
+      ],
+      "sourceType": "deterministic_semantic_diagram_with_registered_art",
+      "source": "art-source/position-diagrams.json",
+      "sourceSha256": "200490b1e157c9767977d1991aa090cc7af9d9396e5e6719ae777e3b84468518",
+      "sourceKey": "platform-flag-5",
+      "sha256": "9de490519e4212d368fb514cfd25a69749a55ab77e702110eba4dfa4e4bf6d66",
+      "playbackDerivative": {
+        "size": [
+          400,
+          150
+        ],
+        "bytes": 2765
+      }
+    },
+    {
+      "key": "platform-flag-9",
+      "file": "assets/platform-flag-9.png",
+      "uses": [
+        "hop-between"
+      ],
+      "sourceType": "deterministic_semantic_diagram_with_registered_art",
+      "source": "art-source/position-diagrams.json",
+      "sourceSha256": "200490b1e157c9767977d1991aa090cc7af9d9396e5e6719ae777e3b84468518",
+      "sourceKey": "platform-flag-9",
+      "sha256": "af1ac6145a989f273d786c86366a122ae9640872653babfad8394e5f979ef445",
+      "playbackDerivative": {
+        "size": [
+          400,
+          150
+        ],
+        "bytes": 3551
+      }
+    },
+    {
+      "key": "platform-flag-8",
+      "file": "assets/platform-flag-8.png",
+      "uses": [
+        "hop-between"
+      ],
+      "sourceType": "deterministic_semantic_diagram_with_registered_art",
+      "source": "art-source/position-diagrams.json",
+      "sourceSha256": "200490b1e157c9767977d1991aa090cc7af9d9396e5e6719ae777e3b84468518",
+      "sourceKey": "platform-flag-8",
+      "sha256": "8bd18b48e178def5ddd859b6468de4e108d19a2986a2f8113527567b5da0b475",
+      "playbackDerivative": {
+        "size": [
+          400,
+          150
+        ],
+        "bytes": 3718
+      }
+    },
+    {
+      "key": "platform-flag-14",
+      "file": "assets/platform-flag-14.png",
+      "uses": [
+        "hop-between"
+      ],
+      "sourceType": "deterministic_semantic_diagram_with_registered_art",
+      "source": "art-source/position-diagrams.json",
+      "sourceSha256": "200490b1e157c9767977d1991aa090cc7af9d9396e5e6719ae777e3b84468518",
+      "sourceKey": "platform-flag-14",
+      "sha256": "ed3900acb165edf58fdd19bd6a387f8f6d8d7772f9029e0e477b3a34662fe3d9",
+      "playbackDerivative": {
+        "size": [
+          400,
+          150
+        ],
+        "bytes": 2094
+      }
+    },
+    {
+      "key": "platform-flag-12",
+      "file": "assets/platform-flag-12.png",
+      "uses": [
+        "hop-between"
+      ],
+      "sourceType": "deterministic_semantic_diagram_with_registered_art",
+      "source": "art-source/position-diagrams.json",
+      "sourceSha256": "200490b1e157c9767977d1991aa090cc7af9d9396e5e6719ae777e3b84468518",
+      "sourceKey": "platform-flag-12",
+      "sha256": "af732da73e09e48f676585dea01d388e70db5453d5c7973c77589975d3381e8f",
+      "playbackDerivative": {
+        "size": [
+          400,
+          150
+        ],
+        "bytes": 3164
+      }
+    },
+    {
+      "key": "platform-flag-18",
+      "file": "assets/platform-flag-18.png",
+      "uses": [
+        "hop-between"
+      ],
+      "sourceType": "deterministic_semantic_diagram_with_registered_art",
+      "source": "art-source/position-diagrams.json",
+      "sourceSha256": "200490b1e157c9767977d1991aa090cc7af9d9396e5e6719ae777e3b84468518",
+      "sourceKey": "platform-flag-18",
+      "sha256": "b243b0903d3adf61d8c7bf57febc3e1f69ae6c2ab8733a6bfe65d7920e690060",
+      "playbackDerivative": {
+        "size": [
+          400,
+          150
+        ],
+        "bytes": 4159
+      }
+    },
+    {
+      "key": "tiles-rule",
+      "file": "assets/tiles-rule.png",
+      "uses": [
+        "match-the-middle"
+      ],
+      "sourceType": "deterministic_semantic_diagram_with_registered_art",
+      "source": "art-source/position-diagrams.json",
+      "sourceSha256": "200490b1e157c9767977d1991aa090cc7af9d9396e5e6719ae777e3b84468518",
+      "sourceKey": "tiles-rule",
+      "sha256": "f23e7c8d3daae7a098f94906a48c09f5d243389318d27e63e75849a2aab4705d",
+      "playbackDerivative": {
+        "size": [
+          480,
+          270
+        ],
+        "bytes": 1618
+      }
+    },
+    {
+      "key": "int-2-6",
+      "file": "assets/int-2-6.png",
+      "uses": [
+        "match-the-middle"
+      ],
+      "sourceType": "deterministic_semantic_diagram_with_registered_art",
+      "source": "art-source/position-diagrams.json",
+      "sourceSha256": "200490b1e157c9767977d1991aa090cc7af9d9396e5e6719ae777e3b84468518",
+      "sourceKey": "int-2-6",
+      "sha256": "8ef6f3954a02989d7e5960f101d6eaa54f8690cc92fa014b98798382d544a5b3",
+      "playbackDerivative": {
+        "size": [
+          288,
+          288
+        ],
+        "bytes": 3121
+      }
+    },
+    {
+      "key": "int-7-12",
+      "file": "assets/int-7-12.png",
+      "uses": [
+        "match-the-middle"
+      ],
+      "sourceType": "deterministic_semantic_diagram_with_registered_art",
+      "source": "art-source/position-diagrams.json",
+      "sourceSha256": "200490b1e157c9767977d1991aa090cc7af9d9396e5e6719ae777e3b84468518",
+      "sourceKey": "int-7-12",
+      "sha256": "5f702ca9d6cb324746c2590d3c109e1cfce3838a3fb2da345896ad6c96668dbc",
+      "playbackDerivative": {
+        "size": [
+          288,
+          288
+        ],
+        "bytes": 2751
+      }
+    },
+    {
+      "key": "int-14-17",
+      "file": "assets/int-14-17.png",
+      "uses": [
+        "match-the-middle"
+      ],
+      "sourceType": "deterministic_semantic_diagram_with_registered_art",
+      "source": "art-source/position-diagrams.json",
+      "sourceSha256": "200490b1e157c9767977d1991aa090cc7af9d9396e5e6719ae777e3b84468518",
+      "sourceKey": "int-14-17",
+      "sha256": "8b37ab6b527e4d20a0a2443c9c49145aebf0bcdd67be4f638b7ca2e02c3d07b5",
+      "playbackDerivative": {
+        "size": [
+          288,
+          288
+        ],
+        "bytes": 2604
+      }
+    },
+    {
+      "key": "int-3-7",
+      "file": "assets/int-3-7.png",
+      "uses": [
+        "match-the-middle"
+      ],
+      "sourceType": "deterministic_semantic_diagram_with_registered_art",
+      "source": "art-source/position-diagrams.json",
+      "sourceSha256": "200490b1e157c9767977d1991aa090cc7af9d9396e5e6719ae777e3b84468518",
+      "sourceKey": "int-3-7",
+      "sha256": "8a145e0363a337cd45a35eca11a1a96ee15b64198fe0edb39953debc65c1cd34",
+      "playbackDerivative": {
+        "size": [
+          288,
+          288
+        ],
+        "bytes": 2783
+      }
+    },
+    {
+      "key": "int-9-14",
+      "file": "assets/int-9-14.png",
+      "uses": [
+        "match-the-middle"
+      ],
+      "sourceType": "deterministic_semantic_diagram_with_registered_art",
+      "source": "art-source/position-diagrams.json",
+      "sourceSha256": "200490b1e157c9767977d1991aa090cc7af9d9396e5e6719ae777e3b84468518",
+      "sourceKey": "int-9-14",
+      "sha256": "df10f3224aec40e1b49b47c913a1c98254e67d0f187918f45e5aaa2fc6382c17",
+      "playbackDerivative": {
+        "size": [
+          288,
+          288
+        ],
+        "bytes": 2946
+      }
+    },
+    {
+      "key": "int-6-8",
+      "file": "assets/int-6-8.png",
+      "uses": [
+        "match-the-middle"
+      ],
+      "sourceType": "deterministic_semantic_diagram_with_registered_art",
+      "source": "art-source/position-diagrams.json",
+      "sourceSha256": "200490b1e157c9767977d1991aa090cc7af9d9396e5e6719ae777e3b84468518",
+      "sourceKey": "int-6-8",
+      "sha256": "91c400fe05afb9a3777dbf9f6f2cddf9e626efa2ab298d6d3d70615ec46daeca",
+      "playbackDerivative": {
+        "size": [
+          288,
+          288
+        ],
+        "bytes": 3152
+      }
+    },
+    {
+      "key": "int-9-13",
+      "file": "assets/int-9-13.png",
+      "uses": [
+        "match-the-middle"
+      ],
+      "sourceType": "deterministic_semantic_diagram_with_registered_art",
+      "source": "art-source/position-diagrams.json",
+      "sourceSha256": "200490b1e157c9767977d1991aa090cc7af9d9396e5e6719ae777e3b84468518",
+      "sourceKey": "int-9-13",
+      "sha256": "df3a111fe7caf20f9b97d2a18d00569f73415fdcefe7b07e1e9df99ff07e5c6c",
+      "playbackDerivative": {
+        "size": [
+          288,
+          288
+        ],
+        "bytes": 3427
+      }
+    },
+    {
+      "key": "int-16-17",
+      "file": "assets/int-16-17.png",
+      "uses": [
+        "match-the-middle"
+      ],
+      "sourceType": "deterministic_semantic_diagram_with_registered_art",
+      "source": "art-source/position-diagrams.json",
+      "sourceSha256": "200490b1e157c9767977d1991aa090cc7af9d9396e5e6719ae777e3b84468518",
+      "sourceKey": "int-16-17",
+      "sha256": "caa436834c4e522fc3159bfc598bb149d584307af95be5d89cacf50b2fcb40e4",
+      "playbackDerivative": {
+        "size": [
+          288,
+          288
+        ],
+        "bytes": 2927
+      }
+    },
+    {
+      "key": "int-1-5",
+      "file": "assets/int-1-5.png",
+      "uses": [
+        "match-the-middle"
+      ],
+      "sourceType": "deterministic_semantic_diagram_with_registered_art",
+      "source": "art-source/position-diagrams.json",
+      "sourceSha256": "200490b1e157c9767977d1991aa090cc7af9d9396e5e6719ae777e3b84468518",
+      "sourceKey": "int-1-5",
+      "sha256": "cb7abcfc817ba7f7b7c976c08cbfbd1b358e79e7ad78284f9f7337361f3588d7",
+      "playbackDerivative": {
+        "size": [
+          288,
+          288
+        ],
+        "bytes": 2365
+      }
+    },
+    {
+      "key": "count-0",
+      "file": "assets/count-0.png",
+      "uses": [
+        "match-the-middle"
+      ],
+      "sourceType": "deterministic_semantic_diagram_with_registered_art",
+      "source": "art-source/position-diagrams.json",
+      "sourceSha256": "200490b1e157c9767977d1991aa090cc7af9d9396e5e6719ae777e3b84468518",
+      "sourceKey": "count-0",
+      "sha256": "d8786a1cde49404478189566fe11583b242144b95ff371c5aa7c118ba352e155",
+      "playbackDerivative": {
+        "size": [
+          288,
+          288
+        ],
+        "bytes": 3427
+      }
+    },
+    {
+      "key": "count-1",
+      "file": "assets/count-1.png",
+      "uses": [
+        "match-the-middle"
+      ],
+      "sourceType": "deterministic_semantic_diagram_with_registered_art",
+      "source": "art-source/position-diagrams.json",
+      "sourceSha256": "200490b1e157c9767977d1991aa090cc7af9d9396e5e6719ae777e3b84468518",
+      "sourceKey": "count-1",
+      "sha256": "a5f09fe9d470a5372db0f33e7152286395de2087e44bfacc382be25c32716484",
+      "playbackDerivative": {
+        "size": [
+          288,
+          288
+        ],
+        "bytes": 784
+      }
+    },
+    {
+      "key": "count-2",
+      "file": "assets/count-2.png",
+      "uses": [
+        "match-the-middle"
+      ],
+      "sourceType": "deterministic_semantic_diagram_with_registered_art",
+      "source": "art-source/position-diagrams.json",
+      "sourceSha256": "200490b1e157c9767977d1991aa090cc7af9d9396e5e6719ae777e3b84468518",
+      "sourceKey": "count-2",
+      "sha256": "e6fafdc4875f8b3732e410452c145d557d12478c5daeb7ab791e1809685e77f7",
+      "playbackDerivative": {
+        "size": [
+          288,
+          288
+        ],
+        "bytes": 848
+      }
+    },
+    {
+      "key": "count-3",
+      "file": "assets/count-3.png",
+      "uses": [
+        "match-the-middle"
+      ],
+      "sourceType": "deterministic_semantic_diagram_with_registered_art",
+      "source": "art-source/position-diagrams.json",
+      "sourceSha256": "200490b1e157c9767977d1991aa090cc7af9d9396e5e6719ae777e3b84468518",
+      "sourceKey": "count-3",
+      "sha256": "83ec0c6e03847f2f50c1b11a4de947f37b980fd50da0a9618afdb3710443c658",
+      "playbackDerivative": {
+        "size": [
+          288,
+          288
+        ],
+        "bytes": 959
+      }
+    },
+    {
+      "key": "count-4",
+      "file": "assets/count-4.png",
+      "uses": [
+        "match-the-middle"
+      ],
+      "sourceType": "deterministic_semantic_diagram_with_registered_art",
+      "source": "art-source/position-diagrams.json",
+      "sourceSha256": "200490b1e157c9767977d1991aa090cc7af9d9396e5e6719ae777e3b84468518",
+      "sourceKey": "count-4",
+      "sha256": "7f81b48ceddf6b8c7006303d487860735cab5759edf9cb4d05b5b2461b86a4e2",
+      "playbackDerivative": {
+        "size": [
+          288,
+          288
+        ],
+        "bytes": 1083
+      }
+    },
+    {
+      "key": "q1-stem",
+      "file": "assets/q1-stem.png",
+      "uses": [
+        "picture-check"
+      ],
+      "sourceType": "deterministic_semantic_diagram_with_registered_art",
+      "source": "art-source/position-diagrams.json",
+      "sourceSha256": "200490b1e157c9767977d1991aa090cc7af9d9396e5e6719ae777e3b84468518",
+      "sourceKey": "q1-stem",
+      "sha256": "ac0b65d9f5a832da5b5eeddb04d0d910cd68b71954fb9ca950dab5235f432b36",
+      "playbackDerivative": {
+        "size": [
+          640,
+          360
+        ],
+        "bytes": 18475
+      }
+    },
+    {
+      "key": "q1-a",
+      "file": "assets/q1-a.png",
+      "uses": [
+        "picture-check"
+      ],
+      "sourceType": "deterministic_semantic_diagram_with_registered_art",
+      "source": "art-source/position-diagrams.json",
+      "sourceSha256": "200490b1e157c9767977d1991aa090cc7af9d9396e5e6719ae777e3b84468518",
+      "sourceKey": "q1-a",
+      "sha256": "57f160648bfcab2ff8a5dcde35d2b43cbbb019063fb66a120b3fedd5e3018f82",
+      "playbackDerivative": {
+        "size": [
+          640,
+          360
+        ],
+        "bytes": 25982
+      }
+    },
+    {
+      "key": "q1-b",
+      "file": "assets/q1-b.png",
+      "uses": [
+        "picture-check"
+      ],
+      "sourceType": "deterministic_semantic_diagram_with_registered_art",
+      "source": "art-source/position-diagrams.json",
+      "sourceSha256": "200490b1e157c9767977d1991aa090cc7af9d9396e5e6719ae777e3b84468518",
+      "sourceKey": "q1-b",
+      "sha256": "d921af9655bc6618776bc2d99b936a516e8f8d29879cb2fe235262d7f23a714a",
+      "playbackDerivative": {
+        "size": [
+          640,
+          360
+        ],
+        "bytes": 25953
+      }
+    },
+    {
+      "key": "q1-c",
+      "file": "assets/q1-c.png",
+      "uses": [
+        "picture-check"
+      ],
+      "sourceType": "deterministic_semantic_diagram_with_registered_art",
+      "source": "art-source/position-diagrams.json",
+      "sourceSha256": "200490b1e157c9767977d1991aa090cc7af9d9396e5e6719ae777e3b84468518",
+      "sourceKey": "q1-c",
+      "sha256": "11fdd860bf372793af8607ca368a0da14be7eb51e95e071669e53f19e8b7bae6",
+      "playbackDerivative": {
+        "size": [
+          640,
+          360
+        ],
+        "bytes": 25982
+      }
+    },
+    {
+      "key": "q2-stem",
+      "file": "assets/q2-stem.png",
+      "uses": [
+        "picture-check"
+      ],
+      "sourceType": "deterministic_semantic_diagram_with_registered_art",
+      "source": "art-source/position-diagrams.json",
+      "sourceSha256": "200490b1e157c9767977d1991aa090cc7af9d9396e5e6719ae777e3b84468518",
+      "sourceKey": "q2-stem",
+      "sha256": "184af89df3e6d9e0ad0605735c879878543d5ac22031836b648323dbb4059b6f",
+      "playbackDerivative": {
+        "size": [
+          640,
+          360
+        ],
+        "bytes": 5414
+      }
+    },
+    {
+      "key": "q2-a",
+      "file": "assets/q2-a.png",
+      "uses": [
+        "picture-check"
+      ],
+      "sourceType": "deterministic_semantic_diagram_with_registered_art",
+      "source": "art-source/position-diagrams.json",
+      "sourceSha256": "200490b1e157c9767977d1991aa090cc7af9d9396e5e6719ae777e3b84468518",
+      "sourceKey": "q2-a",
+      "sha256": "fe3f16785bffb3f1ce1178e70cf378a893b7171fa91f665805be001f625e64a8",
+      "playbackDerivative": {
+        "size": [
+          640,
+          360
+        ],
+        "bytes": 5808
+      }
+    },
+    {
+      "key": "q2-b",
+      "file": "assets/q2-b.png",
+      "uses": [
+        "picture-check"
+      ],
+      "sourceType": "deterministic_semantic_diagram_with_registered_art",
+      "source": "art-source/position-diagrams.json",
+      "sourceSha256": "200490b1e157c9767977d1991aa090cc7af9d9396e5e6719ae777e3b84468518",
+      "sourceKey": "q2-b",
+      "sha256": "68d723a21c17a92be94d7b34583a705b78637a0a9ca5a5bd706e7638cdb8414d",
+      "playbackDerivative": {
+        "size": [
+          640,
+          360
+        ],
+        "bytes": 5771
+      }
+    },
+    {
+      "key": "q2-c",
+      "file": "assets/q2-c.png",
+      "uses": [
+        "picture-check"
+      ],
+      "sourceType": "deterministic_semantic_diagram_with_registered_art",
+      "source": "art-source/position-diagrams.json",
+      "sourceSha256": "200490b1e157c9767977d1991aa090cc7af9d9396e5e6719ae777e3b84468518",
+      "sourceKey": "q2-c",
+      "sha256": "8509c6f0be481f2a4e1e8f49f7c7869e40e5271fab25074baf38e578fb16caa3",
+      "playbackDerivative": {
+        "size": [
+          640,
+          360
+        ],
+        "bytes": 5719
+      }
+    },
+    {
+      "key": "q3-stem",
+      "file": "assets/q3-stem.png",
+      "uses": [
+        "picture-check"
+      ],
+      "sourceType": "deterministic_semantic_diagram_with_registered_art",
+      "source": "art-source/position-diagrams.json",
+      "sourceSha256": "200490b1e157c9767977d1991aa090cc7af9d9396e5e6719ae777e3b84468518",
+      "sourceKey": "q3-stem",
+      "sha256": "230ef757250d79f235d5f7f4e39d2cfe9297d51f8761a09b32639a0cce9370e5",
+      "playbackDerivative": {
+        "size": [
+          640,
+          360
+        ],
+        "bytes": 22353
+      }
+    },
+    {
+      "key": "q3-a",
+      "file": "assets/q3-a.png",
+      "uses": [
+        "picture-check"
+      ],
+      "sourceType": "deterministic_semantic_diagram_with_registered_art",
+      "source": "art-source/position-diagrams.json",
+      "sourceSha256": "200490b1e157c9767977d1991aa090cc7af9d9396e5e6719ae777e3b84468518",
+      "sourceKey": "q3-a",
+      "sha256": "48a0a95d9b42e9ec20a2ebb96b20deb7375d3d8729d0fc593dfc3a9ac6defdec",
+      "playbackDerivative": {
+        "size": [
+          640,
+          360
+        ],
+        "bytes": 4035
+      }
+    },
+    {
+      "key": "q3-b",
+      "file": "assets/q3-b.png",
+      "uses": [
+        "picture-check"
+      ],
+      "sourceType": "deterministic_semantic_diagram_with_registered_art",
+      "source": "art-source/position-diagrams.json",
+      "sourceSha256": "200490b1e157c9767977d1991aa090cc7af9d9396e5e6719ae777e3b84468518",
+      "sourceKey": "q3-b",
+      "sha256": "f81598935fe2b69295925b8f34daad26a05bca650e99cc325ef69fb4680881af",
+      "playbackDerivative": {
+        "size": [
+          640,
+          360
+        ],
+        "bytes": 3823
+      }
+    },
+    {
+      "key": "q3-c",
+      "file": "assets/q3-c.png",
+      "uses": [
+        "picture-check"
+      ],
+      "sourceType": "deterministic_semantic_diagram_with_registered_art",
+      "source": "art-source/position-diagrams.json",
+      "sourceSha256": "200490b1e157c9767977d1991aa090cc7af9d9396e5e6719ae777e3b84468518",
+      "sourceKey": "q3-c",
+      "sha256": "a475958ae97d50577c59a266ad96d6e9585248f61d18ed52bade95daa0b3bea6",
+      "playbackDerivative": {
+        "size": [
+          640,
+          360
+        ],
+        "bytes": 4280
+      }
+    },
+    {
+      "key": "q4-stem",
+      "file": "assets/q4-stem.png",
+      "uses": [
+        "picture-check"
+      ],
+      "sourceType": "deterministic_semantic_diagram_with_registered_art",
+      "source": "art-source/position-diagrams.json",
+      "sourceSha256": "200490b1e157c9767977d1991aa090cc7af9d9396e5e6719ae777e3b84468518",
+      "sourceKey": "q4-stem",
+      "sha256": "585929864f334f47459d4f2d96d35c202dff0a004543f646c9869dde9b3ce516",
+      "playbackDerivative": {
+        "size": [
+          640,
+          420
+        ],
+        "bytes": 5839
+      }
+    },
+    {
+      "key": "q4-a",
+      "file": "assets/q4-a.png",
+      "uses": [
+        "picture-check"
+      ],
+      "sourceType": "deterministic_semantic_diagram_with_registered_art",
+      "source": "art-source/position-diagrams.json",
+      "sourceSha256": "200490b1e157c9767977d1991aa090cc7af9d9396e5e6719ae777e3b84468518",
+      "sourceKey": "q4-a",
+      "sha256": "803abe56c0dc5b587f25e2c71a1bc7f211c15e918718c27ee5d5dc2d0a66d754",
+      "playbackDerivative": {
+        "size": [
+          640,
+          420
+        ],
+        "bytes": 5838
+      }
+    },
+    {
+      "key": "q4-b",
+      "file": "assets/q4-b.png",
+      "uses": [
+        "picture-check"
+      ],
+      "sourceType": "deterministic_semantic_diagram_with_registered_art",
+      "source": "art-source/position-diagrams.json",
+      "sourceSha256": "200490b1e157c9767977d1991aa090cc7af9d9396e5e6719ae777e3b84468518",
+      "sourceKey": "q4-b",
+      "sha256": "82f4a433b901487c9a114e644ddd3dfb561a4fe3041751d84799cf60c857b247",
+      "playbackDerivative": {
+        "size": [
+          640,
+          420
+        ],
+        "bytes": 5856
+      }
+    },
+    {
+      "key": "q4-c",
+      "file": "assets/q4-c.png",
+      "uses": [
+        "picture-check"
+      ],
+      "sourceType": "deterministic_semantic_diagram_with_registered_art",
+      "source": "art-source/position-diagrams.json",
+      "sourceSha256": "200490b1e157c9767977d1991aa090cc7af9d9396e5e6719ae777e3b84468518",
+      "sourceKey": "q4-c",
+      "sha256": "40aa87abfe72f3fa0c3fedf2fddc890e015d4717a1119cd84cd3ed452184142d",
+      "playbackDerivative": {
+        "size": [
+          640,
+          420
+        ],
+        "bytes": 5856
+      }
+    },
+    {
+      "key": "q5-stem",
+      "file": "assets/q5-stem.png",
+      "uses": [
+        "picture-check"
+      ],
+      "sourceType": "deterministic_semantic_diagram_with_registered_art",
+      "source": "art-source/position-diagrams.json",
+      "sourceSha256": "200490b1e157c9767977d1991aa090cc7af9d9396e5e6719ae777e3b84468518",
+      "sourceKey": "q5-stem",
+      "sha256": "3ae3d78cc308cc78f604e9307f161bfe5b7d1ee579acdb0b3a1432f6fe804dcf",
+      "playbackDerivative": {
+        "size": [
+          640,
+          360
+        ],
+        "bytes": 6228
+      }
+    },
+    {
+      "key": "q5-a",
+      "file": "assets/q5-a.png",
+      "uses": [
+        "picture-check"
+      ],
+      "sourceType": "deterministic_semantic_diagram_with_registered_art",
+      "source": "art-source/position-diagrams.json",
+      "sourceSha256": "200490b1e157c9767977d1991aa090cc7af9d9396e5e6719ae777e3b84468518",
+      "sourceKey": "q5-a",
+      "sha256": "6fb440d44ce80cecc6135c2aeff56c66142b220a0db286cbfe32c9772b8e9c57",
+      "playbackDerivative": {
+        "size": [
+          640,
+          360
+        ],
+        "bytes": 1720
+      }
+    },
+    {
+      "key": "q5-b",
+      "file": "assets/q5-b.png",
+      "uses": [
+        "picture-check"
+      ],
+      "sourceType": "deterministic_semantic_diagram_with_registered_art",
+      "source": "art-source/position-diagrams.json",
+      "sourceSha256": "200490b1e157c9767977d1991aa090cc7af9d9396e5e6719ae777e3b84468518",
+      "sourceKey": "q5-b",
+      "sha256": "eb8b20f8059a93ebcbeee0b3d0e9ca21402de7071d962cafdb3c62e61a4e1d5a",
+      "playbackDerivative": {
+        "size": [
+          640,
+          360
+        ],
+        "bytes": 1801
+      }
+    },
+    {
+      "key": "q5-c",
+      "file": "assets/q5-c.png",
+      "uses": [
+        "picture-check"
+      ],
+      "sourceType": "deterministic_semantic_diagram_with_registered_art",
+      "source": "art-source/position-diagrams.json",
+      "sourceSha256": "200490b1e157c9767977d1991aa090cc7af9d9396e5e6719ae777e3b84468518",
+      "sourceKey": "q5-c",
+      "sha256": "03552de275201b5795d7f90b3105c57d0bee5e2bec908ff7e56bd9284ad3dcd2",
+      "playbackDerivative": {
+        "size": [
+          640,
+          360
+        ],
+        "bytes": 1850
+      }
+    },
+    {
+      "key": "q6-stem",
+      "file": "assets/q6-stem.png",
+      "uses": [
+        "picture-check"
+      ],
+      "sourceType": "deterministic_semantic_diagram_with_registered_art",
+      "source": "art-source/position-diagrams.json",
+      "sourceSha256": "200490b1e157c9767977d1991aa090cc7af9d9396e5e6719ae777e3b84468518",
+      "sourceKey": "q6-stem",
+      "sha256": "2e6b8af75a5f5a4d10d9f12e2d559b8bcefb9c5b54734ef8883a1086aee917f8",
+      "playbackDerivative": {
+        "size": [
+          640,
+          360
+        ],
+        "bytes": 6023
+      }
+    },
+    {
+      "key": "q6-a",
+      "file": "assets/q6-a.png",
+      "uses": [
+        "picture-check"
+      ],
+      "sourceType": "deterministic_semantic_diagram_with_registered_art",
+      "source": "art-source/position-diagrams.json",
+      "sourceSha256": "200490b1e157c9767977d1991aa090cc7af9d9396e5e6719ae777e3b84468518",
+      "sourceKey": "q6-a",
+      "sha256": "0a6e24a4bec60bc993506a5d757406e154a6797397627e72bbef6f08e4192e86",
+      "playbackDerivative": {
+        "size": [
+          640,
+          360
+        ],
+        "bytes": 6324
+      }
+    },
+    {
+      "key": "q6-b",
+      "file": "assets/q6-b.png",
+      "uses": [
+        "picture-check"
+      ],
+      "sourceType": "deterministic_semantic_diagram_with_registered_art",
+      "source": "art-source/position-diagrams.json",
+      "sourceSha256": "200490b1e157c9767977d1991aa090cc7af9d9396e5e6719ae777e3b84468518",
+      "sourceKey": "q6-b",
+      "sha256": "4e760c0c987b6eb29a16bf789c5012456448ee9e1606f809703c1e8a31fcc8e9",
+      "playbackDerivative": {
+        "size": [
+          640,
+          360
+        ],
+        "bytes": 6410
+      }
+    },
+    {
+      "key": "q6-c",
+      "file": "assets/q6-c.png",
+      "uses": [
+        "picture-check"
+      ],
+      "sourceType": "deterministic_semantic_diagram_with_registered_art",
+      "source": "art-source/position-diagrams.json",
+      "sourceSha256": "200490b1e157c9767977d1991aa090cc7af9d9396e5e6719ae777e3b84468518",
+      "sourceKey": "q6-c",
+      "sha256": "34ac4fed8966fe62d1fda72505410ef6f7d32894c6ec4d0b0020a8b0019eae20",
+      "playbackDerivative": {
+        "size": [
+          640,
+          360
+        ],
+        "bytes": 6406
+      }
+    }
+  ],
+  "sceneImageBudgets": {
+    "hop-between": {
+      "imageBytes": {
+        "usher-stand": 64659,
+        "usher-run": 78838,
+        "usher-hop": 70585,
+        "theatre-star": 83714,
+        "theatre-lobby": 656963,
+        "hop-start": 614177,
+        "hop-flags-5-9": 4863,
+        "hop-flags-8-14": 4659,
+        "hop-flags-12-18": 5574,
+        "platform-flag-5": 2765,
+        "platform-flag-9": 3551,
+        "platform-flag-8": 3718,
+        "platform-flag-14": 2094,
+        "platform-flag-12": 3164,
+        "platform-flag-18": 4159
+      },
+      "totalPlaybackImageBytes": 1603483,
+      "targetMaximumBytes": 3000000
+    },
+    "match-the-middle": {
+      "imageBytes": {
+        "theatre-star": 83714,
+        "theatre-workroom": 722282,
+        "tiles-start": 437858,
+        "tiles-rule": 1618,
+        "int-2-6": 3121,
+        "int-7-12": 2751,
+        "int-14-17": 2604,
+        "int-3-7": 2783,
+        "int-9-14": 2946,
+        "int-6-8": 3152,
+        "int-9-13": 3427,
+        "int-16-17": 2927,
+        "int-1-5": 2365,
+        "count-0": 3427,
+        "count-1": 784,
+        "count-2": 848,
+        "count-3": 959,
+        "count-4": 1083
+      },
+      "totalPlaybackImageBytes": 1278649,
+      "targetMaximumBytes": 3000000
+    }
+  },
+  "sceneVisualChecks": {
+    "prevoice": {
+      "games": [
+        "hop-between",
+        "match-the-middle"
+      ],
+      "viewports": [
+        "1280x720",
+        "1000x563",
+        "640x360"
+      ],
+      "statesReviewed": [
+        "start",
+        "teacher-demo",
+        "first-mistake",
+        "correct-action"
+      ],
+      "finding": "入口图、旗和图块清晰可认，颜色、顺序和点数在实玩中可分辨。正式录音和正式 G6 待验。"
+    },
+    "slidesAndQuiz": {
+      "checked": "七张讲解图与六题的题干和图片选项",
+      "finding": "序号、两旗和中间位置逐件核对。相邻的两位在等距队列上相接，没有额外槽位。"
+    }
+  }
+}

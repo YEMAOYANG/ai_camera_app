@@ -1,0 +1,817 @@
+{
+  "schemaVersion": "mira.courseware.asset-provenance.v1",
+  "assets": {
+    "stationery-workbench": {
+      "path": "assets/stationery-workbench.png",
+      "sha256": "5234cad194be98bb75f38d36b10eb341c6482e4a74c798b3a36f7a5a585c27a5",
+      "sourceKind": "qualified_existing_codex_art",
+      "sourceReceipt": "output/courseware-lessons/fltrp-g1-upper-its-my-ruler/codex-imagegen-v1/stationery-workbench.json",
+      "sourceReceiptSha256": "e8503dbeda774d5b1cbc35d2acfcc84d1db1b2bd0019f1871d39b4ab1810e381",
+      "generationPrompt": "外研社一年级英语课件《It's my ruler.》的原创首屏图，宽幅16:9。明亮温暖的低年级木桌文具工作台，暖白背景、柔和中性光。桌面上一把造型明显的短直尺、一本薄薄的合拢书、一个长方形笔盒，三件主体完整不遮挡、清楚可区分。直尺有朴素刻线，无可读数字或字母。留足自然木桌负空间供课件叠字，三个物件仍收在中央安全区域。原创儿童绘本水粉和柔和纹理，不出现任何角色、品牌、文字、标志、水印、边框或拼贴。",
+      "usage": [
+        "return-the-stationery:startImage",
+        "paint-the-parade:startImage"
+      ]
+    },
+    "pen": {
+      "path": "assets/pen.png",
+      "sha256": "32e707a2e5a32f6334ee6e92780e33882c57ca919d0fef4e611126e11ed335b8",
+      "sourceKind": "qualified_existing_codex_art",
+      "sourceReceipt": "output/courseware-lessons/fltrp-g1-upper-its-my-ruler/codex-imagegen-v1/pen.json",
+      "sourceReceiptSha256": "14b5f0e456b9e90bf9fc2652e2b8f8b630fc5949789df7fa81411a901d44c67f",
+      "generationPrompt": "一年级英语课堂单件文具识别图，1:1正方形原图，儿童绘本真实质感。钢笔，露出金属笔尖，匹配旁边的笔帽，平铺。 统一低年级木桌工作台风格、暖白背景、柔和中性光、清楚完整主体、无标志和可读文字。",
+      "usage": [
+        "pen-pencil-beat:slide"
+      ]
+    },
+    "pencil": {
+      "path": "assets/pencil.png",
+      "sha256": "becc3ae523f081a3e50d4b9e0feefdf970ba43eec786905111bab07cebb60a34",
+      "sourceKind": "qualified_existing_codex_art",
+      "sourceReceipt": "output/courseware-lessons/fltrp-g1-upper-its-my-ruler/codex-imagegen-v1/pencil.json",
+      "sourceReceiptSha256": "b5de1e53d860b113bc07b72543e1f530254bf23434a1d627fd76193f7d4c68bc",
+      "generationPrompt": "一年级英语课堂单件文具识别图，1:1正方形原图，儿童绘本真实质感。削尖木质黄色铅笔，露出木头和石墨，平铺。 统一低年级木桌工作台风格、暖白背景、柔和中性光、清楚完整主体、无标志和可读文字。",
+      "usage": [
+        "pen-pencil-beat:slide"
+      ]
+    },
+    "workshop-sprite-sheet": {
+      "path": "assets/workshop-sprite-sheet.png",
+      "sha256": "42408936528cd321665e26e0ede5a1888e1b3c742545966f326d5572d1f77114",
+      "sourceKind": "registered_image_provider_master",
+      "payloadSha256": "e677ae83e2e95f3dc694bb6655502725ec06f5a9355fc930d811bc4f98107e36",
+      "requestReceipt": "output/courseware-lessons/fltrp-g1-upper-its-my-ruler-games/work-v1/.media-dispatch/requests/e677ae83e2e95f3dc694bb6655502725ec06f5a9355fc930d811bc4f98107e36/claim.json",
+      "requestReceiptSha256": "a2b4e7c262bdaa21871509aa698f7dd58395428c4d415ca45e71c21794ee1b4b",
+      "responseReceipt": "output/courseware-lessons/fltrp-g1-upper-its-my-ruler-games/work-v1/.media-dispatch/requests/e677ae83e2e95f3dc694bb6655502725ec06f5a9355fc930d811bc4f98107e36/response.json",
+      "responseReceiptSha256": "574b68964c4ced287426a20801ca66475c8ac27f13bc35899ddc4d60ee78b466",
+      "generationPrompt": "一张可以等分裁切的正方形教学素材表，严格4列4行，正好16格。每格居中摆一项，距离每条格边至少留12%空白，全部主体独立，轮廓清楚，不能跨格。不要画格线。全图背景统一纯白，不要背景道具、桌纹、文字或数字。采用温暖细腻的绘本水粉质感，简明，缩小后仍可认清。从左到右，第一行依次为有刻线的宽扁淡绿直尺、带蓝色套的一块白橡皮、带拉链的黄格纹文具盒、露出红蜡笔芯的粗短红蜡笔。第二行依次为有提手和背带的薄荷绿书包、四条腿的小学生单人书桌、合上的浅灰封皮书本且看得到书页、带靠背的木椅。第三行依次为露出木头和黑芯的削尖木铅笔、能看见金属笔尖的蓝墨水笔、戴紫发箍女孩的头像、穿蓝绿上衣戴圆眼镜男孩的头像。第四行依次为穿蜜桃色上衣梳一条辫子的女孩头像、空的低矮四轮送物小推车、单把短柄圆筒刷漆滚轮、一张白纸上清楚的铅笔橡皮轮廓小画。每个物品或头像独自出现在所属格中，不需要任何文字。",
+      "promptStylePath": "courseware/tools/prompts/picture_style.v1.md",
+      "promptStyleSha256": "59d7c46be53133f5e9d435d35103d4ac75e744e171a96aaaa84a3e140d21e74a",
+      "usage": [
+        "derivation source only"
+      ]
+    },
+    "stationery-fair-quiz-sheet": {
+      "path": "assets/stationery-fair-quiz-sheet.png",
+      "sha256": "3f442a1a125b5aaa48eeed70990ac631ac4d8238a11c4c60c52891bbe92ab777",
+      "sourceKind": "registered_image_provider_master",
+      "payloadSha256": "78a7d8676facc4415fd97a0aedfd2354ffcaf2ca337adea0c9f787888f7e875a",
+      "requestReceipt": "output/courseware-lessons/fltrp-g1-upper-its-my-ruler-games/work-v1/.media-dispatch/requests/78a7d8676facc4415fd97a0aedfd2354ffcaf2ca337adea0c9f787888f7e875a/claim.json",
+      "requestReceiptSha256": "59c551306e32f75fb1baad3e00278e1875a7865c3f646ad2bc3c93311baba695",
+      "responseReceipt": "output/courseware-lessons/fltrp-g1-upper-its-my-ruler-games/work-v1/.media-dispatch/requests/78a7d8676facc4415fd97a0aedfd2354ffcaf2ca337adea0c9f787888f7e875a/response.json",
+      "responseReceiptSha256": "fc8f6b01c843f9c1c41bfa649513c0ffabd06da1b2b090708ae8116c74d92d1c",
+      "generationPrompt": "一张横向4比3的教学图片素材表，严格4列3行等分，正好12格。每格独立成图，无格线，各主体置于各自格中央并与边缘留出12%空白，避免跨格。每格淡奶油色纸面背景，儿童绘本温暖水粉风，线条简单清楚，适合小屏识别，无文字、字母、数字和水印。第1行由左到右分别是手工节摊位上的芥黄色方长拉链文具盒、淡紫色纸套的一块白橡皮、浅木色有刻线的长直尺、纸套包着的橘色粗短蜡笔。第2行由左到右分别是穿绿色衣服扎两条辫子女孩的正面半身像、穿橙色背带裤短发男孩的正面半身像、紫色连帽衫有雀斑的短发孩子的正面半身像、一本封面完整显蓝色的合上绘本。第3行由左到右分别是同款式同角度但封面完整显红色的合上绘本、一支绿色木杆露出削尖木头和黑芯的铅笔、一支紫色带笔夹笔帽的圆珠笔、一支有绿色蜡尖的粗短绿蜡笔。每格只包含指定物品或人物，不放其他可混淆的用品。",
+      "promptStylePath": "courseware/tools/prompts/picture_style.v1.md",
+      "promptStyleSha256": "59d7c46be53133f5e9d435d35103d4ac75e744e171a96aaaa84a3e140d21e74a",
+      "usage": [
+        "derivation source only"
+      ]
+    },
+    "ruler": {
+      "path": "assets/ruler.png",
+      "sourceKind": "registered_master_crop",
+      "sourceImage": "workshop-sprite-sheet",
+      "cropBox": [
+        20,
+        43,
+        282,
+        232
+      ],
+      "alphaFromBorderWhiteAt": 242,
+      "whiteChannelDeltaAtMost": 16,
+      "pixels": [
+        262,
+        189
+      ],
+      "sha256": "fa8bef5c5224e48b10862c4f6f7b466f34c81c553a5ed94d3565f3e6489d0251",
+      "usage": [
+        "a-ruler-and-an-eraser:slide",
+        "say-who-owns-it:slide",
+        "return-the-stationery:game"
+      ]
+    },
+    "eraser": {
+      "path": "assets/eraser.png",
+      "sourceKind": "registered_master_crop",
+      "sourceImage": "workshop-sprite-sheet",
+      "cropBox": [
+        283,
+        64,
+        495,
+        230
+      ],
+      "alphaFromBorderWhiteAt": 248,
+      "whiteChannelDeltaAtMost": 16,
+      "pixels": [
+        212,
+        166
+      ],
+      "sha256": "02c6ad08f97c0c7813e67e052c808641b764574bbb0c1d49ad6c9a735a80877b",
+      "usage": [
+        "a-ruler-and-an-eraser:slide",
+        "return-the-stationery:game"
+      ]
+    },
+    "pencil-case": {
+      "path": "assets/pencil-case.png",
+      "sourceKind": "registered_master_crop",
+      "sourceImage": "workshop-sprite-sheet",
+      "cropBox": [
+        520,
+        45,
+        767,
+        232
+      ],
+      "alphaFromBorderWhiteAt": 242,
+      "whiteChannelDeltaAtMost": 16,
+      "pixels": [
+        247,
+        187
+      ],
+      "sha256": "3cb31024ec6fdb0048a7b4829daa47b27c45a1f08ee90085647ac4c4f07712f5",
+      "usage": [
+        "case-and-crayon:slide",
+        "return-the-stationery:game"
+      ]
+    },
+    "crayon": {
+      "path": "assets/crayon.png",
+      "sourceKind": "registered_master_crop",
+      "sourceImage": "workshop-sprite-sheet",
+      "cropBox": [
+        808,
+        29,
+        975,
+        239
+      ],
+      "alphaFromBorderWhiteAt": 242,
+      "whiteChannelDeltaAtMost": 16,
+      "pixels": [
+        167,
+        210
+      ],
+      "sha256": "6f6edb988963c1be0587edcb66cfe57e4fa9b9b2c1174f09c6452a487d333b12",
+      "usage": [
+        "case-and-crayon:slide",
+        "return-the-stationery:game"
+      ]
+    },
+    "schoolbag": {
+      "path": "assets/schoolbag.png",
+      "sourceKind": "registered_master_crop",
+      "sourceImage": "workshop-sprite-sheet",
+      "cropBox": [
+        39,
+        244,
+        246,
+        485
+      ],
+      "alphaFromBorderWhiteAt": 242,
+      "whiteChannelDeltaAtMost": 16,
+      "pixels": [
+        207,
+        241
+      ],
+      "sha256": "aa752715f116725cd84d5e03f366af6ae6fb36963d91da448b20e6208734cdd7",
+      "usage": [
+        "paint-the-parade:game",
+        "derivation:colour-practice-board"
+      ]
+    },
+    "desk": {
+      "path": "assets/desk.png",
+      "sourceKind": "registered_master_crop",
+      "sourceImage": "workshop-sprite-sheet",
+      "cropBox": [
+        278,
+        269,
+        513,
+        485
+      ],
+      "alphaFromBorderWhiteAt": 242,
+      "whiteChannelDeltaAtMost": 16,
+      "pixels": [
+        235,
+        216
+      ],
+      "sha256": "ae9fbbacd41f0c39be7365a1aec7aaa591689fd81207e6b5b8812449da93955f",
+      "usage": [
+        "paint-the-parade:game",
+        "mime-and-guess:slide",
+        "derivation:colour-practice-board"
+      ]
+    },
+    "book": {
+      "path": "assets/book.png",
+      "sourceKind": "registered_master_crop",
+      "sourceImage": "workshop-sprite-sheet",
+      "cropBox": [
+        520,
+        281,
+        752,
+        480
+      ],
+      "alphaFromBorderWhiteAt": 242,
+      "whiteChannelDeltaAtMost": 16,
+      "pixels": [
+        232,
+        199
+      ],
+      "sha256": "a91e1550e72a56348ea7bc2ea275fb0a9995668ebb40f9479780247264bcd525",
+      "usage": [
+        "paint-the-parade:game",
+        "derivation:colour-practice-board"
+      ]
+    },
+    "chair": {
+      "path": "assets/chair.png",
+      "sourceKind": "registered_master_crop",
+      "sourceImage": "workshop-sprite-sheet",
+      "cropBox": [
+        781,
+        245,
+        970,
+        493
+      ],
+      "alphaFromBorderWhiteAt": 242,
+      "whiteChannelDeltaAtMost": 16,
+      "pixels": [
+        189,
+        248
+      ],
+      "sha256": "d6a37d78508eac74ffd77ad6264452e7b80439ce14698c68f68c72ab378bcf22",
+      "usage": [
+        "mime-and-guess:slide"
+      ]
+    },
+    "wood-pencil": {
+      "path": "assets/wood-pencil.png",
+      "sourceKind": "registered_master_crop",
+      "sourceImage": "workshop-sprite-sheet",
+      "cropBox": [
+        46,
+        510,
+        245,
+        717
+      ],
+      "alphaFromBorderWhiteAt": 242,
+      "whiteChannelDeltaAtMost": 16,
+      "pixels": [
+        199,
+        207
+      ],
+      "sha256": "d5775e2823febc0940fea7a8764296caecf6b092cf0fd11b8468129324c2d6ad",
+      "usage": [
+        "paint-the-parade:game",
+        "derivation:colour-practice-board"
+      ]
+    },
+    "ink-pen": {
+      "path": "assets/ink-pen.png",
+      "sourceKind": "registered_master_crop",
+      "sourceImage": "workshop-sprite-sheet",
+      "cropBox": [
+        302,
+        503,
+        475,
+        721
+      ],
+      "alphaFromBorderWhiteAt": 242,
+      "whiteChannelDeltaAtMost": 16,
+      "pixels": [
+        173,
+        218
+      ],
+      "sha256": "380d8cc98e7bfbfc3d0cdd7230729763d58bb5c52491292e1d20b02b16fcc07c",
+      "usage": [
+        "paint-the-parade:game",
+        "derivation:colour-practice-board"
+      ]
+    },
+    "owner-violet": {
+      "path": "assets/owner-violet.png",
+      "sourceKind": "registered_master_crop",
+      "sourceImage": "workshop-sprite-sheet",
+      "cropBox": [
+        527,
+        500,
+        744,
+        719
+      ],
+      "alphaFromBorderWhiteAt": 242,
+      "whiteChannelDeltaAtMost": 16,
+      "pixels": [
+        217,
+        219
+      ],
+      "sha256": "2c4f149fe82f1bfdf19c96e0069c3ef86da4397294705f716cd00c389eebefde",
+      "usage": [
+        "return-the-stationery:game"
+      ]
+    },
+    "owner-teal": {
+      "path": "assets/owner-teal.png",
+      "sourceKind": "registered_master_crop",
+      "sourceImage": "workshop-sprite-sheet",
+      "cropBox": [
+        782,
+        497,
+        972,
+        720
+      ],
+      "alphaFromBorderWhiteAt": 242,
+      "whiteChannelDeltaAtMost": 16,
+      "pixels": [
+        190,
+        223
+      ],
+      "sha256": "07471952a490a2bb91df1d913f030ec914996f4bbe51cedcf8d82c1850fc267d",
+      "usage": [
+        "return-the-stationery:game"
+      ]
+    },
+    "owner-peach": {
+      "path": "assets/owner-peach.png",
+      "sourceKind": "registered_master_crop",
+      "sourceImage": "workshop-sprite-sheet",
+      "cropBox": [
+        35,
+        729,
+        224,
+        974
+      ],
+      "alphaFromBorderWhiteAt": 242,
+      "whiteChannelDeltaAtMost": 16,
+      "pixels": [
+        189,
+        245
+      ],
+      "sha256": "f5a29e73901e69886cee3326742b188670151929a44b88585f0fe54a34081c8f",
+      "usage": [
+        "return-the-stationery:game"
+      ]
+    },
+    "delivery-trolley": {
+      "path": "assets/delivery-trolley.png",
+      "sourceKind": "registered_master_crop",
+      "sourceImage": "workshop-sprite-sheet",
+      "cropBox": [
+        260,
+        741,
+        496,
+        971
+      ],
+      "alphaFromBorderWhiteAt": 242,
+      "whiteChannelDeltaAtMost": 16,
+      "pixels": [
+        236,
+        230
+      ],
+      "sha256": "c0ada223872e5aa950e36163b632e49c6dee3280161fa80e73e3798ea4732e26",
+      "usage": [
+        "return-the-stationery:game"
+      ]
+    },
+    "paint-roller": {
+      "path": "assets/paint-roller.png",
+      "sourceKind": "registered_master_crop",
+      "sourceImage": "workshop-sprite-sheet",
+      "cropBox": [
+        526,
+        728,
+        746,
+        977
+      ],
+      "alphaFromBorderWhiteAt": 242,
+      "whiteChannelDeltaAtMost": 16,
+      "pixels": [
+        220,
+        249
+      ],
+      "sha256": "f453d2ca4f6442994bbb09ed644cd111b245396f1a88cd22ad257990456d17fd",
+      "usage": [
+        "paint-the-parade:game"
+      ]
+    },
+    "drawn-eraser": {
+      "path": "assets/drawn-eraser.png",
+      "sourceKind": "registered_master_crop",
+      "sourceImage": "workshop-sprite-sheet",
+      "cropBox": [
+        776,
+        748,
+        966,
+        961
+      ],
+      "rotationDegrees": 36,
+      "rotatedCropBox": [
+        145,
+        106,
+        203,
+        200
+      ],
+      "enlargement": 4,
+      "autocontrastBlend": 0.38,
+      "pixels": [
+        232,
+        376
+      ],
+      "sha256": "fcf7f541e2c0196a20362e25e7ffd766026524576f1a0bf8bf7cc1dfb5417f81",
+      "usage": [
+        "draw-and-ask:slide"
+      ]
+    },
+    "quiz-pencil-case": {
+      "path": "assets/quiz-pencil-case.png",
+      "sourceKind": "registered_master_crop",
+      "sourceImage": "stationery-fair-quiz-sheet",
+      "cropBox": [
+        1,
+        1,
+        257,
+        250
+      ],
+      "pixels": [
+        256,
+        249
+      ],
+      "sha256": "e2a07c75f914481940426923f9b4f5340b449e7af5e1ce12877eb065787c121e",
+      "usage": [
+        "stationery-fair-check:hear-case:b",
+        "stationery-fair-check:hear-claimed-crayon:c"
+      ]
+    },
+    "quiz-eraser": {
+      "path": "assets/quiz-eraser.png",
+      "sourceKind": "registered_master_crop",
+      "sourceImage": "stationery-fair-quiz-sheet",
+      "cropBox": [
+        260,
+        1,
+        510,
+        250
+      ],
+      "pixels": [
+        250,
+        249
+      ],
+      "sha256": "f90be4e102371a1dd16efa18ee501e4f1ae6c24c0a48c69ad405802bff9c6a27",
+      "usage": [
+        "stationery-fair-check:hear-case:a",
+        "stationery-fair-check:hear-eraser:a",
+        "derivation:quiz-braids-eraser"
+      ]
+    },
+    "quiz-ruler": {
+      "path": "assets/quiz-ruler.png",
+      "sourceKind": "registered_master_crop",
+      "sourceImage": "stationery-fair-quiz-sheet",
+      "cropBox": [
+        512,
+        1,
+        763,
+        250
+      ],
+      "pixels": [
+        251,
+        249
+      ],
+      "sha256": "34828a44369b2a7c7a0abe6be8ac43f483493aea576d76da24db7cb8c1ba76a0",
+      "usage": [
+        "stationery-fair-check:hear-case:c",
+        "stationery-fair-check:hear-eraser:c",
+        "derivation:quiz-orange-ruler",
+        "derivation:quiz-braids-ruler"
+      ]
+    },
+    "quiz-crayon": {
+      "path": "assets/quiz-crayon.png",
+      "sourceKind": "registered_master_crop",
+      "sourceImage": "stationery-fair-quiz-sheet",
+      "cropBox": [
+        766,
+        1,
+        1023,
+        250
+      ],
+      "pixels": [
+        257,
+        249
+      ],
+      "sha256": "2a74a5734090189966399999e3dfb7f2b40042a9102266e1bf6b56c71b89b18a",
+      "usage": [
+        "stationery-fair-check:hear-eraser:b",
+        "stationery-fair-check:hear-claimed-crayon:b"
+      ]
+    },
+    "quiz-owner-braids": {
+      "path": "assets/quiz-owner-braids.png",
+      "sourceKind": "registered_master_crop",
+      "sourceImage": "stationery-fair-quiz-sheet",
+      "cropBox": [
+        1,
+        252,
+        257,
+        508
+      ],
+      "pixels": [
+        256,
+        256
+      ],
+      "sha256": "1d0f9c78f2b7c6ea26b778db9688ba366a1387854f015e07745e4b192c1474f5",
+      "usage": [
+        "stationery-fair-check:hear-speaker-my:question",
+        "derivation:quiz-braids-eraser",
+        "derivation:quiz-braids-ruler"
+      ]
+    },
+    "quiz-owner-orange": {
+      "path": "assets/quiz-owner-orange.png",
+      "sourceKind": "registered_master_crop",
+      "sourceImage": "stationery-fair-quiz-sheet",
+      "cropBox": [
+        260,
+        252,
+        510,
+        508
+      ],
+      "pixels": [
+        250,
+        256
+      ],
+      "sha256": "ed0c0050471f57dbed7200c13064a63462260cd6463a76e72789460c636c570a",
+      "usage": [
+        "derivation:quiz-orange-ruler"
+      ]
+    },
+    "quiz-owner-purple": {
+      "path": "assets/quiz-owner-purple.png",
+      "sourceKind": "registered_master_crop",
+      "sourceImage": "stationery-fair-quiz-sheet",
+      "cropBox": [
+        512,
+        252,
+        763,
+        508
+      ],
+      "pixels": [
+        251,
+        256
+      ],
+      "sha256": "0c35d75e24b99b5fe3e66ce0d8f7126ec0910667298e3bc89ecd7d561ba69256",
+      "usage": [
+        "stationery-fair-check:hear-claimed-crayon:question"
+      ]
+    },
+    "quiz-book-blue": {
+      "path": "assets/quiz-book-blue.png",
+      "sourceKind": "registered_master_crop",
+      "sourceImage": "stationery-fair-quiz-sheet",
+      "cropBox": [
+        766,
+        252,
+        1023,
+        508
+      ],
+      "pixels": [
+        257,
+        256
+      ],
+      "sha256": "0aad63450199e05d1b6e3e9bc362d7b84bfa68c1b50bbe52d158d4fc70af1136",
+      "usage": [
+        "stationery-fair-check:hear-colour-book:a"
+      ]
+    },
+    "quiz-book-red": {
+      "path": "assets/quiz-book-red.png",
+      "sourceKind": "registered_master_crop",
+      "sourceImage": "stationery-fair-quiz-sheet",
+      "cropBox": [
+        1,
+        510,
+        257,
+        767
+      ],
+      "pixels": [
+        256,
+        257
+      ],
+      "sha256": "5a0aa8d7e6d9592cb0742b0d3a148d8e9bffaede1b0ce0f5e9dddc53b014e31a",
+      "usage": [
+        "stationery-fair-check:hear-colour-book:b"
+      ]
+    },
+    "quiz-pencil": {
+      "path": "assets/quiz-pencil.png",
+      "sourceKind": "registered_master_crop",
+      "sourceImage": "stationery-fair-quiz-sheet",
+      "cropBox": [
+        260,
+        510,
+        510,
+        767
+      ],
+      "pixels": [
+        250,
+        257
+      ],
+      "sha256": "97d2141bda117c111af577fae83cae7c8e0f0de198c3ef76ae59d5634b404057",
+      "usage": [
+        "stationery-fair-check:hear-claimed-crayon:a",
+        "stationery-fair-check:hear-colour-book:c",
+        "stationery-fair-check:hear-pencil:c"
+      ]
+    },
+    "quiz-pen": {
+      "path": "assets/quiz-pen.png",
+      "sourceKind": "registered_master_crop",
+      "sourceImage": "stationery-fair-quiz-sheet",
+      "cropBox": [
+        512,
+        510,
+        763,
+        767
+      ],
+      "pixels": [
+        251,
+        257
+      ],
+      "sha256": "e02f9b514043a06acd3f89911084319764f8d1cb38210a6d20553f3219e7ef28",
+      "usage": [
+        "stationery-fair-check:hear-pencil:a"
+      ]
+    },
+    "quiz-crayon-green": {
+      "path": "assets/quiz-crayon-green.png",
+      "sourceKind": "registered_master_crop",
+      "sourceImage": "stationery-fair-quiz-sheet",
+      "cropBox": [
+        766,
+        510,
+        1023,
+        767
+      ],
+      "pixels": [
+        257,
+        257
+      ],
+      "sha256": "8cbd3405553db6a785154822495d989dc030efb8594f958c3894d41731f10dd0",
+      "usage": [
+        "stationery-fair-check:hear-pencil:b"
+      ]
+    },
+    "colour-practice-board": {
+      "path": "assets/colour-practice-board.png",
+      "sourceKind": "registered_crop_composite",
+      "components": [
+        "schoolbag",
+        "desk",
+        "wood-pencil",
+        "book",
+        "ink-pen"
+      ],
+      "placements": [
+        [
+          42,
+          20,
+          170,
+          155
+        ],
+        [
+          255,
+          20,
+          170,
+          155
+        ],
+        [
+          465,
+          20,
+          170,
+          155
+        ],
+        [
+          143,
+          185,
+          170,
+          150
+        ],
+        [
+          355,
+          185,
+          170,
+          150
+        ]
+      ],
+      "pixels": [
+        675,
+        355
+      ],
+      "background": "#fff8e9",
+      "sha256": "e4c2fe4735441423efb3586178cea658ed8e6db741b859424aa1a61faf72303f",
+      "usage": [
+        "hear-item-then-colour:slide"
+      ]
+    },
+    "quiz-braids-eraser": {
+      "path": "assets/quiz-braids-eraser.png",
+      "sourceKind": "registered_crop_composite",
+      "components": [
+        "quiz-owner-braids",
+        "quiz-eraser"
+      ],
+      "placements": [
+        [
+          9,
+          8,
+          250,
+          259
+        ],
+        [
+          261,
+          8,
+          250,
+          259
+        ]
+      ],
+      "pixels": [
+        520,
+        275
+      ],
+      "background": "#fff9e7",
+      "sha256": "0f48a2a553279d5469169b390728dfb36915b0583c49b18a369e31e547c0c8da",
+      "usage": [
+        "stationery-fair-check:hear-speaker-my:a"
+      ]
+    },
+    "quiz-orange-ruler": {
+      "path": "assets/quiz-orange-ruler.png",
+      "sourceKind": "registered_crop_composite",
+      "components": [
+        "quiz-owner-orange",
+        "quiz-ruler"
+      ],
+      "placements": [
+        [
+          9,
+          8,
+          250,
+          259
+        ],
+        [
+          261,
+          8,
+          250,
+          259
+        ]
+      ],
+      "pixels": [
+        520,
+        275
+      ],
+      "background": "#fff9e7",
+      "sha256": "49677f0e4402aa2ea0a615669b214e1bc0dc18b408deb686c1f20bc932d93ee1",
+      "usage": [
+        "stationery-fair-check:hear-speaker-my:b"
+      ]
+    },
+    "quiz-braids-ruler": {
+      "path": "assets/quiz-braids-ruler.png",
+      "sourceKind": "registered_crop_composite",
+      "components": [
+        "quiz-owner-braids",
+        "quiz-ruler"
+      ],
+      "placements": [
+        [
+          9,
+          8,
+          250,
+          259
+        ],
+        [
+          261,
+          8,
+          250,
+          259
+        ]
+      ],
+      "pixels": [
+        520,
+        275
+      ],
+      "background": "#fff9e7",
+      "sha256": "01844f5844e632be889783c10d99ff5a0e7b755beb7c24150a5a6fbce193f262",
+      "usage": [
+        "stationery-fair-check:hear-speaker-my:c"
+      ]
+    }
+  },
+  "visualReview": {
+    "reviewedByModel": "gpt-6.1-sol",
+    "reviewedAt": "2026-11-09T07:27:26.395972+00:00",
+    "mastersReviewed": 2,
+    "cropsReviewed": 28,
+    "compositesReviewed": 4,
+    "result": "确认轮廓、纸套、尺上刻线、眼镜和发箍、人物衣着、封面颜色和笔夹；画面裁切保留完整主体。题图人物为胸像，无需依赖手势；示范按发话牌辨认。"
+  }
+}

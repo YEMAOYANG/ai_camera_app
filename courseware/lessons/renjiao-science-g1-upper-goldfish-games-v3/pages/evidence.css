@@ -1,0 +1,39 @@
+:root {
+  --ink: #173b48;
+  --ink2: #163945;
+  --line: #9bcfcf;
+  --or: #096b68;
+  --or2: #064f50;
+  --gr: #096b68;
+  --gr2: #064f50;
+}
+html, body, #cv { background: #e6f5f2; }
+#ready { background: rgba(10, 56, 65, .72); }
+#ready .card {
+  width: 768px;
+  padding: 34px 38px 38px;
+  border-color: #bee3de;
+  box-shadow: 0 26px 64px #092f4a49;
+}
+#ready .card img.pic {
+  width: 260px;
+  height: 130px;
+  object-fit: contain;
+  border-radius: 20px;
+  background: #ecf8f5;
+}
+#ready h1 { font-size: 48px; margin: 14px 0 0; }
+#ready p { font-size: 28px; margin: 12px 0 24px; }
+#ready .card .btn.xl, #gcard .card .btn.xl, #finish .card .btn.xl { min-height: 112px; }
+#finish, #gcard {
+  right: 352px;
+  background: rgba(10, 43, 58, .45);
+}
+#finish .card, #gcard .card {
+  width: 660px;
+  padding: 28px 38px 38px;
+  border-color: #bee3de;
+  box-shadow: 0 22px 56px #092f4a4c;
+}
+#finish .card h1, #gcard .card h1 { font-size: 46px; }
+#finish .card p, #gcard .card p { font-size: 29px; line-height: 1.4; }

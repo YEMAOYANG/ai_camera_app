@@ -1,0 +1,941 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "Unit 1 They're cows.",
+  "description": "在原创农场故事中听辨单只和同类动物群，指图问答，数蛋并听声猜动物。",
+  "grade": 1,
+  "roster": {
+    "mia": {
+      "name": "Mia 老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Jennifer",
+      "avatar": "/teachers/coco-english-v1.png",
+      "color": "#557B76",
+      "persona": "用短英语和清楚的图带一年级孩子观察、听辨、说一问一答。"
+    }
+  },
+  "images": {
+    "bird-group": {
+      "file": "assets/bird-group.png"
+    },
+    "cat-group": {
+      "file": "assets/cat-group.png"
+    },
+    "cow-group": {
+      "file": "assets/cow-group.png"
+    },
+    "cow-one": {
+      "file": "assets/cow-one.png"
+    },
+    "dog-group": {
+      "file": "assets/dog-group.png"
+    },
+    "duck-group": {
+      "file": "assets/duck-group.png"
+    },
+    "duck-one": {
+      "file": "assets/duck-one.png"
+    },
+    "egg": {
+      "file": "assets/egg.png"
+    },
+    "egg-cart": {
+      "file": "assets/egg-cart.png"
+    },
+    "farm-badge": {
+      "file": "assets/farm-badge.png"
+    },
+    "farm-pond": {
+      "file": "assets/farm-pond.png"
+    },
+    "farm-shed": {
+      "file": "assets/farm-shed.png"
+    },
+    "farm-welcome": {
+      "file": "assets/farm-welcome.png"
+    },
+    "farm-wrap": {
+      "file": "assets/farm-wrap.png"
+    },
+    "hands-outside": {
+      "file": "assets/hands-outside.png"
+    },
+    "hen-group": {
+      "file": "assets/hen-group.png"
+    },
+    "marble": {
+      "file": "assets/marble.png"
+    },
+    "observe-fence": {
+      "file": "assets/observe-fence.png"
+    },
+    "pig-group": {
+      "file": "assets/pig-group.png"
+    },
+    "pig-one": {
+      "file": "assets/pig-one.png"
+    },
+    "q1-one-duck": {
+      "file": "assets/q1-one-duck.png"
+    },
+    "q1-one-hen": {
+      "file": "assets/q1-one-hen.png"
+    },
+    "q1-three-hens": {
+      "file": "assets/q1-three-hens.png"
+    },
+    "q2-chickens": {
+      "file": "assets/q2-chickens.png"
+    },
+    "q2-cows": {
+      "file": "assets/q2-cows.png"
+    },
+    "q2-ducks": {
+      "file": "assets/q2-ducks.png"
+    },
+    "q3-eleven-eggs": {
+      "file": "assets/q3-eleven-eggs.png"
+    },
+    "q3-nine-eggs": {
+      "file": "assets/q3-nine-eggs.png"
+    },
+    "q3-ten-eggs": {
+      "file": "assets/q3-ten-eggs.png"
+    },
+    "q4-birds": {
+      "file": "assets/q4-birds.png"
+    },
+    "q4-cats": {
+      "file": "assets/q4-cats.png"
+    },
+    "q4-dogs": {
+      "file": "assets/q4-dogs.png"
+    },
+    "quiz-tray-stem": {
+      "file": "assets/quiz-tray-stem.png"
+    },
+    "sound-barn": {
+      "file": "assets/sound-barn.png"
+    },
+    "sound-orchard": {
+      "file": "assets/sound-orchard.png"
+    },
+    "sound-pond": {
+      "file": "assets/sound-pond.png"
+    },
+    "sound-yard": {
+      "file": "assets/sound-yard.png"
+    },
+    "tray-one-more": {
+      "file": "assets/tray-one-more.png"
+    },
+    "tray-twelve": {
+      "file": "assets/tray-twelve.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "farm-welcome",
+      "type": "slide",
+      "title": "农场今天开门啦",
+      "template": "title-picture",
+      "data": {
+        "title": "农场今天开门啦",
+        "picture": "farm-welcome",
+        "caption": "farm"
+      },
+      "script": [
+        {
+          "say": "你要给农场拍三张照片。先来找找，哪只是鸭？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "先不急着说，看看嘴巴。"
+        },
+        {
+          "say": "这只嘴巴扁扁，脚像小扇子，是鸭。"
+        },
+        {
+          "say": "尖嘴、红鸡冠的是鸡。"
+        },
+        {
+          "say": "左边那只花身子的，是牛。"
+        },
+        {
+          "say": "It’s a cow."
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "种庄稼或养动物的地方，可以叫 farm。"
+        },
+        {
+          "say": "A farm."
+        },
+        {
+          "say": "进门看看，一只猪和一群猪，要用一样的话介绍吗？"
+        }
+      ]
+    },
+    {
+      "key": "one-or-many",
+      "type": "slide",
+      "title": "一只和一群",
+      "template": "two-columns",
+      "data": {
+        "title": "一只和一群",
+        "left": {
+          "heading": "只看这一只",
+          "body": "It’s a pig."
+        },
+        "right": {
+          "heading": "再看这一群",
+          "body": "They’re pigs."
+        },
+        "left_picture": "pig-one",
+        "right_picture": "pig-group"
+      },
+      "script": [
+        {
+          "say": "朵朵只看见一只粉色动物。你能认出它吗？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "看看短鼻子和卷尾巴，原来是一只猪。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "It’s a pig."
+        },
+        {
+          "say": "这句话只在说这一只。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "现在三只都跑过来了，它们都是猪。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "They’re pigs."
+        },
+        {
+          "say": "说一群时，开头换成 They’re，后面也要换成复数。"
+        },
+        {
+          "say": "听这两句时，别只听到猪，还要听出有几只。"
+        }
+      ]
+    },
+    {
+      "key": "ask-the-group",
+      "type": "slide",
+      "title": "指着一群问",
+      "template": "two-columns",
+      "data": {
+        "title": "指着一群问",
+        "left": {
+          "heading": "这群是牛",
+          "body": "They’re cows."
+        },
+        "right": {
+          "heading": "那群是鸭",
+          "body": "They’re ducks."
+        },
+        "left_picture": "cow-group",
+        "right_picture": "duck-group"
+      },
+      "script": [
+        {
+          "say": "两张照片都拍了一群。你会问这一群是什么吗？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "我先指左边这一群。"
+        },
+        {
+          "say": "What are they?"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "They’re cows."
+        },
+        {
+          "say": "我指的全是牛，所以回答里说 cows。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "指到另一群时，问题还是一样。"
+        },
+        {
+          "say": "What are they?"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "They’re ducks."
+        },
+        {
+          "say": "这一群是鸭，回答里的词跟着换。"
+        },
+        {
+          "say": "听 cows、pigs、chickens 的尾巴，轻轻带一点声音。"
+        },
+        {
+          "say": "听 ducks 的末尾，像一小口气。你可以试着跟我说。"
+        }
+      ]
+    },
+    {
+      "key": "duck-and-hens",
+      "type": "slide",
+      "title": "池边和鸡棚",
+      "template": "two-columns",
+      "data": {
+        "title": "池边和鸡棚",
+        "left": {
+          "heading": "池边这一只",
+          "body": "It’s a duck."
+        },
+        "right": {
+          "heading": "鸡棚这一群",
+          "body": "They’re chickens."
+        },
+        "left_picture": "duck-one",
+        "right_picture": "hen-group"
+      },
+      "script": [
+        {
+          "say": "鸭子跑到池边了。请你想想，我会怎样介绍它？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "扁嘴、宽脚，而且只有一只，是一只鸭。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "It’s a duck."
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "再看鸡棚。三个红鸡冠，都长在鸡的头上。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "They’re chickens."
+        },
+        {
+          "say": "这次介绍同类的一群，所以用 They’re。"
+        },
+        {
+          "say": "弹珠偏了可以再试。先再听，留心一只还是一群。"
+        },
+        {
+          "say": "图卡亮起来了。用方向箭头对准，再发射。"
+        },
+        {
+          "say": "这张图卡找对了，弹珠也对准啦。"
+        }
+      ]
+    },
+    {
+      "key": "sounds-and-groups",
+      "type": "slide",
+      "title": "听声音，猜动物",
+      "template": "title-picture",
+      "data": {
+        "title": "听声音，猜动物",
+        "picture": "sound-yard",
+        "caption": "What are they?"
+      },
+      "script": [
+        {
+          "say": "果树后面有响动。能凭声音猜到是哪群吗？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "Moo, moo!"
+        },
+        {
+          "say": "这是老师学牛叫。可以先猜，再找牛的花身子。"
+        },
+        {
+          "say": "Woof, woof!"
+        },
+        {
+          "say": "这是老师学狗叫。认图时，再看看长耳朵和鼻子。"
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "先找到左边这一群。我指着它们问。"
+        },
+        {
+          "say": "What are they?"
+        },
+        {
+          "say": "They’re dogs."
+        },
+        {
+          "say": "附近还有尖耳朵的猫和小鸟。我们也来听它们的名字。"
+        },
+        {
+          "say": "左边是狗，中间两只的耳朵更尖，那是猫。"
+        },
+        {
+          "say": "They’re cats."
+        },
+        {
+          "say": "右边两只带翅膀，是鸟。"
+        },
+        {
+          "say": "They’re birds."
+        },
+        {
+          "say": "听不清叫声可以重听。再看看图上的耳朵、嘴巴和翅膀。"
+        }
+      ]
+    },
+    {
+      "key": "farm-marble",
+      "type": "interactive",
+      "title": "听线索，送弹珠",
+      "page": "farm-marble",
+      "startImage": "farm-pond",
+      "widgetType": "learning-arcade",
+      "gameAudio": {
+        "hear-cows": "ask-the-group-6",
+        "hear-ducks": "ask-the-group-12",
+        "hear-one-cow": "farm-welcome-7",
+        "hear-one-duck": "duck-and-hens-5",
+        "hear-chickens": "duck-and-hens-9",
+        "marble-hint": "duck-and-hens-11",
+        "marble-help": "duck-and-hens-12",
+        "marble-praise": "duck-and-hens-13",
+        "hear-dog-call": "sounds-and-groups-5",
+        "hear-cats": "sounds-and-groups-13",
+        "hear-birds": "sounds-and-groups-15"
+      },
+      "script": [
+        {
+          "say": "这里有一只牛，也有一群牛。我该把弹珠送给谁？"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#farm-speaker"
+        },
+        {
+          "say": "先听喇叭，我听到的是一群牛。"
+        },
+        {
+          "highlight": "#first-cow-group"
+        },
+        {
+          "say": "看中间这张，花身子有好几个，听和看都对上了。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "我让发射口朝着这群牛，用箭头把方向摆正。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "点发射。第一颗对准了，碰到这一群就停。"
+        },
+        {
+          "say": "动物和一只或一群都得对。现在把第一颗交给你。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ]
+    },
+    {
+      "key": "count-the-eggs",
+      "type": "slide",
+      "title": "再放一枚蛋",
+      "template": "two-columns",
+      "data": {
+        "title": "再放一枚蛋",
+        "left": {
+          "heading": "还没入盘",
+          "body": "Eleven eggs."
+        },
+        "right": {
+          "heading": "正好装满",
+          "body": "Twelve eggs."
+        },
+        "left_picture": "tray-one-more",
+        "right_picture": "tray-twelve"
+      },
+      "script": [
+        {
+          "say": "蛋盘里空了一格。旁边还有一枚，放进去有多少？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "盘外这枚鸡蛋，英文叫 egg。现在只数盘里的，每枚数一次。"
+        },
+        {
+          "say": "One, two, three, four, five, six."
+        },
+        {
+          "say": "Seven, eight, nine, ten, eleven."
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "Eleven eggs."
+        },
+        {
+          "say": "旁边那枚还没进去，刚才没有数它。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "现在把它放进空格。前面的不用从头再数。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "在十一后接着数一个，就到十二。"
+        },
+        {
+          "say": "Twelve eggs."
+        },
+        {
+          "say": "十枚时说 Ten eggs."
+        },
+        {
+          "say": "等会儿两篮都装满，数的是两篮合起来的蛋。"
+        },
+        {
+          "say": "Ten eggs."
+        },
+        {
+          "say": "小车放下这一整盘。看空格，装不下就换篮。"
+        },
+        {
+          "say": "把车移到亮线下面。接住前看看哪篮有空格。"
+        },
+        {
+          "say": "两篮刚好装满啦。我们再合起来数。"
+        }
+      ]
+    },
+    {
+      "key": "egg-cart",
+      "type": "interactive",
+      "title": "接蛋小车",
+      "page": "egg-cart",
+      "startImage": "farm-shed",
+      "widgetType": "learning-arcade",
+      "gameAudio": {
+        "hear-ten": "count-the-eggs-16",
+        "hear-eleven": "count-the-eggs-7",
+        "hear-twelve": "count-the-eggs-13",
+        "egg-hint": "count-the-eggs-17",
+        "egg-help": "count-the-eggs-18",
+        "egg-praise": "count-the-eggs-19"
+      },
+      "script": [
+        {
+          "say": "一整盘蛋要落下来。你猜该接到哪个篮子里？"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#first-egg-batch"
+        },
+        {
+          "say": "这一盘有四枚。它们要一起接住，不能拆开。"
+        },
+        {
+          "highlight": "#egg-baskets"
+        },
+        {
+          "say": "左篮有五个空格，能装四枚。双箭头可以换篮。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "小车在亮线下。用左右箭头，才能跟上下一盘。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "看小车接住第一盘。左篮装进四枚，还空一格。"
+        },
+        {
+          "highlight": "#egg-total"
+        },
+        {
+          "say": "总数牌只数已经接到的蛋。两边装满才过关。"
+        },
+        {
+          "say": "如果已经有十一枚，接到最后一枚就到十二。换你开车。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ]
+    },
+    {
+      "key": "watch-from-outside",
+      "type": "slide",
+      "title": "在围栏外看动物",
+      "template": "two-columns",
+      "data": {
+        "title": "在围栏外看动物",
+        "left": {
+          "heading": "用眼睛观察",
+          "body": "看"
+        },
+        "right": {
+          "heading": "手留在外面",
+          "body": "留在外面"
+        },
+        "left_picture": "observe-fence",
+        "right_picture": "hands-outside"
+      },
+      "script": [
+        {
+          "say": "隔着围栏能看见小鸡，你想走过去摸摸它吗？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "站在外边也能看清。先看看鸡冠，再看看脚。"
+        },
+        {
+          "say": "你还能和家人猜猜，远处还有什么动物。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "手不伸进去，不随手把食物丢给动物。"
+        },
+        {
+          "say": "想看得更清楚，也不用爬围栏。可以跟家人换个位置。"
+        },
+        {
+          "say": "我们用眼睛看，嘴巴轻声介绍，给动物留一点空间。"
+        }
+      ]
+    },
+    {
+      "key": "picture-check",
+      "type": "quiz",
+      "title": "新地方，听一听",
+      "intro": [
+        "听老师说话，选一张符合的图。",
+        "没听清，点小喇叭重听。"
+      ],
+      "questions": [
+        {
+          "id": "farm-q1",
+          "question": "It’s a chicken.",
+          "skill": "听辨一只鸡和同类鸡群",
+          "answer": [
+            "B"
+          ],
+          "analysis": "先听到一只，再找有鸡冠的图。另两张一张有三只鸡，一张是一只鸭。",
+          "visual": {
+            "kind": "asset",
+            "image": "sound-pond",
+            "alt": "湖边题的喇叭"
+          },
+          "options": {
+            "A": {
+              "label": "图卡一",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-three-hens",
+                "alt": "三只红褐色母鸡"
+              }
+            },
+            "B": {
+              "label": "图卡二",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-one-hen",
+                "alt": "一只红褐色母鸡"
+              }
+            },
+            "C": {
+              "label": "图卡三",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-one-duck",
+                "alt": "一只灰绿头鸭"
+              }
+            }
+          }
+        },
+        {
+          "id": "farm-q2",
+          "question": "What are they? They’re chickens.",
+          "skill": "听懂一群动物的问答",
+          "answer": [
+            "C"
+          ],
+          "analysis": "回答里是 chickens。找红鸡冠的那一群；另外两群分别是牛和鸭。",
+          "visual": {
+            "kind": "asset",
+            "image": "sound-barn",
+            "alt": "暖色农舍题的喇叭"
+          },
+          "options": {
+            "A": {
+              "label": "图卡一",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-cows",
+                "alt": "两只棕斑牛"
+              }
+            },
+            "B": {
+              "label": "图卡二",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-ducks",
+                "alt": "两只灰绿头鸭"
+              }
+            },
+            "C": {
+              "label": "图卡三",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-chickens",
+                "alt": "两只红褐色母鸡"
+              }
+            }
+          }
+        },
+        {
+          "id": "farm-q3",
+          "question": "Ten eggs.",
+          "skill": "听数找出正好十枚蛋",
+          "answer": [
+            "A"
+          ],
+          "analysis": "Ten 是十。每格只数一次。第一盘十枚，另外两盘分别是九枚和十一枚。",
+          "visual": {
+            "kind": "asset",
+            "image": "quiz-tray-stem",
+            "alt": "厨房里的空篮子"
+          },
+          "options": {
+            "A": {
+              "label": "图卡一",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-ten-eggs",
+                "alt": "十枚蛋的纸托"
+              }
+            },
+            "B": {
+              "label": "图卡二",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-nine-eggs",
+                "alt": "九枚蛋的纸托"
+              }
+            },
+            "C": {
+              "label": "图卡三",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-eleven-eggs",
+                "alt": "十一枚蛋的纸托"
+              }
+            }
+          }
+        },
+        {
+          "id": "farm-q4",
+          "question": "Meow! Meow! What are they?",
+          "skill": "凭拟声线索识别动物群",
+          "answer": [
+            "B"
+          ],
+          "analysis": "老师在学猫叫。选耳朵尖、有胡须的那群猫；另两群是狗和小鸟。",
+          "visual": {
+            "kind": "asset",
+            "image": "sound-orchard",
+            "alt": "果园题的喇叭"
+          },
+          "options": {
+            "A": {
+              "label": "图卡一",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-dogs",
+                "alt": "三只浅色长耳狗"
+              }
+            },
+            "B": {
+              "label": "图卡二",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-cats",
+                "alt": "三只条纹猫"
+              }
+            },
+            "C": {
+              "label": "图卡三",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-birds",
+                "alt": "三只黄色小鸟"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "farm-wrap",
+      "type": "slide",
+      "title": "把农场讲给家人听",
+      "template": "picture-points",
+      "data": {
+        "title": "把农场讲给家人听",
+        "picture": "farm-wrap",
+        "points": [
+          "It’s a pig.",
+          "What are they? They’re cows.",
+          "Twelve eggs."
+        ]
+      },
+      "script": [
+        {
+          "say": "农场照片带回家啦。你想先介绍哪一张？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "左边只有一只猪。"
+        },
+        {
+          "say": "It’s a pig."
+        },
+        {
+          "say": "中间是同一种动物，有两只。我们可以把它们当一群问。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "What are they?"
+        },
+        {
+          "say": "They’re cows."
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "如果盘里有十一枚蛋，再放一枚就是十二枚。"
+        },
+        {
+          "say": "Twelve eggs."
+        },
+        {
+          "say": "可以画一只动物，再画一群。请家人指图问，换你回答。"
+        },
+        {
+          "say": "也可以到纸书第二十六到二十八页再找一项练。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "再看另一座农场。我从左到右，指着图介绍一遍。"
+        },
+        {
+          "say": "Look at this farm."
+        },
+        {
+          "say": "Look here. It's a pig."
+        },
+        {
+          "say": "And look at these. They're cows."
+        },
+        {
+          "say": "Twelve eggs in the tray."
+        },
+        {
+          "say": "换你来，从左到右把整张图介绍给家人。"
+        }
+      ]
+    }
+  ]
+}

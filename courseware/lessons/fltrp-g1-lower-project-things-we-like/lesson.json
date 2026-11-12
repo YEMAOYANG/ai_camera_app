@@ -1,0 +1,1045 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "Things We Like",
+  "description": "外研一年级起点一下 Project。画自己的喜好图，用英语与同伴问答，再举图介绍。",
+  "grade": 1,
+  "roster": {
+    "mia": {
+      "name": "Mia 老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Jennifer",
+      "avatar": "/teachers/coco-english-v1.png",
+      "color": "#557B76",
+      "persona": "用短英文句示范喜好交流，先说清每次听谁。"
+    }
+  },
+  "images": {
+    "ask-a-friend-board": {
+      "file": "assets/ask-a-friend-board.png"
+    },
+    "deliver-the-survey-start": {
+      "file": "assets/deliver-the-survey-start.png"
+    },
+    "dock-animals": {
+      "file": "assets/dock-animals.png"
+    },
+    "dock-colours": {
+      "file": "assets/dock-colours.png"
+    },
+    "dock-sports": {
+      "file": "assets/dock-sports.png"
+    },
+    "dock-toys": {
+      "file": "assets/dock-toys.png"
+    },
+    "favourite-colour-board": {
+      "file": "assets/favourite-colour-board.png"
+    },
+    "listen-to-the-reply-board": {
+      "file": "assets/listen-to-the-reply-board.png"
+    },
+    "make-a-picture-board": {
+      "file": "assets/make-a-picture-board.png"
+    },
+    "my-likes-board": {
+      "file": "assets/my-likes-board.png"
+    },
+    "project-sequence-board": {
+      "file": "assets/project-sequence-board.png"
+    },
+    "project-sticker": {
+      "file": "assets/project-sticker.png"
+    },
+    "quiz-1-a": {
+      "file": "assets/quiz-1-a.png"
+    },
+    "quiz-1-b": {
+      "file": "assets/quiz-1-b.png"
+    },
+    "quiz-1-c": {
+      "file": "assets/quiz-1-c.png"
+    },
+    "quiz-2-a": {
+      "file": "assets/quiz-2-a.png"
+    },
+    "quiz-2-b": {
+      "file": "assets/quiz-2-b.png"
+    },
+    "quiz-2-c": {
+      "file": "assets/quiz-2-c.png"
+    },
+    "quiz-3-a": {
+      "file": "assets/quiz-3-a.png"
+    },
+    "quiz-3-b": {
+      "file": "assets/quiz-3-b.png"
+    },
+    "quiz-3-c": {
+      "file": "assets/quiz-3-c.png"
+    },
+    "quiz-4-a": {
+      "file": "assets/quiz-4-a.png"
+    },
+    "quiz-4-b": {
+      "file": "assets/quiz-4-b.png"
+    },
+    "quiz-5-a": {
+      "file": "assets/quiz-5-a.png"
+    },
+    "quiz-5-b": {
+      "file": "assets/quiz-5-b.png"
+    },
+    "quiz-5-c": {
+      "file": "assets/quiz-5-c.png"
+    },
+    "quiz-6-a": {
+      "file": "assets/quiz-6-a.png"
+    },
+    "quiz-6-b": {
+      "file": "assets/quiz-6-b.png"
+    },
+    "quiz-6-c": {
+      "file": "assets/quiz-6-c.png"
+    },
+    "show-it-at-home-board": {
+      "file": "assets/show-it-at-home-board.png"
+    },
+    "show-the-drawing-board": {
+      "file": "assets/show-the-drawing-board.png"
+    },
+    "sort-backdrop": {
+      "file": "assets/sort-backdrop.png"
+    },
+    "sort-blocks": {
+      "file": "assets/sort-blocks.png"
+    },
+    "sort-cart": {
+      "file": "assets/sort-cart.png"
+    },
+    "sort-cart-push": {
+      "file": "assets/sort-cart-push.png"
+    },
+    "sort-ducks": {
+      "file": "assets/sort-ducks.png"
+    },
+    "sort-football": {
+      "file": "assets/sort-football.png"
+    },
+    "sort-purple": {
+      "file": "assets/sort-purple.png"
+    },
+    "sort-rabbits": {
+      "file": "assets/sort-rabbits.png"
+    },
+    "sort-robot": {
+      "file": "assets/sort-robot.png"
+    },
+    "sort-skating": {
+      "file": "assets/sort-skating.png"
+    },
+    "sort-the-pictures-board": {
+      "file": "assets/sort-the-pictures-board.png"
+    },
+    "sort-the-stalls-start": {
+      "file": "assets/sort-the-stalls-start.png"
+    },
+    "sort-yellow": {
+      "file": "assets/sort-yellow.png"
+    },
+    "survey-backdrop": {
+      "file": "assets/survey-backdrop.png"
+    },
+    "survey-box-no": {
+      "file": "assets/survey-box-no.png"
+    },
+    "survey-box-yes": {
+      "file": "assets/survey-box-yes.png"
+    },
+    "survey-cart": {
+      "file": "assets/survey-cart.png"
+    },
+    "survey-cart-load": {
+      "file": "assets/survey-cart-load.png"
+    },
+    "survey-green": {
+      "file": "assets/survey-green.png"
+    },
+    "survey-kites": {
+      "file": "assets/survey-kites.png"
+    },
+    "survey-swimming": {
+      "file": "assets/survey-swimming.png"
+    },
+    "survey-tigers": {
+      "file": "assets/survey-tigers.png"
+    },
+    "quiz-5-hat": {
+      "file": "assets/quiz-5-hat.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "make-a-picture",
+      "type": "slide",
+      "title": "给喜欢的东西办一次小画展",
+      "template": "picture-points",
+      "data": {
+        "title": "给喜欢的东西办一次小画展",
+        "picture": "make-a-picture-board",
+        "points": [
+          "先画",
+          "再问",
+          "最后展示"
+        ]
+      },
+      "script": [
+        {
+          "say": "看这张空白纸。等一会儿，它要变成一张说得出故事的喜好图。"
+        },
+        {
+          "say": "今天我们一起做一个小项目，名字叫 Things We Like。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "第一步，把自己喜欢的事物画在纸上。画得简单，让朋友能认出来就行。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "第二步，请朋友看看图，问问对方也喜欢什么。把答案听完。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "第三步，把图举给大家看，用英语说出其中一样和它的颜色。"
+        },
+        {
+          "say": "你可以选和别人不一样的事物。画里放的是你自己的喜好。"
+        },
+        {
+          "say": "现在先去看四个装图卡的展台。"
+        }
+      ]
+    },
+    {
+      "key": "sort-the-pictures",
+      "type": "slide",
+      "title": "按四种意思给图卡找展台",
+      "template": "picture-points",
+      "data": {
+        "title": "按四种意思给图卡找展台",
+        "picture": "sort-the-pictures-board",
+        "points": [
+          "sports",
+          "toys",
+          "animals",
+          "colours"
+        ]
+      },
+      "script": [
+        {
+          "say": "这四个展台收不同的图。先看图上的意思，再决定放在哪里。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "Sports 是运动。图上有人踢球，看的是在做哪种运动。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "Toys 是玩具。积木能搭在一起，玩具火车放在手里玩。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "Animals 是动物。这只长耳朵小兔和池边的鸭子都放在动物展台。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "Colours 是颜色。只画一种颜色的纸片，放进颜色展台。"
+        },
+        {
+          "say": "图上是一件东西，还是一个动作？先看懂再搬。"
+        },
+        {
+          "say": "搬的时候看托盘上的示例图。先把最容易认出的那张送过去。"
+        },
+        {
+          "say": "看看兔子和踢球。把动物图推去动物展台，把运动图推去运动展台。"
+        },
+        {
+          "say": "这次有玩具、颜色和动物。看清图的意思再推。"
+        },
+        {
+          "say": "四个展台都开了。按运动、玩具、颜色、动物，一张一张推到同类托盘。"
+        },
+        {
+          "say": "先停一停。你推的图和托盘图说的是同一类吗？"
+        },
+        {
+          "say": "看哪个同类托盘亮了。退到图卡后面再推。"
+        },
+        {
+          "say": "同类的图聚在一起了。"
+        }
+      ]
+    },
+    {
+      "key": "sort-the-stalls",
+      "type": "interactive",
+      "title": "把图卡推到同类展台",
+      "page": "sort-the-stalls",
+      "widgetType": "game",
+      "startImage": "sort-the-stalls-start",
+      "script": [
+        {
+          "say": "展台要开门了。听完我示范，再自己把图卡推到合适的托盘。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#first-sort-card"
+        },
+        {
+          "say": "先看小兔图。兔子是动物。我把车开到图卡后面。"
+        },
+        {
+          "highlight": "#first-sort-dock"
+        },
+        {
+          "say": "看见托盘里的另一只小动物了吗？这张兔子卡该往那个托盘推。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "按箭头沿格走。我把这一张推到托盘就停下来。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "看小车靠近兔子图。图卡进同类托盘才算放对。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        },
+        {
+          "say": "轮到你。先看图，再把图卡推到同类托盘。"
+        }
+      ],
+      "gameAudio": {
+        "sort-first": "sort-the-pictures-12",
+        "sort-next": "sort-the-pictures-13",
+        "sort-last": "sort-the-pictures-14",
+        "sort-hint": "sort-the-pictures-15",
+        "sort-help": "sort-the-pictures-16",
+        "sort-praise": "sort-the-pictures-17"
+      }
+    },
+    {
+      "key": "my-likes",
+      "type": "slide",
+      "title": "说自己的喜好，也听共同喜好",
+      "template": "picture-points",
+      "data": {
+        "title": "说自己的喜好，也听共同喜好",
+        "picture": "my-likes-board",
+        "points": [
+          "I like …",
+          "听清是谁",
+          "We like …"
+        ]
+      },
+      "script": [
+        {
+          "say": "米娅老师给两个画展小伙伴配音。先看看这句话是谁开口说的。"
+        },
+        {
+          "say": "孩子一边指自己的图，一边用一句英语说自己的喜好。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "I like kites."
+        },
+        {
+          "say": "听到 I like，就知道刚才开口的是在说自己的喜好。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "另一个伙伴也画了风筝。先听过对方自己说，再知道有了同样的喜好。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "We like kites."
+        },
+        {
+          "say": "说 We 的两个伙伴都喜欢风筝，开口的人也在这个小组里。"
+        },
+        {
+          "say": "一位伙伴喜欢玩具机器人也很好。我们可以喜欢不同的事物。"
+        },
+        {
+          "say": "轮到你时，指一指自己要画的东西，用 I like 开头试一试。"
+        }
+      ]
+    },
+    {
+      "key": "ask-a-friend",
+      "type": "slide",
+      "title": "一句问喜好，一句回答",
+      "template": "picture-points",
+      "data": {
+        "title": "一句问喜好，一句回答",
+        "picture": "ask-a-friend-board",
+        "points": [
+          "Do you like …?",
+          "Yes, I do.",
+          "No, I don’t."
+        ]
+      },
+      "script": [
+        {
+          "say": "轮到采访了。拿着画的同伴先开口，听问题最后问的是哪一项。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "Do you like swimming?"
+        },
+        {
+          "say": "我在问对方喜不喜欢游泳。我问完会等一等。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "Yes, I do."
+        },
+        {
+          "say": "这是喜欢。答的是刚才问到的游泳。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "Do you like kites?"
+        },
+        {
+          "say": "No, I don’t."
+        },
+        {
+          "say": "这回换成风筝，对方回答自己不喜欢。"
+        },
+        {
+          "say": "两个回答都是可以的，听清对方实际说了什么。"
+        },
+        {
+          "say": "现在换一个人开口。你也可以先指一指图，再读问句。"
+        }
+      ]
+    },
+    {
+      "key": "listen-to-the-reply",
+      "type": "slide",
+      "title": "听清问的图，再听答案",
+      "template": "picture-points",
+      "data": {
+        "title": "听清问的图，再听答案",
+        "picture": "listen-to-the-reply-board",
+        "points": [
+          "听问句找图",
+          "听回答送箱",
+          "先取，再送"
+        ]
+      },
+      "script": [
+        {
+          "say": "采访图车只记听到的答案。先问的是哪样，再听伙伴说喜欢还是不喜欢。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "问游泳就找人在水中游的画。问风筝就找牵着线的纸风筝。"
+        },
+        {
+          "say": "听到老虎，看有条纹的大猫。听到绿色，看绿色纸片。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "听到肯定回答，把问到的那张图送进爱心票箱。"
+        },
+        {
+          "say": "听到否定回答，送进带斜线的爱心票箱。两个票箱都可以装正确的记录。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "拿到的是问句里的东西。送到哪里，要再听一次回答。"
+        },
+        {
+          "say": "我读几句采访，你听声音在图上找。上车后还可以按喇叭重听这一条。"
+        },
+        {
+          "say": "Do you like swimming?"
+        },
+        {
+          "say": "Do you like kites?"
+        },
+        {
+          "say": "Do you like tigers?"
+        },
+        {
+          "say": "Do you like green?"
+        },
+        {
+          "say": "Yes, I do."
+        },
+        {
+          "say": "No, I don’t."
+        },
+        {
+          "say": "先重听这一步。取图时听问的东西，送图时听喜欢还是不喜欢。"
+        },
+        {
+          "say": "找发亮的站点。等车道空一些，再把车开过去。"
+        },
+        {
+          "say": "你把听到的回答记对了。"
+        }
+      ]
+    },
+    {
+      "key": "deliver-the-survey",
+      "type": "interactive",
+      "title": "把采访图送进合适的票箱",
+      "page": "deliver-the-survey",
+      "widgetType": "game",
+      "startImage": "deliver-the-survey-start",
+      "script": [
+        {
+          "say": "采访开始了。先听伙伴问的东西，再听另一个伙伴的回答。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#first-survey-card"
+        },
+        {
+          "say": "这回听见 swimming。我开到游泳这张图旁边，点包裹按钮拿起。"
+        },
+        {
+          "highlight": "#first-survey-box"
+        },
+        {
+          "say": "听完肯定回答。这张图要送到上面那只爱心票箱。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "用箭头移动。我只拿一张图就停，等路空一些才能开到对面。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "看小车靠近游泳图。图卡拿到车顶才停。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        },
+        {
+          "say": "轮到你。先取对图，再听回答送票。喇叭可以重听。"
+        }
+      ],
+      "gameAudio": {
+        "survey-swimming": "listen-to-the-reply-11",
+        "survey-kites": "listen-to-the-reply-12",
+        "survey-tigers": "listen-to-the-reply-13",
+        "survey-green": "listen-to-the-reply-14",
+        "reply-yes": "listen-to-the-reply-15",
+        "reply-no": "listen-to-the-reply-16",
+        "survey-hint": "listen-to-the-reply-17",
+        "survey-help": "listen-to-the-reply-18",
+        "survey-praise": "listen-to-the-reply-19"
+      }
+    },
+    {
+      "key": "show-the-drawing",
+      "type": "slide",
+      "title": "举起自己的画，说出画里的物品",
+      "template": "picture-points",
+      "data": {
+        "title": "举起自己的画，说出画里的物品",
+        "picture": "show-the-drawing-board",
+        "points": [
+          "指整张画",
+          "说一样东西",
+          "说它的颜色"
+        ]
+      },
+      "script": [
+        {
+          "say": "画展开始了。一位小朋友举起自己的画，让大家看清楚纸上的东西。"
+        },
+        {
+          "say": "她先指整张画，再把手指移到要介绍的那样东西。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "This is my picture."
+        },
+        {
+          "say": "她指整张纸，让我们知道这是她画的。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "This is a kite."
+        },
+        {
+          "say": "她的手指移到风筝上。现在大家知道她在说画里的哪一样。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "It’s red."
+        },
+        {
+          "say": "这里的 It 指刚才的风筝。我们看见画上的风筝是红色的。"
+        },
+        {
+          "say": "你还可以补一句自己的喜好。比如 I like red."
+        },
+        {
+          "say": "轮到你时，先把画举稳，按整张画、物品、颜色的顺序说。"
+        }
+      ]
+    },
+    {
+      "key": "favourite-colour",
+      "type": "slide",
+      "title": "画上的颜色和最喜欢的颜色",
+      "template": "picture-points",
+      "data": {
+        "title": "画上的颜色和最喜欢的颜色",
+        "picture": "favourite-colour-board",
+        "points": [
+          "It’s red.",
+          "I like yellow.",
+          "My favourite colour"
+        ]
+      },
+      "script": [
+        {
+          "say": "再听这位小画家。她喜欢红色，也喜欢黄色。最喜欢的一种是哪一个呢？"
+        },
+        {
+          "say": "看图时，先分清她在描述纸上的东西，还是在说自己最喜欢什么。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "It’s red."
+        },
+        {
+          "say": "这句说风筝的颜色。答案可以在纸上看到。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "I like yellow."
+        },
+        {
+          "say": "这句说我喜欢黄色。你听到的是开口的这位小画家的喜好。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "Yellow is my favourite colour."
+        },
+        {
+          "say": "听到 favourite，知道她挑出了最喜欢的一种。她不用把画里的风筝改成黄色。"
+        },
+        {
+          "say": "我来问你一句。What’s your favourite colour?"
+        },
+        {
+          "say": "可以指自己的色卡，说出自己的答案。不同的人可以最喜欢不同颜色。"
+        }
+      ]
+    },
+    {
+      "key": "project-sequence",
+      "type": "slide",
+      "title": "按三张小画回看项目",
+      "template": "picture-points",
+      "data": {
+        "title": "按三张小画回看项目",
+        "picture": "project-sequence-board",
+        "points": [
+          "画下来",
+          "跟伙伴问答",
+          "带图去展示"
+        ]
+      },
+      "script": [
+        {
+          "say": "把画展的三张小照片摆好。还记得手里先有一张空白纸吗？"
+        },
+        {
+          "say": "看动作和人物，不用读说明也能知道每张照片在做什么。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先画自己喜欢的一项运动、一件玩具、一种动物或一种颜色。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "再拿图去问伙伴。听清问题里的东西，等对方把回答说完。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "最后带图去展示。先指作品，再指物品，说颜色和你喜欢的颜色。"
+        },
+        {
+          "say": "问完还可以在纸边画一个小记号，只记刚听到的答案。"
+        },
+        {
+          "say": "现在做一个新图小检查。听老师读完，再选合适的画。"
+        }
+      ]
+    },
+    {
+      "key": "project-picture-check",
+      "type": "quiz",
+      "title": "听喜好问答，找合适的图",
+      "intro": [
+        "听我读题。听完再选一张最合适的图。"
+      ],
+      "questions": [
+        {
+          "id": "sort-picture",
+          "skill": "visual-category",
+          "question": "新的展台只放玩具。哪张图该放到这个展台？",
+          "answer": [
+            "B"
+          ],
+          "analysis": "小陀螺是手里玩的玩具；打排球是运动，孔雀是动物。",
+          "options": {
+            "A": {
+              "label": "打排球",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-1-a",
+                "alt": "两位孩子隔网打排球，一人正伸手击球"
+              }
+            },
+            "B": {
+              "label": "木陀螺",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-1-b",
+                "alt": "单独一个彩色木陀螺正在平面旋转，边有拉绳"
+              }
+            },
+            "C": {
+              "label": "孔雀",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-1-c",
+                "alt": "一只自然孔雀在草上展开扇形尾羽"
+              }
+            }
+          }
+        },
+        {
+          "id": "hear-my-choice",
+          "skill": "personal-preference",
+          "question": "听小画家的话。I like pandas. 她会把什么画进喜好图？",
+          "answer": [
+            "A"
+          ],
+          "analysis": "听到 pandas，这位小画家喜欢熊猫。",
+          "options": {
+            "A": {
+              "label": "熊猫",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-2-a",
+                "alt": "自然黑白熊猫抱竹竿，脸和黑眼圈清晰"
+              }
+            },
+            "B": {
+              "label": "猴子",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-2-b",
+                "alt": "自然长尾猴子在枝上蹲着，长尾清晰"
+              }
+            },
+            "C": {
+              "label": "斑马",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-2-c",
+                "alt": "自然黑白条纹斑马站草地，四足清晰"
+              }
+            }
+          }
+        },
+        {
+          "id": "find-the-question",
+          "skill": "ask-and-answer",
+          "question": "采访时，伙伴问 Do you like ping-pong? 他问的是哪一项？",
+          "answer": [
+            "C"
+          ],
+          "analysis": "ping-pong 是乒乓球运动，图上有球台、球网和球拍。",
+          "options": {
+            "A": {
+              "label": "跳绳",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-3-a",
+                "alt": "一个小朋友正跳过手摇的细跳绳"
+              }
+            },
+            "B": {
+              "label": "跑步",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-3-b",
+                "alt": "一位小朋友在跑道跑步，没有绳或球拍"
+              }
+            },
+            "C": {
+              "label": "打乒乓球",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-3-c",
+                "alt": "两位孩子隔小球桌与球网各持短柄球拍打乒乓球"
+              }
+            }
+          }
+        },
+        {
+          "id": "hear-the-no",
+          "skill": "ask-and-answer",
+          "question": "Do you like dolls? No, I don’t. 该放哪边？",
+          "answer": [
+            "A"
+          ],
+          "analysis": "No, I don’t. 是这一位伙伴说自己不喜欢。记在带斜线的爱心这边。",
+          "options": {
+            "A": {
+              "label": "不喜欢布娃娃",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-4-a",
+                "alt": "布娃娃在中央，旁边一颗珊瑚色爱心被粗斜线划过"
+              }
+            },
+            "B": {
+              "label": "喜欢布娃娃",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-4-b",
+                "alt": "同一个布娃娃在中央，旁边一颗同样的珊瑚色爱心，没有斜线"
+              }
+            }
+          }
+        },
+        {
+          "id": "find-favourite",
+          "skill": "describe-project",
+          "question": "Green is my favourite colour. 最爱哪色？",
+          "answer": [
+            "B"
+          ],
+          "analysis": "她说最喜欢 green，也就是绿色；帽子是紫色，这件物品的颜色是另一条信息。",
+          "options": {
+            "A": {
+              "label": "紫色",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-5-a",
+                "alt": "一张纯紫色色卡，居中无图案"
+              }
+            },
+            "B": {
+              "label": "绿色",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-5-b",
+                "alt": "一张纯绿色色卡，居中无图案"
+              }
+            },
+            "C": {
+              "label": "橙色",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-5-c",
+                "alt": "一张纯橙色色卡，居中无图案"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "quiz-5-hat",
+            "alt": "一顶紫色帽子"
+          }
+        },
+        {
+          "id": "project-order",
+          "skill": "project-sequence",
+          "question": "小画家要按书里的项目来做。哪一条图带排对了？",
+          "answer": [
+            "C"
+          ],
+          "analysis": "先画自己的喜好，再和朋友问答，最后举图展示。",
+          "options": {
+            "A": {
+              "label": "问、画、展示",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-6-a",
+                "alt": "新角色三格，从左到右：两人互问，单人低头画图，面向观众举画"
+              }
+            },
+            "B": {
+              "label": "画、展示、问",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-6-b",
+                "alt": "新角色三格，从左到右：单人低头画图，面向观众举画，两人互问"
+              }
+            },
+            "C": {
+              "label": "画、问、展示",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-6-c",
+                "alt": "新角色三格，从左到右：单人低头画图，两人互问，面向观众举画"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "show-it-at-home",
+      "type": "slide",
+      "title": "带一张自己的画回家采访",
+      "template": "picture-points",
+      "data": {
+        "title": "带一张自己的画回家采访",
+        "picture": "show-it-at-home-board",
+        "points": [
+          "画和说",
+          "问一道",
+          "做小记号"
+        ]
+      },
+      "script": [
+        {
+          "say": "画展的最后一站在家里。请找一张纸，画一件你真的喜欢的东西。"
+        },
+        {
+          "say": "画好指给家人看。用英语慢慢讲，让家人有时间看清。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "你可以先指整张画，再说它是什么、是什么颜色。"
+        },
+        {
+          "say": "如果愿意，也说说你最喜欢的一种颜色。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "比如我问 Do you like kites? 家人答 No, I don’t."
+        },
+        {
+          "say": "如果对方不喜欢，也照实记下来。那是这位家人自己的喜好。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "听到这句，我就在纸上的风筝图旁画个斜线爱心。"
+        },
+        {
+          "say": "请家人听你用图介绍。课堂的小检查只记你选过的答案。"
+        },
+        {
+          "say": "今天你已经在课堂里听和选了。真实画画、英语介绍和调查等你们一起完成。"
+        },
+        {
+          "say": "把画挂到家里的小展角吧。"
+        }
+      ]
+    }
+  ]
+}

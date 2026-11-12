@@ -1,0 +1,190 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "多彩的花",
+  "binding": {
+    "editionId": "smartedu-science-six-year-g1-lower-e231dd57",
+    "revisionId": "directory-359f40a6afba915101f297d3",
+    "unitId": "11983e8e-c931-46a7-97de-589b20d31258",
+    "nodeId": "30116794-dcd6-4135-a16b-38ccaa80ab18"
+  },
+  "goals": [
+    "能先安全地用眼观察，再说一朵花的颜色、大小、瓣的层次或外形。",
+    "能观察并画出一朵花的主要外形，举例说它哪一处像喇叭、十字、钟或蝴蝶。",
+    "能比较两朵典型花，指出外侧花瓣和中央可见的花蕊，归纳可观察的共同点。",
+    "能用不同角度比较同一朵花并留下图片或手绘记录，在真实家庭活动中不随意采花和尝植物。"
+  ],
+  "scenario": "原创校园花观察桌。从不同角度观察一朵，再比较不同形状，把看见的证据留在图片和手绘记录。",
+  "goalSources": [
+    "印21–22；教案1–2",
+    "印22；课件5–6",
+    "印23；课件7–8",
+    "印22–24；教案4"
+  ],
+  "pageSequence": [
+    {
+      "key": "flower-table",
+      "kind": "teaching",
+      "plan": "介绍校园已确认的安全样本，比较颜色、大小、瓣层，按一句话说外形。"
+    },
+    {
+      "key": "safe-looking",
+      "kind": "teaching",
+      "plan": "先用眼；成人确认后可扇闻，不品尝、不随意采。"
+    },
+    {
+      "key": "compare-flower-shapes",
+      "kind": "teaching",
+      "plan": "观察漏斗、十字、钟形、蝶形及其生活联想。"
+    },
+    {
+      "key": "sketch-a-flower",
+      "kind": "teaching",
+      "plan": "把看得见的轮廓和中央结构简笔记下。"
+    },
+    {
+      "key": "flower-photo-pairs",
+      "kind": "game",
+      "plan": "同朵花的俯视和侧视成对实际抓拍。"
+    },
+    {
+      "key": "sort-flower-shapes",
+      "kind": "game",
+      "plan": "用外形作托盘分类，以正视或侧视中最清楚的形状示例给线索。"
+    },
+    {
+      "key": "find-petals-and-center",
+      "kind": "teaching",
+      "plan": "逐例比较蔷薇和桃花，标外侧花瓣与中央花蕊。"
+    },
+    {
+      "key": "two-flowers-same-parts",
+      "kind": "teaching",
+      "plan": "比较蔷薇与桃花都可见的花瓣和花蕊，用多例归纳。"
+    },
+    {
+      "key": "unusual-flower-gallery",
+      "kind": "teaching",
+      "plan": "看大王花等原书拓展例，按图讲外形，不引申未经验证的功能。"
+    },
+    {
+      "key": "picture-quiz",
+      "kind": "quiz",
+      "plan": "六道原创图题，覆盖比较、外形、观察安全与共同结构。"
+    },
+    {
+      "key": "flower-note-at-home",
+      "kind": "teaching",
+      "plan": "成人同看不采，画下一朵；经成人同意可压花，真实观察待观察。"
+    }
+  ],
+  "games": [
+    {
+      "page": "flower-photo-pairs",
+      "template": "shutterScout",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.shutterScout",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "observe_state",
+      "selection": "三关采用三朵同一编号的示例，俯视用于轮廓与中心、侧视用于宽窄深浅；只记录正常完成本次捕获的两视图。",
+      "levels": [
+        "牵牛",
+        "诸葛菜",
+        "桃花"
+      ],
+      "teacherAnchors": [
+        "flower-preview",
+        "game-player",
+        "game-target"
+      ],
+      "observationPlan": {
+        "sceneId": "scene-flower-photo-pairs",
+        "trialId": "same-flower-two-views",
+        "levels": [
+          "trumpet",
+          "cross",
+          "peach"
+        ],
+        "complete": "仅普通输入的三关全部完成，保存实际拍到的俯/侧成对照片；家庭实物待观察。"
+      }
+    },
+    {
+      "page": "sort-flower-shapes",
+      "template": "sortingDepot",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.sortingDepot",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "classification",
+      "selection": "实际把花样本按轮廓分类推入托盘，颜色不决定类别。首错用外形提示。",
+      "levels": [
+        "漏斗与十字",
+        "再加钟",
+        "再加蝶形"
+      ],
+      "teacherAnchors": [
+        "game-target",
+        "first-shape-dock",
+        "game-player"
+      ]
+    }
+  ],
+  "quiz": [
+    {
+      "id": "open-and-narrow",
+      "skill": "flower-funnel",
+      "prompt": "哪朵花开口宽，另一端收窄，像小喇叭？",
+      "rationale": "粉红花从侧面看有宽口和窄管，轮廓像小喇叭。",
+      "position": 2,
+      "answer": "侧面看开口宽、另一端窄的粉红花"
+    },
+    {
+      "id": "find-flower-center",
+      "skill": "flower-center",
+      "prompt": "哪张图圈出了白花的花蕊？",
+      "rationale": "花蕊是花中间细细的部分。外面宽宽的一片是花瓣。",
+      "position": 1,
+      "answer": "圈住中间许多细丝和小尖"
+    },
+    {
+      "id": "same-outline",
+      "skill": "flower-shape-not-color",
+      "prompt": "哪两朵颜色不同，却都像十字形？",
+      "rationale": "这朵淡紫和这朵黄色，都有四片花瓣向四边展开。颜色不决定外形。",
+      "position": 3,
+      "answer": "淡紫四瓣与黄色四瓣，向四边展开"
+    },
+    {
+      "id": "safe-waft",
+      "skill": "flower-safe-observation",
+      "prompt": "大人同意闻这朵花。哪张图做对了？",
+      "rationale": "站开一点，用手轻轻把气味扇过来。鼻子不贴着花。",
+      "position": 2,
+      "answer": "站开一些，用手轻轻扇闻"
+    },
+    {
+      "id": "draw-what-is-visible",
+      "skill": "flower-picture-record",
+      "prompt": "哪张记录画了花的外边，也画了中间？",
+      "rationale": "有四片花瓣的外边，也有中间看见的小点和短线，两个部分都记到了。",
+      "position": 3,
+      "answer": "画了四瓣外边和中间"
+    },
+    {
+      "id": "unusual-flower-analogy",
+      "skill": "flower-wing-analogy",
+      "prompt": "哪朵花像白鸟张开了翅膀？",
+      "rationale": "鹭兰两边白白的细边伸开，像鸟的翅膀。",
+      "position": 1,
+      "answer": "鹭兰左右白白的花瓣向外伸展"
+    }
+  ],
+  "afterClass": {
+    "familyTask": "由大人陪同在安全地方观察，不随意采或尝；从两个方向看一朵熟悉的花，记录真实看见的花形与共同部位。",
+    "weeklyQuestionSource": [
+      "颜色形状与层次",
+      "常见花形联想",
+      "花瓣与花蕊",
+      "安全观察与记录"
+    ],
+    "evidence": "线上只留模拟照片和图题。家庭观测、气味和压花结果待观察。"
+  }
+}

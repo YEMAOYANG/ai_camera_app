@@ -1,0 +1,263 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "100以内简单的加、减法",
+  "binding": {
+    "editionId": "pep-math-g1-lower-2022-standard",
+    "revisionId": "directory-6205d2037284e91f10b25edd",
+    "nodeId": "4e9dd59b-d90f-4bb8-8325-26888009fea8",
+    "unitId": "acfb0386-a55f-4542-9d5d-619a3e2d9023"
+  },
+  "scenario": "学校游园会前，彩旗工坊把旗子夹成十枚一条。孩子核对整条旗串与散旗的合计，再为两张取货单挑正确的剩量。",
+  "goals": [
+    "用十为单位合并、拿走整十组，说明整十数相加和相应减法。",
+    "看图或计数器，用几个十和几个一表示两位数，解释整十数与一位数换序相加。",
+    "从同一个两位数分别拿走散件和整十组，解释两次剩量为何不同。",
+    "用两个不同部分和总量互相核对加、减算式，并用图说清情境中拿走什么、剩什么。"
+  ],
+  "goalSources": [
+    {
+      "skill": "combine-or-remove-tens",
+      "target": "用十为单位合并、拿走整十组，说明整十数相加和相应减法。",
+      "source": "印37例7；课件2–5；设计1–2；任务单1"
+    },
+    {
+      "skill": "compose-tens-and-ones",
+      "target": "看图或计数器，用几个十和几个一表示两位数，解释整十数与一位数换序相加。",
+      "source": "印37例8；课件6–10；设计2；任务单1–2"
+    },
+    {
+      "skill": "remove-either-part",
+      "target": "从同一个两位数分别拿走散件和整十组，解释两次剩量为何不同。",
+      "source": "印37例8和做一做；课件7–15；设计2–3"
+    },
+    {
+      "skill": "check-part-whole-family",
+      "target": "用两个不同部分和总量互相核对加、减算式，并用图说清情境中拿走什么、剩什么。",
+      "source": "印37做一做；课件14–25；设计3–4；作业1"
+    }
+  ],
+  "pageSequence": [
+    {
+      "key": "visit-flag-workshop",
+      "kind": "teaching",
+      "plan": "介绍原创彩旗工坊和同规格的散旗与十旗串。"
+    },
+    {
+      "key": "put-tens-together",
+      "kind": "teaching",
+      "plan": "数三条与四条，合七条；用七颗十位珠对照，不把整条当一面。"
+    },
+    {
+      "key": "swap-the-tens",
+      "kind": "teaching",
+      "plan": "前后送来顺序换，旗子合计70；解释30+40、40+30。"
+    },
+    {
+      "key": "remove-whole-tens",
+      "kind": "teaching",
+      "plan": "同一70分别拿走30与40，保留另一部分；图中明确拿走位置。"
+    },
+    {
+      "key": "slide-to-fill-orders",
+      "kind": "game",
+      "plan": "左右上下滑动实际拼货，只有两卡之和符合订单才入架。"
+    },
+    {
+      "key": "combine-tens-and-ones",
+      "kind": "teaching",
+      "plan": "六条和七面组成67，读图和计数器，交换两部分出现顺序结果同。"
+    },
+    {
+      "key": "remove-loose-or-bundles",
+      "kind": "teaching",
+      "plan": "同一67拿走7散面剩60，拿走60整串剩7。"
+    },
+    {
+      "key": "four-facts-from-one-tray",
+      "kind": "teaching",
+      "plan": "从60、7和67构成两加两减，连同原图查哪是总量。"
+    },
+    {
+      "key": "aim-at-the-remainder",
+      "kind": "game",
+      "plan": "订单变化时保留实际拿走部分和剩量靶，真实瞄准碰撞。"
+    },
+    {
+      "key": "check-what-stays-in-the-box",
+      "kind": "teaching",
+      "plan": "用原创84面交付情境检查取散旗与取整串，并把剩余同取走复原。"
+    },
+    {
+      "key": "picture-quiz",
+      "kind": "quiz",
+      "plan": "六个独立图题用新算式和原创新情境查合、拆和一图四式。"
+    },
+    {
+      "key": "tell-the-two-parts-at-home",
+      "kind": "teaching",
+      "plan": "亲子摆安全纸旗，任一方拿走部分，另一方依据图说运算关系。"
+    }
+  ],
+  "games": [
+    {
+      "page": "slide-to-fill-orders",
+      "template": "slideMerge",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.slideMerge",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "symbol_merge",
+      "selection": "两张实物数量卡之和必须等于本关订单，棋盘四方向和墙真实作用。先整十，再整十加散件。",
+      "levels": [
+        [
+          [
+            20,
+            40,
+            60
+          ]
+        ],
+        [
+          [
+            40,
+            6,
+            46
+          ],
+          [
+            20,
+            8,
+            28
+          ]
+        ],
+        [
+          [
+            30,
+            7,
+            37
+          ],
+          [
+            50,
+            4,
+            54
+          ],
+          [
+            10,
+            9,
+            19
+          ]
+        ]
+      ],
+      "teacherAnchors": [
+        "slide-order-guide",
+        "first-twenty",
+        "first-forty",
+        "game-player",
+        "first-shelf-tray"
+      ],
+      "demo": "指订单和两份十旗卡，在实际滑道往左合成六串，等成品入架再复位。"
+    },
+    {
+      "page": "aim-at-the-remainder",
+      "template": "magnetMarbles",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.magnetMarbles",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "pair_match",
+      "selection": "本课真实接受条件为总量减取走数量，与靶数量相等；订单图将取走旗放入带标记的盘。变换取走数量时刷新同一总量的任务图。",
+      "levels": [
+        [
+          [
+            80,
+            30,
+            50
+          ]
+        ],
+        [
+          [
+            64,
+            4,
+            60
+          ],
+          [
+            64,
+            60,
+            4
+          ]
+        ],
+        [
+          [
+            73,
+            3,
+            70
+          ],
+          [
+            87,
+            80,
+            7
+          ]
+        ]
+      ],
+      "teacherAnchors": [
+        "current-order",
+        "game-player",
+        "game-target",
+        "confirmed-remainder"
+      ],
+      "demo": "先指总量和实际标记的取走部分，真实瞄并击中剩量，停在成品再交给孩子。"
+    }
+  ],
+  "quiz": [
+    {
+      "id": "combine-packed-lanterns",
+      "skill": "combine-tens",
+      "position": 2,
+      "plan": "灯牌10和40合为50。"
+    },
+    {
+      "id": "take-crates-from-ninety",
+      "skill": "remove-tens",
+      "position": 1,
+      "plan": "从90取50剩40。"
+    },
+    {
+      "id": "add-six-loose-stamps",
+      "skill": "compose-tens-and-ones",
+      "position": 3,
+      "plan": "印章80和6合为86。"
+    },
+    {
+      "id": "leave-the-full-packets",
+      "skill": "remove-ones",
+      "position": 1,
+      "plan": "69取走散9，剩6条十件。"
+    },
+    {
+      "id": "leave-the-loose-pieces",
+      "skill": "remove-tens-from-mixed",
+      "position": 3,
+      "plan": "95取走90，剩散5。"
+    },
+    {
+      "id": "pick-the-four-facts",
+      "skill": "check-part-whole-family",
+      "position": 2,
+      "plan": "20和4组成24，选两个合并和两个正确拆分关系。"
+    }
+  ],
+  "afterClass": {
+    "familyTask": "成人和孩子用安全大纸片摆两组，先说两个部分如何合并，再拿走其中一组说明剩多少。用两个不同部分组成总量后，再用相反顺序和两种取走量说四个关系。",
+    "weeklyQuestionSource": [
+      "整十加减",
+      "整十加散件",
+      "分别取走散件与整串",
+      "两部分和总量",
+      "看实际图核对余量"
+    ],
+    "evidence": "课堂真实事件来自滑轨、瞄准和小测。亲子摆放和口述由成人观察，待观察。"
+  },
+  "artAndLanguage": "旗子条和散件的数量、位值珠、取走轮廓、算式和靶牌由精确图绘。游戏即使遮住非目标文字，也可依据语音与实物区分整十和散旗；课末若要求认算式，算式是目标文字。",
+  "authoring": {
+    "mode": "direct",
+    "model": "gpt-6.1-sol",
+    "bookAndCompanionScope": "印37例7、8和做一做，一课时全34页配套。"
+  },
+  "officialNotesSha256": "cb902099865f4103ac79c9ce9f3a5dbeb20a748c0bb11d20418b5eef94140856"
+}

@@ -1,0 +1,11 @@
+{
+  "template": "fallingTiles",
+  "title": "凑十工坊",
+  "sub": "把能凑成十的两块放到一起。",
+  "art": {"backdrop": "kiln.webp", "sticker": "sticker.webp"},
+  "levels": [
+    {"total":10,"bottom":[null,2,null,7,null,4],"pieces":[8,3,6],"interval":1.17,"hints":["同一行挨着才算哦。","先找能一起凑成十的两块。"]},
+    {"total":10,"bottom":[1,null,5,null,8,null],"pieces":[2,9,5],"interval":0.84,"hints":["还有机会，再挪一挪。","看看底下一排，哪两块合起来是十？"]},
+    {"total":10,"bottom":[null,6,null,1,null,3],"pieces":[4,7,9],"interval":0.56,"hints":["接在隔壁，别压在上面。","看一眼浅浅的影子，那里就是落点。"]}
+  ]
+}

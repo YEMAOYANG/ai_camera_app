@@ -1,0 +1,11 @@
+{
+  "template": "shadowStage",
+  "title": "影子剧场",
+  "sub": "挪一挪灯，把影子套进虚线，再定格。",
+  "art": {"backdrop": "theater.webp", "sticker": "sticker.webp", "frames":["lantern.webp"]},
+  "levels": [
+    {"tolerance":30,"shots":[{"x":508,"d":222,"shape":"circle"},{"x":640,"d":145,"shape":"triangle"}],"hints":["先把影子挪到虚线中间。","看看亮框，把灯挪到那里试试。"]},
+    {"tolerance":23,"shots":[{"x":794,"d":158,"shape":"square"},{"x":488,"d":277,"shape":"triangle"}],"hints":["离纸片近一点，影子会变大。","看看亮框，再挪动灯光。"]},
+    {"tolerance":16,"shots":[{"x":483,"d":152,"shape":"triangle"},{"x":823,"d":285,"shape":"circle"},{"x":565,"d":180,"shape":"square"}],"hints":["位置对了，还要让大小对上。","亮框标出了灯可以放的位置。"]}
+  ]
+}

@@ -1,0 +1,1007 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "5、4、3、2 加几",
+  "description": "在纸鸢工坊用凑十和已知交换式计算较小的加数在前的进位加法，观察和怎样变化。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小数老师",
+      "role": "teacher",
+      "gender": "male",
+      "voice": "Ethan",
+      "avatar": "/teachers/ashu-math-v1.png",
+      "color": "#437763",
+      "persona": "和孩子用纸片、十格和算式解释先后与和的变化。"
+    }
+  },
+  "images": {
+    "workshop-stage": {
+      "file": "assets/workshop-stage.png"
+    },
+    "kite-cart": {
+      "file": "assets/kite-cart.png"
+    },
+    "kite-cart-moving": {
+      "file": "assets/kite-cart-moving.png"
+    },
+    "kite-sticker": {
+      "file": "assets/kite-sticker.png"
+    },
+    "kite-finished": {
+      "file": "assets/kite-finished.png"
+    },
+    "t3-9": {
+      "file": "assets/t3-9.png"
+    },
+    "t5-8": {
+      "file": "assets/t5-8.png"
+    },
+    "t4-7": {
+      "file": "assets/t4-7.png"
+    },
+    "t5-7": {
+      "file": "assets/t5-7.png"
+    },
+    "t4-8": {
+      "file": "assets/t4-8.png"
+    },
+    "t5-9": {
+      "file": "assets/t5-9.png"
+    },
+    "t3-8": {
+      "file": "assets/t3-8.png"
+    },
+    "t4-9": {
+      "file": "assets/t4-9.png"
+    },
+    "t9-3": {
+      "file": "assets/t9-3.png"
+    },
+    "t9-3r": {
+      "file": "assets/t9-3r.png"
+    },
+    "t8-5r": {
+      "file": "assets/t8-5r.png"
+    },
+    "t7-4r": {
+      "file": "assets/t7-4r.png"
+    },
+    "t7-5r": {
+      "file": "assets/t7-5r.png"
+    },
+    "t8-4r": {
+      "file": "assets/t8-4r.png"
+    },
+    "t9-5r": {
+      "file": "assets/t9-5r.png"
+    },
+    "t6-6r": {
+      "file": "assets/t6-6r.png"
+    },
+    "station-11": {
+      "file": "assets/station-11.png"
+    },
+    "station-12": {
+      "file": "assets/station-12.png"
+    },
+    "station-13": {
+      "file": "assets/station-13.png"
+    },
+    "station-14": {
+      "file": "assets/station-14.png"
+    },
+    "teach-47-before": {
+      "file": "assets/teach-47-before.png"
+    },
+    "teach-47-after": {
+      "file": "assets/teach-47-after.png"
+    },
+    "teach-83": {
+      "file": "assets/teach-83.png"
+    },
+    "teach-38": {
+      "file": "assets/teach-38.png"
+    },
+    "teach-37": {
+      "file": "assets/teach-37.png"
+    },
+    "teach-38-more": {
+      "file": "assets/teach-38-more.png"
+    },
+    "teach-38-move": {
+      "file": "assets/teach-38-move.png"
+    },
+    "teach-38-shift": {
+      "file": "assets/teach-38-shift.png"
+    },
+    "teach-56": {
+      "file": "assets/teach-56.png"
+    },
+    "teach-65": {
+      "file": "assets/teach-65.png"
+    },
+    "q-fill-start": {
+      "file": "assets/q-fill-start.png"
+    },
+    "q-fill-a": {
+      "file": "assets/q-fill-a.png"
+    },
+    "q-fill-b": {
+      "file": "assets/q-fill-b.png"
+    },
+    "q-fill-c": {
+      "file": "assets/q-fill-c.png"
+    },
+    "q-flip-start": {
+      "file": "assets/q-flip-start.png"
+    },
+    "q-flip-a": {
+      "file": "assets/q-flip-a.png"
+    },
+    "q-flip-b": {
+      "file": "assets/q-flip-b.png"
+    },
+    "q-flip-c": {
+      "file": "assets/q-flip-c.png"
+    },
+    "q-known-start": {
+      "file": "assets/q-known-start.png"
+    },
+    "q-known-a": {
+      "file": "assets/q-known-a.png"
+    },
+    "q-known-b": {
+      "file": "assets/q-known-b.png"
+    },
+    "q-known-c": {
+      "file": "assets/q-known-c.png"
+    },
+    "q-add-start": {
+      "file": "assets/q-add-start.png"
+    },
+    "q-add-a": {
+      "file": "assets/q-add-a.png"
+    },
+    "q-add-b": {
+      "file": "assets/q-add-b.png"
+    },
+    "q-add-c": {
+      "file": "assets/q-add-c.png"
+    },
+    "q-move-start": {
+      "file": "assets/q-move-start.png"
+    },
+    "q-move-a": {
+      "file": "assets/q-move-a.png"
+    },
+    "q-move-b": {
+      "file": "assets/q-move-b.png"
+    },
+    "q-move-c": {
+      "file": "assets/q-move-c.png"
+    },
+    "q-fast-start": {
+      "file": "assets/q-fast-start.png"
+    },
+    "q-fast-a": {
+      "file": "assets/q-fast-a.png"
+    },
+    "q-fast-b": {
+      "file": "assets/q-fast-b.png"
+    },
+    "q-fast-c": {
+      "file": "assets/q-fast-c.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "kite-ribbon-workbench",
+      "type": "slide",
+      "title": "纸鸢工坊要打包",
+      "template": "title-picture",
+      "data": {
+        "title": "纸鸢工坊要打包",
+        "picture": "kite-finished",
+        "caption": "两堆纸尾片放在一起"
+      },
+      "script": [
+        {
+          "say": "纸鸢工坊要备尾片。小篮写在前面，还能一下算出一共有几片吗？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "看这只纸鸢。尾巴要用两篮里的纸片接起来。"
+        },
+        {
+          "say": "小满问，小篮先写，先拿哪一篮来凑十呢？"
+        },
+        {
+          "say": "先把两只手当作两个篮子。每只手里都有一堆。"
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "加号让我们把两堆合起来。写在前面的叫第一个加数。"
+        },
+        {
+          "say": "写在后面的叫第二个加数。它们都要算进去。"
+        },
+        {
+          "say": "我们先不急着一片片数，看看哪一篮更快凑到十。"
+        }
+      ]
+    },
+    {
+      "key": "still-make-ten",
+      "type": "slide",
+      "title": "较小的加数写前面，也能凑十",
+      "template": "two-columns",
+      "data": {
+        "title": "较小的加数写前面，也能凑十",
+        "left": {
+          "heading": "先看十格里的空位",
+          "body": "左边四片，右边七片。"
+        },
+        "right": {
+          "heading": "先给右边凑十",
+          "body": "十片再加一片，是十一片。"
+        },
+        "left_picture": "teach-47-before",
+        "right_picture": "teach-47-after"
+      },
+      "script": [
+        {
+          "say": "桌上左边四片，右边七片。哪一边离十近？"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "空格能帮我们看。先找右边还空着的三个格。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "七差三到十。用手指点三个空格，别多拿。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "左边的四片，能拆成要移的三片和留下的一片。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "沿箭头把三片移进右边。三片还是原来的三片。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "现在右边十格全满，左边还有一片。两个数都要数到。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "十加一是十一。四在前面，我们也能给后面的七凑十。"
+        },
+        {
+          "say": "如果先给四凑十，就得从七里移六片，仍会剩一片。"
+        },
+        {
+          "say": "两种搬法都能算。先找空位少的一边，往往更省力。"
+        }
+      ]
+    },
+    {
+      "key": "flip-what-we-know",
+      "type": "slide",
+      "title": "换篮子的顺序，片数没变",
+      "template": "two-columns",
+      "data": {
+        "title": "换篮子的顺序，片数没变",
+        "left": {
+          "heading": "熟悉的算式",
+          "body": "八加三是十一。"
+        },
+        "right": {
+          "heading": "两篮对换",
+          "body": "三加八也是十一。"
+        },
+        "left_picture": "teach-83",
+        "right_picture": "teach-38"
+      },
+      "script": [
+        {
+          "say": "纸篮转了个身。只把两篮换边，和会变吗？"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "想起熟悉的算式。八片先放，三片后放。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "你可以点一点，大篮有八片，小篮有三片。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "八加三等于十一。这是我们已经会算的。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "这次让三片的篮子站前面，八片的篮子站后面。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "橙片还是三片，绿片还是八片。没有添，也没有拿走。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "所以三加八也等于十一。遇到熟悉的旧算式，可以借它。"
+        },
+        {
+          "say": "先看两个加数还在不在，再看先后。不能只看和一样。"
+        },
+        {
+          "say": "接下来找只换先后的图。两堆片数都要一样。"
+        },
+        {
+          "say": "先比原来的两堆。和一样，也可能是另外两堆。"
+        },
+        {
+          "say": "对好底牌旁的落点，再让上面的块落下。"
+        },
+        {
+          "say": "两堆的片数找对了。先后不同，和还一样。"
+        }
+      ]
+    },
+    {
+      "key": "swap-pair-play",
+      "type": "interactive",
+      "title": "交换落块",
+      "page": "swap-pair-play",
+      "widgetType": "game",
+      "startImage": "workshop-stage",
+      "script": [
+        {
+          "say": "工坊的两篮纸片变成落块了。哪一块只是换了两篮先后？"
+        },
+        {
+          "setState": {
+            "pause": true,
+            "demo": true,
+            "level": 1
+          }
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "先看落下来的图。橙片三张，绿片九张。"
+        },
+        {
+          "highlight": "#demo-first-base"
+        },
+        {
+          "say": "找只交换顺序的底牌。两堆的片数都要留下。"
+        },
+        {
+          "say": "先比两堆的数。和相同，也可能是另外两堆。"
+        },
+        {
+          "highlight": "#demo-drop-keys"
+        },
+        {
+          "say": "按左右箭头挪。看浅色落点，到了底牌旁再按落下。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "两块配成一对，右边亮起纸鸢。位置换了，数量没变。"
+        },
+        {
+          "say": "现在从第一块交给你。听清，再找能交换的那张图。"
+        },
+        {
+          "setState": {
+            "pause": false,
+            "demo": false,
+            "level": 1
+          }
+        }
+      ],
+      "gameAudio": {
+        "swap-pair-play-goal": "flip-what-we-know-15",
+        "swap-pair-play-hint": "flip-what-we-know-16",
+        "swap-pair-play-hint2": "flip-what-we-know-17",
+        "swap-pair-play-praise": "flip-what-we-know-18"
+      }
+    },
+    {
+      "key": "one-more",
+      "type": "slide",
+      "title": "只添一片，和多一",
+      "template": "two-columns",
+      "data": {
+        "title": "只添一片，和多一",
+        "left": {
+          "heading": "原来",
+          "body": "橙三片，绿七片。"
+        },
+        "right": {
+          "heading": "再添一片",
+          "body": "橙三片，绿八片。"
+        },
+        "left_picture": "teach-37",
+        "right_picture": "teach-38-more"
+      },
+      "script": [
+        {
+          "say": "这次工坊有新纸片送来。你猜总数会不会变？"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "先看原来的两篮，橙片三张，绿片七张。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "左边三片，右边七片。合起来刚好能装满十格。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "记住这个起点。等会儿我们把左篮原样留下。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "右篮从外面添进一片。左边没有动。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "你看，右篮由七变八，合起来就多了一片。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "和由十变十一。倒回去只拿掉一片，和也就少一。"
+        },
+        {
+          "say": "一边没变，另一边增减一，合起来也跟着增减一。"
+        }
+      ]
+    },
+    {
+      "key": "move-one-only",
+      "type": "slide",
+      "title": "从这篮移到那篮，和没变",
+      "template": "two-columns",
+      "data": {
+        "title": "从这篮移到那篮，和没变",
+        "left": {
+          "heading": "原来",
+          "body": "左三片，右八片。"
+        },
+        "right": {
+          "heading": "从右边移一片",
+          "body": "左四片，右七片。"
+        },
+        "left_picture": "teach-38-move",
+        "right_picture": "teach-38-shift"
+      },
+      "script": [
+        {
+          "say": "要是没来新纸片，只从右边移一片，会怎样呢？"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "先把左三右八这两篮看清。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "八加三我们知道是十一。先把总数十一记在心里。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "从右篮拿起一片。先别把它忘在手里。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "沿箭头放到左篮。这片绿纸还在图里。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "左篮多一，从三变四。右篮少一，从八变七。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "一边添的，正是另一边拿出的。四加七还是十一。"
+        },
+        {
+          "say": "和变不变，要看有没有纸片真的加进来或拿走。"
+        },
+        {
+          "say": "接下来先算货牌的两堆，再找总数相同的站。"
+        },
+        {
+          "say": "只数一篮还不够。两边合起来，再和站上的比。"
+        },
+        {
+          "say": "从货牌背后推。走错一步，点回转按钮。"
+        },
+        {
+          "say": "合起来的片数对了，货牌就能送到合适的站。"
+        }
+      ]
+    },
+    {
+      "key": "sort-by-total",
+      "type": "interactive",
+      "title": "按总数送到站",
+      "page": "sort-by-total",
+      "widgetType": "game",
+      "startImage": "workshop-stage",
+      "script": [
+        {
+          "say": "工坊有一车货要分站。不同写法的货，能送到同一站吗？"
+        },
+        {
+          "setState": {
+            "pause": true,
+            "demo": true,
+            "level": 1
+          }
+        },
+        {
+          "highlight": "#game-target"
+        },
+        {
+          "say": "先数货牌的两堆。第一牌有三片和八片。"
+        },
+        {
+          "highlight": "#demo-first-dock"
+        },
+        {
+          "say": "先找总数相同的站。看一盒十片，再数盒外的散片。"
+        },
+        {
+          "say": "这个站装满十格，盒外还有一片。正好是十一片。"
+        },
+        {
+          "say": "先把两堆合起来算，再比站上的总数。别只看一堆。"
+        },
+        {
+          "highlight": "#demo-push-keys"
+        },
+        {
+          "say": "用箭头开到货牌背后推。回转按钮能撤回一步。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "看小车从哪边推。它要去的站是不是也有十一片？"
+        },
+        {
+          "say": "现在你来推。两种写法只要和相同，就找同一类站。"
+        },
+        {
+          "setState": {
+            "pause": false,
+            "demo": false,
+            "level": 1
+          }
+        }
+      ],
+      "gameAudio": {
+        "sort-by-total-goal": "move-one-only-15",
+        "sort-by-total-hint": "move-one-only-16",
+        "sort-by-total-hint2": "move-one-only-17",
+        "sort-by-total-praise": "move-one-only-18"
+      }
+    },
+    {
+      "key": "explain-own-method",
+      "type": "slide",
+      "title": "你想用哪一种算法",
+      "template": "two-columns",
+      "data": {
+        "title": "你想用哪一种算法",
+        "left": {
+          "heading": "看空位凑十",
+          "body": "五片和六片。"
+        },
+        "right": {
+          "heading": "借熟悉的算式",
+          "body": "六加五是十一。"
+        },
+        "left_picture": "teach-56",
+        "right_picture": "teach-65"
+      },
+      "script": [
+        {
+          "say": "最后一盒尾片，橙片五张，绿片六张。你打算怎么数？"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "如果想凑十，先找右边的空格。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "六差四到十。五能拆成四和一。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "把四片给六，十格装满，再加剩下的一片。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "要是记得六加五，想想把哪两堆换了先后。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "六片和五片都还在。只交换位置，和不变。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "两条路都得到十一。你愿意给家人说说选哪条吗？"
+        },
+        {
+          "say": "看到空格很容易补，可以凑十。想起旧题，就借旧题。"
+        }
+      ]
+    },
+    {
+      "key": "picture-check",
+      "title": "换一批纸片检查",
+      "type": "quiz",
+      "intro": [
+        "工坊换了一批新纸片。听题，选一张图。",
+        "没听清，就点小喇叭再听。"
+      ],
+      "questions": [
+        {
+          "id": "fill-sample-frame",
+          "question": "左四片，右八片。给右边凑十，哪张图移得刚好？",
+          "skill": "较小的加数在前仍能凑十",
+          "answer": [
+            "B"
+          ],
+          "analysis": "右边八片差两片满十。从四片中移两片，左边还剩两片。",
+          "visual": {
+            "kind": "asset",
+            "image": "q-fill-start",
+            "alt": "左边四片橙纸，右边八片绿纸"
+          },
+          "options": {
+            "A": {
+              "label": "移一片，左剩三片，右有九片",
+              "visual": {
+                "kind": "asset",
+                "image": "q-fill-a",
+                "alt": "移一片，左剩三片，右有九片"
+              }
+            },
+            "B": {
+              "label": "移两片，左剩两片，右有十片",
+              "visual": {
+                "kind": "asset",
+                "image": "q-fill-b",
+                "alt": "移两片，左剩两片，右有十片"
+              }
+            },
+            "C": {
+              "label": "未移纸片，左四右八",
+              "visual": {
+                "kind": "asset",
+                "image": "q-fill-c",
+                "alt": "未移纸片，左四右八"
+              }
+            }
+          }
+        },
+        {
+          "id": "flip-tag",
+          "question": "九加四等于十三。哪张新签只换了两堆的先后？",
+          "skill": "从已知交换式推新式",
+          "answer": [
+            "A"
+          ],
+          "analysis": "四片移到前面，九片移到后面，数量没变。四加九也等于十三。",
+          "visual": {
+            "kind": "asset",
+            "image": "q-flip-start",
+            "alt": "九片绿纸在前，四片橙纸在后"
+          },
+          "options": {
+            "A": {
+              "label": "四片橙纸在前，九片绿纸在后",
+              "visual": {
+                "kind": "asset",
+                "image": "q-flip-a",
+                "alt": "四片橙纸在前，九片绿纸在后"
+              }
+            },
+            "B": {
+              "label": "五片橙纸在前，八片绿纸在后",
+              "visual": {
+                "kind": "asset",
+                "image": "q-flip-b",
+                "alt": "五片橙纸在前，八片绿纸在后"
+              }
+            },
+            "C": {
+              "label": "九片绿纸仍在前，四片橙纸仍在后",
+              "visual": {
+                "kind": "asset",
+                "image": "q-flip-c",
+                "alt": "九片绿纸仍在前，四片橙纸仍在后"
+              }
+            }
+          }
+        },
+        {
+          "id": "known-old-card",
+          "question": "二加九还没算。哪张旧图只换先后，就能帮我们？",
+          "skill": "辨认同一对加数的交换式",
+          "answer": [
+            "C"
+          ],
+          "analysis": "二加九与九加二是同一对加数，只换了位置。九加二是十一，所以二加九也是十一。",
+          "visual": {
+            "kind": "asset",
+            "image": "q-known-start",
+            "alt": "两片橙纸在前，九片绿纸在后"
+          },
+          "options": {
+            "A": {
+              "label": "八片绿纸和三片橙纸",
+              "visual": {
+                "kind": "asset",
+                "image": "q-known-a",
+                "alt": "八片绿纸和三片橙纸"
+              }
+            },
+            "B": {
+              "label": "九片绿纸和三片橙纸",
+              "visual": {
+                "kind": "asset",
+                "image": "q-known-b",
+                "alt": "九片绿纸和三片橙纸"
+              }
+            },
+            "C": {
+              "label": "九片绿纸和两片橙纸",
+              "visual": {
+                "kind": "asset",
+                "image": "q-known-c",
+                "alt": "九片绿纸和两片橙纸"
+              }
+            }
+          }
+        },
+        {
+          "id": "one-extra-at-packing",
+          "question": "原来五片和七片。右边又添一片，现在共几片？",
+          "skill": "一边添一片时和多一",
+          "answer": [
+            "C"
+          ],
+          "analysis": "五加七等于十二。左边不变，右边从七变八，只多一片，所以总数是十三。",
+          "visual": {
+            "kind": "asset",
+            "image": "q-add-start",
+            "alt": "原来左五片橙纸，右七片绿纸"
+          },
+          "options": {
+            "A": {
+              "label": "一盒十片和两片散纸",
+              "visual": {
+                "kind": "asset",
+                "image": "q-add-a",
+                "alt": "一盒十片和两片散纸"
+              }
+            },
+            "B": {
+              "label": "一盒十片和四片散纸",
+              "visual": {
+                "kind": "asset",
+                "image": "q-add-b",
+                "alt": "一盒十片和四片散纸"
+              }
+            },
+            "C": {
+              "label": "一盒十片和三片散纸",
+              "visual": {
+                "kind": "asset",
+                "image": "q-add-c",
+                "alt": "一盒十片和三片散纸"
+              }
+            }
+          }
+        },
+        {
+          "id": "one-piece-stays",
+          "question": "从右篮移一片到左篮。新图是哪一张？",
+          "skill": "移动一片时和保持",
+          "answer": [
+            "A"
+          ],
+          "analysis": "右边八片少一成七，左边四片多一成五。总片数还是十二。",
+          "visual": {
+            "kind": "asset",
+            "image": "q-move-start",
+            "alt": "移前左四片橙纸，右八片绿纸"
+          },
+          "options": {
+            "A": {
+              "label": "左四橙一绿共五片，右边七片绿纸",
+              "visual": {
+                "kind": "asset",
+                "image": "q-move-a",
+                "alt": "左四橙一绿共五片，右边七片绿纸"
+              }
+            },
+            "B": {
+              "label": "左五片橙纸，右八片绿纸",
+              "visual": {
+                "kind": "asset",
+                "image": "q-move-b",
+                "alt": "左五片橙纸，右八片绿纸"
+              }
+            },
+            "C": {
+              "label": "左四片橙纸，右七片绿纸",
+              "visual": {
+                "kind": "asset",
+                "image": "q-move-c",
+                "alt": "左四片橙纸，右七片绿纸"
+              }
+            }
+          }
+        },
+        {
+          "id": "choose-the-faster-way",
+          "question": "五片和九片。先给九片凑十，要移几片过去？",
+          "skill": "用空格选择简便凑十",
+          "answer": [
+            "B"
+          ],
+          "analysis": "九差一到十，从五片中移一片，原处留四片。十加四是十四。",
+          "visual": {
+            "kind": "asset",
+            "image": "q-fast-start",
+            "alt": "左有五片橙纸，右九片绿纸并空一格"
+          },
+          "options": {
+            "A": {
+              "label": "箭头上要移两片",
+              "visual": {
+                "kind": "asset",
+                "image": "q-fast-a",
+                "alt": "箭头上要移两片"
+              }
+            },
+            "B": {
+              "label": "箭头上要移一片",
+              "visual": {
+                "kind": "asset",
+                "image": "q-fast-b",
+                "alt": "箭头上要移一片"
+              }
+            },
+            "C": {
+              "label": "箭头上要移三片",
+              "visual": {
+                "kind": "asset",
+                "image": "q-fast-c",
+                "alt": "箭头上要移三片"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "closing",
+      "type": "slide",
+      "title": "两篮纸尾片，怎样算得快",
+      "template": "title-picture",
+      "data": {
+        "title": "两篮纸尾片，怎样算得快",
+        "picture": "kite-finished",
+        "caption": "补满十　换顺序　看总数"
+      },
+      "script": [
+        {
+          "say": "纸鸢做好啦。下次看到两篮纸片，你会先看哪里？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "先找离十近的一堆。数清差几片，再从另一堆拿。"
+        },
+        {
+          "say": "凑成十以后，别漏掉原来那边留下的纸片。"
+        },
+        {
+          "say": "知道一个大数在前的算式，也能把两个加数对换。"
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "换位置没有增减，和不变。只添一片，和才多一。"
+        },
+        {
+          "say": "从一边挪一片到另一边，两堆样子变了，总片数没变。"
+        },
+        {
+          "say": "回家和家人各翻一张数字卡。摆出来，说说你怎么算。"
+        },
+        {
+          "say": "然后交换两张卡，再移一片，看看两次总数。"
+        }
+      ]
+    }
+  ]
+}

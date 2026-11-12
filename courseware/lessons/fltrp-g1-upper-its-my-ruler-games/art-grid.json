@@ -1,0 +1,71 @@
+{
+  "schemaVersion": "mira.courseware.lesson-art-grid.v1",
+  "sourceImages": {
+    "workshop-sprite-sheet": {
+      "columns": 4,
+      "rows": 4,
+      "treatAsSprite": true,
+      "cells": [
+        "ruler",
+        "eraser",
+        "pencil-case",
+        "crayon",
+        "schoolbag",
+        "desk",
+        "book",
+        "chair",
+        "wood-pencil",
+        "ink-pen",
+        "owner-violet",
+        "owner-teal",
+        "owner-peach",
+        "delivery-trolley",
+        "paint-roller",
+        "drawn-eraser"
+      ]
+    },
+    "stationery-fair-quiz-sheet": {
+      "columns": 4,
+      "rows": 3,
+      "treatAsSprite": false,
+      "cells": [
+        "quiz-pencil-case",
+        "quiz-eraser",
+        "quiz-ruler",
+        "quiz-crayon",
+        "quiz-owner-braids",
+        "quiz-owner-orange",
+        "quiz-owner-purple",
+        "quiz-book-blue",
+        "quiz-book-red",
+        "quiz-pencil",
+        "quiz-pen",
+        "quiz-crayon-green"
+      ]
+    }
+  },
+  "cropMethod": "按原图实际主体和留白量测边界，以 asset-provenance.json 记录的坐标为准，避免理论等分线截掉尺角或头发。普通精灵只去除与边缘连通的近白背景，橡皮使用更高阈值保留白色主体。将原纸面旋正后裁出完整橡皮草图，保留原底图和操作记录。",
+  "derivedBoards": {
+    "colour-practice-board": [
+      "schoolbag",
+      "desk",
+      "wood-pencil",
+      "book",
+      "ink-pen"
+    ]
+  },
+  "derivedPairs": {
+    "quiz-braids-eraser": [
+      "quiz-owner-braids",
+      "quiz-eraser"
+    ],
+    "quiz-orange-ruler": [
+      "quiz-owner-orange",
+      "quiz-ruler"
+    ],
+    "quiz-braids-ruler": [
+      "quiz-owner-braids",
+      "quiz-ruler"
+    ]
+  }
+}

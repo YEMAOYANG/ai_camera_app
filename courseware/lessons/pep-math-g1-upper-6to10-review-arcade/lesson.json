@@ -1,0 +1,1330 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "整理和复习",
+  "description": "在修理站数物件、分合数量、整理10以内加减法算式，用两个方向补回缺卡。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小数老师",
+      "role": "teacher",
+      "gender": "male",
+      "voice": "Ethan",
+      "avatar": "/teachers/ashu-math-v1.png",
+      "color": "#437763",
+      "persona": "用一一对应、分合和算式讲清每一步。"
+    }
+  },
+  "images": {
+    "toolbox": {
+      "file": "assets/toolbox.png"
+    },
+    "number-line": {
+      "file": "assets/number-line.png"
+    },
+    "compare-dots": {
+      "file": "assets/compare-dots.png"
+    },
+    "split-ten": {
+      "file": "assets/split-ten.png"
+    },
+    "remove-ten": {
+      "file": "assets/remove-ten.png"
+    },
+    "sum-row": {
+      "file": "assets/sum-row.png"
+    },
+    "sum-column": {
+      "file": "assets/sum-column.png"
+    },
+    "subtract-row": {
+      "file": "assets/subtract-row.png"
+    },
+    "zero-pair": {
+      "file": "assets/zero-pair.png"
+    },
+    "choose-add": {
+      "file": "assets/choose-add.png"
+    },
+    "choose-subtract": {
+      "file": "assets/choose-subtract.png"
+    },
+    "two-step-board": {
+      "file": "assets/two-step-board.png"
+    },
+    "q-next-stop": {
+      "file": "assets/q-next-stop.png"
+    },
+    "q-next-stop-a": {
+      "file": "assets/q-next-stop-a.png"
+    },
+    "q-next-stop-b": {
+      "file": "assets/q-next-stop-b.png"
+    },
+    "q-next-stop-c": {
+      "file": "assets/q-next-stop-c.png"
+    },
+    "q-seventh-peg": {
+      "file": "assets/q-seventh-peg.png"
+    },
+    "q-seventh-peg-a": {
+      "file": "assets/q-seventh-peg-a.png"
+    },
+    "q-seventh-peg-b": {
+      "file": "assets/q-seventh-peg-b.png"
+    },
+    "q-seventh-peg-c": {
+      "file": "assets/q-seventh-peg-c.png"
+    },
+    "q-part-of-nine": {
+      "file": "assets/q-part-of-nine.png"
+    },
+    "q-part-of-nine-a": {
+      "file": "assets/q-part-of-nine-a.png"
+    },
+    "q-part-of-nine-b": {
+      "file": "assets/q-part-of-nine-b.png"
+    },
+    "q-part-of-nine-c": {
+      "file": "assets/q-part-of-nine-c.png"
+    },
+    "q-missing-sum": {
+      "file": "assets/q-missing-sum.png"
+    },
+    "q-missing-sum-a": {
+      "file": "assets/q-missing-sum-a.png"
+    },
+    "q-missing-sum-b": {
+      "file": "assets/q-missing-sum-b.png"
+    },
+    "q-missing-sum-c": {
+      "file": "assets/q-missing-sum-c.png"
+    },
+    "q-less-by-one": {
+      "file": "assets/q-less-by-one.png"
+    },
+    "q-less-by-one-a": {
+      "file": "assets/q-less-by-one-a.png"
+    },
+    "q-less-by-one-b": {
+      "file": "assets/q-less-by-one-b.png"
+    },
+    "q-less-by-one-c": {
+      "file": "assets/q-less-by-one-c.png"
+    },
+    "q-tool-bag": {
+      "file": "assets/q-tool-bag.png"
+    },
+    "q-tool-bag-a": {
+      "file": "assets/q-tool-bag-a.png"
+    },
+    "q-tool-bag-b": {
+      "file": "assets/q-tool-bag-b.png"
+    },
+    "q-tool-bag-c": {
+      "file": "assets/q-tool-bag-c.png"
+    },
+    "q-two-moves": {
+      "file": "assets/q-two-moves.png"
+    },
+    "q-two-moves-a": {
+      "file": "assets/q-two-moves-a.png"
+    },
+    "q-two-moves-b": {
+      "file": "assets/q-two-moves-b.png"
+    },
+    "q-two-moves-c": {
+      "file": "assets/q-two-moves-c.png"
+    },
+    "clouds": {
+      "file": "assets/clouds.png"
+    },
+    "garden": {
+      "file": "assets/garden.png"
+    },
+    "kiln": {
+      "file": "assets/kiln.png"
+    },
+    "rabbit-ready": {
+      "file": "assets/rabbit-ready.png"
+    },
+    "rabbit-run": {
+      "file": "assets/rabbit-run.png"
+    },
+    "rabbit-jump": {
+      "file": "assets/rabbit-jump.png"
+    },
+    "orchard-cart": {
+      "file": "assets/orchard-cart.png"
+    },
+    "orchard-apple": {
+      "file": "assets/orchard-apple.png"
+    },
+    "sticker": {
+      "file": "assets/sticker.png"
+    },
+    "sum-diagonal": {
+      "file": "assets/sum-diagonal.png"
+    },
+    "write-ten-one": {
+      "file": "assets/write-ten-one.png"
+    },
+    "write-ten-complete": {
+      "file": "assets/write-ten-complete.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "open-box",
+      "type": "slide",
+      "title": "工具箱里少了哪张卡？",
+      "template": "title-picture",
+      "data": {
+        "title": "工具箱里少了哪张卡？",
+        "picture": "toolbox",
+        "caption": "数清楚　算得对　用得上"
+      },
+      "script": [
+        {
+          "say": "咔嗒，工具箱打开了。怎么有一张卡反扣着？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "这些卡原来是有位置的。一张翻了面，谁能把它找回来？"
+        },
+        {
+          "say": "先别翻。想一想，能从旁边的卡知道它是谁吗？"
+        },
+        {
+          "say": "学过的办法，就像箱里的三件小工具。我们先拿哪一件？"
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "先数清楚，物件和数才能对上。再整理算式，就容易看出规律。"
+        },
+        {
+          "say": "最后遇到真的问题，还要挑有用的数。三件工具会互相帮忙。"
+        },
+        {
+          "say": "例如，要知道两堆有几个，得先数出每一堆，才能合起来算。"
+        },
+        {
+          "say": "等这三件工具都用过，我们再来打开那张反扣的卡。"
+        }
+      ]
+    },
+    {
+      "key": "number-path",
+      "type": "slide",
+      "title": "一共几个？排第几个？",
+      "template": "two-columns",
+      "data": {
+        "title": "一共几个？排第几个？",
+        "left": {
+          "heading": "数一数，排一排",
+          "body": "一共有几个，和排在第几，是两件事。"
+        },
+        "right": {
+          "heading": "两排一一对齐",
+          "body": "9＞7　　7＜9"
+        },
+        "left_picture": "number-line",
+        "right_picture": "compare-dots"
+      },
+      "script": [
+        {
+          "say": "工具箱边上有一排数字。你能从零接着往后念吗？"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "先想第六个和一共有六个，意思一样吗？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "向右每一格大一。跟我念，零、一、二、三、四、五、六、七、八、九、十。"
+        },
+        {
+          "say": "看下方这排六枚圆片。沿箭头从左数，第四枚有个橙圈。"
+        },
+        {
+          "say": "第四只说哪一枚。六说这排一共有多少枚，整排都数。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "换一头开始，位置可能会变。圆片没挪，整排仍有六枚。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "两排圆片，要怎样看出哪排更多？"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "两排从同一头对齐，一个对一个。下面有两枚没配上。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "九比七多，所以九大于七。尖尖的一头对较小的七。"
+        },
+        {
+          "say": "倒着数就往小的一边走。刚才数到的十，还能写下来。"
+        },
+        {
+          "say": "从六出发，往大的一边挨着跳，到九停下。"
+        },
+        {
+          "say": "从十出发，一个一个往小的数，到六停下。"
+        },
+        {
+          "say": "从五出发，往大的一边挨着跳，一直跳到十。"
+        },
+        {
+          "say": "脚踩空了。回到刚才那块，再想下一个数。"
+        },
+        {
+          "say": "看看亮起的落脚处。认准数字，再按跳跃。"
+        },
+        {
+          "say": "每次都接上了下一个数，这一段走完啦！"
+        }
+      ]
+    },
+    {
+      "key": "write-ten",
+      "type": "slide",
+      "title": "写十，要用几个格？",
+      "template": "two-columns",
+      "data": {
+        "title": "写十，要用几个格？",
+        "left": {
+          "heading": "找左半格",
+          "body": "先从上边偏右斜向左下"
+        },
+        "right": {
+          "heading": "再找右半格",
+          "body": "左1右0，同一个田字格"
+        },
+        "left_picture": "write-ten-one",
+        "right_picture": "write-ten-complete"
+      },
+      "script": [
+        {
+          "say": "数到最后是十。写十，要给它几格纸呢？"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "虚线把一个田字格分成左右两半。先指一指左半格。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "看橙色的起笔点。先在左半格写一。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "从左半格上边偏右起笔，斜着写到左下。"
+        },
+        {
+          "say": "写完一先停一下。右半格空着，接下来该写什么？"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "右半格写零。从右上起笔，沿右边向下绕一圈。"
+        },
+        {
+          "say": "绕回起笔的地方，把圈合上。左边一，右边零。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "两个数字挨着，占同一个田字格，读作十。"
+        },
+        {
+          "say": "用手指跟箭头比划一遍。纸上写得怎样，请家人帮你看。"
+        },
+        {
+          "say": "十这张卡写好了。我们带上数字去走云梯！"
+        }
+      ]
+    },
+    {
+      "key": "cloud-route",
+      "type": "interactive",
+      "title": "云梯按数序跳",
+      "page": "cloud-route",
+      "widgetType": "game",
+      "startImage": "clouds",
+      "script": [
+        {
+          "say": "云梯上的数字不是随便排的。兔子该怎么选下一块？"
+        },
+        {
+          "setState": {
+            "pause": true,
+            "demo": true,
+            "level": 1
+          }
+        },
+        {
+          "highlight": "#demo-first-goal"
+        },
+        {
+          "say": "听方向。往大的数，就是每一跳只比刚才大一。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "兔子先站稳。看脚下的六，抬一根手指想下一格。"
+        },
+        {
+          "highlight": "#demo-first-target"
+        },
+        {
+          "say": "脚落在连续的下一块才算。远处那个数再等等。"
+        },
+        {
+          "say": "我用右箭头往这边走，同时按跳跃，先试一次。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "看，落脚就停。踩错要回到刚才的落脚处。"
+        },
+        {
+          "say": "换你来。听清这一关往大数还是往小数跳，慢慢来。"
+        },
+        {
+          "setState": {
+            "pause": false,
+            "demo": false,
+            "level": 1
+          }
+        }
+      ],
+      "gameAudio": {
+        "route-up": "number-path-17",
+        "route-down": "number-path-18",
+        "route-long": "number-path-19",
+        "route-hint": "number-path-20",
+        "route-help": "number-path-21",
+        "route-good": "number-path-22"
+      }
+    },
+    {
+      "key": "part-whole",
+      "type": "slide",
+      "title": "十枚圆片分两盘",
+      "template": "two-columns",
+      "data": {
+        "title": "十枚圆片分两盘",
+        "left": {
+          "heading": "两部分合起来",
+          "body": "6＋4＝10　　4＋6＝10"
+        },
+        "right": {
+          "heading": "知道总数，找另一部分",
+          "body": "10－6＝4　　10－4＝6"
+        },
+        "left_picture": "split-ten",
+        "right_picture": "remove-ten"
+      },
+      "script": [
+        {
+          "say": "桌上有十枚圆片，要分到两盘。只有一种分法吗？"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "先想一想，盘子变了，桌上的圆片会变多吗？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "左盘放六枚，右盘放四枚。每一枚只放在一只盘里。"
+        },
+        {
+          "say": "从右盘挪一枚给左盘，就变成七和三。一枚也没有少。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "还看六和四。先数六再数四，或者先数四，合起来都是十。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "如果只知道总共有十，左盘有六，右盘怎样找？"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "想成从十里拿开六枚。没有拿开的四枚就是另一部分。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "要是从十里拿开四枚，就剩六枚。看拿开的是哪一组。"
+        },
+        {
+          "say": "盘里是圆片，果园里也能这样分。整串果子不能拆开。"
+        },
+        {
+          "say": "两格和四格的篮，一起装六个果子。两篮都要刚好装满。"
+        },
+        {
+          "say": "三格和五格的篮，一起装八个。想想哪两串能装在同一篮。"
+        },
+        {
+          "say": "四格和六格的篮，一起装十个。先看空格，再接下一串。"
+        },
+        {
+          "say": "看看发亮的落点。把小车开到果子下面。"
+        },
+        {
+          "say": "一串要一起进一个篮。空格不够就换篮，再试一次。"
+        },
+        {
+          "say": "两篮都填满了，刚才的分法正好！"
+        }
+      ]
+    },
+    {
+      "key": "orchard-sort",
+      "type": "interactive",
+      "title": "整串果子进双篮",
+      "page": "orchard-sort",
+      "widgetType": "game",
+      "startImage": "garden",
+      "script": [
+        {
+          "say": "一串果子要落下来了。怎样接住，又能把两只篮填满？"
+        },
+        {
+          "setState": {
+            "pause": true,
+            "demo": true,
+            "level": 1
+          }
+        },
+        {
+          "highlight": "#demo-first-goal"
+        },
+        {
+          "say": "看篮里的空格，一格只放一个果子。整串不能拆开。"
+        },
+        {
+          "highlight": "#demo-first-target"
+        },
+        {
+          "say": "我先数这一串，再用眼睛找它下面发亮的落点。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "左右箭头移小车，双箭头换篮。看哪个篮的边框亮着。"
+        },
+        {
+          "say": "我对准落点，先接一串。空格够，这一串就能进去。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "看，它停在这里。下一串进哪边，要重新数空格。"
+        },
+        {
+          "say": "现在轮到你。先听本关的任务，再看篮子和果串。"
+        },
+        {
+          "setState": {
+            "pause": false,
+            "demo": false,
+            "level": 1
+          }
+        }
+      ],
+      "gameAudio": {
+        "orchard-six": "part-whole-16",
+        "orchard-eight": "part-whole-17",
+        "orchard-ten": "part-whole-18",
+        "orchard-hint": "part-whole-19",
+        "orchard-help": "part-whole-20",
+        "orchard-good": "part-whole-21"
+      }
+    },
+    {
+      "key": "add-table",
+      "type": "slide",
+      "title": "缺的加法卡在哪里？",
+      "template": "two-columns",
+      "data": {
+        "title": "缺的加法卡在哪里？",
+        "left": {
+          "heading": "横着找",
+          "body": "同一行合起来是9。"
+        },
+        "right": {
+          "heading": "竖着核对",
+          "body": "第二个数不变。"
+        },
+        "left_picture": "sum-row",
+        "right_picture": "sum-column"
+      },
+      "script": [
+        {
+          "say": "找到了反扣卡的空位。只看它左边，就能确定吗？"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "先横着读。猜猜这一行的卡，为什么会排在一起？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "这一行都得九。看八加一，再看七加二，和还是九。"
+        },
+        {
+          "say": "把前一堆的一枚移到后一堆。前面少一，后面多一。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "七加二的右边，要前面再少一，后面再多一。就是六加三。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "只靠一行心里还没底。我们从上往下再试一次。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "同一列后面的三不变。上面五加三，下面七加三。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "中间前面是六。两条路都找到六加三，刚好补在空位。"
+        },
+        {
+          "say": "如果把六和三交换位置，还是这些圆片，所以和仍是九。"
+        }
+      ]
+    },
+    {
+      "key": "subtract-table",
+      "type": "slide",
+      "title": "减法卡怎么排？",
+      "template": "two-columns",
+      "data": {
+        "title": "减法卡怎么排？",
+        "left": {
+          "heading": "横着看同一行",
+          "body": "总数一样，每次多减一，剩下就少一。"
+        },
+        "right": {
+          "heading": "两张零卡",
+          "body": "一个也没添，一个也没拿走。"
+        },
+        "left_picture": "subtract-row",
+        "right_picture": "zero-pair"
+      },
+      "script": [
+        {
+          "say": "减法卡也有自己的位置。每次多拿走一枚，会怎样？"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "先把开始都是八枚的卡排在一起。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "八减一剩七。八减二多拿走一枚，就只剩六。"
+        },
+        {
+          "say": "从八开始不变，接着多拿走一枚。八减三就剩五。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "沿这行往右看，拿走的越来越多，剩下的越来越少。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "加法表和减法表的开头都有零。它们都是什么意思？"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "看这两张。五加零，一枚也没添。五减零，一枚也没拿。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "所以两张都还是五。这里的零表示没有添或没有拿走。"
+        },
+        {
+          "say": "算式卡和它的得数可以配一对。待会儿我们拿到工坊试试。"
+        },
+        {
+          "say": "两块数字合起来等于八，落在同一行挨着才消掉。"
+        },
+        {
+          "say": "先算落块上的加法。把它放在相同得数的隔壁。"
+        },
+        {
+          "say": "先看是加还是减，再算得数。把落块放在得数隔壁。"
+        },
+        {
+          "say": "先算清两块的关系。看淡淡的影子，想想落在哪儿。"
+        },
+        {
+          "say": "要在同一行相邻。卡在上面了，换一处再试。"
+        },
+        {
+          "say": "消掉啦！这张卡和旁边的卡正好配得上。"
+        }
+      ]
+    },
+    {
+      "key": "add-diagonal",
+      "type": "slide",
+      "title": "沿斜线还能发现什么？",
+      "template": "picture-points",
+      "data": {
+        "title": "沿斜线还能发现什么？",
+        "picture": "sum-diagonal",
+        "points": [
+          "第一个加数都是3",
+          "第二个加数每次多1",
+          "和也每次多1"
+        ]
+      },
+      "script": [
+        {
+          "say": "看，算式卡也能沿斜线排队。哪一个数一直没动？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "从上往右下，沿着浅黄色的三张卡找一找。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "三加四、三加五、三加六。前面的数一直是三。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "后面的数是四、五、六。每往下一张，就多添一枚。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "三没变，另一部分多一枚，和也多一。七、八、九。"
+        },
+        {
+          "say": "如果接着排下一行，猜猜三加几会接在斜线上？"
+        },
+        {
+          "say": "接着是三加七，得十。要横看和是十，也能找到这张卡。"
+        },
+        {
+          "say": "再把和是十的卡一张张排好。这张表就整理到十了。"
+        }
+      ]
+    },
+    {
+      "key": "tile-fit",
+      "type": "interactive",
+      "title": "落块配对工坊",
+      "page": "tile-fit",
+      "widgetType": "game",
+      "startImage": "kiln",
+      "script": [
+        {
+          "say": "一张数字卡往下掉了。它要靠在哪一块旁边呢？"
+        },
+        {
+          "setState": {
+            "pause": true,
+            "demo": true,
+            "level": 1
+          }
+        },
+        {
+          "highlight": "#demo-first-goal"
+        },
+        {
+          "say": "先听目标，再算。要凑八，就找两数合起来是八。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "把眼睛放在落下来的这块上，先算它还差多少。"
+        },
+        {
+          "highlight": "#demo-first-target"
+        },
+        {
+          "say": "对着下面这一排找。相邻就是在同一行的隔壁。"
+        },
+        {
+          "say": "我用左右箭头挪，瞧见淡影对齐，再按快落，试一次。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "配上了就消掉。压在上面，或者算不对，都不能消。"
+        },
+        {
+          "say": "现在换你。每次先听目标，算清楚再决定落在哪里。"
+        },
+        {
+          "setState": {
+            "pause": false,
+            "demo": false,
+            "level": 1
+          }
+        }
+      ],
+      "gameAudio": {
+        "tiles-eight": "subtract-table-16",
+        "tiles-add": "subtract-table-17",
+        "tiles-mix": "subtract-table-18",
+        "tiles-hint": "subtract-table-19",
+        "tiles-help": "subtract-table-20",
+        "tiles-good": "subtract-table-21"
+      }
+    },
+    {
+      "key": "pick-clues",
+      "type": "slide",
+      "title": "修理站该数哪一盒？",
+      "template": "two-columns",
+      "data": {
+        "title": "修理站该数哪一盒？",
+        "left": {
+          "heading": "求合起来有几个",
+          "body": "3＋5＝8"
+        },
+        "right": {
+          "heading": "知道一共，求还剩几个",
+          "body": "7－2＝5"
+        },
+        "left_picture": "choose-add",
+        "right_picture": "choose-subtract"
+      },
+      "script": [
+        {
+          "say": "修理站放了方片和圆片。小满只问方片，该数谁？"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "题目问两盘一共有几枚方片，先用手指找方片。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "左边三枚，右边五枚。另有几枚圆片，先不管它们。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "三和五都是方片，要合在一起，就用加法。一共八枚。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "现在有七枚方片，取走两枚。还剩多少？先想用什么算。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "图上七枚是原来一共有的。打叉的两枚已经拿走。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "从七里去掉两枚，用减法，剩五枚。没打叉的也数得出。"
+        },
+        {
+          "say": "最后看看问的是什么。加进去和拿走，图上的动作不一样。"
+        }
+      ]
+    },
+    {
+      "key": "two-steps",
+      "type": "slide",
+      "title": "小车两次进出",
+      "template": "picture-points",
+      "data": {
+        "title": "小车两次进出",
+        "picture": "two-step-board",
+        "points": [
+          "4＋2＋3＝9",
+          "9－1－3＝5",
+          "6＋2－4＝4"
+        ]
+      },
+      "script": [
+        {
+          "say": "小车带着圆片进站，一会儿又出站。我们先算哪次？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "看图里三个画面。沿箭头从左往右，事情就是这样发生的。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "原来有四枚。先添两枚，成了六枚。再添三枚，成了九枚。"
+        },
+        {
+          "say": "先把前两个数合起来，再让六去和后面的三合起来。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "有九枚，先拿走一枚，剩八枚。再拿走三枚，就剩五枚。"
+        },
+        {
+          "say": "第二次只能从第一次剩下的八枚里拿，不能从九枚再拿。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "有六枚，先添两枚是八。再从八里拿走四枚，剩四枚。"
+        },
+        {
+          "say": "有加有减，也按画面发生的先后算。从左往右，一步一步。"
+        },
+        {
+          "say": "换成题图时，用手指顺着箭头走，再选你的答案。"
+        }
+      ]
+    },
+    {
+      "key": "picture-check",
+      "type": "quiz",
+      "title": "换一套工具来检查",
+      "intro": [
+        "换几张新的图，试试刚学的办法。听题，看图，选一张。",
+        "没听清可以点小喇叭。选完听一听怎么算。"
+      ],
+      "questions": [
+        {
+          "id": "next-stop",
+          "question": "从六起，一个一个倒着数。空站上该放几？",
+          "skill": "连续倒数与缺数",
+          "answer": [
+            "A"
+          ],
+          "analysis": "六、五、四、三，一个比前一个小一，空站是四。",
+          "visual": {
+            "kind": "asset",
+            "image": "q-next-stop",
+            "alt": "从左往右显示六、五、空格、三"
+          },
+          "options": {
+            "A": {
+              "label": "四",
+              "visual": {
+                "kind": "asset",
+                "image": "q-next-stop-a",
+                "alt": "四"
+              }
+            },
+            "B": {
+              "label": "七",
+              "visual": {
+                "kind": "asset",
+                "image": "q-next-stop-b",
+                "alt": "七"
+              }
+            },
+            "C": {
+              "label": "二",
+              "visual": {
+                "kind": "asset",
+                "image": "q-next-stop-c",
+                "alt": "二"
+              }
+            }
+          }
+        },
+        {
+          "id": "seventh-peg",
+          "question": "按箭头，从右边数。哪张图圈的是第七个？",
+          "skill": "区分数量与指定方向的序数",
+          "answer": [
+            "B"
+          ],
+          "analysis": "最右边是第一个，从右往左数到七，圈左起第三个。",
+          "visual": {
+            "kind": "asset",
+            "image": "q-seventh-peg",
+            "alt": "一排九个圆片，箭头从右指向左"
+          },
+          "options": {
+            "A": {
+              "label": "从左起第七个",
+              "visual": {
+                "kind": "asset",
+                "image": "q-seventh-peg-a",
+                "alt": "从左起第七个"
+              }
+            },
+            "B": {
+              "label": "从右起第七个",
+              "visual": {
+                "kind": "asset",
+                "image": "q-seventh-peg-b",
+                "alt": "从右起第七个"
+              }
+            },
+            "C": {
+              "label": "从右起第六个",
+              "visual": {
+                "kind": "asset",
+                "image": "q-seventh-peg-c",
+                "alt": "从右起第六个"
+              }
+            }
+          }
+        },
+        {
+          "id": "part-of-nine",
+          "question": "九格里放四枚绿片，空格刚好还要放几枚？",
+          "skill": "用图找缺少的部分",
+          "answer": [
+            "C"
+          ],
+          "analysis": "九分成四和五。每个空格一枚，还要放五枚。",
+          "visual": {
+            "kind": "asset",
+            "image": "q-part-of-nine",
+            "alt": "九个格子，前四格有绿片"
+          },
+          "options": {
+            "A": {
+              "label": "四枚",
+              "visual": {
+                "kind": "asset",
+                "image": "q-part-of-nine-a",
+                "alt": "四枚"
+              }
+            },
+            "B": {
+              "label": "六枚",
+              "visual": {
+                "kind": "asset",
+                "image": "q-part-of-nine-b",
+                "alt": "六枚"
+              }
+            },
+            "C": {
+              "label": "五枚",
+              "visual": {
+                "kind": "asset",
+                "image": "q-part-of-nine-c",
+                "alt": "五枚"
+              }
+            }
+          }
+        },
+        {
+          "id": "missing-sum",
+          "question": "横着都得八，竖着后面都是二。空位是哪张卡？",
+          "skill": "利用两种算式表规律补卡",
+          "answer": [
+            "B"
+          ],
+          "analysis": "空位也得八，第二个数是二。六加二等于八。",
+          "visual": {
+            "kind": "asset",
+            "image": "q-missing-sum",
+            "alt": "同和行有七加一和空格，竖列上下是五加二与七加二"
+          },
+          "options": {
+            "A": {
+              "label": "五加二",
+              "visual": {
+                "kind": "asset",
+                "image": "q-missing-sum-a",
+                "alt": "五加二"
+              }
+            },
+            "B": {
+              "label": "六加二",
+              "visual": {
+                "kind": "asset",
+                "image": "q-missing-sum-b",
+                "alt": "六加二"
+              }
+            },
+            "C": {
+              "label": "六加三",
+              "visual": {
+                "kind": "asset",
+                "image": "q-missing-sum-c",
+                "alt": "六加三"
+              }
+            }
+          }
+        },
+        {
+          "id": "less-by-one",
+          "question": "十减四和十减三，哪张符号卡能放在两式中间？",
+          "skill": "比较同一总数的两个减法得数",
+          "answer": [
+            "C"
+          ],
+          "analysis": "十减四剩六，十减三剩七。六比七小，开口朝右。",
+          "visual": {
+            "kind": "asset",
+            "image": "q-less-by-one",
+            "alt": "左边十减四，右边十减三，中间空格"
+          },
+          "options": {
+            "A": {
+              "label": "大于号",
+              "visual": {
+                "kind": "asset",
+                "image": "q-less-by-one-a",
+                "alt": "大于号"
+              }
+            },
+            "B": {
+              "label": "等号",
+              "visual": {
+                "kind": "asset",
+                "image": "q-less-by-one-b",
+                "alt": "等号"
+              }
+            },
+            "C": {
+              "label": "小于号",
+              "visual": {
+                "kind": "asset",
+                "image": "q-less-by-one-c",
+                "alt": "小于号"
+              }
+            }
+          }
+        },
+        {
+          "id": "tool-bag",
+          "question": "图上取走两枚三角片。求还剩几枚三角片，该怎么列式？",
+          "skill": "选择相关条件与减法",
+          "answer": [
+            "A"
+          ],
+          "analysis": "原来有九枚三角片，取走两枚。圆片不用数，所以九减二。",
+          "visual": {
+            "kind": "asset",
+            "image": "q-tool-bag",
+            "alt": "九枚三角片中两枚打叉，旁边另有四枚圆片"
+          },
+          "options": {
+            "A": {
+              "label": "九减二",
+              "visual": {
+                "kind": "asset",
+                "image": "q-tool-bag-a",
+                "alt": "九减二"
+              }
+            },
+            "B": {
+              "label": "二加七",
+              "visual": {
+                "kind": "asset",
+                "image": "q-tool-bag-b",
+                "alt": "二加七"
+              }
+            },
+            "C": {
+              "label": "四减二",
+              "visual": {
+                "kind": "asset",
+                "image": "q-tool-bag-c",
+                "alt": "四减二"
+              }
+            }
+          }
+        },
+        {
+          "id": "two-moves",
+          "question": "先拿走三枚，再放进五枚。最后一共有几枚？",
+          "skill": "依时间顺序完成两步加减",
+          "answer": [
+            "B"
+          ],
+          "analysis": "先用七减三得到四，再用四加五得到九。",
+          "visual": {
+            "kind": "asset",
+            "image": "q-two-moves",
+            "alt": "第一格七枚，中间拿走三枚，最后放进五枚"
+          },
+          "options": {
+            "A": {
+              "label": "五",
+              "visual": {
+                "kind": "asset",
+                "image": "q-two-moves-a",
+                "alt": "五"
+              }
+            },
+            "B": {
+              "label": "九",
+              "visual": {
+                "kind": "asset",
+                "image": "q-two-moves-b",
+                "alt": "九"
+              }
+            },
+            "C": {
+              "label": "四",
+              "visual": {
+                "kind": "asset",
+                "image": "q-two-moves-c",
+                "alt": "四"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "close-box",
+      "type": "slide",
+      "title": "把方法放回工具箱",
+      "template": "summary",
+      "data": {
+        "title": "把方法放回工具箱",
+        "items": [
+          "数一数，比一比",
+          "横看、竖看，补回算式卡",
+          "先找条件，再一步步算",
+          "和家人摆一摆，讲一讲"
+        ]
+      },
+      "script": [
+        {
+          "say": "工具箱终于合上了。那张反扣的卡，刚才靠什么找回来？"
+        },
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "先用数。总共有几个和排第几，得听清问哪一件事。"
+        },
+        {
+          "say": "要比较两组，先让它们一个对一个。没配上的那排比较多。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "再用算式表。横着知道和，竖着找到不变的数，两边对一对。"
+        },
+        {
+          "say": "减法表里，开头一样时，多减一，结果就少一。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "解决问题，先挑要用的条件。合起来加，拿走用减。"
+        },
+        {
+          "say": "遇到两步，照发生的先后算。先算出的数要接着用。"
+        },
+        {
+          "spotlight": "item-4"
+        },
+        {
+          "say": "回家找不超过十枚纽扣，和家人分成两部分，交换位置看看。"
+        },
+        {
+          "say": "再从九枚开始，拿走一枚、两枚、三枚。讲讲剩下怎样变。"
+        },
+        {
+          "say": "家人听你说理由，帮你把这个新发现记在成长记录里。"
+        }
+      ]
+    }
+  ]
+}

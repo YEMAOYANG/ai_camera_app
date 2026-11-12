@@ -1,0 +1,1214 @@
+{
+  "schemaVersion": "mira.courseware.asset-sources.v1",
+  "assets": {
+    "festival-open": {
+      "file": "assets/festival-open.png",
+      "sha256": "e6166141d5726ba5fc953c2e7ded52aae20f30871d0f5e59b844b3a7b3b6dc32",
+      "bytes": 939864,
+      "pixels": [
+        1152,
+        648
+      ],
+      "mode": "RGB",
+      "kind": "codex-builtin-imagegen",
+      "source": "festival-environments-original",
+      "crop": [
+        0,
+        0,
+        836,
+        470
+      ],
+      "sourceSha256": "d376394f8e9cbd1ea27c67edac04ae5b55cec58870294d4063714751df7bad60",
+      "usedBy": [
+        "open"
+      ],
+      "derivation": "按图集象限精确裁切，再居中定尺寸为 1152×648。"
+    },
+    "tile-workbench": {
+      "file": "assets/tile-workbench.png",
+      "sha256": "351ffd8e6327d273232e1e4ff0efa32263eb9231a17a09d02ed6c159ea3eb9e6",
+      "bytes": 877799,
+      "pixels": [
+        1152,
+        648
+      ],
+      "mode": "RGB",
+      "kind": "codex-builtin-imagegen",
+      "source": "festival-environments-original",
+      "crop": [
+        836,
+        0,
+        1672,
+        470
+      ],
+      "sourceSha256": "d376394f8e9cbd1ea27c67edac04ae5b55cec58870294d4063714751df7bad60",
+      "usedBy": [
+        "match-workbench"
+      ],
+      "derivation": "按图集象限精确裁切，再居中定尺寸为 1152×648。"
+    },
+    "courier-yard": {
+      "file": "assets/courier-yard.png",
+      "sha256": "33a057de2bca84e914173b7918521177d86fbbbdb91cde5e12bd75230c528e1b",
+      "bytes": 952471,
+      "pixels": [
+        1152,
+        648
+      ],
+      "mode": "RGB",
+      "kind": "codex-builtin-imagegen",
+      "source": "festival-environments-original",
+      "crop": [
+        0,
+        470,
+        836,
+        941
+      ],
+      "sourceSha256": "d376394f8e9cbd1ea27c67edac04ae5b55cec58870294d4063714751df7bad60",
+      "usedBy": [
+        "deliver-materials"
+      ],
+      "derivation": "按图集象限精确裁切，再居中定尺寸为 1152×648。"
+    },
+    "festival-close": {
+      "file": "assets/festival-close.png",
+      "sha256": "aaaab5bb899c3c7641238775e9a4908dbc1f5b81145d96e1a14b06963e3f38b6",
+      "bytes": 937426,
+      "pixels": [
+        1152,
+        648
+      ],
+      "mode": "RGB",
+      "kind": "codex-builtin-imagegen",
+      "source": "festival-environments-original",
+      "crop": [
+        836,
+        470,
+        1672,
+        941
+      ],
+      "sourceSha256": "d376394f8e9cbd1ea27c67edac04ae5b55cec58870294d4063714751df7bad60",
+      "usedBy": [
+        "recap"
+      ],
+      "derivation": "按图集象限精确裁切，再居中定尺寸为 1152×648。"
+    },
+    "courier-ready": {
+      "file": "assets/courier-ready.png",
+      "sha256": "4f4009d95941a94c215c4a480aea39f3cc4ba8d8d33bee95fccc72e697ec50b3",
+      "bytes": 69382,
+      "pixels": [
+        288,
+        202
+      ],
+      "mode": "RGBA",
+      "kind": "codex-builtin-imagegen",
+      "source": "festival-sprites-original",
+      "crop": [
+        0,
+        0,
+        627,
+        627
+      ],
+      "sourceSha256": "5a9091c829a014e75e117b9fde700d4660e24c006c2a454c50df0932bcc01b25",
+      "usedBy": [
+        "deliver-materials"
+      ],
+      "derivation": "按象限裁切透明原图，保留真 alpha，等比缩到 288px 内。",
+      "alphaCrop": [
+        4,
+        110,
+        623,
+        545
+      ]
+    },
+    "courier-load": {
+      "file": "assets/courier-load.png",
+      "sha256": "7a27a6735b0005cfc0aa5fb66bb137d35cdc498ea22a5998379f387511d09a65",
+      "bytes": 78066,
+      "pixels": [
+        288,
+        202
+      ],
+      "mode": "RGBA",
+      "kind": "codex-builtin-imagegen",
+      "source": "festival-sprites-original",
+      "crop": [
+        627,
+        0,
+        1254,
+        627
+      ],
+      "sourceSha256": "5a9091c829a014e75e117b9fde700d4660e24c006c2a454c50df0932bcc01b25",
+      "usedBy": [
+        "deliver-materials"
+      ],
+      "derivation": "按象限裁切透明原图，保留真 alpha，等比缩到 288px 内。",
+      "alphaCrop": [
+        4,
+        110,
+        623,
+        545
+      ]
+    },
+    "traffic-cart": {
+      "file": "assets/traffic-cart.png",
+      "sha256": "ed99efb2b20767cb1bd9687c4b3ec05d0c941bfc223969a5b38c8233a1ba4a1d",
+      "bytes": 96834,
+      "pixels": [
+        288,
+        193
+      ],
+      "mode": "RGBA",
+      "kind": "codex-builtin-imagegen",
+      "source": "festival-sprites-original",
+      "crop": [
+        0,
+        627,
+        627,
+        1254
+      ],
+      "sourceSha256": "5a9091c829a014e75e117b9fde700d4660e24c006c2a454c50df0932bcc01b25",
+      "usedBy": [
+        "deliver-materials"
+      ],
+      "derivation": "按象限裁切透明原图，保留真 alpha，等比缩到 288px 内。",
+      "alphaCrop": [
+        74,
+        162,
+        555,
+        484
+      ]
+    },
+    "festival-sticker": {
+      "file": "assets/festival-sticker.png",
+      "sha256": "c1c224761d614dd1d0890282d773daea8e8e02aba8796aca4668ca1e9d94c9fb",
+      "bytes": 60440,
+      "pixels": [
+        189,
+        288
+      ],
+      "mode": "RGBA",
+      "kind": "codex-builtin-imagegen",
+      "source": "festival-sprites-original",
+      "crop": [
+        627,
+        627,
+        1254,
+        1254
+      ],
+      "sourceSha256": "5a9091c829a014e75e117b9fde700d4660e24c006c2a454c50df0932bcc01b25",
+      "usedBy": [
+        "match-workbench",
+        "deliver-materials"
+      ],
+      "derivation": "按象限裁切透明原图，保留真 alpha，等比缩到 288px 内。",
+      "alphaCrop": [
+        158,
+        89,
+        466,
+        559
+      ]
+    },
+    "box-and-eight": {
+      "file": "assets/box-and-eight.png",
+      "sha256": "e95c36397c8fb29ef7123cf08abd2107538caa2feb9751dc1c380c36fe43d696",
+      "bytes": 2038,
+      "pixels": [
+        620,
+        310
+      ],
+      "mode": "RGB",
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "9e3f54e07cae12400d91406206704d90f7cf18410ad3bbcb4f003b6107fb2f93",
+      "usedBy": [
+        "compose"
+      ]
+    },
+    "counter-add-four": {
+      "file": "assets/counter-add-four.png",
+      "sha256": "b7e23013217b7cb348da0fc156769cb21d7e5a74cd8788d3ccfd2dca4137d0cb",
+      "bytes": 3387,
+      "pixels": [
+        620,
+        310
+      ],
+      "mode": "RGB",
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "9e3f54e07cae12400d91406206704d90f7cf18410ad3bbcb4f003b6107fb2f93",
+      "usedBy": [
+        "change-ones"
+      ]
+    },
+    "counter-remove-four": {
+      "file": "assets/counter-remove-four.png",
+      "sha256": "a771f899f9de7e49baa52f5f1723836ecf12c287f7b9f657dc395b1773d889c9",
+      "bytes": 3404,
+      "pixels": [
+        620,
+        310
+      ],
+      "mode": "RGB",
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "9e3f54e07cae12400d91406206704d90f7cf18410ad3bbcb4f003b6107fb2f93",
+      "usedBy": [
+        "change-ones"
+      ]
+    },
+    "dock-12": {
+      "file": "assets/dock-12.png",
+      "sha256": "063ed8fae78e75faf1fa92353cd23d4f4cbf8d3be62fd4cca29019d3637bbd02",
+      "bytes": 1697,
+      "pixels": [
+        192,
+        192
+      ],
+      "mode": "RGB",
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "9e3f54e07cae12400d91406206704d90f7cf18410ad3bbcb4f003b6107fb2f93",
+      "usedBy": [
+        "deliver-materials"
+      ]
+    },
+    "dock-14": {
+      "file": "assets/dock-14.png",
+      "sha256": "c4bb26ebc6f7ba02de9ea80cb7ec927959fed0a90e3eda2f9bc9e45f950d1e0b",
+      "bytes": 1454,
+      "pixels": [
+        192,
+        192
+      ],
+      "mode": "RGB",
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "9e3f54e07cae12400d91406206704d90f7cf18410ad3bbcb4f003b6107fb2f93",
+      "usedBy": [
+        "deliver-materials"
+      ]
+    },
+    "dock-16": {
+      "file": "assets/dock-16.png",
+      "sha256": "6a522c831b98a0267b54112c32443c81b6eb96a97392778eeb0642d0a66fab84",
+      "bytes": 2010,
+      "pixels": [
+        192,
+        192
+      ],
+      "mode": "RGB",
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "9e3f54e07cae12400d91406206704d90f7cf18410ad3bbcb4f003b6107fb2f93",
+      "usedBy": [
+        "deliver-materials"
+      ]
+    },
+    "dock-17": {
+      "file": "assets/dock-17.png",
+      "sha256": "897fd8364457bc2956650d27e6f72f5041a1560a3a1764187ae530b144dca168",
+      "bytes": 1487,
+      "pixels": [
+        192,
+        192
+      ],
+      "mode": "RGB",
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "9e3f54e07cae12400d91406206704d90f7cf18410ad3bbcb4f003b6107fb2f93",
+      "usedBy": [
+        "deliver-materials"
+      ]
+    },
+    "dock-18": {
+      "file": "assets/dock-18.png",
+      "sha256": "140c250b21132773f74ad584f375704302132f538d3bd51d49650ed84c56a0b5",
+      "bytes": 2207,
+      "pixels": [
+        192,
+        192
+      ],
+      "mode": "RGB",
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "9e3f54e07cae12400d91406206704d90f7cf18410ad3bbcb4f003b6107fb2f93",
+      "usedBy": [
+        "deliver-materials"
+      ]
+    },
+    "operation-part": {
+      "file": "assets/operation-part.png",
+      "sha256": "a3ae73939c08a20bc0399fbed910c6f6b9e86374ced8fcaf6e7de4907bdb7462",
+      "bytes": 5899,
+      "pixels": [
+        620,
+        310
+      ],
+      "mode": "RGB",
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "9e3f54e07cae12400d91406206704d90f7cf18410ad3bbcb4f003b6107fb2f93",
+      "usedBy": [
+        "choose-operation"
+      ]
+    },
+    "operation-total": {
+      "file": "assets/operation-total.png",
+      "sha256": "9b4a457997f07b54df0c45922c6940e7e3e796f85c2325666d7feb623c3edbe4",
+      "bytes": 4117,
+      "pixels": [
+        620,
+        310
+      ],
+      "mode": "RGB",
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "9e3f54e07cae12400d91406206704d90f7cf18410ad3bbcb4f003b6107fb2f93",
+      "usedBy": [
+        "choose-operation"
+      ]
+    },
+    "q1-a": {
+      "file": "assets/q1-a.png",
+      "sha256": "aa348771d5cf484815ddfb70f75682795ea9dc4bd2b12552c1d5f5c5fc6b7fac",
+      "bytes": 2129,
+      "pixels": [
+        620,
+        310
+      ],
+      "mode": "RGB",
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "9e3f54e07cae12400d91406206704d90f7cf18410ad3bbcb4f003b6107fb2f93",
+      "usedBy": [
+        "picture-check"
+      ]
+    },
+    "q1-b": {
+      "file": "assets/q1-b.png",
+      "sha256": "98fdd83295b2d354f567a4cfae12aeb41088d15262e2f5247450a510888c0a32",
+      "bytes": 2020,
+      "pixels": [
+        620,
+        310
+      ],
+      "mode": "RGB",
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "9e3f54e07cae12400d91406206704d90f7cf18410ad3bbcb4f003b6107fb2f93",
+      "usedBy": [
+        "picture-check"
+      ]
+    },
+    "q1-c": {
+      "file": "assets/q1-c.png",
+      "sha256": "ff09249dcf9e410babb235b918b37b6dc083500cb4378f5d6e912189d461d390",
+      "bytes": 2133,
+      "pixels": [
+        620,
+        310
+      ],
+      "mode": "RGB",
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "9e3f54e07cae12400d91406206704d90f7cf18410ad3bbcb4f003b6107fb2f93",
+      "usedBy": [
+        "picture-check"
+      ]
+    },
+    "q1-main": {
+      "file": "assets/q1-main.png",
+      "sha256": "544d7d5d296bfe2a59d4108e889f2afb2c6a2cd0b3546e1d8f560a7664fc385b",
+      "bytes": 2434,
+      "pixels": [
+        620,
+        310
+      ],
+      "mode": "RGB",
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "9e3f54e07cae12400d91406206704d90f7cf18410ad3bbcb4f003b6107fb2f93",
+      "usedBy": [
+        "picture-check"
+      ]
+    },
+    "q2-a": {
+      "file": "assets/q2-a.png",
+      "sha256": "0c4d58bd5857c4e09373c1232d2e20ec9a817bf7a8c96c6f71201fa8449c2d74",
+      "bytes": 1599,
+      "pixels": [
+        620,
+        310
+      ],
+      "mode": "RGB",
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "9e3f54e07cae12400d91406206704d90f7cf18410ad3bbcb4f003b6107fb2f93",
+      "usedBy": [
+        "picture-check"
+      ]
+    },
+    "q2-b": {
+      "file": "assets/q2-b.png",
+      "sha256": "9a71672ed2abfd2000a9ce5d2b6dc5b2bfea00e778678a83cd94ffa60bcd7bc9",
+      "bytes": 1665,
+      "pixels": [
+        620,
+        310
+      ],
+      "mode": "RGB",
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "9e3f54e07cae12400d91406206704d90f7cf18410ad3bbcb4f003b6107fb2f93",
+      "usedBy": [
+        "picture-check"
+      ]
+    },
+    "q2-c": {
+      "file": "assets/q2-c.png",
+      "sha256": "0b398889e859bf612ee6057503cbd644605abf14c2818ef451f5920305945188",
+      "bytes": 1398,
+      "pixels": [
+        620,
+        310
+      ],
+      "mode": "RGB",
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "9e3f54e07cae12400d91406206704d90f7cf18410ad3bbcb4f003b6107fb2f93",
+      "usedBy": [
+        "picture-check"
+      ]
+    },
+    "q2-main": {
+      "file": "assets/q2-main.png",
+      "sha256": "cb0779f03fb5142840d3d49b856ce4f4a39ace4fc3975f2d0542a46bf18d9d83",
+      "bytes": 5084,
+      "pixels": [
+        620,
+        310
+      ],
+      "mode": "RGB",
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "9e3f54e07cae12400d91406206704d90f7cf18410ad3bbcb4f003b6107fb2f93",
+      "usedBy": [
+        "picture-check"
+      ]
+    },
+    "q3-a": {
+      "file": "assets/q3-a.png",
+      "sha256": "30c81ad7d8a17ad13c3a723bc861677c6b4aec04fb7d8744508f82159bf033a2",
+      "bytes": 3588,
+      "pixels": [
+        620,
+        310
+      ],
+      "mode": "RGB",
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "9e3f54e07cae12400d91406206704d90f7cf18410ad3bbcb4f003b6107fb2f93",
+      "usedBy": [
+        "picture-check"
+      ]
+    },
+    "q3-b": {
+      "file": "assets/q3-b.png",
+      "sha256": "92cb12cfa630c0823ea408e61e3a09a558b6769d796e710e0c44ac7775d8d17c",
+      "bytes": 3483,
+      "pixels": [
+        620,
+        310
+      ],
+      "mode": "RGB",
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "9e3f54e07cae12400d91406206704d90f7cf18410ad3bbcb4f003b6107fb2f93",
+      "usedBy": [
+        "picture-check"
+      ]
+    },
+    "q3-c": {
+      "file": "assets/q3-c.png",
+      "sha256": "a068e89f51cf44d0a4f6127e7ef00bf46caf8884d91cf092ceb2ab6c7e47755b",
+      "bytes": 2641,
+      "pixels": [
+        620,
+        310
+      ],
+      "mode": "RGB",
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "9e3f54e07cae12400d91406206704d90f7cf18410ad3bbcb4f003b6107fb2f93",
+      "usedBy": [
+        "picture-check"
+      ]
+    },
+    "q3-main": {
+      "file": "assets/q3-main.png",
+      "sha256": "a068e89f51cf44d0a4f6127e7ef00bf46caf8884d91cf092ceb2ab6c7e47755b",
+      "bytes": 2641,
+      "pixels": [
+        620,
+        310
+      ],
+      "mode": "RGB",
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "9e3f54e07cae12400d91406206704d90f7cf18410ad3bbcb4f003b6107fb2f93",
+      "usedBy": [
+        "picture-check"
+      ]
+    },
+    "q4-a": {
+      "file": "assets/q4-a.png",
+      "sha256": "b7a53ebed12509a016a20ede04ebbbbaac4cd0e8d3bb2bc9767c41f27dc78f6f",
+      "bytes": 1900,
+      "pixels": [
+        620,
+        310
+      ],
+      "mode": "RGB",
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "9e3f54e07cae12400d91406206704d90f7cf18410ad3bbcb4f003b6107fb2f93",
+      "usedBy": [
+        "picture-check"
+      ]
+    },
+    "q4-b": {
+      "file": "assets/q4-b.png",
+      "sha256": "71ffe7cbe22bae4f6302bf2ae76f5f46a202263c4a64edef4b1c44df7a2f1da5",
+      "bytes": 2012,
+      "pixels": [
+        620,
+        310
+      ],
+      "mode": "RGB",
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "9e3f54e07cae12400d91406206704d90f7cf18410ad3bbcb4f003b6107fb2f93",
+      "usedBy": [
+        "picture-check"
+      ]
+    },
+    "q4-c": {
+      "file": "assets/q4-c.png",
+      "sha256": "65bf7c02dfe20e466d9bc656b2c2442fcdb861aeb491a0a00a26138f6a864641",
+      "bytes": 1616,
+      "pixels": [
+        620,
+        310
+      ],
+      "mode": "RGB",
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "9e3f54e07cae12400d91406206704d90f7cf18410ad3bbcb4f003b6107fb2f93",
+      "usedBy": [
+        "picture-check"
+      ]
+    },
+    "q4-main": {
+      "file": "assets/q4-main.png",
+      "sha256": "04cdaea3aadd6a0245a65820cdaea2ead52aaf667c708d4f486f68ff9c08ca56",
+      "bytes": 4905,
+      "pixels": [
+        620,
+        310
+      ],
+      "mode": "RGB",
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "9e3f54e07cae12400d91406206704d90f7cf18410ad3bbcb4f003b6107fb2f93",
+      "usedBy": [
+        "picture-check"
+      ]
+    },
+    "q5-a": {
+      "file": "assets/q5-a.png",
+      "sha256": "c59484bf9b027dee56de9dfff95344dd5cb2510599ae37b9e1fe7550e66d1f23",
+      "bytes": 5001,
+      "pixels": [
+        620,
+        310
+      ],
+      "mode": "RGB",
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "9e3f54e07cae12400d91406206704d90f7cf18410ad3bbcb4f003b6107fb2f93",
+      "usedBy": [
+        "picture-check"
+      ]
+    },
+    "q5-b": {
+      "file": "assets/q5-b.png",
+      "sha256": "4ee318934183e2a2a841c76f8bb8d8f8e8186b9d2dba415cacf0b5fecf883aa5",
+      "bytes": 5727,
+      "pixels": [
+        620,
+        310
+      ],
+      "mode": "RGB",
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "9e3f54e07cae12400d91406206704d90f7cf18410ad3bbcb4f003b6107fb2f93",
+      "usedBy": [
+        "picture-check"
+      ]
+    },
+    "q5-c": {
+      "file": "assets/q5-c.png",
+      "sha256": "c0d295c7c5e0b77e13feca75c98ff30a97678f104a462156994113966cfcfe2b",
+      "bytes": 5704,
+      "pixels": [
+        620,
+        310
+      ],
+      "mode": "RGB",
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "9e3f54e07cae12400d91406206704d90f7cf18410ad3bbcb4f003b6107fb2f93",
+      "usedBy": [
+        "picture-check"
+      ]
+    },
+    "q5-main": {
+      "file": "assets/q5-main.png",
+      "sha256": "b3d2f81cd3ec683ac6ace17d70debf2c0176b14c05b04179ff40267c2633c484",
+      "bytes": 2575,
+      "pixels": [
+        620,
+        310
+      ],
+      "mode": "RGB",
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "9e3f54e07cae12400d91406206704d90f7cf18410ad3bbcb4f003b6107fb2f93",
+      "usedBy": [
+        "picture-check"
+      ]
+    },
+    "q6-a": {
+      "file": "assets/q6-a.png",
+      "sha256": "c6fae15b0f9fbb28be021e07ae7b04b6bce571c2942fced934c02d768b9e8fec",
+      "bytes": 5290,
+      "pixels": [
+        620,
+        310
+      ],
+      "mode": "RGB",
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "9e3f54e07cae12400d91406206704d90f7cf18410ad3bbcb4f003b6107fb2f93",
+      "usedBy": [
+        "picture-check"
+      ]
+    },
+    "q6-b": {
+      "file": "assets/q6-b.png",
+      "sha256": "d6684e253ee204ffaddf4ebb36bed091280e02f562d222407b84df61ef139139",
+      "bytes": 5143,
+      "pixels": [
+        620,
+        310
+      ],
+      "mode": "RGB",
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "9e3f54e07cae12400d91406206704d90f7cf18410ad3bbcb4f003b6107fb2f93",
+      "usedBy": [
+        "picture-check"
+      ]
+    },
+    "q6-c": {
+      "file": "assets/q6-c.png",
+      "sha256": "2c5e6e7d61459cfdfae6ca0e9d19fda58c442afef5caf807665c8b5b58ab1730",
+      "bytes": 5301,
+      "pixels": [
+        620,
+        310
+      ],
+      "mode": "RGB",
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "9e3f54e07cae12400d91406206704d90f7cf18410ad3bbcb4f003b6107fb2f93",
+      "usedBy": [
+        "picture-check"
+      ]
+    },
+    "q6-main": {
+      "file": "assets/q6-main.png",
+      "sha256": "bdfdf10dd979dd29513a14a95f7b0cb4f0d6de168a63dbae8b1ab012937f9333",
+      "bytes": 4782,
+      "pixels": [
+        620,
+        310
+      ],
+      "mode": "RGB",
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "9e3f54e07cae12400d91406206704d90f7cf18410ad3bbcb4f003b6107fb2f93",
+      "usedBy": [
+        "picture-check"
+      ]
+    },
+    "rem-02": {
+      "file": "assets/rem-02.png",
+      "sha256": "1dbe45a8cf3f6d92ac1185e8cdca4770faae60cd9659cf8e30bb6c09cd646682",
+      "bytes": 1566,
+      "pixels": [
+        192,
+        192
+      ],
+      "mode": "RGB",
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "9e3f54e07cae12400d91406206704d90f7cf18410ad3bbcb4f003b6107fb2f93",
+      "usedBy": [
+        "match-workbench"
+      ]
+    },
+    "rem-06": {
+      "file": "assets/rem-06.png",
+      "sha256": "0126fc3f7cb012463c5e8324528cff20aef2d84a5d726dc413733ea8514256c7",
+      "bytes": 1913,
+      "pixels": [
+        192,
+        192
+      ],
+      "mode": "RGB",
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "9e3f54e07cae12400d91406206704d90f7cf18410ad3bbcb4f003b6107fb2f93",
+      "usedBy": [
+        "match-workbench"
+      ]
+    },
+    "rem-09": {
+      "file": "assets/rem-09.png",
+      "sha256": "51f77eb4de33ec04bee3d1397b43f7ac0d991be12a80f5c8537e5b7986edc02f",
+      "bytes": 1907,
+      "pixels": [
+        192,
+        192
+      ],
+      "mode": "RGB",
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "9e3f54e07cae12400d91406206704d90f7cf18410ad3bbcb4f003b6107fb2f93",
+      "usedBy": [
+        "match-workbench"
+      ]
+    },
+    "rem-10": {
+      "file": "assets/rem-10.png",
+      "sha256": "4fdb073c1055a9cfea58ceaac5774ef41254b120f76a14181fbd568e2b7334e7",
+      "bytes": 2044,
+      "pixels": [
+        192,
+        192
+      ],
+      "mode": "RGB",
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "9e3f54e07cae12400d91406206704d90f7cf18410ad3bbcb4f003b6107fb2f93",
+      "usedBy": [
+        "match-workbench"
+      ]
+    },
+    "rem-12": {
+      "file": "assets/rem-12.png",
+      "sha256": "e0d2852cbc3b4c1012affed7980fe5a2c047081f11c2710f81895a321d0f75a7",
+      "bytes": 1968,
+      "pixels": [
+        192,
+        192
+      ],
+      "mode": "RGB",
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "9e3f54e07cae12400d91406206704d90f7cf18410ad3bbcb4f003b6107fb2f93",
+      "usedBy": [
+        "match-workbench"
+      ]
+    },
+    "rem-13": {
+      "file": "assets/rem-13.png",
+      "sha256": "5934da9c721d833864dbd7501b6311e691ae396f3a0370eb2e49ceac9d2a9289",
+      "bytes": 2146,
+      "pixels": [
+        192,
+        192
+      ],
+      "mode": "RGB",
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "9e3f54e07cae12400d91406206704d90f7cf18410ad3bbcb4f003b6107fb2f93",
+      "usedBy": [
+        "match-workbench"
+      ]
+    },
+    "rem-15": {
+      "file": "assets/rem-15.png",
+      "sha256": "9398f20be146400ba748628b3a05bbbfdabd96e5e8c5c895d10b0ffada347196",
+      "bytes": 1979,
+      "pixels": [
+        192,
+        192
+      ],
+      "mode": "RGB",
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "9e3f54e07cae12400d91406206704d90f7cf18410ad3bbcb4f003b6107fb2f93",
+      "usedBy": [
+        "match-workbench"
+      ]
+    },
+    "roles-add": {
+      "file": "assets/roles-add.png",
+      "sha256": "c7e420ba016778239b65715cb7f1af811cbac514a52efbc6df65c99f21fee513",
+      "bytes": 5513,
+      "pixels": [
+        620,
+        310
+      ],
+      "mode": "RGB",
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "9e3f54e07cae12400d91406206704d90f7cf18410ad3bbcb4f003b6107fb2f93",
+      "usedBy": [
+        "roles-add"
+      ]
+    },
+    "roles-minus": {
+      "file": "assets/roles-minus.png",
+      "sha256": "2fac384cc47575d76863e66bd7314882cfc0f3790cc1f2cd9d3f7ca4bd0bfe92",
+      "bytes": 5361,
+      "pixels": [
+        620,
+        310
+      ],
+      "mode": "RGB",
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "9e3f54e07cae12400d91406206704d90f7cf18410ad3bbcb4f003b6107fb2f93",
+      "usedBy": [
+        "roles-minus"
+      ]
+    },
+    "stock-11": {
+      "file": "assets/stock-11.png",
+      "sha256": "b02edf4d204c514dfb48f26cb8e6d4a5868c556959341206cfcb96ebce554297",
+      "bytes": 1186,
+      "pixels": [
+        192,
+        192
+      ],
+      "mode": "RGB",
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "9e3f54e07cae12400d91406206704d90f7cf18410ad3bbcb4f003b6107fb2f93",
+      "usedBy": [
+        "deliver-materials"
+      ]
+    },
+    "stock-12": {
+      "file": "assets/stock-12.png",
+      "sha256": "e0d2852cbc3b4c1012affed7980fe5a2c047081f11c2710f81895a321d0f75a7",
+      "bytes": 1968,
+      "pixels": [
+        192,
+        192
+      ],
+      "mode": "RGB",
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "9e3f54e07cae12400d91406206704d90f7cf18410ad3bbcb4f003b6107fb2f93",
+      "usedBy": [
+        "dispatch-add",
+        "deliver-materials"
+      ]
+    },
+    "stock-13": {
+      "file": "assets/stock-13.png",
+      "sha256": "5934da9c721d833864dbd7501b6311e691ae396f3a0370eb2e49ceac9d2a9289",
+      "bytes": 2146,
+      "pixels": [
+        192,
+        192
+      ],
+      "mode": "RGB",
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "9e3f54e07cae12400d91406206704d90f7cf18410ad3bbcb4f003b6107fb2f93",
+      "usedBy": [
+        "deliver-materials"
+      ]
+    },
+    "stock-14": {
+      "file": "assets/stock-14.png",
+      "sha256": "4151e51e5c7c818515fae12b2b60fa16fa32c2e1e8c1f07e0d71c418d06d006f",
+      "bytes": 1691,
+      "pixels": [
+        192,
+        192
+      ],
+      "mode": "RGB",
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "9e3f54e07cae12400d91406206704d90f7cf18410ad3bbcb4f003b6107fb2f93",
+      "usedBy": [
+        "deliver-materials"
+      ]
+    },
+    "stock-16": {
+      "file": "assets/stock-16.png",
+      "sha256": "e30477d2c738ac2e841607261a233a7245d3587790403b2cd9c5568d30b92135",
+      "bytes": 2318,
+      "pixels": [
+        192,
+        192
+      ],
+      "mode": "RGB",
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "9e3f54e07cae12400d91406206704d90f7cf18410ad3bbcb4f003b6107fb2f93",
+      "usedBy": [
+        "deliver-materials"
+      ]
+    },
+    "stock-18": {
+      "file": "assets/stock-18.png",
+      "sha256": "9a4e9f304587c4a017ce8ec0cfa613d394beeddf639a6b10d9ccaf961b15076e",
+      "bytes": 2445,
+      "pixels": [
+        192,
+        192
+      ],
+      "mode": "RGB",
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "9e3f54e07cae12400d91406206704d90f7cf18410ad3bbcb4f003b6107fb2f93",
+      "usedBy": [
+        "dispatch-minus",
+        "deliver-materials"
+      ]
+    },
+    "stock-19": {
+      "file": "assets/stock-19.png",
+      "sha256": "dfa6a689542d0f2e18ca193a1ac8873d2ff3ae46d0d406e2f949975083b3cb05",
+      "bytes": 2334,
+      "pixels": [
+        192,
+        192
+      ],
+      "mode": "RGB",
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "9e3f54e07cae12400d91406206704d90f7cf18410ad3bbcb4f003b6107fb2f93",
+      "usedBy": [
+        "deliver-materials"
+      ]
+    },
+    "take-12-10": {
+      "file": "assets/take-12-10.png",
+      "sha256": "c46c12b9953d277b4dcb0334749be7ad27886084361e34e17c60b755fb2c885d",
+      "bytes": 2926,
+      "pixels": [
+        192,
+        192
+      ],
+      "mode": "RGB",
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "9e3f54e07cae12400d91406206704d90f7cf18410ad3bbcb4f003b6107fb2f93",
+      "usedBy": [
+        "match-workbench"
+      ]
+    },
+    "take-14-01": {
+      "file": "assets/take-14-01.png",
+      "sha256": "163a513ee64be76ce969051988bff934f2b5bdcd646df7ef4c3793f8da213fdb",
+      "bytes": 1483,
+      "pixels": [
+        192,
+        192
+      ],
+      "mode": "RGB",
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "9e3f54e07cae12400d91406206704d90f7cf18410ad3bbcb4f003b6107fb2f93",
+      "usedBy": [
+        "match-workbench"
+      ]
+    },
+    "take-14-04": {
+      "file": "assets/take-14-04.png",
+      "sha256": "df02a7254b4e8ab640ba5b7322d0a8ad9a27073df1d610bd37dc7c93854758ef",
+      "bytes": 1477,
+      "pixels": [
+        192,
+        192
+      ],
+      "mode": "RGB",
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "9e3f54e07cae12400d91406206704d90f7cf18410ad3bbcb4f003b6107fb2f93",
+      "usedBy": [
+        "match-workbench"
+      ]
+    },
+    "take-15-03": {
+      "file": "assets/take-15-03.png",
+      "sha256": "c898eebbed9429e97a5f832dd3da97db7a1fa9f46a48ea0270344570b73c23f6",
+      "bytes": 2912,
+      "pixels": [
+        192,
+        192
+      ],
+      "mode": "RGB",
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "9e3f54e07cae12400d91406206704d90f7cf18410ad3bbcb4f003b6107fb2f93",
+      "usedBy": [
+        "match-workbench"
+      ]
+    },
+    "take-16-06": {
+      "file": "assets/take-16-06.png",
+      "sha256": "286a0d8bbff7c9dcbd9f920dca470b325b5b98ff9e23c66c13f89895f1d8a3a3",
+      "bytes": 2327,
+      "pixels": [
+        192,
+        192
+      ],
+      "mode": "RGB",
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "9e3f54e07cae12400d91406206704d90f7cf18410ad3bbcb4f003b6107fb2f93",
+      "usedBy": [
+        "match-workbench"
+      ]
+    },
+    "take-16-10": {
+      "file": "assets/take-16-10.png",
+      "sha256": "49bdd5f49484a28a72c96d9612a904887416bafe448f17ca50be23b61073d4d2",
+      "bytes": 3318,
+      "pixels": [
+        192,
+        192
+      ],
+      "mode": "RGB",
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "9e3f54e07cae12400d91406206704d90f7cf18410ad3bbcb4f003b6107fb2f93",
+      "usedBy": [
+        "match-workbench"
+      ]
+    },
+    "take-17-02": {
+      "file": "assets/take-17-02.png",
+      "sha256": "9fe04ebdef6d648668e1882c0d1989a6d8f43583990d2c005f59aa43d43bf715",
+      "bytes": 2365,
+      "pixels": [
+        192,
+        192
+      ],
+      "mode": "RGB",
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "9e3f54e07cae12400d91406206704d90f7cf18410ad3bbcb4f003b6107fb2f93",
+      "usedBy": [
+        "match-workbench"
+      ]
+    },
+    "take-17-07": {
+      "file": "assets/take-17-07.png",
+      "sha256": "7f275dcdf18500908f52691fc3dc48679fc6eecc163fc4ae0de19c04765e1700",
+      "bytes": 1499,
+      "pixels": [
+        192,
+        192
+      ],
+      "mode": "RGB",
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "9e3f54e07cae12400d91406206704d90f7cf18410ad3bbcb4f003b6107fb2f93",
+      "usedBy": [
+        "match-workbench"
+      ]
+    },
+    "take-19-10": {
+      "file": "assets/take-19-10.png",
+      "sha256": "ee3f0b3ae1c63fe7e5cfed54431cc9f4b7824e759f81716a1820594f6c2b6280",
+      "bytes": 3322,
+      "pixels": [
+        192,
+        192
+      ],
+      "mode": "RGB",
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "9e3f54e07cae12400d91406206704d90f7cf18410ad3bbcb4f003b6107fb2f93",
+      "usedBy": [
+        "match-workbench"
+      ]
+    },
+    "take-eight": {
+      "file": "assets/take-eight.png",
+      "sha256": "8fe14b1eeac211345254b52c1016b9ebdc320682a89e3e51bad8ddb4dd2030f5",
+      "bytes": 4470,
+      "pixels": [
+        620,
+        310
+      ],
+      "mode": "RGB",
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "9e3f54e07cae12400d91406206704d90f7cf18410ad3bbcb4f003b6107fb2f93",
+      "usedBy": [
+        "inverse"
+      ]
+    },
+    "take-the-ten": {
+      "file": "assets/take-the-ten.png",
+      "sha256": "0e89171bdff6e755c463c94d5debbfb405b1b32719ca41e570b224b7c085ac00",
+      "bytes": 5536,
+      "pixels": [
+        620,
+        310
+      ],
+      "mode": "RGB",
+      "kind": "deterministic-geometry",
+      "source": "diagrams.py",
+      "sourceSha256": "9e3f54e07cae12400d91406206704d90f7cf18410ad3bbcb4f003b6107fb2f93",
+      "usedBy": [
+        "inverse"
+      ]
+    }
+  },
+  "sourceOnlyAssets": {
+    "festival-environments-original": {
+      "file": "art-source/festival-environments-original.png",
+      "sha256": "d376394f8e9cbd1ea27c67edac04ae5b55cec58870294d4063714751df7bad60",
+      "generator": "Codex built-in ImageGen",
+      "originalToolOutput": "/Users/sqcopenclaw/.codex/generated_images/01a1c43f-03e7-7d21-9ff8-7f979534d302/exec-b9358741-c17a-4257-bb7a-d64e3d717a03.png",
+      "prompt": "Use case: illustration-story\nAsset type: production atlas of four independent widescreen backgrounds for a first-grade arithmetic lesson about a community kite festival supply station. The mathematical quantities will be added in code.\nComposition: landscape 16:9 atlas, exactly four equal 16:9 panels in a 2 by 2 grid, hard crop boundaries exactly halfway across and down, no outer border, no dividers, no bleed between panels. Each quadrant must work as an independent complete widescreen picture when cropped. Keep the central 70 percent of every panel quiet and unobstructed.\nTop left: outside a little park supply stall seen at child's eye level, quiet empty pale counter in the foreground, pine green canopy and a single distant apricot diamond kite tucked into a corner. Warm spring daylight.\nTop right: close, almost straight-on view of the empty workshop counter for a falling tile game; creamy paper-lit wall, muted spruce pegboard shapes only at the edges, no pegs in the middle, no tools or trays on the central counter.\nBottom left: directly overhead view of a flat empty pale apricot paved workyard for a top-down delivery game. Soft foliage at the far side corners only, no pavement seams in the middle, no roads, traffic, buildings, boxes or perspective.\nBottom right: another independent view of the same park stall in soft late afternoon, very subtle warm apricot light and quiet empty wooden work surface. Open edges and tidy silhouette.\nStyle: premium picture-book game art, fine matte gouache paper grain, crisp cut-paper silhouette, warm cream and deep pine green with muted apricot and persimmon accents. Gentle value separation, restrained detail, clean silhouettes.\nAvoid: any counted objects, people, packages, numbers, words, labels, symbols, watermark, UI, grids, borders, signage, or typography. No gradients or glassmorphism.",
+      "transparentBackground": false
+    },
+    "festival-sprites-original": {
+      "file": "art-source/festival-sprites-original.png",
+      "sha256": "5a9091c829a014e75e117b9fde700d4660e24c006c2a454c50df0932bcc01b25",
+      "generator": "Codex built-in ImageGen",
+      "originalToolOutput": "/Users/sqcopenclaw/.codex/generated_images/01a1c43f-03e7-7d21-9ff8-7f979534d302/exec-a53ea235-0405-4b42-89a1-f5031b43b8dd.png",
+      "prompt": "Use case: stylized-concept\nAsset type: a tightly controlled transparent sprite atlas for a first-grade arithmetic kite-festival game. Four isolated transparent icons, exactly one in each quadrant of a square 2-by-2 grid, with wide transparent margins so each will be cropped separately. No shadows outside the silhouettes. The two cart sprites must be the same identity and scale. Each icon needs a strong clean silhouette readable at 25 pixels.\nTop left: single compact persimmon-orange toy utility cart facing right, from DIRECTLY ABOVE, a rounded spruce-green empty cargo compartment behind a cream driver's compartment, dark spruce tires, no cargo.\nTop right: the EXACT SAME cart at the same scale and angle, now with the small dark-green cargo hatch lifted visibly open. No cargo or additional icon.\nBottom left: one noticeably different small muted olive-and-cream service vehicle from directly above, facing right, for lane traffic. Plain closed roof, no logo or lettering, a clean sturdy outline.\nBottom right: one golden diamond kite-shaped completion sticker, centered, deep pine outline with a very short curved persimmon tail contained within the cell. No star, words or marks.\nStyle: premium matte gouache on fine paper grain, clean cut-paper edges, deep spruce, warm cream, muted apricot and persimmon. Top-down, flat, tactile, warm, no shadows or ground planes. Output must have true alpha around every isolated sprite. Zero text, numbers, labels, watermark, graphic layout, grids, borders, badges, UI or other objects.",
+      "transparentBackground": true
+    }
+  },
+  "fontResource": {
+    "path": "mobile/test/assets/fonts/NotoSansCJKsc-Regular.otf",
+    "sha256": "2c76254f6fc379fddfce0a7e84fb5385bb135d3e399294f6eeb6680d0365b74b"
+  }
+}

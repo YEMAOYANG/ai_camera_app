@@ -1,0 +1,133 @@
+{
+  "schemaVersion": "mira.game.candidate.v1",
+  "requestId": "raising-flag-crane-reverses-on-zero-time-step",
+  "sceneId": "scene-frame-crane",
+  "classroomId": "tbpub_d97cf5f980ed5d49a9ffc65e",
+  "releaseSha256": "cba417b5dcdd33683f49290013b372db6cefce254d8299a4f0cba11f2200fdeb",
+  "candidatePatch": "frame-crane.patch",
+  "engine": "courseware/kit/game_templates/crane.js",
+  "baseSha256": "b5f553422405a4f29180e10fe7655b33fe6ff5a5932b539d0afa1ae8e84e320d",
+  "candidateSha256": "bcfdf7306e21d6b9061f363c9427467c53e2e05e1c45df9774cc3c47f27a75ad",
+  "archivedSceneHtmlSha256": "5127cf85735cc304af165567b70bdbeb7e32a64c26a2bbfe4e1312d838f9a8f4",
+  "browserCheck": "Archived scene and rebuilt candidate in the student-style opaque sandbox. Synthetic repeated RAF timestamps plus real child touch; full signed-in classroom needs courseware acceptance.",
+  "observations": [
+    {
+      "variant": "archived",
+      "demoStars": [
+        3
+      ],
+      "childInitialStars": [
+        3
+      ],
+      "edgeX": 1152,
+      "afterZeroDir": 1,
+      "xAfter60Frames": 1152,
+      "childTouchSuccess": false
+    },
+    {
+      "variant": "candidate",
+      "demoStars": [],
+      "childInitialStars": [],
+      "edgeX": 1152,
+      "afterZeroDir": -1,
+      "xAfter60Frames": 902.0000000000091,
+      "childTouchSuccess": true
+    }
+  ],
+  "fullLocalPlayer": {
+    "scope": "Actual localhost:3100 full student playback shell with fixedTextbook metadata, archived scene actions and isolated access, session and speech responses.",
+    "scenario": "The player sent demo and handoff messages; duplicate RAF timestamps were introduced at the rail end. Candidate was completed with a trusted touch on the visible drop button.",
+    "archived": {
+      "handoffStars": [
+        3
+      ],
+      "railX": 1152,
+      "railDirection": 1,
+      "duplicateFrames": 51,
+      "studentControlsEnabled": true
+    },
+    "candidate": {
+      "handoff": {
+        "x": 132.17500000000018,
+        "dir": 1,
+        "stars": [],
+        "landed": [],
+        "errors": [],
+        "repeats": 0,
+        "states": [
+          {
+            "demo": true,
+            "level": 1
+          },
+          {
+            "demo": false,
+            "level": 1
+          }
+        ],
+        "clicks": [],
+        "misses": 0,
+        "state": "play"
+      },
+      "rail": {
+        "x": 947.8250000000003,
+        "dir": -1,
+        "stars": [],
+        "landed": [],
+        "errors": [],
+        "repeats": 50,
+        "states": [
+          {
+            "demo": true,
+            "level": 1
+          },
+          {
+            "demo": false,
+            "level": 1
+          }
+        ],
+        "clicks": [],
+        "misses": 0,
+        "state": "play"
+      },
+      "touch": {
+        "x": 697.8249999999998,
+        "dir": -1,
+        "stars": [],
+        "landed": [
+          1
+        ],
+        "errors": [],
+        "repeats": 149,
+        "states": [
+          {
+            "demo": true,
+            "level": 1
+          },
+          {
+            "demo": false,
+            "level": 1
+          }
+        ],
+        "clicks": [
+          {
+            "x": 697.8249999999998,
+            "landed": [],
+            "trusted": true
+          }
+        ],
+        "misses": 0,
+        "state": "play"
+      },
+      "touchTarget": {
+        "x": 1148,
+        "y": 538.0625,
+        "width": 96,
+        "height": 96
+      },
+      "intercepted": [
+        "scene_entered",
+        "scene_entered"
+      ]
+    }
+  }
+}

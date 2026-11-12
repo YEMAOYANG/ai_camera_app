@@ -1,14 +1,107 @@
 {
   "schemaVersion": "mira.courseware.brief.v1",
+  "binding": {
+    "editionId": "smartedu-english-six-year-g1-upper-sync-af05bc77",
+    "revisionId": "20260928-metadata-1",
+    "unitId": "aad710d5-42fb-342b-b657-c5ecffe6ad12",
+    "nodeId": "c033cdb7-7a31-338e-9aef-fd498e3743cb",
+    "unitTitle": "Module 7",
+    "lessonTitle": "Unit 2 It's an orange cat.",
+    "subject": "english",
+    "gradeCode": "primary_1",
+    "volume": "upper",
+    "schoolSystem": "six_year",
+    "teachingRevision": "1"
+  },
   "lessonTitle": "Unit 2 It's an orange cat.",
-  "teachingScope": "智慧教育平台与当前目录绑定的外研社一年级上册 Module 7 Unit 2，原书印刷第41至43页六项活动。合并外研社第二课时和第三课时中U2的内容，原书决定人物说的颜色和物件。",
+  "teachingScope": "当前外研社一年级上册 Module 7 Unit 2，印刷41至43页六项活动。按同一完整课件合并外研社第二课时与第三课时中U2的内容。",
+  "authorship": {
+    "authorModel": "gpt-6.1-sol",
+    "method": "逐页重读后直接原创讲解、游戏配置与检查题，旧官方笔记复核后沿用。",
+    "priorBriefSha256": "3f6b224f58c75d9a1187c155b376cbce2d673feb028275e48dfae546dad57ffa",
+    "catalogSha256": "c20aa7d310bc5c58698fa447d09b472808bb00f2d1884f91dc71acd5d6a7bf16",
+    "sourceSha256": {
+      "official-notes.json": "abc37ba327aaeea6ced30af879ae7b64f21ea79249fc7a7fe38373493a608404",
+      "lesson.json": "866ebdba6b7481e8f5ed46bdc9372db8b2da2ae9cf8b821a5b2c1375557fce0f",
+      "asset-plan.json": "d3f9b2a4e2dd04ff1a0b09f496b2e0a0e8adcaa93d19e456b33e1da7453c6c7d",
+      "pages/guess-and-drive.html": "e20b43fa17298931813a9291565d8ff0118e283f7aea3ae23e8cca196ac0b303",
+      "pages/guess-and-drive.js": "72b1a450f591fc5d0f53c3381888be9bc64143d91e7e3b18833ed6e788871dc8",
+      "pages/listen-and-aim.html": "3463ba8eb1dbc501997f3760f088b942f4fd280b036867cde473c0bcab00b5de",
+      "pages/listen-and-aim.js": "b69c6a7be0e1759e3f966bb8b1ab727a1cbdf1496667f8a3ce94c07d14573962",
+      "asset-provenance.json": "c9161b3833202795221be49aa157f150c1ab70cf46eafa520069b71bd2cce652",
+      "art-source/teaching-layout.json": "78ec44de17a856c7d0e4e0ffb8d2d85eb7dcd027ba00865b7100a15b87ff71f1",
+      "art-source/quiz-layout.json": "243f69109bdf9658c0bb7587a3f16dcfb4a08650581f1a2bd4d8c789285547aa"
+    },
+    "attestation": "本课作者为 Codex（gpt-6.1-sol）。沿用并重新核对官方笔记。讲解、课件版式、图片计划、题目和游戏关卡配置直接原创。未照搬官方教材整页原文、图片、题目或版式。课名、目标词语及必要语块沿用原书。未使用 DeepSeek 初稿。本课首批播放图沿用游戏样例和相邻课的可追溯 Codex ImageGen 作品，共八张，裁切、缩放和用处见素材清单。另两张内置 ImageGen 母图为本课新出，使用其中30个裁切图与7张按布局拼排的讲解或开场图。两张原母图和逐格裁切或拼排布局保存在课源。",
+    "preVoiceEditorialReview": {
+      "at": "2026-11-09T20:47:22+08:00",
+      "priorLessonSha256": "11c513ae9dfe95c2cb2fba357a7a9189886092a03dbe69cecb4a1fc75998dfe5",
+      "priorVoicePlanSha256": "3b1fb6a54e09b87d34e76e5b2fb6a4c30ac8a409637f221a4d820b3ea78d817a",
+      "voicePlanSha256": "b709e95f2d9de5f20168ec6b21a42d731cb4d2d321af29073996668d4d4684f9",
+      "checkedOfficialPrintedPages": [
+        41,
+        42,
+        43
+      ],
+      "unchangedSpeechIds": 100,
+      "revisedSpeechIds": [
+        "paint-show-1",
+        "find-the-cat-1",
+        "house-or-box-9",
+        "house-or-box-12",
+        "house-or-box-13",
+        "say-the-clues-5",
+        "say-the-clues-8",
+        "listen-and-aim-4",
+        "tap-a-beat-1",
+        "tap-a-beat-11",
+        "guess-two-ways-10",
+        "guess-two-ways-12",
+        "guess-two-ways-15",
+        "guess-and-drive-6",
+        "make-and-share-7",
+        "make-and-share-11",
+        "quiz_speech_6",
+        "quiz_speech_8"
+      ],
+      "lengthWarningsAccepted": [
+        {
+          "id": "find-the-cat-11",
+          "characters": 36
+        },
+        {
+          "id": "say-the-clues-5",
+          "characters": 29
+        },
+        {
+          "id": "say-the-clues-8",
+          "characters": 28
+        },
+        {
+          "id": "guess-two-ways-14",
+          "characters": 29
+        },
+        {
+          "id": "make-and-share-8",
+          "characters": 31
+        },
+        {
+          "id": "quiz_speech_6",
+          "characters": 36
+        },
+        {
+          "id": "quiz_speech_7",
+          "characters": 31
+        },
+        {
+          "id": "quiz_speech_8",
+          "characters": 35
+        }
+      ],
+      "boundary": "以原书语块作听辨示范。只比较 orange 与 yellow 在本课例子开头的声音，不加入国际音标、拼读规则或口音分级。正式录音待试听冠词、目标词和句间停顿。"
+    }
+  },
   "goals": [
-    "听辨本课图片里的颜色和物名，能根据颜色和物名两个线索选图，辨认同一种物品的不同颜色。",
-    "听懂并尝试用完整句描述有颜色的动物和物品，识别house和box，能在本课实例里跟说an orange cat及a yellow box。",
-    "看清颜色和外形后验证猜测，能从只问颜色逐步问到颜色和物名，并用完整的肯定或否定回答。",
-    "跟着原创短节奏做问答，涂色或制作后说出作品的颜色和物名，轮流问答。"
-  ],
-  "objectives": [
     "听辨本课图片里的颜色和物名，能根据颜色和物名两个线索选图，辨认同一种物品的不同颜色。",
     "听懂并尝试用完整句描述有颜色的动物和物品，识别house和box，能在本课实例里跟说an orange cat及a yellow box。",
     "看清颜色和外形后验证猜测，能从只问颜色逐步问到颜色和物名，并用完整的肯定或否定回答。",
@@ -16,199 +109,235 @@
   ],
   "pages": [
     {
-      "key": "colour-studio",
-      "title": "颜色住进图里",
-      "kind": "interactive",
+      "key": "paint-show",
+      "title": "谁给纸偶换了颜色？",
+      "kind": "slide",
       "sourceRefs": [
-        "当前原书41页活动1",
+        "原书41页活动1",
         "216248第8至9页",
         "216251第2至6页"
       ],
-      "play": "美术教室的孩子为展览整理动物纸偶。先听颜色与物名，点选色块，再把它送到对应纸偶，画面实际着色。老师先点亮色盘，再示范蓝猫和黑猴，最后展示一只同种动物加两至多色时仍是原来的物种。课本多色猴为红、蓝、白、黄、黑，展示可分辨的分区；故事和图像原创。孩子用图和录音操作。",
-      "assets": [
-        "studio-cover",
-        "studio-room",
-        "paper-cat",
-        "paper-monkey",
-        "primary-colour-swatches",
-        "multi-monkey"
-      ]
+      "plan": "原创画室小展览。先看蓝猫、黑猴，再找同一只猴身上的五种颜色；颜色会变，动物轮廓还是原来的。"
     },
     {
-      "key": "look-again",
-      "title": "看全了再回答",
-      "kind": "interactive",
+      "key": "find-the-cat",
+      "title": "猫躲在帘子后",
+      "kind": "slide",
       "sourceRefs": [
-        "当前原书41页活动2",
-        "216248第7至10页",
-        "216251第7至11页"
+        "原书41页活动2",
+        "216248第9页"
       ],
-      "play": "两段独立展品揭秘。第一段只露暗色轮廓，孩子先放暂定图，再拉开遮窗，露出橙色猫；老师先示范问黑猫，否定后完整说明橙猫。第二段两张亮黄色图片分别是模型房子和纸盒，比较屋顶、窗门与开口、折边，指出颜色一样也要核物名。孩子重新摆放图卡，老师说当前原书的黄色房子问句与黄色盒子答句。教师演示开窗、替换、指形状，动作先于解说。",
-      "assets": [
-        "studio-room",
-        "orange-cat",
-        "black-cat",
-        "yellow-house",
-        "yellow-box",
-        "reveal-shadow"
-      ]
+      "plan": "看暗色轮廓先猜，聚光灯移到打开后的橙猫，给出完整否定和纠正。"
     },
     {
-      "key": "listen-two-clues",
-      "title": "先听颜色，再听物名",
-      "kind": "interactive",
+      "key": "house-or-box",
+      "title": "两件黄东西",
+      "kind": "slide",
       "sourceRefs": [
-        "当前原书41页活动2、42页活动3",
+        "原书41页活动2",
+        "216248第9至10页",
+        "216251第9至11页"
+      ],
+      "plan": "对比同为黄色的房子和盒子。先看轮廓，再用屋顶、门窗和盒口验证。"
+    },
+    {
+      "key": "say-the-clues",
+      "title": "把两个线索说完整",
+      "kind": "slide",
+      "sourceRefs": [
+        "原书41页活动2和42页活动3",
         "216248第9至10页",
         "216251第10至11页"
       ],
-      "play": "老师用图指着一只橙猫和一个黄盒，分开听an orange与a yellow，再听完整句和颜色在物名前。设置四轮听音配图，每轮先在同物异色的图里选，听到完整句后再和同色异物比较。孩子把选中的图放到听音板上，音图核对后才点亮；首错只提示重听颜色或物名，不直接揭答案。练原书的铅笔、书、猫、鸟四类，选图颜色和音频是原创练习。",
-      "assets": [
-        "orange-cat",
-        "yellow-box",
-        "pencil-pair",
-        "book-pair",
-        "cat-pair",
-        "bird-pair",
-        "label-board"
-      ]
+      "plan": "颜色在物名前，跟说本课的 an orange cat 和 a yellow box 两个完整语块。铅笔、书、猫和鸟的同类异色进入下一页录音练习。"
     },
     {
-      "key": "rhythm-questions",
-      "title": "一拍一句来问",
+      "key": "listen-and-aim",
+      "title": "听清再发射",
       "kind": "interactive",
       "sourceRefs": [
-        "当前原书42页活动4",
+        "原书42页活动3",
+        "216248第9至10页",
+        "216249第1至2页"
+      ],
+      "plan": "按左右键瞄准，松手后也能微调；听清两个线索才会命中图片。",
+      "game": {
+        "template": "magnetMarbles",
+        "version": 1,
+        "entryPoint": "K.gameTemplates.magnetMarbles",
+        "ownerApprovedOn": "2026-11-09",
+        "knowledgeRule": "listen_match",
+        "why": "同时听准颜色和物名才会命中；同色异物、同物异色都不能给分。",
+        "progression": [
+          "不漂移，从三幅图中找蓝铅笔和蓝书。",
+          "轻微漂移，从黄猫、黑猫、黑鸟、黄鸟中逐个找出三幅图。",
+          "漂移更大，红绿两色和球、书两类交叉，连续听辨三次。"
+        ],
+        "listenOnly": true,
+        "voiceLead": true,
+        "stepVoiceLead": true,
+        "demo": "老师只示范第一关的首个动作，收起示范分数，再交还第一关。",
+        "art": "本课图标，辨认所用颜色和轮廓。数字编号与图标替代文字。"
+      }
+    },
+    {
+      "key": "tap-a-beat",
+      "title": "拍着节奏猜一猜",
+      "kind": "slide",
+      "sourceRefs": [
+        "原书42页活动4",
         "216248第12至13页"
       ],
-      "play": "用三张不同场景的动物影卡做原创节奏。先听教师用固定短拍完整读一次问句，再把对应影卡拉到小舞台，卡在拍点揭开颜色或形状。用不同动物和位置写新韵句，保留猜物问句及完整肯定/否定的练习目的。孩子点拍点移动实体卡，口头跟说由成人观察。",
-      "assets": [
-        "studio-room",
-        "animal-stage",
-        "paper-cat",
-        "paper-monkey",
-        "paper-bird",
-        "cue-shapes"
-      ]
+      "plan": "原创两拍问答，先看盒盖角露出的局部，跟着动作问和答。用手拍节奏，真实口头表现留待观察。"
     },
     {
-      "key": "guess-in-steps",
-      "title": "先问颜色，再猜东西",
-      "kind": "interactive",
+      "key": "guess-two-ways",
+      "title": "先问颜色，再猜是什么",
+      "kind": "slide",
       "sourceRefs": [
-        "当前原书43页活动5",
+        "原书43页活动5",
         "216248第12至13页",
         "216249第2页"
       ],
-      "play": "一人暗选图卡。老师先示范只问颜色，听完回答便移走异色图；同色图还剩两张，再问完整的颜色加物名问题，按Yes或No实际翻动对应图片，最后说出完整物名。孩子在新的卡组里用两次听题和选图缩小范围，再拖交接牌换角色。每轮至少保留同色异物和同物异色的干扰，否定后可再试。",
-      "assets": [
-        "studio-room",
-        "actor-pair",
-        "guess-card-set",
-        "colour-filter-panels"
-      ]
+      "plan": "先用颜色排除异色，再用物名排除同色异物。听到 No 时只改不合的线索，听到 Yes 后复述完整描述。"
     },
     {
-      "key": "make-and-tell",
-      "title": "做完一件，说给伙伴",
+      "key": "guess-and-drive",
+      "title": "听问答开泡泡车",
       "kind": "interactive",
       "sourceRefs": [
-        "当前原书43页活动6",
-        "216248第10至14页",
+        "原书43页活动5",
+        "216248第12至13页"
+      ],
+      "plan": "按每段问答确认的图开车，不按猜错的图走。由近到远完成有序路线并到达出口。",
+      "game": {
+        "template": "bubbleMaze",
+        "version": 1,
+        "entryPoint": "K.gameTemplates.bubbleMaze",
+        "ownerApprovedOn": "2026-11-09",
+        "knowledgeRule": "listen_order",
+        "why": "听猜测与回答，按确认后的顺序开车；走到未确认的图不会收取。",
+        "progression": [
+          "短路无巡游，先按否定后的颜色纠正找到橙猫，再按肯定回答找到黄盒。",
+          "岔路增加，从红球、红书、绿书中按两步问答走三站。",
+          "增加巡游和一堵泡泡墙，鸟和书交叉辨认，连续完成四段确认。"
+        ],
+        "listenOnly": true,
+        "voiceLead": true,
+        "stepVoiceLead": true,
+        "demo": "老师只示范第一关的首个动作，收起示范分数，再交还第一关。",
+        "art": "本课图标，辨认所用颜色和轮廓。数字编号与图标替代文字。"
+      }
+    },
+    {
+      "key": "make-and-share",
+      "title": "做完给伙伴猜",
+      "kind": "slide",
+      "sourceRefs": [
+        "原书43页活动6",
+        "216248第13至14页",
         "216251第12至13页"
       ],
-      "play": "孩子把颜色贴片和形状拼到一张纸上，作品变成自己配色的风筝或鸟。老师先组装一件、指轮廓说物名、点亮颜色并说完整句，再让孩子选择后向同伴介绍。完整的肯定和否定用在看作品而猜对象时，课内记录作品选择和答题，实际口语由大人观察。",
-      "assets": [
-        "studio-room",
-        "paper-kite",
-        "paper-bird",
-        "colour-pieces",
-        "actor-pair"
-      ]
+      "plan": "课堂示范观察剪纸作品，先猜是什么再说颜色和物名。留安全的亲子涂色制作及换角色问答。"
     },
     {
       "key": "picture-check",
-      "title": "听一句，选一张",
+      "title": "听音帮展品找位置",
       "kind": "quiz",
       "sourceRefs": [
-        "当前原书41至43页",
+        "原书41至43页",
         "216249第1至4页"
       ],
-      "play": "用全新图和组合检查两条线索、颜色或物名的否定纠正以及完整描述。老师读题，图像为唯一答题方式。每题可重听，有唯一答案和可见证据解析，答案位置打散。",
-      "assets": [
-        "quiz-animal-pairs",
-        "quiz-coloured-objects",
-        "quiz-building-pairs",
-        "quiz-kite-colours",
-        "quiz-combinations"
-      ]
+      "plan": "六道原创听音选图题，用展览新物件和颜色组合检验双线索、否定纠正、完整语块。"
     },
     {
-      "key": "remember-and-share",
-      "title": "看颜色，也看是什么",
+      "key": "gallery-recap",
+      "title": "给下一班看展的小朋友",
       "kind": "slide",
       "sourceRefs": [
-        "当前原书41至43页",
-        "216248第10至14页",
-        "216251第13页"
+        "原书41至43页",
+        "216248第10至14页"
       ],
-      "play": "依序点亮颜色、物名、完整描述、两步问答四点。用橙猫和黄盒回顾an orange与a yellow；同色物品仍须问名称。回家互问、给物品涂色再描述，成人观察实际表达。",
-      "assets": [
-        "studio-cover",
-        "orange-cat",
-        "yellow-box",
-        "guess-card-set"
-      ]
+      "plan": "逐项回顾颜色、物名、完整描述和两步问答，照应最早的展品。"
     }
   ],
   "quizPlan": [
     {
-      "skill": "听辨颜色与动物",
-      "variant": "听a white dog，用白狗、白猫、黑狗三张新图分清颜色和物名。"
+      "id": "white-dog",
+      "skill": "hear-colour-and-animal",
+      "audio": "A white dog.",
+      "target": "白狗",
+      "distractors": [
+        "白猫",
+        "黑狗"
+      ],
+      "position": "b"
     },
     {
-      "skill": "听懂an orange与物名",
-      "variant": "听an orange kite，选橙风筝；干扰为橙纸盒与黄风筝，实体不复用课上纸偶。"
+      "id": "orange-kite",
+      "skill": "hear-orange-description",
+      "audio": "It’s an orange kite.",
+      "target": "橙风筝",
+      "distractors": [
+        "橙盒",
+        "黄风筝"
+      ],
+      "position": "a"
     },
     {
-      "skill": "在相同颜色下听辨house与box",
-      "variant": "听a green house。绿房子有屋顶和窗门，绿盒有上沿开口；另备黄色房子作颜色干扰。"
+      "id": "green-house",
+      "skill": "differentiate-house-and-box",
+      "audio": "It’s a green house.",
+      "target": "绿房子",
+      "distractors": [
+        "绿盒",
+        "蓝房子"
+      ],
+      "position": "c"
     },
     {
-      "skill": "听音辨同类颜色",
-      "variant": "新图中用绿色铅笔、红铅笔、绿色书比对，听到a green pencil选图。"
+      "id": "yellow-book",
+      "skill": "hear-colour-correction",
+      "audio": "Is it green? No, it’s a yellow book.",
+      "target": "黄书",
+      "distractors": [
+        "绿书",
+        "黄铅笔"
+      ],
+      "position": "b"
     },
     {
-      "skill": "听懂多色和物名",
-      "variant": "选红白风筝，另两张风筝为红蓝、白绿，颜色分区一致，音频两词清楚。"
+      "id": "white-bird",
+      "skill": "confirm-colour-and-object",
+      "audio": "Is it a white bird? Yes, it is.",
+      "target": "白鸟",
+      "distractors": [
+        "红鸟",
+        "白猫"
+      ],
+      "position": "c"
     },
     {
-      "skill": "从否定回答改判颜色",
-      "variant": "听Is it red? No, it isn’t. It’s green. 三只同样外形的球各一色，选绿色球。"
-    },
-    {
-      "skill": "颜色符合时继续核对名称",
-      "variant": "蓝书和蓝盒同色，新场景听否定a blue book后明确答a blue box，再选图。"
-    },
-    {
-      "skill": "跟完整是非问答核对两线索",
-      "variant": "听Is it an orange bird? Yes, it is. 橙鸟、橙猫、黄色鸟都有独立轮廓，只一项兼顾两点。"
-    },
-    {
-      "skill": "理解制作后完整描述",
-      "variant": "玩具展示的新白猫、白鸟和红鸟中，听a white bird选图。解释以可见外形和色块为准。"
+      "id": "blue-kite",
+      "skill": "change-object-after-no",
+      "audio": "Is it a ball? No, it’s a blue kite.",
+      "target": "蓝风筝",
+      "distractors": [
+        "蓝球",
+        "绿风筝"
+      ],
+      "position": "a"
     }
   ],
   "afterClassPractice": [
-    "请家人选一件熟悉、安全的物品。孩子先问颜色，再用颜色加物名确认，然后互换角色。",
-    "给自己画的一只鸟或一个风筝涂色，试着用It’s a …或It’s an …说出颜色和物名，由成人观察。",
-    "复听老师示范橙猫、黄色盒子。用两个同色的物品练问答，颜色听对之后还要核物名。"
+    "跟家人轮流藏一件安全物品。先问颜色，再问颜色和物名。成人观察孩子是否用完整句回应，课件标为待观察。",
+    "给纸上的风筝或鸟涂色，向伙伴介绍作品，再交换问答角色。由成人观察真实口头表达。"
   ],
   "weeklyQuestionSources": [
-    "听音找颜色加物名",
-    "橙色实例中听辨an orange，黄色实例中听辨a yellow",
-    "相同颜色不同物品的两步问答",
-    "听否定后修正颜色或物名",
-    "制作后的图片描述"
+    "双线索听音配图",
+    "具体语块 an orange 与 a yellow",
+    "同色不同物验证",
+    "否定后纠正",
+    "制作后描述"
   ]
 }

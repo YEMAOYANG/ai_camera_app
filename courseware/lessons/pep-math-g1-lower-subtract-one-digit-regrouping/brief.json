@@ -1,0 +1,263 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "两位数减一位数（退位）",
+  "binding": {
+    "editionId": "pep-math-g1-lower-2022-standard",
+    "revisionId": "directory-6205d2037284e91f10b25edd",
+    "nodeId": "fb5fd7b6-9672-482d-8e79-7e168894cc3c",
+    "unitId": "ac9164b9-5eba-4c7e-9436-214fc2df042b"
+  },
+  "scenario": "野餐用品站借出彩杯。满盒十个，散杯可单取；散杯不够时拆开一盒，再按取货单拿走。",
+  "goals": [
+    "看个位的散件够不够拿，区分需要退位、刚好够和不退位。",
+    "个位不够时把1个十拆成10个一，知道整十少一组、散件多十个、换法前后总量相同。",
+    "把拆来的十与原散件合在个位再减，算对两位数减一位数和整十数减一位数的退位口算。",
+    "用先减到整十、先从一个十减或先减十再补回来等方法复核，说清每一步拿走或补回多少。"
+  ],
+  "goalSources": [
+    {
+      "skill": "decide-if-regrouping",
+      "target": "看个位的散件够不够拿，区分需要退位、刚好够和不退位。",
+      "source": "印48例2；课件2～5、24～26；设计1、5"
+    },
+    {
+      "skill": "exchange-one-ten",
+      "target": "个位不够时把1个十拆成10个一，知道整十少一组、散件多十个、换法前后总量相同。",
+      "source": "印49例2；课件9～14、26～27；设计2～3"
+    },
+    {
+      "skill": "calculate-with-regrouping",
+      "target": "把拆来的十与原散件合在个位再减，算对两位数减一位数和整十数减一位数的退位口算。",
+      "source": "印49做一做；课件20～26；任务单1～2"
+    },
+    {
+      "skill": "check-with-another-method",
+      "target": "用先减到整十、先从一个十减或先减十再补回来等方法复核，说清每一步拿走或补回多少。",
+      "source": "印49说一说；课件6～19；设计2～4；课后1"
+    }
+  ],
+  "pageSequence": [
+    {
+      "key": "open-the-cup-station",
+      "kind": "teaching",
+      "plan": "原创野餐彩杯站，明确一盒十个和一个散杯。"
+    },
+    {
+      "key": "when-the-ones-are-not-enough",
+      "kind": "teaching",
+      "plan": "同一43，取2时够，取8时3个散杯不够。找该退位的条件。"
+    },
+    {
+      "key": "exchange-one-box-without-losing-cups",
+      "kind": "teaching",
+      "plan": "43由4盒3散换成3盒13散，清楚展示一盒被拆且总量仍43。"
+    },
+    {
+      "key": "remove-from-the-expanded-ones",
+      "kind": "teaching",
+      "plan": "在13个散杯里取8个剩5个，和3盒合成35。"
+    },
+    {
+      "key": "slide-an-open-box-to-the-singles",
+      "kind": "game",
+      "plan": "真实滑动把一盒十个和原有散杯卡合在同一托盘，确认只拆一次。"
+    },
+    {
+      "key": "first-step-back-to-a-ten",
+      "kind": "teaching",
+      "plan": "43−8先减3到40，再减剩余的5得到35，两个取走量合为8。"
+    },
+    {
+      "key": "check-by-ten-and-compensation",
+      "kind": "teaching",
+      "plan": "43留33，取拆开的10里8个再合；或43先减10为33，补回多减2，结果35。"
+    },
+    {
+      "key": "there-are-no-loose-cups-yet",
+      "kind": "teaching",
+      "plan": "70−6，从7盒拆1盒，成为6盒10散，拿走6散剩64。"
+    },
+    {
+      "key": "aim-at-the-actual-remainder",
+      "kind": "game",
+      "plan": "瞄准与本轮实际剩量相等的靶。含相同候选在一题错、下一题对的案例。"
+    },
+    {
+      "key": "check-with-the-removed-part",
+      "kind": "teaching",
+      "plan": "拿走8与留下35合回43，发现错保留原十位；重新检查一步。"
+    },
+    {
+      "key": "picture-quiz",
+      "kind": "quiz",
+      "plan": "六道原创图题查是否需退、同量换组、剩量、整十、先退到整十、补偿。"
+    },
+    {
+      "key": "tell-the-family-about-one-ten",
+      "kind": "teaching",
+      "plan": "回顾个位不够、十拆成一、再取走；亲子用纸片或卡片编不同的题。"
+    }
+  ],
+  "games": [
+    {
+      "page": "slide-an-open-box-to-the-singles",
+      "template": "slideMerge",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.slideMerge",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "symbol_merge",
+      "selection": "十盒牌只表示一个十。与原有散杯牌同路碰头，才出现十加散杯的总散数；保留未拆盒图。",
+      "levels": [
+        [
+          [
+            42,
+            7,
+            12
+          ]
+        ],
+        [
+          [
+            31,
+            5,
+            11
+          ],
+          [
+            46,
+            8,
+            16
+          ]
+        ],
+        [
+          [
+            60,
+            4,
+            10
+          ],
+          [
+            54,
+            7,
+            14
+          ],
+          [
+            77,
+            9,
+            17
+          ]
+        ]
+      ],
+      "teacherAnchors": [
+        "exchange-order-guide",
+        "first-box",
+        "first-singles",
+        "game-player",
+        "first-shelf"
+      ],
+      "demo": "指原42和取7、两散与一盒。真正向左滑，首单保持三盒，架上十二散，确认后复位。"
+    },
+    {
+      "page": "aim-at-the-actual-remainder",
+      "template": "magnetMarbles",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.magnetMarbles",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "pair_match",
+      "selection": "每轮用确切总量减实际借走个数核碰撞。候选56第一订单是错、下一单正确，按本轮解。图保留退位结构和标记的取走位置。",
+      "levels": [
+        [
+          [
+            51,
+            6,
+            45
+          ]
+        ],
+        [
+          [
+            52,
+            6,
+            46
+          ],
+          [
+            65,
+            9,
+            56
+          ]
+        ],
+        [
+          [
+            70,
+            4,
+            66
+          ],
+          [
+            84,
+            8,
+            76
+          ]
+        ]
+      ],
+      "teacherAnchors": [
+        "active-removal",
+        "game-player",
+        "game-target",
+        "accepted-remainder"
+      ],
+      "demo": "指从51取6，四盒与五散，向右真实发射，画面保留45后再交接。"
+    }
+  ],
+  "quiz": [
+    {
+      "id": "choose-the-short-ones",
+      "skill": "decide-if-regrouping",
+      "position": 2,
+      "plan": "从68、61、65各取5，只有61需要拆盒。"
+    },
+    {
+      "id": "swap-one-ten-keep-fifty-three",
+      "skill": "exchange-one-ten",
+      "position": 1,
+      "plan": "53由5盒3散变成4盒13散。"
+    },
+    {
+      "id": "take-nine-from-forty-seven",
+      "skill": "calculate-with-regrouping",
+      "position": 3,
+      "plan": "47−9＝38，区别少写整十和忘退位。"
+    },
+    {
+      "id": "seventy-three-from-eighty",
+      "skill": "subtract-from-a-round-ten",
+      "position": 2,
+      "plan": "80−7＝73。"
+    },
+    {
+      "id": "stop-at-sixty-first",
+      "skill": "split-the-removed-number",
+      "position": 3,
+      "plan": "62−8先减2到60，再减6。"
+    },
+    {
+      "id": "return-the-extra-two",
+      "skill": "compensation",
+      "position": 1,
+      "plan": "75−8先减10得65，补回2成67。"
+    }
+  ],
+  "afterClass": {
+    "familyTask": "请成人和孩子用安全大纸片表示十盒与散杯。选一题个位刚好够、一题不够，让孩子指出何时拆盒并讲理由。也可取数字卡编一组不同的退位题。",
+    "weeklyQuestionSource": [
+      "个位够不够",
+      "等量换十",
+      "退位余量",
+      "整十减",
+      "整十分步和补偿"
+    ],
+    "evidence": "真实小游戏及图题留下事件，手摆和亲子口述由成人观察，待观察。"
+  },
+  "artAndLanguage": "杯子、盒内十格、数线、运算符用代码精确绘；拆盒前后同一总量，右虚线是拿走，另保留未拆的整盒。正式人物背景另用内置图。数学目标数字可读，遮住非目标字也能看图听题。",
+  "authoring": {
+    "mode": "direct",
+    "model": "gpt-6.1-sol",
+    "bookAndCompanionScope": "印48下半例2至印49，一课时全37页配套。"
+  },
+  "officialNotesSha256": "0479c81b323c3abd6ee13313496f0d1a4bd8e387c30e0aacab11ceede3945971"
+}

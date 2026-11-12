@@ -1,0 +1,38 @@
+{
+  "template": "orchardCatch",
+  "draft": true,
+  "title": "双篮果园",
+  "sub": "移动小车，接住一整串果子，让两篮刚好装满。",
+  "doneText": "每个果子都找到空格，果园贴纸到手！",
+  "voiceLead": true,
+  "art": {
+    "backdrop": "garden.webp",
+    "frames": ["orchard-cart.webp"],
+    "icons": {"fruit": "orchard-apple.webp"},
+    "sticker": "sticker.webp"
+  },
+  "levels": [
+    {
+      "capacity": [2, 3],
+      "batches": [[2, 0], [3, 2]],
+      "seconds": 4.1,
+      "catchRadius": 118,
+      "hints": ["看清果子的落点。", "数数两个篮还空几格。"]
+    },
+    {
+      "capacity": [4, 3],
+      "batches": [[2, 1], [3, 2], [2, 0]],
+      "seconds": 3.4,
+      "catchRadius": 100,
+      "hints": ["一串果子放进同一个篮。", "看看哪两串可以合起来装满一个篮。"]
+    },
+    {
+      "capacity": [4, 6],
+      "batches": [[3, 0], [2, 2], [1, 1], [4, 2]],
+      "seconds": 2.65,
+      "catchRadius": 88,
+      "wind": 101,
+      "hints": ["看亮线找果子的落点。", "果子慢了，数完空格再换篮。"]
+    }
+  ]
+}

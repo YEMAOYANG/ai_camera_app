@@ -700,6 +700,109 @@ test('fixed textbook directory reads no media and each authorized page only embe
   assert.equal((await fetch(`${url}&scene=second`, options)).status, 401);
 });
 
+test('fixed textbook binds student controls to a unique published page before embedding', async () => {
+  const { scene, runtime, bytes, audioPath } = narrationFixture();
+  const { classroomId } = runtime;
+  const releaseSha256 = 'a'.repeat(64);
+  const schemaVersion = 'mira.textbook.student-activity-controls.v1';
+  const originalHtml = scene.content.html;
+  const contentSha256 = createHash('sha256').update(originalHtml, 'utf8').digest('hex');
+  const forged = { schemaVersion, releaseSha256, contentSha256, template: 'sortingDepot', version: 1 };
+  scene.miraStudentActivityControls = { ...forged, template: 'bubbleMaze' };
+  const maze = { ...structuredClone(scene), id: 'maze', miraStudentActivityControls: forged };
+  const quiz = { id: 'quiz', stageId: classroomId, type: 'quiz', content: { type: 'quiz', questions: [] },
+    miraStudentActivityControls: forged };
+  const originalClassroom = { stage: { id: classroomId }, scenes: [scene, maze, quiz] };
+  const originalRuntime = { ...runtime, releaseSha256, studentActivityControls: { schemaVersion, scenes: [
+    { sceneId: scene.id, contentSha256, template: 'sortingDepot', version: 1, extra: 'do not forward' },
+    { sceneId: maze.id, contentSha256, template: 'bubbleMaze', version: 1 },
+  ] } };
+  let session = originalRuntime;
+  let classroom = originalClassroom;
+  let mediaReads = 0;
+  const backend = await listen(http.createServer((request, response) => {
+    if (request.url.endsWith('/validate')) return reply(response, { ok: true, ...session });
+    assert.equal(request.method, 'GET');
+    assert.equal(request.url, '/internal/learning/textbooks/runtime/classroom');
+    return reply(response, { success: true, classroom });
+  }));
+  const upstream = await listen(http.createServer((request, response) => {
+    assert.equal(request.url, audioPath);
+    mediaReads++;
+    response.end(bytes);
+  }));
+  const gateway = await listenGateway({ backend, upstream });
+  const url = `${gateway}/api/classroom?id=${classroomId}`;
+  const options = { headers: { cookie: 'mira_openmaic_runtime=tbpr_student-controls' } };
+  const read = async suffix => {
+    const response = await fetch(url + suffix, options);
+    assert.equal(response.status, 200);
+    return response.json();
+  };
+
+  const index = (await read('&view=pages')).classroom;
+  assert.ok(index.paged);
+  assert.ok(index.scenes.every(page => !Object.hasOwn(page, 'miraStudentActivityControls')));
+  assert.equal(mediaReads, 0);
+  const page = (await read('&scene=scene')).scene;
+  assert.deepEqual(page.miraStudentActivityControls, forged);
+  assert.match(page.content.html, /data:audio\/mpeg;base64,/);
+  assert.notEqual(createHash('sha256').update(page.content.html, 'utf8').digest('hex'), contentSha256);
+  const full = (await read('')).classroom.scenes;
+  assert.deepEqual(full[0].miraStudentActivityControls, forged);
+  assert.deepEqual(full[1].miraStudentActivityControls, { ...forged, template: 'bubbleMaze' });
+  assert.equal(Object.hasOwn(full[2], 'miraStudentActivityControls'), false);
+
+  const approvedTemplates = [
+    'sortingDepot', 'bubbleMaze', 'magnetMarbles', 'platformHop',
+    'shutterScout', 'listenDelivery', 'fallingTiles', 'compareSnake',
+    'slideMerge', 'fireflySwing', 'orchardCatch', 'wordBubbles',
+  ];
+  for (const template of approvedTemplates) {
+    session = structuredClone(originalRuntime);
+    session.studentActivityControls.scenes[0].template = template;
+    const { scene: approvedPage } = await read('&scene=scene');
+    assert.deepEqual(approvedPage.miraStudentActivityControls, { ...forged, template }, template);
+    assert.equal(approvedPage.content.html, page.content.html, template);
+  }
+
+  const cases = {
+    'historical runtime has no controls contract': (_c, r) => { delete r.studentActivityControls; },
+    'wrong schema': (_c, r) => { r.studentActivityControls.schemaVersion += '.wrong'; },
+    'wrong release hash': (_c, r) => { r.releaseSha256 = 'not-a-hash'; },
+    'wrong content hash': (_c, r) => { r.studentActivityControls.scenes[0].contentSha256 = 'b'.repeat(64); },
+    'unapproved template': (_c, r) => { r.studentActivityControls.scenes[0].template = 'unknownTemplate'; },
+    'unapproved version': (_c, r) => { r.studentActivityControls.scenes[0].version = 2; },
+    'string version': (_c, r) => { r.studentActivityControls.scenes[0].version = '1'; },
+    'different scene id': (_c, r) => { r.studentActivityControls.scenes[0].sceneId = 'elsewhere'; },
+    'duplicate authority for a page': (_c, r) => {
+      r.studentActivityControls.scenes.push({ ...r.studentActivityControls.scenes[0] });
+    },
+    'duplicate archived scene id': c => { c.scenes.push(structuredClone(c.scenes[0])); },
+    'wrong classroom stage': c => { c.stage.id = 'tbpub_' + 'f'.repeat(24); },
+    'wrong scene stage': c => { c.scenes[0].stageId = 'tbpub_' + 'f'.repeat(24); },
+    'native activity': c => { c.scenes[0].miraActivity = { id: 'native' }; },
+    'summary marker': c => { c.scenes[0].miraPageSummary = true; },
+  };
+  for (const [name, change] of Object.entries(cases)) {
+    session = structuredClone(originalRuntime);
+    classroom = structuredClone(originalClassroom);
+    change(classroom, session);
+    assert.equal(Object.hasOwn((await read('&scene=scene')).scene, 'miraStudentActivityControls'), false, name);
+  }
+});
+
+test('non-textbook classroom delivery strips authored student activity controls', () => {
+  const classroom = formalClassroom(1);
+  classroom.scenes[0].miraStudentActivityControls = { schemaVersion: 'mira.textbook.student-activity-controls.v1',
+    releaseSha256: 'a'.repeat(64), contentSha256: 'b'.repeat(64), template: 'sortingDepot', version: 1 };
+  const raw = Buffer.from(JSON.stringify({ success: true, classroom }));
+  const manifest = formalAudioManifest('c'.repeat(64), 100, classroom);
+  const assembled = JSON.parse(injectRuntimeAudioBindings(raw, formalRuntime(), manifest));
+  assert.equal(Object.hasOwn(assembled.classroom.scenes[0], 'miraStudentActivityControls'), false);
+  assert.equal(assembled.classroom.scenes[0].actions[0].audioId, 'formal-audio-0');
+});
+
 test('published video and GLB bytes retain exact session, hash, size and format boundaries', async () => {
   const classroomId = 'tbpub_' + 'd'.repeat(24);
   const pathFor = name => `/api/classroom-media/${classroomId}/media/${name}`;

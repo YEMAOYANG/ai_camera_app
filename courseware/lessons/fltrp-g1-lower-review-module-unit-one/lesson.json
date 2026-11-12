@@ -1,0 +1,1227 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "Review Module Unit 1",
+  "description": "在原创社区展示日听职业、点数身体部位、猜动物并说喜好。",
+  "grade": 1,
+  "roster": {
+    "mia": {
+      "name": "Mia 老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Jennifer",
+      "avatar": "/teachers/coco-english-v1.png",
+      "color": "#51736c",
+      "persona": "短句带孩子听清人物、部位数量、动物和喜好。"
+    }
+  },
+  "scenes": [
+    {
+      "key": "community-open-day",
+      "type": "slide",
+      "title": "谁来社区展示日",
+      "template": "title-picture",
+      "data": {
+        "title": "谁来社区展示日",
+        "picture": "community-welcome",
+        "caption": "Welcome!"
+      },
+      "script": [
+        {
+          "say": "社区展示日要开始啦。你能帮我听清楚，谁在介绍谁吗？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "小朋友带来画的家人卡。每张都能讲一个小故事。"
+        },
+        {
+          "say": "一张卡说这是谁，另一张卡告诉我们做什么工作。"
+        },
+        {
+          "say": "工作要听介绍才知道。我们不从衣服的颜色猜。"
+        },
+        {
+          "say": "桌上还有纸偶，待会儿只数听到的身体部位。"
+        },
+        {
+          "say": "最后，到动物站猜动物，再说自己最喜欢哪一种。"
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "Welcome!"
+        },
+        {
+          "say": "先听第一位小朋友的介绍。请用手指跟着图片。"
+        }
+      ]
+    },
+    {
+      "key": "say-the-job",
+      "type": "slide",
+      "title": "先听人，再听工作",
+      "template": "two-columns",
+      "data": {
+        "title": "先听人，再听工作",
+        "left": {
+          "heading": "听第一张",
+          "body": "She’s a doctor."
+        },
+        "right": {
+          "heading": "听第二张",
+          "body": "He’s a nurse."
+        },
+        "left_picture": "example-woman-doctor",
+        "right_picture": "example-man-nurse"
+      },
+      "script": [
+        {
+          "say": "两张图都在诊室。你能听出不同的工作吗？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "左边是我的姑姑 Nora。她说今天给人检查身体。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "She’s a doctor."
+        },
+        {
+          "say": "She 说的是刚才介绍的姑姑。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "右边是 Ming 叔叔。他说今天要照护病人。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "He’s a nurse."
+        },
+        {
+          "say": "He 说的是叔叔，nurse 是护士。"
+        },
+        {
+          "say": "先找说到的人，再听清后面的工作。动作和话要对上。"
+        },
+        {
+          "say": "你可以指图，跟我说一遍。每次只介绍一个人。"
+        }
+      ]
+    },
+    {
+      "key": "listen-to-the-radio",
+      "type": "slide",
+      "title": "听一段小广播",
+      "template": "title-picture",
+      "data": {
+        "title": "听一段小广播",
+        "picture": "community-cards",
+        "caption": "Listen and match"
+      },
+      "script": [
+        {
+          "say": "广播说了工作，还说要送给谁。先听哪一句？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "第一句说卡上要画谁的工作。听到司机就找开车的图。"
+        },
+        {
+          "say": "Lin 在开巴士。Bo 在教室带大家上课。"
+        },
+        {
+          "say": "She’s a driver."
+        },
+        {
+          "say": "He’s a teacher."
+        },
+        {
+          "say": "拿到卡还要再听一句名字。听到谁，就送到谁的图。"
+        },
+        {
+          "say": "Pick the doctor card."
+        },
+        {
+          "say": "Give it to Nora."
+        },
+        {
+          "say": "Pick the driver card."
+        },
+        {
+          "say": "Give it to Lin."
+        },
+        {
+          "say": "Pick the nurse card."
+        },
+        {
+          "say": "Give it to Ming."
+        },
+        {
+          "say": "Pick the teacher card."
+        },
+        {
+          "say": "Give it to Bo."
+        },
+        {
+          "say": "再听工作或名字，然后看图。"
+        },
+        {
+          "say": "看亮起来的卡，停车再按方键。"
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "工作和人都配对了！"
+        },
+        {
+          "say": "我们到车边试试。先听，再动。"
+        }
+      ]
+    },
+    {
+      "key": "send-the-job-cards",
+      "type": "interactive",
+      "title": "送对职业图卡",
+      "page": "send-the-job-cards",
+      "startImage": "community-game-yard",
+      "widgetType": "learning-arcade",
+      "script": [
+        {
+          "say": "邮车想帮大家把卡送到展示台。第一张该拿什么？"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#job-replay"
+        },
+        {
+          "say": "先用小喇叭听清楚。我听到了 doctor。"
+        },
+        {
+          "highlight": "#first-job-card"
+        },
+        {
+          "say": "大图上医生正在给人检查。我选医生工作卡。"
+        },
+        {
+          "highlight": "#first-pickup"
+        },
+        {
+          "say": "车停在同一张图的格子里。就按一次方键拿卡。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "拿到后，右边会出现这张卡。先示范这一步。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "卡上车了。接着听名字，开到那个人的图上。"
+        },
+        {
+          "say": "路上有别的车。先看哪一格空着，再往前开。"
+        },
+        {
+          "say": "换你从头做。先听工作，再听名字，两个都配准。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "pick-doctor": "listen-to-the-radio-8",
+        "pick-nurse": "listen-to-the-radio-12",
+        "pick-driver": "listen-to-the-radio-10",
+        "pick-teacher": "listen-to-the-radio-14",
+        "send-nora": "listen-to-the-radio-9",
+        "send-ming": "listen-to-the-radio-13",
+        "send-lin": "listen-to-the-radio-11",
+        "send-bo": "listen-to-the-radio-15",
+        "jobs-hint": "listen-to-the-radio-16",
+        "jobs-help": "listen-to-the-radio-17",
+        "jobs-praise": "listen-to-the-radio-19"
+      }
+    },
+    {
+      "key": "name-the-parts",
+      "type": "slide",
+      "title": "这是什么部位",
+      "template": "two-columns",
+      "data": {
+        "title": "这是什么部位",
+        "left": {
+          "heading": "只有一个",
+          "body": "This is my head."
+        },
+        "right": {
+          "heading": "成对出现",
+          "body": "These are my feet."
+        },
+        "left_picture": "one-robot-head",
+        "right_picture": "two-robot-feet"
+      },
+      "script": [
+        {
+          "say": "纸偶举起手跟我们打招呼。你能指出它的头吗？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "头是上面这个圆圆的大部位。这张卡里只画了一个。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "This is my head."
+        },
+        {
+          "say": "现在自己也指一下头。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "再看脚。左边一个，右边一个。"
+        },
+        {
+          "say": "One, two."
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "These are my feet."
+        },
+        {
+          "say": "一个部位用 This is。说多个部位时，用 These are。"
+        },
+        {
+          "say": "一只脚是 a foot。两只脚说 two feet。听词尾要留神。"
+        }
+      ]
+    },
+    {
+      "key": "count-just-one-kind",
+      "type": "slide",
+      "title": "只数刚才问的部位",
+      "template": "two-columns",
+      "data": {
+        "title": "只数刚才问的部位",
+        "left": {
+          "heading": "先圈眼睛",
+          "body": "How many eyes?"
+        },
+        "right": {
+          "heading": "再指双手",
+          "body": "How many hands?"
+        },
+        "left_picture": "paper-robot-many",
+        "right_picture": "paper-robot-pair"
+      },
+      "script": [
+        {
+          "say": "纸偶有眼睛也有手。听到 How many eyes，只数什么？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "先找眼睛，从左往右一个一个指。手和耳朵先不数。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "How many eyes?"
+        },
+        {
+          "say": "Three."
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "这次换成手。请找两边伸出去的纸手。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "How many hands?"
+        },
+        {
+          "say": "Two."
+        },
+        {
+          "say": "听到 How many，等后面的词说完，再选要数的部位。"
+        },
+        {
+          "say": "有些卡数量相同。还要听清 eyes、hands、ears 或 feet。"
+        },
+        {
+          "say": "Find two hands."
+        },
+        {
+          "say": "Find three eyes."
+        },
+        {
+          "say": "Find two ears."
+        },
+        {
+          "say": "Find four feet."
+        },
+        {
+          "say": "Find two eyes."
+        },
+        {
+          "say": "Find three hands."
+        },
+        {
+          "say": "Find three ears."
+        },
+        {
+          "say": "Find two feet."
+        },
+        {
+          "say": "Find four eyes."
+        },
+        {
+          "say": "听清问哪个部位，再点着数。"
+        },
+        {
+          "say": "对准亮起的图，推一推方向。"
+        },
+        {
+          "say": "这组部位和数量都对。"
+        }
+      ]
+    },
+    {
+      "key": "send-the-body-marble",
+      "type": "interactive",
+      "title": "把弹珠送到对应图",
+      "page": "send-the-body-marble",
+      "startImage": "community-marble-board",
+      "widgetType": "learning-arcade",
+      "script": [
+        {
+          "say": "弹珠要打中一张图。三个靶都看清了，你先听哪一句？"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#body-cue"
+        },
+        {
+          "say": "先听部位和数量。我听到了 two hands。"
+        },
+        {
+          "highlight": "#first-body-target"
+        },
+        {
+          "say": "这张有两只手。旁边虽然也有两个，画的是耳朵。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "左右能转方向。对准这张，点发射。"
+        },
+        {
+          "say": "弹珠出去以后，还能按一下方向，让它靠近正确的图。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "打中了，这张留下一颗星。只示范一次。"
+        },
+        {
+          "say": "轮到你。先说给自己听：数什么，有几个？再瞄准。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "body-hands-two": "count-just-one-kind-14",
+        "body-eyes-three": "count-just-one-kind-15",
+        "body-ears-two": "count-just-one-kind-16",
+        "body-feet-four": "count-just-one-kind-17",
+        "body-eyes-two": "count-just-one-kind-18",
+        "body-hands-three": "count-just-one-kind-19",
+        "body-ears-three": "count-just-one-kind-20",
+        "body-feet-two": "count-just-one-kind-21",
+        "body-eyes-four": "count-just-one-kind-22",
+        "body-hint": "count-just-one-kind-23",
+        "body-help": "count-just-one-kind-24",
+        "body-praise": "count-just-one-kind-25"
+      }
+    },
+    {
+      "key": "guess-the-animal",
+      "type": "slide",
+      "title": "猜动物，要问对",
+      "template": "two-columns",
+      "data": {
+        "title": "猜动物，要问对",
+        "left": {
+          "heading": "先猜一种",
+          "body": "Is it a duck?"
+        },
+        "right": {
+          "heading": "听完再改",
+          "body": "No, it isn’t."
+        },
+        "left_picture": "animal-mime-duck",
+        "right_picture": "animal-mime-dog"
+      },
+      "script": [
+        {
+          "say": "小朋友学一个动物的动作。你要怎么问是不是它？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "两只手摆成扁嘴，身体摇一摇。我先猜鸭子。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "Is it a duck?"
+        },
+        {
+          "say": "Yes, it is."
+        },
+        {
+          "say": "答 Yes，就是猜对了。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "现在换一个。它摇尾巴，还会汪汪叫。还是鸭子吗？"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "Is it a duck?"
+        },
+        {
+          "say": "No, it isn’t."
+        },
+        {
+          "say": "答 No，就换一个猜。"
+        },
+        {
+          "say": "Is it a dog?"
+        },
+        {
+          "say": "Yes, it is."
+        },
+        {
+          "say": "要问的是它是哪种动物。等对方答完，再说你的第二个猜想。"
+        }
+      ]
+    },
+    {
+      "key": "say-what-you-like",
+      "type": "slide",
+      "title": "喜欢，还是最喜欢",
+      "template": "two-columns",
+      "data": {
+        "title": "喜欢，还是最喜欢",
+        "left": {
+          "heading": "问是否喜欢",
+          "body": "Do you like dogs?"
+        },
+        "right": {
+          "heading": "问最喜欢哪种",
+          "body": "What’s your favourite animal?"
+        },
+        "left_picture": "liking-dogs",
+        "right_picture": "favourite-rabbit"
+      },
+      "script": [
+        {
+          "say": "你喜欢小狗，就一定最喜欢小狗吗？我们听两种问法。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "第一种只问你喜不喜欢小狗。喜欢，就点头。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "Do you like dogs?"
+        },
+        {
+          "say": "Yes, I do."
+        },
+        {
+          "say": "也可以不喜欢。那就用 No, I don’t.。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "现在换一个问题。这次要说出一种你最喜欢的。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "What’s your favourite animal?"
+        },
+        {
+          "say": "The rabbit."
+        },
+        {
+          "say": "刚才喜欢小狗，也可以最喜欢兔子。答案由你自己选。"
+        },
+        {
+          "say": "问家人时，先问，再等他说。两个人可以有不同答案。"
+        }
+      ]
+    },
+    {
+      "key": "review-picture-check",
+      "type": "quiz",
+      "title": "听完选一张新图",
+      "intro": [
+        "先听题，再选符合的图。",
+        "没听清，可以点小喇叭再听。"
+      ],
+      "questions": [
+        {
+          "id": "review-one-q1",
+          "question": "She’s a teacher.",
+          "skill": "听辨职业",
+          "answer": [
+            "B"
+          ],
+          "analysis": "听到 teacher，选在教室上课的画面。另两张是检查身体和开车。",
+          "visual": {
+            "kind": "asset",
+            "image": "check-1-listen",
+            "alt": "听题图标"
+          },
+          "options": {
+            "A": {
+              "label": "图卡1",
+              "visual": {
+                "kind": "asset",
+                "image": "check-1-card-1",
+                "alt": "诊室里检查病人的女医生"
+              }
+            },
+            "B": {
+              "label": "图卡2",
+              "visual": {
+                "kind": "asset",
+                "image": "check-1-card-2",
+                "alt": "教室上课的女教师"
+              }
+            },
+            "C": {
+              "label": "图卡3",
+              "visual": {
+                "kind": "asset",
+                "image": "check-1-card-3",
+                "alt": "驾驶公交车的女司机"
+              }
+            }
+          }
+        },
+        {
+          "id": "review-one-q2",
+          "question": "He’s a doctor.",
+          "skill": "人物与职业线索",
+          "answer": [
+            "A"
+          ],
+          "analysis": "doctor 是医生。图一在诊室检查身体；另两张分别在开车和讲课。",
+          "visual": {
+            "kind": "asset",
+            "image": "check-2-listen",
+            "alt": "听题图标"
+          },
+          "options": {
+            "A": {
+              "label": "图卡1",
+              "visual": {
+                "kind": "asset",
+                "image": "check-2-card-1",
+                "alt": "诊室检查身体的男医生"
+              }
+            },
+            "B": {
+              "label": "图卡2",
+              "visual": {
+                "kind": "asset",
+                "image": "check-2-card-2",
+                "alt": "开车的男司机"
+              }
+            },
+            "C": {
+              "label": "图卡3",
+              "visual": {
+                "kind": "asset",
+                "image": "check-2-card-3",
+                "alt": "在教室讲课的男教师"
+              }
+            }
+          }
+        },
+        {
+          "id": "review-one-q3",
+          "question": "Point to five ears.",
+          "skill": "同类身体部位点数",
+          "answer": [
+            "C"
+          ],
+          "analysis": "找耳朵，再逐个数到五。第一张是五只手，第二张只有四只耳朵。",
+          "visual": {
+            "kind": "asset",
+            "image": "check-3-listen",
+            "alt": "听题图标"
+          },
+          "options": {
+            "A": {
+              "label": "图卡1",
+              "visual": {
+                "kind": "asset",
+                "image": "check-3-card-1",
+                "alt": "五只纸偶手"
+              }
+            },
+            "B": {
+              "label": "图卡2",
+              "visual": {
+                "kind": "asset",
+                "image": "check-3-card-2",
+                "alt": "四只纸偶耳朵"
+              }
+            },
+            "C": {
+              "label": "图卡3",
+              "visual": {
+                "kind": "asset",
+                "image": "check-3-card-3",
+                "alt": "五只纸偶耳朵"
+              }
+            }
+          }
+        },
+        {
+          "id": "review-one-q4",
+          "question": "Find four hands.",
+          "skill": "听清名词和数量",
+          "answer": [
+            "B"
+          ],
+          "analysis": "第二张有四只手。第一张是四只脚，第三张只有三只手。",
+          "visual": {
+            "kind": "asset",
+            "image": "check-4-listen",
+            "alt": "听题图标"
+          },
+          "options": {
+            "A": {
+              "label": "图卡1",
+              "visual": {
+                "kind": "asset",
+                "image": "check-4-card-1",
+                "alt": "四只纸偶脚"
+              }
+            },
+            "B": {
+              "label": "图卡2",
+              "visual": {
+                "kind": "asset",
+                "image": "check-4-card-2",
+                "alt": "四只纸偶手"
+              }
+            },
+            "C": {
+              "label": "图卡3",
+              "visual": {
+                "kind": "asset",
+                "image": "check-4-card-3",
+                "alt": "三只纸偶手"
+              }
+            }
+          }
+        },
+        {
+          "id": "review-one-q5",
+          "question": "Is it a pig? Yes, it is.",
+          "skill": "动物确认问答",
+          "answer": [
+            "C"
+          ],
+          "analysis": "听到 Yes，猜的猪对了。第三张有圆鼻子和卷尾巴。",
+          "visual": {
+            "kind": "asset",
+            "image": "check-5-listen",
+            "alt": "听题图标"
+          },
+          "options": {
+            "A": {
+              "label": "图卡1",
+              "visual": {
+                "kind": "asset",
+                "image": "check-5-card-1",
+                "alt": "小羊"
+              }
+            },
+            "B": {
+              "label": "图卡2",
+              "visual": {
+                "kind": "asset",
+                "image": "check-5-card-2",
+                "alt": "小狗"
+              }
+            },
+            "C": {
+              "label": "图卡3",
+              "visual": {
+                "kind": "asset",
+                "image": "check-5-card-3",
+                "alt": "小猪"
+              }
+            }
+          }
+        },
+        {
+          "id": "review-one-q6",
+          "question": "Is it a lion? No. It’s a cat.",
+          "skill": "动物线索和身份",
+          "answer": [
+            "A"
+          ],
+          "analysis": "先否定狮子，再说是猫。第一张是猫，后两张分别是狮子和牛。",
+          "visual": {
+            "kind": "asset",
+            "image": "check-6-listen",
+            "alt": "听题图标"
+          },
+          "options": {
+            "A": {
+              "label": "图卡1",
+              "visual": {
+                "kind": "asset",
+                "image": "check-6-card-1",
+                "alt": "小猫"
+              }
+            },
+            "B": {
+              "label": "图卡2",
+              "visual": {
+                "kind": "asset",
+                "image": "check-6-card-2",
+                "alt": "狮子"
+              }
+            },
+            "C": {
+              "label": "图卡3",
+              "visual": {
+                "kind": "asset",
+                "image": "check-6-card-3",
+                "alt": "奶牛"
+              }
+            }
+          }
+        },
+        {
+          "id": "review-one-q7",
+          "question": "My favourite animal is the bird.",
+          "skill": "听最喜欢的动物",
+          "answer": [
+            "B"
+          ],
+          "analysis": "favourite 问最喜欢，句尾 bird 是小鸟。找翅膀和尖嘴。",
+          "visual": {
+            "kind": "asset",
+            "image": "check-7-listen",
+            "alt": "听题图标"
+          },
+          "options": {
+            "A": {
+              "label": "图卡1",
+              "visual": {
+                "kind": "asset",
+                "image": "check-7-card-1",
+                "alt": "小狗"
+              }
+            },
+            "B": {
+              "label": "图卡2",
+              "visual": {
+                "kind": "asset",
+                "image": "check-7-card-2",
+                "alt": "小鸟"
+              }
+            },
+            "C": {
+              "label": "图卡3",
+              "visual": {
+                "kind": "asset",
+                "image": "check-7-card-3",
+                "alt": "小兔"
+              }
+            }
+          }
+        },
+        {
+          "id": "review-one-q8",
+          "question": "I like cats. My favourite is the dog.",
+          "skill": "听喜欢和最喜欢",
+          "answer": [
+            "C"
+          ],
+          "analysis": "第一句喜欢猫，第二句说最喜欢小狗。这道题只找最喜欢的。",
+          "visual": {
+            "kind": "asset",
+            "image": "check-8-listen",
+            "alt": "听题图标"
+          },
+          "options": {
+            "A": {
+              "label": "图卡1",
+              "visual": {
+                "kind": "asset",
+                "image": "check-8-card-1",
+                "alt": "小猫"
+              }
+            },
+            "B": {
+              "label": "图卡2",
+              "visual": {
+                "kind": "asset",
+                "image": "check-8-card-2",
+                "alt": "小鸡"
+              }
+            },
+            "C": {
+              "label": "图卡3",
+              "visual": {
+                "kind": "asset",
+                "image": "check-8-card-3",
+                "alt": "小狗"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "tell-someone-at-home",
+      "type": "slide",
+      "title": "带一张介绍卡回家",
+      "template": "picture-points",
+      "data": {
+        "title": "带一张介绍卡回家",
+        "picture": "community-review-map",
+        "points": [
+          "Jobs",
+          "Body parts",
+          "Favourite animal"
+        ]
+      },
+      "script": [
+        {
+          "say": "展示台要关门啦。你能选三张卡，向家人介绍吗？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "先拿职业图，想想要介绍谁。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "He’s a teacher."
+        },
+        {
+          "say": "说清楚人和工作，就像我们在邮车上做过的。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "再拿纸偶图。听见要数哪个部位，只数那个。"
+        },
+        {
+          "say": "These are my hands."
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "最后挑一只自己最喜欢的动物，告诉家人。"
+        },
+        {
+          "say": "My favourite animal is the cat."
+        },
+        {
+          "say": "你可以换成自己的答案。"
+        },
+        {
+          "say": "请家人先听，再问一句。也可以回到纸书第六十二、六十三页。"
+        }
+      ]
+    }
+  ],
+  "images": {
+    "animal-mime-dog": {
+      "file": "assets/animal-mime-dog.png"
+    },
+    "animal-mime-duck": {
+      "file": "assets/animal-mime-duck.png"
+    },
+    "check-1-card-1": {
+      "file": "assets/check-1-card-1.png"
+    },
+    "check-1-card-2": {
+      "file": "assets/check-1-card-2.png"
+    },
+    "check-1-card-3": {
+      "file": "assets/check-1-card-3.png"
+    },
+    "check-1-listen": {
+      "file": "assets/check-1-listen.png"
+    },
+    "check-2-card-1": {
+      "file": "assets/check-2-card-1.png"
+    },
+    "check-2-card-2": {
+      "file": "assets/check-2-card-2.png"
+    },
+    "check-2-card-3": {
+      "file": "assets/check-2-card-3.png"
+    },
+    "check-2-listen": {
+      "file": "assets/check-2-listen.png"
+    },
+    "check-3-card-1": {
+      "file": "assets/check-3-card-1.png"
+    },
+    "check-3-card-2": {
+      "file": "assets/check-3-card-2.png"
+    },
+    "check-3-card-3": {
+      "file": "assets/check-3-card-3.png"
+    },
+    "check-3-listen": {
+      "file": "assets/check-3-listen.png"
+    },
+    "check-4-card-1": {
+      "file": "assets/check-4-card-1.png"
+    },
+    "check-4-card-2": {
+      "file": "assets/check-4-card-2.png"
+    },
+    "check-4-card-3": {
+      "file": "assets/check-4-card-3.png"
+    },
+    "check-4-listen": {
+      "file": "assets/check-4-listen.png"
+    },
+    "check-5-card-1": {
+      "file": "assets/check-5-card-1.png"
+    },
+    "check-5-card-2": {
+      "file": "assets/check-5-card-2.png"
+    },
+    "check-5-card-3": {
+      "file": "assets/check-5-card-3.png"
+    },
+    "check-5-listen": {
+      "file": "assets/check-5-listen.png"
+    },
+    "check-6-card-1": {
+      "file": "assets/check-6-card-1.png"
+    },
+    "check-6-card-2": {
+      "file": "assets/check-6-card-2.png"
+    },
+    "check-6-card-3": {
+      "file": "assets/check-6-card-3.png"
+    },
+    "check-6-listen": {
+      "file": "assets/check-6-listen.png"
+    },
+    "check-7-card-1": {
+      "file": "assets/check-7-card-1.png"
+    },
+    "check-7-card-2": {
+      "file": "assets/check-7-card-2.png"
+    },
+    "check-7-card-3": {
+      "file": "assets/check-7-card-3.png"
+    },
+    "check-7-listen": {
+      "file": "assets/check-7-listen.png"
+    },
+    "check-8-card-1": {
+      "file": "assets/check-8-card-1.png"
+    },
+    "check-8-card-2": {
+      "file": "assets/check-8-card-2.png"
+    },
+    "check-8-card-3": {
+      "file": "assets/check-8-card-3.png"
+    },
+    "check-8-listen": {
+      "file": "assets/check-8-listen.png"
+    },
+    "community-cards": {
+      "file": "assets/community-cards.png"
+    },
+    "community-cart": {
+      "file": "assets/community-cart.png"
+    },
+    "community-game-yard": {
+      "file": "assets/community-game-yard.png"
+    },
+    "community-marble": {
+      "file": "assets/community-marble.png"
+    },
+    "community-marble-board": {
+      "file": "assets/community-marble-board.png"
+    },
+    "community-review-map": {
+      "file": "assets/community-review-map.png"
+    },
+    "community-star": {
+      "file": "assets/community-star.png"
+    },
+    "community-traffic": {
+      "file": "assets/community-traffic.png"
+    },
+    "community-welcome": {
+      "file": "assets/community-welcome.png"
+    },
+    "example-man-nurse": {
+      "file": "assets/example-man-nurse.png"
+    },
+    "example-woman-doctor": {
+      "file": "assets/example-woman-doctor.png"
+    },
+    "favourite-rabbit": {
+      "file": "assets/favourite-rabbit.png"
+    },
+    "four-robot-eyes": {
+      "file": "assets/four-robot-eyes.png"
+    },
+    "four-robot-feet": {
+      "file": "assets/four-robot-feet.png"
+    },
+    "job-doctor": {
+      "file": "assets/job-doctor.png"
+    },
+    "job-driver": {
+      "file": "assets/job-driver.png"
+    },
+    "job-nurse": {
+      "file": "assets/job-nurse.png"
+    },
+    "job-teacher": {
+      "file": "assets/job-teacher.png"
+    },
+    "liking-dogs": {
+      "file": "assets/liking-dogs.png"
+    },
+    "one-robot-head": {
+      "file": "assets/one-robot-head.png"
+    },
+    "paper-robot-many": {
+      "file": "assets/paper-robot-many.png"
+    },
+    "paper-robot-pair": {
+      "file": "assets/paper-robot-pair.png"
+    },
+    "person-bo": {
+      "file": "assets/person-bo.png"
+    },
+    "person-lin": {
+      "file": "assets/person-lin.png"
+    },
+    "person-ming": {
+      "file": "assets/person-ming.png"
+    },
+    "person-nora": {
+      "file": "assets/person-nora.png"
+    },
+    "three-robot-ears": {
+      "file": "assets/three-robot-ears.png"
+    },
+    "three-robot-eyes": {
+      "file": "assets/three-robot-eyes.png"
+    },
+    "three-robot-hands": {
+      "file": "assets/three-robot-hands.png"
+    },
+    "two-robot-ears": {
+      "file": "assets/two-robot-ears.png"
+    },
+    "two-robot-eyes": {
+      "file": "assets/two-robot-eyes.png"
+    },
+    "two-robot-feet": {
+      "file": "assets/two-robot-feet.png"
+    },
+    "two-robot-hands": {
+      "file": "assets/two-robot-hands.png"
+    }
+  }
+}

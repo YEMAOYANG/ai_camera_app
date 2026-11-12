@@ -1,0 +1,1791 @@
+{
+  "schemaVersion": "mira.courseware.asset-provenance.v1",
+  "assets": {
+    "bird-park-cover": {
+      "path": "assets/bird-park-cover.png",
+      "sha256": "693d6b0683e7698251d6fccdb3ea87f5c533be2ac189f08f109c8b90d8542e74",
+      "pixels": [
+        1672,
+        941
+      ],
+      "bytes": 2479026,
+      "mode": "RGB",
+      "sourceKind": "codex_builtin_imagegen",
+      "originalToolOutput": "/Users/sqcopenclaw/.codex/generated_images/01a1bef3-8d96-70c1-9412-0d8e58ba9363/exec-fce140d9-6648-415f-b608-b46492ac783e.png",
+      "generationPrompt": "Use case: illustration-story. Landscape 16:9 opening illustration. A young girl with dark brown hair and a pale sage raincoat holds a small camera at chest level, seen from slightly behind. A clear bright yellow bird perches on a single tree branch across the shallow pond and is visually distinct from the greenery. A low wooden rail and winding boardwalk establish an obvious foreground and farther space. No other animal or prominent item. Keep the whole girl and bird inside the central 80 percent. Original warm gouache picture-book illustration for Chinese first-grade English learners, calm mint and honey palette, clean silhouettes at 60 px, matte paint, soft daylight. No text, letters, numerals, logos, marks or copyrighted character design.",
+      "transparentBackground": false,
+      "usedBy": [
+        "listen-three-clues",
+        "lookout-camera:start",
+        "costume-rhythm-run:start"
+      ],
+      "visualInspection": {
+        "reviewedAt": "2026-11-09T08:26:06.602773+00:00",
+        "reviewedBy": "gpt-6.1-sol",
+        "result": "黄鸟在水面另一侧方向的枝上，观察员站在木栈道前景，主体全、轮廓清楚。手扶相机，无文字。小屏实景待 G6。"
+      }
+    },
+    "yellow-bird": {
+      "path": "assets/yellow-bird.png",
+      "sha256": "3443151b534811e7ce245ef16911deffcf9d916f6e46dd73b8043083d255debf",
+      "pixels": [
+        1536,
+        1024
+      ],
+      "bytes": 1477421,
+      "mode": "RGBA",
+      "sourceKind": "codex_builtin_imagegen",
+      "originalToolOutput": "/Users/sqcopenclaw/.codex/generated_images/01a1bef3-8d96-70c1-9412-0d8e58ba9363/exec-f7e485ab-1c3b-4c14-a50a-a2365009f516.png",
+      "generationPrompt": "Use case: illustration-story. One small generic storybook songbird in right-facing profile, ready to perch. Entire head and torso bright sunflower yellow, small neutral beak, two feet, one folded wing, clean short tail. Show the complete bird with 15 percent transparent padding. No twig, cage, scenery, shadow or extra bird. Original warm gouache picture-book illustration for Chinese first-grade English learners, calm mint and honey palette, clean silhouettes at 60 px, matte paint, soft daylight. No text, letters, numerals, logos, marks or copyrighted character design.",
+      "transparentBackground": true,
+      "alphaContentBoundsThreshold160": [
+        296,
+        122,
+        1168,
+        895
+      ],
+      "usedBy": [
+        "bag-and-bird",
+        "lookout-camera"
+      ],
+      "visualInspection": {
+        "reviewedAt": "2026-11-09T08:27:19.398439+00:00",
+        "reviewedBy": "gpt-6.1-sol",
+        "result": "核对了真正的 PNG 透明通道，并放在浅薄荷底上看 96、64、44 像素试缩。完整单只黄鸟，喙、折翼、尾和双脚清楚，无可见边缘光圈。实际游戏以源像素取景框留边放大，原始 alpha 保留。"
+      }
+    },
+    "lookout-background": {
+      "path": "assets/lookout-background.png",
+      "sha256": "ce0a4680869801e5a901f9c1b481e7a4bc1fd753eb1772b7d0c83954e2f4f6b6",
+      "pixels": [
+        1672,
+        941
+      ],
+      "bytes": 2171772,
+      "mode": "RGB",
+      "sourceKind": "codex_builtin_imagegen",
+      "originalToolOutput": "/Users/sqcopenclaw/.codex/generated_images/01a1bef3-8d96-70c1-9412-0d8e58ba9363/exec-4348d74b-4454-44a2-bbae-e0e32e322108.png",
+      "generationPrompt": "Use case: illustration-story. Landscape 16:9 background for a full-screen real-time park photography game. Side-on three-quarter view of a bright quiet park, with a pale boardwalk along the bottom, mint pond beyond and distant foliage and slender trees. Low-contrast scenery with clear open central working area and no animals, people, equipment, signs or painted targets. All moving actors and distance markers will be placed separately by the game. Original warm gouache picture-book illustration for Chinese first-grade English learners, calm mint and honey palette, clean silhouettes at 60 px, matte paint, soft daylight. No text, letters, numerals, logos, marks or copyrighted character design.",
+      "transparentBackground": false,
+      "usedBy": [
+        "lookout-camera"
+      ],
+      "visualInspection": {
+        "reviewedAt": "2026-11-09T08:29:03.618117+00:00",
+        "reviewedBy": "gpt-6.1-sol",
+        "result": "与封面同一绘本画风，完整宽幅。前景栈道、水面和远端树林层次清楚，中央留白，无预画角色或题目。小屏叠加游戏角色待实测。"
+      }
+    },
+    "lookout-guide": {
+      "path": "assets/lookout-guide.png",
+      "sha256": "88a49a524e421d880c12e141a213e583baaf930fe12dec711d72ebd227d7bf93",
+      "pixels": [
+        1254,
+        1254
+      ],
+      "bytes": 690848,
+      "mode": "RGBA",
+      "sourceKind": "codex_builtin_imagegen",
+      "originalToolOutput": "/Users/sqcopenclaw/.codex/generated_images/01a1bef3-8d96-70c1-9412-0d8e58ba9363/exec-f27da721-6703-4c80-96e7-20c438a74fc4.png",
+      "generationPrompt": "Use case: illustration-story. One isolated full-body young girl field guide in pale sage hooded raincoat and mustard-yellow rain boots, shoulder-length chestnut hair gathered half up with a small pale yellow bow. She stands in side profile facing right and holds a compact camera naturally against her chest with two hands. A single distinct silhouette, face, elbows, boots and camera wholly visible. Center the complete figure in a square with 14 percent transparent padding and no floor shadow. Original warm gouache picture-book illustration for Chinese first-grade English learners, calm mint and honey palette, clean silhouettes at 60 px, matte paint, soft daylight. No text, letters, numerals, logos, marks or copyrighted character design.",
+      "transparentBackground": true,
+      "alphaContentBoundsThreshold160": [
+        406,
+        93,
+        796,
+        1179
+      ],
+      "usedBy": [
+        "lookout-camera",
+        "from-the-speaker",
+        "picture-check:distance-stimuli"
+      ],
+      "visualInspection": {
+        "reviewedAt": "2026-11-09T08:30:58.414019+00:00",
+        "reviewedBy": "gpt-6.1-sol",
+        "result": "全身完整，人物侧向与摄像机、两手、蝴蝶结、黄色雨靴清晰。真实透明。图中另有随身浅色背包，保留与题目用品的间距。小屏合成待验。"
+      }
+    },
+    "blue-bird": {
+      "path": "assets/blue-bird.png",
+      "sha256": "50c8848992b2a83dc1004598e666890a0476e0355cc20c76d48465e971f60788",
+      "pixels": [
+        1536,
+        1024
+      ],
+      "bytes": 1592503,
+      "mode": "RGBA",
+      "sourceKind": "codex_builtin_imagegen",
+      "originalToolOutput": "/Users/sqcopenclaw/.codex/generated_images/01a1bef3-8d96-70c1-9412-0d8e58ba9363/exec-21132783-1632-453c-be05-c2fc393a5b29.png",
+      "generationPrompt": "Use case: illustration-story. One small generic storybook songbird in right-facing profile, ready to perch, with a bright blue head, wing and torso. Small neutral beak, two feet, one folded wing and short tail. Complete figure with transparent padding. No twig, scene, floor shadow or extra bird. Original warm gouache picture-book illustration for Chinese first-grade English learners, calm mint and honey palette, clean silhouettes at 60 px, matte paint, soft daylight. No text, letters, numerals, logos, marks or copyrighted character design.",
+      "transparentBackground": true,
+      "alphaContentBoundsThreshold160": [
+        315,
+        115,
+        1211,
+        938
+      ],
+      "usedBy": [
+        "lookout-camera",
+        "picture-check:hear-far-blue-bird",
+        "picture-check:new-speaker-near-black-bird"
+      ],
+      "visualInspection": {
+        "reviewedAt": "2026-11-09T08:32:03.404275+00:00",
+        "reviewedBy": "gpt-6.1-sol",
+        "result": "真实透明，蓝色头、背、折翼和尾明确，胸腹浅色。与黄鸟、观察员和正式背景在640×360静态合成中逐图看过，色类清楚，喙、脚无截断。真实试玩待验。"
+      }
+    },
+    "black-bird": {
+      "path": "assets/black-bird.png",
+      "sha256": "550500417b06e4cc5287f67b4529e324a89e7da6529f4ecd8c7aea8e31048951",
+      "pixels": [
+        1536,
+        1024
+      ],
+      "bytes": 1396237,
+      "mode": "RGBA",
+      "sourceKind": "codex_builtin_imagegen",
+      "originalToolOutput": "/Users/sqcopenclaw/.codex/generated_images/01a1bef3-8d96-70c1-9412-0d8e58ba9363/exec-f55bb270-9e05-4a87-b7a4-bf4915a43c84.png",
+      "generationPrompt": "Use case: illustration-story. Isolated transparent cutout of exactly one entirely black-feathered storybook songbird in right-facing side profile. The head, neck, cheek, entire chest, entire belly, folded wing, back and tail must all have charcoal-black plumage. Only small cool-gray strokes may model feather detail. Absolutely no yellow, cream, tan, white, orange or warm plumage anywhere, especially on the cheek, breast and belly. The tiny beak and two feet can be muted neutral gray. One visible folded wing, complete toes and tail, 15 percent transparent padding, no scenery, branch, shadow or glow. Match warm matte gouache picture-book texture while the subject remains unambiguously black at small classroom size. No text, letters, numerals, logos or watermark.",
+      "transparentBackground": true,
+      "alphaContentBoundsThreshold160": [
+        215,
+        112,
+        1323,
+        952
+      ],
+      "usedBy": [
+        "lookout-camera",
+        "picture-check:hear-far-blue-bird",
+        "picture-check:new-speaker-near-black-bird",
+        "bird-colour-practice"
+      ],
+      "visualInspection": {
+        "reviewedAt": "2026-11-09T08:36:13.799732+00:00",
+        "reviewedBy": "gpt-6.1-sol",
+        "result": "改版全身羽毛为黑，只有细灰纹表现结构。透明边缘、双脚和尾完整。在浅薄荷底132、72、54像素实看，黑色明确且无明显光圈。"
+      }
+    },
+    "cat-prop": {
+      "path": "assets/cat-prop.png",
+      "sha256": "701379ac215adda61ae2d270e9ee4dd1a8001c0c1947704f440f78ebefdd30c5",
+      "pixels": [
+        1254,
+        1254
+      ],
+      "bytes": 931043,
+      "mode": "RGBA",
+      "sourceKind": "codex_builtin_imagegen",
+      "originalToolOutput": "/Users/sqcopenclaw/.codex/generated_images/01a1bef3-8d96-70c1-9412-0d8e58ba9363/exec-b361ed4c-5218-49b8-bcb6-d76a73f1b31f.png",
+      "generationPrompt": "Use case: illustration-story. One upright small cream cat with orange ear patches, unmistakable pointed ears, face whiskers and a curled tail. Keep full body and all paws inside a transparent square, about 14 percent margin. It wears no collar, hat or accessories. No scenery, floor shadow or extra animal. Original warm gouache picture-book illustration for Chinese first-grade English learners, calm mint and honey palette, clean silhouettes at 60 px, matte paint, soft daylight. No text, letters, numerals, logos, marks or copyrighted character design.",
+      "transparentBackground": true,
+      "alphaContentBoundsThreshold160": [
+        204,
+        128,
+        1041,
+        1119
+      ],
+      "usedBy": [
+        "cat-cap-hat-beat",
+        "costume-rhythm-run",
+        "picture-check:hear-cap-in-display",
+        "picture-check:hear-bag-at-fair",
+        "picture-check:hear-near-black-cat"
+      ],
+      "visualInspection": {
+        "reviewedAt": "2026-11-09T08:37:10.788455+00:00",
+        "reviewedBy": "gpt-6.1-sol",
+        "result": "真实透明。尖耳、胡须、四爪与卷尾清楚，未戴帽，无物件混杂。132、72、54像素浅底试缩看得清，边缘没有明显残留。"
+      }
+    },
+    "cap-prop": {
+      "path": "assets/cap-prop.png",
+      "sha256": "c66bb261a13c2b13581ae8afd4c8996d2cb41ef79299024c3e196c0aac38d9b4",
+      "pixels": [
+        1536,
+        1024
+      ],
+      "bytes": 1856101,
+      "mode": "RGBA",
+      "sourceKind": "codex_builtin_imagegen",
+      "originalToolOutput": "/Users/sqcopenclaw/.codex/generated_images/01a1bef3-8d96-70c1-9412-0d8e58ba9363/exec-4885587a-0d4b-4c9b-b519-5777ca358228.png",
+      "generationPrompt": "Use case: illustration-story. One mustard baseball cap with a short, clearly forward-curving visor, no lettering. Slight three-quarter side view shows the single visor and domed crown. Complete single cap with generous transparent padding. No person, cat, surrounding scene or shadow. Original warm gouache picture-book illustration for Chinese first-grade English learners, calm mint and honey palette, clean silhouettes at 60 px, matte paint, soft daylight. No text, letters, numerals, logos, marks or copyrighted character design.",
+      "transparentBackground": true,
+      "alphaContentBoundsThreshold160": [
+        201,
+        120,
+        1326,
+        879
+      ],
+      "usedBy": [
+        "cat-cap-hat-beat",
+        "costume-rhythm-run",
+        "picture-check:hear-cap-in-display"
+      ],
+      "visualInspection": {
+        "reviewedAt": "2026-11-09T08:38:16.232329+00:00",
+        "reviewedBy": "gpt-6.1-sol",
+        "result": "完整一顶棒球帽，单侧帽舌明显。浅底试缩到54像素仍能和针织圆帽区分。真实透明，无人、字或遮盖。"
+      }
+    },
+    "hat-prop": {
+      "path": "assets/hat-prop.png",
+      "sha256": "6a3bc544e608b465bdfe22d13fd1d37856c3cbea6b051ee4b48e8999396090b1",
+      "pixels": [
+        1312,
+        1199
+      ],
+      "bytes": 1811031,
+      "mode": "RGBA",
+      "sourceKind": "codex_builtin_imagegen",
+      "originalToolOutput": "/Users/sqcopenclaw/.codex/generated_images/01a1bef3-8d96-70c1-9412-0d8e58ba9363/exec-4dde1c22-cad5-488e-96f9-ec9d6a7d556c.png",
+      "generationPrompt": "Use case: illustration-story. One teal winter knitted hat, rounded dome with folded band and round pom-pom, no visor. Show softly painted weave with readable silhouette. Complete single hat with transparent padding. No person, cat, scenery or shadow. Original warm gouache picture-book illustration for Chinese first-grade English learners, calm mint and honey palette, clean silhouettes at 60 px, matte paint, soft daylight. No text, letters, numerals, logos, marks or copyrighted character design.",
+      "transparentBackground": true,
+      "alphaContentBoundsThreshold160": [
+        104,
+        45,
+        1187,
+        1145
+      ],
+      "usedBy": [
+        "cat-cap-hat-beat",
+        "costume-rhythm-run",
+        "picture-check:hear-cap-in-display"
+      ],
+      "visualInspection": {
+        "reviewedAt": "2026-11-09T08:39:35.965219+00:00",
+        "reviewedBy": "gpt-6.1-sol",
+        "result": "一顶针织帽，圆球、翻边和织纹完整，没有帽舌。真实透明；54像素浅底试缩仍与棒球帽区分清楚。"
+      }
+    },
+    "near-blue-example": {
+      "sourceKind": "deterministic_imagegen_composition",
+      "path": "assets/near-blue-example.png",
+      "sha256": "fa3ba138e43bcc1b69f3b1ef89746954486ec791bd94ec051f9480d9b8282503",
+      "bytes": 274082,
+      "pixels": [
+        640,
+        380
+      ],
+      "renderer": "illustrations.py",
+      "rendererSha256": "eae770c1423e1985fee55d08a11f180d14a507618b35e5eddf013c4b012d289c",
+      "inputs": [
+        {
+          "key": "lookout-background",
+          "path": "assets/lookout-background.png",
+          "sha256": "ce0a4680869801e5a901f9c1b481e7a4bc1fd753eb1772b7d0c83954e2f4f6b6"
+        },
+        {
+          "key": "lookout-guide",
+          "path": "assets/lookout-guide.png",
+          "sha256": "88a49a524e421d880c12e141a213e583baaf930fe12dec711d72ebd227d7bf93"
+        },
+        {
+          "key": "blue-bird",
+          "path": "assets/blue-bird.png",
+          "sha256": "50c8848992b2a83dc1004598e666890a0476e0355cc20c76d48465e971f60788"
+        }
+      ]
+    },
+    "far-black-example": {
+      "sourceKind": "deterministic_imagegen_composition",
+      "path": "assets/far-black-example.png",
+      "sha256": "1b402f0ab689f58d992631c574f3847326bae0db286b7b3769e0dde934da0c89",
+      "bytes": 268363,
+      "pixels": [
+        640,
+        380
+      ],
+      "renderer": "illustrations.py",
+      "rendererSha256": "eae770c1423e1985fee55d08a11f180d14a507618b35e5eddf013c4b012d289c",
+      "inputs": [
+        {
+          "key": "lookout-background",
+          "path": "assets/lookout-background.png",
+          "sha256": "ce0a4680869801e5a901f9c1b481e7a4bc1fd753eb1772b7d0c83954e2f4f6b6"
+        },
+        {
+          "key": "lookout-guide",
+          "path": "assets/lookout-guide.png",
+          "sha256": "88a49a524e421d880c12e141a213e583baaf930fe12dec711d72ebd227d7bf93"
+        },
+        {
+          "key": "black-bird",
+          "path": "assets/black-bird.png",
+          "sha256": "550500417b06e4cc5287f67b4529e324a89e7da6529f4ecd8c7aea8e31048951"
+        }
+      ]
+    },
+    "three-stage-props": {
+      "sourceKind": "deterministic_imagegen_composition",
+      "path": "assets/three-stage-props.png",
+      "sha256": "b512eeda65788e2f3a6ecf74051c528a7685250addef3dc3f3cc994b80e2bc51",
+      "bytes": 277519,
+      "pixels": [
+        640,
+        380
+      ],
+      "renderer": "illustrations.py",
+      "rendererSha256": "eae770c1423e1985fee55d08a11f180d14a507618b35e5eddf013c4b012d289c",
+      "inputs": [
+        {
+          "key": "lookout-background",
+          "path": "assets/lookout-background.png",
+          "sha256": "ce0a4680869801e5a901f9c1b481e7a4bc1fd753eb1772b7d0c83954e2f4f6b6"
+        },
+        {
+          "key": "cat-prop",
+          "path": "assets/cat-prop.png",
+          "sha256": "701379ac215adda61ae2d270e9ee4dd1a8001c0c1947704f440f78ebefdd30c5"
+        },
+        {
+          "key": "cap-prop",
+          "path": "assets/cap-prop.png",
+          "sha256": "c66bb261a13c2b13581ae8afd4c8996d2cb41ef79299024c3e196c0aac38d9b4"
+        },
+        {
+          "key": "hat-prop",
+          "path": "assets/hat-prop.png",
+          "sha256": "6a3bc544e608b465bdfe22d13fd1d37856c3cbea6b051ee4b48e8999396090b1"
+        }
+      ]
+    },
+    "teaching-bag": {
+      "path": "assets/teaching-bag.png",
+      "sha256": "ae6b72490c2a0c2597c6b422c95c6e42c5659c8ed26506b07eb9078d3e970580",
+      "pixels": [
+        1254,
+        1254
+      ],
+      "bytes": 1151753,
+      "mode": "RGBA",
+      "sourceKind": "codex_builtin_imagegen",
+      "generationTool": "image_gen.imagegen",
+      "originalToolOutput": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-24ddf1ee-5e4d-4c04-8caa-06d1a012a996.png",
+      "originalToolOutputSha256": "ae6b72490c2a0c2597c6b422c95c6e42c5659c8ed26506b07eb9078d3e970580",
+      "generationPrompt": "Use case: illustration-story. One warm golden yellow child-sized crossbody school satchel, flap closed, prominent curved shoulder strap and a simple buckle, sitting in slight three-quarter view. Entire strap and bag visible. Square with transparent padding. No label, person, desk, shadow or other stationery. Original warm gouache picture-book illustration for Chinese first-grade English learners, calm mint and honey palette, clean silhouettes at 60 px, matte paint, soft daylight. No text, letters, numerals, logos, marks or copyrighted character design.",
+      "transparentBackground": true,
+      "alphaContentBoundsThreshold160": [
+        178,
+        22,
+        1023,
+        1222
+      ],
+      "usedBy": [
+        "bag-and-bird",
+        "costume-rhythm-run"
+      ],
+      "visualInspection": {
+        "reviewedAt": "2026-11-09T20:15:23.597950+08:00",
+        "reviewedBy": "/root/dog_english",
+        "result": "完整单个金黄色挎包。弧形肩带、包盖、搭扣清楚，无文字或多余物件。核对了透明通道、肩带内空与完整轮廓。"
+      }
+    },
+    "game-scout-rover": {
+      "path": "assets/game-scout-rover.png",
+      "sha256": "c6528a161e59adafb81b1f885b5299055a7ec2686d88c08b227ce235fec70967",
+      "pixels": [
+        460,
+        369
+      ],
+      "bytes": 258838,
+      "mode": "RGBA",
+      "sourceKind": "codex_builtin_imagegen",
+      "generationTool": "image_gen.imagegen",
+      "originalToolOutput": "/Users/sqcopenclaw/.codex/generated_images/01a1bf78-0c06-7fe0-8877-bc245394cec3/exec-00dcd8f8-2185-492f-81ff-73754de5dc8b.png",
+      "originalToolOutputSha256": "72badede9f926c6be6c58daa9f00645f8b2f85d244108fd4c1514851d4ba8c31",
+      "archivedToolOutput": "assets/arcade-originals/rover-atlas.png",
+      "generationPrompt": "Use case: stylized-concept. A real transparent RGBA sprite sheet, three equal columns and two equal rows, with six fully isolated sprites, every sprite centered in its own cell with generous transparent gaps and similar size; do not touch one another; no shadows outside silhouettes. Top row three animation frames of the exact same cinnamon rabbit with teal scarf facing right, first resting on all fours, second running with front paws out, third airborne with knees tucked. Bottom row exact positions: first a compact round vermilion bubble rover top-down seen from overhead, its bubble nozzle points RIGHT; second the SAME rover with two pearly bubbles immediately to its right (nozzle points RIGHT); third a single illustrated golden star-shaped collector sticker with embossed paper petals but no text. Premium storybook arcade: matte gouache, fine paper grain, clean cut paper edges, charcoal teal shadows, warm cream, deep spruce, apricot and persimmon highlights. No labels, marks, boxes, ground, background, logos or text. Every sprite entirely visible.",
+      "transparentBackground": true,
+      "alphaContentBoundsThreshold160": [
+        25,
+        32,
+        365,
+        345
+      ],
+      "usedBy": [
+        "lookout-camera"
+      ],
+      "sharedArcadeEvidence": {
+        "template": "bubbleMaze",
+        "version": 1,
+        "ownerApprovedOn": "2026-11-09",
+        "manifest": "output/courseware-production/classic-arcade-v3/asset-sources.json",
+        "manifestSha256": "01d4f3f836ac294d47bc31e1470dc15d11cf74ac120939f82d005e010aabdf40",
+        "example": "courseware/kit/examples/classic-arcade/bubble-maze.json",
+        "approvedPreviewAsset": "output/courseware-production/classic-arcade-v3/assets/rover.webp",
+        "approvedPreviewSha256": "a56d62690c8896d0d2b8180d7daeca8cb2a2a31279ef963609806bb8f16b9168",
+        "approvedCrop": [
+          35,
+          576,
+          427,
+          945
+        ]
+      },
+      "lessonExtraction": {
+        "cropLeftTopRightBottomExclusive": [
+          35,
+          576,
+          427,
+          945
+        ],
+        "transparentCanvasPixels": [
+          460,
+          369
+        ],
+        "cropOffsetPixels": [
+          0,
+          0
+        ],
+        "alpha": "preserved from original"
+      },
+      "visualInspection": {
+        "reviewedAt": "2026-11-09T20:27:56.452294+08:00",
+        "reviewedBy": "/root/dog_english",
+        "result": "俯看泡泡车，右边是喷口，四个轮子和深松绿座舱清楚。由原图裁切并加透明画布，和喷泡帧保持相同大小。"
+      }
+    },
+    "game-scout-rover-pop": {
+      "path": "assets/game-scout-rover-pop.png",
+      "sha256": "4adeb0f3ec586bdab0447bd64155bf52da3cdabdc0dc91fb740ce74666e6f429",
+      "pixels": [
+        460,
+        369
+      ],
+      "bytes": 287630,
+      "mode": "RGBA",
+      "sourceKind": "codex_builtin_imagegen",
+      "generationTool": "image_gen.imagegen",
+      "originalToolOutput": "/Users/sqcopenclaw/.codex/generated_images/01a1bf78-0c06-7fe0-8877-bc245394cec3/exec-00dcd8f8-2185-492f-81ff-73754de5dc8b.png",
+      "originalToolOutputSha256": "72badede9f926c6be6c58daa9f00645f8b2f85d244108fd4c1514851d4ba8c31",
+      "archivedToolOutput": "assets/arcade-originals/rover-atlas.png",
+      "generationPrompt": "Use case: stylized-concept. A real transparent RGBA sprite sheet, three equal columns and two equal rows, with six fully isolated sprites, every sprite centered in its own cell with generous transparent gaps and similar size; do not touch one another; no shadows outside silhouettes. Top row three animation frames of the exact same cinnamon rabbit with teal scarf facing right, first resting on all fours, second running with front paws out, third airborne with knees tucked. Bottom row exact positions: first a compact round vermilion bubble rover top-down seen from overhead, its bubble nozzle points RIGHT; second the SAME rover with two pearly bubbles immediately to its right (nozzle points RIGHT); third a single illustrated golden star-shaped collector sticker with embossed paper petals but no text. Premium storybook arcade: matte gouache, fine paper grain, clean cut paper edges, charcoal teal shadows, warm cream, deep spruce, apricot and persimmon highlights. No labels, marks, boxes, ground, background, logos or text. Every sprite entirely visible.",
+      "transparentBackground": true,
+      "alphaContentBoundsThreshold160": [
+        25,
+        32,
+        450,
+        345
+      ],
+      "usedBy": [
+        "lookout-camera"
+      ],
+      "sharedArcadeEvidence": {
+        "template": "bubbleMaze",
+        "version": 1,
+        "ownerApprovedOn": "2026-11-09",
+        "manifest": "output/courseware-production/classic-arcade-v3/asset-sources.json",
+        "manifestSha256": "01d4f3f836ac294d47bc31e1470dc15d11cf74ac120939f82d005e010aabdf40",
+        "example": "courseware/kit/examples/classic-arcade/bubble-maze.json",
+        "approvedPreviewAsset": "output/courseware-production/classic-arcade-v3/assets/rover-pop.webp",
+        "approvedPreviewSha256": "2055b2cffbbb45f80af6ceadf7cc6771a5698f0018c340e01bdb2c18b41c257c",
+        "approvedCrop": [
+          506,
+          580,
+          868,
+          944
+        ]
+      },
+      "lessonExtraction": {
+        "cropLeftTopRightBottomExclusive": [
+          490,
+          576,
+          945,
+          945
+        ],
+        "transparentCanvasPixels": [
+          460,
+          369
+        ],
+        "cropOffsetPixels": [
+          0,
+          0
+        ],
+        "alpha": "preserved from original"
+      },
+      "visualInspection": {
+        "reviewedAt": "2026-11-09T20:27:56.452294+08:00",
+        "reviewedBy": "/root/dog_english",
+        "result": "同一辆车向右喷泡。示例 WebP 的右边裁断第一颗泡泡，课件回到同一原图裁出喷口和一颗完整泡泡，裁线落在两颗泡泡之间的透明缝隙。两帧画布相同。"
+      }
+    },
+    "game-stage-marble": {
+      "path": "assets/game-stage-marble.png",
+      "sha256": "b93de42a383c617519ceb9f03d0cebcfc3f2f8732557c4d7104efbbb487a21c4",
+      "pixels": [
+        371,
+        378
+      ],
+      "bytes": 257606,
+      "mode": "RGBA",
+      "sourceKind": "codex_builtin_imagegen",
+      "generationTool": "image_gen.imagegen",
+      "originalToolOutput": "/Users/sqcopenclaw/.codex/generated_images/01a1bf78-0c06-7fe0-8877-bc245394cec3/exec-50f2b3c5-385c-4136-9aaf-a7f67a680cd1.png",
+      "originalToolOutputSha256": "72e74e61ba8c2f768c7f5b71e04a348ced3c20df04eba16cd8800b9ea30ad859",
+      "archivedToolOutput": "assets/arcade-originals/marble-atlas.png",
+      "generationPrompt": "Use case: stylized-concept. Actual transparent background RGBA game sprite sheet. Four equal cells on a 2 by 2 grid with wide transparent gutters, each centered, every silhouette isolated and fully visible. Top left: shining spherical amber and cream glass marble, miniature warm glint, circular silhouette. Top right: one delightful tiny firefly character in side view pointing right with cream glowing abdomen, black-teal head and two folded turquoise wings. Bottom left: same exact firefly with wings lifted in flight, pointing right, bright amber tail. Bottom right: one stylized symmetrical warm purple butterfly, front view spread wings, a quiet warm cream spot on each upper wing, accurately two pairs of wings and a slender body, no legs needed at this scale. Matte gouache fine paper texture and crisp cut-paper edges. Transparent everywhere outside assets, no ground, no margins colored, no text, logos, drop shadows or tiny scattered dots.",
+      "transparentBackground": true,
+      "alphaContentBoundsThreshold160": [
+        14,
+        15,
+        356,
+        358
+      ],
+      "usedBy": [
+        "costume-rhythm-run"
+      ],
+      "sharedArcadeEvidence": {
+        "template": "magnetMarbles",
+        "version": 1,
+        "ownerApprovedOn": "2026-11-09",
+        "manifest": "output/courseware-production/classic-arcade-v3/asset-sources.json",
+        "manifestSha256": "01d4f3f836ac294d47bc31e1470dc15d11cf74ac120939f82d005e010aabdf40",
+        "example": "courseware/kit/examples/classic-arcade/magnet-marbles.json",
+        "approvedPreviewAsset": "output/courseware-production/classic-arcade-v3/assets/marble.webp",
+        "approvedPreviewSha256": "d39b5df5a69c613fc8da8f2ba4287d00f098b362df1cb662dcb369f80baed489",
+        "approvedCrop": [
+          207,
+          69,
+          578,
+          447
+        ]
+      },
+      "lessonExtraction": {
+        "cropLeftTopRightBottomExclusive": [
+          207,
+          69,
+          578,
+          447
+        ],
+        "transparentCanvasPixels": [
+          371,
+          378
+        ],
+        "cropOffsetPixels": [
+          0,
+          0
+        ],
+        "alpha": "preserved from original"
+      },
+      "visualInspection": {
+        "reviewedAt": "2026-11-09T20:27:56.452294+08:00",
+        "reviewedBy": "/root/dog_english",
+        "result": "完整单颗琥珀色玻璃弹珠，奶油色亮部和圆形轮廓清楚。透明轮廓完整，和词图靶标区分，无字。"
+      }
+    },
+    "rhythm-stage": {
+      "path": "assets/rhythm-stage.png",
+      "sha256": "04d2f032d9dbf0ead68306a0d7ee507dc649387710e7eedf197275e9e2a084c7",
+      "pixels": [
+        1672,
+        941
+      ],
+      "bytes": 2097159,
+      "mode": "RGB",
+      "sourceKind": "codex_builtin_imagegen",
+      "generationTool": "image_gen.imagegen",
+      "originalToolOutput": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-6e1f036d-a0b0-493e-b4f4-5338265ff3af.png",
+      "originalToolOutputSha256": "04d2f032d9dbf0ead68306a0d7ee507dc649387710e7eedf197275e9e2a084c7",
+      "generationPrompt": "Use case: illustration-story. Landscape 16:9 open-air park puppet stage background, wooden arch and cloth curtain in warm cream, coral and mint, drawn as simple wide shapes at the outer edges. Clear matte central work area and an open lower foreground, reserved for rolling costume props and a gameplay light line drawn in code. No props, letters, people, animals or decorative game controls. Original warm gouache picture-book illustration for Chinese first-grade English learners, calm mint and honey palette, clean silhouettes at 60 px, matte paint, soft daylight. No text, letters, numerals, logos, marks or copyrighted character design.",
+      "transparentBackground": false,
+      "usedBy": [
+        "costume-rhythm-run",
+        "costume-rhythm-run:start"
+      ],
+      "visualInspection": {
+        "reviewedAt": "2026-11-09T20:34:04.468847+08:00",
+        "reviewedBy": "/root/dog_english",
+        "result": "公园露天木舞台，橙色和浅绿色帘布围住浅色留白，地面空阔。未见人物、预画道具、文字或标记。保留全幅，等比例缩小用于游戏。"
+      }
+    },
+    "quiz-brick-courtyard": {
+      "path": "assets/quiz-brick-courtyard.png",
+      "sha256": "7f71ab097fb0b1c5cb079d98393a39085774c14aecbff9b1caa3082443f30d5a",
+      "pixels": [
+        1628,
+        966
+      ],
+      "bytes": 2395242,
+      "mode": "RGB",
+      "sourceKind": "codex_builtin_imagegen",
+      "generationTool": "image_gen.imagegen",
+      "toolCallId": "call_2faaa7c17aef43849da0ac120dd351fe",
+      "toolReturnedAt": "2026-11-09T17:37:14.598Z",
+      "referencedImagePaths": [],
+      "originalToolOutput": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-fbdc5d70-d31b-4516-a6ac-4778d00e4571.png",
+      "originalToolOutputSha256": "7f71ab097fb0b1c5cb079d98393a39085774c14aecbff9b1caa3082443f30d5a",
+      "generationPrompt": "Create one ORIGINAL empty children's picture-book BACKGROUND for three first-grade listening quiz scenes, approximately landscape 32:19 (wide 1600 by 950 composition, use 16:9 if necessary). A distinct outdoor neighborhood market courtyard in a historic hillside town, seen straight ahead from a child's eye level. Open daylight sky at top, low terracotta brick arches and plaster walls at the upper outer edges, and spacious even gray-beige stone paving extending to the bottom edge. Keep the middle two thirds of the picture visually calm and low contrast, with broad flat warm cream-to-gray ground at exactly the same level across the width, subtly indicated joints, no major feature or shadow behind any possible answer position. Architectural arches recognizable near the upper edges after a center crop to 640×380 and a broad lightly translucent ivory panel across most of the center. Keep defining shapes inside an 8 percent safe area. Use calm original matte gouache on subtle warm paper with simple cut-paper silhouettes, soft sunlit apricot earth and brick colors, muted deep sage green accents, child-friendly but clean, limited detail. This image contains ARCHITECTURE, PAVING and OPEN SKY only. No people, animals, faces, birds, hand-held objects, bag, hats, furniture, cases, display stands, writing, glyphs, numbers, signs, greenhouse glazing, plant beds, school interior, desks, water, stage curtain, logos or watermark.",
+      "transparentBackground": false,
+      "usedBy": [
+        "picture-check:hear-far-blue-bird",
+        "picture-check:hear-cap-in-display",
+        "picture-check:new-speaker-near-black-bird",
+        "picture-check:hear-bag-at-fair",
+        "picture-check:hear-far-my-desk",
+        "picture-check:hear-near-black-cat"
+      ],
+      "visualInspection": {
+        "reviewedAt": "2026-11-10T01:39:54.609894+08:00",
+        "reviewedBy": "/root/dog_english",
+        "result": "露天砖拱、矮墙和石地构成干净庭院，中心空旷。无人物、动物、家具、道具、字或标记，独立于温室及课中湖边栈道和舞台。"
+      },
+      "compositeInspection": {
+        "reviewedAt": "2026-11-10T01:42:22.284342+08:00",
+        "reviewedBy": "/root/dog_english",
+        "reviewSize": [
+          230,
+          137
+        ],
+        "cardCount": 10,
+        "bytesByQuestion": {
+          "hear-far-blue-bird": 738194,
+          "hear-cap-in-display": 689065,
+          "new-speaker-near-black-bird": 963360
+        },
+        "result": "第2题固定说话人且可区分近蓝、远黑、远蓝。第4题每图一件，猫尾、针织帽球及棒球帽帽舌清晰。第5题题干右侧发话，鸟位置固定，可区分左右站位及黑蓝；人物和物件没有被裁断。离线静态看图，读题音频和正式 G4/G6 待验。"
+      },
+      "finalQuizInspection": {
+        "reviewedAt": "2026-11-09T18:20:34.181918+00:00",
+        "reviewedBy": "/root/dog_english",
+        "reviewSize": [
+          200,
+          119
+        ],
+        "encodedSize": [
+          640,
+          380
+        ],
+        "colorMode": "indexed_png",
+        "cards": 19,
+        "bytesByQuestion": {
+          "hear-bag-at-fair": 276682,
+          "hear-far-blue-bird": 314158,
+          "hear-near-black-cat": 320088,
+          "hear-cap-in-display": 292710,
+          "new-speaker-near-black-bird": 422232,
+          "hear-far-my-desk": 303925
+        },
+        "totalBytes": 1929795,
+        "result": "实看六题19张图。三题黑猫仍明确是黑色；站位、距离、鸟的黑蓝、桌面绿书和帽型都可区分，物件未裁切。只完成离线静态看图。"
+      }
+    },
+    "quiz-courtyard-display-baseball-cap": {
+      "sourceKind": "deterministic_imagegen_composition",
+      "path": "assets/quiz-courtyard-display-baseball-cap.png",
+      "sha256": "2215b3173600c87e8312b143a45b03d6bbcfd9cf32a52ece95515677d5606cd2",
+      "bytes": 96333,
+      "pixels": [
+        640,
+        380
+      ],
+      "renderer": "illustrations.py",
+      "rendererSha256": "865fffc6527e8ec9e8c6ef665d9ad0f1d0785c77cb0414a8c2d9543b56905f86",
+      "inputs": [
+        {
+          "key": "quiz-brick-courtyard",
+          "path": "assets/quiz-brick-courtyard.png",
+          "sha256": "7f71ab097fb0b1c5cb079d98393a39085774c14aecbff9b1caa3082443f30d5a"
+        },
+        {
+          "key": "cap-prop",
+          "path": "assets/cap-prop.png",
+          "sha256": "c66bb261a13c2b13581ae8afd4c8996d2cb41ef79299024c3e196c0aac38d9b4"
+        }
+      ],
+      "encoding": {
+        "mode": "indexed_png",
+        "colors": 192,
+        "method": "median_cut",
+        "dither": false
+      }
+    },
+    "quiz-courtyard-display-cat": {
+      "sourceKind": "deterministic_imagegen_composition",
+      "path": "assets/quiz-courtyard-display-cat.png",
+      "sha256": "fd2db89f20364396e05b9cd8a6524fb19e6f60ff67c2a040fbb5c08f61d499e4",
+      "bytes": 100160,
+      "pixels": [
+        640,
+        380
+      ],
+      "renderer": "illustrations.py",
+      "rendererSha256": "865fffc6527e8ec9e8c6ef665d9ad0f1d0785c77cb0414a8c2d9543b56905f86",
+      "inputs": [
+        {
+          "key": "quiz-brick-courtyard",
+          "path": "assets/quiz-brick-courtyard.png",
+          "sha256": "7f71ab097fb0b1c5cb079d98393a39085774c14aecbff9b1caa3082443f30d5a"
+        },
+        {
+          "key": "cat-prop",
+          "path": "assets/cat-prop.png",
+          "sha256": "701379ac215adda61ae2d270e9ee4dd1a8001c0c1947704f440f78ebefdd30c5"
+        }
+      ],
+      "encoding": {
+        "mode": "indexed_png",
+        "colors": 192,
+        "method": "median_cut",
+        "dither": false
+      }
+    },
+    "quiz-courtyard-display-knit-hat": {
+      "sourceKind": "deterministic_imagegen_composition",
+      "path": "assets/quiz-courtyard-display-knit-hat.png",
+      "sha256": "a6a1d6d292c4d5220899f7b46c70174061747b37c3b2ab57a747e991c994a083",
+      "bytes": 96217,
+      "pixels": [
+        640,
+        380
+      ],
+      "renderer": "illustrations.py",
+      "rendererSha256": "865fffc6527e8ec9e8c6ef665d9ad0f1d0785c77cb0414a8c2d9543b56905f86",
+      "inputs": [
+        {
+          "key": "quiz-brick-courtyard",
+          "path": "assets/quiz-brick-courtyard.png",
+          "sha256": "7f71ab097fb0b1c5cb079d98393a39085774c14aecbff9b1caa3082443f30d5a"
+        },
+        {
+          "key": "hat-prop",
+          "path": "assets/hat-prop.png",
+          "sha256": "6a3bc544e608b465bdfe22d13fd1d37856c3cbea6b051ee4b48e8999396090b1"
+        }
+      ],
+      "encoding": {
+        "mode": "indexed_png",
+        "colors": 192,
+        "method": "median_cut",
+        "dither": false
+      }
+    },
+    "quiz-courtyard-far-black": {
+      "sourceKind": "deterministic_imagegen_composition",
+      "path": "assets/quiz-courtyard-far-black.png",
+      "sha256": "a558395f2336850e6167fc1aca3165aa5325a71b7755e3db950b9a437299b3d0",
+      "bytes": 104830,
+      "pixels": [
+        640,
+        380
+      ],
+      "renderer": "illustrations.py",
+      "rendererSha256": "865fffc6527e8ec9e8c6ef665d9ad0f1d0785c77cb0414a8c2d9543b56905f86",
+      "inputs": [
+        {
+          "key": "quiz-brick-courtyard",
+          "path": "assets/quiz-brick-courtyard.png",
+          "sha256": "7f71ab097fb0b1c5cb079d98393a39085774c14aecbff9b1caa3082443f30d5a"
+        },
+        {
+          "key": "lookout-guide",
+          "path": "assets/lookout-guide.png",
+          "sha256": "88a49a524e421d880c12e141a213e583baaf930fe12dec711d72ebd227d7bf93"
+        },
+        {
+          "key": "black-bird",
+          "path": "assets/black-bird.png",
+          "sha256": "550500417b06e4cc5287f67b4529e324a89e7da6529f4ecd8c7aea8e31048951"
+        }
+      ],
+      "encoding": {
+        "mode": "indexed_png",
+        "colors": 192,
+        "method": "median_cut",
+        "dither": false
+      }
+    },
+    "quiz-courtyard-far-blue": {
+      "sourceKind": "deterministic_imagegen_composition",
+      "path": "assets/quiz-courtyard-far-blue.png",
+      "sha256": "788fc4ec9ac6b68d786649f157764995973f59b0b48f2bedde488b8fbd46d766",
+      "bytes": 104557,
+      "pixels": [
+        640,
+        380
+      ],
+      "renderer": "illustrations.py",
+      "rendererSha256": "865fffc6527e8ec9e8c6ef665d9ad0f1d0785c77cb0414a8c2d9543b56905f86",
+      "inputs": [
+        {
+          "key": "quiz-brick-courtyard",
+          "path": "assets/quiz-brick-courtyard.png",
+          "sha256": "7f71ab097fb0b1c5cb079d98393a39085774c14aecbff9b1caa3082443f30d5a"
+        },
+        {
+          "key": "lookout-guide",
+          "path": "assets/lookout-guide.png",
+          "sha256": "88a49a524e421d880c12e141a213e583baaf930fe12dec711d72ebd227d7bf93"
+        },
+        {
+          "key": "blue-bird",
+          "path": "assets/blue-bird.png",
+          "sha256": "50c8848992b2a83dc1004598e666890a0476e0355cc20c76d48465e971f60788"
+        }
+      ],
+      "encoding": {
+        "mode": "indexed_png",
+        "colors": 192,
+        "method": "median_cut",
+        "dither": false
+      }
+    },
+    "quiz-courtyard-near-blue": {
+      "sourceKind": "deterministic_imagegen_composition",
+      "path": "assets/quiz-courtyard-near-blue.png",
+      "sha256": "71b02b48cca6f70b0d29ad1184d5cc85539e35c36789fd1ebc530909ae3936b2",
+      "bytes": 104771,
+      "pixels": [
+        640,
+        380
+      ],
+      "renderer": "illustrations.py",
+      "rendererSha256": "865fffc6527e8ec9e8c6ef665d9ad0f1d0785c77cb0414a8c2d9543b56905f86",
+      "inputs": [
+        {
+          "key": "quiz-brick-courtyard",
+          "path": "assets/quiz-brick-courtyard.png",
+          "sha256": "7f71ab097fb0b1c5cb079d98393a39085774c14aecbff9b1caa3082443f30d5a"
+        },
+        {
+          "key": "lookout-guide",
+          "path": "assets/lookout-guide.png",
+          "sha256": "88a49a524e421d880c12e141a213e583baaf930fe12dec711d72ebd227d7bf93"
+        },
+        {
+          "key": "blue-bird",
+          "path": "assets/blue-bird.png",
+          "sha256": "50c8848992b2a83dc1004598e666890a0476e0355cc20c76d48465e971f60788"
+        }
+      ],
+      "encoding": {
+        "mode": "indexed_png",
+        "colors": 192,
+        "method": "median_cut",
+        "dither": false
+      }
+    },
+    "quiz-reporter-left-far-black": {
+      "sourceKind": "deterministic_imagegen_composition",
+      "path": "assets/quiz-reporter-left-far-black.png",
+      "sha256": "35ffd8f74c9e5dea85f9f65797b07ced1f489d9f51e5e8b865f01ea9e9302122",
+      "bytes": 105720,
+      "pixels": [
+        640,
+        380
+      ],
+      "renderer": "illustrations.py",
+      "rendererSha256": "865fffc6527e8ec9e8c6ef665d9ad0f1d0785c77cb0414a8c2d9543b56905f86",
+      "inputs": [
+        {
+          "key": "quiz-brick-courtyard",
+          "path": "assets/quiz-brick-courtyard.png",
+          "sha256": "7f71ab097fb0b1c5cb079d98393a39085774c14aecbff9b1caa3082443f30d5a"
+        },
+        {
+          "key": "lookout-guide",
+          "path": "assets/lookout-guide.png",
+          "sha256": "88a49a524e421d880c12e141a213e583baaf930fe12dec711d72ebd227d7bf93"
+        },
+        {
+          "key": "black-bird",
+          "path": "assets/black-bird.png",
+          "sha256": "550500417b06e4cc5287f67b4529e324a89e7da6529f4ecd8c7aea8e31048951"
+        }
+      ],
+      "encoding": {
+        "mode": "indexed_png",
+        "colors": 192,
+        "method": "median_cut",
+        "dither": false
+      }
+    },
+    "quiz-reporter-right-near-black": {
+      "sourceKind": "deterministic_imagegen_composition",
+      "path": "assets/quiz-reporter-right-near-black.png",
+      "sha256": "5d102c970171463b5b3416c1d434802a7c770ad7c51499033c696df9720a9716",
+      "bytes": 105461,
+      "pixels": [
+        640,
+        380
+      ],
+      "renderer": "illustrations.py",
+      "rendererSha256": "865fffc6527e8ec9e8c6ef665d9ad0f1d0785c77cb0414a8c2d9543b56905f86",
+      "inputs": [
+        {
+          "key": "quiz-brick-courtyard",
+          "path": "assets/quiz-brick-courtyard.png",
+          "sha256": "7f71ab097fb0b1c5cb079d98393a39085774c14aecbff9b1caa3082443f30d5a"
+        },
+        {
+          "key": "lookout-guide",
+          "path": "assets/lookout-guide.png",
+          "sha256": "88a49a524e421d880c12e141a213e583baaf930fe12dec711d72ebd227d7bf93"
+        },
+        {
+          "key": "black-bird",
+          "path": "assets/black-bird.png",
+          "sha256": "550500417b06e4cc5287f67b4529e324a89e7da6529f4ecd8c7aea8e31048951"
+        }
+      ],
+      "encoding": {
+        "mode": "indexed_png",
+        "colors": 192,
+        "method": "median_cut",
+        "dither": false
+      }
+    },
+    "quiz-reporter-right-near-blue": {
+      "sourceKind": "deterministic_imagegen_composition",
+      "path": "assets/quiz-reporter-right-near-blue.png",
+      "sha256": "f66180097aa500ab26d9ec0864eecc9ac469ba3991a368a986ecdebe92619225",
+      "bytes": 105709,
+      "pixels": [
+        640,
+        380
+      ],
+      "renderer": "illustrations.py",
+      "rendererSha256": "865fffc6527e8ec9e8c6ef665d9ad0f1d0785c77cb0414a8c2d9543b56905f86",
+      "inputs": [
+        {
+          "key": "quiz-brick-courtyard",
+          "path": "assets/quiz-brick-courtyard.png",
+          "sha256": "7f71ab097fb0b1c5cb079d98393a39085774c14aecbff9b1caa3082443f30d5a"
+        },
+        {
+          "key": "lookout-guide",
+          "path": "assets/lookout-guide.png",
+          "sha256": "88a49a524e421d880c12e141a213e583baaf930fe12dec711d72ebd227d7bf93"
+        },
+        {
+          "key": "blue-bird",
+          "path": "assets/blue-bird.png",
+          "sha256": "50c8848992b2a83dc1004598e666890a0476e0355cc20c76d48465e971f60788"
+        }
+      ],
+      "encoding": {
+        "mode": "indexed_png",
+        "colors": 192,
+        "method": "median_cut",
+        "dither": false
+      }
+    },
+    "quiz-reporter-stimulus": {
+      "sourceKind": "deterministic_imagegen_composition",
+      "path": "assets/quiz-reporter-stimulus.png",
+      "sha256": "f9773cf1af39d51f2c9bb16f11a349a976778418dff10f2156b0aa4c76d9942a",
+      "bytes": 105342,
+      "pixels": [
+        640,
+        380
+      ],
+      "renderer": "illustrations.py",
+      "rendererSha256": "865fffc6527e8ec9e8c6ef665d9ad0f1d0785c77cb0414a8c2d9543b56905f86",
+      "inputs": [
+        {
+          "key": "quiz-brick-courtyard",
+          "path": "assets/quiz-brick-courtyard.png",
+          "sha256": "7f71ab097fb0b1c5cb079d98393a39085774c14aecbff9b1caa3082443f30d5a"
+        },
+        {
+          "key": "lookout-guide",
+          "path": "assets/lookout-guide.png",
+          "sha256": "88a49a524e421d880c12e141a213e583baaf930fe12dec711d72ebd227d7bf93"
+        }
+      ],
+      "encoding": {
+        "mode": "indexed_png",
+        "colors": 192,
+        "method": "median_cut",
+        "dither": false
+      }
+    },
+    "reference-orange-schoolbag": {
+      "path": "assets/reference-orange-schoolbag.png",
+      "sha256": "2859828f25f2224804d33d184521a4a271a6d5895e2fcface40eb9400a8a3812",
+      "pixels": [
+        418,
+        418
+      ],
+      "bytes": 205633,
+      "mode": "RGB",
+      "sourceKind": "codex_builtin_imagegen",
+      "generationTool": "image_gen.imagegen",
+      "generationPrompt": "1:1 正方形画布，严格三列三行等面积隐形网格，顺序完全按原提示，每格主体留四边裁切空间。\n九格资产：红橘双肩书包（肩带可见）、封面浅蓝且见书脊纸页的合上硬皮书、露金属笔尖的蓝色钢笔；削出木头和石墨尖的黄铅笔、单独平直并带短刻线但没有数字的绿色尺、完整四边框玻璃窗；带把手的浅木门、坐姿橘猫有三角耳和一条长尾、坐姿熊猫有黑眼圈和圆耳。每格一个主体，在浅奶油背景上独立。两笔大小接近，裸露笔尖放大清楚，钢笔不用圆珠尖，铅笔不用自动铅笔。书与尺不画真实字。清晰温暖的原创图画书，暖奶油底、深线与少量橘红和青蓝，物体明暗分离，低细节，幼儿一眼可分辨；无文字、标签、数字、emoji、箭头、边框、现有教材角色与图样。多格图严格等面积，图像主体居中于各格并留足裁边，不画可见分隔线。",
+      "transparentBackground": false,
+      "usedBy": [
+        "picture-check:hear-bag-at-fair",
+        "picture-check:hear-far-my-desk"
+      ],
+      "reuseEvidence": {
+        "sourceCourse": "fltrp-g1-upper-whats-this",
+        "sourceManifest": "courseware/lessons/fltrp-g1-upper-whats-this/asset-provenance.json",
+        "sourceAsset": "courseware/lessons/fltrp-g1-upper-whats-this/assets/object-schoolbag.png",
+        "sourceAssetSha256": "2859828f25f2224804d33d184521a4a271a6d5895e2fcface40eb9400a8a3812",
+        "sourceImage": "output/courseware-lessons/fltrp-g1-upper-whats-this/codex-imagegen-v1/candidates/wwt-teaching-objects.png",
+        "sourceImageSha256": "70692351d2e6c54b5a43d428f60bef1ebf9057d4b34b9e36e36651a4646dd0f0",
+        "generationReceipt": "output/courseware-lessons/fltrp-g1-upper-whats-this/codex-imagegen-v1/wwt-teaching-objects.json",
+        "generationReceiptSha256": "17be85e95675ae74d3062d183fbdffbac072746becd343bb10a8c279091d39d2",
+        "originalDerivation": {
+          "method": "pixel_crop_no_resample",
+          "rectangleXywh": [
+            0,
+            0,
+            418,
+            418
+          ],
+          "tool": "ffmpeg"
+        }
+      },
+      "visualInspection": {
+        "reviewedAt": "2026-11-10T02:05:41.216192+08:00",
+        "reviewedBy": "/root/dog_english",
+        "result": "橙红双肩书包的肩带、提手和完整包体清楚。原文件和浅奶油底均保留。"
+      }
+    },
+    "reference-green-book-desk": {
+      "path": "assets/reference-green-book-desk.png",
+      "sha256": "fbdba480c57bb3e5ca7f687f97b1f09c69a5d5090bac503cd1ffdf0b97790637",
+      "pixels": [
+        1448,
+        1086
+      ],
+      "bytes": 2017376,
+      "mode": "RGB",
+      "sourceKind": "codex_builtin_imagegen",
+      "generationTool": "image_gen.imagegen",
+      "generationPrompt": "Use case: illustration-story. Generate a new original illustration for first-grade English picture recognition. Use the provided original classroom illustration as a style, character and setting reference as relevant. Match its warm soft gouache on cream paper, simple readable shapes, pale wood, muted teal, mustard and a touch of coral. Keep subjects centered with safe margins. No visible letters, digits, words, logos, arrows, watermark, graphics, or UI.\n\nLandscape 4:3. One isolated elementary student desk, centered and fully within frame. Clear broad horizontal pale-wood top, short rectangular teal or teal-accented metal legs and one closed plain teal exercise book resting flat on the surface. View from slightly above and front three-quarter angle, so the rectangular top and desk-leg shape are readable. Quiet warm cream background and soft contact shadow. Exactly one desk. No chair, stool, shelving, people, other furniture or clutter.",
+      "transparentBackground": false,
+      "usedBy": [
+        "from-the-speaker",
+        "picture-check:hear-far-my-desk"
+      ],
+      "reuseEvidence": {
+        "sourceCourse": "g1-english-440cace14b4ddacb",
+        "sourceAsset": "courseware/lessons/g1-english-440cace14b4ddacb/assets/desk.png",
+        "sourceAssetSha256": "fbdba480c57bb3e5ca7f687f97b1f09c69a5d5090bac503cd1ffdf0b97790637",
+        "sourceImage": "/Users/sqcopenclaw/.codex/generated_images/01a1a8e3-a35f-7322-858f-e3d3136a2d0c/exec-191e31cf-fd5c-452a-8361-51a7e6d3f2f8.png",
+        "sourceImageSha256": "fbdba480c57bb3e5ca7f687f97b1f09c69a5d5090bac503cd1ffdf0b97790637",
+        "generationRequest": "output/courseware-lessons/g1-english-440cace14b4ddacb/illustration-v1/desk/request.json",
+        "generationRequestSha256": "50c76dd14e5f35198226b87ee1a127a1190563f5c590edbe55d08d287c6b6906",
+        "generationReceipt": "output/courseware-lessons/g1-english-440cace14b4ddacb/illustration-v1/desk/result.json",
+        "generationReceiptSha256": "a49c8f86eac40b97fbb991b5907371b4ee66ed7034524ffccdef5753732dfd31",
+        "referenceInputs": [
+          {
+            "assetPath": "/Users/sqcopenclaw/Desktop/ai_camera_app/courseware/lessons/g1-english-440cace14b4ddacb/assets/classroom.png",
+            "sha256": "9c88147ff48a7a89cb5341554b35c27349f97f76a8bf09433c7e614aace275af",
+            "role": "style_character_and_setting_reference"
+          }
+        ]
+      },
+      "visualInspection": {
+        "reviewedAt": "2026-11-10T02:05:41.216192+08:00",
+        "reviewedBy": "/root/dog_english",
+        "result": "桌面、四条桌腿、绿色书本和奶油底完整。无可读文字。"
+      }
+    },
+    "classroom-door-visit": {
+      "path": "assets/classroom-door-visit.png",
+      "sha256": "02c1df0623096f6759bac1639746be113603bbf0d1ef5b5343eb4e9b272c752e",
+      "pixels": [
+        1672,
+        941
+      ],
+      "bytes": 2051627,
+      "mode": "RGB",
+      "sourceKind": "codex_builtin_imagegen",
+      "generationTool": "image_gen.imagegen",
+      "generationPrompt": "Use case: illustration-story. Generate a new original illustration for first-grade English picture recognition. Use the provided original classroom illustration as a style, character and setting reference as relevant. Match its warm soft gouache on cream paper, simple readable shapes, pale wood, muted teal, mustard and a touch of coral. Keep subjects centered with safe margins. No visible letters, digits, words, logos, arrows, watermark, graphics, or UI.\n\nWide landscape 16:9. Friendly school open day. In the original classroom doorway, Ran with short black hair and mustard pullover is welcoming a visiting adult in a muted lake-blue jacket. The visitor has dark short hair and stands one step behind Ran at the open door. Inside the classroom a friendly dark-haired woman teacher in a coral cardigan turns from her unmarked teal chalkboard and smiles. Show only these three people. Their faces and body directions should be distinct and make the arrival legible. Ran can open one hand toward the teacher. Nobody is yet exchanging a greeting gesture.",
+      "transparentBackground": false,
+      "usedBy": [
+        "visit-our-classroom"
+      ],
+      "reuseEvidence": {
+        "sourceCourse": "g1-english-440cace14b4ddacb",
+        "sourceAsset": "courseware/lessons/g1-english-440cace14b4ddacb/assets/guest-door.png",
+        "sourceAssetSha256": "02c1df0623096f6759bac1639746be113603bbf0d1ef5b5343eb4e9b272c752e",
+        "sourceImage": "/Users/sqcopenclaw/.codex/generated_images/01a1a8e3-a35f-7322-858f-e3d3136a2d0c/exec-1d529d4e-0a99-4fac-8c36-20135fa23708.png",
+        "sourceImageSha256": "02c1df0623096f6759bac1639746be113603bbf0d1ef5b5343eb4e9b272c752e",
+        "generationRequest": "output/courseware-lessons/g1-english-440cace14b4ddacb/illustration-v1/guest-door/request.json",
+        "generationRequestSha256": "9c279934be11f32cc7d9160efcf56239e01f2e37a447ce3aa30a9c4ac60ba5b4",
+        "generationReceipt": "output/courseware-lessons/g1-english-440cace14b4ddacb/illustration-v1/guest-door/result.json",
+        "generationReceiptSha256": "16888bb171adf2d508ab61ea403709dcbd22a933e7486a951f9e475d13c6824c",
+        "referenceInputs": [
+          {
+            "assetPath": "/Users/sqcopenclaw/Desktop/ai_camera_app/courseware/lessons/g1-english-440cace14b4ddacb/assets/classroom.png",
+            "sha256": "9c88147ff48a7a89cb5341554b35c27349f97f76a8bf09433c7e614aace275af",
+            "role": "style_character_and_setting_reference"
+          }
+        ]
+      },
+      "visualInspection": {
+        "reviewedAt": "2026-11-10T02:05:41.216192+08:00",
+        "reviewedBy": "/root/dog_english",
+        "result": "穿黄衣的孩子站在门口向穿珊瑚衣的老师伸手，访客、黑板、窗户和多张课桌可辨。"
+      }
+    },
+    "classroom-desk-closeup": {
+      "path": "assets/classroom-desk-closeup.png",
+      "sha256": "3221aec0f7acf6426c9985ee67db9b561b4bb6cfd04921ae9be46d731552eb38",
+      "pixels": [
+        1672,
+        941
+      ],
+      "bytes": 2050251,
+      "mode": "RGB",
+      "sourceKind": "codex_builtin_imagegen",
+      "generationTool": "image_gen.imagegen",
+      "generationPrompt": "Use case: illustration-story. Create a new landscape 16:9 image for a first-grade English course. The original art reference establishes soft warm gouache on cream paper, crisp simple contours and a calm low-detail picture-book style. Keep Ran's mustard top and short black hair consistent with the reference. Make the single instructional meaning obvious at a small thumbnail size. Put key subjects comfortably inside frame. No legible text, letters, numbers, labels, logos, arrows, UI or watermarks.\n\n原创小学开放日绘本。统一暖奶油底、浅木、青绿与珊瑚色，清晰柔和轮廓。姜黄上衣的小然独自站在自己的浅木课桌旁，课桌放合上的青色小册子。孩子一手轻指胸口，一手示意桌子。人物和物品居中。",
+      "transparentBackground": false,
+      "usedBy": [
+        "visit-our-classroom",
+        "point-then-say"
+      ],
+      "reuseEvidence": {
+        "sourceCourse": "g1-english-440cace14b4ddacb",
+        "sourceAsset": "courseware/lessons/g1-english-440cace14b4ddacb/assets/solo-desk.png",
+        "sourceAssetSha256": "3221aec0f7acf6426c9985ee67db9b561b4bb6cfd04921ae9be46d731552eb38",
+        "sourceImage": "/Users/sqcopenclaw/.codex/generated_images/01a1a8e3-a35f-7322-858f-e3d3136a2d0c/exec-d974d18d-6db1-4a62-b0f0-162193cb400e.png",
+        "sourceImageSha256": "3221aec0f7acf6426c9985ee67db9b561b4bb6cfd04921ae9be46d731552eb38",
+        "generationRequest": "output/courseware-lessons/g1-english-440cace14b4ddacb/illustration-v1/solo-desk/request.json",
+        "generationRequestSha256": "fc985b6461792a75eec6d625c88d4cdafca3cba85fffdefea636424068d17615",
+        "generationReceipt": "output/courseware-lessons/g1-english-440cace14b4ddacb/illustration-v1/solo-desk/result.json",
+        "generationReceiptSha256": "f9130b0d4f3a97ea0f27e0ce1019a83ba3c32c1a171dc2a795a0594fd1f4aa2f",
+        "referenceInputs": [
+          {
+            "assetPath": "/Users/sqcopenclaw/Desktop/ai_camera_app/courseware/lessons/g1-english-440cace14b4ddacb/assets/classroom.png",
+            "sha256": "9c88147ff48a7a89cb5341554b35c27349f97f76a8bf09433c7e614aace275af",
+            "role": "visual_style_reference"
+          }
+        ]
+      },
+      "visualInspection": {
+        "reviewedAt": "2026-11-10T02:05:41.216192+08:00",
+        "reviewedBy": "/root/dog_english",
+        "result": "同一黄衣孩子介绍有绿本的课桌。近景用于认出桌子，距离从门口场景判断。"
+      }
+    },
+    "classroom-door-distance": {
+      "sourceKind": "deterministic_imagegen_composition",
+      "path": "assets/classroom-door-distance.png",
+      "sha256": "50f81aefdd9fa59e6a2fdd42a3be0ebf6ad1dff900657b608f3b9eeeecb19428",
+      "bytes": 359473,
+      "pixels": [
+        640,
+        380
+      ],
+      "renderer": "illustrations.py",
+      "rendererSha256": "3420e306e336ad9ba57554eeb534e4188a2344cf3c30085ed58dc456e58ec7bd",
+      "inputs": [
+        {
+          "key": "classroom-door-visit",
+          "path": "assets/classroom-door-visit.png",
+          "sha256": "02c1df0623096f6759bac1639746be113603bbf0d1ef5b5343eb4e9b272c752e"
+        }
+      ]
+    },
+    "far-desk-example": {
+      "sourceKind": "deterministic_imagegen_composition",
+      "path": "assets/far-desk-example.png",
+      "sha256": "1247ede6dfca1f03fd598bb491cddef049ad226aa5f31454399b3cf84a3c0fc7",
+      "bytes": 258955,
+      "pixels": [
+        640,
+        380
+      ],
+      "renderer": "illustrations.py",
+      "rendererSha256": "3420e306e336ad9ba57554eeb534e4188a2344cf3c30085ed58dc456e58ec7bd",
+      "inputs": [
+        {
+          "key": "lookout-background",
+          "path": "assets/lookout-background.png",
+          "sha256": "ce0a4680869801e5a901f9c1b481e7a4bc1fd753eb1772b7d0c83954e2f4f6b6"
+        },
+        {
+          "key": "lookout-guide",
+          "path": "assets/lookout-guide.png",
+          "sha256": "88a49a524e421d880c12e141a213e583baaf930fe12dec711d72ebd227d7bf93"
+        },
+        {
+          "key": "reference-green-book-desk",
+          "path": "assets/reference-green-book-desk.png",
+          "sha256": "fbdba480c57bb3e5ca7f687f97b1f09c69a5d5090bac503cd1ffdf0b97790637"
+        }
+      ]
+    },
+    "near-desk-example": {
+      "sourceKind": "deterministic_imagegen_composition",
+      "path": "assets/near-desk-example.png",
+      "sha256": "cd965b2a2397a3b62f0abc9514b89beeac75bea15d5aee6c0338340f0decc544",
+      "bytes": 262264,
+      "pixels": [
+        640,
+        380
+      ],
+      "renderer": "illustrations.py",
+      "rendererSha256": "3420e306e336ad9ba57554eeb534e4188a2344cf3c30085ed58dc456e58ec7bd",
+      "inputs": [
+        {
+          "key": "lookout-background",
+          "path": "assets/lookout-background.png",
+          "sha256": "ce0a4680869801e5a901f9c1b481e7a4bc1fd753eb1772b7d0c83954e2f4f6b6"
+        },
+        {
+          "key": "lookout-guide",
+          "path": "assets/lookout-guide.png",
+          "sha256": "88a49a524e421d880c12e141a213e583baaf930fe12dec711d72ebd227d7bf93"
+        },
+        {
+          "key": "reference-green-book-desk",
+          "path": "assets/reference-green-book-desk.png",
+          "sha256": "fbdba480c57bb3e5ca7f687f97b1f09c69a5d5090bac503cd1ffdf0b97790637"
+        }
+      ]
+    },
+    "quiz-fair-blue-bird": {
+      "sourceKind": "deterministic_imagegen_composition",
+      "path": "assets/quiz-fair-blue-bird.png",
+      "sha256": "79d013627f0ae5693081a979b77d1792fe0b49282d7307fee43f68a1dceacf6a",
+      "bytes": 89724,
+      "pixels": [
+        640,
+        380
+      ],
+      "renderer": "illustrations.py",
+      "rendererSha256": "865fffc6527e8ec9e8c6ef665d9ad0f1d0785c77cb0414a8c2d9543b56905f86",
+      "inputs": [
+        {
+          "key": "quiz-brick-courtyard",
+          "path": "assets/quiz-brick-courtyard.png",
+          "sha256": "7f71ab097fb0b1c5cb079d98393a39085774c14aecbff9b1caa3082443f30d5a"
+        },
+        {
+          "key": "blue-bird",
+          "path": "assets/blue-bird.png",
+          "sha256": "50c8848992b2a83dc1004598e666890a0476e0355cc20c76d48465e971f60788"
+        }
+      ],
+      "encoding": {
+        "mode": "indexed_png",
+        "colors": 192,
+        "method": "median_cut",
+        "dither": false
+      }
+    },
+    "quiz-fair-cat": {
+      "sourceKind": "deterministic_imagegen_composition",
+      "path": "assets/quiz-fair-cat.png",
+      "sha256": "6ae407509ab7847ee9e7d7685a903303aa6f5bc17767e1be97b1ab671604ea30",
+      "bytes": 92062,
+      "pixels": [
+        640,
+        380
+      ],
+      "renderer": "illustrations.py",
+      "rendererSha256": "865fffc6527e8ec9e8c6ef665d9ad0f1d0785c77cb0414a8c2d9543b56905f86",
+      "inputs": [
+        {
+          "key": "quiz-brick-courtyard",
+          "path": "assets/quiz-brick-courtyard.png",
+          "sha256": "7f71ab097fb0b1c5cb079d98393a39085774c14aecbff9b1caa3082443f30d5a"
+        },
+        {
+          "key": "cat-prop",
+          "path": "assets/cat-prop.png",
+          "sha256": "701379ac215adda61ae2d270e9ee4dd1a8001c0c1947704f440f78ebefdd30c5"
+        }
+      ],
+      "encoding": {
+        "mode": "indexed_png",
+        "colors": 192,
+        "method": "median_cut",
+        "dither": false
+      }
+    },
+    "quiz-fair-schoolbag": {
+      "sourceKind": "deterministic_imagegen_composition",
+      "path": "assets/quiz-fair-schoolbag.png",
+      "sha256": "5a721efa897c945e105e596a19e11dee66769951d0488fb6db7797dee89f73c3",
+      "bytes": 94896,
+      "pixels": [
+        640,
+        380
+      ],
+      "renderer": "illustrations.py",
+      "rendererSha256": "865fffc6527e8ec9e8c6ef665d9ad0f1d0785c77cb0414a8c2d9543b56905f86",
+      "inputs": [
+        {
+          "key": "quiz-brick-courtyard",
+          "path": "assets/quiz-brick-courtyard.png",
+          "sha256": "7f71ab097fb0b1c5cb079d98393a39085774c14aecbff9b1caa3082443f30d5a"
+        },
+        {
+          "key": "reference-orange-schoolbag",
+          "path": "assets/reference-orange-schoolbag.png",
+          "sha256": "2859828f25f2224804d33d184521a4a271a6d5895e2fcface40eb9400a8a3812"
+        }
+      ],
+      "encoding": {
+        "mode": "indexed_png",
+        "colors": 192,
+        "method": "median_cut",
+        "dither": false
+      }
+    },
+    "quiz-school-far-desk": {
+      "sourceKind": "deterministic_imagegen_composition",
+      "path": "assets/quiz-school-far-desk.png",
+      "sha256": "49a35c18391f13859810f8ec61a6f0a21297830c86811775a75f115de4badf4c",
+      "bytes": 100774,
+      "pixels": [
+        640,
+        380
+      ],
+      "renderer": "illustrations.py",
+      "rendererSha256": "865fffc6527e8ec9e8c6ef665d9ad0f1d0785c77cb0414a8c2d9543b56905f86",
+      "inputs": [
+        {
+          "key": "quiz-brick-courtyard",
+          "path": "assets/quiz-brick-courtyard.png",
+          "sha256": "7f71ab097fb0b1c5cb079d98393a39085774c14aecbff9b1caa3082443f30d5a"
+        },
+        {
+          "key": "lookout-guide",
+          "path": "assets/lookout-guide.png",
+          "sha256": "88a49a524e421d880c12e141a213e583baaf930fe12dec711d72ebd227d7bf93"
+        },
+        {
+          "key": "reference-green-book-desk",
+          "path": "assets/reference-green-book-desk.png",
+          "sha256": "fbdba480c57bb3e5ca7f687f97b1f09c69a5d5090bac503cd1ffdf0b97790637"
+        }
+      ],
+      "encoding": {
+        "mode": "indexed_png",
+        "colors": 192,
+        "method": "median_cut",
+        "dither": false
+      }
+    },
+    "quiz-school-far-schoolbag": {
+      "sourceKind": "deterministic_imagegen_composition",
+      "path": "assets/quiz-school-far-schoolbag.png",
+      "sha256": "b584ab2a74fb07cd2e501b9b30219bdf18ba2fb26c51637b335cf8a0c2da3e30",
+      "bytes": 101715,
+      "pixels": [
+        640,
+        380
+      ],
+      "renderer": "illustrations.py",
+      "rendererSha256": "865fffc6527e8ec9e8c6ef665d9ad0f1d0785c77cb0414a8c2d9543b56905f86",
+      "inputs": [
+        {
+          "key": "quiz-brick-courtyard",
+          "path": "assets/quiz-brick-courtyard.png",
+          "sha256": "7f71ab097fb0b1c5cb079d98393a39085774c14aecbff9b1caa3082443f30d5a"
+        },
+        {
+          "key": "lookout-guide",
+          "path": "assets/lookout-guide.png",
+          "sha256": "88a49a524e421d880c12e141a213e583baaf930fe12dec711d72ebd227d7bf93"
+        },
+        {
+          "key": "reference-orange-schoolbag",
+          "path": "assets/reference-orange-schoolbag.png",
+          "sha256": "2859828f25f2224804d33d184521a4a271a6d5895e2fcface40eb9400a8a3812"
+        }
+      ],
+      "encoding": {
+        "mode": "indexed_png",
+        "colors": 192,
+        "method": "median_cut",
+        "dither": false
+      }
+    },
+    "quiz-school-near-desk": {
+      "sourceKind": "deterministic_imagegen_composition",
+      "path": "assets/quiz-school-near-desk.png",
+      "sha256": "540448d23243f8a5a5554487597dc757a73ee463f7150af0eb3133f8e6801aef",
+      "bytes": 101436,
+      "pixels": [
+        640,
+        380
+      ],
+      "renderer": "illustrations.py",
+      "rendererSha256": "865fffc6527e8ec9e8c6ef665d9ad0f1d0785c77cb0414a8c2d9543b56905f86",
+      "inputs": [
+        {
+          "key": "quiz-brick-courtyard",
+          "path": "assets/quiz-brick-courtyard.png",
+          "sha256": "7f71ab097fb0b1c5cb079d98393a39085774c14aecbff9b1caa3082443f30d5a"
+        },
+        {
+          "key": "lookout-guide",
+          "path": "assets/lookout-guide.png",
+          "sha256": "88a49a524e421d880c12e141a213e583baaf930fe12dec711d72ebd227d7bf93"
+        },
+        {
+          "key": "reference-green-book-desk",
+          "path": "assets/reference-green-book-desk.png",
+          "sha256": "fbdba480c57bb3e5ca7f687f97b1f09c69a5d5090bac503cd1ffdf0b97790637"
+        }
+      ],
+      "encoding": {
+        "mode": "indexed_png",
+        "colors": 192,
+        "method": "median_cut",
+        "dither": false
+      }
+    },
+    "quiz-black-cat": {
+      "path": "assets/quiz-black-cat.png",
+      "sha256": "691234953a6164e3a8e89443e81d284330257bfd29baf113656d55e24a875349",
+      "pixels": [
+        1254,
+        1254
+      ],
+      "bytes": 930026,
+      "mode": "RGBA",
+      "sourceKind": "codex_builtin_imagegen",
+      "generationTool": "image_gen.imagegen",
+      "toolCallId": "call_7a01ab31c6f244b19f3225c55039e2ac",
+      "toolReturnedAt": "2026-11-09T18:11:42.655Z",
+      "referencedImagePaths": [
+        "/Users/sqcopenclaw/Desktop/ai_camera_app/courseware/lessons/fltrp-g1-upper-that-is-a-yellow-bird-games/assets/cat-prop.png"
+      ],
+      "referenceSha256": "701379ac215adda61ae2d270e9ee4dd1a8001c0c1947704f440f78ebefdd30c5",
+      "originalToolOutput": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-fce7def0-94b3-4bd9-88ab-8ce8ff49db4e.png",
+      "originalToolOutputSha256": "691234953a6164e3a8e89443e81d284330257bfd29baf113656d55e24a875349",
+      "generationPrompt": "Create one BLACK CAT transparent game/quiz sprite by editing the supplied cream-and-orange cat. This is a matched choice for a first-grade listening exercise. Preserve the same square canvas, exact cat pose, original head tilt, proportions, silhouette, two triangular ears, visible whiskers, curved tail at right and all four feet. Retain the same overall framing and centered scale so a child can compare colors without other clues. Change the entire fur color (head, back, chest, legs, tail, ear backs) to warm BLACK with very subtle dark-charcoal highlights that still unmistakably read as black at 100 pixels. No orange or cream patches, stripes, collar or accessory. Inside the ears keep a tiny muted gray-rose; use small amber-brown irises and modest gray whiskers and nose highlights so the face is readable, in the same tactile matte gouache paper-cut technique. Keep all fur and limbs inside the original safe margins; do not rotate, enlarge, crop or add any other object. True alpha transparent background, including between legs and near the curled tail, no shadows, ground, words, letters, digits, icons, arrows, logo or watermark.",
+      "transparentBackground": true,
+      "alphaContentBoundsThreshold160": [
+        200,
+        129,
+        1044,
+        1124
+      ],
+      "usedBy": [
+        "picture-check:hear-near-black-cat"
+      ],
+      "visualInspection": {
+        "reviewedAt": "2026-11-10T02:18:21.184951+08:00",
+        "reviewedBy": "/root/dog_english",
+        "result": "单只黑猫，轮廓、耳、胡须、四脚及卷尾完整，眼睛有暖色，主体仍明确读作黑色，脚间和尾旁透明。"
+      }
+    },
+    "quiz-courtyard-far-black-cat": {
+      "sourceKind": "deterministic_imagegen_composition",
+      "path": "assets/quiz-courtyard-far-black-cat.png",
+      "sha256": "8bae28a742e2e4ace6b904d011d94d3690ed307b912561221bb3b852b1b17f43",
+      "bytes": 107330,
+      "pixels": [
+        640,
+        380
+      ],
+      "renderer": "illustrations.py",
+      "rendererSha256": "865fffc6527e8ec9e8c6ef665d9ad0f1d0785c77cb0414a8c2d9543b56905f86",
+      "inputs": [
+        {
+          "key": "quiz-brick-courtyard",
+          "path": "assets/quiz-brick-courtyard.png",
+          "sha256": "7f71ab097fb0b1c5cb079d98393a39085774c14aecbff9b1caa3082443f30d5a"
+        },
+        {
+          "key": "lookout-guide",
+          "path": "assets/lookout-guide.png",
+          "sha256": "88a49a524e421d880c12e141a213e583baaf930fe12dec711d72ebd227d7bf93"
+        },
+        {
+          "key": "quiz-black-cat",
+          "path": "assets/quiz-black-cat.png",
+          "sha256": "691234953a6164e3a8e89443e81d284330257bfd29baf113656d55e24a875349"
+        }
+      ],
+      "encoding": {
+        "mode": "indexed_png",
+        "colors": 192,
+        "method": "median_cut",
+        "dither": false
+      }
+    },
+    "quiz-courtyard-near-black-cat": {
+      "sourceKind": "deterministic_imagegen_composition",
+      "path": "assets/quiz-courtyard-near-black-cat.png",
+      "sha256": "61e8994eb3c9cb0952d7d09911b97df4d5c45b49bbfade473eee342a8aed11b7",
+      "bytes": 106974,
+      "pixels": [
+        640,
+        380
+      ],
+      "renderer": "illustrations.py",
+      "rendererSha256": "865fffc6527e8ec9e8c6ef665d9ad0f1d0785c77cb0414a8c2d9543b56905f86",
+      "inputs": [
+        {
+          "key": "quiz-brick-courtyard",
+          "path": "assets/quiz-brick-courtyard.png",
+          "sha256": "7f71ab097fb0b1c5cb079d98393a39085774c14aecbff9b1caa3082443f30d5a"
+        },
+        {
+          "key": "lookout-guide",
+          "path": "assets/lookout-guide.png",
+          "sha256": "88a49a524e421d880c12e141a213e583baaf930fe12dec711d72ebd227d7bf93"
+        },
+        {
+          "key": "quiz-black-cat",
+          "path": "assets/quiz-black-cat.png",
+          "sha256": "691234953a6164e3a8e89443e81d284330257bfd29baf113656d55e24a875349"
+        }
+      ],
+      "encoding": {
+        "mode": "indexed_png",
+        "colors": 192,
+        "method": "median_cut",
+        "dither": false
+      }
+    },
+    "quiz-courtyard-near-cream-cat": {
+      "sourceKind": "deterministic_imagegen_composition",
+      "path": "assets/quiz-courtyard-near-cream-cat.png",
+      "sha256": "4581434ba3f9f96acb38c8c50bee08a7f961604acf01a00ed68375def87bf04e",
+      "bytes": 105784,
+      "pixels": [
+        640,
+        380
+      ],
+      "renderer": "illustrations.py",
+      "rendererSha256": "865fffc6527e8ec9e8c6ef665d9ad0f1d0785c77cb0414a8c2d9543b56905f86",
+      "inputs": [
+        {
+          "key": "quiz-brick-courtyard",
+          "path": "assets/quiz-brick-courtyard.png",
+          "sha256": "7f71ab097fb0b1c5cb079d98393a39085774c14aecbff9b1caa3082443f30d5a"
+        },
+        {
+          "key": "lookout-guide",
+          "path": "assets/lookout-guide.png",
+          "sha256": "88a49a524e421d880c12e141a213e583baaf930fe12dec711d72ebd227d7bf93"
+        },
+        {
+          "key": "cat-prop",
+          "path": "assets/cat-prop.png",
+          "sha256": "701379ac215adda61ae2d270e9ee4dd1a8001c0c1947704f440f78ebefdd30c5"
+        }
+      ],
+      "encoding": {
+        "mode": "indexed_png",
+        "colors": 192,
+        "method": "median_cut",
+        "dither": false
+      }
+    }
+  },
+  "rejectedAttempts": [
+    {
+      "key": "black-bird",
+      "sourceKind": "codex_builtin_imagegen",
+      "originalToolOutput": "/Users/sqcopenclaw/.codex/generated_images/01a1bef3-8d96-70c1-9412-0d8e58ba9363/exec-711ba256-3a2c-4503-9885-b49aa5cbaeb0.png",
+      "sha256": "05782512c3bf4cb8bfea2c10d29843b51fb38815d35af071c5b5d32b7a7d1690",
+      "generationPrompt": "Use case: illustration-story. One small generic storybook songbird in right-facing profile, ready to perch. Clear charcoal black head, folded wing and torso with subtle gray highlights to keep the silhouette readable, small neutral beak, two feet and short tail. Complete shape with transparent padding. No twig, scene, floor shadow or extra bird. Original warm gouache picture-book illustration for Chinese first-grade English learners, calm mint and honey palette, clean silhouettes at 60 px, matte paint, soft daylight. No text, letters, numerals, logos, marks or copyrighted character design.",
+      "transparentBackground": true,
+      "reviewedAt": "2026-11-09T08:33:26.492764+00:00",
+      "reason": "胸腹有大片黄色，640×360 试缩后仍明显。颜色是答案依据，需要全身主体为黑的清楚样本。原工具输出保留，未注册。"
+    }
+  ],
+  "playbackAssets": {
+    "bird-park-cover": {
+      "sourceKind": "resized_imagegen_playback",
+      "path": "assets/playback/bird-park-cover.png",
+      "sha256": "a2859e791dec052cd78785e4b28ee540247a6f19e88d29b48794938fc48ed274",
+      "bytes": 921239,
+      "pixels": [
+        999,
+        562
+      ],
+      "sourcePath": "assets/bird-park-cover.png",
+      "sourceSha256": "693d6b0683e7698251d6fccdb3ea87f5c533be2ac189f08f109c8b90d8542e74",
+      "rendererSha256": "eae770c1423e1985fee55d08a11f180d14a507618b35e5eddf013c4b012d289c"
+    },
+    "lookout-background": {
+      "sourceKind": "resized_imagegen_playback",
+      "path": "assets/playback/lookout-background.png",
+      "sha256": "e7365f5aeb87dbd61981dd24320bece0f9fd7540ef4309191c7cbd2833e5c3e8",
+      "bytes": 1019050,
+      "pixels": [
+        1119,
+        630
+      ],
+      "sourcePath": "assets/lookout-background.png",
+      "sourceSha256": "ce0a4680869801e5a901f9c1b481e7a4bc1fd753eb1772b7d0c83954e2f4f6b6",
+      "rendererSha256": "eae770c1423e1985fee55d08a11f180d14a507618b35e5eddf013c4b012d289c"
+    },
+    "lookout-guide": {
+      "sourceKind": "resized_imagegen_playback",
+      "path": "assets/playback/lookout-guide.png",
+      "sha256": "00469da0aef24eadb6a6ecbc997b29d63700845068c350edd01e54ff14fb88c4",
+      "bytes": 141393,
+      "pixels": [
+        550,
+        550
+      ],
+      "sourcePath": "assets/lookout-guide.png",
+      "sourceSha256": "88a49a524e421d880c12e141a213e583baaf930fe12dec711d72ebd227d7bf93",
+      "rendererSha256": "eae770c1423e1985fee55d08a11f180d14a507618b35e5eddf013c4b012d289c"
+    },
+    "yellow-bird": {
+      "sourceKind": "resized_imagegen_playback",
+      "path": "assets/playback/yellow-bird.png",
+      "sha256": "436d13fddc6fb5d33aa51e464c0f3c41dcaf204da5cfde1cc16e5b06db4f0c9f",
+      "bytes": 56277,
+      "pixels": [
+        420,
+        280
+      ],
+      "sourcePath": "assets/yellow-bird.png",
+      "sourceSha256": "3443151b534811e7ce245ef16911deffcf9d916f6e46dd73b8043083d255debf",
+      "rendererSha256": "eae770c1423e1985fee55d08a11f180d14a507618b35e5eddf013c4b012d289c"
+    },
+    "blue-bird": {
+      "sourceKind": "resized_imagegen_playback",
+      "path": "assets/playback/blue-bird.png",
+      "sha256": "a340028c62d1203ae2f07be02b1b7dc260f89fa8eee4ec5d733b6998ce317383",
+      "bytes": 70237,
+      "pixels": [
+        420,
+        280
+      ],
+      "sourcePath": "assets/blue-bird.png",
+      "sourceSha256": "50c8848992b2a83dc1004598e666890a0476e0355cc20c76d48465e971f60788",
+      "rendererSha256": "eae770c1423e1985fee55d08a11f180d14a507618b35e5eddf013c4b012d289c"
+    },
+    "black-bird": {
+      "sourceKind": "resized_imagegen_playback",
+      "path": "assets/playback/black-bird.png",
+      "sha256": "75249a30e2c54933adfbfcb19772bb78a20f5466b9be0ab063980e15a0ed791a",
+      "bytes": 63953,
+      "pixels": [
+        420,
+        280
+      ],
+      "sourcePath": "assets/black-bird.png",
+      "sourceSha256": "550500417b06e4cc5287f67b4529e324a89e7da6529f4ecd8c7aea8e31048951",
+      "rendererSha256": "eae770c1423e1985fee55d08a11f180d14a507618b35e5eddf013c4b012d289c"
+    },
+    "cat-prop": {
+      "sourceKind": "resized_imagegen_playback",
+      "path": "assets/playback/cat-prop.png",
+      "sha256": "0fccb9713055c8c7fa036a5eccfbe6f203398f0e52c4e28e1d56a31d6996e7d2",
+      "bytes": 115604,
+      "pixels": [
+        420,
+        420
+      ],
+      "sourcePath": "assets/cat-prop.png",
+      "sourceSha256": "701379ac215adda61ae2d270e9ee4dd1a8001c0c1947704f440f78ebefdd30c5",
+      "rendererSha256": "eae770c1423e1985fee55d08a11f180d14a507618b35e5eddf013c4b012d289c"
+    },
+    "cap-prop": {
+      "sourceKind": "resized_imagegen_playback",
+      "path": "assets/playback/cap-prop.png",
+      "sha256": "cc21c9341084a848bd35a314ef7e628ab9dbfff0fb0f3f8646f2425e20f4b769",
+      "bytes": 81960,
+      "pixels": [
+        420,
+        280
+      ],
+      "sourcePath": "assets/cap-prop.png",
+      "sourceSha256": "c66bb261a13c2b13581ae8afd4c8996d2cb41ef79299024c3e196c0aac38d9b4",
+      "rendererSha256": "eae770c1423e1985fee55d08a11f180d14a507618b35e5eddf013c4b012d289c"
+    },
+    "hat-prop": {
+      "sourceKind": "resized_imagegen_playback",
+      "path": "assets/playback/hat-prop.png",
+      "sha256": "f6eadd2a7ba8912775bfcce41b6f6436c820783c381b8fc3223ea291bffba64a",
+      "bytes": 187698,
+      "pixels": [
+        420,
+        384
+      ],
+      "sourcePath": "assets/hat-prop.png",
+      "sourceSha256": "6a3bc544e608b465bdfe22d13fd1d37856c3cbea6b051ee4b48e8999396090b1",
+      "rendererSha256": "eae770c1423e1985fee55d08a11f180d14a507618b35e5eddf013c4b012d289c"
+    },
+    "teaching-bag": {
+      "sourceKind": "resized_imagegen_playback",
+      "path": "assets/playback/teaching-bag.png",
+      "sha256": "ba6b512fe72f368f775a10292f06335b0aa576e4951991f6f25dc04bb3ee9030",
+      "bytes": 163208,
+      "pixels": [
+        470,
+        470
+      ],
+      "sourcePath": "assets/teaching-bag.png",
+      "sourceSha256": "ae6b72490c2a0c2597c6b422c95c6e42c5659c8ed26506b07eb9078d3e970580",
+      "rendererSha256": "eae770c1423e1985fee55d08a11f180d14a507618b35e5eddf013c4b012d289c"
+    },
+    "game-scout-rover": {
+      "sourceKind": "resized_imagegen_playback",
+      "path": "assets/playback/game-scout-rover.png",
+      "sha256": "38dead8fc2ec8ad9c0ba92455981d7bfab22ce578c3d383cc9f08aa0a9a8c9e1",
+      "bytes": 63820,
+      "pixels": [
+        240,
+        193
+      ],
+      "sourcePath": "assets/game-scout-rover.png",
+      "sourceSha256": "c6528a161e59adafb81b1f885b5299055a7ec2686d88c08b227ce235fec70967",
+      "rendererSha256": "eae770c1423e1985fee55d08a11f180d14a507618b35e5eddf013c4b012d289c"
+    },
+    "game-scout-rover-pop": {
+      "sourceKind": "resized_imagegen_playback",
+      "path": "assets/playback/game-scout-rover-pop.png",
+      "sha256": "e25218fb4115e12a71bedc345fbdd8c07e32d79d90a11d564352051e2dc58b02",
+      "bytes": 70842,
+      "pixels": [
+        240,
+        193
+      ],
+      "sourcePath": "assets/game-scout-rover-pop.png",
+      "sourceSha256": "4adeb0f3ec586bdab0447bd64155bf52da3cdabdc0dc91fb740ce74666e6f429",
+      "rendererSha256": "eae770c1423e1985fee55d08a11f180d14a507618b35e5eddf013c4b012d289c"
+    },
+    "game-stage-marble": {
+      "sourceKind": "resized_imagegen_playback",
+      "path": "assets/playback/game-stage-marble.png",
+      "sha256": "ee75d9f864200a6bff06efe35053eba705a463feb6b599cb6e5f25f37d6db28a",
+      "bytes": 67578,
+      "pixels": [
+        196,
+        200
+      ],
+      "sourcePath": "assets/game-stage-marble.png",
+      "sourceSha256": "b93de42a383c617519ceb9f03d0cebcfc3f2f8732557c4d7104efbbb487a21c4",
+      "rendererSha256": "eae770c1423e1985fee55d08a11f180d14a507618b35e5eddf013c4b012d289c"
+    },
+    "rhythm-stage": {
+      "sourceKind": "resized_imagegen_playback",
+      "path": "assets/playback/rhythm-stage.png",
+      "sha256": "d1e8ecde636bda888c7e70c448f3009fbb265e2fbe70691c53fd3d4af9efb4f1",
+      "bytes": 743787,
+      "pixels": [
+        999,
+        562
+      ],
+      "sourcePath": "assets/rhythm-stage.png",
+      "sourceSha256": "04d2f032d9dbf0ead68306a0d7ee507dc649387710e7eedf197275e9e2a084c7",
+      "rendererSha256": "eae770c1423e1985fee55d08a11f180d14a507618b35e5eddf013c4b012d289c"
+    },
+    "classroom-desk-closeup": {
+      "sourceKind": "resized_imagegen_playback",
+      "path": "assets/playback/classroom-desk-closeup.png",
+      "sha256": "968c0a7afe5b25978b320bc936eb0b8b4d92c5bcb1ce09d06d017a34b9ae2fe7",
+      "bytes": 772069,
+      "pixels": [
+        999,
+        562
+      ],
+      "sourcePath": "assets/classroom-desk-closeup.png",
+      "sourceSha256": "3221aec0f7acf6426c9985ee67db9b561b4bb6cfd04921ae9be46d731552eb38",
+      "rendererSha256": "3420e306e336ad9ba57554eeb534e4188a2344cf3c30085ed58dc456e58ec7bd"
+    }
+  }
+}

@@ -1,0 +1,215 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "东南西北",
+  "binding": {
+    "editionId": "smartedu-science-six-year-g1-lower-e231dd57",
+    "revisionId": "directory-359f40a6afba915101f297d3",
+    "unitId": "133c2c07-4952-4ded-962b-03d98fd0358b",
+    "nodeId": "197b035c-57e6-4cd7-8ab9-bab7d999de63"
+  },
+  "scenario": "小小庭院要给来访的朋友做方向图。孩子从庭院模型找一条方向线索，再当记录员用地图给朋友指路。",
+  "goals": [
+    "能借早晚太阳的大致位置或影子取得方向线索，给模型场地标出四个方向。",
+    "知道东西相对、南北相对，能从任一已知方向按顺时针补齐其他方向。",
+    "在固定地点记录四个方向的物体，转身比较身体的前后左右与场地的东南西北。",
+    "能看方向标读简单平面图，按指定顺序说出经过两个地点的路线。"
+  ],
+  "goalSources": [
+    {
+      "skill": "first-direction",
+      "target": "能借早晚太阳的大致位置或影子取得方向线索，给模型场地标出四个方向。",
+      "source": "印5～6、第一课时教案2～3"
+    },
+    {
+      "skill": "four-directions",
+      "target": "知道东西相对、南北相对，能从任一已知方向按顺时针补齐其他方向。",
+      "source": "印6～7、第一课时课件17～25"
+    },
+    {
+      "skill": "record-station",
+      "target": "在固定地点记录四个方向的物体，转身比较身体的前后左右与场地的东南西北。",
+      "source": "印7、第二课时任务单2"
+    },
+    {
+      "skill": "map-route",
+      "target": "能看方向标读简单平面图，按指定顺序说出经过两个地点的路线。",
+      "source": "印8、第二课时课件10～13"
+    }
+  ],
+  "pageSequence": [
+    {
+      "key": "same-place-different-views",
+      "kind": "teaching",
+      "plan": "同一庭院两个人面对不同地标，说清站位和朝向后追问有什么词能在场地上固定下来。"
+    },
+    {
+      "key": "three-times-model",
+      "kind": "teaching",
+      "plan": "使用简图和模型标出早晨、课本示意地点的午间和傍晚。现场只看影子或地上光照，画出影子与光源所在侧的关系。"
+    },
+    {
+      "key": "model-noon-and-safety",
+      "kind": "teaching",
+      "plan": "用同一模型侧视补充该示意场地午间偏南，说明实际只观察地上的影子。"
+    },
+    {
+      "key": "classroom-directions",
+      "kind": "teaching",
+      "plan": "从同一模型已知东边或其他一边，给教室平面添四向。先找相对，再用钟表箭头说出依次排列。"
+    },
+    {
+      "key": "three-model-facings",
+      "kind": "teaching",
+      "plan": "角色留在圆垫上，画面依次朝东、朝南、朝西。用三个分立的小图逐一跟老师填前后左右对应的方向。"
+    },
+    {
+      "key": "direction-photo-pairs",
+      "kind": "game",
+      "plan": "跟老师完成同一个庭院模型的俯视与侧视取景，按三个时段完成后看观察卡。"
+    },
+    {
+      "key": "record-at-one-station",
+      "kind": "teaching",
+      "plan": "同一俯视图记录北树、东风铃、南长椅、西石凳，转身确认地标不动，比较两种位置说法。"
+    },
+    {
+      "key": "read-the-direction-mark",
+      "kind": "teaching",
+      "plan": "找平面图方向标，图示北朝上后再依图识别相对位置。老师描画先向北到水池再向东去凉亭。"
+    },
+    {
+      "key": "follow-cardinal-route",
+      "kind": "game",
+      "plan": "先看方向标和起点图示，再听教师两段方位指令并开车依次到站。"
+    },
+    {
+      "key": "compass-can-turn",
+      "kind": "teaching",
+      "plan": "新图标北向右，先看方向标再说东西南北。"
+    },
+    {
+      "key": "picture-quiz",
+      "kind": "quiz",
+      "plan": "六道语音和图像题，三处正确位置各两次。"
+    },
+    {
+      "key": "apply-at-home",
+      "kind": "teaching",
+      "plan": "按一次辨向、一次站点记录、一条双站路线回顾，布置由成人观察的短实践。"
+    }
+  ],
+  "games": [
+    {
+      "page": "direction-photo-pairs",
+      "template": "shutterScout",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.shutterScout",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "observe_state",
+      "selection": "同一个虚构庭院和同一模型杆，每关各拍一张有固定方向与同一参照点的俯视图，以及同一时段的正交侧视图。两视图中光源模型和影子应对应同一状态。游戏计入规定状态下真实拍照，时间线不能点空跳过。",
+      "levels": [
+        "早晨近东的模型，宽取景框，慢速识别俯视及侧视。",
+        "示意地点午间的模型，保留原场地，调窄取景并等待两种视图。",
+        "傍晚近西的同一场地，加快切换并重复两种状态。"
+      ],
+      "demo": "老师指取景框、同一模型杆、时间图标与快门，演一次真实拍照，随后重置进入正式关卡。",
+      "teacherAnchors": [
+        "photo-preview",
+        "game-player",
+        "game-target"
+      ],
+      "observationPlan": {
+        "sceneId": "scene-direction-photo-pairs",
+        "trialId": "one-model-two-views",
+        "levels": [
+          "morning",
+          "noon-model",
+          "evening"
+        ],
+        "photoViews": "各关用独立俯/侧图标，分别登记在 art.icons，1 俯视、0 侧视。三关用同一 trialId，保留每关匹配的两个来源。",
+        "complete": "配置 observation 和页面 observationCard。仅真人完成正式全关才出卡，展示所拍图，家长卡据关列出早、午示意、晚的照片。演示与自动试玩不计作实地观察。"
+      }
+    },
+    {
+      "page": "follow-cardinal-route",
+      "template": "bubbleMaze",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.bubbleMaze",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "listen_order",
+      "selection": "以清晰方向标的北朝上平面图承载迷宫。老师说方位和阶段起点，图上只有该方向可选的正确地标，选对次序才收集；地标用图片或图标，重听后仍能操作。每关两到三个图标目标与终点，正确路线应做静态校验和两轮自动试玩。",
+      "levels": [
+        "起点向东到风铃，再向北到长椅，最后从长椅沿通道向东到出口，无巡游。",
+        "起点向北到树牌，再向西到水池，最后沿通道向南到出口，添可区分的岔路。",
+        "起点向西到亭子，再向南到小桥，最后沿通道向东到出口；缩短每格步时并设置有清晰地标的岔路。"
+      ],
+      "demo": "亮方向标和起点，老师从方向标指出地图上东边，演一小段操控，重置后按录音做正式任务。",
+      "teacherAnchors": [
+        "maze-compass",
+        "game-player",
+        "game-target"
+      ]
+    }
+  ],
+  "quiz": [
+    {
+      "id": "east-near-sun",
+      "skill": "模型早晨方向",
+      "prompt": "哪张图把早晨的光球摆在靠东的一边？",
+      "answer": "光球在东侧，影子朝西",
+      "position": 2,
+      "rationale": "方向标的东指右。光球在杆的东侧，影子向相对的西侧伸。"
+    },
+    {
+      "id": "safe-shadow",
+      "skill": "安全观察",
+      "prompt": "哪张图是用地上的影子安全地找线索？",
+      "answer": "孩子低头指着地上杆影",
+      "position": 1,
+      "rationale": "低头看地上的影子。到室外不能直视太阳，低头看书也看不到地上的影子。"
+    },
+    {
+      "id": "opposites",
+      "skill": "东西相对",
+      "prompt": "凉亭在东，正对面的西边是哪样东西？",
+      "answer": "小石桥",
+      "position": 3,
+      "rationale": "从东边凉亭穿过圆垫，到相对的一边是西。那里是小石桥。"
+    },
+    {
+      "id": "clockwise-from-south",
+      "skill": "从已知方向推知相邻方向",
+      "prompt": "从南边顺着弯箭头转一格，会到哪件物品？",
+      "answer": "蓝水桶",
+      "position": 2,
+      "rationale": "从南按顺时针往下一格是西，图中西边是蓝水桶。"
+    },
+    {
+      "id": "turn-station",
+      "skill": "转身与固定方向",
+      "prompt": "人偶原地转到朝西。哪张图里的水池还在北边？",
+      "answer": "面向西，水池在北边",
+      "position": 3,
+      "rationale": "原地转身时水池没挪动，仍在圆垫北边。人偶面向西时，北边在他的右手侧。"
+    },
+    {
+      "id": "route-two-stops",
+      "skill": "读北朝上平面图路线",
+      "prompt": "看方向标。从红门出发，先向北走一段，再向东走一段。哪张图的箭头和口令一样？",
+      "answer": "红门向上到水池，再向右到凉亭",
+      "position": 1,
+      "rationale": "图标的北朝上，先从红门向上走到水池。东朝右，再从水池向右到凉亭。"
+    }
+  ],
+  "afterClass": {
+    "familyTask": "成人在开阔安全处确定一个站位，用已知地标和地上影子交流辨向，停在原地画四个方向的物体，再用一张虚构公园图说出经过两个地点的路线。阴天可用纸上模型。不能直视太阳。",
+    "weeklyQuestionSource": [
+      "借安全线索找方向",
+      "固定站点判断相对方向及顺时针",
+      "转身后对照身体和场地方位",
+      "沿方向标所示的两段路线"
+    ],
+    "evidence": "线上只记录图题和实际操作；实地辨向、口述和画图由成人观察。无需拍摄或提交家庭地理信息。"
+  },
+  "artAndLanguage": "统一场地底图与地标，固定真实朝向、光照方向、影子、人物与地图标记；场景美术可由图像生成，四向标和路线用核过的可读矢量叠层。方向字可作目标，所有指令和反馈均语音讲清。遮住非目标文字仍能凭可见地标、方向标和口令完成。"
+}

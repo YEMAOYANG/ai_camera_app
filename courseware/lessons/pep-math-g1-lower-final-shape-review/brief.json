@@ -1,0 +1,86 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "图形的认识",
+  "binding": {
+    "editionId": "pep-math-g1-lower-2022-standard",
+    "revisionId": "directory-6205d2037284e91f10b25edd",
+    "unitId": "3118eaa6-4e44-470a-b7ec-dab2ae9b29b5",
+    "nodeId": "9a1947b2-0ff5-4b28-aa41-5d478a4d93a4"
+  },
+  "scenario": "手工角给纸偶小剧场准备标牌和图案。孩子从教具的面上找轮廓，把有共同特点的图块分开，再拼图和清点需要的材料。",
+  "goals": [
+    "能从熟悉物体上找出指定面的轮廓，认出长方形、正方形、三角形、圆和平行四边形。",
+    "能用直边、曲线轮廓或边的条数等可观察特点给图形分类，能指出分在一起的理由。",
+    "能通过移动、转动和沿相等边拼接相同图块得到新轮廓，比较不同拼法的结果。",
+    "能按图形种类或按图案分组数出实际图块，并用每组所需数解决还差几块的问题。"
+  ],
+  "goalEvidence": [
+    {"skill":"identify-flat-faces","source":"印85图形的认识、课件3至7、教案1至2"},
+    {"skill":"sort-by-shape-features","source":"印85平面图形图示、课件8至13、教案2、任务单1"},
+    {"skill":"compose-shapes","source":"印85拼组图、印86第3题、课件14至25、教案2至3、任务单1"},
+    {"skill":"count-pieces-by-kind","source":"印89第12题、课件26至37、教案4"}
+  ],
+  "pageSequence": [
+    {"key":"trace-a-face","kind":"teaching","title":"从一个面找出轮廓","plan":"用印泥教具、纸盒和三棱柱图示，逐个点亮指定面。从正对该面的方向描出圆、正方形、长方形和三角形，再从斜边纸卡找平行四边形。"},
+    {"key":"what-do-these-shapes-share","kind":"teaching","title":"看边，找相同的特点","plan":"在统一色彩的五种图上逐个点亮外边界。先按直边与曲线分类，再找四条直边的图。把正方形、长方形与斜放的平行四边形一起圈出，分别数边。"},
+    {"key":"sort-shape-pieces","kind":"interactive","title":"按边的特点把图块推入托盘","plan":"图块方向和颜色可变，孩子按当前的边数或边界特点判断，再把图块推入相应样图托盘。"},
+    {"key":"rearrange-the-same-square-pieces","kind":"teaching","title":"同样的方片可以换一种拼法","plan":"从四块相同正方形做标牌，先排一行四块，再排两行两列。点亮接合边和外轮廓，分别观察两条较长边的长方形和大正方形。"},
+    {"key":"match-two-triangle-edges","kind":"teaching","title":"两块三角形沿相等的边拼","plan":"用程序绘制两块相同直角三角形，依次示范沿斜边无缝拼成长方形和沿适合的直角边改变朝向。突出接合边等长、外轮廓变化，无空隙或重叠。"},
+    {"key":"fit-the-shape-into-the-gap","kind":"interactive","title":"转一转，把空位补完整","plan":"相连方格块慢慢落下，孩子观察空位的轮廓、格数和方向，横移或旋转后再落下。"},
+    {"key":"two-ways-to-count-a-picture","kind":"teaching","title":"给同一幅拼图换一种数法","plan":"纸船用3个三角形与1个平行四边形，信号塔用1个长方形、1个正方形、1个三角形和1个圆。先按种类点亮计数，再按图案数4和4，核对每块只计一次，共8块。"},
+    {"key":"find-the-missing-pieces","kind":"teaching","title":"要做几组，还缺几块","plan":"每套风向牌要2个圆片，做5套共需10个。把手头6片放进图上逐一对照，再算10减6得4。"},
+    {"key":"picture-check-one","kind":"quiz","title":"从物体和图形上看轮廓","plan":"老师预录逐题读小检查1至3，核查识别、分类和用同样方片拼组。"},
+    {"key":"picture-check-two","kind":"quiz","title":"拼合、计数和补齐","plan":"老师预录逐题读小检查4至6，呈现精确的新拼接图和分组计数图。"},
+    {"key":"show-a-new-picture","kind":"teaching","title":"和家人拼一个新图案","plan":"逐项回看轮廓、接缝和分组计数。展示原创剪影并引导孩子向家人指一条用了哪两块图形的接合边。"}
+  ],
+  "games": [
+    {
+      "page": "sort-shape-pieces",
+      "template": "sortingDepot",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.sortingDepot",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "classification",
+      "reason": "托盘样图表示当前的共同特点，图块的边界特征决定是否能入盘。改变图块颜色、大小和方向仍按同一分类规则。孩子同时要计划推行路径。",
+      "levels": [
+        "按直边或曲线轮廓分类。三角片和圆片分别入盘，开阔直通。",
+        "按三条直边、四条直边、曲线轮廓分三组。用旋转过的三角形、斜放平行四边形和圆，增加转向。",
+        "仍按三条直边、四条直边、曲线轮廓分类。长方形与转过的正方形送进两个同组托盘，另分三角片和圆片。加入柱子和推送次序。"
+      ],
+      "demo": "依次高亮一条可观察的边界、搬运角色和对应托盘。实际把第一片推入后立即停止，复位后用预录语音交接。"
+    },
+    {
+      "page": "fit-the-shape-into-the-gap",
+      "template": "shapeBridge",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.shapeBridge",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "shape_compose",
+      "reason": "由小正方形连成的图块必须完全覆盖相同轮廓的空位，正确拼合才能补完图。玩家要在落下前移动并调整方向。",
+      "levels": [
+        "补两格长条和四格正方形两个空位，慢速下落，先对齐外边。",
+        "补三格直条与三格转角两个空位，两块格数相同。起始方向需要旋转，缩短下落时间。",
+        "补四格正方形、四格丁字轮廓和三格转角三个不重叠空位。加快下落，逐块对照形状、方向及占格。"
+      ],
+      "demo": "依次点亮待落图块、旋转动作位置和目标空位，真实补好第一块后停住。复位首关，再用预录指令让孩子接手。"
+    }
+  ],
+  "quizPlan": [
+    {"skill":"identify-flat-faces","task":"从正对竹筒笔架底面的位置看，描下的轮廓是哪一张？","pictureOptions":["四边一样长的方形","圆形轮廓","两端细长的椭圆形轮廓"],"correctPosition":2,"rationale":"竹筒图示的底面是圆，正对底面描下它的边界得到圆。"},
+    {"skill":"sort-by-shape-features","task":"要找每一块都由四条直边围成的一组，选哪盘？","pictureOptions":["一个三角形与一个长方形","一个圆与一个正方形","一个长方形、一个转过的正方形和一个平行四边形"],"correctPosition":3,"rationale":"正确组里的三块各有四条直边。三角形只有三条直边，圆的轮廓是曲线。"},
+    {"skill":"compose-shapes","task":"六块同样的方片，要拼成两行，每行三块。哪一幅拼图符合？","pictureOptions":["两行三列的实心长方形","有一角凸起的六格拼图","三行两列的实心长方形"],"correctPosition":1,"rationale":"两行各三块共六块。另两幅分别改变了外轮廓或行列方向。"},
+    {"skill":"compose-shapes","task":"用两块相同直角三角形拼一块长方形标牌。哪张图沿一条边贴齐，外轮廓完整？","pictureOptions":["两块仅在一个顶点碰到的图","沿斜边完全贴合成新比例长方形的图","两块沿一条直角边拼成三角外轮廓的图"],"correctPosition":2,"rationale":"这两块直角三角形沿斜边对齐，四条外边组成长方形，接合处没有空隙。"},
+    {"skill":"count-pieces-by-kind","task":"纸舞台图案里有4块圆片、2块三角片、3块方片。只数圆片和三角片，一共有多少块？","pictureOptions":["4块圆和3块方片组成的一组","2块三角和3块方片组成的一组","4块圆和2块三角组成的一组"],"correctPosition":3,"rationale":"题目指定圆片和三角片，两类各计一次，4加2得6块。"},
+    {"skill":"count-pieces-by-kind","task":"每幅风车图需要3块三角片。要拼3幅，手里已有4块，还缺几块？","pictureOptions":["5块三角片","4块三角片","9块三角片"],"correctPosition":1,"rationale":"三幅共需3加3加3等于9块，减去已有4块还缺5块。"}
+  ],
+  "presentation": "用原创手工角插画和程序精确绘制的边界、方格、三角块与拼接线。教师说明哪一个面、哪一条边和哪一类要计数，预录每次操作指令、反馈和重听。遮住非目标文字，孩子仍可按图完成任务。",
+  "evidence": {
+    "inClass": "记录孩子在课堂里选择的面、分类、旋转拼合与图题结果。",
+    "realWorld": "实物描边、纸片拼组和口头解释由家长或教师现场观察。未观察的事项记待观察。"
+  },
+  "afterClass": {
+    "familyTask":"和家人用同样大的纸方片拼两个不同的轮廓，再试着拼一个自选七巧板剪影。用手指沿外边走一遍，说一处拼接的办法。实物拼组和口头表现待观察。",
+    "weeklyQuestionSource":["从物体的面找轮廓","按共同边界特点分类","同一批图块换拼接方法","分组计数与计算还缺多少"],
+    "source":"印85至86关联题、印89第12题、教案4、课件38至39、课练1"
+  }
+}

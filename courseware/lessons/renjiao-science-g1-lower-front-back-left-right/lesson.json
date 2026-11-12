@@ -1,0 +1,1031 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "前后左右",
+  "grade": 1,
+  "description": "在原创小剧场按站位、参照人和朝向描述物件，比较原地转身与换站点的结果，再用两种照片记录同一幕。",
+  "roster": {
+    "teacher": {
+      "name": "小科老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Serena",
+      "avatar": "/avatars/teacher-2.png",
+      "color": "#287B94",
+      "persona": "用自然清楚的普通话，引导孩子先猜再观察，指出自己的根据。"
+    }
+  },
+  "images": {
+    "blue-lantern": {
+      "file": "assets/blue-lantern.png"
+    },
+    "blue-spot": {
+      "file": "assets/blue-spot.png"
+    },
+    "camera-background": {
+      "file": "assets/camera-background.png"
+    },
+    "camera-badge": {
+      "file": "assets/camera-badge.png"
+    },
+    "camera-cover": {
+      "file": "assets/camera-cover.png"
+    },
+    "delivery-background": {
+      "file": "assets/delivery-background.png"
+    },
+    "entrance": {
+      "file": "assets/entrance.png"
+    },
+    "family-model": {
+      "file": "assets/family-model.png"
+    },
+    "green-flag": {
+      "file": "assets/green-flag.png"
+    },
+    "green-ref-east": {
+      "file": "assets/green-ref-east.png"
+    },
+    "green-ref-north": {
+      "file": "assets/green-ref-north.png"
+    },
+    "green-ref-south": {
+      "file": "assets/green-ref-south.png"
+    },
+    "lane-cart": {
+      "file": "assets/lane-cart.png"
+    },
+    "orange-crate": {
+      "file": "assets/orange-crate.png"
+    },
+    "purple-drum": {
+      "file": "assets/purple-drum.png"
+    },
+    "q1-a": {
+      "file": "assets/q1-a.png"
+    },
+    "q1-b": {
+      "file": "assets/q1-b.png"
+    },
+    "q1-c": {
+      "file": "assets/q1-c.png"
+    },
+    "q1-stimulus": {
+      "file": "assets/q1-stimulus.png"
+    },
+    "q2-a": {
+      "file": "assets/q2-a.png"
+    },
+    "q2-b": {
+      "file": "assets/q2-b.png"
+    },
+    "q2-c": {
+      "file": "assets/q2-c.png"
+    },
+    "q2-stimulus": {
+      "file": "assets/q2-stimulus.png"
+    },
+    "q3-a": {
+      "file": "assets/q3-a.png"
+    },
+    "q3-b": {
+      "file": "assets/q3-b.png"
+    },
+    "q3-c": {
+      "file": "assets/q3-c.png"
+    },
+    "q3-stimulus": {
+      "file": "assets/q3-stimulus.png"
+    },
+    "q4-a": {
+      "file": "assets/q4-a.png"
+    },
+    "q4-b": {
+      "file": "assets/q4-b.png"
+    },
+    "q4-c": {
+      "file": "assets/q4-c.png"
+    },
+    "q5-a": {
+      "file": "assets/q5-a.png"
+    },
+    "q5-b": {
+      "file": "assets/q5-b.png"
+    },
+    "q5-c": {
+      "file": "assets/q5-c.png"
+    },
+    "q5-stimulus": {
+      "file": "assets/q5-stimulus.png"
+    },
+    "q6-a": {
+      "file": "assets/q6-a.png"
+    },
+    "q6-b": {
+      "file": "assets/q6-b.png"
+    },
+    "q6-c": {
+      "file": "assets/q6-c.png"
+    },
+    "q6-stimulus": {
+      "file": "assets/q6-stimulus.png"
+    },
+    "red-spot": {
+      "file": "assets/red-spot.png"
+    },
+    "sample-seat": {
+      "file": "assets/sample-seat.png"
+    },
+    "sample-ticket": {
+      "file": "assets/sample-ticket.png"
+    },
+    "shelf-model": {
+      "file": "assets/shelf-model.png"
+    },
+    "stage-side-forward": {
+      "file": "assets/stage-side-forward.png"
+    },
+    "stage-side-sideways": {
+      "file": "assets/stage-side-sideways.png"
+    },
+    "stage-side-turned": {
+      "file": "assets/stage-side-turned.png"
+    },
+    "stage-top-forward": {
+      "file": "assets/stage-top-forward.png"
+    },
+    "stage-top-sideways": {
+      "file": "assets/stage-top-sideways.png"
+    },
+    "stage-top-turned": {
+      "file": "assets/stage-top-turned.png"
+    },
+    "star-ref-north": {
+      "file": "assets/star-ref-north.png"
+    },
+    "star-ref-west": {
+      "file": "assets/star-ref-west.png"
+    },
+    "star-reference": {
+      "file": "assets/star-reference.png"
+    },
+    "triangle-shaker": {
+      "file": "assets/triangle-shaker.png"
+    },
+    "truck-moving": {
+      "file": "assets/truck-moving.png"
+    },
+    "truck-still": {
+      "file": "assets/truck-still.png"
+    },
+    "teach-near": {
+      "file": "assets/teach-near.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "where-to-put-it",
+      "title": "小剧场缺一件道具",
+      "type": "slide",
+      "template": "two-columns",
+      "data": {
+        "title": "小剧场缺一件道具",
+        "left": {
+          "heading": "听演员说",
+          "body": "哪一件？"
+        },
+        "left_picture": "entrance",
+        "right": {
+          "heading": "看道具架",
+          "body": "上面和下面"
+        },
+        "right_picture": "shelf-model"
+      },
+      "script": [
+        {
+          "say": "剧场快开门了。绿帽演员想把道具放到自己的左边。你知道要看谁吗？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "先找说话的绿帽演员。还要知道他站在哪儿、脸朝哪儿。"
+        },
+        {
+          "say": "你指左边时，可能和他指的不是同一处。我们先约好看谁。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "看这个道具架。紫鼓在上面，橙箱在下面。试着从上往下指一指。"
+        },
+        {
+          "say": "这里是上下两层。等会儿，我们在同一块地板上找人的身前和身后。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "和绿帽演员朝同一边。脸朝的是前，背朝的是后，左右按他的手分。"
+        }
+      ]
+    },
+    {
+      "key": "stand-then-face",
+      "title": "脚没挪，朝向变了",
+      "type": "slide",
+      "template": "two-columns",
+      "data": {
+        "title": "脚没挪，朝向变了",
+        "left": {
+          "heading": "先朝舞台",
+          "body": "从绿帽演员看"
+        },
+        "left_picture": "stage-top-forward",
+        "right": {
+          "heading": "原地转半圈",
+          "body": "还是这四件道具"
+        },
+        "right_picture": "stage-top-turned"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "从上面看。绿帽演员站在圆垫上，脚下箭头指着他面对的地方。"
+        },
+        {
+          "say": "第一张写转前。我画绿帽演员面朝舞台，紫鼓在前，橙箱在后。"
+        },
+        {
+          "say": "让自己的脸也朝小鼓那边。右手边是蓝灯，左手边是绿旗。"
+        },
+        {
+          "say": "猜一猜，他原地转半圈以后，紫鼓会在他的哪一边？"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "看两张图，圆垫、紫鼓、橙箱、蓝灯和绿旗都还在原来的地方。"
+        },
+        {
+          "say": "第二张写转后。我画他背朝舞台，紫鼓在后，橙箱在前。"
+        },
+        {
+          "say": "再看看手的两边。左手边变成蓝灯，右手边变成绿旗。"
+        },
+        {
+          "say": "两张一起比。演员站原处，紫鼓没挪。朝向变了，鼓由前变后。"
+        },
+        {
+          "say": "再听听是谁的方向，找那顶帽子和脚下的箭头。"
+        },
+        {
+          "say": "车慢一点，可以先在路边停一停。"
+        }
+      ]
+    },
+    {
+      "key": "another-person",
+      "title": "换个人来看",
+      "type": "slide",
+      "template": "picture-points",
+      "data": {
+        "title": "换个人来看",
+        "picture": "star-reference",
+        "points": [
+          "找星帽",
+          "看箭头",
+          "伸自己的手比一比"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "有两位演员。先指绿帽，再指星帽。两个人朝着不同的地方。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "星帽演员想要自己左边的道具。你刚才是按谁的方向找的？"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "把自己想成星帽演员，脸跟他的箭头朝同一边。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "举起你的左手。图上左手朝三角沙锤，不是朝紫鼓。"
+        },
+        {
+          "say": "送货时，先按绿帽演员的方向取，再按星帽演员的方向送。"
+        },
+        {
+          "say": "去取绿帽演员左边的道具。"
+        },
+        {
+          "say": "把道具送到星帽演员右边的图站。"
+        },
+        {
+          "say": "去取绿帽演员右边的道具。"
+        },
+        {
+          "say": "把道具送到星帽演员左边的图站。"
+        },
+        {
+          "say": "去取绿帽演员身前的道具。"
+        },
+        {
+          "say": "把道具送到星帽演员身后的图站。"
+        },
+        {
+          "say": "去取绿帽演员身后的道具。"
+        },
+        {
+          "say": "把道具送到星帽演员身前的图站。"
+        }
+      ]
+    },
+    {
+      "key": "costume-delivery",
+      "type": "interactive",
+      "title": "给小演员送道具",
+      "page": "costume-delivery",
+      "widgetType": "game",
+      "startImage": "delivery-background",
+      "script": [
+        {
+          "say": "这次我们开小车。先听要取哪件，再听把它送到哪里。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#stage-ref-bottom"
+        },
+        {
+          "say": "先看下面绿帽演员的脸和脚下箭头。他朝舞台，左手边是小鼓。"
+        },
+        {
+          "highlight": "#game-target"
+        },
+        {
+          "say": "我把车开到小鼓的图站。"
+        },
+        {
+          "highlight": "#delivery-action"
+        },
+        {
+          "say": "车到站了，就按这个圆按钮取货。接着去上面送货。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "上面换星帽演员。看他的朝向，再找他的右手边。"
+        },
+        {
+          "setState": {
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#stage-ref-top"
+        },
+        {
+          "say": "星帽演员的右手边是橙箱图站。"
+        },
+        {
+          "highlight": "#listen-again"
+        },
+        {
+          "say": "要再听一次，点左下角的喇叭。"
+        },
+        {
+          "say": "轮到你啦。开车取道具，再送到另一岸。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "delivery-hint": "stand-then-face-11",
+        "delivery-help": "stand-then-face-12",
+        "green-left": "another-person-10",
+        "star-right": "another-person-11",
+        "green-right": "another-person-12",
+        "star-left": "another-person-13",
+        "green-front": "another-person-14",
+        "star-back": "another-person-15",
+        "green-back": "another-person-16",
+        "star-front": "another-person-17",
+        "delivery-praise": "two-places-1"
+      }
+    },
+    {
+      "key": "two-places",
+      "title": "从两个站点描述木桌",
+      "type": "slide",
+      "template": "two-columns",
+      "data": {
+        "title": "从两个站点描述木桌",
+        "left": {
+          "heading": "站红垫",
+          "body": "面向舞台"
+        },
+        "left_picture": "red-spot",
+        "right": {
+          "heading": "站蓝垫",
+          "body": "也面向舞台"
+        },
+        "right_picture": "blue-spot"
+      },
+      "script": [
+        {
+          "say": "先找对了人和朝向，取和送都到对的图站了。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "木桌放在两张垫子中间。从红垫看，你会怎么告诉同伴桌子在哪儿？"
+        },
+        {
+          "say": "我站在红垫上，面向舞台。木桌在我右边。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "现在走到蓝垫上，也面向舞台。木桌一直留在原处。"
+        },
+        {
+          "say": "在蓝垫这边，木桌在我左边。你指的还是原来的木桌。"
+        },
+        {
+          "say": "把你站哪张垫子、面向哪儿都说出来，同伴就能跟着做。"
+        },
+        {
+          "say": "接下来让相机换个看法。先猜从上面、从侧面各能看见什么。"
+        },
+        {
+          "say": "请从上面拍。等画面和上面的小图一样。"
+        },
+        {
+          "say": "请从侧面拍。等画面和上面的小图一样。"
+        },
+        {
+          "say": "等画面和上面的小图一样，再按快门。"
+        },
+        {
+          "say": "把画面移进虚线框，先让它完整地进来。"
+        },
+        {
+          "say": "先看上面的小图，再等画面转到相同的角度。"
+        }
+      ]
+    },
+    {
+      "key": "camera-compare",
+      "type": "interactive",
+      "title": "给同一幕拍两张照",
+      "page": "camera-compare",
+      "widgetType": "game",
+      "startImage": "camera-cover",
+      "script": [
+        {
+          "say": "来给绿帽演员和四件道具拍照。我们会从上面看，也会从侧面看。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#camera-first-preview"
+        },
+        {
+          "say": "第一张照着上面的小图拍。俯看能看清圆垫四边都有谁。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "我按箭头移虚线框，把整个画面放进框里。"
+        },
+        {
+          "highlight": "#game-target"
+        },
+        {
+          "say": "等画面和小图一样，我才按圆圆的快门。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "下边留下拍到的照片。还要看下一张小图，换个角度再拍。"
+        },
+        {
+          "say": "比较照片里的绿帽演员，看看紫鼓和蓝灯分别在他哪里。"
+        },
+        {
+          "say": "轮到你来拍啦。不同的照片能帮我们看同一幕。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "observationCard": {
+        "title": "同一幕的两种看法",
+        "familyTask": "和家人在空地摆好四件软物，留出转身的位置。站在垫上，说朝哪儿，再指出前后左右。原地转半圈，让家人按两次的说法画下发现。",
+        "levels": [
+          {
+            "label": "面向舞台",
+            "trials": [
+              {
+                "id": "stage-directions",
+                "label": "面向舞台时，同一幕的两种看法",
+                "top": {
+                  "stage-top-forward": {
+                    "label": "俯看圆垫和四件道具，紫鼓在身前",
+                    "image": "stage-top-forward"
+                  }
+                },
+                "side": {
+                  "stage-side-forward": {
+                    "label": "侧看演员的脸朝哪儿",
+                    "image": "stage-side-forward"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "label": "原地转半圈",
+            "trials": [
+              {
+                "id": "stage-directions",
+                "label": "原地转半圈时，同一幕的两种看法",
+                "top": {
+                  "stage-top-turned": {
+                    "label": "俯看圆垫和四件道具，橙箱在身前",
+                    "image": "stage-top-turned"
+                  }
+                },
+                "side": {
+                  "stage-side-turned": {
+                    "label": "侧看演员的脸朝哪儿",
+                    "image": "stage-side-turned"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "label": "朝向蓝灯",
+            "trials": [
+              {
+                "id": "stage-directions",
+                "label": "朝向蓝灯时，同一幕的两种看法",
+                "top": {
+                  "stage-top-sideways": {
+                    "label": "俯看圆垫和四件道具，蓝灯在身前",
+                    "image": "stage-top-sideways"
+                  }
+                },
+                "side": {
+                  "stage-side-sideways": {
+                    "label": "侧看演员的脸朝哪儿",
+                    "image": "stage-side-sideways"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gameAudio": {
+        "camera-top": "two-places-10",
+        "camera-side": "two-places-11",
+        "camera-goal": "two-places-12",
+        "camera-hint": "two-places-13",
+        "camera-help": "two-places-14",
+        "camera-praise": "ticket-row-1"
+      }
+    },
+    {
+      "key": "near-and-far",
+      "type": "slide",
+      "title": "都从同一张桌子看",
+      "template": "picture-points",
+      "data": {
+        "title": "都从同一张桌子看",
+        "picture": "teach-near",
+        "points": [
+          "找木桌",
+          "看中间的空隙",
+          "说离什么近"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "剧场里还有三个小玩具。哪个离木桌最近？先用手指猜一个。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "我们都从木桌看。指一指桌子的边。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "桌边到沙锤只隔一点。到球和小旗，都要走远一些。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "可以这样说。沙锤离木桌最近。我比的是它们到同一张桌子的远近。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "从桌边到每件玩具，直着比中间的空隙。空隙短的就近。"
+        },
+        {
+          "say": "换成球作参照，就从球重新比。描述远近时先说离谁。"
+        }
+      ]
+    },
+    {
+      "key": "ticket-row",
+      "title": "让数字帮我们找座",
+      "type": "slide",
+      "template": "two-columns",
+      "data": {
+        "title": "让数字帮我们找座",
+        "left": {
+          "heading": "先看票",
+          "body": "第1排第2座"
+        },
+        "left_picture": "sample-ticket",
+        "right": {
+          "heading": "再看座位图",
+          "body": "从舞台数排"
+        },
+        "right_picture": "sample-seat"
+      },
+      "script": [
+        {
+          "say": "同一幕的两种看法都拍到了。可以比一比两张照片。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "小剧场用数字告诉我们站哪儿。这张票写着第1排第2座。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "从舞台往后找。靠近舞台的第一排，左边标着一。"
+        },
+        {
+          "say": "在第一排找座椅上的二。手指停在那一格。"
+        },
+        {
+          "say": "坐到二号座，脸朝舞台。你身前是舞台，身后还有两排座椅。"
+        },
+        {
+          "say": "第一排和第二座要一起说，同伴才能找到同一个位置。"
+        }
+      ]
+    },
+    {
+      "key": "picture-check",
+      "type": "quiz",
+      "title": "看图找对地方",
+      "intro": [
+        "换几张新的剧场图。听清要找谁，指一指，再点能回答的那张图。"
+      ],
+      "questions": [
+        {
+          "id": "right-of-player",
+          "skill": "direction-relative-right",
+          "question": "演员朝门口看。哪件道具在演员的右边？",
+          "answer": [
+            "B"
+          ],
+          "analysis": "站在圆垫上的演员朝右边的门看，他的右手边朝图的下方，所以选蓝灯。",
+          "options": {
+            "A": {
+              "label": "紫色小鼓",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-a",
+                "alt": "紫色小鼓"
+              }
+            },
+            "B": {
+              "label": "蓝色灯笼",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-b",
+                "alt": "蓝色灯笼"
+              }
+            },
+            "C": {
+              "label": "橙色道具箱",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-c",
+                "alt": "橙色道具箱"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "q1-stimulus",
+            "alt": "俯视圆垫上的演员，箭头指门，灯笼在演员下方，鼓在上方，箱在另一边"
+          }
+        },
+        {
+          "id": "turn-half-circle",
+          "skill": "direction-turn-in-place",
+          "question": "演员原先面对鼓。他原地转半圈，哪张图对？",
+          "answer": [
+            "C"
+          ],
+          "analysis": "鼓和圆垫都不挪。演员转半圈朝另一边，原来身前的鼓现在在身后。",
+          "options": {
+            "A": {
+              "label": "演员朝下，鼓在演员身前",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-a",
+                "alt": "演员朝下，鼓在演员身前"
+              }
+            },
+            "B": {
+              "label": "演员朝下，鼓在演员旁边",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-b",
+                "alt": "演员朝下，鼓在演员旁边"
+              }
+            },
+            "C": {
+              "label": "演员朝下，鼓在演员身后",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-c",
+                "alt": "演员朝下，鼓在演员身后"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "q2-stimulus",
+            "alt": "俯看演员站在圆垫朝上，小鼓在前，环形箭头表示原地转身"
+          }
+        },
+        {
+          "id": "different-reference",
+          "skill": "direction-change-person",
+          "question": "哪件道具在戴星帽的演员左边？",
+          "answer": [
+            "A"
+          ],
+          "analysis": "按星帽演员的箭头看。他朝图的左侧看，他左手边是三角沙锤。",
+          "options": {
+            "A": {
+              "label": "三角沙锤",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-a",
+                "alt": "三角沙锤"
+              }
+            },
+            "B": {
+              "label": "橙色道具箱",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-b",
+                "alt": "橙色道具箱"
+              }
+            },
+            "C": {
+              "label": "纸飞机",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-c",
+                "alt": "纸飞机"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "q3-stimulus",
+            "alt": "绿帽演员在左侧，星帽演员朝图左侧，箱在星帽上方，沙锤在下方，纸飞机在另一侧"
+          }
+        },
+        {
+          "id": "clear-directions",
+          "skill": "direction-position-and-facing",
+          "question": "要让同伴看懂左和右，哪张图说全了？",
+          "answer": [
+            "B"
+          ],
+          "analysis": "图上同时有圆垫和朝门的箭头，同伴能站到同一处、面向同一处。",
+          "options": {
+            "A": {
+              "label": "只有圆垫标站位",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-a",
+                "alt": "只有圆垫标站位"
+              }
+            },
+            "B": {
+              "label": "圆垫标站位，箭头朝门",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-b",
+                "alt": "圆垫标站位，箭头朝门"
+              }
+            },
+            "C": {
+              "label": "只有箭头指门",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-c",
+                "alt": "只有箭头指门"
+              }
+            }
+          }
+        },
+        {
+          "id": "nearer-table",
+          "skill": "distance-same-reference",
+          "question": "从木桌边看，哪个玩具离桌子最近？",
+          "answer": [
+            "A"
+          ],
+          "analysis": "以木桌为同一个参照。小熊和桌边的空隙最小。",
+          "options": {
+            "A": {
+              "label": "绒布小熊",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-a",
+                "alt": "绒布小熊"
+              }
+            },
+            "B": {
+              "label": "条纹小球",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-b",
+                "alt": "条纹小球"
+              }
+            },
+            "C": {
+              "label": "纸飞机",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-c",
+                "alt": "纸飞机"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "q5-stimulus",
+            "alt": "木桌居中，小熊贴近上边，球在右侧，纸飞机在左下角"
+          }
+        },
+        {
+          "id": "ticket-number",
+          "skill": "location-row-and-seat",
+          "question": "票上写第2排第3座。图里应该坐哪里？",
+          "answer": [
+            "C"
+          ],
+          "analysis": "先找标着二的第二排，再找这排座椅上写的三。",
+          "options": {
+            "A": {
+              "label": "第1排第3座",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-a",
+                "alt": "第1排第3座"
+              }
+            },
+            "B": {
+              "label": "第3排第2座",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-b",
+                "alt": "第3排第2座"
+              }
+            },
+            "C": {
+              "label": "第2排第3座",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-c",
+                "alt": "第2排第3座"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "q6-stimulus",
+            "alt": "米色剧场票，写着2排3座"
+          }
+        }
+      ]
+    },
+    {
+      "key": "try-it-together",
+      "title": "回家做一次真实观察",
+      "type": "slide",
+      "template": "picture-points",
+      "data": {
+        "title": "回家做一次真实观察",
+        "picture": "family-model",
+        "points": [
+          "摆好四件软物",
+          "站定，指朝向",
+          "转半圈再画一张"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "今天我们在小剧场里观察。回家也能和家人玩一次真正的转身。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "请家人在垫子四周摆四件软物，给自己留够转身的位置。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "先说我站在垫子上，脸朝哪里。再指出我的前、后、左、右。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "原地转半圈，道具都别挪。请家人画下两次的说法，再比一比。"
+        },
+        {
+          "say": "如果你们说的不一样，先回到原站点，朝同一个方向，再看一遍。"
+        },
+        {
+          "say": "家里的结果等你们真的观察了再记下来。下次见！"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,870 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "Unit 1 How old are you?",
+  "description": "当一天小记者，听清年龄、摆正年龄牌，再把牌交给回答的同学。",
+  "grade": 1,
+  "roster": {
+    "mia": {
+      "name": "Mia 老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Jennifer",
+      "avatar": "/teachers/coco-english-v1.png",
+      "color": "#557B76",
+      "persona": "用生活里的对话，引导孩子先听完，再说一整句。"
+    }
+  },
+  "images": {
+    "workshop-cover": {
+      "file": "assets/workshop-cover.png"
+    },
+    "friends-different-heights": {
+      "file": "assets/friends-different-heights.png"
+    },
+    "speaker-round-cap": {
+      "file": "assets/speaker-round-cap.png"
+    },
+    "speaker-paint-apron": {
+      "file": "assets/speaker-paint-apron.png"
+    },
+    "interview-desk": {
+      "file": "assets/interview-desk.png"
+    },
+    "marble-opening": {
+      "file": "assets/marble-opening.png"
+    },
+    "marble-workshop": {
+      "file": "assets/marble-workshop.png"
+    },
+    "delivery-opening": {
+      "file": "assets/delivery-opening.png"
+    },
+    "delivery-workshop": {
+      "file": "assets/delivery-workshop.png"
+    },
+    "reporter-sticker": {
+      "file": "assets/reporter-sticker.png"
+    },
+    "amber-marble": {
+      "file": "assets/amber-marble.png"
+    },
+    "reporter-van": {
+      "file": "assets/reporter-van.png"
+    },
+    "reporter-van-loaded": {
+      "file": "assets/reporter-van-loaded.png"
+    },
+    "traffic-van": {
+      "file": "assets/traffic-van.png"
+    },
+    "guest-cap": {
+      "file": "assets/guest-cap.png"
+    },
+    "guest-phones": {
+      "file": "assets/guest-phones.png"
+    },
+    "guest-scarf": {
+      "file": "assets/guest-scarf.png"
+    },
+    "guest-headband": {
+      "file": "assets/guest-headband.png"
+    },
+    "guest-bowtie": {
+      "file": "assets/guest-bowtie.png"
+    },
+    "guest-glasses": {
+      "file": "assets/guest-glasses.png"
+    },
+    "badge-three": {
+      "file": "assets/badge-three.png"
+    },
+    "badge-six": {
+      "file": "assets/badge-six.png"
+    },
+    "badge-seven": {
+      "file": "assets/badge-seven.png"
+    },
+    "badge-eight": {
+      "file": "assets/badge-eight.png"
+    },
+    "badge-nine": {
+      "file": "assets/badge-nine.png"
+    },
+    "badge-ten": {
+      "file": "assets/badge-ten.png"
+    },
+    "badge-six-inverted": {
+      "file": "assets/badge-six-inverted.png"
+    },
+    "badge-direction-upright": {
+      "file": "assets/badge-direction-upright.png"
+    },
+    "badge-direction-inverted": {
+      "file": "assets/badge-direction-inverted.png"
+    },
+    "quiz-asking-greeting": {
+      "file": "assets/quiz-asking-greeting.png"
+    },
+    "quiz-asking-age": {
+      "file": "assets/quiz-asking-age.png"
+    },
+    "quiz-asking-name": {
+      "file": "assets/quiz-asking-name.png"
+    },
+    "quiz-guest-earmuffs": {
+      "file": "assets/quiz-guest-earmuffs.png"
+    },
+    "quiz-guest-roundhat": {
+      "file": "assets/quiz-guest-roundhat.png"
+    },
+    "quiz-guest-apron": {
+      "file": "assets/quiz-guest-apron.png"
+    },
+    "quiz-age-pair-four-five": {
+      "file": "assets/quiz-age-pair-four-five.png"
+    },
+    "quiz-age-pair-three-four": {
+      "file": "assets/quiz-age-pair-three-four.png"
+    },
+    "quiz-age-pair-four-four": {
+      "file": "assets/quiz-age-pair-four-four.png"
+    },
+    "quiz-answering-age": {
+      "file": "assets/quiz-answering-age.png"
+    },
+    "quiz-answering-name": {
+      "file": "assets/quiz-answering-name.png"
+    },
+    "quiz-answering-greeting": {
+      "file": "assets/quiz-answering-greeting.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "meet-at-workshop",
+      "type": "slide",
+      "title": "小记者的第一问",
+      "template": "picture-points",
+      "data": {
+        "title": "小记者的第一问",
+        "picture": "workshop-cover",
+        "points": [
+          "先听在问什么",
+          "问年龄",
+          "说完整回答"
+        ]
+      },
+      "script": [
+        {
+          "say": "小记者拿起了话筒。他想知道新朋友几岁，开口该怎么说？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "先看拿话筒的人。他在等对面的同学回答。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "听清一句再想。Hello. 这是打招呼。"
+        },
+        {
+          "say": "What's your name? 这句是问名字。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "想问几岁，要说这一句。How old are you?"
+        },
+        {
+          "say": "跟我把整句念一遍。How old are you?"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "回答自己的年龄，先说 I'm，再说年龄。I'm seven."
+        },
+        {
+          "say": "现在假装你七岁，跟我答一遍。刚才那位小记者就听懂啦。"
+        }
+      ]
+    },
+    {
+      "key": "age-badge-direction",
+      "type": "slide",
+      "title": "倒过来的年龄牌",
+      "template": "two-columns",
+      "data": {
+        "title": "倒过来的年龄牌",
+        "left": {
+          "heading": "牌摆正时",
+          "body": "下边的小横线在下方"
+        },
+        "right": {
+          "heading": "整张牌倒过来",
+          "body": "先听本人，再把牌摆正"
+        },
+        "left_picture": "badge-direction-upright",
+        "right_picture": "badge-direction-inverted"
+      },
+      "script": [
+        {
+          "say": "小记者听到同学说六岁，牌子却像九。是年龄变了吗？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "看这张牌。横线在下面，数字是六。英文说 six。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "手掌当小牌，先把有横线的那一边放下面。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "现在把整张牌转半圈。六看着有点像九。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "线跑到上面了。把牌摆正，再听他回答。"
+        },
+        {
+          "say": "他答 I'm six. 还是六岁。Nine 才是九岁。"
+        },
+        {
+          "say": "再用手转回去。牌会转，人的年龄没跟着变。"
+        }
+      ]
+    },
+    {
+      "key": "hear-a-full-age",
+      "type": "slide",
+      "title": "耳朵帮我认年龄",
+      "template": "picture-points",
+      "data": {
+        "title": "耳朵帮我认年龄",
+        "picture": "friends-different-heights",
+        "points": [
+          "年龄要听回答",
+          "听清数字",
+          "瞄准前先重听"
+        ]
+      },
+      "script": [
+        {
+          "say": "一个朋友个子高，一个朋友个子矮。你能只看个子猜年龄吗？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "我们先问，再听。他们说几岁，才知道几岁。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "高个子说 I'm three. 矮个子说 I'm ten."
+        },
+        {
+          "say": "原来高个子不一定年龄大。我们跟着耳朵找数字。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "跟我听完整的回答。手指可以悄悄比出那个数。"
+        },
+        {
+          "say": "I'm three."
+        },
+        {
+          "say": "I'm six."
+        },
+        {
+          "say": "I'm seven."
+        },
+        {
+          "say": "I'm nine."
+        },
+        {
+          "say": "I'm ten."
+        },
+        {
+          "say": "Six 是六岁，nine 是九岁。听准最后的数词，再去找牌。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "先重听完整一句，再听最后一个数字。"
+        },
+        {
+          "say": "看看哪张牌亮起来，慢慢瞄准再发射。"
+        },
+        {
+          "say": "听准再瞄准，年龄牌接到啦！"
+        }
+      ]
+    },
+    {
+      "key": "badge-marbles",
+      "type": "interactive",
+      "title": "年龄牌弹珠",
+      "widgetType": "courseware_game",
+      "page": "badge-marbles",
+      "startImage": "marble-opening",
+      "script": [
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "say": "年龄牌摆在小台上。老师说的是哪一张？"
+        },
+        {
+          "highlight": "#demo-listen"
+        },
+        {
+          "say": "听我说：I'm six. 句末是 six，就是六岁。"
+        },
+        {
+          "highlight": "#demo-age-six"
+        },
+        {
+          "say": "我找正着的六。牌离得近，也要听清才发射。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "按左右键或点箭头，让弹珠朝这张牌。"
+        },
+        {
+          "say": "瞄好了按空格或发射键。看，命中后留下了贴纸。"
+        },
+        {
+          "say": "轮到你啦。先听整句，再瞄准你听到的那张。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "age-three": "hear-a-full-age-9",
+        "age-six": "hear-a-full-age-10",
+        "age-seven": "hear-a-full-age-11",
+        "age-nine": "hear-a-full-age-12",
+        "age-ten": "hear-a-full-age-13",
+        "marble-hint": "hear-a-full-age-16",
+        "marble-help": "hear-a-full-age-17",
+        "marble-praise": "hear-a-full-age-18"
+      }
+    },
+    {
+      "key": "listen-to-the-speaker",
+      "type": "slide",
+      "title": "是谁答的？",
+      "template": "two-columns",
+      "data": {
+        "title": "是谁答的？",
+        "left": {
+          "heading": "圆帽同学",
+          "body": "先听这一位"
+        },
+        "right": {
+          "heading": "围裙同学",
+          "body": "换人，重新听"
+        },
+        "left_picture": "speaker-round-cap",
+        "right_picture": "speaker-paint-apron"
+      },
+      "script": [
+        {
+          "say": "两人会报同一个年龄吗？先猜一猜。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "圆帽同学先答。I'm seven."
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "轮到围裙同学。I'm ten."
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "围裙同学十岁。刚才的七岁是圆帽同学说的。"
+        },
+        {
+          "say": "每个人说的是自己的年龄。换人就重新听。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "再演一回。这回圆帽同学说 I'm six."
+        },
+        {
+          "say": "这回听围裙同学。她会说几岁？"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "围裙同学说 I'm six, too. 跟我念一遍。"
+        },
+        {
+          "say": "Too 是“也”。这回两位都六岁。"
+        }
+      ]
+    },
+    {
+      "key": "interview-practice",
+      "type": "slide",
+      "title": "采访接力",
+      "template": "picture-points",
+      "data": {
+        "title": "采访接力",
+        "picture": "interview-desk",
+        "points": [
+          "先问名字",
+          "再问年龄",
+          "把年龄牌交给回答的人"
+        ]
+      },
+      "script": [
+        {
+          "say": "小记者拿到了一张新牌。先问什么，才能把两条消息记清？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "一人拿话筒，一人回答。先看谁正在回答。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先问 What's your name? 听，回答的是名字。"
+        },
+        {
+          "say": "I'm Lin. 这是我扮演的名字。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "再问 How old are you? 这次要报年龄。"
+        },
+        {
+          "say": "I'm seven. 听到 seven，就记下七岁。"
+        },
+        {
+          "say": "问名字和问几岁，开头不一样。你跟我分别问一遍。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "先听完整回答拿对牌，再看送给哪一位。"
+        },
+        {
+          "say": "把牌送给戴圆帽的同学。"
+        },
+        {
+          "say": "把牌送给戴大耳机的同学。"
+        },
+        {
+          "say": "把牌送给系围巾的同学。"
+        },
+        {
+          "say": "把牌送给戴发带的同学。"
+        },
+        {
+          "say": "把牌送给戴蝴蝶结的同学。"
+        },
+        {
+          "say": "把牌送给戴圆眼镜的同学。"
+        },
+        {
+          "say": "先重听。看看现在要拿牌，还是要找收件人。"
+        },
+        {
+          "say": "等一等。亮起来的格子，是你这一步要去的地方。"
+        },
+        {
+          "say": "这次年龄和收件人都配对啦！"
+        },
+        {
+          "say": "等会儿可以和家人用假名字轮流采访。先问名字，再问年龄。"
+        }
+      ]
+    },
+    {
+      "key": "interview-dispatch",
+      "type": "interactive",
+      "title": "采访邮车送年龄牌",
+      "widgetType": "courseware_game",
+      "page": "interview-dispatch",
+      "startImage": "delivery-opening",
+      "script": [
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "say": "来帮采访邮车拿一张牌。先听同学报的年龄。"
+        },
+        {
+          "highlight": "#demo-age-six"
+        },
+        {
+          "say": "这位同学答 I'm six. 我只示范拿正着的六岁牌。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "往右挪一格。车到牌旁，按空格或点包裹按钮。"
+        },
+        {
+          "highlight": "#demo-carry-box"
+        },
+        {
+          "say": "看，车上有六岁牌了。等路空了，再开过去。"
+        },
+        {
+          "say": "到了收件人那一格，同一个按钮可以交牌。"
+        },
+        {
+          "say": "这次交给你。先听完整回答拿牌，再听要送给谁。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "age-three": "hear-a-full-age-9",
+        "age-six": "hear-a-full-age-10",
+        "age-seven": "hear-a-full-age-11",
+        "age-nine": "hear-a-full-age-12",
+        "age-ten": "hear-a-full-age-13",
+        "to-cap": "interview-practice-13",
+        "to-phones": "interview-practice-14",
+        "to-scarf": "interview-practice-15",
+        "to-headband": "interview-practice-16",
+        "to-bowtie": "interview-practice-17",
+        "to-glasses": "interview-practice-18",
+        "delivery-hint": "interview-practice-19",
+        "delivery-help": "interview-practice-20",
+        "delivery-praise": "interview-practice-21"
+      }
+    },
+    {
+      "key": "picture-check",
+      "type": "quiz",
+      "title": "听一听，选一选",
+      "intro": [
+        "听清老师说什么，再选一张图。想再听一遍，点一下喇叭。"
+      ],
+      "questions": [
+        {
+          "id": "age-question-meaning",
+          "question": "How old are you? 这句话问什么？",
+          "skill": "听辨问年龄",
+          "answer": [
+            "b"
+          ],
+          "analysis": "这句话问对方几岁。指年龄牌的采访图符合。挥手是招呼，头像卡提示在问名字。",
+          "options": {
+            "a": {
+              "label": "挥手打招呼",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-asking-greeting",
+                "alt": "挥手打招呼"
+              }
+            },
+            "b": {
+              "label": "采访者指年龄牌",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-asking-age",
+                "alt": "采访者指年龄牌"
+              }
+            },
+            "c": {
+              "label": "采访者指带头像的姓名卡",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-asking-name",
+                "alt": "采访者指带头像的姓名卡"
+              }
+            }
+          }
+        },
+        {
+          "id": "hear-eight",
+          "question": "I'm eight. 听到几岁？选那张牌。",
+          "skill": "听年龄回答找数字",
+          "answer": [
+            "c"
+          ],
+          "analysis": "eight 是八。找到形状相同且下边线朝下的 8 岁牌。另两张是 7 和 9。",
+          "options": {
+            "a": {
+              "label": "七岁的年龄牌",
+              "visual": {
+                "kind": "asset",
+                "image": "badge-seven",
+                "alt": "七岁的年龄牌"
+              }
+            },
+            "b": {
+              "label": "九岁的年龄牌",
+              "visual": {
+                "kind": "asset",
+                "image": "badge-nine",
+                "alt": "九岁的年龄牌"
+              }
+            },
+            "c": {
+              "label": "八岁的年龄牌",
+              "visual": {
+                "kind": "asset",
+                "image": "badge-eight",
+                "alt": "八岁的年龄牌"
+              }
+            }
+          }
+        },
+        {
+          "id": "upright-six",
+          "question": "I'm six. 哪张牌摆正了，又和他说的一样？",
+          "skill": "听辨六和九并看方向",
+          "answer": [
+            "a"
+          ],
+          "analysis": "six 是六岁。A 的六岁牌下边线朝下。B 正着是九，C 的六岁牌倒了。",
+          "options": {
+            "a": {
+              "label": "正向六岁牌",
+              "visual": {
+                "kind": "asset",
+                "image": "badge-six",
+                "alt": "正向六岁牌"
+              }
+            },
+            "b": {
+              "label": "正向九岁牌",
+              "visual": {
+                "kind": "asset",
+                "image": "badge-nine",
+                "alt": "正向九岁牌"
+              }
+            },
+            "c": {
+              "label": "整张倒着的六岁牌",
+              "visual": {
+                "kind": "asset",
+                "image": "badge-six-inverted",
+                "alt": "整张倒着的六岁牌"
+              }
+            }
+          }
+        },
+        {
+          "id": "find-five-speaker",
+          "question": "耳罩同学说 I'm four. 圆帽同学说 I'm five. 谁五岁？",
+          "skill": "把年龄对应到说话人",
+          "answer": [
+            "b"
+          ],
+          "analysis": "说 five 的是戴圆帽的同学。他说的是五岁。戴耳罩的同学说的是四岁。",
+          "options": {
+            "a": {
+              "label": "戴软耳罩的同学",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-guest-earmuffs",
+                "alt": "戴软耳罩的同学"
+              }
+            },
+            "b": {
+              "label": "戴圆帽的同学",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-guest-roundhat",
+                "alt": "戴圆帽的同学"
+              }
+            },
+            "c": {
+              "label": "穿画画围裙的同学",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-guest-apron",
+                "alt": "穿画画围裙的同学"
+              }
+            }
+          }
+        },
+        {
+          "id": "same-age-too",
+          "question": "I'm four. 另一人说 I'm four, too. 选两张牌。",
+          "skill": "理解 too 表示年龄相同",
+          "answer": [
+            "c"
+          ],
+          "analysis": "两个人都说 four，就是两个四岁。too 在这里表示“也”，不用把年龄加起来。",
+          "options": {
+            "a": {
+              "label": "一张四岁牌和一张五岁牌",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-age-pair-four-five",
+                "alt": "一张四岁牌和一张五岁牌"
+              }
+            },
+            "b": {
+              "label": "一张三岁牌和一张四岁牌",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-age-pair-three-four",
+                "alt": "一张三岁牌和一张四岁牌"
+              }
+            },
+            "c": {
+              "label": "两张四岁牌",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-age-pair-four-four",
+                "alt": "两张四岁牌"
+              }
+            }
+          }
+        },
+        {
+          "id": "answer-after-name",
+          "question": "名字问完了。How old are you? 哪张是在答年龄？",
+          "skill": "采访时分别回答姓名与年龄",
+          "answer": [
+            "a"
+          ],
+          "analysis": "这次问的是几岁，回答要说 I’m 加年龄。举年龄牌的孩子在报年龄，另两张是说名字和打招呼。",
+          "options": {
+            "a": {
+              "label": "孩子举起自己的年龄牌",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-answering-age",
+                "alt": "孩子举起自己的年龄牌"
+              }
+            },
+            "b": {
+              "label": "孩子举起有头像的姓名卡",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-answering-name",
+                "alt": "孩子举起有头像的姓名卡"
+              }
+            },
+            "c": {
+              "label": "孩子抬手打招呼",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-answering-greeting",
+                "alt": "孩子抬手打招呼"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "recap-workshop",
+      "type": "slide",
+      "title": "把采访带回家",
+      "template": "summary",
+      "data": {
+        "title": "把采访带回家",
+        "items": [
+          "问几岁",
+          "听数字和说话人",
+          "同岁可以说 too",
+          "轮流问名字和年龄"
+        ]
+      },
+      "script": [
+        {
+          "say": "小记者收起话筒前，想留一张提醒卡。你还记得怎么问几岁吗？"
+        },
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "想知道年龄，跟我问。How old are you?"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "先看谁回答，再听最后的数字。I'm six. 就是六岁。"
+        },
+        {
+          "say": "牌子像九也先别猜。看下边线，再和听到的对一对。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "两个人同岁，可以用 too，说自己也是这个年龄。"
+        },
+        {
+          "spotlight": "item-4"
+        },
+        {
+          "say": "和家人用假名字做两轮采访。先问名字，再问年龄。"
+        },
+        {
+          "say": "记得交换角色。请家人听你有没有把问句和答句说完整。"
+        }
+      ]
+    }
+  ]
+}

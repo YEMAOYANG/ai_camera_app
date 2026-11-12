@@ -1,0 +1,23 @@
+#pattern-strip {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 8px;
+  box-sizing: border-box;
+  border: 2px solid #517b65;
+  border-radius: 14px;
+  background: #fff5dff5;
+}
+#pattern-strip img {
+  width: 55px;
+  height: 55px;
+  flex: none;
+  object-fit: contain;
+}
+#pattern-strip img[hidden] {
+  display: none;
+}
+#pattern-strip img[data-current="true"] {
+  border-radius: 10px;
+  background: #ffdfad;
+}

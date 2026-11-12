@@ -1,0 +1,922 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "使用工具｜单元回顾",
+  "description": "社区工作台从盒角布环出发，比较工具结构和视角，选工具、画办法、试一次再改。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小科老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Serena",
+      "avatar": "/avatars/teacher-2.png",
+      "color": "#57B05A",
+      "persona": "带孩子先说问题，再看证据，用看到的结果改办法。"
+    }
+  },
+  "images": {
+    "circle-task": {
+      "file": "assets/circle-task.png"
+    },
+    "driver-icon": {
+      "file": "assets/driver-icon.png"
+    },
+    "driver-side": {
+      "file": "assets/driver-side.png"
+    },
+    "driver-top": {
+      "file": "assets/driver-top.png"
+    },
+    "long-tongs-grip": {
+      "file": "assets/long-tongs-grip.png"
+    },
+    "paper-cut-task": {
+      "file": "assets/paper-cut-task.png"
+    },
+    "paper-scoop": {
+      "file": "assets/paper-scoop.png"
+    },
+    "q-bag-changed": {
+      "file": "assets/q-bag-changed.png"
+    },
+    "q-bag-fair": {
+      "file": "assets/q-bag-fair.png"
+    },
+    "q-bag-same-position": {
+      "file": "assets/q-bag-same-position.png"
+    },
+    "q-clip-back": {
+      "file": "assets/q-clip-back.png"
+    },
+    "q-clip-side": {
+      "file": "assets/q-clip-side.png"
+    },
+    "q-clip-top": {
+      "file": "assets/q-clip-top.png"
+    },
+    "q-drawer-changed": {
+      "file": "assets/q-drawer-changed.png"
+    },
+    "q-drawer-color": {
+      "file": "assets/q-drawer-color.png"
+    },
+    "q-drawer-fair": {
+      "file": "assets/q-drawer-fair.png"
+    },
+    "q-paper-tray": {
+      "file": "assets/q-paper-tray.png"
+    },
+    "q-slot-cross": {
+      "file": "assets/q-slot-cross.png"
+    },
+    "q-tip-cross": {
+      "file": "assets/q-tip-cross.png"
+    },
+    "q-tip-flat": {
+      "file": "assets/q-tip-flat.png"
+    },
+    "q-tip-hex": {
+      "file": "assets/q-tip-hex.png"
+    },
+    "ring-in-box": {
+      "file": "assets/ring-in-box.png"
+    },
+    "scissors": {
+      "file": "assets/scissors.png"
+    },
+    "screw-task": {
+      "file": "assets/screw-task.png"
+    },
+    "short-tongs-miss": {
+      "file": "assets/short-tongs-miss.png"
+    },
+    "short-tongs": {
+      "file": "assets/short-tongs.png"
+    },
+    "stencil-side": {
+      "file": "assets/stencil-side.png"
+    },
+    "stencil-top": {
+      "file": "assets/stencil-top.png"
+    },
+    "tongs-side": {
+      "file": "assets/tongs-side.png"
+    },
+    "tongs-top": {
+      "file": "assets/tongs-top.png"
+    },
+    "triangle-task": {
+      "file": "assets/triangle-task.png"
+    },
+    "workshop-cart": {
+      "file": "assets/workshop-cart.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "open",
+      "type": "slide",
+      "title": "收纳盒里的布环",
+      "template": "picture-points",
+      "data": {
+        "title": "收纳盒里的布环",
+        "picture": "ring-in-box",
+        "points": [
+          "布环落在盒底角",
+          "先说要做什么",
+          "猜怎样够到"
+        ]
+      },
+      "script": [
+        {
+          "say": "工作台收到一件小麻烦。你猜，盒子里有什么？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "有个布环滑到盒底的角落，盒壁挡在手前面。"
+        },
+        {
+          "say": "先只看一会儿。你觉得手能碰到布环吗？"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "我们想把布环取出来，还要让盒子稳稳当当。"
+        },
+        {
+          "say": "先说清要做的事，才知道工具该帮哪一步。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "我猜，有一件细长的工具能伸进盒角。"
+        },
+        {
+          "say": "猜想要试一试。等会儿看夹口能不能够到布环。"
+        }
+      ]
+    },
+    {
+      "key": "why-tools",
+      "type": "slide",
+      "title": "需要什么，才选什么",
+      "template": "picture-points",
+      "data": {
+        "title": "需要什么，才选什么",
+        "picture": "scissors",
+        "points": [
+          "先看任务和材料",
+          "再找能帮忙的部位",
+          "看看事情是否更好做"
+        ]
+      },
+      "script": [
+        {
+          "say": "做小旗要把纸条剪开。用手撕，边常常跑偏。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "我们需要剪纸，还想让纸边顺着同一条线。"
+        },
+        {
+          "say": "遇到费劲的事情，人们会想办法，也会做出工具。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "剪刀有两片刃，合起来能把纸剪开。"
+        },
+        {
+          "say": "画图时要让笔沿着边走，图形尺能给笔一条路线。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "剪刀帮我们剪，图形尺帮我们画。它们做的事不同。"
+        },
+        {
+          "say": "真剪纸请大人陪着，剪完把剪刀合好放回去。"
+        },
+        {
+          "say": "先看看这张托盘图要做什么。"
+        },
+        {
+          "say": "对一对工具的末端，再从后面慢慢推。"
+        }
+      ]
+    },
+    {
+      "key": "compare-tool-ends",
+      "type": "slide",
+      "title": "看看工具的末端",
+      "template": "two-columns",
+      "data": {
+        "title": "看看工具的末端",
+        "left": {
+          "heading": "两片夹口",
+          "body": "两片合拢，可以夹住软物。"
+        },
+        "left_picture": "tongs-top",
+        "right": {
+          "heading": "杆头和槽",
+          "body": "末端的形状要和槽配合。"
+        },
+        "right_picture": "driver-top"
+      },
+      "script": [
+        {
+          "say": "两件工具都有把手。它们都能取出布环吗？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "夹子前面有两片夹口，中间留了一点空。"
+        },
+        {
+          "say": "把布环放在两片之间，再轻轻夹合，才有地方抓住。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "螺丝刀前面是一根杆。看右边螺丝顶上的槽。"
+        },
+        {
+          "say": "杆头要合上槽，转动手柄才好带着螺丝转。"
+        },
+        {
+          "say": "夹环和转螺丝要的动作不同，工具的末端也不同。"
+        },
+        {
+          "say": "看图里的任务，从工具卡后面推到合适的托盘。"
+        },
+        {
+          "say": "每件工具都到需要它的工作台啦！"
+        }
+      ]
+    },
+    {
+      "key": "sort-tools",
+      "type": "interactive",
+      "title": "工具送到工作台",
+      "page": "sort-tools",
+      "widgetType": "courseware_game",
+      "gameAudio": {
+        "sort-hint": "why-tools-11",
+        "sort-help": "why-tools-12",
+        "sort-goal": "compare-tool-ends-9",
+        "sort-praise": "compare-tool-ends-10"
+      },
+      "script": [
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#sort-demo-task"
+        },
+        {
+          "say": "看看托盘上的纸。它已经剪开了一条小口。"
+        },
+        {
+          "say": "小满问，这张纸也能用夹子把它剪开吗？"
+        },
+        {
+          "highlight": "#sort-demo-tool"
+        },
+        {
+          "say": "夹口能夹住纸。要剪开纸，得找有两片刃的剪刀。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "车停在剪刀卡后面。我按右键，把卡往前推。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "看卡片往哪里去。工具能做图里的事，卡片才会留下。"
+        },
+        {
+          "say": "有墙就先绕到后面。想改一改，可以退回一步。"
+        },
+        {
+          "say": "轮到你。先看托盘图，再推能帮忙的工具卡。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ]
+    },
+    {
+      "key": "what-to-look-for",
+      "type": "slide",
+      "title": "换个方向看同一把尺",
+      "template": "two-columns",
+      "data": {
+        "title": "换个方向看同一把尺",
+        "left": {
+          "heading": "从上看",
+          "body": "能看到圆孔和三角孔。"
+        },
+        "left_picture": "stencil-top",
+        "right": {
+          "heading": "从侧面看",
+          "body": "能看到尺贴着桌面的薄边。"
+        },
+        "right_picture": "stencil-side"
+      },
+      "script": [
+        {
+          "say": "同一把尺，从两个方向看，会一样吗？先猜一猜。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "我从上面看见圆孔和三角孔。把孔形画下来。"
+        },
+        {
+          "say": "我想沿着孔边试试，看能不能画出同样的形状。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "从桌子旁边看，我只看见橙色的薄边。"
+        },
+        {
+          "say": "看不见孔，不等于孔没了。我们只是换了方向。"
+        },
+        {
+          "say": "我确实看见三角孔。我猜沿孔边能画三角形，还得拿笔试。"
+        },
+        {
+          "say": "看上面的小图，等它转到那个方向再拍。"
+        },
+        {
+          "say": "先把工具跟在取景框里。"
+        },
+        {
+          "say": "等工具和小图一样了，再按快门。"
+        },
+        {
+          "say": "这次从上看，等工具和小图一个样，再拍。"
+        },
+        {
+          "say": "这次从侧面看，等工具和小图一个样，再拍。"
+        },
+        {
+          "say": "同一件工具的两个方向都拍下来啦！"
+        }
+      ]
+    },
+    {
+      "key": "tool-camera",
+      "type": "interactive",
+      "title": "工具相机找线索",
+      "page": "tool-camera",
+      "widgetType": "courseware_game",
+      "gameAudio": {
+        "camera-goal": "what-to-look-for-9",
+        "camera-hint": "what-to-look-for-10",
+        "camera-help": "what-to-look-for-11",
+        "camera-top": "what-to-look-for-12",
+        "camera-side": "what-to-look-for-13",
+        "camera-praise": "what-to-look-for-14"
+      },
+      "script": [
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#camera-demo-view"
+        },
+        {
+          "say": "上方小图提醒我，这次要拍从上面看到的样子。"
+        },
+        {
+          "say": "先猜一猜。这个方向能不能拍到图形尺的两个孔？"
+        },
+        {
+          "highlight": "#game-target"
+        },
+        {
+          "say": "看尺上的孔。两个孔都能看见，正好是从上面看。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "我让框跟住尺，等图跟小图一样，再按快门。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "等照片出现，在照片里找一个圆孔和一个三角孔。"
+        },
+        {
+          "say": "另一张换个方向。我们拍的是同一把尺。"
+        },
+        {
+          "say": "轮到你。把工具留在框里，跟着小图各拍一张。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "observationCard": {
+        "title": "同一件工具的两个方向",
+        "familyTask": "和家人选一件安全的塑料夹或小托盘，移动一个软物。先猜哪里会碰到，从上面和旁边各看一次，画下看到的一个地方，再问一个下次想试的问题。真实操作、绘画和口述由成人观察。",
+        "levels": [
+          {
+            "label": "图形尺的孔和薄边",
+            "trials": [
+              {
+                "id": "tool-pair",
+                "label": "同一工具的两种视图",
+                "top": {
+                  "stencil-top": {
+                    "label": "俯看，看到圆孔和三角孔。",
+                    "image": "stencil-top"
+                  }
+                },
+                "side": {
+                  "stencil-side": {
+                    "label": "侧看，看到贴桌面的薄边。",
+                    "image": "stencil-side"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "label": "夹子的两片夹口",
+            "trials": [
+              {
+                "id": "tool-pair",
+                "label": "同一工具的两种视图",
+                "top": {
+                  "tongs-top": {
+                    "label": "俯看，两片橙色夹口之间有空隙。",
+                    "image": "tongs-top"
+                  }
+                },
+                "side": {
+                  "tongs-side": {
+                    "label": "侧看，上面一片较高，下面一片靠着板。",
+                    "image": "tongs-side"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "label": "螺丝槽与手柄",
+            "trials": [
+              {
+                "id": "tool-pair",
+                "label": "同一工具的两种视图",
+                "top": {
+                  "driver-top": {
+                    "label": "俯看，螺丝头上有十字槽。",
+                    "image": "driver-top"
+                  }
+                },
+                "side": {
+                  "driver-side": {
+                    "label": "侧看，看见手柄、杆和练习板上凸起的螺丝。",
+                    "image": "driver-side"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "key": "draw-a-solution",
+      "type": "slide",
+      "title": "先把办法画出来",
+      "template": "picture-points",
+      "data": {
+        "title": "先把办法画出来",
+        "picture": "ring-in-box",
+        "points": [
+          "画出布环的位置",
+          "画夹口从哪边进",
+          "画取出来的样子"
+        ]
+      },
+      "script": [
+        {
+          "say": "回到我们的收纳盒。说说要解决哪一件事。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先画盒子和底角的布环，免得忘了它有多深。"
+        },
+        {
+          "say": "我们只取出这个布环，盒子要留在原来的位置。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "我选长夹。画一条从盒口到布环的路线。"
+        },
+        {
+          "say": "画出夹口怎么对准布环，再画它往上走的方向。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "想知道办法行不行，就看布环有没有离开盒底。"
+        },
+        {
+          "say": "画个小图给大人看。让别人照图也知道怎么做。"
+        }
+      ]
+    },
+    {
+      "key": "test-and-improve",
+      "type": "slide",
+      "title": "同一个盒子，换夹再试",
+      "template": "two-columns",
+      "data": {
+        "title": "同一个盒子，换夹再试",
+        "left": {
+          "heading": "先用短夹",
+          "body": "夹口停在布环上方，没碰到。"
+        },
+        "left_picture": "short-tongs-miss",
+        "right": {
+          "heading": "换成长夹",
+          "body": "夹口夹住布环，把它提起来了。"
+        },
+        "right_picture": "long-tongs-grip"
+      },
+      "script": [
+        {
+          "say": "先用短夹。你猜，夹口能到盒底的布环旁吗？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "看，夹口和布环之间还有空。布环留在底下。"
+        },
+        {
+          "say": "试过短夹，夹口够不到。改用长夹，盒子和布环都不挪。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "长夹这次碰到了布环。两片夹口合住，再往上提。"
+        },
+        {
+          "say": "布环离开了盒底，这个办法在图里的试验成功了。"
+        },
+        {
+          "say": "换个任务。积木桥下有个小绒球，要夹出来，桥别动。"
+        },
+        {
+          "say": "我先画桥和球，再画夹口从旁边伸进去的路线。"
+        },
+        {
+          "say": "选一把能伸到球旁的夹子，合住球，沿原路往外拿。"
+        },
+        {
+          "say": "试时看球有没有到桥外。夹口够不到，就换长夹再试。"
+        }
+      ]
+    },
+    {
+      "key": "self-check",
+      "type": "quiz",
+      "title": "给新难题选一幅图",
+      "intro": [
+        "换几个新难题。听我要做什么，再选帮得上忙的图。"
+      ],
+      "questions": [
+        {
+          "id": "paper-scoop",
+          "question": "三团软纸要一起移进盒里。哪个工具能托住它们？",
+          "skill": "tools-and-needs",
+          "analysis": "小铲的宽托面能从下面托住三团软纸。剪刀用来剪，短夹更适合一件一件夹。",
+          "answer": [
+            "B"
+          ],
+          "options": {
+            "A": {
+              "label": "短夹",
+              "visual": {
+                "kind": "asset",
+                "image": "short-tongs",
+                "alt": "橙色短夹，有两片圆头夹口"
+              }
+            },
+            "B": {
+              "label": "小铲",
+              "visual": {
+                "kind": "asset",
+                "image": "paper-scoop",
+                "alt": "蓝绿色小铲，有一个宽的托面"
+              }
+            },
+            "C": {
+              "label": "剪刀",
+              "visual": {
+                "kind": "asset",
+                "image": "scissors",
+                "alt": "闭合的圆头剪刀，有两孔手柄"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "q-paper-tray",
+            "alt": "浅盘里有三团纸，旁边是空盒"
+          }
+        },
+        {
+          "id": "matching-screw-tip",
+          "question": "玩具上的螺丝有十字槽。哪个端头的形状能跟槽合上？",
+          "skill": "select-tool",
+          "analysis": "十字端头能合进十字槽。一条直边和六边端头跟这个槽的形状不同。",
+          "answer": [
+            "A"
+          ],
+          "options": {
+            "A": {
+              "label": "十字端头",
+              "visual": {
+                "kind": "asset",
+                "image": "q-tip-cross",
+                "alt": "端头的突出部分是十字形"
+              }
+            },
+            "B": {
+              "label": "一字端头",
+              "visual": {
+                "kind": "asset",
+                "image": "q-tip-flat",
+                "alt": "端头的突出部分是一条直边"
+              }
+            },
+            "C": {
+              "label": "六边端头",
+              "visual": {
+                "kind": "asset",
+                "image": "q-tip-hex",
+                "alt": "端头的突出部分呈六边形"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "q-slot-cross",
+            "alt": "练习螺丝头正中有一道十字形凹槽"
+          }
+        },
+        {
+          "id": "clip-contact",
+          "question": "想看清夹口有没有碰到纸边，该选哪张照片？",
+          "skill": "observe-feature",
+          "analysis": "侧面的照片同时看到两片夹口，也看到蓝纸边夹在中间。其他方向有遮挡。",
+          "answer": [
+            "C"
+          ],
+          "options": {
+            "A": {
+              "label": "从上方看",
+              "visual": {
+                "kind": "asset",
+                "image": "q-clip-top",
+                "alt": "从上面看橙色木夹，纸边接触处被夹子上片挡住"
+              }
+            },
+            "B": {
+              "label": "从弹簧后面看",
+              "visual": {
+                "kind": "asset",
+                "image": "q-clip-back",
+                "alt": "从夹子尾部看见弹簧，夹口在后面看不清"
+              }
+            },
+            "C": {
+              "label": "从旁边看",
+              "visual": {
+                "kind": "asset",
+                "image": "q-clip-side",
+                "alt": "从侧面看到蓝纸边夹在橙色木夹的两片夹口之间"
+              }
+            }
+          }
+        },
+        {
+          "id": "round-label",
+          "question": "要画圆形小标签，哪件工具能让笔贴着圆边走？",
+          "skill": "select-tool",
+          "analysis": "图形尺有圆孔，笔贴着圆孔边走一圈就能画圆。夹子和剪刀的末端都不能给笔一条圆边。",
+          "answer": [
+            "C"
+          ],
+          "options": {
+            "A": {
+              "label": "剪刀",
+              "visual": {
+                "kind": "asset",
+                "image": "scissors",
+                "alt": "闭合的圆头剪刀"
+              }
+            },
+            "B": {
+              "label": "短夹",
+              "visual": {
+                "kind": "asset",
+                "image": "short-tongs",
+                "alt": "一把橙色的圆头短夹"
+              }
+            },
+            "C": {
+              "label": "图形尺",
+              "visual": {
+                "kind": "asset",
+                "image": "stencil-top",
+                "alt": "薄橙色图形尺上有一个圆孔和一个三角孔"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "circle-task",
+            "alt": "小标签纸上是一道圆形轮廓"
+          }
+        },
+        {
+          "id": "drawer-comparison",
+          "question": "想知道新把手好不好拉，哪组图能帮你比较？",
+          "skill": "design-and-recheck",
+          "analysis": "保持同一个抽屉和拉动方向，只比较有没有把手，才能看把手带来的变化。",
+          "answer": [
+            "B"
+          ],
+          "options": {
+            "A": {
+              "label": "拉两个不同抽屉",
+              "visual": {
+                "kind": "asset",
+                "image": "q-drawer-changed",
+                "alt": "用同样的橙色把手分别拉黄色深抽屉和蓝色浅抽屉"
+              }
+            },
+            "B": {
+              "label": "同一抽屉先后试",
+              "visual": {
+                "kind": "asset",
+                "image": "q-drawer-fair",
+                "alt": "拉同一绿色抽屉，左图拉前沿，右图拉加上的织带把手"
+              }
+            },
+            "C": {
+              "label": "只看把手颜色",
+              "visual": {
+                "kind": "asset",
+                "image": "q-drawer-color",
+                "alt": "两个关着的绿抽屉配不同颜色把手，都没有试拉"
+              }
+            }
+          }
+        },
+        {
+          "id": "bag-question",
+          "question": "想知道夹袋口的哪个位置合得更好，下一次怎么比？",
+          "skill": "design-and-recheck",
+          "analysis": "袋子和夹子一样，只把夹子从一端换到正中，才容易看出夹的位置有没有影响。",
+          "answer": [
+            "A"
+          ],
+          "options": {
+            "A": {
+              "label": "只换夹的位置",
+              "visual": {
+                "kind": "asset",
+                "image": "q-bag-fair",
+                "alt": "同一黄纸袋和同一绿夹，一图夹左端，另一图夹袋口正中"
+              }
+            },
+            "B": {
+              "label": "总夹在左端",
+              "visual": {
+                "kind": "asset",
+                "image": "q-bag-same-position",
+                "alt": "两幅图中同一个绿夹都夹在黄纸袋左端"
+              }
+            },
+            "C": {
+              "label": "袋子和夹子一起换",
+              "visual": {
+                "kind": "asset",
+                "image": "q-bag-changed",
+                "alt": "左图小黄袋用绿木夹，右图大蓝袋用红色金属夹"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "recap",
+      "type": "slide",
+      "title": "回家再试一个办法",
+      "template": "summary",
+      "data": {
+        "title": "回家再试一个办法",
+        "items": [
+          "先说生活里的需要",
+          "看结构，选工具",
+          "画办法，再比较",
+          "提出一个新的问题"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "今天要把布环从深盒里拿出来。先说清这件事。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "从上面和旁边看夹口，找出哪一处能碰到布环。"
+        },
+        {
+          "say": "工具能帮生活里的忙，先想要它帮哪一步。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "画出准备怎么做。试短夹和长夹时，盒子照旧。"
+        },
+        {
+          "say": "我们只看图里试过的事，家里真做了再记。"
+        },
+        {
+          "spotlight": "item-4"
+        },
+        {
+          "say": "你还想问什么？比如换个浅盒，短夹够不够？"
+        },
+        {
+          "say": "请大人陪你用安全的塑料夹或小托盘移一个软物。"
+        },
+        {
+          "say": "从两个方向看，画下发现，想一个下次要试的问题。"
+        }
+      ]
+    }
+  ]
+}

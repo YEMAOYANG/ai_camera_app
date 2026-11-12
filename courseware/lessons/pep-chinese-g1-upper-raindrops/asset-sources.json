@@ -1,0 +1,1137 @@
+{
+  "schemaVersion": "mira.courseware.asset-sources.v1",
+  "inputs": {
+    "story": {
+      "source": "art-source/story-atlas.png",
+      "sha256": "61d8c93fa887bba6c713072b58742b71b05257a205b10ce74682283e5a95814f",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "original": "/Users/sqcopenclaw/.codex/generated_images/01a1c43e-b707-70d1-8436-005b59e5091d/exec-c4362b46-7bd1-4caa-985c-39c31fc7cc1c.png",
+      "generator": "Codex 内置 ImageGen",
+      "prompt": "Use case: illustration-story for an original first-grade Chinese interactive reading lesson. Produce one flat rectangular atlas of exactly 3 columns x 2 rows of equal square panels, all six have different simple illustrated scenes. Grid boundaries are at thirds of width and half of height, no gutter, each is independently full bleed and self-contained; no object crosses a cell edge, key subjects stay away from every edge. No words, letters, numbers, punctuation, arrows, printed marks or watermark anywhere. Same warm tactile storybook art in every panel: fine paper grain, matte gouache, clean cut paper shapes, pine green and warm cream, muted rain blue and apricot and persimmon orange accents, calm background, large clear shapes visible at thumbnail size. Not photoreal or 3D.\nTOP LEFT: cloud radio booth on a fluffy open cloud beneath a quiet rainy blue sky. One simple wooden microphone on a small desk near two charming expressive anthropomorphic raindrop characters. The large slate-blue teardrop wears a short orange scarf, the smaller turquoise teardrop wears a small dark green leaf cap; the large body is about 1.7 times the size of the small body. Both are easy to tell apart, no other faces in the rain. See both full bodies, room at edges.\nTOP MIDDLE: a child with orange scarf and pale teal jacket sits under a porch, points with one finger to one of THREE separate small paper lanterns on a simple cream cloth as the child counts them. Show whole three lanterns in a spaced horizontal row, other hand can show tally fingers. The child's face and counting finger are clearly visible. No other objects competing with the lanterns, not a marketplace.\nTOP RIGHT: the same child kneels close and carefully watches exactly ONE little pale green leaf pushing up on a short stem in a small terracotta pot of dark soil. Place plant in open space in middle, not an image of a mature plant, show only one pot. No diagram lines.\nBOTTOM LEFT: the same child holds both empty hands up, brows and head tilted in a clearly inquisitive, politely asking expression, facing a friend with a pine-green vest at a simple porch rail. Friend is listening quietly, eyes toward questioner, friendly. Show both faces and open hands with lots of empty margin. No speech bubbles or lettering.\nBOTTOM MIDDLE: same two children and porch but the friend now answers and clearly points sideways toward a small lantern on a stool. First child now listens with hands down, clear turn-taking and unmistakable contrast with panel at bottom left. No lettering or speech bubbles.\nBOTTOM RIGHT: a tiny cream and dark pine-green toy boat with apricot prow in a quiet outdoor rain puddle, a round clear soap bubble floating above the prow and small puddle rings, beside a painted tabletop sign with a simple yellow paper lantern pictured but no text. Balanced miniature playful scene, no frame and no interface.\nEach panel must stay fully visible after cropping inside the outer 4% edge. The artwork is original, no reference to published textbook composition."
+    },
+    "sprites": {
+      "source": "art-source/sprites-atlas.png",
+      "sha256": "0bc29c5732ac67b677c0764b4c9dc173b7b81c5eb48281e50158893660d43e09",
+      "dimensions": [
+        1261,
+        1247
+      ],
+      "original": "/Users/sqcopenclaw/.codex/generated_images/01a1c43e-b707-70d1-8436-005b59e5091d/exec-b641339c-c174-4b94-ab9a-d1b34451f199.png",
+      "generator": "Codex 内置 ImageGen",
+      "prompt": "Use case: isolated sprite assets for an original first-grade Chinese story game, one true transparent PNG atlas. Produce exactly 3 by 3 grid of equal square cells, nine separate illustrations with only transparent pixel gaps, no background or labels. Boundaries at thirds. Each sprite remains centered in its cell with clear completely transparent margins. No text, arrows, letters, words, numerals or watermark. All same approved tactile style: fine paper grain, matte gouache, clean cut-paper contours, deep pine green, warm cream, muted rain blue and persimmon-orange accents. Strong readable silhouette at 32 pixels, no particle trails beyond the bounds. No grid lines.\nROW ONE LEFT: anthropomorphic slate-blue teardrop with small apricot orange scarf, large rounded bottom and pointed head. Two tiny arms, two tiny dark blue shoes and a warm simple face. Clearly visible large body. CENTER: a matching smaller rounded turquoise teardrop character with a small pine-green leaf hat, a tiny face and two dark blue shoes, body about 60 percent the height of left sprite. RIGHT: one dark pine-green vintage toy delivery car in side view with light cream open cargo bed, two dark wheels, orange tip facing RIGHT.\nROW TWO LEFT: same car in the exact same view and silhouette, now softly glowing at its orange nose as a second action frame. CENTER: one tiny flat cream and dark pine-green toy boat in side view with apricot prow pointing RIGHT and a simple pale paper sail. No water, shadow or bubbles. RIGHT: the exact same boat in the exact same position and view with one small translucent bubble at prow as the second animation frame, the boat still fills most of this cell.\nROW THREE LEFT: exactly one simple upward-facing red five-petal wildflower atop one straight thin green stem and two green leaves, no pot, bare stem visible all the way to its bottom; petal shape is unmistakably red. CENTER: one isolated compact bright grass tuft of five green long narrow blades, clearly pointed up, no ground or soil beneath it. RIGHT: one small original vintage table microphone with amber grille, pine green stand, warm cream accent. Single mic, no wire or shadow.\nFinish all outlines and margins clearly. Keep the actual background fully transparent, no fake checkerboards or off-white."
+    },
+    "flower": {
+      "source": "art-source/flower.png",
+      "sha256": "2c2e88d6567897891bcb6bd4a06dcc7071b239579df5233abd8ba4cf69523beb",
+      "dimensions": [
+        164,
+        268
+      ],
+      "atlas": "sprites",
+      "cell": [
+        3,
+        1
+      ],
+      "crop": [
+        40,
+        796,
+        389,
+        1247
+      ],
+      "processing": "按透明轮廓留边并缩放"
+    },
+    "grass": {
+      "source": "art-source/grass.png",
+      "sha256": "90123f68595d7c03b296982e8e7fb60260b51ceec80f4c993a8d6d321d4677fe",
+      "dimensions": [
+        268,
+        252
+      ],
+      "atlas": "sprites",
+      "cell": [
+        3,
+        2
+      ],
+      "crop": [
+        424,
+        801,
+        824,
+        1215
+      ],
+      "processing": "按透明轮廓留边并缩放"
+    },
+    "sites": {
+      "source": "art-source/sites-atlas.png",
+      "sha256": "6923e45c00449531c0a53d5ac5217e40214b4c373c83a6c7f93721fe69f4b5de",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "original": "/Users/sqcopenclaw/.codex/generated_images/01a1c43e-b707-70d1-8436-005b59e5091d/exec-6cba0a43-8c5c-468b-b24b-6f4dd2573d74.png",
+      "generator": "Codex 内置 ImageGen",
+      "prompt": "Use case: original atlas for six separate first-grade reading and picture-question illustrations. Exactly three columns by two rows of equal square tiles, clean fixed boundaries at thirds and half, no gutters, each full bleed and self contained. Essential objects stay at least 8 percent away from the edges and no overlap across tiles. Fine paper grain, matte gouache, clean cut-paper edges, deep pine green and warm cream, soft rain blue and apricot, persimmon orange accents, calm backdrops and easily recognizable objects. No text, letters, numbers, marks, arrows, grids or watercolor drips.\nTOP LEFT: a broad smooth empty ochre soil patch in a rain-blue landscape. Focus on a very simple blank open, slightly sunken expanse of dry sand with two cream stones in the far left corner of the foreground. The foreground must have absolutely no grass, flowers, weeds, tree or people, because flower and grass will be added by a separate layout later. The empty ground takes bottom 65 percent of tile. Gentle blue hills and sky far away in background only.\nTOP MIDDLE: a different simple landscape composition, a flat pale green meadow with a distinctive curved bank and one broad grey rock at the left edge. No detailed flowers or foreground grass blades at all: use uninterrupted plain pale green field in bottom 65 percent as a place to put separate grass/flower sprites later. Far-away blue tree silhouettes and warm pale sky in background only.\nTOP RIGHT: a distinct miniature cozy urban courtyard seen slightly from above. One low wide terracotta brick-edged rectangular soil bed dominates the lower two thirds. Dark bare soil in the bed is plain and empty, no leaves, grass, sprout, flowers or weeds. One small cream stone rests in the upper left corner of the bed. Muted warm flat wall and wooden gate behind. Entire planter visible and unchanged canvas framing for a later illustration layer.\nBOTTOM LEFT: new child with pine vest and orange cap at a low cream table in a calm classroom, visibly counting three bright teal-and-apricot round beads arranged in a line. One extended index finger points at the middle bead, the other hand shows fingers to count. No more beads or other things scattered on the table; make it obvious from thumbnail that the child is counting rather than moving an object.\nBOTTOM MIDDLE: the same orange-capped child on a similar cream table washes three clearly separate colorful round pebbles under a little trickle of water from a pitcher, both open hands low over a blue basin, no tally or pointing gesture. Show all the pebbles in the blue basin. This is a distinct action from counting.\nBOTTOM RIGHT: same orange-capped child holding two ends of one long horizontal clean apricot ribbon, with a second much shorter green ribbon lying flat on the cream table below. The child is clearly stretching out the long piece to see its length. No numbers, tick marks or ruler, simple composition with two distinct lengths clearly visible.\nNo typography or education poster. Original composition, no known textbook artwork. Keep simple bold shapes and objects visible in a 90 pixel thumbnail."
+    },
+    "site-empty": {
+      "source": "art-source/site-empty.png",
+      "sha256": "e238cf49e311cfba4bac6fcbadb60f5dd0b5324b19daa01cfe0cd7940043f9cd",
+      "dimensions": [
+        462,
+        462
+      ],
+      "atlas": "sites",
+      "cell": [
+        1,
+        1
+      ],
+      "crop": [
+        5,
+        5,
+        507,
+        507
+      ],
+      "processing": "独立格四边各向内裁 5 像素，缩至 462 像素"
+    },
+    "site-green": {
+      "source": "art-source/site-green.png",
+      "sha256": "b0b39bb6c6eb7a635d247222ef905233b8beade9621615e8330a26d5516ab91b",
+      "dimensions": [
+        462,
+        462
+      ],
+      "atlas": "sites",
+      "cell": [
+        1,
+        2
+      ],
+      "crop": [
+        517,
+        5,
+        1019,
+        507
+      ],
+      "processing": "独立格四边各向内裁 5 像素，缩至 462 像素"
+    },
+    "site-yard": {
+      "source": "art-source/site-yard.png",
+      "sha256": "8c54dd654f45f68617acb0a0d74491463f5cb60143b760391996e5116ec1f122",
+      "dimensions": [
+        462,
+        462
+      ],
+      "atlas": "sites",
+      "cell": [
+        1,
+        3
+      ],
+      "crop": [
+        1029,
+        5,
+        1531,
+        507
+      ],
+      "processing": "独立格四边各向内裁 5 像素，缩至 462 像素"
+    },
+    "support": {
+      "source": "art-source/support-atlas.png",
+      "sha256": "4130c7322c21a735c2b5541f27fdc59054d112e190d7d82cac514d91a41db9e8",
+      "dimensions": [
+        1774,
+        887
+      ],
+      "original": "/Users/sqcopenclaw/.codex/generated_images/01a1c43e-b707-70d1-8436-005b59e5091d/exec-19e86b69-a69b-4bc1-9d51-fb85d9de1285.png",
+      "generator": "Codex 内置 ImageGen",
+      "prompt": "Use case: standalone original illustration assets for an early-grade paper-cut raindrop story game. Produce one true transparent PNG atlas with exactly 2 columns and 2 rows, four isolated nonoverlapping sprites with substantial transparent space at the margins, each object centered inside its own quadrant and smaller than 70 percent of the quadrant. Leave gaps at all four edges of every quadrant. Fine paper grain and matte gouache, clean cut-paper shapes, pine green, warm cream, muted rain blue, apricot and persimmon orange. Friendly simple chunky shapes, clean silhouettes at 32 pixels. No text, numbers, arrows, letters, grid, shadow, or watermark.\nTop left: one small boxy ORANGE patrol toy truck in exact side view facing right, two small charcoal wheels, a cream horizontal stripe across the body, a plain closed tan cargo roof. Orange is main body color and no green. It will visually contrast with a green delivery car on the same screen. No flashing lights or text.\nTop right: a single flat pale cream stepping stone arch bridge seen from side view, with four slightly irregular warm stones, one arch hole, and one thin moss green trim above. No grass or landscape around it, only the stone bridge silhouette.\nBottom left: a short flat strip of green paper with one crease, seen from overhead, one object only, long side exactly horizontal, no dots or marks. \nBottom right: one soft warm amber and pine green paper lantern with rounded sides and simple tassel, closed silhouette and no lighting effects.\nBackground transparent, no fake checkerboard, no landscape. Do not include any other elements."
+    },
+    "stone-bridge": {
+      "source": "art-source/stone-bridge.png",
+      "sha256": "a467f3158aa910cb32c1a4f8fbd93ff7e240289ff860fa2c39f5d82aa0697b9c",
+      "dimensions": [
+        268,
+        115
+      ],
+      "atlas": "support",
+      "cell": [
+        1,
+        2
+      ],
+      "crop": [
+        887,
+        0,
+        1774,
+        443
+      ],
+      "processing": "按透明轮廓留边并缩放"
+    },
+    "paper-lantern": {
+      "source": "art-source/paper-lantern.png",
+      "sha256": "49f93a23a7f950e4b4c607ff9d15ce7e0ab6ce6bfb24963c1ac666e158825fd0",
+      "dimensions": [
+        188,
+        268
+      ],
+      "atlas": "support",
+      "cell": [
+        2,
+        2
+      ],
+      "crop": [
+        887,
+        443,
+        1774,
+        887
+      ],
+      "processing": "按透明轮廓留边并缩放"
+    }
+  },
+  "assets": {
+    "cloud-radio": {
+      "file": "assets/cloud-radio.png",
+      "sha256": "9f7356bc3aaa2928df9c9236ade0162767abec84e468ccee3c8a1eeee17b260d",
+      "dimensions": [
+        462,
+        462
+      ],
+      "usedBy": [
+        "cloud-radio"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "atlas": "story",
+      "cell": [
+        1,
+        1
+      ],
+      "crop": [
+        5,
+        5,
+        507,
+        507
+      ],
+      "processing": "独立格四边各向内裁 5 像素，缩至 462 像素"
+    },
+    "count-lanterns": {
+      "file": "assets/count-lanterns.png",
+      "sha256": "d6fcaac774a8af816114ce47a25055674053fcbc1a6c6ae9851701bd8901833b",
+      "dimensions": [
+        462,
+        462
+      ],
+      "usedBy": [
+        "listen-for-a-scene"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "atlas": "story",
+      "cell": [
+        1,
+        2
+      ],
+      "crop": [
+        517,
+        5,
+        1019,
+        507
+      ],
+      "processing": "独立格四边各向内裁 5 像素，缩至 462 像素"
+    },
+    "grow-leaf": {
+      "file": "assets/grow-leaf.png",
+      "sha256": "bccdc4395b881b35cbde35f481c1176c870385ec7520b7e429c2c291362a4326",
+      "dimensions": [
+        462,
+        462
+      ],
+      "usedBy": [
+        "listen-for-a-scene"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "atlas": "story",
+      "cell": [
+        1,
+        3
+      ],
+      "crop": [
+        1029,
+        5,
+        1531,
+        507
+      ],
+      "processing": "独立格四边各向内裁 5 像素，缩至 462 像素"
+    },
+    "ask-scene": {
+      "file": "assets/ask-scene.png",
+      "sha256": "4b49aadffcf7a993ea373e81de640e5ce882292eb56062be197a1b4e5039ce9c",
+      "dimensions": [
+        462,
+        462
+      ],
+      "usedBy": [
+        "listen-for-a-scene"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "atlas": "story",
+      "cell": [
+        2,
+        1
+      ],
+      "crop": [
+        5,
+        517,
+        507,
+        1019
+      ],
+      "processing": "独立格四边各向内裁 5 像素，缩至 462 像素"
+    },
+    "answer-scene": {
+      "file": "assets/answer-scene.png",
+      "sha256": "68b78701ae51f8380b5487caaa09e890219403cd9f5a87a333176c2019edb3f4",
+      "dimensions": [
+        462,
+        462
+      ],
+      "usedBy": [
+        "listen-for-a-scene"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "atlas": "story",
+      "cell": [
+        2,
+        2
+      ],
+      "crop": [
+        517,
+        517,
+        1019,
+        1019
+      ],
+      "processing": "独立格四边各向内裁 5 像素，缩至 462 像素"
+    },
+    "bubble-start": {
+      "file": "assets/bubble-start.png",
+      "sha256": "6a037b6250e6b70ab11507268276798e22ea330fef92aea8480821773f07bee1",
+      "dimensions": [
+        462,
+        462
+      ],
+      "usedBy": [
+        "listen-for-a-scene"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "atlas": "story",
+      "cell": [
+        2,
+        3
+      ],
+      "crop": [
+        1029,
+        517,
+        1531,
+        1019
+      ],
+      "processing": "独立格四边各向内裁 5 像素，缩至 462 像素"
+    },
+    "count-beads": {
+      "file": "assets/count-beads.png",
+      "sha256": "06ffcada527d9fec198a4863bacb8e4850b29e2bddb8627c3a6765353bdd9198",
+      "dimensions": [
+        462,
+        462
+      ],
+      "usedBy": [
+        "rain-q1"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "atlas": "sites",
+      "cell": [
+        2,
+        1
+      ],
+      "crop": [
+        5,
+        517,
+        507,
+        1019
+      ],
+      "processing": "独立格四边各向内裁 5 像素，缩至 462 像素"
+    },
+    "wash-pebbles": {
+      "file": "assets/wash-pebbles.png",
+      "sha256": "6142a49ca3243c6073505baea67be9781f269daa0fb7635b1967566f2bd7bf80",
+      "dimensions": [
+        462,
+        462
+      ],
+      "usedBy": [
+        "rain-q1"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "atlas": "sites",
+      "cell": [
+        2,
+        2
+      ],
+      "crop": [
+        517,
+        517,
+        1019,
+        1019
+      ],
+      "processing": "独立格四边各向内裁 5 像素，缩至 462 像素"
+    },
+    "long-ribbon": {
+      "file": "assets/long-ribbon.png",
+      "sha256": "4695542280d3c7cb628020cf2f03d34c020d543837b32bd7e72a051e8836d66f",
+      "dimensions": [
+        462,
+        462
+      ],
+      "usedBy": [
+        "rain-q1"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "atlas": "sites",
+      "cell": [
+        2,
+        3
+      ],
+      "crop": [
+        1029,
+        517,
+        1531,
+        1019
+      ],
+      "processing": "独立格四边各向内裁 5 像素，缩至 462 像素"
+    },
+    "drop-big": {
+      "file": "assets/drop-big.png",
+      "sha256": "fee37ce5305915d89d36395425ce4ebbeeff50eaf87544a23b3cc41dbe4ada42",
+      "dimensions": [
+        225,
+        268
+      ],
+      "usedBy": [
+        "deliver-a-role"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "atlas": "sprites",
+      "cell": [
+        1,
+        1
+      ],
+      "crop": [
+        0,
+        0,
+        420,
+        445
+      ],
+      "processing": "按透明轮廓留边并缩放"
+    },
+    "drop-small": {
+      "file": "assets/drop-small.png",
+      "sha256": "746a29f5a4a7c030eddad3d829f6ea0fadabd26bca2bd95d0cead757b2ceeb63",
+      "dimensions": [
+        260,
+        325
+      ],
+      "usedBy": [
+        "listen-for-a-scene",
+        "deliver-a-role"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "atlas": "sprites",
+      "cell": [
+        1,
+        2
+      ],
+      "crop": [
+        447,
+        70,
+        800,
+        424
+      ],
+      "processing": "按透明轮廓留边并缩放；按卡牌参照的相对体形补透明边"
+    },
+    "rain-boat": {
+      "file": "assets/rain-boat.png",
+      "sha256": "1ac135e191f8ac78ece3461a9bdee76d7c3165ea58a27d90f971043434ff642b",
+      "dimensions": [
+        268,
+        254
+      ],
+      "usedBy": [
+        "listen-for-a-scene"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "atlas": "sprites",
+      "cell": [
+        2,
+        2
+      ],
+      "crop": [
+        463,
+        445,
+        804,
+        778
+      ],
+      "processing": "按透明轮廓留边并缩放"
+    },
+    "rain-boat-pop": {
+      "file": "assets/rain-boat-pop.png",
+      "sha256": "03c3e8213a01e1efb2284c8578fcc9af7efbd86b3b3474c0666fd2a682459d8c",
+      "dimensions": [
+        268,
+        202
+      ],
+      "usedBy": [
+        "listen-for-a-scene"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "atlas": "sprites",
+      "cell": [
+        2,
+        3
+      ],
+      "crop": [
+        805,
+        445,
+        1261,
+        780
+      ],
+      "processing": "按透明轮廓留边并缩放"
+    },
+    "rain-truck": {
+      "file": "assets/rain-truck.png",
+      "sha256": "51648171788da13c71779e3f39bc2374cb4e8b540dad3824b0b3247b36a6d826",
+      "dimensions": [
+        268,
+        185
+      ],
+      "usedBy": [
+        "deliver-a-role"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "atlas": "sprites",
+      "cell": [
+        1,
+        3
+      ],
+      "crop": [
+        810,
+        74,
+        1261,
+        431
+      ],
+      "processing": "按透明轮廓留边并缩放"
+    },
+    "rain-truck-glow": {
+      "file": "assets/rain-truck-glow.png",
+      "sha256": "a84d3cfeeb0f1a9b3ad70ee08a53f9ea538b0baacff19b961ec6839fcadac7b7",
+      "dimensions": [
+        268,
+        171
+      ],
+      "usedBy": [
+        "deliver-a-role"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "atlas": "sprites",
+      "cell": [
+        2,
+        1
+      ],
+      "crop": [
+        0,
+        445,
+        463,
+        790
+      ],
+      "processing": "按透明轮廓留边并缩放"
+    },
+    "patrol-truck": {
+      "file": "assets/patrol-truck.png",
+      "sha256": "bccf6c7b8622ce94335d90a3277dd2463d947af74d783d60e25d04e218a970c3",
+      "dimensions": [
+        268,
+        176
+      ],
+      "usedBy": [
+        "deliver-a-role"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "atlas": "support",
+      "cell": [
+        1,
+        1
+      ],
+      "crop": [
+        0,
+        0,
+        887,
+        443
+      ],
+      "processing": "按透明轮廓留边并缩放"
+    },
+    "rain-mic": {
+      "file": "assets/rain-mic.png",
+      "sha256": "9a2e79e28ed2ec28206725eb66e93abc0cdb9202ae1da91cc813e90e3dc7626a",
+      "dimensions": [
+        163,
+        268
+      ],
+      "usedBy": [
+        "listen-for-a-scene",
+        "deliver-a-role"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "atlas": "sprites",
+      "cell": [
+        3,
+        3
+      ],
+      "crop": [
+        880,
+        802,
+        1261,
+        1247
+      ],
+      "processing": "按透明轮廓留边并缩放"
+    },
+    "empty-station": {
+      "file": "assets/empty-station.png",
+      "sha256": "ac3df0aec90cfa60d8372daa9dcc0dd9493ef036caef15403c3e476f02f83596",
+      "dimensions": [
+        462,
+        462
+      ],
+      "usedBy": [
+        "deliver-a-role"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "75cfc269c4bc2509906650c62026b13224c0a1be5a6cfef194fd935fcb725097",
+      "sources": [
+        "site-empty"
+      ]
+    },
+    "green-station": {
+      "file": "assets/green-station.png",
+      "sha256": "3312e062604f89a0d113309422437cacdf746b95f77cae6a24c3675e7b5296c8",
+      "dimensions": [
+        462,
+        462
+      ],
+      "usedBy": [
+        "deliver-a-role"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "75cfc269c4bc2509906650c62026b13224c0a1be5a6cfef194fd935fcb725097",
+      "sources": [
+        "site-green",
+        "flower",
+        "grass"
+      ]
+    },
+    "words-above": {
+      "file": "assets/words-above.png",
+      "sha256": "907af44241e25cdae48c0766985e14239a22aa4dc490d97682c235045b303ab1",
+      "dimensions": [
+        499,
+        499
+      ],
+      "usedBy": [
+        "words-above"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "75cfc269c4bc2509906650c62026b13224c0a1be5a6cfef194fd935fcb725097",
+      "sources": [
+        "cloud-radio",
+        "count-lanterns",
+        "site-green",
+        "site-empty"
+      ]
+    },
+    "words-in-talk": {
+      "file": "assets/words-in-talk.png",
+      "sha256": "08896ae944a87de88988f7ed4c1718402b0f9aa0be89307e9a1d24739b6f9e5f",
+      "dimensions": [
+        499,
+        499
+      ],
+      "usedBy": [
+        "words-in-talk"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "75cfc269c4bc2509906650c62026b13224c0a1be5a6cfef194fd935fcb725097",
+      "sources": [
+        "ask-scene",
+        "answer-scene",
+        "grow-leaf",
+        "long-ribbon"
+      ]
+    },
+    "pause-example": {
+      "file": "assets/pause-example.png",
+      "sha256": "b5d557bfc6af424e9438826f4bb467a693adce128f644c8f9de28964a6f018bf",
+      "dimensions": [
+        501,
+        235
+      ],
+      "usedBy": [
+        "listen-to-pauses"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "75cfc269c4bc2509906650c62026b13224c0a1be5a6cfef194fd935fcb725097",
+      "sources": [
+        "rain-truck",
+        "stone-bridge"
+      ]
+    },
+    "writing-one": {
+      "file": "assets/writing-one.png",
+      "sha256": "010d9438807c6ef580ff9c601e79a78fd6a8d24b026eebc186e3f3a78256385e",
+      "dimensions": [
+        780,
+        432
+      ],
+      "usedBy": [
+        "first-writing"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "75cfc269c4bc2509906650c62026b13224c0a1be5a6cfef194fd935fcb725097",
+      "sources": []
+    },
+    "writing-two": {
+      "file": "assets/writing-two.png",
+      "sha256": "a7db7a8c7d01a239f717e856ca3e4e3464dc52de1d0653df52bebee81e04e933",
+      "dimensions": [
+        780,
+        432
+      ],
+      "usedBy": [
+        "second-writing"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "75cfc269c4bc2509906650c62026b13224c0a1be5a6cfef194fd935fcb725097",
+      "sources": []
+    },
+    "rain-dialogue": {
+      "file": "assets/rain-dialogue.png",
+      "sha256": "85441f1a320c13afb583b075ee92b84358d59d77d19fe1773d2c9dcbc1d402b4",
+      "dimensions": [
+        499,
+        499
+      ],
+      "usedBy": [
+        "two-rain-voices"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "75cfc269c4bc2509906650c62026b13224c0a1be5a6cfef194fd935fcb725097",
+      "sources": [
+        "drop-big",
+        "drop-small",
+        "rain-mic",
+        "site-empty",
+        "site-green",
+        "flower",
+        "grass"
+      ]
+    },
+    "delivery-start": {
+      "file": "assets/delivery-start.png",
+      "sha256": "8c8667c2ea415dc784bad5af2e217c4c1f805784272a23309597b40539c78287",
+      "dimensions": [
+        499,
+        499
+      ],
+      "usedBy": [
+        "deliver-a-role"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "75cfc269c4bc2509906650c62026b13224c0a1be5a6cfef194fd935fcb725097",
+      "sources": [
+        "drop-big",
+        "drop-small",
+        "site-empty",
+        "site-green",
+        "flower",
+        "grass"
+      ]
+    },
+    "two-endings": {
+      "file": "assets/two-endings.png",
+      "sha256": "67ee002031b528711287e9921a694829c57460429b0c16273b885a0465283037",
+      "dimensions": [
+        499,
+        499
+      ],
+      "usedBy": [
+        "two-endings"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "75cfc269c4bc2509906650c62026b13224c0a1be5a6cfef194fd935fcb725097",
+      "sources": [
+        "site-empty",
+        "site-green",
+        "flower",
+        "grass"
+      ]
+    },
+    "role-rehearsal": {
+      "file": "assets/role-rehearsal.png",
+      "sha256": "422659cc67ef546b6113df51f747f44afb2bf8631cc506f092aa4d33976c7f69",
+      "dimensions": [
+        501,
+        235
+      ],
+      "usedBy": [
+        "role-rehearsal"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "75cfc269c4bc2509906650c62026b13224c0a1be5a6cfef194fd935fcb725097",
+      "sources": [
+        "drop-big",
+        "drop-small",
+        "rain-mic"
+      ]
+    },
+    "grow-choice-a": {
+      "file": "assets/grow-choice-a.png",
+      "sha256": "b3acc4f32c44be70a88be752b86a3fcf9ac5c45e1f6d4cd62e241c11a57896ef",
+      "dimensions": [
+        501,
+        235
+      ],
+      "usedBy": [
+        "rain-q2"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "75cfc269c4bc2509906650c62026b13224c0a1be5a6cfef194fd935fcb725097",
+      "sources": [
+        "site-yard",
+        "grass"
+      ]
+    },
+    "grow-choice-b": {
+      "file": "assets/grow-choice-b.png",
+      "sha256": "376644713af9c7069d69b6d775b23d1bffa64a5b661905a33caa17934f62bd15",
+      "dimensions": [
+        501,
+        235
+      ],
+      "usedBy": [
+        "rain-q2"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "75cfc269c4bc2509906650c62026b13224c0a1be5a6cfef194fd935fcb725097",
+      "sources": [
+        "site-yard",
+        "grass"
+      ]
+    },
+    "grow-choice-c": {
+      "file": "assets/grow-choice-c.png",
+      "sha256": "fd553956590afd7610e0343abbb779d0682d645f7d632eb9cd478df87fbb7004",
+      "dimensions": [
+        501,
+        235
+      ],
+      "usedBy": [
+        "rain-q2"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "75cfc269c4bc2509906650c62026b13224c0a1be5a6cfef194fd935fcb725097",
+      "sources": [
+        "site-yard"
+      ]
+    },
+    "place-choice-a": {
+      "file": "assets/place-choice-a.png",
+      "sha256": "ac3df0aec90cfa60d8372daa9dcc0dd9493ef036caef15403c3e476f02f83596",
+      "dimensions": [
+        462,
+        462
+      ],
+      "usedBy": [
+        "rain-q3"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "75cfc269c4bc2509906650c62026b13224c0a1be5a6cfef194fd935fcb725097",
+      "sources": [
+        "site-empty"
+      ]
+    },
+    "place-choice-b": {
+      "file": "assets/place-choice-b.png",
+      "sha256": "b974ac9bdb47fe5d983a1de8e4d14282cd5b59b7f7c7c2839e0c8609f6fea33e",
+      "dimensions": [
+        462,
+        462
+      ],
+      "usedBy": [
+        "rain-q3"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "75cfc269c4bc2509906650c62026b13224c0a1be5a6cfef194fd935fcb725097",
+      "sources": [
+        "site-green",
+        "grass"
+      ]
+    },
+    "place-choice-c": {
+      "file": "assets/place-choice-c.png",
+      "sha256": "f9770795818fc0eefbc33e8ed9ff6a6ffdf2fff2cfb73cf20aee7106960a6100",
+      "dimensions": [
+        462,
+        462
+      ],
+      "usedBy": [
+        "rain-q3"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "75cfc269c4bc2509906650c62026b13224c0a1be5a6cfef194fd935fcb725097",
+      "sources": [
+        "site-yard",
+        "flower",
+        "grass"
+      ]
+    },
+    "change-choice-a": {
+      "file": "assets/change-choice-a.png",
+      "sha256": "9257f9a9910c21cacb8fd00d747aa52382f8bb30c2d8ad877a3db27100deca80",
+      "dimensions": [
+        501,
+        235
+      ],
+      "usedBy": [
+        "rain-q4"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "75cfc269c4bc2509906650c62026b13224c0a1be5a6cfef194fd935fcb725097",
+      "sources": [
+        "site-yard",
+        "flower",
+        "grass"
+      ]
+    },
+    "change-choice-b": {
+      "file": "assets/change-choice-b.png",
+      "sha256": "dc4d5eae9a77033a23e8daaaead134197a2eb560ce8bfa68d59915968546993a",
+      "dimensions": [
+        501,
+        235
+      ],
+      "usedBy": [
+        "rain-q4"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "75cfc269c4bc2509906650c62026b13224c0a1be5a6cfef194fd935fcb725097",
+      "sources": [
+        "site-yard",
+        "flower",
+        "grass"
+      ]
+    },
+    "change-choice-c": {
+      "file": "assets/change-choice-c.png",
+      "sha256": "d7313663dee7dd648d2d1109e9ca31559afee6a043dc3f5996130058bfe25709",
+      "dimensions": [
+        501,
+        235
+      ],
+      "usedBy": [
+        "rain-q4"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "75cfc269c4bc2509906650c62026b13224c0a1be5a6cfef194fd935fcb725097",
+      "sources": [
+        "site-yard",
+        "flower"
+      ]
+    },
+    "bright-choice-a": {
+      "file": "assets/bright-choice-a.png",
+      "sha256": "2df881b59d38c0d56fad5fef9e648d8af554738737a6075b79681ef7fd393717",
+      "dimensions": [
+        501,
+        235
+      ],
+      "usedBy": [
+        "rain-q5"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "75cfc269c4bc2509906650c62026b13224c0a1be5a6cfef194fd935fcb725097",
+      "sources": [
+        "site-empty",
+        "flower",
+        "grass"
+      ]
+    },
+    "bright-choice-b": {
+      "file": "assets/bright-choice-b.png",
+      "sha256": "e85c33e0aa06110069134e90c2dc53bef0951a79496f4fb04e23a36a01136fb1",
+      "dimensions": [
+        501,
+        235
+      ],
+      "usedBy": [
+        "rain-q5"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "75cfc269c4bc2509906650c62026b13224c0a1be5a6cfef194fd935fcb725097",
+      "sources": [
+        "site-empty",
+        "flower",
+        "grass"
+      ]
+    },
+    "bright-choice-c": {
+      "file": "assets/bright-choice-c.png",
+      "sha256": "bc1510a28644149c86b606a8631bbafa114a29d72b65fc45d6869687ac7c3550",
+      "dimensions": [
+        501,
+        235
+      ],
+      "usedBy": [
+        "rain-q5"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "75cfc269c4bc2509906650c62026b13224c0a1be5a6cfef194fd935fcb725097",
+      "sources": [
+        "site-empty",
+        "flower",
+        "grass"
+      ]
+    },
+    "talk-choice-a": {
+      "file": "assets/talk-choice-a.png",
+      "sha256": "82e548c69ff9a1dcd82faea25d310c8e7800c8b07dac75b14df114e4e3fcde21",
+      "dimensions": [
+        501,
+        235
+      ],
+      "usedBy": [
+        "rain-q6"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "75cfc269c4bc2509906650c62026b13224c0a1be5a6cfef194fd935fcb725097",
+      "sources": [
+        "drop-big",
+        "drop-small",
+        "rain-mic"
+      ]
+    },
+    "talk-choice-b": {
+      "file": "assets/talk-choice-b.png",
+      "sha256": "2d722bf9583df1cebefc0dd92aa3a4f6fd35fc9106076c4835e739bfe0d08220",
+      "dimensions": [
+        501,
+        235
+      ],
+      "usedBy": [
+        "rain-q6"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "75cfc269c4bc2509906650c62026b13224c0a1be5a6cfef194fd935fcb725097",
+      "sources": [
+        "drop-big",
+        "drop-small",
+        "rain-mic"
+      ]
+    },
+    "talk-choice-c": {
+      "file": "assets/talk-choice-c.png",
+      "sha256": "422659cc67ef546b6113df51f747f44afb2bf8631cc506f092aa4d33976c7f69",
+      "dimensions": [
+        501,
+        235
+      ],
+      "usedBy": [
+        "rain-q6"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "75cfc269c4bc2509906650c62026b13224c0a1be5a6cfef194fd935fcb725097",
+      "sources": [
+        "drop-big",
+        "drop-small",
+        "rain-mic"
+      ]
+    },
+    "pause-choice-a": {
+      "file": "assets/pause-choice-a.png",
+      "sha256": "de58cb77f1a64490205df6fa6614bad9cb5ce66275c90bda701cbc28665291b7",
+      "dimensions": [
+        501,
+        235
+      ],
+      "usedBy": [
+        "rain-q7"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "75cfc269c4bc2509906650c62026b13224c0a1be5a6cfef194fd935fcb725097",
+      "sources": [
+        "paper-lantern"
+      ]
+    },
+    "pause-choice-b": {
+      "file": "assets/pause-choice-b.png",
+      "sha256": "c050e514f58674de8d362e330afb29630ef8a4b63e6f318567b2ee6f83cef1a4",
+      "dimensions": [
+        501,
+        235
+      ],
+      "usedBy": [
+        "rain-q7"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "75cfc269c4bc2509906650c62026b13224c0a1be5a6cfef194fd935fcb725097",
+      "sources": [
+        "paper-lantern"
+      ]
+    },
+    "pause-choice-c": {
+      "file": "assets/pause-choice-c.png",
+      "sha256": "3d20f1e3f266a3e5e4ffbfee1d6fd6339745ccd3c02961990e4ef8a4cea44b29",
+      "dimensions": [
+        501,
+        235
+      ],
+      "usedBy": [
+        "rain-q7"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "75cfc269c4bc2509906650c62026b13224c0a1be5a6cfef194fd935fcb725097",
+      "sources": [
+        "paper-lantern"
+      ]
+    }
+  }
+}

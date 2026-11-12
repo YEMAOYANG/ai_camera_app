@@ -1,0 +1,372 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "Unit 2 That is a yellow bird.",
+  "authorModels": [
+    "gpt-6.1-sol"
+  ],
+  "binding": {
+    "editionId": "smartedu-english-six-year-g1-upper-sync-af05bc77",
+    "revisionId": "20260928-metadata-1",
+    "nodeId": "1f7b226d-d3b7-461b-b8f1-3904af819639",
+    "lessonTitle": "Unit 2 That is a yellow bird.",
+    "unitTitle": "Module 5",
+    "gradeCode": "primary_1",
+    "subject": "english",
+    "volume": "upper",
+    "schoolSystem": "six_year",
+    "classHour": "lesson_1",
+    "teachingRevision": "1"
+  },
+  "goals": [
+    "听辨 bag，能从图中指出包，并模仿整词。听到 that 能留意它指向较远的事物",
+    "从说话者所在位置判断近远，理解并尝试使用 This is 和 That is。换站位后重新判断",
+    "听完整句时一起核对近远、事物和颜色，能指认正确对象，并尝试用颜色和物品名介绍它",
+    "在原创短韵句里听辨 cat、cap 和 hat，并跟拍尝试模仿，能从图上区分猫、本课棒球帽和针织帽",
+    "听 This 或 That 后先指相对近处或远处，再说完整句。能把方法带到教室参观或家中实景介绍"
+  ],
+  "scenes": [
+    {
+      "key": "bag-and-bird",
+      "type": "slide",
+      "focus": "先用真实外形听辨 bag 和 bird。拿提带、包身与翅膀、鸟喙分别解释。",
+      "visuals": [
+        "teaching-bag",
+        "yellow-bird"
+      ]
+    },
+    {
+      "key": "from-the-speaker",
+      "type": "slide",
+      "focus": "同一张课桌两次摆同一位置，人物换站位，比较观察距离。先找谁说话，再选 This is 或 That is。",
+      "visuals": [
+        "near-desk-example",
+        "far-desk-example"
+      ]
+    },
+    {
+      "key": "listen-three-clues",
+      "type": "slide",
+      "focus": "用新公园场景分开讲距离、颜色和物品名，示范把三个线索合在同一句。",
+      "visuals": [
+        "bird-park-cover"
+      ]
+    },
+    {
+      "key": "bird-colour-practice",
+      "type": "slide",
+      "focus": "在两张练习卡中比较近处蓝鸟和远处黑鸟，分开讲距离与颜色。",
+      "visuals": [
+        "near-blue-example",
+        "far-black-example"
+      ]
+    },
+    {
+      "key": "lookout-camera",
+      "type": "interactive",
+      "focus": "以固定小导游为参照听 this 或 that，再核对颜色，按英语口令驾驶泡泡车经过对应鸟站。",
+      "visuals": [
+        "bird-park-cover",
+        "lookout-background",
+        "lookout-guide",
+        "yellow-bird",
+        "black-bird",
+        "game-scout-rover",
+        "game-scout-rover-pop"
+      ],
+      "levelProgression": [
+        "同色黄鸟近和远，慢速开到邻格先找近处，再找远处。",
+        "换成同色黑鸟，先远后近，增加巡游和车速。",
+        "近处、远处各有黄鸟和黑鸟，四次听完整线索，绕开巡游。"
+      ],
+      "proof": "固定导游的图标始终在左侧。找对的鸟站闪亮后移出路线，分数和星星留下。实际移动经过正确鸟站才推进，早到的鸟站不计分。",
+      "knowledgeRule": "同色鸟分处近处和远处；同一侧也可能有两种颜色。依口令顺序开到唯一合适的鸟站才计分。",
+      "gameTemplate": {
+        "id": "bubbleMaze",
+        "version": 1,
+        "entryPoint": "K.gameTemplates.bubbleMaze",
+        "ownerApprovedOn": "2026-11-09",
+        "catalogKnowledgeRule": "listen_order"
+      }
+    },
+    {
+      "key": "cat-cap-hat-beat",
+      "type": "slide",
+      "focus": "指猫、棒球帽、针织帽，听老师分开读 cat、cap、hat。听第一组示范原创新韵句后跟着拍。",
+      "visuals": [
+        "cat-prop",
+        "cap-prop",
+        "hat-prop"
+      ]
+    },
+    {
+      "key": "costume-rhythm-run",
+      "type": "interactive",
+      "focus": "听 cat、cap 或 hat，左右转向并发射弹珠，撞到所听道具的图才推进。节奏模仿另在前一讲解页练。",
+      "visuals": [
+        "rhythm-stage",
+        "cat-prop",
+        "cap-prop",
+        "hat-prop",
+        "teaching-bag",
+        "game-stage-marble"
+      ],
+      "levelProgression": [
+        "猫和针织帽静止，只听一条口令，目标宽。",
+        "三种道具，两条口令，靶轻微漂移。",
+        "加入红包干扰，三条口令，靶更窄且漂移更快。"
+      ],
+      "proof": "听音辨图后仍需转向、发射和修正轨迹。击中的正确图保留贴纸；第二次失误后提示并放慢弹珠。",
+      "knowledgeRule": "单词、猫和两种帽子图片一一配对。选错图或弹珠未击中都不能进入下一条口令。",
+      "gameTemplate": {
+        "id": "magnetMarbles",
+        "version": 1,
+        "entryPoint": "K.gameTemplates.magnetMarbles",
+        "ownerApprovedOn": "2026-11-09",
+        "catalogKnowledgeRule": "listen_match"
+      }
+    },
+    {
+      "key": "visit-our-classroom",
+      "type": "slide",
+      "focus": "从黄衣同学在门口的位置介绍教室和老师；圈出他离得较远的课桌，右图近看同一张桌子。",
+      "visuals": [
+        "classroom-door-distance",
+        "classroom-desk-closeup"
+      ]
+    },
+    {
+      "key": "point-then-say",
+      "type": "slide",
+      "focus": "迁移原书活动5和6。先听 This 或 That 作位置提示，孩子指给家人，再把实物名说进完整句。",
+      "visuals": [
+        "classroom-desk-closeup"
+      ]
+    },
+    {
+      "key": "picture-check",
+      "type": "quiz",
+      "focus": "新场景中用图测听辨与说话人站位。",
+      "visuals": [
+        "quiz-brick-courtyard"
+      ]
+    },
+    {
+      "key": "recap-lookout",
+      "type": "slide",
+      "focus": "回顾包、说话人近远、距离加颜色和名称、三个节奏词、实景介绍，约定家里轮流指给对方。",
+      "visuals": []
+    }
+  ],
+  "quizPlan": [
+    {
+      "id": "hear-bag-at-fair",
+      "prompt": "Find the bag. 听物品名，选一张图。",
+      "skill": "听懂 bag",
+      "answer": "b",
+      "visualMeaning": "庭院展台的三张同框图片分别是猫、橙红双肩书包和蓝鸟；B 是包。",
+      "analysis": "bag 是包。这张图里的包有提手，可以装东西。翅膀和喙的是鸟，带胡须的是猫。"
+    },
+    {
+      "id": "hear-far-blue-bird",
+      "prompt": "That is a blue bird. 选一张图。",
+      "skill": "同时听懂距离、颜色和鸟",
+      "answer": "c",
+      "visualMeaning": "同一露天砖拱庭院里，说话者固定在左侧。C 是远处蓝鸟，另有近处蓝鸟和远处黑鸟。",
+      "analysis": "that 指离说话者较远，blue bird 是蓝鸟。只对颜色或只对距离都不够。"
+    },
+    {
+      "id": "hear-near-black-cat",
+      "prompt": "This is a black cat. 选一张图。",
+      "skill": "同时听懂距离、颜色和动物名",
+      "answer": "a",
+      "visualMeaning": "庭院中同一说话者固定在左侧。A 是近处黑猫，另有远处黑猫和近处浅橘奶油色猫。",
+      "analysis": "this 指离说话人近，black cat 是黑猫。只有小导游身边的黑猫同时符合这两条。"
+    },
+    {
+      "id": "hear-cap-in-display",
+      "prompt": "Listen. A cap. 选一张图。",
+      "skill": "听辨 cat、cap、hat",
+      "answer": "c",
+      "visualMeaning": "露天砖拱庭院里，三张独立的展台图片分别呈现猫、针织帽和棒球帽。C 的棒球帽有向前伸的帽舌。",
+      "analysis": "本课用 cap 指这顶棒球帽。cat 是猫，这里的 hat 是另一顶针织帽。"
+    },
+    {
+      "id": "new-speaker-near-black-bird",
+      "prompt": "听图上这位同学。This is a black bird. 选图。",
+      "skill": "换发话站位后重新判断近远",
+      "answer": "a",
+      "visualMeaning": "题干中带相机的小导游站在庭院右侧发话。A 保持右侧站位且是近处黑鸟，B 改回左侧，C 改成近处蓝鸟。",
+      "analysis": "先找图上发话的孩子，再从她的位置看。this 指离她较近，black bird 是黑鸟。"
+    },
+    {
+      "id": "hear-far-my-desk",
+      "prompt": "That is my desk. 选对的一张。",
+      "skill": "在新参观情境里听懂远处物品",
+      "answer": "b",
+      "visualMeaning": "庭院中说话者固定在左侧，B 是远处带绿书的课桌；另有近处同款课桌和远处橙红双肩书包。",
+      "analysis": "that 提醒你看说话人远处，my desk 是“我的课桌”。选图里离小导游较远的课桌。"
+    }
+  ],
+  "gameCuePlan": {
+    "mode": "cross_scene_teacher_action_replay",
+    "goal": "同一 Mia 教学动作的预录音在讲解和游戏中复用。游戏展示图片和重听按钮；正常尝试时不提前标出正确图。",
+    "noAdditionalTts": true,
+    "rounds": {
+      "lookout-camera": [
+        {
+          "level": 1,
+          "cues": [
+            "near-yellow",
+            "far-yellow",
+            "maze-exit"
+          ],
+          "variation": "同色近远，慢速练第一站"
+        },
+        {
+          "level": 2,
+          "cues": [
+            "far-black",
+            "near-black",
+            "maze-exit"
+          ],
+          "variation": "先远后近并绕过巡游"
+        },
+        {
+          "level": 3,
+          "cues": [
+            "near-black",
+            "far-yellow",
+            "near-yellow",
+            "far-black",
+            "maze-exit"
+          ],
+          "variation": "两种颜色和两个距离都要核对"
+        }
+      ],
+      "costume-rhythm-run": [
+        {
+          "level": 1,
+          "cues": [
+            "a-hat"
+          ],
+          "variation": "静止宽靶，两张图"
+        },
+        {
+          "level": 2,
+          "cues": [
+            "a-cat",
+            "a-cap"
+          ],
+          "variation": "三张图，两条口令，轻漂移"
+        },
+        {
+          "level": 3,
+          "cues": [
+            "a-cap",
+            "a-hat",
+            "a-cat"
+          ],
+          "variation": "加红包干扰，三条口令，漂移更快"
+        }
+      ]
+    },
+    "bindings": {
+      "lookout-camera": {
+        "near-yellow": {
+          "actionId": "bird-colour-practice-15",
+          "line": "This is a yellow bird.",
+          "usage": "lecture_then_game_replay"
+        },
+        "far-yellow": {
+          "actionId": "listen-three-clues-11",
+          "line": "That is a yellow bird.",
+          "usage": "lecture_then_game_replay"
+        },
+        "near-black": {
+          "actionId": "bird-colour-practice-17",
+          "line": "This is a black bird.",
+          "usage": "lecture_then_game_replay"
+        },
+        "far-black": {
+          "actionId": "bird-colour-practice-11",
+          "line": "That is a black bird.",
+          "usage": "lecture_then_game_replay"
+        },
+        "maze-hint": {
+          "actionId": "bird-colour-practice-18",
+          "line": "听不清就重听一句，先看小导游站在哪儿。",
+          "usage": "lecture_then_game_replay"
+        },
+        "maze-help": {
+          "actionId": "bird-colour-practice-19",
+          "line": "两次还没找到，就跟着亮起来的记号。",
+          "usage": "lecture_then_game_replay"
+        },
+        "maze-exit": {
+          "actionId": "bird-colour-practice-20",
+          "line": "每只鸟都找到后，就沿小路开到旗子旁。",
+          "usage": "lecture_then_game_replay"
+        },
+        "maze-praise": {
+          "actionId": "bird-colour-practice-21",
+          "line": "听准距离和颜色，小导游就收到消息啦！",
+          "usage": "lecture_then_game_replay"
+        }
+      },
+      "costume-rhythm-run": {
+        "a-cat": {
+          "actionId": "cat-cap-hat-beat-5",
+          "line": "A cat.",
+          "usage": "lecture_then_game_replay"
+        },
+        "a-cap": {
+          "actionId": "cat-cap-hat-beat-8",
+          "line": "A cap.",
+          "usage": "lecture_then_game_replay"
+        },
+        "a-hat": {
+          "actionId": "cat-cap-hat-beat-11",
+          "line": "A hat.",
+          "usage": "lecture_then_game_replay"
+        },
+        "stage-hint": {
+          "actionId": "cat-cap-hat-beat-16",
+          "line": "先重听，再看帽舌、帽球或猫尾巴。",
+          "usage": "lecture_then_game_replay"
+        },
+        "stage-help": {
+          "actionId": "cat-cap-hat-beat-17",
+          "line": "再听一遍。亮起来的图能帮你瞄准。",
+          "usage": "lecture_then_game_replay"
+        },
+        "stage-praise": {
+          "actionId": "cat-cap-hat-beat-18",
+          "line": "能听出哪件道具，舞台就准备好啦！",
+          "usage": "lecture_then_game_replay"
+        }
+      }
+    },
+    "audioBehavior": [
+      "老师在互动页自动示范时只有课堂台词发声，游戏不发声。",
+      "交接后尝试播第一轮，同一回合可点大按钮重听。隐藏、切场和老师讲话时保持既有音频可见性。",
+      "切关或换任务调用既有 cancel helper，停止过期口令并重听当前口令。"
+    ],
+    "verification": [
+      "一条标准 speech id 对一份录音，同一地址和哈希被另一个游戏场景引用。",
+      "确认两张练习图和游戏位置、候选和顺序不同，题目场景也不同。",
+      "检查正式包同课堂 /media 转换到已登记 /audio；真实孩子端 iframe 点击首关和重听能播放。",
+      "私有预览实际播放同一录音，验证有效手势及隐藏／老师讲话无叠音。"
+    ]
+  },
+  "afterClassPractice": [
+    "跟着老师的原创短韵句用手打拍，给家人演示。",
+    "请家人站在两个不同位置，用身边的一件物品和远一点的一件物品轮流介绍。",
+    "可以介绍教室画或家中场景，由家人听是否说清是何物及说话者相对近远。"
+  ],
+  "weeklyQuestionSources": [
+    "听词选图，区分包、鸟、猫和本课两类帽子。",
+    "听近远与颜色、物品三条线索，看说话者站位再选图。",
+    "同一物品换站位或换说话者后重新判断近远。",
+    "将 This 或 That 扩展为指向明确的完整介绍。"
+  ]
+}

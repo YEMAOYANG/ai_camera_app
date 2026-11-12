@@ -1,0 +1,804 @@
+diff --git a/components/scene-renderers/InteractiveIframeHost.tsx b/components/scene-renderers/InteractiveIframeHost.tsx
+index b1b4448..0c0a8e3 100644
+--- a/components/scene-renderers/InteractiveIframeHost.tsx
++++ b/components/scene-renderers/InteractiveIframeHost.tsx
+@@ -15,6 +15,13 @@ import {
+   fitGenUiViewport,
+ } from '@/lib/interactive/logical-viewport';
+ import { activityViewportMode } from '@/lib/interactive/activity-viewport';
++import {
++  compactActivityViewport,
++  planStudentActivityControls,
++  STUDENT_ACTIVITY_CONTROLS_MESSAGE,
++  studentActivityControlsKey,
++  subscribeCompactActivityViewport,
++} from '@/lib/interactive/student-activity-controls';
+ import {
+   ACTIVITY_AUDIO_EVENT,
+   LECTURE_AUDIO_EVENT,
+@@ -117,6 +124,7 @@ export function InteractiveIframeHost({ container }: { container?: HTMLElement |
+     [classroomScenes],
+   );
+   const setActiveScene = useWidgetIframeStore((s) => s.setActiveScene);
++  const compactViewport = useSyncExternalStore(subscribeCompactActivityViewport, compactActivityViewport, () => false);
+ 
+   // Configure before InteractiveRenderer's passive mount effects. This keeps
+   // five or more low-reading activities alive without lifting the general LRU
+@@ -154,6 +162,7 @@ export function InteractiveIframeHost({ container }: { container?: HTMLElement |
+           key={`${classroomGeneration}:${sceneId}:${studentMode && supportsRecordedWidgetReadiness(entry.srcDoc) ? entry.documentGeneration : 0}`}
+           sceneId={sceneId}
+           entry={entry}
++          compactViewport={compactViewport}
+           visible={entry.owner !== null && sceneId === activeSceneId}
+         />
+       ))}
+@@ -165,6 +174,7 @@ export function InteractiveIframeHost({ container }: { container?: HTMLElement |
+ interface PooledIframeProps {
+   readonly sceneId: string;
+   readonly entry: IframePoolEntry;
++  readonly compactViewport: boolean;
+   readonly visible: boolean;
+ }
+ 
+@@ -185,7 +195,7 @@ interface PooledIframeProps {
+  * works correctly with a null origin because the host sends with
+  * targetOrigin='*'.
+  */
+-function PooledIframe({ sceneId, entry, visible }: PooledIframeProps) {
++function PooledIframe({ sceneId, entry, visible, compactViewport }: PooledIframeProps) {
+   const { t } = useI18n();
+   const studentMode = useMiraStudentRuntime();
+   const runtimeEvents = useMiraStudentRuntimeEvents();
+@@ -211,6 +221,10 @@ function PooledIframe({ sceneId, entry, visible }: PooledIframeProps) {
+   const parentReplayRef = useRef<(() => boolean) | null>(null);
+   const classroomId = useStageStore((state) => state.stage?.id);
+   const sceneIndex = scenes.findIndex((scene) => scene.id === sceneId);
++  const controlsKey = useStageStore((state) => {
++    const scene = state.getCurrentScene();
++    return scene?.id === sceneId ? studentActivityControlsKey(studentMode, state.stage, scene) : undefined;
++  });
+   const checkpoint = scenes[sceneIndex]?.miraActivityPersistence;
+   const checkpointRelease = checkpoint?.releaseSha256;
+   const checkpointContent = checkpoint?.contentSha256;
+@@ -393,7 +407,15 @@ function PooledIframe({ sceneId, entry, visible }: PooledIframeProps) {
+ 
+   const rect = entry.rect;
+   const clip = entry.clip ?? rect;
+-  const viewportMode = useMemo(() => activityViewportMode(entry.srcDoc), [entry.srcDoc]);
++  const authoredViewportMode = useMemo(() => activityViewportMode(entry.srcDoc), [entry.srcDoc]);
++  const controlsPlan = useMemo(() => {
++    if (!visible || !compactViewport || !rect || !clip
++        || !controlsKey || controlsKey !== entry.studentActivityControlsKey) return null;
++    return planStudentActivityControls(rect, intersectClientBoxes(clip, {
++      left: 0, top: 0, width: window.innerWidth, height: window.innerHeight,
++    }));
++  }, [visible, compactViewport, rect, clip, controlsKey, entry.studentActivityControlsKey]);
++  const viewportMode = controlsPlan ? 'responsive' : authoredViewportMode;
+   const viewport = rect ? fitGenUiViewport(rect, viewportMode) : null;
+   const visibleViewport = viewport && clip ? intersectClientBoxes(viewport.box, clip) : null;
+   // Require a real measured box before showing — a null or zero-size rect means
+@@ -429,6 +451,13 @@ function PooledIframe({ sceneId, entry, visible }: PooledIframeProps) {
+   useLayoutEffect(() => {
+     if (widgetLeaseRef.current) useWidgetIframeStore.getState().setReadyIframeVisible(widgetLeaseRef.current, shown);
+   }, [shown]);
++  const railKey = entry.studentActivityControlsKey;
++  useLayoutEffect(() => {
++    if (!railKey) return;
++    iframeRef.current?.contentWindow?.postMessage({
++      type: STUDENT_ACTIVITY_CONTROLS_MESSAGE, key: railKey, plan: controlsPlan,
++    }, '*');
++  }, [railKey, controlsPlan, source]);
+   // The page's own teacher lines wait while the lecture or a discussion speaks.
+   const [lectureSpeaking, setLectureSpeaking] = useState(isLectureSpeaking);
+   useEffect(() => {
+@@ -551,9 +580,13 @@ function PooledIframe({ sceneId, entry, visible }: PooledIframeProps) {
+         ref={iframeRef}
+         srcDoc={entry.srcDoc}
+         src={entry.srcDoc ? undefined : entry.src}
++        data-mira-student-activity-layout={controlsPlan ? 'side-rails' : undefined}
+         data-mira-student-page-ready={studentMode && shown && documentReady ? sceneId : undefined}
+         onLoad={() => {
+           setLoadedSource(source);
++          if (railKey) iframeRef.current?.contentWindow?.postMessage({
++            type: STUDENT_ACTIVITY_CONTROLS_MESSAGE, key: railKey, plan: controlsPlan,
++          }, '*');
+           if (needsCheckpoint) { checkpointReadyRef.current = null; setReadyCheckpoint(null); }
+           if (guardedMathOperation) {
+             mathOperationReadyRef.current = null; setReadyMathOperation(null);
+diff --git a/components/scene-renderers/interactive-renderer.tsx b/components/scene-renderers/interactive-renderer.tsx
+index 9a78dcc..bdf9937 100644
+--- a/components/scene-renderers/interactive-renderer.tsx
++++ b/components/scene-renderers/interactive-renderer.tsx
+@@ -6,6 +6,8 @@ import { useInteractiveIframePool } from '@/lib/store/interactive-iframe-pool';
+ import { useStageStore } from '@/lib/store/stage';
+ import { patchHtmlForIframe } from '@/lib/utils/iframe';
+ import { visibleClientRect } from '@/lib/edit/visible-client-rect';
++import { useMiraStudentRuntime } from '@/lib/contexts/mira-student-runtime-context';
++import { injectStudentActivityControls, studentActivityControlsKey } from '@/lib/interactive/student-activity-controls';
+ 
+ interface InteractiveRendererProps {
+   readonly content: InteractiveContent;
+@@ -23,6 +25,12 @@ interface InteractiveRendererProps {
+  */
+ export function InteractiveRenderer({ content, sceneId }: InteractiveRendererProps) {
+   const classroomId = useStageStore((s) => s.stage?.id);
++  const studentMode = useMiraStudentRuntime();
++  const controlsKey = useStageStore((state) => {
++    const scene = state.scenes.find(item => item.id === sceneId);
++    return scene?.content.type === 'interactive' && scene.content.html === content.html
++      ? studentActivityControlsKey(studentMode, state.stage, scene) : undefined;
++  });
+   const slotRef = useRef<HTMLDivElement>(null);
+   // Unique per mounted placeholder instance — its visibility ownership token, so
+   // a stale unmount during the mode cross-fade can't hide a newer instance.
+@@ -33,10 +41,13 @@ export function InteractiveRenderer({ content, sceneId }: InteractiveRendererPro
+   const release = useInteractiveIframePool((s) => s.release);
+   const setActive = useInteractiveIframePool((s) => s.setActive);
+ 
+-  const patchedHtml = useMemo(
+-    () => (content.html ? patchHtmlForIframe(content.html) : undefined),
+-    [content.html],
+-  );
++  const patchedHtml = useMemo(() => {
++    if (!content.html) return undefined;
++    // Handle the exact Gateway wrapper before generic iframe patches add any
++    // outer markers. The rails and the authored controls must share a document.
++    const html = controlsKey ? injectStudentActivityControls(content.html, controlsKey) : content.html;
++    return patchHtmlForIframe(html);
++  }, [content.html, controlsKey]);
+ 
+   // Register / activate / claim visibility while mounted; release (keep-alive) on
+   // unmount. A content change re-runs this and rebuilds the iframe — the only
+@@ -44,12 +55,13 @@ export function InteractiveRenderer({ content, sceneId }: InteractiveRendererPro
+   useEffect(() => {
+     mount(sceneId, {
+       srcDoc: patchedHtml,
++      studentActivityControlsKey: controlsKey,
+       src: patchedHtml ? undefined : content.url,
+     });
+     setActive(sceneId);
+     claim(sceneId, owner);
+     return () => release(sceneId, owner);
+-  }, [classroomId, sceneId, owner, patchedHtml, content.url, mount, setActive, claim, release]);
++  }, [classroomId, sceneId, owner, patchedHtml, controlsKey, content.url, mount, setActive, claim, release]);
+ 
+   // Track this slot's screen rect for the host. rAF loop mirrors useTrackedRect:
+   // one getBoundingClientRect read resolves canvas scale, viewport offset and
+diff --git a/lib/interactive/student-activity-controls.ts b/lib/interactive/student-activity-controls.ts
+new file mode 100644
+index 0000000..53ac4b4
+--- /dev/null
++++ b/lib/interactive/student-activity-controls.ts
+@@ -0,0 +1,217 @@
++import { intersectClientBoxes, type ClientBox } from '@/lib/edit/visible-client-rect';
++import { mapEmbeddedActivityDocument } from '@/lib/mira/activity-checkpoint-adapters';
++import type { Scene } from '@/lib/types/stage';
++import { CLASSROOM_TOUCH_CONTROL_SIZE } from '@/lib/ui/classroom-controls';
++import { injectIntoDocumentHead } from '@/lib/utils/html-document';
++import { fitGenUiViewport } from './logical-viewport';
++
++export const SHORT_LANDSCAPE_QUERY = '(max-width: 640px) and (max-height: 380px) and (orientation: landscape)';
++export const STUDENT_ACTIVITY_CONTROLS_MESSAGE = 'mira:student-activity-controls';
++const SHA256 = /^[a-f0-9]{64}$/;
++const GAP = 8;
++const EDGE = 6;
++const TARGET = CLASSROOM_TOUCH_CONTROL_SIZE;
++const PITCH = TARGET + GAP;
++const ROWS = 2;
++const railWidth = (columns: number) => columns * PITCH - GAP;
++
++// Both certified v1 templates have these seven native buttons. The selectors
++// constrain the move; they do not opt an authored document in.
++const BUTTONS = [
++  { selector: ':scope > button.arc-key.arc-music', side: 'left', column: 0, row: 1 },
++  { selector: ':scope > button.arc-key.arc-voice', side: 'left', column: 1, row: 1 },
++  { selector: ':scope > .arc-pad > button.arc-key[data-arc-input="left"]', side: 'right', column: 0, row: 1 },
++  { selector: ':scope > .arc-pad > button.arc-key[data-arc-input="right"]', side: 'right', column: 2, row: 1 },
++  { selector: ':scope > .arc-pad > button.arc-key[data-arc-input="up"]', side: 'right', column: 1, row: 0 },
++  { selector: ':scope > .arc-pad > button.arc-key[data-arc-input="down"]', side: 'right', column: 1, row: 1 },
++  { selector: ':scope > .arc-pad > button.arc-key[data-arc-input="action"]', side: 'right', column: 2, row: 0 },
++] as const;
++
++export function studentActivityControlsKey(
++  studentMode: boolean,
++  stage: { readonly id: string } | null | undefined,
++  scene: Scene | null | undefined,
++): string | undefined {
++  const fixedTextbook = (stage as { fixedTextbook?: unknown } | null | undefined)?.fixedTextbook;
++  const binding = scene?.miraStudentActivityControls;
++  if (!studentMode || fixedTextbook !== true || !stage || !scene || scene.miraPageSummary
++      || !/^tbpub_[a-f0-9]{24}$/.test(stage.id) || scene.stageId !== stage.id || scene.miraActivity
++      || scene.type !== 'interactive' || scene.content.type !== 'interactive'
++      || typeof scene.content.html !== 'string' || !scene.content.html.trim()
++      || !binding || Object.keys(binding).length !== 5
++      || binding.schemaVersion !== 'mira.textbook.student-activity-controls.v1' || binding.version !== 1
++      || typeof binding.releaseSha256 !== 'string' || !SHA256.test(binding.releaseSha256)
++      || typeof binding.contentSha256 !== 'string' || !SHA256.test(binding.contentSha256)
++      || (binding.template !== 'sortingDepot' && binding.template !== 'bubbleMaze')) return;
++  // The gateway binds the source HTML before media embedding. The delivered
++  // HTML differs, so the runtime pairs that certified identity with its srcDoc.
++  return [binding.releaseSha256, binding.contentSha256, binding.template, binding.version].join(':');
++}
++
++export interface StudentActivityControlsPlan {
++  readonly canvas: ClientBox;
++  readonly buttons: readonly { readonly left: number; readonly top: number }[];
++}
++
++export function planStudentActivityControls(
++  slot: ClientBox, clip: ClientBox,
++): StudentActivityControlsPlan | null {
++  if (![slot, clip].every(box => [box.left, box.top, box.width, box.height].every(Number.isFinite)
++      && box.width > 0 && box.height > 0)) return null;
++  const visible = intersectClientBoxes(slot, clip);
++  const { box: canvas } = fitGenUiViewport(slot, 'fixed');
++  const left = canvas.left - GAP - railWidth(2);
++  const right = canvas.left + canvas.width + GAP;
++  const top = visible.top + (visible.height - railWidth(ROWS)) / 2;
++  if (left < visible.left + EDGE || right + railWidth(3) > visible.left + visible.width - EDGE
++      || top < visible.top + EDGE || canvas.top < visible.top
++      || canvas.top + canvas.height > visible.top + visible.height) return null;
++  return {
++    canvas: { ...canvas, left: canvas.left - slot.left, top: canvas.top - slot.top },
++    buttons: BUTTONS.map(({ side, column, row }) => ({
++      left: (side === 'left' ? left : right) + column * PITCH - slot.left,
++      top: top + row * PITCH - slot.top,
++    })),
++  };
++}
++
++export function compactActivityViewport(): boolean {
++  return typeof window !== 'undefined' && typeof window.matchMedia === 'function'
++    && window.matchMedia(SHORT_LANDSCAPE_QUERY).matches;
++}
++
++export function subscribeCompactActivityViewport(update: () => void): () => void {
++  const media = window.matchMedia?.(SHORT_LANDSCAPE_QUERY);
++  media?.addEventListener('change', update);
++  return () => media?.removeEventListener('change', update);
++}
++
++const RAILS_ATTRIBUTE = 'data-mira-student-activity-rails';
++const BUTTON_ATTRIBUTE = 'data-mira-student-activity-rail-button';
++const shimStyle = `<style data-mira-student-activity-controls>
++  .arc-controls[${RAILS_ATTRIBUTE}] {
++    position: absolute; inset: 0; pointer-events: none;
++    --mira-classroom-secondary-size: ${TARGET}px;
++  }
++  .arc-controls[${RAILS_ATTRIBUTE}] button[${BUTTON_ATTRIBUTE}] {
++    position: absolute;
++    left: var(--mira-student-activity-button-left);
++    top: var(--mira-student-activity-button-top);
++    touch-action: none !important;
++  }
++</style>`;
++
++/** Install a dormant adapter in this exact document. Resizing and visibility
++ * only change the plan message, never srcDoc or the authored game state. */
++export function injectStudentActivityControls(html: string, key: string): string {
++  if (!/^[a-f0-9]{64}:[a-f0-9]{64}:(sortingDepot|bubbleMaze):1$/.test(key)) return html;
++  const shim = shimStyle + `<script data-mira-student-activity-controls>
++(function () {
++  const key = ${JSON.stringify(key)};
++  const selectors = ${JSON.stringify(BUTTONS.map(button => button.selector))};
++  const railsAttribute = ${JSON.stringify(RAILS_ATTRIBUTE)};
++  const buttonAttribute = ${JSON.stringify(BUTTON_ATTRIBUTE)};
++  const roles = [buttonAttribute, 'data-mira-activity-control', 'data-mira-control-icon'];
++  const styles = ['--mira-student-activity-button-left', '--mira-student-activity-button-top'];
++  let plan = null, mounted = null, frame = 0;
++
++  function move(bar, parent, before) {
++    const focus = bar.contains(document.activeElement) ? document.activeElement : null;
++    if (typeof parent.moveBefore === 'function' && bar.isConnected && parent.isConnected) {
++      parent.moveBefore(bar, before);
++    } else parent.insertBefore(bar, before);
++    if (focus && document.activeElement !== focus) focus.focus({ preventScroll: true });
++  }
++
++  function restore() {
++    if (!mounted) return;
++    const { canvas, bar, following, buttons, original } = mounted;
++    move(bar, canvas, following?.parentNode === canvas ? following : null);
++    bar.removeAttribute(railsAttribute);
++    buttons.forEach((button, index) => {
++      const state = original[index];
++      roles.forEach((name, i) => {
++        if (state.attrs[i] === null) button.removeAttribute(name);
++        else button.setAttribute(name, state.attrs[i]);
++      });
++      styles.forEach((name, i) => {
++        const [value, priority] = state.styles[i];
++        if (value) button.style.setProperty(name, value, priority);
++        else button.style.removeProperty(name);
++      });
++      if (!state.hadStyle && !button.getAttribute('style')) button.removeAttribute('style');
++    });
++    mounted = null;
++  }
++
++  function apply() {
++    frame = 0;
++    const canvases = document.querySelectorAll('body > #cv.classic-arcade');
++    const canvas = canvases.length === 1 ? canvases[0] : null;
++    if (!plan || !canvas) { restore(); return; }
++    const bounds = canvas.getBoundingClientRect();
++    // A similarly shaped document or a slot whose layout is still changing
++    // cannot put controls into the illustration or over an adjacent panel.
++    if (!['left', 'top', 'width', 'height'].every(name => Math.abs(bounds[name] - plan.canvas[name]) <= 1)) {
++      restore();
++      return;
++    }
++    if (!mounted) {
++      const bars = canvas.querySelectorAll(':scope > .arc-controls');
++      const bar = bars.length === 1 ? bars[0] : null;
++      if (!bar || bar.hasAttribute(railsAttribute) || bar.querySelectorAll('button').length !== selectors.length) return;
++      const groups = selectors.map(selector => [...bar.querySelectorAll(selector)]);
++      if (groups.some(group => group.length !== 1
++          || group[0].matches('[data-mira-picture-choice], [draggable="true"], [' + buttonAttribute + ']'))) return;
++      const buttons = groups.map(group => group[0]);
++      if (new Set(buttons).size !== selectors.length) return;
++      const original = buttons.map(button => ({
++        attrs: roles.map(name => button.getAttribute(name)),
++        hadStyle: button.hasAttribute('style'),
++        styles: styles.map(name => [button.style.getPropertyValue(name), button.style.getPropertyPriority(name)]),
++      }));
++      mounted = { canvas, bar, following: bar.nextSibling, buttons, original };
++      bar.setAttribute(railsAttribute, '');
++      for (const button of buttons) {
++        button.setAttribute(buttonAttribute, '');
++        button.setAttribute('data-mira-activity-control', 'secondary');
++        button.setAttribute('data-mira-control-icon', '');
++      }
++      move(bar, document.body, canvas.nextSibling);
++    }
++    mounted.buttons.forEach((button, index) => {
++      const { left, top } = plan.buttons[index];
++      button.style.setProperty(styles[0], left + 'px');
++      button.style.setProperty(styles[1], top + 'px');
++    });
++  }
++
++  function schedule() {
++    if (plan && !frame) frame = window.requestAnimationFrame(apply);
++  }
++
++  window.addEventListener('message', event => {
++    const data = event.data;
++    if (event.source !== window.parent || !event.isTrusted
++        || data?.type !== ${JSON.stringify(STUDENT_ACTIVITY_CONTROLS_MESSAGE)} || data.key !== key) return;
++    const next = data.plan;
++    if (next !== null && (!next?.canvas || !Array.isArray(next.buttons) || next.buttons.length !== selectors.length
++        || next.buttons.some(button => !Number.isFinite(button?.left) || !Number.isFinite(button?.top)))) return;
++    plan = next;
++    if (!plan) {
++      if (frame) window.cancelAnimationFrame(frame);
++      frame = 0;
++      restore();
++      return;
++    }
++    schedule();
++  });
++  window.addEventListener('resize', schedule);
++  document.addEventListener('DOMContentLoaded', schedule, { once: true });
++})();
++</script>`;
++  const inject = (document: string) => injectIntoDocumentHead(document, shim);
++  // Large Gateway deliveries replace the outer document with the activity.
++  // Install the adapter inside the replacement so it survives document.open().
++  return mapEmbeddedActivityDocument(html, inject) ?? inject(html);
++}
+diff --git a/lib/store/interactive-iframe-pool.ts b/lib/store/interactive-iframe-pool.ts
+index dd58b4e..361d894 100644
+--- a/lib/store/interactive-iframe-pool.ts
++++ b/lib/store/interactive-iframe-pool.ts
+@@ -31,6 +31,7 @@ export interface IframeRect {
+ export interface IframePoolEntry {
+   /** Patched HTML for `srcDoc`, when the scene carries inline HTML. */
+   readonly srcDoc?: string;
++  readonly studentActivityControlsKey?: string;
+   /** URL for `src`, when the scene points at an external page. */
+   readonly src?: string;
+   /** Full available slot rect. The host contain-fits one fixed logical viewport inside it. */
+@@ -55,6 +56,7 @@ export interface IframePoolEntry {
+ 
+ interface MountInput {
+   readonly srcDoc?: string;
++  readonly studentActivityControlsKey?: string;
+   readonly src?: string;
+ }
+ 
+@@ -146,7 +148,8 @@ export const useInteractiveIframePool = create<InteractiveIframePoolState>((set)
+       // existing srcDoc/src reference so the host never re-sets it (which would
+       // reload the iframe). String `===` is by value, so a remount that produces
+       // an equal-but-new srcDoc string still hits this keep-alive fast path.
+-      if (existing && existing.srcDoc === input.srcDoc && existing.src === input.src) {
++      if (existing && existing.srcDoc === input.srcDoc && existing.src === input.src
++          && existing.studentActivityControlsKey === input.studentActivityControlsKey) {
+         const entries = { ...state.entries, [sceneId]: { ...existing, tick } };
+         return { entries, tick };
+       }
+@@ -155,6 +158,7 @@ export const useInteractiveIframePool = create<InteractiveIframePoolState>((set)
+       const documentGeneration = state.latestDocumentGeneration + 1;
+       const entry: IframePoolEntry = {
+         srcDoc: input.srcDoc,
++        ...(input.studentActivityControlsKey && { studentActivityControlsKey: input.studentActivityControlsKey }),
+         src: input.src,
+         documentGeneration,
+         rect: existing?.rect ?? null,
+diff --git a/lib/types/stage.ts b/lib/types/stage.ts
+index 5492138..fed2339 100644
+--- a/lib/types/stage.ts
++++ b/lib/types/stage.ts
+@@ -110,6 +110,14 @@ export type AppScene = DslScene<Action, SceneContent> & {
+   };
+   /** Server-bound native activities for reviewed Mira textbook releases. */
+   miraActivity?: { id: string; section: 'games' | 'challenge' };
++  /** Gateway delivery-only binding of the fixed release and raw activity HTML. */
++  miraStudentActivityControls?: {
++    schemaVersion: 'mira.textbook.student-activity-controls.v1';
++    releaseSha256: string;
++    contentSha256: string;
++    template: 'sortingDepot' | 'bubbleMaze';
++    version: 1;
++  };
+   /** Authenticated release metadata for UI continuity, never learning credit. */
+   miraActivityPersistence?: {
+     schemaVersion: 'mira.textbook.activity-state.v1';
+diff --git a/lib/ui/classroom-controls.ts b/lib/ui/classroom-controls.ts
+index 27876dc..f91e80c 100644
+--- a/lib/ui/classroom-controls.ts
++++ b/lib/ui/classroom-controls.ts
+@@ -1,3 +1,5 @@
++export const CLASSROOM_TOUCH_CONTROL_SIZE = 48;
++
+ /** One presentation contract for native classroom utilities and isolated games.
+  * Picture answers, draggable objects and visibility remain author-owned. */
+ export function classroomControlCss(target: 'native' | 'iframe' = 'native'): string {
+@@ -17,9 +19,9 @@ export function classroomControlCss(target: 'native' | 'iframe' = 'native'): str
+   const p = target === 'iframe' ? ' !important' : '';
+   return `
+ :root {
+-  --mira-classroom-secondary-size: 48px;
+-  --mira-classroom-primary-size: 48px;
+-  --mira-classroom-toolbar-size: 48px;
++  --mira-classroom-secondary-size: ${CLASSROOM_TOUCH_CONTROL_SIZE}px;
++  --mira-classroom-primary-size: ${CLASSROOM_TOUCH_CONTROL_SIZE}px;
++  --mira-classroom-toolbar-size: ${CLASSROOM_TOUCH_CONTROL_SIZE}px;
+   --mira-control-surface: var(--mira-orbit-panel, #fffbf3);
+   --mira-control-hover: var(--mira-orbit-raised, #f2eadb);
+   --mira-control-line: var(--mira-orbit-line, #ded4c2);
+@@ -121,9 +123,9 @@ ${control}:focus-visible { outline: 2px solid var(--mira-control-active)${p}; ou
+ }
+ @media (any-pointer: coarse) {
+   :root {
+-    --mira-classroom-secondary-size: 48px;
+-    --mira-classroom-primary-size: 48px;
+-    --mira-classroom-toolbar-size: 48px;
++    --mira-classroom-secondary-size: ${CLASSROOM_TOUCH_CONTROL_SIZE}px;
++    --mira-classroom-primary-size: ${CLASSROOM_TOUCH_CONTROL_SIZE}px;
++    --mira-classroom-toolbar-size: ${CLASSROOM_TOUCH_CONTROL_SIZE}px;
+   }
+ }
+ @media (prefers-reduced-motion: reduce) {
+diff --git a/tests/scene-renderers/student-activity-controls.test.ts b/tests/scene-renderers/student-activity-controls.test.ts
+new file mode 100644
+index 0000000..77d9844
+--- /dev/null
++++ b/tests/scene-renderers/student-activity-controls.test.ts
+@@ -0,0 +1,316 @@
++// @vitest-environment jsdom
++import { act, createElement, Fragment } from 'react';
++import { createRoot } from 'react-dom/client';
++import { afterEach, describe, expect, it, vi } from 'vitest';
++import { InteractiveIframeHost } from '@/components/scene-renderers/InteractiveIframeHost';
++import { InteractiveRenderer } from '@/components/scene-renderers/interactive-renderer';
++import {
++  injectStudentActivityControls,
++  planStudentActivityControls,
++  SHORT_LANDSCAPE_QUERY,
++  STUDENT_ACTIVITY_CONTROLS_MESSAGE,
++  studentActivityControlsKey,
++} from '@/lib/interactive/student-activity-controls';
++import { useInteractiveIframePool } from '@/lib/store/interactive-iframe-pool';
++import { useStageStore } from '@/lib/store/stage';
++import type { InteractiveContent, Scene, Stage } from '@/lib/types/stage';
++import { CLASSROOM_TOUCH_CONTROL_SIZE, classroomControlCss } from '@/lib/ui/classroom-controls';
++import { patchHtmlForIframe } from '@/lib/utils/iframe';
++
++vi.mock('@/lib/contexts/mira-student-runtime-context', () => ({
++  useMiraStudentRuntime: () => true,
++  useMiraStudentRuntimeEvents: () => null,
++}));
++vi.mock('@/lib/mira/student-interaction-bridge', () => ({
++  studentInteractionObjectives: () => [],
++  connectStudentInteractionFrame: vi.fn(),
++  STUDENT_INTERACTION_OBSERVER: '',
++}));
++vi.mock('@/lib/hooks/use-i18n', () => ({ useI18n: () => ({ t: (key: string) => key }) }));
++
++const stage = { id: 'tbpub_' + 'c'.repeat(24), fixedTextbook: true } as Stage & { fixedTextbook: boolean };
++const source = '<!doctype html><html><head></head><body><div id="cv"></div></body></html>';
++const binding = {
++  schemaVersion: 'mira.textbook.student-activity-controls.v1',
++  releaseSha256: 'a'.repeat(64),
++  contentSha256: 'b'.repeat(64),
++  template: 'sortingDepot',
++  version: 1,
++} as const;
++const game = {
++  id: 'interactive', stageId: stage.id, type: 'interactive', order: 0,
++  content: { type: 'interactive', html: source },
++  miraStudentActivityControls: binding,
++} as Scene;
++const key = studentActivityControlsKey(true, stage, game)!;
++const slot = { left: 8, top: 56, width: 623, height: 143 };
++const compactPlan = planStudentActivityControls(slot, slot)!;
++const rails = '[data-mira-student-activity-rails]';
++const targets = '[data-mira-student-activity-rail-button]';
++
++describe('Gateway binding and visible geometry', () => {
++  it('accepts the two exact approved template contracts', () => {
++    for (const template of ['sortingDepot', 'bubbleMaze'] as const) {
++      expect(studentActivityControlsKey(true, stage,
++        { ...game, miraStudentActivityControls: { ...binding, template } })).toMatch(new RegExp(template + ':1$'));
++    }
++    expect(SHORT_LANDSCAPE_QUERY).toBe('(max-width: 640px) and (max-height: 380px) and (orientation: landscape)');
++  });
++
++  it('requires the student fixed textbook and a complete scene with a valid binding', () => {
++    expect(studentActivityControlsKey(false, stage, game)).toBeUndefined();
++    expect(studentActivityControlsKey(true, { ...stage, fixedTextbook: false } as Stage, game)).toBeUndefined();
++    expect(studentActivityControlsKey(true, stage, { ...game, stageId: 'another-classroom' })).toBeUndefined();
++    expect(studentActivityControlsKey(true, { ...stage, id: 'direct-preview' },
++      { ...game, stageId: 'direct-preview' })).toBeUndefined();
++    expect(studentActivityControlsKey(true, stage, { ...game, miraActivity: { id: 'other', section: 'games' } })).toBeUndefined();
++    expect(studentActivityControlsKey(true, stage, { ...game, miraPageSummary: true })).toBeUndefined();
++    expect(studentActivityControlsKey(true, stage, { ...game, miraStudentActivityControls: undefined })).toBeUndefined();
++    const malformed = [
++      { releaseSha256: '0' }, { contentSha256: 7 }, { template: 'shutterScout' },
++      { schemaVersion: 'wrong' }, { version: 2 }, { unexpected: true },
++    ];
++    for (const value of malformed) {
++      expect(studentActivityControlsKey(true, stage, {
++        ...game, miraStudentActivityControls: { ...binding, ...value },
++      } as Scene)).toBeUndefined();
++    }
++    expect(injectStudentActivityControls(source, '</script>')).toBe(source);
++  });
++
++  it('keeps seven 48px targets outside the original canvas and inside the real clip', () => {
++    expect(compactPlan.buttons).toHaveLength(7);
++    expect(compactPlan.canvas).toEqual({ left: expect.any(Number), top: 0, width: expect.any(Number), height: 143 });
++    const size = CLASSROOM_TOUCH_CONTROL_SIZE;
++    expect(size).toBe(48);
++    const intersects = (a: { left: number; top: number }, b: { left: number; top: number }) =>
++      Math.abs(a.left - b.left) < size && Math.abs(a.top - b.top) < size;
++    for (const [index, rect] of compactPlan.buttons.entries()) {
++      expect(rect.top).toBeGreaterThanOrEqual(6);
++      expect(rect.top + size).toBeLessThanOrEqual(slot.height - 6);
++      expect(rect.left).toBeGreaterThanOrEqual(6);
++      expect(rect.left + size).toBeLessThanOrEqual(slot.width - 6);
++      expect(rect.left + size <= compactPlan.canvas.left
++        || rect.left >= compactPlan.canvas.left + compactPlan.canvas.width).toBe(true);
++      expect(compactPlan.buttons.slice(index + 1).some(other => intersects(rect, other))).toBe(false);
++    }
++    expect(planStudentActivityControls(slot, { ...slot, width: 570 })).toBeNull();
++    expect(planStudentActivityControls(slot, { ...slot, top: slot.top + 1 })).toBeNull();
++    expect(planStudentActivityControls({ ...slot, height: 260 }, { ...slot, height: 260 })).toBeNull();
++    expect(planStudentActivityControls({ ...slot, width: Infinity }, slot)).toBeNull();
++    expect(classroomControlCss('iframe')).toContain('--mira-classroom-secondary-size: 48px');
++  });
++});
++
++const shim = '[data-mira-student-activity-controls]';
++type Delivery = 'inline' | 'gateway-wrapper';
++const deliveries: Delivery[] = ['inline', 'gateway-wrapper'];
++
++function deliveredHtml(mode: Delivery, html = source) {
++  if (mode === 'inline') return html;
++  const page = JSON.stringify(html).replace(/</g, '\\u003c');
++  return '<!doctype html><html><head><meta charset="utf-8"></head><body><script>'
++    + '(function(){const assets=[];let page=' + page + ';'
++    + 'for(const asset of assets){const binary=atob(asset.base64);const bytes=new Uint8Array(binary.length);'
++    + 'for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);'
++    + 'const url=URL.createObjectURL(new Blob([bytes],{type:asset.mimeType}));page=page.split(asset.path).join(url);}'
++    + 'document.open();document.write(page);document.close();})();</script></body></html>';
++}
++
++function activityDocument(mode: Delivery, html: string): Document {
++  const parse = (input: string) => new DOMParser().parseFromString(input, 'text/html');
++  const outer = parse(html);
++  if (mode === 'inline') return outer;
++  expect(outer.querySelector(shim)).toBeNull();
++  let content = '';
++  const write = vi.fn((value: string) => { content = value; });
++  const transport = { open: vi.fn(), write, close: vi.fn() };
++  const script = outer.body.querySelector('script')!;
++  new Function('document', script.textContent!)(transport);
++  expect(transport.open).toHaveBeenCalledOnce();
++  expect(write).toHaveBeenCalledOnce();
++  expect(transport.close).toHaveBeenCalledOnce();
++  return parse(content);
++}
++
++function childFixture(mode: Delivery = 'inline') {
++  const doc = document.implementation.createHTMLDocument();
++  const buttons = ['left', 'right', 'up', 'down', 'action']
++    .map(name => '<button class="arc-key" data-arc-input="' + name + '"></button>').join('');
++  doc.body.innerHTML = '<div id="cv" class="classic-arcade"><canvas></canvas><div class="arc-controls" hidden>'
++    + '<button class="arc-key arc-music" aria-pressed="true" style="color:red"></button>'
++    + '<button class="arc-key arc-voice" hidden disabled></button><div class="arc-pad">' + buttons + '</div>'
++    + '</div><div id="unchanged"></div></div>';
++  const delivered = deliveredHtml(mode);
++  const actual = activityDocument(mode, patchHtmlForIframe(injectStudentActivityControls(delivered, key)));
++  expect(actual.querySelectorAll('style' + shim)).toHaveLength(1);
++  expect(actual.querySelectorAll('script' + shim)).toHaveLength(1);
++  doc.head.innerHTML = actual.head.innerHTML;
++  const script = doc.head.querySelector('script[data-mira-student-activity-controls]')!;
++  const canvas = doc.querySelector<HTMLDivElement>('#cv')!;
++  const bar = doc.querySelector<HTMLDivElement>('.arc-controls')!;
++  const originals = [...bar.querySelectorAll<HTMLButtonElement>('button')];
++  const other = doc.querySelector('#unchanged')!;
++  let bounds = compactPlan.canvas;
++  canvas.getBoundingClientRect = () => DOMRect.fromRect({
++    x: bounds.left, y: bounds.top, width: bounds.width, height: bounds.height,
++  });
++  let frame: (() => void) | undefined;
++  const parent = {};
++  const callbacks = new Map<string, (event: unknown) => void>();
++  const child = {
++    parent,
++    requestAnimationFrame(callback: () => void) { frame = callback; return 1; },
++    cancelAnimationFrame() { frame = undefined; },
++    addEventListener(name: string, listener: (event: unknown) => void) { callbacks.set(name, listener); },
++  };
++  new Function('window', 'document', script.textContent!)(child, doc);
++  return { doc, canvas, bar, originals, other,
++    send(plan: typeof compactPlan | null, options = {}) {
++      callbacks.get('message')!({
++        source: parent, isTrusted: true, data: { type: STUDENT_ACTIVITY_CONTROLS_MESSAGE, key, plan }, ...options,
++      });
++      const pending = frame;
++      frame = undefined;
++      pending?.();
++    },
++    setBounds(next: typeof compactPlan.canvas) { bounds = next; },
++  };
++}
++
++describe('isolated document reuses the real controls', () => {
++  it.each(deliveries)('keeps native handlers and restores the same DOM for %s delivery', mode => {
++    const { doc, bar, canvas, originals, other, send } = childFixture(mode);
++    const click = vi.fn();
++    originals[0].addEventListener('click', click);
++    const attributes = (button: HTMLButtonElement) => [...button.attributes]
++      .filter(attr => attr.name !== 'style').map(attr => [attr.name, attr.value]);
++    const originalAttrs = originals.map(attributes);
++    send(compactPlan);
++    expect(bar.parentElement).toBe(doc.body);
++    expect([...bar.querySelectorAll(targets)]).toEqual(originals);
++    expect(bar.hidden).toBe(true);
++    expect(originals[1].hidden && originals[1].disabled).toBe(true);
++    expect(originals[0].getAttribute('aria-pressed')).toBe('true');
++    expect(originals[0].getAttribute('data-mira-activity-control')).toBe('secondary');
++    bar.hidden = false;
++    originals[0].click();
++    expect(click).toHaveBeenCalledOnce();
++    send(compactPlan);
++    expect(doc.querySelectorAll(rails)).toHaveLength(1);
++    send(null);
++    expect(bar.parentElement).toBe(canvas);
++    expect(bar.nextElementSibling).toBe(other);
++    expect(bar.hidden).toBe(false);
++    expect(originals.map(attributes)).toEqual(originalAttrs);
++    expect(originals[0].style.color).toBe('red');
++    expect(originals.every(button => !button.style.getPropertyValue('--mira-student-activity-button-left'))).toBe(true);
++    expect(originals.slice(1).every(button => !button.hasAttribute('style'))).toBe(true);
++    originals[0].click();
++    expect(click).toHaveBeenCalledTimes(2);
++  });
++
++  it('rejects stale or synthetic plans, an unexpected key set, and mismatched child bounds', () => {
++    const { canvas, bar, originals, send, setBounds } = childFixture();
++    send(compactPlan, { source: {} });
++    send(compactPlan, { isTrusted: false });
++    send(compactPlan, { data: { type: STUDENT_ACTIVITY_CONTROLS_MESSAGE, key: 'old', plan: compactPlan } });
++    expect(bar.parentElement).toBe(canvas);
++    setBounds({ ...compactPlan.canvas, top: 3 });
++    send(compactPlan);
++    expect(bar.parentElement).toBe(canvas);
++    setBounds(compactPlan.canvas);
++    originals[6].setAttribute('data-arc-input', 'shutter');
++    send(compactPlan);
++    expect(bar.parentElement).toBe(canvas);
++    expect(bar.querySelectorAll(targets)).toHaveLength(0);
++  });
++});
++
++describe('real renderer and host use the same delivered scene', () => {
++  let root: ReturnType<typeof createRoot> | undefined;
++  afterEach(async () => {
++    await act(async () => root?.unmount());
++    root = undefined;
++    document.body.replaceChildren();
++    useInteractiveIframePool.getState().reset();
++    useStageStore.setState({ stage: null, scenes: [], currentSceneId: null });
++    vi.restoreAllMocks();
++    vi.unstubAllGlobals();
++  });
++
++  async function setup(scene: Scene) {
++    vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true);
++    vi.stubGlobal('innerWidth', 640);
++    vi.stubGlobal('innerHeight', 360);
++    let compact = true;
++    const listeners = new Set<() => void>();
++    vi.stubGlobal('matchMedia', () => ({
++      get matches() { return compact; },
++      addEventListener: (_event: string, listener: () => void) => listeners.add(listener),
++      removeEventListener: (_event: string, listener: () => void) => listeners.delete(listener),
++    }));
++    const send = vi.fn();
++    vi.spyOn(HTMLIFrameElement.prototype, 'contentWindow', 'get').mockReturnValue({ postMessage: send } as unknown as Window);
++    useStageStore.setState({ stage, scenes: [scene], currentSceneId: scene.id });
++    const element = document.createElement('div');
++    document.body.appendChild(element);
++    root = createRoot(element);
++    await act(async () => root!.render(createElement(Fragment, null,
++      createElement(InteractiveRenderer, { sceneId: scene.id, content: scene.content as InteractiveContent }),
++      createElement<{ container: HTMLElement }>(InteractiveIframeHost, { container: element }),
++    )));
++    await act(async () => useInteractiveIframePool.getState().setRect(scene.id, slot));
++    return { send, frame: element.querySelector('iframe')!,
++      async wide() {
++        compact = false;
++        await act(async () => listeners.forEach(listener => listener()));
++      },
++    };
++  }
++
++  it('uses an unscaled iframe on a regular 640 viewport and keeps the same iframe on exit', async () => {
++    const { send, frame, wide } = await setup(game);
++    const originalSrc = frame.getAttribute('srcdoc');
++    expect(originalSrc).toContain('data-mira-student-activity-controls');
++    expect(frame.style.width).toBe('623px');
++    expect(frame.style.transform).toBe('none');
++    expect(frame.getAttribute('data-mira-student-activity-layout')).toBe('side-rails');
++    expect(send).toHaveBeenCalledWith({ type: STUDENT_ACTIVITY_CONTROLS_MESSAGE, key, plan: compactPlan }, '*');
++    await wide();
++    expect(document.querySelector('iframe')).toBe(frame);
++    expect(frame.getAttribute('srcdoc')).toBe(originalSrc);
++    expect(frame.style.width).toBe('1280px');
++    expect(frame.style.transform).toMatch(/^scale\(/);
++    expect(frame.getAttribute('data-mira-student-activity-layout')).toBeNull();
++    const layouts = send.mock.calls.filter(([data]) => data.type === STUDENT_ACTIVITY_CONTROLS_MESSAGE);
++    expect(layouts.at(-1)).toEqual([{ type: STUDENT_ACTIVITY_CONTROLS_MESSAGE, key, plan: null }, '*']);
++  });
++
++  it('deactivates the outgoing scene without replacing its source document', async () => {
++    const { send, frame } = await setup(game);
++    const originalSrc = frame.getAttribute('srcdoc');
++    await act(async () => useStageStore.setState({ currentSceneId: 'another-scene' }));
++    expect(document.querySelector('iframe')).toBe(frame);
++    expect(frame.getAttribute('srcdoc')).toBe(originalSrc);
++    expect(frame.getAttribute('data-mira-student-activity-layout')).toBeNull();
++    expect(send).toHaveBeenCalledWith({ type: STUDENT_ACTIVITY_CONTROLS_MESSAGE, key, plan: null }, '*');
++  });
++
++  it('passes the original Gateway wrapper to the adapter before generic iframe patches', async () => {
++    const scene = { ...game, content: { type: 'interactive', html: deliveredHtml('gateway-wrapper') } } as Scene;
++    const { frame } = await setup(scene);
++    const inner = activityDocument('gateway-wrapper', frame.getAttribute('srcdoc')!);
++    expect(inner.querySelectorAll('style' + shim)).toHaveLength(1);
++    expect(inner.querySelectorAll('script' + shim)).toHaveLength(1);
++  });
++
++  it.each(deliveries)('leaves an unbound %s document on its original viewport', async mode => {
++    const scene = { ...game, content: { type: 'interactive', html: deliveredHtml(mode) },
++      miraStudentActivityControls: undefined } as Scene;
++    const { send, frame } = await setup(scene);
++    expect(activityDocument(mode, frame.getAttribute('srcdoc')!).querySelector(shim)).toBeNull();
++    expect(frame.style.width).toBe('1280px');
++    expect(send.mock.calls.some(([data]) => data.type === STUDENT_ACTIVITY_CONTROLS_MESSAGE)).toBe(false);
++  });
++});

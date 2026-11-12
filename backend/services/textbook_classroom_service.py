@@ -13,6 +13,8 @@ from zoneinfo import ZoneInfo
 from itsdangerous import BadSignature, URLSafeTimedSerializer
 
 from content.textbook_catalog import canonical, digest, lesson_by_id
+from content.courseware_observation import project_snapshot, scene_card
+from content.student_activity_controls import FIELD as STUDENT_ACTIVITY_CONTROLS
 from content import textbook_journey as textbook_activity
 from services.textbook_journey_service import sync_journey
 from content.textbook_classroom import classroom_roster, discussion_request, INTERACTION_PATHS
@@ -238,13 +240,16 @@ class TextbookClassroomService:
             **({'entry': data['entry']} if 'entry' in data else {})}
 
     def validate(self, token):
-        data, _, _, release, _, session = self._authority(token)
+        data, _, build, release, _, session = self._authority(token)
         if int(data.get('expiresAt', 0)) <= now_ms():
             raise ApiError('textbook_session_invalid', '请重新进入课堂', 401)
         result = {'ok': True, 'purpose': 'fixed_textbook', 'classroomId': release['classroomId'],
             'runtimeSessionId': session['id'], 'learningSessionId': session['id'], 'expiresAt': data['expiresAt'],
             'media': release['media'], 'releaseSha256': release['sha256'],
             'activityPersistence': activity_state.descriptors(release)}
+        controls = release.get(STUDENT_ACTIVITY_CONTROLS)
+        if controls and self.repository.parse(build['input_json']).get('schemaVersion') == INPUT_SCHEMA:
+            result[STUDENT_ACTIVITY_CONTROLS] = deepcopy(controls)
         if 'entry' in data:
             result['entry'] = data['entry']
             plan = sections.plan_for(data['key'], release['sha256'])
@@ -252,6 +257,11 @@ class TextbookClassroomService:
             indexes = {scene['id']: index for index, scene in enumerate(scenes)}
             result['activityPersistence'] = [{**item, 'sceneIndex': indexes[item['sceneId']]}
                 for item in result['activityPersistence'] if item['sceneId'] in indexes]
+            if STUDENT_ACTIVITY_CONTROLS in result:
+                descriptor = result[STUDENT_ACTIVITY_CONTROLS]
+                descriptor['scenes'] = [item for item in descriptor['scenes'] if item['sceneId'] in indexes]
+                if not descriptor['scenes']:
+                    del result[STUDENT_ACTIVITY_CONTROLS]
         if release.get('interactionCompletionContract'):
             contract = course_interaction.validate_contract(release)
             result['courseInteraction'] = {'schemaVersion': course_interaction.OP_SCHEMA,
@@ -512,6 +522,14 @@ class TextbookClassroomService:
             result, changed = activity_state.exchange(progress, session_id=session['id'],
                 release=release, definitions=definitions, data=data)
             if changed:
+                scene = next(scene for scene in textbook_activity.ordered_scenes(release)
+                             if scene['id'] == data['sceneId'])
+                card = scene_card(scene)
+                if card is not None:
+                    try:
+                        project_snapshot(card, scene['id'], result['activity']['state'])
+                    except ValueError:
+                        activity_state.invalid('模拟观察结果不符合本课记录卡')
                 conn.execute('UPDATE learning_sessions SET runtime_state_json=?,updated_at=? WHERE id=?',
                     (canonical(progress), now_ms(), session['id']))
             if local_indexes is not None:

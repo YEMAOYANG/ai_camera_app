@@ -1,0 +1,973 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "图形的拼组",
+  "description": "在纸花房里比边长、换摆法、检查外轮廓。用同样的纸片拼出不同图形。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小数老师",
+      "role": "teacher",
+      "gender": "male",
+      "voice": "Ethan",
+      "avatar": "/avatars/teacher-1.png",
+      "color": "#286956",
+      "persona": "陪孩子看见边与接缝，给时间试摆，再说清外形为什么会变。"
+    }
+  },
+  "images": {
+    "bench-scene": {
+      "file": "assets/bench-scene.png"
+    },
+    "bridge-bank": {
+      "file": "assets/bridge-bank.png"
+    },
+    "bridge-preview": {
+      "file": "assets/bridge-preview.png"
+    },
+    "compare-rectangle-pairs": {
+      "file": "assets/compare-rectangle-pairs.png"
+    },
+    "edge-check": {
+      "file": "assets/edge-check.png"
+    },
+    "filled-diag": {
+      "file": "assets/filled-diag.png"
+    },
+    "filled-equi": {
+      "file": "assets/filled-equi.png"
+    },
+    "filled-narrow": {
+      "file": "assets/filled-narrow.png"
+    },
+    "filled-peaked": {
+      "file": "assets/filled-peaked.png"
+    },
+    "filled-slant": {
+      "file": "assets/filled-slant.png"
+    },
+    "filled-small": {
+      "file": "assets/filled-small.png"
+    },
+    "filled-wide": {
+      "file": "assets/filled-wide.png"
+    },
+    "fold-diagonal": {
+      "file": "assets/fold-diagonal.png"
+    },
+    "fold-middle": {
+      "file": "assets/fold-middle.png"
+    },
+    "four-squares": {
+      "file": "assets/four-squares.png"
+    },
+    "gap-diag": {
+      "file": "assets/gap-diag.png"
+    },
+    "gap-equi": {
+      "file": "assets/gap-equi.png"
+    },
+    "gap-narrow": {
+      "file": "assets/gap-narrow.png"
+    },
+    "gap-peaked": {
+      "file": "assets/gap-peaked.png"
+    },
+    "gap-slant": {
+      "file": "assets/gap-slant.png"
+    },
+    "gap-small": {
+      "file": "assets/gap-small.png"
+    },
+    "gap-wide": {
+      "file": "assets/gap-wide.png"
+    },
+    "marble-preview": {
+      "file": "assets/marble-preview.png"
+    },
+    "more-pieces": {
+      "file": "assets/more-pieces.png"
+    },
+    "mosaic-scene": {
+      "file": "assets/mosaic-scene.png"
+    },
+    "paper-table": {
+      "file": "assets/paper-table.png"
+    },
+    "petal-sticker": {
+      "file": "assets/petal-sticker.png"
+    },
+    "piece-diag": {
+      "file": "assets/piece-diag.png"
+    },
+    "piece-equi": {
+      "file": "assets/piece-equi.png"
+    },
+    "piece-narrow": {
+      "file": "assets/piece-narrow.png"
+    },
+    "piece-peaked": {
+      "file": "assets/piece-peaked.png"
+    },
+    "piece-slant": {
+      "file": "assets/piece-slant.png"
+    },
+    "piece-small": {
+      "file": "assets/piece-small.png"
+    },
+    "piece-wide": {
+      "file": "assets/piece-wide.png"
+    },
+    "q-circle-fit": {
+      "file": "assets/q-circle-fit.png"
+    },
+    "q-circle-plan": {
+      "file": "assets/q-circle-plan.png"
+    },
+    "q-circle-rectangle": {
+      "file": "assets/q-circle-rectangle.png"
+    },
+    "q-circle-small": {
+      "file": "assets/q-circle-small.png"
+    },
+    "q-diag-fit": {
+      "file": "assets/q-diag-fit.png"
+    },
+    "q-diag-narrow": {
+      "file": "assets/q-diag-narrow.png"
+    },
+    "q-diag-plan": {
+      "file": "assets/q-diag-plan.png"
+    },
+    "q-diag-small": {
+      "file": "assets/q-diag-small.png"
+    },
+    "q-fold-plan": {
+      "file": "assets/q-fold-plan.png"
+    },
+    "q-fold-rectangles": {
+      "file": "assets/q-fold-rectangles.png"
+    },
+    "q-fold-squares": {
+      "file": "assets/q-fold-squares.png"
+    },
+    "q-fold-triangles": {
+      "file": "assets/q-fold-triangles.png"
+    },
+    "q-four-line": {
+      "file": "assets/q-four-line.png"
+    },
+    "q-four-square": {
+      "file": "assets/q-four-square.png"
+    },
+    "q-four-step": {
+      "file": "assets/q-four-step.png"
+    },
+    "q-rect-a": {
+      "file": "assets/q-rect-a.png"
+    },
+    "q-rect-b": {
+      "file": "assets/q-rect-b.png"
+    },
+    "q-rect-c": {
+      "file": "assets/q-rect-c.png"
+    },
+    "q-squares-aligned": {
+      "file": "assets/q-squares-aligned.png"
+    },
+    "q-squares-corner": {
+      "file": "assets/q-squares-corner.png"
+    },
+    "q-squares-overlap": {
+      "file": "assets/q-squares-overlap.png"
+    },
+    "rabbit-hop": {
+      "file": "assets/rabbit-hop.png"
+    },
+    "rabbit-ready": {
+      "file": "assets/rabbit-ready.png"
+    },
+    "triangles-slanted": {
+      "file": "assets/triangles-slanted.png"
+    },
+    "triangles-two-ways": {
+      "file": "assets/triangles-two-ways.png"
+    },
+    "two-rectangles": {
+      "file": "assets/two-rectangles.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "workbench",
+      "type": "slide",
+      "title": "两张纸片怎样贴在一起",
+      "template": "two-columns",
+      "data": {
+        "title": "两张纸片怎样贴在一起",
+        "left": {
+          "heading": "纸花房开工",
+          "body": "帮小禾和小满拼一块窗贴。"
+        },
+        "right": {
+          "heading": "三种摆法",
+          "body": "顺着外边走一圈。"
+        },
+        "left_picture": "bench-scene",
+        "right_picture": "edge-check"
+      },
+      "script": [
+        {
+          "say": "花房要换一块窗贴。小禾只有两张一样大的方纸片。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "要变成一张长条窗贴，你会怎么摆？"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "看最左边，只碰到一个角。两条边还没有贴上。"
+        },
+        {
+          "say": "再看中间。一张压在另一张上，外边线会凸出来。"
+        },
+        {
+          "say": "右边这组让两条一样长的整边贴合。纸片各在一边。"
+        },
+        {
+          "say": "用手指沿外边走一圈。横着两片长，竖着一片长，是长方形。"
+        },
+        {
+          "say": "碰到的地方可以变。我们试试换一条边。"
+        }
+      ]
+    },
+    {
+      "key": "rectangle-pairs",
+      "type": "slide",
+      "title": "同样的长方形换摆法",
+      "template": "two-columns",
+      "data": {
+        "title": "同样的长方形换摆法",
+        "left": {
+          "heading": "同一对纸片",
+          "body": "换一条边贴，外形会变。"
+        },
+        "right": {
+          "heading": "两对尺寸不同",
+          "body": "拼完再比外边长短。"
+        },
+        "left_picture": "two-rectangles",
+        "right_picture": "compare-rectangle-pairs"
+      },
+      "script": [
+        {
+          "say": "小禾换了两张长方形纸片。它们能拼成什么？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "两条短边贴上，外面变成细细长长的一条。"
+        },
+        {
+          "say": "换长边贴。每片两格长、一格宽，两片宽合成两格。"
+        },
+        {
+          "say": "四条外边刚好一样长，拼成了一个正方形。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "另一对每片三格长、一格宽。长边贴上以后，一边还是三格。"
+        },
+        {
+          "say": "另一边只有两格，外形还是长方形。拼完用手比比四条边。"
+        },
+        {
+          "say": "我们用这招去修纸花桥。"
+        },
+        {
+          "say": "看桥面少哪几格。把纸片移过去，转好再放下。"
+        },
+        {
+          "say": "先看看空位占几格。"
+        },
+        {
+          "say": "长边、短边都对好。要转方向，可以点转动键。"
+        },
+        {
+          "say": "边都贴齐了，纸片补进了桥面。"
+        }
+      ]
+    },
+    {
+      "key": "replace-the-tile",
+      "type": "interactive",
+      "title": "拼好纸花桥的空位",
+      "widgetType": "courseware_game",
+      "page": "replace-the-tile",
+      "startImage": "bridge-preview",
+      "script": [
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "say": "小兔要过纸花桥。桥上少了两块，你先看看掉下来那块。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "这块横着占两格，和长条一样。"
+        },
+        {
+          "highlight": "#bridge-demo-slot"
+        },
+        {
+          "say": "桥上这个空位也横着占两格。边和角能对齐。"
+        },
+        {
+          "highlight": "#bridge-spin"
+        },
+        {
+          "say": "要换朝向，点转动键。这张已经横着，先直接移。"
+        },
+        {
+          "highlight": "#bridge-drop"
+        },
+        {
+          "say": "移到空位正上方，点落下。老师只示范这一次。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "纸片刚好盖住空位，两边都没有露出。"
+        },
+        {
+          "say": "到你啦。先比边长，再决定要不要转。最后落到空位上。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "bridge-goal": "rectangle-pairs-10",
+        "bridge-hint": "rectangle-pairs-11",
+        "bridge-help": "rectangle-pairs-12",
+        "bridge-praise": "rectangle-pairs-13"
+      }
+    },
+    {
+      "key": "triangle-seams",
+      "type": "slide",
+      "title": "三角纸片也能换一条边",
+      "template": "two-columns",
+      "data": {
+        "title": "三角纸片也能换一条边",
+        "left": {
+          "heading": "同一对两种摆法",
+          "body": "贴斜边，或者贴一条直角边。"
+        },
+        "right": {
+          "heading": "另两张同样的纸片",
+          "body": "换一下朝向，贴好一样长的边。"
+        },
+        "left_picture": "triangles-two-ways",
+        "right_picture": "triangles-slanted"
+      },
+      "script": [
+        {
+          "say": "换两张一样大的三角片。它们会变成正方形吗？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "先把最长的两条斜边对齐。看外面，四条边一样长。"
+        },
+        {
+          "say": "还是这两张片。换两条短边相接，这次外面只有三条边。"
+        },
+        {
+          "say": "你可以指着图比一比。中间那条是接缝，算外形时沿外边走。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "再看另一对三角片。转一张，把一样长的斜边贴上。"
+        },
+        {
+          "say": "上边和下边平行，左边和右边也平行。"
+        },
+        {
+          "say": "外轮廓是平行四边形。"
+        },
+        {
+          "say": "每次先想要接哪条边。拼完再看看外形，可能和你原来想的不一样。"
+        }
+      ]
+    },
+    {
+      "key": "four-pieces",
+      "type": "slide",
+      "title": "还是这四张，换个排法",
+      "template": "picture-points",
+      "data": {
+        "title": "还是这四张，换个排法",
+        "picture": "four-squares",
+        "points": [
+          "一排四张",
+          "两排两列",
+          "看看轮廓"
+        ]
+      },
+      "script": [
+        {
+          "say": "桌上有四张一样大的方纸片。全用上，能拼出几种样子？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "我先把纸片一张挨一张，边贴边。你数数，一共用了四张。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "排成一条，横着四片长，竖着一片长。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "把右边两张移到下面。每排两张，刚好两排。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "现在横竖都两片长，外形是一个正方形。"
+        },
+        {
+          "say": "纸片还是那四张。变的是摆放的位置和外边线。"
+        }
+      ]
+    },
+    {
+      "key": "many-paper-pieces",
+      "type": "slide",
+      "title": "把同样的纸片摆出新图",
+      "template": "picture-points",
+      "data": {
+        "title": "把同样的纸片摆出新图",
+        "picture": "more-pieces",
+        "points": [
+          "四张三角片",
+          "六张小方片",
+          "留一份自己的摆法"
+        ]
+      },
+      "script": [
+        {
+          "say": "加几张纸片，花房还能多做什么图样？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "先看左边。大的三角形里还能看见四张小的。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "三张小三角形围住中间。中间那张倒过来，正好补满。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "右边用的是六张小方片。上面三张，下面三张。"
+        },
+        {
+          "say": "小方片还可以排成一长条。都用六张，外形长短就不同。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "你手里有几张？先试一种，再留一张图记下另一种。"
+        }
+      ]
+    },
+    {
+      "key": "fold-and-check",
+      "type": "slide",
+      "title": "猜一猜，剪开是两块什么",
+      "template": "two-columns",
+      "data": {
+        "title": "猜一猜，剪开是两块什么",
+        "left": {
+          "heading": "从边中间折",
+          "body": "两条对边的中点连起来。"
+        },
+        "right": {
+          "heading": "从两个角折",
+          "body": "连到对面的那个角。"
+        },
+        "left_picture": "fold-middle",
+        "right_picture": "fold-diagonal"
+      },
+      "script": [
+        {
+          "say": "小禾只有一张正方形纸。怎么分成两个同样的纸片？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "把左边和右边合上。折痕连着上边中间和下边中间。"
+        },
+        {
+          "say": "沿折痕分开，得到两个同样的长方形。叠上去，边能重合。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "这次让折痕连着斜对的两个角。猜一猜，会分出哪两片？"
+        },
+        {
+          "say": "沿这条折痕分开，得到两个同样的三角形。"
+        },
+        {
+          "say": "把两片叠起来比一比，再沿刚才的斜边拼回去。"
+        },
+        {
+          "say": "在家请大人沿折痕剪。你可以摆一摆，核对有没有拼回方形。"
+        },
+        {
+          "say": "折开又能拼回，正好能用来找缺口。听听接下来怎么做。"
+        },
+        {
+          "say": "先看手里的纸片，再找一样大小、同方向的虚线空位。"
+        },
+        {
+          "say": "先看手里的纸片，再看虚线。"
+        },
+        {
+          "say": "比一比边长和斜边朝向，再慢慢瞄准。"
+        },
+        {
+          "say": "纸片把空位正好补满了！"
+        },
+        {
+          "say": "这回是短纸条。看看哪个空位和它一样长。"
+        },
+        {
+          "say": "换一张长纸条。看清边长，再瞄准。"
+        },
+        {
+          "say": "这个三角片大一些。找斜边和角都贴合的空位。"
+        },
+        {
+          "say": "换小一些的三角片。找和它同样大的空位。"
+        },
+        {
+          "say": "看斜边朝哪边。找能补成大三角形的空位。"
+        },
+        {
+          "say": "看这张斜纸片。沿着同样长的斜边对一对。"
+        },
+        {
+          "say": "这一张尖尖朝下。找能填满中间的空位。"
+        }
+      ]
+    },
+    {
+      "key": "matching-missing-piece",
+      "type": "interactive",
+      "title": "弹珠送纸片补图",
+      "widgetType": "courseware_game",
+      "page": "matching-missing-piece",
+      "startImage": "marble-preview",
+      "script": [
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "say": "小满拿到一张纸条。哪一个空位能让它刚好贴进去？"
+        },
+        {
+          "highlight": "#marble-piece-view"
+        },
+        {
+          "say": "先看左下角放大的纸片。它是短的长方形。"
+        },
+        {
+          "highlight": "#marble-demo-gap"
+        },
+        {
+          "say": "这个虚线空位的长边和短边都和它一样。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "用左箭头转一下弹珠，让它朝这个空位。"
+        },
+        {
+          "highlight": "#marble-launch"
+        },
+        {
+          "say": "对准了，点发射。老师只送这一张。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "看弹珠沿着线过去，纸片刚好填满。"
+        },
+        {
+          "highlight": "#marble-finished-view"
+        },
+        {
+          "say": "右边留下刚拼好的图形。外边一圈都接上了。"
+        },
+        {
+          "say": "换你。照画面的方向比边长，对准再送出。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "marble-goal": "fold-and-check-11",
+        "marble-hint": "fold-and-check-12",
+        "marble-help": "fold-and-check-13",
+        "marble-praise": "fold-and-check-14",
+        "width-one": "fold-and-check-15",
+        "width-two": "fold-and-check-16",
+        "half-large": "fold-and-check-17",
+        "half-small": "fold-and-check-18",
+        "peak": "fold-and-check-19",
+        "slope": "fold-and-check-20",
+        "center": "fold-and-check-21"
+      }
+    },
+    {
+      "key": "picture-check",
+      "type": "quiz",
+      "title": "听一听，选拼法",
+      "intro": [
+        "听完老师的话再选图。想重听，就点喇叭。",
+        "虚线表示想拼出的轮廓，想想怎样补满。"
+      ],
+      "questions": [
+        {
+          "id": "two-squares",
+          "question": "两块方片一样大。哪幅摆法整边贴合？",
+          "skill": "对齐两条同样长的整边",
+          "answer": [
+            "b"
+          ],
+          "analysis": "两片上下紧贴，共用一条完整的边。只碰角或互相盖住，都不是这道题的拼法。",
+          "options": {
+            "a": {
+              "label": "两张方片只有一个角相碰",
+              "visual": {
+                "kind": "asset",
+                "image": "q-squares-corner",
+                "alt": "两张方片只有一个角相碰"
+              }
+            },
+            "b": {
+              "label": "两张方片上下齐边贴合",
+              "visual": {
+                "kind": "asset",
+                "image": "q-squares-aligned",
+                "alt": "两张方片上下齐边贴合"
+              }
+            },
+            "c": {
+              "label": "两张方片重叠一部分",
+              "visual": {
+                "kind": "asset",
+                "image": "q-squares-overlap",
+                "alt": "两张方片重叠一部分"
+              }
+            }
+          }
+        },
+        {
+          "id": "which-rectangles",
+          "question": "哪一对长方形沿长边贴合会变成正方形？",
+          "skill": "用边长判断外轮廓",
+          "answer": [
+            "a"
+          ],
+          "analysis": "两条一格宽的短边合起来，与两格的长边一样长。其余两对拼完后两种边的长短不同。",
+          "options": {
+            "a": {
+              "label": "两张两格长一格宽的纸片",
+              "visual": {
+                "kind": "asset",
+                "image": "q-rect-a",
+                "alt": "两张两格长一格宽的纸片"
+              }
+            },
+            "b": {
+              "label": "两张两格半长一格宽的纸片",
+              "visual": {
+                "kind": "asset",
+                "image": "q-rect-b",
+                "alt": "两张两格半长一格宽的纸片"
+              }
+            },
+            "c": {
+              "label": "两张三格长一格宽的纸片",
+              "visual": {
+                "kind": "asset",
+                "image": "q-rect-c",
+                "alt": "两张三格长一格宽的纸片"
+              }
+            }
+          }
+        },
+        {
+          "id": "two-triangles",
+          "question": "把图中的正方形补全。哪张三角片大小正合？",
+          "skill": "按斜边和外轮廓反找零件",
+          "answer": [
+            "c"
+          ],
+          "analysis": "缺口是正方形沿对角线分出的一半。第三张和已有三角片一样大，补好四个角。",
+          "options": {
+            "a": {
+              "label": "同方向但明显较小的三角片",
+              "visual": {
+                "kind": "asset",
+                "image": "q-diag-small",
+                "alt": "同方向但明显较小的三角片"
+              }
+            },
+            "b": {
+              "label": "底边短于空位的较窄三角片",
+              "visual": {
+                "kind": "asset",
+                "image": "q-diag-narrow",
+                "alt": "底边短于空位的较窄三角片"
+              }
+            },
+            "c": {
+              "label": "和空位尺寸相同的三角片",
+              "visual": {
+                "kind": "asset",
+                "image": "q-diag-fit",
+                "alt": "和空位尺寸相同的三角片"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "q-diag-plan",
+            "alt": "虚线正方形里已有左上半片"
+          }
+        },
+        {
+          "id": "rearrange-four",
+          "question": "四张一样大的方纸片，哪组外形是正方形？",
+          "skill": "用同样四块检验外轮廓",
+          "answer": [
+            "b"
+          ],
+          "analysis": "两行两列时，横着和竖着都一样长。其他摆法也用四张，但外边形状不同。",
+          "options": {
+            "a": {
+              "label": "四张排成一条",
+              "visual": {
+                "kind": "asset",
+                "image": "q-four-line",
+                "alt": "四张排成一条"
+              }
+            },
+            "b": {
+              "label": "两行两列，外边四边一样长",
+              "visual": {
+                "kind": "asset",
+                "image": "q-four-square",
+                "alt": "两行两列，外边四边一样长"
+              }
+            },
+            "c": {
+              "label": "两排错开一格形成台阶",
+              "visual": {
+                "kind": "asset",
+                "image": "q-four-step",
+                "alt": "两排错开一格形成台阶"
+              }
+            }
+          }
+        },
+        {
+          "id": "cut-square",
+          "question": "沿图中两个对角的线分开，得到哪一组？",
+          "skill": "根据对角折线预测两半",
+          "answer": [
+            "c"
+          ],
+          "analysis": "沿对角线，正方形被分成两个同样的三角形。把斜边贴起来可拼回原形。",
+          "options": {
+            "a": {
+              "label": "两片同样的长方形",
+              "visual": {
+                "kind": "asset",
+                "image": "q-fold-rectangles",
+                "alt": "两片同样的长方形"
+              }
+            },
+            "b": {
+              "label": "两片同样的正方形",
+              "visual": {
+                "kind": "asset",
+                "image": "q-fold-squares",
+                "alt": "两片同样的正方形"
+              }
+            },
+            "c": {
+              "label": "两片同样的三角形",
+              "visual": {
+                "kind": "asset",
+                "image": "q-fold-triangles",
+                "alt": "两片同样的三角形"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "q-fold-plan",
+            "alt": "正方形的左下角与右上角用虚线连接"
+          }
+        },
+        {
+          "id": "complement-curve",
+          "question": "纸灯的圆形缺一半。选正好补齐的一块。",
+          "skill": "根据目标的弯边和直边找零件",
+          "answer": [
+            "a"
+          ],
+          "analysis": "两片半圆的直边要一样长。平齐贴上，两道弯边围成一个圆。小半圆会露空，长方形的外边是直的。",
+          "options": {
+            "a": {
+              "label": "正好与空位同样大的右半圆",
+              "visual": {
+                "kind": "asset",
+                "image": "q-circle-fit",
+                "alt": "正好与空位同样大的右半圆"
+              }
+            },
+            "b": {
+              "label": "较小的右半圆",
+              "visual": {
+                "kind": "asset",
+                "image": "q-circle-small",
+                "alt": "较小的右半圆"
+              }
+            },
+            "c": {
+              "label": "长方形纸片",
+              "visual": {
+                "kind": "asset",
+                "image": "q-circle-rectangle",
+                "alt": "长方形纸片"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "q-circle-plan",
+            "alt": "已有左半圆，右半用虚线表示"
+          }
+        }
+      ]
+    },
+    {
+      "key": "make-your-mosaic",
+      "type": "slide",
+      "title": "带着纸片做自己的拼贴",
+      "template": "picture-points",
+      "data": {
+        "title": "带着纸片做自己的拼贴",
+        "picture": "mosaic-scene",
+        "points": [
+          "先找同长的边",
+          "再换个摆法",
+          "沿外边检查"
+        ]
+      },
+      "script": [
+        {
+          "say": "纸花房的窗贴做好了。你会给自己的作品起什么名？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "可以让家人准备几张大小一样的纸片。先用两张试一试。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "找两条一样长的整边。贴的时候两片各在一边。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "换一条边或换个方向，再试一次。也可以加到四张或更多。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "绕外边一圈，看看有没有压住或空着，图形变成了什么。"
+        },
+        {
+          "say": "画一张拼贴，也画一张换摆法的图。请家人听你说哪两条边接上了。"
+        },
+        {
+          "say": "如果你剪了纸片，试着把它们叠起来比一比，再拼回原来的纸。"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,1071 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "数与运算",
+  "description": "用社区邮亭的数卡，把20以内的数、十与一、加减和凑十连起来。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小数老师",
+      "role": "teacher",
+      "gender": "male",
+      "voice": "Ethan",
+      "avatar": "/avatars/teacher-1.png",
+      "color": "#157a70",
+      "persona": "用自然清楚的语速带一年级孩子数一数、比一比、说一说。"
+    }
+  },
+  "images": {
+    "post-booth": {
+      "file": "assets/post-booth.png"
+    },
+    "snake-start": {
+      "file": "assets/snake-start.png"
+    },
+    "tile-start": {
+      "file": "assets/tile-start.png"
+    },
+    "snake-head": {
+      "file": "assets/snake-head.png"
+    },
+    "snake-body": {
+      "file": "assets/snake-body.png"
+    },
+    "snake-tail": {
+      "file": "assets/snake-tail.png"
+    },
+    "post-sticker": {
+      "file": "assets/post-sticker.png"
+    },
+    "count-and-position": {
+      "file": "assets/count-and-position.png"
+    },
+    "number-order": {
+      "file": "assets/number-order.png"
+    },
+    "tens-and-ones": {
+      "file": "assets/tens-and-ones.png"
+    },
+    "part-and-whole": {
+      "file": "assets/part-and-whole.png"
+    },
+    "methods": {
+      "file": "assets/methods.png"
+    },
+    "make-a-ten": {
+      "file": "assets/make-a-ten.png"
+    },
+    "knowledge-map": {
+      "file": "assets/knowledge-map.png"
+    },
+    "count-1": {
+      "file": "assets/count-1.png"
+    },
+    "count-2": {
+      "file": "assets/count-2.png"
+    },
+    "count-3": {
+      "file": "assets/count-3.png"
+    },
+    "count-4": {
+      "file": "assets/count-4.png"
+    },
+    "count-5": {
+      "file": "assets/count-5.png"
+    },
+    "count-6": {
+      "file": "assets/count-6.png"
+    },
+    "count-7": {
+      "file": "assets/count-7.png"
+    },
+    "count-8": {
+      "file": "assets/count-8.png"
+    },
+    "count-9": {
+      "file": "assets/count-9.png"
+    },
+    "count-10": {
+      "file": "assets/count-10.png"
+    },
+    "count-11": {
+      "file": "assets/count-11.png"
+    },
+    "count-12": {
+      "file": "assets/count-12.png"
+    },
+    "count-13": {
+      "file": "assets/count-13.png"
+    },
+    "count-14": {
+      "file": "assets/count-14.png"
+    },
+    "count-15": {
+      "file": "assets/count-15.png"
+    },
+    "count-16": {
+      "file": "assets/count-16.png"
+    },
+    "count-18": {
+      "file": "assets/count-18.png"
+    },
+    "quiz-1-a": {
+      "file": "assets/quiz-1-a.png"
+    },
+    "quiz-1-b": {
+      "file": "assets/quiz-1-b.png"
+    },
+    "quiz-1-c": {
+      "file": "assets/quiz-1-c.png"
+    },
+    "quiz-2-a": {
+      "file": "assets/quiz-2-a.png"
+    },
+    "quiz-2-b": {
+      "file": "assets/quiz-2-b.png"
+    },
+    "quiz-2-c": {
+      "file": "assets/quiz-2-c.png"
+    },
+    "quiz-3-a": {
+      "file": "assets/quiz-3-a.png"
+    },
+    "quiz-3-b": {
+      "file": "assets/quiz-3-b.png"
+    },
+    "quiz-3-c": {
+      "file": "assets/quiz-3-c.png"
+    },
+    "quiz-4-a": {
+      "file": "assets/quiz-4-a.png"
+    },
+    "quiz-4-b": {
+      "file": "assets/quiz-4-b.png"
+    },
+    "quiz-4-c": {
+      "file": "assets/quiz-4-c.png"
+    },
+    "quiz-5-a": {
+      "file": "assets/quiz-5-a.png"
+    },
+    "quiz-5-b": {
+      "file": "assets/quiz-5-b.png"
+    },
+    "quiz-5-c": {
+      "file": "assets/quiz-5-c.png"
+    },
+    "quiz-6-a": {
+      "file": "assets/quiz-6-a.png"
+    },
+    "quiz-6-b": {
+      "file": "assets/quiz-6-b.png"
+    },
+    "quiz-6-c": {
+      "file": "assets/quiz-6-c.png"
+    },
+    "quiz-7-a": {
+      "file": "assets/quiz-7-a.png"
+    },
+    "quiz-7-b": {
+      "file": "assets/quiz-7-b.png"
+    },
+    "quiz-7-c": {
+      "file": "assets/quiz-7-c.png"
+    },
+    "quiz-8-a": {
+      "file": "assets/quiz-8-a.png"
+    },
+    "quiz-8-b": {
+      "file": "assets/quiz-8-b.png"
+    },
+    "quiz-8-c": {
+      "file": "assets/quiz-8-c.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "open",
+      "type": "slide",
+      "title": "邮亭来了张数卡",
+      "template": "picture-points",
+      "data": {
+        "title": "邮亭来了张数卡",
+        "picture": "post-booth",
+        "points": [
+          "同一个数",
+          "把数摆出来",
+          "把办法连起来"
+        ]
+      },
+      "script": [
+        {
+          "say": "邮亭拿到一张数卡。它能告诉我们哪些事？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "同一张写着十四的卡，能说有多少枚邮票。"
+        },
+        {
+          "say": "如果贴在柜门上，还能表示从头数第几个柜。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "把票一张一张点清，再想想怎样分组更快。"
+        },
+        {
+          "say": "可以画成点，也可以装成一捆，再摆几张散票。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "一会儿用数卡找前后，再用同一组票写算式。"
+        },
+        {
+          "say": "最后做张自己的图，把我们会的办法连起来。"
+        }
+      ]
+    },
+    {
+      "key": "count-and-position",
+      "type": "slide",
+      "title": "有几枚和第几枚",
+      "template": "picture-points",
+      "data": {
+        "title": "有几枚和第几枚",
+        "picture": "count-and-position",
+        "points": [
+          "个数看整组",
+          "第几先找起点",
+          "顺序换了，总数还在"
+        ]
+      },
+      "script": [
+        {
+          "say": "一条排得长，一团摆得紧，哪边的邮票更多？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "手指点一枚，嘴里说一个数，数过的别再数。"
+        },
+        {
+          "say": "两组各是六枚。换了摆法，票没有增减。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "找第四枚时，从左边箭头起，只圈那一枚。"
+        },
+        {
+          "say": "第四说一枚的位置，六枚说整组的数量。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "换到右边数第四枚，圈的位置就可能变。"
+        },
+        {
+          "say": "可这一排还是六枚。先问是有几个，还是第几个。"
+        }
+      ]
+    },
+    {
+      "key": "number-order",
+      "type": "slide",
+      "title": "往前走一格，数多一",
+      "template": "picture-points",
+      "data": {
+        "title": "往前走一格，数多一",
+        "picture": "number-order",
+        "points": [
+          "零到二十",
+          "往后一张添一个",
+          "先看十，再看一"
+        ]
+      },
+      "script": [
+        {
+          "say": "邮亭柜台卡排开了，十三的下一张是什么？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "一个也没有，用零记。零到九用一位数字。"
+        },
+        {
+          "say": "十到二十用两位数字，右边个位，左边十位。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "十二、十三、十四。每往后一张就添一个。"
+        },
+        {
+          "say": "十三前是十二，后是十四，在数线上相邻。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "十四和十七都有一个十，再比四和七。"
+        },
+        {
+          "say": "七个一多，所以十七大；不用从第一张重数。"
+        },
+        {
+          "say": "看右边参照卡，找比它更多的一组。"
+        },
+        {
+          "say": "看右边参照卡，找比它更少的一组。"
+        },
+        {
+          "say": "看右边参照卡，找和它一样多的一组。"
+        },
+        {
+          "say": "重听是找更多、更少，还是一样多。"
+        },
+        {
+          "say": "先看有没有一整盒十，再看散着的点。"
+        }
+      ]
+    },
+    {
+      "key": "tens-and-ones",
+      "type": "slide",
+      "title": "满十就装成一捆",
+      "template": "picture-points",
+      "data": {
+        "title": "满十就装成一捆",
+        "picture": "tens-and-ones",
+        "points": [
+          "10 个一 → 1 个十",
+          "十位 1、个位 4",
+          "两个十，个位 0"
+        ]
+      },
+      "script": [
+        {
+          "say": "这一把邮票怎样装，别人不用一枚枚数？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "每满十枚就装一捆。十个一就是一个十。"
+        },
+        {
+          "say": "打捆只是换一种摆法，邮票没有变多。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "十四是一捆十加四枚散票，读十四，写十四。"
+        },
+        {
+          "say": "写时十位写一，个位写四。十位的一代表十。"
+        },
+        {
+          "say": "计数器的十位放一颗，个位放四颗，表示同一个数。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "二十有两捆十，散票没有，个位就写零。"
+        },
+        {
+          "say": "想想十一。十位的一是一个十，个位的一是一个一。"
+        }
+      ]
+    },
+    {
+      "key": "compare-stamps",
+      "type": "interactive",
+      "title": "邮票小蛇比多少",
+      "page": "compare-stamps",
+      "widgetType": "game",
+      "startImage": "snake-start",
+      "script": [
+        {
+          "say": "小蛇遇见两张点卡，哪张比它手里的更多？"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#game-goal"
+        },
+        {
+          "say": "右边是参照卡。这次先数右边的四个点。"
+        },
+        {
+          "highlight": "#ops-snake-first-food"
+        },
+        {
+          "say": "这一张有六个点，比四个多。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "按箭头让小蛇拐弯，走到六个点那张。"
+        },
+        {
+          "say": "每吃一张，右边的参照会换成刚吃到的那张。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "我只吃到这一张就停。接下来回到首关，由你来听。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        },
+        {
+          "say": "轮到你了。先听清要找的关系，再按箭头。"
+        }
+      ],
+      "gameAudio": {
+        "more": "number-order-11",
+        "fewer": "number-order-12",
+        "same": "number-order-13",
+        "compare-hint": "number-order-14",
+        "compare-help": "number-order-15",
+        "compare-praise": "closing-3"
+      }
+    },
+    {
+      "key": "part-and-whole",
+      "type": "slide",
+      "title": "同一组票能写四个式子",
+      "template": "picture-points",
+      "data": {
+        "title": "同一组票能写四个式子",
+        "picture": "part-and-whole",
+        "points": [
+          "两部分合在一起",
+          "总数去掉一部分",
+          "调顺序，总数一样"
+        ]
+      },
+      "script": [
+        {
+          "say": "六枚圆票和七枚星票摆在这里。一共多少？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "把六枚和七枚合起来，总数是十三。"
+        },
+        {
+          "say": "六加七等于十三。换个顺序，七加六也等于十三。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "十三减六等于七。拿走圆票，留下七枚星票。"
+        },
+        {
+          "say": "十三减七等于六。拿走星票，留下六枚圆票。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "同一张图，两种加法都找总数。"
+        },
+        {
+          "say": "两种减法都从总数里去掉一部分，找另一部分。"
+        },
+        {
+          "say": "看到总数和两部分，想想哪一项是这次要找的。"
+        }
+      ]
+    },
+    {
+      "key": "methods",
+      "type": "slide",
+      "title": "组成和接着数都能帮忙",
+      "template": "picture-points",
+      "data": {
+        "title": "组成和接着数都能帮忙",
+        "picture": "methods",
+        "points": [
+          "先认出一个十",
+          "从已有的数出发",
+          "每添一个走一格"
+        ]
+      },
+      "script": [
+        {
+          "say": "十枚装在邮袋里，又来了四枚，怎么快些数？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "一捆十加四枚散票，就是十加四等于十四。"
+        },
+        {
+          "say": "想一想组成，先认出一个十，不用重新点袋里的票。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "也能从十出发，往后接着数四下。"
+        },
+        {
+          "say": "第一下到十一，再到十二、十三、十四。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "出发的十是已经有的，不能把它当成第一下。"
+        },
+        {
+          "say": "每添一枚走一格。四枚走四格，停在十四。"
+        },
+        {
+          "say": "分组能直接看出十和一，数线能看见每一步。"
+        }
+      ]
+    },
+    {
+      "key": "make-a-ten",
+      "type": "slide",
+      "title": "先补满，再数剩下的",
+      "template": "picture-points",
+      "data": {
+        "title": "先补满，再数剩下的",
+        "picture": "make-a-ten",
+        "points": [
+          "九格已经放上",
+          "从六枚里挪一枚",
+          "10 再加剩下的 5"
+        ]
+      },
+      "script": [
+        {
+          "say": "九枚在十格盒里，旁边还有六枚。怎么快算？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "十格只空一个。要凑满，还差一枚。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "从六枚里挪一枚进空格，六枚那边剩五枚。"
+        },
+        {
+          "say": "挪走的一枚已经进了十格，不在外面再数一次。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "现在盒子里十枚，外面五枚。十加五等于十五。"
+        },
+        {
+          "say": "所以九加六也等于十五，挪动没改变总数。"
+        },
+        {
+          "say": "找能挨在一起、合成十个点的两块。"
+        },
+        {
+          "say": "先数这块有几个点，再想还差几个。"
+        },
+        {
+          "say": "对照底行的点，移到同一行的空格边。"
+        }
+      ]
+    },
+    {
+      "key": "fill-ten-trays",
+      "type": "interactive",
+      "title": "落块配成十",
+      "page": "fill-ten-trays",
+      "widgetType": "game",
+      "startImage": "tile-start",
+      "script": [
+        {
+          "say": "一块装三枚票的卡落下来，应该接在哪组旁边？"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#ops-ten-target"
+        },
+        {
+          "say": "右边的一整盒是目标，合起来要正好十个点。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "落下来的这张有三个点，还缺七个。"
+        },
+        {
+          "highlight": "#ops-first-partner"
+        },
+        {
+          "say": "底行的七在这里。把三落到同一行的隔壁。"
+        },
+        {
+          "say": "箭头管左右。对好空格，按向下的钮让它落下。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "我只合一对就停。现在回首关，让你自己接。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        },
+        {
+          "say": "先看票的个数，再看浅色落点，合起来一定是十。"
+        }
+      ],
+      "gameAudio": {
+        "ten-goal": "make-a-ten-10",
+        "ten-hint": "make-a-ten-11",
+        "ten-help": "make-a-ten-12",
+        "ten-praise": "closing-10"
+      }
+    },
+    {
+      "key": "knowledge-map",
+      "type": "slide",
+      "title": "给十五做一张会说话的图",
+      "template": "picture-points",
+      "data": {
+        "title": "给十五做一张会说话的图",
+        "picture": "knowledge-map",
+        "points": [
+          "这个数表示多少",
+          "十和一怎样组成",
+          "再把运算接进来"
+        ]
+      },
+      "script": [
+        {
+          "say": "你会把同一个数画成几种样子吗？先挑十五。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "十五能表示十五枚票，也能给第十五个柜编号。"
+        },
+        {
+          "say": "十五比十四多一，比十六少一，正好排在它们中间。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "十五是一捆十和五枚散票。它们指同一个数。"
+        },
+        {
+          "say": "这个数读十五，十位写一，个位写五。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "九加六等于十五。拿走这六枚，十五减六等于九。"
+        },
+        {
+          "say": "六枚里拿一枚给九凑十，外面还有五枚。"
+        },
+        {
+          "say": "认数和计算都能用十和一。用连线把它们接起来。"
+        }
+      ]
+    },
+    {
+      "key": "picture-check",
+      "type": "quiz",
+      "title": "听完老师再选图",
+      "intro": [
+        "听完一题，用数卡和图找答案。"
+      ],
+      "questions": [
+        {
+          "id": "number-ops-q1",
+          "question": "看左边七枚邮票。哪张右边和它一样多？",
+          "skill": "cardinal",
+          "answer": [
+            "C"
+          ],
+          "analysis": "第一组有六枚，第二组有八枚。第三组虽然摆法不同，也有七枚。",
+          "options": {
+            "A": {
+              "label": "六枚",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-1-a",
+                "alt": "左边七枚，右边两行一共六枚"
+              }
+            },
+            "B": {
+              "label": "八枚",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-1-b",
+                "alt": "左边七枚，右边两行一共八枚"
+              }
+            },
+            "C": {
+              "label": "七枚",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-1-c",
+                "alt": "左边七枚，右边两行一共七枚"
+              }
+            }
+          }
+        },
+        {
+          "id": "number-ops-q2",
+          "question": "从左边绿色箭头开始，哪张图圈出第三枚？",
+          "skill": "ordinal",
+          "answer": [
+            "B"
+          ],
+          "analysis": "从左向右数，一、二、三。第三枚只圈那一枚。",
+          "options": {
+            "A": {
+              "label": "第二枚",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-2-a",
+                "alt": "一排五枚，左边的第二枚被圈出"
+              }
+            },
+            "B": {
+              "label": "第三枚",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-2-b",
+                "alt": "一排五枚，左边的第三枚被圈出"
+              }
+            },
+            "C": {
+              "label": "第四枚",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-2-c",
+                "alt": "一排五枚，左边的第四枚被圈出"
+              }
+            }
+          }
+        },
+        {
+          "id": "number-ops-q3",
+          "question": "柜台十六号往后添一张。下面哪张是它的下一号？",
+          "skill": "number-order",
+          "answer": [
+            "A"
+          ],
+          "analysis": "十六再添一是十七。沿箭头向右只走一格。",
+          "options": {
+            "A": {
+              "label": "十七号",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-3-a",
+                "alt": "十六的右边接十七"
+              }
+            },
+            "B": {
+              "label": "十五号",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-3-b",
+                "alt": "十六的右边接十五"
+              }
+            },
+            "C": {
+              "label": "十八号",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-3-c",
+                "alt": "十六的右边接十八"
+              }
+            }
+          }
+        },
+        {
+          "id": "number-ops-q4",
+          "question": "哪张图用一捆十和散票摆出了十八？",
+          "skill": "tens-and-ones",
+          "answer": [
+            "B"
+          ],
+          "analysis": "十格盒是一个十，外面八枚是八个一。一个十和八个一是十八。",
+          "options": {
+            "A": {
+              "label": "十七",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-4-a",
+                "alt": "一个满十格盒和七枚散票"
+              }
+            },
+            "B": {
+              "label": "十八",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-4-b",
+                "alt": "一个满十格盒和八枚散票"
+              }
+            },
+            "C": {
+              "label": "十九",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-4-c",
+                "alt": "一个满十格盒和九枚散票"
+              }
+            }
+          }
+        },
+        {
+          "id": "number-ops-q5",
+          "question": "哪组比一捆十和三枚散票还多？",
+          "skill": "compare-tens",
+          "answer": [
+            "C"
+          ],
+          "analysis": "三个选项都是一个十，就比散票。六枚比三枚多。",
+          "options": {
+            "A": {
+              "label": "十二",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-5-a",
+                "alt": "一个十和两枚散票"
+              }
+            },
+            "B": {
+              "label": "十三",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-5-b",
+                "alt": "一个十和三枚散票"
+              }
+            },
+            "C": {
+              "label": "十六",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-5-c",
+                "alt": "一个十和六枚散票"
+              }
+            }
+          }
+        },
+        {
+          "id": "number-ops-q6",
+          "question": "十四枚票里去掉八枚圆票。哪张剩下的星票数对？",
+          "skill": "part-and-whole",
+          "answer": [
+            "B"
+          ],
+          "analysis": "总数十四去掉八，剩六枚星票。十四可以分成八和六。",
+          "options": {
+            "A": {
+              "label": "五枚",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-6-a",
+                "alt": "只剩五枚星票"
+              }
+            },
+            "B": {
+              "label": "六枚",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-6-b",
+                "alt": "只剩六枚星票"
+              }
+            },
+            "C": {
+              "label": "七枚",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-6-c",
+                "alt": "只剩七枚星票"
+              }
+            }
+          }
+        },
+        {
+          "id": "number-ops-q7",
+          "question": "算八加七，哪张把合适的票挪进十格，刚好装满？",
+          "skill": "make-a-ten",
+          "answer": [
+            "A"
+          ],
+          "analysis": "八个已经在盒里，正好差两个。从七枚里挪两枚，外面还剩五枚。",
+          "options": {
+            "A": {
+              "label": "挪两枚",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-7-a",
+                "alt": "十格先放八枚，箭头把外面两枚送到空格，旁边保留五枚"
+              }
+            },
+            "B": {
+              "label": "挪一枚",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-7-b",
+                "alt": "十格先放八枚，只挪入一枚，外面保留六枚"
+              }
+            },
+            "C": {
+              "label": "挪三枚",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-7-c",
+                "alt": "十格先放八枚，箭头标出三枚想挪入，盒子只有两个空格"
+              }
+            }
+          }
+        },
+        {
+          "id": "number-ops-q8",
+          "question": "从十一接着添三枚。每添一枚走一格，哪张图对？",
+          "skill": "counting-on",
+          "answer": [
+            "C"
+          ],
+          "analysis": "十一已经在起点。三步分别落在十二、十三、十四，答案十四。",
+          "options": {
+            "A": {
+              "label": "落在十三",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-8-a",
+                "alt": "数线从十一向右走两步，落在十三"
+              }
+            },
+            "B": {
+              "label": "落在十五",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-8-b",
+                "alt": "数线从十一向右走四步，落在十五"
+              }
+            },
+            "C": {
+              "label": "落在十四",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-8-c",
+                "alt": "数线从十一向右走三步，落在十四"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "closing",
+      "type": "slide",
+      "title": "带走你的邮亭数卡",
+      "template": "summary",
+      "data": {
+        "title": "带走你的邮亭数卡",
+        "items": [
+          "看清是几个还是第几个",
+          "先找十，再看一",
+          "总数和两个部分",
+          "凑十和接着数",
+          "给家人画张图"
+        ]
+      },
+      "script": [
+        {
+          "say": "今天拿到的数卡，能和哪些办法连起来？"
+        },
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "你先看参照再比较，找到了合适的一组。"
+        },
+        {
+          "say": "有几个说总数，第几个说位置。先弄清从哪头数。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "先看几个十，再看几个一，就能读出两位数。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "两个部分合起来得总数，去掉一部分找剩下的。"
+        },
+        {
+          "spotlight": "item-4"
+        },
+        {
+          "say": "正好凑成十，余下的点也别漏掉。"
+        },
+        {
+          "spotlight": "item-5"
+        },
+        {
+          "say": "回家选一个数，用画和算式把几种办法连起来。"
+        }
+      ]
+    }
+  ]
+}

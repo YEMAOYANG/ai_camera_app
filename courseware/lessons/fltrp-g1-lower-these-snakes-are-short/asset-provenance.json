@@ -1,0 +1,2021 @@
+{
+  "schemaVersion": "mira.courseware.asset-provenance.v1",
+  "lesson": "fltrp-g1-lower-these-snakes-are-short",
+  "reviewedAt": "2026-11-10T18:33:23.703040+08:00",
+  "status": "all_current_media_contact_checked_game_prevoice_sample_passed",
+  "assets": [
+    {
+      "source": "Measured layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_zoo_cards.py",
+        "sha256": "7461e7d6821fe3e0a21683e59fe1d494945760a451daa3966486b7dfb99c2eeb"
+      },
+      "data": {
+        "path": "art-source/zoo-cards.json",
+        "sha256": "300464e3645a6b726bc6529df1620b57915fbafa5ed8426930c05d9dca4ca808"
+      },
+      "upstreamAssetKeys": [
+        "zoo-elephant"
+      ],
+      "layout": {
+        "canvas": [
+          416,
+          235
+        ],
+        "guides": [
+          [
+            12,
+            216,
+            404,
+            216
+          ]
+        ],
+        "subjects": [
+          [
+            "elephant",
+            "width",
+            173,
+            28,
+            214
+          ],
+          [
+            "elephant",
+            "width",
+            173,
+            219,
+            214
+          ]
+        ]
+      },
+      "assetKey": "zoo-big-group",
+      "path": "assets/zoo-big-group.png",
+      "sha256": "0f86743373ae7632f5496d5a3dd5eedd096f01c3605d015c96bbe8c5646fc5f9",
+      "usedBy": [
+        "identify-the-group",
+        "bubble-portraits",
+        "jump-to-the-group"
+      ],
+      "visualReview": "contact_checked_interactive_browser_sample_passed"
+    },
+    {
+      "assetKey": "zoo-boat-action",
+      "path": "assets/zoo-boat-action.png",
+      "sha256": "29f00a59e7ae2a35130b724db0f736fb4398f056ccffd2b089ad199e2ebadace",
+      "width": 376,
+      "height": 268,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/zoo-variants.png",
+      "generatedSourceSha256": "079d435f87bbcb718d5d29259aea5a00cd8cf5cc27652c831982a84a511e588c",
+      "promptSha256": "4f106a6706412e6ce3f3fb9af0f914d39683602fd580fff6cb92f53ac7d8dd50",
+      "sourceCrop": [
+        860,
+        483,
+        1236,
+        751
+      ],
+      "promptFile": {
+        "path": "art-source/zoo-variants.prompt.txt",
+        "sha256": "4f106a6706412e6ce3f3fb9af0f914d39683602fd580fff6cb92f53ac7d8dd50"
+      },
+      "atlasReceipt": {
+        "path": "art-source/zoo-variants.receipt.json",
+        "sha256": "07505729ee65298a1e5610f15780b0e2bb53eb23d556e2d45d4fdad43b1c5bde"
+      },
+      "usedBy": [
+        "bubble-portraits"
+      ],
+      "visualReview": "contact_checked_interactive_browser_sample_passed"
+    },
+    {
+      "assetKey": "zoo-boat",
+      "path": "assets/zoo-boat.png",
+      "sha256": "2a9444a91130372ceb53932ca8f7b08d608044a9f088fb7aad09a2da4c7056cd",
+      "width": 420,
+      "height": 283,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/zoo-core.png",
+      "generatedSourceSha256": "0b01df8ce6edc29ac0e7dc4b6e323e477427b868b32f7be61f4e79d729efe17d",
+      "promptSha256": "4713d8365a38177ca0c389684efe671c3bf904c0db6e2248c63f7774e5a7c72f",
+      "sourceCrop": [
+        769,
+        958,
+        1193,
+        1244
+      ],
+      "promptFile": {
+        "path": "art-source/zoo-core.prompt.txt",
+        "sha256": "4713d8365a38177ca0c389684efe671c3bf904c0db6e2248c63f7774e5a7c72f"
+      },
+      "atlasReceipt": {
+        "path": "art-source/zoo-core.receipt.json",
+        "sha256": "189a28c1059795fe27bbe0a3070ac6ee9d37f6e50e696e7896880fb95677c1eb"
+      },
+      "usedBy": [
+        "bubble-portraits"
+      ],
+      "visualReview": "contact_checked_interactive_browser_sample_passed"
+    },
+    {
+      "assetKey": "zoo-bot-jump",
+      "path": "assets/zoo-bot-jump.png",
+      "sha256": "efe7a9950693bd129783fdc69dbc8ab3d2ffbeaaf9c5f38b5012df43aed15159",
+      "width": 255,
+      "height": 331,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/zoo-variants.png",
+      "generatedSourceSha256": "079d435f87bbcb718d5d29259aea5a00cd8cf5cc27652c831982a84a511e588c",
+      "promptSha256": "4f106a6706412e6ce3f3fb9af0f914d39683602fd580fff6cb92f53ac7d8dd50",
+      "sourceCrop": [
+        922,
+        844,
+        1177,
+        1175
+      ],
+      "promptFile": {
+        "path": "art-source/zoo-variants.prompt.txt",
+        "sha256": "4f106a6706412e6ce3f3fb9af0f914d39683602fd580fff6cb92f53ac7d8dd50"
+      },
+      "atlasReceipt": {
+        "path": "art-source/zoo-variants.receipt.json",
+        "sha256": "07505729ee65298a1e5610f15780b0e2bb53eb23d556e2d45d4fdad43b1c5bde"
+      },
+      "usedBy": [
+        "jump-to-the-group"
+      ],
+      "visualReview": "contact_checked_interactive_browser_sample_passed"
+    },
+    {
+      "assetKey": "zoo-bot-walk",
+      "path": "assets/zoo-bot-walk.png",
+      "sha256": "5b7865bdabc9069a60f9a035372a6480743630f25fd289d6ac0552e91be61ab9",
+      "width": 249,
+      "height": 362,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/zoo-variants.png",
+      "generatedSourceSha256": "079d435f87bbcb718d5d29259aea5a00cd8cf5cc27652c831982a84a511e588c",
+      "promptSha256": "4f106a6706412e6ce3f3fb9af0f914d39683602fd580fff6cb92f53ac7d8dd50",
+      "sourceCrop": [
+        498,
+        853,
+        747,
+        1215
+      ],
+      "promptFile": {
+        "path": "art-source/zoo-variants.prompt.txt",
+        "sha256": "4f106a6706412e6ce3f3fb9af0f914d39683602fd580fff6cb92f53ac7d8dd50"
+      },
+      "atlasReceipt": {
+        "path": "art-source/zoo-variants.receipt.json",
+        "sha256": "07505729ee65298a1e5610f15780b0e2bb53eb23d556e2d45d4fdad43b1c5bde"
+      },
+      "usedBy": [
+        "jump-to-the-group"
+      ],
+      "visualReview": "contact_checked_interactive_browser_sample_passed"
+    },
+    {
+      "assetKey": "zoo-bot",
+      "path": "assets/zoo-bot.png",
+      "sha256": "65634e881fc07f7b2f0dc4debae3a6df5636990fc1775320bdd9bcf4dbdc54ae",
+      "width": 203,
+      "height": 363,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/zoo-variants.png",
+      "generatedSourceSha256": "079d435f87bbcb718d5d29259aea5a00cd8cf5cc27652c831982a84a511e588c",
+      "promptSha256": "4f106a6706412e6ce3f3fb9af0f914d39683602fd580fff6cb92f53ac7d8dd50",
+      "sourceCrop": [
+        113,
+        856,
+        316,
+        1219
+      ],
+      "promptFile": {
+        "path": "art-source/zoo-variants.prompt.txt",
+        "sha256": "4f106a6706412e6ce3f3fb9af0f914d39683602fd580fff6cb92f53ac7d8dd50"
+      },
+      "atlasReceipt": {
+        "path": "art-source/zoo-variants.receipt.json",
+        "sha256": "07505729ee65298a1e5610f15780b0e2bb53eb23d556e2d45d4fdad43b1c5bde"
+      },
+      "usedBy": [
+        "bubble-portraits",
+        "jump-to-the-group",
+        "picture-check"
+      ],
+      "visualReview": "contact_checked_interactive_browser_sample_passed"
+    },
+    {
+      "source": "Measured layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_zoo_cards.py",
+        "sha256": "7461e7d6821fe3e0a21683e59fe1d494945760a451daa3966486b7dfb99c2eeb"
+      },
+      "data": {
+        "path": "art-source/zoo-cards.json",
+        "sha256": "300464e3645a6b726bc6529df1620b57915fbafa5ed8426930c05d9dca4ca808"
+      },
+      "upstreamAssetKeys": [
+        "zoo-child"
+      ],
+      "layout": {
+        "canvas": [
+          416,
+          235
+        ],
+        "guides": [
+          [
+            12,
+            216,
+            404,
+            216
+          ]
+        ],
+        "subjects": [
+          [
+            "child",
+            "height",
+            98,
+            168,
+            214
+          ]
+        ]
+      },
+      "assetKey": "zoo-child-low",
+      "path": "assets/zoo-child-low.png",
+      "sha256": "6e0e2d735a24888fb9118406238c0a7e8a15110dba98b685afcdcf3a8ad1fb9b",
+      "usedBy": [
+        "compare-height"
+      ],
+      "visualReview": "contact_checked_final_student_playback_pending"
+    },
+    {
+      "assetKey": "zoo-child",
+      "path": "assets/zoo-child.png",
+      "sha256": "a65479ba504b7a1c4056a75b76b97604e88ed6fd4b6534df97bbc87fd0a8da36",
+      "width": 242,
+      "height": 420,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/zoo-core.png",
+      "generatedSourceSha256": "0b01df8ce6edc29ac0e7dc4b6e323e477427b868b32f7be61f4e79d729efe17d",
+      "promptSha256": "4713d8365a38177ca0c389684efe671c3bf904c0db6e2248c63f7774e5a7c72f",
+      "sourceCrop": [
+        454,
+        817,
+        733,
+        1302
+      ],
+      "promptFile": {
+        "path": "art-source/zoo-core.prompt.txt",
+        "sha256": "4713d8365a38177ca0c389684efe671c3bf904c0db6e2248c63f7774e5a7c72f"
+      },
+      "atlasReceipt": {
+        "path": "art-source/zoo-core.receipt.json",
+        "sha256": "189a28c1059795fe27bbe0a3070ac6ee9d37f6e50e696e7896880fb95677c1eb"
+      },
+      "usedBy": [
+        "ready-to-guide"
+      ],
+      "visualReview": "contact_checked_final_student_playback_pending"
+    },
+    {
+      "source": "Measured layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_zoo_cards.py",
+        "sha256": "7461e7d6821fe3e0a21683e59fe1d494945760a451daa3966486b7dfb99c2eeb"
+      },
+      "data": {
+        "path": "art-source/zoo-cards.json",
+        "sha256": "300464e3645a6b726bc6529df1620b57915fbafa5ed8426930c05d9dca4ca808"
+      },
+      "upstreamAssetKeys": [
+        "zoo-green-long"
+      ],
+      "layout": {
+        "canvas": [
+          416,
+          235
+        ],
+        "guides": [
+          [
+            32,
+            76,
+            32,
+            185
+          ],
+          [
+            32,
+            163,
+            387,
+            163
+          ]
+        ],
+        "subjects": [
+          [
+            "green-long",
+            "width",
+            340,
+            32,
+            158
+          ]
+        ]
+      },
+      "assetKey": "zoo-length-long",
+      "path": "assets/zoo-length-long.png",
+      "sha256": "81eceb241ff65f24b741f4b614cd189bc261032f015d02d23b7b3f7fa3776299",
+      "usedBy": [
+        "compare-length"
+      ],
+      "visualReview": "contact_checked_final_student_playback_pending"
+    },
+    {
+      "source": "Measured layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_zoo_cards.py",
+        "sha256": "7461e7d6821fe3e0a21683e59fe1d494945760a451daa3966486b7dfb99c2eeb"
+      },
+      "data": {
+        "path": "art-source/zoo-cards.json",
+        "sha256": "300464e3645a6b726bc6529df1620b57915fbafa5ed8426930c05d9dca4ca808"
+      },
+      "upstreamAssetKeys": [
+        "zoo-green-short"
+      ],
+      "layout": {
+        "canvas": [
+          416,
+          235
+        ],
+        "guides": [
+          [
+            32,
+            76,
+            32,
+            185
+          ],
+          [
+            32,
+            163,
+            387,
+            163
+          ]
+        ],
+        "subjects": [
+          [
+            "green-short",
+            "width",
+            201,
+            32,
+            158
+          ]
+        ]
+      },
+      "assetKey": "zoo-length-short",
+      "path": "assets/zoo-length-short.png",
+      "sha256": "f60a1559d518b9773adadcac4a74463f363e4c26e86acc2f3ab6a541c439295f",
+      "usedBy": [
+        "compare-length"
+      ],
+      "visualReview": "contact_checked_final_student_playback_pending"
+    },
+    {
+      "source": "Measured layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_zoo_cards.py",
+        "sha256": "7461e7d6821fe3e0a21683e59fe1d494945760a451daa3966486b7dfb99c2eeb"
+      },
+      "data": {
+        "path": "art-source/zoo-cards.json",
+        "sha256": "300464e3645a6b726bc6529df1620b57915fbafa5ed8426930c05d9dca4ca808"
+      },
+      "upstreamAssetKeys": [
+        "zoo-green-long"
+      ],
+      "layout": {
+        "canvas": [
+          366,
+          201
+        ],
+        "guides": [
+          [
+            26,
+            39,
+            26,
+            185
+          ],
+          [
+            26,
+            99,
+            347,
+            99
+          ],
+          [
+            26,
+            178,
+            347,
+            178
+          ]
+        ],
+        "subjects": [
+          [
+            "green-long",
+            "width",
+            305,
+            26,
+            96
+          ],
+          [
+            "green-long",
+            "width",
+            305,
+            26,
+            175
+          ]
+        ]
+      },
+      "assetKey": "zoo-long-group",
+      "path": "assets/zoo-long-group.png",
+      "sha256": "a4ef2df8adaefeead580052ffb6453f23174fc5c4b38985aa2ac89a6861bad68",
+      "usedBy": [
+        "ask-about-the-group",
+        "bubble-portraits",
+        "jump-to-the-group"
+      ],
+      "visualReview": "contact_checked_interactive_browser_sample_passed"
+    },
+    {
+      "source": "Measured layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_zoo_cards.py",
+        "sha256": "7461e7d6821fe3e0a21683e59fe1d494945760a451daa3966486b7dfb99c2eeb"
+      },
+      "data": {
+        "path": "art-source/zoo-cards.json",
+        "sha256": "300464e3645a6b726bc6529df1620b57915fbafa5ed8426930c05d9dca4ca808"
+      },
+      "upstreamAssetKeys": [
+        "zoo-giraffe"
+      ],
+      "layout": {
+        "canvas": [
+          416,
+          235
+        ],
+        "guides": [
+          [
+            12,
+            216,
+            404,
+            216
+          ]
+        ],
+        "subjects": [
+          [
+            "giraffe",
+            "height",
+            92,
+            63,
+            214
+          ],
+          [
+            "giraffe",
+            "height",
+            92,
+            224,
+            214
+          ]
+        ]
+      },
+      "assetKey": "zoo-low-group",
+      "path": "assets/zoo-low-group.png",
+      "sha256": "db978c567fa9a529a510b1fb4ce713c2052a3c3a27cae41bfd15944b33941a42",
+      "usedBy": [
+        "bubble-portraits",
+        "jump-to-the-group"
+      ],
+      "visualReview": "contact_checked_interactive_browser_sample_passed"
+    },
+    {
+      "source": "Measured layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_zoo_cards.py",
+        "sha256": "7461e7d6821fe3e0a21683e59fe1d494945760a451daa3966486b7dfb99c2eeb"
+      },
+      "data": {
+        "path": "art-source/zoo-cards.json",
+        "sha256": "300464e3645a6b726bc6529df1620b57915fbafa5ed8426930c05d9dca4ca808"
+      },
+      "upstreamAssetKeys": [
+        "zoo-elephant"
+      ],
+      "layout": {
+        "canvas": [
+          416,
+          235
+        ],
+        "guides": [
+          [
+            12,
+            216,
+            404,
+            216
+          ]
+        ],
+        "subjects": [
+          [
+            "elephant",
+            "width",
+            182,
+            20,
+            214
+          ],
+          [
+            "elephant",
+            "width",
+            182,
+            214,
+            214
+          ]
+        ]
+      },
+      "assetKey": "zoo-quiz-elephant-big",
+      "path": "assets/zoo-quiz-elephant-big.png",
+      "sha256": "03a37a96a2f131cc0168755dae09f1caeed6dd02bd69664e2f7253175d9bb910",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "contact_checked_final_student_playback_pending"
+    },
+    {
+      "source": "Measured layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_zoo_cards.py",
+        "sha256": "7461e7d6821fe3e0a21683e59fe1d494945760a451daa3966486b7dfb99c2eeb"
+      },
+      "data": {
+        "path": "art-source/zoo-cards.json",
+        "sha256": "300464e3645a6b726bc6529df1620b57915fbafa5ed8426930c05d9dca4ca808"
+      },
+      "upstreamAssetKeys": [
+        "zoo-elephant"
+      ],
+      "layout": {
+        "canvas": [
+          416,
+          235
+        ],
+        "guides": [
+          [
+            12,
+            216,
+            404,
+            216
+          ]
+        ],
+        "subjects": [
+          [
+            "elephant",
+            "width",
+            87,
+            50,
+            214
+          ]
+        ]
+      },
+      "assetKey": "zoo-quiz-elephant-one",
+      "path": "assets/zoo-quiz-elephant-one.png",
+      "sha256": "1c8827071ee4fba1fea041aa81da39342e1ce041d21fd20a0d4cfc325907ee73",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "contact_checked_final_student_playback_pending"
+    },
+    {
+      "source": "Measured layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_zoo_cards.py",
+        "sha256": "7461e7d6821fe3e0a21683e59fe1d494945760a451daa3966486b7dfb99c2eeb"
+      },
+      "data": {
+        "path": "art-source/zoo-cards.json",
+        "sha256": "300464e3645a6b726bc6529df1620b57915fbafa5ed8426930c05d9dca4ca808"
+      },
+      "upstreamAssetKeys": [
+        "zoo-elephant"
+      ],
+      "layout": {
+        "canvas": [
+          416,
+          235
+        ],
+        "guides": [
+          [
+            12,
+            216,
+            404,
+            216
+          ]
+        ],
+        "subjects": [
+          [
+            "elephant",
+            "width",
+            87,
+            50,
+            214
+          ],
+          [
+            "elephant",
+            "width",
+            87,
+            153,
+            214
+          ]
+        ]
+      },
+      "assetKey": "zoo-quiz-elephant-small",
+      "path": "assets/zoo-quiz-elephant-small.png",
+      "sha256": "327991bfa1b941b05d209ea02b37790a5417e93b3fcb2745645ddb88eecc473b",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "contact_checked_final_student_playback_pending"
+    },
+    {
+      "source": "Measured layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_zoo_cards.py",
+        "sha256": "7461e7d6821fe3e0a21683e59fe1d494945760a451daa3966486b7dfb99c2eeb"
+      },
+      "data": {
+        "path": "art-source/zoo-cards.json",
+        "sha256": "300464e3645a6b726bc6529df1620b57915fbafa5ed8426930c05d9dca4ca808"
+      },
+      "upstreamAssetKeys": [
+        "zoo-elephant"
+      ],
+      "layout": {
+        "canvas": [
+          416,
+          235
+        ],
+        "guides": [
+          [
+            12,
+            216,
+            404,
+            216
+          ]
+        ],
+        "subjects": [
+          [
+            "elephant",
+            "width",
+            112,
+            19,
+            214
+          ],
+          [
+            "elephant",
+            "width",
+            112,
+            152,
+            214
+          ],
+          [
+            "elephant",
+            "width",
+            112,
+            285,
+            214
+          ]
+        ]
+      },
+      "assetKey": "zoo-quiz-elephant-trio",
+      "path": "assets/zoo-quiz-elephant-trio.png",
+      "sha256": "5a8785a0341d7a7feac15974cb126cc22ce9491cddba7d5bc6dbf828a55d6635",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "contact_checked_final_student_playback_pending"
+    },
+    {
+      "source": "Measured layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_zoo_cards.py",
+        "sha256": "7461e7d6821fe3e0a21683e59fe1d494945760a451daa3966486b7dfb99c2eeb"
+      },
+      "data": {
+        "path": "art-source/zoo-cards.json",
+        "sha256": "300464e3645a6b726bc6529df1620b57915fbafa5ed8426930c05d9dca4ca808"
+      },
+      "upstreamAssetKeys": [
+        "zoo-quiz-giraffe"
+      ],
+      "layout": {
+        "canvas": [
+          416,
+          235
+        ],
+        "guides": [
+          [
+            12,
+            216,
+            404,
+            216
+          ]
+        ],
+        "subjects": [
+          [
+            "quiz-giraffe",
+            "height",
+            89,
+            65,
+            214
+          ],
+          [
+            "quiz-giraffe",
+            "height",
+            89,
+            225,
+            214
+          ]
+        ]
+      },
+      "assetKey": "zoo-quiz-giraffe-low",
+      "path": "assets/zoo-quiz-giraffe-low.png",
+      "sha256": "672c875ab4db94c376f4e56435dec7cb675647d08cb4bc0a4cd4a3b4b322d173",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "contact_checked_final_student_playback_pending"
+    },
+    {
+      "source": "Measured layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_zoo_cards.py",
+        "sha256": "7461e7d6821fe3e0a21683e59fe1d494945760a451daa3966486b7dfb99c2eeb"
+      },
+      "data": {
+        "path": "art-source/zoo-cards.json",
+        "sha256": "300464e3645a6b726bc6529df1620b57915fbafa5ed8426930c05d9dca4ca808"
+      },
+      "upstreamAssetKeys": [
+        "zoo-quiz-giraffe"
+      ],
+      "layout": {
+        "canvas": [
+          416,
+          235
+        ],
+        "guides": [
+          [
+            12,
+            216,
+            404,
+            216
+          ]
+        ],
+        "subjects": [
+          [
+            "quiz-giraffe",
+            "height",
+            181,
+            140,
+            214
+          ]
+        ]
+      },
+      "assetKey": "zoo-quiz-giraffe-one",
+      "path": "assets/zoo-quiz-giraffe-one.png",
+      "sha256": "9e5b918ab2c4303cb96db103a5fa8e25e080677faf3d451d68fe5d25b48e1c57",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "contact_checked_final_student_playback_pending"
+    },
+    {
+      "source": "Measured layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_zoo_cards.py",
+        "sha256": "7461e7d6821fe3e0a21683e59fe1d494945760a451daa3966486b7dfb99c2eeb"
+      },
+      "data": {
+        "path": "art-source/zoo-cards.json",
+        "sha256": "300464e3645a6b726bc6529df1620b57915fbafa5ed8426930c05d9dca4ca808"
+      },
+      "upstreamAssetKeys": [
+        "zoo-quiz-giraffe"
+      ],
+      "layout": {
+        "canvas": [
+          416,
+          235
+        ],
+        "guides": [
+          [
+            12,
+            216,
+            404,
+            216
+          ]
+        ],
+        "subjects": [
+          [
+            "quiz-giraffe",
+            "height",
+            181,
+            65,
+            214
+          ],
+          [
+            "quiz-giraffe",
+            "height",
+            181,
+            225,
+            214
+          ]
+        ]
+      },
+      "assetKey": "zoo-quiz-giraffe-pair",
+      "path": "assets/zoo-quiz-giraffe-pair.png",
+      "sha256": "07b3ad231a06e3b531b2ead904bcdb81d7e35951625a8ad4decf11c9779d929c",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "contact_checked_final_student_playback_pending"
+    },
+    {
+      "source": "Measured layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_zoo_cards.py",
+        "sha256": "7461e7d6821fe3e0a21683e59fe1d494945760a451daa3966486b7dfb99c2eeb"
+      },
+      "data": {
+        "path": "art-source/zoo-cards.json",
+        "sha256": "300464e3645a6b726bc6529df1620b57915fbafa5ed8426930c05d9dca4ca808"
+      },
+      "upstreamAssetKeys": [
+        "zoo-quiz-giraffe"
+      ],
+      "layout": {
+        "canvas": [
+          416,
+          235
+        ],
+        "guides": [
+          [
+            12,
+            216,
+            404,
+            216
+          ]
+        ],
+        "subjects": [
+          [
+            "quiz-giraffe",
+            "height",
+            143,
+            20,
+            214
+          ],
+          [
+            "quiz-giraffe",
+            "height",
+            143,
+            151,
+            214
+          ],
+          [
+            "quiz-giraffe",
+            "height",
+            143,
+            282,
+            214
+          ]
+        ]
+      },
+      "assetKey": "zoo-quiz-giraffe-trio",
+      "path": "assets/zoo-quiz-giraffe-trio.png",
+      "sha256": "903d762e0eb0e504286be9defa0adfde22a4ac149d43406a30b228a0a89f1e0e",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "contact_checked_final_student_playback_pending"
+    },
+    {
+      "source": "Measured layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_zoo_cards.py",
+        "sha256": "7461e7d6821fe3e0a21683e59fe1d494945760a451daa3966486b7dfb99c2eeb"
+      },
+      "data": {
+        "path": "art-source/zoo-cards.json",
+        "sha256": "300464e3645a6b726bc6529df1620b57915fbafa5ed8426930c05d9dca4ca808"
+      },
+      "upstreamAssetKeys": [
+        "zoo-coral-long"
+      ],
+      "layout": {
+        "canvas": [
+          448,
+          238
+        ],
+        "guides": [
+          [
+            30,
+            28,
+            30,
+            211
+          ],
+          [
+            30,
+            108,
+            421,
+            108
+          ],
+          [
+            30,
+            204,
+            421,
+            204
+          ]
+        ],
+        "subjects": [
+          [
+            "coral-long",
+            "width",
+            340,
+            30,
+            102
+          ],
+          [
+            "coral-long",
+            "width",
+            325,
+            30,
+            198
+          ]
+        ]
+      },
+      "assetKey": "zoo-quiz-long-pair-alt",
+      "path": "assets/zoo-quiz-long-pair-alt.png",
+      "sha256": "0d52d3819679e3ac7900d41774c2197fe6a794dc73917df7834a5186f23dfe35",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "contact_checked_final_student_playback_pending"
+    },
+    {
+      "source": "Measured layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_zoo_cards.py",
+        "sha256": "7461e7d6821fe3e0a21683e59fe1d494945760a451daa3966486b7dfb99c2eeb"
+      },
+      "data": {
+        "path": "art-source/zoo-cards.json",
+        "sha256": "300464e3645a6b726bc6529df1620b57915fbafa5ed8426930c05d9dca4ca808"
+      },
+      "upstreamAssetKeys": [
+        "zoo-coral-long"
+      ],
+      "layout": {
+        "canvas": [
+          416,
+          235
+        ],
+        "guides": [
+          [
+            31,
+            36,
+            31,
+            205
+          ],
+          [
+            31,
+            104,
+            395,
+            104
+          ],
+          [
+            31,
+            190,
+            395,
+            190
+          ]
+        ],
+        "subjects": [
+          [
+            "coral-long",
+            "width",
+            337,
+            31,
+            100
+          ],
+          [
+            "coral-long",
+            "width",
+            337,
+            31,
+            185
+          ]
+        ]
+      },
+      "assetKey": "zoo-quiz-long-pair",
+      "path": "assets/zoo-quiz-long-pair.png",
+      "sha256": "c30de3c436328e3b5143cb9a1f371aec0d1636582bbde3d67b2d8c8a5d6c76de",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "contact_checked_final_student_playback_pending"
+    },
+    {
+      "source": "Measured layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_zoo_cards.py",
+        "sha256": "7461e7d6821fe3e0a21683e59fe1d494945760a451daa3966486b7dfb99c2eeb"
+      },
+      "data": {
+        "path": "art-source/zoo-cards.json",
+        "sha256": "300464e3645a6b726bc6529df1620b57915fbafa5ed8426930c05d9dca4ca808"
+      },
+      "upstreamAssetKeys": [
+        "zoo-coral-short"
+      ],
+      "layout": {
+        "canvas": [
+          416,
+          235
+        ],
+        "guides": [
+          [
+            31,
+            36,
+            31,
+            205
+          ],
+          [
+            31,
+            104,
+            395,
+            104
+          ],
+          [
+            31,
+            190,
+            395,
+            190
+          ]
+        ],
+        "subjects": [
+          [
+            "coral-short",
+            "width",
+            205,
+            31,
+            185
+          ]
+        ]
+      },
+      "assetKey": "zoo-quiz-short-one",
+      "path": "assets/zoo-quiz-short-one.png",
+      "sha256": "4fa77bc43b23c4e1df46bf97cee8c4c0e455f4f6846d5123f6721f5032920f3a",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "contact_checked_final_student_playback_pending"
+    },
+    {
+      "source": "Measured layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_zoo_cards.py",
+        "sha256": "7461e7d6821fe3e0a21683e59fe1d494945760a451daa3966486b7dfb99c2eeb"
+      },
+      "data": {
+        "path": "art-source/zoo-cards.json",
+        "sha256": "300464e3645a6b726bc6529df1620b57915fbafa5ed8426930c05d9dca4ca808"
+      },
+      "upstreamAssetKeys": [
+        "zoo-coral-short"
+      ],
+      "layout": {
+        "canvas": [
+          448,
+          238
+        ],
+        "guides": [
+          [
+            30,
+            28,
+            30,
+            211
+          ],
+          [
+            30,
+            108,
+            421,
+            108
+          ],
+          [
+            30,
+            204,
+            421,
+            204
+          ]
+        ],
+        "subjects": [
+          [
+            "coral-short",
+            "width",
+            207,
+            30,
+            102
+          ],
+          [
+            "coral-short",
+            "width",
+            193,
+            30,
+            198
+          ]
+        ]
+      },
+      "assetKey": "zoo-quiz-short-pair-alt",
+      "path": "assets/zoo-quiz-short-pair-alt.png",
+      "sha256": "d2a2428c3a4fc2f92dd000f41d2e4246bb72024a53c83ecd1faf757605e8b48c",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "contact_checked_final_student_playback_pending"
+    },
+    {
+      "source": "Measured layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_zoo_cards.py",
+        "sha256": "7461e7d6821fe3e0a21683e59fe1d494945760a451daa3966486b7dfb99c2eeb"
+      },
+      "data": {
+        "path": "art-source/zoo-cards.json",
+        "sha256": "300464e3645a6b726bc6529df1620b57915fbafa5ed8426930c05d9dca4ca808"
+      },
+      "upstreamAssetKeys": [
+        "zoo-coral-short"
+      ],
+      "layout": {
+        "canvas": [
+          416,
+          235
+        ],
+        "guides": [
+          [
+            31,
+            36,
+            31,
+            205
+          ],
+          [
+            31,
+            104,
+            395,
+            104
+          ],
+          [
+            31,
+            190,
+            395,
+            190
+          ]
+        ],
+        "subjects": [
+          [
+            "coral-short",
+            "width",
+            205,
+            31,
+            100
+          ],
+          [
+            "coral-short",
+            "width",
+            205,
+            31,
+            185
+          ]
+        ]
+      },
+      "assetKey": "zoo-quiz-short-pair",
+      "path": "assets/zoo-quiz-short-pair.png",
+      "sha256": "2024e81f6e3617e12e09bfa257616746302b4367a2e146184c78090eee6d9f11",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "contact_checked_final_student_playback_pending"
+    },
+    {
+      "source": "Measured layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_zoo_cards.py",
+        "sha256": "7461e7d6821fe3e0a21683e59fe1d494945760a451daa3966486b7dfb99c2eeb"
+      },
+      "data": {
+        "path": "art-source/zoo-cards.json",
+        "sha256": "300464e3645a6b726bc6529df1620b57915fbafa5ed8426930c05d9dca4ca808"
+      },
+      "upstreamAssetKeys": [
+        "zoo-tiger"
+      ],
+      "layout": {
+        "canvas": [
+          416,
+          235
+        ],
+        "guides": [
+          [
+            12,
+            216,
+            404,
+            216
+          ]
+        ],
+        "subjects": [
+          [
+            "tiger",
+            "width",
+            108,
+            22,
+            214
+          ],
+          [
+            "tiger",
+            "width",
+            108,
+            152,
+            214
+          ],
+          [
+            "tiger",
+            "width",
+            108,
+            282,
+            214
+          ]
+        ]
+      },
+      "assetKey": "zoo-quiz-tiger-trio",
+      "path": "assets/zoo-quiz-tiger-trio.png",
+      "sha256": "a0139f91339f09a1d422a646164245736563f3f3842e93a69d470b6f6b5189a7",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "contact_checked_final_student_playback_pending"
+    },
+    {
+      "source": "Measured layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_zoo_cards.py",
+        "sha256": "7461e7d6821fe3e0a21683e59fe1d494945760a451daa3966486b7dfb99c2eeb"
+      },
+      "data": {
+        "path": "art-source/zoo-cards.json",
+        "sha256": "300464e3645a6b726bc6529df1620b57915fbafa5ed8426930c05d9dca4ca808"
+      },
+      "upstreamAssetKeys": [
+        "zoo-green-short"
+      ],
+      "layout": {
+        "canvas": [
+          366,
+          201
+        ],
+        "guides": [
+          [
+            26,
+            39,
+            26,
+            185
+          ],
+          [
+            26,
+            99,
+            347,
+            99
+          ],
+          [
+            26,
+            178,
+            347,
+            178
+          ]
+        ],
+        "subjects": [
+          [
+            "green-short",
+            "width",
+            203,
+            26,
+            96
+          ],
+          [
+            "green-short",
+            "width",
+            203,
+            26,
+            175
+          ]
+        ]
+      },
+      "assetKey": "zoo-short-group",
+      "path": "assets/zoo-short-group.png",
+      "sha256": "ada36c01c095ab528ec6a9f728215cedc171e488e00af033c2349dc23fcb0a6b",
+      "usedBy": [
+        "ask-about-the-group",
+        "bubble-portraits",
+        "jump-to-the-group"
+      ],
+      "visualReview": "contact_checked_interactive_browser_sample_passed"
+    },
+    {
+      "source": "Measured layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_zoo_cards.py",
+        "sha256": "7461e7d6821fe3e0a21683e59fe1d494945760a451daa3966486b7dfb99c2eeb"
+      },
+      "data": {
+        "path": "art-source/zoo-cards.json",
+        "sha256": "300464e3645a6b726bc6529df1620b57915fbafa5ed8426930c05d9dca4ca808"
+      },
+      "upstreamAssetKeys": [
+        "zoo-cat",
+        "zoo-dog",
+        "zoo-elephant"
+      ],
+      "layout": {
+        "canvas": [
+          640,
+          246
+        ],
+        "guides": [
+          [
+            15,
+            224,
+            625,
+            224
+          ]
+        ],
+        "subjects": [
+          [
+            "dog",
+            "width",
+            151,
+            38,
+            221
+          ],
+          [
+            "cat",
+            "width",
+            76,
+            222,
+            221
+          ],
+          [
+            "elephant",
+            "width",
+            271,
+            339,
+            221
+          ]
+        ]
+      },
+      "assetKey": "zoo-size-three",
+      "path": "assets/zoo-size-three.png",
+      "sha256": "0fb8dd6254b14f146ed2cdb6ea28893791c2884c48f125914d9cdc401522d924",
+      "usedBy": [
+        "compare-overall"
+      ],
+      "visualReview": "contact_checked_final_student_playback_pending"
+    },
+    {
+      "source": "Measured layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_zoo_cards.py",
+        "sha256": "7461e7d6821fe3e0a21683e59fe1d494945760a451daa3966486b7dfb99c2eeb"
+      },
+      "data": {
+        "path": "art-source/zoo-cards.json",
+        "sha256": "300464e3645a6b726bc6529df1620b57915fbafa5ed8426930c05d9dca4ca808"
+      },
+      "upstreamAssetKeys": [
+        "zoo-elephant"
+      ],
+      "layout": {
+        "canvas": [
+          416,
+          235
+        ],
+        "guides": [
+          [
+            12,
+            216,
+            404,
+            216
+          ]
+        ],
+        "subjects": [
+          [
+            "elephant",
+            "width",
+            99,
+            72,
+            214
+          ],
+          [
+            "elephant",
+            "width",
+            99,
+            239,
+            214
+          ]
+        ]
+      },
+      "assetKey": "zoo-small-group",
+      "path": "assets/zoo-small-group.png",
+      "sha256": "bd9b20132b99874cb621b3f836b60a819b1d1c4dd570f886a57a1332486649f2",
+      "usedBy": [
+        "bubble-portraits",
+        "jump-to-the-group"
+      ],
+      "visualReview": "contact_checked_interactive_browser_sample_passed"
+    },
+    {
+      "assetKey": "zoo-stage",
+      "source": "Codex built-in image_gen",
+      "generatedSource": {
+        "path": "art-source/zoo-stage.png",
+        "sha256": "0c499c4edaf6905c6133a93dc7e08866fd1b38f380ab19c2b42993b87d65bf1f"
+      },
+      "promptFile": {
+        "path": "art-source/zoo-stage.prompt.txt",
+        "sha256": "87863a57e5727d991c90fdc0344c10c6cfb5d268a31e84f9e120ec87be4786dd"
+      },
+      "derivedBy": "sips -Z 1280; 16:9 retained",
+      "path": "assets/zoo-stage.png",
+      "sha256": "44aa7febf555cc12fe8f3920c7487108ef85bc5ddd48e9aabe54b39cc934e267",
+      "usedBy": [
+        "bubble-portraits",
+        "jump-to-the-group"
+      ],
+      "visualReview": "contact_checked_interactive_browser_sample_passed"
+    },
+    {
+      "source": "Measured layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_zoo_cards.py",
+        "sha256": "7461e7d6821fe3e0a21683e59fe1d494945760a451daa3966486b7dfb99c2eeb"
+      },
+      "data": {
+        "path": "art-source/zoo-cards.json",
+        "sha256": "300464e3645a6b726bc6529df1620b57915fbafa5ed8426930c05d9dca4ca808"
+      },
+      "upstreamAssetKeys": [
+        "zoo-giraffe"
+      ],
+      "layout": {
+        "canvas": [
+          416,
+          235
+        ],
+        "guides": [
+          [
+            12,
+            216,
+            404,
+            216
+          ]
+        ],
+        "subjects": [
+          [
+            "giraffe",
+            "height",
+            179,
+            63,
+            214
+          ],
+          [
+            "giraffe",
+            "height",
+            179,
+            224,
+            214
+          ]
+        ]
+      },
+      "assetKey": "zoo-tall-group",
+      "path": "assets/zoo-tall-group.png",
+      "sha256": "ed4266052b005c4ce08edc0579005755fff037b413789b6232dddd5cf3e442ac",
+      "usedBy": [
+        "compare-height",
+        "bubble-portraits",
+        "jump-to-the-group"
+      ],
+      "visualReview": "contact_checked_interactive_browser_sample_passed"
+    },
+    {
+      "source": "Measured layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_zoo_cards.py",
+        "sha256": "7461e7d6821fe3e0a21683e59fe1d494945760a451daa3966486b7dfb99c2eeb"
+      },
+      "data": {
+        "path": "art-source/zoo-cards.json",
+        "sha256": "300464e3645a6b726bc6529df1620b57915fbafa5ed8426930c05d9dca4ca808"
+      },
+      "upstreamAssetKeys": [
+        "zoo-tiger"
+      ],
+      "layout": {
+        "canvas": [
+          416,
+          235
+        ],
+        "guides": [
+          [
+            12,
+            216,
+            404,
+            216
+          ]
+        ],
+        "subjects": [
+          [
+            "tiger",
+            "width",
+            169,
+            36,
+            214
+          ],
+          [
+            "tiger",
+            "width",
+            169,
+            215,
+            214
+          ]
+        ]
+      },
+      "assetKey": "zoo-tiger-group",
+      "path": "assets/zoo-tiger-group.png",
+      "sha256": "c3120e9c6ec516cb372b6e93ff0e7260fc46db9d332a69d5a19c69f8f752ae78",
+      "usedBy": [
+        "identify-the-group",
+        "bubble-portraits",
+        "guide-one-stop",
+        "jump-to-the-group"
+      ],
+      "visualReview": "contact_checked_interactive_browser_sample_passed"
+    }
+  ],
+  "missing": [],
+  "interactivePageBudget": [
+    {
+      "scene": "bubble-portraits",
+      "imageBytes": 1881346,
+      "limitBytes": 3145728
+    },
+    {
+      "scene": "jump-to-the-group",
+      "imageBytes": 1858122,
+      "limitBytes": 3145728
+    }
+  ],
+  "atlasCutouts": [
+    {
+      "assetKey": "zoo-green-long",
+      "path": "assets/zoo-green-long.png",
+      "sha256": "feb6a3ac63940ab460ee7dd3ee42ac3704cb56d39261bebfe8327e43fc0c329a",
+      "width": 420,
+      "height": 61,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/zoo-core.png",
+      "generatedSourceSha256": "0b01df8ce6edc29ac0e7dc4b6e323e477427b868b32f7be61f4e79d729efe17d",
+      "promptSha256": "4713d8365a38177ca0c389684efe671c3bf904c0db6e2248c63f7774e5a7c72f",
+      "sourceCrop": [
+        10,
+        198,
+        446,
+        261
+      ],
+      "promptFile": {
+        "path": "art-source/zoo-core.prompt.txt",
+        "sha256": "4713d8365a38177ca0c389684efe671c3bf904c0db6e2248c63f7774e5a7c72f"
+      },
+      "atlasReceipt": {
+        "path": "art-source/zoo-core.receipt.json",
+        "sha256": "189a28c1059795fe27bbe0a3070ac6ee9d37f6e50e696e7896880fb95677c1eb"
+      }
+    },
+    {
+      "assetKey": "zoo-green-short",
+      "path": "assets/zoo-green-short.png",
+      "sha256": "dc9c890fe14d45b23d92cb721309e30d0411030ae035d497805ddc5b6f8b8a74",
+      "width": 260,
+      "height": 65,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/zoo-core.png",
+      "generatedSourceSha256": "0b01df8ce6edc29ac0e7dc4b6e323e477427b868b32f7be61f4e79d729efe17d",
+      "promptSha256": "4713d8365a38177ca0c389684efe671c3bf904c0db6e2248c63f7774e5a7c72f",
+      "sourceCrop": [
+        513,
+        195,
+        773,
+        260
+      ],
+      "promptFile": {
+        "path": "art-source/zoo-core.prompt.txt",
+        "sha256": "4713d8365a38177ca0c389684efe671c3bf904c0db6e2248c63f7774e5a7c72f"
+      },
+      "atlasReceipt": {
+        "path": "art-source/zoo-core.receipt.json",
+        "sha256": "189a28c1059795fe27bbe0a3070ac6ee9d37f6e50e696e7896880fb95677c1eb"
+      }
+    },
+    {
+      "assetKey": "zoo-giraffe",
+      "path": "assets/zoo-giraffe.png",
+      "sha256": "3ff0e8e9b3546d890461b4ec13e1ba967847c057810352bdc13161a22a546f52",
+      "width": 303,
+      "height": 414,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/zoo-core.png",
+      "generatedSourceSha256": "0b01df8ce6edc29ac0e7dc4b6e323e477427b868b32f7be61f4e79d729efe17d",
+      "promptSha256": "4713d8365a38177ca0c389684efe671c3bf904c0db6e2248c63f7774e5a7c72f",
+      "sourceCrop": [
+        832,
+        11,
+        1135,
+        425
+      ],
+      "promptFile": {
+        "path": "art-source/zoo-core.prompt.txt",
+        "sha256": "4713d8365a38177ca0c389684efe671c3bf904c0db6e2248c63f7774e5a7c72f"
+      },
+      "atlasReceipt": {
+        "path": "art-source/zoo-core.receipt.json",
+        "sha256": "189a28c1059795fe27bbe0a3070ac6ee9d37f6e50e696e7896880fb95677c1eb"
+      }
+    },
+    {
+      "assetKey": "zoo-dog",
+      "path": "assets/zoo-dog.png",
+      "sha256": "eeab4b516cd4af434fece9be2a2ff9f768a363218c2b5d4bae1691d900ed4ab7",
+      "width": 306,
+      "height": 321,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/zoo-core.png",
+      "generatedSourceSha256": "0b01df8ce6edc29ac0e7dc4b6e323e477427b868b32f7be61f4e79d729efe17d",
+      "promptSha256": "4713d8365a38177ca0c389684efe671c3bf904c0db6e2248c63f7774e5a7c72f",
+      "sourceCrop": [
+        862,
+        465,
+        1168,
+        786
+      ],
+      "promptFile": {
+        "path": "art-source/zoo-core.prompt.txt",
+        "sha256": "4713d8365a38177ca0c389684efe671c3bf904c0db6e2248c63f7774e5a7c72f"
+      },
+      "atlasReceipt": {
+        "path": "art-source/zoo-core.receipt.json",
+        "sha256": "189a28c1059795fe27bbe0a3070ac6ee9d37f6e50e696e7896880fb95677c1eb"
+      }
+    },
+    {
+      "assetKey": "zoo-cat",
+      "path": "assets/zoo-cat.png",
+      "sha256": "579a7d4e316f060de7b4876a243f26eed7c4fa749a4a9311a8c82d766cfbf469",
+      "width": 265,
+      "height": 331,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/zoo-core.png",
+      "generatedSourceSha256": "0b01df8ce6edc29ac0e7dc4b6e323e477427b868b32f7be61f4e79d729efe17d",
+      "promptSha256": "4713d8365a38177ca0c389684efe671c3bf904c0db6e2248c63f7774e5a7c72f",
+      "sourceCrop": [
+        58,
+        918,
+        323,
+        1249
+      ],
+      "promptFile": {
+        "path": "art-source/zoo-core.prompt.txt",
+        "sha256": "4713d8365a38177ca0c389684efe671c3bf904c0db6e2248c63f7774e5a7c72f"
+      },
+      "atlasReceipt": {
+        "path": "art-source/zoo-core.receipt.json",
+        "sha256": "189a28c1059795fe27bbe0a3070ac6ee9d37f6e50e696e7896880fb95677c1eb"
+      }
+    },
+    {
+      "assetKey": "zoo-child",
+      "path": "assets/zoo-child.png",
+      "sha256": "a65479ba504b7a1c4056a75b76b97604e88ed6fd4b6534df97bbc87fd0a8da36",
+      "width": 242,
+      "height": 420,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/zoo-core.png",
+      "generatedSourceSha256": "0b01df8ce6edc29ac0e7dc4b6e323e477427b868b32f7be61f4e79d729efe17d",
+      "promptSha256": "4713d8365a38177ca0c389684efe671c3bf904c0db6e2248c63f7774e5a7c72f",
+      "sourceCrop": [
+        454,
+        817,
+        733,
+        1302
+      ],
+      "promptFile": {
+        "path": "art-source/zoo-core.prompt.txt",
+        "sha256": "4713d8365a38177ca0c389684efe671c3bf904c0db6e2248c63f7774e5a7c72f"
+      },
+      "atlasReceipt": {
+        "path": "art-source/zoo-core.receipt.json",
+        "sha256": "189a28c1059795fe27bbe0a3070ac6ee9d37f6e50e696e7896880fb95677c1eb"
+      }
+    },
+    {
+      "assetKey": "zoo-boat",
+      "path": "assets/zoo-boat.png",
+      "sha256": "2a9444a91130372ceb53932ca8f7b08d608044a9f088fb7aad09a2da4c7056cd",
+      "width": 420,
+      "height": 283,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/zoo-core.png",
+      "generatedSourceSha256": "0b01df8ce6edc29ac0e7dc4b6e323e477427b868b32f7be61f4e79d729efe17d",
+      "promptSha256": "4713d8365a38177ca0c389684efe671c3bf904c0db6e2248c63f7774e5a7c72f",
+      "sourceCrop": [
+        769,
+        958,
+        1193,
+        1244
+      ],
+      "promptFile": {
+        "path": "art-source/zoo-core.prompt.txt",
+        "sha256": "4713d8365a38177ca0c389684efe671c3bf904c0db6e2248c63f7774e5a7c72f"
+      },
+      "atlasReceipt": {
+        "path": "art-source/zoo-core.receipt.json",
+        "sha256": "189a28c1059795fe27bbe0a3070ac6ee9d37f6e50e696e7896880fb95677c1eb"
+      }
+    },
+    {
+      "assetKey": "zoo-coral-long",
+      "path": "assets/zoo-coral-long.png",
+      "sha256": "9e6cf16fa4bf7c992b313c6c747e1cfc1a4bce38f30ab0cb3b3f5940f75f7f87",
+      "width": 395,
+      "height": 98,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/zoo-variants.png",
+      "generatedSourceSha256": "079d435f87bbcb718d5d29259aea5a00cd8cf5cc27652c831982a84a511e588c",
+      "promptSha256": "4f106a6706412e6ce3f3fb9af0f914d39683602fd580fff6cb92f53ac7d8dd50",
+      "sourceCrop": [
+        20,
+        173,
+        415,
+        271
+      ],
+      "promptFile": {
+        "path": "art-source/zoo-variants.prompt.txt",
+        "sha256": "4f106a6706412e6ce3f3fb9af0f914d39683602fd580fff6cb92f53ac7d8dd50"
+      },
+      "atlasReceipt": {
+        "path": "art-source/zoo-variants.receipt.json",
+        "sha256": "07505729ee65298a1e5610f15780b0e2bb53eb23d556e2d45d4fdad43b1c5bde"
+      }
+    },
+    {
+      "assetKey": "zoo-coral-short",
+      "path": "assets/zoo-coral-short.png",
+      "sha256": "5ee95593f2ecdd951561789700b90107a48c1700bc9372867573161343f5ea36",
+      "width": 260,
+      "height": 91,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/zoo-variants.png",
+      "generatedSourceSha256": "079d435f87bbcb718d5d29259aea5a00cd8cf5cc27652c831982a84a511e588c",
+      "promptSha256": "4f106a6706412e6ce3f3fb9af0f914d39683602fd580fff6cb92f53ac7d8dd50",
+      "sourceCrop": [
+        514,
+        177,
+        774,
+        268
+      ],
+      "promptFile": {
+        "path": "art-source/zoo-variants.prompt.txt",
+        "sha256": "4f106a6706412e6ce3f3fb9af0f914d39683602fd580fff6cb92f53ac7d8dd50"
+      },
+      "atlasReceipt": {
+        "path": "art-source/zoo-variants.receipt.json",
+        "sha256": "07505729ee65298a1e5610f15780b0e2bb53eb23d556e2d45d4fdad43b1c5bde"
+      }
+    },
+    {
+      "assetKey": "zoo-quiz-giraffe",
+      "path": "assets/zoo-quiz-giraffe.png",
+      "sha256": "1e07ec6e0972456005cab9083a75890998f07877e51e2866f7323c17d3eda876",
+      "width": 264,
+      "height": 365,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/zoo-variants.png",
+      "generatedSourceSha256": "079d435f87bbcb718d5d29259aea5a00cd8cf5cc27652c831982a84a511e588c",
+      "promptSha256": "4f106a6706412e6ce3f3fb9af0f914d39683602fd580fff6cb92f53ac7d8dd50",
+      "sourceCrop": [
+        914,
+        32,
+        1178,
+        397
+      ],
+      "promptFile": {
+        "path": "art-source/zoo-variants.prompt.txt",
+        "sha256": "4f106a6706412e6ce3f3fb9af0f914d39683602fd580fff6cb92f53ac7d8dd50"
+      },
+      "atlasReceipt": {
+        "path": "art-source/zoo-variants.receipt.json",
+        "sha256": "07505729ee65298a1e5610f15780b0e2bb53eb23d556e2d45d4fdad43b1c5bde"
+      }
+    },
+    {
+      "assetKey": "zoo-elephant",
+      "path": "assets/zoo-elephant.png",
+      "sha256": "36bef3a19b4e9d828cd3463599d114bf838c0f57c04e74c345ea2779a17cdfaf",
+      "width": 383,
+      "height": 264,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/zoo-variants.png",
+      "generatedSourceSha256": "079d435f87bbcb718d5d29259aea5a00cd8cf5cc27652c831982a84a511e588c",
+      "promptSha256": "4f106a6706412e6ce3f3fb9af0f914d39683602fd580fff6cb92f53ac7d8dd50",
+      "sourceCrop": [
+        19,
+        491,
+        402,
+        755
+      ],
+      "promptFile": {
+        "path": "art-source/zoo-variants.prompt.txt",
+        "sha256": "4f106a6706412e6ce3f3fb9af0f914d39683602fd580fff6cb92f53ac7d8dd50"
+      },
+      "atlasReceipt": {
+        "path": "art-source/zoo-variants.receipt.json",
+        "sha256": "07505729ee65298a1e5610f15780b0e2bb53eb23d556e2d45d4fdad43b1c5bde"
+      }
+    },
+    {
+      "assetKey": "zoo-tiger",
+      "path": "assets/zoo-tiger.png",
+      "sha256": "f9ee88b9a0a099deee0d1a2135520d1feab78336107945481e448abd4b78540e",
+      "width": 374,
+      "height": 246,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/zoo-variants.png",
+      "generatedSourceSha256": "079d435f87bbcb718d5d29259aea5a00cd8cf5cc27652c831982a84a511e588c",
+      "promptSha256": "4f106a6706412e6ce3f3fb9af0f914d39683602fd580fff6cb92f53ac7d8dd50",
+      "sourceCrop": [
+        444,
+        502,
+        818,
+        748
+      ],
+      "promptFile": {
+        "path": "art-source/zoo-variants.prompt.txt",
+        "sha256": "4f106a6706412e6ce3f3fb9af0f914d39683602fd580fff6cb92f53ac7d8dd50"
+      },
+      "atlasReceipt": {
+        "path": "art-source/zoo-variants.receipt.json",
+        "sha256": "07505729ee65298a1e5610f15780b0e2bb53eb23d556e2d45d4fdad43b1c5bde"
+      }
+    },
+    {
+      "assetKey": "zoo-boat-action",
+      "path": "assets/zoo-boat-action.png",
+      "sha256": "29f00a59e7ae2a35130b724db0f736fb4398f056ccffd2b089ad199e2ebadace",
+      "width": 376,
+      "height": 268,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/zoo-variants.png",
+      "generatedSourceSha256": "079d435f87bbcb718d5d29259aea5a00cd8cf5cc27652c831982a84a511e588c",
+      "promptSha256": "4f106a6706412e6ce3f3fb9af0f914d39683602fd580fff6cb92f53ac7d8dd50",
+      "sourceCrop": [
+        860,
+        483,
+        1236,
+        751
+      ],
+      "promptFile": {
+        "path": "art-source/zoo-variants.prompt.txt",
+        "sha256": "4f106a6706412e6ce3f3fb9af0f914d39683602fd580fff6cb92f53ac7d8dd50"
+      },
+      "atlasReceipt": {
+        "path": "art-source/zoo-variants.receipt.json",
+        "sha256": "07505729ee65298a1e5610f15780b0e2bb53eb23d556e2d45d4fdad43b1c5bde"
+      }
+    },
+    {
+      "assetKey": "zoo-bot",
+      "path": "assets/zoo-bot.png",
+      "sha256": "65634e881fc07f7b2f0dc4debae3a6df5636990fc1775320bdd9bcf4dbdc54ae",
+      "width": 203,
+      "height": 363,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/zoo-variants.png",
+      "generatedSourceSha256": "079d435f87bbcb718d5d29259aea5a00cd8cf5cc27652c831982a84a511e588c",
+      "promptSha256": "4f106a6706412e6ce3f3fb9af0f914d39683602fd580fff6cb92f53ac7d8dd50",
+      "sourceCrop": [
+        113,
+        856,
+        316,
+        1219
+      ],
+      "promptFile": {
+        "path": "art-source/zoo-variants.prompt.txt",
+        "sha256": "4f106a6706412e6ce3f3fb9af0f914d39683602fd580fff6cb92f53ac7d8dd50"
+      },
+      "atlasReceipt": {
+        "path": "art-source/zoo-variants.receipt.json",
+        "sha256": "07505729ee65298a1e5610f15780b0e2bb53eb23d556e2d45d4fdad43b1c5bde"
+      }
+    },
+    {
+      "assetKey": "zoo-bot-walk",
+      "path": "assets/zoo-bot-walk.png",
+      "sha256": "5b7865bdabc9069a60f9a035372a6480743630f25fd289d6ac0552e91be61ab9",
+      "width": 249,
+      "height": 362,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/zoo-variants.png",
+      "generatedSourceSha256": "079d435f87bbcb718d5d29259aea5a00cd8cf5cc27652c831982a84a511e588c",
+      "promptSha256": "4f106a6706412e6ce3f3fb9af0f914d39683602fd580fff6cb92f53ac7d8dd50",
+      "sourceCrop": [
+        498,
+        853,
+        747,
+        1215
+      ],
+      "promptFile": {
+        "path": "art-source/zoo-variants.prompt.txt",
+        "sha256": "4f106a6706412e6ce3f3fb9af0f914d39683602fd580fff6cb92f53ac7d8dd50"
+      },
+      "atlasReceipt": {
+        "path": "art-source/zoo-variants.receipt.json",
+        "sha256": "07505729ee65298a1e5610f15780b0e2bb53eb23d556e2d45d4fdad43b1c5bde"
+      }
+    },
+    {
+      "assetKey": "zoo-bot-jump",
+      "path": "assets/zoo-bot-jump.png",
+      "sha256": "efe7a9950693bd129783fdc69dbc8ab3d2ffbeaaf9c5f38b5012df43aed15159",
+      "width": 255,
+      "height": 331,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/zoo-variants.png",
+      "generatedSourceSha256": "079d435f87bbcb718d5d29259aea5a00cd8cf5cc27652c831982a84a511e588c",
+      "promptSha256": "4f106a6706412e6ce3f3fb9af0f914d39683602fd580fff6cb92f53ac7d8dd50",
+      "sourceCrop": [
+        922,
+        844,
+        1177,
+        1175
+      ],
+      "promptFile": {
+        "path": "art-source/zoo-variants.prompt.txt",
+        "sha256": "4f106a6706412e6ce3f3fb9af0f914d39683602fd580fff6cb92f53ac7d8dd50"
+      },
+      "atlasReceipt": {
+        "path": "art-source/zoo-variants.receipt.json",
+        "sha256": "07505729ee65298a1e5610f15780b0e2bb53eb23d556e2d45d4fdad43b1c5bde"
+      }
+    },
+    {
+      "assetKey": "zoo-stage",
+      "source": "Codex built-in image_gen",
+      "generatedSource": {
+        "path": "art-source/zoo-stage.png",
+        "sha256": "0c499c4edaf6905c6133a93dc7e08866fd1b38f380ab19c2b42993b87d65bf1f"
+      },
+      "promptFile": {
+        "path": "art-source/zoo-stage.prompt.txt",
+        "sha256": "87863a57e5727d991c90fdc0344c10c6cfb5d268a31e84f9e120ec87be4786dd"
+      },
+      "derivedBy": "sips -Z 1280; 16:9 retained"
+    }
+  ],
+  "excludedCoreAtlasCells": [
+    "raw core elephant and tiger bounds overlap; full non-overlapping variants used"
+  ],
+  "contactSheets": [
+    {
+      "path": "output/courseware-lessons/fltrp-g1-lower-these-snakes-are-short/work-grade1Handoff20261110-prevoice-v2/qa-prevoice/compiled-art-1.jpg",
+      "sha256": "7f0513bbe9020beaf614246597587bfe18d8becf210ef2ce99f40cb32739c050"
+    },
+    {
+      "path": "output/courseware-lessons/fltrp-g1-lower-these-snakes-are-short/work-grade1Handoff20261110-prevoice-v2/qa-prevoice/compiled-art-2.jpg",
+      "sha256": "06e8098668555bcf1f277c55a06ceb3eb34fd54268bdfd119ddce4ad23c2f00c"
+    },
+    {
+      "path": "output/courseware-lessons/fltrp-g1-lower-these-snakes-are-short/work-grade1Handoff20261110-prevoice-v2/qa-prevoice/compiled-art-3.jpg",
+      "sha256": "ee5c0e619231fac30bd59cb6e636ed6546a96b84bd99af85d8fbace4d01580a6"
+    }
+  ]
+}

@@ -32,6 +32,7 @@ SOURCE_ROOT = Path(__file__).resolve().parents[1] / 'lessons'
 SLOTS_DIR = SOURCE_ROOT.parents[1] / 'output' / 'courseware-production' / 'media-dispatch-slots'
 DEFAULT_ENDPOINT = 'http://127.0.0.1:3100'
 SCHEMA = 'mira.courseware.media-dispatch.v1'
+VOICE_DEDUPE_PLAN = '.media-dispatch/voice-dedupe.json'
 MINIMUM_FREE_BYTES = 2 * 1024**3
 
 
@@ -121,6 +122,15 @@ def _raw_response(status, body):
 
 
 def _require_disk_space(destination):
+    setting = 'MIRA_COURSEWARE_MIN_FREE_BYTES'
+    try:
+        floor = int(os.environ.get(setting, str(MINIMUM_FREE_BYTES)))
+    except ValueError:
+        floor = None
+    if floor is None or floor < MINIMUM_FREE_BYTES:
+        raise DispatchError('disk_space_floor_invalid',
+                            f'{setting} must be an integer of at least {MINIMUM_FREE_BYTES} bytes')
+
     try:
         existing = Path(destination).resolve()
         while not existing.exists() and existing != existing.parent:
@@ -128,9 +138,10 @@ def _require_disk_space(destination):
         free = shutil.disk_usage(existing).free
     except OSError as exc:
         raise DispatchError('disk_space_check_failed', f'{destination}: {exc}') from exc
-    if free < MINIMUM_FREE_BYTES:
+    if free < floor:
+        required = '2 GiB' if floor == MINIMUM_FREE_BYTES else f'{floor} bytes'
         raise DispatchError('disk_space_insufficient',
-                            f'{destination} has {free} bytes available, requires at least 2 GiB')
+                            f'{destination} has {free} bytes available, requires at least {required}')
 
 
 @contextmanager
@@ -644,23 +655,193 @@ def run_authorized_retry(lesson, work, authorization_path, *, companions=(), pos
         return {'voice': clips}
 
 
+def _read_voice_wav(recorded, attempt, url, payload, digest):
+    status, body = recorded._read_attempt(attempt, url, payload, digest)
+    if status != 200:
+        raise DispatchError('tts_http_error', f"{payload['audioId']}: HTTP {status}")
+    data = voice._wav_bytes(body)
+    voice._validate_wav(data)
+    return data
+
+
+def _voice_reuse_record(recorded, url, payloads, digests, sources, alias, representative):
+    attempt, wav_sha = sources[representative]
+    return {
+        'schemaVersion': 'mira.courseware.voice-reuse.v1',
+        'reuseKind': 'same_batch_exact_utf8_text_and_settings',
+        'ttsUrl': url,
+        'aliasAudioId': alias,
+        'aliasUnsubmittedPayloadSha256': digests[alias],
+        'textSha256': hashlib.sha256(payloads[alias]['text'].encode('utf-8')).hexdigest(),
+        'representativeAudioId': representative,
+        'representativePayloadSha256': digests[representative],
+        'representativeAttempt': str(attempt.relative_to(recorded.directory)),
+        'representativeClaimSha256': hashlib.sha256((attempt / 'claim.json').read_bytes()).hexdigest(),
+        'representativeResponseSha256': hashlib.sha256((attempt / 'response.json').read_bytes()).hexdigest(),
+        'originalHttpStatus': 200,
+        'targetWavFile': f'tts-{alias}-{wav_sha}.wav',
+        'wavSha256': wav_sha,
+        'providerPostsForAlias': 0,
+    }
+
+
+def _bind_voice_wav(line, data, name, media_dir, cache_path, cache):
+    media_dir.mkdir(parents=True, exist_ok=True)
+    target = media_dir / name
+    temporary = media_dir / f'.{name}.tmp'
+    temporary.write_bytes(data)
+    temporary.replace(target)
+    cache[voice._cache_key(line)] = name
+    voice._write_cache(cache_path, cache)
+
+
+def _dispatch_identical_voice(lines, recorded, endpoint, lines_sha256):
+    """Bind exact duplicate requests from this work's own settled TTS receipts."""
+    voice._validate_lines(lines, 1)
+    recorded._check_unresolved()
+    url = endpoint.rstrip('/') + '/api/generate/tts'
+    media_dir, cache_path = recorded.work / 'media', recorded.work / 'voice-cache.json'
+    cache = _load(cache_path) if cache_path.exists() else {}
+    if not isinstance(cache, dict):
+        raise DispatchError('record_invalid', str(cache_path))
+    indexed = {line['id']: line for line in lines}
+    payloads = {line_id: voice._tts_payload(line) for line_id, line in indexed.items()}
+    digests = {line_id: hashlib.sha256(_json_bytes(payload)).hexdigest()
+               for line_id, payload in payloads.items()}
+    plan_path = recorded.work / VOICE_DEDUPE_PLAN
+    plan_exists = plan_path.exists()
+    plan = {'schemaVersion': 'mira.courseware.voice-dedupe.v1', 'linesSha256': lines_sha256,
+            'payloadsSha256': hashlib.sha256(_json_bytes(list(payloads.values()))).hexdigest(), 'ttsUrl': url}
+    if plan_exists and _load(plan_path) != plan:
+        raise DispatchError('voice_dedupe_plan_mismatch', str(plan_path))
+    groups, files, sources, reuse_records = {}, {}, {}, {}
+    reuse_dir = recorded.directory / 'reused'
+    wav_pattern = re.compile(r'tts-([A-Za-z0-9_-]+)-[0-9a-f]{64}\.wav')
+    local_wavs = set()
+    for path in media_dir.glob('tts-*.wav'):
+        match = wav_pattern.fullmatch(path.name)
+        if match:
+            local_wavs.add(match[1])
+    for line_id, line in indexed.items():
+        payload, digest = payloads[line_id], digests[line_id]
+        key = (url, payload['ttsProviderId'], payload['ttsModelId'], payload['ttsVoice'], payload['text'])
+        groups.setdefault(key, []).append(line_id)
+        name = voice._cached_name(line, media_dir, cache, require_pcm=True)
+        if name:
+            files[line_id] = name
+        base = recorded.requests / digest
+        if base.exists():
+            attempt, _ = recorded._latest_attempt(base, url, payload, digest)
+            data = _read_voice_wav(recorded, attempt, url, payload, digest)
+            wav_sha = hashlib.sha256(data).hexdigest()
+            if name and name != f'tts-{line_id}-{wav_sha}.wav':
+                raise DispatchError('voice_cache_receipt_mismatch', line_id)
+            sources[line_id] = (attempt, wav_sha)
+        reuse_path = reuse_dir / f'{line_id}.json'
+        if reuse_path.exists():
+            reuse_records[line_id] = _load(reuse_path)
+
+    # Check all known local history before starting any new request.
+    for members in groups.values():
+        for alias in members:
+            if alias not in reuse_records:
+                continue
+            entry = reuse_records[alias]
+            representative = entry.get('representativeAudioId') if isinstance(entry, dict) else None
+            if (representative not in members or representative == alias
+                    or representative not in sources or alias in sources):
+                raise DispatchError('voice_reuse_receipt_mismatch', alias)
+            expected = _voice_reuse_record(recorded, url, payloads, digests, sources, alias, representative)
+            if (any(entry.get(key) != value for key, value in expected.items())
+                    or (alias in files and files[alias] != expected['targetWavFile'])):
+                raise DispatchError('voice_reuse_receipt_mismatch', alias)
+        if any(member not in files for member in members) and not any(member in sources for member in members):
+            for member in members:
+                if (voice._cache_key(indexed[member]) in cache
+                        or member in local_wavs):
+                    raise DispatchError('voice_reuse_source_unverified', member)
+
+    # Pin the mode before any claim or binding. A standard voice run has no
+    # grouping information and must not submit a pending alias after a crash.
+    if not plan_exists:
+        _atomic_record(plan_path, plan)
+    reused, posted, aliased = len(files), 0, 0
+    for members in groups.values():
+        pending = [member for member in members if member not in files]
+        if not pending:
+            continue
+        representative = next((member for member in members if member in sources), members[0])
+        clips = {}
+        if representative not in sources:
+            payload, digest = payloads[representative], digests[representative]
+            recorded(url, payload)
+            posted += 1
+            attempt = recorded.requests / digest
+            data = _read_voice_wav(recorded, attempt, url, payload, digest)
+            sources[representative] = (attempt, hashlib.sha256(data).hexdigest())
+            clips[representative] = data
+        # Existing independently paid members keep their own responses. If an
+        # alias already has evidence, recover from that exact representative.
+        for member in pending:
+            source = member if member in sources else representative
+            if member in reuse_records:
+                source = reuse_records[member]['representativeAudioId']
+            attempt, wav_sha = sources[source]
+            if source not in clips:
+                data = _read_voice_wav(recorded, attempt, url, payloads[source], digests[source])
+                if hashlib.sha256(data).hexdigest() != wav_sha:
+                    raise DispatchError('voice_reuse_receipt_mismatch', source)
+                clips[source] = data
+            name = f'tts-{member}-{wav_sha}.wav'
+            if member != source:
+                if member not in reuse_records:
+                    entry = _voice_reuse_record(recorded, url, payloads, digests, sources, member, source)
+                    # Record the source first so a crash before cache publication
+                    # can recreate the binding without another paid request.
+                    _atomic_record(reuse_dir / f'{member}.json', {**entry, 'recordedAt': _now()})
+                aliased += 1
+            _bind_voice_wav(indexed[member], clips[source], name, media_dir, cache_path, cache)
+            files[member] = name
+    return {'voiced': len(files) - reused, 'reused': reused, 'posted': posted, 'aliased': aliased,
+            'files': {line_id: files[line_id] for line_id in indexed}}
+
+
 def run_dispatch(lesson, work, *, steps=('pictures', 'voice'), jobs=2,
                  source_root=SOURCE_ROOT, endpoint=DEFAULT_ENDPOINT, post=None,
                  fetch=None, health_get=default_health_get, slots_dir=SLOTS_DIR,
-                 retry_rate_limited=False):
+                 retry_rate_limited=False, dedupe_identical_tts=False, lines_sha256=None,
+                 stop_on_voice_error=False):
     if (not isinstance(lesson, str) or not re.fullmatch(r'[a-z0-9][a-z0-9-]*', lesson)
             or not isinstance(jobs, int) or isinstance(jobs, bool) or jobs < 1):
         raise DispatchError('arguments_invalid', 'lesson must be a slug and jobs must be positive')
     if not steps or set(steps) - {'pictures', 'voice'} or len(steps) != len(set(steps)):
         raise DispatchError('steps_invalid', str(steps))
+    if stop_on_voice_error and (tuple(steps) != ('voice',) or jobs != 1
+                                or retry_rate_limited or dedupe_identical_tts):
+        raise DispatchError('arguments_invalid', '--stop-on-voice-error requires voice only, one job and no retry or deduplication')
+    if dedupe_identical_tts and (tuple(steps) != ('voice',) or jobs != 1 or retry_rate_limited):
+        raise DispatchError('arguments_invalid', 'TTS deduplication requires voice only, one job and no retry')
+    if dedupe_identical_tts and (not isinstance(lines_sha256, str) or not re.fullmatch(r'[0-9a-f]{64}', lines_sha256)):
+        raise DispatchError('voice_dedupe_hash_invalid', 'TTS deduplication requires the reviewed lines SHA-256')
+    if not dedupe_identical_tts and lines_sha256 is not None:
+        raise DispatchError('arguments_invalid', 'lines_sha256 requires TTS deduplication')
     source_root = Path(source_root).resolve()
     source = (source_root / lesson).resolve()
     if source.parent != source_root or not source.is_dir():
         raise DispatchError('lesson_missing', str(source))
     with work_lock(work, lesson) as work:
+        if not dedupe_identical_tts and 'voice' in steps and (work / VOICE_DEDUPE_PLAN).exists():
+            raise DispatchError('voice_dedupe_mode_required', str(work / VOICE_DEDUPE_PLAN))
         recorded_post = RecordedPost(work, post=post or default_post, health_get=health_get,
                                      slots_dir=slots_dir, retry_rate_limited=retry_rate_limited,
                                      picture_assets=source / 'assets')
+        if dedupe_identical_tts:
+            lines_path = work / 'lines.json'
+            raw_lines = lines_path.read_bytes()
+            if hashlib.sha256(raw_lines).hexdigest() != lines_sha256:
+                raise DispatchError('voice_dedupe_lines_changed', str(lines_path))
+            lines = json.loads(raw_lines.decode('utf-8'))
+            return {'voice': _dispatch_identical_voice(lines, recorded_post, endpoint, lines_sha256)}
         results = {}
         # Load all selected inputs before a paid call; the existing helpers validate them.
         requests = _load(source / 'pictures.json') if 'pictures' in steps else None
@@ -673,7 +854,7 @@ def run_dispatch(lesson, work, *, steps=('pictures', 'voice'), jobs=2,
         if 'voice' in steps:
             results['voice'] = voice.voice_lines(
                 lines, work / 'media', post=recorded_post, cache_path=work / 'voice-cache.json',
-                endpoint=endpoint, jobs=jobs, sleep=lambda _: None)
+                endpoint=endpoint, jobs=jobs, sleep=lambda _: None, stop_on_error=stop_on_voice_error)
         return results
 
 
@@ -691,6 +872,8 @@ def run_unsubmitted_tts(lesson, work, pending, response_sha, lines_sha, *, addit
         raise DispatchError('continuation_hash_invalid', lesson)
     url = DEFAULT_ENDPOINT + '/api/generate/tts'
     with work_lock(work, lesson) as work:
+        if (work / VOICE_DEDUPE_PLAN).exists():
+            raise DispatchError('voice_dedupe_mode_required', str(work / VOICE_DEDUPE_PLAN))
         recorded = RecordedPost(work, post=post or default_post, health_get=health_get, slots_dir=slots_dir)
         allowed, prior_payloads = set(), []
         for prior_sha, prior_response_sha in known.items():
@@ -735,15 +918,35 @@ def run_unsubmitted_tts(lesson, work, pending, response_sha, lines_sha, *, addit
             evidence['additionalUnresolved'] = [{'payloadSha256': p, 'responseSha256': r}
                                                 for p, r in known.items() if p != pending]
 
+        stop_reason = None
+        rejected_response = None
+
         def send_first(request_url, payload):
+            nonlocal stop_reason, rejected_response
+            if stop_reason is not None:
+                # The voice worker may re-enter the rejected line. Return its
+                # settled response locally so it still reports the HTTP error.
+                if rejected_response is not None and request_url == url and payload == rejected_response[0]:
+                    return rejected_response[1]
+                raise DispatchError('continuation_stopped', stop_reason)
+
             line = first.get(payload['audioId'])
             digest = hashlib.sha256(_json_bytes(payload)).hexdigest()
             directory = recorded.requests / digest
             if (request_url != url or line is None or line['text'] != payload['text']
                     or line['voice'] != payload['ttsVoice'] or directory.exists()):
                 raise DispatchError('continuation_first_post_only', digest)
-            return recorded._send_attempt(directory, url, payload, digest, allowed_unknown=allowed,
-                                          continuation=evidence)
+            try:
+                result = recorded._send_attempt(directory, url, payload, digest, allowed_unknown=allowed,
+                                                continuation=evidence)
+            except BaseException as exc:
+                stop_reason = f"{line['id']}: {exc}"
+                raise
+            status, _ = result
+            if status in (402, 403):
+                stop_reason = f"{line['id']}: HTTP {status}"
+                rejected_response = (payload, result)
+            return result
 
         clips = voice.voice_lines(list(first.values()), work / 'media', post=send_first,
                                   cache_path=work / 'voice-cache.json', endpoint=DEFAULT_ENDPOINT,
@@ -768,15 +971,22 @@ def main(argv=None):
                               'repeat it for several authorized payloads of the same work, sent in order')
     retries.add_argument('--continue-unsubmitted-tts-after', metavar='PAYLOAD_SHA256',
                          help='send untouched TTS lines only, retaining this known unresolved 500')
+    retries.add_argument('--dedupe-identical-tts', action='store_true',
+                         help='bind exact duplicate TTS lines from one recorded request '
+                              '(requires --steps voice --jobs 1 and the reviewed --lines-sha256)')
+    retries.add_argument('--stop-on-voice-error', action='store_true',
+                         help='stop at the first voice failure without retrying (requires --steps voice --jobs 1)')
     parser.add_argument('--response-sha256', help='byte hash of the unresolved response for continuation')
     parser.add_argument('--lines-file', type=Path, help='reviewed continuation lines; defaults to lines.json in --work')
-    parser.add_argument('--lines-sha256', help='byte hash of the reviewed continuation lines file')
+    parser.add_argument('--lines-sha256', help='byte hash of reviewed lines for deduplication or continuation')
     parser.add_argument('--additional-unresolved-tts', action='append', default=[],
                         metavar='PAYLOAD_SHA256:RESPONSE_SHA256', help='another recorded unresolved TTS 500')
     args = parser.parse_args(argv)
     if not args.continue_unsubmitted_tts_after and (
-            args.response_sha256 or args.lines_file or args.lines_sha256 or args.additional_unresolved_tts):
+            args.response_sha256 or args.lines_file or args.additional_unresolved_tts):
         parser.error('Continuation options require --continue-unsubmitted-tts-after')
+    if args.lines_sha256 is not None and not (args.dedupe_identical_tts or args.continue_unsubmitted_tts_after):
+        parser.error('--lines-sha256 requires --dedupe-identical-tts or --continue-unsubmitted-tts-after')
     try:
         if args.retry_authorized_request:
             paths = args.retry_authorized_request
@@ -799,8 +1009,11 @@ def main(argv=None):
                                          args.response_sha256, args.lines_sha256,
                                          additional=args.additional_unresolved_tts, lines_file=args.lines_file)
         else:
+            voice_options = {'stop_on_voice_error': True} if args.stop_on_voice_error else {}
             result = run_dispatch(args.lesson, args.work, steps=tuple(args.steps.split(',')), jobs=args.jobs,
-                                  retry_rate_limited=args.retry_rate_limited)
+                                  retry_rate_limited=args.retry_rate_limited,
+                                  dedupe_identical_tts=args.dedupe_identical_tts, lines_sha256=args.lines_sha256,
+                                  **voice_options)
     except (DispatchError, picture.PictureError, voice.VoiceError, OSError, ValueError) as exc:
         print(f'{type(exc).__name__}: ' + ': '.join(str(part) for part in exc.args), file=sys.stderr)
         return 1

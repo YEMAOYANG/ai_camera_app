@@ -9,7 +9,9 @@ verification.verifier.model must differ from each, case-insensitively.
 estimatedMinutes is a required integer from 5 to 120. Confirmation contains
 userQuote, confirmedAt (with timezone), confirmedBy='owner', authorAttestation.
 An optional identity.manifest permits offline checks; otherwise the repository
-supplies the registered alignment manifest. No check or dry run writes files.
+supplies the registered alignment manifest. The studentActivityControls opt-in
+replays local lesson source in a temporary workspace. Check and dry run leave
+the package, classroom storage and database unchanged.
 """
 import hashlib
 import importlib.util

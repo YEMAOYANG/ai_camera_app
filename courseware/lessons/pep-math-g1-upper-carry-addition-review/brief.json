@@ -1,0 +1,206 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "整理和复习",
+  "binding": {
+    "editionId": "pep-math-g1-upper-2022-standard",
+    "revisionId": "directory-ede7a8c63c337cf95a03fe79",
+    "unitId": "e3561735-f831-494f-ba43-370dccc3ff2a",
+    "nodeId": "dcf4353d-bcb9-4774-9f43-f8c1924fa5c6"
+  },
+  "scenario": "灯牌修理站准备一本算式索引。孩子按不同办法整理卡片，给同总数的卡开一排格，再用熟悉的格子修好相邻缺牌。",
+  "goals": [
+    "在具体图里判断凑十、交换或画图怎样帮忙。",
+    "按第一加数、和或成对整理，能定位横、竖和斜线规律。",
+    "通过邻项计算或用等和找缺失数。",
+    "分清实际问题要求什么，以另一种办法核对。"
+  ],
+  "pageSequence": [
+    {
+      "key": "the-repair-index",
+      "kind": "teaching",
+      "plan": "从一桌散开的灯牌问哪几张可以放一起。先回忆凑十与交换两个已学方法，各用一个全新数图示范。"
+    },
+    {
+      "key": "which-problem",
+      "kind": "teaching",
+      "plan": "用新图对照不同观察方法求一共，以及用已领和剩余求原来。每次先亮出问题和两条信息，再用图说明。"
+    },
+    {
+      "key": "make-sorted-cards",
+      "kind": "teaching",
+      "plan": "对照固定第一加数、同和或交换成对三种记录方式。示范如何接着写，避免随手抄导致重复遗漏。"
+    },
+    {
+      "key": "sort-the-rows",
+      "kind": "interactive",
+      "plan": "听和并调炮口。用弹珠打中同和图卡；邻和不计分。"
+    },
+    {
+      "key": "map-the-grid",
+      "kind": "teaching",
+      "plan": "用代码绘制自创的部分算式表。指横排找同和，指竖列固定第一加数，再指斜向固定第二加数。对照印100保留和10边界但不搬表布局。"
+    },
+    {
+      "key": "find-the-next-card",
+      "kind": "interactive",
+      "plan": "开泡泡车沿空位路线访问正确的下一张卡。只有固定加数或指定和的系列符合，移动和路线影响成功。"
+    },
+    {
+      "key": "both-sides-match",
+      "kind": "teaching",
+      "plan": "在等号两边画数量相等的两组，遮一个未知的组成数，试两种填法并核对哪种真的等和。"
+    },
+    {
+      "key": "choose-and-recheck",
+      "kind": "teaching",
+      "plan": "换新图让孩子看问题、列一式、再用图或另一个算式核查。另回看少一或多一怎样用相邻式推算。"
+    },
+    {
+      "key": "picture-check",
+      "kind": "quiz",
+      "plan": "六道新图题读题配音，检查知识图选择、按规则整理、等和与变式运用。"
+    },
+    {
+      "key": "wrap-up",
+      "kind": "teaching",
+      "plan": "沿知识图逐点回顾，留纸卡整理和家人交流，并按成长档案说一个自己能解释的办法。"
+    }
+  ],
+  "games": [
+    {
+      "page": "sort-the-rows",
+      "template": "magnetMarbles",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.magnetMarbles",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "pair_match",
+      "selection": "同一口令和对应多张不同的加法图卡。命中任一未使用的等和牌计分；打中邻和牌失误。",
+      "selectionReason": "替换简要稿的搬运分类建议。瞄准时可从同屏比较不同组成的等和牌，只有所求的和相同才得分，同时避免与上一课重复推箱子玩法。",
+      "levels": [
+        "和十二，慢漂移，六加六与七加五均符合。",
+        "和十三，三张不同组成，十四是干扰。",
+        "在十四和十六之间切换，四次听完各自新口令后重新瞄准。"
+      ],
+      "demo": "亮重听、第一张等和牌、瞄准键。只示范命中一张，正式交接时恢复零分与第1关。"
+    },
+    {
+      "page": "find-the-next-card",
+      "template": "bubbleMaze",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.bubbleMaze",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "ordered_route",
+      "selection": "地图有分叉和视觉干扰牌，规则要求访问符合本关固定加数与逐一增加顺序的卡。关卡末可换成同和横排的一边减1、另一边加1的规则。",
+      "levels": [
+        "三站，第一加数固定八，第二加数从三逐一增加。",
+        "三站，第二加数固定七，第一加数从五逐一增加，绕墙并避开巡逻。",
+        "三站和十六，第一加数逐一少一、第二加数多一，最后到旗子。"
+      ],
+      "demo": "高亮重听、首张算式、方向和喷泡泡。只示范收第一张卡，交接回起点。启用 voiceLead；重听重复当前规则。"
+    }
+  ],
+  "quizPlan": [
+    {
+      "id": "fill-nine",
+      "skill": "选择凑十第一步",
+      "prompt": "左边九盏，右边六盏。给九盏凑十，先怎么移？",
+      "answer": "向左移一盏，左十右五",
+      "position": 1,
+      "rationale": "九盏差一满十。从六盏移来一盏，右边还剩五盏。"
+    },
+    {
+      "id": "next-equal-row",
+      "skill": "横排一边少一边多",
+      "prompt": "和十五的一排，八加七右边该接哪一张？",
+      "answer": "七盏橙灯与八盏绿灯",
+      "position": 3,
+      "rationale": "往右前一个加数少一成七，后一个多一成八，和仍是十五。"
+    },
+    {
+      "id": "column-four",
+      "skill": "固定第一加数时用邻项",
+      "prompt": "前面都是四，后面从六变成七。新的一格共多少？",
+      "answer": "十盏和一盏",
+      "position": 2,
+      "rationale": "四加六是十。后一个加数多一，前一个没变，和从十到十一。"
+    },
+    {
+      "id": "equal-right",
+      "skill": "让等号两边同和",
+      "prompt": "左边七盏加八盏，右边已有九盏。再放几盏才一样多？",
+      "answer": "六盏灯",
+      "position": 1,
+      "rationale": "七加八是十五。九加六也是十五，所以右边还需六盏。"
+    },
+    {
+      "id": "before-sending",
+      "skill": "合并发出和留下的部分",
+      "prompt": "送出去七盏灯，还剩九盏。哪幅图表示原来一共有多少？",
+      "answer": "一盒十盏和六盏",
+      "position": 2,
+      "rationale": "求送出以前，要把已送的七盏和剩下九盏一起数。七加九等于十六。"
+    },
+    {
+      "id": "check-by-color",
+      "skill": "用另一种分法核对同一批",
+      "prompt": "把图上同一批灯换成按颜色分。哪张没有漏掉或多放？",
+      "answer": "六盏橙灯、七盏绿灯",
+      "position": 3,
+      "rationale": "橙色五盏加一盏等于六盏，绿色三盏加四盏等于七盏。总数仍是十三。"
+    }
+  ],
+  "afterClass": {
+    "familyTask": "用纸卡摆一小行等和算式和一小列固定加数的算式，指一张让家人猜下一张，并说自己发现的规律。",
+    "weeklyQuestionSource": [
+      "知识图与选算法",
+      "按规律有序整理卡片",
+      "等号左右相等和相邻推算",
+      "画图解决两类问题并核查"
+    ],
+    "evidence": "线上记录图题和游戏动作，实际整理、解释和核查由家人观察。"
+  },
+  "artAndLanguage": "原创灯牌工作站。数量、算式与有序卡片由代码绘制并逐个核算。教师录音说明任务，数字和图形保留作为目标。",
+  "goalSources": [
+    {
+      "skill": "recall-and-choose",
+      "target": "在具体图里判断凑十、交换或画图怎样帮忙。",
+      "source": "原书印100、教案1～2"
+    },
+    {
+      "skill": "order-and-find",
+      "target": "按第一加数、和或成对整理，能定位横、竖和斜线规律。",
+      "source": "原书印100、课件9～19"
+    },
+    {
+      "skill": "equal-and-next",
+      "target": "通过邻项计算或用等和找缺失数。",
+      "source": "原书印101第3题、教案4"
+    },
+    {
+      "skill": "apply-and-check",
+      "target": "分清实际问题要求什么，以另一种办法核对。",
+      "source": "原书印101～102、课件6～7、学习任务单"
+    }
+  ],
+  "authorship": {
+    "authorModel": "gpt-6.1-sol",
+    "method": "核原书、正式边界与G0笔记后直接原创。数学表、数量和灯的位置由代码生成，沿用两款已批准模板。",
+    "attestation": "我是本课作者。讲解文字、题目、画面和版式为原创。图片来自内置 ImageGen 或精确数量绘图。未照搬官方原文、图片、题目或版式，未使用 DeepSeek 初稿。",
+    "catalogSha256": "1f04d478644e68af67bc264bf46227ece3d94d9c4070e8a8dd219846a48f4753",
+    "sourceSha256": {
+      "identity.json": "96bc9c2965dd52859b70bf91e3a3fbeff3988512cd8a867a00a9ab1217c72777",
+      "official-notes.json": "920dd3cf5857ff7c89821baad322ae58827b85415ce3fb7af67813ff9235da1b",
+      "lesson.json": "55cf1f5469109290e554d68ca50b5dc992336565703be7420f0b708dd7815db6",
+      "asset-provenance.json": "1a25b78ca8871889c6a5d8954c99bbfabbbed90ad0373efedd49e9eb921081d3",
+      "art-source/draw_lanterns.py": "f6196a207db6b312b947a48a7c7a4d7523d161d8b869d3d75b1466fb093285e4",
+      "art-source/lantern-math.json": "cd2813944c193b17d1d5b20ff2649deb30c2cc1c5b4077ae60ea85b0310a1c6d",
+      "art-source/lantern-cutouts.receipt.json": "da3c3592e6da76c230b1ef4022cccfd047eefd24f6538e808277f9ddd17a12e8",
+      "pages/sort-the-rows.html": "41928342bd0e9c7ad1c987dc48d2f7b8b18e209339a2f6b6929e80f25e3c680f",
+      "pages/sort-the-rows.js": "1648fb4abd2706ea7cc0016ebd6a284ad693f810cd5276788fbaf36e312d861d",
+      "pages/find-the-next-card.html": "19ee4f314bb281d18731ea12c86a993932bbc4f14f26b21b24d211377a10f3d5",
+      "pages/find-the-next-card.js": "237ca321b387158a73cb36589f7e3830481dddf6dac2b823aa538f2b7e6dd5a2",
+      "tests/game_rules.test.cjs": "fe22459c8dec3cfeec82d5778a5111df0992aa46919cbafd79d405fcc46f2e09",
+      "tests/test_draw_lanterns.py": "6736236d5b076e97e895318372c3f2f708852f283707fa2dd97176d4f3604411"
+    }
+  }
+}

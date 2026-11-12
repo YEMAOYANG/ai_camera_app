@@ -1,0 +1,225 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "100的认识和写法",
+  "binding": {
+    "editionId": "pep-math-g1-lower-2022-standard",
+    "revisionId": "directory-6205d2037284e91f10b25edd",
+    "nodeId": "0f10564d-e8e4-4b43-9c72-97cd8d16a341",
+    "unitId": "acfb0386-a55f-4542-9d5d-619a3e2d9023"
+  },
+  "scenario": "贴纸整理站想收好整张展板。孩子先补上最后一枚，再把相同的十连条重新打包，最后给发货卡写正确数量。",
+  "goals": [
+    "用九个十和九个一或十个十少一个解释99，实际添1后得到100。",
+    "用十条十连或十小捆解释10个十是1个百，合并前后总数保持100。",
+    "按两个满十交换演示计数器怎样从99到100，说明百位位置和一颗珠子的意义。",
+    "对照1、10、100的珠子位置、读法和写法，给100的空十位和个位分别写0，并辨认生活中的100数量和100页码。"
+  ],
+  "goalSources": [
+    {
+      "skill": "ninety-nine-plus-one",
+      "target": "用九个十和九个一或十个十少一个解释99，实际添1后得到100。",
+      "source": "印28；课件3～5；教学设计2；任务单1～2"
+    },
+    {
+      "skill": "ten-tens-are-one-hundred",
+      "target": "用十条十连或十小捆解释10个十是1个百，合并前后总数保持100。",
+      "source": "印28～29；课件6～11；教学设计3"
+    },
+    {
+      "skill": "double-regrouping",
+      "target": "按两个满十交换演示计数器怎样从99到100，说明百位位置和一颗珠子的意义。",
+      "source": "印28；课件12～17；教学设计3～4"
+    },
+    {
+      "skill": "write-and-identify-one-hundred",
+      "target": "对照1、10、100的珠子位置、读法和写法，给100的空十位和个位分别写0，并辨认生活中的100数量和100页码。",
+      "source": "印28～29及印30练习五第3题；课件17～24；课后练习1"
+    }
+  ],
+  "pageSequence": [
+    {
+      "key": "look-at-the-display",
+      "kind": "teaching",
+      "plan": "贴纸整理站开门，教师放大一条十格、一枚散贴及整板轮廓。先听声看图，指出摆满的和空的位置。"
+    },
+    {
+      "key": "ninety-nine-two-views",
+      "kind": "teaching",
+      "plan": "九整行与九散枚的两种看法依次高亮。每条十格位置固定，最后一行只空一格。"
+    },
+    {
+      "key": "the-last-sticker",
+      "kind": "teaching",
+      "plan": "老师依次点亮箭头添一前的空格和添一后的满板，比较最后一行九到十。"
+    },
+    {
+      "key": "ten-strips-one-sheet",
+      "kind": "teaching",
+      "plan": "先把散枚十个归一条，再把十条放入一张大托盘。保留十条边界，点数后教师说明是100。"
+    },
+    {
+      "key": "complete-the-ten-strips",
+      "kind": "game",
+      "plan": "左右移、落下，按十连条的个数找伙伴，凑成十条才计分。画面常驻十行空托盘作目标；老师示范一对后复位。"
+    },
+    {
+      "key": "ones-exchange",
+      "kind": "teaching",
+      "plan": "用位值计数器看99，个位加1从9到10，保持珠子和原物一一对应；撤下个位10颗，在十位加1颗。"
+    },
+    {
+      "key": "tens-exchange",
+      "kind": "teaching",
+      "plan": "十位也达10，撤下十位10颗，在百位加1颗。画面并列交换前后的一百，总数不变。"
+    },
+    {
+      "key": "write-from-the-highest-place",
+      "kind": "teaching",
+      "plan": "从右用一散枚、十连条、百托盘图标辨认三杆；从左侧实际最高位置读写。百位1，空十位和个位各写0。"
+    },
+    {
+      "key": "same-bead-different-amount",
+      "kind": "teaching",
+      "plan": "同三杆上一颗珠子依次居于个位、十位、百位，旁边出现散枚、十连条、百托盘。逐项摆出和读写1、10、100。"
+    },
+    {
+      "key": "deliver-to-the-bead-docks",
+      "kind": "game",
+      "plan": "真实格子推运物件，按一颗珠子的位置匹配同量图，不能只按颜色；先两种数量再加入第三种，后段绕障碍。"
+    },
+    {
+      "key": "quantity-or-page-number",
+      "kind": "teaching",
+      "plan": "教师对照确有100枚的原创集合和标第100页的原创书页。页码数字不用于声称该页画了100个。"
+    },
+    {
+      "key": "picture-quiz",
+      "kind": "quiz",
+      "plan": "六题以新图和新操作检查添一、等值、写法、读图与现实含义，答案三列各两次。"
+    },
+    {
+      "key": "tell-the-story-of-one-hundred",
+      "kind": "teaching",
+      "plan": "回放添一、十条成百、两次交换、1和两个0。家庭复述环节交成人观察。"
+    }
+  ],
+  "games": [
+    {
+      "page": "complete-the-ten-strips",
+      "template": "fallingTiles",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.fallingTiles",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "sum_pair",
+      "selection": "每个牌面显示若干横放的十连条，每条内十格以刻痕区分。参数 total=10 以条数判定，symbol 为十行托盘。底行严格六格，留相邻空格。每关每种目标条数只出现一次，真实方向键移位和落下，回顾画面展示合成后整托盘。",
+      "levels": [
+        "底行 [null,null,null,null,8,null]，pieces [2]；首件从中间移动再落下，老师示范一次后清零。",
+        "底行 [null,7,null,null,6,null]，pieces [3,4]，两对相隔，适度提速。",
+        "底行 [null,9,null,5,null,8]，pieces [1,5,2]，交错目标连续操作，仍留足左右时间。"
+      ],
+      "demo": "先指常驻托盘、正在落下的牌、底行目标，真正移动并落下一牌，指出两边条数和得分，再复位交给孩子。",
+      "teacherAnchors": [
+        "hundred-target",
+        "falling-strip-preview",
+        "first-eight-strips",
+        "game-player",
+        "joined-hundred"
+      ]
+    },
+    {
+      "page": "deliver-to-the-bead-docks",
+      "template": "sortingDepot",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.sortingDepot",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "classification",
+      "selection": "货件是单枚、十连条或百托盘。每个托盘显示同样的三杆，只在相应杆放一珠，杆头用散枚、一条十连条和百托盘形状提示。token、sample 用独立图片，group 仅取 1、10 或 100，真实方向推运且按数量入盘。混用不同颜色和图案以压低外观捷径。",
+      "levels": [
+        "开阔地图送一件单枚和一件十连条。",
+        "三件送到个位、十位、百位，转弯让出推进路线。",
+        "四件中有两种外观的十连条、一个散枚和一个百托盘；两个十位盘同组，绕柱逐件送。"
+      ],
+      "demo": "指规则目标、玩家当前推动位和一珠托盘，实际推进一件并听数量反馈，再清零交接。",
+      "teacherAnchors": [
+        "unit-legend",
+        "first-unit-item",
+        "first-ones-dock",
+        "game-player"
+      ]
+    }
+  ],
+  "quiz": [
+    {
+      "id": "fill-the-mosaic",
+      "skill": "99添1",
+      "prompt": "马赛克样板每行放十块。补上箭头这块，哪张图能对上？",
+      "answer": "十行完整的拼片图。",
+      "position": 2,
+      "rationale": "添上之前九行和最后一行九块，补上后最后一行也满十。"
+    },
+    {
+      "id": "check-ten-full-bags",
+      "skill": "十个十为一百",
+      "prompt": "每袋都有十片。哪辆送货车正好装一百片？",
+      "answer": "能核对为两排各五满袋的送货车。",
+      "position": 1,
+      "rationale": "十袋各十片。旁边八袋和九袋可按袋数排除。"
+    },
+    {
+      "id": "two-zero-places",
+      "skill": "100的写法",
+      "prompt": "左边的百位有一颗珠子，其余两杆空着。哪张数量牌应该贴上？",
+      "answer": "100。",
+      "position": 3,
+      "rationale": "百位记1，十位和个位都要写0。数牌是本题的目标字形，语音描述杆位。"
+    },
+    {
+      "id": "bead-in-the-middle",
+      "skill": "同一颗珠子位置不同",
+      "prompt": "中间杆有一颗珠子。哪一盘印章和它一样多？",
+      "answer": "两排各五枚印章的图。",
+      "position": 2,
+      "rationale": "中间杆是十位。两排各五枚正好十枚。"
+    },
+    {
+      "id": "count-the-contents",
+      "skill": "区分实物数和数字编号",
+      "prompt": "哪张图里真的有一百枚印章？",
+      "answer": "四盒和六盒印章合在一起，每盒都有十枚。",
+      "position": 3,
+      "rationale": "展台第100号只表示编号；十盒每盒十枚才说明实际数量。"
+    },
+    {
+      "id": "finish-the-last-exchange",
+      "skill": "十位满十向百位换",
+      "prompt": "把两条、三条和五条十连条全部拨在同一根杆上。整理后哪幅计数器图正确？",
+      "answer": "百位一颗，十位和个位都没有。",
+      "position": 1,
+      "rationale": "三堆一共有十条十连条，十位满十要撤回，向百位换一颗。"
+    }
+  ],
+  "afterClass": {
+    "familyTask": "请成人和孩子用安全的大件纸片画十条，每条十格，把十条归在同一张纸上。孩子向家人演示99添一到100，用三杆图说百位的1和两个0；也可找一本书的第100页并说明它是页码。",
+    "weeklyQuestionSource": [
+      "99添1",
+      "十条十连合为一百",
+      "百位和两次交换",
+      "1、10、100及空位占位",
+      "物件数量和100编号"
+    ],
+    "evidence": "课堂只记录真实游戏和图题事件；家庭拼放、指页、口述由成人观察，记录待观察。"
+  },
+  "artAndLanguage": "用代码精确绘制格子、条、100单元矩阵、计数器珠子和数字。每条保留十个清楚的分格，百托盘保持10×10或十条边界；计数器交换时按先补满、再撤回、再换入分帧。人物、背景、贴纸外观可生成。去掉非目标文字后仍以图和语音完成。图中足量和空位以轮廓与位置区分，颜色只辅助。",
+  "authoring": {
+    "mode": "direct",
+    "model": "gpt-6.1-sol",
+    "bookAndCompanionScope": "印28–29及印30–31相关练习，一课时32页。"
+  },
+  "officialNotesSha256": "e3b4709f70bf9ba9c6433cc086d774c4b66a0bb238b857fdb708a2ff578ccef7",
+  "g0SourceCorrection": {
+    "priorNotesSha256": "b79b92c84ad7edd0d49ed266e1b05da2026f35d4e01af68819a2f9b0ee2d0b38",
+    "printedPage": 31,
+    "ebookPage": 36,
+    "change": "练习五第5题图示是彩色圆片。"
+  }
+}

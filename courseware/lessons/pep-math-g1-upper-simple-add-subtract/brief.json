@@ -1,0 +1,336 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "简单加、减法",
+  "binding": {
+    "editionId": "pep-math-g1-upper-2022-standard",
+    "revisionId": "directory-ede7a8c63c337cf95a03fe79",
+    "nodeId": "4868b198-14ac-4f85-8e55-ccaaef49f888",
+    "unitId": "ae4d78e6-9ed7-4bec-a5a4-26ed49147600"
+  },
+  "goals": [
+    "用一捆十和若干散件说清十加几的结果；给出同一整体和其中一份，能用组成关系或对应加法求另一份。",
+    "用实物或计数器解释十几加几和十几减几怎样在个位添去；在不进位、不退位的前提下说清为什么原来的整十不变。",
+    "从全体和部分的图片判断求总数还是求剩余部分，列出有实际意义的算式。",
+    "在具体算式和图示中指认两个加数及和，也能分清被减数、减数和差。"
+  ],
+  "scenario": "社区风筝节的材料补给站。用一盒十和分开的线扣、贴纸或彩绳结点验材料，移动的是确实拿进或拿出的东西。",
+  "pageSequence": [
+    {
+      "key": "open",
+      "title": "补给站开门啦",
+      "kind": "slide",
+      "play": "风筝节补给站开门。老师发问盒子是否算一件，解释满一盒先记作十，散件另数。"
+    },
+    {
+      "key": "compose",
+      "title": "一盒十加八枚",
+      "kind": "slide",
+      "play": "一盒十与八枚散件。先点亮一盒，再指着散件从十数到十八，最后点亮算式。"
+    },
+    {
+      "key": "inverse",
+      "title": "同一袋，拿走不同一份",
+      "kind": "slide",
+      "play": "分别从同一袋十八枚拿走八枚散件或整盒十。看划掉的部分和没动的部分，连到两道减式。"
+    },
+    {
+      "key": "match-workbench",
+      "title": "余量配对工坊",
+      "kind": "interactive",
+      "play": "教师固定指向首关底卡，说明拿走四枚后留一盒十，只示范一次消除。孩子在落下前横移、落放，算式和值不配不能消。"
+    },
+    {
+      "key": "change-ones",
+      "title": "只添去几个一",
+      "kind": "slide",
+      "play": "计数器右边拨进或拨出四颗，比较12＋4＝16和16－4＝12。说明只在不进位、不退位的条件下保留原来的整十。"
+    },
+    {
+      "key": "choose-operation",
+      "title": "先看问号在哪里",
+      "kind": "slide",
+      "play": "用两张独立的部分－整体图，比较问号在括线下和一份上。先找未知的位置，再决定加或减。"
+    },
+    {
+      "key": "roles-add",
+      "title": "加式里的两个加数与和",
+      "kind": "slide",
+      "play": "先后点亮原来的加数、添进的加数与合起来的和，把术语指回物量。"
+    },
+    {
+      "key": "roles-minus",
+      "title": "减式里的三个数",
+      "kind": "slide",
+      "play": "依次把被减数、减数、差指回原全体、去掉的一份与留下的一份。"
+    },
+    {
+      "key": "dispatch-add",
+      "title": "收到添散件的材料单",
+      "kind": "slide",
+      "play": "给送货车的加单：下方取原数，听需添几枚，上方送到新的计数器数量。游戏原声口令出自本页。"
+    },
+    {
+      "key": "dispatch-minus",
+      "title": "收到借走散件的材料单",
+      "kind": "slide",
+      "play": "给送货车的减单：按原数取货，算去掉散件后的余量，右边载货框一直提醒原数。本页登记关卡原声。"
+    },
+    {
+      "key": "deliver-materials",
+      "title": "风筝节送货车",
+      "kind": "interactive",
+      "play": "首关只演示取十二枚。孩子听两段口令，拿货后自己算结果，等车辆过去，按方向键送到对应的收货图。"
+    },
+    {
+      "key": "picture-check",
+      "title": "换一批材料来检查",
+      "kind": "quiz",
+      "play": "六道新情境图题预录读题；用新数检查组成、求另一份、个位变化、选择运算与加式各量。交卷后显示解析。"
+    },
+    {
+      "key": "recap",
+      "title": "下次点货，也用这几步",
+      "kind": "slide",
+      "play": "复述十和几个一、全体与部分、只添去几个一的条件和问号的位置。实物摆放、纸笔及口述由家人实际观察。"
+    }
+  ],
+  "games": [
+    {
+      "page": "match-workbench",
+      "template": "fallingTiles",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.fallingTiles",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "pair_match",
+      "selection": "有向配对以减式图卡和余量图卡为两类。只有算式减得的余量和落块一致，且同一行相邻，才消除。所有卡片使用同一底色和精确数学图形。",
+      "levels": [
+        "宽空位慢落。十四减四、十六减六都留下一盒十；有一张减整十的干扰底卡。",
+        "同时对照去掉整盒十和去掉所有散件，辨认余二、余十、余六。",
+        "四次按不退位减法算余量，包含拿走部分散件；底卡更多，落速更快。"
+      ],
+      "demo": "先点亮首关固定底卡与下落图，说明十四去掉四后剩一盒十，再示范一次快落。交接时返回首关并清掉示范得分和连击。",
+      "templateSourceSha256": "8b5f44fd0529b53f3684a1cedf6b2268432170c36e426b5fa5df553f880ee0e0",
+      "registeredAssets": [
+        "festival-sticker",
+        "rem-02",
+        "rem-06",
+        "rem-09",
+        "rem-10",
+        "rem-12",
+        "rem-13",
+        "rem-15",
+        "take-12-10",
+        "take-14-01",
+        "take-14-04",
+        "take-15-03",
+        "take-16-06",
+        "take-16-10",
+        "take-17-02",
+        "take-17-07",
+        "take-19-10",
+        "tile-workbench"
+      ],
+      "pageAssetBytes": 973391,
+      "gameCueSources": {
+        "tile-goal": "inverse-11",
+        "tile-hint": "inverse-12",
+        "tile-help": "inverse-13",
+        "tile-praise": "inverse-14"
+      },
+      "status": "source_complete_waiting_formal_voice_and_browser"
+    },
+    {
+      "page": "deliver-materials",
+      "template": "listenDelivery",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.listenDelivery",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "listen_pick_deliver",
+      "selection": "先按口令选原数量图取货，听添几个一或去几个一，再去正确余量或总量图所在的收货点。驾驶避让和读图运算共同决定完成订单，交付口令不读结果。",
+      "levels": [
+        "取十二、添五，送到十七的计数器；原数十二是干扰。一路慢车。",
+        "取十三添三、取十八减四；收货点交错，两条车道。",
+        "三份加减混合订单，变换取货和收货站位；三条车道，需要等候和绕行。"
+      ],
+      "demo": "老师只示范首关拿十二枚。指出车道及整排收货图的位置，不点亮目标答案，复位后交给孩子。",
+      "templateSourceSha256": "3bcbf62c10d5142e340d3cd4267fb4b31fc8cc58c4ede2d12a7ded24cfe4fda4",
+      "registeredAssets": [
+        "courier-load",
+        "courier-ready",
+        "courier-yard",
+        "dock-12",
+        "dock-14",
+        "dock-16",
+        "dock-17",
+        "dock-18",
+        "festival-sticker",
+        "stock-11",
+        "stock-12",
+        "stock-13",
+        "stock-14",
+        "stock-16",
+        "stock-18",
+        "stock-19",
+        "traffic-cart"
+      ],
+      "pageAssetBytes": 1280136,
+      "gameCueSources": {
+        "delivery-hint": "dispatch-minus-12",
+        "delivery-help": "dispatch-minus-13",
+        "delivery-praise": "dispatch-minus-14",
+        "stock-twelve": "dispatch-add-4",
+        "plus-five": "dispatch-add-9",
+        "stock-thirteen": "dispatch-add-5",
+        "plus-three": "dispatch-add-10",
+        "stock-eighteen": "dispatch-minus-3",
+        "minus-four": "dispatch-minus-7",
+        "stock-eleven": "dispatch-add-6",
+        "plus-six": "dispatch-add-11",
+        "stock-nineteen": "dispatch-minus-4",
+        "minus-five": "dispatch-minus-8",
+        "stock-sixteen": "dispatch-minus-5"
+      },
+      "status": "source_complete_waiting_formal_voice_and_browser"
+    }
+  ],
+  "quizPlan": [
+    {
+      "id": "festival-q1",
+      "skill": "十和一个一合成总量",
+      "prompt": "一盒有十枚徽章，又添一枚。哪张图表示合起来的数量？",
+      "answer": "A",
+      "rationale": "一盒是一个十，添进的一枚是一个一。合起来是十一枚。",
+      "picture": "q1-main",
+      "optionPictures": {
+        "A": "q1-a",
+        "B": "q1-b",
+        "C": "q1-c"
+      }
+    },
+    {
+      "id": "festival-q2",
+      "skill": "从整体中减去一个十",
+      "prompt": "盒里十枚，盒外九枚。拿走整盒，哪张图是剩下的？",
+      "answer": "C",
+      "rationale": "拿走整盒就是拿走十枚。盒外九枚没有动，所以留下九枚。",
+      "picture": "q2-main",
+      "optionPictures": {
+        "A": "q2-a",
+        "B": "q2-b",
+        "C": "q2-c"
+      }
+    },
+    {
+      "id": "festival-q3",
+      "skill": "个位添几时保留原来的十位",
+      "prompt": "计数器上是十二。个位添七颗，哪张图是添完的？",
+      "answer": "B",
+      "rationale": "个位原有两颗，添七颗得九颗。十位仍是一颗，所以是十九。",
+      "picture": "q3-main",
+      "optionPictures": {
+        "A": "q3-a",
+        "B": "q3-b",
+        "C": "q3-c"
+      }
+    },
+    {
+      "id": "festival-q4",
+      "skill": "从十几个里减去部分散件",
+      "prompt": "有十七枚纽扣，从散件里拿走六枚。哪幅图是剩下的？",
+      "answer": "A",
+      "rationale": "盒外七枚拿走六枚，只剩一枚散件。整盒十枚仍在，合起来十一枚。",
+      "picture": "q4-main",
+      "optionPictures": {
+        "A": "q4-a",
+        "B": "q4-b",
+        "C": "q4-c"
+      }
+    },
+    {
+      "id": "festival-q5",
+      "skill": "根据全体和已知部分选减法",
+      "prompt": "一共十五片彩纸，借走两片。哪张算式卡能算留下几片？",
+      "answer": "B",
+      "rationale": "原来的全体是十五片，借走两片，求留下的数量，用十五减二等于十三。",
+      "picture": "q5-main",
+      "optionPictures": {
+        "A": "q5-a",
+        "B": "q5-b",
+        "C": "q5-c"
+      }
+    },
+    {
+      "id": "festival-q6",
+      "skill": "把加法的和指回合起来的量",
+      "prompt": "十四加三等于十七。哪张图圈的是这道加法算式的和？",
+      "answer": "C",
+      "rationale": "十四和三是两个加数。合起来是十七，等号后面的十七叫和。",
+      "picture": "q6-main",
+      "optionPictures": {
+        "A": "q6-a",
+        "B": "q6-b",
+        "C": "q6-c"
+      }
+    }
+  ],
+  "afterClass": {
+    "familyTask": "任选小件，装一盒十，再添几个或去几个。请孩子指着两部分讲一加两减，再解释一次为什么个位变了。纸笔、口述和实际摆放由大人观察。",
+    "weeklyQuestionSource": [
+      "一个十和几个一的组式及逆向求一份",
+      "计数器个位变与整十是否保留",
+      "全体与部分图选运算",
+      "读图找加减法各量的位置"
+    ],
+    "evidence": "系统只记录数字交互和图题。真实口算、实物、纸笔与理由待观察。"
+  },
+  "art": {
+    "builtInImagegen": "两份本课图集，分离风筝节场景、货车与贴纸，原件和最终提示见 asset-sources.json。",
+    "deterministicDiagrams": "十格、散件、计数器、括线、算式和题图由 diagrams.py 精确绘制。",
+    "lowReading": "保留数学数字和符号；每道题和每步游戏操作用录制口令。去掉非目标文字仍可按图片、方向键及算出的数量完成。"
+  },
+  "goalBindings": [
+    {
+      "skill": "compose-and-invert",
+      "target": "用一份十和几个一说明总量，再求去掉一份剩多少。",
+      "source": "教材印81例4、教学设计第1～2页"
+    },
+    {
+      "skill": "add-remove-ones",
+      "target": "说明个位的增减与整十保留，并能算十几加减几个一。",
+      "source": "教材印81例5、教学设计第3页"
+    },
+    {
+      "skill": "choose-operation",
+      "target": "看出图中未知的是合起来的总量还是余下的一部分。",
+      "source": "教材印81做一做第2题、教学设计第4页"
+    },
+    {
+      "skill": "equation-roles",
+      "target": "按实际物量说出加式和减式各部分的名称。",
+      "source": "教材印81例5、课件第23页"
+    }
+  ],
+  "authorship": {
+    "author": "Codex /root/review_6to10",
+    "authorModel": "Codex GPT-6",
+    "method": "依据人教版印刷81页、官方配套和已有简要稿直接写成；教学例子、讲解、图题及两款游戏关卡均独立创作。复用已批准公共模板。",
+    "catalogSha256": "1f04d478644e68af67bc264bf46227ece3d94d9c4070e8a8dd219846a48f4753",
+    "priorBrief": {
+      "path": "output/courseware-lessons/pep-math-g1-upper-simple-add-subtract/prevoice-v1/source-before-authoring/brief.json",
+      "sha256": "fa123e7552bccc2a27b04abcf59abe35aee9d0047810d1dc9df24673bb9b72bc"
+    },
+    "sourceSha256": {
+      "identity.json": "b461ee42f0f94ff21f41ffc08d984a335e4ea3f2f915aafa3130cd2994f8e4f0",
+      "official-notes.json": "0d3018a6739d5961e63045e5831bd4db640091babd177a8f37365c122009c493",
+      "lesson.json": "bfe7d5891e26f3eb5915a2624183f4baf3594e41b7364d57e14fc01c6fcb13a0",
+      "asset-sources.json": "973d7e705b1f01e8b69ec481c4b7a73556a8b25a4d68d67c9863f4856c324ce2",
+      "diagrams.py": "9e3f54e07cae12400d91406206704d90f7cf18410ad3bbcb4f003b6107fb2f93",
+      "pages/match-workbench.html": "bbc431446e6d5a948de6da52f61ae17fe39aa9ecae207d9b3d83d506d69a3f7e",
+      "pages/match-workbench.js": "21eb0f84db7a25a4bef2e319dc86eb77313c962cf99e1c7381e4e1fba812d2cc",
+      "pages/deliver-materials.html": "2a40e9f25de4666c0626bd428ce1e723475b093a996e5bdbc3be468bcd0247fe",
+      "pages/deliver-materials.js": "5c14f0e08aa0666f9e53ccfd4d28210b4c602fb50d8fb21f2b74133d9351d8fa",
+      "tests/game_rules.test.cjs": "dacdb720d976147accb76008f615176fdad72e13845ad9743362cdd24df0b730",
+      "tests/test_diagrams.py": "187dbebe6f7666db9b4f79abe4522225a2b480964aee1b8fc158999a767f04e2"
+    }
+  }
+}

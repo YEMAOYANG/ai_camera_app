@@ -1,0 +1,199 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "5、4、3、2 加几",
+  "binding": {
+    "editionId": "pep-math-g1-upper-2022-standard",
+    "revisionId": "directory-ede7a8c63c337cf95a03fe79",
+    "unitId": "e3561735-f831-494f-ba43-370dccc3ff2a",
+    "nodeId": "db848b0f-fc25-4806-bb02-f6b49226d0a3"
+  },
+  "scenario": "纸鸢工坊把两篮纸尾片装成十片一袋，再按总数给纸鸢工具盒分站。",
+  "goals": [
+    "小的一堆写在前面时，仍能找十的缺口并拆分计算。",
+    "借已知交换式推较小的加数在前的和，说清交换不增减。",
+    "比较只添一片与从一边移一片到另一边，判断和变不变。",
+    "新图中按不同办法找总数，解释为何用这个方法。"
+  ],
+  "pageSequence": [
+    {
+      "key": "kite-ribbon-workbench",
+      "kind": "teaching",
+      "plan": "看两个纸尾片篮，先问两堆哪堆小，再问小堆写前时怎样借前课方法。"
+    },
+    {
+      "key": "still-make-ten",
+      "kind": "teaching",
+      "plan": "用原创数量图示范给左边或右边凑十，逐次点亮补到十、留下和总量。保留供孩子先猜的停顿。"
+    },
+    {
+      "key": "flip-what-we-know",
+      "kind": "teaching",
+      "plan": "两篮对换位置，先让孩子数图核对，再用已知大数在前的式子推结果。对照真正添减的情况。"
+    },
+    {
+      "key": "swap-pair-play",
+      "kind": "interactive",
+      "plan": "移动下落的数量块或算式牌，把调换顺序的两组落到对应底板，误配可重试。"
+    },
+    {
+      "key": "one-more",
+      "kind": "teaching",
+      "plan": "固定一篮，另篮每次添一片；逐帧指出和跟着变化。回放倒着看少一片。"
+    },
+    {
+      "key": "move-one-only",
+      "kind": "teaching",
+      "plan": "一篮拿一片放到另一篮，点亮这片始终在画里，先猜总数后核对。与上一页并列。"
+    },
+    {
+      "key": "sort-by-total",
+      "kind": "interactive",
+      "plan": "推送两组数量牌到相同总量站；两种不同写法可到同站，近邻总量要区分。"
+    },
+    {
+      "key": "explain-own-method",
+      "kind": "teaching",
+      "plan": "为一张新图先留尝试时间，然后对照一种凑十和一种交换。让孩子自行选择并说出理由。"
+    },
+    {
+      "key": "picture-check",
+      "kind": "quiz",
+      "plan": "六道新图题用教师录音引导，检验凑十、对换、变化及应用。目标算式可保留。"
+    },
+    {
+      "key": "closing",
+      "kind": "teaching",
+      "plan": "指图回顾补十、借已知交换式和观察两堆变化，安排亲子纸卡任务。"
+    }
+  ],
+  "games": [
+    {
+      "page": "swap-pair-play",
+      "template": "fallingTiles",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.fallingTiles",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "pair_match",
+      "selection": "下落块呈小堆在前的式或图，底板为正确对换后的对应大堆在前式或图。总和相同但并非原来两堆的图可作干扰；本关核对是否仅换顺序。",
+      "levels": [
+        "两组数图，慢落，把3与9互换的块配起来。",
+        "三组带数量图和数字的牌，底牌换位置，仍只认交换的两个量。",
+        "三组和同和干扰牌，加快落速，错误同和牌不能组成交换对。"
+      ],
+      "demo": "先点亮两组、底板与移动键，教师只带着落第一块，交接时重置；录音读数量及目标。"
+    },
+    {
+      "page": "sort-by-total",
+      "template": "sortingDepot",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.sortingDepot",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "classification",
+      "selection": "数图牌用图和目标数字显示两组，不把答案写在货件。目的站展示满十加散片，玩家按总数推动分组并走通路径。每关保留撤回和重开。",
+      "levels": [
+        "两件、两种总量站，开阔短路区分十一与十二。",
+        "三站，两个换顺序的牌要推到同总数站。",
+        "加入一边移一片的同和牌与一边添加的近邻牌，走两段不同路线。"
+      ],
+      "demo": "逐一点亮两组、总量站、方向键和撤回，示范推动第一件后回到起点。目标、提示、纠错、表扬与交接用预录。"
+    }
+  ],
+  "quizPlan": [
+    {
+      "skill": "make-ten-with-small-first",
+      "prompt": "一边4片，另一边8片。若先给8凑十，该怎样动？",
+      "answer": "从4片取2片补进8片那一堆，原处剩2片",
+      "position": 2,
+      "rationale": "8差2到十，4分成2和2。"
+    },
+    {
+      "skill": "swap-to-known-sum",
+      "prompt": "已知9+4是13。图里哪一张只换了原来两篮的先后？",
+      "answer": "4片在前、9片在后，合计13片",
+      "position": 1,
+      "rationale": "两篮数量都保留，和还是13。"
+    },
+    {
+      "skill": "swap-to-known-sum",
+      "prompt": "小篮2片放在前面，大篮9片在后。哪幅已知旧图可直接帮助计算？",
+      "answer": "前面9片、后面2片",
+      "position": 3,
+      "rationale": "只交换2和9的位置，两个量仍然一样。"
+    },
+    {
+      "skill": "track-the-change",
+      "prompt": "一篮保持5片，另篮由7片变为8片。选择变化后总量图。",
+      "answer": "满十盒加3片，比原来多1片",
+      "position": 3,
+      "rationale": "只增加1片，所以总量从12变成13。"
+    },
+    {
+      "skill": "track-the-change",
+      "prompt": "从8片的篮移一片到4片的篮。新图应当是哪一张？",
+      "answer": "5片与7片，满十另有2片",
+      "position": 1,
+      "rationale": "5和7合起来仍是12，移动没有增加纸片。"
+    },
+    {
+      "skill": "choose-method",
+      "prompt": "一堆有5片，另一堆有9片。要给9片凑十，应从5片里移几片过去？",
+      "answer": "从5片取1给9，保留4片",
+      "position": 2,
+      "rationale": "9差1到十，满十后有4片，合计14。"
+    }
+  ],
+  "afterClass": {
+    "familyTask": "家人各翻一张数字卡，先摆数量或口算，再轮流说为什么这样算。交换卡再算一次，并试一次从一堆挪一片。",
+    "weeklyQuestionSource": [
+      "较小的加数在前也可凑十",
+      "从已知交换式推出结果",
+      "一组增减或移一片的和",
+      "选择并说明计算方法"
+    ],
+    "evidence": "线上记录题目和游戏操作，家人观察实际摆放、计算与口头表达。"
+  },
+  "artAndLanguage": "原创纸鸢工坊，纸片和十格由代码准确计数。录音承担说明，数字、数量图和等式为目标学习内容。",
+  "goalSources": [
+    {
+      "skill": "make-ten-with-small-first",
+      "target": "小的一堆写在前面时，仍能找十的缺口并拆分计算。",
+      "source": "原书印93例4、教案2页"
+    },
+    {
+      "skill": "swap-to-known-sum",
+      "target": "借已知交换式推较小的加数在前的和，说清交换不增减。",
+      "source": "原书印93试一试、课件6～9页"
+    },
+    {
+      "skill": "track-the-change",
+      "target": "比较只添一片与从一边移一片到另一边，判断和变不变。",
+      "source": "原书印93做一做、课件10～15页"
+    },
+    {
+      "skill": "choose-method",
+      "target": "新图中按不同办法找总数，解释为何用这个方法。",
+      "source": "原书印93数学游戏和相关练一练、任务单2页"
+    }
+  ],
+  "authorship": {
+    "authorModel": "gpt-6.1-sol",
+    "method": "读官方边界与 G0 配套笔记，直接原创老师台词、题目、精确数图及游戏配置，使用两款批准模板。",
+    "attestation": "我是本课作者。讲解文字、题目、画面与版式均为本课原创，图片来自内置 ImageGen 或代码按数量绘制。未照搬官方原文、图片、题目或版式，未使用 DeepSeek 初稿。",
+    "catalogSha256": "1f04d478644e68af67bc264bf46227ece3d94d9c4070e8a8dd219846a48f4753",
+    "sourceSha256": {
+      "identity.json": "48eaa26a8e2b69e700eaf709b0f3dbfaf4bd9e1db188353c3d4d030aa7b4513e",
+      "official-notes.json": "f6b8771ba8f8d74316912fd2c3e4d220373b880ad10ebc5f875920bf5ad76027",
+      "lesson.json": "4031cd9f1334e28125bb2ccbdbae3209d5120021e4facd438eb9e217a78a9c1c",
+      "asset-provenance.json": "033b67c7b88ff61126fe52bb7a20add954dec13adc4f8ae998e7762dda870266",
+      "art-source/draw_math.py": "e0f1aa7f73a21dd3710f7ecfbf9e1765413ed4384efd6c74c5d570914dd073ed",
+      "art-source/math-diagrams.json": "03fa3bf08a424fb38e7706f5e522d8cbc7852708cdccd03e4c618d30e04a132e",
+      "art-source/kite-cutouts.receipt.json": "bd765525e46986a80ee4119bfb1d002ed02ad9997c52f77a4a6a005258a31cdc",
+      "pages/swap-pair-play.html": "3774faec3426607d6a033378d538cf437fcbe3c2721f96af8fa94cf68fad61cd",
+      "pages/swap-pair-play.js": "a004989a1c2bdacc9c4f7f4815b5c144794c5a2715aa9a1e66a52d525e630484",
+      "pages/sort-by-total.html": "581d3f3745b601756d040a8443d4a7b27274ff550916be53261a890d875ced3a",
+      "pages/sort-by-total.js": "5c10a46c17d187d3988e6fa2df73db8f7e0b9802973726e175e51a8b941de963",
+      "tests/game_rules.test.cjs": "f6e0b3bf0f9489f896b4c5fd27104cd3eb30048a9c1894dd998c6c6b065d930a",
+      "tests/test_draw_math.py": "02c8019af56630d5c3ee82b3ca21172dbb3548458e0e55f99d136a3e15458cfc"
+    }
+  }
+}

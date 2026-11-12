@@ -25,6 +25,7 @@ from courseware.tools import media_dispatch as dispatch, picture, voice
 
 IMAGE_URL = 'http://127.0.0.1:3100/api/generate/image'
 TTS_URL = 'http://127.0.0.1:3100/api/generate/tts'
+DISK_FLOOR_ENV = 'MIRA_COURSEWARE_MIN_FREE_BYTES'
 RATE_LIMITED = b'{"success":false,"errorCode":"RATE_LIMITED","error":"Qwen TTS rate limit exceeded (HTTP 429)"}'
 
 
@@ -39,18 +40,22 @@ def image_answer():
         'base64': base64.b64encode(stream.getvalue()).decode()}})
 
 
-def voice_answer():
+def voice_answer(sample=b'\0\0'):
     stream = io.BytesIO()
     with wave.open(stream, 'wb') as output:
         output.setnchannels(1)
         output.setsampwidth(2)
         output.setframerate(8000)
-        output.writeframes(b'\0\0' * 4000)
+        output.writeframes(sample * 4000)
     return json_bytes({'data': {'base64': base64.b64encode(stream.getvalue()).decode()}})
 
 
 class MediaDispatchTests(unittest.TestCase):
     def setUp(self):
+        environment = patch.dict(os.environ)
+        environment.start()
+        self.addCleanup(environment.stop)
+        os.environ.pop(DISK_FLOOR_ENV, None)
         disk_usage = patch.object(dispatch.shutil, 'disk_usage',
                                   return_value=SimpleNamespace(free=dispatch.MINIMUM_FREE_BYTES))
         self.disk_usage = disk_usage.start()
@@ -98,6 +103,10 @@ class MediaDispatchTests(unittest.TestCase):
             'demo-lesson', self.work, source_root=self.source_root, slots_dir=self.slots,
             post=kwargs.pop('post', self.post), health_get=kwargs.pop('health_get', self.health),
             **kwargs)
+
+    def voice_dedupe_mode(self):
+        lines_sha = hashlib.sha256((self.work / 'lines.json').read_bytes()).hexdigest()
+        return {'steps': ('voice',), 'jobs': 1, 'dedupe_identical_tts': True, 'lines_sha256': lines_sha}
 
     def seed_authorized_timeout(self):
         line = self.lines[0]
@@ -150,6 +159,208 @@ class MediaDispatchTests(unittest.TestCase):
         self.assertTrue((self.work / 'picture-cache.json').exists())
         self.assertTrue((self.work / 'voice-cache.json').exists())
 
+    def test_opt_in_binds_103_exact_lines_from_98_original_responses(self):
+        originals = [{'id': f'line-{index}', 'text': f'Line {index}', 'voice': 'Jennifer'}
+                     for index in range(98)]
+        aliases = [{**original, 'id': f'alias-{index}'} for index, original in enumerate(originals[:5])]
+        self.lines = originals + aliases
+        self.write_inputs()
+        lines_path = self.work / 'lines.json'
+        frozen = lines_path.read_bytes()
+        mode = self.voice_dedupe_mode()
+
+        def mock_pcm(url, payload):
+            self.post(url, payload)
+            index = int(payload['audioId'].split('-')[1])
+            return 200, voice_answer(index.to_bytes(2, 'little'))
+
+        result = self.run_media(**mode, post=mock_pcm)['voice']
+        self.assertEqual((result['voiced'], result['reused'], result['posted'], result['aliased']),
+                         (103, 0, 98, 5))
+        self.assertEqual([payload['audioId'] for _, payload in self.calls], [line['id'] for line in originals])
+        self.assertEqual(len(self.health_calls), 98)
+        self.assertEqual(len(list(self.ledger.glob('*/response.json'))), 98)
+        media = self.work / 'media'
+        reuse = self.work / '.media-dispatch' / 'reused'
+        self.assertEqual({path.stem for path in reuse.glob('*.json')}, {line['id'] for line in aliases})
+        for index, alias in enumerate(aliases):
+            original = originals[index]
+            original_id, alias_id = original['id'], alias['id']
+            payload_sha = hashlib.sha256(dispatch._json_bytes(voice._tts_payload(original))).hexdigest()
+            alias_sha = hashlib.sha256(dispatch._json_bytes(voice._tts_payload(alias))).hexdigest()
+            self.assertFalse((self.ledger / alias_sha).exists())
+            receipt = self.ledger / payload_sha / 'response.json'
+            source = json.loads(receipt.read_text())
+            self.assertEqual(source['httpStatus'], 200)
+            pcm = voice._wav_bytes(base64.b64decode(source['bodyBase64']))
+            self.assertEqual(pcm, voice._wav_bytes(voice_answer(index.to_bytes(2, 'little'))))
+            self.assertEqual((media / result['files'][original_id]).read_bytes(), pcm)
+            self.assertEqual((media / result['files'][alias_id]).read_bytes(), pcm)
+            record = json.loads((reuse / f'{alias_id}.json').read_text())
+            self.assertEqual(record['representativeAudioId'], original_id)
+            self.assertEqual(record['aliasUnsubmittedPayloadSha256'], alias_sha)
+            self.assertEqual(record['representativeResponseSha256'], hashlib.sha256(receipt.read_bytes()).hexdigest())
+            self.assertEqual(record['wavSha256'], hashlib.sha256(pcm).hexdigest())
+            self.assertEqual(record['providerPostsForAlias'], 0)
+
+        lock = self.work / '.media-dispatch.lock'
+        inode = lock.stat().st_ino
+        with patch.object(dispatch, 'post_slot', side_effect=AssertionError('replay took a slot')):
+            replay = self.run_media(**mode, post=lambda *_: self.fail('paid replay'),
+                                    health_get=lambda *_: self.fail('health during replay'))['voice']
+        self.assertEqual(replay, {'voiced': 0, 'reused': 103, 'posted': 0, 'aliased': 0,
+                                  'files': result['files']})
+        self.assertEqual(lock.stat().st_ino, inode)
+        self.assertEqual(lines_path.read_bytes(), frozen)
+
+    def test_opt_in_uses_exact_spelling_and_voice(self):
+        self.lines = [
+            {'id': 'straight', 'text': "They're cute.", 'voice': 'Jennifer'},
+            {'id': 'curly', 'text': 'They’re cute.', 'voice': 'Jennifer'},
+            {'id': 'bella', 'text': 'They’re cute.', 'voice': 'Bella'},
+            {'id': 'curly-copy', 'text': 'They’re cute.', 'voice': 'Jennifer'},
+        ]
+        self.write_inputs()
+        result = self.run_media(**self.voice_dedupe_mode())['voice']
+        self.assertEqual((result['posted'], result['aliased']), (3, 1))
+        self.assertEqual([payload['audioId'] for _, payload in self.calls], ['straight', 'curly', 'bella'])
+
+    def test_default_dispatch_keeps_independent_audio_ids(self):
+        self.lines.append({**self.lines[0], 'id': 'teacher-2'})
+        self.write_inputs()
+        result = self.run_media(steps=('voice',), jobs=1)['voice']
+        self.assertEqual(result['voiced'], 2)
+        self.assertEqual([payload['audioId'] for _, payload in self.calls], ['teacher-1', 'teacher-2'])
+        self.assertFalse((self.work / '.media-dispatch' / 'reused').exists())
+
+    def test_opt_in_recovers_an_interrupted_alias_from_an_existing_response(self):
+        original = self.lines[0]
+        self.lines = [{**original, 'id': 'first-in-order'}, original]
+        self.write_inputs()
+        mode = self.voice_dedupe_mode()
+        # The settled response predates this run and is for the second member.
+        with dispatch.work_lock(self.work, 'demo-lesson'):
+            post = dispatch.RecordedPost(self.work, post=self.post, health_get=self.health, slots_dir=self.slots)
+            post(TTS_URL, voice._tts_payload(original))
+            with self.assertRaisesRegex(dispatch.DispatchError, 'work_locked'):
+                self.run_media(**mode)
+
+        with patch.object(dispatch, '_bind_voice_wav', side_effect=OSError('interrupted')):
+            with self.assertRaisesRegex(OSError, 'interrupted'):
+                self.run_media(**mode, post=lambda *_: self.fail('paid replay'),
+                               health_get=lambda *_: self.fail('health during replay'))
+        evidence = self.work / '.media-dispatch' / 'reused' / 'first-in-order.json'
+        before = evidence.read_bytes()
+        record = json.loads(before)
+        self.assertEqual(record['representativeAudioId'], original['id'])
+        self.assertFalse((self.work / 'media' / record['targetWavFile']).exists())
+        with self.assertRaisesRegex(dispatch.DispatchError, 'voice_dedupe_mode_required'):
+            self.run_media(steps=('voice',), jobs=1, post=lambda *_: self.fail('paid alias'),
+                           health_get=lambda *_: self.fail('health during alias replay'))
+
+        recovered = self.run_media(**mode, post=lambda *_: self.fail('paid replay'),
+                                   health_get=lambda *_: self.fail('health during replay'))['voice']
+        self.assertEqual((recovered['voiced'], recovered['posted'], recovered['aliased']), (2, 0, 1))
+        self.assertEqual(evidence.read_bytes(), before)
+        self.assertEqual(len(self.calls), 1)
+        self.assertEqual(len(self.health_calls), 1)
+        self.assertEqual(len(list(self.ledger.glob('*/claim.json'))), 1)
+        self.assertEqual((self.work / 'media' / recovered['files']['first-in-order']).read_bytes(),
+                         voice._wav_bytes(self.voice_body))
+
+    def test_opt_in_preserves_cache_only_clips_and_refuses_unverified_aliases(self):
+        original = self.lines[0]
+        voice.voice_lines(self.lines, self.work / 'media', post=lambda *_: (200, self.voice_body),
+                          cache_path=self.work / 'voice-cache.json', jobs=1)
+        cache_path = self.work / 'voice-cache.json'
+        prior_cache = cache_path.read_bytes()
+        self.lines = [{**original, 'id': 'another-text', 'text': 'New first group'}, original,
+                      {**original, 'id': 'unproven-alias'}]
+        self.write_inputs()
+        with self.assertRaisesRegex(dispatch.DispatchError, 'voice_reuse_source_unverified'):
+            self.run_media(**self.voice_dedupe_mode())
+        self.assertEqual(cache_path.read_bytes(), prior_cache)
+        self.assertEqual(self.calls + self.health_calls, [])
+        self.assertFalse(self.ledger.exists())
+
+    def test_opt_in_refuses_corrupt_cache_before_treating_lines_as_new(self):
+        cache_path = self.work / 'voice-cache.json'
+        cache_path.write_bytes(b'{"incomplete')
+        with self.assertRaisesRegex(dispatch.DispatchError, 'record_invalid'):
+            self.run_media(**self.voice_dedupe_mode())
+        self.assertEqual(cache_path.read_bytes(), b'{"incomplete')
+        self.assertEqual(self.calls + self.health_calls, [])
+        self.assertFalse((self.work / dispatch.VOICE_DEDUPE_PLAN).exists())
+
+    def test_opt_in_stops_at_first_unknown_and_keeps_original_receipts(self):
+        for line_id, text in [('alias', '请看窗户。'), ('unknown', 'Second'),
+                              ('unknown-copy', 'Second'), ('later', 'Third')]:
+            self.lines.append({'id': line_id, 'text': text, 'voice': 'Jennifer'})
+        self.write_inputs()
+        mode = self.voice_dedupe_mode()
+        error = b'{"success":false,"error":"upstream timeout"}'
+
+        def mock_unknown(url, payload):
+            self.post(url, payload)
+            return (500, error) if payload['audioId'] == 'unknown' else (200, self.voice_body)
+
+        with self.assertRaisesRegex(dispatch.DispatchError, 'unknown_upstream_outcome'):
+            self.run_media(**mode, post=mock_unknown)
+        self.assertEqual([payload['audioId'] for _, payload in self.calls], ['teacher-1', 'unknown'])
+        responses = {path: path.read_bytes() for path in self.ledger.glob('*/response.json')}
+        unknown = next(entry for raw in responses.values()
+                       if (entry := json.loads(raw))['httpStatus'] == 500)
+        self.assertEqual(base64.b64decode(unknown['bodyBase64']), error)
+        reuse = self.work / '.media-dispatch' / 'reused'
+        self.assertEqual({path.stem for path in reuse.glob('*.json')}, {'alias'})
+
+        with self.assertRaisesRegex(dispatch.DispatchError, 'unreconciled_claim'):
+            self.run_media(**mode, post=lambda *_: self.fail('paid replay'),
+                           health_get=lambda *_: self.fail('health during replay'))
+        self.assertEqual({path: path.read_bytes() for path in responses}, responses)
+        self.assertEqual(len(self.health_calls), 2)
+
+    def test_opt_in_rejects_http_200_with_invalid_pcm(self):
+        self.lines.append({**self.lines[0], 'id': 'teacher-2'})
+        self.write_inputs()
+        mode = self.voice_dedupe_mode()
+
+        def invalid_pcm(url, payload):
+            self.post(url, payload)
+            return 200, json_bytes({'base64': 'aW52YWxpZA=='})
+
+        with self.assertRaisesRegex(voice.VoiceError, 'wav_invalid'):
+            self.run_media(**mode, post=invalid_pcm)
+        with self.assertRaisesRegex(voice.VoiceError, 'wav_invalid'):
+            self.run_media(**mode, post=lambda *_: self.fail('paid replay'),
+                           health_get=lambda *_: self.fail('health during replay'))
+        self.assertEqual(len(self.calls), 1)
+        self.assertFalse((self.work / '.media-dispatch' / 'reused').exists())
+        self.assertFalse((self.work / 'voice-cache.json').exists())
+
+    def test_opt_in_checks_the_reviewed_byte_hash_and_pins_it_for_resume(self):
+        mode = self.voice_dedupe_mode()
+        lines_path = self.work / 'lines.json'
+        original = lines_path.read_bytes()
+        lines_path.write_bytes(original + b'\n')
+        with self.assertRaisesRegex(dispatch.DispatchError, 'voice_dedupe_lines_changed'):
+            self.run_media(**mode)
+        plan_path = self.work / dispatch.VOICE_DEDUPE_PLAN
+        self.assertFalse(plan_path.exists())
+        self.assertEqual(self.calls + self.health_calls, [])
+
+        lines_path.write_bytes(original)
+        self.run_media(**mode)
+        plan = plan_path.read_bytes()
+        self.assertEqual(json.loads(plan)['linesSha256'], mode['lines_sha256'])
+        self.assertEqual(json.loads(plan)['ttsUrl'], TTS_URL)
+        lines_path.write_bytes(original + b'\n')
+        with self.assertRaisesRegex(dispatch.DispatchError, 'voice_dedupe_plan_mismatch'):
+            self.run_media(**self.voice_dedupe_mode())
+        self.assertEqual(plan_path.read_bytes(), plan)
+        self.assertEqual(len(self.calls), 1)
+        self.assertEqual(len(self.health_calls), 1)
+
     def test_low_disk_refuses_new_dispatch_before_health_or_claim(self):
         self.disk_usage.return_value = SimpleNamespace(free=dispatch.MINIMUM_FREE_BYTES - 1)
         with self.assertRaisesRegex(voice.VoiceError, 'disk_space_insufficient'):
@@ -187,6 +398,127 @@ class MediaDispatchTests(unittest.TestCase):
             self.assertEqual(list(self.ledger.rglob('claim.json')), [])
         self.assertEqual(self.calls, [])
         self.assertEqual(len(self.health_calls), 2)
+
+    def test_disk_floor_accepts_exact_default_and_configured_boundaries(self):
+        for settings, floor, required in (
+            ({}, 2 * 1024**3, '2 GiB'),
+            ({DISK_FLOOR_ENV: str(5 * 1024**3)}, 5 * 1024**3, f'{5 * 1024**3} bytes'),
+        ):
+            with self.subTest(floor=floor), patch.dict(os.environ, settings):
+                self.disk_usage.return_value = SimpleNamespace(free=floor - 1)
+                with self.assertRaisesRegex(dispatch.DispatchError, f'requires at least {required}'):
+                    dispatch._require_disk_space(self.work)
+                self.disk_usage.return_value = SimpleNamespace(free=floor)
+                dispatch._require_disk_space(self.work)
+
+    def test_configured_disk_floor_blocks_claim_if_space_drops_after_slot(self):
+        floor = 5 * 1024**3
+        self.disk_usage.return_value = SimpleNamespace(free=floor)
+        real_slot = dispatch.post_slot
+
+        @contextmanager
+        def slot(*args, **kwargs):
+            with real_slot(*args, **kwargs):
+                self.disk_usage.return_value = SimpleNamespace(free=floor - 1)
+                yield
+
+        with patch.dict(os.environ, {DISK_FLOOR_ENV: str(floor)}), patch.object(dispatch, 'post_slot', slot):
+            with self.assertRaisesRegex(voice.VoiceError, f'requires at least {floor} bytes'):
+                self.run_media(steps=('voice',), jobs=1)
+        self.assertEqual(len(self.health_calls), 1)
+        self.assertEqual(self.calls, [])
+        self.assertEqual(list(self.ledger.rglob('claim.json')), [])
+
+    def test_invalid_disk_floor_blocks_new_dispatch_before_health_or_claim(self):
+        for value in ('', '5 GiB', '5.5', str(dispatch.MINIMUM_FREE_BYTES - 1)):
+            with self.subTest(value=value), patch.dict(os.environ, {DISK_FLOOR_ENV: value}):
+                with self.assertRaisesRegex(voice.VoiceError, 'disk_space_floor_invalid'):
+                    self.run_media(steps=('voice',), jobs=1)
+        self.disk_usage.assert_not_called()
+        self.assertEqual(self.calls + self.health_calls, [])
+        self.assertEqual(list(self.ledger.rglob('claim.json')), [])
+
+    def assert_regular_voice_http_rejection(self, status, expected_ids, **options):
+        self.lines.append({'id': 'teacher-2', 'text': '请找桌子。', 'voice': 'Jennifer'})
+        self.write_inputs()
+        raw = b'{"success":false,"error":"provider rejected the request"}'
+
+        def reject_first(url, payload):
+            if payload['audioId'] == 'teacher-1':
+                self.calls.append((url, payload))
+                raise HTTPError(url, status, 'provider rejection', {}, io.BytesIO(raw))
+            return self.post(url, payload)
+
+        with self.assertRaisesRegex(voice.VoiceError, f'teacher-1: HTTP {status}'):
+            self.run_media(steps=('voice',), jobs=1, post=reject_first, **options)
+        self.assertEqual([p['audioId'] for _, p in self.calls], expected_ids)
+        self.assertEqual(len(self.health_calls), len(expected_ids))
+        claims = {json.loads(p.read_bytes())['payload']['audioId']: p
+                  for p in self.ledger.rglob('claim.json')}
+        self.assertEqual(set(claims), set(expected_ids))
+        response = json.loads(claims['teacher-1'].with_name('response.json').read_bytes())
+        self.assertEqual((response['httpStatus'], response['outcome']), (status, 'http_error'))
+        self.assertEqual(base64.b64decode(response['bodyBase64']), raw)
+        self.assertFalse((self.work / dispatch.VOICE_DEDUPE_PLAN).exists())
+
+    def test_stop_on_voice_error_stops_after_http_402(self):
+        self.assert_regular_voice_http_rejection(402, ['teacher-1'], stop_on_voice_error=True)
+
+    def test_stop_on_voice_error_stops_after_http_403(self):
+        self.assert_regular_voice_http_rejection(403, ['teacher-1'], stop_on_voice_error=True)
+
+    def test_regular_voice_continues_after_http_rejection_by_default(self):
+        self.assert_regular_voice_http_rejection(402, ['teacher-1', 'teacher-2'])
+
+    def test_stop_on_voice_error_stays_stopped_when_disk_recovers(self):
+        self.lines.append({'id': 'teacher-2', 'text': '请找桌子。', 'voice': 'Jennifer'})
+        self.write_inputs()
+        floor = 5 * 1024**3
+        self.disk_usage.return_value = SimpleNamespace(free=floor)
+        real_slot = dispatch.post_slot
+        acquisitions = 0
+
+        @contextmanager
+        def slot(*args, **kwargs):
+            nonlocal acquisitions
+            with real_slot(*args, **kwargs):
+                acquisitions += 1
+                if acquisitions == 1:
+                    self.disk_usage.return_value = SimpleNamespace(free=floor - 1)
+                try:
+                    yield
+                finally:
+                    self.disk_usage.return_value = SimpleNamespace(free=floor)
+
+        with patch.dict(os.environ, {DISK_FLOOR_ENV: str(floor)}), patch.object(dispatch, 'post_slot', slot):
+            with self.assertRaisesRegex(voice.VoiceError, 'disk_space_insufficient'):
+                self.run_media(steps=('voice',), jobs=1, stop_on_voice_error=True)
+        self.assertEqual(acquisitions, 1)
+        self.assertEqual(len(self.health_calls), 1)
+        self.assertEqual(self.calls, [])
+        self.assertEqual(list(self.ledger.rglob('claim.json')), [])
+
+    def test_voice_stop_on_error_keeps_success_and_never_retries_invalid_pcm(self):
+        self.lines.extend([{'id': 'teacher-2', 'text': '请找桌子。', 'voice': 'Jennifer'},
+                           {'id': 'teacher-3', 'text': '请找椅子。', 'voice': 'Jennifer'}])
+        sleeps = []
+
+        def post(url, payload):
+            self.calls.append((url, payload))
+            if payload['audioId'] == 'teacher-1':
+                return 200, self.voice_body
+            return 200, json_bytes({'data': {'base64': base64.b64encode(b'not RIFF').decode()}})
+
+        cache_path = self.work / 'voice-cache.json'
+        media = self.work / 'media'
+        with self.assertRaisesRegex(voice.VoiceError, 'teacher-2: wav_invalid'):
+            voice.voice_lines(self.lines, media, post=post, cache_path=cache_path, jobs=1,
+                              sleep=sleeps.append, stop_on_error=True)
+        self.assertEqual([p['audioId'] for _, p in self.calls], ['teacher-1', 'teacher-2'])
+        self.assertEqual(sleeps, [])
+        cache = json.loads(cache_path.read_bytes())
+        self.assertEqual(set(cache), {voice._cache_key(self.lines[0])})
+        self.assertTrue(voice._cached_name(self.lines[0], media, cache, require_pcm=True))
 
     def test_low_disk_preserves_settled_replay_without_new_post(self):
         payload = {'text': 'already generated'}
@@ -391,13 +723,52 @@ except DispatchError:
                 self.assertEqual(dispatch.main(['--lesson', 'demo-lesson', '--work', str(self.work),
                                                  '--steps', 'voice', '--jobs', '3']), 0)
             self.assertEqual(run.call_args.kwargs, {'steps': ('voice',), 'jobs': 3,
-                                                    'retry_rate_limited': False})
+                                                    'retry_rate_limited': False,
+                                                    'dedupe_identical_tts': False, 'lines_sha256': None})
         with patch.object(dispatch, 'run_dispatch', side_effect=dispatch.DispatchError('work_locked', 'path')):
             with redirect_stderr(io.StringIO()):
                 self.assertEqual(dispatch.main(['--lesson', 'demo-lesson', '--work', str(self.work)]), 1)
         for kwargs in [{'jobs': 0}, {'steps': ('unknown',)}, {'steps': ('voice', 'voice')}]:
             with self.assertRaises(dispatch.DispatchError):
                 self.run_media(**kwargs)
+        self.assertEqual(self.calls + self.health_calls, [])
+
+    def test_cli_deduplication_requires_voice_only_and_one_job_without_retry(self):
+        mode = self.voice_dedupe_mode()
+        args = ['--lesson', 'demo-lesson', '--work', str(self.work), '--steps', 'voice', '--jobs', '1',
+                '--dedupe-identical-tts', '--lines-sha256', mode['lines_sha256']]
+        with patch.object(dispatch, 'run_dispatch', return_value={'voice': {'posted': 0}}) as run:
+            with redirect_stdout(io.StringIO()):
+                self.assertEqual(dispatch.main(args), 0)
+            run.assert_called_once_with('demo-lesson', str(self.work), steps=('voice',), jobs=1,
+                                        retry_rate_limited=False, dedupe_identical_tts=True,
+                                        lines_sha256=mode['lines_sha256'])
+        for retry in [('--retry-rate-limited',), ('--retry-authorized-request', 'authorization.json'),
+                      ('--continue-unsubmitted-tts-after', 'sha'), ('--lines-file', 'replacement.json')]:
+            with redirect_stderr(io.StringIO()), self.assertRaises(SystemExit):
+                dispatch.main([*args, *retry])
+        for invalid in [{'jobs': 2}, {'steps': ('pictures', 'voice')}, {'retry_rate_limited': True}]:
+            with self.assertRaisesRegex(dispatch.DispatchError, 'arguments_invalid'):
+                self.run_media(**(mode | invalid))
+        with self.assertRaisesRegex(dispatch.DispatchError, 'voice_dedupe_hash_invalid'):
+            self.run_media(**(mode | {'lines_sha256': None}))
+        self.assertEqual(self.calls + self.health_calls, [])
+
+    def test_cli_stop_on_voice_error_is_only_for_regular_serial_voice(self):
+        args = ['--lesson', 'demo-lesson', '--work', str(self.work), '--steps', 'voice', '--jobs', '1',
+                '--stop-on-voice-error']
+        with patch.object(dispatch, 'run_dispatch', return_value={}) as run:
+            self.assertEqual(dispatch.main(args), 0)
+            self.assertIs(run.call_args.kwargs['stop_on_voice_error'], True)
+        for conflict in [('--retry-rate-limited',), ('--retry-authorized-request', 'authorization.json'),
+                         ('--continue-unsubmitted-tts-after', 'sha'), ('--dedupe-identical-tts',)]:
+            with self.subTest(conflict=conflict), redirect_stderr(io.StringIO()), self.assertRaises(SystemExit):
+                dispatch.main([*args, *conflict])
+        for invalid in ({'jobs': 2}, {'steps': ('pictures', 'voice')}, {'retry_rate_limited': True},
+                        {'dedupe_identical_tts': True}):
+            options = {'steps': ('voice',), 'jobs': 1, 'stop_on_voice_error': True}
+            with self.subTest(invalid=invalid), self.assertRaisesRegex(dispatch.DispatchError, 'arguments_invalid'):
+                self.run_media(**(options | invalid))
         self.assertEqual(self.calls + self.health_calls, [])
 
     def test_health_transport_error_is_recorded_before_any_paid_claim(self):
@@ -769,6 +1140,71 @@ except DispatchError:
         self.assertEqual(set(self.continue_new(base)['voice']['files']), {'teacher-2'})
         self.assertEqual([payload['audioId'] for _, payload in self.calls], ['teacher-1', 'teacher-2'])
         self.assertFalse((base / 'attempts').exists())
+
+    def assert_continuation_stops_after_http_rejection(self, status):
+        _, _, base = self.seed_authorized_timeout()
+        original = (base / 'response.json').read_bytes()
+        self.lines.extend([{'id': 'teacher-2', 'text': '请找桌子。', 'voice': 'Jennifer'},
+                           {'id': 'teacher-3', 'text': '请找椅子。', 'voice': 'Jennifer'}])
+        self.write_inputs()
+        raw = b'{"success":false,"error":"provider rejected the request"}'
+
+        def reject(url, payload):
+            self.calls.append((url, payload))
+            raise HTTPError(url, status, 'provider rejection', {}, io.BytesIO(raw))
+
+        with self.assertRaisesRegex(voice.VoiceError, f'teacher-2: HTTP {status}'):
+            self.continue_new(base, post=reject)
+        self.assertEqual([payload['audioId'] for _, payload in self.calls], ['teacher-1', 'teacher-2'])
+        self.assertEqual(len(self.health_calls), 2)
+        [new_claim] = [p for p in self.ledger.rglob('claim.json') if p.parent != base]
+        self.assertEqual(json.loads(new_claim.read_bytes())['payload']['audioId'], 'teacher-2')
+        response = json.loads(new_claim.with_name('response.json').read_bytes())
+        self.assertEqual(response['httpStatus'], status)
+        self.assertEqual(response['outcome'], 'http_error')
+        self.assertEqual(base64.b64decode(response['bodyBase64']), raw)
+        self.assertEqual((base / 'response.json').read_bytes(), original)
+        recorded = dispatch.RecordedPost(self.work, post=self.post, health_get=self.health,
+                                         slots_dir=self.slots)
+        self.assertEqual(recorded._unresolved, {str((base / 'claim.json').resolve())})
+
+    def test_continuation_stops_after_http_402(self):
+        self.assert_continuation_stops_after_http_rejection(402)
+
+    def test_continuation_stops_after_http_403(self):
+        self.assert_continuation_stops_after_http_rejection(403)
+
+    def test_continuation_stays_stopped_after_disk_space_recovers(self):
+        _, _, base = self.seed_authorized_timeout()
+        original = (base / 'response.json').read_bytes()
+        self.lines.extend([{'id': 'teacher-2', 'text': '请找桌子。', 'voice': 'Jennifer'},
+                           {'id': 'teacher-3', 'text': '请找椅子。', 'voice': 'Jennifer'}])
+        self.write_inputs()
+        floor = 5 * 1024**3
+        self.disk_usage.return_value = SimpleNamespace(free=floor)
+        real_slot = dispatch.post_slot
+        acquisitions = 0
+
+        @contextmanager
+        def slot(*args, **kwargs):
+            nonlocal acquisitions
+            with real_slot(*args, **kwargs):
+                acquisitions += 1
+                if acquisitions == 1:
+                    self.disk_usage.return_value = SimpleNamespace(free=floor - 1)
+                try:
+                    yield
+                finally:
+                    self.disk_usage.return_value = SimpleNamespace(free=floor)
+
+        with patch.dict(os.environ, {DISK_FLOOR_ENV: str(floor)}), patch.object(dispatch, 'post_slot', slot):
+            with self.assertRaisesRegex(voice.VoiceError, 'disk_space_insufficient'):
+                self.continue_new(base)
+        self.assertEqual(acquisitions, 1)
+        self.assertEqual(len(self.health_calls), 2)
+        self.assertEqual([payload['audioId'] for _, payload in self.calls], ['teacher-1'])
+        self.assertEqual(list(self.ledger.rglob('claim.json')), [base / 'claim.json'])
+        self.assertEqual((base / 'response.json').read_bytes(), original)
 
     def test_new_unknown_fences_remaining_first_time_tts(self):
         _, _, base = self.seed_authorized_timeout()

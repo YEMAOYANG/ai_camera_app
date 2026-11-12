@@ -1,0 +1,1743 @@
+{
+  "schemaVersion": "mira.courseware.asset-provenance.v1",
+  "visualPhase": "exact_diagrams_complete_illustrated_game_art_pending_disk",
+  "numberPlan": {
+    "maxPerPlace": 9,
+    "value": "10 * tens + ones",
+    "pieces": "tens + ones",
+    "mainRange": [
+      1,
+      9
+    ],
+    "companionBoundary": 10
+  },
+  "assets": {
+    "budget-3": {
+      "path": "assets/budget-3.png",
+      "sha256": "95c349492ff30b51e55cf8a61d224db8fab389228a83c80bc59f476dd2a43a69",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "sort-the-disc-budgets"
+      ],
+      "discProof": {
+        "discs": 3
+      }
+    },
+    "budget-4": {
+      "path": "assets/budget-4.png",
+      "sha256": "b31b933f448836bf9d03c191765e063b77e8039c27ade1ea03adf3685df3f06a",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "sort-the-disc-budgets"
+      ],
+      "discProof": {
+        "discs": 4
+      }
+    },
+    "budget-5": {
+      "path": "assets/budget-5.png",
+      "sha256": "4b4f63fb7a542d8d9e8480e2215da8f1559836bc6a0a01827e18e05742e1a09f",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "sort-the-disc-budgets"
+      ],
+      "discProof": {
+        "discs": 5
+      }
+    },
+    "budget-6": {
+      "path": "assets/budget-6.png",
+      "sha256": "6ce957b03b9d195cccefd81679765c2487d775bc09a69398507ceb1da89880b7",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "sort-the-disc-budgets"
+      ],
+      "discProof": {
+        "discs": 6
+      }
+    },
+    "depot-ready": {
+      "path": "assets/depot-ready.png",
+      "sha256": "b60234741eccf426a428ef76c6aa185ec6d0d2071f824af14da176865070aea8",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "sort-the-disc-budgets"
+      ],
+      "discProof": {
+        "tens": 1,
+        "ones": 2,
+        "discs": 3,
+        "value": 12,
+        "moved": "none",
+        "legal": true
+      }
+    },
+    "family-blank-mat": {
+      "path": "assets/family-blank-mat.png",
+      "sha256": "93839821e5b1722ae17295ea6de47b10d68a12e47b4478b67eaf176e98d93227",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "make-your-own-disc-board"
+      ],
+      "discProof": {
+        "tens": 0,
+        "ones": 0,
+        "discs": 0,
+        "value": 0,
+        "moved": "none",
+        "legal": true
+      }
+    },
+    "family-paper-discs": {
+      "path": "assets/family-paper-discs.png",
+      "sha256": "aa53f01b880dd091399cd21e0b3fe8d973cb6f37f3d0a6649ca92a4982cb8338",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "make-your-own-disc-board"
+      ],
+      "discProof": {
+        "discs": 8
+      }
+    },
+    "five-complete": {
+      "path": "assets/five-complete.png",
+      "sha256": "f0f9a4f7afddfde40f134b4a2658e28c1804f96f4e1658b844efbc6861fce2ea",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "same-count-along-a-diagonal"
+      ],
+      "discProof": {
+        "discs": 5,
+        "rows": [
+          {
+            "tens": 0,
+            "ones": 5,
+            "discs": 5,
+            "value": 5
+          },
+          {
+            "tens": 1,
+            "ones": 4,
+            "discs": 5,
+            "value": 14
+          },
+          {
+            "tens": 2,
+            "ones": 3,
+            "discs": 5,
+            "value": 23
+          },
+          {
+            "tens": 3,
+            "ones": 2,
+            "discs": 5,
+            "value": 32
+          },
+          {
+            "tens": 4,
+            "ones": 1,
+            "discs": 5,
+            "value": 41
+          },
+          {
+            "tens": 5,
+            "ones": 0,
+            "discs": 5,
+            "value": 50
+          }
+        ],
+        "reverse": false,
+        "hidden": [],
+        "spoiled": []
+      }
+    },
+    "four-down": {
+      "path": "assets/four-down.png",
+      "sha256": "582ca04ee52c78048eda927f8595ea91c8c21f773b066577be0bafc70cf10c17",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "one-way-and-back"
+      ],
+      "discProof": {
+        "discs": 4,
+        "rows": [
+          {
+            "tens": 4,
+            "ones": 0,
+            "discs": 4,
+            "value": 40
+          },
+          {
+            "tens": 3,
+            "ones": 1,
+            "discs": 4,
+            "value": 31
+          },
+          {
+            "tens": 2,
+            "ones": 2,
+            "discs": 4,
+            "value": 22
+          },
+          {
+            "tens": 1,
+            "ones": 3,
+            "discs": 4,
+            "value": 13
+          },
+          {
+            "tens": 0,
+            "ones": 4,
+            "discs": 4,
+            "value": 4
+          }
+        ],
+        "reverse": true,
+        "hidden": [],
+        "spoiled": []
+      }
+    },
+    "four-up": {
+      "path": "assets/four-up.png",
+      "sha256": "eef77642db5d2e98f8e506bc0019b3cac5955fdb39acbd4696390f76310a829b",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "one-way-and-back"
+      ],
+      "discProof": {
+        "discs": 4,
+        "rows": [
+          {
+            "tens": 0,
+            "ones": 4,
+            "discs": 4,
+            "value": 4
+          },
+          {
+            "tens": 1,
+            "ones": 3,
+            "discs": 4,
+            "value": 13
+          },
+          {
+            "tens": 2,
+            "ones": 2,
+            "discs": 4,
+            "value": 22
+          },
+          {
+            "tens": 3,
+            "ones": 1,
+            "discs": 4,
+            "value": 31
+          },
+          {
+            "tens": 4,
+            "ones": 0,
+            "discs": 4,
+            "value": 40
+          }
+        ],
+        "reverse": false,
+        "hidden": [],
+        "spoiled": []
+      }
+    },
+    "game-mat-11": {
+      "path": "assets/game-mat-11.png",
+      "sha256": "fbc4ee608b3b9b51a72e0af044fb5065b3ccf2588c99209a2b6e023ec413bf0f",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "follow-the-disc-route"
+      ],
+      "discProof": {
+        "tens": 1,
+        "ones": 1,
+        "discs": 2,
+        "value": 11,
+        "moved": "none",
+        "legal": true
+      }
+    },
+    "game-mat-12": {
+      "path": "assets/game-mat-12.png",
+      "sha256": "6e214b8ba1af6bf25ea11f63bf5dff915d6c7fedfb551bf31ccd2fa8faf7a479",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "sort-the-disc-budgets"
+      ],
+      "discProof": {
+        "tens": 1,
+        "ones": 2,
+        "discs": 3,
+        "value": 12,
+        "moved": "none",
+        "legal": true
+      }
+    },
+    "game-mat-13": {
+      "path": "assets/game-mat-13.png",
+      "sha256": "c6d8428d15065f75f24cdf6a83bec603ef4c67d3055a34fb159d87b74ba04b4d",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "follow-the-disc-route"
+      ],
+      "discProof": {
+        "tens": 1,
+        "ones": 3,
+        "discs": 4,
+        "value": 13,
+        "moved": "none",
+        "legal": true
+      }
+    },
+    "game-mat-14": {
+      "path": "assets/game-mat-14.png",
+      "sha256": "72229f2f0063d797b7d7a4f7cd9b077766f976d41692f39b3586216b14d7e087",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "follow-the-disc-route"
+      ],
+      "discProof": {
+        "tens": 1,
+        "ones": 4,
+        "discs": 5,
+        "value": 14,
+        "moved": "none",
+        "legal": true
+      }
+    },
+    "game-mat-20": {
+      "path": "assets/game-mat-20.png",
+      "sha256": "90222f519e94292c5cab806f727eda563f687057939ff8b37914fec1e6a23dd7",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "follow-the-disc-route"
+      ],
+      "discProof": {
+        "tens": 2,
+        "ones": 0,
+        "discs": 2,
+        "value": 20,
+        "moved": "none",
+        "legal": true
+      }
+    },
+    "game-mat-21": {
+      "path": "assets/game-mat-21.png",
+      "sha256": "45b4605553d2b90218f92fd068ba6a780f2f3d5c26812e43fad9a40bdcd8f899",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "sort-the-disc-budgets"
+      ],
+      "discProof": {
+        "tens": 2,
+        "ones": 1,
+        "discs": 3,
+        "value": 21,
+        "moved": "none",
+        "legal": true
+      }
+    },
+    "game-mat-22": {
+      "path": "assets/game-mat-22.png",
+      "sha256": "5c61871ee24ca27cdb2afc6e6f01bb06ad0b1e7822991fcb4f91b5ea0d67b374",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "follow-the-disc-route",
+        "sort-the-disc-budgets"
+      ],
+      "discProof": {
+        "tens": 2,
+        "ones": 2,
+        "discs": 4,
+        "value": 22,
+        "moved": "none",
+        "legal": true
+      }
+    },
+    "game-mat-23": {
+      "path": "assets/game-mat-23.png",
+      "sha256": "a1cdd31d2b918e3beb88b45ca5e0d56008d4197811c58850cf075583a5767e7d",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "follow-the-disc-route"
+      ],
+      "discProof": {
+        "tens": 2,
+        "ones": 3,
+        "discs": 5,
+        "value": 23,
+        "moved": "none",
+        "legal": true
+      }
+    },
+    "game-mat-31": {
+      "path": "assets/game-mat-31.png",
+      "sha256": "de5644e8532e24ee730f8aad75a124eb2060a6b94349bf711d54c3b8c24062cb",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "follow-the-disc-route",
+        "sort-the-disc-budgets"
+      ],
+      "discProof": {
+        "tens": 3,
+        "ones": 1,
+        "discs": 4,
+        "value": 31,
+        "moved": "none",
+        "legal": true
+      }
+    },
+    "game-mat-32": {
+      "path": "assets/game-mat-32.png",
+      "sha256": "681ab377c67c17c5d0c14300b59240a1562b15e0f6a86eb8f1d8eeed5029ee22",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "follow-the-disc-route",
+        "sort-the-disc-budgets"
+      ],
+      "discProof": {
+        "tens": 3,
+        "ones": 2,
+        "discs": 5,
+        "value": 32,
+        "moved": "none",
+        "legal": true
+      }
+    },
+    "game-mat-33": {
+      "path": "assets/game-mat-33.png",
+      "sha256": "21a46b9124c8458cb8c1c0f5e43097e1eb3daaf4be6f74ff1f0b02766e35efc3",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "sort-the-disc-budgets"
+      ],
+      "discProof": {
+        "tens": 3,
+        "ones": 3,
+        "discs": 6,
+        "value": 33,
+        "moved": "none",
+        "legal": true
+      }
+    },
+    "game-mat-40": {
+      "path": "assets/game-mat-40.png",
+      "sha256": "d30116c28d03863186d517a14ba6efc4e579bbd164c0706af5d11551da293d2a",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "follow-the-disc-route"
+      ],
+      "discProof": {
+        "tens": 4,
+        "ones": 0,
+        "discs": 4,
+        "value": 40,
+        "moved": "none",
+        "legal": true
+      }
+    },
+    "game-mat-41": {
+      "path": "assets/game-mat-41.png",
+      "sha256": "cb0e0968af9d5251e854bf110a5586694beb6d037aa6795dc2bfa07602878af6",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "follow-the-disc-route",
+        "sort-the-disc-budgets"
+      ],
+      "discProof": {
+        "tens": 4,
+        "ones": 1,
+        "discs": 5,
+        "value": 41,
+        "moved": "none",
+        "legal": true
+      }
+    },
+    "game-mat-42": {
+      "path": "assets/game-mat-42.png",
+      "sha256": "eb8dd565ff38ebad1e1408e90f93f2479597b6690e0fad53fd8b5437f2acb777",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "sort-the-disc-budgets"
+      ],
+      "discProof": {
+        "tens": 4,
+        "ones": 2,
+        "discs": 6,
+        "value": 42,
+        "moved": "none",
+        "legal": true
+      }
+    },
+    "game-mat-5": {
+      "path": "assets/game-mat-5.png",
+      "sha256": "5429e37267afa4a64c6d2981619e5cf686a2a9a5381a5aaabf826691f5d45f5f",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "follow-the-disc-route"
+      ],
+      "discProof": {
+        "tens": 0,
+        "ones": 5,
+        "discs": 5,
+        "value": 5,
+        "moved": "none",
+        "legal": true
+      }
+    },
+    "game-mat-51": {
+      "path": "assets/game-mat-51.png",
+      "sha256": "f7de601eb9f3f3cbdb92a5aea270f5ee032d64ab1fee1aa72c9ba0232e8b943d",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "sort-the-disc-budgets"
+      ],
+      "discProof": {
+        "tens": 5,
+        "ones": 1,
+        "discs": 6,
+        "value": 51,
+        "moved": "none",
+        "legal": true
+      }
+    },
+    "large-mat-11": {
+      "path": "assets/large-mat-11.png",
+      "sha256": "da0c71a80802ad08635dfb2057becb90675fd88bf2262324cf5386f822810960",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "follow-the-disc-route"
+      ],
+      "discProof": {
+        "tens": 1,
+        "ones": 1,
+        "discs": 2,
+        "value": 11,
+        "moved": "none",
+        "legal": true
+      }
+    },
+    "large-mat-12": {
+      "path": "assets/large-mat-12.png",
+      "sha256": "e737098082626c1f490e1e5d35c11442ebe2cb019d673c61e07d5ab833687d0c",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "sort-the-disc-budgets"
+      ],
+      "discProof": {
+        "tens": 1,
+        "ones": 2,
+        "discs": 3,
+        "value": 12,
+        "moved": "none",
+        "legal": true
+      }
+    },
+    "large-mat-13": {
+      "path": "assets/large-mat-13.png",
+      "sha256": "fedaa2e5fffc373546fceda358d55f11324d8b6849ef7ffc70f53161a13d5f61",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "follow-the-disc-route"
+      ],
+      "discProof": {
+        "tens": 1,
+        "ones": 3,
+        "discs": 4,
+        "value": 13,
+        "moved": "none",
+        "legal": true
+      }
+    },
+    "large-mat-14": {
+      "path": "assets/large-mat-14.png",
+      "sha256": "c6f20d75e36b302c8f2a6308a49eebe8d95f0e6339632f2e8455765062a247bd",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "follow-the-disc-route"
+      ],
+      "discProof": {
+        "tens": 1,
+        "ones": 4,
+        "discs": 5,
+        "value": 14,
+        "moved": "none",
+        "legal": true
+      }
+    },
+    "large-mat-2": {
+      "path": "assets/large-mat-2.png",
+      "sha256": "6502a6effc875ea89d7c9ac3e96de21af5e42fd2fe596c218b7d01324fca4815",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "follow-the-disc-route"
+      ],
+      "discProof": {
+        "tens": 0,
+        "ones": 2,
+        "discs": 2,
+        "value": 2,
+        "moved": "none",
+        "legal": true
+      }
+    },
+    "large-mat-20": {
+      "path": "assets/large-mat-20.png",
+      "sha256": "24bd5ccbb2278956f7482baa02c5a5e1542a8a28231f194322299cb399760a61",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "follow-the-disc-route"
+      ],
+      "discProof": {
+        "tens": 2,
+        "ones": 0,
+        "discs": 2,
+        "value": 20,
+        "moved": "none",
+        "legal": true
+      }
+    },
+    "large-mat-21": {
+      "path": "assets/large-mat-21.png",
+      "sha256": "e902ffdd77f2431a1eac8958a77f25ae6fb6fcd21ad509002d1b298c6fd58697",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "sort-the-disc-budgets"
+      ],
+      "discProof": {
+        "tens": 2,
+        "ones": 1,
+        "discs": 3,
+        "value": 21,
+        "moved": "none",
+        "legal": true
+      }
+    },
+    "large-mat-22": {
+      "path": "assets/large-mat-22.png",
+      "sha256": "c21b073dd6bddcffc7a1040ab86a43d73bc29bc0557c0c3e16ad65110f9ed142",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "follow-the-disc-route",
+        "sort-the-disc-budgets"
+      ],
+      "discProof": {
+        "tens": 2,
+        "ones": 2,
+        "discs": 4,
+        "value": 22,
+        "moved": "none",
+        "legal": true
+      }
+    },
+    "large-mat-23": {
+      "path": "assets/large-mat-23.png",
+      "sha256": "78d797c7f3a90806cf3122e7d4296db2fad8ac9972f834ae028947b84ddabb35",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "follow-the-disc-route"
+      ],
+      "discProof": {
+        "tens": 2,
+        "ones": 3,
+        "discs": 5,
+        "value": 23,
+        "moved": "none",
+        "legal": true
+      }
+    },
+    "large-mat-31": {
+      "path": "assets/large-mat-31.png",
+      "sha256": "6a0a5e008623b59a832e6197f66c8eafea9bd8ee161f2645f5dc4f5b9f6bef5f",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "follow-the-disc-route",
+        "sort-the-disc-budgets"
+      ],
+      "discProof": {
+        "tens": 3,
+        "ones": 1,
+        "discs": 4,
+        "value": 31,
+        "moved": "none",
+        "legal": true
+      }
+    },
+    "large-mat-32": {
+      "path": "assets/large-mat-32.png",
+      "sha256": "2b323bb9433ed5b875b8c96da6a53639c18555cf3b8fe8f244c5526fbf82ea5f",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "follow-the-disc-route",
+        "sort-the-disc-budgets"
+      ],
+      "discProof": {
+        "tens": 3,
+        "ones": 2,
+        "discs": 5,
+        "value": 32,
+        "moved": "none",
+        "legal": true
+      }
+    },
+    "large-mat-33": {
+      "path": "assets/large-mat-33.png",
+      "sha256": "b1e9a088915de9b97f574f76ad72d488b61073ae0a9667a649f21933616e7034",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "sort-the-disc-budgets"
+      ],
+      "discProof": {
+        "tens": 3,
+        "ones": 3,
+        "discs": 6,
+        "value": 33,
+        "moved": "none",
+        "legal": true
+      }
+    },
+    "large-mat-4": {
+      "path": "assets/large-mat-4.png",
+      "sha256": "a86f933d70b99bf50d9cd960091b1b30cbb8f0858c9be88aac9482919c00b620",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "follow-the-disc-route"
+      ],
+      "discProof": {
+        "tens": 0,
+        "ones": 4,
+        "discs": 4,
+        "value": 4,
+        "moved": "none",
+        "legal": true
+      }
+    },
+    "large-mat-40": {
+      "path": "assets/large-mat-40.png",
+      "sha256": "6329c41bd5aaf19de6d8c7e707c1bb5f9bb0a9935dd54b25da710c0574ded7b6",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "follow-the-disc-route"
+      ],
+      "discProof": {
+        "tens": 4,
+        "ones": 0,
+        "discs": 4,
+        "value": 40,
+        "moved": "none",
+        "legal": true
+      }
+    },
+    "large-mat-41": {
+      "path": "assets/large-mat-41.png",
+      "sha256": "055e35ab4ff677582e57a2201672fa9e06253d68a79d40c2ae68088e3e11cc26",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "follow-the-disc-route",
+        "sort-the-disc-budgets"
+      ],
+      "discProof": {
+        "tens": 4,
+        "ones": 1,
+        "discs": 5,
+        "value": 41,
+        "moved": "none",
+        "legal": true
+      }
+    },
+    "large-mat-42": {
+      "path": "assets/large-mat-42.png",
+      "sha256": "bdb6e025cb4ef9d701b32cade09887b7803a1b1deda3baae19fb0b826280281e",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "sort-the-disc-budgets"
+      ],
+      "discProof": {
+        "tens": 4,
+        "ones": 2,
+        "discs": 6,
+        "value": 42,
+        "moved": "none",
+        "legal": true
+      }
+    },
+    "large-mat-5": {
+      "path": "assets/large-mat-5.png",
+      "sha256": "3fec58eed0e43ca0597da93965d7055d5fd10871a36148741affdca0285b093e",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "follow-the-disc-route"
+      ],
+      "discProof": {
+        "tens": 0,
+        "ones": 5,
+        "discs": 5,
+        "value": 5,
+        "moved": "none",
+        "legal": true
+      }
+    },
+    "large-mat-50": {
+      "path": "assets/large-mat-50.png",
+      "sha256": "bc61e9314af2b24895c7b951fd5de8dbd8ba3e7b1ae34e8db9d926c0d3fd8964",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "follow-the-disc-route"
+      ],
+      "discProof": {
+        "tens": 5,
+        "ones": 0,
+        "discs": 5,
+        "value": 50,
+        "moved": "none",
+        "legal": true
+      }
+    },
+    "large-mat-51": {
+      "path": "assets/large-mat-51.png",
+      "sha256": "8be6418238f5fd7be889378d64d5d107327e5da50c31fba3144939de5545e90b",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "sort-the-disc-budgets"
+      ],
+      "discProof": {
+        "tens": 5,
+        "ones": 1,
+        "discs": 6,
+        "value": 51,
+        "moved": "none",
+        "legal": true
+      }
+    },
+    "maze-exit": {
+      "path": "assets/maze-exit.png",
+      "sha256": "398ecdabdf8848d4997c4b4df635bc3a867ffc1d4742d8d57235e0b2faa3f294",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "follow-the-disc-route"
+      ],
+      "discProof": {
+        "type": "exit"
+      }
+    },
+    "maze-ready": {
+      "path": "assets/maze-ready.png",
+      "sha256": "5c8092ff04a18b2ec758c12bcac37f8cec0a36d11614483f819f0538a8a73d6b",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "follow-the-disc-route"
+      ],
+      "discProof": {
+        "discs": 2
+      }
+    },
+    "move-left": {
+      "path": "assets/move-left.png",
+      "sha256": "12ba577d732dad93a11a28eccfc16d994a4fe30c13915b5b7f16c4f2488b9497",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "follow-the-disc-route"
+      ],
+      "discProof": {
+        "direction": "left"
+      }
+    },
+    "move-right": {
+      "path": "assets/move-right.png",
+      "sha256": "4f30baef0c85cc4122c46d1425deafff795ee9096984b1801fcc29dee09b89cf",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "follow-the-disc-route"
+      ],
+      "discProof": {
+        "direction": "right"
+      }
+    },
+    "nine-prediction": {
+      "path": "assets/nine-prediction.png",
+      "sha256": "3b3bcf50f184bf706f5c3d1b77b5b3d0b83e1bb17b601ad0ed68f057518f7b43",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "same-count-along-a-diagonal"
+      ],
+      "discProof": {
+        "values": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ]
+      }
+    },
+    "one-in-ones": {
+      "path": "assets/one-in-ones.png",
+      "sha256": "fd78cc9dfeaa314e92e1a218785b35f0b108a6094f2e27e2ab88c2a7474244ad",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "same-disc-new-place"
+      ],
+      "discProof": {
+        "tens": 0,
+        "ones": 1,
+        "discs": 1,
+        "value": 1,
+        "moved": "none",
+        "legal": true
+      }
+    },
+    "one-in-tens": {
+      "path": "assets/one-in-tens.png",
+      "sha256": "14c297af411f5741a2b9e249f762fd6a46c108f1ff0c70dd9eef5fab8db07a1b",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "same-disc-new-place"
+      ],
+      "discProof": {
+        "tens": 1,
+        "ones": 0,
+        "discs": 1,
+        "value": 10,
+        "moved": "none",
+        "legal": true
+      }
+    },
+    "q-eight-budget": {
+      "path": "assets/q-eight-budget.png",
+      "sha256": "aa53f01b880dd091399cd21e0b3fe8d973cb6f37f3d0a6649ca92a4982cb8338",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "quiz:remove-a-wrong-card"
+      ],
+      "discProof": {
+        "discs": 8
+      }
+    },
+    "q-eleven-a": {
+      "path": "assets/q-eleven-a.png",
+      "sha256": "1815d982289739b72fd380ca1763834e27ac0896ea53b3146ac52410891f4e33",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "quiz:pick-a-valid-over-nine-split"
+      ],
+      "discProof": {
+        "tens": 9,
+        "ones": 2,
+        "discs": 11,
+        "value": 92,
+        "moved": "none",
+        "legal": true
+      }
+    },
+    "q-eleven-b": {
+      "path": "assets/q-eleven-b.png",
+      "sha256": "a6e1f789fed615d6f7442f5baab2d911144dee0f086edc387a62e4c0ffeb7afb",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "quiz:pick-a-valid-over-nine-split"
+      ],
+      "discProof": {
+        "tens": 10,
+        "ones": 1,
+        "discs": 11,
+        "value": null,
+        "moved": "none",
+        "legal": false
+      }
+    },
+    "q-eleven-budget": {
+      "path": "assets/q-eleven-budget.png",
+      "sha256": "d2bcb2776a716101d9c83e4a763906ba6dca1f4c7abf5313859c68414b7f687a",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "quiz:pick-a-valid-over-nine-split"
+      ],
+      "discProof": {
+        "discs": 11
+      }
+    },
+    "q-eleven-c": {
+      "path": "assets/q-eleven-c.png",
+      "sha256": "645be8c115f7afa8e9e2f9b0e866af0ed591a3e3284e2ad1bf5c5e9d150ab4d6",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "quiz:pick-a-valid-over-nine-split"
+      ],
+      "discProof": {
+        "tens": 1,
+        "ones": 10,
+        "discs": 11,
+        "value": null,
+        "moved": "none",
+        "legal": false
+      }
+    },
+    "q-move-a-44": {
+      "path": "assets/q-move-a-44.png",
+      "sha256": "d057ab500177c5a1d5c46a06f2c12ecd3a78a1d42d839e1778b52c25c5ceea78",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "quiz:move-one-to-the-tens"
+      ],
+      "discProof": {
+        "tens": 4,
+        "ones": 4,
+        "discs": 8,
+        "value": 44,
+        "moved": "none",
+        "legal": true
+      }
+    },
+    "q-move-b-26": {
+      "path": "assets/q-move-b-26.png",
+      "sha256": "7628d7a5099e6fa01d59ed214746d692455841515dd02d55e3aeb3828b3ad3ca",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "quiz:move-one-to-the-tens"
+      ],
+      "discProof": {
+        "tens": 2,
+        "ones": 6,
+        "discs": 8,
+        "value": 26,
+        "moved": "none",
+        "legal": true
+      }
+    },
+    "q-move-c-45": {
+      "path": "assets/q-move-c-45.png",
+      "sha256": "f36ecb680220108c1b2d6301011e284852be3129783a70d686bb1711391bab59",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "quiz:move-one-to-the-tens"
+      ],
+      "discProof": {
+        "tens": 4,
+        "ones": 5,
+        "discs": 9,
+        "value": 45,
+        "moved": "none",
+        "legal": true
+      }
+    },
+    "q-move-start-35": {
+      "path": "assets/q-move-start-35.png",
+      "sha256": "a824207ba61c8666184c2b832f2fc3c49b57b13c89b0b3d389f56b16d7cfdcd0",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "quiz:move-one-to-the-tens"
+      ],
+      "discProof": {
+        "tens": 3,
+        "ones": 5,
+        "discs": 8,
+        "value": 35,
+        "moved": "none",
+        "legal": true
+      }
+    },
+    "q-new-board-43": {
+      "path": "assets/q-new-board-43.png",
+      "sha256": "f30f1d74160787e414be7cb72adec5b86fe0a493829718f63882608d2b1bc982",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "quiz:read-a-new-board"
+      ],
+      "discProof": {
+        "tens": 4,
+        "ones": 3,
+        "discs": 7,
+        "value": 43,
+        "moved": "none",
+        "legal": true
+      }
+    },
+    "q-number-10": {
+      "path": "assets/q-number-10.png",
+      "sha256": "291c03d7cbad38385c31582b801fa6a2ac8f1e6df281d1889770290a817cdd83",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "quiz:predict-seven"
+      ],
+      "discProof": {
+        "value": 10
+      }
+    },
+    "q-number-17": {
+      "path": "assets/q-number-17.png",
+      "sha256": "57ffefdbac19f7cdcd7c6d3a881292799e716b757ed2a3971914692f0035a037",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "quiz:remove-a-wrong-card"
+      ],
+      "discProof": {
+        "value": 17
+      }
+    },
+    "q-number-34": {
+      "path": "assets/q-number-34.png",
+      "sha256": "db431347561c54b313313e223f479edbd20446bec8e0b08c34a6e7fca3315720",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "quiz:read-a-new-board"
+      ],
+      "discProof": {
+        "value": 34
+      }
+    },
+    "q-number-36": {
+      "path": "assets/q-number-36.png",
+      "sha256": "31653eb2433dcafcb5b4a23b4d555336707b39e899a7bfe12d8cb6cdd53fbf15",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "quiz:remove-a-wrong-card"
+      ],
+      "discProof": {
+        "value": 36
+      }
+    },
+    "q-number-43": {
+      "path": "assets/q-number-43.png",
+      "sha256": "445a5c1d059291370698ad625dd35fb5683e15daebe1efc36eb68621505730d1",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "quiz:read-a-new-board"
+      ],
+      "discProof": {
+        "value": 43
+      }
+    },
+    "q-number-6": {
+      "path": "assets/q-number-6.png",
+      "sha256": "5a11b78d2105706e84a7c467825b2b4268638f8447caa00cb31468f7cf816bc4",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "quiz:reverse-count-matching-pair"
+      ],
+      "discProof": {
+        "value": 6
+      }
+    },
+    "q-number-62": {
+      "path": "assets/q-number-62.png",
+      "sha256": "22c70a3906c1717bb2a1f9d8cfd92b71cf810e89bf6feefd9828744c10d20a6a",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "quiz:remove-a-wrong-card"
+      ],
+      "discProof": {
+        "value": 62
+      }
+    },
+    "q-number-7": {
+      "path": "assets/q-number-7.png",
+      "sha256": "32df88ff5747cdda6a1bfd6e01681723b8f922631920a9bbfeb9d7187b9cf7f5",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "quiz:predict-seven",
+        "quiz:read-a-new-board"
+      ],
+      "discProof": {
+        "value": 7
+      }
+    },
+    "q-number-8": {
+      "path": "assets/q-number-8.png",
+      "sha256": "0bbb2010e28b2413b216d9723db7ffe84de333b93eb84b493f511652da66b0af",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "quiz:predict-seven",
+        "quiz:reverse-count-matching-pair"
+      ],
+      "discProof": {
+        "value": 8
+      }
+    },
+    "q-number-9": {
+      "path": "assets/q-number-9.png",
+      "sha256": "da2c52c5fa7ee1a3c0d207be6706adae54dcd55b3543ac1f4d3d1da9ff105f9b",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "quiz:reverse-count-matching-pair"
+      ],
+      "discProof": {
+        "value": 9
+      }
+    },
+    "q-reverse-54-72": {
+      "path": "assets/q-reverse-54-72.png",
+      "sha256": "2f28d6595d516af14363008a47d23633c83c79c041dd27ba979cc18fda404d54",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "quiz:reverse-count-matching-pair"
+      ],
+      "discProof": {
+        "values": [
+          54,
+          72
+        ]
+      }
+    },
+    "q-seven-budget": {
+      "path": "assets/q-seven-budget.png",
+      "sha256": "3636680b544d262447943e57f6b9e76c14dab5d37a76d167eea4fd122d93117d",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "quiz:predict-seven"
+      ],
+      "discProof": {
+        "discs": 7
+      }
+    },
+    "same-six-diagonal": {
+      "path": "assets/same-six-diagonal.png",
+      "sha256": "15b8e932f1fce4722a4dbcf2a433a5706f8c7727ab565d895037ed90ff31550b",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "count-discs-not-the-value"
+      ],
+      "discProof": {
+        "selected": 6,
+        "selectedValues": [
+          6,
+          15,
+          24,
+          33,
+          42,
+          51,
+          60
+        ],
+        "origin": 0
+      }
+    },
+    "six-record-error": {
+      "path": "assets/six-record-error.png",
+      "sha256": "72716e258c4f82903d02872f92538cb6dd2a4def6563f289ddff9e274020b19a",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "count-discs-not-the-value",
+        "fix-the-six-disc-record"
+      ],
+      "discProof": {
+        "discs": 6,
+        "rows": [
+          {
+            "tens": 0,
+            "ones": 6,
+            "discs": 6,
+            "value": 6
+          },
+          {
+            "tens": 1,
+            "ones": 5,
+            "discs": 6,
+            "value": 15
+          },
+          {
+            "tens": 2,
+            "ones": 4,
+            "discs": 6,
+            "value": 24
+          },
+          {
+            "tens": 3,
+            "ones": 3,
+            "discs": 6,
+            "value": 33
+          },
+          {
+            "tens": 4,
+            "ones": 2,
+            "discs": 6,
+            "value": 42
+          },
+          {
+            "tens": 5,
+            "ones": 1,
+            "discs": 6,
+            "value": 51
+          },
+          {
+            "tens": 6,
+            "ones": 0,
+            "discs": 6,
+            "value": 60
+          }
+        ],
+        "reverse": false,
+        "hidden": [
+          51
+        ],
+        "spoiled": [
+          [
+            33,
+            34
+          ]
+        ]
+      }
+    },
+    "six-record-fixed": {
+      "path": "assets/six-record-fixed.png",
+      "sha256": "634a009567c54d8f1f672e34322573863bd0748f0c402efa9713422bb4021f85",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "fix-the-six-disc-record"
+      ],
+      "discProof": {
+        "discs": 6,
+        "rows": [
+          {
+            "tens": 0,
+            "ones": 6,
+            "discs": 6,
+            "value": 6
+          },
+          {
+            "tens": 1,
+            "ones": 5,
+            "discs": 6,
+            "value": 15
+          },
+          {
+            "tens": 2,
+            "ones": 4,
+            "discs": 6,
+            "value": 24
+          },
+          {
+            "tens": 3,
+            "ones": 3,
+            "discs": 6,
+            "value": 33
+          },
+          {
+            "tens": 4,
+            "ones": 2,
+            "discs": 6,
+            "value": 42
+          },
+          {
+            "tens": 5,
+            "ones": 1,
+            "discs": 6,
+            "value": 51
+          },
+          {
+            "tens": 6,
+            "ones": 0,
+            "discs": 6,
+            "value": 60
+          }
+        ],
+        "reverse": false,
+        "hidden": [],
+        "spoiled": []
+      }
+    },
+    "ten-cannot-fit-one-side": {
+      "path": "assets/ten-cannot-fit-one-side.png",
+      "sha256": "ba57cd93ff4154b9c9cf140bada51567df1945ce7b2ad3feb4e864c1378021b9",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "ten-discs-have-limits"
+      ],
+      "discProof": {
+        "discs": 10,
+        "invalid": [
+          [
+            0,
+            10
+          ],
+          [
+            10,
+            0
+          ]
+        ]
+      }
+    },
+    "ten-legal-record": {
+      "path": "assets/ten-legal-record.png",
+      "sha256": "579396e1e470b9c836b0b050e1a50af43cad97d5b2ee696682d802976939c2fd",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "ten-discs-have-limits"
+      ],
+      "discProof": {
+        "discs": 10,
+        "rows": [
+          {
+            "tens": 1,
+            "ones": 9,
+            "discs": 10,
+            "value": 19
+          },
+          {
+            "tens": 2,
+            "ones": 8,
+            "discs": 10,
+            "value": 28
+          },
+          {
+            "tens": 3,
+            "ones": 7,
+            "discs": 10,
+            "value": 37
+          },
+          {
+            "tens": 4,
+            "ones": 6,
+            "discs": 10,
+            "value": 46
+          },
+          {
+            "tens": 5,
+            "ones": 5,
+            "discs": 10,
+            "value": 55
+          },
+          {
+            "tens": 6,
+            "ones": 4,
+            "discs": 10,
+            "value": 64
+          },
+          {
+            "tens": 7,
+            "ones": 3,
+            "discs": 10,
+            "value": 73
+          },
+          {
+            "tens": 8,
+            "ones": 2,
+            "discs": 10,
+            "value": 82
+          },
+          {
+            "tens": 9,
+            "ones": 1,
+            "discs": 10,
+            "value": 91
+          }
+        ],
+        "reverse": false,
+        "hidden": [],
+        "spoiled": []
+      }
+    },
+    "three-complete": {
+      "path": "assets/three-complete.png",
+      "sha256": "0c05df8a053701b406c9f3e84b42585bb86fd787e3b6d6227eb2df64002be0e4",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "find-the-missing-placement",
+        "sort-the-disc-budgets"
+      ],
+      "discProof": {
+        "discs": 3,
+        "rows": [
+          {
+            "tens": 0,
+            "ones": 3,
+            "discs": 3,
+            "value": 3
+          },
+          {
+            "tens": 1,
+            "ones": 2,
+            "discs": 3,
+            "value": 12
+          },
+          {
+            "tens": 2,
+            "ones": 1,
+            "discs": 3,
+            "value": 21
+          },
+          {
+            "tens": 3,
+            "ones": 0,
+            "discs": 3,
+            "value": 30
+          }
+        ],
+        "reverse": false,
+        "hidden": [],
+        "spoiled": []
+      }
+    },
+    "three-missing-21": {
+      "path": "assets/three-missing-21.png",
+      "sha256": "f4c48ff333e3c75c4e70b14896b8a3478e58e332264dac5d91da29c811ccdc10",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "find-the-missing-placement"
+      ],
+      "discProof": {
+        "discs": 3,
+        "rows": [
+          {
+            "tens": 0,
+            "ones": 3,
+            "discs": 3,
+            "value": 3
+          },
+          {
+            "tens": 1,
+            "ones": 2,
+            "discs": 3,
+            "value": 12
+          },
+          {
+            "tens": 2,
+            "ones": 1,
+            "discs": 3,
+            "value": 21
+          },
+          {
+            "tens": 3,
+            "ones": 0,
+            "discs": 3,
+            "value": 30
+          }
+        ],
+        "reverse": false,
+        "hidden": [
+          21
+        ],
+        "spoiled": []
+      }
+    },
+    "two-disc-record": {
+      "path": "assets/two-disc-record.png",
+      "sha256": "eaf416604f56f4d4f286d3aff7e36119fce93a6294dc3131ad497b60fa8dd95e",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "follow-the-disc-route",
+        "move-one-record-once"
+      ],
+      "discProof": {
+        "discs": 2,
+        "rows": [
+          {
+            "tens": 0,
+            "ones": 2,
+            "discs": 2,
+            "value": 2
+          },
+          {
+            "tens": 1,
+            "ones": 1,
+            "discs": 2,
+            "value": 11
+          },
+          {
+            "tens": 2,
+            "ones": 0,
+            "discs": 2,
+            "value": 20
+          }
+        ],
+        "reverse": false,
+        "hidden": [],
+        "spoiled": []
+      }
+    },
+    "two-discs-move": {
+      "path": "assets/two-discs-move.png",
+      "sha256": "9d043502ae2bb6bb284b5b84d7e310ffc427c7756bc8bbdc627972b6b67c2a9d",
+      "source": "exact_disc_arrangement_render",
+      "renderSource": "art-source/disc-diagrams.mjs",
+      "renderSourceSha256": "0e74931758a801505e4da1c13c820ab4a30c64668a0d55eda374a436f5ab7c9e",
+      "usedBy": [
+        "move-one-record-once"
+      ],
+      "discProof": {
+        "from": {
+          "tens": 0,
+          "ones": 2,
+          "discs": 2,
+          "value": 2
+        },
+        "to": {
+          "tens": 1,
+          "ones": 1,
+          "discs": 2,
+          "value": 11
+        },
+        "moved": "tens"
+      }
+    }
+  }
+}

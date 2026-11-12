@@ -1,0 +1,215 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "数数、数的组成",
+  "binding": {
+    "editionId": "pep-math-g1-lower-2022-standard",
+    "revisionId": "directory-6205d2037284e91f10b25edd",
+    "nodeId": "752c43ba-9465-4170-8d05-ec407c8e6ae8",
+    "unitId": "acfb0386-a55f-4542-9d5d-619a3e2d9023"
+  },
+  "scenario": "风筝工坊要把散开的扎杆按十装袋。先估有多少，再数和装；最后按邻组需要的整袋和散杆合单。",
+  "goals": [
+    "按顺序逐一或分组数100以内的物件，用记号、移动或圈组避免遗漏和重复。",
+    "解释10个一合成1个十，演示9个散件添1后换组，从二十九等数跨到下一个整十。",
+    "看一捆捆与散件说出几个十和几个一，并用物件说明整十没有散件。",
+    "用10个作参照先估量，再逐组数出准确结果。"
+  ],
+  "goalSources": [
+    {
+      "skill": "count-once",
+      "target": "按顺序逐一或分组数100以内的物件，用记号、移动或圈组避免遗漏和重复。",
+      "source": "印24～25、课件14～15及24～29"
+    },
+    {
+      "skill": "bundle-ten",
+      "target": "解释10个一合成1个十，演示9个散件添1后换组，从二十九等数跨到下一个整十。",
+      "source": "印24、课件16～18及21～22"
+    },
+    {
+      "skill": "tens-and-ones",
+      "target": "看一捆捆与散件说出几个十和几个一，并用物件说明整十没有散件。",
+      "source": "印24～25、课件19及23、30～34"
+    },
+    {
+      "skill": "estimate-check",
+      "target": "用10个作参照先估量，再逐组数出准确结果。",
+      "source": "印23、印25做一做4"
+    }
+  ],
+  "pageSequence": [
+    {
+      "key": "welcome-workshop",
+      "kind": "teaching",
+      "plan": "从工坊领杆备货的问题进入。先看看、再估、最后用数核对。"
+    },
+    {
+      "key": "move-each-once",
+      "kind": "teaching",
+      "plan": "精确十四根。按行把数过的移到同一侧，未移的继续数。"
+    },
+    {
+      "key": "bundle-at-ten",
+      "kind": "teaching",
+      "plan": "十根和绑好的十根一一对齐，辨认一个十。"
+    },
+    {
+      "key": "nine-then-one",
+      "kind": "teaching",
+      "plan": "两捆九根添一，原两捆不动，十根散杆换第三捆。"
+    },
+    {
+      "key": "cross-another-ten",
+      "kind": "teaching",
+      "plan": "三条十连、九个小方块添一后成为四条，迁移到四十。"
+    },
+    {
+      "key": "aim-to-fill-ten",
+      "kind": "game",
+      "plan": "弹珠实际找补足十的伙伴，右边持续显示刚合出的同一十格。"
+    },
+    {
+      "key": "read-the-grouping",
+      "kind": "teaching",
+      "plan": "五捆和三根表示53，六捆和空散盘表示60。只读数量不教位值写法。"
+    },
+    {
+      "key": "count-in-groups",
+      "kind": "teaching",
+      "plan": "同样23个夹片分别按2、5圈组，每组位置固定，未满组继续数。"
+    },
+    {
+      "key": "ten-groups-and-leftovers",
+      "kind": "teaching",
+      "plan": "同一组23个夹片用两个完整十和三个散片核对；未满的也算。"
+    },
+    {
+      "key": "estimate-by-a-ten",
+      "kind": "teaching",
+      "plan": "先以一组十估四小盘，整理成三个十和八个散片，精确数38。"
+    },
+    {
+      "key": "merge-bundles-and-singles",
+      "kind": "game",
+      "plan": "整盘滑动，让捆卡和散卡合成指定订单，实际结果留在架上。"
+    },
+    {
+      "key": "picture-quiz",
+      "kind": "quiz",
+      "plan": "六道原创图题，数量、足十、整十和估数准确绘制。"
+    },
+    {
+      "key": "take-home-stock-check",
+      "kind": "teaching",
+      "plan": "回放有序数、满十换捆、说组成和先估后数。"
+    }
+  ],
+  "games": [
+    {
+      "page": "aim-to-fill-ten",
+      "template": "magnetMarbles",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.magnetMarbles",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "sum_pair",
+      "selection": "每关 total 固定10。发射物和移动靶的值都用单个扎杆图精确复现，固定十格目标图与录音说明需要填满。只有合足10命中才能得分，命中反馈让两组在同一十格核对。",
+      "levels": [
+        "低漂移，待发射6或8时分别找4或2根。",
+        "增加发射7与5的两轮，排除同样颜色但不同数量的靶。",
+        "加入9与4的不同队列，寻找1与6根并提前量瞄准。"
+      ],
+      "demo": "老师指空十格、两组杆和发射操作，实际瞄一次合十，停在可复核的结果再清零。",
+      "teacherAnchors": [
+        "game-goal",
+        "game-player",
+        "game-target"
+      ]
+    },
+    {
+      "page": "merge-bundles-and-singles",
+      "template": "slideMerge",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.slideMerge",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "symbol_merge",
+      "selection": "用4×4真实整盘滑动，pairs 由成捆图加散杆图生成目标总量图，targets 收指定订单。计分只靠数量配对；别的可组成另一数，继续寻找本轮需要的组合。新物件沿用相同数量表示，目标在开局用语音说明。",
+      "levels": [
+        "开阔板把2捆和3根收成23，先一滑即成。",
+        "混合35与57，满十捆图和散件顺序可反，加入一挡板。",
+        "收72、84和无散件的90。90用9捆图和可辨的空散格卡配对，均用实图表示。"
+      ],
+      "demo": "指捆图、散根图与滑动方向，真实完成一组合并并停在收集结果，再清零交接。",
+      "teacherAnchors": [
+        "game-goal",
+        "game-player",
+        "game-target"
+      ]
+    }
+  ],
+  "quiz": [
+    {
+      "id": "count-each-once",
+      "skill": "有序逐一点数",
+      "prompt": "收集了18枚书签。哪张记录表示每枚都数过一次？",
+      "answer": "每枚书签各有一个标记的图",
+      "position": 2,
+      "rationale": "有一枚没标或标两次都会数错。"
+    },
+    {
+      "id": "cross-sixty",
+      "skill": "满十换组",
+      "prompt": "五捆外有九根。再来一根，捆好后选哪图？",
+      "answer": "六捆，没有散杆。",
+      "position": 1,
+      "rationale": "十根散杆合成第六捆。"
+    },
+    {
+      "id": "tens-and-six",
+      "skill": "整十和散个组成",
+      "prompt": "工具台有八捆和六根，一捆十根。找出数出的总量图。",
+      "answer": "八条十格和六个散点表示86",
+      "position": 3,
+      "rationale": "八个十和六个一合成八十六。"
+    },
+    {
+      "id": "exactly-eight-tens",
+      "skill": "整十无散个",
+      "prompt": "桌上铺了八条十连积木，没有散块。一共有多少？",
+      "answer": "八条十连积木表示80的数图",
+      "position": 2,
+      "rationale": "八个十是八十。"
+    },
+    {
+      "id": "invert-the-count",
+      "skill": "由数量找组成",
+      "prompt": "工坊有九十三根扎杆。哪盘的捆和散根对得上？",
+      "answer": "九捆，每捆十根，还有三根。",
+      "position": 1,
+      "rationale": "九个十和三个一合起来是九十三。"
+    },
+    {
+      "id": "estimate-by-ten",
+      "skill": "估一估再点数",
+      "prompt": "有五盘，第一盘十片，其余差不多满。大约多少？",
+      "answer": "五组十，约五十。",
+      "position": 3,
+      "rationale": "已知十片那一盘已经包含在五盘中。数量图四盘十片、一盘九片，共四十九，最接近五十。"
+    }
+  ],
+  "afterClass": {
+    "familyTask": "请成人挑一堆安全的大件小物，孩子先圈或摆10个作参照，估个大约数，再有序凑十数全并说几个十和几个一。",
+    "weeklyQuestionSource": [
+      "逐一点数不重漏",
+      "添一跨整十",
+      "数的组成和整十",
+      "以10作参照估算后复核"
+    ],
+    "evidence": "课堂记录点选及操作，真实分组与口述由家人观察，报告记待观察。"
+  },
+  "artAndLanguage": "扎杆单件、每捆10根、十连块、散件和图题按代码精确排列。生成图只负责背景、人物和单件原型。数过记号同时用位置与形状变化表示。移入表示总体的图用方向箭头，声音说明动作和依据。",
+  "officialNotesSha256": "e6ee35270f3edfd7bfb13734f2af0d635fcf5518e67c75fde444563d87ba305e",
+  "authoring": {
+    "mode": "direct",
+    "model": "gpt-6.1-sol",
+    "bookAndCompanionScope": "印24–25，含同版边界与一课时43页。"
+  }
+}

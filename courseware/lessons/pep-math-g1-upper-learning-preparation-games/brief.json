@@ -1,0 +1,167 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "lesson": "学习准备",
+  "goals": [
+    "按本校作息提前回班坐好。还在外面时，听到本班上课铃就马上走回教室。",
+    "认出数学书、练习本、文具盒，从自己的座位判断左右和前后并按要求摆整齐。",
+    "课堂上先举手、等老师点到再说；同伴交流先听清主题，一人讲完再接话，音量适合小组。"
+  ],
+  "keyPoint": "按本校作息提前回班做好准备，按要求整理桌面，等轮到自己再开口。",
+  "difficultPoint": "课桌方位从自己的座位看。举手只是发出想说的信号，等同伴说完并轮到自己再说。",
+  "pageSequence": [
+    {
+      "key": "s01",
+      "type": "slide",
+      "title": "听到上课铃",
+      "play": "区分作息安排和铃声提醒。按本校作息提前回班坐好。走廊喝水的例子是孩子仍在外面，听到上课铃马上回教室。八点半只是教材学校的例子。"
+    },
+    {
+      "key": "g02",
+      "type": "interactive",
+      "title": "铃响走回班",
+      "play": "游戏只模拟上课铃响时孩子仍在外面的情境。老师示范听见铃便沿走道走进有课桌的门，再说明平时按本校作息提前回班。首关熟悉听铃回班，第二关教室换边，挑战关铃声更晚、进门范围更窄。铃前操作和响铃后走错门分别提示。"
+    },
+    {
+      "key": "s03",
+      "type": "slide",
+      "title": "坐好再看方位",
+      "play": "从自己的椅子朝桌面看，辨认数学书、练习本、文具盒。看靠前和靠近自己怎么分，再从自己的双手判断左右。"
+    },
+    {
+      "key": "g04",
+      "type": "interactive",
+      "title": "桌面滑滑车",
+      "play": "从自己的椅子看，照小桌图摆学具。老师只示范把数学书滑到左前方。首关分开摆三件，第二关先放数学书再叠练习本，挑战关换一张小桌图，数学书和练习本换边。"
+    },
+    {
+      "key": "s05",
+      "type": "slide",
+      "title": "举手、等到、再说",
+      "play": "从想说喜欢的校园植物切入，先举手让老师知道你想说，听完同伴的话并等老师点到再开口。两人围绕同一件事轮流，音量适合伙伴。"
+    },
+    {
+      "key": "g06",
+      "type": "interactive",
+      "title": "轮到我来传话",
+      "play": "看话泡辨认谁在说，老师示范听完后只举一次手。孩子等老师递来话泡，再沿桌边传给亮着的伙伴。三关分别听完一轮、两轮、三轮。实际倾听、音量和口头表达待观察。"
+    },
+    {
+      "key": "q07",
+      "type": "quiz",
+      "title": "换个情境试一试",
+      "play": "六道图片题分别检查雨天听到上课铃、找缺少的用品、从椅子看右后方、辨认哪件学具更近、举手示意和安静听同桌。"
+    },
+    {
+      "key": "s08",
+      "type": "slide",
+      "title": "今天准备好了吗",
+      "play": "回顾按本校作息提前回班。还在外面听见上课铃，就马上走回教室。再回顾从自己的座位摆学具、举手和轮流倾听。课后与家人看本校作息并聊一项和幼儿园不同的安排。"
+    }
+  ],
+  "quiz": [
+    {
+      "id": "prep-q1",
+      "skill": "按本班上课信号行动",
+      "answer": "B",
+      "scenario": "连廊看雨时听到上课铃，选进教室。"
+    },
+    {
+      "id": "prep-q2",
+      "skill": "备齐数学用品",
+      "answer": "C",
+      "scenario": "桌上有数学书和文具盒，选缺的练习本。"
+    },
+    {
+      "id": "prep-q3",
+      "skill": "从自己的座位辨认右后方",
+      "answer": "A",
+      "scenario": "从椅子看，选把数学书放在桌面右边又靠近椅子的图。"
+    },
+    {
+      "id": "prep-q4",
+      "skill": "从自己的座位辨认前后",
+      "answer": "C",
+      "scenario": "选练习本比文具盒离自己的椅子更近的图，解析用前后说明。"
+    },
+    {
+      "id": "prep-q5",
+      "skill": "用举手表示想发言",
+      "answer": "A",
+      "scenario": "想讲最喜欢的课间活动、老师还没点到自己，选用举手示意。"
+    },
+    {
+      "id": "prep-q6",
+      "skill": "先听完再补充",
+      "answer": "B",
+      "scenario": "同桌拿书讲故事，选一人说一人安静听的图。"
+    }
+  ],
+  "afterClass": "请家人陪着看自己的学校作息表，找一项跟幼儿园不同的活动或安排，说给家人听。另可把自己的数学用品摆一次，说明其中一个位置。实际摆放和口头表达由家人观察。",
+  "authorship": {
+    "authorModels": [
+      "gpt-6.1-sol"
+    ],
+    "reuse": "复用已对照教材印刷第10—11页及配套第一课时的官方审读笔记。三张既有专用游戏接入游戏会话交付的 V15 修订、同课图片衍生备用图和已核验的游戏录音。",
+    "new": "直接原创课堂讲解、教师示范台词、六道图片小检查和家庭任务提示。插画采用 Codex 内置图像工具，位置、时钟和配图排版由代码绘制。",
+    "recordingReuse": [
+      {
+        "targetSpeechId": "s05-3",
+        "sourceSpeechId": "s08-8",
+        "voice": "Ethan",
+        "recordingSha256": "7f10bcb7d3e3e637a5ecacf3f9c6a906a5464bce697f36f487cf37b92f6f5ba7",
+        "sourceResponse": "output/courseware-lessons/pep-math-g1-upper-learning-preparation-games/work-v3/.media-dispatch/requests/3c4b6672da8ab466fd3d28167d259f3ed6d97ed8e9c561dbe17eeab8c968ba5f/response.json",
+        "sourceResponseSha256": "71df0d1c5703b79ed2fa882fbfffc3b29d0d9c5d5496147b167b8088feda362c"
+      },
+      {
+        "targetSpeechId": "s05-4",
+        "sourceSpeechId": "g06-7",
+        "voice": "Ethan",
+        "recordingSha256": "5f69d80545345fb01c32a6a4533051a133ed5e05da3fde44abd6b1f8c83c83c0",
+        "sourceResponse": "output/courseware-lessons/pep-math-g1-upper-learning-preparation-games/work-v3/.media-dispatch/requests/e1398324d4b84cb229f460517ed2285d82d0fdd29ea5c88fd531103c7d483e09/response.json",
+        "sourceResponseSha256": "74e41d55993802ec2f5a164ef90957cbc0817e1f87b5333731e6667b255945b6"
+      },
+      {
+        "targetSpeechId": "s05-6",
+        "sourceSpeechId": "s08-11",
+        "voice": "Ethan",
+        "recordingSha256": "0759b1d35382a1bbb851540eef8bb542acc500e439bce27ebffcbf422447cdad",
+        "sourceResponse": "output/courseware-lessons/pep-math-g1-upper-learning-preparation-games/work-v3/.media-dispatch/requests/157e086fe939d6698cea607f98d24c22d9fd226d38ad49dfee6ef5df8207bc26/response.json",
+        "sourceResponseSha256": "dacea97f20d527232f4db6c7b9956437efce96c55f46beb0ebbd8c35aa9995de"
+      },
+      {
+        "targetSpeechId": "s05-7",
+        "sourceSpeechId": "s08-9",
+        "voice": "Ethan",
+        "recordingSha256": "841e5f9e96bbd84055242ca2abf2775906916e7d2580db7016b85cfd622313c7",
+        "sourceResponse": "output/courseware-lessons/pep-math-g1-upper-learning-preparation-games/work-v3/.media-dispatch/requests/3b0f5ec10f33184d9cf4b16a5c938a48cdab4e4e99bf8dfba4ad0f644d1b4b2a/response.json",
+        "sourceResponseSha256": "d72ece3b4cfb9048bafcf599b4624ce85ac24752bc8b249234d5061d00f601d1"
+      },
+      {
+        "targetSpeechId": "s08-3",
+        "sourceSpeechId": "g02-12",
+        "voice": "Ethan",
+        "recordingSha256": "d11f78af6e8e05d71a2ae38f8edcbeac7c3b08a8e0debb6ca4bd4ab4372d1936",
+        "sourceResponse": "output/courseware-lessons/pep-math-g1-upper-learning-preparation-games/work-v8-timing-revision/single-voice/.media-dispatch/requests/cf41370e5ace0180c586f96d20dddd258b4e5ca170e23293b9805946dc9e2fc6/response.json",
+        "sourceResponseSha256": "8e4ad4b045cb4e3528fee63de0e490d4b9e78e38af94bac44edeb439b22df8dc",
+        "sourceRequestSha256": "cf41370e5ace0180c586f96d20dddd258b4e5ca170e23293b9805946dc9e2fc6"
+      }
+    ],
+    "gameDelivery": {
+      "version": "V15",
+      "deliveredBy": "构建 Mira 经典游戏模板目录（Codex 游戏会话）",
+      "gameAuthorModel": "gpt-6.1-sol",
+      "gameAuthorModelStatus": "已核对游戏会话本地交付轮次记录",
+      "handoff": "output/courseware-lessons/pep-math-g1-upper-learning-preparation-games/work-v7-v15-integrated/game-source-receipts/learning-preparation-game-handoff.json",
+      "handoffSha256": "1dcdc72d0c137067f36eb95a3a20d3c46da9f5014a50f8345bc8f3c780570a8d",
+      "patchSha256": "433a8727d7a0052aeae6dd717bce545b725a9c8aad9e93d4aec6c23c330baee8",
+      "engineSha256": "ab3142d41294056be6af5dca5ffafe25357bbef4035aeb93917a69901524cfe4",
+      "scope": "三张游戏的九个交付文件、十一张登记备用图、十七段游戏录音。游戏会话的自测证据见交接清单。",
+      "gameAuthorModelEvidence": {
+        "kind": "codex_turn_context",
+        "turnId": "01a1c09f-7c44-7c60-bd64-3b63a9f742f0",
+        "record": "rollout-2026-11-09T17-35-07-01a1bfa9-523f-7d33-96d3-f76a23538938.jsonl",
+        "line": 3757
+      }
+    }
+  }
+}

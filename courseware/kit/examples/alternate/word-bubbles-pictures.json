@@ -1,0 +1,32 @@
+{
+  "template": "wordBubbles",
+  "title": "听指令找图形",
+  "sub": "听老师念图形名字，对准那张卡吹泡泡。",
+  "voiceLead": true,
+  "stepVoiceLead": true,
+  "labels": {"circle": "●", "triangle": "▲", "square": "■", "rectangle": "▬"},
+  "levels": [
+    {
+      "rounds": [
+        {"target": "circle", "cards": ["circle", "triangle"]},
+        {"target": "triangle", "cards": ["circle", "triangle"]}
+      ],
+      "drift": 14, "pace": 0.65, "tolerance": 62
+    },
+    {
+      "rounds": [
+        {"target": "square", "cards": ["circle", "triangle", "square"]},
+        {"target": "circle", "cards": ["triangle", "circle", "square"]}
+      ],
+      "drift": 35, "pace": 1, "tolerance": 55
+    },
+    {
+      "rounds": [
+        {"target": "rectangle", "cards": ["rectangle", "triangle", "square"]},
+        {"target": "square", "cards": ["circle", "square", "rectangle"]},
+        {"target": "triangle", "cards": ["circle", "rectangle", "triangle"]}
+      ],
+      "drift": 54, "pace": 1.45, "tolerance": 46
+    }
+  ]
+}

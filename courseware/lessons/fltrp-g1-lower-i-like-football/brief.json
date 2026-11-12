@@ -1,0 +1,188 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "I like football.",
+  "sourceBinding": {
+    "schemaVersion": "mira.courseware.identity.v1",
+    "slug": "fltrp-g1-lower-i-like-football",
+    "editionId": "smartedu-english-six-year-g1-lower-sync-c8ae9406",
+    "revisionId": "directory-057e330e9b4c19ff0e6ab21e",
+    "nodeId": "ef27e4dd-659b-39ac-b7ea-6400b7e71882",
+    "unitId": "bdf20f53-0c84-387f-b7cd-8a2f318d70f9",
+    "officialChapterId": "ef27e4dd-659b-39ac-b7ea-6400b7e71882",
+    "officialActivityId": "ff808081-574b-a254-0157-4c5afe191298",
+    "officialMaterialId": "c8ae9406-6280-bd3e-0444-3227ae2dab7a",
+    "subject": "english",
+    "gradeCode": "primary_1",
+    "volume": "lower",
+    "schoolSystem": "six_year",
+    "publisher": "外语教学与研究出版社",
+    "title": "I like football.",
+    "unitTitle": "Module 9",
+    "lessonTitle": "Unit 1 I like football.",
+    "printedPages": [
+      50,
+      51,
+      52
+    ],
+    "digitalPageImages": [
+      55,
+      56,
+      57
+    ]
+  },
+  "authoring": {
+    "model": "gpt-6.1-sol",
+    "mode": "Codex direct authoring",
+    "originality": "用原创运动日广播和社团报名卡；保留目标句型，不搬用教材人物、题图、原歌谣。正式图待内置生成，人物范围和道具数由本课代码定位。"
+  },
+  "goals": [
+    "听见 like 知道在说喜好。能指认 football、basketball、ping-pong；听图认出 lion，并把 them all 对应到刚才的一整组。",
+    "用 I like … 表达自己的喜好；能听懂一个人可以喜欢两项，不从手里拿着什么来猜。",
+    "区分 I、we、they 的发话者范围。We 把自己也算进来；they 是说到的另外一组，不能只数人数。",
+    "听懂 too 表示另一位或组也喜欢同一项；听懂 play with 与 together，尝试听说邀请。",
+    "和家人各画一个喜好，轮流说自己、共同或别人的喜好。纸上记录和真实口语由家人观察。"
+  ],
+  "keyPoint": "用 I / We / They like … 报不同发话者范围的喜好，听清运动词；too 对应相同喜好。",
+  "difficultPoint": "we 与 they 可能都指两人。先找谁在说、这组里包不包括说话的人，再看运动。",
+  "games": [
+    {
+      "scene": "aim-the-club",
+      "template": "magnetMarbles@1",
+      "knowledgeRule": "听清 I/we/they 与运动，瞄中对应照片得分。",
+      "why": "听词大靶。640 宽下单靶 92–100px；完整角色图约 78×56px，便于在同样三人中看出话筒位置。首错不会亮出目标。",
+      "progression": [
+        "两幅同运动同人数照片，只看话筒位置。",
+        "三幅图，交换发话者和运动。",
+        "四个连续口令，弹珠和靶漂更快。"
+      ]
+    },
+    {
+      "scene": "sort-the-clubs",
+      "template": "sortingDepot@1",
+      "knowledgeRule": "按报名人声明的运动，把卡推到有对应运动设备的场地。",
+      "why": "卡上人物和动作不等同于场地符号，需要按喜好分类，且要规划推卡路线。",
+      "progression": [
+        "两卡两区，直线和转弯。",
+        "三卡三种运动，绕过障碍。",
+        "四卡，篮球同类两位，预留路线。"
+      ]
+    }
+  ],
+  "pages": [
+    {
+      "page": 1,
+      "id": "club-welcome",
+      "type": "slide",
+      "title": "运动社团，等你来报名"
+    },
+    {
+      "page": 2,
+      "id": "animal-warmup",
+      "type": "slide",
+      "title": "从动物画板听见 like"
+    },
+    {
+      "page": 3,
+      "id": "sports-clues",
+      "type": "slide",
+      "title": "用球和动作认出三种运动"
+    },
+    {
+      "page": 4,
+      "id": "i-can-like-two",
+      "type": "slide",
+      "title": "我开口，说我的喜好"
+    },
+    {
+      "page": 5,
+      "id": "speaker-and-group",
+      "type": "slide",
+      "title": "两组都有人，谁在说话"
+    },
+    {
+      "page": 6,
+      "id": "aim-the-club",
+      "type": "interactive",
+      "title": "听谁在说，瞄准报名图"
+    },
+    {
+      "page": 7,
+      "id": "same-preference",
+      "type": "slide",
+      "title": "也喜欢，就能一起玩"
+    },
+    {
+      "page": 8,
+      "id": "plan-the-clubs",
+      "type": "slide",
+      "title": "按说过的喜好，排运动区"
+    },
+    {
+      "page": 9,
+      "id": "sort-the-clubs",
+      "type": "interactive",
+      "title": "推报名卡，送到同一运动区"
+    },
+    {
+      "page": 10,
+      "id": "picture-check",
+      "type": "quiz",
+      "title": "新一轮广播，听图选照片"
+    },
+    {
+      "page": 11,
+      "id": "closing",
+      "type": "slide",
+      "title": "把你的喜好说给家人听"
+    }
+  ],
+  "quiz": [
+    {
+      "id": "one-speaker",
+      "skill": "同项运动听辨 I 与 we",
+      "answer": [
+        "B"
+      ]
+    },
+    {
+      "id": "our-football",
+      "skill": "两人组时判断发话者是不是组员",
+      "answer": [
+        "C"
+      ]
+    },
+    {
+      "id": "other-pair",
+      "skill": "听辨 they 和运动双条件",
+      "answer": [
+        "A"
+      ]
+    },
+    {
+      "id": "same-team",
+      "skill": "听 too 找到共同喜好",
+      "answer": [
+        "B"
+      ]
+    },
+    {
+      "id": "two-sports",
+      "skill": "听出 and 连起来的两种喜好",
+      "answer": [
+        "B"
+      ]
+    },
+    {
+      "id": "invite-partner",
+      "skill": "听懂一起玩并找对运动",
+      "answer": [
+        "C"
+      ]
+    }
+  ],
+  "afterClass": {
+    "home": "家人各画一种喜欢的运动，轮流说自己、共同或别人的喜好。",
+    "weekly": "I/we/they 的发话者范围、三种运动、too、and 和一起玩。",
+    "evidence": "课内操作和选图为客观证据；真实问答由家人观察。"
+  }
+}

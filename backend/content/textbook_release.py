@@ -5,6 +5,7 @@ import re
 
 from content.textbook_catalog import canonical, digest, lesson_by_id, lesson_release_aliases
 from content.textbook_review_evidence import restore_split_review
+from content.student_activity_controls import validate_release_controls
 from core.errors import ApiError
 
 INPUT_SCHEMA = 'mira.textbook.saved-classroom-input.v1'
@@ -156,6 +157,10 @@ def validate_release(build, manifest, course=None):
             or review.get('alignmentConfirmed') is not True or review.get('originalExpressionConfirmed') is not True
             or review.get('sourceUsageConfirmed') is not True or review.get('publicationAuthorized') is not True
             or not review.get('reviewer') or not review.get('basis')):
+        fail()
+    try:
+        validate_release_controls(frozen, release)
+    except ValueError:
         fail()
     _, node = lesson_by_id(manifest, build['node_id'])
     try:

@@ -1,0 +1,82 @@
+{
+  "schemaVersion": "mira.courseware.imagegen-plan.v1",
+  "state": "generated_registered",
+  "officialReferencesAttached": false,
+  "recordedAt": "2026-11-10T23:58:36.800651+00:00",
+  "runs": [
+    {
+      "generator": "Codex built-in imagegen",
+      "requestedTransparency": true,
+      "source": "art-source/reading-fair-atlas.png",
+      "sourceNativePath": "/Users/sqcopenclaw/.codex/generated_images/01a1c77a-d547-72b1-a262-029c7f4a40e5/exec-21c42239-7889-4871-9dd3-dc2494dca33f.png",
+      "sourcePixels": [
+        1536,
+        1024
+      ],
+      "sourceSha256": "841936476672412c56c3ac976ed802e14928f04f0b2d8670e543ad76df01dfef",
+      "prompt": "A single original panoramic horizontal atlas for a Chinese first-grade classroom lesson about sorting and exchanging pretend play money at a class book fair. 3 columns by 2 rows, exact equal cells, a broad neutral gutter, all six compositions fully contained and centered within their respective thirds. Canvas 1536x1024. The style is warm premium cut paper, matte gouache, fine paper grain, gentle off-white and apricot with deep pine greens; original, tactile, easily readable at small sizes. No lettering, words, numbers, logos, real or replica money, readable book titles, geometric equations, or currency designs in any part. TOP LEFT: warm elementary school book fair, young children setting up a small exchange desk near children's books with solid blank covers, happy curious expressions, light over shoulders, hero composition. TOP MIDDLE: slightly overhead quiet tabletop layout with warm cream canvas center, small books along very far outer edges, the center mostly empty for a game grid, subtle green matte edges, no lines. TOP RIGHT: hand-made forest green and cream carnival reading-fair booth for a tabletop marble activity, plain pale background and quiet rug texture, almost blank open central area, no targets or written clues. BOTTOM LEFT: a small wooden book trolley side facing right, wheels and pine green shelf, isolated on actual fully transparent alpha with no checkerboard rendering or shadows. BOTTOM CENTER: the same trolley angled slightly forward with one little apricot ribbon fluttering, isolated on actual fully transparent alpha. BOTTOM RIGHT: a little original closed book with a pine cover and a cream bookmark, isolated on actual fully transparent alpha. Keep the sprite silhouettes surrounded by open alpha and separated; no sprite goes outside its own cell. Each top scene fills its cell and does not touch neighboring scene.",
+      "promptSha256": "b61cc15ee714906d3ec03e92b3cb7e527a5a8215cce5db9402d56026daddf35b",
+      "assets": {
+        "reading-fair-cover": [
+          16,
+          15,
+          508,
+          515
+        ],
+        "reading-fair-table": [
+          526,
+          15,
+          1010,
+          515
+        ],
+        "reading-fair-booth": [
+          1028,
+          15,
+          1520,
+          515
+        ]
+      },
+      "usedRegions": "Three original scene plates. The bottom row had broad translucent halos and is not used in runtime."
+    },
+    {
+      "generator": "Codex built-in imagegen",
+      "requestedTransparency": true,
+      "source": "art-source/reading-fair-sprites.png",
+      "sourceNativePath": "/Users/sqcopenclaw/.codex/generated_images/01a1c77a-d547-72b1-a262-029c7f4a40e5/exec-2e063b04-3c54-46b7-bd54-ed27fbfc31de.png",
+      "sourcePixels": [
+        2172,
+        724
+      ],
+      "sourceSha256": "e2dae616cf33cf8ddae1f943d13ebdf8c1d5d29f9ebc37db3c9a82d843e16f59",
+      "prompt": "Create a transparent sprite strip derived from the bottom three icons of this reference artwork, with exactly four independent icons across a single row, wide horizontal 4:1 if available. Left to right: the wood-and-green book trolley side view facing right; its matching trolley with small apricot ribbon motion pose facing right; the same closed forest-green book with cream bookmark; a single warm apricot translucent glass marble (small specular highlight), isolated. Each icon is centered in its quarter of the strip with ample gap between; no cropped part. Preserve the warm cut-paper shapes and grain of the first three objects. Use literal clean alpha transparency outside every cutout, alpha zero beyond the edges, completely remove the blurred surroundings, background, base, matte, halo and ground shadows. No checkerboard, grid, visible background, words, letters, markings, flags, humans, numbers or currency. True RGBA with crisp contours on fully transparent space.",
+      "promptSha256": "a0bc077ca996850a20477b7282de72793dfc0fb3081c8f132224f9d6c40acafd",
+      "assets": {
+        "book-cart": [
+          37,
+          70,
+          554,
+          650
+        ],
+        "book-cart-moving": [
+          576,
+          70,
+          1152,
+          653
+        ],
+        "book-badge": [
+          1218,
+          104,
+          1704,
+          645
+        ],
+        "glass-marble": [
+          1770,
+          190,
+          2107,
+          535
+        ]
+      },
+      "reference": "art-source/reading-fair-atlas.png"
+    }
+  ]
+}

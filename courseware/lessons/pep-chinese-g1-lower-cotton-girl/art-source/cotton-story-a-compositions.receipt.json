@@ -1,0 +1,77 @@
+{
+  "schemaVersion": "mira.courseware.asset-sources.v1",
+  "assets": [
+    {
+      "assetKey": "cotton-before-after",
+      "path": "assets/cotton-before-after.png",
+      "sha256": "dd451c4a789eff9ce8b2efe4006043242dcc482081f4033119bd4eaec7a9f7e1",
+      "width": 816,
+      "height": 400,
+      "usedBy": [
+        "green-and-white"
+      ],
+      "composition": "ordered two 400px squares with 16px gutter, fit contain",
+      "components": [
+        {
+          "assetKey": "cotton-opening",
+          "path": "assets/cotton-opening.png",
+          "sha256": "dc01dfff1cc0646325b10c2df085884cc74eaabb90c8853d541097023f252b42",
+          "generatedSource": "art-source/cotton-story-a.png",
+          "generatedSourceSha256": "ed712972735faf6aa814ae167460238c554cfecbe08f226f186874dbeb5f905a",
+          "sourceCrop": [
+            6,
+            6,
+            412,
+            412
+          ],
+          "promptSha256": "b1f5d715d2ae1219844565d83308ce0f2133c0581b19a48cb2c5df14669ecbd1"
+        },
+        {
+          "assetKey": "cotton-recovered",
+          "path": "assets/cotton-recovered.png",
+          "sha256": "e918464e2b6b389e45bb593a53d495cb5e0fdaf7eecfe72a3f5cc793b7eba32d",
+          "generatedSource": "art-source/cotton-story-a.png",
+          "generatedSourceSha256": "ed712972735faf6aa814ae167460238c554cfecbe08f226f186874dbeb5f905a",
+          "sourceCrop": [
+            6,
+            842,
+            412,
+            1248
+          ],
+          "promptSha256": "b1f5d715d2ae1219844565d83308ce0f2133c0581b19a48cb2c5df14669ecbd1"
+        }
+      ]
+    },
+    {
+      "assetKey": "helper-leaf-and-spots",
+      "path": "assets/helper-leaf-and-spots.png",
+      "sha256": "a43a61045d73ec47cb7c14c90631b48f8bc66b322aa1504e3343b299b90d594a",
+      "width": 816,
+      "height": 400,
+      "usedBy": [
+        "small-spotted-helper"
+      ],
+      "composition": "ordered two 400px squares with 16px gutter, fit contain",
+      "components": [
+        {
+          "assetKey": "helper-on-leaf",
+          "path": "assets/helper-on-leaf.png",
+          "sha256": "872045ee2d33a842d5e0d65ed4667ed872f8f3f7950755d176bbb3e39e54dd7b",
+          "generatedSource": "art-source/cotton-story-a.png",
+          "generatedSourceSha256": "ed712972735faf6aa814ae167460238c554cfecbe08f226f186874dbeb5f905a",
+          "sourceCrop": [
+            842,
+            424,
+            1248,
+            830
+          ],
+          "promptSha256": "b1f5d715d2ae1219844565d83308ce0f2133c0581b19a48cb2c5df14669ecbd1"
+        },
+        {
+          "source": "diagrams.py paper_beetle(7)",
+          "sha256": "d33423e4eeec5695164a6cf2e816618bb5011eadf10bfd060b0faa34cc795ad1"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,1473 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "6 日月明",
+  "description": "小语老师带孩子看部件猜字义，读出儿歌的节奏，在三个小游戏里练识字和笔画。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小语老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Serena",
+      "avatar": "/avatars/teacher-2.png",
+      "color": "#D65A8A",
+      "persona": "用实物图、字格和生活故事陪一年级小朋友认字读词，讲清理由再动手。"
+    }
+  },
+  "images": {
+    "studio": {
+      "file": "assets/studio.png"
+    },
+    "sun-moon": {
+      "file": "assets/sun-moon.png"
+    },
+    "field-pull": {
+      "file": "assets/field-pull.png"
+    },
+    "tip-cone": {
+      "file": "assets/tip-cone.png"
+    },
+    "dust-beam": {
+      "file": "assets/dust-beam.png"
+    },
+    "people-follow": {
+      "file": "assets/people-follow.png"
+    },
+    "people-group": {
+      "file": "assets/people-group.png"
+    },
+    "paired-hands": {
+      "file": "assets/paired-hands.png"
+    },
+    "tree-grove": {
+      "file": "assets/tree-grove.png"
+    },
+    "forest-view": {
+      "file": "assets/forest-view.png"
+    },
+    "tears": {
+      "file": "assets/tears.png"
+    },
+    "seedling-bed": {
+      "file": "assets/seedling-bed.png"
+    },
+    "tilted-frame": {
+      "file": "assets/tilted-frame.png"
+    },
+    "strip-ribbon": {
+      "file": "assets/strip-ribbon.png"
+    },
+    "care-help": {
+      "file": "assets/care-help.png"
+    },
+    "gold-leaves": {
+      "file": "assets/gold-leaves.png"
+    },
+    "paper-build": {
+      "file": "assets/paper-build.png"
+    },
+    "paper-built": {
+      "file": "assets/paper-built.png"
+    },
+    "mailbox-flat": {
+      "file": "assets/mailbox-flat.png"
+    },
+    "mailbox-point": {
+      "file": "assets/mailbox-point.png"
+    },
+    "mailbox-round": {
+      "file": "assets/mailbox-round.png"
+    },
+    "force-grid": {
+      "file": "assets/force-grid.png"
+    },
+    "man-grid": {
+      "file": "assets/man-grid.png"
+    },
+    "soil-grid": {
+      "file": "assets/soil-grid.png"
+    },
+    "wood-grid": {
+      "file": "assets/wood-grid.png"
+    },
+    "heart-grid": {
+      "file": "assets/heart-grid.png"
+    },
+    "heart-left-dot": {
+      "file": "assets/heart-left-dot.png"
+    },
+    "heart-middle-dot": {
+      "file": "assets/heart-middle-dot.png"
+    },
+    "heart-hook": {
+      "file": "assets/heart-hook.png"
+    },
+    "from-card": {
+      "glyph": {
+        "layout": "rows",
+        "size": [
+          480,
+          480
+        ],
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "从"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "grove-card": {
+      "glyph": {
+        "layout": "rows",
+        "size": [
+          480,
+          480
+        ],
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "林"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "forest-card": {
+      "glyph": {
+        "layout": "rows",
+        "size": [
+          480,
+          480
+        ],
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "森"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "pair-card": {
+      "glyph": {
+        "layout": "rows",
+        "size": [
+          480,
+          480
+        ],
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "双"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "crowd-card": {
+      "glyph": {
+        "layout": "rows",
+        "size": [
+          480,
+          480
+        ],
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "众"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "heart-card": {
+      "glyph": {
+        "layout": "rows",
+        "size": [
+          480,
+          480
+        ],
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "心"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "dust-card": {
+      "glyph": {
+        "layout": "rows",
+        "size": [
+          480,
+          480
+        ],
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "尘"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "tears-card": {
+      "glyph": {
+        "layout": "rows",
+        "size": [
+          480,
+          480
+        ],
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "泪"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "sprout-card": {
+      "glyph": {
+        "layout": "rows",
+        "size": [
+          480,
+          480
+        ],
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "苗"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "scenes": [
+    {
+      "key": "light-and-power",
+      "type": "slide",
+      "title": "字里有亮，也有力",
+      "template": "two-columns",
+      "data": {
+        "title": "字里有亮，也有力",
+        "left": {
+          "heading": "明",
+          "body": "左边日，右边月"
+        },
+        "left_picture": "sun-moon",
+        "right": {
+          "heading": "男",
+          "body": "上面田，下面力"
+        },
+        "right_picture": "field-pull"
+      },
+      "script": [
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "明，第二声。左边是日，右边是月。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "白天太阳照得亮，夜里月光也能照亮路。"
+        },
+        {
+          "say": "想起这两种光，就能记住明亮的明。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "男，第二声。上面的田像分好格子的田地。"
+        },
+        {
+          "say": "下面是力，第四声，表示使劲。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "图里的男子在田里拉车，拉动车要用力。"
+        },
+        {
+          "say": "田是干活的地方，力提醒我们拉车得使劲。"
+        },
+        {
+          "say": "想到田里用力的男子，就记住男孩的男。"
+        },
+        {
+          "say": "人使出的劲叫力气，大家都能出力帮忙。"
+        },
+        {
+          "say": "遇到一个新字，可以先找熟悉的小部件。"
+        }
+      ]
+    },
+    {
+      "key": "tips-and-dust",
+      "type": "slide",
+      "title": "同一个小，下面不同",
+      "template": "two-columns",
+      "data": {
+        "title": "同一个小，下面不同",
+        "left": {
+          "heading": "尖",
+          "body": "小在上，大在下"
+        },
+        "left_picture": "tip-cone",
+        "right": {
+          "heading": "尘",
+          "body": "小在上，土在下"
+        },
+        "right_picture": "dust-beam"
+      },
+      "script": [
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "尖，第一声。上面小，下面大。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "看纸锥从下往上慢慢变细，顶头小小的。"
+        },
+        {
+          "say": "那一点叫尖，削好的铅笔也有个笔尖。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "尘，第二声。它上面也是小，下面换成土。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "阳光照进屋时，光里会看见细小的尘土。"
+        },
+        {
+          "say": "一看见下面的土，就能想起那些小小的土粒。"
+        },
+        {
+          "say": "分不清尖和尘，就先找它们不一样的下半边。"
+        }
+      ]
+    },
+    {
+      "key": "people-and-pairs",
+      "type": "slide",
+      "title": "跟着走，聚在一起",
+      "template": "two-columns",
+      "data": {
+        "title": "跟着走，聚在一起",
+        "left": {
+          "heading": "从",
+          "body": "两个人一前一后"
+        },
+        "left_picture": "people-follow",
+        "right": {
+          "heading": "众",
+          "body": "上面一人，下面两人"
+        },
+        "right_picture": "people-group"
+      },
+      "script": [
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "从，第二声。字里有两个人的样子。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "你在前面走，我在后面跟，就叫跟从。"
+        },
+        {
+          "say": "先看前后的脚步，再把它和从字联系起来。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "众，第四声。上一个人，下面还有两个人。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "图里这么多人聚在一起，可以叫众人。"
+        },
+        {
+          "say": "三个部件是记字的线索，众人可以有更多。"
+        },
+        {
+          "say": "双，第一声。伸出左手和右手，合起来是一双手。"
+        },
+        {
+          "say": "双现在写成两个又的样子，帮我想到一对。"
+        },
+        {
+          "say": "两个相配，才好说一双。想想你的一双鞋。"
+        }
+      ]
+    },
+    {
+      "key": "woods",
+      "type": "slide",
+      "title": "树林和森林",
+      "template": "two-columns",
+      "data": {
+        "title": "树林和森林",
+        "left": {
+          "heading": "林",
+          "body": "两个木并排"
+        },
+        "left_picture": "tree-grove",
+        "right": {
+          "heading": "森",
+          "body": "上一木，下面并排两木"
+        },
+        "right_picture": "forest-view"
+      },
+      "script": [
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "林，第二声。左边一个木，右边还有一个木。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "看树挨着树长成一片，我们常说树林。"
+        },
+        {
+          "say": "两个木挨在一起，像一片树相邻长着。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "森，第一声。上面一个木，下面两个木。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "这里的树长得很密，往远处还有一层层树。"
+        },
+        {
+          "say": "许多树长成很大片，我们常说森林。"
+        },
+        {
+          "say": "木的个数帮助记字。真正的树可以有很多棵。"
+        },
+        {
+          "say": "看到林和森，先数木，再看木是怎样排的。"
+        }
+      ]
+    },
+    {
+      "key": "component-crane",
+      "type": "interactive",
+      "title": "部件吊车",
+      "page": "component-crane",
+      "widgetType": "game",
+      "startImage": "studio",
+      "script": [
+        {
+          "say": "吊车会来回走，要等吊臂对准字车再点。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1
+          }
+        },
+        {
+          "highlight": "#game-goal"
+        },
+        {
+          "say": "这一轮是老师示范。我先看吊车带的是日。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "日要送到含日的字车上，所以得先找部件。"
+        },
+        {
+          "say": "小满说，右边那辆有田，也像一个框呢。",
+          "by": "xiaoman"
+        },
+        {
+          "highlight": "#game-target"
+        },
+        {
+          "say": "看框里。日只有一条横，田还有中间的竖。"
+        },
+        {
+          "say": "找到真的含日的字车，我等吊臂到它头上。"
+        },
+        {
+          "say": "吊臂对齐再松下部件，慢一点也可以。"
+        },
+        {
+          "say": "有时两个字都带同一个部件，两辆都要送到。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1
+          }
+        },
+        {
+          "say": "轮到你了。先认部件，再看吊臂走到哪儿。"
+        }
+      ]
+    },
+    {
+      "key": "picture-meaning",
+      "type": "slide",
+      "title": "先看部件，再对照生活",
+      "template": "two-columns",
+      "data": {
+        "title": "先看部件，再对照生活",
+        "left": {
+          "heading": "泪",
+          "body": "左边三点水，右边目"
+        },
+        "left_picture": "tears",
+        "right": {
+          "heading": "苗",
+          "body": "上面草字头，下面田"
+        },
+        "right_picture": "seedling-bed"
+      },
+      "script": [
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "泪，第四声。三点水让我想到水，目是眼睛。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "眼睛里流出了水，这就对上了眼泪的泪。"
+        },
+        {
+          "say": "先用字形猜，再看真实的样子能不能对上。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "苗，第二声。看到草字头，我先猜它和植物有关。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "再看下面的田，田里长出了一株株小苗。"
+        },
+        {
+          "say": "草字头和田都能给我线索，帮我记住苗字。"
+        },
+        {
+          "say": "只猜一次还不够，再找一个生活例子确认。"
+        }
+      ]
+    },
+    {
+      "key": "shape-fishing",
+      "type": "interactive",
+      "title": "字义钓鱼船",
+      "page": "shape-fishing",
+      "widgetType": "game",
+      "startImage": "tilted-frame",
+      "script": [
+        {
+          "say": "我们要把合适的字牌钓上来，送给上面的图。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1
+          }
+        },
+        {
+          "highlight": "#game-goal"
+        },
+        {
+          "say": "这是老师的示范。图框向一边斜，没摆正。"
+        },
+        {
+          "say": "小满说，图框里面有花，我想钓苗。",
+          "by": "xiaoman"
+        },
+        {
+          "highlight": "#game-target"
+        },
+        {
+          "say": "上面是‘不’，下面是‘正’，放在一起就让我想到歪。"
+        },
+        {
+          "say": "下面的歪正合图里的样子，所以我朝它开船。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "先把船移到字牌上方，再轻点船边放钩。"
+        },
+        {
+          "say": "错过了就等字牌游回来。先看图，再看字形。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1
+          }
+        },
+        {
+          "say": "轮到你用图找字。挑好方向再放下钩子。"
+        }
+      ]
+    },
+    {
+      "key": "not-and-ribbon",
+      "type": "slide",
+      "title": "不正是歪，长长可用条",
+      "template": "two-columns",
+      "data": {
+        "title": "不正是歪，长长可用条",
+        "left": {
+          "heading": "不与歪",
+          "body": "不正，想一想歪"
+        },
+        "left_picture": "tilted-frame",
+        "right": {
+          "heading": "条",
+          "body": "一条布带"
+        },
+        "right_picture": "strip-ribbon"
+      },
+      "script": [
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "单说不，是第四声。它表示没有或不愿意。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "画框一边高一边低，和旁边直直的窗边不同。"
+        },
+        {
+          "say": "把不和正上下看，能帮助记住歪的意思。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "条，第二声。长长的一根布带，可以数一条。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "沿布带从一头看到另一头，它细长还会弯。"
+        },
+        {
+          "say": "我们还可以说一条小路，因为它也长长的。"
+        },
+        {
+          "say": "再找一件能用条来数的东西，说给大人听。"
+        }
+      ]
+    },
+    {
+      "key": "heart-and-gold",
+      "type": "slide",
+      "title": "心情、关心和金黄",
+      "template": "two-columns",
+      "data": {
+        "title": "心情、关心和金黄",
+        "left": {
+          "heading": "心",
+          "body": "关心 · 开心"
+        },
+        "left_picture": "care-help",
+        "right": {
+          "heading": "金",
+          "body": "金黄"
+        },
+        "right_picture": "gold-leaves"
+      },
+      "script": [
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "心，第一声。想别人的感受，也是把他放在心上。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "图里小朋友看见伙伴冷了，就递一条围巾。"
+        },
+        {
+          "say": "她想让伙伴暖和一点，这样的做法叫关心。"
+        },
+        {
+          "say": "做成一件喜欢的事，心里高兴，就叫开心。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "金，第一声。金黄的金，可以帮我们说一种颜色。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "这些叶子亮亮的、黄黄的，可以说金黄。"
+        },
+        {
+          "say": "说叶子金黄，是在说它看起来是什么颜色。"
+        }
+      ]
+    },
+    {
+      "key": "read-all-chars",
+      "type": "slide",
+      "title": "十一字，跟拼音读",
+      "template": "summary",
+      "data": {
+        "title": "十一字，跟拼音读",
+        "items": [
+          "尖 jiān　双 shuāng　森 sēn　心 xīn　金 jīn",
+          "尘 chén　林 lín　条 tiáo",
+          "力 lì　众 zhòng　不 bù"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "先看拼音上面的小记号，它会告诉我们声调。"
+        },
+        {
+          "say": "第一行是第一声。跟我读，尖、双、森、心、金。"
+        },
+        {
+          "say": "声音平平地走，像笔尖的尖，尖，第一声。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "第二行是第二声。跟我读，尘、林、条。"
+        },
+        {
+          "say": "读尘土的尘，声音从低往高扬。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "第三行是第四声。跟我读，力、众、不。"
+        },
+        {
+          "say": "读力气的力，声音往下落。"
+        },
+        {
+          "say": "先借拼音读准，再看字形，想想它在词里说什么。"
+        }
+      ]
+    },
+    {
+      "key": "read-all-words",
+      "type": "slide",
+      "title": "八个词，连起来读",
+      "template": "picture-points",
+      "data": {
+        "title": "八个词，连起来读",
+        "picture": "paper-build",
+        "points": [
+          "力气　尘土",
+          "双手　金黄",
+          "树林　森林",
+          "关心　开心"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "第一组，力气，尘土。词里的两个字连着读。"
+        },
+        {
+          "say": "用力扶住纸墙，需要力气。细小的灰就是尘土。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "第二组，双手，金黄。两个词中间轻轻停。"
+        },
+        {
+          "say": "两手一起扶，是双手。亮黄的秋叶是金黄。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "第三组，树林，森林。林的声音都往上扬。"
+        },
+        {
+          "say": "成片的树是树林，望不到边的也常叫森林。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "第四组，关心，开心。两个词都把心连着读。"
+        },
+        {
+          "say": "想着伙伴需要什么是关心，心里高兴是开心。"
+        },
+        {
+          "say": "再读这四组，读词连起来，换下一个词再停。"
+        }
+      ]
+    },
+    {
+      "key": "work-together",
+      "type": "slide",
+      "title": "几双手，做成一件事",
+      "template": "two-columns",
+      "data": {
+        "title": "几双手，做成一件事",
+        "left": {
+          "heading": "先分工",
+          "body": "扶住墙，再对齐屋顶"
+        },
+        "left_picture": "paper-build",
+        "right": {
+          "heading": "再合力",
+          "body": "扶稳同一座纸房"
+        },
+        "right_picture": "paper-built"
+      },
+      "script": [
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "同心就是大家朝着同一个目标做事。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "比如纸墙站不稳，一个伙伴先把墙扶住。"
+        },
+        {
+          "say": "另一个人贴屋顶，手就不用同时去扶墙。"
+        },
+        {
+          "say": "还有人扶住另一面，贴的时候房子不会跑。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "各做不同的一步，最后合成一座纸房。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "人多只是条件。大家肯配合，才更容易做成。"
+        },
+        {
+          "say": "儿歌把合力做成的好事，说得像金子一样宝贵。"
+        },
+        {
+          "say": "那是比喻，真的泥土还是原来的泥土。"
+        }
+      ]
+    },
+    {
+      "key": "reading-beats",
+      "type": "slide",
+      "title": "短句连起来，句末停一停",
+      "template": "picture-points",
+      "data": {
+        "title": "短句连起来，句末停一停",
+        "picture": "paired-hands",
+        "points": [
+          "前四句 · 三字一组",
+          "后两句 · 五字一组",
+          "全篇 · 逗号短停，句号多停"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先练前四句。每句三字一组，分成两组。"
+        },
+        {
+          "say": "听老师读。二人从，三人众。"
+        },
+        {
+          "say": "从后面轻停，后面三个字再连着读。"
+        },
+        {
+          "say": "其他三句也用三下、停、三下的节拍。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "后两句每句五字一组，也分成两组。"
+        },
+        {
+          "say": "一人不成众，独木不成林。"
+        },
+        {
+          "say": "众后短停，再连读五个字，林后多停一会儿。"
+        },
+        {
+          "say": "末句同样五字接五字，读到句号再多停。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "打开课文，手指从第一句跟到第六句。"
+        },
+        {
+          "say": "碰到逗号短停，碰到句号多停，再接下一句。"
+        },
+        {
+          "say": "一人和一条里的两个一，在课文里读第四声。"
+        },
+        {
+          "say": "前四句读部件怎样合，后两句读大家怎样合力。"
+        },
+        {
+          "say": "请大人听你跟原书读，看看哪里停得对。"
+        }
+      ]
+    },
+    {
+      "key": "write-force-and-man",
+      "type": "slide",
+      "title": "力和男，先看上下",
+      "template": "two-columns",
+      "data": {
+        "title": "力和男，先看上下",
+        "left": {
+          "heading": "力",
+          "body": "横折钩，撇"
+        },
+        "left_picture": "force-grid",
+        "right": {
+          "heading": "男",
+          "body": "上田写紧，下力展开"
+        },
+        "right_picture": "man-grid"
+      },
+      "script": [
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "写力先横折钩。横向右，折下来再向里钩。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "横在格子中间附近，右边的钩落在右下格。"
+        },
+        {
+          "say": "第二笔从上半格起，经过中间，撇向左下。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "写男先写上面的田。上半格给田留窄一点。"
+        },
+        {
+          "say": "田先竖、横折，接着横、竖、横，末横封口。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "下半部再写力，先横折钩，再往左下撇。"
+        },
+        {
+          "say": "田收紧，力展开，上下挨得住，字才站得稳。"
+        },
+        {
+          "say": "写完给大人看看，先写哪一笔，写在哪一格。"
+        }
+      ]
+    },
+    {
+      "key": "write-soil-and-wood",
+      "type": "slide",
+      "title": "土和木，中线不一样",
+      "template": "two-columns",
+      "data": {
+        "title": "土和木，中线不一样",
+        "left": {
+          "heading": "土",
+          "body": "下横较长，竖对中线"
+        },
+        "left_picture": "soil-grid",
+        "right": {
+          "heading": "木",
+          "body": "撇向左下，捺向右下"
+        },
+        "right_picture": "wood-grid"
+      },
+      "script": [
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "土先写短横，再写竖，最后写下面的长横。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "竖沿竖中线落下，接住下半格的长横。"
+        },
+        {
+          "say": "下横展开像个底座，上面就不容易显得头重。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "木也先写横和竖，横靠近上半格的中间。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "竖站在中线，第三笔往左下撇。"
+        },
+        {
+          "say": "第四笔往右下捺，两笔展开，就像小树伸枝。"
+        },
+        {
+          "say": "土收在下面的长横，木往两边舒展开。"
+        }
+      ]
+    },
+    {
+      "key": "write-heart",
+      "type": "slide",
+      "title": "第二笔是卧钩",
+      "template": "picture-points",
+      "data": {
+        "title": "第二笔是卧钩",
+        "picture": "heart-grid",
+        "points": [
+          "第一笔左点",
+          "第二笔卧钩",
+          "中点和右点"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "心先写左边的点，起在横中线附近。"
+        },
+        {
+          "say": "左点短短的，落在左下格，给卧钩留地方。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "第二笔是卧钩，从左边横中线附近起笔。"
+        },
+        {
+          "say": "先往下弯，再贴着下半格向右走。"
+        },
+        {
+          "say": "到右边向上挑，尾巴有个小钩。它叫卧钩。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "最后写两个点，先中间的点，再写右边的点。"
+        },
+        {
+          "say": "两个点都往右下轻轻点，在卧钩的上面。"
+        },
+        {
+          "say": "请大人看你先写左点，再写卧钩的顺序。"
+        }
+      ]
+    },
+    {
+      "key": "stroke-drive",
+      "type": "interactive",
+      "title": "笔画小车",
+      "page": "stroke-drive",
+      "widgetType": "game",
+      "startImage": "studio",
+      "script": [
+        {
+          "say": "手指按住小车，从每一笔的起点慢慢走。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1
+          }
+        },
+        {
+          "highlight": "#game-goal"
+        },
+        {
+          "say": "老师先示范力。第一笔是横折钩。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "先向右走，转弯下来，再让钩向里挑。"
+        },
+        {
+          "say": "小满说，我斜着开过去，能快一点吗？",
+          "by": "xiaoman"
+        },
+        {
+          "highlight": "#game-target"
+        },
+        {
+          "say": "要沿着转角走，横折的角才会留在字里。"
+        },
+        {
+          "say": "到终点先抬手。第二笔从上面向左下撇。"
+        },
+        {
+          "say": "开偏了就回到小车停下的地方，再接着走。"
+        },
+        {
+          "say": "屏幕能练路线，纸上写字要请大人看笔形。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1
+          }
+        },
+        {
+          "say": "现在轮到你了。每写一笔，都先找到起点。"
+        }
+      ]
+    },
+    {
+      "key": "picture-check",
+      "type": "quiz",
+      "title": "小检查",
+      "intro": [
+        "老师会读出每一道题。",
+        "先听完整的问题，再看三张图。",
+        "选好以后，一起看看为什么。"
+      ],
+      "questions": [
+        {
+          "id": "mailbox-roof",
+          "question": "给信箱选一个尖尖的顶。看哪一张？",
+          "skill": "从生活形状理解尖",
+          "answer": [
+            "B"
+          ],
+          "analysis": "斜边向上靠拢成一点的是尖顶。平顶和圆顶都没有尖尖的那一点。",
+          "options": {
+            "A": {
+              "label": "平顶信箱",
+              "visual": {
+                "kind": "asset",
+                "image": "mailbox-flat",
+                "alt": "平顶信箱"
+              }
+            },
+            "B": {
+              "label": "尖顶信箱",
+              "visual": {
+                "kind": "asset",
+                "image": "mailbox-point",
+                "alt": "尖顶信箱"
+              }
+            },
+            "C": {
+              "label": "圆顶信箱",
+              "visual": {
+                "kind": "asset",
+                "image": "mailbox-round",
+                "alt": "圆顶信箱"
+              }
+            }
+          }
+        },
+        {
+          "id": "mountain-sign",
+          "question": "给山谷步道做标记。哪张字卡里有三个木？",
+          "skill": "从木部件数量分辨森与林",
+          "answer": [
+            "C"
+          ],
+          "analysis": "森有三个木，上面一个，下面并排两个。林只有两个木，从用的是人形。",
+          "options": {
+            "A": {
+              "label": "从",
+              "visual": {
+                "kind": "asset",
+                "image": "from-card",
+                "alt": "从"
+              }
+            },
+            "B": {
+              "label": "林",
+              "visual": {
+                "kind": "asset",
+                "image": "grove-card",
+                "alt": "林"
+              }
+            },
+            "C": {
+              "label": "森",
+              "visual": {
+                "kind": "asset",
+                "image": "forest-card",
+                "alt": "森"
+              }
+            }
+          }
+        },
+        {
+          "id": "carry-carton",
+          "question": "两手托纸盒。双手的双是哪一张？",
+          "skill": "识记双与成对数量",
+          "answer": [
+            "A"
+          ],
+          "analysis": "相配的左手和右手是一双。双可以表示这样配成一对的两个。",
+          "options": {
+            "A": {
+              "label": "双",
+              "visual": {
+                "kind": "asset",
+                "image": "pair-card",
+                "alt": "双"
+              }
+            },
+            "B": {
+              "label": "众",
+              "visual": {
+                "kind": "asset",
+                "image": "crowd-card",
+                "alt": "众"
+              }
+            },
+            "C": {
+              "label": "心",
+              "visual": {
+                "kind": "asset",
+                "image": "heart-card",
+                "alt": "心"
+              }
+            }
+          }
+        },
+        {
+          "id": "laughing-tears",
+          "question": "笑得流眼泪了。哪张字卡有水和眼睛的线索？",
+          "skill": "用氵和目解释泪",
+          "answer": [
+            "B"
+          ],
+          "analysis": "泪左边有三点水，右边是目。目能让我们想到眼睛。尘和苗没有这一对部件。",
+          "options": {
+            "A": {
+              "label": "尘",
+              "visual": {
+                "kind": "asset",
+                "image": "dust-card",
+                "alt": "尘"
+              }
+            },
+            "B": {
+              "label": "泪",
+              "visual": {
+                "kind": "asset",
+                "image": "tears-card",
+                "alt": "泪"
+              }
+            },
+            "C": {
+              "label": "苗",
+              "visual": {
+                "kind": "asset",
+                "image": "sprout-card",
+                "alt": "苗"
+              }
+            }
+          }
+        },
+        {
+          "id": "hook-clue",
+          "question": "找一找，哪一张图把心的卧钩标红了？",
+          "skill": "识别心的卧钩和笔形",
+          "answer": [
+            "C"
+          ],
+          "analysis": "卧钩是第二笔，弯着躺在下半格，末端往上钩。其他图标红的是点。",
+          "options": {
+            "A": {
+              "label": "红色在左点",
+              "visual": {
+                "kind": "asset",
+                "image": "heart-left-dot",
+                "alt": "红色在左点"
+              }
+            },
+            "B": {
+              "label": "红色在中点",
+              "visual": {
+                "kind": "asset",
+                "image": "heart-middle-dot",
+                "alt": "红色在中点"
+              }
+            },
+            "C": {
+              "label": "红色在卧钩",
+              "visual": {
+                "kind": "asset",
+                "image": "heart-hook",
+                "alt": "红色在卧钩"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "recap",
+      "type": "slide",
+      "title": "字有部件，大家有分工",
+      "template": "summary",
+      "data": {
+        "title": "字有部件，大家有分工",
+        "items": [
+          "先找部件，看看怎么排",
+          "对照图景，再确认意思",
+          "读词连起来，句末停",
+          "先分工，再一起完成",
+          "先看起笔和占格"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "日和月在左右，田和力在上下。部件都有位置。"
+        },
+        {
+          "say": "林和森还要数一数，看看几个木怎样排。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "遇到生字先猜一猜，再用身边的样子证实。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "回原书朗读，词读连一点，句号处多停一下。"
+        },
+        {
+          "spotlight": "item-4"
+        },
+        {
+          "say": "大家朝同一个目标配合，就能合力做成事。"
+        },
+        {
+          "spotlight": "item-5"
+        },
+        {
+          "say": "写力、男、土、木、心，要看起笔和横竖中线。"
+        },
+        {
+          "say": "心的第二笔是卧钩。写完请大人看顺序和字形。"
+        },
+        {
+          "say": "也请大人听你读课文，说说你怎样认出一个字。"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+#current-reference-guide {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 8px;
+  border: 2px solid #755e46;
+  border-radius: 15px;
+  background: #34584b;
+}
+#current-reference-guide img {
+  width: 49%;
+  height: 100%;
+  object-fit: contain;
+}
+#current-reference-guide img[hidden] {
+  display: none;
+}
+#last-accepted-number {
+  box-sizing: border-box;
+  padding: 4px;
+  border: 2px solid #59784f;
+  border-radius: 15px;
+  background: #fff3db;
+  object-fit: contain;
+}

@@ -1,0 +1,160 @@
+diff --git a/components/edit/PlaybackChromeRoot.tsx b/components/edit/PlaybackChromeRoot.tsx
+--- a/components/edit/PlaybackChromeRoot.tsx
++++ b/components/edit/PlaybackChromeRoot.tsx
+@@ -58,6 +58,7 @@
+ import { fixedQuizQuestionNarrationText } from '@/lib/mira/fixed-quiz-narration';
+ import { fixedPageManagedSpeechIds, fixedInteractiveNarrationText, speechAfterActivityGesture, lectureModeOwnsAudio, usesTextbookPageNarration } from '@/lib/mira/page-managed-narration';
+ import { classroomFullscreenRoot } from '@/lib/interactive/classroom-fullscreen-root';
++import { studentActivityControlsKey } from '@/lib/interactive/student-activity-controls';
+ import type { AgentConfig } from '@/lib/orchestration/registry/types';
+ import {
+   AlertDialog,
+@@ -1953,6 +1954,9 @@
+         ref={stageRef}
+         data-mira-playback-shell={studentMode ? 'storybook' : undefined}
+         data-mira-student-quiz={studentMode && !isPresenting && currentScene?.type === 'quiz' ? '' : undefined}
++        data-mira-compact-student-game={
++          !isPresenting && studentActivityControlsKey(studentMode, stage, currentScene) ? '' : undefined
++        }
+         data-mira-fixed-game-landscape={fixedGameCanvas ? '' : undefined}
+         data-mira-picture-course={pictureCourse ? 'true' : undefined}
+         className={cn(
+diff --git a/app/mira-student-orbit.css b/app/mira-student-orbit.css
+--- a/app/mira-student-orbit.css
++++ b/app/mira-student-orbit.css
+@@ -1973,37 +1973,43 @@
+   }
+ }
+ 
+-/* Keep short embedded quizzes in the ordinary classroom. Reuse the compact
+- * discussion row and keep its existing navigation available on one line. */
++/* Short embedded quizzes and certified games share the compact discussion
++ * row and keep the existing navigation available on one line. */
+ @media (max-width: 640px) and (max-height: 380px) and (orientation: landscape) {
+   [data-mira-student-quiz] {
+     --mira-classroom-secondary-size: 48px;
+     --mira-classroom-primary-size: 48px;
+     --mira-classroom-toolbar-size: 48px;
+   }
++  html [data-mira-classroom-root]:not(:fullscreen) [data-mira-compact-student-game] [data-mira-chrome='discussion'] [data-mira-roundtable-layout='standard'],
+   html [data-mira-classroom-root] [data-mira-student-quiz] [data-mira-chrome='discussion'] [data-mira-roundtable-layout='standard'] {
+     height: 105px !important;
+     min-height: 105px;
+   }
++  html [data-mira-classroom-root]:not(:fullscreen) [data-mira-compact-student-game] [data-mira-roundtable-layout='standard'] > div:first-child,
+   html [data-mira-student-quiz] [data-mira-roundtable-layout='standard'] > div:first-child {
+     height: 48px;
+     min-height: 48px;
+     flex-basis: 48px;
+   }
++  html [data-mira-classroom-root]:not(:fullscreen) [data-mira-compact-student-game] [data-mira-chrome='playback-controls'],
+   html [data-mira-classroom-root] [data-mira-student-quiz] [data-mira-chrome='playback-controls'] {
+     display: flex !important;
+     height: 48px;
+     min-height: 48px;
+     padding: 0 4px;
+   }
++  html [data-mira-classroom-root]:not(:fullscreen) [data-mira-compact-student-game] [data-mira-chrome='playback-controls'] > .flex-1,
+   html [data-mira-classroom-root] [data-mira-student-quiz] [data-mira-chrome='playback-controls'] > .flex-1 {
+     order: 0;
+     flex: 1 0 auto;
+     width: auto;
+   }
++  html [data-mira-classroom-root]:not(:fullscreen) [data-mira-compact-student-game] [data-mira-chrome='playback-controls'] > .flex-1 > div,
+   html [data-mira-classroom-root] [data-mira-student-quiz] [data-mira-chrome='playback-controls'] > .flex-1 > div {
+     width: auto;
+   }
++  html [data-mira-classroom-root]:not(:fullscreen) [data-mira-compact-student-game] [data-mira-chrome='playback-controls'] :is([data-mira-whiteboard-toggle], [data-mira-live-control='continue']),
+   html [data-mira-classroom-root] [data-mira-student-quiz] [data-mira-chrome='playback-controls'] :is([data-mira-whiteboard-toggle], [data-mira-live-control='continue']) {
+     position: static;
+   }
+@@ -2021,6 +2027,7 @@
+ }
+ 
+ @media (max-width: 520px) and (max-height: 380px) and (orientation: landscape) {
++  html [data-mira-classroom-root]:not(:fullscreen) [data-mira-compact-student-game] [data-mira-chrome='playback-controls'],
+   html [data-mira-classroom-root] [data-mira-student-quiz] [data-mira-chrome='playback-controls'] {
+     min-width: 0;
+     max-width: 100%;
+diff --git a/tests/scene-renderers/student-activity-controls.test.ts b/tests/scene-renderers/student-activity-controls.test.ts
+--- a/tests/scene-renderers/student-activity-controls.test.ts
++++ b/tests/scene-renderers/student-activity-controls.test.ts
+@@ -1,4 +1,6 @@
+ // @vitest-environment jsdom
++import { readFileSync } from 'node:fs';
++import postcss, { type AtRule, type Rule } from 'postcss';
+ import { act, createElement, Fragment } from 'react';
+ import { createRoot } from 'react-dom/client';
+ import { afterEach, describe, expect, it, vi } from 'vitest';
+@@ -69,6 +71,71 @@
+ const rails = '[data-mira-student-activity-rails]';
+ const targets = '[data-mira-student-activity-rail-button]';
+ 
++describe('ordinary embedded student game layout', () => {
++  const marker = '[data-mira-compact-student-game]';
++  const chrome = readFileSync('components/edit/PlaybackChromeRoot.tsx', 'utf8');
++  const css = postcss.parse(readFileSync('app/mira-student-orbit.css', 'utf8'));
++  const rules: Rule[] = [];
++  css.walkRules(rule => {
++    if (rule.selectors.some(selector => selector.includes(marker))) rules.push(rule);
++  });
++
++  it('enables compact chrome only for a certified student game outside presentation', () => {
++    expect(chrome).toMatch(
++      /data-mira-compact-student-game=\{\s*!isPresenting && studentActivityControlsKey\(studentMode, stage, currentScene\) \? '' : undefined\s*\}/,
++    );
++    expect(studentActivityControlsKey(true, stage, gameFor('shutterScout'))).toBeDefined();
++    expect(studentActivityControlsKey(false, stage, game)).toBeUndefined();
++    expect(studentActivityControlsKey(true, stage, { ...game, miraStudentActivityControls: undefined })).toBeUndefined();
++    for (const type of ['slide', 'quiz'] as const) {
++      expect(studentActivityControlsKey(true, stage, { ...game, type } as Scene)).toBeUndefined();
++    }
++  });
++
++  it('limits the new rules to short landscape outside fullscreen and preserves the quiz selectors', () => {
++    expect(rules).not.toHaveLength(0);
++    for (const rule of rules) {
++      expect(rule.parent).toMatchObject({ type: 'atrule', name: 'media' });
++      expect((rule.parent as AtRule).params).toMatch(
++        /^\(max-width: (640|520)px\) and \(max-height: 380px\) and \(orientation: landscape\)$/,
++      );
++      for (const selector of rule.selectors.filter(selector => selector.includes(marker))) {
++        expect(selector).toContain('[data-mira-classroom-root]:not(:fullscreen) ' + marker);
++      }
++      expect(rule.selectors.some(selector => selector.includes('[data-mira-student-quiz]'))).toBe(true);
++    }
++  });
++
++  it('fits the original 48px controls in the 640×360 Student Web frame', () => {
++    const discussion = rules.find(rule =>
++      rule.selectors.some(selector => selector.includes(marker + " [data-mira-chrome='discussion']")));
++    const height = discussion?.nodes.find(node => node.type === 'decl' && node.prop === 'height');
++    expect(height).toMatchObject({ type: 'decl', value: '105px' });
++
++    const frameHeight = 360 - 60; // Student Web's pinned schoolbag header.
++    const slotWithDiscussion = (discussionHeight: number) => ({
++      left: 8, top: 56, width: 623, height: frameHeight - 48 - discussionHeight - 16,
++    });
++    const oldSlot = slotWithDiscussion(153);
++    expect(planStudentActivityControls(oldSlot, oldSlot)).toBeNull();
++
++    const slot = slotWithDiscussion(105);
++    const plan = planStudentActivityControls(slot, slot)!;
++    expect(plan).not.toBeNull();
++    const target = CLASSROOM_TOUCH_CONTROL_SIZE;
++    expect(target).toBe(48);
++    expect(plan.buttons).toHaveLength(7);
++    for (const button of plan.buttons) {
++      expect(button.left).toBeGreaterThanOrEqual(0);
++      expect(button.top).toBeGreaterThanOrEqual(0);
++      expect(button.left + target).toBeLessThanOrEqual(slot.width);
++      expect(button.top + target).toBeLessThanOrEqual(slot.height);
++      expect(button.left + target <= plan.canvas.left
++        || button.left >= plan.canvas.left + plan.canvas.width).toBe(true);
++    }
++  });
++});
++
+ describe('Gateway binding and visible geometry', () => {
+   it('accepts all twelve exact Classic v1 template contracts', () => {
+     for (const template of templates) {

@@ -1,0 +1,87 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "小讲堂",
+  "binding": {
+    "editionId": "pep-math-g1-lower-2022-standard",
+    "revisionId": "directory-6205d2037284e91f10b25edd",
+    "unitId": "fdc950af-3aa4-4c77-a95f-fe523b226262",
+    "nodeId": "5171f545-27ad-41da-9a7c-19f941d1ebd3"
+  },
+  "scenario": "班级为小讲堂搭了钱币观察展。孩子选一个问题，从场景画、不同样式的展品图和数字拼图找线索，最后整理一张可以指着图讲的分享卡。",
+  "goals": [
+    "能选一个有关人民币的具体问题，从图像、物件或老师和家人的帮助中找与问题相关的线索。",
+    "能用人民币背面示例的图像特征与建筑或风景对应，并指着图说一处依据。",
+    "能比较不同套别或不同形态的货币图例，并能选一种合适的方式观察样例上的特征。",
+    "能用简单的数字组合说明少数基础数怎样组成其他数，并对照套别理解2元示例。",
+    "能根据问题、线索、发现的顺序整理一张分享图，回顾自己做过的一件事。"
+  ],
+  "goalEvidence": [
+    {"skill":"choose-inquiry-evidence","source":"印81下半、印82、课件5至7、教案1至2、任务单1"},
+    {"skill":"match-banknote-back","source":"印82、课件8至9及13、教案2"},
+    {"skill":"observe-currency-changes","source":"印81下半、课件10至18及20、教案2至3"},
+    {"skill":"compose-denomination-numbers","source":"印81下半、课件19至20、教案3"},
+    {"skill":"share-and-reflect","source":"印82成长小档案、课件21至22、教案3、任务单1、课练1"}
+  ],
+  "pageSequence": [
+    {"key":"choose-an-exhibit-question","kind":"teaching","title":"先挑一个想研究的问题","plan":"展板上分别放地标风景、旧钱币、透光观察和数字组图。老师用语音提出对应问题，示范挑一个问题并选合适的线索卡。"},
+    {"key":"compare-a-back-design","kind":"teaching","title":"把背面图案和风景线索对一对","plan":"用100元标记旁的原创建筑局部图与人民大会堂原创建筑图比对，逐一突出横向展开和柱列。再用图卡简要对应20、10、5、1和50元的背面景物，老师逐张讲出地点。"},
+    {"key":"aim-for-a-landmark","kind":"interactive","title":"把线索送到能对上的风景图","plan":"听面额及背面局部线索，瞄准相符的地标图靶。每次击中后老师用短音频点出可观察的图形依据。"},
+    {"key":"compare-examples-from-two-series","kind":"teaching","title":"不同样式的样例要标清来源","plan":"把第四套2元样例和课件所示第五套示例分别放在两个展板上。用原创局部和抽象票面框比较数字、图形与套别，再看贝币与方孔圆钱的外形图，说明比较的是不同来源的样例。"},
+    {"key":"choose-how-to-observe","kind":"teaching","title":"先想想怎样让线索看得见","plan":"用原创透光示意图点亮水印位置。另展示样例的角度变化数字与触摸线索，各配一个观察动作图。课堂练习根据目标选动作，实物观察由成人现场指导。"},
+    {"key":"combine-small-numbers","kind":"teaching","title":"用数字块拼出别的数","plan":"用标1、2、5的数字块讨论怎样合成7和8。依次把5与2、5与2与1放进合计图，分别验证总量。关联课件面额数字问题并标清这里只做数字组合。"},
+    {"key":"hop-to-the-combined-count","kind":"interactive","title":"按数字块的顺序跳到合计台","plan":"每关听一串数字块，从0开始，每加一个块就跳到此刻合计的台面。不同高度和诱导台要求控制落点，只有正确累加序列进入下一检查点。"},
+    {"key":"organize-the-share-card","kind":"teaching","title":"把问题、线索和发现摆成一张图","plan":"用一处和课堂例子不同的展板观察，依次摆上问题卡、对照图和发现卡。老师说出每张卡的用途，让孩子按相同顺序给家人讲一遍。"},
+    {"key":"picture-quiz-one","kind":"quiz","title":"找与问题有关的图","plan":"老师预录逐题读小检查1至3，核查线索选择、地标对应和观察方式。"},
+    {"key":"picture-quiz-two","kind":"quiz","title":"比较样例并整理发现","plan":"老师预录逐题读小检查4至6，检查历史样例的对应、数字合成和分享卡。"}
+  ],
+  "games": [
+    {
+      "page": "aim-for-a-landmark",
+      "template": "magnetMarbles",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.magnetMarbles",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "pair_match",
+      "reason": "播放面额与局部特征口令后，孩子要从移动图靶里辨认对应景物。目标只按核过的面额与景物配对。发射角度和飞行中的调整决定是否击中，位置与颜色不泄露地名。",
+      "levels": [
+        "人民大会堂与桂林山水两题，展示横向展开的柱廊和一层层山峰伴水，另有湖中石塔作干扰。靶漂移小。",
+        "长江三峡与泰山两题，图里都可见山，要分辨穿过峡谷的江面与近远相叠的山峰轮廓。增加漂移，使用贴合对应图例的原创风景图。",
+        "杭州西湖三潭印月与人民大会堂两题，换观察视角及靶的位置。加入布达拉宫和其他山水图干扰，增大漂移。"
+      ],
+      "demo": "依次高亮当前局部线索、发射器和目标图靶，实际击中一次后停住。清空示范进度，用预录语音交接。"
+    },
+    {
+      "page": "hop-to-the-combined-count",
+      "template": "platformHop",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.platformHop",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "ordered_route",
+      "reason": "每次正确落台代表把一个数字块加到已有合计中。只落最终数无法完成前面的检查点。题图和语音都给出添加顺序，玩家要选择下一块台并控制跳跃距离。",
+      "levels": [
+        "依次加1、2、5，从0落到1、3、8，台面宽、距离短。",
+        "依次加2、5、2，落到2、7、9，加入写3和5的干扰台。",
+        "依次加5、2、2、2，落到5、7、9、11，台面高低变化并加入顺序干扰。"
+      ],
+      "demo": "依次高亮数字块、起跳角色和第一个合计台。示范一次正确落台就停，复位检查点再预录交接。"
+    }
+  ],
+  "quizPlan": [
+    {"skill":"choose-inquiry-evidence","task":"想查一张纸币背面画的是哪座建筑，先找哪组材料？","pictureOptions":["两组钱牌的付款记录","背面局部图和一张建筑对照图","装着不同零钱的两个钱盒"],"correctPosition":2,"rationale":"要查背面图案描绘的地点，需要能比对的纸币局部和建筑图。"},
+    {"skill":"match-banknote-back","task":"听老师说的50元背面线索，哪张图是布达拉宫？","pictureOptions":["湖中有石塔的西湖图","江水从峡谷间经过的图","宫殿建筑群沿山坡层层展开的图"],"correctPosition":3,"rationale":"课件所示50元背面是布达拉宫，教案也标明这个对应关系。"},
+    {"skill":"observe-currency-changes","task":"在老师的示意图上要看水印，选哪个观察动作？","pictureOptions":["纸片举到光前，光线穿过纸片","手指触摸纸片上的凸起","把面额钱牌按大小排成一行"],"correctPosition":1,"rationale":"水印是透过光线观察的线索。这个图题检查观察动作。"},
+    {"skill":"observe-currency-changes","task":"想观察不同套别的纸币样式，哪组展板资料最适合？","pictureOptions":["同一张纸币的正面和背面","左边第四套样例、右边第五套样例","同一套里两张相同的纸币样例"],"correctPosition":2,"rationale":"不同套别的样例可以对照样式，两面和两张相同纸币仍是同一套的样例。"},
+    {"skill":"compose-denomination-numbers","task":"请用数字块拼成12。哪一组正好？","pictureOptions":["5、5、1三块","5、5、5三块","5、5、2三块"],"correctPosition":3,"rationale":"5加5是10，再加2得12。"},
+    {"skill":"share-and-reflect","task":"老师请你先摆自己想查的问题，再摆看到的线索，最后摆发现。哪张分享卡按这个顺序？","pictureOptions":["先放问题图，再放两张对照图，最后放指着共同特征的发现图","先放发现图，再放问题图，最后放两张对照图","先放对照图，再放发现图，最后放问题图"],"correctPosition":1,"rationale":"按本次分享要求依次介绍问题、用到的线索和从线索得到的发现。"}
+  ],
+  "presentation": "使用原创教具式展板、钱币局部示意和可辨认的地标插画。按笔记核准对应套别、面额与线索。每页只聚焦一件事，老师读清问题并指向相应图。小检查用新构图呈现线索，遮住非目标文字后仍可听题、看图和操作。",
+  "evidence": {
+    "inClass": "记录孩子完成的地标配对、观察动作选择、数字顺序与分享卡选择。",
+    "realWorld": "实物观察、口头分享、研究过程和自评由家长或教师现场观察，学习报告中的这些事项待观察。"
+  },
+  "afterClass": {
+    "familyTask":"和家人选一个问题，用一张可核对的图或一项观察作依据，画下自己发现的一点，指着图讲给家人。实物观察和口头表达待观察。",
+    "weeklyQuestionSource":["为研究问题选证据","根据背面特征对应建筑与景物","辨认套别并选择观察动作","用数字块组成目标数","按顺序讲发现"],
+    "source":"印81下半至82、教案2至3、课件21至22、任务单1、课练1"
+  }
+}

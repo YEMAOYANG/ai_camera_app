@@ -1,0 +1,191 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "整理和复习",
+  "binding": {
+    "editionId": "pep-math-g1-lower-2022-standard",
+    "revisionId": "directory-6205d2037284e91f10b25edd",
+    "unitId": "f91c81c2-d62f-4a5d-b55e-dd42ef644a88",
+    "nodeId": "846e5732-8c47-4cd9-b556-43ded0475a58"
+  },
+  "scenario": "自然观察站把记录牌和一根根记录棒装入十根一盒的收纳柜。用盒和散棒画出两列操作，分类整理给值班伙伴，再修正几张抄错或漏标的牌。",
+  "goals": [
+    "能把十位与十位、个位与个位对齐，从个位算起，并用捆和散件图说明同一数位代表同一种计数单位。",
+    "能将两位数的笔算分成不进位加、进位加、不退位减和退位减，并用一张自己能讲清的图整理四类。",
+    "能用十个一换一个十解释进位，用一个十换十个一解释退位，继续在调整后的十位正确计算。",
+    "能根据图中两部分或原量与取走量选择加减，检查竖式是否抄错数、漏加进位或退位后漏减一个十。"
+  ],
+  "goalEvidence": [
+    {
+      "skill": "place-value",
+      "target": "能把十位与十位、个位与个位对齐，从个位算起，并用捆和散件图说明同一数位代表同一种计数单位。",
+      "source": "印66、教案1和4"
+    },
+    {
+      "skill": "classify-four",
+      "target": "能将两位数的笔算分成不进位加、进位加、不退位减和退位减，并用一张自己能讲清的图整理四类。",
+      "source": "印66、课件6至12"
+    },
+    {
+      "skill": "exchange-ten",
+      "target": "能用十个一换一个十解释进位，用一个十换十个一解释退位，继续在调整后的十位正确计算。",
+      "source": "印66和68、课件12和20至23"
+    },
+    {
+      "skill": "choose-and-debug",
+      "target": "能根据图中两部分或原量与取走量选择加减，检查竖式是否抄错数、漏加进位或退位后漏减一个十。",
+      "source": "印67至68、课件13至22和课练1"
+    }
+  ],
+  "pageSequence": [
+    {
+      "key": "station-order",
+      "kind": "teaching",
+      "title": "观察站的记录棒"
+    },
+    {
+      "key": "same-place",
+      "kind": "teaching",
+      "title": "相同的计数单位对齐"
+    },
+    {
+      "key": "exchange-ten",
+      "kind": "teaching",
+      "title": "个位满十，装成一盒"
+    },
+    {
+      "key": "split-ten",
+      "kind": "teaching",
+      "title": "个位不够减，拆开一盒"
+    },
+    {
+      "key": "sort-four-rules",
+      "kind": "interactive",
+      "title": "把竖式送到合适的托盘"
+    },
+    {
+      "key": "compare-explanations",
+      "kind": "teaching",
+      "title": "把四类笔算画在一起"
+    },
+    {
+      "key": "repair-pair",
+      "kind": "interactive",
+      "title": "让落牌找到正确的记录"
+    },
+    {
+      "key": "check-the-record",
+      "kind": "teaching",
+      "title": "从哪一步找错"
+    },
+    {
+      "key": "use-and-check",
+      "kind": "teaching",
+      "title": "先问要找的是什么"
+    },
+    {
+      "key": "picture-check-a",
+      "kind": "quiz",
+      "title": "看图核对笔算办法"
+    },
+    {
+      "key": "picture-check-b",
+      "kind": "quiz",
+      "title": "看图查一查新记录"
+    },
+    {
+      "key": "family-recap",
+      "kind": "teaching",
+      "title": "把你的办法讲给家人听"
+    }
+  ],
+  "teachingPlan": [
+    "用原创24加43与76减32把几盒和几根放在相同的列。先看个位再看十位，分别验证67和44。",
+    "用28加46把十四根换成一盒四根，得74；用72减48拆一盒，在个位从12减8、十位从6减4，得24。用46加24说明恰好满十也进位，个位写0。",
+    "带孩子把四种操作都归到一张原创图，既能按加减分，又能从盒有没有换动看规则。通过画和口头说明交流，图样不沿用教材。",
+    "用新的三张记录区分漏加进位、抄倒减数、漏扣拆掉的一盒。观察站的新增和用去问题各用一图，先说要找的量，再选算式和核算。"
+  ],
+  "games": [
+    {
+      "page": "sort-four-rules",
+      "template": "sortingDepot",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.sortingDepot",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "classification",
+      "levels": [
+        "先送两种加法记录，看个位合起来有没有装满一盒。",
+        "再送两种减法记录，看散棒够不够取。",
+        "混合送四类，各有唯一托盘，增加路线而不改变分类规则。"
+      ],
+      "demo": "逐个点亮待送记录、同一计数列和托盘的图形提示，完成一次真实正确投放并等待结果，复位交给孩子。"
+    },
+    {
+      "page": "repair-pair",
+      "template": "fallingTiles",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.fallingTiles",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "pair_match",
+      "levels": [
+        "看清原记录再匹配抄写正确的一张。",
+        "找补上进位十位变化的结果图。",
+        "找正确处理拆一盒后十位和个位的结果图。"
+      ],
+      "demo": "点亮原卡、需要核对的位和备选结果的图，实做一张唯一方向配对；等真实命中回执再复位交接。"
+    }
+  ],
+  "quizPlan": [
+    {
+      "skill": "place-value",
+      "task": "图中45根与23根合并，找同数位已正确对齐的记录。",
+      "correctPosition": 2,
+      "rationale": "十位4和2在同列，个位5和3在同列，得68。"
+    },
+    {
+      "skill": "exchange-ten",
+      "task": "两组记录棒37加46，选正确换好的一图。",
+      "correctPosition": 3,
+      "rationale": "7加6得13，个位留下3，向十位送1，结果83。"
+    },
+    {
+      "skill": "classify-four",
+      "task": "从图中86根去43根，找散根直接拿走的减法图。",
+      "correctPosition": 1,
+      "rationale": "个位6够去3，十位不退，剩43。"
+    },
+    {
+      "skill": "exchange-ten",
+      "task": "图中73根要去56根，选正确的第一步。",
+      "correctPosition": 2,
+      "rationale": "3不够减6，先拆一盒使个位有13，最后剩17。"
+    },
+    {
+      "skill": "choose-and-debug",
+      "task": "检查92减85的竖式，选十位已扣掉拆走一盒且差写对的一张。",
+      "correctPosition": 3,
+      "rationale": "12减5得7，十位8减8为0，差写7。"
+    },
+    {
+      "skill": "choose-and-debug",
+      "task": "图中观测站有58根记录棒，带走24根，选余量图和配套记录。",
+      "correctPosition": 1,
+      "rationale": "要找剩余，用58减24，剩34根。"
+    }
+  ],
+  "afterClass": {
+    "familyTask": "用家中可分成十个一盒和散件的东西提出一个100以内的加减问题，画图后列竖式，向家人讲是否换过十。家庭表现待观察。",
+    "weeklyQuestionSource": [
+      "同计数单位对齐与个位先算",
+      "四种笔算分类",
+      "进位和退位对应的实物交换",
+      "选择加减并逐位检查错因"
+    ]
+  },
+  "artAndLanguage": "沿用本课内置 ImageGen 自然观察站图，精确十盒散棒和竖式用代码绘制。位置、轮廓和可数数量共同区分。遮盖非目标字仍能凭图和老师录音完成。错图只作提示和反馈，保留第二次尝试。例题和小测使用原创算式、画面和台词。",
+  "authoring": {
+    "sourceMode": "direct",
+    "authorModels": [
+      "gpt-6.1-sol"
+    ]
+  }
+}

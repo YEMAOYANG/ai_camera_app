@@ -1,0 +1,134 @@
+{
+  "schemaVersion": "mira.courseware.imagegen-plan.v1",
+  "mode": "codex_builtin_imagegen",
+  "plates": [
+    {
+      "id": "story-a",
+      "source": "assets/illustrations/source/story-a.png",
+      "originalFilename": "exec-6824eeef-8370-4d8a-a649-a91241fba1e5.png",
+      "columns": 2,
+      "rows": 2,
+      "transparent": false,
+      "cells": [
+        "return-desk-art",
+        "sibling-art",
+        "owners-art",
+        "sort-plan-art"
+      ],
+      "references": [],
+      "prompt": "Make a production illustration sprite sheet for an original first-grade English picture-book lesson about a community lost-and-found desk. No words, letters, digits, symbols, frames, whitespace gutters, or speech balloons. Exact equal square panel grid within square canvas, backgrounds meet at grid edges. Strong silhouettes, uncluttered big objects, legible when thumbnail, cut paper and soft matte gouache with fine paper texture, pine green, warm cream, persimmon and apricot with lavender accents, rendered original children's editorial illustrations. Consistent original contemporary Chinese family: Maya young girl with two short low dark pigtails and burnt orange sleeveless vest over cream shirt; Ben young boy with dark cropped hair and pine-green top; Lili young girl with short wavy dark bob and lavender top; father with round glasses and cropped dark hair; mother with dark bun, grandfather cropped gray hair and grandmother silver bob. Keep subjects inside each panel. Exact four-panel 2 x 2 grid. Top left: at a bright community lost-and-found counter, Maya points to a clearly small red toy car on the low wooden desk; Maya and red toy are central, modest empty background. Top right: Maya in foreground introducing her brother Ben on the left in pine green and her sister Lili on the right in lavender; the three are distinct, facing viewer, no other people. Bottom left: Ben holding his blue hardback book at left and Lili holding her mustard capped pen at right, head and associated object visibly connected by her grasp. Maya listens in orange in the background. Bottom right: community sorting desk with four clearly separate objects, blue hardback book, mustard capped pen, burnt orange schoolbag, small wooden desk; two blank small upright owner stations use portrait illustrations of Ben and Lili. Items await sorting in a middle area, no hands carrying them."
+    },
+    {
+      "id": "story-b",
+      "source": "assets/illustrations/source/story-b.png",
+      "originalFilename": "exec-acc76e92-4e7b-4c8a-b60f-b36096d551d1.png",
+      "columns": 2,
+      "rows": 2,
+      "transparent": false,
+      "cells": [
+        "rhythm-source",
+        "album-source",
+        null,
+        "bubble-start"
+      ],
+      "references": [],
+      "prompt": "Make a production illustration sprite sheet for an original first-grade English picture-book lesson about a community lost-and-found desk. No words, letters, digits, symbols, frames, whitespace gutters, or speech balloons. Exact equal square panel grid within square canvas, backgrounds meet at grid edges. Strong silhouettes, uncluttered big objects, legible when thumbnail, cut paper and soft matte gouache with fine paper texture, pine green, warm cream, persimmon and apricot with lavender accents, rendered original children's editorial illustrations. Consistent original contemporary Chinese family: Maya young girl with two short low dark pigtails and burnt orange sleeveless vest over cream shirt; Ben young boy with dark cropped hair and pine-green top; Lili young girl with short wavy dark bob and lavender top; father with round glasses and cropped dark hair; mother with dark bun, grandfather cropped gray hair and grandmother silver bob. Keep subjects inside each panel. Exact four-panel 2 x 2 grid. Top left: Maya in orange clapping rhythm with Ben in pine green and Lili in lavender around the lost-and-found counter. Blue hardback and red toy car as the two large props. Top right: Maya in orange draws a very simple loving recognizable silver-haired grandmother portrait and a drawing of a pencil on a sketch sheet resting flat on the desk, view over her shoulder. Bottom left: side view of a very cute simple pine-green two-wheel wooden pushcart inside the community lost-and-found room, with two low bins with separate simple portrait decals, Ben in green and Lili in lavender. One blue hardback waiting nearby, uncluttered. Bottom right: at a sunny community pond, small orange wooden toy bubble boat and giant soap bubbles; one bubble contains a stylized big red ball and a little orange-clad girl in two pigtails to its left; leave room between them to show distance. Warm cream floor and green surroundings, no words."
+    },
+    {
+      "id": "family-portraits",
+      "source": "assets/illustrations/source/family-portraits.png",
+      "originalFilename": "exec-b4ba143b-ebeb-4336-a2eb-fefbf6c2bb50.png",
+      "columns": 3,
+      "rows": 3,
+      "transparent": true,
+      "cells": [
+        "owner-maya",
+        "owner-ben",
+        "owner-lili",
+        "owner-father",
+        "owner-mother",
+        "owner-grandpa",
+        "owner-grandma",
+        "maya-pointing"
+      ],
+      "references": [
+        "story-b"
+      ],
+      "prompt": "Original children's editorial art, painted in cut-paper gouache with subtle fine paper texture and crisp warm edges. Palette pine green, cream, orange, apricot, lavender and deep blue. Use the reference only for these exact fictional characters and art treatment. No numbers, words, logos or letter-like marks. Keep subjects isolated and fully inside their own cells. Transparent sprite atlas. Exact equal 3 x 3 cells on square canvas. Each cell has a single isolated character or remains empty. Huge clearance from each cell's borders. No backgrounds, boxes, halos, floors or shadows. Row 1 left to right: head and shoulders of Maya (orange sleeveless vest over cream, two short low pigtails), Ben (pine green, short cropped dark hair), Lili (lavender, short wavy bob). Row 2: their father (round glasses, cropped dark hair, green jacket), their mother (dark high bun, apricot cardigan), their grandfather (short silver gray hair and green waistcoat). Row 3: their grandmother (silver bob, lavender sweater); Maya (half-body profile pointing with her right arm to the right side of the image); transparent empty. Art order is essential."
+    },
+    {
+      "id": "prop-atlas",
+      "source": "assets/illustrations/source/prop-atlas.png",
+      "originalFilename": "exec-a561515e-17e8-4a7f-955e-d507eaf88530.png",
+      "columns": 3,
+      "rows": 3,
+      "transparent": true,
+      "cells": [
+        "item-book",
+        "item-pen",
+        "item-bag",
+        "item-desk",
+        "item-ball",
+        "item-car",
+        "item-pencil"
+      ],
+      "references": [
+        "story-b"
+      ],
+      "prompt": "Original children's editorial art, painted in cut-paper gouache with subtle fine paper texture and crisp warm edges. Palette pine green, cream, orange, apricot, lavender and deep blue. Use the reference only for these exact fictional characters and art treatment. No numbers, words, logos or letter-like marks. Keep subjects isolated and fully inside their own cells. Transparent sprite atlas. Exact equal 3 x 3 cells on square canvas. Each cell has one isolated item or is empty. Huge clearance from all cell borders, no floors, frames or shadows. Row 1: blue hardback book (pages visible, blank cover), amber yellow capped pen with visible cap and clip (full pen, slightly angled), burnt orange schoolbag with shoulder straps. Row 2: low small wooden single-person school desk (four legs, clear writing top, no chair), large red ball with one cream curved stripe, small red toy car (side view, two chunky dark wheels). Row 3: yellow wooden sharpened pencil with pink eraser (long body visibly distinct from capped pen), empty cell, empty cell. It will be used for 6-year-old children at small thumbnail size."
+    },
+    {
+      "id": "car-and-environments",
+      "source": "assets/illustrations/source/car-and-environments.png",
+      "originalFilename": "exec-467e38f4-48f7-4bf1-ae01-3e21c2428b8b.png",
+      "columns": 2,
+      "rows": 2,
+      "transparent": false,
+      "cells": [
+        "father-car-frame",
+        "ben-car-frame",
+        "depot-backdrop",
+        "bubble-backdrop"
+      ],
+      "references": [
+        "story-b"
+      ],
+      "prompt": "Original children's editorial art, painted in cut-paper gouache with subtle fine paper texture and crisp warm edges. Palette pine green, cream, orange, apricot, lavender and deep blue. Use the reference only for these exact fictional characters and art treatment. No numbers, words, logos or letter-like marks. Keep subjects isolated and fully inside their own cells. Exact four 2x2 square scenes with no gaps. Top left: original realistic scale illustration of a father with round glasses and cropped dark hair standing by his full-sized green hatchback in a driveway visible through a community center doorway. At left foreground within the doorway, his little daughter Maya with two low pigtails and orange vest clearly points outdoors toward the far green car. No toy. Top right: Maya in orange stands at the left of an indoor low wooden table on whose far right sits Ben's small red toy car. Ben in pine-green stands behind his toy car; he and the girl are separated by an obvious wide gap. No real cars here. Bottom left: wide establishing view inside a community lost-and-found station, cream walls, arched window, pine-green shelves with a few simple cardboard boxes at far edges, warm neutral floor and large open central lower area, no people, no carts. Bottom right: empty original community pond environment with bright still water, a far bank, sparse soft green shrubs at edges, broad soft low-contrast center area, no people, no boat, no bubbles."
+    },
+    {
+      "id": "sprite-atlas",
+      "source": "assets/illustrations/source/sprite-atlas.png",
+      "originalFilename": "exec-339ef4e4-d3b2-45e5-aa4f-538aad591a9a.png",
+      "columns": 3,
+      "rows": 3,
+      "transparent": true,
+      "cells": [
+        null,
+        null,
+        "bubble-boat",
+        "bubble-boat-pop",
+        "home-sticker"
+      ],
+      "references": [
+        "story-b"
+      ],
+      "prompt": "Transparent sprite atlas for a little English lesson. Original fine cut-paper and matte gouache children's book illustration. Use attached image for color and style. Exact equal square 3 by 3 grid with generous clear space from cell edges. No writing, logos, digits, borders, scenery or shadows. Row 1 left to right: simple cute pine-green wooden lost-property cart, seen three quarters from above, two visible warm round wheels and a tall plain push handle; same exact cart and view with a small matching curved movement streak behind its wheels; a simple small orange and cream wooden toy boat facing upward, viewed three quarters from above. Row 2 left to right: exact same boat with a single bright transparent bubble just above its bow, keep both well within its cell; a flat celebratory medallion with a cream hand holding a small red heart, sunny gold and pine edges with a few tiny sparkles; empty. Row 3: empty cells. Clear silhouettes at 44 pixels. Use true transparency everywhere beyond the silhouettes."
+    },
+    {
+      "id": "neutral-cart",
+      "source": "assets/illustrations/source/neutral-cart.png",
+      "originalFilename": "exec-6436d143-fb14-4b63-9206-5507325861e0.png",
+      "columns": 2,
+      "rows": 1,
+      "transparent": true,
+      "cells": [
+        "depot-cart",
+        "depot-cart-push"
+      ],
+      "references": [
+        "sprite-atlas"
+      ],
+      "prompt": "Create a two-frame production sprite sheet matching the attached's top-left hand-painted cut-paper pine-green wooden pushcart style. Canvas landscape 3:2, two equal-sized side-by-side columns with transparent padding and gap. Only one object per column. Make it a very simple low wooden platform cart with a plain shallow cream empty top tray, plain solid green front and side boards, a tall push handle at left, and two tan wheels. No boxes, compartments, portraits, faces, stickers, letters, items, or marks on the wooden boards. Cart is shown in the exact same view, scale, x-centered in each cell. Right frame adds tiny warm yellow motion streak behind the wheels. Both frames stand fully alone on true transparent alpha. There are no other sprites or decorations."
+    }
+  ]
+}

@@ -1,0 +1,1075 @@
+{
+  "schemaVersion": "mira.courseware.imagegen-plan.v1",
+  "lesson": "家养动物｜单元回顾",
+  "style": "Original first-grade educational matte gouache paper-cut illustration, clean bold shapes, warm cream, deep pine green, and muted apricot accents. No words, digits, labels, logo, watermark or decorative glyphs.",
+  "sourcePolicy": "ImageGen 正式原件保留来源路径、实际提示词、逐级参考图和原/派生SHA；精确圈图与排序用本课可编辑SVG，媒体到齐前不使用占位图。",
+  "releaseBudget": {
+    "gamePageBytesMaximum": 3000000,
+    "gameFrame": "1280×720",
+    "gamePreviewMinimum": "640×360",
+    "quizOptionVisualCheck": "96px"
+  },
+  "sequentialPriority": [
+    "goldfish-side",
+    "goldfish-top",
+    "animal-workbench",
+    "goldfish-water",
+    "cat-rabbit-compare",
+    "goldfish-swims",
+    "rabbit-hops",
+    "rabbit-eats",
+    "hen-eats",
+    "chick-grows",
+    "dog-grows",
+    "hen-offspring",
+    "cat-offspring"
+  ],
+  "sourceOnlyImagegen": [
+    {
+      "key": "q1-carp-master",
+      "usedBy": [
+        "q1-a",
+        "q1-b",
+        "q1-c"
+      ],
+      "status": "ready_imagegen_source",
+      "target": {
+        "width": 768,
+        "height": 768,
+        "alpha": false
+      },
+      "prompt": "Use case: scientific-educational. One whole living crucian carp in clear water, exact orthographic left-facing side view, silver muted olive scales, natural single forked tail, natural one near eye, distinct small curved gill-cover edge directly behind the head, correct fins. Entire fish at least 86% of square width, with clear separation of head edge, midbody and tail; no other animals, bubbles, annotations, captions, arrows or visible water surface. Original first-grade educational matte gouache paper-cut illustration, clean bold shapes, warm cream, deep pine green, and muted apricot accents. No words, digits, labels, logo, watermark or decorative glyphs.",
+      "verify": "鲫鱼的正常单尾、鳞片和眼后鳃盖。正式后记录三个固定中心坐标。",
+      "file": "assets/q1-carp-master.png",
+      "sha256": "71ebaf7c2528cfde9b6546be8e0d3881bd24ba5ff60fa2bd618a9890fdee6c18",
+      "sourceAssetKey": "quiz-animal-masters-and-safety",
+      "artReview": "完整原图已逐部位查看。"
+    },
+    {
+      "key": "q2-goat-goose-master",
+      "usedBy": [
+        "q2-a",
+        "q2-b",
+        "q2-c"
+      ],
+      "status": "ready_imagegen_source",
+      "target": {
+        "width": 768,
+        "height": 768,
+        "alpha": false
+      },
+      "prompt": "Use case: scientific-educational. Show a complete natural hornless white domestic goat and a complete gray-white domestic goose, both left-facing in side view, two separate quiet cream horizontal picture bands with a clean gap. Goat above, goose below, both on a clean flat horizontal floor line. Entire head and muzzle or bill, natural full tail, feet on the ground, anatomically correct legs and goose webbed feet. Two animals in separate bands; no grass covering feet, tools, shadows obscuring anatomy, circles, arrows or words. Bold legible silhouettes and bright spacing; designed for overlay circles at head, tail, and feet. Original first-grade educational matte gouache paper-cut illustration, clean bold shapes, warm cream, deep pine green, and muted apricot accents. No words, digits, labels, logo, watermark or decorative glyphs.",
+      "verify": "嘴/尾/足分开，家鹅正常趾与蹼，山羊正常蹄；两者支撑地面。",
+      "file": "assets/q2-goat-goose-master.png",
+      "sha256": "12b6bb1be3172b278e6cae2be179f85bdcac95b2d48e7f61eca33a459378ee3c",
+      "sourceAssetKey": "quiz-animal-masters-and-safety",
+      "artReview": "完整原图已逐部位查看。"
+    },
+    {
+      "key": "q6-sheep-master",
+      "usedBy": [
+        "q6-a",
+        "q6-b",
+        "q6-c"
+      ],
+      "status": "ready_imagegen_source",
+      "target": {
+        "width": 768,
+        "height": 768,
+        "alpha": false
+      },
+      "prompt": "Use case: scientific-educational. One complete single cream-wool domestic sheep on a plain warm cream ground facing left in a full side view, one small muted ochre patch next to the base of the visible ear, natural gentle sheep muzzle, four correct legs, and a visible downturned natural tail at the right rear. Same animal will be digitally cropped to its head or tail, so leave enough detail in each. Clear gaps around the whole sheep including the feet, muzzle and tail. No extra animal, no text, other props, markings or borders. Original first-grade educational matte gouache paper-cut illustration, clean bold shapes, warm cream, deep pine green, and muted apricot accents. No words, digits, labels, logo, watermark or decorative glyphs.",
+      "verify": "绵羊明显，从头尾取局部时能回指整只；原图不得缺尾、脚或头。",
+      "file": "assets/q6-sheep-master.png",
+      "sha256": "679ba66ed0f7d2c42f9bb6c466dc477faaa36c9297212e3862f648486b3e366c",
+      "sourceAssetKey": "quiz-animal-masters-and-safety",
+      "artReview": "完整原图已逐部位查看。"
+    }
+  ],
+  "pendingFactChecks": [
+    "已逐组核 18 张小检查选项在 96px 的题义、圈位与顺序。正式录音后的 G6 和独立 G7 待验。",
+    "金鱼观察卡学生端真实操作和家长端回读待验；真实家养动物观察、孩子口述和新问题仍为待观察。"
+  ],
+  "assets": [
+    {
+      "key": "goldfish-side",
+      "file": "assets/goldfish-side.png",
+      "usedBy": [
+        "p03 left-picture",
+        "p04 visible/target/capture/finish/report",
+        "fish-cam-start",
+        "fish-record"
+      ],
+      "status": "ready_imagegen",
+      "target": {
+        "width": 512,
+        "height": 512,
+        "alpha": true
+      },
+      "prompt": "Use case: scientific-educational. One original isolated transparent orthographic SIDE VIEW of one live common single-tail goldfish (Carassius auratus), oriented left, entire animal centered and uncut. Natural streamlined warm orange-gold body, gently tapering tail base, one single forked caudal fin (ordinary common goldfish, no double fantail), one dorsal fin along the top midline, the near pectoral fin just behind the gill cover, small other visible fins in natural position, one natural near eye and a distinct curved gill-cover edge behind the eye. The opposite eye and far-side pectoral fin are occluded from this exact side angle. A small pale gold patch along the upper orange shoulder and no other distinctive patches, subtle visible scales. Matte gouache paper grain, clean biological silhouette with true alpha margins, no shadow, labels, lines, bubbles, hands, scenery or text. Broadside with no foreshortening, entire fish at least 84% of square width.",
+      "verify": "普通单尾金鱼，不画双尾；侧近眼一、头后鳃盖弧线清楚、鳞片位置自然、胸背尾鳍正确。31px保持横向侧轮廓。",
+      "priority": 1,
+      "sha256": "0aff0d891425b6e5bcdc67e53102c74e2953bab5b578d2a3f75ddf9bb851a77e",
+      "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-411988c6-fb8d-45dc-a923-e834a420c39f.png",
+      "receivedPrompt": "Use case: scientific-educational. One original isolated transparent orthographic SIDE VIEW of one live common single-tail goldfish (Carassius auratus), oriented left, entire animal centered and uncut. Natural oval-bodied warm orange-gold common goldfish, gently tapering tail base, one single forked caudal fin (ordinary common goldfish, no double fantail), one dorsal fin along the top midline, the near pectoral fin just behind the gill cover, small other visible fins in natural position, one natural near eye and a distinct curved gill-cover edge behind the eye. The opposite eye and far-side pectoral fin are occluded from this exact side angle. A small pale gold patch along the upper orange shoulder and no other distinctive patches, subtle visible scales. Matte gouache paper grain, clean biological silhouette with true alpha margins, no shadow, labels, lines, bubbles, hands, scenery or text. Broadside with no foreshortening, entire fish at least 84% of square width.",
+      "artReview": "头左尾右，单眼、眼后弯鳃盖、自然鳞片、背鳍和单叉尾；肩部同一杏金斑。快门目标31px能与俯视分开，较细鳃盖线在原图核。"
+    },
+    {
+      "key": "goldfish-top",
+      "file": "assets/goldfish-top.png",
+      "usedBy": [
+        "p03 right-picture",
+        "p04 visible/target/capture/finish/report",
+        "fish-cam-start",
+        "fish-record"
+      ],
+      "status": "ready_imagegen",
+      "target": {
+        "width": 512,
+        "height": 512,
+        "alpha": true
+      },
+      "prompt": "Use case: identity-preserve scientific-educational. From the supplied exact common single-tail goldfish side profile, show an orthographic DIRECTLY OVERHEAD view of that very same whole individual swimming straight, head to the left and its single tail to the right. Rotate the camera physically upward by 90 degrees. Maintain head-to-tail length, slender organic proportions, orange-gold colors and pale upper-shoulder patch, with no squeeze of the reference image. Two small translucent pectoral fins spread naturally outward, one on each side just behind the head, clearly separated in top view. A single ordinary caudal fin lies on the lengthwise centerline at the tapered tail base; do not draw two diverging tails, an extra pair of fins beside the head, side gill-cover edge, bulging eyes or a front view. A subtle dorsal midline is allowed; don't add anatomy hidden from above. Entire fish, 84 percent of horizontal width, true transparent square with no water, shadow, arrows, text, labels, symbols or watermark. Matte paper-cut gouache texture matching the reference.",
+      "verify": "同一鱼方向头左尾右、颜色小肩斑与尺寸稳定。顶视头后两侧各一胸鳍，背线及单尾中线自然。31px先认顶视轮廓及两侧鳍。",
+      "reference": "goldfish-side 正式原件",
+      "priority": 2,
+      "sha256": "63d517b92fc2f8af5f0a2880b25c003ccb8dea2fc0d49c6e49f949e0ae933147",
+      "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-edc56bc2-571c-4f86-bc13-a906187bd30c.png",
+      "receivedPrompt": "Use case: identity-preserve scientific-educational. From the supplied exact common single-tail goldfish side profile, show an orthographic DIRECTLY OVERHEAD view of that very same whole individual swimming straight, head to the LEFT and single tail to the RIGHT. Rotate the camera physically upward by 90 degrees. Preserve head-to-tail length, orange-gold colors, one pale gold patch on the upper shoulder just behind the head, and matte gouache texture. From directly above its naturally narrow orange back forms a long tapered shape, with two small translucent pectoral fins spread naturally outward, exactly one on each side just behind the head. The single forked caudal fin is vertical in real life and looks slender and edge-on along the centerline from directly above, not a flat symmetrical fan sticking out sideways. The one dorsal fin also appears only as a narrow line on the back. Subtle paired eyes near front outline, no second gill cover on back, no additional fins beside the head, no barbels, no foreshortening or skew, no angled broadside. Entire fish with generous clear margins on a truly transparent horizontal 3:2 sheet, no water, shadow, arrows, text, labels, symbols or watermark.",
+      "artReview": "同一条鱼头左尾右、长度及杏金肩斑一致；头后两侧各一胸鳍，单尾从上方呈狭长边。31px可辨长窄顶视与鳍外伸，鳍细节在较大视图核。"
+    },
+    {
+      "key": "animal-workbench",
+      "file": "assets/animal-workbench.png",
+      "usedBy": [
+        "p04 game backdrop",
+        "p07 game backdrop",
+        "fish-cam-start"
+      ],
+      "status": "ready_imagegen",
+      "target": {
+        "width": 1280,
+        "height": 720,
+        "alpha": false
+      },
+      "prompt": "Use case: illustration-story. One opaque 16:9 quiet observation work surface, empty warm pale cream paper on a level tabletop. Keep the center 86% nearly flat ivory with very fine subtle matte grain. Only muted sage and apricot texture at the far corners. No fruit, animals, objects, floor divisions, shadows or perspective props, so the moving target, guide and buttons remain distinct at 640×360. Original first-grade science courseware art. Clean bold paper-cut shapes with subtly textured matte gouache, pale warm cream, muted apricot accents, deep pine green, colors suited to the actual animal. Quiet broad backgrounds, no lettering, digits, logos, watermark or decorative glyphs.",
+      "verify": "中央连续空白，不与取景框、鱼或弹珠靶重叠混淆。",
+      "priority": 3,
+      "sha256": "3d1a34ad18b079bf43f6c7f471f728773ea6d7a0c5f36415563bef243158653b",
+      "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-9896cb52-5da1-46e0-99e5-9c763d16cf2e.png",
+      "receivedPrompt": "Use case: illustration-story. One opaque 16:9 quiet observation work surface, empty warm pale cream paper on a level tabletop. Keep the center 86% nearly flat ivory with very fine subtle matte grain. Only muted sage and apricot texture at the far corners. No fruit, animals, objects, floor divisions, shadows or perspective props, so the moving target, guide and buttons remain distinct at 640×360. Original first-grade science courseware art. Clean bold paper-cut shapes with subtly textured matte gouache, pale warm cream, muted apricot accents, deep pine green, colors suited to the actual animal. Quiet broad backgrounds, no lettering, digits, logos, watermark or decorative glyphs.\nProduce a pure low-contrast game background: edge-to-edge broad unbroken flat cream, no paper boundary, no foreground graphic, only quiet thin paper grain and small irregular color tint in extreme corners.",
+      "artReview": "暖奶油平面和低对比纸纹，中央空，角落有淡色，不含物体、箭头、文字或拟似取景边。"
+    },
+    {
+      "key": "goldfish-water",
+      "file": "assets/goldfish-water.png",
+      "usedBy": [
+        "p02 picture",
+        "unit-animals source"
+      ],
+      "status": "ready_imagegen",
+      "target": {
+        "width": 960,
+        "height": 720,
+        "alpha": false
+      },
+      "prompt": "Use case: scientific-educational. Show the same whole single-tail common goldfish from the reference in shallow clear water, side-on facing left. Keep its pale golden shoulder patch, one visible eye, natural curved gill-cover edge behind the eye, soft overlapping scales and identifiable dorsal, pectoral and forked caudal fins. No anthropomorphism. Fill most of the image with this ONE animal, make gill edge and scales legible from a distance. A faint desaturated sage water background with empty space, no companions, gravel, feeding, bubbles, shadows or labels. Landscape 4:3. Original first-grade science courseware art. Clean bold paper-cut shapes with subtly textured matte gouache, pale warm cream, muted apricot accents, deep pine green, colors suited to the actual animal. Quiet broad backgrounds, no lettering, digits, logos, watermark or decorative glyphs.",
+      "verify": "依次可指整鱼、眼后鳃盖、鳞片、鱼鳍及尾；鳃盖为外部边缘，不能画成剖开鳃片。",
+      "reference": "goldfish-side 正式原件",
+      "priority": 4,
+      "sha256": "aae672eaaee833bd53421461e5408974f4386b31a6251f07b277c766ae99a988",
+      "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-413236bb-bb03-4d74-956f-588e095373ff.png",
+      "receivedPrompt": "Use case: scientific-educational. Show the same whole single-tail common goldfish from the reference in shallow clear water, side-on facing left. Keep its pale golden shoulder patch, one visible eye, natural curved gill-cover edge behind the eye, soft overlapping scales and identifiable dorsal, pectoral and forked caudal fins. No anthropomorphism. Fill most of the image with this ONE animal, make gill edge and scales legible from a distance. A faint desaturated sage water background with empty space, no companions, gravel, feeding, bubbles, shadows or labels. Landscape 4:3. Original first-grade science courseware art. Clean bold paper-cut shapes with subtly textured matte gouache, pale warm cream, muted apricot accents, deep pine green, colors suited to the actual animal. Quiet broad backgrounds, no lettering, digits, logos, watermark or decorative glyphs.\nMatch the attached original fish identity, body proportions and leftward direction. Use realistic normal features: one gill-cover seam just behind the visible eye, precise attached fins and one forked tail, no labels or teaching marks. Keep the fish fully inside the 4:3 frame.",
+      "artReview": "实际 p02 以400×300不裁图渲染，640宽等效256×192。左头右尾整条可见，保留单眼、杏金肩斑、自然鳞片、眼后鳃盖外弧及正常背鳍、胸鳍和单叉尾。浅绿水色衬底，画面只有一条鱼；呼吸和游动由讲解说明。"
+    },
+    {
+      "key": "cat-rabbit-compare",
+      "file": "assets/cat-rabbit-compare.png",
+      "usedBy": [
+        "p05 picture",
+        "unit-animals source",
+        "rabbit-hops identity",
+        "rabbit-eats identity",
+        "cat-offspring identity"
+      ],
+      "status": "ready_imagegen",
+      "target": {
+        "width": 960,
+        "height": 720,
+        "alpha": false
+      },
+      "prompt": "Use case: scientific-educational. Two distinct complete real domestic animals with space between them on a quiet cream ground. LEFT: an ordinary short-haired ginger-and-cream domestic cat, in side view facing left, two short pointed upright ears, long tapering naturally raised tail fully visible and paws on ground. RIGHT: a brown upright-eared domestic rabbit, in side view facing left, two elongated ears in natural alignment, short visible cottony tail, natural large folded hind legs and forefeet resting on ground. Same neutral camera height and sufficient spacing, no furniture, vegetation, shadows that hide feet, food, clothing, extra animals or labels. Landscape 4:3. Natural anatomy, simple bold paper-cut silhouettes. Original first-grade science courseware art. Clean bold paper-cut shapes with subtly textured matte gouache, pale warm cream, muted apricot accents, deep pine green, colors suited to the actual animal. Quiet broad backgrounds, no lettering, digits, logos, watermark or decorative glyphs.",
+      "verify": "同地平线，整只不截尾耳及脚，猫兔明显可从同部位比较；只描述此图样本。",
+      "priority": 5,
+      "sha256": "347fb3a5f567005ea9bbf32e7ebeb68effab507a46e6629e2b2b4b5d19a979c5",
+      "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-b7c16157-1a19-4142-91aa-eb499193627f.png",
+      "receivedPrompt": "Use case: scientific-educational. Two distinct complete real domestic animals with space between them on a quiet cream ground. LEFT: an ordinary short-haired ginger-and-cream domestic cat, in side view facing left, two short pointed upright ears, long tapering naturally raised tail fully visible and paws on ground. RIGHT: a brown upright-eared domestic rabbit, in side view facing left, two elongated ears in natural alignment, short visible cottony tail, natural large folded hind legs and forefeet resting on ground. Same neutral camera height and sufficient spacing, no furniture, vegetation, shadows that hide feet, food, clothing, extra animals or labels. Landscape 4:3. Natural anatomy, simple bold paper-cut silhouettes. Original first-grade science courseware art. Clean bold paper-cut shapes with subtly textured matte gouache, pale warm cream, muted apricot accents, deep pine green, colors suited to the actual animal. Quiet broad backgrounds, no lettering, digits, logos, watermark or decorative glyphs.\nMake the cat and rabbit together along exactly the same imaginary floor line; both full in left-facing profile and well separated. Ensure the right rabbit shows a small pale natural tail clearly attached at the rump rather than a separate dot or absent shape, and both upright ears have visible silhouette. The cat's long tail must not overlap either body, and ears and feet should be clear with no cutoff. Show only these two animals, no objects, no text. Keep comfortable margins.",
+      "artReview": "左猫右兔，均向左，足底基本同地线，彼此不遮。猫鼻距左边缘较窄但完整，双耳、长尾和脚可见；兔长双耳、连接身后的短尾和落地前后足清楚。p05全画幅放在400×300图框，640宽等效256×192，两种尾形可辨。画面呈静态身体对照，吃食和陆地活动由教师对照教材说明。"
+    },
+    {
+      "key": "goldfish-swims",
+      "file": "assets/goldfish-swims.png",
+      "usedBy": [
+        "p07 game token",
+        "shared-actions source"
+      ],
+      "status": "ready_imagegen",
+      "target": {
+        "width": 400,
+        "height": 400,
+        "alpha": true
+      },
+      "prompt": "Use case: scientific-educational. Same individual common single-tail orange goldfish from reference, swimming leftward in profile with its tail slightly curved laterally in a believable swim phase, two clean pale teal trailing wake strokes and a very small transparent blue-green patch of water around the fish. Keep the entire single tail and normal fins. Isolated square cutout. Large silhouette and simple clear motion clue even at 23 pixels. No bubbles at the mouth, arrows or other fish. Original first-grade science courseware art. Clean bold paper-cut shapes with subtly textured matte gouache, pale warm cream, muted apricot accents, deep pine green, colors suited to the actual animal. Quiet broad backgrounds, no lettering, digits, logos, watermark or decorative glyphs.",
+      "verify": "与同一金鱼保持身份，动作和短水纹示意游动；不要画额外尾。",
+      "reference": "goldfish-side 正式原件",
+      "priority": 6,
+      "sha256": "f33992a9889c2f27444036fc11ff4c8ccf078fca578b1ce94c669571906a5fc4",
+      "source": "diagrams/p07-animal-actions-atlas-clean.original.png",
+      "sourceAssetKey": "p07-animal-actions-atlas-clean",
+      "receivedPrompt": "Edit this exact 2-by-2 square scientific sprite sheet. Extract the four hard-edged paper cutouts onto true alpha zero, completely deleting the pale or charcoal wash behind them, soft shadow and halo. Keep all four animal anatomies, natural leg counts, positions, scale, poses and fine paper grain. Upper-left single goldfish with one forked tail and two thin crisp teal water strokes, upper-right airborne rabbit and a short crisp green ground stroke, lower-left seated rabbit with the green leaf at its lips, lower-right pecking hen with small pile of grain. Keep only the animals and the listed hard-edged props. Discard the fish's soft blue water wash and any ground/water smear. Subjects have opaque interiors, tiny antialiasing only; a large fully transparent cross and all four corners are genuine zero-alpha. No cast shadow, fog, mist, light emission, framing, new props or background of any kind.",
+      "artReview": "单条橙金鱼头左，保留杏肩斑、单叉尾、背和胸鳍。蓝绿水纹提示游动，23px可辨鱼与水纹，47px叉尾和身形清楚。"
+    },
+    {
+      "key": "rabbit-hops",
+      "file": "assets/rabbit-hops.png",
+      "usedBy": [
+        "p07 game token",
+        "shared-actions source"
+      ],
+      "status": "ready_imagegen",
+      "target": {
+        "width": 400,
+        "height": 400,
+        "alpha": true
+      },
+      "prompt": "Use case: scientific-educational. One brown domestic upright-eared rabbit in recognizable sideways leaping pose, facing left, all natural limbs, hind legs extending back during take-off, front legs preparing to land, body lifted above a tiny pale ground line. Short rabbit tail and long ears preserved. No speed stripes on the rabbit, no other objects. Transparent square, large full silhouette legible at 23 px. Original first-grade science courseware art. Clean bold paper-cut shapes with subtly textured matte gouache, pale warm cream, muted apricot accents, deep pine green, colors suited to the actual animal. Quiet broad backgrounds, no lettering, digits, logos, watermark or decorative glyphs.",
+      "verify": "明显不同于坐着或吃，四足合理、耳长、尾短。",
+      "reference": "cat-rabbit-compare 的兔，仅保持身份",
+      "priority": 7,
+      "sha256": "e07e3840109c617cc009e1b5a5b2f1ae98acb6be6a1e317a88fd98189694fc93",
+      "source": "diagrams/p07-animal-actions-atlas-clean.original.png",
+      "sourceAssetKey": "p07-animal-actions-atlas-clean",
+      "receivedPrompt": "Edit this exact 2-by-2 square scientific sprite sheet. Extract the four hard-edged paper cutouts onto true alpha zero, completely deleting the pale or charcoal wash behind them, soft shadow and halo. Keep all four animal anatomies, natural leg counts, positions, scale, poses and fine paper grain. Upper-left single goldfish with one forked tail and two thin crisp teal water strokes, upper-right airborne rabbit and a short crisp green ground stroke, lower-left seated rabbit with the green leaf at its lips, lower-right pecking hen with small pile of grain. Keep only the animals and the listed hard-edged props. Discard the fish's soft blue water wash and any ground/water smear. Subjects have opaque interiors, tiny antialiasing only; a large fully transparent cross and all four corners are genuine zero-alpha. No cast shadow, fog, mist, light emission, framing, new props or background of any kind.",
+      "artReview": "同一褐兔头左，双耳长、短尾，两个前足与两个后足在大图各可辨。跃起的伸展轮廓和下方地面有空隙，23px与坐吃图区分，47px足部清楚。"
+    },
+    {
+      "key": "rabbit-eats",
+      "file": "assets/rabbit-eats.png",
+      "usedBy": [
+        "p07 game token",
+        "shared-actions source"
+      ],
+      "status": "ready_imagegen",
+      "target": {
+        "width": 400,
+        "height": 400,
+        "alpha": true
+      },
+      "prompt": "Use case: scientific-educational. One brown upright-eared domestic rabbit quietly nibbling a single broad sage lettuce leaf directly at its lips, sitting naturally in side view. Ears and short tail visible, hind feet folded naturally. One simple bold animal and one leaf, leaf near the mouth unmistakeable at 23 pixels, transparent square, no dishes, no extra animal. Original first-grade science courseware art. Clean bold paper-cut shapes with subtly textured matte gouache, pale warm cream, muted apricot accents, deep pine green, colors suited to the actual animal. Quiet broad backgrounds, no lettering, digits, logos, watermark or decorative glyphs.",
+      "verify": "嘴和叶相接，蹲姿和跳图区分；不是动物需要儿童投喂的指示。",
+      "reference": "cat-rabbit-compare 的兔",
+      "priority": 8,
+      "sha256": "ce1d5012efe88d9cce45391339497b1631abcf1fbe08dcb8ab8659ce96e4243c",
+      "source": "diagrams/p07-animal-actions-atlas-clean.original.png",
+      "sourceAssetKey": "p07-animal-actions-atlas-clean",
+      "receivedPrompt": "Edit this exact 2-by-2 square scientific sprite sheet. Extract the four hard-edged paper cutouts onto true alpha zero, completely deleting the pale or charcoal wash behind them, soft shadow and halo. Keep all four animal anatomies, natural leg counts, positions, scale, poses and fine paper grain. Upper-left single goldfish with one forked tail and two thin crisp teal water strokes, upper-right airborne rabbit and a short crisp green ground stroke, lower-left seated rabbit with the green leaf at its lips, lower-right pecking hen with small pile of grain. Keep only the animals and the listed hard-edged props. Discard the fish's soft blue water wash and any ground/water smear. Subjects have opaque interiors, tiny antialiasing only; a large fully transparent cross and all four corners are genuine zero-alpha. No cast shadow, fog, mist, light emission, framing, new props or background of any kind.",
+      "artReview": "同一褐兔坐着，双耳、短尾和正常落足，单片绿色叶在唇边直接接触。23px仍见绿叶，47px见动作；只示范进食。"
+    },
+    {
+      "key": "hen-eats",
+      "file": "assets/hen-eats.png",
+      "usedBy": [
+        "p07 game token",
+        "shared-actions source"
+      ],
+      "status": "ready_imagegen",
+      "target": {
+        "width": 400,
+        "height": 400,
+        "alpha": true
+      },
+      "prompt": "Use case: scientific-educational. One recognizable adult russet domestic hen bending its head to peck at a compact small cluster of plain amber grain on the ground, natural two legs, head, beak, folded wings and short tail. Full side three-quarter profile, cream grain contrast, one simple action silhouette and no other prop. True transparent square; grain and touching beak readable at 23 px. Original first-grade science courseware art. Clean bold paper-cut shapes with subtly textured matte gouache, pale warm cream, muted apricot accents, deep pine green, colors suited to the actual animal. Quiet broad backgrounds, no lettering, digits, logos, watermark or decorative glyphs.",
+      "verify": "母鸡喙低且对准食物，不误认为正在走；脚与喙数量自然。",
+      "priority": 9,
+      "sha256": "8e6f90b6f9cf6540cc699a7ebc143799e01c59fae8143373019f1ef134b796f1",
+      "source": "diagrams/p07-animal-actions-atlas-clean.original.png",
+      "sourceAssetKey": "p07-animal-actions-atlas-clean",
+      "receivedPrompt": "Edit this exact 2-by-2 square scientific sprite sheet. Extract the four hard-edged paper cutouts onto true alpha zero, completely deleting the pale or charcoal wash behind them, soft shadow and halo. Keep all four animal anatomies, natural leg counts, positions, scale, poses and fine paper grain. Upper-left single goldfish with one forked tail and two thin crisp teal water strokes, upper-right airborne rabbit and a short crisp green ground stroke, lower-left seated rabbit with the green leaf at its lips, lower-right pecking hen with small pile of grain. Keep only the animals and the listed hard-edged props. Discard the fish's soft blue water wash and any ground/water smear. Subjects have opaque interiors, tiny antialiasing only; a large fully transparent cross and all four corners are genuine zero-alpha. No cast shadow, fog, mist, light emission, framing, new props or background of any kind.",
+      "artReview": "一只成年母鸡，两足落地，低头向一小堆谷粒啄食，头喙与食物关系清楚。23px能辨低头啄食姿态，47px及大图可见谷粒。"
+    },
+    {
+      "key": "chick-grows",
+      "file": "assets/chick-grows.png",
+      "usedBy": [
+        "p07 game token",
+        "life-sequences source"
+      ],
+      "status": "ready_imagegen",
+      "target": {
+        "width": 400,
+        "height": 400,
+        "alpha": true
+      },
+      "prompt": "Use case: scientific-educational. One compact two-panel observational sequence showing the same individual young domestic chicken as a small yellow chick in the LEFT frame and as a larger pale-cream young hen with a small russet wing patch in the RIGHT frame. Both face left, both simply stand at the same position on matching plain cream ground, no other animals. Use the same unmistakable muted russet patch on the near wing in both frames. Two equal rounded cream miniature frames side by side centered in one transparent square, broad shapes legible at 23 pixels. No arrows, numerals or text; each phase includes only the one individual. Original first-grade science courseware art. Clean bold paper-cut shapes with subtly textured matte gouache, pale warm cream, muted apricot accents, deep pine green, colors suited to the actual animal. Quiet broad backgrounds, no lettering, digits, logos, watermark or decorative glyphs.",
+      "verify": "两格只一只，生长前后同方向和醒目标记，不用同格亲子代替。",
+      "priority": 10,
+      "sha256": "0aa9e1d0c4763ab22c2a0054f4c06028cc8c281a6c5efdf3786cdfdce9ec0d6c",
+      "source": "art-source/p07-life-evidence-and-family.original.png",
+      "sourceAssetKey": "p07-life-evidence-and-family",
+      "receivedPrompt": "Use case: scientific-educational.\nCreate one atlas containing separate original picture assets for a first-grade lesson.\nUse 2 equal rows and 3 equal columns, with one fully visible object centered in each occupied cell. Keep wide empty margins around every object and between cells. No crossing cell boundaries, touching subjects, dividers, frames, text, letters, numbers, labels, logos or watermarks. Leave unused cells empty. Use true transparent alpha for the background, including the margins. Do not draw a checkerboard.\n\nKeep a consistent matte gouache and fine paper grain, with clean cut-paper contours. Use deep pine green, warm cream, apricot and persimmon as accents when appropriate. Keep the objects immediately recognizable and retain the real or lesson-specific colors and details in the descriptions. An object used for counting appears exactly once in its own cell.\n\nCell positions, in reading order:\nRow 1, column 1: Two tiny cream panels inside one picture, spaced left to right. The same domestic chicken at two ages, small yellow chick at left and taller cream juvenile hen at right. In both it stands left-facing and has one distinct identical muted rusty spot near the base of the visible wing. Only one chicken in each phase. Keep a clear gap and strong contrasting silhouettes.\nRow 1, column 2: Two tiny cream panels inside one picture, spaced left to right. The same tan dog at two ages, small puppy at left and larger adult at right. Same white forehead stripe and chest blaze, same left-facing quiet stance. Exactly one dog per phase. Strong simple silhouettes.\nRow 1, column 3: Full side view of one adult russet hen and one tiny pale yellow newly hatched chick standing distinctly beside it and one empty split eggshell, both birds on one shared short ground line. Natural two legs per animal, clear beaks. This is one adult and its offspring together.\nRow 2, column 1: One short-haired ginger-and-cream adult domestic cat lying calmly beside one tiny ginger-and-cream kitten in the same image. Clearly two separate bodies, complete silhouettes, natural legs and tails, a large size difference, both face left.\nRow 2, column 2: One simple apricot glass play marble with a nearly blank pale cream center and thin dark pine rim. Round, with only subtle sheen and no surrounding object. Designed as a projectile for a moving illustration overlay.\nRow 2, column 3: One wide 4:3 scene inside this cell. A child sitting an arm’s length away from an aquarium, hands resting in their own lap, with an adult calmly seated beside them. One small orange fish visibly in clear water inside the tank, closed lid, both people quietly look at it. Open notebook on a side table has a single unlabelled fish sketch. No touching, feeding, reaching or clutter. Distinct clear silhouettes and safe distance.\n\nNo dividers or frames between atlas cells. The tiny paired backgrounds inside the first two cell illustrations are intentional. The family scene is its own landscape rectangle with transparent space around it. Keep every colored pixel inside its own cell with at least 9 percent transparent padding on every side, preserve true alpha zero in the surrounding margins, no shadow or halo. Use the maximum available resolution for a landscape atlas.\n",
+      "artReview": "两幅浅色画面，一只较小雏鸡与一只较大青年鸡，均侧向左，近侧翅基部同一处栗色斑；以斑记和时间先后提示同一个体长大。"
+    },
+    {
+      "key": "dog-grows",
+      "file": "assets/dog-grows.png",
+      "usedBy": [
+        "p07 game token",
+        "life-sequences source"
+      ],
+      "status": "ready_imagegen",
+      "target": {
+        "width": 400,
+        "height": 400,
+        "alpha": true
+      },
+      "prompt": "Use case: scientific-educational. One compact two-panel observational sequence showing the same individual domestic dog as a small tan puppy in the LEFT frame and larger tan adult dog in the RIGHT frame. Same wide white blaze on forehead and chest in both phases, same left-facing neutral stance on two equal matching cream panels. No other animals. Transparent square outside panels. Extreme simplicity and clear size and shape difference at 23 pixels. No labels, letters, numbers, arrows or scenery. Original first-grade science courseware art. Clean bold paper-cut shapes with subtly textured matte gouache, pale warm cream, muted apricot accents, deep pine green, colors suited to the actual animal. Quiet broad backgrounds, no lettering, digits, logos, watermark or decorative glyphs.",
+      "verify": "一犬幼年至长大，同额斑胸斑，不能画成不同花色。",
+      "priority": 11,
+      "sha256": "966b3f44654599cd690961c5f54a61e62efc4af25a539243d6eccb3187d3ce45",
+      "source": "art-source/p07-life-evidence-and-family.original.png",
+      "sourceAssetKey": "p07-life-evidence-and-family",
+      "receivedPrompt": "Use case: scientific-educational.\nCreate one atlas containing separate original picture assets for a first-grade lesson.\nUse 2 equal rows and 3 equal columns, with one fully visible object centered in each occupied cell. Keep wide empty margins around every object and between cells. No crossing cell boundaries, touching subjects, dividers, frames, text, letters, numbers, labels, logos or watermarks. Leave unused cells empty. Use true transparent alpha for the background, including the margins. Do not draw a checkerboard.\n\nKeep a consistent matte gouache and fine paper grain, with clean cut-paper contours. Use deep pine green, warm cream, apricot and persimmon as accents when appropriate. Keep the objects immediately recognizable and retain the real or lesson-specific colors and details in the descriptions. An object used for counting appears exactly once in its own cell.\n\nCell positions, in reading order:\nRow 1, column 1: Two tiny cream panels inside one picture, spaced left to right. The same domestic chicken at two ages, small yellow chick at left and taller cream juvenile hen at right. In both it stands left-facing and has one distinct identical muted rusty spot near the base of the visible wing. Only one chicken in each phase. Keep a clear gap and strong contrasting silhouettes.\nRow 1, column 2: Two tiny cream panels inside one picture, spaced left to right. The same tan dog at two ages, small puppy at left and larger adult at right. Same white forehead stripe and chest blaze, same left-facing quiet stance. Exactly one dog per phase. Strong simple silhouettes.\nRow 1, column 3: Full side view of one adult russet hen and one tiny pale yellow newly hatched chick standing distinctly beside it and one empty split eggshell, both birds on one shared short ground line. Natural two legs per animal, clear beaks. This is one adult and its offspring together.\nRow 2, column 1: One short-haired ginger-and-cream adult domestic cat lying calmly beside one tiny ginger-and-cream kitten in the same image. Clearly two separate bodies, complete silhouettes, natural legs and tails, a large size difference, both face left.\nRow 2, column 2: One simple apricot glass play marble with a nearly blank pale cream center and thin dark pine rim. Round, with only subtle sheen and no surrounding object. Designed as a projectile for a moving illustration overlay.\nRow 2, column 3: One wide 4:3 scene inside this cell. A child sitting an arm’s length away from an aquarium, hands resting in their own lap, with an adult calmly seated beside them. One small orange fish visibly in clear water inside the tank, closed lid, both people quietly look at it. Open notebook on a side table has a single unlabelled fish sketch. No touching, feeding, reaching or clutter. Distinct clear silhouettes and safe distance.\n\nNo dividers or frames between atlas cells. The tiny paired backgrounds inside the first two cell illustrations are intentional. The family scene is its own landscape rectangle with transparent space around it. Keep every colored pixel inside its own cell with at least 9 percent transparent padding on every side, preserve true alpha zero in the surrounding margins, no shadow or halo. Use the maximum available resolution for a landscape atlas.\n",
+      "artReview": "两幅浅色画面，幼犬与长大的同一只犬保留额头白纹、白胸、耳色和方向；每幅均只有一只，体现同一个体长大。"
+    },
+    {
+      "key": "hen-offspring",
+      "file": "assets/hen-offspring.png",
+      "usedBy": [
+        "p07 game token",
+        "life-sequences source",
+        "unit-animals source"
+      ],
+      "status": "ready_imagegen",
+      "target": {
+        "width": 400,
+        "height": 400,
+        "alpha": true
+      },
+      "prompt": "Use case: scientific-educational. One original transparent evidence image showing one adult russet domestic hen and one tiny fluffy pale-yellow newly hatched chick next to one cracked empty eggshell, all on one short neutral ground line. Hen and chick visible as distinct individuals side by side, legs and anatomy natural. Warm russet hen, soft yellow chick, bold silhouettes and wide gap for distinction at 23px. No additional animals, eggs, writing, scenery or labels. Original first-grade science courseware art. Clean bold paper-cut shapes with subtly textured matte gouache, pale warm cream, muted apricot accents, deep pine green, colors suited to the actual animal. Quiet broad backgrounds, no lettering, digits, logos, watermark or decorative glyphs.",
+      "verify": "一张同场成鸡和新小鸡、有壳作观察线索，无动物受伤。",
+      "reference": "hen-eats 的母鸡保持身份",
+      "priority": 12,
+      "sha256": "7be6844f0a3a5d6dd98b61d707788ad565a5f71c71cf5f1cd1b92c4dc812e000",
+      "source": "art-source/p07-life-evidence-and-family.original.png",
+      "sourceAssetKey": "p07-life-evidence-and-family",
+      "receivedPrompt": "Use case: scientific-educational.\nCreate one atlas containing separate original picture assets for a first-grade lesson.\nUse 2 equal rows and 3 equal columns, with one fully visible object centered in each occupied cell. Keep wide empty margins around every object and between cells. No crossing cell boundaries, touching subjects, dividers, frames, text, letters, numbers, labels, logos or watermarks. Leave unused cells empty. Use true transparent alpha for the background, including the margins. Do not draw a checkerboard.\n\nKeep a consistent matte gouache and fine paper grain, with clean cut-paper contours. Use deep pine green, warm cream, apricot and persimmon as accents when appropriate. Keep the objects immediately recognizable and retain the real or lesson-specific colors and details in the descriptions. An object used for counting appears exactly once in its own cell.\n\nCell positions, in reading order:\nRow 1, column 1: Two tiny cream panels inside one picture, spaced left to right. The same domestic chicken at two ages, small yellow chick at left and taller cream juvenile hen at right. In both it stands left-facing and has one distinct identical muted rusty spot near the base of the visible wing. Only one chicken in each phase. Keep a clear gap and strong contrasting silhouettes.\nRow 1, column 2: Two tiny cream panels inside one picture, spaced left to right. The same tan dog at two ages, small puppy at left and larger adult at right. Same white forehead stripe and chest blaze, same left-facing quiet stance. Exactly one dog per phase. Strong simple silhouettes.\nRow 1, column 3: Full side view of one adult russet hen and one tiny pale yellow newly hatched chick standing distinctly beside it and one empty split eggshell, both birds on one shared short ground line. Natural two legs per animal, clear beaks. This is one adult and its offspring together.\nRow 2, column 1: One short-haired ginger-and-cream adult domestic cat lying calmly beside one tiny ginger-and-cream kitten in the same image. Clearly two separate bodies, complete silhouettes, natural legs and tails, a large size difference, both face left.\nRow 2, column 2: One simple apricot glass play marble with a nearly blank pale cream center and thin dark pine rim. Round, with only subtle sheen and no surrounding object. Designed as a projectile for a moving illustration overlay.\nRow 2, column 3: One wide 4:3 scene inside this cell. A child sitting an arm’s length away from an aquarium, hands resting in their own lap, with an adult calmly seated beside them. One small orange fish visibly in clear water inside the tank, closed lid, both people quietly look at it. Open notebook on a side table has a single unlabelled fish sketch. No touching, feeding, reaching or clutter. Distinct clear silhouettes and safe distance.\n\nNo dividers or frames between atlas cells. The tiny paired backgrounds inside the first two cell illustrations are intentional. The family scene is its own landscape rectangle with transparent space around it. Keep every colored pixel inside its own cell with at least 9 percent transparent padding on every side, preserve true alpha zero in the surrounding margins, no shadow or halo. Use the maximum available resolution for a landscape atlas.\n",
+      "artReview": "一只栗色母鸡和一只独立站立的浅黄雏鸡，有清晰体型差和一只裂开的空蛋壳；画面表示出现下一代。"
+    },
+    {
+      "key": "cat-offspring",
+      "file": "assets/cat-offspring.png",
+      "usedBy": [
+        "p07 game token",
+        "life-sequences source"
+      ],
+      "status": "ready_imagegen",
+      "target": {
+        "width": 400,
+        "height": 400,
+        "alpha": true
+      },
+      "prompt": "Use case: scientific-educational. One original transparent evidence image of a single ordinary ginger-and-cream adult domestic cat lying calmly beside one tiny ginger kitten, two visibly separate individuals in a quiet side-on pose. Both anatomically natural, with eyes, paws and tails positioned naturally. Size difference conspicuous in one shared ground line, no division into panels. No extra cats, basket, hands, toy, scenes or labels. Original first-grade science courseware art. Clean bold paper-cut shapes with subtly textured matte gouache, pale warm cream, muted apricot accents, deep pine green, colors suited to the actual animal. Quiet broad backgrounds, no lettering, digits, logos, watermark or decorative glyphs.",
+      "verify": "同框亲子，不画成成长前后两幅；检查没有额外肢体、尾或猫。",
+      "reference": "cat-rabbit-compare 的成年猫保持身份",
+      "priority": 13,
+      "sha256": "b62b2aaed3f1f68f6b55bc3089c54b75836f76864173d63a3b4bbafc3b0fca16",
+      "source": "art-source/p07-life-evidence-and-family.original.png",
+      "sourceAssetKey": "p07-life-evidence-and-family",
+      "receivedPrompt": "Use case: scientific-educational.\nCreate one atlas containing separate original picture assets for a first-grade lesson.\nUse 2 equal rows and 3 equal columns, with one fully visible object centered in each occupied cell. Keep wide empty margins around every object and between cells. No crossing cell boundaries, touching subjects, dividers, frames, text, letters, numbers, labels, logos or watermarks. Leave unused cells empty. Use true transparent alpha for the background, including the margins. Do not draw a checkerboard.\n\nKeep a consistent matte gouache and fine paper grain, with clean cut-paper contours. Use deep pine green, warm cream, apricot and persimmon as accents when appropriate. Keep the objects immediately recognizable and retain the real or lesson-specific colors and details in the descriptions. An object used for counting appears exactly once in its own cell.\n\nCell positions, in reading order:\nRow 1, column 1: Two tiny cream panels inside one picture, spaced left to right. The same domestic chicken at two ages, small yellow chick at left and taller cream juvenile hen at right. In both it stands left-facing and has one distinct identical muted rusty spot near the base of the visible wing. Only one chicken in each phase. Keep a clear gap and strong contrasting silhouettes.\nRow 1, column 2: Two tiny cream panels inside one picture, spaced left to right. The same tan dog at two ages, small puppy at left and larger adult at right. Same white forehead stripe and chest blaze, same left-facing quiet stance. Exactly one dog per phase. Strong simple silhouettes.\nRow 1, column 3: Full side view of one adult russet hen and one tiny pale yellow newly hatched chick standing distinctly beside it and one empty split eggshell, both birds on one shared short ground line. Natural two legs per animal, clear beaks. This is one adult and its offspring together.\nRow 2, column 1: One short-haired ginger-and-cream adult domestic cat lying calmly beside one tiny ginger-and-cream kitten in the same image. Clearly two separate bodies, complete silhouettes, natural legs and tails, a large size difference, both face left.\nRow 2, column 2: One simple apricot glass play marble with a nearly blank pale cream center and thin dark pine rim. Round, with only subtle sheen and no surrounding object. Designed as a projectile for a moving illustration overlay.\nRow 2, column 3: One wide 4:3 scene inside this cell. A child sitting an arm’s length away from an aquarium, hands resting in their own lap, with an adult calmly seated beside them. One small orange fish visibly in clear water inside the tank, closed lid, both people quietly look at it. Open notebook on a side table has a single unlabelled fish sketch. No touching, feeding, reaching or clutter. Distinct clear silhouettes and safe distance.\n\nNo dividers or frames between atlas cells. The tiny paired backgrounds inside the first two cell illustrations are intentional. The family scene is its own landscape rectangle with transparent space around it. Keep every colored pixel inside its own cell with at least 9 percent transparent padding on every side, preserve true alpha zero in the surrounding margins, no shadow or halo. Use the maximum available resolution for a landscape atlas.\n",
+      "artReview": "姜白色成年猫卧伏，旁边另有一只全身可辨的较小同色幼猫，两只分离，说明有下一代。"
+    },
+    {
+      "key": "evidence-marble",
+      "file": "assets/evidence-marble.png",
+      "usedBy": [
+        "p07 projectile"
+      ],
+      "status": "ready_imagegen",
+      "target": {
+        "width": 256,
+        "height": 256,
+        "alpha": true
+      },
+      "prompt": "Use case: illustration-story. One simple warm apricot rounded glass play marble with cream center nearly blank to carry a small picture overlay, thin pine edge, subtle sheen. Fully transparent square, no reflection symbols, words or props. The center should remain pale and calm to keep small illustrated action tokens readable. Original first-grade science courseware art. Clean bold paper-cut shapes with subtly textured matte gouache, pale warm cream, muted apricot accents, deep pine green, colors suited to the actual animal. Quiet broad backgrounds, no lettering, digits, logos, watermark or decorative glyphs.",
+      "verify": "中心留图，有弹珠轮廓不抢占动物图。",
+      "priority": 14,
+      "sha256": "015f8172d468f86c1de8f08180c45901ca86e3b1ed5a2dc30138ade10f4ad3c4",
+      "source": "art-source/p07-life-evidence-and-family.original.png",
+      "sourceAssetKey": "p07-life-evidence-and-family",
+      "receivedPrompt": "Use case: scientific-educational.\nCreate one atlas containing separate original picture assets for a first-grade lesson.\nUse 2 equal rows and 3 equal columns, with one fully visible object centered in each occupied cell. Keep wide empty margins around every object and between cells. No crossing cell boundaries, touching subjects, dividers, frames, text, letters, numbers, labels, logos or watermarks. Leave unused cells empty. Use true transparent alpha for the background, including the margins. Do not draw a checkerboard.\n\nKeep a consistent matte gouache and fine paper grain, with clean cut-paper contours. Use deep pine green, warm cream, apricot and persimmon as accents when appropriate. Keep the objects immediately recognizable and retain the real or lesson-specific colors and details in the descriptions. An object used for counting appears exactly once in its own cell.\n\nCell positions, in reading order:\nRow 1, column 1: Two tiny cream panels inside one picture, spaced left to right. The same domestic chicken at two ages, small yellow chick at left and taller cream juvenile hen at right. In both it stands left-facing and has one distinct identical muted rusty spot near the base of the visible wing. Only one chicken in each phase. Keep a clear gap and strong contrasting silhouettes.\nRow 1, column 2: Two tiny cream panels inside one picture, spaced left to right. The same tan dog at two ages, small puppy at left and larger adult at right. Same white forehead stripe and chest blaze, same left-facing quiet stance. Exactly one dog per phase. Strong simple silhouettes.\nRow 1, column 3: Full side view of one adult russet hen and one tiny pale yellow newly hatched chick standing distinctly beside it and one empty split eggshell, both birds on one shared short ground line. Natural two legs per animal, clear beaks. This is one adult and its offspring together.\nRow 2, column 1: One short-haired ginger-and-cream adult domestic cat lying calmly beside one tiny ginger-and-cream kitten in the same image. Clearly two separate bodies, complete silhouettes, natural legs and tails, a large size difference, both face left.\nRow 2, column 2: One simple apricot glass play marble with a nearly blank pale cream center and thin dark pine rim. Round, with only subtle sheen and no surrounding object. Designed as a projectile for a moving illustration overlay.\nRow 2, column 3: One wide 4:3 scene inside this cell. A child sitting an arm’s length away from an aquarium, hands resting in their own lap, with an adult calmly seated beside them. One small orange fish visibly in clear water inside the tank, closed lid, both people quietly look at it. Open notebook on a side table has a single unlabelled fish sketch. No touching, feeding, reaching or clutter. Distinct clear silhouettes and safe distance.\n\nNo dividers or frames between atlas cells. The tiny paired backgrounds inside the first two cell illustrations are intentional. The family scene is its own landscape rectangle with transparent space around it. Keep every colored pixel inside its own cell with at least 9 percent transparent padding on every side, preserve true alpha zero in the surrounding margins, no shadow or halo. Use the maximum available resolution for a landscape atlas.\n",
+      "artReview": "一颗杏橙色玻璃弹珠，圆面留浅色背景、深绿色细轮廓，没有动物或学科事实。"
+    },
+    {
+      "key": "animal-sticker",
+      "file": "assets/animal-sticker.png",
+      "usedBy": [
+        "p04 finish",
+        "p07 finish"
+      ],
+      "status": "ready_imagegen",
+      "target": {
+        "width": 320,
+        "height": 320,
+        "alpha": true
+      },
+      "prompt": "Use case: illustration-story. One opaque cream die-cut circular achievement badge on a transparent square, with one small orange common goldfish and one simple picture-frame edge behind it. The whole fish is a recognizable icon, no paired eyes or extra fins, use the pale shoulder patch from reference. No words, numbers, extra animals, decorative symbols or props. Original first-grade science courseware art. Clean bold paper-cut shapes with subtly textured matte gouache, pale warm cream, muted apricot accents, deep pine green, colors suited to the actual animal. Quiet broad backgrounds, no lettering, digits, logos, watermark or decorative glyphs.",
+      "verify": "贴纸清楚非观察证据，外圈真 alpha；一个鱼符号。",
+      "reference": "goldfish-side 正式原件",
+      "priority": 15,
+      "sha256": "b03907f0879039a0f00ec786d8c8dcdd4f06323b2d4b2f35ff846bcf29dea69a",
+      "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-07bd5256-139f-4f5a-9684-42441ed49d14.png",
+      "receivedPrompt": "Use case: illustration-story. One opaque cream die-cut circular achievement badge on a transparent square, with one small orange common goldfish and one simple picture-frame edge behind it. The whole fish is a recognizable icon, no paired eyes or extra fins, use the pale shoulder patch from reference. No words, numbers, extra animals, decorative symbols or props. Original first-grade science courseware art. Clean bold paper-cut shapes with subtly textured matte gouache, pale warm cream, muted apricot accents, deep pine green, colors suited to the actual animal. Quiet broad backgrounds, no lettering, digits, logos, watermark or decorative glyphs.\nKeep the fish head at left and one forked tail at right, match the body marking in the attached style and subject reference. Badge and fish wholly within canvas and outside transparent.",
+      "artReview": "单条橙金色鱼面左、单叉尾在右，保留杏金肩斑。圆框外真 alpha，48px仍可辨。这是奖励符号，不用作观察证据。"
+    },
+    {
+      "key": "family-observes",
+      "file": "assets/family-observes.png",
+      "usedBy": [
+        "p11 picture"
+      ],
+      "status": "ready_imagegen",
+      "target": {
+        "width": 960,
+        "height": 720,
+        "alpha": false
+      },
+      "prompt": "Use case: illustration-story. A calm 4:3 home science picture. One six-year-old child sits a comfortable arm's length away from a closed aquarium, both hands resting in their lap, eyes looking at one small common orange goldfish inside. An adult at the child's side watches the child's quiet observation, hands not on the aquarium. Clear water and clear glass, no tapping, reaching, catching or feeding. One open notebook on a side table has one unlabelled simple whole-fish drawing and room left blank. One fish only, visible natural tail and color. Quiet warm cream home, adults and child with natural limbs and eyes, no decorations drawing attention from safe distance. Original first-grade science courseware art. Clean bold paper-cut shapes with subtly textured matte gouache, pale warm cream, muted apricot accents, deep pine green, colors suited to the actual animal. Quiet broad backgrounds, no lettering, digits, logos, watermark or decorative glyphs.",
+      "verify": "家长确实在旁，双手远离缸、观察距离清楚、鱼确在水里，笔记无字。",
+      "reference": "goldfish-side 正式原件",
+      "priority": 16,
+      "sha256": "71c88cfc6a53d28fbd26f93f30ee55c3ebb6a7fbd7a195a9f06d84f842b32ee0",
+      "source": "art-source/p07-life-evidence-and-family.original.png",
+      "sourceAssetKey": "p07-life-evidence-and-family",
+      "receivedPrompt": "Use case: scientific-educational.\nCreate one atlas containing separate original picture assets for a first-grade lesson.\nUse 2 equal rows and 3 equal columns, with one fully visible object centered in each occupied cell. Keep wide empty margins around every object and between cells. No crossing cell boundaries, touching subjects, dividers, frames, text, letters, numbers, labels, logos or watermarks. Leave unused cells empty. Use true transparent alpha for the background, including the margins. Do not draw a checkerboard.\n\nKeep a consistent matte gouache and fine paper grain, with clean cut-paper contours. Use deep pine green, warm cream, apricot and persimmon as accents when appropriate. Keep the objects immediately recognizable and retain the real or lesson-specific colors and details in the descriptions. An object used for counting appears exactly once in its own cell.\n\nCell positions, in reading order:\nRow 1, column 1: Two tiny cream panels inside one picture, spaced left to right. The same domestic chicken at two ages, small yellow chick at left and taller cream juvenile hen at right. In both it stands left-facing and has one distinct identical muted rusty spot near the base of the visible wing. Only one chicken in each phase. Keep a clear gap and strong contrasting silhouettes.\nRow 1, column 2: Two tiny cream panels inside one picture, spaced left to right. The same tan dog at two ages, small puppy at left and larger adult at right. Same white forehead stripe and chest blaze, same left-facing quiet stance. Exactly one dog per phase. Strong simple silhouettes.\nRow 1, column 3: Full side view of one adult russet hen and one tiny pale yellow newly hatched chick standing distinctly beside it and one empty split eggshell, both birds on one shared short ground line. Natural two legs per animal, clear beaks. This is one adult and its offspring together.\nRow 2, column 1: One short-haired ginger-and-cream adult domestic cat lying calmly beside one tiny ginger-and-cream kitten in the same image. Clearly two separate bodies, complete silhouettes, natural legs and tails, a large size difference, both face left.\nRow 2, column 2: One simple apricot glass play marble with a nearly blank pale cream center and thin dark pine rim. Round, with only subtle sheen and no surrounding object. Designed as a projectile for a moving illustration overlay.\nRow 2, column 3: One wide 4:3 scene inside this cell. A child sitting an arm’s length away from an aquarium, hands resting in their own lap, with an adult calmly seated beside them. One small orange fish visibly in clear water inside the tank, closed lid, both people quietly look at it. Open notebook on a side table has a single unlabelled fish sketch. No touching, feeding, reaching or clutter. Distinct clear silhouettes and safe distance.\n\nNo dividers or frames between atlas cells. The tiny paired backgrounds inside the first two cell illustrations are intentional. The family scene is its own landscape rectangle with transparent space around it. Keep every colored pixel inside its own cell with at least 9 percent transparent padding on every side, preserve true alpha zero in the surrounding margins, no shadow or halo. Use the maximum available resolution for a landscape atlas.\n",
+      "artReview": "孩子和家人坐在缸外，手都放在腿上，一起看清水中的一条橙色单尾鱼；边桌本子有一个鱼形观察简图，没有投喂或敲缸。"
+    },
+    {
+      "key": "unit-animals",
+      "file": "assets/unit-animals.png",
+      "usedBy": [
+        "p01 picture",
+        "p12 picture"
+      ],
+      "status": "ready_deterministic_composition",
+      "target": {
+        "width": 960,
+        "height": 720,
+        "alpha": false
+      },
+      "method": "四个同尺寸图框，正式 goldfish-water、cat-rabbit-compare 分别提取猫与兔，hen-eats 的母鸡取已核完整主体。按鱼、猫、兔、鸡固定各一。",
+      "verify": "四只形态和名字容易一一对应；保留耳、尾和足。",
+      "priority": 17,
+      "sha256": "847039270f938f2c2d3cf8a8a0f89a219e63e8c0a026f9a40f93cbf33b528bc4",
+      "source": "diagrams/unit-animals.svg",
+      "artReview": "鱼、猫、兔、鸡各一张。猫和兔分别按源图明确像素范围裁出，耳、脚和尾部完整，四图没有相邻动物残片。"
+    },
+    {
+      "key": "fish-cam-start",
+      "file": "assets/fish-cam-start.png",
+      "usedBy": [
+        "p04 ready"
+      ],
+      "status": "ready_deterministic_composition",
+      "target": {
+        "width": 960,
+        "height": 640,
+        "alpha": false
+      },
+      "method": "复用金鱼顶视和侧视原比例并排，左俯右侧，置于安静工作台。",
+      "verify": "两视图均可认、头左尾右、目标不受裁切。",
+      "priority": 18,
+      "sha256": "22cb233879d66f42c9f28e17ea7956222747075a5fa814fd5f65888d295f8be3",
+      "source": "diagrams/fish-cam-start.svg"
+    },
+    {
+      "key": "fish-record",
+      "file": "assets/fish-record.png",
+      "usedBy": [
+        "p08 picture"
+      ],
+      "status": "ready_deterministic_composition",
+      "target": {
+        "width": 960,
+        "height": 640,
+        "alpha": false
+      },
+      "method": "双图卡左侧视右俯视，精确复用 goldfish-side/top，标为讲课示例。",
+      "verify": "可视证据一致，不能冒称孩子实玩证据。",
+      "priority": 19,
+      "sha256": "6a4517b7c2242db0e1daa12af110763f61c3e376987ffb7270395a824a2e6ea4",
+      "source": "diagrams/fish-record.svg"
+    },
+    {
+      "key": "shared-actions",
+      "file": "assets/shared-actions.png",
+      "usedBy": [
+        "p06 left-picture"
+      ],
+      "status": "ready_deterministic_composition",
+      "target": {
+        "width": 960,
+        "height": 720,
+        "alpha": false
+      },
+      "method": "两行可编辑图框，先兔吃/鸡吃，再鱼游/兔跳，直接复用四张正式动作图。",
+      "verify": "两种运动方式和两种进食有清楚动作。",
+      "priority": 20,
+      "sha256": "ae9a8469f9770648afc5b8a79800b97e51637267998bd6856a76f87036f9750e",
+      "source": "diagrams/shared-actions.svg",
+      "artReview": "上行兔咬叶、鸡啄谷，下行金鱼游动、兔腾跃。四图均从登记原图排成对，不新增行为或数量。"
+    },
+    {
+      "key": "life-sequences",
+      "file": "assets/life-sequences.png",
+      "usedBy": [
+        "p06 right-picture"
+      ],
+      "status": "ready_deterministic_composition",
+      "target": {
+        "width": 960,
+        "height": 720,
+        "alpha": false
+      },
+      "method": "两行同样图框，先小鸡长大/小狗长大，下面母鸡与小鸡/猫与幼猫。复用正式图，不加生成字。",
+      "verify": "上下分别是两格同一个体与同格两代，读图有区分。",
+      "priority": 21,
+      "sha256": "ae999c642d55eb0a6111d27783fa8a618b3e172cc63a22a8de24ea3fe15a6a27",
+      "source": "diagrams/life-sequences.svg",
+      "artReview": "上行各两格表示同一只鸡或狗长大；下行各同格表示母鸡和雏鸡、成年猫和幼猫两个个体。体型和相同标记可读。"
+    },
+    {
+      "key": "evidence-arcade-start",
+      "file": "assets/evidence-arcade-start.png",
+      "usedBy": [
+        "p07 ready"
+      ],
+      "status": "ready_deterministic_composition",
+      "target": {
+        "width": 960,
+        "height": 640,
+        "alpha": false
+      },
+      "method": "用正式 goldfish-swims 与 rabbit-hops 两图、evidence-marble 和同款工作台组成一对已配证据示例。",
+      "verify": "只显示示例共同运动，避免文字/箭头遮住鱼或兔。",
+      "priority": 22,
+      "sha256": "87126b215334f0fa90c4214e312658f15ba6e0c87690439f48ae9dd7f3621a72",
+      "source": "diagrams/evidence-arcade-start.svg",
+      "artReview": "鱼游和兔跳各一张，工作台的两个小图中间是一颗弹珠。只举出运动配对，画面不用文字。"
+    },
+    {
+      "key": "q1-a",
+      "file": "assets/q1-a.png",
+      "usedBy": [
+        "p09 q1"
+      ],
+      "status": "ready_deterministic_composition",
+      "target": {
+        "width": 480,
+        "height": 480,
+        "alpha": false
+      },
+      "method": "复用同一个 q1-carp-master。以可编辑 SVG 精确圈住尾鳍区，其它构图、方向、颜色及位置全相同。",
+      "verify": "96px边缘不盖住部位。B唯一圈到眼后鳃盖所在区。 ",
+      "priority": 23,
+      "sha256": "d3c1aa779e48d70af9ae248bf65969a1fca2e5938dd1ce7d6d0875ed80258e35",
+      "source": "diagrams/q1-a.svg",
+      "artReview": "已在96px逐张核对圈位或顺序。"
+    },
+    {
+      "key": "q1-b",
+      "file": "assets/q1-b.png",
+      "usedBy": [
+        "p09 q1"
+      ],
+      "status": "ready_deterministic_composition",
+      "target": {
+        "width": 480,
+        "height": 480,
+        "alpha": false
+      },
+      "method": "复用同一个 q1-carp-master。以可编辑 SVG 精确圈住眼后鳃盖区，其它构图、方向、颜色及位置全相同。",
+      "verify": "96px边缘不盖住部位。B唯一圈到眼后鳃盖所在区。 ",
+      "priority": 24,
+      "sha256": "ae663ef0157bc6b42e53719d0beb4575c45f8eb742cb9ad7d243c201c8b9450a",
+      "source": "diagrams/q1-b.svg",
+      "artReview": "已在96px逐张核对圈位或顺序。"
+    },
+    {
+      "key": "q1-c",
+      "file": "assets/q1-c.png",
+      "usedBy": [
+        "p09 q1"
+      ],
+      "status": "ready_deterministic_composition",
+      "target": {
+        "width": 480,
+        "height": 480,
+        "alpha": false
+      },
+      "method": "复用同一个 q1-carp-master。以可编辑 SVG 精确圈住鱼身中央鳞片区，其它构图、方向、颜色及位置全相同。",
+      "verify": "96px边缘不盖住部位。B唯一圈到眼后鳃盖所在区。 ",
+      "priority": 25,
+      "sha256": "0d4791e02b8eb96ea7b53e3faf772a06a20956472e9b3c250f56148bc6f7dcd6",
+      "source": "diagrams/q1-c.svg",
+      "artReview": "已在96px逐张核对圈位或顺序。"
+    },
+    {
+      "key": "q2-a",
+      "file": "assets/q2-a.png",
+      "usedBy": [
+        "p09 q2"
+      ],
+      "status": "ready_deterministic_composition",
+      "target": {
+        "width": 480,
+        "height": 480,
+        "alpha": false
+      },
+      "method": "复用同一个 q2-goat-goose-master。以可编辑 SVG 精确圈住各自嘴的位置，其它构图、方向、颜色及位置全相同。",
+      "verify": "96px边缘不盖住部位。C只圈两种动物的脚，A/B的身体区域不同。 ",
+      "priority": 26,
+      "sha256": "1b46948678dd9529e1dff5c9ac945d55a66140bba1909d53b1b51d2ac985687a",
+      "source": "diagrams/q2-a.svg",
+      "artReview": "已在96px逐张核对圈位或顺序。"
+    },
+    {
+      "key": "q2-b",
+      "file": "assets/q2-b.png",
+      "usedBy": [
+        "p09 q2"
+      ],
+      "status": "ready_deterministic_composition",
+      "target": {
+        "width": 480,
+        "height": 480,
+        "alpha": false
+      },
+      "method": "复用同一个 q2-goat-goose-master。以可编辑 SVG 精确圈住各自尾的位置，其它构图、方向、颜色及位置全相同。",
+      "verify": "96px边缘不盖住部位。C只圈两种动物的脚，A/B的身体区域不同。 ",
+      "priority": 27,
+      "sha256": "aab8a443acc64b34f2b7682e0e1b27834e420bdfb45214cdcab5870471bc252c",
+      "source": "diagrams/q2-b.svg",
+      "artReview": "已在96px逐张核对圈位或顺序。"
+    },
+    {
+      "key": "q2-c",
+      "file": "assets/q2-c.png",
+      "usedBy": [
+        "p09 q2"
+      ],
+      "status": "ready_deterministic_composition",
+      "target": {
+        "width": 480,
+        "height": 480,
+        "alpha": false
+      },
+      "method": "复用同一个 q2-goat-goose-master。以可编辑 SVG 精确圈住各自接地脚的位置，其它构图、方向、颜色及位置全相同。",
+      "verify": "96px边缘不盖住部位。C只圈两种动物的脚，A/B的身体区域不同。 ",
+      "priority": 28,
+      "sha256": "cddcd89574284819f5e3dd9c62b968bff98af666ccb0d382515b445e15750e03",
+      "source": "diagrams/q2-c.svg",
+      "artReview": "已在96px逐张核对圈位或顺序。"
+    },
+    {
+      "key": "q3-a",
+      "file": "assets/q3-a.png",
+      "usedBy": [
+        "p09 q3-a"
+      ],
+      "status": "ready_imagegen",
+      "target": {
+        "width": 480,
+        "height": 480,
+        "alpha": false
+      },
+      "prompt": "Use case: scientific-educational. One square split into two equal cream-framed rows, same object scale. Upper frame: one pale-yellow duckling paddles left across shallow clear teal water, a short clear wake behind it. Lower frame: one striped gray kitten walks left with a forepaw raised in a natural forward stride and remaining feet at different positions. Show both full animals and obvious movement cues, no other animals, no motion letters or arrows. Two separate backgrounds, no decorative objects. Original first-grade educational matte gouache paper-cut illustration, clean bold shapes, warm cream, deep pine green, and muted apricot accents. No words, digits, labels, logo, watermark or decorative glyphs.",
+      "verify": "鸭醒目水纹且猫一步正抬脚，两个都在运动。作为另外两图身份锁定。",
+      "priority": 29,
+      "sha256": "bed7f2c9544458f4bba5b4576ea5b03a57fd12da33b692a6c82e1fd5e6075582",
+      "source": "art-source/quiz-actions-and-growth.original.png",
+      "sourceAssetKey": "quiz-actions-and-growth",
+      "receivedPrompt": "Use case: scientific-educational.\nCreate one opaque landscape atlas of six different first-grade science illustrations. Exactly 2 equal rows and 3 equal columns of square cells in a 3:2 image, six occupied cells. Each scene stays entirely inside its own cell with at least 9% quiet margin on each side. Cell boundaries are invisible, no line or art crossing any border. Use a warm ivory matte gouache paper background, simple recognizable silhouettes, fine paper grain, natural colors, apricot and pine accents. For mini stories inside cells, two softly separated subpanels are intentional. Clear shape separation and very simple backgrounds so each cell is readable after reduction to 96 pixels. No text, letters, numbers, logos, checkmarks, arrows or watermark.\nRow 1, column 1. Two horizontal subpanels within this one square. Upper: the same small pale-yellow duckling paddles left in still teal water, with a short clear wake behind. Lower: the same silver-gray tabby kitten with dark stripes and a white chest walks left, one front paw lifted in forward stride. Both fully visible.\nRow 1, column 2. Exactly the same two stacked subpanels, pale-yellow duckling and silver-gray tabby kitten with white chest. Upper: duckling bends and pecks feed from a low shallow dish, both feet on dry ground. Lower: kitten bends its muzzle toward a simple food bowl, paws planted. Both are eating.\nRow 1, column 3. Exactly the same two stacked subpanels and animals. Upper: the SAME swimming pale-yellow duckling with short wake as upper left cell. Lower: the SAME silver-gray tabby kitten with white chest lies calmly resting on the ground with paws tucked, no bowl. Only the duckling is moving.\nRow 2, column 1. Two side-by-side subpanels within the square. The same mature brown hornless female cow with cream heart-shaped forehead patch and small cream near-shoulder patch appears once per subpanel, same adult size. Left cow walks left with one forehoof lifted; right cow lowers its head to nibble a small tuft of grass. No calf.\nRow 2, column 2. Two side-by-side subpanels within the square. LEFT: one mature brown hornless female cow with cream heart-shaped forehead patch and small cream near-shoulder patch, standing left-facing. RIGHT: the same adult cow, same size and markings, plus one clearly separate smaller brown calf standing just beside it, with white chest and solid brown forehead. Exactly one calf only in right subpanel.\nRow 2, column 3. Two side-by-side subpanels within the square. LEFT: one small brown hornless calf with the same cream heart-shaped forehead patch AND cream near-shoulder patch as the adult cow. RIGHT: that same individual has grown into the larger brown hornless cow with the exact same two markings. One animal per subpanel, same left-facing stance.\n",
+      "artReview": "已在96px逐张核对题义、动物和动作。"
+    },
+    {
+      "key": "q3-b",
+      "file": "assets/q3-b.png",
+      "usedBy": [
+        "p09 q3-b"
+      ],
+      "status": "ready_imagegen",
+      "target": {
+        "width": 480,
+        "height": 480,
+        "alpha": false
+      },
+      "prompt": "Use case: scientific-educational. Reuse the exact pale-yellow duckling and striped gray kitten from the reference, same two-frame layout and comparable scale. Upper frame duckling bends down to peck safe grain from a shallow dish, feet on firm ground. Lower frame the same kitten bends down with nose by a bowl of food, paws planted. Both are eating, no water wake, no running, no overlapping animals. Quiet cream ground. Original first-grade educational matte gouache paper-cut illustration, clean bold shapes, warm cream, deep pine green, and muted apricot accents. No words, digits, labels, logo, watermark or decorative glyphs.",
+      "verify": "两动物同一，进食动作可认；不同时展示步行或游泳。",
+      "reference": "q3-a 身份与排版",
+      "priority": 30,
+      "sha256": "237d2c2f99951d99440beb6be690ffe39949b614f064ceba575dc68b96ad9fc8",
+      "source": "art-source/quiz-actions-and-growth.original.png",
+      "sourceAssetKey": "quiz-actions-and-growth",
+      "receivedPrompt": "Use case: scientific-educational.\nCreate one opaque landscape atlas of six different first-grade science illustrations. Exactly 2 equal rows and 3 equal columns of square cells in a 3:2 image, six occupied cells. Each scene stays entirely inside its own cell with at least 9% quiet margin on each side. Cell boundaries are invisible, no line or art crossing any border. Use a warm ivory matte gouache paper background, simple recognizable silhouettes, fine paper grain, natural colors, apricot and pine accents. For mini stories inside cells, two softly separated subpanels are intentional. Clear shape separation and very simple backgrounds so each cell is readable after reduction to 96 pixels. No text, letters, numbers, logos, checkmarks, arrows or watermark.\nRow 1, column 1. Two horizontal subpanels within this one square. Upper: the same small pale-yellow duckling paddles left in still teal water, with a short clear wake behind. Lower: the same silver-gray tabby kitten with dark stripes and a white chest walks left, one front paw lifted in forward stride. Both fully visible.\nRow 1, column 2. Exactly the same two stacked subpanels, pale-yellow duckling and silver-gray tabby kitten with white chest. Upper: duckling bends and pecks feed from a low shallow dish, both feet on dry ground. Lower: kitten bends its muzzle toward a simple food bowl, paws planted. Both are eating.\nRow 1, column 3. Exactly the same two stacked subpanels and animals. Upper: the SAME swimming pale-yellow duckling with short wake as upper left cell. Lower: the SAME silver-gray tabby kitten with white chest lies calmly resting on the ground with paws tucked, no bowl. Only the duckling is moving.\nRow 2, column 1. Two side-by-side subpanels within the square. The same mature brown hornless female cow with cream heart-shaped forehead patch and small cream near-shoulder patch appears once per subpanel, same adult size. Left cow walks left with one forehoof lifted; right cow lowers its head to nibble a small tuft of grass. No calf.\nRow 2, column 2. Two side-by-side subpanels within the square. LEFT: one mature brown hornless female cow with cream heart-shaped forehead patch and small cream near-shoulder patch, standing left-facing. RIGHT: the same adult cow, same size and markings, plus one clearly separate smaller brown calf standing just beside it, with white chest and solid brown forehead. Exactly one calf only in right subpanel.\nRow 2, column 3. Two side-by-side subpanels within the square. LEFT: one small brown hornless calf with the same cream heart-shaped forehead patch AND cream near-shoulder patch as the adult cow. RIGHT: that same individual has grown into the larger brown hornless cow with the exact same two markings. One animal per subpanel, same left-facing stance.\n",
+      "artReview": "已在96px逐张核对题义、动物和动作。"
+    },
+    {
+      "key": "q3-c",
+      "file": "assets/q3-c.png",
+      "usedBy": [
+        "p09 q3-c"
+      ],
+      "status": "ready_imagegen",
+      "target": {
+        "width": 480,
+        "height": 480,
+        "alpha": false
+      },
+      "prompt": "Use case: scientific-educational. Reuse the same exact two animal identities and two-frame composition of the reference. Preserve the same swimming duckling with wake in the upper frame. Lower frame: same striped gray kitten now lying with its body and all four paws resting comfortably on cream ground, no running or eating. Neither image has words or arrows. Original first-grade educational matte gouache paper-cut illustration, clean bold shapes, warm cream, deep pine green, and muted apricot accents. No words, digits, labels, logo, watermark or decorative glyphs.",
+      "verify": "同样鸭游、猫趴，只有上格明显运动，整组不满足。",
+      "reference": "q3-a 身份与排版",
+      "priority": 31,
+      "sha256": "6fd35139a218ad33b3bd288a4dcdf4d490b0a851bea1e665e46bdeef87abeaf8",
+      "source": "art-source/quiz-actions-and-growth.original.png",
+      "sourceAssetKey": "quiz-actions-and-growth",
+      "receivedPrompt": "Use case: scientific-educational.\nCreate one opaque landscape atlas of six different first-grade science illustrations. Exactly 2 equal rows and 3 equal columns of square cells in a 3:2 image, six occupied cells. Each scene stays entirely inside its own cell with at least 9% quiet margin on each side. Cell boundaries are invisible, no line or art crossing any border. Use a warm ivory matte gouache paper background, simple recognizable silhouettes, fine paper grain, natural colors, apricot and pine accents. For mini stories inside cells, two softly separated subpanels are intentional. Clear shape separation and very simple backgrounds so each cell is readable after reduction to 96 pixels. No text, letters, numbers, logos, checkmarks, arrows or watermark.\nRow 1, column 1. Two horizontal subpanels within this one square. Upper: the same small pale-yellow duckling paddles left in still teal water, with a short clear wake behind. Lower: the same silver-gray tabby kitten with dark stripes and a white chest walks left, one front paw lifted in forward stride. Both fully visible.\nRow 1, column 2. Exactly the same two stacked subpanels, pale-yellow duckling and silver-gray tabby kitten with white chest. Upper: duckling bends and pecks feed from a low shallow dish, both feet on dry ground. Lower: kitten bends its muzzle toward a simple food bowl, paws planted. Both are eating.\nRow 1, column 3. Exactly the same two stacked subpanels and animals. Upper: the SAME swimming pale-yellow duckling with short wake as upper left cell. Lower: the SAME silver-gray tabby kitten with white chest lies calmly resting on the ground with paws tucked, no bowl. Only the duckling is moving.\nRow 2, column 1. Two side-by-side subpanels within the square. The same mature brown hornless female cow with cream heart-shaped forehead patch and small cream near-shoulder patch appears once per subpanel, same adult size. Left cow walks left with one forehoof lifted; right cow lowers its head to nibble a small tuft of grass. No calf.\nRow 2, column 2. Two side-by-side subpanels within the square. LEFT: one mature brown hornless female cow with cream heart-shaped forehead patch and small cream near-shoulder patch, standing left-facing. RIGHT: the same adult cow, same size and markings, plus one clearly separate smaller brown calf standing just beside it, with white chest and solid brown forehead. Exactly one calf only in right subpanel.\nRow 2, column 3. Two side-by-side subpanels within the square. LEFT: one small brown hornless calf with the same cream heart-shaped forehead patch AND cream near-shoulder patch as the adult cow. RIGHT: that same individual has grown into the larger brown hornless cow with the exact same two markings. One animal per subpanel, same left-facing stance.\n",
+      "artReview": "已在96px逐张核对题义、动物和动作。"
+    },
+    {
+      "key": "q4-c",
+      "file": "assets/q4-c.png",
+      "usedBy": [
+        "p10 q4-c"
+      ],
+      "status": "ready_imagegen",
+      "target": {
+        "width": 480,
+        "height": 480,
+        "alpha": false
+      },
+      "prompt": "Use case: scientific-educational. Two same-size frames in a square, read from left to right. First frame one young dark-brown domestic calf with a bold warm cream heart-shaped forehead patch and one small cream shoulder patch. Second frame the SAME individual as a larger adult, same two markings in the same relative places, both at the same left-facing relaxed stance in matching cream ground. Leave a clear visual gap and no extra animal, written time marker, arrows, labels or props. Distinct youth and adult silhouette even at 96px. Original first-grade educational matte gouache paper-cut illustration, clean bold shapes, warm cream, deep pine green, and muted apricot accents. No words, digits, labels, logo, watermark or decorative glyphs.",
+      "verify": "左右只各一头，同额斑、同肩斑、明确小牛到成牛，唯一C。",
+      "priority": 32,
+      "sha256": "078489b9b3504fc50dc214846057e995801dca48c286ab387cd3f8ab302126d1",
+      "source": "art-source/quiz-actions-and-growth.original.png",
+      "sourceAssetKey": "quiz-actions-and-growth",
+      "receivedPrompt": "Use case: scientific-educational.\nCreate one opaque landscape atlas of six different first-grade science illustrations. Exactly 2 equal rows and 3 equal columns of square cells in a 3:2 image, six occupied cells. Each scene stays entirely inside its own cell with at least 9% quiet margin on each side. Cell boundaries are invisible, no line or art crossing any border. Use a warm ivory matte gouache paper background, simple recognizable silhouettes, fine paper grain, natural colors, apricot and pine accents. For mini stories inside cells, two softly separated subpanels are intentional. Clear shape separation and very simple backgrounds so each cell is readable after reduction to 96 pixels. No text, letters, numbers, logos, checkmarks, arrows or watermark.\nRow 1, column 1. Two horizontal subpanels within this one square. Upper: the same small pale-yellow duckling paddles left in still teal water, with a short clear wake behind. Lower: the same silver-gray tabby kitten with dark stripes and a white chest walks left, one front paw lifted in forward stride. Both fully visible.\nRow 1, column 2. Exactly the same two stacked subpanels, pale-yellow duckling and silver-gray tabby kitten with white chest. Upper: duckling bends and pecks feed from a low shallow dish, both feet on dry ground. Lower: kitten bends its muzzle toward a simple food bowl, paws planted. Both are eating.\nRow 1, column 3. Exactly the same two stacked subpanels and animals. Upper: the SAME swimming pale-yellow duckling with short wake as upper left cell. Lower: the SAME silver-gray tabby kitten with white chest lies calmly resting on the ground with paws tucked, no bowl. Only the duckling is moving.\nRow 2, column 1. Two side-by-side subpanels within the square. The same mature brown hornless female cow with cream heart-shaped forehead patch and small cream near-shoulder patch appears once per subpanel, same adult size. Left cow walks left with one forehoof lifted; right cow lowers its head to nibble a small tuft of grass. No calf.\nRow 2, column 2. Two side-by-side subpanels within the square. LEFT: one mature brown hornless female cow with cream heart-shaped forehead patch and small cream near-shoulder patch, standing left-facing. RIGHT: the same adult cow, same size and markings, plus one clearly separate smaller brown calf standing just beside it, with white chest and solid brown forehead. Exactly one calf only in right subpanel.\nRow 2, column 3. Two side-by-side subpanels within the square. LEFT: one small brown hornless calf with the same cream heart-shaped forehead patch AND cream near-shoulder patch as the adult cow. RIGHT: that same individual has grown into the larger brown hornless cow with the exact same two markings. One animal per subpanel, same left-facing stance.\n",
+      "artReview": "已在96px逐张核对题义、动物和动作。"
+    },
+    {
+      "key": "q4-a",
+      "file": "assets/q4-a.png",
+      "usedBy": [
+        "p10 q4-a"
+      ],
+      "status": "ready_imagegen",
+      "target": {
+        "width": 480,
+        "height": 480,
+        "alpha": false
+      },
+      "prompt": "Use case: scientific-educational. Use the adult cow from the right frame in the exact same two-frame arrangement and at the same mature size in both frames. In the first frame, the adult walks in a gentle leftward stride, and in the second, the same adult lowers its muzzle to nibble grass. Match its two cream markings and brown coat. No calf, no writing, arrows or scenery, strong legible silhouettes. Original first-grade educational matte gouache paper-cut illustration, clean bold shapes, warm cream, deep pine green, and muted apricot accents. No words, digits, labels, logo, watermark or decorative glyphs.",
+      "verify": "两格同样大小的成年牛、同标记，只换动作。",
+      "reference": "q4-c 的成年牛和相同画框",
+      "priority": 33,
+      "sha256": "ae5dc250f7fb730cb9987e33465d3511fd0ab73e482437b5811dba2756a43111",
+      "source": "art-source/quiz-actions-and-growth.original.png",
+      "sourceAssetKey": "quiz-actions-and-growth",
+      "receivedPrompt": "Use case: scientific-educational.\nCreate one opaque landscape atlas of six different first-grade science illustrations. Exactly 2 equal rows and 3 equal columns of square cells in a 3:2 image, six occupied cells. Each scene stays entirely inside its own cell with at least 9% quiet margin on each side. Cell boundaries are invisible, no line or art crossing any border. Use a warm ivory matte gouache paper background, simple recognizable silhouettes, fine paper grain, natural colors, apricot and pine accents. For mini stories inside cells, two softly separated subpanels are intentional. Clear shape separation and very simple backgrounds so each cell is readable after reduction to 96 pixels. No text, letters, numbers, logos, checkmarks, arrows or watermark.\nRow 1, column 1. Two horizontal subpanels within this one square. Upper: the same small pale-yellow duckling paddles left in still teal water, with a short clear wake behind. Lower: the same silver-gray tabby kitten with dark stripes and a white chest walks left, one front paw lifted in forward stride. Both fully visible.\nRow 1, column 2. Exactly the same two stacked subpanels, pale-yellow duckling and silver-gray tabby kitten with white chest. Upper: duckling bends and pecks feed from a low shallow dish, both feet on dry ground. Lower: kitten bends its muzzle toward a simple food bowl, paws planted. Both are eating.\nRow 1, column 3. Exactly the same two stacked subpanels and animals. Upper: the SAME swimming pale-yellow duckling with short wake as upper left cell. Lower: the SAME silver-gray tabby kitten with white chest lies calmly resting on the ground with paws tucked, no bowl. Only the duckling is moving.\nRow 2, column 1. Two side-by-side subpanels within the square. The same mature brown hornless female cow with cream heart-shaped forehead patch and small cream near-shoulder patch appears once per subpanel, same adult size. Left cow walks left with one forehoof lifted; right cow lowers its head to nibble a small tuft of grass. No calf.\nRow 2, column 2. Two side-by-side subpanels within the square. LEFT: one mature brown hornless female cow with cream heart-shaped forehead patch and small cream near-shoulder patch, standing left-facing. RIGHT: the same adult cow, same size and markings, plus one clearly separate smaller brown calf standing just beside it, with white chest and solid brown forehead. Exactly one calf only in right subpanel.\nRow 2, column 3. Two side-by-side subpanels within the square. LEFT: one small brown hornless calf with the same cream heart-shaped forehead patch AND cream near-shoulder patch as the adult cow. RIGHT: that same individual has grown into the larger brown hornless cow with the exact same two markings. One animal per subpanel, same left-facing stance.\n",
+      "artReview": "已在96px逐张核对题义、动物和动作。"
+    },
+    {
+      "key": "q4-b",
+      "file": "assets/q4-b.png",
+      "usedBy": [
+        "p10 q4-b"
+      ],
+      "status": "ready_imagegen",
+      "target": {
+        "width": 480,
+        "height": 480,
+        "alpha": false
+      },
+      "prompt": "Use case: scientific-educational. Use the exact adult cow from the right frame and same two-frame layout. LEFT: this adult cow stands alone in a simple left-facing stance. RIGHT: the adult remains the same size and same position, and ONE noticeably smaller calf with a cream chest and solid brown forehead stands beside it with a clear gap. Show two distinct individuals in the second frame, no eating, action marks, words, numbers, or arrows. Original first-grade educational matte gouache paper-cut illustration, clean bold shapes, warm cream, deep pine green, and muted apricot accents. No words, digits, labels, logo, watermark or decorative glyphs.",
+      "verify": "第一格成牛，第二格同成牛另有小牛，不能理解为变小或长大。",
+      "reference": "q4-c 的成年牛和相同画框",
+      "priority": 34,
+      "sha256": "6e0ceeef7222e6dfcee8975cb9d00aace6744e13bac5385e922b9a2613de1a92",
+      "source": "art-source/quiz-actions-and-growth.original.png",
+      "sourceAssetKey": "quiz-actions-and-growth",
+      "receivedPrompt": "Use case: scientific-educational.\nCreate one opaque landscape atlas of six different first-grade science illustrations. Exactly 2 equal rows and 3 equal columns of square cells in a 3:2 image, six occupied cells. Each scene stays entirely inside its own cell with at least 9% quiet margin on each side. Cell boundaries are invisible, no line or art crossing any border. Use a warm ivory matte gouache paper background, simple recognizable silhouettes, fine paper grain, natural colors, apricot and pine accents. For mini stories inside cells, two softly separated subpanels are intentional. Clear shape separation and very simple backgrounds so each cell is readable after reduction to 96 pixels. No text, letters, numbers, logos, checkmarks, arrows or watermark.\nRow 1, column 1. Two horizontal subpanels within this one square. Upper: the same small pale-yellow duckling paddles left in still teal water, with a short clear wake behind. Lower: the same silver-gray tabby kitten with dark stripes and a white chest walks left, one front paw lifted in forward stride. Both fully visible.\nRow 1, column 2. Exactly the same two stacked subpanels, pale-yellow duckling and silver-gray tabby kitten with white chest. Upper: duckling bends and pecks feed from a low shallow dish, both feet on dry ground. Lower: kitten bends its muzzle toward a simple food bowl, paws planted. Both are eating.\nRow 1, column 3. Exactly the same two stacked subpanels and animals. Upper: the SAME swimming pale-yellow duckling with short wake as upper left cell. Lower: the SAME silver-gray tabby kitten with white chest lies calmly resting on the ground with paws tucked, no bowl. Only the duckling is moving.\nRow 2, column 1. Two side-by-side subpanels within the square. The same mature brown hornless female cow with cream heart-shaped forehead patch and small cream near-shoulder patch appears once per subpanel, same adult size. Left cow walks left with one forehoof lifted; right cow lowers its head to nibble a small tuft of grass. No calf.\nRow 2, column 2. Two side-by-side subpanels within the square. LEFT: one mature brown hornless female cow with cream heart-shaped forehead patch and small cream near-shoulder patch, standing left-facing. RIGHT: the same adult cow, same size and markings, plus one clearly separate smaller brown calf standing just beside it, with white chest and solid brown forehead. Exactly one calf only in right subpanel.\nRow 2, column 3. Two side-by-side subpanels within the square. LEFT: one small brown hornless calf with the same cream heart-shaped forehead patch AND cream near-shoulder patch as the adult cow. RIGHT: that same individual has grown into the larger brown hornless cow with the exact same two markings. One animal per subpanel, same left-facing stance.\n",
+      "artReview": "已在96px逐张核对题义、动物和动作。"
+    },
+    {
+      "key": "q5-b",
+      "file": "assets/q5-b.png",
+      "usedBy": [
+        "p10 q5-b"
+      ],
+      "status": "ready_imagegen",
+      "target": {
+        "width": 480,
+        "height": 480,
+        "alpha": false
+      },
+      "prompt": "Use case: scientific-educational. One calm square courtyard of a domestic goose. White-gray goose stands with natural orange webbed feet and bill behind a simple low fence, body visible. On the other side of the fence one six-year-old child stands a comfortable distance away with both hands relaxed down, and an adult beside the child looking at the goose. No feed, catching, touching, running, injuries or objects. Distances and separated positions are clear at 96px. Original first-grade educational matte gouache paper-cut illustration, clean bold shapes, warm cream, deep pine green, and muted apricot accents. No words, digits, labels, logo, watermark or decorative glyphs.",
+      "verify": "成人和孩子确在栏外，孩子两手下垂，鹅自然站立并与人有距离。",
+      "priority": 35,
+      "sha256": "56b231284fc483b12cce883fc96b5fd5a0f0585d30578e67325972459135d3df",
+      "source": "art-source/quiz-animal-masters-and-safety.original.png",
+      "sourceAssetKey": "quiz-animal-masters-and-safety",
+      "receivedPrompt": "Use case: scientific-educational.\nCreate one opaque landscape atlas of six different first-grade science illustrations. Exactly 2 equal rows and 3 equal columns of square cells in a 3:2 image, six occupied cells. Each scene stays entirely inside its own cell with at least 9% quiet margin on each side. Cell boundaries are invisible, no line or art crossing any border. Use a warm ivory matte gouache paper background, simple recognizable silhouettes, fine paper grain, natural colors, apricot and pine accents. For mini stories inside cells, two softly separated subpanels are intentional. Clear shape separation and very simple backgrounds so each cell is readable after reduction to 96 pixels. No text, letters, numbers, logos, checkmarks, arrows or watermark.\nRow 1, column 1. One whole living crucian carp (Carassius carassius), exact broadside head left and tail right, in a pale-teal rectangular area of clear water. Silver-olive oval body, one near eye, small curved gill-cover seam immediately behind head, clear scale pattern, naturally placed fins, one subtly forked caudal fin. No barbels. Full head, body and tail separated for precise overlay circles.\nRow 1, column 2. Two clearly separate horizontal bands within the square. Upper: full hornless white domestic goat standing left-facing, realistic short tail, muzzle and four cloven-hooved legs. Lower: full gray-white domestic goose standing left-facing, two natural orange webbed feet both on flat ground, distinct bill and tail. No grass or shadows obscuring feet. Full animals and extra margin for later annotation.\nRow 1, column 3. One whole cream-wool domestic sheep alone on blank cream ground, in exact left-facing side view. Natural soft wool, sheep muzzle, small ochre patch at base of visible ear, four cloven-hooved legs (natural far-side overlap), distinct small downturned natural tail at right rump. All feet, muzzle and tail visible with safe margins. No horns or extras.\nRow 2, column 1. One simple square courtyard scene. Gray-white domestic goose behind a waist-high light pine slatted fence. One child in sage top and apricot trousers is very near the outside of fence, one arm extending toward the goose above the fence, hand still clearly separated from animal. No adult, no food or contact. Child and goose fully visible, hand gesture obvious.\nRow 2, column 2. Exactly the same gray-white domestic goose, fence, sage-shirt child and quiet courtyard. Goose remains behind fence. Child stands clearly back from fence, both hands down, and one calm adult stands beside child. All calmly look at the goose, no food or contact. Show a clear gap between child and fence.\nRow 2, column 3. Exactly the same gray-white goose and sage-shirt child, in the same simple courtyard. Child runs behind the goose with a generous gap as goose moves away to the left. Full bodies and clear running poses, no touching, injury, feed or grabbing. Low pine fence is in the background.\n",
+      "artReview": "已在96px逐张核对题义、动物和动作。"
+    },
+    {
+      "key": "q5-a",
+      "file": "assets/q5-a.png",
+      "usedBy": [
+        "p10 q5-a"
+      ],
+      "status": "ready_imagegen",
+      "target": {
+        "width": 480,
+        "height": 480,
+        "alpha": false
+      },
+      "prompt": "Use case: scientific-educational. Use the exact same white-gray goose, low fence, child and courtyard look. Show the child standing very near the fence, arm extended toward the goose with one hand near a gap above the fence, fingertips still well separated from the goose; the goose stays behind the fence. There is no adult in this image, no contact, feeding, injuries or marks. The extended arm reads clearly at 96px. Original first-grade educational matte gouache paper-cut illustration, clean bold shapes, warm cream, deep pine green, and muted apricot accents. No words, digits, labels, logo, watermark or decorative glyphs.",
+      "verify": "近栏伸手、手未触碰鹅，鹅保持同身份。",
+      "reference": "q5-b 的鹅和场景",
+      "priority": 36,
+      "sha256": "4f6bfaa1abb958c458885ae3248cd3983ab0fcba2fc43d769d0ba5a6f2fbf15d",
+      "source": "art-source/quiz-animal-masters-and-safety.original.png",
+      "sourceAssetKey": "quiz-animal-masters-and-safety",
+      "receivedPrompt": "Use case: scientific-educational.\nCreate one opaque landscape atlas of six different first-grade science illustrations. Exactly 2 equal rows and 3 equal columns of square cells in a 3:2 image, six occupied cells. Each scene stays entirely inside its own cell with at least 9% quiet margin on each side. Cell boundaries are invisible, no line or art crossing any border. Use a warm ivory matte gouache paper background, simple recognizable silhouettes, fine paper grain, natural colors, apricot and pine accents. For mini stories inside cells, two softly separated subpanels are intentional. Clear shape separation and very simple backgrounds so each cell is readable after reduction to 96 pixels. No text, letters, numbers, logos, checkmarks, arrows or watermark.\nRow 1, column 1. One whole living crucian carp (Carassius carassius), exact broadside head left and tail right, in a pale-teal rectangular area of clear water. Silver-olive oval body, one near eye, small curved gill-cover seam immediately behind head, clear scale pattern, naturally placed fins, one subtly forked caudal fin. No barbels. Full head, body and tail separated for precise overlay circles.\nRow 1, column 2. Two clearly separate horizontal bands within the square. Upper: full hornless white domestic goat standing left-facing, realistic short tail, muzzle and four cloven-hooved legs. Lower: full gray-white domestic goose standing left-facing, two natural orange webbed feet both on flat ground, distinct bill and tail. No grass or shadows obscuring feet. Full animals and extra margin for later annotation.\nRow 1, column 3. One whole cream-wool domestic sheep alone on blank cream ground, in exact left-facing side view. Natural soft wool, sheep muzzle, small ochre patch at base of visible ear, four cloven-hooved legs (natural far-side overlap), distinct small downturned natural tail at right rump. All feet, muzzle and tail visible with safe margins. No horns or extras.\nRow 2, column 1. One simple square courtyard scene. Gray-white domestic goose behind a waist-high light pine slatted fence. One child in sage top and apricot trousers is very near the outside of fence, one arm extending toward the goose above the fence, hand still clearly separated from animal. No adult, no food or contact. Child and goose fully visible, hand gesture obvious.\nRow 2, column 2. Exactly the same gray-white domestic goose, fence, sage-shirt child and quiet courtyard. Goose remains behind fence. Child stands clearly back from fence, both hands down, and one calm adult stands beside child. All calmly look at the goose, no food or contact. Show a clear gap between child and fence.\nRow 2, column 3. Exactly the same gray-white goose and sage-shirt child, in the same simple courtyard. Child runs behind the goose with a generous gap as goose moves away to the left. Full bodies and clear running poses, no touching, injury, feed or grabbing. Low pine fence is in the background.\n",
+      "artReview": "已在96px逐张核对题义、动物和动作。"
+    },
+    {
+      "key": "q5-c",
+      "file": "assets/q5-c.png",
+      "usedBy": [
+        "p10 q5-c"
+      ],
+      "status": "ready_imagegen",
+      "target": {
+        "width": 480,
+        "height": 480,
+        "alpha": false
+      },
+      "prompt": "Use case: scientific-educational. Reuse the exact same white-gray goose and child. Show a simple outdoor fenced yard with the child running after the goose and the goose moving away to the left, a generous physical gap between them. No injury, touching, falling, reaching the animal, aggressive depiction or words. Keep the action silhouettes and direction distinct at 96px. Original first-grade educational matte gouache paper-cut illustration, clean bold shapes, warm cream, deep pine green, and muted apricot accents. No words, digits, labels, logo, watermark or decorative glyphs.",
+      "verify": "跑向前方鹅，鹅在前、人后，留间隙、无受伤、无接触。",
+      "reference": "q5-b 的鹅与孩童身份",
+      "priority": 37,
+      "sha256": "e17c48ee04fbc5fb2ed0dc58cf87b94029842ee11da1ec88f3938cd1d8666408",
+      "source": "art-source/quiz-animal-masters-and-safety.original.png",
+      "sourceAssetKey": "quiz-animal-masters-and-safety",
+      "receivedPrompt": "Use case: scientific-educational.\nCreate one opaque landscape atlas of six different first-grade science illustrations. Exactly 2 equal rows and 3 equal columns of square cells in a 3:2 image, six occupied cells. Each scene stays entirely inside its own cell with at least 9% quiet margin on each side. Cell boundaries are invisible, no line or art crossing any border. Use a warm ivory matte gouache paper background, simple recognizable silhouettes, fine paper grain, natural colors, apricot and pine accents. For mini stories inside cells, two softly separated subpanels are intentional. Clear shape separation and very simple backgrounds so each cell is readable after reduction to 96 pixels. No text, letters, numbers, logos, checkmarks, arrows or watermark.\nRow 1, column 1. One whole living crucian carp (Carassius carassius), exact broadside head left and tail right, in a pale-teal rectangular area of clear water. Silver-olive oval body, one near eye, small curved gill-cover seam immediately behind head, clear scale pattern, naturally placed fins, one subtly forked caudal fin. No barbels. Full head, body and tail separated for precise overlay circles.\nRow 1, column 2. Two clearly separate horizontal bands within the square. Upper: full hornless white domestic goat standing left-facing, realistic short tail, muzzle and four cloven-hooved legs. Lower: full gray-white domestic goose standing left-facing, two natural orange webbed feet both on flat ground, distinct bill and tail. No grass or shadows obscuring feet. Full animals and extra margin for later annotation.\nRow 1, column 3. One whole cream-wool domestic sheep alone on blank cream ground, in exact left-facing side view. Natural soft wool, sheep muzzle, small ochre patch at base of visible ear, four cloven-hooved legs (natural far-side overlap), distinct small downturned natural tail at right rump. All feet, muzzle and tail visible with safe margins. No horns or extras.\nRow 2, column 1. One simple square courtyard scene. Gray-white domestic goose behind a waist-high light pine slatted fence. One child in sage top and apricot trousers is very near the outside of fence, one arm extending toward the goose above the fence, hand still clearly separated from animal. No adult, no food or contact. Child and goose fully visible, hand gesture obvious.\nRow 2, column 2. Exactly the same gray-white domestic goose, fence, sage-shirt child and quiet courtyard. Goose remains behind fence. Child stands clearly back from fence, both hands down, and one calm adult stands beside child. All calmly look at the goose, no food or contact. Show a clear gap between child and fence.\nRow 2, column 3. Exactly the same gray-white goose and sage-shirt child, in the same simple courtyard. Child runs behind the goose with a generous gap as goose moves away to the left. Full bodies and clear running poses, no touching, injury, feed or grabbing. Low pine fence is in the background.\n",
+      "artReview": "已在96px逐张核对题义、动物和动作。"
+    },
+    {
+      "key": "q6-a",
+      "file": "assets/q6-a.png",
+      "usedBy": [
+        "p10 q6"
+      ],
+      "status": "ready_deterministic_composition",
+      "target": {
+        "width": 480,
+        "height": 480,
+        "alpha": false
+      },
+      "method": "以同一 q6-sheep-master 正式图生成整只、尾部、头部裁剪。两框同大小，代码放同样的从左到右连接箭头，本图顺序为整只→尾部。",
+      "verify": "同一只绵羊、同一尾部或头部，不裁掉正需要比较的部位。96px只有 A 是先整只再尾部。",
+      "priority": 38,
+      "sha256": "ec0474c0c906822b19a288fa727f4a2f3f7e2467efdf896287ddbe3d7edd1a4b",
+      "source": "diagrams/q6-a.svg",
+      "artReview": "已在96px逐张核对圈位或顺序。"
+    },
+    {
+      "key": "q6-b",
+      "file": "assets/q6-b.png",
+      "usedBy": [
+        "p10 q6"
+      ],
+      "status": "ready_deterministic_composition",
+      "target": {
+        "width": 480,
+        "height": 480,
+        "alpha": false
+      },
+      "method": "以同一 q6-sheep-master 正式图生成整只、尾部、头部裁剪。两框同大小，代码放同样的从左到右连接箭头，本图顺序为尾部→整只。",
+      "verify": "同一只绵羊、同一尾部或头部，不裁掉正需要比较的部位。96px只有 A 是先整只再尾部。",
+      "priority": 39,
+      "sha256": "1f65861b645ab7268849edc56f01ca28da9e86921c3f67fa5929986a9f107674",
+      "source": "diagrams/q6-b.svg",
+      "artReview": "已在96px逐张核对圈位或顺序。"
+    },
+    {
+      "key": "q6-c",
+      "file": "assets/q6-c.png",
+      "usedBy": [
+        "p10 q6"
+      ],
+      "status": "ready_deterministic_composition",
+      "target": {
+        "width": 480,
+        "height": 480,
+        "alpha": false
+      },
+      "method": "以同一 q6-sheep-master 正式图生成整只、尾部、头部裁剪。两框同大小，代码放同样的从左到右连接箭头，本图顺序为整只→头部。",
+      "verify": "同一只绵羊、同一尾部或头部，不裁掉正需要比较的部位。96px只有 A 是先整只再尾部。",
+      "priority": 40,
+      "sha256": "597a5a673654a034317a0e95fb92c6f0ecbc00027048588987e61e547e3dbd98",
+      "source": "diagrams/q6-c.svg",
+      "artReview": "已在96px逐张核对圈位或顺序。"
+    }
+  ],
+  "observationOutcomes": [
+    {
+      "key": "goldfish-top",
+      "view": "top",
+      "scope": "同一条普通金鱼",
+      "status": "ready_imagegen",
+      "expectedPose": "左右胸鳍出现在头后身体两侧，俯看。",
+      "sha256": "63d517b92fc2f8af5f0a2880b25c003ccb8dea2fc0d49c6e49f949e0ae933147",
+      "artReview": "同一条鱼头左尾右、长度及杏金肩斑一致；头后两侧各一胸鳍，单尾从上方呈狭长边。31px可辨长窄顶视与鳍外伸，鳍细节在较大视图核。"
+    },
+    {
+      "key": "goldfish-side",
+      "view": "side",
+      "scope": "同一条普通金鱼",
+      "status": "ready_imagegen",
+      "expectedPose": "侧面看到头后鳃盖外缘、身体及尾部。",
+      "sha256": "0aff0d891425b6e5bcdc67e53102c74e2953bab5b578d2a3f75ddf9bb851a77e",
+      "artReview": "头左尾右，单眼、眼后弯鳃盖、自然鳞片、背鳍和单叉尾；肩部同一杏金斑。快门目标31px能与俯视分开，较细鳃盖线在原图核。"
+    }
+  ],
+  "gamePageAssetBudgets": {
+    "p04": {
+      "assetKeys": [
+        "animal-sticker",
+        "animal-workbench",
+        "fish-cam-start",
+        "goldfish-side",
+        "goldfish-top"
+      ],
+      "totalAssetBytes": 1735352,
+      "budgetBytes": 3000000,
+      "localVisualCheck": {
+        "status": "verified_prevoice",
+        "viewports": [
+          [
+            640,
+            360
+          ],
+          [
+            1000,
+            563
+          ],
+          [
+            1280,
+            720
+          ]
+        ],
+        "checkedAt": "2026-11-10T14:07:18+08:00",
+        "states": [
+          "ready",
+          "play",
+          "finish"
+        ],
+        "scope": "以本课真实配置和 PNG 在本地 Chromium 检查。每个尺寸完成三关，核开局、课中、完成双图与奖励贴纸；正式录音、学生端和家长端回读待验。"
+      }
+    },
+    "p07": {
+      "assetKeys": [
+        "animal-workbench",
+        "animal-sticker",
+        "evidence-arcade-start",
+        "evidence-marble",
+        "goldfish-swims",
+        "rabbit-hops",
+        "rabbit-eats",
+        "hen-eats",
+        "chick-grows",
+        "dog-grows",
+        "hen-offspring",
+        "cat-offspring"
+      ],
+      "totalAssetBytes": 2982439,
+      "budgetBytes": 3000000,
+      "localVisualCheck": {
+        "status": "art_composed_offline_pending_browser",
+        "checkedAt": "2026-11-10T15:39:19.176611+08:00",
+        "scope": "正式图已逐张查看，三个尺寸的完整画面和首次真实操作待 G6。"
+      }
+    }
+  },
+  "registeredAtlases": {
+    "p07-animal-actions-atlas-clean": {
+      "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-75ceba5f-c6db-48c1-8ddc-98f09ca089ec.png",
+      "sha256": "6c96bdc6e2cc804e4c4e6b5c7cc82d97a55c1c262bdf78c0c49dfe1c27b3db17",
+      "localOriginal": "diagrams/p07-animal-actions-atlas-clean.original.png",
+      "coversKeys": [
+        "goldfish-swims",
+        "rabbit-hops",
+        "rabbit-eats",
+        "hen-eats"
+      ],
+      "status": "ready_imagegen_source"
+    },
+    "p07-life-evidence-and-family": {
+      "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c43e-dd98-7b51-b559-476add2ee95e/exec-7bcb55d7-8ab9-4c96-81bd-b8ae7d9f6b61.png",
+      "sha256": "0bd96a161a1a927fccf4a3a3f2b35c7dc5801d4f68aaca00fce8345139271a09",
+      "localOriginal": "art-source/p07-life-evidence-and-family.original.png",
+      "coversKeys": [
+        "chick-grows",
+        "dog-grows",
+        "hen-offspring",
+        "cat-offspring",
+        "evidence-marble",
+        "family-observes"
+      ],
+      "status": "ready_imagegen_source",
+      "receipt": "art-source/p07-life-evidence-and-family.receipt.json"
+    },
+    "quiz-actions-and-growth": {
+      "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c43e-dd98-7b51-b559-476add2ee95e/exec-7fd32938-f95d-4c3a-981a-f2edde288437.png",
+      "sha256": "777b934cdf8d4d25566b32c6d633fb82426d301e4d443c8e3d44c7a9c9fd9cb3",
+      "localOriginal": "art-source/quiz-actions-and-growth.original.png",
+      "coversKeys": [
+        "q3-a",
+        "q3-b",
+        "q3-c",
+        "q4-a",
+        "q4-b",
+        "q4-c"
+      ],
+      "status": "ready_imagegen_source",
+      "receipt": "art-source/quiz-actions-and-growth.receipt.json"
+    },
+    "quiz-animal-masters-and-safety": {
+      "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c43e-dd98-7b51-b559-476add2ee95e/exec-f0f4a6ba-a17c-4a7c-bc55-5ca90772fbf9.png",
+      "sha256": "e6f416ac861cfb415b359afde944fc36ecdd222914d8d88017c13adc01976a47",
+      "localOriginal": "art-source/quiz-animal-masters-and-safety.original.png",
+      "coversKeys": [
+        "q1-carp-master",
+        "q2-goat-goose-master",
+        "q6-sheep-master",
+        "q5-a",
+        "q5-b",
+        "q5-c"
+      ],
+      "status": "ready_imagegen_source",
+      "receipt": "art-source/quiz-animal-masters-and-safety.receipt.json"
+    }
+  }
+}

@@ -1,0 +1,1066 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "逆向用加法解决问题",
+  "description": "人教数学一年级上册。看苗圃送走的和剩下的两部分，还原出发前的总量，再演动作核对。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小数老师",
+      "role": "teacher",
+      "gender": "male",
+      "voice": "Ethan",
+      "avatar": "/avatars/teacher-1.png",
+      "color": "#347863",
+      "persona": "用贴近生活的图和动作讲清数学数量关系。"
+    }
+  },
+  "images": {
+    "after-13": {
+      "file": "assets/after-13.png"
+    },
+    "ask-left": {
+      "file": "assets/ask-left.png"
+    },
+    "ask-past": {
+      "file": "assets/ask-past.png"
+    },
+    "bench-backdrop": {
+      "file": "assets/bench-backdrop.png"
+    },
+    "cart-covered": {
+      "file": "assets/cart-covered.png"
+    },
+    "cart-open": {
+      "file": "assets/cart-open.png"
+    },
+    "check-cross": {
+      "file": "assets/check-cross.png"
+    },
+    "check-full": {
+      "file": "assets/check-full.png"
+    },
+    "combine-7-6": {
+      "file": "assets/combine-7-6.png"
+    },
+    "equation-7-6": {
+      "file": "assets/equation-7-6.png"
+    },
+    "invent-story": {
+      "file": "assets/invent-story.png"
+    },
+    "left-5": {
+      "file": "assets/left-5.png"
+    },
+    "left-6": {
+      "file": "assets/left-6.png"
+    },
+    "left-7": {
+      "file": "assets/left-7.png"
+    },
+    "left-8": {
+      "file": "assets/left-8.png"
+    },
+    "left-six": {
+      "file": "assets/left-six.png"
+    },
+    "nursery-cover": {
+      "file": "assets/nursery-cover.png"
+    },
+    "nursery-sticker": {
+      "file": "assets/nursery-sticker.png"
+    },
+    "past-11": {
+      "file": "assets/past-11.png"
+    },
+    "past-12": {
+      "file": "assets/past-12.png"
+    },
+    "past-13": {
+      "file": "assets/past-13.png"
+    },
+    "past-14": {
+      "file": "assets/past-14.png"
+    },
+    "past-15": {
+      "file": "assets/past-15.png"
+    },
+    "past-16": {
+      "file": "assets/past-16.png"
+    },
+    "past-17": {
+      "file": "assets/past-17.png"
+    },
+    "q1-a": {
+      "file": "assets/q1-a.png"
+    },
+    "q1-b": {
+      "file": "assets/q1-b.png"
+    },
+    "q1-c": {
+      "file": "assets/q1-c.png"
+    },
+    "q2-a": {
+      "file": "assets/q2-a.png"
+    },
+    "q2-b": {
+      "file": "assets/q2-b.png"
+    },
+    "q2-c": {
+      "file": "assets/q2-c.png"
+    },
+    "q3-a": {
+      "file": "assets/q3-a.png"
+    },
+    "q3-b": {
+      "file": "assets/q3-b.png"
+    },
+    "q3-c": {
+      "file": "assets/q3-c.png"
+    },
+    "q4-a": {
+      "file": "assets/q4-a.png"
+    },
+    "q4-b": {
+      "file": "assets/q4-b.png"
+    },
+    "q4-c": {
+      "file": "assets/q4-c.png"
+    },
+    "q5-a": {
+      "file": "assets/q5-a.png"
+    },
+    "q5-b": {
+      "file": "assets/q5-b.png"
+    },
+    "q5-c": {
+      "file": "assets/q5-c.png"
+    },
+    "q6-a": {
+      "file": "assets/q6-a.png"
+    },
+    "q6-b": {
+      "file": "assets/q6-b.png"
+    },
+    "q6-c": {
+      "file": "assets/q6-c.png"
+    },
+    "return-empty": {
+      "file": "assets/return-empty.png"
+    },
+    "returned-4-7": {
+      "file": "assets/returned-4-7.png"
+    },
+    "returned-4-8": {
+      "file": "assets/returned-4-8.png"
+    },
+    "returned-6-7": {
+      "file": "assets/returned-6-7.png"
+    },
+    "returned-8-5": {
+      "file": "assets/returned-8-5.png"
+    },
+    "sent-4": {
+      "file": "assets/sent-4.png"
+    },
+    "sent-6": {
+      "file": "assets/sent-6.png"
+    },
+    "sent-7": {
+      "file": "assets/sent-7.png"
+    },
+    "sent-8": {
+      "file": "assets/sent-8.png"
+    },
+    "sent-seven": {
+      "file": "assets/sent-seven.png"
+    },
+    "tile-3-8": {
+      "file": "assets/tile-3-8.png"
+    },
+    "tile-4-9": {
+      "file": "assets/tile-4-9.png"
+    },
+    "tile-5-7": {
+      "file": "assets/tile-5-7.png"
+    },
+    "tile-6-7": {
+      "file": "assets/tile-6-7.png"
+    },
+    "tile-6-9": {
+      "file": "assets/tile-6-9.png"
+    },
+    "tile-8-6": {
+      "file": "assets/tile-8-6.png"
+    },
+    "tile-8-8": {
+      "file": "assets/tile-8-8.png"
+    },
+    "tile-9-8": {
+      "file": "assets/tile-9-8.png"
+    },
+    "time-three": {
+      "file": "assets/time-three.png"
+    },
+    "utility-trolley": {
+      "file": "assets/utility-trolley.png"
+    },
+    "workcard-3-8": {
+      "file": "assets/workcard-3-8.png"
+    },
+    "workcard-4-9": {
+      "file": "assets/workcard-4-9.png"
+    },
+    "workcard-5-7": {
+      "file": "assets/workcard-5-7.png"
+    },
+    "workcard-6-7": {
+      "file": "assets/workcard-6-7.png"
+    },
+    "workcard-6-9": {
+      "file": "assets/workcard-6-9.png"
+    },
+    "workcard-8-6": {
+      "file": "assets/workcard-8-6.png"
+    },
+    "workcard-8-8": {
+      "file": "assets/workcard-8-8.png"
+    },
+    "workcard-9-8": {
+      "file": "assets/workcard-9-8.png"
+    },
+    "yard-backdrop": {
+      "file": "assets/yard-backdrop.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "nursery-before-and-after",
+      "title": "小车出发以前",
+      "type": "slide",
+      "template": "two-columns",
+      "data": {
+        "title": "小车出发以前",
+        "left": {
+          "heading": "苗圃里有个托盘",
+          "body": "送苗日快到了"
+        },
+        "left_picture": "nursery-cover",
+        "right": {
+          "heading": "小车走了以后",
+          "body": "原来 → 送走 → 剩下"
+        },
+        "right_picture": "time-three"
+      },
+      "script": [
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "苗圃要给花坛送盆苗。小车还没开，先看看托盘。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "开车前的那一刻，盆苗都还在苗棚里。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "等车开出去，我们再看，还是同一个托盘吗？"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "托盘没变，里面的盆苗变了。你能指给我看吗？"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "看三格图。第一格五盆都在，是送走以前。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "中间，小车搬了两盆。最后，托盘里只剩三盆。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "题目说原来，就是问送走以前。手指要回到第一格。"
+        },
+        {
+          "say": "路上可以停一停，等前面的车先过。"
+        }
+      ]
+    },
+    {
+      "key": "find-both-parts",
+      "title": "现在看得见哪两组？",
+      "type": "slide",
+      "template": "two-columns",
+      "data": {
+        "title": "现在看得见哪两组？",
+        "left": {
+          "heading": "已经送走",
+          "body": "小车送去花坛的7盆"
+        },
+        "left_picture": "sent-seven",
+        "right": {
+          "heading": "还留在苗棚",
+          "body": "同一个托盘里剩下6盆"
+        },
+        "right_picture": "left-six"
+      },
+      "script": [
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "又送了一批。出发前没点数，现在还能知道原来几盆吗？"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "先找已经送走的。它们在花坛边，还是这批盆苗。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "一盆画一个记号。左边这组是送走的七盆。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "小车送走了它们，棚里看不到。我们用图把它们记下来。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "再看苗棚。没被小车搬走的，还是原来那批。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "这一边一共有六盆，是现在留在托盘里的。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "现在知道两组。要找原来的样子，还缺哪一步？"
+        },
+        {
+          "say": "重听一句，分清送走的和还剩的。"
+        },
+        {
+          "say": "小车接到的口令也分两步。听听它怎么说。"
+        },
+        {
+          "say": "换一批盆苗。先领回送走的四盆。"
+        },
+        {
+          "say": "再送到同一批还剩七盆的托盘。"
+        }
+      ]
+    },
+    {
+      "key": "bring-the-parts-back",
+      "title": "把送走的盆苗领回来",
+      "type": "interactive",
+      "page": "bring-the-parts-back",
+      "widgetType": "learning-arcade",
+      "startImage": "yard-backdrop",
+      "gameAudio": {
+        "return-sent-4": "find-both-parts-17",
+        "return-sent-6": "make-up-a-story-13",
+        "return-sent-8": "make-up-a-story-15",
+        "return-left-5": "make-up-a-story-16",
+        "return-left-7": "find-both-parts-18",
+        "return-left-8": "make-up-a-story-14",
+        "return-hint": "find-both-parts-15",
+        "return-help": "nursery-before-and-after-15",
+        "return-praise": "make-an-addition-16"
+      },
+      "script": [
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "这辆车要把分开的两组放回原处。"
+        },
+        {
+          "highlight": "#game-target"
+        },
+        {
+          "say": "先找已经送走的四盆。这个牌在下面。"
+        },
+        {
+          "highlight": "#nursery-first-drop"
+        },
+        {
+          "say": "上面是托盘。这次要送到还留着七盆的那格。"
+        },
+        {
+          "highlight": "#return-proof"
+        },
+        {
+          "say": "送到以后，左边就能看到两组合成的数。"
+        },
+        {
+          "highlight": "#nursery-deliver-action"
+        },
+        {
+          "say": "方向键开车，到了再按方块键领苗或交苗。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "我先领这组。四盆上了车，过路时可以停一停。"
+        },
+        {
+          "say": "现在轮到你。先听这一步的口令，再动手。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ]
+    },
+    {
+      "key": "make-an-addition",
+      "title": "两组都放回同一个框",
+      "type": "slide",
+      "template": "two-columns",
+      "data": {
+        "title": "两组都放回同一个框",
+        "left": {
+          "heading": "一盆画一个记号",
+          "body": "送走的7盆和留下的6盆"
+        },
+        "left_picture": "combine-7-6",
+        "right": {
+          "heading": "算出原来的总数",
+          "body": "7＋6＝13（盆）"
+        },
+        "right_picture": "equation-7-6"
+      },
+      "script": [
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "回到苗棚那道题。七盆和六盆放进同一个大框。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "橙色是那批送走的七盆。绿色是那批剩下的六盆。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "框住两部分，画的就是一开始都在的样子。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "虽然故事里有送走的动作，现在却在找出发前。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "要把两组合起来，所以用加法。七加六。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "从六里拿三个和七凑成十。另一边还剩三个。"
+        },
+        {
+          "say": "十再加三是十三。两边的盆苗都算上了。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "我们答，原来有十三盆。单位是盆。"
+        },
+        {
+          "say": "送走的放回来了，两组都在，原来的托盘就找回来了。"
+        }
+      ]
+    },
+    {
+      "key": "different-questions",
+      "title": "同样送走，问题变了",
+      "type": "slide",
+      "template": "two-columns",
+      "data": {
+        "title": "同样送走，问题变了",
+        "left": {
+          "heading": "问送走前",
+          "body": "送走3盆，剩9盆，原来？"
+        },
+        "left_picture": "ask-past",
+        "right": {
+          "heading": "问送走后",
+          "body": "原有12盆，送走3盆，还剩？"
+        },
+        "right_picture": "ask-left"
+      },
+      "script": [
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "两张单子都写着送走。它们一定要用同一个办法吗？"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "先听左边问什么。送走三盆，余下九盆，问原来。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "出发前两组都在，把三和九合起来，是十二盆。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "两部分合起来，找送走前的那块牌。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "右边已经知道原有十二盆。问的是送走以后的数。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "在十二盆里圈出送走的三盆。数留下的部分。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "这回只找一部分。从整体去掉三盆，就剩九盆。"
+        },
+        {
+          "say": "先看看问题问哪个时候，再数两组。"
+        },
+        {
+          "say": "求原来，合并两组。求剩下，从原有的去掉送走的。"
+        },
+        {
+          "say": "让两张牌落在同一排、挨在一起。"
+        }
+      ]
+    },
+    {
+      "key": "restore-pair",
+      "title": "拼出原来的托盘",
+      "type": "interactive",
+      "page": "restore-pair",
+      "widgetType": "learning-arcade",
+      "startImage": "bench-backdrop",
+      "gameAudio": {
+        "tile-goal": "different-questions-8",
+        "tile-goal-last": "different-questions-16",
+        "tile-hint": "different-questions-15",
+        "tile-help": "different-questions-17",
+        "tile-praise": "wrap-up-8"
+      },
+      "script": [
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#tile-proof"
+        },
+        {
+          "say": "左边大图是两组。送走三盆，剩下八盆。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "上面的牌也记这两组。要找送走之前有几盆。"
+        },
+        {
+          "highlight": "#nursery-first-past"
+        },
+        {
+          "say": "三和八合起来是十一。向左的箭头表示往前看。"
+        },
+        {
+          "say": "找对十一牌，让手里的牌落在它旁边。"
+        },
+        {
+          "highlight": "#nursery-tile-action"
+        },
+        {
+          "say": "用箭头左右移，用向下的大键让它落下。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "两张牌挨在一起，左边留下找对的原数。"
+        },
+        {
+          "say": "轮到你了。先看问题的时点，再想两部分。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ]
+    },
+    {
+      "key": "replay-and-check",
+      "title": "按原来的动作演一遍",
+      "type": "slide",
+      "template": "two-columns",
+      "data": {
+        "title": "按原来的动作演一遍",
+        "left": {
+          "heading": "先摆出算出的数",
+          "body": "先摆13盆"
+        },
+        "left_picture": "check-full",
+        "right": {
+          "heading": "再演一次送走",
+          "body": "划去7盆，核对余下"
+        },
+        "right_picture": "check-cross"
+      },
+      "script": [
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "我们说原来是十三盆。怎样知道自己算对了？"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "先按算出的数摆一整盘，不用急着说对。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "数一数，盘里有十三盆。现在重做刚才的动作。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "题目说送走七盆。先圈住七盆，再把它们移出去。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "图里划掉的，就是移走的那七盆。它们只数一次。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "没划掉的还有几盆？一、二、三、四、五、六。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "余下六盆，跟题目说的相同。这样就核对过了。"
+        }
+      ]
+    },
+    {
+      "key": "make-up-a-story",
+      "title": "给阳台送一车苗",
+      "type": "slide",
+      "template": "picture-points",
+      "data": {
+        "title": "给阳台送一车苗",
+        "picture": "invent-story",
+        "points": [
+          "先说送走多少",
+          "再说苗棚留下多少",
+          "问出发前有多少"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "另一班也要布置阳台。你能用两组图编一道题吗？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "橙色是已经送去阳台的。绿色是留在苗棚的。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "我先说一半。车送走了六盆，摆到了阳台边。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "苗棚还留六盆。你能把两条信息都说完整吗？"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "最后问，送之前原来有多少盆？六加六是十二。"
+        },
+        {
+          "say": "借走两本书，还剩五本。原来都在，合起来七本。"
+        },
+        {
+          "say": "用掉三张纸，还剩五张。求原来，三加五是八张。"
+        },
+        {
+          "say": "先领回已经送走的六盆。"
+        },
+        {
+          "say": "送到还剩八盆的托盘那里。"
+        },
+        {
+          "say": "先领回已经送走的八盆。"
+        },
+        {
+          "say": "送到还剩五盆的托盘那里。"
+        }
+      ]
+    },
+    {
+      "key": "picture-check",
+      "title": "听题看图小检查",
+      "type": "quiz",
+      "intro": [
+        "换一些东西，再试试刚才的办法。",
+        "听清问哪个时候，再挑一幅图。"
+      ],
+      "questions": [
+        {
+          "id": "before-the-stickers-leave",
+          "question": "拿走几张贴纸。问原来有多少，要看哪一格？",
+          "skill": "before-and-after",
+          "answer": [
+            "B"
+          ],
+          "analysis": "原来指拿出动作发生之前。",
+          "options": {
+            "A": {
+              "label": "托盘里剩六张，另外四张正在移走",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-a",
+                "alt": "托盘里剩六张，另外四张正在移走"
+              }
+            },
+            "B": {
+              "label": "十张全在托盘里，动作还没发生",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-b",
+                "alt": "十张全在托盘里，动作还没发生"
+              }
+            },
+            "C": {
+              "label": "托盘里只剩六张",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-c",
+                "alt": "托盘里只剩六张"
+              }
+            }
+          }
+        },
+        {
+          "id": "original-checker-count",
+          "question": "棋子带走五枚，还剩八枚。原来是哪张图？",
+          "skill": "restore-the-whole",
+          "answer": [
+            "C"
+          ],
+          "analysis": "原来包括带走的和余下的两部分，5加8等于13。",
+          "options": {
+            "A": {
+              "label": "盒里摆八枚棋子",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-a",
+                "alt": "盒里摆八枚棋子"
+              }
+            },
+            "B": {
+              "label": "盒里摆十二枚棋子",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-b",
+                "alt": "盒里摆十二枚棋子"
+              }
+            },
+            "C": {
+              "label": "盒里摆十三枚棋子",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-c",
+                "alt": "盒里摆十三枚棋子"
+              }
+            }
+          }
+        },
+        {
+          "id": "draw-both-card-parts",
+          "question": "用掉六张小卡，剩七张。哪张图画全了两组？",
+          "skill": "restore-the-whole",
+          "answer": [
+            "A"
+          ],
+          "analysis": "两部分合起来才是原来。",
+          "options": {
+            "A": {
+              "label": "左六张右七张",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-a",
+                "alt": "左六张右七张"
+              }
+            },
+            "B": {
+              "label": "左六张右六张",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-b",
+                "alt": "左六张右六张"
+              }
+            },
+            "C": {
+              "label": "左七张右七张",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-c",
+                "alt": "左七张右七张"
+              }
+            }
+          }
+        },
+        {
+          "id": "restore-crayon-box",
+          "question": "取走五支蜡笔，盒里还有九支。原来是哪幅图？",
+          "skill": "operation-from-question",
+          "answer": [
+            "B"
+          ],
+          "analysis": "拿走是发生过的动作，要求原来应当合并。",
+          "options": {
+            "A": {
+              "label": "完整图里九支蜡笔",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-a",
+                "alt": "完整图里九支蜡笔"
+              }
+            },
+            "B": {
+              "label": "完整图里十四支蜡笔",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-b",
+                "alt": "完整图里十四支蜡笔"
+              }
+            },
+            "C": {
+              "label": "完整图里五支蜡笔",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-c",
+                "alt": "完整图里五支蜡笔"
+              }
+            }
+          }
+        },
+        {
+          "id": "recheck-the-pegs",
+          "question": "算出原有十四个木夹。拿走八个，哪幅图能核对？",
+          "skill": "replay-and-check",
+          "answer": [
+            "A"
+          ],
+          "analysis": "重做取走动作并核对余下，能检查原数。",
+          "options": {
+            "A": {
+              "label": "十四个夹子，划去八个",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-a",
+                "alt": "十四个夹子，划去八个"
+              }
+            },
+            "B": {
+              "label": "十四个夹子，划去六个",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-b",
+                "alt": "十四个夹子，划去六个"
+              }
+            },
+            "C": {
+              "label": "十四个夹子，划去九个",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-c",
+                "alt": "十四个夹子，划去九个"
+              }
+            }
+          }
+        },
+        {
+          "id": "fabric-after-taking",
+          "question": "十片布取走四片。问剩下多少，选哪张图？",
+          "skill": "operation-from-question",
+          "answer": [
+            "C"
+          ],
+          "analysis": "问的是动作以后剩下的。从原有的十片里拿走四片。",
+          "options": {
+            "A": {
+              "label": "把两组摆回去，共十四片",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-a",
+                "alt": "把两组摆回去，共十四片"
+              }
+            },
+            "B": {
+              "label": "十片布划去六片，留下四片",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-b",
+                "alt": "十片布划去六片，留下四片"
+              }
+            },
+            "C": {
+              "label": "十片布划去四片，留下六片",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-c",
+                "alt": "十片布划去四片，留下六片"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "wrap-up",
+      "title": "把原来的数找回来",
+      "type": "slide",
+      "template": "summary",
+      "data": {
+        "title": "把原来的数找回来",
+        "items": [
+          "听清问的是哪一刻",
+          "画送走的和剩下的",
+          "求原来，就合成整体",
+          "重做动作，核对余下"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "又一张送苗单来了。你准备先看什么，再做什么？"
+        },
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "先听问的是送走以前，还是送走以后。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "要问原来，画出已经送走的和还留着的。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "合起来才是原来的总数，两部分都算到了。"
+        },
+        {
+          "say": "如果知道了整体，问题只问余下，就把送走的去掉。"
+        },
+        {
+          "spotlight": "item-4"
+        },
+        {
+          "say": "最后从算出的数重新演一遍，核对两组。"
+        },
+        {
+          "say": "回家用小卡片摆给家人看，再编一道求原来的题。"
+        }
+      ]
+    }
+  ]
+}

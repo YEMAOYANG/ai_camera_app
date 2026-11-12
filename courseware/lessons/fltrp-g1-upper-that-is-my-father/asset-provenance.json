@@ -1,0 +1,1262 @@
+{
+  "schemaVersion": "mira.courseware.asset-provenance.v1",
+  "atlasReceipts": {
+    "family-portrait-atlas": {
+      "path": "art-source/family-portrait-atlas.receipt.json",
+      "sha256": "e3d5b7891adfb2de72553297993a77b242198ed671e55084308f4bd55be5b24b"
+    },
+    "new-presenter-portraits": {
+      "path": "art-source/new-presenter-portraits.receipt.json",
+      "sha256": "f259240e4a99aa83a4348c90e48802ee136c21e0d622d3f2d4fb0918238aa8d1"
+    },
+    "welcome-and-replies": {
+      "path": "art-source/welcome-and-replies.receipt.json",
+      "sha256": "701734b8176e247b3b2d0e97384cfcc5325cef45b878e60d59b9e973a3818596"
+    }
+  },
+  "assets": {
+    "delivery-opening": {
+      "path": "assets/delivery-opening.png",
+      "sha256": "a02f078102cf1eb094c4636ba76cbcf6add88ab00a6e71995ca7a4d323c7f7e7",
+      "bytes": 61789,
+      "source": "deterministic positions and lines over registered ImageGen portraits",
+      "renderSource": "art-source/family-diagrams.mjs",
+      "renderSourceSha256": "1a557269720a5b9a67ff47c974e5470602a53beb67f6882b0b0baf2b00acedd9",
+      "inputs": {
+        "near-a": "aa339e680a8af8a19e78e3ce376bfe5365bf53bf1dc09b8778e2c547bf287d38",
+        "far-a": "e21d899a87e307affb588acda1a61c99cfcc220a29f3a953fcf723f4eadd4874",
+        "lantern-van": "fb2b4f21103aca7c7ca2ebcbb1014b9bfb65f10de6fda76bbc008381fed8448e",
+        "father-a": "72c86cc3513721c4975f10d25ea001ce20c660a90a994a2db8e4ed7aae86f547"
+      },
+      "visualReview": "source frame reviewed",
+      "usedBy": [
+        "deliver-introductions"
+      ],
+      "derivativeConsumers": []
+    },
+    "family-cards-opening": {
+      "path": "assets/family-cards-opening.png",
+      "sha256": "d952810f89de6a2bc3e534f71c95255571e3df636809b0d289fb0fc8a239289b",
+      "bytes": 57766,
+      "source": "deterministic positions and lines over registered ImageGen portraits",
+      "renderSource": "art-source/family-diagrams.mjs",
+      "renderSourceSha256": "1a557269720a5b9a67ff47c974e5470602a53beb67f6882b0b0baf2b00acedd9",
+      "inputs": {
+        "host-a": "c08cb410ed4e7588aef7b8c0f99cbbe901a52a67c7c9defa4fd5fd102e49b7b2",
+        "tile-mother-a": "2d9e75c54d874c4ed39191be3a385943d2d881c670d8a38ad67141e2f7e776a1",
+        "tile-father-a": "62911fc1724a035a8a719bba08d3e1faeb54dcdce55b172ba61d33b96f608b89"
+      },
+      "visualReview": "source frame reviewed",
+      "usedBy": [
+        "family-cards"
+      ],
+      "derivativeConsumers": []
+    },
+    "family-tree-a": {
+      "path": "assets/family-tree-a.png",
+      "sha256": "0ae707906259d4576022295b76254468b840e284a8437d2ec77577c6264691e4",
+      "bytes": 174552,
+      "source": "deterministic positions and lines over registered ImageGen portraits",
+      "renderSource": "art-source/family-diagrams.mjs",
+      "renderSourceSha256": "1a557269720a5b9a67ff47c974e5470602a53beb67f6882b0b0baf2b00acedd9",
+      "inputs": {
+        "grandpa-a": "f1fcad87259250047d8e837a448cb4ab11ee47f6f8f583a733d86308e47318a7",
+        "grandma-a": "36afc0c349a1c55dce7ae6f13d13541af92cb52d242ba6856cac51e9015fc631",
+        "father-a": "72c86cc3513721c4975f10d25ea001ce20c660a90a994a2db8e4ed7aae86f547",
+        "mother-a": "02aa4e2d530aba61729b5fb83a9c64879146cca946fa96e88b51974e4eeae47e",
+        "host-a": "c08cb410ed4e7588aef7b8c0f99cbbe901a52a67c7c9defa4fd5fd102e49b7b2",
+        "friend-a": "63bec68ecbaa015a2af6450ac24b82896b3c0e11be0cce44fc7443bbffef0628"
+      },
+      "visualReview": "source frame reviewed",
+      "usedBy": [
+        "grandparents-friend"
+      ],
+      "derivativeConsumers": []
+    },
+    "far-a": {
+      "path": "assets/far-a.png",
+      "sha256": "e21d899a87e307affb588acda1a61c99cfcc220a29f3a953fcf723f4eadd4874",
+      "bytes": 37181,
+      "source": "deterministic positions and lines over registered ImageGen portraits",
+      "renderSource": "art-source/family-diagrams.mjs",
+      "renderSourceSha256": "1a557269720a5b9a67ff47c974e5470602a53beb67f6882b0b0baf2b00acedd9",
+      "inputs": {
+        "host-a": "c08cb410ed4e7588aef7b8c0f99cbbe901a52a67c7c9defa4fd5fd102e49b7b2"
+      },
+      "visualReview": "source frame reviewed",
+      "usedBy": [
+        "deliver-introductions"
+      ],
+      "derivativeConsumers": [
+        "delivery-opening"
+      ]
+    },
+    "far-b": {
+      "path": "assets/far-b.png",
+      "sha256": "08e9b47066e1944b82b0edb34f6d663441435a5c5a638a1b0f28b19e7e36e8a4",
+      "bytes": 35408,
+      "source": "deterministic positions and lines over registered ImageGen portraits",
+      "renderSource": "art-source/family-diagrams.mjs",
+      "renderSourceSha256": "1a557269720a5b9a67ff47c974e5470602a53beb67f6882b0b0baf2b00acedd9",
+      "inputs": {
+        "host-b": "639f78d8d7149ef9a0b43178ba1eab1dcb74362757b5c7e6d12706940b90b5b5"
+      },
+      "visualReview": "source frame reviewed",
+      "usedBy": [
+        "deliver-introductions"
+      ],
+      "derivativeConsumers": []
+    },
+    "far-father-a": {
+      "path": "assets/far-father-a.png",
+      "sha256": "a0a6120925b48fc80fc805aae7d79be89f969c2fa56aec9ce0eeaae936790654",
+      "bytes": 87534,
+      "source": "deterministic positions and lines over registered ImageGen portraits",
+      "renderSource": "art-source/family-diagrams.mjs",
+      "renderSourceSha256": "1a557269720a5b9a67ff47c974e5470602a53beb67f6882b0b0baf2b00acedd9",
+      "inputs": {
+        "host-a": "c08cb410ed4e7588aef7b8c0f99cbbe901a52a67c7c9defa4fd5fd102e49b7b2",
+        "father-a": "72c86cc3513721c4975f10d25ea001ce20c660a90a994a2db8e4ed7aae86f547"
+      },
+      "visualReview": "source frame reviewed",
+      "usedBy": [
+        "this-that"
+      ],
+      "derivativeConsumers": []
+    },
+    "far-mother": {
+      "path": "assets/far-mother.png",
+      "sha256": "347c975fcb9450b0ff0db4ed1181e6933e8b74db2d2279345ff45b695f3935e0",
+      "bytes": 36967,
+      "source": "deterministic positions and lines over registered ImageGen portraits",
+      "renderSource": "art-source/family-diagrams.mjs",
+      "renderSourceSha256": "1a557269720a5b9a67ff47c974e5470602a53beb67f6882b0b0baf2b00acedd9",
+      "inputs": {
+        "mother-a": "02aa4e2d530aba61729b5fb83a9c64879146cca946fa96e88b51974e4eeae47e"
+      },
+      "visualReview": "source frame reviewed",
+      "usedBy": [
+        "deliver-introductions"
+      ],
+      "derivativeConsumers": []
+    },
+    "father-a": {
+      "path": "assets/father-a.png",
+      "sha256": "72c86cc3513721c4975f10d25ea001ce20c660a90a994a2db8e4ed7aae86f547",
+      "width": 399,
+      "height": 395,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/family-portrait-atlas.png",
+      "generatedSourceSha256": "476b09681d7a1e11b6884f9fb9a8fa77ecd4395e347f101d11b7af9c3941e125",
+      "promptSha256": "b4d1564c3d6a6b72c9aae5a1c3a2eb9bc8e22999b76e7897a1e137adad0e1f84",
+      "sourceCrop": [
+        431,
+        11,
+        830,
+        406
+      ],
+      "bytes": 267572,
+      "receipt": "art-source/family-portrait-atlas.receipt.json",
+      "visualReview": "source frame reviewed",
+      "usedBy": [
+        "deliver-introductions"
+      ],
+      "derivativeConsumers": [
+        "delivery-opening",
+        "family-tree-a",
+        "far-father-a",
+        "near-father-a",
+        "tile-father-a"
+      ]
+    },
+    "father-b": {
+      "path": "assets/father-b.png",
+      "sha256": "b4020773ab08db16ff0668d68f7c337079ba9c3b55b758186675be218cf1f4f2",
+      "width": 399,
+      "height": 398,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/family-portrait-atlas.png",
+      "generatedSourceSha256": "476b09681d7a1e11b6884f9fb9a8fa77ecd4395e347f101d11b7af9c3941e125",
+      "promptSha256": "b4d1564c3d6a6b72c9aae5a1c3a2eb9bc8e22999b76e7897a1e137adad0e1f84",
+      "sourceCrop": [
+        431,
+        833,
+        830,
+        1231
+      ],
+      "bytes": 275354,
+      "receipt": "art-source/family-portrait-atlas.receipt.json",
+      "visualReview": "source frame reviewed",
+      "usedBy": [
+        "deliver-introductions"
+      ],
+      "derivativeConsumers": [
+        "tile-father-b"
+      ]
+    },
+    "friend-a": {
+      "path": "assets/friend-a.png",
+      "sha256": "63bec68ecbaa015a2af6450ac24b82896b3c0e11be0cce44fc7443bbffef0628",
+      "width": 402,
+      "height": 391,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/family-portrait-atlas.png",
+      "generatedSourceSha256": "476b09681d7a1e11b6884f9fb9a8fa77ecd4395e347f101d11b7af9c3941e125",
+      "promptSha256": "b4d1564c3d6a6b72c9aae5a1c3a2eb9bc8e22999b76e7897a1e137adad0e1f84",
+      "sourceCrop": [
+        847,
+        423,
+        1249,
+        814
+      ],
+      "bytes": 267310,
+      "receipt": "art-source/family-portrait-atlas.receipt.json",
+      "visualReview": "source frame reviewed",
+      "usedBy": [
+        "deliver-introductions",
+        "family-cards"
+      ],
+      "derivativeConsumers": [
+        "family-tree-a",
+        "near-friend-a",
+        "tile-friend-a"
+      ]
+    },
+    "grandma-a": {
+      "path": "assets/grandma-a.png",
+      "sha256": "36afc0c349a1c55dce7ae6f13d13541af92cb52d242ba6856cac51e9015fc631",
+      "width": 399,
+      "height": 391,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/family-portrait-atlas.png",
+      "generatedSourceSha256": "476b09681d7a1e11b6884f9fb9a8fa77ecd4395e347f101d11b7af9c3941e125",
+      "promptSha256": "b4d1564c3d6a6b72c9aae5a1c3a2eb9bc8e22999b76e7897a1e137adad0e1f84",
+      "sourceCrop": [
+        431,
+        423,
+        830,
+        814
+      ],
+      "bytes": 265929,
+      "receipt": "art-source/family-portrait-atlas.receipt.json",
+      "visualReview": "source frame reviewed",
+      "usedBy": [
+        "deliver-introductions"
+      ],
+      "derivativeConsumers": [
+        "family-tree-a",
+        "tile-grandma-a"
+      ]
+    },
+    "grandpa-a": {
+      "path": "assets/grandpa-a.png",
+      "sha256": "f1fcad87259250047d8e837a448cb4ab11ee47f6f8f583a733d86308e47318a7",
+      "width": 400,
+      "height": 391,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/family-portrait-atlas.png",
+      "generatedSourceSha256": "476b09681d7a1e11b6884f9fb9a8fa77ecd4395e347f101d11b7af9c3941e125",
+      "promptSha256": "b4d1564c3d6a6b72c9aae5a1c3a2eb9bc8e22999b76e7897a1e137adad0e1f84",
+      "sourceCrop": [
+        15,
+        423,
+        415,
+        814
+      ],
+      "bytes": 262886,
+      "receipt": "art-source/family-portrait-atlas.receipt.json",
+      "visualReview": "source frame reviewed",
+      "usedBy": [
+        "deliver-introductions"
+      ],
+      "derivativeConsumers": [
+        "family-tree-a",
+        "relation-father-mother",
+        "relation-grandpa-a",
+        "tile-father-mother",
+        "tile-grandpa-a"
+      ]
+    },
+    "greet-daddy": {
+      "path": "assets/greet-daddy.png",
+      "sha256": "532803e2e2b902d2474261f2230d91c5833f5b62103bd97f44faaf9e79745189",
+      "width": 490,
+      "height": 487,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/welcome-and-replies.png",
+      "generatedSourceSha256": "4fe395592eda3c6bb7e86b911dee9dc60e446df8e707cf1ece9786dd0560b2ce",
+      "promptSha256": "69477b52197d6cc9b8247d9731c9793a7a9d4083a69a856f353c8a637948e269",
+      "sourceCrop": [
+        524,
+        14,
+        1014,
+        501
+      ],
+      "bytes": 415921,
+      "receipt": "art-source/welcome-and-replies.receipt.json",
+      "visualReview": "source frame reviewed",
+      "usedBy": [
+        "parents"
+      ],
+      "derivativeConsumers": []
+    },
+    "host-a": {
+      "path": "assets/host-a.png",
+      "sha256": "c08cb410ed4e7588aef7b8c0f99cbbe901a52a67c7c9defa4fd5fd102e49b7b2",
+      "width": 400,
+      "height": 395,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/family-portrait-atlas.png",
+      "generatedSourceSha256": "476b09681d7a1e11b6884f9fb9a8fa77ecd4395e347f101d11b7af9c3941e125",
+      "promptSha256": "b4d1564c3d6a6b72c9aae5a1c3a2eb9bc8e22999b76e7897a1e137adad0e1f84",
+      "sourceCrop": [
+        15,
+        11,
+        415,
+        406
+      ],
+      "bytes": 269266,
+      "receipt": "art-source/family-portrait-atlas.receipt.json",
+      "visualReview": "source frame reviewed",
+      "usedBy": [
+        "family-cards"
+      ],
+      "derivativeConsumers": [
+        "family-cards-opening",
+        "family-tree-a",
+        "far-a",
+        "far-father-a",
+        "near-a",
+        "near-father-a",
+        "near-friend-a",
+        "relation-grandpa-a",
+        "tile-father-a",
+        "tile-friend-a",
+        "tile-grandma-a",
+        "tile-grandpa-a",
+        "tile-mother-a"
+      ]
+    },
+    "host-b": {
+      "path": "assets/host-b.png",
+      "sha256": "639f78d8d7149ef9a0b43178ba1eab1dcb74362757b5c7e6d12706940b90b5b5",
+      "width": 400,
+      "height": 398,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/family-portrait-atlas.png",
+      "generatedSourceSha256": "476b09681d7a1e11b6884f9fb9a8fa77ecd4395e347f101d11b7af9c3941e125",
+      "promptSha256": "b4d1564c3d6a6b72c9aae5a1c3a2eb9bc8e22999b76e7897a1e137adad0e1f84",
+      "sourceCrop": [
+        15,
+        833,
+        415,
+        1231
+      ],
+      "bytes": 266002,
+      "receipt": "art-source/family-portrait-atlas.receipt.json",
+      "visualReview": "source frame reviewed",
+      "usedBy": [
+        "family-cards"
+      ],
+      "derivativeConsumers": [
+        "far-b",
+        "near-b",
+        "tile-father-b"
+      ]
+    },
+    "introduce-father": {
+      "path": "assets/introduce-father.png",
+      "sha256": "67f617dd6e6e70b7581dc24b0a0e97bd25df83c72b0a12910d6f4bd3f97adde6",
+      "width": 491,
+      "height": 487,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/welcome-and-replies.png",
+      "generatedSourceSha256": "4fe395592eda3c6bb7e86b911dee9dc60e446df8e707cf1ece9786dd0560b2ce",
+      "promptSha256": "69477b52197d6cc9b8247d9731c9793a7a9d4083a69a856f353c8a637948e269",
+      "sourceCrop": [
+        1032,
+        14,
+        1523,
+        501
+      ],
+      "bytes": 405744,
+      "receipt": "art-source/welcome-and-replies.receipt.json",
+      "visualReview": "source frame reviewed",
+      "usedBy": [
+        "parents"
+      ],
+      "derivativeConsumers": []
+    },
+    "lantern-hall": {
+      "path": "assets/lantern-hall.png",
+      "sha256": "91d76ed41c3e4c7688854b89f6d67bbc37daf47a763d0be74b4173c8f1fef0f2",
+      "width": 413,
+      "height": 414,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/new-presenter-portraits.png",
+      "generatedSourceSha256": "13e94d7d99e269131b431970da5a1613934433268846aa7864709aecc2ea3933",
+      "promptSha256": "727dfd3045830884c631d77171e0cb2d4102e38f9302aaca726d46f665952a38",
+      "sourceCrop": [
+        839,
+        838,
+        1252,
+        1252
+      ],
+      "bytes": 295013,
+      "receipt": "art-source/new-presenter-portraits.receipt.json",
+      "visualReview": "source frame reviewed",
+      "usedBy": [
+        "deliver-introductions",
+        "family-cards"
+      ],
+      "derivativeConsumers": []
+    },
+    "lantern-van": {
+      "path": "assets/lantern-van.png",
+      "sha256": "fb2b4f21103aca7c7ca2ebcbb1014b9bfb65f10de6fda76bbc008381fed8448e",
+      "width": 402,
+      "height": 398,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/family-portrait-atlas.png",
+      "generatedSourceSha256": "476b09681d7a1e11b6884f9fb9a8fa77ecd4395e347f101d11b7af9c3941e125",
+      "promptSha256": "b4d1564c3d6a6b72c9aae5a1c3a2eb9bc8e22999b76e7897a1e137adad0e1f84",
+      "sourceCrop": [
+        847,
+        833,
+        1249,
+        1231
+      ],
+      "bytes": 249700,
+      "receipt": "art-source/family-portrait-atlas.receipt.json",
+      "visualReview": "source frame reviewed",
+      "usedBy": [
+        "deliver-introductions"
+      ],
+      "derivativeConsumers": [
+        "delivery-opening"
+      ]
+    },
+    "look-at-paper": {
+      "path": "assets/look-at-paper.png",
+      "sha256": "2696f0c02bca356d838ee4bd9251136a774abc5ac2cfc1c629a2726ca3aee111",
+      "width": 491,
+      "height": 488,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/welcome-and-replies.png",
+      "generatedSourceSha256": "4fe395592eda3c6bb7e86b911dee9dc60e446df8e707cf1ece9786dd0560b2ce",
+      "promptSha256": "69477b52197d6cc9b8247d9731c9793a7a9d4083a69a856f353c8a637948e269",
+      "sourceCrop": [
+        1032,
+        520,
+        1523,
+        1008
+      ],
+      "bytes": 409633,
+      "receipt": "art-source/welcome-and-replies.receipt.json",
+      "visualReview": "source frame reviewed",
+      "usedBy": [
+        "picture-check:reply-to-friend"
+      ],
+      "derivativeConsumers": []
+    },
+    "mother-a": {
+      "path": "assets/mother-a.png",
+      "sha256": "02aa4e2d530aba61729b5fb83a9c64879146cca946fa96e88b51974e4eeae47e",
+      "width": 402,
+      "height": 395,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/family-portrait-atlas.png",
+      "generatedSourceSha256": "476b09681d7a1e11b6884f9fb9a8fa77ecd4395e347f101d11b7af9c3941e125",
+      "promptSha256": "b4d1564c3d6a6b72c9aae5a1c3a2eb9bc8e22999b76e7897a1e137adad0e1f84",
+      "sourceCrop": [
+        847,
+        11,
+        1249,
+        406
+      ],
+      "bytes": 270653,
+      "receipt": "art-source/family-portrait-atlas.receipt.json",
+      "visualReview": "source frame reviewed",
+      "usedBy": [
+        "deliver-introductions",
+        "family-cards"
+      ],
+      "derivativeConsumers": [
+        "family-tree-a",
+        "far-mother",
+        "near-mother",
+        "relation-father-mother",
+        "relation-grandpa-a",
+        "tile-father-mother",
+        "tile-grandma-a",
+        "tile-grandpa-a",
+        "tile-mother-a"
+      ]
+    },
+    "near-a": {
+      "path": "assets/near-a.png",
+      "sha256": "aa339e680a8af8a19e78e3ce376bfe5365bf53bf1dc09b8778e2c547bf287d38",
+      "bytes": 37055,
+      "source": "deterministic positions and lines over registered ImageGen portraits",
+      "renderSource": "art-source/family-diagrams.mjs",
+      "renderSourceSha256": "1a557269720a5b9a67ff47c974e5470602a53beb67f6882b0b0baf2b00acedd9",
+      "inputs": {
+        "host-a": "c08cb410ed4e7588aef7b8c0f99cbbe901a52a67c7c9defa4fd5fd102e49b7b2"
+      },
+      "visualReview": "source frame reviewed",
+      "usedBy": [
+        "deliver-introductions"
+      ],
+      "derivativeConsumers": [
+        "delivery-opening"
+      ]
+    },
+    "near-b": {
+      "path": "assets/near-b.png",
+      "sha256": "86ba08ae46ef2c9e8ec80286a003cbb6002cb00659e3043e59d78087b42e7620",
+      "bytes": 35286,
+      "source": "deterministic positions and lines over registered ImageGen portraits",
+      "renderSource": "art-source/family-diagrams.mjs",
+      "renderSourceSha256": "1a557269720a5b9a67ff47c974e5470602a53beb67f6882b0b0baf2b00acedd9",
+      "inputs": {
+        "host-b": "639f78d8d7149ef9a0b43178ba1eab1dcb74362757b5c7e6d12706940b90b5b5"
+      },
+      "visualReview": "source frame reviewed",
+      "usedBy": [
+        "deliver-introductions"
+      ],
+      "derivativeConsumers": []
+    },
+    "near-father-a": {
+      "path": "assets/near-father-a.png",
+      "sha256": "626cc45306c461703db9914cf05960931f6e856e1928144dcdab7220dddf07d6",
+      "bytes": 87650,
+      "source": "deterministic positions and lines over registered ImageGen portraits",
+      "renderSource": "art-source/family-diagrams.mjs",
+      "renderSourceSha256": "1a557269720a5b9a67ff47c974e5470602a53beb67f6882b0b0baf2b00acedd9",
+      "inputs": {
+        "host-a": "c08cb410ed4e7588aef7b8c0f99cbbe901a52a67c7c9defa4fd5fd102e49b7b2",
+        "father-a": "72c86cc3513721c4975f10d25ea001ce20c660a90a994a2db8e4ed7aae86f547"
+      },
+      "visualReview": "source frame reviewed",
+      "usedBy": [
+        "this-that"
+      ],
+      "derivativeConsumers": []
+    },
+    "near-friend-a": {
+      "path": "assets/near-friend-a.png",
+      "sha256": "ad38be0f5e4b355304da07f85d2ac794abc858dc0650b7962fd1601c7e1ca040",
+      "bytes": 88764,
+      "source": "deterministic positions and lines over registered ImageGen portraits",
+      "renderSource": "art-source/family-diagrams.mjs",
+      "renderSourceSha256": "1a557269720a5b9a67ff47c974e5470602a53beb67f6882b0b0baf2b00acedd9",
+      "inputs": {
+        "host-a": "c08cb410ed4e7588aef7b8c0f99cbbe901a52a67c7c9defa4fd5fd102e49b7b2",
+        "friend-a": "63bec68ecbaa015a2af6450ac24b82896b3c0e11be0cce44fc7443bbffef0628"
+      },
+      "visualReview": "source frame reviewed",
+      "usedBy": [
+        "recap"
+      ],
+      "derivativeConsumers": []
+    },
+    "near-mother": {
+      "path": "assets/near-mother.png",
+      "sha256": "154077df9c103db894c5485d446f597651ffd325d2f02ad423202b47ec138215",
+      "bytes": 36841,
+      "source": "deterministic positions and lines over registered ImageGen portraits",
+      "renderSource": "art-source/family-diagrams.mjs",
+      "renderSourceSha256": "1a557269720a5b9a67ff47c974e5470602a53beb67f6882b0b0baf2b00acedd9",
+      "inputs": {
+        "mother-a": "02aa4e2d530aba61729b5fb83a9c64879146cca946fa96e88b51974e4eeae47e"
+      },
+      "visualReview": "source frame reviewed",
+      "usedBy": [
+        "deliver-introductions"
+      ],
+      "derivativeConsumers": []
+    },
+    "quiz-a-father-far": {
+      "path": "assets/quiz-a-father-far.png",
+      "sha256": "d51f632cfac0a44108ae156b385ce355d55f8e2d5c465573d820d608463ffbd5",
+      "bytes": 92510,
+      "source": "deterministic positions and lines over registered ImageGen portraits",
+      "renderSource": "art-source/family-diagrams.mjs",
+      "renderSourceSha256": "1a557269720a5b9a67ff47c974e5470602a53beb67f6882b0b0baf2b00acedd9",
+      "inputs": {
+        "quiz-host-a": "af6cbacc3a305041c57f45c6814a45fd29d96d058d086d753deb271a88695772",
+        "quiz-father": "89b54cbe79afa93e3453f16155dd0c1bb019f48f9b36ae407e0f9ad702933b7d"
+      },
+      "visualReview": "source frame reviewed",
+      "usedBy": [
+        "picture-check:follow-my"
+      ],
+      "derivativeConsumers": []
+    },
+    "quiz-b-father-far": {
+      "path": "assets/quiz-b-father-far.png",
+      "sha256": "036528a73f11b1c4a782053baf469518d87d36433822aef06314311941be1cf1",
+      "bytes": 95058,
+      "source": "deterministic positions and lines over registered ImageGen portraits",
+      "renderSource": "art-source/family-diagrams.mjs",
+      "renderSourceSha256": "1a557269720a5b9a67ff47c974e5470602a53beb67f6882b0b0baf2b00acedd9",
+      "inputs": {
+        "quiz-host-b": "45a87758b4f954452529f608ba52cddc617cb7554031cb285053c19911d1b219",
+        "quiz-father-b": "ffe63a34f9ab8bb636b6ce0885ca5f9e0f50ecb6870ca15b98f4f2f31b115f92"
+      },
+      "visualReview": "source frame reviewed",
+      "usedBy": [
+        "picture-check:follow-my"
+      ],
+      "derivativeConsumers": []
+    },
+    "quiz-b-father-wrong": {
+      "path": "assets/quiz-b-father-wrong.png",
+      "sha256": "6c4bb57fcbc36704633294bf6072b451be1882967026f96f1ff4032f1f8394de",
+      "bytes": 91802,
+      "source": "deterministic positions and lines over registered ImageGen portraits",
+      "renderSource": "art-source/family-diagrams.mjs",
+      "renderSourceSha256": "1a557269720a5b9a67ff47c974e5470602a53beb67f6882b0b0baf2b00acedd9",
+      "inputs": {
+        "quiz-host-b": "45a87758b4f954452529f608ba52cddc617cb7554031cb285053c19911d1b219",
+        "quiz-father": "89b54cbe79afa93e3453f16155dd0c1bb019f48f9b36ae407e0f9ad702933b7d"
+      },
+      "visualReview": "source frame reviewed",
+      "usedBy": [
+        "picture-check:follow-my"
+      ],
+      "derivativeConsumers": []
+    },
+    "quiz-father": {
+      "path": "assets/quiz-father.png",
+      "sha256": "89b54cbe79afa93e3453f16155dd0c1bb019f48f9b36ae407e0f9ad702933b7d",
+      "width": 413,
+      "height": 414,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/new-presenter-portraits.png",
+      "generatedSourceSha256": "13e94d7d99e269131b431970da5a1613934433268846aa7864709aecc2ea3933",
+      "promptSha256": "727dfd3045830884c631d77171e0cb2d4102e38f9302aaca726d46f665952a38",
+      "sourceCrop": [
+        839,
+        2,
+        1252,
+        416
+      ],
+      "bytes": 294467,
+      "receipt": "art-source/new-presenter-portraits.receipt.json",
+      "visualReview": "source frame reviewed",
+      "usedBy": [
+        "picture-check:greet-daddy"
+      ],
+      "derivativeConsumers": [
+        "quiz-a-father-far",
+        "quiz-b-father-wrong",
+        "quiz-other-father-relation",
+        "quiz-welcome-chart"
+      ]
+    },
+    "quiz-father-b": {
+      "path": "assets/quiz-father-b.png",
+      "sha256": "ffe63a34f9ab8bb636b6ce0885ca5f9e0f50ecb6870ca15b98f4f2f31b115f92",
+      "width": 413,
+      "height": 414,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/new-presenter-portraits.png",
+      "generatedSourceSha256": "13e94d7d99e269131b431970da5a1613934433268846aa7864709aecc2ea3933",
+      "promptSha256": "727dfd3045830884c631d77171e0cb2d4102e38f9302aaca726d46f665952a38",
+      "sourceCrop": [
+        421,
+        838,
+        834,
+        1252
+      ],
+      "bytes": 297255,
+      "receipt": "art-source/new-presenter-portraits.receipt.json",
+      "visualReview": "source frame reviewed",
+      "usedBy": [
+        "picture-check:greet-daddy"
+      ],
+      "derivativeConsumers": [
+        "quiz-b-father-far",
+        "quiz-welcome-chart"
+      ]
+    },
+    "quiz-friend": {
+      "path": "assets/quiz-friend.png",
+      "sha256": "135469057d8d32a63c5767ffdf78e00eb9ebeb4e4efdc074651677784a251fab",
+      "width": 413,
+      "height": 413,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/new-presenter-portraits.png",
+      "generatedSourceSha256": "13e94d7d99e269131b431970da5a1613934433268846aa7864709aecc2ea3933",
+      "promptSha256": "727dfd3045830884c631d77171e0cb2d4102e38f9302aaca726d46f665952a38",
+      "sourceCrop": [
+        839,
+        421,
+        1252,
+        834
+      ],
+      "bytes": 288295,
+      "receipt": "art-source/new-presenter-portraits.receipt.json",
+      "visualReview": "source frame reviewed",
+      "usedBy": [],
+      "derivativeConsumers": [
+        "quiz-route-correct",
+        "quiz-route-near-first",
+        "quiz-route-reverse",
+        "quiz-welcome-chart"
+      ]
+    },
+    "quiz-grandma": {
+      "path": "assets/quiz-grandma.png",
+      "sha256": "b14179b72cb07559434e5193a4de657f6f6177d31ebfa92ab93b8b0eaf7311ce",
+      "width": 415,
+      "height": 413,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/new-presenter-portraits.png",
+      "generatedSourceSha256": "13e94d7d99e269131b431970da5a1613934433268846aa7864709aecc2ea3933",
+      "promptSha256": "727dfd3045830884c631d77171e0cb2d4102e38f9302aaca726d46f665952a38",
+      "sourceCrop": [
+        2,
+        421,
+        417,
+        834
+      ],
+      "bytes": 310981,
+      "receipt": "art-source/new-presenter-portraits.receipt.json",
+      "visualReview": "source frame reviewed",
+      "usedBy": [],
+      "derivativeConsumers": [
+        "quiz-grandma-far",
+        "quiz-grandma-near",
+        "quiz-grandma-relation",
+        "quiz-welcome-chart"
+      ]
+    },
+    "quiz-grandma-far": {
+      "path": "assets/quiz-grandma-far.png",
+      "sha256": "6433013ce165b7628700025ac19e541092418e0c493e8683e1b5d5960d7d4513",
+      "bytes": 99586,
+      "source": "deterministic positions and lines over registered ImageGen portraits",
+      "renderSource": "art-source/family-diagrams.mjs",
+      "renderSourceSha256": "1a557269720a5b9a67ff47c974e5470602a53beb67f6882b0b0baf2b00acedd9",
+      "inputs": {
+        "quiz-host-a": "af6cbacc3a305041c57f45c6814a45fd29d96d058d086d753deb271a88695772",
+        "quiz-grandma": "b14179b72cb07559434e5193a4de657f6f6177d31ebfa92ab93b8b0eaf7311ce"
+      },
+      "visualReview": "source frame reviewed",
+      "usedBy": [
+        "picture-check:hear-this"
+      ],
+      "derivativeConsumers": []
+    },
+    "quiz-grandma-near": {
+      "path": "assets/quiz-grandma-near.png",
+      "sha256": "ef9f8708964d20622548265f3c220421f07fbe3fafbe56264db8ea09a60c2e75",
+      "bytes": 99713,
+      "source": "deterministic positions and lines over registered ImageGen portraits",
+      "renderSource": "art-source/family-diagrams.mjs",
+      "renderSourceSha256": "1a557269720a5b9a67ff47c974e5470602a53beb67f6882b0b0baf2b00acedd9",
+      "inputs": {
+        "quiz-host-a": "af6cbacc3a305041c57f45c6814a45fd29d96d058d086d753deb271a88695772",
+        "quiz-grandma": "b14179b72cb07559434e5193a4de657f6f6177d31ebfa92ab93b8b0eaf7311ce"
+      },
+      "visualReview": "source frame reviewed",
+      "usedBy": [
+        "picture-check:hear-this"
+      ],
+      "derivativeConsumers": []
+    },
+    "quiz-grandma-relation": {
+      "path": "assets/quiz-grandma-relation.png",
+      "sha256": "36bf3a9963a89b0a79d0ffd2ed7db229489b50015a6d9d0e62bf95a5ea977d61",
+      "bytes": 111695,
+      "source": "deterministic positions and lines over registered ImageGen portraits",
+      "renderSource": "art-source/family-diagrams.mjs",
+      "renderSourceSha256": "1a557269720a5b9a67ff47c974e5470602a53beb67f6882b0b0baf2b00acedd9",
+      "inputs": {
+        "quiz-host-a": "af6cbacc3a305041c57f45c6814a45fd29d96d058d086d753deb271a88695772",
+        "quiz-mother": "0e5963c3f902aba9d1fd0f6dba7ce18eabcdcd49c6864a302af7e13d85564f33",
+        "quiz-grandma": "b14179b72cb07559434e5193a4de657f6f6177d31ebfa92ab93b8b0eaf7311ce"
+      },
+      "visualReview": "source frame reviewed",
+      "usedBy": [
+        "picture-check:hear-mother"
+      ],
+      "derivativeConsumers": []
+    },
+    "quiz-grandpa": {
+      "path": "assets/quiz-grandpa.png",
+      "sha256": "dcd537c92b058b5d89f710c2261bf1832a4c7881e4e0db07b198353cbc0e9f30",
+      "width": 413,
+      "height": 413,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/new-presenter-portraits.png",
+      "generatedSourceSha256": "13e94d7d99e269131b431970da5a1613934433268846aa7864709aecc2ea3933",
+      "promptSha256": "727dfd3045830884c631d77171e0cb2d4102e38f9302aaca726d46f665952a38",
+      "sourceCrop": [
+        421,
+        421,
+        834,
+        834
+      ],
+      "bytes": 299866,
+      "receipt": "art-source/new-presenter-portraits.receipt.json",
+      "visualReview": "source frame reviewed",
+      "usedBy": [
+        "picture-check:greet-daddy"
+      ],
+      "derivativeConsumers": [
+        "quiz-grandpa-near",
+        "quiz-route-correct",
+        "quiz-route-near-first",
+        "quiz-route-reverse",
+        "quiz-welcome-chart"
+      ]
+    },
+    "quiz-grandpa-near": {
+      "path": "assets/quiz-grandpa-near.png",
+      "sha256": "66d3909d3292a3e7d63ca8e4db8f4e19154b97f05b2f2741fccfda4e75565cca",
+      "bytes": 94958,
+      "source": "deterministic positions and lines over registered ImageGen portraits",
+      "renderSource": "art-source/family-diagrams.mjs",
+      "renderSourceSha256": "1a557269720a5b9a67ff47c974e5470602a53beb67f6882b0b0baf2b00acedd9",
+      "inputs": {
+        "quiz-host-a": "af6cbacc3a305041c57f45c6814a45fd29d96d058d086d753deb271a88695772",
+        "quiz-grandpa": "dcd537c92b058b5d89f710c2261bf1832a4c7881e4e0db07b198353cbc0e9f30"
+      },
+      "visualReview": "source frame reviewed",
+      "usedBy": [
+        "picture-check:hear-this"
+      ],
+      "derivativeConsumers": []
+    },
+    "quiz-host-a": {
+      "path": "assets/quiz-host-a.png",
+      "sha256": "af6cbacc3a305041c57f45c6814a45fd29d96d058d086d753deb271a88695772",
+      "width": 415,
+      "height": 414,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/new-presenter-portraits.png",
+      "generatedSourceSha256": "13e94d7d99e269131b431970da5a1613934433268846aa7864709aecc2ea3933",
+      "promptSha256": "727dfd3045830884c631d77171e0cb2d4102e38f9302aaca726d46f665952a38",
+      "sourceCrop": [
+        2,
+        2,
+        417,
+        416
+      ],
+      "bytes": 298762,
+      "receipt": "art-source/new-presenter-portraits.receipt.json",
+      "visualReview": "source frame reviewed",
+      "usedBy": [],
+      "derivativeConsumers": [
+        "quiz-a-father-far",
+        "quiz-grandma-far",
+        "quiz-grandma-near",
+        "quiz-grandma-relation",
+        "quiz-grandpa-near",
+        "quiz-mother-relation",
+        "quiz-other-father-relation",
+        "quiz-route-correct",
+        "quiz-route-near-first",
+        "quiz-route-reverse",
+        "quiz-welcome-chart"
+      ]
+    },
+    "quiz-host-b": {
+      "path": "assets/quiz-host-b.png",
+      "sha256": "45a87758b4f954452529f608ba52cddc617cb7554031cb285053c19911d1b219",
+      "width": 415,
+      "height": 414,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/new-presenter-portraits.png",
+      "generatedSourceSha256": "13e94d7d99e269131b431970da5a1613934433268846aa7864709aecc2ea3933",
+      "promptSha256": "727dfd3045830884c631d77171e0cb2d4102e38f9302aaca726d46f665952a38",
+      "sourceCrop": [
+        2,
+        838,
+        417,
+        1252
+      ],
+      "bytes": 293996,
+      "receipt": "art-source/new-presenter-portraits.receipt.json",
+      "visualReview": "source frame reviewed",
+      "usedBy": [],
+      "derivativeConsumers": [
+        "quiz-b-father-far",
+        "quiz-b-father-wrong",
+        "quiz-welcome-chart"
+      ]
+    },
+    "quiz-mother": {
+      "path": "assets/quiz-mother.png",
+      "sha256": "0e5963c3f902aba9d1fd0f6dba7ce18eabcdcd49c6864a302af7e13d85564f33",
+      "width": 413,
+      "height": 414,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/new-presenter-portraits.png",
+      "generatedSourceSha256": "13e94d7d99e269131b431970da5a1613934433268846aa7864709aecc2ea3933",
+      "promptSha256": "727dfd3045830884c631d77171e0cb2d4102e38f9302aaca726d46f665952a38",
+      "sourceCrop": [
+        421,
+        2,
+        834,
+        416
+      ],
+      "bytes": 295794,
+      "receipt": "art-source/new-presenter-portraits.receipt.json",
+      "visualReview": "source frame reviewed",
+      "usedBy": [],
+      "derivativeConsumers": [
+        "quiz-grandma-relation",
+        "quiz-mother-relation",
+        "quiz-welcome-chart"
+      ]
+    },
+    "quiz-mother-relation": {
+      "path": "assets/quiz-mother-relation.png",
+      "sha256": "9167216ddfab4ebccf2e43b08cfdc21716a2e1dd2e72280598c38027f1eb8483",
+      "bytes": 101082,
+      "source": "deterministic positions and lines over registered ImageGen portraits",
+      "renderSource": "art-source/family-diagrams.mjs",
+      "renderSourceSha256": "1a557269720a5b9a67ff47c974e5470602a53beb67f6882b0b0baf2b00acedd9",
+      "inputs": {
+        "quiz-host-a": "af6cbacc3a305041c57f45c6814a45fd29d96d058d086d753deb271a88695772",
+        "quiz-mother": "0e5963c3f902aba9d1fd0f6dba7ce18eabcdcd49c6864a302af7e13d85564f33"
+      },
+      "visualReview": "source frame reviewed",
+      "usedBy": [
+        "picture-check:hear-mother"
+      ],
+      "derivativeConsumers": []
+    },
+    "quiz-other-father-relation": {
+      "path": "assets/quiz-other-father-relation.png",
+      "sha256": "5d97bc969e0f983153c266da41e9f6ec3ed914f5f1ea81bf9df09a84de7b8358",
+      "bytes": 96872,
+      "source": "deterministic positions and lines over registered ImageGen portraits",
+      "renderSource": "art-source/family-diagrams.mjs",
+      "renderSourceSha256": "1a557269720a5b9a67ff47c974e5470602a53beb67f6882b0b0baf2b00acedd9",
+      "inputs": {
+        "quiz-host-a": "af6cbacc3a305041c57f45c6814a45fd29d96d058d086d753deb271a88695772",
+        "quiz-father": "89b54cbe79afa93e3453f16155dd0c1bb019f48f9b36ae407e0f9ad702933b7d"
+      },
+      "visualReview": "source frame reviewed",
+      "usedBy": [
+        "picture-check:hear-mother"
+      ],
+      "derivativeConsumers": []
+    },
+    "quiz-route-correct": {
+      "path": "assets/quiz-route-correct.png",
+      "sha256": "8d4120f2990b1fea596329a80b7f10b4345b3f6e495c9e814b4a55bc5f57fc4a",
+      "bytes": 38703,
+      "source": "deterministic positions and lines over registered ImageGen portraits",
+      "renderSource": "art-source/family-diagrams.mjs",
+      "renderSourceSha256": "1a557269720a5b9a67ff47c974e5470602a53beb67f6882b0b0baf2b00acedd9",
+      "inputs": {
+        "quiz-host-a": "af6cbacc3a305041c57f45c6814a45fd29d96d058d086d753deb271a88695772",
+        "quiz-grandpa": "dcd537c92b058b5d89f710c2261bf1832a4c7881e4e0db07b198353cbc0e9f30",
+        "quiz-friend": "135469057d8d32a63c5767ffdf78e00eb9ebeb4e4efdc074651677784a251fab"
+      },
+      "visualReview": "source frame reviewed",
+      "usedBy": [
+        "picture-check:follow-two-introductions"
+      ],
+      "derivativeConsumers": []
+    },
+    "quiz-route-near-first": {
+      "path": "assets/quiz-route-near-first.png",
+      "sha256": "ab0af89e437a37b5652e813f4f2a34d63dc3dc9e74c49ff8f0a6664d45bbb787",
+      "bytes": 38572,
+      "source": "deterministic positions and lines over registered ImageGen portraits",
+      "renderSource": "art-source/family-diagrams.mjs",
+      "renderSourceSha256": "1a557269720a5b9a67ff47c974e5470602a53beb67f6882b0b0baf2b00acedd9",
+      "inputs": {
+        "quiz-host-a": "af6cbacc3a305041c57f45c6814a45fd29d96d058d086d753deb271a88695772",
+        "quiz-grandpa": "dcd537c92b058b5d89f710c2261bf1832a4c7881e4e0db07b198353cbc0e9f30",
+        "quiz-friend": "135469057d8d32a63c5767ffdf78e00eb9ebeb4e4efdc074651677784a251fab"
+      },
+      "visualReview": "source frame reviewed",
+      "usedBy": [
+        "picture-check:follow-two-introductions"
+      ],
+      "derivativeConsumers": []
+    },
+    "quiz-route-reverse": {
+      "path": "assets/quiz-route-reverse.png",
+      "sha256": "9752bf10f2682190a777f58efecf04097aac30624dae7ffe58824524366d5029",
+      "bytes": 38758,
+      "source": "deterministic positions and lines over registered ImageGen portraits",
+      "renderSource": "art-source/family-diagrams.mjs",
+      "renderSourceSha256": "1a557269720a5b9a67ff47c974e5470602a53beb67f6882b0b0baf2b00acedd9",
+      "inputs": {
+        "quiz-host-a": "af6cbacc3a305041c57f45c6814a45fd29d96d058d086d753deb271a88695772",
+        "quiz-friend": "135469057d8d32a63c5767ffdf78e00eb9ebeb4e4efdc074651677784a251fab",
+        "quiz-grandpa": "dcd537c92b058b5d89f710c2261bf1832a4c7881e4e0db07b198353cbc0e9f30"
+      },
+      "visualReview": "source frame reviewed",
+      "usedBy": [
+        "picture-check:follow-two-introductions"
+      ],
+      "derivativeConsumers": []
+    },
+    "quiz-welcome-chart": {
+      "path": "assets/quiz-welcome-chart.png",
+      "sha256": "208f9cb0471852a062581099563f6f5b41ed35148beffbd4ae22e91aca990e18",
+      "bytes": 193033,
+      "source": "deterministic positions and lines over registered ImageGen portraits",
+      "renderSource": "art-source/family-diagrams.mjs",
+      "renderSourceSha256": "1a557269720a5b9a67ff47c974e5470602a53beb67f6882b0b0baf2b00acedd9",
+      "inputs": {
+        "quiz-grandpa": "dcd537c92b058b5d89f710c2261bf1832a4c7881e4e0db07b198353cbc0e9f30",
+        "quiz-grandma": "b14179b72cb07559434e5193a4de657f6f6177d31ebfa92ab93b8b0eaf7311ce",
+        "quiz-father": "89b54cbe79afa93e3453f16155dd0c1bb019f48f9b36ae407e0f9ad702933b7d",
+        "quiz-mother": "0e5963c3f902aba9d1fd0f6dba7ce18eabcdcd49c6864a302af7e13d85564f33",
+        "quiz-host-a": "af6cbacc3a305041c57f45c6814a45fd29d96d058d086d753deb271a88695772",
+        "quiz-friend": "135469057d8d32a63c5767ffdf78e00eb9ebeb4e4efdc074651677784a251fab",
+        "quiz-father-b": "ffe63a34f9ab8bb636b6ce0885ca5f9e0f50ecb6870ca15b98f4f2f31b115f92",
+        "quiz-host-b": "45a87758b4f954452529f608ba52cddc617cb7554031cb285053c19911d1b219"
+      },
+      "visualReview": "source frame reviewed",
+      "usedBy": [
+        "introduce-someone"
+      ],
+      "derivativeConsumers": []
+    },
+    "relation-father-mother": {
+      "path": "assets/relation-father-mother.png",
+      "sha256": "66b6ba1ea9d64b578e1e488a960134422c3e56beaba2b0e70627a12fb6ba63fd",
+      "bytes": 92001,
+      "source": "deterministic positions and lines over registered ImageGen portraits",
+      "renderSource": "art-source/family-diagrams.mjs",
+      "renderSourceSha256": "1a557269720a5b9a67ff47c974e5470602a53beb67f6882b0b0baf2b00acedd9",
+      "inputs": {
+        "mother-a": "02aa4e2d530aba61729b5fb83a9c64879146cca946fa96e88b51974e4eeae47e",
+        "grandpa-a": "f1fcad87259250047d8e837a448cb4ab11ee47f6f8f583a733d86308e47318a7"
+      },
+      "visualReview": "source frame reviewed",
+      "usedBy": [
+        "who-says-my"
+      ],
+      "derivativeConsumers": []
+    },
+    "relation-grandpa-a": {
+      "path": "assets/relation-grandpa-a.png",
+      "sha256": "f73366182a1113f2e60dd52b2fd80ece516b41d4d05b631f9c5fe4bd0932bf2f",
+      "bytes": 98239,
+      "source": "deterministic positions and lines over registered ImageGen portraits",
+      "renderSource": "art-source/family-diagrams.mjs",
+      "renderSourceSha256": "1a557269720a5b9a67ff47c974e5470602a53beb67f6882b0b0baf2b00acedd9",
+      "inputs": {
+        "host-a": "c08cb410ed4e7588aef7b8c0f99cbbe901a52a67c7c9defa4fd5fd102e49b7b2",
+        "mother-a": "02aa4e2d530aba61729b5fb83a9c64879146cca946fa96e88b51974e4eeae47e",
+        "grandpa-a": "f1fcad87259250047d8e837a448cb4ab11ee47f6f8f583a733d86308e47318a7"
+      },
+      "visualReview": "source frame reviewed",
+      "usedBy": [
+        "who-says-my"
+      ],
+      "derivativeConsumers": []
+    },
+    "respond-friend": {
+      "path": "assets/respond-friend.png",
+      "sha256": "3c0100835dc067e3282c469b76f0243454e695722e6baa6d309a739880b3b329",
+      "width": 491,
+      "height": 488,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/welcome-and-replies.png",
+      "generatedSourceSha256": "4fe395592eda3c6bb7e86b911dee9dc60e446df8e707cf1ece9786dd0560b2ce",
+      "promptSha256": "69477b52197d6cc9b8247d9731c9793a7a9d4083a69a856f353c8a637948e269",
+      "sourceCrop": [
+        14,
+        520,
+        505,
+        1008
+      ],
+      "bytes": 413683,
+      "receipt": "art-source/welcome-and-replies.receipt.json",
+      "visualReview": "source frame reviewed",
+      "usedBy": [
+        "picture-check:reply-to-friend"
+      ],
+      "derivativeConsumers": []
+    },
+    "respond-to-host": {
+      "path": "assets/respond-to-host.png",
+      "sha256": "34bbefdebf67f181349c5eff0d0a2aa858768fe9c20b900dc907ea9cf4417584",
+      "width": 490,
+      "height": 488,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/welcome-and-replies.png",
+      "generatedSourceSha256": "4fe395592eda3c6bb7e86b911dee9dc60e446df8e707cf1ece9786dd0560b2ce",
+      "promptSha256": "69477b52197d6cc9b8247d9731c9793a7a9d4083a69a856f353c8a637948e269",
+      "sourceCrop": [
+        524,
+        520,
+        1014,
+        1008
+      ],
+      "bytes": 409253,
+      "receipt": "art-source/welcome-and-replies.receipt.json",
+      "visualReview": "source frame reviewed",
+      "usedBy": [
+        "picture-check:reply-to-friend"
+      ],
+      "derivativeConsumers": []
+    },
+    "tile-father-a": {
+      "path": "assets/tile-father-a.png",
+      "sha256": "62911fc1724a035a8a719bba08d3e1faeb54dcdce55b172ba61d33b96f608b89",
+      "bytes": 111284,
+      "source": "deterministic positions and lines over registered ImageGen portraits",
+      "renderSource": "art-source/family-diagrams.mjs",
+      "renderSourceSha256": "1a557269720a5b9a67ff47c974e5470602a53beb67f6882b0b0baf2b00acedd9",
+      "inputs": {
+        "host-a": "c08cb410ed4e7588aef7b8c0f99cbbe901a52a67c7c9defa4fd5fd102e49b7b2",
+        "father-a": "72c86cc3513721c4975f10d25ea001ce20c660a90a994a2db8e4ed7aae86f547"
+      },
+      "visualReview": "source frame reviewed",
+      "usedBy": [
+        "family-cards"
+      ],
+      "derivativeConsumers": [
+        "family-cards-opening"
+      ]
+    },
+    "tile-father-b": {
+      "path": "assets/tile-father-b.png",
+      "sha256": "66ed9fd90152c7c21d3e8268e89e067b818c1bbfd6e573bb29b9a2f1d55c983a",
+      "bytes": 109064,
+      "source": "deterministic positions and lines over registered ImageGen portraits",
+      "renderSource": "art-source/family-diagrams.mjs",
+      "renderSourceSha256": "1a557269720a5b9a67ff47c974e5470602a53beb67f6882b0b0baf2b00acedd9",
+      "inputs": {
+        "host-b": "639f78d8d7149ef9a0b43178ba1eab1dcb74362757b5c7e6d12706940b90b5b5",
+        "father-b": "b4020773ab08db16ff0668d68f7c337079ba9c3b55b758186675be218cf1f4f2"
+      },
+      "visualReview": "source frame reviewed",
+      "usedBy": [
+        "family-cards"
+      ],
+      "derivativeConsumers": []
+    },
+    "tile-father-mother": {
+      "path": "assets/tile-father-mother.png",
+      "sha256": "5ea1d700e27984c43ccea3359ac7b9958ff942184f89b34985069a9d87b91f13",
+      "bytes": 111151,
+      "source": "deterministic positions and lines over registered ImageGen portraits",
+      "renderSource": "art-source/family-diagrams.mjs",
+      "renderSourceSha256": "1a557269720a5b9a67ff47c974e5470602a53beb67f6882b0b0baf2b00acedd9",
+      "inputs": {
+        "mother-a": "02aa4e2d530aba61729b5fb83a9c64879146cca946fa96e88b51974e4eeae47e",
+        "grandpa-a": "f1fcad87259250047d8e837a448cb4ab11ee47f6f8f583a733d86308e47318a7"
+      },
+      "visualReview": "source frame reviewed",
+      "usedBy": [
+        "family-cards"
+      ],
+      "derivativeConsumers": []
+    },
+    "tile-friend-a": {
+      "path": "assets/tile-friend-a.png",
+      "sha256": "7ddd9923f3782c99df4258cd22c132d76ea014d10d8cb8937a372c2fe08998aa",
+      "bytes": 111639,
+      "source": "deterministic positions and lines over registered ImageGen portraits",
+      "renderSource": "art-source/family-diagrams.mjs",
+      "renderSourceSha256": "1a557269720a5b9a67ff47c974e5470602a53beb67f6882b0b0baf2b00acedd9",
+      "inputs": {
+        "host-a": "c08cb410ed4e7588aef7b8c0f99cbbe901a52a67c7c9defa4fd5fd102e49b7b2",
+        "friend-a": "63bec68ecbaa015a2af6450ac24b82896b3c0e11be0cce44fc7443bbffef0628"
+      },
+      "visualReview": "source frame reviewed",
+      "usedBy": [
+        "family-cards"
+      ],
+      "derivativeConsumers": []
+    },
+    "tile-grandma-a": {
+      "path": "assets/tile-grandma-a.png",
+      "sha256": "b68e94d6a22b2836ceb2f004222c5bcba9ea166876f5d15d243875f94cd1f4ef",
+      "bytes": 123830,
+      "source": "deterministic positions and lines over registered ImageGen portraits",
+      "renderSource": "art-source/family-diagrams.mjs",
+      "renderSourceSha256": "1a557269720a5b9a67ff47c974e5470602a53beb67f6882b0b0baf2b00acedd9",
+      "inputs": {
+        "host-a": "c08cb410ed4e7588aef7b8c0f99cbbe901a52a67c7c9defa4fd5fd102e49b7b2",
+        "grandma-a": "36afc0c349a1c55dce7ae6f13d13541af92cb52d242ba6856cac51e9015fc631",
+        "mother-a": "02aa4e2d530aba61729b5fb83a9c64879146cca946fa96e88b51974e4eeae47e"
+      },
+      "visualReview": "source frame reviewed",
+      "usedBy": [
+        "family-cards"
+      ],
+      "derivativeConsumers": []
+    },
+    "tile-grandpa-a": {
+      "path": "assets/tile-grandpa-a.png",
+      "sha256": "263a0011a829ee176d236bbe52aa61f988e7f221920ef53b4b3674a7ff80fff8",
+      "bytes": 121396,
+      "source": "deterministic positions and lines over registered ImageGen portraits",
+      "renderSource": "art-source/family-diagrams.mjs",
+      "renderSourceSha256": "1a557269720a5b9a67ff47c974e5470602a53beb67f6882b0b0baf2b00acedd9",
+      "inputs": {
+        "host-a": "c08cb410ed4e7588aef7b8c0f99cbbe901a52a67c7c9defa4fd5fd102e49b7b2",
+        "grandpa-a": "f1fcad87259250047d8e837a448cb4ab11ee47f6f8f583a733d86308e47318a7",
+        "mother-a": "02aa4e2d530aba61729b5fb83a9c64879146cca946fa96e88b51974e4eeae47e"
+      },
+      "visualReview": "source frame reviewed",
+      "usedBy": [
+        "family-cards"
+      ],
+      "derivativeConsumers": []
+    },
+    "tile-mother-a": {
+      "path": "assets/tile-mother-a.png",
+      "sha256": "2d9e75c54d874c4ed39191be3a385943d2d881c670d8a38ad67141e2f7e776a1",
+      "bytes": 110191,
+      "source": "deterministic positions and lines over registered ImageGen portraits",
+      "renderSource": "art-source/family-diagrams.mjs",
+      "renderSourceSha256": "1a557269720a5b9a67ff47c974e5470602a53beb67f6882b0b0baf2b00acedd9",
+      "inputs": {
+        "host-a": "c08cb410ed4e7588aef7b8c0f99cbbe901a52a67c7c9defa4fd5fd102e49b7b2",
+        "mother-a": "02aa4e2d530aba61729b5fb83a9c64879146cca946fa96e88b51974e4eeae47e"
+      },
+      "visualReview": "source frame reviewed",
+      "usedBy": [
+        "family-cards"
+      ],
+      "derivativeConsumers": [
+        "family-cards-opening"
+      ]
+    },
+    "welcome": {
+      "path": "assets/welcome.png",
+      "sha256": "1961515906535d237ea2ccadb52cdc6015f1bbbe9b1aa79e01653a25bebf9fd1",
+      "width": 491,
+      "height": 487,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/welcome-and-replies.png",
+      "generatedSourceSha256": "4fe395592eda3c6bb7e86b911dee9dc60e446df8e707cf1ece9786dd0560b2ce",
+      "promptSha256": "69477b52197d6cc9b8247d9731c9793a7a9d4083a69a856f353c8a637948e269",
+      "sourceCrop": [
+        14,
+        14,
+        505,
+        501
+      ],
+      "bytes": 411162,
+      "receipt": "art-source/welcome-and-replies.receipt.json",
+      "visualReview": "source frame reviewed",
+      "usedBy": [
+        "deliver-introductions",
+        "family-cards",
+        "welcome"
+      ],
+      "derivativeConsumers": []
+    }
+  },
+  "scope": "源图和规则图核对完毕。整页比例、交接态和听音待浏览器及正式配音验收。"
+}

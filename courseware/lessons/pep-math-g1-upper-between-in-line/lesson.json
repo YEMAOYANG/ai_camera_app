@@ -1,0 +1,985 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "解决问题｜两人之间",
+  "description": "光影剧场里，两面旗帮我们找清位置。顺着数、画点，再换个地方试试。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小数老师",
+      "role": "teacher",
+      "gender": "male",
+      "voice": "Ethan",
+      "avatar": "/teachers/ashu-math-v1.png",
+      "color": "#306357",
+      "persona": "先请孩子猜，再指着同一队的人、旗和点说明每一步。"
+    }
+  },
+  "images": {
+    "theatre-lobby": {
+      "file": "assets/theatre-lobby.png"
+    },
+    "theatre-workroom": {
+      "file": "assets/theatre-workroom.png"
+    },
+    "usher-stand": {
+      "file": "assets/usher-stand.png"
+    },
+    "usher-run": {
+      "file": "assets/usher-run.png"
+    },
+    "usher-hop": {
+      "file": "assets/usher-hop.png"
+    },
+    "theatre-star": {
+      "file": "assets/theatre-star.png"
+    },
+    "theatre-queue-open": {
+      "file": "assets/theatre-queue-open.png"
+    },
+    "queue-8-13": {
+      "file": "assets/queue-8-13.png"
+    },
+    "queue-to-dots": {
+      "file": "assets/queue-to-dots.png"
+    },
+    "adjacent-and-reverse": {
+      "file": "assets/adjacent-and-reverse.png"
+    },
+    "photos-include": {
+      "file": "assets/photos-include.png"
+    },
+    "floor-transfer": {
+      "file": "assets/floor-transfer.png"
+    },
+    "recap-dots": {
+      "file": "assets/recap-dots.png"
+    },
+    "hop-start": {
+      "file": "assets/hop-start.png"
+    },
+    "tiles-start": {
+      "file": "assets/tiles-start.png"
+    },
+    "hop-flags-5-9": {
+      "file": "assets/hop-flags-5-9.png"
+    },
+    "hop-flags-8-14": {
+      "file": "assets/hop-flags-8-14.png"
+    },
+    "hop-flags-12-18": {
+      "file": "assets/hop-flags-12-18.png"
+    },
+    "platform-flag-5": {
+      "file": "assets/platform-flag-5.png"
+    },
+    "platform-flag-9": {
+      "file": "assets/platform-flag-9.png"
+    },
+    "platform-flag-8": {
+      "file": "assets/platform-flag-8.png"
+    },
+    "platform-flag-14": {
+      "file": "assets/platform-flag-14.png"
+    },
+    "platform-flag-12": {
+      "file": "assets/platform-flag-12.png"
+    },
+    "platform-flag-18": {
+      "file": "assets/platform-flag-18.png"
+    },
+    "tiles-rule": {
+      "file": "assets/tiles-rule.png"
+    },
+    "int-2-6": {
+      "file": "assets/int-2-6.png"
+    },
+    "int-7-12": {
+      "file": "assets/int-7-12.png"
+    },
+    "int-14-17": {
+      "file": "assets/int-14-17.png"
+    },
+    "int-3-7": {
+      "file": "assets/int-3-7.png"
+    },
+    "int-9-14": {
+      "file": "assets/int-9-14.png"
+    },
+    "int-6-8": {
+      "file": "assets/int-6-8.png"
+    },
+    "int-9-13": {
+      "file": "assets/int-9-13.png"
+    },
+    "int-16-17": {
+      "file": "assets/int-16-17.png"
+    },
+    "int-1-5": {
+      "file": "assets/int-1-5.png"
+    },
+    "count-0": {
+      "file": "assets/count-0.png"
+    },
+    "count-1": {
+      "file": "assets/count-1.png"
+    },
+    "count-2": {
+      "file": "assets/count-2.png"
+    },
+    "count-3": {
+      "file": "assets/count-3.png"
+    },
+    "count-4": {
+      "file": "assets/count-4.png"
+    },
+    "q1-stem": {
+      "file": "assets/q1-stem.png"
+    },
+    "q1-a": {
+      "file": "assets/q1-a.png"
+    },
+    "q1-b": {
+      "file": "assets/q1-b.png"
+    },
+    "q1-c": {
+      "file": "assets/q1-c.png"
+    },
+    "q2-stem": {
+      "file": "assets/q2-stem.png"
+    },
+    "q2-a": {
+      "file": "assets/q2-a.png"
+    },
+    "q2-b": {
+      "file": "assets/q2-b.png"
+    },
+    "q2-c": {
+      "file": "assets/q2-c.png"
+    },
+    "q3-stem": {
+      "file": "assets/q3-stem.png"
+    },
+    "q3-a": {
+      "file": "assets/q3-a.png"
+    },
+    "q3-b": {
+      "file": "assets/q3-b.png"
+    },
+    "q3-c": {
+      "file": "assets/q3-c.png"
+    },
+    "q4-stem": {
+      "file": "assets/q4-stem.png"
+    },
+    "q4-a": {
+      "file": "assets/q4-a.png"
+    },
+    "q4-b": {
+      "file": "assets/q4-b.png"
+    },
+    "q4-c": {
+      "file": "assets/q4-c.png"
+    },
+    "q5-stem": {
+      "file": "assets/q5-stem.png"
+    },
+    "q5-a": {
+      "file": "assets/q5-a.png"
+    },
+    "q5-b": {
+      "file": "assets/q5-b.png"
+    },
+    "q5-c": {
+      "file": "assets/q5-c.png"
+    },
+    "q6-stem": {
+      "file": "assets/q6-stem.png"
+    },
+    "q6-a": {
+      "file": "assets/q6-a.png"
+    },
+    "q6-b": {
+      "file": "assets/q6-b.png"
+    },
+    "q6-c": {
+      "file": "assets/q6-c.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "open",
+      "type": "slide",
+      "title": "剧场队伍有几个位置",
+      "template": "picture-points",
+      "data": {
+        "title": "剧场队伍有几个位置",
+        "picture": "theatre-queue-open",
+        "points": [
+          "从门口开始数",
+          "第八位是一个位置",
+          "全队一共九人"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "剧场的灯亮了，门口排起一队。"
+        },
+        {
+          "say": "有人说他排第八。你猜，队里就有八个人吗？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "从靠门的这头数，每个人只数一次。"
+        },
+        {
+          "say": "数到八就停一下，手指只指着这个人。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "第八位说的是他站在哪里。"
+        },
+        {
+          "say": "他身后还有一个人，不能把这一位漏掉。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "要数全队，就从第一位数到最后。"
+        },
+        {
+          "say": "最后数到九，这队一共有九个人。"
+        },
+        {
+          "say": "问第几位，要找一个位置。问几个人，要数一组。"
+        }
+      ]
+    },
+    {
+      "key": "two-markers",
+      "type": "slide",
+      "title": "先找到两面小旗",
+      "template": "picture-points",
+      "data": {
+        "title": "先找到两面小旗",
+        "picture": "queue-8-13",
+        "points": [
+          "两旗找位置",
+          "只数旗中间",
+          "到终点前停"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "剧场来了两个拿旗的孩子。"
+        },
+        {
+          "say": "他们想知道，两面旗之间有几个人。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "从门口那头数，蓝旗在第八位。"
+        },
+        {
+          "say": "橙旗排在第十三位，两面旗把范围夹住。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "第八位只帮我们找边，从它后面开始。"
+        },
+        {
+          "say": "九、十、十一、十二，手指走过四个人。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "再往前是第十三位，已经碰到橙旗。"
+        },
+        {
+          "say": "在橙旗前停下。数到的是四个人。"
+        },
+        {
+          "say": "看两面旗。只走旗和旗之间的位置。"
+        }
+      ]
+    },
+    {
+      "key": "draw-and-check",
+      "type": "slide",
+      "title": "一人一点，换方法核对",
+      "template": "picture-points",
+      "data": {
+        "title": "一人一点，换方法核对",
+        "picture": "queue-to-dots",
+        "points": [
+          "一个人画一个点",
+          "旗点留着定位",
+          "点和人一样多"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "刚才顺着数得出四人。画图也会是四吗？"
+        },
+        {
+          "say": "上面站着一队人，下面有一排点。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "每个人下面只画一个点。"
+        },
+        {
+          "say": "每个点都能找到上面对应的一个人。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "前面的人离两面旗都远，画近处就够了。"
+        },
+        {
+          "say": "蓝旗和橙旗的点留下来，帮我们看清两头。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "数中间的点，一、二、三、四。"
+        },
+        {
+          "say": "再指回上面，正好是那四个人。"
+        },
+        {
+          "say": "点数和两面旗之间的位置数一样，才是一对。"
+        }
+      ]
+    },
+    {
+      "key": "hop-between",
+      "type": "interactive",
+      "title": "跳过旗台，走中间",
+      "page": "hop-between",
+      "widgetType": "hop-between",
+      "startImage": "hop-start",
+      "script": [
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#hop-flags"
+        },
+        {
+          "say": "舞台有两面旗。你想从哪一格开始跳？"
+        },
+        {
+          "say": "旗台标出两头，给我们定方向。"
+        },
+        {
+          "highlight": "#hop-first"
+        },
+        {
+          "say": "第一脚落在蓝旗后面的台子，那里才在中间。"
+        },
+        {
+          "highlight": "#hop-actor"
+        },
+        {
+          "say": "方向键让演员走，跳键让脚离开台面。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "看演员往哪里跳，等落到第一块中间台，再看星星亮没亮。"
+        },
+        {
+          "say": "现在回到开头。剩下的台子由你找。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "hop-goal": "two-markers-13",
+        "hop-hint": "edges-and-empty-13",
+        "hop-help": "edges-and-empty-14",
+        "hop-praise": "from-through-13"
+      }
+    },
+    {
+      "key": "edges-and-empty",
+      "type": "slide",
+      "title": "倒着问，也数同一段",
+      "template": "picture-points",
+      "data": {
+        "title": "倒着问，也数同一段",
+        "picture": "adjacent-and-reverse",
+        "points": [
+          "换说法，位置不动",
+          "邻位紧挨着",
+          "中间没人就是零"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "有人把橙旗先说、蓝旗后说。中间会变吗？"
+        },
+        {
+          "say": "看图，两面旗还在刚才的位置。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "只换了说话的顺序，中间的人没有换。"
+        },
+        {
+          "say": "我从靠门的一面往后数，仍然数到四。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "再看下面，两面旗站得紧挨着。"
+        },
+        {
+          "say": "第十四位后面，紧接着是第十五位。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "还没数到别人，就已经碰到第二面旗。"
+        },
+        {
+          "say": "两面旗之间一个人也没有，可以说有零个人。"
+        },
+        {
+          "say": "看一眼两面旗，再找夹在里面的台子。"
+        },
+        {
+          "say": "先看靠左的旗，再顺着找下一块里面的台。"
+        }
+      ]
+    },
+    {
+      "key": "from-through",
+      "type": "slide",
+      "title": "有时两头都要数",
+      "template": "picture-points",
+      "data": {
+        "title": "有时两头都要数",
+        "picture": "photos-include",
+        "points": [
+          "听清问的范围",
+          "两头都看到",
+          "从第二张数到第五张"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "剧场走廊挂着照片。我们从第二张看到第五张。"
+        },
+        {
+          "say": "你会把第二张和第五张也算上吗？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "刚才问旗之间，只找夹在中间的人。"
+        },
+        {
+          "say": "这次说从这一张看到那一张。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "第二张已经看了，第一下就数它。"
+        },
+        {
+          "say": "第五张也看了，数到这张才停。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "第二、第三、第四、第五，一共看四张。"
+        },
+        {
+          "say": "先听问题怎么问，再决定两头算不算。"
+        },
+        {
+          "say": "中间的台子都走到了，路线完成。"
+        }
+      ]
+    },
+    {
+      "key": "match-the-middle",
+      "type": "interactive",
+      "title": "让点数配对落块",
+      "page": "match-the-middle",
+      "widgetType": "match-the-middle",
+      "startImage": "tiles-start",
+      "script": [
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#tiles-row"
+        },
+        {
+          "say": "道具室的票块往下掉。你能给它找同伴吗？"
+        },
+        {
+          "say": "底下一张图用两面旗围住一排小点。"
+        },
+        {
+          "highlight": "#tiles-falling"
+        },
+        {
+          "say": "上面是人数点。先数底图两旗里面，再数这块。"
+        },
+        {
+          "highlight": "#tiles-drop"
+        },
+        {
+          "say": "一样多就挪到旁边。轻按落下键，能更快落下。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "两块靠在一起，人数对上，它们就会消掉。"
+        },
+        {
+          "say": "你从第一块试。卡住了，就看里面漏没漏数。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "tiles-goal": "draw-and-check-13",
+        "tiles-hint": "new-places-13",
+        "tiles-help": "new-places-14",
+        "tiles-praise": "new-places-15"
+      }
+    },
+    {
+      "key": "new-places",
+      "type": "slide",
+      "title": "从队伍想到楼层",
+      "template": "picture-points",
+      "data": {
+        "title": "从队伍想到楼层",
+        "picture": "floor-transfer",
+        "points": [
+          "两层当边界",
+          "一层只数一次",
+          "换一种办法验一验"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "剧场的两个道具间，一个在三楼，一个在七楼。"
+        },
+        {
+          "say": "你猜，两层之间还隔着几层？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "楼层从下面往上排，和队伍一样有顺序。"
+        },
+        {
+          "say": "三楼和七楼先标出来，只用来定两头。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "从三楼上面一层数。四楼、五楼、六楼。"
+        },
+        {
+          "say": "再上去碰到七楼，就要停下。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "我给夹在中间的楼层各放一点。"
+        },
+        {
+          "say": "点图有三点，和刚才数的三层一样。"
+        },
+        {
+          "say": "先找两面小旗，再数它们之间的小点。"
+        },
+        {
+          "say": "两面旗只找位置。数清中间，再把落块靠过去。"
+        },
+        {
+          "say": "每块点数都和它的中间位置配上了。"
+        }
+      ]
+    },
+    {
+      "key": "picture-check",
+      "type": "quiz",
+      "title": "剧场门口小检查",
+      "intro": [
+        "听题，看清两处位置。再选一张图。"
+      ],
+      "questions": [
+        {
+          "id": "queue-sixth",
+          "question": "蓝旗孩子排第六。哪张只圈了他前面的人？",
+          "skill": "辨别第几位与人数",
+          "visual": {
+            "kind": "asset",
+            "image": "q1-stem",
+            "alt": "有八位孩子，从左边数第六位举蓝旗。"
+          },
+          "options": {
+            "A": {
+              "label": "只圈了第一至第五位",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-a",
+                "alt": "只圈了第一至第五位"
+              }
+            },
+            "B": {
+              "label": "圈了第一至第六位",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-b",
+                "alt": "圈了第一至第六位"
+              }
+            },
+            "C": {
+              "label": "只圈了第六位后面的人",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-c",
+                "alt": "只圈了第六位后面的人"
+              }
+            }
+          },
+          "answer": [
+            "A"
+          ],
+          "analysis": "第六位指蓝旗孩子站的位置。他前面是第一到第五位，共五个人。"
+        },
+        {
+          "id": "stamp-interval",
+          "question": "第九格和第十二格有旗。哪张图只亮了中间？",
+          "skill": "找出严格在两端之间的位置",
+          "visual": {
+            "kind": "asset",
+            "image": "q2-stem",
+            "alt": "从第八格到第十三格，第九格和第十二格有旗。"
+          },
+          "options": {
+            "A": {
+              "label": "亮第九、十、十一格",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-a",
+                "alt": "亮第九、十、十一格"
+              }
+            },
+            "B": {
+              "label": "亮第十一、十二格",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-b",
+                "alt": "亮第十一、十二格"
+              }
+            },
+            "C": {
+              "label": "亮第十、十一格",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-c",
+                "alt": "亮第十、十一格"
+              }
+            }
+          },
+          "answer": [
+            "C"
+          ],
+          "analysis": "第九格后面开始，第十二格前停。中间只有第十格和第十一格。"
+        },
+        {
+          "id": "adjacent-people",
+          "question": "第十三和第十四两人之间有几人？选点图。",
+          "skill": "理解相邻端点之间为零",
+          "visual": {
+            "kind": "asset",
+            "image": "q3-stem",
+            "alt": "第十三和第十四位各举一面旗，两人紧挨着。"
+          },
+          "options": {
+            "A": {
+              "label": "里面有一个点",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-a",
+                "alt": "里面有一个点"
+              }
+            },
+            "B": {
+              "label": "两旗紧挨着，里面没有点",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-b",
+                "alt": "两旗紧挨着，里面没有点"
+              }
+            },
+            "C": {
+              "label": "里面有两个点",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-c",
+                "alt": "里面有两个点"
+              }
+            }
+          },
+          "answer": [
+            "B"
+          ],
+          "analysis": "数完第十三位，下一位就是第十四位。中间没有别的位置，所以一个点也不用画。"
+        },
+        {
+          "id": "floor-check",
+          "question": "第十一层和第十六层之间，哪张图只亮了中间的楼层？",
+          "skill": "用楼层图核对内部范围",
+          "visual": {
+            "kind": "asset",
+            "image": "q4-stem",
+            "alt": "一栋楼从第十一层到第十六层，两头各有旗。"
+          },
+          "options": {
+            "A": {
+              "label": "从第十一层亮到第十五层",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-a",
+                "alt": "从第十一层亮到第十五层"
+              }
+            },
+            "B": {
+              "label": "只亮第十二至第十五层",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-b",
+                "alt": "只亮第十二至第十五层"
+              }
+            },
+            "C": {
+              "label": "从第十二层亮到第十六层",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-c",
+                "alt": "从第十二层亮到第十六层"
+              }
+            }
+          },
+          "answer": [
+            "B"
+          ],
+          "analysis": "第十二、十三、十四、十五层夹在两旗之间，正好四层。两头只标位置。"
+        },
+        {
+          "id": "exhibit-dots",
+          "question": "展品第三位和第八位有旗。选两旗之间的点图。",
+          "skill": "按一物一点画图核对",
+          "visual": {
+            "kind": "asset",
+            "image": "q5-stem",
+            "alt": "从第二到第九位是一排展品，第三和第八位有旗。"
+          },
+          "options": {
+            "A": {
+              "label": "四个点",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-a",
+                "alt": "四个点"
+              }
+            },
+            "B": {
+              "label": "五个点",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-b",
+                "alt": "五个点"
+              }
+            },
+            "C": {
+              "label": "六个点",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-c",
+                "alt": "六个点"
+              }
+            }
+          },
+          "answer": [
+            "A"
+          ],
+          "analysis": "第四、第五、第六、第七位各画一点，正好四点。两面旗的位置不算。"
+        },
+        {
+          "id": "photos-inclusive",
+          "question": "从第六张照片看到第九张，两头都看。圈哪几张？",
+          "skill": "听问题确定是否计入两端",
+          "visual": {
+            "kind": "asset",
+            "image": "q6-stem",
+            "alt": "墙上从第五张到第十张挂着照片，第六和第九张有标记。"
+          },
+          "options": {
+            "A": {
+              "label": "只圈第七和第八张",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-a",
+                "alt": "只圈第七和第八张"
+              }
+            },
+            "B": {
+              "label": "圈第六、第七和第八张",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-b",
+                "alt": "圈第六、第七和第八张"
+              }
+            },
+            "C": {
+              "label": "圈第六、第七、第八和第九张",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-c",
+                "alt": "圈第六、第七、第八和第九张"
+              }
+            }
+          },
+          "answer": [
+            "C"
+          ],
+          "analysis": "题目说两头都看。第六张和第九张都要圈进去，一共四张。"
+        }
+      ]
+    },
+    {
+      "key": "recap",
+      "type": "slide",
+      "title": "把两面旗的秘密带回家",
+      "template": "picture-points",
+      "data": {
+        "title": "把两面旗的秘密带回家",
+        "picture": "recap-dots",
+        "points": [
+          "先找两个位置",
+          "只数中间",
+          "换方法核对"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "剧场散场了，旗手请我们教家人一个新办法。"
+        },
+        {
+          "say": "不用跑进剧场，几块积木也能排队。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "把积木排一排，再用两片不同颜色的纸标位置。"
+        },
+        {
+          "say": "先告诉大人你从哪头开始数。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "问两处之间，手指从第一面旗后面开始。"
+        },
+        {
+          "say": "快碰到另一面旗时停下，记住你数了几块。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "一块积木画一点，把点数和刚才的数对一对。"
+        },
+        {
+          "say": "请大人换个顺序说，看看中间有没有变。"
+        },
+        {
+          "say": "如果大人说两头都要数，就再看一遍问题。"
+        }
+      ]
+    }
+  ]
+}

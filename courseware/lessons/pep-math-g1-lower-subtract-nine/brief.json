@@ -1,0 +1,197 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "十几减9",
+  "binding": {
+    "editionId": "pep-math-g1-lower-2022-standard",
+    "revisionId": "directory-6205d2037284e91f10b25edd",
+    "nodeId": "ef1b990a-ea75-4d0a-a2ea-703a87c4e6b4",
+    "unitId": "2eeba665-272f-4a55-b064-2be484fc77e4"
+  },
+  "officialNotesSha256": "5f595d029d793280f71d141dd1cd417e8db42ce06279288e52d131465730e576",
+  "authoredBy": "Codex /root/how_old",
+  "scenario": "社区点灯节准备纸灯。孩子从十格整托与散灯里送出九盏，再用补货车按总量验算。",
+  "goals": [
+    "能在图片情境中分清原有总数、拿走的9和剩下的量，知道为什么用减法。",
+    "用一盒十和零散个数表示十几，先从十里取9留下1，再把1与零散个数合起来。",
+    "能把要减的9分成两部分，先去掉零散的部分得到10，再从10里减去没减够的部分。",
+    "能用9加剩下的量复原总数来计算或检验，知道图上三种算法对应同一剩余。",
+    "减数始终是9时，能根据十里留下的1说明原数每多1、余数也多1，并把计算迁移到还差多少和两步任务。"
+  ],
+  "goalSources": [
+    {
+      "skill": "model-remainder",
+      "target": "能在图片情境中分清原有总数、拿走的9和剩下的量，知道为什么用减法。",
+      "source": "印9例1、印11练一练5～6、课件3～4"
+    },
+    {
+      "skill": "break-ten",
+      "target": "用一盒十和零散个数表示十几，先从十里取9留下1，再把1与零散个数合起来。",
+      "source": "印9、课件7～8、教案2～3"
+    },
+    {
+      "skill": "subtract-in-two",
+      "target": "能把要减的9分成两部分，先去掉零散的部分得到10，再从10里减去没减够的部分。",
+      "source": "印9、课件5～6、教案2"
+    },
+    {
+      "skill": "inverse-addition",
+      "target": "能用9加剩下的量复原总数来计算或检验，知道图上三种算法对应同一剩余。",
+      "source": "印9做一做2、印10第3题、课件9和16"
+    },
+    {
+      "skill": "recognize-and-apply-pattern",
+      "target": "减数始终是9时，能根据十里留下的1说明原数每多1、余数也多1，并把计算迁移到还差多少和两步任务。",
+      "source": "印10练一练4、印11第6～7题、课件19～22"
+    }
+  ],
+  "pageSequence": [
+    {
+      "key": "festival-count",
+      "kind": "teaching",
+      "plan": "用社区纸灯情境和可逐个数的十格与零散图表示总量和送走9，点数核对剩余。"
+    },
+    {
+      "key": "first-break-ten",
+      "kind": "teaching",
+      "plan": "同一题先从十格托中拿9，留下1，与原零散合并。三种状态的每一盏都守恒。"
+    },
+    {
+      "key": "take-in-two",
+      "kind": "teaching",
+      "plan": "把9分成先拿完散灯的部分及补足的部分，回到10再拿；比较两种路径拆的不同。"
+    },
+    {
+      "key": "match-the-remainder",
+      "kind": "game",
+      "plan": "把送走9后的数量状态与同数的余量卡实时落块配对，结果用同一个十格图验证。"
+    },
+    {
+      "key": "add-back-to-check",
+      "kind": "teaching",
+      "plan": "用9和剩余合回原来，数格表示逆向，联回前两法。"
+    },
+    {
+      "key": "return-the-quantity",
+      "kind": "game",
+      "plan": "按当前总量选缺的灯量，穿越动态车道把补数带回匹配总量站。"
+    },
+    {
+      "key": "one-more-left",
+      "kind": "teaching",
+      "plan": "始终去掉9，原来每多一盏，余量也多一盏；处理最后能组成一组十的情形留新题。"
+    },
+    {
+      "key": "apply-what-is-left",
+      "kind": "teaching",
+      "plan": "剩余与计划还差两种语境，原创两步量先合并/先取，再减9。"
+    },
+    {
+      "key": "picture-check",
+      "kind": "quiz",
+      "plan": "六道图片题，使用教学及游戏未出现的16、17、18、19。"
+    },
+    {
+      "key": "tell-it-at-home",
+      "kind": "teaching",
+      "plan": "家庭用一组十和零散物件复述所选算法，并用加法复核。相邻空隙作选做。"
+    }
+  ],
+  "games": [
+    {
+      "page": "match-the-remainder",
+      "template": "fallingTiles",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.fallingTiles",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "pair_match",
+      "selection": "落块显示已从十格取9、余1加零散的数量情境，底座是不同余数的实物图。只有余量一致的相邻块消除，横移和落下都影响结果。",
+      "levels": [
+        "10与1到3个一的两种对照。",
+        "打乱2和5个一的目标位置。",
+        "混合不同总量，必须逐块比较，颜色不提示正确位置。"
+      ],
+      "demo": "教师亮待落数量卡、余量图和落下键，只消一对，交接前清零。",
+      "teacherAnchors": [
+        "ten-tray-view",
+        "first-remainder-base",
+        "drop-lamp-tile",
+        "remainder-proof"
+      ]
+    },
+    {
+      "page": "return-the-quantity",
+      "template": "listenDelivery",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.listenDelivery",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "listen_pick_deliver",
+      "selection": "每单用9加缺量复原总量，同时决定正确的拿取货量和目的货台。拿错或送错不得分，动态车道要求真实走位。",
+      "levels": [
+        "两个货量中选能补足的一单。",
+        "两个不同总量按顺序补足，位置换边。",
+        "三个总量混排，留相邻一盏的干扰。"
+      ],
+      "demo": "教师亮总量图及拿取格，只按一次正确拿取，交接从空手开始。",
+      "teacherAnchors": [
+        "delivery-job",
+        "game-target",
+        "load-lamps"
+      ]
+    }
+  ],
+  "quiz": [
+    {
+      "id": "left-from-sixteen",
+      "skill": "解释原有和拿走",
+      "prompt": "原有16件，送出9件，认出剩余图。",
+      "answer": "7件",
+      "position": 2
+    },
+    {
+      "id": "break-seventeen",
+      "skill": "破十与合并",
+      "prompt": "17减9，十格留一并合七。",
+      "answer": "8件",
+      "position": 3
+    },
+    {
+      "id": "take-nine-loose",
+      "skill": "连减在散数等于九时",
+      "prompt": "19件中先拿走散着的9件，判断十格是否还要拿。",
+      "answer": "十格全留",
+      "position": 1
+    },
+    {
+      "id": "put-nine-back",
+      "skill": "用加法复原",
+      "prompt": "看18总量，选能用9和余量复原的图。",
+      "answer": "9加9",
+      "position": 2
+    },
+    {
+      "id": "one-more-original",
+      "skill": "固定减数的规律",
+      "prompt": "原有17与18相差1，两个都取9，判断后者余量的变化。",
+      "answer": "后者多1件",
+      "position": 1
+    },
+    {
+      "id": "two-steps-for-a-display",
+      "skill": "先求总量，再找还缺",
+      "prompt": "两托先合成19个位置，放好9件，还差几件。",
+      "answer": "10件",
+      "position": 3
+    }
+  ],
+  "afterClass": {
+    "familyTask": "用一满十格和几件安全小物演示两种取法，向成人解释十格留下的1，再用9和余数还原。",
+    "weeklyQuestionSource": [
+      "原有、拿走和剩余",
+      "破十及连减",
+      "加法逆向检验",
+      "差的变化与生活迁移"
+    ],
+    "evidence": "线上只记操作和选择；实体摆放、口述及相邻空隙思考由家庭观察。"
+  },
+  "artAndLanguage": "正式情境与游戏背景由内置 imagegen 制作，具体数量、十格、移除标记、数量卡和图题均由坐标精确绘制。数字为教学目标，遮掉其余文字仍能看图操作。"
+}

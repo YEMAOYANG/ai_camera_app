@@ -1,0 +1,2125 @@
+{
+  "schemaVersion": "mira.courseware.asset-sources.v1",
+  "lesson": "fltrp-g1-lower-theyre-little-and-cute",
+  "assets": [
+    {
+      "key": "exhibit-door",
+      "file": "assets/exhibit-door.png",
+      "sourceType": "codex_imagegen",
+      "sha256": "4b78d9a445ac6050428d92c01c3a1fdab8a663bddea458646a15d6aaca84f609",
+      "size": [
+        758,
+        502
+      ],
+      "derivation": {
+        "operation": "crop_quadrant",
+        "box": [
+          5,
+          5,
+          763,
+          507
+        ]
+      },
+      "provider": "Codex built-in imagegen",
+      "source": "art-source/exhibit-environments.png",
+      "sourceSha256": "089159f179e6f258ce03547769b8cfd2a0c274efb7a350f1c24769a53f0e7639",
+      "prompt": "Exact 2×2 original matte gouache toy museum entrance, exhibition garden pond, soft empty exhibit maze backdrop, and tabletop workshop. No animals, people, lettering or props.",
+      "packaged": false
+    },
+    {
+      "key": "exhibit-pond",
+      "file": "assets/exhibit-pond.png",
+      "sourceType": "codex_imagegen",
+      "sha256": "532df777eb091207fdc569ace28c5e329e5f675c78d462e6c716853881ae4007",
+      "size": [
+        758,
+        502
+      ],
+      "derivation": {
+        "operation": "crop_quadrant",
+        "box": [
+          773,
+          5,
+          1531,
+          507
+        ]
+      },
+      "provider": "Codex built-in imagegen",
+      "source": "art-source/exhibit-environments.png",
+      "sourceSha256": "089159f179e6f258ce03547769b8cfd2a0c274efb7a350f1c24769a53f0e7639",
+      "prompt": "Exact 2×2 original matte gouache toy museum entrance, exhibition garden pond, soft empty exhibit maze backdrop, and tabletop workshop. No animals, people, lettering or props.",
+      "packaged": true
+    },
+    {
+      "key": "exhibit-map",
+      "file": "assets/exhibit-map.png",
+      "sourceType": "codex_imagegen",
+      "sha256": "9cb4f52199ea2aac87b4a45b8319fec92286f6bb03cdadb0b8fb1142c91868ef",
+      "size": [
+        758,
+        502
+      ],
+      "derivation": {
+        "operation": "crop_quadrant",
+        "box": [
+          5,
+          517,
+          763,
+          1019
+        ]
+      },
+      "provider": "Codex built-in imagegen",
+      "source": "art-source/exhibit-environments.png",
+      "sourceSha256": "089159f179e6f258ce03547769b8cfd2a0c274efb7a350f1c24769a53f0e7639",
+      "prompt": "Exact 2×2 original matte gouache toy museum entrance, exhibition garden pond, soft empty exhibit maze backdrop, and tabletop workshop. No animals, people, lettering or props.",
+      "packaged": true
+    },
+    {
+      "key": "exhibit-bench",
+      "file": "assets/exhibit-bench.png",
+      "sourceType": "codex_imagegen",
+      "sha256": "985b6430582eb07bfbaeec58e6fbf12baf0a121f94569176f619006f5e66fb13",
+      "size": [
+        758,
+        502
+      ],
+      "derivation": {
+        "operation": "crop_quadrant",
+        "box": [
+          773,
+          517,
+          1531,
+          1019
+        ]
+      },
+      "provider": "Codex built-in imagegen",
+      "source": "art-source/exhibit-environments.png",
+      "sourceSha256": "089159f179e6f258ce03547769b8cfd2a0c274efb7a350f1c24769a53f0e7639",
+      "prompt": "Exact 2×2 original matte gouache toy museum entrance, exhibition garden pond, soft empty exhibit maze backdrop, and tabletop workshop. No animals, people, lettering or props.",
+      "packaged": false
+    },
+    {
+      "key": "toy-foal",
+      "file": "assets/toy-foal.png",
+      "sourceType": "codex_imagegen",
+      "sha256": "b5741bf6e39f00a5d7bfe80dc39fc1d3d6b157f1ca2cc7115192dc8ff804884e",
+      "size": [
+        310,
+        327
+      ],
+      "derivation": {
+        "operation": "crop_chroma",
+        "box": [
+          0,
+          0,
+          440,
+          435
+        ]
+      },
+      "provider": "Codex built-in imagegen",
+      "source": "art-source/exhibit-animals.png",
+      "sourceSha256": "3dac3d24e7aaf33e9f5ea8d081df0054c000099d18897bc32a4931b24c2f210b",
+      "prompt": "Exact 4×2 isolated matte cut-paper toy animals on pure green key: foal, adult horse, plush bear, monkey, giraffe, panda, rabbit and elephant. One animal per cell.",
+      "packaged": false
+    },
+    {
+      "key": "toy-horse",
+      "file": "assets/toy-horse.png",
+      "sourceType": "codex_imagegen",
+      "sha256": "aca5daae614016af4c0fce9e0312659fa4434e25f97aaac4c63b78fa7046e91d",
+      "size": [
+        381,
+        393
+      ],
+      "derivation": {
+        "operation": "crop_chroma",
+        "box": [
+          445,
+          0,
+          880,
+          432
+        ]
+      },
+      "provider": "Codex built-in imagegen",
+      "source": "art-source/exhibit-animals.png",
+      "sourceSha256": "3dac3d24e7aaf33e9f5ea8d081df0054c000099d18897bc32a4931b24c2f210b",
+      "prompt": "Exact 4×2 isolated matte cut-paper toy animals on pure green key: foal, adult horse, plush bear, monkey, giraffe, panda, rabbit and elephant. One animal per cell.",
+      "packaged": false
+    },
+    {
+      "key": "toy-bear",
+      "file": "assets/toy-bear.png",
+      "sourceType": "codex_imagegen",
+      "sha256": "41649c44a6d5f19b61b0686744a946bdac6900307e3120906395c179aaef78b9",
+      "size": [
+        291,
+        365
+      ],
+      "derivation": {
+        "operation": "crop_chroma",
+        "box": [
+          891,
+          0,
+          1316,
+          433
+        ]
+      },
+      "provider": "Codex built-in imagegen",
+      "source": "art-source/exhibit-animals.png",
+      "sourceSha256": "3dac3d24e7aaf33e9f5ea8d081df0054c000099d18897bc32a4931b24c2f210b",
+      "prompt": "Exact 4×2 isolated matte cut-paper toy animals on pure green key: foal, adult horse, plush bear, monkey, giraffe, panda, rabbit and elephant. One animal per cell.",
+      "packaged": false
+    },
+    {
+      "key": "toy-monkey",
+      "file": "assets/toy-monkey.png",
+      "sourceType": "codex_imagegen",
+      "sha256": "7bba614be199f7186988e2e504f43505d6b2165082c267413cfdfc29a7eefaa2",
+      "size": [
+        352,
+        321
+      ],
+      "derivation": {
+        "operation": "crop_chroma",
+        "box": [
+          1330,
+          0,
+          1774,
+          433
+        ]
+      },
+      "provider": "Codex built-in imagegen",
+      "source": "art-source/exhibit-animals.png",
+      "sourceSha256": "3dac3d24e7aaf33e9f5ea8d081df0054c000099d18897bc32a4931b24c2f210b",
+      "prompt": "Exact 4×2 isolated matte cut-paper toy animals on pure green key: foal, adult horse, plush bear, monkey, giraffe, panda, rabbit and elephant. One animal per cell.",
+      "packaged": false
+    },
+    {
+      "key": "toy-giraffe",
+      "file": "assets/toy-giraffe.png",
+      "sourceType": "codex_imagegen",
+      "sha256": "c26792a453da0ab6327e1b4a5d58eec6c702282a632e40e01efe37522928545b",
+      "size": [
+        267,
+        425
+      ],
+      "derivation": {
+        "operation": "crop_chroma",
+        "box": [
+          0,
+          442,
+          426,
+          887
+        ]
+      },
+      "provider": "Codex built-in imagegen",
+      "source": "art-source/exhibit-animals.png",
+      "sourceSha256": "3dac3d24e7aaf33e9f5ea8d081df0054c000099d18897bc32a4931b24c2f210b",
+      "prompt": "Exact 4×2 isolated matte cut-paper toy animals on pure green key: foal, adult horse, plush bear, monkey, giraffe, panda, rabbit and elephant. One animal per cell.",
+      "packaged": false
+    },
+    {
+      "key": "toy-panda",
+      "file": "assets/toy-panda.png",
+      "sourceType": "codex_imagegen",
+      "sha256": "87b22efd433ce4a45c5ad383ce31d26feea5cbf129cb7534031d0b3723aff1f3",
+      "size": [
+        298,
+        380
+      ],
+      "derivation": {
+        "operation": "crop_chroma",
+        "box": [
+          446,
+          444,
+          870,
+          887
+        ]
+      },
+      "provider": "Codex built-in imagegen",
+      "source": "art-source/exhibit-animals.png",
+      "sourceSha256": "3dac3d24e7aaf33e9f5ea8d081df0054c000099d18897bc32a4931b24c2f210b",
+      "prompt": "Exact 4×2 isolated matte cut-paper toy animals on pure green key: foal, adult horse, plush bear, monkey, giraffe, panda, rabbit and elephant. One animal per cell.",
+      "packaged": false
+    },
+    {
+      "key": "toy-rabbit",
+      "file": "assets/toy-rabbit.png",
+      "sourceType": "codex_imagegen",
+      "sha256": "9cdc48ab7b877222f944ae874fe18bdbf12bbb2e944fb8b9f0d62d0cd5d8f98b",
+      "size": [
+        253,
+        391
+      ],
+      "derivation": {
+        "operation": "crop_chroma",
+        "box": [
+          890,
+          443,
+          1317,
+          887
+        ]
+      },
+      "provider": "Codex built-in imagegen",
+      "source": "art-source/exhibit-animals.png",
+      "sourceSha256": "3dac3d24e7aaf33e9f5ea8d081df0054c000099d18897bc32a4931b24c2f210b",
+      "prompt": "Exact 4×2 isolated matte cut-paper toy animals on pure green key: foal, adult horse, plush bear, monkey, giraffe, panda, rabbit and elephant. One animal per cell.",
+      "packaged": false
+    },
+    {
+      "key": "toy-elephant",
+      "file": "assets/toy-elephant.png",
+      "sourceType": "codex_imagegen",
+      "sha256": "07ddb69edfa8474312cc39f797498a7439338241f46efed1f0f583cddb7041bf",
+      "size": [
+        432,
+        328
+      ],
+      "derivation": {
+        "operation": "crop_chroma",
+        "box": [
+          1318,
+          446,
+          1774,
+          887
+        ]
+      },
+      "provider": "Codex built-in imagegen",
+      "source": "art-source/exhibit-animals.png",
+      "sourceSha256": "3dac3d24e7aaf33e9f5ea8d081df0054c000099d18897bc32a4931b24c2f210b",
+      "prompt": "Exact 4×2 isolated matte cut-paper toy animals on pure green key: foal, adult horse, plush bear, monkey, giraffe, panda, rabbit and elephant. One animal per cell.",
+      "packaged": false
+    },
+    {
+      "key": "wood-tiger",
+      "file": "assets/wood-tiger.png",
+      "sourceType": "codex_imagegen",
+      "sha256": "1581d4dc22f8c945edc2c666a658ecd625a15d57af610d3611184fedf3d8f25a",
+      "size": [
+        390,
+        335
+      ],
+      "derivation": {
+        "operation": "crop_chroma",
+        "box": [
+          0,
+          0,
+          446,
+          445
+        ]
+      },
+      "provider": "Codex built-in imagegen",
+      "source": "art-source/independent-quiz-animals.png",
+      "sourceSha256": "aaea736c3f7d5d2aaf20a0a6fd836cfa13ecb869c9ee3dc0e752a9a17d5fca6f",
+      "prompt": "Exact 4×2 independent gouache painted toy sprites on magenta key: tiger, dog, kitten, giraffe, rabbit, pony, elephant and horizontal snake. One animal per cell.",
+      "packaged": false
+    },
+    {
+      "key": "wood-dog",
+      "file": "assets/wood-dog.png",
+      "sourceType": "codex_imagegen",
+      "sha256": "da7a3dfc033d7e9804750a97c1ba16ce0bd72c5be1e3823834344ca0a86c3dc2",
+      "size": [
+        327,
+        334
+      ],
+      "derivation": {
+        "operation": "crop_chroma",
+        "box": [
+          448,
+          0,
+          870,
+          443
+        ]
+      },
+      "provider": "Codex built-in imagegen",
+      "source": "art-source/independent-quiz-animals.png",
+      "sourceSha256": "aaea736c3f7d5d2aaf20a0a6fd836cfa13ecb869c9ee3dc0e752a9a17d5fca6f",
+      "prompt": "Exact 4×2 independent gouache painted toy sprites on magenta key: tiger, dog, kitten, giraffe, rabbit, pony, elephant and horizontal snake. One animal per cell.",
+      "packaged": false
+    },
+    {
+      "key": "wood-cat",
+      "file": "assets/wood-cat.png",
+      "sourceType": "codex_imagegen",
+      "sha256": "c7cb262d5761dd24bf411b0b06d23f269a6273bc18e340dee56b9178dd4de086",
+      "size": [
+        315,
+        356
+      ],
+      "derivation": {
+        "operation": "crop_chroma",
+        "box": [
+          884,
+          0,
+          1320,
+          443
+        ]
+      },
+      "provider": "Codex built-in imagegen",
+      "source": "art-source/independent-quiz-animals.png",
+      "sourceSha256": "aaea736c3f7d5d2aaf20a0a6fd836cfa13ecb869c9ee3dc0e752a9a17d5fca6f",
+      "prompt": "Exact 4×2 independent gouache painted toy sprites on magenta key: tiger, dog, kitten, giraffe, rabbit, pony, elephant and horizontal snake. One animal per cell.",
+      "packaged": false
+    },
+    {
+      "key": "wood-giraffe",
+      "file": "assets/wood-giraffe.png",
+      "sourceType": "codex_imagegen",
+      "sha256": "5509fa6d27b70214c0b1750252ec22b7bd4e3ec2cd4db648d6919d3f811cdf32",
+      "size": [
+        282,
+        431
+      ],
+      "derivation": {
+        "operation": "crop_chroma",
+        "box": [
+          1327,
+          0,
+          1774,
+          450
+        ]
+      },
+      "provider": "Codex built-in imagegen",
+      "source": "art-source/independent-quiz-animals.png",
+      "sourceSha256": "aaea736c3f7d5d2aaf20a0a6fd836cfa13ecb869c9ee3dc0e752a9a17d5fca6f",
+      "prompt": "Exact 4×2 independent gouache painted toy sprites on magenta key: tiger, dog, kitten, giraffe, rabbit, pony, elephant and horizontal snake. One animal per cell.",
+      "packaged": false
+    },
+    {
+      "key": "wood-rabbit",
+      "file": "assets/wood-rabbit.png",
+      "sourceType": "codex_imagegen",
+      "sha256": "179a905337054edd3a5fdfe3f159ee86cac877e2014b7e82e453c4d4dbc8a643",
+      "size": [
+        310,
+        388
+      ],
+      "derivation": {
+        "operation": "crop_chroma",
+        "box": [
+          0,
+          449,
+          426,
+          887
+        ]
+      },
+      "provider": "Codex built-in imagegen",
+      "source": "art-source/independent-quiz-animals.png",
+      "sourceSha256": "aaea736c3f7d5d2aaf20a0a6fd836cfa13ecb869c9ee3dc0e752a9a17d5fca6f",
+      "prompt": "Exact 4×2 independent gouache painted toy sprites on magenta key: tiger, dog, kitten, giraffe, rabbit, pony, elephant and horizontal snake. One animal per cell.",
+      "packaged": false
+    },
+    {
+      "key": "wood-pony",
+      "file": "assets/wood-pony.png",
+      "sourceType": "codex_imagegen",
+      "sha256": "601129589a6e7c3eb382c29b84e7f794e988309992ddade550535626b8d25169",
+      "size": [
+        402,
+        380
+      ],
+      "derivation": {
+        "operation": "crop_chroma",
+        "box": [
+          430,
+          452,
+          860,
+          887
+        ]
+      },
+      "provider": "Codex built-in imagegen",
+      "source": "art-source/independent-quiz-animals.png",
+      "sourceSha256": "aaea736c3f7d5d2aaf20a0a6fd836cfa13ecb869c9ee3dc0e752a9a17d5fca6f",
+      "prompt": "Exact 4×2 independent gouache painted toy sprites on magenta key: tiger, dog, kitten, giraffe, rabbit, pony, elephant and horizontal snake. One animal per cell.",
+      "packaged": false
+    },
+    {
+      "key": "wood-elephant",
+      "file": "assets/wood-elephant.png",
+      "sourceType": "codex_imagegen",
+      "sha256": "9b5b2e24257d19dd556e789e0e39dda878930310010a3811584119a8f4ce7a52",
+      "size": [
+        415,
+        307
+      ],
+      "derivation": {
+        "operation": "crop_chroma",
+        "box": [
+          870,
+          451,
+          1315,
+          887
+        ]
+      },
+      "provider": "Codex built-in imagegen",
+      "source": "art-source/independent-quiz-animals.png",
+      "sourceSha256": "aaea736c3f7d5d2aaf20a0a6fd836cfa13ecb869c9ee3dc0e752a9a17d5fca6f",
+      "prompt": "Exact 4×2 independent gouache painted toy sprites on magenta key: tiger, dog, kitten, giraffe, rabbit, pony, elephant and horizontal snake. One animal per cell.",
+      "packaged": false
+    },
+    {
+      "key": "wood-snake",
+      "file": "assets/wood-snake.png",
+      "sourceType": "codex_imagegen",
+      "sha256": "cdfaa81268ad75701edafce0a2e0f1a00ba20837fe7c10a17e1b01b2989b3eea",
+      "size": [
+        438,
+        121
+      ],
+      "derivation": {
+        "operation": "crop_chroma",
+        "box": [
+          1317,
+          451,
+          1774,
+          887
+        ]
+      },
+      "provider": "Codex built-in imagegen",
+      "source": "art-source/independent-quiz-animals.png",
+      "sourceSha256": "aaea736c3f7d5d2aaf20a0a6fd836cfa13ecb869c9ee3dc0e752a9a17d5fca6f",
+      "prompt": "Exact 4×2 independent gouache painted toy sprites on magenta key: tiger, dog, kitten, giraffe, rabbit, pony, elephant and horizontal snake. One animal per cell.",
+      "packaged": false
+    },
+    {
+      "key": "bubble-boat",
+      "file": "assets/bubble-boat.png",
+      "sourceType": "codex_imagegen",
+      "sha256": "53915e4dfd84a86f2aa802847a0e107c994292d8edb0b7cd3ccadf40f370411e",
+      "size": [
+        425,
+        350
+      ],
+      "derivation": {
+        "operation": "crop_chroma",
+        "box": [
+          0,
+          0,
+          626,
+          627
+        ]
+      },
+      "provider": "Codex built-in imagegen",
+      "source": "art-source/exhibit-vehicles.png",
+      "sourceSha256": "8885b5c7c47e43c8421fa8a2b664cd7582e5ba77c9d86ba4d886944e11f0cc2b",
+      "prompt": "Exact 2×2 original four sprites on violet-magenta key: right-facing teal boat ready and blowing, right-facing toy car ready and puffing.",
+      "packaged": true
+    },
+    {
+      "key": "bubble-boat-action",
+      "file": "assets/bubble-boat-action.png",
+      "sourceType": "codex_imagegen",
+      "sha256": "e1eb2cec45304bbeb0fa80c7ebcec1f1ec554c9b64819cb87e1a98391a1822d1",
+      "size": [
+        498,
+        350
+      ],
+      "derivation": {
+        "operation": "crop_chroma",
+        "box": [
+          628,
+          0,
+          1254,
+          627
+        ]
+      },
+      "provider": "Codex built-in imagegen",
+      "source": "art-source/exhibit-vehicles.png",
+      "sourceSha256": "8885b5c7c47e43c8421fa8a2b664cd7582e5ba77c9d86ba4d886944e11f0cc2b",
+      "prompt": "Exact 2×2 original four sprites on violet-magenta key: right-facing teal boat ready and blowing, right-facing toy car ready and puffing.",
+      "packaged": true
+    },
+    {
+      "key": "exhibit-car",
+      "file": "assets/exhibit-car.png",
+      "sourceType": "codex_imagegen",
+      "sha256": "70b2b954cd1e0db60e6bf457516ff336011720e87fae352ce991d566b520c038",
+      "size": [
+        438,
+        361
+      ],
+      "derivation": {
+        "operation": "crop_chroma",
+        "box": [
+          0,
+          627,
+          626,
+          1254
+        ]
+      },
+      "provider": "Codex built-in imagegen",
+      "source": "art-source/exhibit-vehicles.png",
+      "sourceSha256": "8885b5c7c47e43c8421fa8a2b664cd7582e5ba77c9d86ba4d886944e11f0cc2b",
+      "prompt": "Exact 2×2 original four sprites on violet-magenta key: right-facing teal boat ready and blowing, right-facing toy car ready and puffing.",
+      "packaged": true
+    },
+    {
+      "key": "exhibit-car-action",
+      "file": "assets/exhibit-car-action.png",
+      "sourceType": "codex_imagegen",
+      "sha256": "2b45ed482f082521ee18dd14cc9fb874a52f8b96ad085c16821021b24585d83d",
+      "size": [
+        547,
+        361
+      ],
+      "derivation": {
+        "operation": "crop_chroma",
+        "box": [
+          628,
+          627,
+          1254,
+          1254
+        ]
+      },
+      "provider": "Codex built-in imagegen",
+      "source": "art-source/exhibit-vehicles.png",
+      "sourceSha256": "8885b5c7c47e43c8421fa8a2b664cd7582e5ba77c9d86ba4d886944e11f0cc2b",
+      "prompt": "Exact 2×2 original four sprites on violet-magenta key: right-facing teal boat ready and blowing, right-facing toy car ready and puffing.",
+      "packaged": true
+    },
+    {
+      "key": "bear-lifts",
+      "file": "assets/bear-lifts.png",
+      "sourceType": "code_drawn",
+      "sha256": "31360f28e2f2921f6e0dc0aff7ee8d88afb5348d7e26b67b9941e9af85f96138",
+      "size": [
+        516,
+        330
+      ],
+      "derivation": {
+        "operation": "compose_same_baseline_animals",
+        "animal": "toy-bear",
+        "count": 1,
+        "targetHeight": 149,
+        "renderedBoxes": [
+          [
+            98,
+            102,
+            217,
+            251
+          ]
+        ],
+        "baseline": 251,
+        "action": {
+          "blockBottom": 166,
+          "floorY": 251,
+          "raised": true
+        },
+        "colors": [
+          "#fff0ce",
+          "#e7b987",
+          "#996f50"
+        ]
+      },
+      "packaged": true
+    },
+    {
+      "key": "monkey-box-stays",
+      "file": "assets/monkey-box-stays.png",
+      "sourceType": "code_drawn",
+      "sha256": "57dc71441857d8b698df0a55ab212ff091d9b0b4d3c68d11e7df7975aef33e17",
+      "size": [
+        516,
+        330
+      ],
+      "derivation": {
+        "operation": "compose_same_baseline_animals",
+        "animal": "toy-monkey",
+        "count": 1,
+        "targetHeight": 149,
+        "renderedBoxes": [
+          [
+            76,
+            102,
+            239,
+            251
+          ]
+        ],
+        "baseline": 251,
+        "action": {
+          "blockBottom": 250,
+          "floorY": 251,
+          "raised": false
+        },
+        "colors": [
+          "#fff0ce",
+          "#e7b987",
+          "#996f50"
+        ]
+      },
+      "packaged": true
+    },
+    {
+      "key": "horses-little",
+      "file": "assets/horses-little.png",
+      "sourceType": "code_drawn",
+      "sha256": "808e388b9b030a0814802baf736fb24ca9240de5910506f186b5c7a6600c9512",
+      "size": [
+        516,
+        330
+      ],
+      "derivation": {
+        "operation": "compose_same_baseline_animals",
+        "animal": "toy-foal",
+        "count": 2,
+        "targetHeight": 92,
+        "renderedBoxes": [
+          [
+            115,
+            159,
+            202,
+            251
+          ],
+          [
+            321,
+            159,
+            408,
+            251
+          ]
+        ],
+        "baseline": 251,
+        "action": null,
+        "colors": [
+          "#fff0ce",
+          "#e7b987",
+          "#996f50"
+        ]
+      },
+      "packaged": true
+    },
+    {
+      "key": "horses-big",
+      "file": "assets/horses-big.png",
+      "sourceType": "code_drawn",
+      "sha256": "52152725d61222ad22a8146bc831cfe93b82d030332c6d7be561c3dbc7c2120e",
+      "size": [
+        516,
+        330
+      ],
+      "derivation": {
+        "operation": "compose_same_baseline_animals",
+        "animal": "toy-horse",
+        "count": 2,
+        "targetHeight": 170,
+        "renderedBoxes": [
+          [
+            76,
+            81,
+            241,
+            251
+          ],
+          [
+            282,
+            81,
+            447,
+            251
+          ]
+        ],
+        "baseline": 251,
+        "action": null,
+        "colors": [
+          "#fff0ce",
+          "#e7b987",
+          "#996f50"
+        ]
+      },
+      "packaged": true
+    },
+    {
+      "key": "horses-big-lift",
+      "file": "assets/horses-big-lift.png",
+      "sourceType": "code_drawn",
+      "sha256": "ce79d1338dcbedea0fa11fb78a7a17ec7aa47f0d0c30fef1628ea354d7fc7bcf",
+      "size": [
+        516,
+        330
+      ],
+      "derivation": {
+        "operation": "compose_same_baseline_animals",
+        "animal": "toy-horse",
+        "count": 2,
+        "targetHeight": 170,
+        "renderedBoxes": [
+          [
+            53,
+            82,
+            217,
+            251
+          ],
+          [
+            300,
+            82,
+            464,
+            251
+          ]
+        ],
+        "baseline": 251,
+        "action": {
+          "blockBottom": 166,
+          "floorY": 251,
+          "raised": true
+        },
+        "colors": [
+          "#fff0ce",
+          "#e7b987",
+          "#996f50"
+        ]
+      },
+      "packaged": true
+    },
+    {
+      "key": "horses-big-ground",
+      "file": "assets/horses-big-ground.png",
+      "sourceType": "code_drawn",
+      "sha256": "4f9bdd2caa33f427093be8da7a87fcbdc45f135958c9e8cf1ecae56246b30692",
+      "size": [
+        516,
+        330
+      ],
+      "derivation": {
+        "operation": "compose_same_baseline_animals",
+        "animal": "toy-horse",
+        "count": 2,
+        "targetHeight": 170,
+        "renderedBoxes": [
+          [
+            53,
+            82,
+            217,
+            251
+          ],
+          [
+            300,
+            82,
+            464,
+            251
+          ]
+        ],
+        "baseline": 251,
+        "action": {
+          "blockBottom": 250,
+          "floorY": 251,
+          "raised": false
+        },
+        "colors": [
+          "#fff0ce",
+          "#e7b987",
+          "#996f50"
+        ]
+      },
+      "packaged": true
+    },
+    {
+      "key": "horses-small-lift",
+      "file": "assets/horses-small-lift.png",
+      "sourceType": "code_drawn",
+      "sha256": "7be9b5743e690f0152842f39aa2a7db6e2c80af6172c8508d986ee284d8fbc53",
+      "size": [
+        516,
+        330
+      ],
+      "derivation": {
+        "operation": "compose_same_baseline_animals",
+        "animal": "toy-foal",
+        "count": 2,
+        "targetHeight": 96,
+        "renderedBoxes": [
+          [
+            89,
+            155,
+            180,
+            251
+          ],
+          [
+            336,
+            155,
+            427,
+            251
+          ]
+        ],
+        "baseline": 251,
+        "action": {
+          "blockBottom": 166,
+          "floorY": 251,
+          "raised": true
+        },
+        "colors": [
+          "#fff0ce",
+          "#e7b987",
+          "#996f50"
+        ]
+      },
+      "packaged": true
+    },
+    {
+      "key": "pandas-little-lift",
+      "file": "assets/pandas-little-lift.png",
+      "sourceType": "code_drawn",
+      "sha256": "f8547623ee2235758f56221b3b31be0d822fa1081e81730423af26bffa8a85a3",
+      "size": [
+        516,
+        330
+      ],
+      "derivation": {
+        "operation": "compose_same_baseline_animals",
+        "animal": "toy-panda",
+        "count": 2,
+        "targetHeight": 98,
+        "renderedBoxes": [
+          [
+            96,
+            153,
+            173,
+            251
+          ],
+          [
+            343,
+            153,
+            420,
+            251
+          ]
+        ],
+        "baseline": 251,
+        "action": {
+          "blockBottom": 166,
+          "floorY": 251,
+          "raised": true
+        },
+        "colors": [
+          "#fff0ce",
+          "#e7b987",
+          "#996f50"
+        ]
+      },
+      "packaged": true
+    },
+    {
+      "key": "pandas-big-lift",
+      "file": "assets/pandas-big-lift.png",
+      "sourceType": "code_drawn",
+      "sha256": "b3973591b218efc458a84622db1d7b08d96051e3b02e1f498daa3e7dabd9b1fe",
+      "size": [
+        516,
+        330
+      ],
+      "derivation": {
+        "operation": "compose_same_baseline_animals",
+        "animal": "toy-panda",
+        "count": 2,
+        "targetHeight": 170,
+        "renderedBoxes": [
+          [
+            68,
+            81,
+            201,
+            251
+          ],
+          [
+            315,
+            81,
+            448,
+            251
+          ]
+        ],
+        "baseline": 251,
+        "action": {
+          "blockBottom": 166,
+          "floorY": 251,
+          "raised": true
+        },
+        "colors": [
+          "#fff0ce",
+          "#e7b987",
+          "#996f50"
+        ]
+      },
+      "packaged": true
+    },
+    {
+      "key": "pandas-little-ground",
+      "file": "assets/pandas-little-ground.png",
+      "sourceType": "code_drawn",
+      "sha256": "ba01c71a5ac928815fec663311b1989d38a63d00308d388b873a861116b8ced3",
+      "size": [
+        516,
+        330
+      ],
+      "derivation": {
+        "operation": "compose_same_baseline_animals",
+        "animal": "toy-panda",
+        "count": 2,
+        "targetHeight": 98,
+        "renderedBoxes": [
+          [
+            96,
+            153,
+            173,
+            251
+          ],
+          [
+            343,
+            153,
+            420,
+            251
+          ]
+        ],
+        "baseline": 251,
+        "action": {
+          "blockBottom": 250,
+          "floorY": 251,
+          "raised": false
+        },
+        "colors": [
+          "#fff0ce",
+          "#e7b987",
+          "#996f50"
+        ]
+      },
+      "packaged": true
+    },
+    {
+      "key": "rabbits-little",
+      "file": "assets/rabbits-little.png",
+      "sourceType": "code_drawn",
+      "sha256": "b05bb8d23249324f08a196a80fa91bf6706b253607a7175daf16bee02922f9cf",
+      "size": [
+        516,
+        330
+      ],
+      "derivation": {
+        "operation": "compose_same_baseline_animals",
+        "animal": "toy-rabbit",
+        "count": 2,
+        "targetHeight": 106,
+        "renderedBoxes": [
+          [
+            124,
+            145,
+            193,
+            251
+          ],
+          [
+            330,
+            145,
+            399,
+            251
+          ]
+        ],
+        "baseline": 251,
+        "action": null,
+        "colors": [
+          "#dceee3",
+          "#a6c8ae",
+          "#50785c"
+        ]
+      },
+      "packaged": true
+    },
+    {
+      "key": "giraffes-tall",
+      "file": "assets/giraffes-tall.png",
+      "sourceType": "code_drawn",
+      "sha256": "45850d810157f47f95983bc326ebcc19b306e0147cbde29a24184ed71b3c8154",
+      "size": [
+        516,
+        330
+      ],
+      "derivation": {
+        "operation": "compose_same_baseline_animals",
+        "animal": "toy-giraffe",
+        "count": 2,
+        "targetHeight": 179,
+        "renderedBoxes": [
+          [
+            102,
+            72,
+            214,
+            251
+          ],
+          [
+            308,
+            72,
+            420,
+            251
+          ]
+        ],
+        "baseline": 251,
+        "action": null,
+        "colors": [
+          "#dceee3",
+          "#a6c8ae",
+          "#50785c"
+        ]
+      },
+      "packaged": true
+    },
+    {
+      "key": "elephants-big",
+      "file": "assets/elephants-big.png",
+      "sourceType": "code_drawn",
+      "sha256": "e7e776634260766c9611f8556a4ea1ceea2a15a9f4bf3d1a670736587353084d",
+      "size": [
+        516,
+        330
+      ],
+      "derivation": {
+        "operation": "compose_same_baseline_animals",
+        "animal": "toy-elephant",
+        "count": 2,
+        "targetHeight": 168,
+        "renderedBoxes": [
+          [
+            63,
+            106,
+            254,
+            251
+          ],
+          [
+            269,
+            106,
+            460,
+            251
+          ]
+        ],
+        "baseline": 251,
+        "action": null,
+        "colors": [
+          "#dceee3",
+          "#a6c8ae",
+          "#50785c"
+        ]
+      },
+      "packaged": true
+    },
+    {
+      "key": "pandas-little",
+      "file": "assets/pandas-little.png",
+      "sourceType": "code_drawn",
+      "sha256": "eea974872352b84827f89d9b6a049dd3a63af1cc31bf165fcc831b342c6c6ee6",
+      "size": [
+        516,
+        330
+      ],
+      "derivation": {
+        "operation": "compose_same_baseline_animals",
+        "animal": "toy-panda",
+        "count": 2,
+        "targetHeight": 97,
+        "renderedBoxes": [
+          [
+            120,
+            154,
+            196,
+            251
+          ],
+          [
+            326,
+            154,
+            402,
+            251
+          ]
+        ],
+        "baseline": 251,
+        "action": null,
+        "colors": [
+          "#dceee3",
+          "#a6c8ae",
+          "#50785c"
+        ]
+      },
+      "packaged": true
+    },
+    {
+      "key": "snakes-long",
+      "file": "assets/snakes-long.png",
+      "sourceType": "code_drawn",
+      "sha256": "940be8dc84770fd9fe969d86ba1c8bcb475b564c514d7e46a000fbc63aa06b10",
+      "size": [
+        516,
+        330
+      ],
+      "derivation": {
+        "operation": "compose_same_baseline_animals",
+        "animal": "wood-snake",
+        "count": 2,
+        "targetHeight": 90,
+        "renderedBoxes": [
+          [
+            63,
+            198,
+            254,
+            251
+          ],
+          [
+            269,
+            198,
+            460,
+            251
+          ]
+        ],
+        "baseline": 251,
+        "action": null,
+        "colors": [
+          "#dceee3",
+          "#a6c8ae",
+          "#50785c"
+        ]
+      },
+      "packaged": true
+    },
+    {
+      "key": "q1-dogs-ground",
+      "file": "assets/q1-dogs-ground.png",
+      "sourceType": "code_drawn",
+      "sha256": "733316459e29a49a9b50f8a3262fe51e3b9694fecc41bebcde056ba17be20c53",
+      "size": [
+        516,
+        330
+      ],
+      "derivation": {
+        "operation": "compose_same_baseline_animals",
+        "animal": "wood-dog",
+        "count": 2,
+        "targetHeight": 152,
+        "renderedBoxes": [
+          [
+            60,
+            99,
+            209,
+            251
+          ],
+          [
+            307,
+            99,
+            456,
+            251
+          ]
+        ],
+        "baseline": 251,
+        "action": {
+          "blockBottom": 250,
+          "floorY": 251,
+          "raised": false
+        },
+        "colors": [
+          "#dbeceb",
+          "#98bfb5",
+          "#4e7569"
+        ]
+      },
+      "packaged": true
+    },
+    {
+      "key": "q1-dogs-lift",
+      "file": "assets/q1-dogs-lift.png",
+      "sourceType": "code_drawn",
+      "sha256": "6d1e6c54c8ad59b070cf42b1565b0a0d4d78d02a3131ae0f44951e30073bd4a1",
+      "size": [
+        516,
+        330
+      ],
+      "derivation": {
+        "operation": "compose_same_baseline_animals",
+        "animal": "wood-dog",
+        "count": 2,
+        "targetHeight": 152,
+        "renderedBoxes": [
+          [
+            60,
+            99,
+            209,
+            251
+          ],
+          [
+            307,
+            99,
+            456,
+            251
+          ]
+        ],
+        "baseline": 251,
+        "action": {
+          "blockBottom": 166,
+          "floorY": 251,
+          "raised": true
+        },
+        "colors": [
+          "#dbeceb",
+          "#98bfb5",
+          "#4e7569"
+        ]
+      },
+      "packaged": true
+    },
+    {
+      "key": "q1-cats-ground",
+      "file": "assets/q1-cats-ground.png",
+      "sourceType": "code_drawn",
+      "sha256": "c353025553285b1bb3b1d242045f0f10709140baae2d7ba3eb7decd39e92fda3",
+      "size": [
+        516,
+        330
+      ],
+      "derivation": {
+        "operation": "compose_same_baseline_animals",
+        "animal": "wood-cat",
+        "count": 2,
+        "targetHeight": 152,
+        "renderedBoxes": [
+          [
+            68,
+            99,
+            202,
+            251
+          ],
+          [
+            315,
+            99,
+            449,
+            251
+          ]
+        ],
+        "baseline": 251,
+        "action": {
+          "blockBottom": 250,
+          "floorY": 251,
+          "raised": false
+        },
+        "colors": [
+          "#dbeceb",
+          "#98bfb5",
+          "#4e7569"
+        ]
+      },
+      "packaged": true
+    },
+    {
+      "key": "q2-elephants-big-lift",
+      "file": "assets/q2-elephants-big-lift.png",
+      "sourceType": "code_drawn",
+      "sha256": "101b6d1a559d5bbaac9c3550b22435cd7d37fed1fe09317c19cca563de350173",
+      "size": [
+        516,
+        330
+      ],
+      "derivation": {
+        "operation": "compose_same_baseline_animals",
+        "animal": "wood-elephant",
+        "count": 2,
+        "targetHeight": 170,
+        "renderedBoxes": [
+          [
+            53,
+            130,
+            217,
+            251
+          ],
+          [
+            300,
+            130,
+            464,
+            251
+          ]
+        ],
+        "baseline": 251,
+        "action": {
+          "blockBottom": 166,
+          "floorY": 251,
+          "raised": true
+        },
+        "colors": [
+          "#f3e5d7",
+          "#dbb68b",
+          "#8c6a4c"
+        ]
+      },
+      "packaged": true
+    },
+    {
+      "key": "q2-elephants-big-ground",
+      "file": "assets/q2-elephants-big-ground.png",
+      "sourceType": "code_drawn",
+      "sha256": "cc41f47ebb5595a2edd5ec7341f9de8c9afb9c40994496a4f819dd904939fe6c",
+      "size": [
+        516,
+        330
+      ],
+      "derivation": {
+        "operation": "compose_same_baseline_animals",
+        "animal": "wood-elephant",
+        "count": 2,
+        "targetHeight": 170,
+        "renderedBoxes": [
+          [
+            53,
+            130,
+            217,
+            251
+          ],
+          [
+            300,
+            130,
+            464,
+            251
+          ]
+        ],
+        "baseline": 251,
+        "action": {
+          "blockBottom": 250,
+          "floorY": 251,
+          "raised": false
+        },
+        "colors": [
+          "#f3e5d7",
+          "#dbb68b",
+          "#8c6a4c"
+        ]
+      },
+      "packaged": true
+    },
+    {
+      "key": "q2-elephants-small-lift",
+      "file": "assets/q2-elephants-small-lift.png",
+      "sourceType": "code_drawn",
+      "sha256": "89dde5ad9e9f968b5dbf6e57d17ade54010779b1c4040b83534fdad137b921a7",
+      "size": [
+        516,
+        330
+      ],
+      "derivation": {
+        "operation": "compose_same_baseline_animals",
+        "animal": "wood-elephant",
+        "count": 2,
+        "targetHeight": 88,
+        "renderedBoxes": [
+          [
+            75,
+            163,
+            194,
+            251
+          ],
+          [
+            322,
+            163,
+            441,
+            251
+          ]
+        ],
+        "baseline": 251,
+        "action": {
+          "blockBottom": 166,
+          "floorY": 251,
+          "raised": true
+        },
+        "colors": [
+          "#f3e5d7",
+          "#dbb68b",
+          "#8c6a4c"
+        ]
+      },
+      "packaged": true
+    },
+    {
+      "key": "q3-rabbits-low",
+      "file": "assets/q3-rabbits-low.png",
+      "sourceType": "code_drawn",
+      "sha256": "edc2b4b1da519e1883971af24ff17348178c4e5f14cac7b046401fc5b1f8be5e",
+      "size": [
+        516,
+        330
+      ],
+      "derivation": {
+        "operation": "compose_same_baseline_animals",
+        "animal": "wood-rabbit",
+        "count": 2,
+        "targetHeight": 98,
+        "renderedBoxes": [
+          [
+            119,
+            153,
+            197,
+            251
+          ],
+          [
+            325,
+            153,
+            403,
+            251
+          ]
+        ],
+        "baseline": 251,
+        "action": null,
+        "colors": [
+          "#fff1d4",
+          "#d4c798",
+          "#81633e"
+        ]
+      },
+      "packaged": true
+    },
+    {
+      "key": "q3-elephants-low",
+      "file": "assets/q3-elephants-low.png",
+      "sourceType": "code_drawn",
+      "sha256": "07a372cf531c35be57c9a3f231c883afaccda6817b1a421728cc0f93978d5cdf",
+      "size": [
+        516,
+        330
+      ],
+      "derivation": {
+        "operation": "compose_same_baseline_animals",
+        "animal": "wood-elephant",
+        "count": 2,
+        "targetHeight": 102,
+        "renderedBoxes": [
+          [
+            89,
+            149,
+            227,
+            251
+          ],
+          [
+            295,
+            149,
+            433,
+            251
+          ]
+        ],
+        "baseline": 251,
+        "action": null,
+        "colors": [
+          "#fff1d4",
+          "#d4c798",
+          "#81633e"
+        ]
+      },
+      "packaged": true
+    },
+    {
+      "key": "q3-giraffes-tall",
+      "file": "assets/q3-giraffes-tall.png",
+      "sourceType": "code_drawn",
+      "sha256": "7255b1408d715afbade66ea0cb82f4f071476baf8fc899d469cb6fdd684e6738",
+      "size": [
+        516,
+        330
+      ],
+      "derivation": {
+        "operation": "compose_same_baseline_animals",
+        "animal": "wood-giraffe",
+        "count": 2,
+        "targetHeight": 184,
+        "renderedBoxes": [
+          [
+            98,
+            67,
+            218,
+            251
+          ],
+          [
+            304,
+            67,
+            424,
+            251
+          ]
+        ],
+        "baseline": 251,
+        "action": null,
+        "colors": [
+          "#fff1d4",
+          "#d4c798",
+          "#81633e"
+        ]
+      },
+      "packaged": true
+    },
+    {
+      "key": "q4-horses-big",
+      "file": "assets/q4-horses-big.png",
+      "sourceType": "code_drawn",
+      "sha256": "204765035baf6691748dc148651965f663556a31c9ff10ec7f6ae4fbe1ba8869",
+      "size": [
+        516,
+        330
+      ],
+      "derivation": {
+        "operation": "compose_same_baseline_animals",
+        "animal": "wood-pony",
+        "count": 2,
+        "targetHeight": 171,
+        "renderedBoxes": [
+          [
+            68,
+            80,
+            249,
+            251
+          ],
+          [
+            274,
+            80,
+            455,
+            251
+          ]
+        ],
+        "baseline": 251,
+        "action": null,
+        "colors": [
+          "#efe4ec",
+          "#c6b1c7",
+          "#786882"
+        ]
+      },
+      "packaged": true
+    },
+    {
+      "key": "q4-elephants-little",
+      "file": "assets/q4-elephants-little.png",
+      "sourceType": "code_drawn",
+      "sha256": "2dbf1b0ea785649bc7a15c1f8a243b7bf49b2389c2f93aafea829d9ca457d4f4",
+      "size": [
+        516,
+        330
+      ],
+      "derivation": {
+        "operation": "compose_same_baseline_animals",
+        "animal": "wood-elephant",
+        "count": 2,
+        "targetHeight": 86,
+        "renderedBoxes": [
+          [
+            100,
+            165,
+            216,
+            251
+          ],
+          [
+            306,
+            165,
+            422,
+            251
+          ]
+        ],
+        "baseline": 251,
+        "action": null,
+        "colors": [
+          "#efe4ec",
+          "#c6b1c7",
+          "#786882"
+        ]
+      },
+      "packaged": true
+    },
+    {
+      "key": "q4-tigers-big",
+      "file": "assets/q4-tigers-big.png",
+      "sourceType": "code_drawn",
+      "sha256": "b7451b443fac70d13638cded70ec96f267aa8b0d2addb559f16088954b5a3b2f",
+      "size": [
+        516,
+        330
+      ],
+      "derivation": {
+        "operation": "compose_same_baseline_animals",
+        "animal": "wood-tiger",
+        "count": 2,
+        "targetHeight": 174,
+        "renderedBoxes": [
+          [
+            63,
+            87,
+            254,
+            251
+          ],
+          [
+            269,
+            87,
+            460,
+            251
+          ]
+        ],
+        "baseline": 251,
+        "action": null,
+        "colors": [
+          "#efe4ec",
+          "#c6b1c7",
+          "#786882"
+        ]
+      },
+      "packaged": true
+    },
+    {
+      "key": "q5-tigers-lift",
+      "file": "assets/q5-tigers-lift.png",
+      "sourceType": "code_drawn",
+      "sha256": "bb88401d9f05873d9e785476502ed2504d9acb67764e03161ea62d667da0ec1f",
+      "size": [
+        516,
+        330
+      ],
+      "derivation": {
+        "operation": "compose_same_baseline_animals",
+        "animal": "wood-tiger",
+        "count": 2,
+        "targetHeight": 152,
+        "renderedBoxes": [
+          [
+            53,
+            110,
+            217,
+            251
+          ],
+          [
+            300,
+            110,
+            464,
+            251
+          ]
+        ],
+        "baseline": 251,
+        "action": {
+          "blockBottom": 166,
+          "floorY": 251,
+          "raised": true
+        },
+        "colors": [
+          "#e4ead8",
+          "#b2bd8a",
+          "#6f7b46"
+        ]
+      },
+      "packaged": true
+    },
+    {
+      "key": "q5-cats-ground",
+      "file": "assets/q5-cats-ground.png",
+      "sourceType": "code_drawn",
+      "sha256": "6211cfb062634cf08fcfa30710858516e65087c0fa672f72928fedf878cb78e6",
+      "size": [
+        516,
+        330
+      ],
+      "derivation": {
+        "operation": "compose_same_baseline_animals",
+        "animal": "wood-cat",
+        "count": 2,
+        "targetHeight": 152,
+        "renderedBoxes": [
+          [
+            68,
+            99,
+            202,
+            251
+          ],
+          [
+            315,
+            99,
+            449,
+            251
+          ]
+        ],
+        "baseline": 251,
+        "action": {
+          "blockBottom": 250,
+          "floorY": 251,
+          "raised": false
+        },
+        "colors": [
+          "#e4ead8",
+          "#b2bd8a",
+          "#6f7b46"
+        ]
+      },
+      "packaged": true
+    },
+    {
+      "key": "q5-tigers-ground",
+      "file": "assets/q5-tigers-ground.png",
+      "sourceType": "code_drawn",
+      "sha256": "c60feda86781a28d48c0e5218c614de788e847dcadc6cd2638f16a25198a59d9",
+      "size": [
+        516,
+        330
+      ],
+      "derivation": {
+        "operation": "compose_same_baseline_animals",
+        "animal": "wood-tiger",
+        "count": 2,
+        "targetHeight": 152,
+        "renderedBoxes": [
+          [
+            53,
+            110,
+            217,
+            251
+          ],
+          [
+            300,
+            110,
+            464,
+            251
+          ]
+        ],
+        "baseline": 251,
+        "action": {
+          "blockBottom": 250,
+          "floorY": 251,
+          "raised": false
+        },
+        "colors": [
+          "#e4ead8",
+          "#b2bd8a",
+          "#6f7b46"
+        ]
+      },
+      "packaged": true
+    },
+    {
+      "key": "q6-rabbits-big",
+      "file": "assets/q6-rabbits-big.png",
+      "sourceType": "code_drawn",
+      "sha256": "8929969b602d20f4a49e8e28d86af81dfc6d80a0cadd449d33cf01dd2843bd68",
+      "size": [
+        516,
+        330
+      ],
+      "derivation": {
+        "operation": "compose_same_baseline_animals",
+        "animal": "wood-rabbit",
+        "count": 2,
+        "targetHeight": 171,
+        "renderedBoxes": [
+          [
+            90,
+            80,
+            227,
+            251
+          ],
+          [
+            296,
+            80,
+            433,
+            251
+          ]
+        ],
+        "baseline": 251,
+        "action": null,
+        "colors": [
+          "#e2eaf1",
+          "#acc0c8",
+          "#557587"
+        ]
+      },
+      "packaged": true
+    },
+    {
+      "key": "q6-rabbits-little",
+      "file": "assets/q6-rabbits-little.png",
+      "sourceType": "code_drawn",
+      "sha256": "999a04b58cac6e86dac2d6411b5bf77f36d89c025dee247876813c0a8cca1967",
+      "size": [
+        516,
+        330
+      ],
+      "derivation": {
+        "operation": "compose_same_baseline_animals",
+        "animal": "wood-rabbit",
+        "count": 2,
+        "targetHeight": 85,
+        "renderedBoxes": [
+          [
+            124,
+            166,
+            192,
+            251
+          ],
+          [
+            330,
+            166,
+            398,
+            251
+          ]
+        ],
+        "baseline": 251,
+        "action": null,
+        "colors": [
+          "#e2eaf1",
+          "#acc0c8",
+          "#557587"
+        ]
+      },
+      "packaged": true
+    },
+    {
+      "key": "q6-cats-big",
+      "file": "assets/q6-cats-big.png",
+      "sourceType": "code_drawn",
+      "sha256": "dcc8ef8af09fdb33cac4170e57477ec602c82293f2c0f28155b36e75557cbab7",
+      "size": [
+        516,
+        330
+      ],
+      "derivation": {
+        "operation": "compose_same_baseline_animals",
+        "animal": "wood-cat",
+        "count": 2,
+        "targetHeight": 171,
+        "renderedBoxes": [
+          [
+            83,
+            80,
+            234,
+            251
+          ],
+          [
+            289,
+            80,
+            440,
+            251
+          ]
+        ],
+        "baseline": 251,
+        "action": null,
+        "colors": [
+          "#e2eaf1",
+          "#acc0c8",
+          "#557587"
+        ]
+      },
+      "packaged": true
+    },
+    {
+      "key": "open-exhibit",
+      "file": "assets/open-exhibit.png",
+      "sourceType": "code_drawn",
+      "sha256": "cd7392e77f400e439bf9b11a59e719e9ee9fdf94cf97b1026b2a9cde7633c79a",
+      "size": [
+        830,
+        422
+      ],
+      "derivation": {
+        "operation": "compose_story_scene",
+        "background": "exhibit-door",
+        "sprites": [
+          [
+            "toy-bear",
+            [
+              88,
+              247,
+              146,
+              143
+            ],
+            false
+          ],
+          [
+            "toy-giraffe",
+            [
+              336,
+              162,
+              155,
+              206
+            ],
+            false
+          ],
+          [
+            "toy-foal",
+            [
+              591,
+              251,
+              128,
+              126
+            ],
+            true
+          ]
+        ]
+      },
+      "packaged": true
+    },
+    {
+      "key": "workshop-finale",
+      "file": "assets/workshop-finale.png",
+      "sourceType": "code_drawn",
+      "sha256": "1c53a37668afc8b98af06c4e143a327a09ca2fbcf3093e65c4eaaa79c7960b19",
+      "size": [
+        830,
+        422
+      ],
+      "derivation": {
+        "operation": "compose_story_scene",
+        "background": "exhibit-bench",
+        "sprites": [
+          [
+            "toy-foal",
+            [
+              72,
+              247,
+              139,
+              129
+            ],
+            false
+          ],
+          [
+            "toy-foal",
+            [
+              215,
+              254,
+              140,
+              126
+            ],
+            true
+          ],
+          [
+            "toy-horse",
+            [
+              426,
+              173,
+              163,
+              205
+            ],
+            false
+          ],
+          [
+            "toy-horse",
+            [
+              618,
+              173,
+              154,
+              205
+            ],
+            true
+          ]
+        ]
+      },
+      "packaged": true
+    },
+    {
+      "key": "quiz-stem-1",
+      "file": "assets/quiz-stem-1.png",
+      "sourceType": "code_drawn",
+      "sha256": "b3cf493bce6eb0d187b47e9edc41f37a17bf2dd690afa1f883edd21ee0a55dc4",
+      "size": [
+        260,
+        175
+      ],
+      "derivation": {
+        "operation": "draw_listening_symbol",
+        "colors": [
+          "#dbeceb",
+          "#98bfb5",
+          "#4e7569"
+        ]
+      },
+      "packaged": true
+    },
+    {
+      "key": "quiz-stem-2",
+      "file": "assets/quiz-stem-2.png",
+      "sourceType": "code_drawn",
+      "sha256": "9eccf7b4de9a7982510b5d764af7174113edd53e6544c87e2d6e43a2c4591394",
+      "size": [
+        260,
+        175
+      ],
+      "derivation": {
+        "operation": "draw_listening_symbol",
+        "colors": [
+          "#f3e5d7",
+          "#dbb68b",
+          "#8c6a4c"
+        ]
+      },
+      "packaged": true
+    },
+    {
+      "key": "quiz-stem-3",
+      "file": "assets/quiz-stem-3.png",
+      "sourceType": "code_drawn",
+      "sha256": "eb3072d1e6a954177f076d04214e406e47e8231675ab1724cbf100f1cecc9449",
+      "size": [
+        260,
+        175
+      ],
+      "derivation": {
+        "operation": "draw_listening_symbol",
+        "colors": [
+          "#fff1d4",
+          "#d4c798",
+          "#81633e"
+        ]
+      },
+      "packaged": true
+    },
+    {
+      "key": "quiz-stem-4",
+      "file": "assets/quiz-stem-4.png",
+      "sourceType": "code_drawn",
+      "sha256": "2329c1e96e6b69399ec1b258681354a4439e4463abefaefe10f2ac19c5c5be8c",
+      "size": [
+        260,
+        175
+      ],
+      "derivation": {
+        "operation": "draw_listening_symbol",
+        "colors": [
+          "#efe4ec",
+          "#c6b1c7",
+          "#786882"
+        ]
+      },
+      "packaged": true
+    },
+    {
+      "key": "quiz-stem-5",
+      "file": "assets/quiz-stem-5.png",
+      "sourceType": "code_drawn",
+      "sha256": "b3a82eed0b6ffe80b17cee3fdee6a8403d13b9dc3407211f250beb5fe065439f",
+      "size": [
+        260,
+        175
+      ],
+      "derivation": {
+        "operation": "draw_listening_symbol",
+        "colors": [
+          "#e4ead8",
+          "#b2bd8a",
+          "#6f7b46"
+        ]
+      },
+      "packaged": true
+    },
+    {
+      "key": "quiz-stem-6",
+      "file": "assets/quiz-stem-6.png",
+      "sourceType": "code_drawn",
+      "sha256": "e38b75a06368adf723aacccc632f762af2c72e58e902321fdffc5a7f5187af41",
+      "size": [
+        260,
+        175
+      ],
+      "derivation": {
+        "operation": "draw_listening_symbol",
+        "colors": [
+          "#e2eaf1",
+          "#acc0c8",
+          "#557587"
+        ]
+      },
+      "packaged": true
+    },
+    {
+      "key": "exhibit-sticker",
+      "file": "assets/exhibit-sticker.png",
+      "sourceType": "code_drawn",
+      "sha256": "3c8c50aa2373d8ad3d2d1ab2d9b5b9408a636dcaad2ca8dd8487f2b01ee7da97",
+      "size": [
+        230,
+        230
+      ],
+      "derivation": {
+        "operation": "sticker_with_sprite",
+        "sprite": "toy-foal"
+      },
+      "packaged": true
+    }
+  ]
+}

@@ -1,0 +1,204 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "整理和复习｜100以内的口算加、减法",
+  "binding": {
+    "editionId": "pep-math-g1-lower-2022-standard",
+    "revisionId": "directory-6205d2037284e91f10b25edd",
+    "nodeId": "f760f10e-29b3-4677-bde4-621cfbe06702",
+    "unitId": "ac9164b9-5eba-4c7e-9436-214fc2df042b"
+  },
+  "scenario": "社区广播站准备交换展示牌。孩子先把算式卡送到对的操作台，再用十束与散件修正进退位，最后比较两套展示方案。",
+  "goals": [
+    "能先按加减、再按进位或退位给口算分类，也能解释一种按位数分类的办法。",
+    "用小棒或计数器说明几个一与几个一、几个十与几个十相加减，分辨加一位数和加整十数。",
+    "个位满十把十个一换为一个十；个位不够减把一个十换为十个一，能用图核对口算结果。",
+    "根据生活图的已知和所问，选择求差、加起来比较或连减同数，并用图或算式检查。"
+  ],
+  "goalEvidence": [
+    {
+      "skill": "organize-oral-calculation",
+      "target": "能先按加减、再按进位或退位给口算分类，也能解释一种按位数分类的办法。",
+      "source": "印53、课件4至8、教案2"
+    },
+    {
+      "skill": "match-place-units",
+      "target": "用小棒或计数器说明几个一与几个一、几个十与几个十相加减，分辨加一位数和加整十数。",
+      "source": "印53、课件13至15"
+    },
+    {
+      "skill": "regroup-and-check",
+      "target": "个位满十把十个一换为一个十；个位不够减把一个十换为十个一，能用图核对口算结果。",
+      "source": "印53、课件11及18、教案3"
+    },
+    {
+      "skill": "select-strategy-from-picture",
+      "target": "根据生活图的已知和所问，选择求差、加起来比较或连减同数，并用图或算式检查。",
+      "source": "印54至55、课件23至24"
+    }
+  ],
+  "pageSequence": [
+    {
+      "key": "map-start",
+      "kind": "teaching",
+      "title": "给口算卡找位置"
+    },
+    {
+      "key": "sort-by-operation",
+      "kind": "teaching",
+      "title": "先分加法和减法"
+    },
+    {
+      "key": "change-criteria",
+      "kind": "teaching",
+      "title": "换一条分卡规则"
+    },
+    {
+      "key": "sorting-rules",
+      "kind": "teaching",
+      "title": "上车前先听规则"
+    },
+    {
+      "key": "send-cards",
+      "kind": "interactive",
+      "title": "推口算卡到对应托盘"
+    },
+    {
+      "key": "same-place",
+      "kind": "teaching",
+      "title": "整捆和整捆算，散块和散块算"
+    },
+    {
+      "key": "carry-and-uncarry",
+      "kind": "teaching",
+      "title": "十个一和一个十互相换"
+    },
+    {
+      "key": "match-rules",
+      "kind": "teaching",
+      "title": "结果图怎么核对"
+    },
+    {
+      "key": "match-picture-result",
+      "kind": "interactive",
+      "title": "发射算式，配对结果图"
+    },
+    {
+      "key": "real-situations",
+      "kind": "teaching",
+      "title": "还差多少张票"
+    },
+    {
+      "key": "one-or-several",
+      "kind": "teaching",
+      "title": "每次搬一样多"
+    },
+    {
+      "key": "capacity-limit",
+      "kind": "teaching",
+      "title": "两叠票能不能一起放"
+    },
+    {
+      "key": "check-with-compare",
+      "kind": "teaching",
+      "title": "先算清，再看符号"
+    },
+    {
+      "key": "picture-check",
+      "kind": "quiz",
+      "title": "听题，用新图查一查"
+    },
+    {
+      "key": "recap-map",
+      "kind": "teaching",
+      "title": "把方法带回家"
+    }
+  ],
+  "games": [
+    {
+      "page": "send-cards",
+      "template": "sortingDepot",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.sortingDepot",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "classification",
+      "selection": "按当关播报的规则把算式卡推到托盘。加减符号、十束和散件是目标图示；所有卡和托盘底色一致。错类推入不计分。",
+      "levels": [
+        "开阔地先推加减两张卡。",
+        "绕柱送三张加法卡，个位满十与不满十分开。",
+        "多处绕路送四张减法卡，按是否退位分；侧边两种规则图的次序换过。"
+      ],
+      "demo": "圈当前规则、两张卡与托盘，讲清为什么第一张可归类，再实际推到首盘，复位交接。"
+    },
+    {
+      "page": "match-picture-result",
+      "template": "magnetMarbles",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.magnetMarbles",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "pair_match",
+      "selection": "每颗弹珠代表带束与散件的一个运算图，靶用位值图表示可能的结果。孩子依据运算图选择唯一正确数量，两个靶可相差十或一。",
+      "levels": [
+        "用同一原数加整十和加一个一，分别找正确总量。",
+        "接连配出两道进位加法，靶轻微漂移。",
+        "连续配出两道退位减法，在五个移动的候选结果中找对应的十束和散件。"
+      ],
+      "demo": "先看左侧算式、候选结果图、首个正确靶与发射物，老师说完动作要求后解锁一次瞄准命中，观察提示之后清分复位。"
+    }
+  ],
+  "quizPlan": [
+    {
+      "skill": "organize-oral-calculation",
+      "task": "三张束散图中找需要进位的加法。",
+      "correctPosition": 2,
+      "rationale": "所选图示34加8，4个一加8个一满十。"
+    },
+    {
+      "skill": "match-place-units",
+      "task": "47再加20，选两捆新增后总量图。",
+      "correctPosition": 1,
+      "rationale": "十位增加两个十，个位仍有7个一，结果67。"
+    },
+    {
+      "skill": "regroup-and-check",
+      "task": "53取走8，选择正确余量图。",
+      "correctPosition": 3,
+      "rationale": "拆一个十，13个一取8个一剩5个一，合计45。"
+    },
+    {
+      "skill": "select-strategy-from-picture",
+      "task": "需要46张票，已有20张，选要补的张数和图。",
+      "correctPosition": 2,
+      "rationale": "46减20得26。"
+    },
+    {
+      "skill": "select-strategy-from-picture",
+      "task": "有28盒彩片，每车运7盒，选运完所需车次数。",
+      "correctPosition": 1,
+      "rationale": "每次减7，四次后为0。"
+    },
+    {
+      "skill": "select-strategy-from-picture",
+      "task": "两组共不能超过50，三组分别29、26、23，三张配对图中选可行组合。",
+      "correctPosition": 3,
+      "rationale": "26与23合计49，其余两对52、55超上限。"
+    }
+  ],
+  "afterClass": {
+    "familyTask": "找一个家里可画图的加法或减法问题，和家人说条件、说所问、算并核对。孩子可自己画出新的知识图。",
+    "weeklyQuestionSource": [
+      "看图分类",
+      "同计数单位与进退位",
+      "口算结果验算",
+      "求差、限量比较和连减解决问题",
+      "口算后检查等式和不等式的合适数"
+    ],
+    "evidence": "线上仅记录图题和游戏，家庭讨论、画图及口头说法待观察。"
+  },
+  "artAndLanguage": "广播站场景、滚轮车、票、道具盒和麦克风来自本课自制的内置 imagegen 拼板。所有十束、散件、算式、次数与可选方案由程序绘制。目标数字或符号和画面共同表达，不依赖颜色或非目标文字。",
+  "authoring": {
+    "sourceMode": "direct",
+    "authorModels": [
+      "gpt-6.1-sol"
+    ]
+  }
+}

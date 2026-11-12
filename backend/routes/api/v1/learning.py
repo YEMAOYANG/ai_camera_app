@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from flask import Blueprint, jsonify, make_response, request
+from flask import Blueprint, Response, jsonify, make_response, request
 
 from core.errors import ApiError, error_response
 from schemas.auth import bearer_token
@@ -171,5 +171,16 @@ def report_detail(report_id: str):
                 request.args,
             )
         )
+    except ApiError as exc:
+        return error_response(exc)
+
+
+@learning_bp.get("/reports/<report_id>/observation-images/<image_sha>")
+def report_observation_image(report_id: str, image_sha: str):
+    try:
+        data = learning_service().report_observation_image(
+            bearer_token(request), report_id, request.args, image_sha)
+        return Response(data, content_type='image/png',
+                        headers={'Cache-Control': 'private, no-store', 'X-Content-Type-Options': 'nosniff'})
     except ApiError as exc:
         return error_response(exc)

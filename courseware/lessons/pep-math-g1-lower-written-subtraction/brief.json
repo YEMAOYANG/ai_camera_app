@@ -1,0 +1,183 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "笔算减法",
+  "binding": {
+    "editionId": "pep-math-g1-lower-2022-standard",
+    "revisionId": "directory-6205d2037284e91f10b25edd",
+    "nodeId": "45773dbd-7ba8-4925-807d-d560fb09ab8a",
+    "unitId": "f91c81c2-d62f-4a5d-b55e-dd42ef644a88"
+  },
+  "scenario": "公园冬鸟补给站清点饲料袋。每个透明小盒装十袋，散袋放个位栏。孩子按图从库存取出送走的袋数，用竖式登记余量。",
+  "goals": [
+    "能按同数位对齐，从个位算起，并从实物图判断个位够减时直接算、不够时要退位。",
+    "能把一个十拆成十个一，理解十位退位点，算两位数减两位数时从退掉一捆后的十位继续减。",
+    "能解释整十数的个位0退一后有10个一，并正确处理一位减数的对齐和一位数的差。",
+    "能按图判断还剩多少，并辨认反着减、忘记从十位减一或数位错齐的竖式。"
+  ],
+  "goalEvidence": [
+    {
+      "skill": "align-and-select",
+      "target": "能按同数位对齐，从个位算起，并从实物图判断个位够减时直接算、不够时要退位。",
+      "source": "印62至63、课件13及19"
+    },
+    {
+      "skill": "exchange-one-ten",
+      "target": "能把一个十拆成十个一，理解十位退位点，算两位数减两位数时从退掉一捆后的十位继续减。",
+      "source": "印62、课件7至11和教案2"
+    },
+    {
+      "skill": "zero-and-one-digit",
+      "target": "能解释整十数的个位0退一后有10个一，并正确处理一位减数的对齐和一位数的差。",
+      "source": "印62至63、课件16和18、教案4"
+    },
+    {
+      "skill": "find-remainder-and-debug",
+      "target": "能按图判断还剩多少，并辨认反着减、忘记从十位减一或数位错齐的竖式。",
+      "source": "印62及65、课件14、15及21、课练1"
+    }
+  ],
+  "pageSequence": [
+    {
+      "key": "borrow-basics",
+      "kind": "teaching",
+      "title": "把已用与剩下分清楚"
+    },
+    {
+      "key": "same-place",
+      "kind": "teaching",
+      "title": "两列放进相同的数位"
+    },
+    {
+      "key": "split-one-ten",
+      "kind": "teaching",
+      "title": "散件不够就拆一盒"
+    },
+    {
+      "key": "enough-to-remove",
+      "kind": "interactive",
+      "title": "看个位够不够再选"
+    },
+    {
+      "key": "zero-in-ones",
+      "kind": "teaching",
+      "title": "原来没有散件时也能拆盒"
+    },
+    {
+      "key": "one-digit-cases",
+      "kind": "teaching",
+      "title": "一位减数与一位的差"
+    },
+    {
+      "key": "match-remaining",
+      "kind": "interactive",
+      "title": "给竖式找剩量图"
+    },
+    {
+      "key": "repair-record",
+      "kind": "teaching",
+      "title": "三张记录，先查哪一步"
+    },
+    {
+      "key": "picture-check",
+      "kind": "quiz",
+      "title": "用新图核对位置、退位和余量"
+    },
+    {
+      "key": "family-recap",
+      "kind": "teaching",
+      "title": "把退一当十说给家人听"
+    }
+  ],
+  "teachingPlan": [
+    "用原创76减23对齐并直接减，说明同计数单位，剩53袋。",
+    "用63减27先看到3袋不够取7袋，拆一盒成10袋，个位13减7得6，十位变5再减2，剩36袋。",
+    "用80减26处理原个位0，个位从10减6、十位7减2，得54；对照64减8先把8对齐个位，得56。用68减64核一位数的差写4。",
+    "把反向相减、忘记减退掉的一盒、数位错齐做成三张独立错误图，逐步对照实物。已送与剩下相加可核原量。"
+  ],
+  "games": [
+    {
+      "page": "enough-to-remove",
+      "template": "compareSnake",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.compareSnake",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "comparison",
+      "selection": "用可数十格显示已有散袋作基准，蛇按老师当轮规则挑取袋数。小于、等于、大于三类各明确；只有所取大于已有才要拆盒。",
+      "levels": [
+        "选少于已有散袋的一项，直接取。",
+        "选恰好等于已有散袋的一项，够取且不留散袋。",
+        "选多于已有散袋的一项，指向拆一个十。"
+      ],
+      "demo": "圈已有散袋和三种取法，带孩子比较一项并按路线实际吃到；等真实动作事件后暂停复位交接。"
+    },
+    {
+      "page": "match-remaining",
+      "template": "fallingTiles",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.fallingTiles",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "pair_match",
+      "selection": "下落记录展示原量和拿走的数量，底部是独立绘制的余量图，用唯一有方向的配对判定；干扰是少退一盒、数位错齐或取走量本身。",
+      "levels": [
+        "不退位求余量。",
+        "原个位不够，退位后找余量。",
+        "整十被减或一位减数，同计数单位图仍可辨。"
+      ],
+      "demo": "分别圈两列和三组可能余量，再操纵第一块落到正确图上；等真实配对完成后复位交给孩子。"
+    }
+  ],
+  "quizPlan": [
+    {
+      "skill": "align-and-select",
+      "task": "按图从85袋取42袋，找个位和十位均对齐且可直接减的余量。",
+      "correctPosition": 2,
+      "rationale": "5减2得3，8个十减4个十，得43。"
+    },
+    {
+      "skill": "exchange-one-ten",
+      "task": "从75袋取48袋，选已拆一盒后的正确余量图。",
+      "correctPosition": 3,
+      "rationale": "15减8得7，6个十减4个十，得27。"
+    },
+    {
+      "skill": "zero-and-one-digit",
+      "task": "从90袋取24袋，选空个位应从哪里得到散件。",
+      "correctPosition": 1,
+      "rationale": "拆一盒，个位10减4、十位8减2，剩66。"
+    },
+    {
+      "skill": "zero-and-one-digit",
+      "task": "按图从72袋取6袋，选把6放在个位栏的竖式。",
+      "correctPosition": 2,
+      "rationale": "6是6个一，退位后个位12减6，结果66。"
+    },
+    {
+      "skill": "zero-and-one-digit",
+      "task": "图中58袋取54袋，只剩4个一，选正确写法。",
+      "correctPosition": 3,
+      "rationale": "十位没有剩十，作为一位数写4。"
+    },
+    {
+      "skill": "find-remainder-and-debug",
+      "task": "两处补给共86袋，送出39袋，找补上漏退一盒的余量图。",
+      "correctPosition": 1,
+      "rationale": "16减9得7，十位7减3，正确剩47。"
+    }
+  ],
+  "afterClass": {
+    "familyTask": "用家里的成盒物件画一次剩余问题，给家人讲哪一步要拆盒，再把取走和剩下加回核对；家庭表现待观察。",
+    "weeklyQuestionSource": [
+      "同数位对齐和判断够不够减",
+      "退一十换十个一",
+      "整十减两位数、一位减数与一位数的差",
+      "看图列式、竖式辨错"
+    ]
+  },
+  "artAndLanguage": "画原创盒与散袋，以形状、数量和位置区分，不能用颜色匹配答案。遮住非目标文字后仍可凭图与真人学科录音完成。老师示范等真实命中信号再交接。",
+  "authoring": {
+    "sourceMode": "direct",
+    "authorModels": [
+      "gpt-6.1-sol"
+    ]
+  }
+}

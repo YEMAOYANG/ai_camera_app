@@ -1,0 +1,946 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "纸制品",
+  "grade": 1,
+  "description": "观察纸的边和褶形，公平比较湿痕与耐拉，按特点选纸并了解旧纸再造。",
+  "roster": {
+    "teacher": {
+      "name": "小科老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Serena",
+      "avatar": "/avatars/teacher-2.png",
+      "color": "#287B94",
+      "persona": "自然清楚，陪孩子慢慢比较并如实记下能看见的线索。"
+    }
+  },
+  "images": {
+    "four-paper-samples": {
+      "file": "assets/four-paper-samples.png"
+    },
+    "paper-camera-table": {
+      "file": "assets/paper-camera-table.png"
+    },
+    "paper-dry": {
+      "file": "assets/paper-dry.png"
+    },
+    "paper-family-record": {
+      "file": "assets/paper-family-record.png"
+    },
+    "paper-fiber-methods": {
+      "file": "assets/paper-fiber-methods.png"
+    },
+    "paper-job-choices": {
+      "file": "assets/paper-job-choices.png"
+    },
+    "paper-made-badge": {
+      "file": "assets/paper-made-badge.png"
+    },
+    "paper-making-sequence": {
+      "file": "assets/paper-making-sequence.png"
+    },
+    "paper-observer-camera": {
+      "file": "assets/paper-observer-camera.png"
+    },
+    "paper-on-mesh": {
+      "file": "assets/paper-on-mesh.png"
+    },
+    "paper-photo-cover": {
+      "file": "assets/paper-photo-cover.png"
+    },
+    "paper-pulp": {
+      "file": "assets/paper-pulp.png"
+    },
+    "paper-route-cover": {
+      "file": "assets/paper-route-cover.png"
+    },
+    "paper-scout-bubble": {
+      "file": "assets/paper-scout-bubble.png"
+    },
+    "paper-scout-idle": {
+      "file": "assets/paper-scout-idle.png"
+    },
+    "paper-scraps": {
+      "file": "assets/paper-scraps.png"
+    },
+    "paper-side-kraft": {
+      "file": "assets/paper-side-kraft.png"
+    },
+    "paper-side-news": {
+      "file": "assets/paper-side-news.png"
+    },
+    "paper-side-print": {
+      "file": "assets/paper-side-print.png"
+    },
+    "paper-top-kraft": {
+      "file": "assets/paper-top-kraft.png"
+    },
+    "paper-top-news": {
+      "file": "assets/paper-top-news.png"
+    },
+    "paper-top-print": {
+      "file": "assets/paper-top-print.png"
+    },
+    "paper-tug-setup": {
+      "file": "assets/paper-tug-setup.png"
+    },
+    "paper-workshop-cover": {
+      "file": "assets/paper-workshop-cover.png"
+    },
+    "paper-workshop-maze": {
+      "file": "assets/paper-workshop-maze.png"
+    },
+    "quiz-bag-kraft": {
+      "file": "assets/quiz-bag-kraft.png"
+    },
+    "quiz-bag-news": {
+      "file": "assets/quiz-bag-news.png"
+    },
+    "quiz-bag-tissue": {
+      "file": "assets/quiz-bag-tissue.png"
+    },
+    "quiz-dry-window": {
+      "file": "assets/quiz-dry-window.png"
+    },
+    "quiz-paper-frayed-edge": {
+      "file": "assets/quiz-paper-frayed-edge.png"
+    },
+    "quiz-paper-printed-center": {
+      "file": "assets/quiz-paper-printed-center.png"
+    },
+    "quiz-paper-smooth-edge": {
+      "file": "assets/quiz-paper-smooth-edge.png"
+    },
+    "quiz-stir-new-pulp": {
+      "file": "assets/quiz-stir-new-pulp.png"
+    },
+    "quiz-tear-leftovers": {
+      "file": "assets/quiz-tear-leftovers.png"
+    },
+    "tug-both-torn": {
+      "file": "assets/tug-both-torn.png"
+    },
+    "tug-kraft-holds": {
+      "file": "assets/tug-kraft-holds.png"
+    },
+    "tug-other-holds": {
+      "file": "assets/tug-other-holds.png"
+    },
+    "tug-result-guide": {
+      "file": "assets/tug-result-guide.png"
+    },
+    "water-comparison-model": {
+      "file": "assets/water-comparison-model.png"
+    },
+    "water-height-high": {
+      "file": "assets/water-height-high.png"
+    },
+    "water-height-low": {
+      "file": "assets/water-height-low.png"
+    },
+    "water-height-middle": {
+      "file": "assets/water-height-middle.png"
+    },
+    "water-setup-depth": {
+      "file": "assets/water-setup-depth.png"
+    },
+    "water-setup-fair": {
+      "file": "assets/water-setup-fair.png"
+    },
+    "water-setup-width": {
+      "file": "assets/water-setup-width.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "paper-around-us",
+      "title": "展台要用哪种纸",
+      "type": "slide",
+      "template": "two-columns",
+      "data": {
+        "title": "展台要用哪种纸",
+        "left": {
+          "heading": "纸工坊展台",
+          "body": "看看纸制品"
+        },
+        "right": {
+          "heading": "四种样纸",
+          "body": "说出看见的"
+        },
+        "left_picture": "paper-workshop-cover",
+        "right_picture": "four-paper-samples"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "松风校园的纸工坊要开小展。哪种纸适合装东西？"
+        },
+        {
+          "say": "这里有一个纸包、一份印过的纸，还有几张餐巾。"
+        },
+        {
+          "say": "物品都是纸做的，用到的纸却不一定一样。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "老师带来牛皮纸、新闻纸、打印纸和餐巾纸。"
+        },
+        {
+          "say": "看一看边和表面。有的薄软，有的厚些，有的更平整。"
+        },
+        {
+          "say": "同伴问哪种能擦水。先记下猜想，我们待会儿试。"
+        }
+      ]
+    },
+    {
+      "key": "see-fibers",
+      "title": "从一张纸看到细丝",
+      "type": "slide",
+      "template": "picture-points",
+      "data": {
+        "title": "从一张纸看到细丝",
+        "picture": "paper-fiber-methods",
+        "points": [
+          "先看整张再轻揉",
+          "撕开一点看纸边",
+          "调放大镜看清楚"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "看上去平平的纸，撕开以后，边上会露出什么？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先看整张，找颜色和薄厚。轻揉这张，再摊开看看。"
+        },
+        {
+          "say": "揉过以后，这张纸留下了深浅不一的褶线。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "用干净旧纸撕一点。看看这一条撕开的边。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "放大镜对准纸边，慢慢调和纸的距离，直到看清。"
+        },
+        {
+          "say": "纸边露出来的短细丝叫纤维。不同纸都能找到纤维。"
+        },
+        {
+          "say": "放大镜只朝纸面。别对着太阳，也别朝人的眼睛。"
+        },
+        {
+          "say": "要拍照片时，先看小图要哪个角度，再把纸放进框。"
+        },
+        {
+          "say": "从上面看，能看清几条褶线怎样穿过纸面。"
+        },
+        {
+          "say": "从侧面看，能看到同一张纸上哪些地方鼓起来。"
+        },
+        {
+          "say": "先挪动虚线框，把整张纸放进去。"
+        },
+        {
+          "say": "等纸转到和小图一样的角度，再按快门。"
+        },
+        {
+          "say": "拍到了。两张放在一起，看见的地方不一样。"
+        }
+      ]
+    },
+    {
+      "key": "photograph-paper-shapes",
+      "title": "给同一张纸拍两个角度",
+      "type": "interactive",
+      "page": "photograph-paper-shapes",
+      "widgetType": "game",
+      "startImage": "paper-photo-cover",
+      "script": [
+        {
+          "say": "这张牛皮纸揉过又摊开了。两种角度能看清什么？"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#game-goal"
+        },
+        {
+          "say": "小图要从上面看。先找这张纸面上的褶线。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "用箭头挪虚线框，把整张纸放进去。"
+        },
+        {
+          "highlight": "#game-target"
+        },
+        {
+          "say": "纸的角度和小图一样，再按右边带圆点的快门。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "拍中后，照片留在下面。侧看更容易找翘角。"
+        },
+        {
+          "say": "轮到你。从上面和侧面拍，只记看到的。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "paper-photo-goal": "see-fibers-12",
+        "paper-photo-top": "see-fibers-13",
+        "paper-photo-side": "see-fibers-14",
+        "paper-photo-hint": "see-fibers-15",
+        "paper-photo-help": "see-fibers-16",
+        "paper-photo-praise": "see-fibers-17"
+      },
+      "observationCard": {
+        "title": "揉展后三张纸的两种观察角度",
+        "familyTask": "和大人选两种干净旧纸，取等宽等长小条，同一时间把末端放到同一水线，等到同一时刻再画湿痕。不把水或纸放进嘴里，避开插座。只记实际看到的。想再造一张纸，请大人帮助。",
+        "levels": [
+          {
+            "label": "牛皮纸",
+            "trials": [
+              {
+                "id": "same-paper-two-views",
+                "label": "牛皮纸同一张的两个角度",
+                "top": {
+                  "paper-top-kraft": {
+                    "label": "俯看浅棕纸面上斜着的一道折痕",
+                    "image": "paper-top-kraft"
+                  }
+                },
+                "side": {
+                  "paper-side-kraft": {
+                    "label": "侧看同一张浅棕纸起伏的折角",
+                    "image": "paper-side-kraft"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "label": "新闻纸",
+            "trials": [
+              {
+                "id": "same-paper-two-views",
+                "label": "新闻纸同一张的两个角度",
+                "top": {
+                  "paper-top-news": {
+                    "label": "俯看同一张纸面上折痕和印刷色块的位置",
+                    "image": "paper-top-news"
+                  }
+                },
+                "side": {
+                  "paper-side-news": {
+                    "label": "侧看同一张纸边的低褶和翘角",
+                    "image": "paper-side-news"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "label": "打印纸",
+            "trials": [
+              {
+                "id": "same-paper-two-views",
+                "label": "打印纸同一张的两个角度",
+                "top": {
+                  "paper-top-print": {
+                    "label": "俯看同一张浅白纸面上交叉的褶线",
+                    "image": "paper-top-print"
+                  }
+                },
+                "side": {
+                  "paper-side-print": {
+                    "label": "侧看同一张浅白纸的弯起边缘",
+                    "image": "paper-side-print"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "key": "same-start-water",
+      "title": "让纸条从同一水线出发",
+      "type": "slide",
+      "template": "picture-points",
+      "data": {
+        "title": "让纸条从同一水线出发",
+        "picture": "water-comparison-model",
+        "points": [
+          "纸条同宽同长",
+          "同时沾到一样深",
+          "同一时刻看湿痕"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "水在这几种纸条上能向上爬。怎样比才公平？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先准备同样长、同样宽的纸条，夹在支架上。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "让大人把两条同时放进色水。纸条入水一样深。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "到同一时刻，看水线上方的湿痕。湿痕高的爬得远。"
+        },
+        {
+          "say": "这次餐巾纸样的湿痕高过打印纸样。换了纸要重新试。"
+        },
+        {
+          "say": "图里是这次的现象示意。自己的记录，要看实际湿痕。"
+        },
+        {
+          "say": "如果一条先放进水里，就不能用那次结果直接比。"
+        }
+      ]
+    },
+    {
+      "key": "paper-tug",
+      "title": "纸条拔河看谁先断",
+      "type": "slide",
+      "template": "two-columns",
+      "data": {
+        "title": "纸条拔河看谁先断",
+        "left": {
+          "heading": "拉之前",
+          "body": "纸条一样宽，同样拉法"
+        },
+        "right": {
+          "heading": "拉以后",
+          "body": "看哪条先断"
+        },
+        "left_picture": "paper-tug-setup",
+        "right_picture": "tug-result-guide"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "纸条也能拔河。水爬得快的纸，一定更耐拉吗？"
+        },
+        {
+          "say": "请大人准备等宽的纸条，两条纸套好，朝两边慢慢拉。"
+        },
+        {
+          "say": "用一样的拉法，看看哪条先断，哪条还连着。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "这次浅棕的牛皮纸还连着，下面这一条先断。"
+        },
+        {
+          "say": "较不容易被拉断的纸，在这次比较里更耐拉。"
+        },
+        {
+          "say": "湿痕和断口各回答一个问题，记录要分开放。"
+        }
+      ]
+    },
+    {
+      "key": "choose-paper-for-use",
+      "title": "按要做的事挑纸",
+      "type": "slide",
+      "template": "picture-points",
+      "data": {
+        "title": "按要做的事挑纸",
+        "picture": "paper-job-choices",
+        "points": [
+          "擦一点水",
+          "装轻物品",
+          "先找真实依据"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "展台洒了一点水，又要包一份手作。两件事选什么纸？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "擦水可选这次容易沾湿的餐巾纸。用过记得擦干。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "装手作要拎得住。选这次较耐拉的牛皮纸来做小袋。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "说选哪张纸，也说为什么。可以指湿痕或断口来解释。"
+        },
+        {
+          "say": "牛皮纸做袋子，打印纸常用来印资料，任务各不相同。"
+        },
+        {
+          "say": "换成别的样纸，先试一试，再决定合不合用。"
+        }
+      ]
+    },
+    {
+      "key": "paper-from-paper",
+      "title": "旧纸怎样再成纸",
+      "type": "slide",
+      "template": "picture-points",
+      "data": {
+        "title": "旧纸怎样再成纸",
+        "picture": "paper-making-sequence",
+        "points": [
+          "撕碎旧纸",
+          "浸泡，搅成纸浆",
+          "用网抄一层",
+          "晒干，再取下"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "桌上剩了干净旧纸。它能变成一张新的纸吗？"
+        },
+        {
+          "say": "古人很早就会造纸。蔡伦总结前人的办法，改进了造纸。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先把干净的旧纸撕成小碎片。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "把碎片放进清水里泡软，大人帮忙搅成纸浆。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "用网从纸浆里捞起薄薄一层，让多余的水漏下去。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "把湿纸层放到安全的地方晒干，再取下新的纸。"
+        },
+        {
+          "say": "网刚捞出来时还湿。等晒干，才是可取下的新纸。"
+        },
+        {
+          "say": "看看最后的出口图，沿路走到它那里。"
+        },
+        {
+          "say": "先想上一站做了什么，再听下一站。"
+        },
+        {
+          "say": "湿纸浆要先抄到网上，不能直接跳到晒干。"
+        },
+        {
+          "say": "走对了。按顺序做，旧纸才变成新的纸。"
+        }
+      ]
+    },
+    {
+      "key": "rebuild-paper-route",
+      "title": "旧纸走过纸工坊",
+      "type": "interactive",
+      "page": "rebuild-paper-route",
+      "widgetType": "game",
+      "startImage": "paper-route-cover",
+      "script": [
+        {
+          "say": "小车要送旧纸进工坊。看到湿纸浆站，要先过去吗？"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#paper-next-preview"
+        },
+        {
+          "say": "上面的小图是碎纸。第一步先把旧纸撕成碎片。"
+        },
+        {
+          "highlight": "#game-target"
+        },
+        {
+          "say": "这边是碎纸站。先到这里，湿纸浆站还要等一等。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "用箭头沿空路走。我先去碎纸站，收下这一步。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "看小车往哪走。先撕碎旧纸，再泡软、搅浆。"
+        },
+        {
+          "say": "轮到你啦。看下一步的小图，按做纸的顺序到站。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "route-scrap": "paper-from-paper-5",
+        "route-pulp": "paper-from-paper-7",
+        "route-mesh": "paper-from-paper-9",
+        "route-dry": "paper-from-paper-11",
+        "route-exit": "paper-from-paper-13",
+        "route-hint": "paper-from-paper-14",
+        "route-help": "paper-from-paper-15",
+        "route-praise": "paper-from-paper-16"
+      }
+    },
+    {
+      "key": "picture-quiz",
+      "title": "纸工坊图题",
+      "type": "quiz",
+      "intro": [
+        "先听题，再选图。说一说你用到的线索。"
+      ],
+      "questions": [
+        {
+          "id": "look-at-torn-fibers",
+          "skill": "locate-paper-fibers",
+          "question": "哪张放大图看到撕开的纸边露出细丝？",
+          "answer": [
+            "B"
+          ],
+          "analysis": "中间露出的是纸边上的细小纤维。",
+          "options": {
+            "A": {
+              "label": "一段整齐的纸边",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-paper-smooth-edge",
+                "alt": "一段整齐的纸边"
+              }
+            },
+            "B": {
+              "label": "浅米纸撕边伸出细小纤维",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-paper-frayed-edge",
+                "alt": "浅米纸撕边伸出细小纤维"
+              }
+            },
+            "C": {
+              "label": "平整纸面的印色块",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-paper-printed-center",
+                "alt": "平整纸面的印色块"
+              }
+            }
+          }
+        },
+        {
+          "id": "control-samples",
+          "skill": "fair-paper-water-comparison",
+          "question": "哪组纸条同长同宽，入水深度也一样？",
+          "answer": [
+            "A"
+          ],
+          "analysis": "左边两条尺寸和入水深度相同。",
+          "options": {
+            "A": {
+              "label": "两条同长同宽，下端对齐",
+              "visual": {
+                "kind": "asset",
+                "image": "water-setup-fair",
+                "alt": "两条同长同宽，下端对齐"
+              }
+            },
+            "B": {
+              "label": "两条宽度不同",
+              "visual": {
+                "kind": "asset",
+                "image": "water-setup-width",
+                "alt": "两条宽度不同"
+              }
+            },
+            "C": {
+              "label": "右条浸得更深",
+              "visual": {
+                "kind": "asset",
+                "image": "water-setup-depth",
+                "alt": "右条浸得更深"
+              }
+            }
+          }
+        },
+        {
+          "id": "higher-wet-front",
+          "skill": "compare-wet-front-from-line",
+          "question": "同一时刻，哪张记录的湿痕爬得最高？",
+          "answer": [
+            "C"
+          ],
+          "analysis": "右边离同一水线的湿痕最高。",
+          "options": {
+            "A": {
+              "label": "湿痕略高于水线",
+              "visual": {
+                "kind": "asset",
+                "image": "water-height-low",
+                "alt": "湿痕略高于水线"
+              }
+            },
+            "B": {
+              "label": "湿痕爬到中间",
+              "visual": {
+                "kind": "asset",
+                "image": "water-height-middle",
+                "alt": "湿痕爬到中间"
+              }
+            },
+            "C": {
+              "label": "湿痕离水线最高",
+              "visual": {
+                "kind": "asset",
+                "image": "water-height-high",
+                "alt": "湿痕离水线最高"
+              }
+            }
+          }
+        },
+        {
+          "id": "find-the-stronger-result",
+          "skill": "compare-tear-outcome",
+          "question": "哪张记录能看出浅棕纸这次较耐拉？",
+          "answer": [
+            "B"
+          ],
+          "analysis": "浅棕纸仍连着，另一张先断了。",
+          "options": {
+            "A": {
+              "label": "浅棕和浅蓝纸都断了",
+              "visual": {
+                "kind": "asset",
+                "image": "tug-both-torn",
+                "alt": "浅棕和浅蓝纸都断了"
+              }
+            },
+            "B": {
+              "label": "浅棕纸连着，浅蓝纸断了",
+              "visual": {
+                "kind": "asset",
+                "image": "tug-kraft-holds",
+                "alt": "浅棕纸连着，浅蓝纸断了"
+              }
+            },
+            "C": {
+              "label": "浅棕纸断了，浅蓝纸仍连着",
+              "visual": {
+                "kind": "asset",
+                "image": "tug-other-holds",
+                "alt": "浅棕纸断了，浅蓝纸仍连着"
+              }
+            }
+          }
+        },
+        {
+          "id": "select-a-bag-paper",
+          "skill": "paper-property-for-use",
+          "question": "等宽纸条同样拉，哪种纸适合做小袋装积木？",
+          "answer": [
+            "C"
+          ],
+          "analysis": "右边牛皮纸这次较耐拉，适合做小袋。",
+          "options": {
+            "A": {
+              "label": "容易拉断的轻薄餐巾纸",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-bag-tissue",
+                "alt": "容易拉断的轻薄餐巾纸"
+              }
+            },
+            "B": {
+              "label": "断开的新闻纸",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-bag-news",
+                "alt": "断开的新闻纸"
+              }
+            },
+            "C": {
+              "label": "这次没有断的牛皮纸",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-bag-kraft",
+                "alt": "这次没有断的牛皮纸"
+              }
+            }
+          }
+        },
+        {
+          "id": "next-step-after-the-screen",
+          "skill": "ordered-papermaking",
+          "question": "湿纸浆已抄到网上，接下来做什么？",
+          "answer": [
+            "A"
+          ],
+          "analysis": "先让湿纸层晒干，再取下新纸。",
+          "options": {
+            "A": {
+              "label": "湿纸层放在安全窗边等干",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-dry-window",
+                "alt": "湿纸层放在安全窗边等干"
+              }
+            },
+            "B": {
+              "label": "把干旧纸撕成小片",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-tear-leftovers",
+                "alt": "把干旧纸撕成小片"
+              }
+            },
+            "C": {
+              "label": "在碗里搅碎纸浆",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-stir-new-pulp",
+                "alt": "在碗里搅碎纸浆"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "home-paper-observation",
+      "title": "跟大人留一张真记录",
+      "type": "slide",
+      "template": "picture-points",
+      "data": {
+        "title": "跟大人留一张真记录",
+        "picture": "paper-family-record",
+        "points": [
+          "干净的两种旧纸",
+          "同一水线一起比",
+          "画实际的湿痕"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "你家里的两种纸，谁的湿痕会先爬高？先猜一猜。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "请大人选干净旧纸，准备两条同样长宽的小纸条。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "两条一起到同一水线，同一时刻再看。远离插座。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "把两条的湿痕画下来。只记实际看到的，不尝纸和水。"
+        },
+        {
+          "say": "想用旧纸再做一张纸，请大人帮忙照看水和工具。"
+        },
+        {
+          "say": "今天我们看纸边、比纸条，再按纸的特点选择用途。"
+        },
+        {
+          "say": "把真记录带回来，和同伴说说你是怎么比的。"
+        }
+      ]
+    }
+  ]
+}

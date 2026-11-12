@@ -1,0 +1,1164 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "11～20的认识｜整理和复习",
+  "description": "人教数学一年级上册。小展馆用实物、计数器、得数和站牌串起十一到二十的认识、计算和应用。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小数老师",
+      "role": "teacher",
+      "gender": "male",
+      "voice": "Ethan",
+      "avatar": "/avatars/teacher-1.png",
+      "color": "#286956",
+      "persona": "用自然简短的普通话，结合实物和图示，把数的组成和计算讲清楚。"
+    }
+  },
+  "images": {
+    "museum-entry": {
+      "file": "assets/museum-entry.png"
+    },
+    "rover-idle": {
+      "file": "assets/rover-idle.png"
+    },
+    "rover-moving": {
+      "file": "assets/rover-moving.png"
+    },
+    "exhibit-flag": {
+      "file": "assets/exhibit-flag.png"
+    },
+    "open-clues": {
+      "file": "assets/open-clues.png"
+    },
+    "scattered-16": {
+      "file": "assets/scattered-16.png"
+    },
+    "groups-16": {
+      "file": "assets/groups-16.png"
+    },
+    "beads-16": {
+      "file": "assets/beads-16.png"
+    },
+    "beads-20": {
+      "file": "assets/beads-20.png"
+    },
+    "neighbors-line": {
+      "file": "assets/neighbors-line.png"
+    },
+    "compose-16": {
+      "file": "assets/compose-16.png"
+    },
+    "add-two-cards": {
+      "file": "assets/add-two-cards.png"
+    },
+    "flags-11-17": {
+      "file": "assets/flags-11-17.png"
+    },
+    "interior-five": {
+      "file": "assets/interior-five.png"
+    },
+    "same-15": {
+      "file": "assets/same-15.png"
+    },
+    "fill-15": {
+      "file": "assets/fill-15.png"
+    },
+    "finish-diagram": {
+      "file": "assets/finish-diagram.png"
+    },
+    "depot-number-14": {
+      "file": "assets/depot-number-14.png"
+    },
+    "depot-number-15": {
+      "file": "assets/depot-number-15.png"
+    },
+    "depot-beads-10": {
+      "file": "assets/depot-beads-10.png"
+    },
+    "depot-beads-11": {
+      "file": "assets/depot-beads-11.png"
+    },
+    "depot-beads-12": {
+      "file": "assets/depot-beads-12.png"
+    },
+    "depot-beads-13": {
+      "file": "assets/depot-beads-13.png"
+    },
+    "depot-beads-15": {
+      "file": "assets/depot-beads-15.png"
+    },
+    "depot-beads-19": {
+      "file": "assets/depot-beads-19.png"
+    },
+    "depot-beads-20": {
+      "file": "assets/depot-beads-20.png"
+    },
+    "depot-cards-10": {
+      "file": "assets/depot-cards-10.png"
+    },
+    "depot-cards-11": {
+      "file": "assets/depot-cards-11.png"
+    },
+    "depot-cards-12": {
+      "file": "assets/depot-cards-12.png"
+    },
+    "depot-cards-13": {
+      "file": "assets/depot-cards-13.png"
+    },
+    "depot-cards-14": {
+      "file": "assets/depot-cards-14.png"
+    },
+    "depot-cards-15": {
+      "file": "assets/depot-cards-15.png"
+    },
+    "depot-cards-19": {
+      "file": "assets/depot-cards-19.png"
+    },
+    "depot-cards-20": {
+      "file": "assets/depot-cards-20.png"
+    },
+    "route-a": {
+      "file": "assets/route-a.png"
+    },
+    "route-b": {
+      "file": "assets/route-b.png"
+    },
+    "route-c": {
+      "file": "assets/route-c.png"
+    },
+    "route-d": {
+      "file": "assets/route-d.png"
+    },
+    "route-e": {
+      "file": "assets/route-e.png"
+    },
+    "route-f": {
+      "file": "assets/route-f.png"
+    },
+    "route-g": {
+      "file": "assets/route-g.png"
+    },
+    "route-h": {
+      "file": "assets/route-h.png"
+    },
+    "route-i": {
+      "file": "assets/route-i.png"
+    },
+    "route-j": {
+      "file": "assets/route-j.png"
+    },
+    "route-k": {
+      "file": "assets/route-k.png"
+    },
+    "route-m": {
+      "file": "assets/route-m.png"
+    },
+    "q1-a": {
+      "file": "assets/q1-a.png"
+    },
+    "q1-b": {
+      "file": "assets/q1-b.png"
+    },
+    "q1-c": {
+      "file": "assets/q1-c.png"
+    },
+    "q2-a": {
+      "file": "assets/q2-a.png"
+    },
+    "q2-b": {
+      "file": "assets/q2-b.png"
+    },
+    "q2-c": {
+      "file": "assets/q2-c.png"
+    },
+    "q3-a": {
+      "file": "assets/q3-a.png"
+    },
+    "q3-b": {
+      "file": "assets/q3-b.png"
+    },
+    "q3-c": {
+      "file": "assets/q3-c.png"
+    },
+    "q3-stimulus": {
+      "file": "assets/q3-stimulus.png"
+    },
+    "q4-a": {
+      "file": "assets/q4-a.png"
+    },
+    "q4-b": {
+      "file": "assets/q4-b.png"
+    },
+    "q4-c": {
+      "file": "assets/q4-c.png"
+    },
+    "q4-stimulus": {
+      "file": "assets/q4-stimulus.png"
+    },
+    "q5-a": {
+      "file": "assets/q5-a.png"
+    },
+    "q5-b": {
+      "file": "assets/q5-b.png"
+    },
+    "q5-c": {
+      "file": "assets/q5-c.png"
+    },
+    "q5-stimulus": {
+      "file": "assets/q5-stimulus.png"
+    },
+    "q6-a": {
+      "file": "assets/q6-a.png"
+    },
+    "q6-b": {
+      "file": "assets/q6-b.png"
+    },
+    "q6-c": {
+      "file": "assets/q6-c.png"
+    },
+    "q6-stimulus": {
+      "file": "assets/q6-stimulus.png"
+    },
+    "depot-room": {
+      "file": "assets/depot-room.png"
+    },
+    "route-room": {
+      "file": "assets/route-room.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "open-map",
+      "type": "slide",
+      "title": "小展馆的三张线索",
+      "template": "two-columns",
+      "data": {
+        "title": "小展馆的三张线索",
+        "left": {
+          "heading": "开门前的展馆",
+          "body": "收货、补货、找展位"
+        },
+        "left_picture": "museum-entry",
+        "right": {
+          "heading": "三张不同的线索",
+          "body": "哪两张在记同一批展品？"
+        },
+        "right_picture": "open-clues"
+      },
+      "script": [
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "小展馆快开门了。我收到几张图，请你一起整理。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "馆里的架子还空着，等我们把展品送来。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "先收货，再算要补几件，最后找展位。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "同一个数，也能记不同的事。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "这三张图，哪两张在记同一批展品？"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "看，有一盘卡、一个收货签，还有一面展位旗。"
+        },
+        {
+          "say": "在心里选两张。你能指着图说说理由吗？"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "等我们会数、会算、会找了，再回来核对。"
+        },
+        {
+          "say": "推错了先比十位和个位，按回转键可以撤回。"
+        }
+      ]
+    },
+    {
+      "key": "estimate-bundle",
+      "type": "slide",
+      "title": "先估一估，再数清楚",
+      "template": "two-columns",
+      "data": {
+        "title": "先估一估，再数清楚",
+        "left": {
+          "heading": "还没分组",
+          "body": "先想，比十多还是少？"
+        },
+        "left_picture": "scattered-16",
+        "right": {
+          "heading": "满十先放进盘",
+          "body": "一组十，外面六张"
+        },
+        "right_picture": "groups-16"
+      },
+      "script": [
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "这一把卡散在桌上。光看一眼，你觉得超过十了吗？"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "先猜一猜，再数清楚。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "可以一张张数，也可以把数过的卡移到一边。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "移到一边，就不怕又把同一张数了一遍。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "我们数到十就停，把十张一起放进绿盘。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "先数一组十，再数散开的。两边记的是同一个数吗？"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "盘外有六张。从十接着数到十六，省得从头数。"
+        },
+        {
+          "say": "摆法变了，还是原来那些卡。"
+        }
+      ]
+    },
+    {
+      "key": "place-value",
+      "type": "slide",
+      "title": "同一批卡，怎么写数？",
+      "template": "two-columns",
+      "data": {
+        "title": "同一批卡，怎么写数？",
+        "left": {
+          "heading": "一组十，六张散卡",
+          "body": "十位写1，个位写6"
+        },
+        "left_picture": "beads-16",
+        "right": {
+          "heading": "两组十，没有散卡",
+          "body": "十位写2，个位写0"
+        },
+        "right_picture": "beads-20"
+      },
+      "script": [
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "收货单上不能贴一整盘卡，怎么记才方便？"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "一组十和六张散卡，可以用两根杆来记。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "左边一珠记十，右边六珠记六张。"
+        },
+        {
+          "say": "珠和实物画法不同，先看它们各表示什么数。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "写数从左开始。十位写一，个位写六。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "另一批有两组十。你猜右边要不要拨珠？"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "两组就拨左边两珠。没有散卡，右边留空。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "十有一个十，二十有两个十。都是零个一，个位都写零。"
+        },
+        {
+          "say": "几张卡很像，先看有几组十，再想从哪边推。"
+        },
+        {
+          "say": "数一数，两边的十和一都一样，就能配成对。"
+        },
+        {
+          "say": "数量相同的卡和托盘配好了，记数的方法可以不同。"
+        },
+        {
+          "say": "零到九各用一个数字，十到二十各用两个。"
+        }
+      ]
+    },
+    {
+      "key": "depot",
+      "type": "interactive",
+      "title": "展品收货站",
+      "page": "depot",
+      "widgetType": "learning-arcade",
+      "startImage": "depot-room",
+      "gameAudio": {
+        "depot-hint": "estimate-bundle-12",
+        "depot-goal": "place-value-17",
+        "depot-goal-b": "place-value-7",
+        "depot-goal-c": "place-value-16",
+        "depot-help": "open-map-16",
+        "depot-praise": "place-value-18"
+      },
+      "script": [
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "看小车。把卡片推到合适的托盘里。"
+        },
+        {
+          "highlight": "#game-target"
+        },
+        {
+          "say": "一盘十和一张散卡，记的是十一。"
+        },
+        {
+          "highlight": "#depot-first-tray"
+        },
+        {
+          "say": "托盘左边一珠记十，右边一珠记一个。"
+        },
+        {
+          "say": "都记十一，就能配到一起。"
+        },
+        {
+          "highlight": "#depot-arrows"
+        },
+        {
+          "say": "小车只能推。站到卡片背后，向右推到托盘上。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "pause": false
+          }
+        },
+        {
+          "say": "卡片进了托盘，就停在那里。"
+        },
+        {
+          "say": "轮到你了，按箭头开车，按回转键撤回。"
+        },
+        {
+          "say": "先数清楚再推。你也可以换一张先送。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ]
+    },
+    {
+      "key": "neighbors",
+      "type": "slide",
+      "title": "相邻站牌只差一",
+      "template": "picture-points",
+      "data": {
+        "title": "相邻站牌只差一",
+        "picture": "neighbors-line",
+        "points": [
+          "正着走，每格多1",
+          "倒着走，每格少1",
+          "19的下一站是20"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "展厅里有一串按顺序排的站牌。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "沿箭头走。每一小格都一样长。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "十二向右一格是十三，再向右一格是十四。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "往回也试一次。十四退一格是十三，少了一。"
+        },
+        {
+          "say": "看左边现在是几，想想多一是多少。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "十九再添一个一，个位正好凑够十。"
+        },
+        {
+          "say": "把满十换成一组，和原来的合在一起就是二十。"
+        },
+        {
+          "say": "对着橙色挡板喷泡泡，路通了再开。"
+        },
+        {
+          "say": "起点是十。先算站牌，再找得数多一的站。"
+        }
+      ]
+    },
+    {
+      "key": "calculate-from-groups",
+      "type": "slide",
+      "title": "一组十，怎样帮我们算？",
+      "template": "two-columns",
+      "data": {
+        "title": "一组十，怎样帮我们算？",
+        "left": {
+          "heading": "合起来，再拿走",
+          "body": "总数和两部分能互相找"
+        },
+        "left_picture": "compose-16",
+        "right": {
+          "heading": "在散卡里添、去",
+          "body": "16＋2＝18　18－2＝16"
+        },
+        "right_picture": "add-two-cards"
+      },
+      "script": [
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "收货站的十六张卡，又有了两张补货单。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "先合拢刚才的两部分，再试着分开看。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "一组十添六张散卡，一共十六张。"
+        },
+        {
+          "say": "从十六张里把六张散卡取走，就剩一组十。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "也能取走一组十，盘外的六张就留下来。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "再拿来两张散卡。一组十还在，哪里变了？"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "看两张有橙圈的新卡。六个一添两个一，变成八个一。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "没有凑成新的一组十，合起来是十八。"
+        },
+        {
+          "say": "把新添的两张拿走，八个一又回到六个一，剩十六。"
+        }
+      ]
+    },
+    {
+      "key": "route-by-result",
+      "type": "interactive",
+      "title": "得数巡游路线",
+      "page": "route-by-result",
+      "widgetType": "learning-arcade",
+      "startImage": "route-room",
+      "gameAudio": {
+        "route-goal-a": "neighbors-14",
+        "route-hint": "neighbors-9",
+        "route-goal-b": "equal-result-16",
+        "route-goal-c": "equal-result-17",
+        "route-help": "neighbors-13",
+        "route-praise": "finish-map-10"
+      },
+      "script": [
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#route-current"
+        },
+        {
+          "say": "左边现在是十，下一站要多一。"
+        },
+        {
+          "highlight": "#game-target"
+        },
+        {
+          "say": "十三去两个一，剩一组十和一个一。"
+        },
+        {
+          "say": "十再多一是十一，正好是下一站。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "highlight": "#route-arrows"
+        },
+        {
+          "say": "用箭头开车，我先只进这一站。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "pause": false
+          }
+        },
+        {
+          "say": "看左边。到这一站，十就变成十一。"
+        },
+        {
+          "say": "走错站就停下，重新算它的得数，再选方向。"
+        },
+        {
+          "say": "面朝橙色挡板按圆圈，就能喷泡泡。"
+        },
+        {
+          "say": "轮到你从头接路啦。站牌走完，再开到小旗。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ]
+    },
+    {
+      "key": "between-stops",
+      "type": "slide",
+      "title": "两面旗中间有几处？",
+      "template": "two-columns",
+      "data": {
+        "title": "两面旗中间有几处？",
+        "left": {
+          "heading": "先找到两头",
+          "body": "蓝线连起11号和17号"
+        },
+        "left_picture": "flags-11-17",
+        "right": {
+          "heading": "只数两旗之间",
+          "body": "12、13、14、15、16"
+        },
+        "right_picture": "interior-five"
+      },
+      "script": [
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "小队约好从十一号走到十七号。"
+        },
+        {
+          "say": "他们想知道两头中间能停几次。你先猜一猜。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "用两面旗找到十一号和十七号。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "沿线向右走，每到一个位置，号码多一。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "题目只问中间。两头先留在外面。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "从十二数到十六，看看有几个数。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "每到一个中间位置就涂一点。现在涂亮了五点。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "对着号码核一遍，十二到十六也是五处。"
+        },
+        {
+          "say": "两头都要数的时候，再把两头也算进去。"
+        }
+      ]
+    },
+    {
+      "key": "equal-result",
+      "type": "slide",
+      "title": "算式不同，得数能一样",
+      "template": "two-columns",
+      "data": {
+        "title": "算式不同，得数能一样",
+        "left": {
+          "heading": "算一算，再放一起",
+          "body": "两张补给单都去15号"
+        },
+        "left_picture": "same-15",
+        "right": {
+          "heading": "找缺的几个一",
+          "body": "用拿走的办法检查"
+        },
+        "right_picture": "fill-15"
+      },
+      "script": [
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "哪些补给单要送去同一站？我们先算一算。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "两张写法不同，算出来会怎样？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "十一添四，一个一变五个一，得十五。"
+        },
+        {
+          "say": "十八去三个一，八个一剩五个一，也得十五。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "得数相同，两张都送去十五号。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "十一添几张变成十五，怎样找？"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "十五是总数。从十五去掉原有的十一。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "剩四，就是漏写的那部分。添回去，刚好十五。"
+        },
+        {
+          "say": "起点是十一。每站找多一，橙色挡板可以喷开。"
+        },
+        {
+          "say": "起点是十五。每站多一，记得给巡游小车让路。"
+        }
+      ]
+    },
+    {
+      "key": "picture-check",
+      "type": "quiz",
+      "title": "新展品小检查",
+      "intro": [
+        "新展品到了，来做六道小检查。",
+        "听完问题，再在三张图中点一张。"
+      ],
+      "questions": [
+        {
+          "id": "museum-picture-1",
+          "question": "园艺台有十七张种子牌。哪张图先圈满一组十？",
+          "skill": "represent-11-to-20",
+          "answer": [
+            "A"
+          ],
+          "analysis": "圈里正好十张，圈外还有七张，合起来是十七。",
+          "options": {
+            "A": {
+              "label": "一圈十张，圈外七张",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-a",
+                "alt": "一圈十张，圈外七张"
+              }
+            },
+            "B": {
+              "label": "一圈九张，圈外八张",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-b",
+                "alt": "一圈九张，圈外八张"
+              }
+            },
+            "C": {
+              "label": "一圈十一张，圈外六张",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-c",
+                "alt": "一圈十一张，圈外六张"
+              }
+            }
+          }
+        },
+        {
+          "id": "museum-picture-2",
+          "question": "盒里有十盏灯，盒外还有八盏。哪幅计数器图对？",
+          "skill": "represent-11-to-20",
+          "answer": [
+            "C"
+          ],
+          "analysis": "满盒是一个十，八盏散灯是八个一。",
+          "options": {
+            "A": {
+              "label": "左一珠右七珠",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-a",
+                "alt": "左一珠右七珠"
+              }
+            },
+            "B": {
+              "label": "左两珠右空",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-b",
+                "alt": "左两珠右空"
+              }
+            },
+            "C": {
+              "label": "左一珠右八珠",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-c",
+                "alt": "左一珠右八珠"
+              }
+            }
+          }
+        },
+        {
+          "id": "museum-picture-3",
+          "question": "储位牌从十九倒着排到十八。下一块是哪张？",
+          "skill": "order-by-one",
+          "answer": [
+            "B"
+          ],
+          "analysis": "倒着每次少一，十八往回一格是十七。",
+          "options": {
+            "A": {
+              "label": "16号牌",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-a",
+                "alt": "16号牌"
+              }
+            },
+            "B": {
+              "label": "17号牌",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-b",
+                "alt": "17号牌"
+              }
+            },
+            "C": {
+              "label": "19号牌",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-c",
+                "alt": "19号牌"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "q3-stimulus",
+            "alt": "从十九倒着到十八，左边的下一站留空"
+          }
+        },
+        {
+          "id": "museum-picture-4",
+          "question": "十五个纸扣，拿走两个散扣。哪张图是剩下的？",
+          "skill": "compose-and-calculate",
+          "answer": [
+            "B"
+          ],
+          "analysis": "从五个一中去两个一，整十保留。",
+          "options": {
+            "A": {
+              "label": "一组十和四个散扣",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-a",
+                "alt": "一组十和四个散扣"
+              }
+            },
+            "B": {
+              "label": "一组十和三个散扣",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-b",
+                "alt": "一组十和三个散扣"
+              }
+            },
+            "C": {
+              "label": "一组十和两个散扣",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-c",
+                "alt": "一组十和两个散扣"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "q4-stimulus",
+            "alt": "一盘十个纸扣和五个散扣"
+          }
+        },
+        {
+          "id": "museum-picture-5",
+          "question": "展台有十二个木徽。补到十七个，要加哪一盘？",
+          "skill": "compose-and-calculate",
+          "answer": [
+            "A"
+          ],
+          "analysis": "原先有一组十和两个一，再添五个一就有七个一。",
+          "options": {
+            "A": {
+              "label": "一盘五个木徽",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-a",
+                "alt": "一盘五个木徽"
+              }
+            },
+            "B": {
+              "label": "一盘四个木徽",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-b",
+                "alt": "一盘四个木徽"
+              }
+            },
+            "C": {
+              "label": "一盘六个木徽",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-c",
+                "alt": "一盘六个木徽"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "q5-stimulus",
+            "alt": "一盘十个木徽和两个散徽"
+          }
+        },
+        {
+          "id": "museum-picture-6",
+          "question": "第六位和第十一位亮灯。哪张图只涂亮灯中间的位置？",
+          "skill": "apply-and-organize",
+          "answer": [
+            "C"
+          ],
+          "analysis": "只涂第七到第十这四处。两盏灯是两头，不算在内。",
+          "options": {
+            "A": {
+              "label": "只涂八到十",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-a",
+                "alt": "只涂八到十"
+              }
+            },
+            "B": {
+              "label": "涂七到十一",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-b",
+                "alt": "涂七到十一"
+              }
+            },
+            "C": {
+              "label": "只涂七到十",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-c",
+                "alt": "只涂七到十"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "q6-stimulus",
+            "alt": "第六位和第十一位的两盏亮灯"
+          }
+        }
+      ]
+    },
+    {
+      "key": "finish-map",
+      "type": "slide",
+      "title": "把三张线索接成图",
+      "template": "picture-points",
+      "data": {
+        "title": "把三张线索接成图",
+        "picture": "finish-diagram",
+        "points": [
+          "认识数：把实物、珠和数字连起来",
+          "用组成计算：十六添二是十八",
+          "用得数找位置：去第十八号"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "开场哪两张图在说同一批展品？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "一盘十和六张散卡，就是收货签上的十六。"
+        },
+        {
+          "say": "十六号旗只记展位，那儿摆几件得另数。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "六个一添两个一，变八个一。原来一组十还在。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "算出十八，就沿号码去十八号旗。"
+        },
+        {
+          "say": "每一站比刚才多一，整条路线接好了。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "把只数两头之间的点图，接到知识图的解决问题那一边。"
+        },
+        {
+          "say": "回家找小物，画出几个十和几个一，再写个算式。"
+        },
+        {
+          "say": "画两个位置，让家人找一找中间有几处。"
+        },
+        {
+          "say": "还可以把小物两个两个摆，看看会不会剩一个。"
+        }
+      ]
+    }
+  ]
+}

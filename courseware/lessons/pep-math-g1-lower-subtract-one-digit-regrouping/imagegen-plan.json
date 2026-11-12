@@ -1,0 +1,68 @@
+{
+  "schemaVersion": "mira.courseware.imagegen-plan.v1",
+  "mode": "builtin_native_imagegen",
+  "state": "native_generated_and_registered_browser_review_pending",
+  "plates": [
+    {
+      "id": "picnic-cup-scenes",
+      "transparent": false,
+      "prompt": "Four independent strictly equal quadrants for a Chinese primary school picnic-supply station. Clean cut-paper shapes, fine cream paper grain, matte gouache, pine green, apricot and persimmon. No text, numbers or countable objects. Top left two first-grade children and a cheerful clerk beside a shelf of closed supply boxes; top right quiet empty side shelves and ample open center for slide game; bottom left uncluttered oak counter and window light with open space for aim game; bottom right a parent and child sorting simple paper cards at home. Each quadrant self-contained, no dividing lines or lettering.",
+      "actualPrompt": "Use case: illustration-story. Single square asset atlas with exactly four equal independent quadrants in a 2×2 grid. This is an original first-grade Chinese math lesson about getting cups ready for a picnic. No external margin, border, seam decorations or gutters. No artwork crosses either midline. Fine natural paper texture, matte gouache, clean rounded cut-paper silhouettes, warm cream and pine green, muted apricot and persimmon accents. No text, numerals, labels, watermarks, countable loose cups, or visible arithmetic. Upper-left: two Chinese first graders with a warm attendant at a small picnic-supply station, the child in front carefully asks about an unmarked closed cream supply carton on the counter. Put faces and carton around the vertical middle so a wide crop retains the story. Upper-right: empty overhead view of a quiet warm cream wooden tabletop at that station, hints of shelves along the far edge, extremely open light midtone middle 85 percent as a low-contrast slide-puzzle backdrop. Bottom-left: quiet low-contrast front-on oak tabletop and warm window light at the station, very wide empty center and simple forest-green trim at the far left and right, designed to be a background for an aiming game. Bottom-right: parent and Chinese first grader sorting blank colored paper cards together at a small kitchen table. Keep faces and hands within this cell and no legible marks on cards. Distinct picture subjects and consistently professional children's picture-book style across all four cells.",
+      "originalFile": "art-source/picnic-cup-scenes.png"
+    },
+    {
+      "id": "picnic-cup-sprites",
+      "transparent": true,
+      "prompt": "Exactly equal three by two grid of isolated sprites on transparent canvas. Fine paper grain, child-friendly matte gouache, pine and warm apricot. Top left a tiny mint rabbit helper standing still, top middle same rabbit mid-hop, top right amber marble. Bottom left warm star completion sticker, bottom center small pine cup-shaped completion sticker, bottom right empty. Center subjects in the middle 55 percent of each tile, no text, markings, ground or cast shadow.",
+      "actualPrompt": "Use case: stylized-concept. Single 3:2 landscape sprite atlas for the same primary-school picnic cup math lesson. Exactly three equal columns and two equal rows, six square cells, each independent. Actual transparent background with alpha throughout. No visible checkerboard, frames, table, text, badges with numbers, drop shadows, or background props. Every cutout remains centered inside the middle 60 percent of its own cell with broad transparent margins; nothing crosses cell edges. Use rounded children's storybook matte gouache and clean cut-paper silhouettes with delicate cream paper grain, muted pine green and apricot or persimmon accents. Top left: a tiny round mint-green rabbit station helper facing right, all four paws visible in a poised standing pose. Top middle: the identical rabbit (matching green body, cream muzzle and simple orange neck scarf) in a small hopping pose facing right, same scale and silhouette, ears raised. Top right: one isolated spherical amber marble, with small warm highlight and clear round outline. Bottom left: one warm apricot five-point star completion sticker with a small cream edge and simple pine cut-paper detailing. Bottom middle: one deep pine-green paper-cup completion sticker with broad cream edge, handles absent, no words, no tally marks. Bottom right: fully transparent and entirely empty. Keep separation and genuine alpha between all subjects.",
+      "originalFile": "art-source/picnic-cup-sprites.png"
+    }
+  ],
+  "plannedAssets": {
+    "cover-cups": {
+      "file": "assets/cover-cups.png",
+      "plate": "picnic-cup-scenes",
+      "cell": "top-left"
+    },
+    "slide-backdrop": {
+      "file": "assets/slide-backdrop.png",
+      "plate": "picnic-cup-scenes",
+      "cell": "top-right"
+    },
+    "aim-backdrop": {
+      "file": "assets/aim-backdrop.png",
+      "plate": "picnic-cup-scenes",
+      "cell": "bottom-left"
+    },
+    "family-cups": {
+      "file": "assets/family-cups.png",
+      "plate": "picnic-cup-scenes",
+      "cell": "bottom-right"
+    },
+    "cup-helper": {
+      "file": "assets/cup-helper.png",
+      "plate": "picnic-cup-sprites",
+      "cell": "top-left"
+    },
+    "cup-hop": {
+      "file": "assets/cup-hop.png",
+      "plate": "picnic-cup-sprites",
+      "cell": "top-center"
+    },
+    "cup-marble": {
+      "file": "assets/cup-marble.png",
+      "plate": "picnic-cup-sprites",
+      "cell": "top-right"
+    },
+    "cup-slide-award": {
+      "file": "assets/cup-slide-award.png",
+      "plate": "picnic-cup-sprites",
+      "cell": "bottom-left"
+    },
+    "cup-aim-award": {
+      "file": "assets/cup-aim-award.png",
+      "plate": "picnic-cup-sprites",
+      "cell": "bottom-center"
+    }
+  }
+}

@@ -1,0 +1,995 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "家养动物｜单元回顾",
+  "description": "人教鄂教版一年级科学上册第三单元回顾。从整只动物到身体局部，有顺序地观察，比较相同的生活证据。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小科老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Serena",
+      "avatar": "/avatars/teacher-2.png",
+      "color": "#287B94",
+      "persona": "用清楚自然的普通话带孩子观察身体和生活证据，尊重动物和他人的发现。"
+    }
+  },
+  "images": {
+    "animal-sticker": {
+      "file": "assets/animal-sticker.png"
+    },
+    "animal-workbench": {
+      "file": "assets/animal-workbench.png"
+    },
+    "cat-offspring": {
+      "file": "assets/cat-offspring.png"
+    },
+    "cat-rabbit-compare": {
+      "file": "assets/cat-rabbit-compare.png"
+    },
+    "chick-grows": {
+      "file": "assets/chick-grows.png"
+    },
+    "dog-grows": {
+      "file": "assets/dog-grows.png"
+    },
+    "evidence-arcade-start": {
+      "file": "assets/evidence-arcade-start.png"
+    },
+    "evidence-marble": {
+      "file": "assets/evidence-marble.png"
+    },
+    "family-observes": {
+      "file": "assets/family-observes.png"
+    },
+    "fish-cam-start": {
+      "file": "assets/fish-cam-start.png"
+    },
+    "fish-record": {
+      "file": "assets/fish-record.png"
+    },
+    "goldfish-side": {
+      "file": "assets/goldfish-side.png"
+    },
+    "goldfish-swims": {
+      "file": "assets/goldfish-swims.png"
+    },
+    "goldfish-top": {
+      "file": "assets/goldfish-top.png"
+    },
+    "goldfish-water": {
+      "file": "assets/goldfish-water.png"
+    },
+    "hen-eats": {
+      "file": "assets/hen-eats.png"
+    },
+    "hen-offspring": {
+      "file": "assets/hen-offspring.png"
+    },
+    "life-sequences": {
+      "file": "assets/life-sequences.png"
+    },
+    "q1-a": {
+      "file": "assets/q1-a.png"
+    },
+    "q1-b": {
+      "file": "assets/q1-b.png"
+    },
+    "q1-c": {
+      "file": "assets/q1-c.png"
+    },
+    "q2-a": {
+      "file": "assets/q2-a.png"
+    },
+    "q2-b": {
+      "file": "assets/q2-b.png"
+    },
+    "q2-c": {
+      "file": "assets/q2-c.png"
+    },
+    "q3-a": {
+      "file": "assets/q3-a.png"
+    },
+    "q3-b": {
+      "file": "assets/q3-b.png"
+    },
+    "q3-c": {
+      "file": "assets/q3-c.png"
+    },
+    "q4-a": {
+      "file": "assets/q4-a.png"
+    },
+    "q4-b": {
+      "file": "assets/q4-b.png"
+    },
+    "q4-c": {
+      "file": "assets/q4-c.png"
+    },
+    "q5-a": {
+      "file": "assets/q5-a.png"
+    },
+    "q5-b": {
+      "file": "assets/q5-b.png"
+    },
+    "q5-c": {
+      "file": "assets/q5-c.png"
+    },
+    "q6-a": {
+      "file": "assets/q6-a.png"
+    },
+    "q6-b": {
+      "file": "assets/q6-b.png"
+    },
+    "q6-c": {
+      "file": "assets/q6-c.png"
+    },
+    "rabbit-eats": {
+      "file": "assets/rabbit-eats.png"
+    },
+    "rabbit-hops": {
+      "file": "assets/rabbit-hops.png"
+    },
+    "shared-actions": {
+      "file": "assets/shared-actions.png"
+    },
+    "unit-animals": {
+      "file": "assets/unit-animals.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "p01",
+      "type": "slide",
+      "title": "家养动物观察站",
+      "template": "picture-points",
+      "data": {
+        "title": "家养动物观察站",
+        "picture": "unit-animals",
+        "points": [
+          "看身体",
+          "比运动",
+          "找住处"
+        ]
+      },
+      "script": [
+        {
+          "say": "观察站来了一群动物。你能叫出其中几位的名字？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "这里有金鱼、猫、兔和鸡。先看整只，再说你认出谁。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "看身体，兔的耳朵竖得长，鱼身上能找到一片片鱼鳞。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "看运动，金鱼在水里游，猫在地面走，走法不一样。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "还可以比它们生活在哪里。金鱼待在水里，兔通常生活在陆地上。"
+        },
+        {
+          "say": "你也伸手指一指。你想从身体、运动、住处里先比哪一样？"
+        },
+        {
+          "say": "先从会游的金鱼开始。我们去找它身上的线索。"
+        }
+      ]
+    },
+    {
+      "key": "p02",
+      "type": "slide",
+      "title": "从头到尾看金鱼",
+      "template": "picture-points",
+      "data": {
+        "title": "从头到尾看金鱼",
+        "picture": "goldfish-water",
+        "points": [
+          "头后找鳃盖",
+          "身体找鳞片",
+          "鱼鳍帮它游"
+        ]
+      },
+      "script": [
+        {
+          "say": "金鱼在水里游。你猜它从头到尾，哪一处和呼吸有关？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "我先看整条鱼，再把眼睛移到头，慢慢向后找。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "眼睛后面那条弯边是鳃盖的边。鳃在里面，鱼用鳃呼吸。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "再看身体。像小片叠在一起的是鳞片，金鱼身上有鳞片。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "鱼鳍和身体一起帮它游。尾巴左右摆，鱼可以往前游。"
+        },
+        {
+          "say": "把手掌立起来，当鱼尾左右摆一摆。你模仿的是尾鳍的动作。"
+        },
+        {
+          "say": "我们先看清身体，再说哪个部位怎样帮金鱼生活。"
+        }
+      ]
+    },
+    {
+      "key": "p03",
+      "type": "slide",
+      "title": "同一条鱼，两种看法",
+      "template": "two-columns",
+      "data": {
+        "title": "同一条鱼，两种看法",
+        "left": {
+          "heading": "从侧面看",
+          "body": "看头后弯边和整条尾"
+        },
+        "left_picture": "goldfish-side",
+        "right": {
+          "heading": "从上面看",
+          "body": "找身体两边的小鳍"
+        },
+        "right_picture": "goldfish-top"
+      },
+      "script": [
+        {
+          "say": "同一条金鱼，换到正上方看，会多看到哪儿？先猜一猜。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "从侧面能看见靠我们这一侧的鳃盖边，还看见整条尾巴。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "从上面看，两边各伸出一片小鳍。它们是胸鳍，在头的后面。"
+        },
+        {
+          "say": "两张图的头都在左，尾巴在右。金鱼还是这同一条。"
+        },
+        {
+          "say": "照片能留下看见的部位。它怎样游，要在水里继续看。"
+        },
+        {
+          "say": "从上面拍，找头后左右伸出的两片胸鳍。"
+        },
+        {
+          "say": "从侧面拍，找眼睛后面弯弯的鳃盖边。"
+        },
+        {
+          "say": "先把金鱼框住，再对照上面的小图，等角度一样时按快门。"
+        }
+      ]
+    },
+    {
+      "key": "p04",
+      "type": "interactive",
+      "title": "金鱼快门观察站",
+      "page": "goldfish-camera",
+      "widgetType": "game",
+      "startImage": "fish-cam-start",
+      "script": [
+        {
+          "say": "金鱼观察册少两张照片。怎样才能拍到要看的那一边？"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#fish-first-preview"
+        },
+        {
+          "say": "先看上面小图。第一张要从上面拍，记住头后的两片小鳍。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "我按箭头移虚线框，把这条金鱼整个框住。"
+        },
+        {
+          "highlight": "#game-target"
+        },
+        {
+          "say": "鱼换到和小图一样的角度，我才按一下圆圆的快门。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "我拍一张。下边留住这条鱼从上面看到的样子。"
+        },
+        {
+          "say": "轮到你啦，跟着小图和虚线框，把两种看法都留下来。"
+        },
+        {
+          "say": "没拍到就再等一等。相片里的角度对了，才算拍成功。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "observationCard": {
+        "title": "同一条金鱼的两张照片",
+        "familyTask": "和家人安静观察一只熟悉的家养动物，保持安全距离。先看整只，再挑一个部位，画下它的样子，说一条发现，再问一个新问题。",
+        "levels": [
+          {
+            "label": "从上面开始",
+            "trials": [
+              {
+                "id": "goldfish-views",
+                "label": "同一金鱼的两种观察角度",
+                "top": {
+                  "goldfish-top": {
+                    "label": "俯看头后两侧的胸鳍",
+                    "image": "goldfish-top"
+                  }
+                },
+                "side": {
+                  "goldfish-side": {
+                    "label": "侧看鳃盖边和尾部",
+                    "image": "goldfish-side"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "label": "从侧面开始",
+            "trials": [
+              {
+                "id": "goldfish-views",
+                "label": "同一金鱼的两种观察角度",
+                "top": {
+                  "goldfish-top": {
+                    "label": "俯看头后两侧的胸鳍",
+                    "image": "goldfish-top"
+                  }
+                },
+                "side": {
+                  "goldfish-side": {
+                    "label": "侧看鳃盖边和尾部",
+                    "image": "goldfish-side"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "label": "换角度多拍两次",
+            "trials": [
+              {
+                "id": "goldfish-views",
+                "label": "同一金鱼的两种观察角度",
+                "top": {
+                  "goldfish-top": {
+                    "label": "俯看头后两侧的胸鳍",
+                    "image": "goldfish-top"
+                  }
+                },
+                "side": {
+                  "goldfish-side": {
+                    "label": "侧看鳃盖边和尾部",
+                    "image": "goldfish-side"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gameAudio": {
+        "fish-photo-goal": "p03-10",
+        "fish-photo-top": "p03-8",
+        "fish-photo-side": "p03-9",
+        "fish-photo-praise": "p08-3"
+      }
+    },
+    {
+      "key": "p05",
+      "type": "slide",
+      "title": "耳朵比耳朵，尾巴比尾巴",
+      "template": "picture-points",
+      "data": {
+        "title": "耳朵比耳朵，尾巴比尾巴",
+        "picture": "cat-rabbit-compare",
+        "points": [
+          "耳朵对耳朵",
+          "尾巴对尾巴",
+          "都在地面上行走",
+          "都会吃食物"
+        ]
+      },
+      "script": [
+        {
+          "say": "猫和兔站在一起。先挑一个要比的地方，你想比什么？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "先看整只。左边是猫，右边是兔，再从头往后看。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "耳朵比耳朵。这只猫的耳朵短而尖，这只兔的耳朵长。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "尾巴比尾巴。猫这条尾巴长，兔身后只有一小团短尾。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "再看怎样走。猫和兔都能用脚在地面上走，兔也常会跳。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "它们都吃食物。食物可以不同，吃东西这个动作相同。"
+        },
+        {
+          "say": "你指一处，说出两只哪里一样，哪里不一样。一次比同一个方面。"
+        }
+      ]
+    },
+    {
+      "key": "p06",
+      "type": "slide",
+      "title": "一样的生活线索",
+      "template": "two-columns",
+      "data": {
+        "title": "一样的生活线索",
+        "left": {
+          "heading": "进食和运动",
+          "body": "吃的、动的样子可以不同"
+        },
+        "left_picture": "shared-actions",
+        "right": {
+          "heading": "生长和繁殖",
+          "body": "看是自己长大，还是有了下一代"
+        },
+        "right_picture": "life-sequences"
+      },
+      "script": [
+        {
+          "say": "鱼、小兔、小狗和鸡长得不同。它们的生活里也有相同的事吗？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "兔咬叶子、鸡啄食物，都在进食。食物不一样，也能比。"
+        },
+        {
+          "say": "鱼摆身子游，兔蹬脚往前跳，都在运动。这里有两种动法。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "小鸡慢慢长大，还是原来那只鸡。这叫生长。"
+        },
+        {
+          "say": "这只母鸡的蛋里孵出小鸡，有了下一代。这叫繁殖。"
+        },
+        {
+          "say": "小狗也会长大，猫也会有小猫。动物会进食、运动、生长、繁殖。"
+        },
+        {
+          "say": "听这一回的线索，给正在运动的动物找另一个正在运动的伙伴。"
+        },
+        {
+          "say": "给在吃东西的动物找一个也在进食的伙伴。"
+        },
+        {
+          "say": "给同一只从小到大的图，找另一种动物的生长图。"
+        },
+        {
+          "say": "给有了下一代的图，找另一种动物也有下一代的图。"
+        },
+        {
+          "say": "先认图在告诉你什么，再找同一类线索。找到了，线索就能成对。"
+        }
+      ]
+    },
+    {
+      "key": "p07",
+      "type": "interactive",
+      "title": "把同类线索配起来",
+      "page": "animal-evidence",
+      "widgetType": "game",
+      "startImage": "evidence-arcade-start",
+      "script": [
+        {
+          "say": "动物观察站要给图找伙伴。鱼在游，哪只动物也在运动？"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#animal-marble-first-card"
+        },
+        {
+          "say": "弹珠上的小图是金鱼游动。它要找的是也在运动的动物。"
+        },
+        {
+          "highlight": "#animal-marble-first-target"
+        },
+        {
+          "say": "中间小兔正蹬脚往前跳。两只动法不同，可它们都在运动。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "我按箭头对准图，再按发射键。飞的时候也能稍微调方向。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "眼睛跟着弹珠，看它是不是飞向正在跳的小兔。"
+        },
+        {
+          "say": "轮到你了。先认清动作或变化，再把弹珠送到同类的图。"
+        },
+        {
+          "say": "碰错也没关系，看看图片讲的是哪一件事，再试一次。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "evidence-move": "p06-9",
+        "evidence-eat": "p06-10",
+        "evidence-grow": "p06-11",
+        "evidence-next": "p06-12",
+        "evidence-hint": "p06-13",
+        "evidence-praise": "p08-11"
+      }
+    },
+    {
+      "key": "p08",
+      "type": "slide",
+      "title": "听完发现，再问一件事",
+      "template": "picture-points",
+      "data": {
+        "title": "听完发现，再问一件事",
+        "picture": "fish-record",
+        "points": [
+          "说照片里的证据",
+          "听完再接着说",
+          "问一件还想知道的事"
+        ]
+      },
+      "script": [
+        {
+          "say": "照片册里有同一条鱼。只靠这两张图，能说明鱼刚才吃了什么吗？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "同一条金鱼的两种角度都拍下来了。两张放一起，就能比一比。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "我能说从上面看见两边的鳍。要知道它吃什么，还得看它怎样进食。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "小满说：我看到侧面有条弯边。另一侧也有吗？",
+          "by": "xiaoman"
+        },
+        {
+          "say": "我等小满说完，再指他刚才说的这条弯边。这样才接得上他的发现。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "要找另一侧的证据，可以等鱼自己转身，再从那一侧看。"
+        },
+        {
+          "say": "同一类线索已经配上了，接着可以看看还有哪一类。"
+        },
+        {
+          "say": "你也说一条你看见的事，再问一句还想知道什么。"
+        }
+      ]
+    },
+    {
+      "key": "p09",
+      "type": "quiz",
+      "title": "看部位，找共同点",
+      "intro": [
+        "换几个新动物。听清要找什么，再点能回答问题的图。"
+      ],
+      "questions": [
+        {
+          "id": "animal-review-q1",
+          "question": "图上是一条鲫鱼。哪张图圈出了它用来呼吸的鳃所在的地方？",
+          "skill": "science-fish-gill-location",
+          "analysis": "鳃在头后、鳃盖里面。尾部和鱼身中间都不是这条鱼鳃所在的位置。",
+          "answer": [
+            "B"
+          ],
+          "options": {
+            "A": {
+              "label": "鱼尾",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-a",
+                "alt": "同一条鲫鱼，圈住后端的尾鳍"
+              }
+            },
+            "B": {
+              "label": "头后",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-b",
+                "alt": "同一条鲫鱼，圈住眼睛后侧的鳃盖所在部位"
+              }
+            },
+            "C": {
+              "label": "鱼身中间",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-c",
+                "alt": "同一条鲫鱼，圈住身体中部的鳞片区域"
+              }
+            }
+          }
+        },
+        {
+          "id": "animal-review-q2",
+          "question": "想比山羊和鹅怎样在地面上走。哪组图圈出了应该先比的部位？",
+          "skill": "science-compare-one-body-part",
+          "analysis": "要比较在地面怎样走，就用同一个问题看两只动物的脚。只比嘴或尾巴，不能直接帮我们比较怎样走。",
+          "answer": [
+            "C"
+          ],
+          "options": {
+            "A": {
+              "label": "比较嘴",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-a",
+                "alt": "同一只山羊和家鹅，圈住两者嘴的位置"
+              }
+            },
+            "B": {
+              "label": "比较尾巴",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-b",
+                "alt": "同一只山羊和家鹅，圈住两者的尾部"
+              }
+            },
+            "C": {
+              "label": "比较脚",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-c",
+                "alt": "同一只山羊和家鹅，圈住两者接触地面的脚"
+              }
+            }
+          }
+        },
+        {
+          "id": "animal-review-q3",
+          "question": "哪组图同时记录了小鸭和小猫正在运动？",
+          "skill": "science-shared-movement-evidence",
+          "analysis": "上面的小鸭在水里游，下面的小猫正在向前走，两只都在运动。两只都吃，或有一只安静趴着，都不能说明两只正在运动。",
+          "answer": [
+            "A"
+          ],
+          "options": {
+            "A": {
+              "label": "都在运动",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-a",
+                "alt": "小鸭在水里游出水纹，小猫抬着一只前爪向前走"
+              }
+            },
+            "B": {
+              "label": "都在进食",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-b",
+                "alt": "小鸭低头在碗边啄食，小猫低头吃盆里的食物"
+              }
+            },
+            "C": {
+              "label": "只有小鸭运动",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-c",
+                "alt": "小鸭在水里游，小猫趴在地面休息"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p10",
+      "type": "quiz",
+      "title": "分证据，也会安全观察",
+      "intro": [
+        "看看这组图片能告诉你什么，再选最合适的一组。"
+      ],
+      "questions": [
+        {
+          "id": "animal-review-q4",
+          "question": "哪一组记录了同一头小牛慢慢长大？",
+          "skill": "science-distinguish-growth-and-offspring",
+          "analysis": "两幅图是有同一块浅额斑的一头牛，先小后大。不同时间做不同动作，或母牛和小牛一起出现，都不能说明同一头牛长大了。",
+          "answer": [
+            "C"
+          ],
+          "options": {
+            "A": {
+              "label": "同一只牛做两件事",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-a",
+                "alt": "同一头成年牛在一格走路、另一格低头吃草，体型相同"
+              }
+            },
+            "B": {
+              "label": "母牛和小牛",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-b",
+                "alt": "同一头母牛先单独出现，再和一头更小的幼牛同时出现"
+              }
+            },
+            "C": {
+              "label": "同一头牛长大",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-c",
+                "alt": "同一处浅额斑的小牛和长大的牛先后出现"
+              }
+            }
+          }
+        },
+        {
+          "id": "animal-review-q5",
+          "question": "你想看邻居家的鹅怎样走。哪种做法合适？",
+          "skill": "science-safe-animal-observation",
+          "analysis": "家人陪着，隔着围栏安静看，既能观察鹅，也不打扰它。伸手进栏或追赶会让动物受惊。",
+          "answer": [
+            "B"
+          ],
+          "options": {
+            "A": {
+              "label": "伸手靠近鹅",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-a",
+                "alt": "孩子在围栏边，把手伸向鹅，手和鹅仍有距离"
+              }
+            },
+            "B": {
+              "label": "隔开安静观察",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-b",
+                "alt": "成人陪孩子站在围栏外，和里面的鹅留有距离"
+              }
+            },
+            "C": {
+              "label": "追着鹅跑",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-c",
+                "alt": "孩子跑向前方的鹅，孩子和鹅之间还有距离"
+              }
+            }
+          }
+        },
+        {
+          "id": "animal-review-q6",
+          "question": "想有顺序地看清绵羊的尾巴。哪一组先看整只，再看尾巴？",
+          "skill": "science-observe-whole-then-part",
+          "analysis": "先找整只羊，知道哪一头是你要看的，再把目光移到尾巴。只换到头部，或先盯住局部，都不符合这个顺序。",
+          "answer": [
+            "A"
+          ],
+          "options": {
+            "A": {
+              "label": "先整只再尾巴",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-a",
+                "alt": "左边整只绵羊，右边放大了同一只羊的尾部"
+              }
+            },
+            "B": {
+              "label": "先尾巴再整只",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-b",
+                "alt": "左边是绵羊尾部近景，右边是同一只羊的整只"
+              }
+            },
+            "C": {
+              "label": "先整只再头部",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-c",
+                "alt": "左边整只绵羊，右边放大了同一只羊的头部"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p11",
+      "type": "slide",
+      "title": "和家人安静观察一次",
+      "template": "picture-points",
+      "data": {
+        "title": "和家人安静观察一次",
+        "picture": "family-observes",
+        "points": [
+          "有家人陪，离远一点",
+          "先整只，再看一处",
+          "说发现，再问一件事"
+        ]
+      },
+      "script": [
+        {
+          "say": "回家也能做观察员。你会用刚才的顺序看一只熟悉的动物吗？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "请家人陪着。图里小朋友隔着鱼缸安静看，手放在身边。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "我们不敲缸，也不伸手追、抓或喂动物。它不受惊，你也更安全。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "先看整只，再挑一处，比如鱼尾。把你看见的样子画下来。"
+        },
+        {
+          "say": "如果动物没动，就记当时没动。看到它动了，再补画方向。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "对着图说一条发现，再问一件还想知道的事。"
+        },
+        {
+          "say": "家人亲眼看你怎么观察，亲耳听你怎么说，才能记下真实表现。"
+        },
+        {
+          "say": "没有安全观察的机会，可以先用图练。实物发现留到真看见时再记。"
+        }
+      ]
+    },
+    {
+      "key": "p12",
+      "type": "slide",
+      "title": "观察员收好记录",
+      "template": "picture-points",
+      "data": {
+        "title": "观察员收好记录",
+        "picture": "unit-animals",
+        "points": [
+          "认一只，按顺序看",
+          "用同一个方面比较",
+          "找四类生活线索",
+          "轻轻看，听完再问"
+        ]
+      },
+      "script": [
+        {
+          "say": "观察站要收工啦。你会挑哪一只动物，跟家人说说你的发现？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "我先认名字、看整只，再从头到尾找部位。金鱼用鳃呼吸，用鳍游动。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "猫兔可以比耳朵、尾巴和脚。一次比同一个地方，更容易找到相同和不同。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "吃东西、运动、长大、有下一代，是我们比较出来的共同特点。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "遇到真的动物，要家人陪着安静看。先听别人说完，再说自己的发现。"
+        },
+        {
+          "say": "屏幕留下练习照片。你怎样看、怎样说，要等家人实际看到和听到。"
+        },
+        {
+          "say": "你还想问什么？记下来，留给下一次观察。"
+        }
+      ]
+    }
+  ]
+}

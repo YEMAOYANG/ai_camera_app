@@ -14,6 +14,8 @@ from pathlib import PurePosixPath
 import re
 
 from content.textbook_catalog import canonical, digest, identifier, lesson_by_id, lesson_release_aliases
+from content.courseware_observation import scene_card
+from content import student_activity_controls
 from content.textbook_release import INPUT_SCHEMA, RELEASE_SCHEMA, MEDIA, check_questions, validate_release
 from content.textbook_release_media import media_mime_type
 from core.errors import ApiError
@@ -45,12 +47,21 @@ def _page_reference(value):
     return _text(value) or type(value) is int and value > 0
 
 
-def _finding(value):
-    if isinstance(value, dict):
-        refs = value.get('pageRefs')
-        return (_text(value.get('classHour')) and _text(value.get('finding'))
-                and isinstance(refs, list) and bool(refs) and all(_page_reference(ref) for ref in refs))
-    return _text(value)
+def _finding(value, *, resource_name, resource_refs):
+    if not isinstance(value, dict):
+        return _text(value)
+    class_hour = value.get('classHour')
+    if not _text(class_hour) or not _text(value.get('finding')):
+        return False
+    if 'pageRefs' in value:
+        refs = value['pageRefs']
+        return isinstance(refs, list) and bool(refs) and all(_page_reference(ref) for ref in refs)
+    if value.keys() != {'classHour', 'finding'} or not re.fullmatch(r'lesson_[1-9][0-9]*', class_hour):
+        return False
+    # Older notes list scoped page references at the resource level. Validate
+    # against them without rewriting the notes bound to the verification receipt.
+    scoped_ref = re.compile(rf'{class_hour}/{re.escape(resource_name)}:[1-9][0-9]*')
+    return any(isinstance(ref, str) and scoped_ref.fullmatch(ref) is not None for ref in resource_refs)
 
 
 def _independent_verifier(author_models, verifier):
@@ -91,10 +102,11 @@ def _evidence(inputs, speech, questions, confirmation):
             # The official listing of this class hour has no such resource; the evidence names the saved listing.
             require(_text(item.get('evidence')), 'notes_invalid')
             continue
-        require(isinstance(item, dict) and isinstance(item.get('findings'), list)
-                and bool(item['findings']) and all(_finding(v) for v in item['findings'])
+        require(isinstance(item, dict) and isinstance(item.get('findings'), list) and bool(item['findings'])
                 and isinstance(item.get('pageRefs'), list) and bool(item['pageRefs'])
-                and all(_page_reference(v) for v in item['pageRefs']), 'notes_invalid')
+                and all(_page_reference(v) for v in item['pageRefs'])
+                and all(_finding(v, resource_name=name, resource_refs=item['pageRefs'])
+                        for v in item['findings']), 'notes_invalid')
     objectives = notes.get('objectives')
     require(isinstance(objectives, list) and bool(objectives) and all(_text(value) for value in objectives),
             'objectives_invalid')
@@ -276,6 +288,10 @@ def build_release(inputs):
             'evidence': evidence}}
     if aliases:
         frozen['identity']['directoryAliasNodeIds'] = list(aliases)
+    control_field = student_activity_controls.FIELD
+    if control_field in identity:
+        frozen[control_field] = student_activity_controls.compile_evidence(
+            identity[control_field], inputs['brief'], body, raw_media, binding)
     key = digest(frozen)
     frozen['contentKey'] = key
     classroom_id = 'tbpub_' + key[:24]
@@ -303,6 +319,8 @@ def build_release(inputs):
     release = {'schemaVersion': RELEASE_SCHEMA, 'contentKey': key, 'classroomId': classroom_id,
         'classroom': classroom, 'classroomSha256': digest(classroom), 'media': inventory,
         'audioAudit': {'passed': True, 'segments': len(speech), 'method': AUDIO_METHOD}}
+    if control_field in frozen:
+        release[control_field] = student_activity_controls.descriptors(frozen[control_field], classroom)
     release['sha256'] = digest(release)
     review = {**_review(evidence, confirmation, identity['authorModels'], verification_status),
         'release': release}
@@ -312,6 +330,17 @@ def build_release(inputs):
             'choices': [{'id': o['value'], 'text': o['label']} for o in q['options']],
             'answer': q['answer'][0] if isinstance(q['answer'], list) else q['answer'],
             'explanation': q['analysis'], 'skill': q['skill']} for q in questions], 'releaseSha256': release['sha256']}
+    observation_cards = {}
+    for scene in classroom['scenes']:
+        card = scene_card(scene)
+        if card is not None:
+            observation_cards[scene['id']] = {'card': card,
+                'contentSha256': hashlib.sha256(scene['content']['html'].encode('utf-8')).hexdigest()}
+    if observation_cards:
+        require(manifest['subject'] == 'science', 'observation_cards_require_science')
+        require(len(observation_cards) <= 3, 'observation_cards_limit')
+        content['observationCards'] = observation_cards
+        content['observationClassroomId'] = classroom_id
     course = {'id': 'textbook_' + key[:40], 'version': identity['teachingRevision'],
         'grade_code': manifest['gradeCode'], 'subject': manifest['subject'],
         'node_code': 'textbook:%s:%s' % (manifest['editionId'], identity['nodeId']),

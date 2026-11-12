@@ -1,0 +1,982 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "它们是用什么材料做的",
+  "grade": 1,
+  "description": "观察和比较七种常见材料，按材料分类，再用同一物品的双角度可见证据解释不同部位的选材。",
+  "roster": {
+    "teacher": {
+      "name": "小科老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Serena",
+      "avatar": "/avatars/teacher-2.png",
+      "color": "#287B94",
+      "persona": "语气自然清楚，引导孩子先猜、再看、讲出一条可见依据。"
+    }
+  },
+  "images": {
+    "camera-workbench": {
+      "file": "assets/camera-workbench.png"
+    },
+    "cloth-pouch": {
+      "file": "assets/cloth-pouch.png"
+    },
+    "glass-dish": {
+      "file": "assets/glass-dish.png"
+    },
+    "home-material-record": {
+      "file": "assets/home-material-record.png"
+    },
+    "material-camera": {
+      "file": "assets/material-camera.png"
+    },
+    "material-cart-idle": {
+      "file": "assets/material-cart-idle.png"
+    },
+    "material-cart-move": {
+      "file": "assets/material-cart-move.png"
+    },
+    "material-record-example": {
+      "file": "assets/material-record-example.png"
+    },
+    "material-side-case": {
+      "file": "assets/material-side-case.png"
+    },
+    "material-side-clipboard": {
+      "file": "assets/material-side-clipboard.png"
+    },
+    "material-side-stool": {
+      "file": "assets/material-side-stool.png"
+    },
+    "material-top-case": {
+      "file": "assets/material-top-case.png"
+    },
+    "material-top-clipboard": {
+      "file": "assets/material-top-clipboard.png"
+    },
+    "material-top-stool": {
+      "file": "assets/material-top-stool.png"
+    },
+    "materials-badge": {
+      "file": "assets/materials-badge.png"
+    },
+    "metal-bell": {
+      "file": "assets/metal-bell.png"
+    },
+    "paper-card": {
+      "file": "assets/paper-card.png"
+    },
+    "photo-start-cover": {
+      "file": "assets/photo-start-cover.png"
+    },
+    "plastic-tray": {
+      "file": "assets/plastic-tray.png"
+    },
+    "quiz-bright-cap": {
+      "file": "assets/quiz-bright-cap.png"
+    },
+    "quiz-cardboard-tube": {
+      "file": "assets/quiz-cardboard-tube.png"
+    },
+    "quiz-cloth-around-corner": {
+      "file": "assets/quiz-cloth-around-corner.png"
+    },
+    "quiz-fabric-snap-stimulus": {
+      "file": "assets/quiz-fabric-snap-stimulus.png"
+    },
+    "quiz-knit-glove": {
+      "file": "assets/quiz-knit-glove.png"
+    },
+    "quiz-metal-and-plastic": {
+      "file": "assets/quiz-metal-and-plastic.png"
+    },
+    "quiz-record-highlight": {
+      "file": "assets/quiz-record-highlight.png"
+    },
+    "quiz-record-smell": {
+      "file": "assets/quiz-record-smell.png"
+    },
+    "quiz-record-touch": {
+      "file": "assets/quiz-record-touch.png"
+    },
+    "quiz-stone-at-corner": {
+      "file": "assets/quiz-stone-at-corner.png"
+    },
+    "quiz-stone-marker": {
+      "file": "assets/quiz-stone-marker.png"
+    },
+    "quiz-wood-and-gear": {
+      "file": "assets/quiz-wood-and-gear.png"
+    },
+    "quiz-wood-and-plastic-rulers": {
+      "file": "assets/quiz-wood-and-plastic-rulers.png"
+    },
+    "quiz-wood-at-corner": {
+      "file": "assets/quiz-wood-at-corner.png"
+    },
+    "same-ring-comparison": {
+      "file": "assets/same-ring-comparison.png"
+    },
+    "seven-material-samples": {
+      "file": "assets/seven-material-samples.png"
+    },
+    "sorting-workbench": {
+      "file": "assets/sorting-workbench.png"
+    },
+    "stone-tile": {
+      "file": "assets/stone-tile.png"
+    },
+    "stool-detail": {
+      "file": "assets/stool-detail.png"
+    },
+    "swatch-cloth": {
+      "file": "assets/swatch-cloth.png"
+    },
+    "swatch-glass": {
+      "file": "assets/swatch-glass.png"
+    },
+    "swatch-metal": {
+      "file": "assets/swatch-metal.png"
+    },
+    "swatch-paper": {
+      "file": "assets/swatch-paper-flat.png"
+    },
+    "swatch-plastic": {
+      "file": "assets/swatch-plastic.png"
+    },
+    "swatch-stone": {
+      "file": "assets/swatch-stone.png"
+    },
+    "swatch-wood": {
+      "file": "assets/swatch-wood.png"
+    },
+    "two-trays-compare": {
+      "file": "assets/two-trays-compare.png"
+    },
+    "window-clear": {
+      "file": "assets/window-clear.png"
+    },
+    "window-metal": {
+      "file": "assets/window-metal.png"
+    },
+    "window-wood": {
+      "file": "assets/window-wood.png"
+    },
+    "wood-box": {
+      "file": "assets/wood-box.png"
+    },
+    "wood-frame": {
+      "file": "assets/wood-frame.png"
+    },
+    "wood-object-comparison": {
+      "file": "assets/wood-object-comparison.png"
+    },
+    "wood-tray": {
+      "file": "assets/wood-tray.png"
+    },
+    "workbench-cover": {
+      "file": "assets/workbench-cover.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "material-workbench",
+      "title": "展台物品用什么做",
+      "type": "slide",
+      "template": "two-columns",
+      "data": {
+        "title": "展台物品用什么做",
+        "left": {
+          "heading": "松风校园展台",
+          "body": "找出物品"
+        },
+        "right": {
+          "heading": "木托盘和木框",
+          "body": "找相同材料"
+        },
+        "left_picture": "workbench-cover",
+        "right_picture": "wood-object-comparison"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "松风校园要布置展台。你能帮忙看这些东西怎么做的吗？"
+        },
+        {
+          "say": "先看整件物品。这里有托盘、小框，还有一个布袋。"
+        },
+        {
+          "say": "托盘是物品的名字。它用什么做，说的就是材料。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "看托盘边上的纹路，再看小框的边。两处都有木纹。"
+        },
+        {
+          "say": "这两件物品都用木材做，一个装物件，一个框住画。"
+        },
+        {
+          "say": "东西的样子不同，用的材料可以一样。再找找看。"
+        }
+      ]
+    },
+    {
+      "key": "seven-sample-materials",
+      "title": "认一认七种常见材料",
+      "type": "slide",
+      "template": "picture-points",
+      "data": {
+        "title": "认一认七种常见材料",
+        "picture": "seven-material-samples",
+        "points": [
+          "木材、布和纸",
+          "玻璃和塑料",
+          "金属和石材"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "展台上有一排材料片。你最先认出了哪一片？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "看左边。木片上有木纹，布片能看到线交织的样子。"
+        },
+        {
+          "say": "旁边的纸片边缘薄，能折起来。纸也能做卡片。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "中间有玻璃片和塑料片。大人拿稳玻璃给我们看。"
+        },
+        {
+          "say": "塑料可以做收纳托盘。样子像玻璃时，请大人核对。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "这片金属上有亮斑。石样能看见颗粒和粗的纹理。"
+        },
+        {
+          "say": "请用这些样片去对照。看见一点线索时，先别急着定。"
+        }
+      ]
+    },
+    {
+      "key": "same-method-fair-compare",
+      "title": "用同样办法看两块",
+      "type": "slide",
+      "template": "picture-points",
+      "data": {
+        "title": "用同样办法看两块",
+        "picture": "same-ring-comparison",
+        "points": [
+          "同样的橙圈",
+          "看能不能透过",
+          "分开记录眼看和手摸"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "小满问：两块样片都亮亮的，隔着它们还能看见图吗？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "我们用一样大的橙圈，放到两块样片后面的相同位置。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "左边隔着这块玻璃，还看得清橙圈。这个样片透明。"
+        },
+        {
+          "say": "右边的金属片挡住橙圈。它有亮斑，这片却不透明。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "能看见什么，用眼睛记下来。手感要摸过才知道。"
+        },
+        {
+          "say": "大人先检查。安全的布可轻摸，玻璃由大人展示。"
+        },
+        {
+          "say": "找一样的地方，也找不同的地方，这就叫比较。"
+        }
+      ]
+    },
+    {
+      "key": "same-shape-different-material",
+      "title": "两个托盘长得很像",
+      "type": "slide",
+      "template": "picture-points",
+      "data": {
+        "title": "两个托盘长得很像",
+        "picture": "two-trays-compare",
+        "points": [
+          "先看整个托盘",
+          "再看边和表面",
+          "按材料送到样片盘"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "展台收到两个托盘。它们颜色和样子都近，能放一组吗？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "两个都能放东西。我们这回按材料来分，先找材料线索。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "左边这个有木纹。右边是做成同样颜色的塑料托盘。"
+        },
+        {
+          "say": "我们还核对过样片。这个塑料托盘边上有圆圆的压边。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "找到相同材料的样片，就把物品送到那一个托盘。"
+        },
+        {
+          "say": "先送两个托盘。看准木片和塑料片，再推过去。"
+        },
+        {
+          "say": "木盒和木框形状不同。看到木纹，可以分别送到木料盘。"
+        },
+        {
+          "say": "还有四种材料要分。比一比物品和托盘里的样片。"
+        },
+        {
+          "say": "遇到拿不准的，先看物品边上，再和样片比一比。"
+        },
+        {
+          "say": "绕到物品后面再推。想撤回一步，就按回转键。"
+        },
+        {
+          "say": "送对啦。样子不一样的物品，也可能用同一种材料。"
+        }
+      ]
+    },
+    {
+      "key": "material-docks",
+      "title": "给材料找托盘",
+      "type": "interactive",
+      "page": "material-docks",
+      "widgetType": "game",
+      "startImage": "two-trays-compare",
+      "script": [
+        {
+          "say": "相似的两个托盘都到了。你能推车把它们分开吗？"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#game-target"
+        },
+        {
+          "say": "我先看这只托盘。表面有木纹，和木样片一样。"
+        },
+        {
+          "highlight": "#wood-dock-first"
+        },
+        {
+          "say": "要送到上面的木样片盘。右边同一排是另一个材料盘。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "我绕到物品后面，朝木样片盘一步一步推。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "托盘停在木样片盘里。这样才按材料摆好了。"
+        },
+        {
+          "say": "轮到你啦。用箭头推，先比一比材料再选方向。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "docks-start": "same-shape-different-material-10",
+        "docks-wood": "same-shape-different-material-11",
+        "docks-mix": "same-shape-different-material-12",
+        "docks-hint": "same-shape-different-material-13",
+        "docks-help": "same-shape-different-material-14",
+        "docks-praise": "same-shape-different-material-15"
+      }
+    },
+    {
+      "key": "each-part-has-a-job",
+      "title": "凳面和凳腿各有用",
+      "type": "slide",
+      "template": "picture-points",
+      "data": {
+        "title": "凳面和凳腿各有用",
+        "picture": "stool-detail",
+        "points": [
+          "先看整把凳子",
+          "从上看布面",
+          "从侧看木腿"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "小满想做一把凳子。凳面和凳腿需要同一种材料吗？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "整把凳子能坐。靠近看，凳面和下面的腿长得不一样。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "从上看，凳垫外面有布纹和一圈缝线。"
+        },
+        {
+          "say": "这块布能沿着垫子的边包起来。坐的感觉要实物试。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "从侧面看，木腿上有木纹，撑着上面的凳面。"
+        },
+        {
+          "say": "这把凳子的木腿硬，不容易弯，所以能撑稳凳面。"
+        },
+        {
+          "say": "先看小图要哪一面，再让整件进到虚线框。"
+        },
+        {
+          "say": "小图像从上面看。找一找哪一面看得清上边。"
+        },
+        {
+          "say": "小图像从侧面看。找一找哪一面露出侧边。"
+        },
+        {
+          "say": "先挪一挪虚线框，把整件物品放进来。"
+        },
+        {
+          "say": "再等等，物品的角度要和上面小图一样。"
+        },
+        {
+          "say": "拍到了。把两张留在一起，看看哪里拍得更清楚。"
+        }
+      ]
+    },
+    {
+      "key": "material-photo-pairs",
+      "title": "给同一件物品拍两种角度",
+      "type": "interactive",
+      "page": "material-photo-pairs",
+      "widgetType": "game",
+      "startImage": "photo-start-cover",
+      "script": [
+        {
+          "say": "同一把凳子换个角度，能找到哪些部位的材料线索？"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#material-view-preview"
+        },
+        {
+          "say": "看上面的小图。第一张从上面拍，能看布面。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "我按箭头挪虚线框，让整把凳子进框。"
+        },
+        {
+          "highlight": "#game-target"
+        },
+        {
+          "say": "等到角度和小图一样，再按右边带圆点的快门。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "下面留下第一张。下一张从侧面拍，木腿更容易看到。"
+        },
+        {
+          "say": "轮到你啦。每件都拍两种角度，再看看实际留了什么。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "photo-goal": "each-part-has-a-job-11",
+        "photo-top": "each-part-has-a-job-12",
+        "photo-side": "each-part-has-a-job-13",
+        "photo-hint": "each-part-has-a-job-14",
+        "photo-help": "each-part-has-a-job-15",
+        "photo-praise": "each-part-has-a-job-16"
+      },
+      "observationCard": {
+        "title": "同一件物品的两种观察照片",
+        "familyTask": "和大人观察家中一件熟悉的收纳用品。先画整件，再圈两个部位，记下看见的材料线索。大人确认干净、无尖边的样本才轻摸。玻璃由大人展示，陌生物品不闻不尝。没观察的先留空。",
+        "levels": [
+          {
+            "label": "木腿布面凳",
+            "trials": [
+              {
+                "id": "same-object-two-views",
+                "label": "木腿布面凳的两个角度",
+                "top": {
+                  "material-top-stool": {
+                    "label": "俯看圆形布面，有织纹和一圈缝线",
+                    "image": "material-top-stool"
+                  }
+                },
+                "side": {
+                  "material-side-stool": {
+                    "label": "侧看木腿和凳垫的接合处",
+                    "image": "material-side-stool"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "label": "透明工具盒",
+            "trials": [
+              {
+                "id": "same-object-two-views",
+                "label": "透明工具盒的两个角度",
+                "top": {
+                  "material-top-case": {
+                    "label": "俯看时能隔着透明塑料盖看见盒内色块",
+                    "image": "material-top-case"
+                  }
+                },
+                "side": {
+                  "material-side-case": {
+                    "label": "侧看盒边的金属小搭扣",
+                    "image": "material-side-case"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "label": "木底夹板",
+            "trials": [
+              {
+                "id": "same-object-two-views",
+                "label": "木底夹板的两个角度",
+                "top": {
+                  "material-top-clipboard": {
+                    "label": "俯看金属夹压住纸卡",
+                    "image": "material-top-clipboard"
+                  }
+                },
+                "side": {
+                  "material-side-clipboard": {
+                    "label": "侧看木底板的边和金属夹的接合处",
+                    "image": "material-side-clipboard"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "key": "evidence-not-a-guess",
+      "title": "观察卡里只放亲自发现",
+      "type": "slide",
+      "template": "picture-points",
+      "data": {
+        "title": "观察卡里只放亲自发现",
+        "picture": "material-record-example",
+        "points": [
+          "写清物品和部位",
+          "留下看到的证据",
+          "没有做的先留空"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "小伙伴只拍过照片。能在卡上写摸过这块材料吗？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先说是哪个物品，再说哪个部位。比如工具盒的盖子。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "在这张俯视图里，能透过盒盖看到里面的色块。"
+        },
+        {
+          "say": "侧面还能看见小搭扣。它能把盖子扣住，盒子不易打开。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "照片留下可见线索。光不光滑，安全摸过才知道。"
+        },
+        {
+          "say": "没有摸过就留空。先猜出的线索，要和实际观察分开。"
+        },
+        {
+          "say": "现在你选一个部位，说说你看到了什么，又怎么知道。"
+        }
+      ]
+    },
+    {
+      "key": "picture-quiz",
+      "title": "展台材料小检查",
+      "type": "quiz",
+      "intro": [
+        "先听题，再选图。想想哪条线索帮了你。"
+      ],
+      "questions": [
+        {
+          "id": "paper-object",
+          "skill": "material-versus-object",
+          "question": "哪件物品的主体是用纸做的？",
+          "answer": [
+            "B"
+          ],
+          "analysis": "中间的纸筒卷边能看到纸层。",
+          "options": {
+            "A": {
+              "label": "布线编织的手套",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-knit-glove",
+                "alt": "布线编织的手套"
+              }
+            },
+            "B": {
+              "label": "卷边可见纸层的纸筒",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-cardboard-tube",
+                "alt": "卷边可见纸层的纸筒"
+              }
+            },
+            "C": {
+              "label": "粗颗粒的石制标记",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-stone-marker",
+                "alt": "粗颗粒的石制标记"
+              }
+            }
+          }
+        },
+        {
+          "id": "see-through-sample",
+          "skill": "controlled-transparency",
+          "question": "隔着哪块样片，还能看清后面的蓝三角？",
+          "answer": [
+            "A"
+          ],
+          "analysis": "左边隔着样片，蓝三角仍看得清。",
+          "options": {
+            "A": {
+              "label": "透过浅绿样片仍看到蓝三角",
+              "visual": {
+                "kind": "asset",
+                "image": "window-clear",
+                "alt": "透过浅绿样片仍看到蓝三角"
+              }
+            },
+            "B": {
+              "label": "棕色样片挡住蓝三角",
+              "visual": {
+                "kind": "asset",
+                "image": "window-wood",
+                "alt": "棕色样片挡住蓝三角"
+              }
+            },
+            "C": {
+              "label": "灰色样片挡住蓝三角",
+              "visual": {
+                "kind": "asset",
+                "image": "window-metal",
+                "alt": "灰色样片挡住蓝三角"
+              }
+            }
+          }
+        },
+        {
+          "id": "different-things-same-material",
+          "skill": "classify-by-material",
+          "question": "哪组的两件物品都能送到木样片盘？",
+          "answer": [
+            "C"
+          ],
+          "analysis": "右边两件都能看到木纹。",
+          "options": {
+            "A": {
+              "label": "一把木尺和一把塑料尺",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-wood-and-plastic-rulers",
+                "alt": "一把木尺和一把塑料尺"
+              }
+            },
+            "B": {
+              "label": "金属夹和塑料叉",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-metal-and-plastic",
+                "alt": "金属夹和塑料叉"
+              }
+            },
+            "C": {
+              "label": "木尺和带木纹的木齿轮",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-wood-and-gear",
+                "alt": "木尺和带木纹的木齿轮"
+              }
+            }
+          }
+        },
+        {
+          "id": "material-at-the-clasp",
+          "skill": "identify-material-by-part",
+          "question": "小布包上圈起来的搭扣用什么做？",
+          "answer": [
+            "B"
+          ],
+          "analysis": "圈住的是金属扣，布在旁边。",
+          "options": {
+            "A": {
+              "label": "木纹样片",
+              "visual": {
+                "kind": "asset",
+                "image": "swatch-wood",
+                "alt": "木纹样片"
+              }
+            },
+            "B": {
+              "label": "带反光的金属样片",
+              "visual": {
+                "kind": "asset",
+                "image": "swatch-metal",
+                "alt": "带反光的金属样片"
+              }
+            },
+            "C": {
+              "label": "看见织纹的布样片",
+              "visual": {
+                "kind": "asset",
+                "image": "swatch-cloth",
+                "alt": "看见织纹的布样片"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "quiz-fabric-snap-stimulus",
+            "alt": "圈出布包上圆形金属按扣，金属小件与包身分开"
+          }
+        },
+        {
+          "id": "record-seen-evidence",
+          "skill": "only-record-observed",
+          "question": "只看过瓶盖，哪张卡只记看见的线索？",
+          "answer": [
+            "C"
+          ],
+          "analysis": "看见了亮斑，手感和气味先留空。",
+          "options": {
+            "A": {
+              "label": "记录手在摸瓶盖",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-record-touch",
+                "alt": "记录手在摸瓶盖"
+              }
+            },
+            "B": {
+              "label": "记录鼻子在闻瓶盖",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-record-smell",
+                "alt": "记录鼻子在闻瓶盖"
+              }
+            },
+            "C": {
+              "label": "记录瓶盖表面的小亮斑",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-record-highlight",
+                "alt": "记录瓶盖表面的小亮斑"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "quiz-bright-cap",
+            "alt": "放在观察台上的金属瓶盖，表面一个清楚的亮斑"
+          }
+        },
+        {
+          "id": "fold-around-corner",
+          "skill": "choose-material-for-use",
+          "question": "要给展板包住拐角，哪块样片合适？",
+          "answer": [
+            "A"
+          ],
+          "analysis": "左边的布沿着拐角弯下来了。",
+          "options": {
+            "A": {
+              "label": "布贴着展板拐角弯下去",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-cloth-around-corner",
+                "alt": "布贴着展板拐角弯下去"
+              }
+            },
+            "B": {
+              "label": "直木片停在边上",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-wood-at-corner",
+                "alt": "直木片停在边上"
+              }
+            },
+            "C": {
+              "label": "石片平放在拐角旁",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-stone-at-corner",
+                "alt": "石片平放在拐角旁"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "home-material-observation",
+      "title": "带一条真实线索回来",
+      "type": "slide",
+      "template": "picture-points",
+      "data": {
+        "title": "带一条真实线索回来",
+        "picture": "home-material-record",
+        "points": [
+          "先看整件物品",
+          "再圈出两个部位",
+          "记下亲自观察的"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "和大人挑一件熟悉的收纳用品。它有几种材料？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先画整件，再说它能做什么。看一看用到了什么材料。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "圈出两处，想想它们的用途。为什么这样选材料？"
+        },
+        {
+          "say": "样品干净、无尖边才轻摸。玻璃请大人展示。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "看到或摸到什么，就记什么。陌生物品不闻不尝。"
+        },
+        {
+          "say": "我们先看整体，再找局部。比材料，还要找真实的线索。"
+        },
+        {
+          "say": "没做过的先留空。下次带回两幅图，给同伴讲一讲。"
+        }
+      ]
+    }
+  ]
+}

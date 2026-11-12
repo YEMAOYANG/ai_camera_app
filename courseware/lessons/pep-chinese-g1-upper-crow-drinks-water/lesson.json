@@ -1,0 +1,1097 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "乌鸦喝水",
+  "description": "人教一年级上册。用原创图理解乌鸦遇到的困难、怎样放石子和水线怎样变，学习字词与有序复述。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小语老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Serena",
+      "avatar": "/avatars/teacher-2.png",
+      "color": "#377d6c",
+      "persona": "用孩子熟悉的动作和画面带着观察、认字、复述。"
+    }
+  },
+  "images": {
+    "boat-right-blow": {
+      "file": "assets/boat-right-blow.png"
+    },
+    "boat-right-idle": {
+      "file": "assets/boat-right-idle.png"
+    },
+    "channel-backdrop": {
+      "file": "assets/channel-backdrop.png"
+    },
+    "film-cart": {
+      "file": "assets/film-cart.png"
+    },
+    "film-sticker": {
+      "file": "assets/film-sticker.png"
+    },
+    "look-close": {
+      "file": "assets/look-close.png"
+    },
+    "opening-crow": {
+      "file": "assets/opening-crow.png"
+    },
+    "projection-backdrop": {
+      "file": "assets/projection-backdrop.png"
+    },
+    "q1-a": {
+      "file": "assets/q1-a.png"
+    },
+    "q1-b": {
+      "file": "assets/q1-b.png"
+    },
+    "q1-c": {
+      "file": "assets/q1-c.png"
+    },
+    "q2-a": {
+      "file": "assets/q2-a.png"
+    },
+    "q2-b": {
+      "file": "assets/q2-b.png"
+    },
+    "q2-c": {
+      "file": "assets/q2-c.png"
+    },
+    "q3-a": {
+      "file": "assets/q3-a.png"
+    },
+    "q3-b": {
+      "file": "assets/q3-b.png"
+    },
+    "q3-c": {
+      "file": "assets/q3-c.png"
+    },
+    "q4-a": {
+      "file": "assets/q4-a.png"
+    },
+    "q4-b": {
+      "file": "assets/q4-b.png"
+    },
+    "q4-c": {
+      "file": "assets/q4-c.png"
+    },
+    "q5-a": {
+      "file": "assets/q5-a.png"
+    },
+    "q5-b": {
+      "file": "assets/q5-b.png"
+    },
+    "q5-c": {
+      "file": "assets/q5-c.png"
+    },
+    "q6-a": {
+      "file": "assets/q6-a.png"
+    },
+    "q6-b": {
+      "file": "assets/q6-b.png"
+    },
+    "q6-c": {
+      "file": "assets/q6-c.png"
+    },
+    "radical-cards": {
+      "file": "assets/radical-cards.png"
+    },
+    "steps-story": {
+      "file": "assets/steps-story.png"
+    },
+    "stone-one": {
+      "file": "assets/stone-one.png"
+    },
+    "story-drink": {
+      "file": "assets/story-drink.png"
+    },
+    "story-drop": {
+      "file": "assets/story-drop.png"
+    },
+    "story-dry": {
+      "file": "assets/story-dry.png"
+    },
+    "story-search": {
+      "file": "assets/story-search.png"
+    },
+    "story-stone": {
+      "file": "assets/story-stone.png"
+    },
+    "story-take": {
+      "file": "assets/story-take.png"
+    },
+    "stroke-first": {
+      "file": "assets/stroke-first.png"
+    },
+    "stroke-last": {
+      "file": "assets/stroke-last.png"
+    },
+    "vessel-high": {
+      "file": "assets/vessel-high.png"
+    },
+    "vessel-low": {
+      "file": "assets/vessel-low.png"
+    },
+    "vessel-mouth": {
+      "file": "assets/vessel-mouth.png"
+    },
+    "vessel-process": {
+      "file": "assets/vessel-process.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "story-stage",
+      "type": "slide",
+      "title": "故事放映台",
+      "template": "picture-points",
+      "data": {
+        "title": "故事放映台",
+        "picture": "opening-crow",
+        "points": [
+          "乌鸦",
+          "找水",
+          "想办法"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "放映台收到一段没讲完的故事。先来看看图。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "图里的小家伙走走停停，眼睛在看哪里？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "这是一只乌鸦。深色的翅膀和尖尖的嘴都看得见。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "它口渴了，正想找水。假如你在这里，会往哪儿看？"
+        },
+        {
+          "say": "听，找。眼睛往周围看，要找到水。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "找到水，能不能马上喝到？先把这个问题留在心里。"
+        },
+        {
+          "say": "打开纸书，看看这故事的题目。我们再来把三幕接起来。"
+        }
+      ]
+    },
+    {
+      "key": "read-and-recognize",
+      "type": "slide",
+      "title": "从三幕里认字",
+      "template": "picture-points",
+      "data": {
+        "title": "从三幕里认字",
+        "picture": "steps-story",
+        "points": [
+          "喝　只　处　找",
+          "着　许　石　出",
+          "法　放　进　高"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "这本书里的故事有三段。我们先看卡片猜每段的大意。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "第一段找水却喝不着。第二段见石子想办法。末两张是第三段，投石喝到水。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "跟我读，喝水，一只，到处，寻找。"
+        },
+        {
+          "say": "喝水的喝有口字旁。嘴巴做的事，常能在字里找线索。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "再读，喝不着，许多，石子，出来。"
+        },
+        {
+          "say": "喝不着，就是还喝不到。这里的着读第二声。"
+        },
+        {
+          "say": "听，石。找找哪幅画有小石子。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "读一读，办法，放下，进去，升高。"
+        },
+        {
+          "say": "我读到哪个词，你就指给我看。找，放，石。"
+        },
+        {
+          "say": "重听一句，再看图里在做什么。"
+        }
+      ]
+    },
+    {
+      "key": "read-radical",
+      "type": "slide",
+      "title": "一个字，听听两种读法",
+      "template": "two-columns",
+      "data": {
+        "title": "一个字，听听两种读法",
+        "left": {
+          "heading": "喝不着／沿着",
+          "body": "喝不着：还喝不到"
+        },
+        "left_picture": "story-dry",
+        "right": {
+          "heading": "进和出",
+          "body": "进字左下是走之"
+        },
+        "right_picture": "radical-cards"
+      },
+      "script": [
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "同一个着，放进不同的词里，读起来会一样吗？"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "听，喝不着。这个着是第二声，表示没能喝到。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "乌鸦试了，嘴却碰不到水。你能说出喝不着吗？"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "再听，沿着小路走。这回着轻轻带过，读轻声。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "瓶口可以让合适的东西进，也可以让它出。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "看右边这个进字，左下的部件叫走之。"
+        },
+        {
+          "say": "走之像托着上面的字。你能在进字里把它指给我吗？"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "放进。小石子从瓶口往瓶子里面去。"
+        },
+        {
+          "say": "取出。小石子从瓶里往瓶口外面来。"
+        }
+      ]
+    },
+    {
+      "key": "the-bottle-problem",
+      "type": "slide",
+      "title": "水就在眼前，怎么喝不到？",
+      "template": "two-columns",
+      "data": {
+        "title": "水就在眼前，怎么喝不到？",
+        "left": {
+          "heading": "先看水面",
+          "body": "水少，水面很低"
+        },
+        "left_picture": "story-dry",
+        "right": {
+          "heading": "再看瓶口",
+          "body": "瓶口窄，头伸不进去"
+        },
+        "right_picture": "vessel-mouth"
+      },
+      "script": [
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "看，乌鸦找到一瓶水。它为什么还在发愁？"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "眼睛顺着乌鸦的嘴往下看，找到蓝色的水线。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "嘴离水面还有一截。瓶里水少，水面在下面。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "低。水面离瓶口还很远。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "再找第二条线索。瓶口和下面，哪一处更窄？"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "瓶口窄，乌鸦的头不能伸进去，嘴就够不到。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "水少和口小，是它这一回喝不着的两个原因。"
+        },
+        {
+          "say": "跟我问一问，怎么才能喝到呢？把最后的语气扬起来。"
+        },
+        {
+          "say": "等图卡慢下来，先让船和图对齐。"
+        }
+      ]
+    },
+    {
+      "key": "word-scenes",
+      "title": "词语泡泡船",
+      "type": "interactive",
+      "page": "word-scenes",
+      "widgetType": "courseware_game",
+      "startImage": "channel-backdrop",
+      "gameAudio": {
+        "crow-word-search": "story-stage-9",
+        "crow-word-stone": "read-and-recognize-11",
+        "crow-word-drop": "read-radical-15",
+        "crow-word-take": "read-radical-16",
+        "crow-word-high": "see-it-rise-13",
+        "crow-word-low": "the-bottle-problem-8",
+        "crow-words-hint": "read-and-recognize-15",
+        "crow-words-help": "the-bottle-problem-16",
+        "crow-words-praise": "look-around-9"
+      },
+      "script": [
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#crow-boat-listen"
+        },
+        {
+          "say": "小艇要找对一张图。左边的喇叭可以重听。"
+        },
+        {
+          "highlight": "#game-target"
+        },
+        {
+          "say": "先听这个词：找。你留意图里乌鸦的眼睛，想想它在做什么。"
+        },
+        {
+          "say": "先听清动作，再看嘴和眼睛在哪儿。换一张图也这样找。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "我要把小艇开到想要的图卡下面。"
+        },
+        {
+          "highlight": "#crow-boat-action"
+        },
+        {
+          "say": "等小艇对准图卡，再按圆圈键吹泡泡。也能按空格。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "看泡泡往上飞。碰到找水的图卡，就能收下这一幅。"
+        },
+        {
+          "say": "轮到你啦，先听清词，图卡动了就等它过来。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ]
+    },
+    {
+      "key": "write-first-two",
+      "type": "slide",
+      "title": "纸笔练一练，只和石",
+      "template": "title-picture",
+      "data": {
+        "title": "纸笔练一练，只和石",
+        "picture": "stroke-first",
+        "caption": "先观察在格里的位置，再照笔顺写"
+      },
+      "script": [
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "请拿出纸和笔。先看格子，手指慢慢跟着走。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "先写只。上面的口要收小，留出下面的位置。"
+        },
+        {
+          "say": "先竖，再横折、横。口的最后一横把下面合起来。"
+        },
+        {
+          "say": "口下面先写撇，再写点。两边分开，像小脚站稳。"
+        },
+        {
+          "say": "再写石。长横在上面，撇从上面往左下走。"
+        },
+        {
+          "say": "下方的口靠右。竖、横折、横，最后封住。"
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "可以暂停，在纸上各写一个，再比一比占位。"
+        },
+        {
+          "say": "前两段读纸书。不认识的字，指给家人看。"
+        }
+      ]
+    },
+    {
+      "key": "look-around",
+      "type": "slide",
+      "title": "看见了什么，可以用吗？",
+      "template": "picture-points",
+      "data": {
+        "title": "看见了什么，可以用吗？",
+        "picture": "look-close",
+        "points": [
+          "回想两个困难",
+          "发现小石子",
+          "先猜办法"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "我们再回来看看。乌鸦喝不着，哪两处能看出来？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "左边嘴和水之间还有距离，右边它转头看见了什么？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "水面低，瓶口窄。往嘴的方向再看一眼，就能想起来。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "地上有几颗石子。看它们的大小，再看瓶口。"
+        },
+        {
+          "say": "听懂词，再找图，办法就用对了。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "如果拿一颗小石子放进去，你猜水线会不会动？"
+        },
+        {
+          "say": "你可以先指一指旧水线。下一页我们看图验证。"
+        },
+        {
+          "say": "先找那幅乌鸦碰不到水的画。"
+        },
+        {
+          "say": "接着找乌鸦发现小石子的画。"
+        },
+        {
+          "say": "重听一句。想想这时候发生了什么。"
+        }
+      ]
+    },
+    {
+      "key": "see-it-rise",
+      "type": "slide",
+      "title": "对着旧线，看水面怎么变",
+      "template": "picture-points",
+      "data": {
+        "title": "对着旧线，看水面怎么变",
+        "picture": "vessel-process",
+        "points": [
+          "左：还没放",
+          "中：逐颗放入",
+          "右：又高了一点"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "看三个画面。瓶子一直是同一个，注意蓝色水线。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "我们先看左边，再看中间，最后看右边。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "没放石子时，蓝线在下面。记住它原来在哪儿。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "每次只往里放一颗。放了一些后，水面比旧线高。"
+        },
+        {
+          "say": "找小石子一颗一颗进瓶的画。"
+        },
+        {
+          "say": "虚线是旧位置。看它和现在的蓝线隔着多远。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "又接着放了一些，水线又上去了。"
+        },
+        {
+          "say": "高。水面更靠近瓶口。"
+        },
+        {
+          "say": "先高一点，再高一点，叫渐渐。一下跳到最高，叫突然升高。"
+        },
+        {
+          "say": "找水面升高、乌鸦喝到水的画。"
+        },
+        {
+          "say": "现在水面到了嘴能碰着的地方，这次就能喝到了。"
+        },
+        {
+          "say": "沿能走的路去亮起来的那站。"
+        },
+        {
+          "say": "故事卡收齐了，开到小旗那里。"
+        }
+      ]
+    },
+    {
+      "key": "retell-route",
+      "title": "开车找回故事卡",
+      "type": "interactive",
+      "page": "retell-route",
+      "widgetType": "courseware_game",
+      "startImage": "projection-backdrop",
+      "gameAudio": {
+        "crow-route-dry": "look-around-13",
+        "crow-route-stone": "look-around-14",
+        "crow-route-drop": "see-it-rise-9",
+        "crow-route-drink": "see-it-rise-15",
+        "crow-route-exit": "see-it-rise-18",
+        "crow-route-hint": "look-around-15",
+        "crow-route-help": "see-it-rise-17",
+        "crow-route-praise": "say-the-story-12"
+      },
+      "script": [
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "放映车来收图啦。方向键让车往前或往旁边开。"
+        },
+        {
+          "highlight": "#game-target"
+        },
+        {
+          "say": "先找故事的开头。这张图里，水面离嘴还很远。"
+        },
+        {
+          "say": "开头遇到困难，所以先到这一站。"
+        },
+        {
+          "highlight": "#crow-film-exit"
+        },
+        {
+          "say": "小旗是出口。收好故事卡以后再来这里。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "看放映车朝第一站开。到了那里，就能收下开头这张卡。"
+        },
+        {
+          "say": "现在轮到你。每到一站，先听下一句再走。"
+        },
+        {
+          "say": "有挡板时，对准它按圆圈键。最后照图讲给家人听。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ]
+    },
+    {
+      "key": "write-last-three",
+      "type": "slide",
+      "title": "纸笔练一练，多、出、个",
+      "template": "title-picture",
+      "data": {
+        "title": "纸笔练一练，多、出、个",
+        "picture": "stroke-last",
+        "caption": "红色是每一步刚写的那一笔"
+      },
+      "script": [
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "再看三个字。先观察它们怎样住在田字格里。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "多，上下各一个夕。上面的收一点，下面稍舒展。"
+        },
+        {
+          "say": "先写上面的撇、横撇、点，再照这个顺序写下面。"
+        },
+        {
+          "say": "出，第一笔竖折连着写。中间的长竖像一根柱。"
+        },
+        {
+          "say": "下面再写竖折和竖。下半部略宽，写在格子中间。"
+        },
+        {
+          "say": "个，先写撇和捺，像开了一把伞。"
+        },
+        {
+          "say": "最后一竖从伞下面起笔，沿竖中线往下。"
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "现在停一停，在纸上各写一个。请家人看看占位。"
+        }
+      ]
+    },
+    {
+      "key": "say-the-story",
+      "type": "slide",
+      "title": "用四张卡讲给家人听",
+      "template": "picture-points",
+      "data": {
+        "title": "用四张卡讲给家人听",
+        "picture": "steps-story",
+        "points": [
+          "先遇到了什么",
+          "看到了什么，怎么做",
+          "最后怎么样"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "如果家人没听过这故事，你想从哪一张开始讲？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "我指着四张卡，用自己的话讲一遍。你听怎样接起来。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "乌鸦口渴，找到了一个瓶子。瓶口窄，水又少，它够不到水。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "它发现旁边有石子，想出了主意，把小石子一颗一颗放进瓶中。"
+        },
+        {
+          "say": "每放一些，水线就高一点。接着放，水线又往上升。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "等水面升到嘴边，乌鸦就能喝到水。你也来连起来讲。"
+        },
+        {
+          "say": "故事卡接好了。指着它们讲给身边的人听。"
+        },
+        {
+          "say": "如果少了一步，可以再指图补一句。"
+        },
+        {
+          "say": "这张图用手演示放进，故事里是乌鸦在做。"
+        }
+      ]
+    },
+    {
+      "key": "picture-check",
+      "type": "quiz",
+      "title": "放映台小检查",
+      "intro": [
+        "还有几张新图，来听问题找一找。",
+        "每次听完，从三幅图里挑一幅。"
+      ],
+      "questions": [
+        {
+          "id": "paintbrush-goes-in",
+          "question": "听“放进篮子”。哪张图画的是画笔要放进去？",
+          "skill": "recognize-and-write",
+          "answer": [
+            "A"
+          ],
+          "analysis": "放进要由外到里，箭头朝篮子里面。",
+          "options": {
+            "A": {
+              "label": "画笔沿向下箭头进入篮口",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-a",
+                "alt": "画笔沿向下箭头进入篮口"
+              }
+            },
+            "B": {
+              "label": "画笔沿向上箭头离开篮口",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-b",
+                "alt": "画笔沿向上箭头离开篮口"
+              }
+            },
+            "C": {
+              "label": "画笔在篮子左侧朝旁边去",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-c",
+                "alt": "画笔在篮子左侧朝旁边去"
+              }
+            }
+          }
+        },
+        {
+          "id": "toy-bird-reaches",
+          "question": "小木鸟够着了纸星。哪张图和这句话相合？",
+          "skill": "recognize-and-write",
+          "answer": [
+            "B"
+          ],
+          "analysis": "这里的“着”读第二声。“够着”说明已经碰到了。",
+          "options": {
+            "A": {
+              "label": "纸星挂得高，木鸟嘴碰不到",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-a",
+                "alt": "纸星挂得高，木鸟嘴碰不到"
+              }
+            },
+            "B": {
+              "label": "木鸟嘴刚好碰到垂下来的纸星",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-b",
+                "alt": "木鸟嘴刚好碰到垂下来的纸星"
+              }
+            },
+            "C": {
+              "label": "纸星在右边，离木鸟嘴还有空隙",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-c",
+                "alt": "纸星在右边，离木鸟嘴还有空隙"
+              }
+            }
+          }
+        },
+        {
+          "id": "narrow-mouth-low-water",
+          "question": "哪张图的瓶口又窄，里面的水又少？",
+          "skill": "why-no-water",
+          "answer": [
+            "C"
+          ],
+          "analysis": "口小、水少，画里的嘴够不到水。",
+          "options": {
+            "A": {
+              "label": "瓶口宽，水面低",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-a",
+                "alt": "瓶口宽，水面低"
+              }
+            },
+            "B": {
+              "label": "瓶口窄，水面高",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-b",
+                "alt": "瓶口窄，水面高"
+              }
+            },
+            "C": {
+              "label": "瓶口窄，水面也低",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-c",
+                "alt": "瓶口窄，水面也低"
+              }
+            }
+          }
+        },
+        {
+          "id": "water-changes-gradually",
+          "question": "用另一只透明小瓶再试一次。哪组图是水线渐渐升高？",
+          "skill": "stones-and-water-line",
+          "answer": [
+            "B"
+          ],
+          "analysis": "从左往右，水线先升一点，再升一点。",
+          "options": {
+            "A": {
+              "label": "左中两幅水线不变，最后一下变高",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-a",
+                "alt": "左中两幅水线不变，最后一下变高"
+              }
+            },
+            "B": {
+              "label": "水线从左到右一次比一次高",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-b",
+                "alt": "水线从左到右一次比一次高"
+              }
+            },
+            "C": {
+              "label": "水线从左到右一次比一次低",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-c",
+                "alt": "水线从左到右一次比一次低"
+              }
+            }
+          }
+        },
+        {
+          "id": "rescue-steps-order",
+          "question": "球掉进池里。先看见网，再捞球。哪组顺序对？",
+          "skill": "retell-in-order",
+          "answer": [
+            "A"
+          ],
+          "analysis": "先看到可用的网，再动手，最后才取回球。",
+          "options": {
+            "A": {
+              "label": "落水、看到网、动手捞、取回球",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-a",
+                "alt": "落水、看到网、动手捞、取回球"
+              }
+            },
+            "B": {
+              "label": "看到网、球落水、动手捞、取回球",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-b",
+                "alt": "看到网、球落水、动手捞、取回球"
+              }
+            },
+            "C": {
+              "label": "球落水、取回球、看网、动手捞",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-c",
+                "alt": "球落水、取回球、看网、动手捞"
+              }
+            }
+          }
+        },
+        {
+          "id": "action-and-result",
+          "question": "要看见怎样捞、捞成了什么，选哪两幅图？",
+          "skill": "retell-in-order",
+          "answer": [
+            "C"
+          ],
+          "analysis": "一幅看得出怎样做，另一幅看得出做成了什么。",
+          "options": {
+            "A": {
+              "label": "球落水、看见网",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-a",
+                "alt": "球落水、看见网"
+              }
+            },
+            "B": {
+              "label": "看见网、球在网里已经取回",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-b",
+                "alt": "看见网、球在网里已经取回"
+              }
+            },
+            "C": {
+              "label": "用网去兜球、网把球取回",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-c",
+                "alt": "用网去兜球、网把球取回"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "closing",
+      "type": "slide",
+      "title": "把发现带回纸书",
+      "template": "summary",
+      "data": {
+        "title": "把发现带回纸书",
+        "items": [
+          "先观察困难",
+          "再讲办法",
+          "最后说结果",
+          "读纸书，纸上练"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "放映结束啦。今天我们用三步，把一个故事讲清楚了。"
+        },
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "遇到困难，先看水在哪儿、口有多窄。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "找到小石子，说明每次放几颗、往哪里放。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "看到水线从低到高，就能解释后来为什么喝到了。"
+        },
+        {
+          "say": "你也可以试着用上渐渐，说说你看到了怎样的变化。"
+        },
+        {
+          "spotlight": "item-4"
+        },
+        {
+          "say": "回家打开纸书，把课文读给家人听。再练今天的五个字。"
+        },
+        {
+          "say": "请家人听一听你讲的先后，看一看你写的笔顺。"
+        }
+      ]
+    }
+  ]
+}

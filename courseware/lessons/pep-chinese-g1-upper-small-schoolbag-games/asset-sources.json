@@ -1,0 +1,211 @@
+{
+  "schemaVersion": "mira.courseware.asset-sources.v1",
+  "assets": {
+    "opening-desk": {
+      "path": "assets/opening-desk.png",
+      "sha256": "1196b2160ad857ad4d9eb105e7ee047597546daa1a973a8e43f8661f807229d7",
+      "sourceReceipt": "source-receipts/opening-desk.json",
+      "sourceReceiptSha256": "a2e78b4f4519dd4e31165fc57124b6341840c302703d0b4e1850458fecdbac18",
+      "sourceArtifact": "exec-693a3b46-2335-464c-88a6-2a9eca1b3b9f.png",
+      "uses": [
+        "open-bag",
+        "treasure-words",
+        "early-lesson",
+        "reading-rhythm",
+        "tool-rescue",
+        "stroke-drive"
+      ],
+      "generationPlan": {
+        "key": "opening-desk",
+        "prompt": "原创一年级语文绘本插画。自然童趣的圆润轮廓，柔和晨光，温暖浅木和青绿搭配，少量珊瑚橙，动作和物体轮廓清楚。主体完整有留白。禁止文字、字母、数字、商标、水印、卡通图标、边框及套用教材插图。唯一首屏与封面原画。宽幅居家晨光绘本，半敞的深青绿色圆角软书包放在浅枫木桌中央偏右。身旁物件清楚分开：珊瑚橙白橡皮、半透明直尺、珊瑚红薄作业本、青绿软笔袋、橙木杆铅笔、有圆形笔孔的黄色小转笔刀。左上留一片温暖浅米空墙供外部标题，画内不写题名。远处柔光即可。不要裁掉书包、物体不堆叠、不要出现人。",
+        "aspect": "16:9"
+      }
+    },
+    "paper-tool-strip": {
+      "path": "assets/paper-tool-strip.png",
+      "sha256": "1b0198ffba3e93ab2d5f4dbd7539dba9ffdbe4dfc56d989eb7e9b15670978f74",
+      "sourceReceipt": "source-receipts/paper-tool-strip.json",
+      "sourceReceiptSha256": "2c538b6d50530e428e79e770ded19d65e1f1a87a64e52b81ca5ba7765e3b3834",
+      "sourceArtifact": "exec-463fd419-f527-453f-b423-a2b2c2de0636.png",
+      "uses": [
+        "paper-tools"
+      ],
+      "generationPlan": {
+        "key": "paper-tool-strip",
+        "prompt": "原创一年级语文绘本插画。自然童趣的圆润轮廓，柔和晨光，温暖浅木和青绿搭配，少量珊瑚橙，动作和物体轮廓清楚。主体完整有留白。禁止文字、字母、数字、商标、水印、卡通图标、边框及套用教材插图。俯视同一张浅枫木桌，背景干净，物体比例像儿童日用品。恰好三件并彼此不重叠，上中下三排，颜色与课程实物一致。上排是珊瑚橙白双色圆角块橡皮，中排是一把横放的浅青半透明直尺，直边带短刻线但绝无数字，下排是略打开的珊瑚红薄作业本，右页只画细的平行行格。无其他物品。",
+        "aspect": "1:1"
+      }
+    },
+    "pen-tool-strip": {
+      "path": "assets/pen-tool-strip.png",
+      "sha256": "c5af534cc10147cbd69a235cd337c1d6f351a75a32fcc57f8ee28718ff06b41d",
+      "sourceReceipt": "source-receipts/pen-tool-strip.json",
+      "sourceReceiptSha256": "40b6f89606d3d6bc5464b3708e2c0a8ec4a613723a049818e1ae80625d3f1786",
+      "sourceArtifact": "exec-fa8684a5-e423-4242-a644-33161a3aa431.png",
+      "uses": [
+        "pencil-tools"
+      ],
+      "generationPlan": {
+        "key": "pen-tool-strip",
+        "prompt": "原创一年级语文绘本插画。自然童趣的圆润轮廓，柔和晨光，温暖浅木和青绿搭配，少量珊瑚橙，动作和物体轮廓清楚。主体完整有留白。禁止文字、字母、数字、商标、水印、卡通图标、边框及套用教材插图。俯视同一张浅枫木桌，背景干净，物体比例像儿童日用品。恰好三件并彼此不重叠，上中下三排。上排是打开拉链的青绿色长软布笔袋，袋内空；中排是橙木杆完整铅笔，能看见削尖的木头和深灰笔尖；下排是黄色圆角防护外壳的儿童手摇转笔刀，正面一个明显圆笔孔，侧后有小摇柄，完全看不到刀片。无其他物品。",
+        "aspect": "1:1"
+      }
+    },
+    "glyph-components": {
+      "path": "assets/glyph-components.png",
+      "sha256": "e72ff17855a2ee10a7d16181418f736ecd2eb6931d75493edb044f7c997a42a6",
+      "drawingSource": "diagrams/glyph-components.svg",
+      "drawingSourceSha256": "385db44312ba92cf49f13d2d41eb04d93f80c877f16d9c3ed4ba7f059c57f37f",
+      "uses": [
+        "character-parts"
+      ]
+    },
+    "ruler": {
+      "path": "assets/ruler.png",
+      "sha256": "9262ffd419700cc2ab8c28a478913b49a6e827de48489d6b9108965bfba09bb2",
+      "sourceReceipt": "source-receipts/ruler.json",
+      "sourceReceiptSha256": "7b940961542a50930f3ca3c4659b8f7c5f5fc94e33f9fe54ac9e90c2e98f8cc1",
+      "sourceArtifact": "exec-23bf4a85-ee27-4965-ba05-be7e1c8c6c0a.png",
+      "uses": [
+        "tool-rescue",
+        "draw-a-sign",
+        "put-away-pens"
+      ],
+      "generationPlan": {
+        "key": "ruler",
+        "prompt": "原创一年级语文绘本插画。自然童趣的圆润轮廓，柔和晨光，温暖浅木和青绿搭配，少量珊瑚橙，动作和物体轮廓清楚。主体完整有留白。禁止文字、字母、数字、商标、水印、卡通图标、边框及套用教材插图。浅米白单色背景，单一对象完整居中，占画面约三分之二，带很轻的接触投影。无人物、手或任何其他物件。一把浅青半透明硬直尺，长约是宽的八倍，带直边，沿单边画浅色短刻线，不要数字、图案和其他文具。",
+        "aspect": "1:1"
+      }
+    },
+    "eraser": {
+      "path": "assets/eraser.png",
+      "sha256": "8b2941c3b14f23e99db77c72615caa89093763ae06cf50028bbb5bb2327b0472",
+      "sourceReceipt": "source-receipts/eraser.json",
+      "sourceReceiptSha256": "025a54b2f5dd99f4377a3db2dfe8bd35a2c8450d78b5d6cb623ac88ded0f2349",
+      "sourceArtifact": "exec-8b8524a3-97cf-4227-bdf5-48fad4cf1ef2.png",
+      "uses": [
+        "tool-rescue",
+        "draw-a-sign",
+        "put-away-pens"
+      ],
+      "generationPlan": {
+        "key": "eraser",
+        "prompt": "原创一年级语文绘本插画。自然童趣的圆润轮廓，柔和晨光，温暖浅木和青绿搭配，少量珊瑚橙，动作和物体轮廓清楚。主体完整有留白。禁止文字、字母、数字、商标、水印、卡通图标、边框及套用教材插图。浅米白单色背景，单一对象完整居中，占画面约三分之二，带很轻的接触投影。无人物、手或任何其他物件。一块珊瑚橙与暖白两段色的长方形圆角橡皮，边缘平滑，微微斜放，无纸套、无孔。",
+        "aspect": "1:1"
+      }
+    },
+    "pencilcase": {
+      "path": "assets/pencilcase.png",
+      "sha256": "0206f1516e9c8b7b5d4e4bcd63cc7b0d5bb984cdcae114028c28c91b7960ce58",
+      "sourceReceipt": "source-receipts/pencilcase.json",
+      "sourceReceiptSha256": "4e1f874b41493488be6b7205fbfdf44171c0394dedaa8a9c3bb65a4b38abe73b",
+      "sourceArtifact": "exec-69d29720-4fd4-4b3e-89c9-8c638961e9f2.png",
+      "uses": [
+        "tool-rescue",
+        "pack-practice",
+        "draw-a-sign",
+        "put-away-pens"
+      ],
+      "generationPlan": {
+        "key": "pencilcase",
+        "prompt": "原创一年级语文绘本插画。自然童趣的圆润轮廓，柔和晨光，温暖浅木和青绿搭配，少量珊瑚橙，动作和物体轮廓清楚。主体完整有留白。禁止文字、字母、数字、商标、水印、卡通图标、边框及套用教材插图。浅米白单色背景，单一对象完整居中，占画面约三分之二，带很轻的接触投影。无人物、手或任何其他物件。一只青绿色软布拉链笔袋，宽长的圆角长方形，三分之二略俯视，拉链打开到两端，空的袋口朝前上方清楚可见。无图案无笔。",
+        "aspect": "1:1"
+      }
+    },
+    "task-line": {
+      "path": "assets/task-line.png",
+      "sha256": "60d7bf5f48bdb1ec9ac9ac7b4adcb337dfc11e7f71ad2cb29de6df84b4ea68a9",
+      "sourceReceipt": "source-receipts/task-line.json",
+      "sourceReceiptSha256": "6aa4da2957542323e63c095475275990b5bc832d60626eb9a2f5d8a771d2af92",
+      "sourceArtifact": "exec-b4cc0387-9d11-43ea-a38b-bc519d22192b.png",
+      "uses": [
+        "tool-rescue"
+      ],
+      "generationPlan": {
+        "key": "task-line",
+        "prompt": "原创一年级语文绘本插画。自然童趣的圆润轮廓，柔和晨光，温暖浅木和青绿搭配，少量珊瑚橙，动作和物体轮廓清楚。主体完整有留白。禁止文字、字母、数字、商标、水印、卡通图标、边框及套用教材插图。俯视同一张浅枫木桌，背景干净，物体比例像儿童日用品。一张略斜放的方形米白练习纸，左下和右上各有一个同色深青圆点，二点之间干净空白，没有连线。只有一支橙杆木铅笔斜放在纸边且没有碰到两个点，留出宽大的可画直线区域。没有尺子、橡皮、袋子或手。",
+        "aspect": "16:9"
+      }
+    },
+    "task-erase": {
+      "path": "assets/task-erase.png",
+      "sha256": "13bd9050b9d13f27f268239cf059849474cae87e2b7fd6f1480b553a89e2f55b",
+      "sourceReceipt": "source-receipts/task-erase.json",
+      "sourceReceiptSha256": "dd26ba2b4657cc41cebc4c9880c2196f6f27d6452702bd96ff58ccf040ccd16c",
+      "sourceArtifact": "exec-7c23e160-6b00-4ed1-826c-f1b4f3fd4239.png",
+      "uses": [
+        "tool-rescue"
+      ],
+      "generationPlan": {
+        "key": "task-erase",
+        "prompt": "原创一年级语文绘本插画。自然童趣的圆润轮廓，柔和晨光，温暖浅木和青绿搭配，少量珊瑚橙，动作和物体轮廓清楚。主体完整有留白。禁止文字、字母、数字、商标、水印、卡通图标、边框及套用教材插图。俯视同一张浅枫木桌，背景干净，物体比例像儿童日用品。一张有两条很淡的空白横线的米白练习纸，占画面中央。纸上有一条十分清楚的灰黑铅笔乱弯线，从纸张中部滑过；这条多余的深灰弯线是唯一重点。画面里没有橡皮、尺子、铅笔、笔袋或手。",
+        "aspect": "16:9"
+      }
+    },
+    "task-pens": {
+      "path": "assets/task-pens.png",
+      "sha256": "37cb9eb41880e1499414301796f8125e125d718b092628acf4ba41f46bb33e05",
+      "sourceReceipt": "source-receipts/task-pens.json",
+      "sourceReceiptSha256": "1c86a846f7ff82f4fbec98df4211af61f994be2daca68b166db7ce63615e14f1",
+      "sourceArtifact": "exec-2f14aa96-987a-4a11-97b6-d2d0d1e3fed8.png",
+      "uses": [
+        "tool-rescue"
+      ],
+      "generationPlan": {
+        "key": "task-pens",
+        "prompt": "原创一年级语文绘本插画。自然童趣的圆润轮廓，柔和晨光，温暖浅木和青绿搭配，少量珊瑚橙，动作和物体轮廓清楚。主体完整有留白。禁止文字、字母、数字、商标、水印、卡通图标、边框及套用教材插图。俯视同一张浅枫木桌，背景干净，物体比例像儿童日用品。浅青和橙色的三支木杆铅笔散在桌面中间，彼此方向略不同，每支都完整可见。画面只出现这三支散笔和空桌面，不出现任何笔袋、橡皮、尺子、纸或人。",
+        "aspect": "16:9"
+      }
+    },
+    "dao-grid": {
+      "path": "assets/dao-grid.png",
+      "sha256": "d57ff952ded6b4d4ecef6f91511acedf608e2c9f9944c856a7d851297a45f499",
+      "drawingSource": "diagrams/dao-grid.svg",
+      "drawingSourceSha256": "e8805c17372079afe1dca51b390ce25d56f3e6f83e672a4441f1060ed0b53a59",
+      "traceSource": "pages/stroke-drive.js",
+      "traceSourceSha256": "075ebb80906f5deea28aaa16e01c74386c6e5d264e609702961290eaa2644490",
+      "uses": [
+        "write-first"
+      ]
+    },
+    "chi-grid": {
+      "path": "assets/chi-grid.png",
+      "sha256": "a6f341d248f1bde024c624b2e59848f07b84e4f182910bd77ca466a50a6086c6",
+      "drawingSource": "diagrams/chi-grid.svg",
+      "drawingSourceSha256": "32eb5b82d93b86fc9ed4f835f0a94d9d83c546967ec29c082aa2af7f1be09dfb",
+      "traceSource": "pages/stroke-drive.js",
+      "traceSourceSha256": "075ebb80906f5deea28aaa16e01c74386c6e5d264e609702961290eaa2644490",
+      "uses": [
+        "write-first"
+      ]
+    },
+    "writing-grid-set": {
+      "path": "assets/writing-grid-set.png",
+      "sha256": "2bd5a421975b1cb1b00c111ffe2870e8dfa18f791a33c6ba15eeeb4456459384",
+      "drawingSource": "diagrams/writing-grid-set.svg",
+      "drawingSourceSha256": "14014e923089473e85bd6c70c9e5c35de62f1818a13679093cf94e2839e07aa1",
+      "traceSource": "pages/stroke-drive.js",
+      "traceSourceSha256": "075ebb80906f5deea28aaa16e01c74386c6e5d264e609702961290eaa2644490",
+      "uses": [
+        "write-next"
+      ]
+    }
+  },
+  "builtInGlyphs": {
+    "source": "lesson.json images.glyph via courseware/tools/glyph_picture.py",
+    "keys": [
+      "small-pair",
+      "early-card",
+      "dao-card",
+      "chi-card",
+      "bi-card",
+      "bao-card",
+      "zuo-card",
+      "ke-card",
+      "ben-card",
+      "xiao-card",
+      "shao-card",
+      "bu-card"
+    ]
+  }
+}

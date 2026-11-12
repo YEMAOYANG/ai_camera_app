@@ -1,0 +1,810 @@
+{
+  "schemaVersion": "mira.courseware.asset-sources.v1",
+  "generatedBy": "codex_builtin_imagegen",
+  "imagegenPlan": "imagegen-plan.json",
+  "diagramProgram": {
+    "path": "diagrams.py",
+    "sha256": "9c4c9ad1a3663c66a2cdb15bc4deba0ae18c59d59cec1183cdd83bedfb3dea22"
+  },
+  "plates": {
+    "observation-station": {
+      "source": "assets/source/observation-atlas.png",
+      "sourceSha256": "041ddff866ff33d1f83449a11053086a7a144072eb18ded0c49e1aece5eec60e",
+      "width": 1254,
+      "height": 1254
+    }
+  },
+  "assets": {
+    "cover": {
+      "path": "assets/cover.png",
+      "sha256": "506dd4510bf2dedb1306298b886374890364b26bd75e633437d190d33a67f187",
+      "width": 622,
+      "height": 622,
+      "source": "observation-station",
+      "uses": [
+        "station-order"
+      ]
+    },
+    "sort-backdrop": {
+      "path": "assets/sort-backdrop.png",
+      "sha256": "67a4becd312f5395d8674657a01822e02c33365b19f41563eae1a762ef68014c",
+      "width": 960,
+      "height": 540,
+      "source": "observation-station",
+      "uses": [
+        "sort-four-rules"
+      ]
+    },
+    "repair-backdrop": {
+      "path": "assets/repair-backdrop.png",
+      "sha256": "dd75bbf6631cc9a38e5b7a1f6dc1e5768bbad5c4949937843efeaf8127456776",
+      "width": 960,
+      "height": 540,
+      "source": "observation-station",
+      "uses": [
+        "repair-pair"
+      ]
+    },
+    "trolley": {
+      "path": "assets/trolley.png",
+      "sha256": "5a24220d50a7871f53696574b013c7840f5ecf6bc00e8b38eb48c0a07fdc4c04",
+      "width": 240,
+      "height": 191,
+      "source": "observation-station",
+      "uses": [
+        "sort-four-rules"
+      ]
+    },
+    "leaf-badge": {
+      "path": "assets/leaf-badge.png",
+      "sha256": "44697004902595e402addbb77fb212ca72a4f0f265c0f26b755f36c4c9e5f6be",
+      "width": 192,
+      "height": 236,
+      "source": "observation-station",
+      "uses": [
+        "repair-pair",
+        "sort-four-rules"
+      ]
+    },
+    "record-badge": {
+      "path": "assets/record-badge.png",
+      "sha256": "f1d062c598946f5c2ab31b185bbb837e976d0473ff25ee89d0114e48edae6d6a",
+      "width": 236,
+      "height": 209,
+      "source": "observation-station",
+      "uses": [
+        "repair-pair"
+      ]
+    },
+    "alignment-add": {
+      "path": "assets/alignment-add.png",
+      "sha256": "e7314e53385a161517472b399fb254218e5c2460c990150218a5605ce499ad0b",
+      "width": 1000,
+      "height": 355,
+      "source": "diagrams.py",
+      "uses": [
+        "same-place"
+      ]
+    },
+    "alignment-sub": {
+      "path": "assets/alignment-sub.png",
+      "sha256": "e40b7c2cf85f1697300778373c7ad6be1452133e4a70fe2755c9f4bd83d04ed2",
+      "width": 1000,
+      "height": 355,
+      "source": "diagrams.py",
+      "uses": [
+        "same-place"
+      ]
+    },
+    "carry-board": {
+      "path": "assets/carry-board.png",
+      "sha256": "34ad009cc490979c4414316e2e3cb5ea0fa5c0f0a402649bab2d2807d9c107fa",
+      "width": 920,
+      "height": 590,
+      "source": "diagrams.py",
+      "uses": [
+        "exchange-ten"
+      ]
+    },
+    "carry-exact-ten": {
+      "path": "assets/carry-exact-ten.png",
+      "sha256": "dcd1a2e684b82c958c7e3577647f7f6a71ec8385b6783b0f1a87257088b5d689",
+      "width": 900,
+      "height": 385,
+      "source": "diagrams.py",
+      "uses": [
+        "exchange-ten"
+      ]
+    },
+    "borrow-board": {
+      "path": "assets/borrow-board.png",
+      "sha256": "d0634e473bd943ce6bb2e674b84cd3061992315231502d7d47ae34d6fdaab900",
+      "width": 920,
+      "height": 590,
+      "source": "diagrams.py",
+      "uses": [
+        "split-ten"
+      ]
+    },
+    "four-rules": {
+      "path": "assets/four-rules.png",
+      "sha256": "fa3851b080b018226bc29b1d172035ece9a55817bdc9bcce3e1ea41e428c75b3",
+      "width": 900,
+      "height": 580,
+      "source": "diagrams.py",
+      "uses": [
+        "compare-explanations"
+      ]
+    },
+    "copy-check-board": {
+      "path": "assets/copy-check-board.png",
+      "sha256": "fb1bdf4d9318b835f205e022c126ab7eb8b832ca8d0559448446dfa8771db563",
+      "width": 775,
+      "height": 350,
+      "source": "diagrams.py",
+      "uses": [
+        "check-the-record"
+      ]
+    },
+    "change-check-board": {
+      "path": "assets/change-check-board.png",
+      "sha256": "b9e879b3bcfc9f5acef87d56be6e11557fd78ad1d8c1b4034f075fdf5a3291b1",
+      "width": 900,
+      "height": 580,
+      "source": "diagrams.py",
+      "uses": [
+        "check-the-record"
+      ]
+    },
+    "use-merge": {
+      "path": "assets/use-merge.png",
+      "sha256": "926e24aab1ed717df888bdecb52e41d00d943f82d330810da5ec395f772b0c33",
+      "width": 650,
+      "height": 355,
+      "source": "diagrams.py",
+      "uses": [
+        "use-and-check"
+      ]
+    },
+    "use-remove": {
+      "path": "assets/use-remove.png",
+      "sha256": "d10d9d4a96a50be52ad83cff394c335b21582b19e4dd6fe2d3953a445574614a",
+      "width": 650,
+      "height": 355,
+      "source": "diagrams.py",
+      "uses": [
+        "use-and-check"
+      ]
+    },
+    "sort-add": {
+      "path": "assets/sort-add.png",
+      "sha256": "0bbee8c282c3c03483a27753c5c7869e0f6f291a7c3ec30142e3a56c4128c192",
+      "width": 400,
+      "height": 185,
+      "source": "diagrams.py",
+      "uses": [
+        "sort-four-rules"
+      ]
+    },
+    "sort-sub": {
+      "path": "assets/sort-sub.png",
+      "sha256": "ad4b706bd57e4b34fe0ad2a56ed20a7940bc3cdd2a146e8ebde66d6a3b465812",
+      "width": 400,
+      "height": 185,
+      "source": "diagrams.py",
+      "uses": [
+        "sort-four-rules"
+      ]
+    },
+    "sort-mix": {
+      "path": "assets/sort-mix.png",
+      "sha256": "7757b7dfd79e1e1495cb8dfe174926e5c53260dd74369d04708f7c2e922057cf",
+      "width": 400,
+      "height": 305,
+      "source": "diagrams.py",
+      "uses": [
+        "sort-four-rules"
+      ]
+    },
+    "dock-add-keep": {
+      "path": "assets/dock-add-keep.png",
+      "sha256": "e5c064fadc431063a028ac7c52b2005e9b8b776b9efb3c4f266228d26fa4e1b4",
+      "width": 224,
+      "height": 224,
+      "source": "diagrams.py",
+      "uses": [
+        "sort-four-rules"
+      ]
+    },
+    "dock-add-carry": {
+      "path": "assets/dock-add-carry.png",
+      "sha256": "ea53dc2db2be8aa5b70d4b5a989ce582e23b0e7d117dc39925214bb4658ff506",
+      "width": 224,
+      "height": 224,
+      "source": "diagrams.py",
+      "uses": [
+        "sort-four-rules"
+      ]
+    },
+    "dock-sub-keep": {
+      "path": "assets/dock-sub-keep.png",
+      "sha256": "4171d8d5c885d6b69e454b821c955a1c72f45121e1201ebb54305fce365b9e46",
+      "width": 224,
+      "height": 224,
+      "source": "diagrams.py",
+      "uses": [
+        "sort-four-rules"
+      ]
+    },
+    "dock-sub-borrow": {
+      "path": "assets/dock-sub-borrow.png",
+      "sha256": "cf12054ebf805b3f597fd827e63cfec07f1c69d2fcb7e59503973a12f28d29aa",
+      "width": 224,
+      "height": 224,
+      "source": "diagrams.py",
+      "uses": [
+        "sort-four-rules"
+      ]
+    },
+    "s-36-22": {
+      "path": "assets/s-36-22.png",
+      "sha256": "e1c9e9adb1a30759e07af35fd63bddc468d57cd3c06b7aa60e7e68fbbb89c1d8",
+      "width": 224,
+      "height": 224,
+      "source": "diagrams.py",
+      "uses": [
+        "sort-four-rules"
+      ]
+    },
+    "s-39-24": {
+      "path": "assets/s-39-24.png",
+      "sha256": "3d80a889ea1c63fb013215d374dfee8b1d415dbc4525c2c11c1f63a86e17fcaf",
+      "width": 224,
+      "height": 224,
+      "source": "diagrams.py",
+      "uses": [
+        "sort-four-rules"
+      ]
+    },
+    "s-68-35": {
+      "path": "assets/s-68-35.png",
+      "sha256": "d36a7792c5c75869831303f33511856fe4fa2ca4f25099e9b2f8f0dc6323fd67",
+      "width": 224,
+      "height": 224,
+      "source": "diagrams.py",
+      "uses": [
+        "sort-four-rules"
+      ]
+    },
+    "s-61-23": {
+      "path": "assets/s-61-23.png",
+      "sha256": "b319d20f4f00ef3508f6bc9f9b484bd15188b92c47c4f9b975714860e80e1ac0",
+      "width": 224,
+      "height": 224,
+      "source": "diagrams.py",
+      "uses": [
+        "sort-four-rules"
+      ]
+    },
+    "s-85-44": {
+      "path": "assets/s-85-44.png",
+      "sha256": "d815cbe1f743fbd5b9a315d18ec086aee1aef17358b235cc518c10fdafb4f253",
+      "width": 224,
+      "height": 224,
+      "source": "diagrams.py",
+      "uses": [
+        "sort-four-rules"
+      ]
+    },
+    "s-52-31": {
+      "path": "assets/s-52-31.png",
+      "sha256": "ba2b6da7aa40262025c9a0d5c4f08b278294b27c8b2f332056286f9ab07fa7ad",
+      "width": 224,
+      "height": 224,
+      "source": "diagrams.py",
+      "uses": [
+        "sort-four-rules"
+      ]
+    },
+    "s-48-27": {
+      "path": "assets/s-48-27.png",
+      "sha256": "c33d678380011f01b3a21745dbfb3c57dd44065348cceee8a54b30e15e5691eb",
+      "width": 224,
+      "height": 224,
+      "source": "diagrams.py",
+      "uses": [
+        "sort-four-rules"
+      ]
+    },
+    "s-77-42": {
+      "path": "assets/s-77-42.png",
+      "sha256": "9618c5f6bfbacee56fd332c519ed2675948212a1edb56ba63b1d17ba9c93915b",
+      "width": 224,
+      "height": 224,
+      "source": "diagrams.py",
+      "uses": [
+        "sort-four-rules"
+      ]
+    },
+    "s-63-29": {
+      "path": "assets/s-63-29.png",
+      "sha256": "2229129c48e288fdd256471b7ba85ab516a245e148f2a0feb060a42e0b8cc692",
+      "width": 224,
+      "height": 224,
+      "source": "diagrams.py",
+      "uses": [
+        "sort-four-rules"
+      ]
+    },
+    "repair-copy-plus": {
+      "path": "assets/repair-copy-plus.png",
+      "sha256": "360f198eb72ed2e28ceb12c5fff5201955d74bbed2f54ad07739daba28edee0d",
+      "width": 360,
+      "height": 305,
+      "source": "diagrams.py",
+      "uses": [
+        "repair-pair"
+      ]
+    },
+    "repair-copy-minus": {
+      "path": "assets/repair-copy-minus.png",
+      "sha256": "8e603aa41002f2b262018fc5666dbc1aa14f941dac71c62184c272b7c4143506",
+      "width": 360,
+      "height": 305,
+      "source": "diagrams.py",
+      "uses": [
+        "repair-pair"
+      ]
+    },
+    "repair-carry-a": {
+      "path": "assets/repair-carry-a.png",
+      "sha256": "eb1cd60c14a2c1a3c2b1e479929d8ba28e4d0e74e096f05921a25d3a678c3cc0",
+      "width": 360,
+      "height": 305,
+      "source": "diagrams.py",
+      "uses": [
+        "repair-pair"
+      ]
+    },
+    "repair-carry-b": {
+      "path": "assets/repair-carry-b.png",
+      "sha256": "c5ea9cfab8b30cae207871c22e9705ce34eca50998636c8f60324e8790535c34",
+      "width": 360,
+      "height": 305,
+      "source": "diagrams.py",
+      "uses": [
+        "repair-pair"
+      ]
+    },
+    "repair-borrow-a": {
+      "path": "assets/repair-borrow-a.png",
+      "sha256": "73491f7fe308b04c32e576ceddb974989aaa266a175eb83023bd12f850c60355",
+      "width": 360,
+      "height": 305,
+      "source": "diagrams.py",
+      "uses": [
+        "repair-pair"
+      ]
+    },
+    "repair-borrow-b": {
+      "path": "assets/repair-borrow-b.png",
+      "sha256": "e29b2065a3e312aef9bc0d093758e2b74753a9dc656dbdcc9bcb22a128cccdcc",
+      "width": 360,
+      "height": 305,
+      "source": "diagrams.py",
+      "uses": [
+        "repair-pair"
+      ]
+    },
+    "tile-copy-plus": {
+      "path": "assets/tile-copy-plus.png",
+      "sha256": "b3b3a692ae6c4f401a5034d77fc80c87b94d27e54ce9a13f3ef152b92d0a4e0d",
+      "width": 224,
+      "height": 224,
+      "source": "diagrams.py",
+      "uses": [
+        "repair-pair"
+      ]
+    },
+    "tile-copy-minus": {
+      "path": "assets/tile-copy-minus.png",
+      "sha256": "9b5dcb5e4f7488ef01cb17addbe439970fa6285881c96f4908dbd2346f6ea0d3",
+      "width": 224,
+      "height": 224,
+      "source": "diagrams.py",
+      "uses": [
+        "repair-pair"
+      ]
+    },
+    "tile-carry-a": {
+      "path": "assets/tile-carry-a.png",
+      "sha256": "8ed9d8d22e1ec37d37d109d0f50ef63d67d3c25b09b6811468d95a8fc97b3971",
+      "width": 224,
+      "height": 224,
+      "source": "diagrams.py",
+      "uses": [
+        "repair-pair"
+      ]
+    },
+    "tile-carry-b": {
+      "path": "assets/tile-carry-b.png",
+      "sha256": "7a2c3ea3381fc9db746304f22977f2e2ab1b9d0ff89e5c39216d7e4918f39e34",
+      "width": 224,
+      "height": 224,
+      "source": "diagrams.py",
+      "uses": [
+        "repair-pair"
+      ]
+    },
+    "tile-borrow-a": {
+      "path": "assets/tile-borrow-a.png",
+      "sha256": "a3dd313a93e3a088bf2b162c6c5323f167d32fb8b5d17c4c3b15d99408ef2121",
+      "width": 224,
+      "height": 224,
+      "source": "diagrams.py",
+      "uses": [
+        "repair-pair"
+      ]
+    },
+    "tile-borrow-b": {
+      "path": "assets/tile-borrow-b.png",
+      "sha256": "9e07b94484214e94f22b32bf86fb951bad25cfd936036b47ef661efc4df34dfb",
+      "width": 224,
+      "height": 224,
+      "source": "diagrams.py",
+      "uses": [
+        "repair-pair"
+      ]
+    },
+    "tile-copy-plus-correct": {
+      "path": "assets/tile-copy-plus-correct.png",
+      "sha256": "fa209169bf0979b9512d7991ed4fec9079572bedd285c24dc144ce7a1e7d76f9",
+      "width": 224,
+      "height": 224,
+      "source": "diagrams.py",
+      "uses": [
+        "repair-pair"
+      ]
+    },
+    "tile-copy-plus-swapped": {
+      "path": "assets/tile-copy-plus-swapped.png",
+      "sha256": "b116bd294b4cd767c61b7351c121aadbdbb290858a5f41a08aea7ea3f16df843",
+      "width": 224,
+      "height": 224,
+      "source": "diagrams.py",
+      "uses": [
+        "repair-pair"
+      ]
+    },
+    "tile-copy-minus-correct": {
+      "path": "assets/tile-copy-minus-correct.png",
+      "sha256": "0bd1ff0d7a5124a8b8997262e1d542724e1ed622c66905e6d3ea8926d94be789",
+      "width": 224,
+      "height": 224,
+      "source": "diagrams.py",
+      "uses": [
+        "repair-pair"
+      ]
+    },
+    "result-75": {
+      "path": "assets/result-75.png",
+      "sha256": "56d68ea97372c58d51e6ea9de3c2ecefe31095a826a561f59b2ccfbc63d754b8",
+      "width": 224,
+      "height": 224,
+      "source": "diagrams.py",
+      "uses": [
+        "repair-pair"
+      ]
+    },
+    "result-65": {
+      "path": "assets/result-65.png",
+      "sha256": "cee9c811d7ecb0aac839aa2c1cc528f6096e13c1419c185ea6b628d7d1e00fe5",
+      "width": 224,
+      "height": 224,
+      "source": "diagrams.py",
+      "uses": [
+        "repair-pair"
+      ]
+    },
+    "result-63": {
+      "path": "assets/result-63.png",
+      "sha256": "76e888ccc5eae964038e7093e83b5ce5d0c73caa07492d404da794c1df5d0828",
+      "width": 224,
+      "height": 224,
+      "source": "diagrams.py",
+      "uses": [
+        "repair-pair"
+      ]
+    },
+    "result-53": {
+      "path": "assets/result-53.png",
+      "sha256": "4aa9207ce210264b19cbb5cb5df9a9d00bc229b8fbee9eb5e3a6c59136fe23a4",
+      "width": 224,
+      "height": 224,
+      "source": "diagrams.py",
+      "uses": [
+        "repair-pair"
+      ]
+    },
+    "result-28": {
+      "path": "assets/result-28.png",
+      "sha256": "9dd794e56dc6a583a5cb4a8026f710802d5a9afe63dc888f062e71f6ee19ca22",
+      "width": 224,
+      "height": 224,
+      "source": "diagrams.py",
+      "uses": [
+        "repair-pair"
+      ]
+    },
+    "result-38": {
+      "path": "assets/result-38.png",
+      "sha256": "fe295030afbe10ac8af1de578c26c7b047d16f065b737317efd695ea862cd34e",
+      "width": 224,
+      "height": 224,
+      "source": "diagrams.py",
+      "uses": [
+        "repair-pair"
+      ]
+    },
+    "result-25": {
+      "path": "assets/result-25.png",
+      "sha256": "d3dd185b792715886728130b70d78d7aca82a07c43fba9f82b36aa3f73156d33",
+      "width": 224,
+      "height": 224,
+      "source": "diagrams.py",
+      "uses": [
+        "repair-pair"
+      ]
+    },
+    "result-35": {
+      "path": "assets/result-35.png",
+      "sha256": "2fd95b05b644f19e3e3a8653243f15980a48e0b55f421e44bf51ccef3a960612",
+      "width": 224,
+      "height": 224,
+      "source": "diagrams.py",
+      "uses": [
+        "repair-pair"
+      ]
+    },
+    "q1-stem": {
+      "path": "assets/q1-stem.png",
+      "sha256": "7b039b179c649d190d1063f636070f7d8090d435af80d45f5adf06e834310e03",
+      "width": 650,
+      "height": 355,
+      "source": "diagrams.py",
+      "uses": [
+        "picture-check-a/align-new-record/stem"
+      ]
+    },
+    "q1-a": {
+      "path": "assets/q1-a.png",
+      "sha256": "0694a5ce1a00792f16c1379060d5164f0ab566680f78b687f3cd25b496c6cc41",
+      "width": 360,
+      "height": 305,
+      "source": "diagrams.py",
+      "uses": [
+        "picture-check-a/align-new-record/A"
+      ]
+    },
+    "q1-b": {
+      "path": "assets/q1-b.png",
+      "sha256": "55bd603e1402eaaf425fe0722ebad0ab06274bc6e51f11149807dfd18f7c28e2",
+      "width": 360,
+      "height": 305,
+      "source": "diagrams.py",
+      "uses": [
+        "picture-check-a/align-new-record/B"
+      ]
+    },
+    "q1-c": {
+      "path": "assets/q1-c.png",
+      "sha256": "9a80a74e896a8afb71e64987cd34c8599423012b92b291d9866ca364e2212d50",
+      "width": 360,
+      "height": 305,
+      "source": "diagrams.py",
+      "uses": [
+        "picture-check-a/align-new-record/C"
+      ]
+    },
+    "q2-stem": {
+      "path": "assets/q2-stem.png",
+      "sha256": "b8b1dbedefa208b488a2753e432f35f91ea43539d70dababc0a77279d5841a27",
+      "width": 650,
+      "height": 355,
+      "source": "diagrams.py",
+      "uses": [
+        "picture-check-a/pack-new-ten/stem"
+      ]
+    },
+    "q2-a": {
+      "path": "assets/q2-a.png",
+      "sha256": "1410d250ae1daa8b6c67d1e2230ce7195c991c999b0c7c0e8bcfe8d61a54d81c",
+      "width": 560,
+      "height": 330,
+      "source": "diagrams.py",
+      "uses": [
+        "picture-check-a/pack-new-ten/A"
+      ]
+    },
+    "q2-b": {
+      "path": "assets/q2-b.png",
+      "sha256": "ca7ff3cd062d30cf2c053cb18c5f1669207eb19541372b2a1ec98e052ac86d33",
+      "width": 560,
+      "height": 330,
+      "source": "diagrams.py",
+      "uses": [
+        "picture-check-a/pack-new-ten/B"
+      ]
+    },
+    "q2-c": {
+      "path": "assets/q2-c.png",
+      "sha256": "7d117f39833f0aa7d172be48392627b16b0d58d4c0b8398d3c7acc0c9122a150",
+      "width": 560,
+      "height": 330,
+      "source": "diagrams.py",
+      "uses": [
+        "picture-check-a/pack-new-ten/C"
+      ]
+    },
+    "q3-stem": {
+      "path": "assets/q3-stem.png",
+      "sha256": "07fa024c7720674c959ff095ceff2c843ff25359618a8aba461bdbb2091dbe8b",
+      "width": 650,
+      "height": 355,
+      "source": "diagrams.py",
+      "uses": [
+        "picture-check-a/remove-without-borrowing/stem"
+      ]
+    },
+    "q3-a": {
+      "path": "assets/q3-a.png",
+      "sha256": "1eb2f8993b951a5fcab4b2a481e18c461d4323c40b27da8958a918d2b0b3b60f",
+      "width": 560,
+      "height": 330,
+      "source": "diagrams.py",
+      "uses": [
+        "picture-check-a/remove-without-borrowing/A"
+      ]
+    },
+    "q3-b": {
+      "path": "assets/q3-b.png",
+      "sha256": "fce7311c47fd007d3fc006cb8bf497d7f061cbd1fb5c6c7b64fb3b18dda1e5cc",
+      "width": 560,
+      "height": 330,
+      "source": "diagrams.py",
+      "uses": [
+        "picture-check-a/remove-without-borrowing/B"
+      ]
+    },
+    "q3-c": {
+      "path": "assets/q3-c.png",
+      "sha256": "bb877d92356aa065ef8f2cd063ee57f1b8235f74d217a98d0bf1e9df5bfb0ac8",
+      "width": 560,
+      "height": 330,
+      "source": "diagrams.py",
+      "uses": [
+        "picture-check-a/remove-without-borrowing/C"
+      ]
+    },
+    "q4-stem": {
+      "path": "assets/q4-stem.png",
+      "sha256": "4103b4ff6d2ad79723f5517c12d35702e0da0cbd929a3d577075cb94968da998",
+      "width": 650,
+      "height": 355,
+      "source": "diagrams.py",
+      "uses": [
+        "picture-check-b/unpack-a-ten-first/stem"
+      ]
+    },
+    "q4-a": {
+      "path": "assets/q4-a.png",
+      "sha256": "ca7ff3cd062d30cf2c053cb18c5f1669207eb19541372b2a1ec98e052ac86d33",
+      "width": 560,
+      "height": 330,
+      "source": "diagrams.py",
+      "uses": [
+        "picture-check-b/unpack-a-ten-first/A"
+      ]
+    },
+    "q4-b": {
+      "path": "assets/q4-b.png",
+      "sha256": "92eb2f8ad16de1cc872ef5e3ae3d76f196750fa0fa0095e0bf973680792c1fc1",
+      "width": 560,
+      "height": 330,
+      "source": "diagrams.py",
+      "uses": [
+        "picture-check-b/unpack-a-ten-first/B"
+      ]
+    },
+    "q4-c": {
+      "path": "assets/q4-c.png",
+      "sha256": "aea29eeae0e4f608f867f9b4ee5aff1dcf7a4e52496a3bdc856434e39f9a83a7",
+      "width": 560,
+      "height": 330,
+      "source": "diagrams.py",
+      "uses": [
+        "picture-check-b/unpack-a-ten-first/C"
+      ]
+    },
+    "q5-stem": {
+      "path": "assets/q5-stem.png",
+      "sha256": "45d2d59f273bcc77fce86888107da65eaa3edfe4fb87c16e197469fdae826977",
+      "width": 650,
+      "height": 355,
+      "source": "diagrams.py",
+      "uses": [
+        "picture-check-b/check-new-borrow/stem"
+      ]
+    },
+    "q5-a": {
+      "path": "assets/q5-a.png",
+      "sha256": "8809b1c6edfb2f157f9d1cb07b55ec6001b808cd54654bdb3ccd19fb9990bfad",
+      "width": 360,
+      "height": 305,
+      "source": "diagrams.py",
+      "uses": [
+        "picture-check-b/check-new-borrow/A"
+      ]
+    },
+    "q5-b": {
+      "path": "assets/q5-b.png",
+      "sha256": "9e506e40c4b478073dee77b4c8acedf600770a7683eabf997a8411bd85a4339a",
+      "width": 360,
+      "height": 305,
+      "source": "diagrams.py",
+      "uses": [
+        "picture-check-b/check-new-borrow/B"
+      ]
+    },
+    "q5-c": {
+      "path": "assets/q5-c.png",
+      "sha256": "ee7b27012b18e2b45231c7c1eaa253411901505ccf00186f941fa0367de99626",
+      "width": 360,
+      "height": 305,
+      "source": "diagrams.py",
+      "uses": [
+        "picture-check-b/check-new-borrow/C"
+      ]
+    },
+    "q6-stem": {
+      "path": "assets/q6-stem.png",
+      "sha256": "7fcdbd9dac908bb8b85ecb3e7a4e661e3986db9f5c2cac5e7d0f10c0cb81f3ae",
+      "width": 650,
+      "height": 355,
+      "source": "diagrams.py",
+      "uses": [
+        "picture-check-b/find-the-remainder/stem"
+      ]
+    },
+    "q6-a": {
+      "path": "assets/q6-a.png",
+      "sha256": "6d84347d2f925314c88b89f794b2d162c8e80100dfaf614cbb6008f37bf6b98c",
+      "width": 850,
+      "height": 392,
+      "source": "diagrams.py",
+      "uses": [
+        "picture-check-b/find-the-remainder/A"
+      ]
+    },
+    "q6-b": {
+      "path": "assets/q6-b.png",
+      "sha256": "e9f6b61c51110b2a48232498224ca2e1a657251632ec3e80b379c3de6f76650a",
+      "width": 850,
+      "height": 392,
+      "source": "diagrams.py",
+      "uses": [
+        "picture-check-b/find-the-remainder/B"
+      ]
+    },
+    "q6-c": {
+      "path": "assets/q6-c.png",
+      "sha256": "616f8d29e3f2ca00a5b3a8eb51b6ae21f0bdce7618cc0beebfa477842dd57493",
+      "width": 850,
+      "height": 392,
+      "source": "diagrams.py",
+      "uses": [
+        "picture-check-b/find-the-remainder/C"
+      ]
+    }
+  }
+}

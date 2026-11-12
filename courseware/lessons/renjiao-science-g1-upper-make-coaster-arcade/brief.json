@@ -1,0 +1,284 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "制作杯垫｜小小工坊",
+  "goals": [
+    "从放杯子的生活需要提出制作任务，区分加工用的材料与帮助加工的工具，选纸、铅笔和剪刀制作圆形杯垫。",
+    "知道可以沿圆形物品描圆，也可用笔和绳子或组合的笔制成简易画圆工具；尝试用不同方法画大小不同的圆。",
+    "在指导下按设计、画圆、裁剪、装饰的过程制作纸杯垫，使用安全剪刀，认识工具能提高操作的便利和效率。",
+    "测试杯垫的使用效果，找出优点和不足，依据不足提出增加厚度、改变材料或调整大小等改进方案，再测试。",
+    "以粘毛器设计迁移解决生活问题的方法：明确任务、选择材料、画设计图、制作、测试与评价；认识工具源于生活需要，能带来便利。",
+    "用口述、画图记录制作和改进的方法，对常见工具提出新问题；实际用剪刀、画圆、制作和口述表现需由成人观察。"
+  ],
+  "pages": [
+    {
+      "key": "bench",
+      "type": "slide",
+      "title": "先想杯子需要什么",
+      "activity": "从纸留下、铅笔和剪刀帮忙做的动作区分材料和工具。",
+      "skills": [
+        "任务与选材",
+        "区分材料和工具"
+      ]
+    },
+    {
+      "key": "circle-tools",
+      "type": "slide",
+      "title": "三种办法画圆",
+      "activity": "精确示意对照教材第59页三法，讲清固定盖或支点、贴边或保持距离以及圆的大小。",
+      "skills": [
+        "描圆",
+        "简易画圆工具",
+        "画大小不同的圆"
+      ]
+    },
+    {
+      "key": "circle",
+      "type": "interactive",
+      "title": "圆线追光",
+      "activity": "沿圆形轨道追灯。先把笔尖调到圆边才可落笔，靠同一绳长绕回起点；三关改变绳长、速度与灯的开放时机。可随时抬笔暂停，连续失误后放宽灯与定位。",
+      "skills": [
+        "简易画圆工具",
+        "画大小不同的圆"
+      ]
+    },
+    {
+      "key": "cut",
+      "type": "slide",
+      "title": "沿线剪出杯垫",
+      "activity": "说明从纸边起剪、沿线分段、停下转纸、成人陪同和剪好再装饰。",
+      "skills": [
+        "安全裁剪",
+        "按步骤制作"
+      ]
+    },
+    {
+      "key": "test",
+      "type": "slide",
+      "title": "试一试，再改",
+      "activity": "正上方检查覆盖、侧方检查平整，按所见调整材料或大小，同杯同位置复测。",
+      "skills": [
+        "检查和记录使用效果",
+        "按不足改进"
+      ]
+    },
+    {
+      "key": "cup",
+      "type": "interactive",
+      "title": "空杯接力",
+      "activity": "在移动的试放带上对准垫子并轻放同一只空杯。先试原样再按观察换垫。逐关检查面积、平整或两项，完成页展示每关两次模拟试放的结果。",
+      "skills": [
+        "检查和记录使用效果",
+        "按不足改进"
+      ],
+      "observationBinding": {
+        "sceneId": "scene-cup",
+        "schemaVersion": "mira.game.observation.v1",
+        "kind": "simulation",
+        "checkpointEvent": "mira-game-observation-ready",
+        "status": "课件数据和结果图已绑定。游戏组实测三关完成后只发一份模拟记录，正式课堂与家长账号待验收。",
+        "gameHandoff": {
+          "path": "output/courseware-production/classic-arcade-coaster-final/coaster-observation-handoff.json",
+          "sha256": "09617e53bcbc76fc61cfe8af895039b6251aa3b4a366143e02f9950dcad2b406"
+        },
+        "levels": [
+          {
+            "level": 1,
+            "trials": [
+              {
+                "trialId": "before",
+                "material": "narrow",
+                "top": "extends",
+                "side": "flat"
+              },
+              {
+                "trialId": "after",
+                "material": "ready",
+                "top": "covers",
+                "side": "flat"
+              }
+            ]
+          },
+          {
+            "level": 2,
+            "trials": [
+              {
+                "trialId": "before",
+                "material": "curled",
+                "top": "covers",
+                "side": "raised"
+              },
+              {
+                "trialId": "after",
+                "material": "ready",
+                "top": "covers",
+                "side": "flat"
+              }
+            ]
+          },
+          {
+            "level": 3,
+            "trials": [
+              {
+                "trialId": "before",
+                "material": "mixed",
+                "top": "extends",
+                "side": "raised"
+              },
+              {
+                "trialId": "after",
+                "material": "ready",
+                "top": "covers",
+                "side": "flat"
+              }
+            ]
+          }
+        ],
+        "authority": "只取孩子亲手完成的已记录前后试放；自动试玩、教师示范、落空或未纳入比较的试放不形成家长端观察证据。"
+      }
+    },
+    {
+      "key": "transfer",
+      "type": "slide",
+      "title": "把办法用到别处",
+      "activity": "第二课时官方配套工程迁移。比较小粘板轻按角落与纸筒外露胶面滚过长条两套原创安全方案，试用后按现象缩短纸筒再试，口述和实作由成人观察。",
+      "skills": [
+        "用工具解决生活问题",
+        "口述或画图记录设计"
+      ]
+    },
+    {
+      "key": "quiz",
+      "type": "quiz",
+      "title": "工坊小检查",
+      "activity": "蜡笔盒、两笔间距的新组合、水壶、花盆和靠垫的新情境。",
+      "skills": [
+        "区分材料和工具",
+        "画大小不同的圆",
+        "沿画好的圆线裁剪",
+        "根据使用效果改进",
+        "按需要设计简单工具"
+      ]
+    },
+    {
+      "key": "recap",
+      "type": "slide",
+      "title": "带走工坊的办法",
+      "activity": "全课回顾需求、选材工具、三种画圆、安全剪裁、试放、观察改进和设计迁移。",
+      "skills": [
+        "全课回顾"
+      ]
+    }
+  ],
+  "quizPlan": [
+    {
+      "skill": "区分材料和工具",
+      "scenario": "给蜡笔盒做块垫子，哪样剪下来留在盒下？",
+      "position": "A"
+    },
+    {
+      "skill": "画大小不同的圆",
+      "scenario": "想画一个更大的圆，两支笔该选哪种摆法？",
+      "position": "B"
+    },
+    {
+      "skill": "沿画好的圆线裁剪",
+      "scenario": "给水壶做圆垫，哪条剪线能把画好的圆完整剪下来？",
+      "position": "C"
+    },
+    {
+      "skill": "根据使用效果改进",
+      "scenario": "花盆底没伸出去，可垫子翘了。怎么改好？",
+      "position": "A"
+    },
+    {
+      "skill": "按需要设计简单工具",
+      "scenario": "靠垫上有几根毛。哪个纸筒的粘面能滚到毛上？",
+      "position": "B"
+    }
+  ],
+  "afterClass": {
+    "source": "教材58–61页、两课时学习任务单、第2课时课件第2、9页及教学设计第2页。",
+    "practice": [
+      "请大人陪着画两个不同大小的圆，画图或说出所用的工具。",
+      "在成人指导下沿线剪圆；试放空杯，画下一个好处和一个不足，改过后用同一只空杯再试。",
+      "给家人画一个生活小工具的设计，说明每样材料为什么有用；实物试做请成人协助。"
+    ],
+    "evidence": "屏幕只记录操作和选图。真实画圆、剪裁、试用、口述和纸笔为待观察。",
+    "weeklyQuestionSources": [
+      "材料与工具",
+      "三种画圆及改变大小",
+      "安全裁剪",
+      "记录与改进",
+      "设计迁移"
+    ],
+    "familyObservation": {
+      "task": "和大人一起用同一只空杯试做好的垫子。从上面看杯底是否全垫住，从旁边看垫边是否平整；先画下发现，再改一处并用原来的空杯复试。实际剪裁请成人陪伴。",
+      "oralDescription": "待观察",
+      "handsOn": "待观察",
+      "parentDisplay": "游戏组已核对模拟记录，待用对应家长账号验收"
+    }
+  },
+  "authoring": {
+    "method": "直接原创",
+    "authorModels": [
+      "gpt-6.1-sol"
+    ],
+    "owner": "/root/science_prep",
+    "reused": [
+      "核对准确教材原页后保留的本课两课时配套资源原审读笔记",
+      "同一教材已审读的直接原创候选所用讲解、小检查、精确图示和七张已登记的 Codex 内置 imagegen 插画"
+    ],
+    "original": [
+      "直接原创的简要稿、讲解、示范和总结",
+      "新增圆线追光、空杯接力的实时规则、关卡、操作及随实测生成的观察记录",
+      "原创小检查、解析、结构与精确几何示意图"
+    ],
+    "officialVerbatimOrPictures": false,
+    "previousOwner": "/root/goldfish"
+  },
+  "authorship": {
+    "authorModels": [
+      "gpt-6.1-sol"
+    ],
+    "pageAuthorModels": [
+      "gpt-6.1-sol"
+    ],
+    "sources": {
+      "original": "本课讲解、教师示范台词、小检查、解析、布局和精确图示由课件作者直接原创。沿用同课 imagegen 候选中已核对的原创内容，后续修订加入本课的观察记录配置和示范时序。",
+      "priorDirectAuthoring": "courseware/lessons/renjiao-science-g1-upper-make-coaster-imagegen/brief.json",
+      "priorDirectAuthoringSha256": "85b422bc6f87367e66a888b7ecf45d85fb8c639ff79e785c9ea2aa77cc13b284",
+      "officialUse": "沿用并对照原页核验本课两个课时的官方审读笔记。官方教材与配套资源用于核对教学范围和练习方向。没有照搬官方原文、图片、题目或版式。",
+      "art": "沿用七张本课 Codex 内置 imagegen 原创插画及其已登记的显示版，另有二十七张原创精确图示。原图、提示词和绘图源码的出处与哈希见本课 asset-sources.json。",
+      "historicalModelUnknown": "最早一版官方审读只记录 Codex lesson_16，精确审读模型未知。该记录是官方资料审读，不是本版台词或小检查的作者记录。"
+    },
+    "demonstrationTimingAuthor": {
+      "model": "gpt-6.1-sol",
+      "scope": "调整两页老师先讲再示范的非语音动作，不改台词或题目。",
+      "record": "rollout-2026-11-09T19-44-39-01a1c01f-ea23-7153-8a64-9ae6440dc4df.jsonl",
+      "turnId": "01a1c0b3-221a-7c31-81b1-86e6da14c37e",
+      "line": 802
+    },
+    "gameDelivery": {
+      "deliveredBy": "构建 Mira 经典游戏模板目录（Codex 游戏会话）",
+      "scope": "保留本课既有的圆线追光和空杯接力两页。游戏方制作 V7 观察记录补丁，最终交接用同一补丁核对实际完成记录与语音。",
+      "handoff": "output/courseware-production/classic-arcade-coaster-final/coaster-observation-handoff.json",
+      "handoffSha256": "09617e53bcbc76fc61cfe8af895039b6251aa3b4a366143e02f9950dcad2b406",
+      "patchSha256": "19553fe89f9b0aaf3ad45059ff927b29fb74dee7571f62e7545c2b2cb4c96946",
+      "gameAuthorModel": "gpt-6.1-sol",
+      "modelEvidence": {
+        "record": "rollout-2026-11-09T17-35-07-01a1bfa9-523f-7d33-96d3-f76a23538938.jsonl",
+        "v7TurnId": "01a1bfe4-9838-7c31-a9ee-8ca8dfa65440",
+        "v7TurnContextLine": 1470,
+        "finalTurnId": "01a1c09f-7c44-7c60-bd64-3b63a9f742f0",
+        "finalTurnContextLine": 3757
+      }
+    },
+    "recordingReuse": {
+      "scope": "本版 98 段录音均沿用同课原录音。原批次复用 79 段并收到了 19 段成功配音。示范改序后保留 82 段原编号，另 16 段按相同台词、声线和音频字节迁移编号，没有重新配音。八条游戏语音引用本课老师原录音。",
+      "originalPreflight": "output/courseware-lessons/renjiao-science-g1-upper-make-coaster-arcade/work-v2/voice-preflight.json",
+      "originalPreflightSha256": "726bca4f0ef331b61b91d7b21dd5a7f44f7e8845bd0e59d4efd43d6fa5b8ff97",
+      "timingReuseProof": "output/courseware-lessons/renjiao-science-g1-upper-make-coaster-arcade/work-v5-demo-timing/voice-reuse-proof.json",
+      "timingReuseProofSha256": "549e1bb57ee0f86352115669a2c9ea03d6cb6076f0ecbc74a1310c2c55762e7e"
+    }
+  }
+}

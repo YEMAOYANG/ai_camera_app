@@ -1,0 +1,188 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "乌鸦喝水",
+  "binding": {
+    "editionId": "pep-chinese-g1-upper-2022-standard",
+    "revisionId": "20260924-directory-3",
+    "nodeId": "u8-l2",
+    "unitId": "unit-8-reading"
+  },
+  "scenario": "小小故事放映台。孩子帮讲故事的老师找出失序的场景卡，用一组自制水位图和关键字把故事说明白。",
+  "goals": [
+    "在原书规定范围认读，借语境读准“着”，认识走之，观察五个字并在纸上练。",
+    "说出水少与瓶口小这两个线索，理解最初喝不着的原因。",
+    "从逐颗放石的状态图观察水线逐步升高，并指出最后为何喝得到。",
+    "按困难、观察到的线索、办法和结果，向别人复述并交流。"
+  ],
+  "pageSequence": [
+    {
+      "key": "story-stage",
+      "kind": "teaching",
+      "plan": "图中乌鸦在找水。老师先请孩子指画里的角色和需要找的东西，再点出课题。"
+    },
+    {
+      "key": "read-and-recognize",
+      "kind": "teaching",
+      "plan": "用三张事件图表示三段。分小组用听、看、指带出12个目标字，语境区分喝得着与别的“着”，用“进”认走之。非目标文字由声音承担。"
+    },
+    {
+      "key": "the-bottle-problem",
+      "kind": "teaching",
+      "plan": "两次特写先看少量水的位置，再看狭小瓶口和喙够不到，提问并示范不同语气。两条件用同一瓶图表现。"
+    },
+    {
+      "key": "word-scenes",
+      "kind": "interactive",
+      "plan": "听“找”“石”“放进”“高”及简单语境，在移动图卡里找对应的动作、物件或状态；图卡不靠标签。"
+    },
+    {
+      "key": "write-first-two",
+      "kind": "teaching",
+      "plan": "第一课时收束。教师用原创田字格显示只、石的笔画和关键占位，停顿请孩子在纸上练，留纸书朗读。"
+    },
+    {
+      "key": "look-around",
+      "kind": "teaching",
+      "plan": "进入第二课时，回忆乌鸦喝不着的两个线索，观察附近有什么，先猜可用的东西再听说明。"
+    },
+    {
+      "key": "see-it-rise",
+      "kind": "teaching",
+      "plan": "用同一个原创瓶子的三个连续画面，逐个落入小石子并保留旧水位标记。请孩子对照逐颗和渐渐，再说结果。"
+    },
+    {
+      "key": "retell-route",
+      "kind": "interactive",
+      "plan": "开泡泡车按先后取场景卡并走到出口。最后播放孩子取到的步骤图，供实际口头复述。"
+    },
+    {
+      "key": "write-last-three",
+      "kind": "teaching",
+      "plan": "观察多、出、个的间架与关键笔画，用停顿留纸笔练写和家人核看时间。"
+    },
+    {
+      "key": "say-the-story",
+      "kind": "teaching",
+      "plan": "在放映台指图讲给身边人听。先说困难，再说注意到石子、做法和水线结果，允许自己的话和简短回答。"
+    },
+    {
+      "key": "picture-check",
+      "kind": "quiz",
+      "plan": "用六组全新画面和录音检验字词、困难、变化和事件顺序。纸书朗读和实际书写单独观察。"
+    },
+    {
+      "key": "closing",
+      "kind": "teaching",
+      "plan": "重看问题、办法、结果三张原创卡；给出纸书朗读、纸笔练字和亲子复述安排。"
+    }
+  ],
+  "games": [
+    {
+      "page": "word-scenes",
+      "template": "wordBubbles",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.wordBubbles",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "listen_match",
+      "selection": "每轮由录音说出明确的词或短句，孩子移动小艇并吹泡泡，击中符合语义的图才通过。用两组易区分的动作图表现“找”和“放进”，用前后可比较的水线图呈现“高”。",
+      "levels": [
+        "两轮低速，从找水动作和小石子图入手。",
+        "三轮三选项，用原创手部动作区分放进和取出，并复练石。",
+        "三至四轮，更换画面位置，用相同瓶身里两种水位加非目标干扰图选择。"
+      ],
+      "demo": "先点亮扬声提示、动作图、船和吹泡泡按钮，示范第一轮一次并重置。目标、提示、纠错和表扬使用预录，启用voiceLead和stepVoiceLead。"
+    },
+    {
+      "page": "retell-route",
+      "template": "bubbleMaze",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.bubbleMaze",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "ordered_route",
+      "selection": "场景卡无文字顺序提示，用先后与画面线索决定实际驾驶路线。访问错序图站不计完成，孩子可返回继续。",
+      "levels": [
+        "短直路两步：水够不到、最后喝得到，定位开始与结果。",
+        "有岔路的三步：喝不到、逐颗放进、看到水线上升。",
+        "四步：遇到困难、发现石子、逐颗放进、水线上升后够到。图站顺序不等于屏幕左右顺序。"
+      ],
+      "demo": "点亮故事状态卡、车、岔路和出口，老师示范朝首站的一步，重置到起点让孩子接手。老师带到最后一关后提示向身边的人实际复述。"
+    }
+  ],
+  "quizPlan": [
+    {
+      "skill": "recognize-and-write",
+      "prompt": "听“放进篮子”。哪张图画的是画笔要放进去？",
+      "answer": "画笔由篮口外向篮口里面移动",
+      "position": 1,
+      "rationale": "放进要由外到里，箭头朝篮子里面。"
+    },
+    {
+      "skill": "recognize-and-write",
+      "prompt": "小木鸟够着了纸星。哪张图和这句话相合？",
+      "answer": "小木鸟的尖嘴刚好碰到垂下来的纸星",
+      "position": 2,
+      "rationale": "这里的“着”读第二声。“够着”说明已经碰到了。"
+    },
+    {
+      "skill": "why-no-water",
+      "prompt": "哪张图的瓶口又窄，里面的水又少？",
+      "answer": "小瓶口窄，水面低，鸟嘴和水面之间留着空隙",
+      "position": 3,
+      "rationale": "口小、水少，画里的嘴够不到水。"
+    },
+    {
+      "skill": "stones-and-water-line",
+      "prompt": "用另一只透明小瓶再试一次。哪组图是水线渐渐升高？",
+      "answer": "同瓶三帧水线逐步升高",
+      "position": 2,
+      "rationale": "从左往右，水线先升一点，再升一点。"
+    },
+    {
+      "skill": "retell-in-order",
+      "prompt": "球掉进池里。先看见网，再捞球。哪组顺序对？",
+      "answer": "池里的球、看见网、用网捞球、取回球",
+      "position": 1,
+      "rationale": "先看到可用的网，再动手，最后才取回球。"
+    },
+    {
+      "skill": "retell-in-order",
+      "prompt": "要看见怎样捞、捞成了什么，选哪两幅图？",
+      "answer": "网伸进池里兜球、网把球带到池边",
+      "position": 3,
+      "rationale": "一幅看得出怎样做，另一幅看得出做成了什么。"
+    }
+  ],
+  "afterClass": {
+    "familyTask": "打开纸书朗读，选自画的三张图说清原因、办法、结果；在纸上的田字格练五个目标字。家人分开观察朗读、复述和写字。",
+    "weeklyQuestionSource": [
+      "语境认字、着的读音及字形",
+      "从图解释原来的困难",
+      "逐颗与水线变化",
+      "事件先后和口头复述线索"
+    ],
+    "evidence": "线上记录图题及游戏动作，实际朗读、复述、笔顺和书写由家人观察。"
+  },
+  "artAndLanguage": "原创乌鸦、瓶子、石子及场景卡，瓶内的不同水位可用代码精确控制。除认读或书写目标外，用画面和教师录音说明任务。",
+  "goalDetails": [
+    {
+      "skill": "recognize-and-write",
+      "target": "在原书规定范围认读，借语境读准“着”，认识走之，观察五个字并在纸上练。",
+      "source": "原书印98、第一课时教案1～2、第二课时教案2"
+    },
+    {
+      "skill": "why-no-water",
+      "target": "说出水少与瓶口小这两个线索，理解最初喝不着的原因。",
+      "source": "原书印97、第一课时课件15～31"
+    },
+    {
+      "skill": "stones-and-water-line",
+      "target": "从逐颗放石的状态图观察水线逐步升高，并指出最后为何喝得到。",
+      "source": "原书印98、第二课时课件9～24"
+    },
+    {
+      "skill": "retell-in-order",
+      "target": "按困难、观察到的线索、办法和结果，向别人复述并交流。",
+      "source": "原书印98、第二课时教案1与课后练习1"
+    }
+  ]
+}

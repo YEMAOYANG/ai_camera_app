@@ -1,0 +1,1102 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "比尾巴",
+  "grade": 1,
+  "description": "和小语老师布置尾巴照片馆，看轮廓、听词认字、试问答和书空。",
+  "roster": {
+    "teacher": {
+      "name": "小语老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Serena",
+      "avatar": "/avatars/teacher-2.png",
+      "color": "#D65A8A",
+      "persona": "用看图、听词、简短问答和书空带孩子读图认字。"
+    }
+  },
+  "images": {
+    "monkey": {
+      "file": "assets/monkey.png"
+    },
+    "rabbit": {
+      "file": "assets/rabbit.png"
+    },
+    "squirrel": {
+      "file": "assets/squirrel.png"
+    },
+    "rooster": {
+      "file": "assets/rooster.png"
+    },
+    "duck": {
+      "file": "assets/duck.png"
+    },
+    "peacock": {
+      "file": "assets/peacock.png"
+    },
+    "tail-monkey": {
+      "file": "assets/tail-monkey.png"
+    },
+    "tail-rabbit": {
+      "file": "assets/tail-rabbit.png"
+    },
+    "tail-squirrel": {
+      "file": "assets/tail-squirrel.png"
+    },
+    "tail-rooster": {
+      "file": "assets/tail-rooster.png"
+    },
+    "tail-duck": {
+      "file": "assets/tail-duck.png"
+    },
+    "tail-peacock": {
+      "file": "assets/tail-peacock.png"
+    },
+    "q-rabbit": {
+      "file": "assets/q-rabbit.png"
+    },
+    "q-curve": {
+      "file": "assets/q-curve.png"
+    },
+    "q-flat": {
+      "file": "assets/q-flat.png"
+    },
+    "q-fan": {
+      "file": "assets/q-fan.png"
+    },
+    "family-cat": {
+      "file": "assets/family-cat.png"
+    },
+    "river": {
+      "file": "assets/river.png"
+    },
+    "courtyard": {
+      "file": "assets/courtyard.png"
+    },
+    "boat": {
+      "file": "assets/boat.png"
+    },
+    "boat-bubble": {
+      "file": "assets/boat-bubble.png"
+    },
+    "van": {
+      "file": "assets/van.png"
+    },
+    "length-panel": {
+      "file": "assets/length-panel.png"
+    },
+    "feather-panel": {
+      "file": "assets/feather-panel.png"
+    },
+    "umbrella-panel": {
+      "file": "assets/umbrella-panel.png"
+    },
+    "orders-full": {
+      "file": "assets/orders-full.png"
+    },
+    "orders-detail": {
+      "file": "assets/orders-detail.png"
+    },
+    "q-length-panel": {
+      "file": "assets/q-length-panel.png"
+    },
+    "q-shapes-panel": {
+      "file": "assets/q-shapes-panel.png"
+    },
+    "char-bi": {
+      "file": "assets/char-bi.png"
+    },
+    "char-wei": {
+      "file": "assets/char-wei.png"
+    },
+    "char-ba": {
+      "file": "assets/char-ba.png"
+    },
+    "char-chang": {
+      "file": "assets/char-chang.png"
+    },
+    "char-duan": {
+      "file": "assets/char-duan.png"
+    },
+    "char-ba-hold": {
+      "file": "assets/char-ba-hold.png"
+    },
+    "char-san": {
+      "file": "assets/char-san.png"
+    },
+    "char-tu": {
+      "file": "assets/char-tu.png"
+    },
+    "char-gong": {
+      "file": "assets/char-gong.png"
+    },
+    "word-table-one": {
+      "file": "assets/word-table-one.png"
+    },
+    "word-table-two": {
+      "file": "assets/word-table-two.png"
+    },
+    "q-tu": {
+      "file": "assets/q-tu.png"
+    },
+    "q-ba": {
+      "file": "assets/q-ba.png"
+    },
+    "q-wei": {
+      "file": "assets/q-wei.png"
+    },
+    "q-fen": {
+      "file": "assets/q-fen.png"
+    },
+    "q-gong": {
+      "file": "assets/q-gong.png"
+    },
+    "q-ba-eight": {
+      "file": "assets/q-ba-eight.png"
+    },
+    "q-tu-picture": {
+      "file": "assets/q-tu-picture.png"
+    },
+    "q-gong-picture": {
+      "file": "assets/q-gong-picture.png"
+    },
+    "grids-bi-chang": {
+      "file": "assets/grids-bi-chang.png"
+    },
+    "grids-ba-gong": {
+      "file": "assets/grids-ba-gong.png"
+    },
+    "q-ti": {
+      "file": "assets/q-ti.png"
+    },
+    "q-hook": {
+      "file": "assets/q-hook.png"
+    },
+    "q-vertical": {
+      "file": "assets/q-vertical.png"
+    },
+    "q-pen-panel": {
+      "file": "assets/q-pen-panel.png"
+    },
+    "gallery-cover": {
+      "file": "assets/gallery-cover.png"
+    },
+    "photo-badge": {
+      "file": "assets/photo-badge.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "opening",
+      "type": "slide",
+      "title": "尾巴照片馆",
+      "template": "title-picture",
+      "data": {
+        "title": "尾巴照片馆",
+        "picture": "gallery-cover",
+        "caption": "找准位置，再看形状"
+      },
+      "script": [
+        {
+          "say": "照片馆收了许多动物照。猜猜今天要看哪一部分？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "有些尾巴藏在身体后面，只露出一点。"
+        },
+        {
+          "say": "等会儿看全身照，先找身子后面，再找到尾巴。"
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "比较尾巴时，要看它从哪里开始，又到哪里结束。"
+        },
+        {
+          "say": "只看耳朵和脚，就回答不了尾巴的问题。"
+        },
+        {
+          "say": "我们帮照片馆排照片。先看看两位刚来的客人。"
+        }
+      ]
+    },
+    {
+      "key": "length",
+      "type": "slide",
+      "title": "比一比尾巴的长短",
+      "template": "title-picture",
+      "data": {
+        "title": "比一比尾巴的长短",
+        "picture": "length-panel",
+        "caption": "比　尾　巴　长　短　兔"
+      },
+      "script": [
+        {
+          "say": "猴子和小兔都来拍照。你先用手指找找它们的尾巴。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "左边那条细细的，从猴子身后伸了好远。"
+        },
+        {
+          "say": "右边小兔身后只有一团，轻轻一指就到头了。"
+        },
+        {
+          "say": "顺着两条尾巴看过去，猴子的伸得远，兔子的短。"
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "比一比的比，就是拿两样东西放在一起看。"
+        },
+        {
+          "say": "尾巴的尾是第三声，巴单读是第一声。"
+        },
+        {
+          "say": "合在尾巴里，巴读得轻些。跟老师读，尾巴。"
+        },
+        {
+          "say": "长短的长是第二声。短，第三声。"
+        },
+        {
+          "say": "小兔的兔读第四声。兔字顶上是斜刀头。"
+        },
+        {
+          "say": "下回你也可以先找到两条尾巴，再说哪条更长。"
+        }
+      ]
+    },
+    {
+      "key": "umbrella",
+      "type": "slide",
+      "title": "松鼠的尾巴像什么",
+      "template": "title-picture",
+      "data": {
+        "title": "松鼠的尾巴像什么",
+        "picture": "umbrella-panel",
+        "caption": "一把伞　把的左边是提手旁"
+      },
+      "script": [
+        {
+          "say": "松鼠站在这里，尾巴翘得好高。它像旁边哪样东西？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "手指顺着尾巴的边走。先向上，再往旁边弯过去。"
+        },
+        {
+          "say": "右边雨伞的顶也拱起来。两样东西有一点像。"
+        },
+        {
+          "say": "我们在比形状。松鼠这条尾巴的边缘也向外拱。"
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "一把伞。把字左边是提手旁，右边是巴。"
+        },
+        {
+          "say": "伞是第三声。想一想撑开的伞是什么形状。"
+        },
+        {
+          "say": "你还想到了什么？可以指着弯起的地方，说给家人听。"
+        }
+      ]
+    },
+    {
+      "key": "fans",
+      "type": "slide",
+      "title": "看清弯、扁和展开",
+      "template": "title-picture",
+      "data": {
+        "title": "看清弯、扁和展开",
+        "picture": "feather-panel",
+        "caption": "公鸡　鸭子　孔雀"
+      },
+      "script": [
+        {
+          "say": "三张新照片都到了。哪张尾巴照像把扇子？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "左边的公鸡，尾羽像几道弯下来的小弧线。"
+        },
+        {
+          "say": "中间这只鸭子，尾羽叠着向后伸，看上去平平扁扁。"
+        },
+        {
+          "say": "右边孔雀把长羽展开，边缘一圈，像一把大扇子。"
+        },
+        {
+          "say": "如果换成局部照，也能从尾羽的形状配对。"
+        },
+        {
+          "say": "从下面取尾羽弯下来的那张全身照。"
+        },
+        {
+          "say": "从下面取尾羽扁扁叠在一起的全身照。"
+        },
+        {
+          "say": "从下面取展开大扇子一样长羽的全身照。"
+        },
+        {
+          "say": "送到尾羽一根根弯下来的窗。"
+        },
+        {
+          "say": "送到尾羽平平往后伸的窗。"
+        },
+        {
+          "say": "送到铺开一圈漂亮羽毛的窗。"
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "公鸡的公，第一声。公字上面是八字头。"
+        },
+        {
+          "say": "我在这三张里最喜欢孔雀照，羽毛铺得很开。"
+        },
+        {
+          "say": "最放在喜欢前面，说的是我在这三张里特别偏爱哪张。"
+        },
+        {
+          "say": "你可以选另一张，指着那条尾巴，说说喜欢的理由。"
+        }
+      ]
+    },
+    {
+      "key": "questions",
+      "type": "slide",
+      "title": "听听问题是怎么问的",
+      "template": "title-picture",
+      "data": {
+        "title": "听听问题是怎么问的",
+        "picture": "feather-panel",
+        "caption": "谁？　问一问，再回答"
+      },
+      "script": [
+        {
+          "say": "如果客人只看到照片，想知道名字，该怎么开口呢？"
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "谁左边是言字旁。读第二声，用来问哪一个。"
+        },
+        {
+          "say": "句尾的小钩叫问号。听我把哪一位读重一点。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "听我问，哪一位把羽毛铺开，像一把大扇子？"
+        },
+        {
+          "say": "我先听到了像扇子，就去找铺开的一圈。"
+        },
+        {
+          "say": "我会答，右边的孔雀展开羽毛，真像一把大扇子。"
+        },
+        {
+          "say": "这一问尾音轻轻扬。回答时把问到的特征说清楚。"
+        },
+        {
+          "say": "试着学我问，哪张照片里的尾羽弯下来？"
+        }
+      ]
+    },
+    {
+      "key": "word-station",
+      "type": "slide",
+      "title": "听词找字卡",
+      "template": "two-columns",
+      "data": {
+        "title": "听词找字卡",
+        "left": {
+          "heading": "左边的字",
+          "body": "比　尾　巴　长　短"
+        },
+        "right": {
+          "heading": "右边的字",
+          "body": "兔　公　把　伞　最"
+        },
+        "left_picture": "word-table-one",
+        "right_picture": "word-table-two"
+      },
+      "script": [
+        {
+          "say": "牌子上有相像的字。怎么知道要找哪一个？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "听完整个词，记住老师最后请你找的那个字。"
+        },
+        {
+          "say": "听，比一比。要找的是比。"
+        },
+        {
+          "say": "小嘴巴。找嘴巴的巴。"
+        },
+        {
+          "say": "长尾巴。找长短的长。"
+        },
+        {
+          "say": "短绳子。找长短的短。"
+        },
+        {
+          "say": "大尾巴。找尾巴的尾。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "把和巴有点像。把的左边多了提手旁。"
+        },
+        {
+          "say": "小雨伞。找雨伞的伞。"
+        },
+        {
+          "say": "小白兔。找白兔的兔。"
+        },
+        {
+          "say": "一把勺子。找提手旁的把。"
+        },
+        {
+          "say": "公鸡。找公鸡的公。"
+        },
+        {
+          "say": "看最字。它上面是日，下面是取，读第四声。"
+        },
+        {
+          "say": "再听一遍词语，想想要找的是哪一个字。"
+        },
+        {
+          "say": "看那张发亮的字卡，把小艇开到下面。"
+        },
+        {
+          "say": "你听清了词，也认出了字卡。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "比左边有竖提，右边有弯钩。巴上面像小方框。"
+        },
+        {
+          "say": "尾的尸字头下是毛。长的捺往右下伸。"
+        },
+        {
+          "say": "短的左边像一支箭，右边是豆。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "兔上面是斜刀头，右下的一点别漏。"
+        },
+        {
+          "say": "公上面是八字头。伞上头像撑开的小伞。"
+        }
+      ]
+    },
+    {
+      "key": "bubble-dock",
+      "type": "interactive",
+      "title": "听准了再吹泡泡",
+      "page": "bubble-dock",
+      "widgetType": "learning-arcade",
+      "startImage": "river",
+      "gameAudio": {
+        "hear-bi": "word-station-4",
+        "hear-ba": "word-station-5",
+        "hear-chang": "word-station-6",
+        "hear-duan": "word-station-7",
+        "hear-wei": "word-station-8",
+        "hear-san": "word-station-11",
+        "hear-tu": "word-station-12",
+        "hear-ba-hold": "word-station-13",
+        "hear-gong": "word-station-14",
+        "word-hint": "word-station-16",
+        "word-help": "word-station-17",
+        "word-praise": "word-station-18"
+      },
+      "script": [
+        {
+          "say": "听见比一比，要找哪个字？我们先认准比。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#game-goal"
+        },
+        {
+          "say": "上面飘着两张卡，先看清哪张是比。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "小艇可以用左右箭头挪动。"
+        },
+        {
+          "highlight": "#bubble-first-word"
+        },
+        {
+          "say": "比在左边。我把船移到它下方，再按圆圈吹泡泡。"
+        },
+        {
+          "say": "泡泡会往上飘一小会儿，所以要先瞄好。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "看泡泡往哪张卡飘。听准了，接对才得分。"
+        },
+        {
+          "say": "轮到你，从头听词再找字。没听清就点喇叭。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ]
+    },
+    {
+      "key": "photo-orders",
+      "type": "slide",
+      "title": "照片要放进哪扇窗",
+      "template": "two-columns",
+      "data": {
+        "title": "照片要放进哪扇窗",
+        "left": {
+          "heading": "全身照",
+          "body": "先找整只动物"
+        },
+        "right": {
+          "heading": "尾巴局部",
+          "body": "再认同一条尾巴"
+        },
+        "left_picture": "orders-full",
+        "right_picture": "orders-detail"
+      },
+      "script": [
+        {
+          "say": "整只动物和尾巴局部要挂在一起。你有什么办法？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "先在下面挑整只动物。听到哪种尾巴，就看哪种形状。"
+        },
+        {
+          "say": "从下面取尾巴又短又圆的那张全身照。"
+        },
+        {
+          "say": "从下面取尾巴细细长长的那张全身照。"
+        },
+        {
+          "say": "从下面取尾巴蓬松，向上拱的全身照。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "上面只露出尾巴。找到与全身照对得上的形状。"
+        },
+        {
+          "say": "送到只露出一小团绒尾巴的窗。"
+        },
+        {
+          "say": "送到露出一条细长尾巴的窗。"
+        },
+        {
+          "say": "送到尾巴轮廓像拱起的伞顶的窗。"
+        },
+        {
+          "say": "重听现在这句话，听清尾巴的样子。"
+        },
+        {
+          "say": "看看发亮的地方。等车过去再走。"
+        },
+        {
+          "say": "全身照和尾巴窗配上啦，你找对了线索。"
+        }
+      ]
+    },
+    {
+      "key": "tail-post",
+      "type": "interactive",
+      "title": "尾巴照片邮车",
+      "page": "tail-post",
+      "widgetType": "learning-arcade",
+      "startImage": "courtyard",
+      "gameAudio": {
+        "get-rabbit": "photo-orders-4",
+        "send-rabbit": "photo-orders-9",
+        "get-monkey": "photo-orders-5",
+        "send-monkey": "photo-orders-10",
+        "get-squirrel": "photo-orders-6",
+        "send-squirrel": "photo-orders-11",
+        "get-rooster": "fans-7",
+        "send-rooster": "fans-10",
+        "get-duck": "fans-8",
+        "send-duck": "fans-11",
+        "get-peacock": "fans-9",
+        "send-peacock": "fans-12",
+        "photo-hint": "photo-orders-12",
+        "photo-help": "photo-orders-13",
+        "photo-praise": "photo-orders-14"
+      },
+      "script": [
+        {
+          "say": "照片能和自己的尾巴窗配成一对吗？看看邮车怎么取。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#tail-first-photo"
+        },
+        {
+          "say": "这张全身照有一团短尾巴。我们只取这一张。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "邮车就在它旁边。点方形装卸键，把照片放进车里。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "右边的小框亮出刚拿的照片。这就取对了。"
+        },
+        {
+          "highlight": "#tail-photo-windows"
+        },
+        {
+          "say": "上面是尾巴窗。到哪扇窗，要等交付口令。"
+        },
+        {
+          "say": "路上有车时先停，等空了再开。"
+        },
+        {
+          "say": "现在你来。用箭头开车，到取送点再按装卸键。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ]
+    },
+    {
+      "key": "write-bi-chang",
+      "type": "slide",
+      "title": "先看清竖提",
+      "template": "title-picture",
+      "data": {
+        "title": "先看清竖提",
+        "picture": "grids-bi-chang",
+        "caption": "比、长　竖提先下，再向右上"
+      },
+      "script": [
+        {
+          "say": "为什么比和长两排里都有一笔，向下走又斜上去？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "上排写比。左半格先写横，再写竖提。"
+        },
+        {
+          "say": "竖提先向下，接着斜向右上。一笔写完，中间不抬手。"
+        },
+        {
+          "say": "右半格先写撇，竖弯钩沿着竖中线右边下笔。"
+        },
+        {
+          "say": "下排写长。先撇再横，横沿横中线跨过竖中线。"
+        },
+        {
+          "say": "竖提靠竖中线左边，最后一笔捺伸向右下格。"
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "跟着两排红笔书空。竖提向下再向右上。"
+        },
+        {
+          "say": "等你在纸上写，请家人看下笔顺序。"
+        }
+      ]
+    },
+    {
+      "key": "write-ba-gong",
+      "type": "slide",
+      "title": "看格子写巴和公",
+      "template": "title-picture",
+      "data": {
+        "title": "看格子写巴和公",
+        "picture": "grids-ba-gong",
+        "caption": "巴的末笔是竖弯钩　公先写上面"
+      },
+      "script": [
+        {
+          "say": "照片背面的两个字要写清楚。巴和公，先下哪一笔？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "上排写巴。上半格先横折，再靠竖中线写短竖。"
+        },
+        {
+          "say": "第三笔横挨着横中线。最后写竖弯钩，托住下半格。"
+        },
+        {
+          "say": "写公，八字头从上半格起，先撇后捺，向两边分。"
+        },
+        {
+          "say": "撇折从横中线附近起，往右折，最后点在右下格。"
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "手指慢慢跟。巴收在竖弯钩，公先写上面。"
+        },
+        {
+          "say": "请家人在你写时看一看，每一笔从哪里起。"
+        }
+      ]
+    },
+    {
+      "key": "picture-check",
+      "type": "quiz",
+      "title": "找找新照片里的线索",
+      "intro": [
+        "换了一批照片。听完问题，再找图上的线索。",
+        "没听清，可以点小喇叭再听一遍。"
+      ],
+      "questions": [
+        {
+          "id": "long-tail",
+          "question": "新来了小兔和花猫。看尾巴，哪一条伸得更长？",
+          "skill": "根据可见的起点与末端比较尾巴长度",
+          "answer": [
+            "B"
+          ],
+          "analysis": "花猫尾巴从背后往上伸了很长一截。小兔身后只露出一团短尾巴。",
+          "visual": {
+            "kind": "asset",
+            "image": "q-length-panel",
+            "alt": "灰兔和花猫的全身照片"
+          },
+          "options": {
+            "A": {
+              "label": "灰兔",
+              "visual": {
+                "kind": "asset",
+                "image": "q-rabbit",
+                "alt": "灰兔的短尾巴"
+              }
+            },
+            "B": {
+              "label": "花猫",
+              "visual": {
+                "kind": "asset",
+                "image": "family-cat",
+                "alt": "花猫的长尾巴"
+              }
+            }
+          }
+        },
+        {
+          "id": "flat-tail",
+          "question": "有三张尾羽照片。哪一张的尾羽又平又扁？",
+          "skill": "通过尾羽局部形状辨认扁形",
+          "answer": [
+            "C"
+          ],
+          "analysis": "浅黄色的尾羽平着往后伸，是扁扁的一束。另两张分别向下弯和向四周展开。",
+          "visual": {
+            "kind": "asset",
+            "image": "q-shapes-panel",
+            "alt": "三张尾羽局部照片"
+          },
+          "options": {
+            "A": {
+              "label": "绿色羽毛",
+              "visual": {
+                "kind": "asset",
+                "image": "q-fan",
+                "alt": "向四周展开的尾羽"
+              }
+            },
+            "B": {
+              "label": "深色羽毛",
+              "visual": {
+                "kind": "asset",
+                "image": "q-curve",
+                "alt": "向下弯的尾羽"
+              }
+            },
+            "C": {
+              "label": "浅黄羽毛",
+              "visual": {
+                "kind": "asset",
+                "image": "q-flat",
+                "alt": "平扁的尾羽"
+              }
+            }
+          }
+        },
+        {
+          "id": "target-tu",
+          "question": "小灰兔。听清最后一个字，哪一张是兔？",
+          "skill": "在新词语里听辨并认读兔",
+          "answer": [
+            "A"
+          ],
+          "analysis": "兔字上面有斜刀头，下面还有一点。小灰兔的最后一个字是兔。",
+          "visual": {
+            "kind": "asset",
+            "image": "q-tu-picture",
+            "alt": "一只灰色的兔子"
+          },
+          "options": {
+            "A": {
+              "label": "兔",
+              "visual": {
+                "kind": "asset",
+                "image": "q-tu",
+                "alt": "兔"
+              }
+            },
+            "B": {
+              "label": "巴",
+              "visual": {
+                "kind": "asset",
+                "image": "q-ba",
+                "alt": "巴"
+              }
+            },
+            "C": {
+              "label": "尾",
+              "visual": {
+                "kind": "asset",
+                "image": "q-wei",
+                "alt": "尾"
+              }
+            }
+          }
+        },
+        {
+          "id": "target-gong",
+          "question": "我们去公园。哪张卡是公园开头的公？",
+          "skill": "把学过的公迁移到新词",
+          "answer": [
+            "B"
+          ],
+          "analysis": "公园开头是公。公的上面是八字头，下面还有两笔。",
+          "visual": {
+            "kind": "asset",
+            "image": "q-gong-picture",
+            "alt": "春天的公园小路"
+          },
+          "options": {
+            "A": {
+              "label": "分",
+              "visual": {
+                "kind": "asset",
+                "image": "q-fen",
+                "alt": "分"
+              }
+            },
+            "B": {
+              "label": "公",
+              "visual": {
+                "kind": "asset",
+                "image": "q-gong",
+                "alt": "公"
+              }
+            },
+            "C": {
+              "label": "八",
+              "visual": {
+                "kind": "asset",
+                "image": "q-ba-eight",
+                "alt": "八"
+              }
+            }
+          }
+        },
+        {
+          "id": "question-cue",
+          "question": "哪张的羽毛尖弯下来，像小钩？请用照片回答。",
+          "skill": "听清问的特征后选择相应回答",
+          "answer": [
+            "A"
+          ],
+          "analysis": "问题问的是羽毛尖弯下来。深色尾羽的尖向下弯，正好能回答。",
+          "visual": {
+            "kind": "asset",
+            "image": "q-shapes-panel",
+            "alt": "三张不同形状的尾羽照片"
+          },
+          "options": {
+            "A": {
+              "label": "深色羽毛",
+              "visual": {
+                "kind": "asset",
+                "image": "q-curve",
+                "alt": "尾羽尖弯下去"
+              }
+            },
+            "B": {
+              "label": "绿色羽毛",
+              "visual": {
+                "kind": "asset",
+                "image": "q-fan",
+                "alt": "尾羽向外展开"
+              }
+            },
+            "C": {
+              "label": "浅黄羽毛",
+              "visual": {
+                "kind": "asset",
+                "image": "q-flat",
+                "alt": "尾羽平伸"
+              }
+            }
+          }
+        },
+        {
+          "id": "upward-stroke",
+          "question": "想一想，先向下写，再向右上提。哪一张是竖提？",
+          "skill": "辨认竖提的走向",
+          "answer": [
+            "C"
+          ],
+          "analysis": "竖提下笔先向下，再提向右上。这两段要连着写。",
+          "visual": {
+            "kind": "asset",
+            "image": "q-pen-panel",
+            "alt": "三种不同的竖形笔画"
+          },
+          "options": {
+            "A": {
+              "label": "笔形一",
+              "visual": {
+                "kind": "asset",
+                "image": "q-hook",
+                "alt": "竖钩"
+              }
+            },
+            "B": {
+              "label": "笔形二",
+              "visual": {
+                "kind": "asset",
+                "image": "q-vertical",
+                "alt": "竖"
+              }
+            },
+            "C": {
+              "label": "笔形三",
+              "visual": {
+                "kind": "asset",
+                "image": "q-ti",
+                "alt": "竖提"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "closing",
+      "type": "slide",
+      "title": "把一组问答带回家",
+      "template": "title-picture",
+      "data": {
+        "title": "把一组问答带回家",
+        "picture": "family-cat",
+        "caption": "回到纸书第九十五、九十六页"
+      },
+      "script": [
+        {
+          "say": "照片馆又来了新客人。你会怎样问它的尾巴？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "我可以问，这只小猫的尾巴尖往哪边弯？"
+        },
+        {
+          "say": "我看到它往身子这边弯，像个小钩。"
+        },
+        {
+          "say": "先找尾巴，再比长短和形状。回答时别漏了问的特征。"
+        },
+        {
+          "say": "字卡能帮我们读词，田字格能提醒我们从哪笔开始。"
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "请家人翻开纸书第九十五和第九十六页。"
+        },
+        {
+          "say": "读一遍，再借着课本插图试着按顺序背一背。"
+        },
+        {
+          "say": "比、巴、长、公各写一个，请家人看一看笔顺。"
+        },
+        {
+          "say": "你们也可以找新动物照，一人问，一人指图答。"
+        }
+      ]
+    }
+  ]
+}

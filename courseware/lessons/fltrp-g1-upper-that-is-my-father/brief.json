@@ -1,0 +1,179 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "Unit 1 That is my father.",
+  "binding": {
+    "editionId": "smartedu-english-six-year-g1-upper-sync-af05bc77",
+    "revisionId": "20260928-metadata-1",
+    "nodeId": "93b3b491-4d6f-3d36-b49b-e4bc92354c36",
+    "unitId": "0827b5f8-adbe-35aa-bdde-cb2d9326e900"
+  },
+  "scenario": "社区灯影展的欢迎台。两位小主持看见家人和朋友从不同位置入场，把来访者介绍给身边的同伴。",
+  "goals": [
+    "听懂father、daddy、mother、grandpa、grandma和friend，根据图中人物关系找到说话者指的人。",
+    "分清说话者在近处或稍远处指谁，听辨this和that，说明my随说话者改变。",
+    "在新场景听介绍、看关系和距离，再用完整的This is my…或That is my…做一次介绍，并礼貌回应。"
+  ],
+  "pageSequence": [
+    {
+      "key": "welcome",
+      "kind": "teaching",
+      "plan": "展馆来了三位访客。先问小主持跟谁打招呼、向谁介绍，再点亮说话者、听者和访客的动作。"
+    },
+    {
+      "key": "parents",
+      "kind": "teaching",
+      "plan": "先听孩子直接跟爸爸打招呼，再听她向同伴说明这是她爸爸。逐项点亮两段关系，并用另一个孩子的图引出mother。"
+    },
+    {
+      "key": "grandparents-friend",
+      "kind": "teaching",
+      "plan": "猜图上的谁是grandpa、grandma和friend。以彩带连出家庭关系、以共同入场动作提示朋友，强调听语句确认，服装和年龄只是辅助。"
+    },
+    {
+      "key": "family-cards",
+      "kind": "interactive",
+      "plan": "把正在下落的访客图卡移到对应关系图旁，只有关系合得上才得分。目标由老师先读，卡面以图为主。"
+    },
+    {
+      "key": "this-that",
+      "kind": "teaching",
+      "plan": "同一位家人先在主持人身边，再走到远侧。每次先让孩子看主持人的脚下和指向，再听this或that，最后对照完整介绍句。"
+    },
+    {
+      "key": "who-says-my",
+      "kind": "teaching",
+      "plan": "两个人轮流对同一位访客说话。逐一亮出说话者与关系线，说明my跟着当前说话的人。"
+    },
+    {
+      "key": "deliver-introductions",
+      "kind": "interactive",
+      "plan": "听介绍后拿相应的访客卡，控制小车穿过路口，再送到符合介绍句距离线索的图站。"
+    },
+    {
+      "key": "introduce-someone",
+      "kind": "teaching",
+      "plan": "用两组原创短对话示范先指人、说完整介绍句，再礼貌回应。换一张图让孩子说给身边的大人听。"
+    },
+    {
+      "key": "picture-check",
+      "kind": "quiz",
+      "plan": "六道新图题由教师读题，结合英语关键句和人物关系图检查听辨与情境理解。口语输出单独留给亲子观察。"
+    },
+    {
+      "key": "recap",
+      "kind": "teaching",
+      "plan": "回到欢迎台，依次回顾家庭关系词、说话者的远近、my的归属和完整介绍与问好。"
+    }
+  ],
+  "games": [
+    {
+      "page": "family-cards",
+      "template": "fallingTiles",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.fallingTiles",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "pair_match",
+      "selection": "下落卡画同一位说话者，底板画相应关系；称谓由配音读出。听词、沿关系线找人、横移落卡，配对规则核验。",
+      "levels": [
+        "小宁介绍父母。两块卡，间隔较长，底板有相邻空格。",
+        "加入祖辈和朋友，三块卡，以短实线、经由妈妈的关系线和朋友虚线辨别。",
+        "小宁、妈妈和阿川轮流说话，三块卡。同一访客随说话者换称谓。"
+      ],
+      "demo": "先点亮说话者、底板关系线、落块和落点，老师只示范第一块，交接时回首关清空分数。"
+    },
+    {
+      "page": "deliver-introductions",
+      "template": "listenDelivery",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.listenDelivery",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "listen_pick_deliver",
+      "selection": "取货必须听对角色；交付须根据this或that选择相对于同一位说话者更近或更远的图站。两个站图都标说话者，避免把距离理解为与屏幕的距离。开车还要停等避让。",
+      "levels": [
+        "一单，两个以小宁为参照的近远站。",
+        "两单，交换画面上的近远站位置并加入祖辈。",
+        "三单，换妈妈和阿川为说话者，四个图站，三车道。"
+      ],
+      "demo": "先点亮说话者、取货卡、远近参照和按钮，只取首单一次就交给孩子。正式口令、提示和表扬预录，开 voiceLead 与 stepVoiceLead。"
+    }
+  ],
+  "quizPlan": [
+    {
+      "skill": "listen-to-family-words",
+      "prompt": "听到mother。选画出她和小主持关系的一张。",
+      "answer": "孩子到自己妈妈的关系图",
+      "position": 1,
+      "rationale": "mother在这里是说话孩子的妈妈。"
+    },
+    {
+      "skill": "listen-to-family-words",
+      "prompt": "听红毛衣男孩说 Hello, Daddy。选他朝谁打招呼。",
+      "answer": "说话孩子的爸爸",
+      "position": 3,
+      "rationale": "直接招呼时可以亲切地叫Daddy。"
+    },
+    {
+      "skill": "near-and-far",
+      "prompt": "听This is my grandma。两位祖辈分别在近处和远处，哪图指对了？",
+      "answer": "选说话者身边的祖母关系图",
+      "position": 2,
+      "rationale": "要从说话者看，这句用this指她身边的人。"
+    },
+    {
+      "skill": "my-and-speaker",
+      "prompt": "换了另一位小主持说That is my father。哪条关系线跟这句话合得上？",
+      "answer": "当下说话的红毛衣男孩与远处戴绿帽的爸爸",
+      "position": 1,
+      "rationale": "my跟着现在说话的人。"
+    },
+    {
+      "skill": "near-and-far",
+      "prompt": "主持人先指较远的家人，再介绍身边的朋友。听两句，哪幅图的先后对？",
+      "answer": "先较远的家人，后近处的朋友",
+      "position": 3,
+      "rationale": "先听关系词，再用that和this核对画面的距离和顺序。"
+    },
+    {
+      "skill": "introduce-and-reply",
+      "prompt": "同伴介绍身边的朋友后，你会怎样开始交谈？选有合适回应的一幅图。",
+      "answer": "转向新朋友挥手问好",
+      "position": 2,
+      "rationale": "听完介绍可以看向被介绍的人，礼貌地说Hello。"
+    }
+  ],
+  "afterClass": {
+    "familyTask": "可在纸上画虚构家庭树或用手边纸偶。选两个人，从近和远各说一次介绍；再互换说话者试一次。由家人听清实际说出的句子，不需要提供真实家庭照片。",
+    "weeklyQuestionSource": [
+      "听称谓找对应关系",
+      "以说话者为参照的this和that",
+      "my随说话者改变",
+      "完整介绍和礼貌回应"
+    ],
+    "evidence": "系统记录数字图题和游戏动作，真实听说、口头介绍与亲子练习待观察。"
+  },
+  "artAndLanguage": "灯影展和家庭角色使用原创图。关系线和距离提示由代码放置。孩子通过录音和图案完成互动，词汇可留给跟读，移除非目标文字仍能继续。",
+  "goalReferences": [
+    {
+      "skill": "listen-to-family-words",
+      "target": "听懂father、daddy、mother、grandpa、grandma和friend，借关系线索认出对象。",
+      "source": "原书印56～57活动1和2、外研社216262第1～6页"
+    },
+    {
+      "skill": "near-and-far",
+      "target": "从说话者站的位置判断this和that所指的对象。",
+      "source": "原书印56～58活动1～4、外研社216260第4～5页"
+    },
+    {
+      "skill": "my-and-speaker",
+      "target": "认出句子里my是当前说话者的关系，换说话者后重新判断。",
+      "source": "原书印57活动2、国家优课任务单第2～3页"
+    },
+    {
+      "skill": "introduce-and-reply",
+      "target": "听完一句介绍先指对对象，再尝试用完整英语句介绍并礼貌问好。",
+      "source": "原书印58活动3和4、外研社216260第5～6和11页"
+    }
+  ],
+  "authoredBy": "Codex courseware",
+  "officialNotesSha256": "7be0d961dd48c3ad84adf4b46379ebe22b4e8e61040ad704ee2d39e7a9cd673f"
+}

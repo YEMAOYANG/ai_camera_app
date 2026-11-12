@@ -11,7 +11,7 @@ built exactly as before.
 import html
 import re
 
-from courseware.kit import game
+from courseware.kit import game, game_templates
 
 CSS = r"""
 :root{--ink:#6B4423;--ink2:#8A5A24;--paper:#FFFDF6;--line:#E8C48F;--or:#F6A935;--or2:#C47A12;--gr:#58B45C;--gr2:#2F8A3A;--rd:#E4572E;--rd2:#B23A17;--bl:#4C8DDB;--bl2:#2F66AE;--pu:#8B5CF6}
@@ -77,7 +77,7 @@ K.rnd=function(n){return Math.floor(Math.random()*n)};
 K.shuffle=function(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=K.rnd(i+1),t=a[i];a[i]=a[j];a[j]=t}return a};
 K.wait=function(ms){return new Promise(function(r){setTimeout(r,ms)})};
 K.rm=function(a,x){var i=a.indexOf(x);if(i>=0)a.splice(i,1)};
-function fit(){var k=Math.min(W.innerWidth/1280,W.innerHeight/720);if(!(k>0))k=1;D.documentElement.style.setProperty('--k',k);K.scale=k}
+function fit(){var root=D.documentElement,k=Math.min((root.clientWidth||W.innerWidth)/1280,(root.clientHeight||W.innerHeight)/720);if(!(k>0))k=1;root.style.setProperty('--k',k);K.scale=k}
 W.addEventListener('resize',fit);fit();
 K.stage=function(){return K.$('#cv')};
 K.pos=function(el){var s=K.stage().getBoundingClientRect(),r=el.getBoundingClientRect(),k=K.scale||1;return {x:(r.left-s.left)/k,y:(r.top-s.top)/k,w:r.width/k,h:r.height/k}};
@@ -95,10 +95,10 @@ K.pop=function(el){if(!el)return;el.classList.remove('pop');void el.offsetWidth;
 var ac;function A(){if(!ac){try{ac=new (W.AudioContext||W.webkitAudioContext)()}catch(e){}}if(ac&&ac.state==='suspended'){try{ac.resume()}catch(e){}}return ac}
 function tone(f,t,d,type,v){try{var a=A();if(!a)return;var o=a.createOscillator(),g=a.createGain(),s=a.currentTime+t;o.type=type||'sine';o.frequency.value=f;g.gain.setValueAtTime(0.0001,s);g.gain.exponentialRampToValueAtTime(v||0.16,s+0.02);g.gain.exponentialRampToValueAtTime(0.0001,s+d);o.connect(g);g.connect(a.destination);o.start(s);o.stop(s+d+0.05)}catch(e){}}
 K.sfx={tick:function(n){tone(392*Math.pow(1.122,(n||0)),0,0.14,'triangle')},pick:function(){tone(520,0,0.08,'triangle')},ok:function(){tone(523,0,0.12);tone(659,0.1,0.12);tone(784,0.2,0.2)},no:function(){tone(220,0,0.18,'sawtooth',0.07);tone(196,0.14,0.22,'sawtooth',0.06)},win:function(){[523,659,784,1047].forEach(function(f,i){tone(f,i*0.12,0.22,'triangle',0.18)})},drop:function(){tone(330,0,0.1,'square',0.06)}};
-K.ready=function(o){var r=K.el('div','',null,K.stage());r.id='ready';r.innerHTML='<div class="card">'+(o.img?'<img class="pic" alt="" src="'+o.img+'">':'<div class="big">'+o.emoji+'</div>')+'<h1>'+o.title+'</h1><p>'+o.sub+'</p><button class="btn xl" id="'+(o.btn||'start-btn')+'">开始 ▶</button></div>';
- var im=K.$('.pic',r);if(im)im.addEventListener('error',function(){var d=K.el('div','big',o.emoji);im.replaceWith(d)});
+K.ready=function(o){var r=K.el('div','',null,K.stage());r.id='ready';r.innerHTML='<div class="card">'+(o.img?'<img class="pic" alt="" src="'+o.img+'">':(o.emoji?'<div class="big">'+o.emoji+'</div>':''))+'<h1>'+o.title+'</h1><p>'+o.sub+'</p><button class="btn xl" id="'+(o.btn||'start-btn')+'">开始 ▶</button></div>';
+ var im=K.$('.pic',r);if(im)im.addEventListener('error',function(){var d=K.startPictureFallback?K.startPictureFallback():o.emoji?K.el('div','big',o.emoji):null;if(d)im.replaceWith(d);else im.remove()});
  K.$('button',r).addEventListener('click',function(){K.sfx.pick();K.begin()})};
-K.finish=function(o){var r=K.$('#finish')||K.el('div','',null,K.stage());r.id='finish';r.className='';r.innerHTML='<div class="card"><div class="big">🏆</div><h1>'+o.title+'</h1><p>'+o.sub+'</p><button class="btn xl green" id="btn-again">再玩一次 ↺</button></div>';K.$('button',r).addEventListener('click',function(){K.sfx.pick();r.classList.add('gone');if(o.again)o.again()});K.sfx.win();K.confetti()};
+K.finish=function(o){var r=K.$('#finish')||K.el('div','',null,K.stage());r.id='finish';r.className='';r.innerHTML='<div class="card"><div class="big">'+(o.mark||'🏆')+'</div><h1>'+o.title+'</h1><p>'+o.sub+'</p><button class="btn xl green" id="btn-again">再玩一次 ↺</button></div>';K.$('button',r).addEventListener('click',function(){K.sfx.pick();r.classList.add('gone');if(o.again)o.again()});K.sfx.win();K.confetti()};
 K.begin=function(){if(K.started)return;K.started=true;var r=K.$('#ready');if(r)r.classList.add('gone');if(K.onStart)K.onStart()};
 K.highlight=function(sel){K.$$(sel).forEach(function(el){el.classList.remove('teach-hl');void el.offsetWidth;el.classList.add('teach-hl');setTimeout(function(){el.classList.remove('teach-hl')},3600)})};
 K.annotate=function(sel,text){var el=K.$(sel),tip=K.$('#tip');if(!el||!text||!tip)return;var p=K.pos(el);tip.textContent=text;tip.style.display='block';
@@ -157,8 +157,12 @@ JS_TAIL = r"""
 
 def page(title, body, css, js, css_extra="", *, tests=False):
     with_game = game.uses_game(js)
-    script = JS_HEAD + (game.GAME_JS if with_game else "") + (JS_TEST if tests else "") + JS_TAIL
-    style = CSS + (game.GAME_CSS if with_game else "") + css + css_extra
+    mechanics = game_templates.javascript(js) if with_game else ""
+    engine = game.GAME_JS + mechanics if with_game else ""
+    script = JS_HEAD + engine + (JS_TEST if tests else "") + JS_TAIL
+    template_style = ("#ready .btn.xl,#finish .btn.xl,#gcard .btn.xl{min-height:96px}"
+                      "#finish .big{font-size:78px;color:#CE871C;font-variant-emoji:text}") if mechanics else ""
+    style = CSS + (game.GAME_CSS if with_game else "") + template_style + game_templates.stylesheet(js) + css + css_extra
     return ('<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8">'
             '<meta name="viewport" content="width=device-width,initial-scale=1">'
             '<title>' + html.escape(title) + '</title><style>' + style + '</style></head><body>'

@@ -1,0 +1,476 @@
+diff --git a/app/mira-student-orbit.css b/app/mira-student-orbit.css
+index 3d3e851..4bb398c 100644
+--- a/app/mira-student-orbit.css
++++ b/app/mira-student-orbit.css
+@@ -1972,3 +1972,60 @@ html[data-mira-student-theme='storybook'] [data-mira-chrome='discussion'] [data-
+     bottom: 64px;
+   }
+ }
++
++/* Keep short embedded quizzes in the ordinary classroom. Reuse the compact
++ * discussion row and keep its existing navigation available on one line. */
++@media (max-width: 640px) and (max-height: 380px) and (orientation: landscape) {
++  [data-mira-student-quiz] {
++    --mira-classroom-secondary-size: 48px;
++    --mira-classroom-primary-size: 48px;
++    --mira-classroom-toolbar-size: 48px;
++  }
++  html [data-mira-classroom-root] [data-mira-student-quiz] [data-mira-chrome='discussion'] [data-mira-roundtable-layout='standard'] {
++    height: 105px !important;
++    min-height: 105px;
++  }
++  html [data-mira-student-quiz] [data-mira-roundtable-layout='standard'] > div:first-child {
++    height: 48px;
++    min-height: 48px;
++    flex-basis: 48px;
++  }
++  html [data-mira-classroom-root] [data-mira-student-quiz] [data-mira-chrome='playback-controls'] {
++    display: flex !important;
++    height: 48px;
++    min-height: 48px;
++    padding: 0 4px;
++  }
++  html [data-mira-classroom-root] [data-mira-student-quiz] [data-mira-chrome='playback-controls'] > .flex-1 {
++    order: 0;
++    flex: 1 0 auto;
++    width: auto;
++  }
++  html [data-mira-classroom-root] [data-mira-student-quiz] [data-mira-chrome='playback-controls'] > .flex-1 > div {
++    width: auto;
++  }
++  html [data-mira-classroom-root] [data-mira-student-quiz] [data-mira-chrome='playback-controls'] :is([data-mira-whiteboard-toggle], [data-mira-live-control='continue']) {
++    position: static;
++  }
++  html [data-mira-student-quiz] [data-mira-canvas-surround] { padding: 4px; }
++
++  /* The top-center toast remains readable and interactive within the header. */
++  html:has([data-mira-student-quiz]) [data-sonner-toaster][data-y-position='top'] {
++    top: 0;
++  }
++  html:has([data-mira-student-quiz]) [data-sonner-toast][data-y-position='top'] {
++    max-height: 48px;
++    overflow-y: auto;
++    padding-block: 4px;
++  }
++}
++
++@media (max-width: 520px) and (max-height: 380px) and (orientation: landscape) {
++  html [data-mira-classroom-root] [data-mira-student-quiz] [data-mira-chrome='playback-controls'] {
++    min-width: 0;
++    max-width: 100%;
++    overflow-x: auto;
++    touch-action: pan-x;
++    scrollbar-width: none;
++  }
++}
+diff --git a/components/edit/PlaybackChromeRoot.tsx b/components/edit/PlaybackChromeRoot.tsx
+index 885c625..b9dfece 100644
+--- a/components/edit/PlaybackChromeRoot.tsx
++++ b/components/edit/PlaybackChromeRoot.tsx
+@@ -1904,6 +1904,7 @@ export const PlaybackChromeRoot = forwardRef<PlaybackChromeRootHandle, PlaybackC
+       <div
+         ref={stageRef}
+         data-mira-playback-shell={studentMode ? 'storybook' : undefined}
++        data-mira-student-quiz={studentMode && !isPresenting && currentScene?.type === 'quiz' ? '' : undefined}
+         data-mira-fixed-game-landscape={fixedGameCanvas ? '' : undefined}
+         data-mira-picture-course={pictureCourse ? 'true' : undefined}
+         className={cn(
+diff --git a/components/scene-renderers/fixed-textbook-picture-layout.module.css b/components/scene-renderers/fixed-textbook-picture-layout.module.css
+index 40f7d0a..418e25d 100644
+--- a/components/scene-renderers/fixed-textbook-picture-layout.module.css
++++ b/components/scene-renderers/fixed-textbook-picture-layout.module.css
+@@ -261,3 +261,53 @@
+     margin: 0;
+   }
+ }
++
++@media (max-width: 640px) and (max-height: 380px) and (orientation: landscape) {
++  :global([data-mira-student-quiz]) .root { overflow: hidden; }
++  :global([data-mira-student-quiz]) .shell { padding: 4px; gap: 2px; }
++  :global([data-mira-student-quiz]) .header { display: none; }
++  :global([data-mira-student-quiz]) .fieldset { padding: 4px 6px; }
++  :global([data-mira-student-quiz]) .task,
++  :global([data-mira-student-quiz]) .task:has([data-quiz-selected-feedback]) {
++    display: grid;
++    grid-template-columns: minmax(56px, .6fr) minmax(48px, 100px) minmax(0, 3fr);
++    grid-template-rows: auto;
++    align-items: start;
++    height: auto;
++    gap: 4px 6px;
++  }
++  :global([data-mira-student-quiz]) .task:not(:has(.scenePicture)) {
++    grid-template-columns: minmax(48px, 100px) minmax(0, 1fr);
++  }
++  :global([data-mira-student-quiz]) .question { display: contents; }
++  :global([data-mira-student-quiz]) .scenePicture {
++    grid-column: 1;
++    grid-row: 1;
++    height: 64px;
++    min-height: 0;
++  }
++  :global([data-mira-student-quiz]) .question > div:not([role="radiogroup"]):not([data-quiz-selected-feedback]) {
++    grid-column: -3;
++    grid-row: 1;
++    margin: 0;
++    align-self: start;
++  }
++  :global([data-mira-student-quiz]) .question .options {
++    grid-column: -2;
++    grid-row: 1;
++    height: auto;
++    min-height: 0;
++  }
++  :global([data-mira-student-quiz]) .question .options > [data-quiz-picture-option] { min-height: 0; }
++  :global([data-mira-student-quiz]) .question .options > [data-quiz-picture-option] > button {
++    flex: none;
++    height: 64px;
++    min-height: 48px;
++  }
++  :global([data-mira-student-quiz]) .question > div[data-quiz-selected-feedback] {
++    grid-column: 1 / -1;
++    grid-row: 2;
++    margin-top: 0;
++  }
++  :global([data-mira-student-quiz]) .footer > button { min-height: 44px; }
++}
+diff --git a/components/scene-renderers/picture-quiz-layout.module.css b/components/scene-renderers/picture-quiz-layout.module.css
+index b94eac5..825c847 100644
+--- a/components/scene-renderers/picture-quiz-layout.module.css
++++ b/components/scene-renderers/picture-quiz-layout.module.css
+@@ -98,3 +98,64 @@
+   .root [data-quiz-picture-card]:not(:has([data-quiz-scene-picture])) > div:has(> button) { grid-column: 1; }
+   .root [data-quiz-picture-card]:not(:has([data-quiz-scene-picture])) [data-quiz-option-group] { grid-column: 2; }
+ }
++
++@media (max-width: 640px) and (max-height: 380px) and (orientation: landscape) {
++  :global([data-mira-student-quiz]) .root[data-quiz-phase="not_started"] > div > div {
++    justify-content: safe center;
++    gap: 4px;
++    overflow-y: auto;
++  }
++  :global([data-mira-student-quiz]) .root[data-quiz-phase="not_started"] > div > div > div:has(> svg) {
++    display: none;
++  }
++  :global([data-mira-student-quiz]) .root[data-quiz-phase="not_started"] button { flex-shrink: 0; }
++  :global([data-mira-student-quiz]) .root[data-quiz-phase="answering"] > div {
++    display: grid;
++    grid-template-columns: minmax(0, 1fr) auto;
++    grid-template-rows: minmax(0, 1fr) 48px;
++  }
++  :global([data-mira-student-quiz]) .root[data-quiz-phase="answering"] [data-quiz-answer-header] {
++    grid-row: 2;
++    grid-column: 1;
++    min-height: 48px;
++    padding: 0 4px;
++  }
++  :global([data-mira-student-quiz]) .root [data-picture-question-navigation] {
++    grid-row: 2;
++    grid-column: 2;
++    gap: 4px;
++    padding: 0 4px;
++  }
++  :global([data-mira-student-quiz]) .root[data-quiz-phase="answering"] [data-quiz-question-scroll] {
++    grid-row: 1;
++    grid-column: 1 / -1;
++    padding: 2px;
++  }
++  :global([data-mira-student-quiz]) .root[data-quiz-phase="answering"] [data-quiz-picture-card] {
++    grid-template-columns: minmax(56px, .6fr) minmax(48px, 100px) minmax(0, 3fr);
++    grid-template-rows: auto;
++    gap: 4px 6px;
++    padding: 4px;
++  }
++  :global([data-mira-student-quiz]) .root [data-quiz-picture-card]:not(:has([data-quiz-scene-picture])) {
++    grid-template-columns: minmax(48px, 100px) minmax(0, 1fr);
++  }
++  :global([data-mira-student-quiz]) .root [data-quiz-scene-picture] {
++    grid-column: 1;
++    grid-row: 1;
++    height: 64px;
++  }
++  :global([data-mira-student-quiz]) .root [data-quiz-picture-card] > div:has(> button) {
++    grid-column: -3;
++    grid-row: 1;
++    margin: 0;
++  }
++  :global([data-mira-student-quiz]) .root [data-quiz-option-group] {
++    grid-column: -2;
++    grid-row: 1;
++  }
++  :global([data-mira-student-quiz]) .root [data-quiz-option-group] button:not([data-quiz-option-picture]) {
++    height: 64px;
++    min-height: 48px;
++  }
++}
+diff --git a/tests/scene-renderers/picture-quiz-layout.browser.test.ts b/tests/scene-renderers/picture-quiz-layout.browser.test.ts
+index 040a714..d78c4ab 100644
+--- a/tests/scene-renderers/picture-quiz-layout.browser.test.ts
++++ b/tests/scene-renderers/picture-quiz-layout.browser.test.ts
+@@ -3,11 +3,14 @@ import { chromium } from 'playwright-core';
+ import { createRequire } from 'node:module';
+ import { readFileSync, mkdirSync, writeFileSync } from 'node:fs';
+ import { dirname, join } from 'node:path';
++import { classroomControlCss } from '../../lib/ui/classroom-controls';
+ 
+ type FixtureWindow = Window & {
+   mountQuiz: (fixed: boolean, count: number, hasScene?: boolean) => void;
+   mountScene: (type: 'slide' | 'interactive') => void;
+   posts: Array<{ answers: Record<string, string> }>;
++  mountStudentQuiz: (fixed: boolean, hasScene: boolean, kind?: 'quiz' | 'slide') => number;
++  showStudentQuizToast: () => void;
+ };
+ type BundleFile = { path: string; text: string };
+ type BuildHooks = {
+@@ -34,11 +37,12 @@ describe.skipIf(process.env.FORMAL_INSPECTION_BROWSER !== '1')(
+         '@/components/canvas/canvas-toolbar': `export const CanvasToolbar=()=>null;`,
+         '@/components/scene-renderers/classroom-complete': `export const ClassroomCompletePageConnected=()=>null;`,
+         '@/lib/workbench/panel-context': `export const useInWorkbenchPanel=()=>false;`,
++        '@/lib/mira/student-classroom-pages': `export const useStudentClassroomPages=()=>null;`,
+         '@/lib/hooks/use-i18n': `export const useI18n=()=>({t:k=>k,locale:'zh-CN'});`,
+-        '@/lib/store': `const state={stage:{fixedTextbook:true},currentSceneId:'quiz',scenes:[]};export const useStageStore=f=>f(state);useStageStore.getState=()=>state;`,
+-        '@/lib/contexts/mira-student-runtime-context': `export const useMiraStudentRuntimeEvents=()=>null;`,
+-        '@/lib/quiz/runtime': `export const createQuizAttemptWriter=()=>({});export const loadQuizAttemptState=async()=>({attemptId:'test'});export class QuizRetryProgressedError extends Error {}`,
+-        '@/lib/quiz/view-state': `export const createQuizViewLifetime=()=>({});export const isQuizRuntimeReady=()=>true;export const persistQuizReview=async()=>{};export const persistQuizRetry=async()=>{};export const persistQuizSubmission=async()=>{};export const quizViewStateFromAttempt=()=>({});export const runQuizPersistenceTransition=async()=>{};`,
++        '@/lib/store': `const state={get stage(){return {fixedTextbook:window.quizTestFixed??true}},currentSceneId:'quiz',scenes:[]};export const useStageStore=f=>f(state);useStageStore.getState=()=>state;`,
++        '@/lib/contexts/mira-student-runtime-context': `export const useMiraStudentRuntimeEvents=()=>null;export const useMiraStudentRuntime=()=>true;`,
++        '@/lib/quiz/runtime': `export const createQuizAttemptWriter=()=>({flushDraft:async()=>{},scheduleDraft(){}});export const loadQuizAttemptState=async()=>({attemptId:'test'});export class QuizRetryProgressedError extends Error {}`,
++        '@/lib/quiz/view-state': `export const createQuizViewLifetime=()=>({invalidate(){}});export const isQuizRuntimeReady=gate=>gate.status==='ready';export const persistQuizReview=async()=>{};export const persistQuizRetry=async()=>{};export const persistQuizSubmission=async()=>{};export const quizViewStateFromAttempt=()=>({phase:'not_started',answers:{},results:[]});export const runQuizPersistenceTransition=async()=>{};`,
+         '@/lib/utils/model-config': `export const getCurrentModelConfig=()=>({});`,
+         '@/components/audio/speech-button': `export const SpeechButton=()=>null;`,
+       };
+@@ -49,11 +53,57 @@ describe.skipIf(process.env.FORMAL_INSPECTION_BROWSER !== '1')(
+           contents: `
+ import React from 'react';import {createRoot} from 'react-dom/client';
+ import {CanvasArea} from './components/canvas/canvas-area';
++import {CanvasToolbar} from './components/canvas/canvas-toolbar';
++import {Toaster,toast} from 'sonner';
+ import {FixedTextbookQuiz} from './components/scene-renderers/fixed-textbook-quiz';
+-import {SingleChoiceQuestion} from './components/scene-renderers/quiz-view';
++import {QuizView,SingleChoiceQuestion} from './components/scene-renderers/quiz-view';
+ import styles from './components/scene-renderers/picture-quiz-layout.module.css';
+ const picture=(color)=>'data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300"><rect width="400" height="300" fill="'+color+'"/><circle cx="200" cy="150" r="70" fill="white"/></svg>');
+-let generation=0;window.mountQuiz=(fixed,count,hasScene=true)=>{generation++;const q={id:'q',type:'single',question:'下一步用哪个动作？请听老师说，再看图选择。',questionAudioUrl:'/api/classroom-media/test/audio/question.wav',options:Array.from({length:count},(_,i)=>({value:String(i),label:'图'+i})),optionVisuals:Object.fromEntries(Array.from({length:count},(_,i)=>[String(i),{kind:'image',src:picture(['#428c72','#df8a50','#6983b4'][i]),alt:'picture'+i}])),visual:hasScene?{kind:'image',src:picture('#e2e9cd'),alt:'scene'}:undefined};window.posts=[];window.fetch=async(_url,init)=>{if(init?.method==='POST')window.posts.push(JSON.parse(init.body));return{ok:true,json:async()=>init?.method==='POST'?{ok:true,partial:{results:[{questionId:'q',response:'1',correct:true,explanation:'选对了',correctAnswer:'1'}]}}:{ok:true}}};window.quizContent=fixed?<FixedTextbookQuiz key={'fixed'+count+':'+generation} questions={[q]}/>:<div className={styles.root} data-quiz-phase='answering' style={{height:'100%',display:'flex',flexDirection:'column'}}><div data-quiz-answer-header style={{display:'flex',justifyContent:'space-between',alignItems:'center',flexShrink:0}}>答题中<button style={{minHeight:48,minWidth:48}}>✓</button></div><div data-quiz-question-scroll style={{flex:1,overflowY:'auto'}}><SingleChoiceQuestion question={q} index={0} onChange={()=>{}}/></div></div>;root.render(<CanvasArea currentScene={{id:'quiz',type:'quiz',content:{type:'quiz',questions:[q]}}} mode='playback' hideToolbar currentSceneIndex={0} scenesCount={1} engineState='idle' whiteboardOpen={false}/>);};const root=createRoot(document.querySelector('#app'));window.mountScene=(type)=>{window.quizContent=<iframe title='activity' srcDoc='<button>Play</button>'/>;root.render(<CanvasArea currentScene={{id:type,type,content:{type}}} mode='playback' hideToolbar currentSceneIndex={0} scenesCount={1} engineState='idle' whiteboardOpen={false}/>);};window.mountQuiz(true,3);`,
++let generation=0;window.mountQuiz=(fixed,count,hasScene=true)=>{generation++;const q={id:'q',type:'single',question:'下一步用哪个动作？请听老师说，再看图选择。',questionAudioUrl:'/api/classroom-media/test/audio/question.wav',options:Array.from({length:count},(_,i)=>({value:String(i),label:'图'+i})),optionVisuals:Object.fromEntries(Array.from({length:count},(_,i)=>[String(i),{kind:'image',src:picture(['#428c72','#df8a50','#6983b4'][i]),alt:'picture'+i}])),visual:hasScene?{kind:'image',src:picture('#e2e9cd'),alt:'scene'}:undefined};window.posts=[];window.fetch=async(_url,init)=>{if(init?.method==='POST')window.posts.push(JSON.parse(init.body));return{ok:true,json:async()=>init?.method==='POST'?{ok:true,partial:{results:[{questionId:'q',response:'1',correct:true,explanation:'选对了',correctAnswer:'1'}]}}:{ok:true}}};window.quizContent=fixed?<FixedTextbookQuiz key={'fixed'+count+':'+generation} questions={[q]}/>:<div className={styles.root} data-quiz-phase='answering' style={{height:'100%',display:'flex',flexDirection:'column'}}><div data-quiz-answer-header style={{display:'flex',justifyContent:'space-between',alignItems:'center',flexShrink:0}}>答题中<button style={{minHeight:48,minWidth:48}}>✓</button></div><div data-quiz-question-scroll style={{flex:1,overflowY:'auto'}}><SingleChoiceQuestion question={q} index={0} onChange={()=>{}}/></div></div>;root.render(<CanvasArea currentScene={{id:'quiz',type:'quiz',content:{type:'quiz',questions:[q]}}} mode='playback' hideToolbar currentSceneIndex={0} scenesCount={1} engineState='idle' whiteboardOpen={false}/>);};const root=createRoot(document.querySelector('#app'));window.mountScene=(type)=>{window.quizContent=<iframe title='activity' srcDoc='<button>Play</button>'/>;root.render(<CanvasArea currentScene={{id:type,type,content:{type}}} mode='playback' hideToolbar currentSceneIndex={0} scenesCount={1} engineState='idle' whiteboardOpen={false}/>);};window.mountQuiz(true,3);
++
++window.mountStudentQuiz=(fixed,hasScene,kind='quiz')=>{
++  generation++;
++  window.quizTestFixed=fixed;
++  const makeQuestion=id=>({
++    id,type:'single',question:'请听题，再选一幅图。',questionAudioUrl:'/api/classroom-media/test/audio/question.wav',
++    options:['0','1','2'].map(value=>({value,label:'图'+value})),
++    optionVisuals:Object.fromEntries(['0','1','2'].map((value,index)=>[value,{kind:'image',src:picture(['#428c72','#df8a50','#6983b4'][index]),alt:'choice '+value}])),
++    visual:hasScene?{kind:'image',src:picture('#e2e9cd'),alt:'scene'}:undefined,
++  });
++  const questions=[makeQuestion('one'),makeQuestion('two')];
++  const quiz=kind==='quiz';
++  window.quizContent=quiz?<QuizView key={generation} stageId='quiz-test' sceneId='quiz' questions={questions}/>:<span>Slide</span>;
++  root.render(<>
++    <div data-mira-classroom-root style={{height:'100%',overflow:'hidden'}}>
++      <div data-quiz-fixture={generation} data-mira-playback-shell='storybook' data-mira-student-quiz={quiz?'':undefined}
++        style={{height:'100%',display:'flex',flexDirection:'column',overflow:'hidden'}}>
++        <div data-mira-chrome='scene-sidebar' data-mira-sidebar-collapsed='true' style={{width:0}}/>
++        <header data-mira-chrome='header' style={{height:48,flexShrink:0}}>Classroom</header>
++        <div style={{flex:1,minHeight:0,overflow:'hidden'}}>
++          <CanvasArea currentScene={{id:kind,type:kind,content:{type:kind,questions}}} mode='playback'
++            hideToolbar currentSceneIndex={0} scenesCount={2} engineState='idle' whiteboardOpen={false}/>
++        </div>
++        <div data-mira-chrome='discussion' style={{flexShrink:0}}>
++          <div data-mira-fixed-textbook={fixed?'':undefined} data-mira-roundtable-layout='standard'
++            style={{height:fixed?216:192}}>
++            <div><CanvasToolbar currentSceneIndex={0} scenesCount={2} engineState='idle' whiteboardOpen={false}
++              sidebarCollapsed onToggleSidebar={()=>{}} onPrevSlide={()=>{}} onNextSlide={()=>{}}
++              onPlayPause={()=>{}} onWhiteboardClose={()=>{}} onToggleMute={()=>{}} audioPlaybackAvailable
++              onToggleAutoPlay={()=>{}} onCycleSpeed={()=>{}} onTogglePresentation={()=>{}} onToggleChat={()=>{}} /></div>
++            <div data-mira-interaction-row/>
++          </div>
++        </div>
++      </div>
++    </div>
++    <Toaster position='top-center'/>
++  </>);
++  return generation;
++};
++window.showStudentQuizToast=()=>{
++  toast.message('课堂提示',{id:'qa-notice-'+generation,description:'这条提示仍然可以查看。',duration:Infinity,
++    action:{label:'知道了',onClick:()=>{}}});
++};
++`,
+         },
+         bundle: true,
+         write: false,
+@@ -86,7 +136,8 @@ let generation=0;window.mountQuiz=(fixed,count,hasScene=true)=>{generation++;con
+       );
+       const files = ['fixed-textbook-quiz.tsx', 'quiz-view.tsx', 'quiz-picture.tsx']
+         .map((f) => `components/scene-renderers/${f}`)
+-        .concat('components/audio/question-narration.tsx', 'components/canvas/canvas-area.tsx');
++        .concat('components/audio/question-narration.tsx', 'components/canvas/canvas-area.tsx',
++          'components/canvas/canvas-toolbar.tsx');
+       const source = files.map((f) => readFileSync(f, 'utf8')).join('\n');
+       const css =
+         compiled.build([
+@@ -97,6 +148,8 @@ let generation=0;window.mountQuiz=(fixed,count,hasScene=true)=>{generation++;con
+         bundle.outputFiles.find((f: BundleFile) => f.path.endsWith('.css')).text +
+         '\nhtml,body,#app{height:100%;width:100%;margin:0}';
+       const js = bundle.outputFiles.find((f: BundleFile) => f.path.endsWith('.js')).text;
++      const studentCss = readFileSync(join(dirname(require.resolve('sonner')), 'styles.css'), 'utf8')
++        + '\n' + readFileSync('app/mira-student-orbit.css', 'utf8') + classroomControlCss();
+       if (process.env.MIRA_FORMAL_QA_EXPORT_DIR) {
+         mkdirSync(process.env.MIRA_FORMAL_QA_EXPORT_DIR, { recursive: true });
+         writeFileSync(
+@@ -282,9 +335,155 @@ let generation=0;window.mountQuiz=(fixed,count,hasScene=true)=>{generation++;con
+           .first()
+           .boundingBox();
+         expect(activity!.width).toBe(374);
++
++        // Embed both real quiz renderers in the default short classroom shell,
++        // including the actual CanvasArea, toolbar, student CSS, and Sonner portal.
++        page.setDefaultTimeout(5000);
++        await page.addStyleTag({ content: studentCss });
++        await page.evaluate(() => document.documentElement.setAttribute('data-mira-student-theme', 'storybook'));
++        const hitBox = (element: Element) => {
++          const r = element.getBoundingClientRect();
++          const radius = parseFloat(getComputedStyle(element).borderTopLeftRadius);
++          const diagonal = Math.abs(r.width - r.height) < 1 && radius >= r.width / 2 ? 15 : 21;
++          const samples = [
++            [0, 0], [-21, 0], [21, 0], [0, -21], [0, 21],
++            [-diagonal, -diagonal], [-diagonal, diagonal], [diagonal, -diagonal], [diagonal, diagonal],
++          ];
++          const misses = [];
++          for (const [dx, dy] of samples) {
++            const hit = document.elementFromPoint(r.left + r.width / 2 + dx, r.top + r.height / 2 + dy);
++            if (!element.contains(hit)) misses.push([dx, dy, hit?.tagName, hit?.getAttribute('aria-label')]);
++          }
++          return {
++            reachable: r.width >= 44 && r.height >= 44 && misses.length === 0,
++            label: element.getAttribute('aria-label'),
++            rect: [r.x, r.y, r.width, r.height],
++            misses,
++          };
++        };
++        const embeddedViewports = [
++          { width: 640, height: 360 },
++          { width: 480, height: 360 },
++          { width: 1280, height: 800 },
++        ];
++        const embeddedCases = embeddedViewports.flatMap(view =>
++          [true, false].flatMap(fixed => [true, false].map(hasScene => ({ view, fixed, hasScene }))),
++        );
++        for (const { view, fixed, hasScene } of embeddedCases) {
++          await page.setViewportSize(view);
++          const generation = await page.evaluate(({ fixed, hasScene }) =>
++            (window as unknown as FixtureWindow).mountStudentQuiz(fixed, hasScene), { fixed, hasScene });
++          await page.locator(`[data-quiz-fixture="${generation}"]`).waitFor();
++          const sidebar = page.locator('[data-mira-sidebar-collapsed="true"]');
++          await sidebar.waitFor({ state: 'attached' });
++          if (view.width <= 640) {
++            expect(await sidebar.evaluate(el => getComputedStyle(el).pointerEvents)).toBe('none');
++          }
++          if (!fixed) {
++            const start = page.getByRole('button', { name: 'quiz.startQuiz', exact: true });
++            await start.waitFor();
++            await page.waitForFunction(() => document.getAnimations().every(a => a.playState !== 'running'));
++            const hit = await start.evaluate(hitBox);
++            expect(hit.reachable, JSON.stringify({ view, hasScene, ...hit })).toBe(true);
++            await start.click();
++          }
++          const options = page.locator(fixed ? '[role=radio]' : '[data-quiz-option]');
++          await expect.poll(() => options.count()).toBe(3);
++          const narration = page.getByRole('button', { name: '听第 1 题', exact: true });
++          const next = page.getByRole('button', { name: '下一题', exact: true });
++          await narration.waitFor();
++          await page.waitForFunction(() => {
++            const motion = document.querySelector('[data-quiz-answer-header]')?.parentElement;
++            const transform = motion ? getComputedStyle(motion).transform : 'none';
++            const settled = transform === 'none' || new DOMMatrixReadOnly(transform).isIdentity;
++            return settled && document.getAnimations().every(a => a.playState !== 'running');
++          });
++          const bar = page.locator('[data-mira-roundtable-layout="standard"]');
++          expect((await bar.boundingBox())?.height).toBe(view.width <= 640 ? 105 : fixed ? 216 : 192);
++          if (view.width > 640) {
++            const desktopLayout = await page.evaluate(() => {
++              const shell = document.querySelector('[data-mira-student-quiz]')!;
++              const measure = () => [
++                '[data-mira-canvas-surround]',
++                '[data-mira-roundtable-layout="standard"]',
++                '[data-mira-chrome="playback-controls"]',
++                '[role="radio"], [data-quiz-option]',
++              ].map(selector => {
++                const element = shell.querySelector(selector)!;
++                const style = getComputedStyle(element);
++                return [element.getBoundingClientRect().toJSON(), style.display, style.overflowX];
++              });
++              const scoped = measure();
++              shell.removeAttribute('data-mira-student-quiz');
++              const baseline = measure();
++              shell.setAttribute('data-mira-student-quiz', '');
++              return { scoped, baseline };
++            });
++            expect(desktopLayout.scoped).toEqual(desktopLayout.baseline);
++          }
++          const notice = page.locator('[data-sonner-toast][data-visible="true"]');
++          for (const toast of [false, true]) {
++            if (toast) await page.evaluate(() => (window as unknown as FixtureWindow).showStudentQuizToast());
++            await notice.waitFor({ state: toast ? 'visible' : 'detached' });
++            if (toast) {
++              if (view.width <= 640) {
++                const box = await notice.boundingBox();
++                expect(box!.y + box!.height).toBeLessThanOrEqual(48);
++              }
++            }
++            await page.waitForFunction(() => document.getAnimations().every(a => a.playState !== 'running'));
++            for (const [index, option] of (await options.all()).entries()) {
++              const initial = await option.evaluate(hitBox);
++              if (view.width > 640 && !initial.reachable) await option.scrollIntoViewIfNeeded();
++              const hit = await option.evaluate(hitBox);
++              if (view.width > 640 && !fixed && hasScene && !toast && index === 0) {
++                console.info('Desktop reference quiz first answer', { initial: initial.reachable, afterScroll: hit.reachable });
++              }
++              expect(hit.reachable, JSON.stringify({ fixed, view, hasScene, toast, ...hit })).toBe(true);
++              expect(await option.locator('img').evaluate(async img => {
++                await (img as HTMLImageElement).decode();
++                return (img as HTMLImageElement).naturalWidth > 0;
++              })).toBe(true);
++            }
++            for (const control of [narration, next]) {
++              if (view.width > 640) await control.scrollIntoViewIfNeeded();
++              const hit = await control.evaluate(hitBox);
++              expect(hit.reachable, JSON.stringify({ fixed, view, hasScene, toast, ...hit })).toBe(true);
++            }
++          }
++          await notice.getByRole('button', { name: '知道了' }).click();
++          await notice.waitFor({ state: 'detached' });
++          if (view.width <= 640) {
++            const toolbar = bar.locator('[data-mira-chrome="playback-controls"]');
++            const buttons = await toolbar.locator('button[data-mira-control="toolbar"]').all();
++            expect(buttons).toHaveLength(10);
++            for (const button of buttons) {
++              // Only the toolbar can pan at 480px. The quiz controls above must
++              // all pass hit testing from the initial scroll position.
++              const scroll = view.width === 480 ? await button.evaluate(el => {
++                const row = el.closest<HTMLElement>('[data-mira-chrome="playback-controls"]')!;
++                const viewportRight = Math.min(row.getBoundingClientRect().right, innerWidth);
++                row.scrollLeft += Math.max(0, Math.ceil(el.getBoundingClientRect().right - viewportRight));
++                return { clientWidth: row.clientWidth, scrollWidth: row.scrollWidth, scrollLeft: row.scrollLeft, viewportRight };
++              }) : undefined;
++              const hit = await button.evaluate(hitBox);
++              expect(hit.reachable, JSON.stringify({ fixed, view, hasScene, ...hit, scroll })).toBe(true);
++            }
++            await toolbar.evaluate(row => { row.scrollLeft = 0; });
++          }
++          await options.nth(1).click();
++          await next.click();
++          await page.getByRole('button', { name: '听第 2 题', exact: true }).waitFor();
++        }
++        await page.setViewportSize({ width: 640, height: 360 });
++        const slideGeneration = await page.evaluate(() =>
++          (window as unknown as FixtureWindow).mountStudentQuiz(true, false, 'slide'));
++        await page.locator(`[data-quiz-fixture="${slideGeneration}"]`).waitFor();
++        expect(await page.locator('[data-mira-student-quiz]').count()).toBe(0);
++        expect((await page.locator('[data-mira-roundtable-layout="standard"]').boundingBox())?.height).toBe(153);
+       } finally {
+         await browser.close();
+       }
+-    }, 60000);
++    }, 100000);
+   },
+ );

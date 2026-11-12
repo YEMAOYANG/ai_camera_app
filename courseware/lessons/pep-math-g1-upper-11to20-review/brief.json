@@ -1,0 +1,184 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "11～20的认识｜整理和复习",
+  "binding": {
+    "editionId": "pep-math-g1-upper-2022-standard",
+    "revisionId": "directory-ede7a8c63c337cf95a03fe79",
+    "nodeId": "ab5809e7-f2b5-4516-b035-dd54115ea0f9",
+    "unitId": "ae4d78e6-9ed7-4bec-a5a4-26ed49147600"
+  },
+  "goals": [
+    "先估再数、每十成组，连起实物、计数器和数的写法，解释20的组成。",
+    "正数与倒数都按相邻相差一，用这条关系判断得数的顺序。",
+    "把一个十和散件的组成用在十加几、相应减法和十几加减几个一。",
+    "用点图解答中间间隔，把认识数、运算和应用的例子连起来。"
+  ],
+  "scenario": "小小展馆要把到货、展位和参观路线合成一张图。孩子把不同表示的同一数量找对，把算得的编号排出一条能走的路线，再让到访的人按图找位置。",
+  "production": "按整理和复习标准，讲解页平均约160字，互动页平均约130字，优先采用8～10句自然口语。每个知识目标给一个小难题、一个图示理由和一次回扣。",
+  "pageSequence": [
+    {
+      "key": "open-map",
+      "kind": "teaching",
+      "plan": "展馆收到三张不同的线索图，先猜哪两张说同一件事。最后一次操作之前保留思考时间，再展开数量、运算和路线三个区。"
+    },
+    {
+      "key": "estimate-bundle",
+      "kind": "teaching",
+      "plan": "先估一把展品卡比十多还是少，再一张一张圈到满十，最后数余量。对照先逐个数和先成一组为什么会得到同一数。"
+    },
+    {
+      "key": "place-value",
+      "kind": "teaching",
+      "plan": "把同一批卡变成十位珠和个位珠，再按先十位后个位写出数量。用另一个恰好两组十的图说清20，零表示没有散件。"
+    },
+    {
+      "key": "depot",
+      "kind": "interactive",
+      "plan": "把成捆的展品卡或计数器图推入数量相同的收货格。两边画法不同，数位相合才能入库。"
+    },
+    {
+      "key": "neighbors",
+      "kind": "teaching",
+      "plan": "沿展位牌从小到大走，再反过来数。逐个点亮相邻两个位置，说明每走一处数怎样变。"
+    },
+    {
+      "key": "calculate-from-groups",
+      "kind": "teaching",
+      "plan": "先用两部分组成展品数，再分别去一部分。另举十几添去几个一的计数器例子，逐步点亮变化的个位和保留的十位。"
+    },
+    {
+      "key": "route-by-result",
+      "kind": "interactive",
+      "plan": "每个站只给图示算式。先算起点，从几个可到达站中找到得数恰好多一的站，再实时开车穿过迷宫抵达出口。"
+    },
+    {
+      "key": "between-stops",
+      "kind": "teaching",
+      "plan": "两位参观者在不同展位合流，先用两旗定位，再数内部位置。用号码带和点图互证，说明这一步为什么用到了数的顺序。"
+    },
+    {
+      "key": "equal-result",
+      "kind": "teaching",
+      "plan": "比较几张不同写法的补给单，先算再按相同得数归到一处。让孩子猜缺的部分，再用另一种表示核对。"
+    },
+    {
+      "key": "picture-check",
+      "kind": "quiz",
+      "plan": "教师读六道新图题，分别检验分组、数位、相邻关系、简单运算和间隔。选项用图表示，解析说出选择理由。"
+    },
+    {
+      "key": "finish-map",
+      "kind": "teaching",
+      "plan": "把认识数、怎样算、怎样用三个图例依次放回展馆地图。请孩子选一条连接说给大人听，最后回看开场哪两张线索说的是同一数量。"
+    }
+  ],
+  "games": [
+    {
+      "page": "depot",
+      "template": "sortingDepot",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.sortingDepot",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "classification",
+      "selection": "用已有 group 按总数归类。待搬卡画实物捆与散件，托盘画计数器或数字；孩子要先转换表示才能找到合适托盘，推箱路线也要保留出口。",
+      "levels": [
+        "两件卡、两个宽托盘，个位差别明显。",
+        "三件卡，其中一件计数器图要匹配实物图，加入转弯。",
+        "四件卡，出现两个十和看起来相似的误导牌，需要比较十位并在绕柱前留路。"
+      ],
+      "demo": "讲清当前要送的那一张，逐个高亮捆、散件、托盘和控制区，只推一次成功；回首关清空进度。"
+    },
+    {
+      "page": "route-by-result",
+      "template": "bubbleMaze",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.bubbleMaze",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "ordered_route",
+      "selection": "地图路线按相邻得数排定，每块用本课图示和符号表达不同算式，目标栏启用 listenOnly。孩子按相邻结果选择应先经过哪一块，路线放置需保证不按次序碰到的块会使操作失败。",
+      "levels": [
+        "先读出起点，短路线和三块易算站牌，暂停留给孩子想。",
+        "四块混合加减站牌，加入岔路和一块可打通的障碍。",
+        "五块站牌，部分得数很接近，加入可避让巡游，按得数恰好多一逐站完成。"
+      ],
+      "demo": "先点亮起点算式、目标牌和车，再示范开到下一个得数多一的站。只演示第一步，录音交还首关。"
+    }
+  ],
+  "quizPlan": [
+    {
+      "skill": "represent-11-to-20",
+      "prompt": "园艺台有十七张种子牌。哪张图先圈满一组十？",
+      "answer": "一圈十、圈外七个",
+      "position": 1,
+      "rationale": "圈里正好十张，圈外还有七张，合起来是十七。"
+    },
+    {
+      "skill": "represent-11-to-20",
+      "prompt": "盒里有十盏灯，盒外还有八盏。哪幅计数器图对？",
+      "answer": "十位一珠、个位八珠",
+      "position": 3,
+      "rationale": "满盒是一个十，八盏散灯是八个一。"
+    },
+    {
+      "skill": "order-by-one",
+      "prompt": "储位牌从十九倒着排到十八。下一块是哪张？",
+      "answer": "第十七号牌",
+      "position": 2,
+      "rationale": "倒着每次少一，十八往回一格是十七。"
+    },
+    {
+      "skill": "compose-and-calculate",
+      "prompt": "十五个纸扣，拿走两个散扣。哪张图是剩下的？",
+      "answer": "一组十和三个散件",
+      "position": 2,
+      "rationale": "从五个一中去两个一，整十保留。"
+    },
+    {
+      "skill": "compose-and-calculate",
+      "prompt": "展台有十二个木徽。补到十七个，要加哪一盘？",
+      "answer": "五个散徽",
+      "position": 1,
+      "rationale": "原先有一组十和两个一，再添五个一就有七个一。"
+    },
+    {
+      "skill": "apply-and-organize",
+      "prompt": "第六位和第十一位亮灯。哪张图只涂亮灯中间的位置？",
+      "answer": "第七到第十共四处",
+      "position": 3,
+      "rationale": "只涂第七到第十这四处。两盏灯是两头，不算在内。"
+    }
+  ],
+  "afterClass": {
+    "familyTask": "用手边小物做自己的知识图，把一组十和零散物画出来，再写一个能解释这组物品的算式和一个位置问题。另用两两配对观察哪一堆剩一个、哪一堆没有剩。",
+    "weeklyQuestionSource": [
+      "成组与计数器互换",
+      "相邻顺序及得数链",
+      "十与个表示加减和缺项",
+      "排位间隔和三类知识的连接"
+    ],
+    "evidence": "数字课程记录游戏动作与图题，真实口述、写数、画图和单双数家庭观察待观察。"
+  },
+  "art": "用原创展馆与角色图讲情境，数量、数字、计数器、点图和路线标记均由代码放置，遮盖非目标文字后仍能依据图和录音继续。",
+  "goalDetails": [
+    {
+      "skill": "represent-11-to-20",
+      "target": "先估再数、每十成组，连起实物、计数器和数的写法，解释20的组成。",
+      "source": "教材印85～86、教案第2～3页"
+    },
+    {
+      "skill": "order-by-one",
+      "target": "正数与倒数都按相邻相差一，用这条关系判断得数的顺序。",
+      "source": "教材印85数线、印86第4题"
+    },
+    {
+      "skill": "compose-and-calculate",
+      "target": "把一个十和散件的组成用在十加几、相应减法和十几加减几个一。",
+      "source": "教材印85知识图、印86第4～5题"
+    },
+    {
+      "skill": "apply-and-organize",
+      "target": "用点图解答中间间隔，把认识数、运算和应用的例子连起来。",
+      "source": "教材印85知识图、印86第3题、教案第4～7页"
+    }
+  ]
+}

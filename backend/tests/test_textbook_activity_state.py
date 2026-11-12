@@ -98,6 +98,28 @@ class TextbookActivityStateTests(unittest.TestCase):
         first['activity']['state']['position'] = 99
         self.assertEqual(self.service.activity_state('session-a')['activities'][0]['state']['position'], 2)
 
+    def test_opted_in_scene_saves_only_complete_declared_simulation_results(self):
+        from content.courseware_observation import CARD_ID, SNAPSHOT_SCHEMA
+
+        scene = self.release['classroom']['scenes'][1]
+        photo = {'round': {'label': '圆的杯口',
+            'image': '/api/classroom-media/tbpub_room/media/' + 'c' * 64 + '.png'}}
+        card = {'title': '观察杯口', 'familyTask': '跟家人观察实际的杯子。',
+            'levels': [{'label': '第一关', 'trials': [
+                {'id': 'before', 'label': '开始试放', 'top': photo, 'side': photo}]}]}
+        scene['content']['html'] += (
+            f'<script type="application/json" id="{CARD_ID}">' + json.dumps(card) + '</script>')
+        state = {'schemaVersion': SNAPSHOT_SCHEMA, 'sceneId': scene['id'],
+            'kind': 'simulation', 'levels': [{'level': 1, 'trials': []}]}
+        self.error('textbook_activity_state_invalid', lambda: self.service.activity_state(
+            'session-a', self.request(state=state)))
+        self.assertEqual(self.state(), self.original)
+        state['levels'][0]['trials'].append({'trialId': 'before', 'top': 'round', 'side': 'round'})
+        self.service.activity_state('session-a', self.request(state=state))
+        self.assertEqual(self.service.activity_state('session-a')['activities'][0]['state'], state)
+        self.assertEqual(self.state()['quiz'], self.original['quiz'])
+        self.assertEqual(self.state('session-b'), self.original)
+
     def test_optimistic_conflict_and_idempotence_do_not_overwrite(self):
         data = self.request()
         first = self.service.activity_state('session-a', data)

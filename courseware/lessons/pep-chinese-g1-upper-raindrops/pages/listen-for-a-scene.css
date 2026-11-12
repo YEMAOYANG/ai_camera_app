@@ -1,0 +1,13 @@
+#cv.classic-arcade #ready .pic {
+  object-fit: contain;
+}
+
+#rain-listen-symbol {
+  display: grid;
+  place-items: center;
+  background: #294a40;
+}
+
+#cv:has(#ready:not(.gone), #finish:not(.gone)) #rain-listen-symbol {
+  visibility: hidden;
+}

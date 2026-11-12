@@ -9,6 +9,7 @@ surface errors, then finished twice by the engine's own autopilot over every lev
 'game-autopilot' so the receipt never presents an autopilot finish as random play.
 """
 import argparse
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
 import json
 import os
@@ -55,22 +56,39 @@ def page_html(scene, media_dir):
     return MEDIA_URL.sub(local, scene.get('content', {}).get('html', ''))
 
 
-def play_body(body, media_dir, *, run=default_run, work_dir=None, max_steps=400, seed=7):
+def play_body(body, media_dir, *, run=default_run, work_dir=None, max_steps=400, seed=7, jobs=1):
+    if jobs not in range(1, 5):
+        raise ValueError('play jobs must be between 1 and 4')
     scenes = [(index, scene) for index, scene in enumerate(body.get('scenes', []), 1) if scene.get('type') == 'interactive']
     pages = []
     with tempfile.TemporaryDirectory(dir=work_dir) as temporary:
-        for index, scene in scenes:
-            (Path(temporary) / f'scene-{index:02d}.html').write_text(page_html(scene, media_dir), encoding='utf-8')
         node = os.environ.get('MIRA_NODE_BIN') or shutil.which('node') or 'node'
-        command = [node, str(BOT), '--playwright', str(_playwright_dir()), '--chrome', os.environ.get('MIRA_CHROME_BIN', CHROME),
-                   '--dir', temporary, '--max-steps', str(max_steps), '--seed', str(seed)]
-        code, stdout, stderr = run(command, 120 + len(scenes) * max_steps)
-        try:
-            results = json.loads(stdout.strip().splitlines()[-1]) if stdout.strip() else []
-        except ValueError:
-            results = []
-        if code or len(results) != len(scenes):
-            raise RuntimeError(f'autoplay failed (exit {code}): {(stderr or stdout).strip()[-400:]}')
+        command = [node, str(BOT), '--playwright', str(_playwright_dir()), '--chrome', os.environ.get('MIRA_CHROME_BIN', CHROME)]
+
+        def play_group(group):
+            directory, batch = group
+            directory.mkdir(exist_ok=True)
+            for index, scene in batch:
+                (directory / f'scene-{index:02d}.html').write_text(page_html(scene, media_dir), encoding='utf-8')
+            code, stdout, stderr = run([*command, '--dir', str(directory),
+                                       '--max-steps', str(max_steps), '--seed', str(seed)],
+                                      120 + len(batch) * max_steps)
+            try:
+                results = json.loads(stdout.strip().splitlines()[-1]) if stdout.strip() else []
+            except ValueError:
+                results = []
+            if code or len(results) != len(batch):
+                raise RuntimeError(f'autoplay failed (exit {code}): {(stderr or stdout).strip()[-400:]}')
+            return results
+
+        if jobs == 1 or len(scenes) < 2:
+            results = play_group((Path(temporary), scenes))
+        else:
+            size = (len(scenes) + jobs - 1) // jobs
+            groups = [(Path(temporary) / f'batch-{start}', scenes[start:start + size])
+                      for start in range(0, len(scenes), size)]
+            with ThreadPoolExecutor(max_workers=jobs) as pool:
+                results = [result for batch in pool.map(play_group, groups) for result in batch]
     for (index, _), result in zip(scenes, results):
         errors = sorted(set(result['errors']))
         stuck = result.get('stuck')
@@ -96,10 +114,11 @@ def main(argv=None):
     parser.add_argument('--out', required=True)
     parser.add_argument('--max-steps', type=int, default=400)
     parser.add_argument('--seed', type=int, default=7)
+    parser.add_argument('--jobs', type=int, choices=range(1, 5), default=1)
     args = parser.parse_args(argv)
     try:
         body = json.loads(Path(args.body).read_text(encoding='utf-8'))
-        receipt = play_body(body, args.media_dir, max_steps=args.max_steps, seed=args.seed)
+        receipt = play_body(body, args.media_dir, max_steps=args.max_steps, seed=args.seed, jobs=args.jobs)
     except (OSError, ValueError, RuntimeError) as exc:
         print(f'autoplay failed: {exc}', file=sys.stderr)
         return 2

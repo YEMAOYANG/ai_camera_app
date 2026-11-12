@@ -1,0 +1,68 @@
+{
+  "schemaVersion": "mira.courseware.imagegen-requests.v1",
+  "provider": "Codex built-in imagegen",
+  "supersededUnsubmittedPicturePlanSha256": "52284920ca2775923ee88ff7df93d14f2d8d8e948c9f2af3cbd23ce163a634b1",
+  "requests": [
+    {
+      "key": "schoolyard-base",
+      "operation": "generate",
+      "prompt": "Use case: illustration-story\nAsset type: 一年级《升国旗》讲解图、游戏封面和全景拍摄关卡的正式校园场景，宽幅 16:9，实景感的儿童绘本水彩和清晰的铅笔线。\n场景：晴朗早晨的中国小学操场，干净浅石色地面，淡蓝天空，后景右侧淡杏色教学楼和一两棵秋树。无文字和标识。\n人物与动作：四个六七岁小学生在画面右半部稀疏站成一排；全身和鞋底都看得到，脸、鼻尖、眼睛和身体明确侧向左方旗杆，略仰视，背挺直，双手自然垂在裤边，脚站稳，神情安静认真。人物彼此不遮挡，不举手。\n构图：左边四分之一处只有一根竖直细银灰旗杆，顶部和底座完整可见，约从画面高度的 7% 到 93%。杆右侧至画面中间留干净天空，让课件稍后叠加准确的旗形。孩子集中在画面横向 54%–90%，上下各留空间，便于宽幅裁切和游戏取景。\n约束：保留完整观礼场景；旗杆保持空杆，国旗本身由课程精确绘制。无红领巾、其他旗帜、星星、字母、数字、徽章或水印。不要画成说明图或拼贴。",
+      "transparentBackground": false,
+      "pagesOrQuestions": [
+        "look-at-flag",
+        "face-the-flag",
+        "ceremony-camera",
+        "frame-crane",
+        "stroke-route",
+        "read-five-lines"
+      ]
+    },
+    {
+      "key": "museum-toward-base",
+      "operation": "generate",
+      "prompt": "Use case: illustration-story\nAsset type: 一年级看图小检查的校外观礼对照图，单幅横向 4:3。\n场景：小型现代展览馆外的开放广场。暖米色柱廊、低矮淡绿灌木、浅石板地，均匀柔和的白天日光。水彩儿童绘本，干净铅笔轮廓，留白有空气感。\n人物与动作：右半幅只站一位六七岁中国女孩，短黑发、雾蓝长袖衫、深蓝长裤，完整全身。她的鼻尖、眼睛、肩膀和脚尖清楚侧向画面左边的杆，微微抬眼看杆上方，背挺直，两手自然下垂，两脚停稳。姿势一眼可读，神情平静认真。\n构图：一根细银灰旗杆位于左边约 15% 处，从上部蓝天到底部石板地，顶部和底座都在画面内。杆右边约四分之一画宽保留干净背景，让课件随后把准确国旗放在杆顶部。女孩全身各部分保持在右半幅，周围有小屏裁切余量。\n约束：旗杆保持空杆，国旗图形由课程单独绘制。不要其他旗帜、红领巾、字样、星星、标志或水印。",
+      "transparentBackground": false,
+      "pagesOrQuestions": [
+        "watch-at-exhibition"
+      ]
+    },
+    {
+      "key": "museum-away-base",
+      "operation": "edit",
+      "prompt": "Use case: identity-preserve\nAsset type: 同一道一年级观礼小检查的独立对照选项，横向 4:3 单幅插画。\n输入图 1 是需编辑的原图。保留同一个展览馆广场、左边空旗杆的精确位置、视角、光线、留白、背景和画风。保留同一位女孩的身份、发型、衣服、尺寸与右半幅位置，只改变她的朝向或站姿。\n唯一改动：她站直，但身体、肩膀、鼻尖和眼睛全部明确转向画面右边，背对画面左边的旗杆。两脚站稳，双手自然垂下。\n保持人物全身和双脚都在画面内。左侧仍是空旗杆，旗面由课程绘制。不要添加任何人物、旗子、红领巾、文字、标志、星星或水印。",
+      "transparentBackground": false,
+      "pagesOrQuestions": [
+        "watch-at-exhibition"
+      ],
+      "imageKeyToEdit": "museum-toward-base"
+    },
+    {
+      "key": "museum-down-base",
+      "operation": "edit",
+      "prompt": "Use case: identity-preserve\nAsset type: 同一道一年级观礼小检查的独立对照选项，横向 4:3 单幅插画。\n输入图 1 是需编辑的原图。保留同一个展览馆广场、左边空旗杆的精确位置、视角、光线、留白、背景和画风。保留同一位女孩的身份、发型、衣服、尺寸与右半幅位置，只改变她的朝向或站姿。\n唯一改动：她明显向前弯腰、低头看自己的鞋尖附近，鼻尖与眼睛向下。双脚留在原处，手自然靠近膝盖，和原图直立观礼的姿势容易区分。\n保持人物全身和双脚都在画面内。左侧仍是空旗杆，旗面由课程绘制。不要添加任何人物、旗子、红领巾、文字、标志、星星或水印。",
+      "transparentBackground": false,
+      "pagesOrQuestions": [
+        "watch-at-exhibition"
+      ],
+      "imageKeyToEdit": "museum-toward-base"
+    },
+    {
+      "key": "museum-ribbon",
+      "operation": "generate",
+      "prompt": "Use case: illustration-story\nAsset type: 一年级小检查中的展览陈列图，横向 4:3 单幅水彩绘本。\n场景：近拍现代展览厅暖白墙的一小部分，光线柔和，背景整洁。\n主体：墙前居中挂一根细长柔软的红绸带，松松打一个结，两条长窄尾带有清楚的 S 形卷曲。轮廓与背景对比明显，绸带从结到尾端完整可见；一眼看出是装饰绸带。\n约束：只有一根绸带。没有旗杆、矩形旗、星星、印花、文字、人物、边框或水印。",
+      "transparentBackground": false,
+      "pagesOrQuestions": [
+        "flag-from-exhibition"
+      ]
+    },
+    {
+      "key": "museum-bunting",
+      "operation": "generate",
+      "prompt": "Use case: illustration-story\nAsset type: 一年级小检查中的展览陈列图，横向 4:3 单幅水彩绘本。\n场景：近拍与红绸带图相同风格的现代展览厅暖白墙，光线柔和，背景整洁。\n主体：一根浅色细绳在中央轻微下垂，上面是清楚分开的湖蓝、浅绿、杏橙、淡紫三角装饰片。每片一个尖角朝下，彼此留空，绳和完整三角形都在画面内。缩小后也一眼看出是一串装饰。\n约束：没有旗杆、矩形旗、星星、印花、文字、人物、边框或水印。",
+      "transparentBackground": false,
+      "pagesOrQuestions": [
+        "flag-from-exhibition"
+      ]
+    }
+  ]
+}

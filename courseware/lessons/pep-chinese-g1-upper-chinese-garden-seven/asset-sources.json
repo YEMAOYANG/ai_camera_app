@@ -1,0 +1,1011 @@
+{
+  "schemaVersion": "mira.courseware.asset-sources.v1",
+  "inputs": {
+    "story": {
+      "source": "art-source/story-atlas.png",
+      "sha256": "343c29d05d058bf2e6f362892c8ffa1af81aa36e8448bc7154289f764ff78e93",
+      "original": "/Users/sqcopenclaw/.codex/generated_images/01a1c43e-b707-70d1-8436-005b59e5091d/exec-98cbe6a5-4e2e-4860-83bc-442f410e8300.png",
+      "dimensions": [
+        2172,
+        724
+      ],
+      "generator": "Codex 内置 ImageGen",
+      "prompt": "Use case: illustration-story.\nAsset type: one 3-column × 3-row original illustration atlas for a first-grade Chinese language lesson set around a community storytelling radio show. Each of the nine cells is a standalone square, exactly equal grid positions and full-bleed; every subject stays well within its own cell. No gutter is needed. No text, letters, numbers, marks, captions, typography, brands or watermark. Visual style fine paper texture, matte gouache, clean cut-paper silhouettes, deep pine green and warm cream with apricot and persimmon orange. Child-friendly, quiet uncluttered backgrounds, thumbnail readability. Use wholly original scenes, simple expressive faces.\nRow 1 left: community radio event, two children set a tabletop microphone on a little rounded table near an open picture book, green curtains and warm wall, one child a school-age girl with orange scarf and bobbed dark hair. Row 1 center: at the same storytelling event, an older woman and an older man greet the child and her adult caregivers, everyone at a comfortable distance, welcoming; composition with a few clear faces. Row 1 right: a small open notebook, unlettered calendar with blank pale blocks, a warm orange sunset on one side and fresh green spring buds on the other, visual cues for time, no printed numbers.\nRow 2 left: a garden table with a hand placing a bean seed in a tray, next to a lush plant bearing recognizable long green bean pods; the same kind of bean shown in both, one linked visual idea. Row 2 center: a large leafy tree gives cool shade to two children sitting together reading, a small watering can under the tree as a visual clue someone previously cared for it. Row 2 right: a child beginning to walk along a long simple gently curving path, only one first clear footstep near their shoe, destination small and far, no sign or letters.\nRow 3 left: a child is proud of a tidy stack of three handmade wooden blocks and tries adding one more above it, secure hands, improvement through a small next action. Row 3 center: quiet indoor picture exhibition, two friends close together speaking softly, a third nearby person studies pictures on a wall. Row 3 right: bright simple practice hall, a child standing by a microphone speaks to three seated classmates several meters away, the listeners look toward the speaker, room layout shows distance, no text and no sound waves drawn.\nUse natural poses and no extra distracting objects. The requested palette and illustrative style must be shared by all cells."
+    },
+    "beans": {
+      "source": "art-source/beans.png",
+      "sha256": "6f533c893aed4677dbc57c1be4abb117a89470294d64b1458a78feac0b753e5e",
+      "dimensions": [
+        714,
+        231
+      ],
+      "atlas": "story",
+      "cell": [
+        2,
+        1
+      ],
+      "processing": "独立格四边各向内裁 5 像素"
+    },
+    "shade": {
+      "source": "art-source/shade.png",
+      "sha256": "765e81c0b87a1470f54bfa6d537d0fd65893cd9198e1425744cab96511aeeb58",
+      "dimensions": [
+        714,
+        231
+      ],
+      "atlas": "story",
+      "cell": [
+        2,
+        2
+      ],
+      "processing": "独立格四边各向内裁 5 像素"
+    },
+    "first-step": {
+      "source": "art-source/first-step.png",
+      "sha256": "fede017460a5506396881993d6857e30faafb201d15b03ec03cbad6e853bd12d",
+      "dimensions": [
+        714,
+        231
+      ],
+      "atlas": "story",
+      "cell": [
+        2,
+        3
+      ],
+      "processing": "独立格四边各向内裁 5 像素"
+    },
+    "improve": {
+      "source": "art-source/improve.png",
+      "sha256": "bf9a8574ba9a5062e6e6e0671d5281d6a499550b0596e6874f17978b5ea1b2ab",
+      "dimensions": [
+        714,
+        232
+      ],
+      "atlas": "story",
+      "cell": [
+        3,
+        1
+      ],
+      "processing": "独立格四边各向内裁 5 像素"
+    },
+    "quiet": {
+      "source": "art-source/quiet.png",
+      "sha256": "78ff142cc3c2aab615cf3944e6da25344487d5b1422759bcfbb628384fe9ae0c",
+      "dimensions": [
+        714,
+        232
+      ],
+      "atlas": "story",
+      "cell": [
+        3,
+        2
+      ],
+      "processing": "独立格四边各向内裁 5 像素"
+    },
+    "hall": {
+      "source": "art-source/hall.png",
+      "sha256": "b308a82bf68e67625a926870e7941221b25f95beb58989b658a5bc0519d8717f",
+      "dimensions": [
+        714,
+        232
+      ],
+      "atlas": "story",
+      "cell": [
+        3,
+        3
+      ],
+      "processing": "独立格四边各向内裁 5 像素"
+    },
+    "sprites": {
+      "source": "art-source/sprites-atlas.png",
+      "sha256": "bda15adcf23af13ccb38b6999df63582254bb3e11f34bfd2257fdde806ec1d40",
+      "original": "/Users/sqcopenclaw/.codex/generated_images/01a1c43e-b707-70d1-8436-005b59e5091d/exec-d91c0c33-391f-4474-9b0e-9d7fccce4d4d.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "generator": "Codex 内置 ImageGen",
+      "prompt": "Use case: illustration-story.\nAsset type: one 3×3 transparent sprite atlas with 9 isolated paper-cut illustrations for a first-grade Chinese lesson. True alpha background and empty space around every subject. Divide into exactly 3 columns and 3 rows, equal cell boundaries. Center each object within its own cell and keep it to about 60% of the cell. No gridlines, text, numbers, labels or added icons. Same matte gouache, fine paper grain, deep pine green, warm cream, apricot and orange color palette. Clean simple contours for recognition in thumbnails.\nRow 1 left: portrait from the shoulders up of a friendly 6-year-old girl with a short dark bob and an orange scarf. Row 1 center: portrait from the shoulders up of an adult woman with a dark bun and a cream and warm orange scarf. Row 1 right: portrait from the shoulders up of an adult man with short dark hair and a pine-green cardigan. Only one portrait per cell.\nRow 2 left: portrait from the shoulders up of a silver-haired older woman smiling, round glasses and muted apricot clothes. Row 2 center: portrait from the shoulders up of a silver-haired older man smiling, warm brown cardigan. Row 2 right: a small toy delivery cart seen in 2D side view with the hood pointing to the RIGHT, two visible dark wheels, pine-green body, orange front light.\nRow 3 left: identical toy cart, same orientation, a small light-orange glow right at the hood to indicate animation; no detached trail. Row 3 center: one simple warm yellow five-point wooden star token with a tiny orange circle at its center, no text, suitable as identical marker on a direction map. Row 3 right: an entire little green cardboard reference figure seen from above, body aligned vertically, FACE and small triangular orange direction pointer oriented toward the TOP of the cell, use big simple shape and clear contrast. This figure will be rotated by code.\nKeep the 9 cutouts self-contained. No cast shadows or background fill."
+    },
+    "child": {
+      "source": "art-source/child.png",
+      "sha256": "b64c5241fe51fad47bd8e9ee4c828481ef31a259361885ca9b7235cd569eb2ef",
+      "dimensions": [
+        252,
+        260
+      ],
+      "atlas": "sprites",
+      "cell": [
+        1,
+        1
+      ],
+      "processing": "按透明轮廓裁切，保留透明边缘，最长边不超过 260 像素"
+    },
+    "mother": {
+      "source": "art-source/mother.png",
+      "sha256": "78afc7abcad2aad00a73eb2b110d02ad2847c85484f091667edd0456d6d9f4f5",
+      "dimensions": [
+        190,
+        260
+      ],
+      "atlas": "sprites",
+      "cell": [
+        1,
+        2
+      ],
+      "processing": "按透明轮廓裁切，保留透明边缘，最长边不超过 260 像素"
+    },
+    "father": {
+      "source": "art-source/father.png",
+      "sha256": "6c731ce57c0b413d9b454f5f1e5d3b4b9280345d0b4f0bf5ac71c2e201ccd348",
+      "dimensions": [
+        228,
+        260
+      ],
+      "atlas": "sprites",
+      "cell": [
+        1,
+        3
+      ],
+      "processing": "按透明轮廓裁切，保留透明边缘，最长边不超过 260 像素"
+    },
+    "granny": {
+      "source": "art-source/granny.png",
+      "sha256": "7e346bdcfc8bbfe42577b7fdba490321524f8880fd8b4a2b3bd97b2b1aa3b3dd",
+      "dimensions": [
+        232,
+        260
+      ],
+      "atlas": "sprites",
+      "cell": [
+        2,
+        1
+      ],
+      "processing": "按透明轮廓裁切，保留透明边缘，最长边不超过 260 像素"
+    },
+    "quiz": {
+      "source": "art-source/quiz-atlas.png",
+      "sha256": "9d40afb3d1e538ef23d6c68c1a5981643453c4da4744aff2d3a218248a416f8e",
+      "original": "/Users/sqcopenclaw/.codex/generated_images/01a1c43e-b707-70d1-8436-005b59e5091d/exec-e0429697-3a16-4968-8af9-5ca1ff107001.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "generator": "Codex 内置 ImageGen",
+      "prompt": "Use case: illustration-story.\nAsset type: one 3-column × 3-row atlas of nine ORIGINAL standalone picture-book scenes for an early-grade language lesson. Equal cells exactly at thirds horizontally and vertically; every subject stays safely inside one cell; no shared borders, panels overlap, text, labels, numbers, signs, or watermark. Fine paper grain, matte gouache, quiet cream and deep pine green, soft apricot and persimmon, crisp friendly cut-paper contours. Art must remain meaningful at 96 pixels.\nTop left: a small cartoon monkey on the grass by a wide shallow-looking stone water basin at night, staring down at a clear round pale moon reflection in the water. Show the monkey and basin clearly, calm illustration with no dramatic danger. Top middle: an original side silhouette illustration of three little cartoon monkeys holding onto one another in a fanciful story scene, trying to reach a wavering moon reflection on the water. Artistic storybook view, not an instruction diagram, no children or people, no realistic safety setup. Top right: older cartoon monkey pauses and raises its head to look UP at the clearly visible crescent-free full white moon in dark blue-green night sky, leafy tree in the background.\nMiddle left: a school-age girl with short black hair and orange scarf has just opened a picture book next to a tabletop microphone, finger on the first picture, about to begin. Middle center: the same girl cheerfully bowing to a small audience after the reading, closed book on the table and hands clapping. Middle right: the same girl turns away and walks off, closed untouched book on an otherwise empty table. All three original distinct actions and child proportions.\nBottom left: different story rehearsal composition inside a simple community room. A child speaker at the LEFT, one peer seated in the center and two at the far RIGHT, listeners visibly face the speaker. Leave clear open space in the middle at face height for diagrams to be added later. Bottom middle: quiet exhibit in a different room. Two children, a speaker at far LEFT and one close listener immediately to her right, a separate person at far RIGHT absorbed in looking at an artwork. Leave clear space at face height; no visual sound waves. Bottom right: one ORIGINAL cartoon monkey scene with three clear separate regions for pointing out details: upper-right full white moon, center-left treetop branch, lower-center pale ripples on a basin of water. A small monkey looks up from between the basin and sky. Keep all three features fully within the cell and away from borders. No arrows or diagrams.\nMaintain the same visual style throughout. No additional frames, overlays, logos or words."
+    },
+    "monkey-sees": {
+      "source": "art-source/monkey-sees.png",
+      "sha256": "8ebf580874842f0c915e89bf7f95e8ffd93781e6a03b6d8606d43df6ed349324",
+      "dimensions": [
+        492,
+        321
+      ],
+      "atlas": "quiz",
+      "cell": [
+        1,
+        1
+      ],
+      "processing": "独立格四边各向内裁 10 像素"
+    },
+    "monkey-tries": {
+      "source": "art-source/monkey-tries.png",
+      "sha256": "0fb0a339aecce69904c4bf12e8e70bf79743bbe62c2fe82fdeff8e4c016e2815",
+      "dimensions": [
+        492,
+        321
+      ],
+      "atlas": "quiz",
+      "cell": [
+        1,
+        2
+      ],
+      "processing": "独立格四边各向内裁 10 像素"
+    },
+    "monkey-checks": {
+      "source": "art-source/monkey-checks.png",
+      "sha256": "848faa7eb7b50872c6c45ea7a617cc32c74dfea1a7f8b913ceeff8e6386d064c",
+      "dimensions": [
+        492,
+        321
+      ],
+      "atlas": "quiz",
+      "cell": [
+        1,
+        3
+      ],
+      "processing": "独立格四边各向内裁 10 像素"
+    },
+    "rehearsal": {
+      "source": "art-source/rehearsal.png",
+      "sha256": "8abd3d9888b33d687723634f4baaba8596cb151205e011f67e4d97ae4d081f63",
+      "dimensions": [
+        492,
+        322
+      ],
+      "atlas": "quiz",
+      "cell": [
+        3,
+        1
+      ],
+      "processing": "独立格四边各向内裁 10 像素"
+    },
+    "exhibit": {
+      "source": "art-source/exhibit.png",
+      "sha256": "45ad9f4ac3c92d0151476ce26478dd59c23d5e2d647db75eeee9b5ed15c7ff0c",
+      "dimensions": [
+        492,
+        322
+      ],
+      "atlas": "quiz",
+      "cell": [
+        3,
+        2
+      ],
+      "processing": "独立格四边各向内裁 10 像素"
+    },
+    "moon-details": {
+      "source": "art-source/moon-details.png",
+      "sha256": "c972bed2821a73cbfa56efb4d7576b0171efc6d6e593d02d7e1af229a02ddb47",
+      "dimensions": [
+        492,
+        322
+      ],
+      "atlas": "quiz",
+      "cell": [
+        3,
+        3
+      ],
+      "processing": "独立格四边各向内裁 10 像素"
+    }
+  },
+  "assets": {
+    "radio-open": {
+      "file": "assets/radio-open.png",
+      "sha256": "9d674d6cc769b8d6310778c3eb9ac78182b07ab0fa3c49a537d4abeedb009234",
+      "dimensions": [
+        714,
+        231
+      ],
+      "usedBy": [
+        "open"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "atlas": "story",
+      "cell": [
+        1,
+        1
+      ],
+      "processing": "独立格四边各向内裁 5 像素"
+    },
+    "family-gathering": {
+      "file": "assets/family-gathering.png",
+      "sha256": "9dd185d0185900b9442d473df00eee68984b826516ca80a55b77d620dbbaaaae",
+      "dimensions": [
+        714,
+        231
+      ],
+      "usedBy": [
+        "family-words",
+        "sort-character-cards"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "atlas": "story",
+      "cell": [
+        1,
+        2
+      ],
+      "processing": "独立格四边各向内裁 5 像素"
+    },
+    "time-picture": {
+      "file": "assets/time-picture.png",
+      "sha256": "dff3a73d2ece7c256f785b93c60b94bbd0448e73ef8d08a4e80b0f4de1060710",
+      "dimensions": [
+        714,
+        231
+      ],
+      "usedBy": [
+        "meaning-clues"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "atlas": "story",
+      "cell": [
+        1,
+        3
+      ],
+      "processing": "独立格四边各向内裁 5 像素"
+    },
+    "write-family": {
+      "file": "assets/write-family.png",
+      "sha256": "dff4381a75bcf33cf117b3cfef8fb53555f206b7acc2f1038c1a99d3d4905504",
+      "dimensions": [
+        740,
+        464
+      ],
+      "usedBy": [
+        "write-parents"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "da2877ef2babeda741dbb9c6573c97807082fff18950523cf67da15657369e87",
+      "sources": []
+    },
+    "strokes-first": {
+      "file": "assets/strokes-first.png",
+      "sha256": "52a60450c197776302a57735b3abee5b102eeedb197262a1ed13c7e80144c7a5",
+      "dimensions": [
+        660,
+        488
+      ],
+      "usedBy": [
+        "strokes-one"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "da2877ef2babeda741dbb9c6573c97807082fff18950523cf67da15657369e87",
+      "sources": []
+    },
+    "strokes-second": {
+      "file": "assets/strokes-second.png",
+      "sha256": "f76b6ccb06c25905c18e288e752a0605bd1bcce0562169e4c7408e27b1eaf10d",
+      "dimensions": [
+        660,
+        488
+      ],
+      "usedBy": [
+        "strokes-two"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "da2877ef2babeda741dbb9c6573c97807082fff18950523cf67da15657369e87",
+      "sources": []
+    },
+    "direction-east": {
+      "file": "assets/direction-east.png",
+      "sha256": "4cfb96fb1c417254ffd4ab058479bfe7ab716e07e632692784835e642d2c6f51",
+      "dimensions": [
+        440,
+        334
+      ],
+      "usedBy": [
+        "face-and-turn",
+        "sound-route"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "da2877ef2babeda741dbb9c6573c97807082fff18950523cf67da15657369e87",
+      "sources": [
+        "compass-person",
+        "star-pin"
+      ]
+    },
+    "proverb-strip": {
+      "file": "assets/proverb-strip.png",
+      "sha256": "15435cecae82900150a3aea298974a1daf350e2023ab948fb920ddddaca9d3e1",
+      "dimensions": [
+        684,
+        394
+      ],
+      "usedBy": [
+        "ideas-in-pictures"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "da2877ef2babeda741dbb9c6573c97807082fff18950523cf67da15657369e87",
+      "sources": [
+        "beans",
+        "shade",
+        "first-step",
+        "improve"
+      ]
+    },
+    "volume-teach": {
+      "file": "assets/volume-teach.png",
+      "sha256": "5dd772dd2f3427c98bbcb6b63d223be85e2913e1b4685fc27bcf5e25663f5690",
+      "dimensions": [
+        516,
+        440
+      ],
+      "usedBy": [
+        "listen-and-speak"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "da2877ef2babeda741dbb9c6573c97807082fff18950523cf67da15657369e87",
+      "sources": [
+        "quiet",
+        "hall"
+      ]
+    },
+    "monkey-strip": {
+      "file": "assets/monkey-strip.png",
+      "sha256": "93f1c763953b97e9f2a1c29e4ab307cd0d4bd49dcd556f4723d710f6ae0471d7",
+      "dimensions": [
+        446,
+        500
+      ],
+      "usedBy": [
+        "read-with-a-grownup"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "da2877ef2babeda741dbb9c6573c97807082fff18950523cf67da15657369e87",
+      "sources": [
+        "monkey-sees",
+        "monkey-tries",
+        "monkey-checks"
+      ]
+    },
+    "rover": {
+      "file": "assets/rover.png",
+      "sha256": "d507a2431e2a9bdf580743008e96d024041c02a2f81cf299320b229e98aaf938",
+      "dimensions": [
+        260,
+        181
+      ],
+      "usedBy": [
+        "sort-character-cards",
+        "sound-route"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "atlas": "sprites",
+      "cell": [
+        2,
+        3
+      ],
+      "processing": "按透明轮廓裁切，保留透明边缘，最长边不超过 260 像素"
+    },
+    "rover-boost": {
+      "file": "assets/rover-boost.png",
+      "sha256": "6eba3bccf0a5cd7eac72a9a4dfabfc60104297427d7e2af0bbf44509d6ab949e",
+      "dimensions": [
+        260,
+        164
+      ],
+      "usedBy": [
+        "sort-character-cards",
+        "sound-route"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "atlas": "sprites",
+      "cell": [
+        3,
+        1
+      ],
+      "processing": "按透明轮廓裁切，保留透明边缘，最长边不超过 260 像素"
+    },
+    "star-pin": {
+      "file": "assets/star-pin.png",
+      "sha256": "d1a90c1ed623b0def276d51403c56fc54c4246527b122924168932ea94133456",
+      "dimensions": [
+        260,
+        247
+      ],
+      "usedBy": [
+        "sound-route"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "atlas": "sprites",
+      "cell": [
+        3,
+        2
+      ],
+      "processing": "按透明轮廓裁切，保留透明边缘，最长边不超过 260 像素"
+    },
+    "compass-person": {
+      "file": "assets/compass-person.png",
+      "sha256": "d1b3acefc434c9888b7946440636c4e0eb7038c2e208c180cbd8b038e914c3a9",
+      "dimensions": [
+        161,
+        260
+      ],
+      "usedBy": [
+        "sound-route"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "atlas": "sprites",
+      "cell": [
+        3,
+        3
+      ],
+      "processing": "按透明轮廓裁切，保留透明边缘，最长边不超过 260 像素"
+    },
+    "family-choice-a": {
+      "file": "assets/family-choice-a.png",
+      "sha256": "6c11e028654b91a5b0828ac4e82c4a1f62250fce912f45d86ced565c8ea82de9",
+      "dimensions": [
+        440,
+        250
+      ],
+      "usedBy": [
+        "garden-seven-q1"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "da2877ef2babeda741dbb9c6573c97807082fff18950523cf67da15657369e87",
+      "sources": [
+        "child",
+        "mother",
+        "granny"
+      ]
+    },
+    "family-choice-b": {
+      "file": "assets/family-choice-b.png",
+      "sha256": "499a4e2539f30428658ea76a536aa1d8b04285d8967b5df85f26079b0a32fadd",
+      "dimensions": [
+        440,
+        250
+      ],
+      "usedBy": [
+        "garden-seven-q1"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "da2877ef2babeda741dbb9c6573c97807082fff18950523cf67da15657369e87",
+      "sources": [
+        "child",
+        "father",
+        "granny"
+      ]
+    },
+    "family-choice-c": {
+      "file": "assets/family-choice-c.png",
+      "sha256": "f4e26228666b1023d7cb99905a4fae81791488ec42f21b9e02ea480873cd9223",
+      "dimensions": [
+        440,
+        250
+      ],
+      "usedBy": [
+        "garden-seven-q1"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "da2877ef2babeda741dbb9c6573c97807082fff18950523cf67da15657369e87",
+      "sources": [
+        "child",
+        "mother"
+      ]
+    },
+    "radical-choice-a": {
+      "file": "assets/radical-choice-a.png",
+      "sha256": "f39642ea77011ad42a2188ca58ec383b54ec28a092cdb4bf8c9685b58a26492a",
+      "dimensions": [
+        420,
+        290
+      ],
+      "usedBy": [
+        "garden-seven-q2"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "da2877ef2babeda741dbb9c6573c97807082fff18950523cf67da15657369e87",
+      "sources": []
+    },
+    "radical-choice-b": {
+      "file": "assets/radical-choice-b.png",
+      "sha256": "7deb6091cec2c3b16243a8e1096c3b3364e029a697350af8272daafcf6a0d011",
+      "dimensions": [
+        420,
+        290
+      ],
+      "usedBy": [
+        "garden-seven-q2"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "da2877ef2babeda741dbb9c6573c97807082fff18950523cf67da15657369e87",
+      "sources": []
+    },
+    "radical-choice-c": {
+      "file": "assets/radical-choice-c.png",
+      "sha256": "b89bb60fbf2ea6b82c285006bca70685d3e1c09056fcb80419148b78beba0d7b",
+      "dimensions": [
+        420,
+        290
+      ],
+      "usedBy": [
+        "garden-seven-q2"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "da2877ef2babeda741dbb9c6573c97807082fff18950523cf67da15657369e87",
+      "sources": []
+    },
+    "stroke-choice-a": {
+      "file": "assets/stroke-choice-a.png",
+      "sha256": "f99e8c0d4364f6ce005971b9b49cce71e20dca06beec0b29084aff63f73c95e9",
+      "dimensions": [
+        420,
+        280
+      ],
+      "usedBy": [
+        "garden-seven-q3"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "da2877ef2babeda741dbb9c6573c97807082fff18950523cf67da15657369e87",
+      "sources": []
+    },
+    "stroke-choice-b": {
+      "file": "assets/stroke-choice-b.png",
+      "sha256": "2fab5eb349b18513b29ecd3ce9ea440485950562a7d87294917b18bbec26bc42",
+      "dimensions": [
+        420,
+        280
+      ],
+      "usedBy": [
+        "garden-seven-q3"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "da2877ef2babeda741dbb9c6573c97807082fff18950523cf67da15657369e87",
+      "sources": []
+    },
+    "stroke-choice-c": {
+      "file": "assets/stroke-choice-c.png",
+      "sha256": "137dce186eef798d6303269e054932f5d935fbbe86ba15f0a9110ca871ec82ce",
+      "dimensions": [
+        420,
+        280
+      ],
+      "usedBy": [
+        "garden-seven-q3"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "da2877ef2babeda741dbb9c6573c97807082fff18950523cf67da15657369e87",
+      "sources": []
+    },
+    "direction-choice-a": {
+      "file": "assets/direction-choice-a.png",
+      "sha256": "e6660fb06fb68c968b661485d052a4dd436f07f282f1822a727f72a6d480bf1c",
+      "dimensions": [
+        440,
+        334
+      ],
+      "usedBy": [
+        "garden-seven-q4"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "da2877ef2babeda741dbb9c6573c97807082fff18950523cf67da15657369e87",
+      "sources": [
+        "compass-person",
+        "star-pin"
+      ]
+    },
+    "direction-choice-b": {
+      "file": "assets/direction-choice-b.png",
+      "sha256": "f14fea04f6465e37f1c77f5a4ac007ebe7e0651aec80aa285065e3fdd0bbf8bb",
+      "dimensions": [
+        440,
+        334
+      ],
+      "usedBy": [
+        "garden-seven-q4"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "da2877ef2babeda741dbb9c6573c97807082fff18950523cf67da15657369e87",
+      "sources": [
+        "compass-person",
+        "star-pin"
+      ]
+    },
+    "direction-choice-c": {
+      "file": "assets/direction-choice-c.png",
+      "sha256": "a0e19a61e515ecc91e31178e7bc52b271654501e08e33d18edd7596f3f57c4d9",
+      "dimensions": [
+        440,
+        334
+      ],
+      "usedBy": [
+        "garden-seven-q4"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "da2877ef2babeda741dbb9c6573c97807082fff18950523cf67da15657369e87",
+      "sources": [
+        "compass-person",
+        "star-pin"
+      ]
+    },
+    "start-choice-a": {
+      "file": "assets/start-choice-a.png",
+      "sha256": "3a54590ad64a21530eac3f30f06b8cef6e1c6c54f21e17863fba08639df8204d",
+      "dimensions": [
+        492,
+        321
+      ],
+      "usedBy": [
+        "garden-seven-q5"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "atlas": "quiz",
+      "cell": [
+        2,
+        1
+      ],
+      "processing": "独立格四边各向内裁 10 像素"
+    },
+    "start-choice-b": {
+      "file": "assets/start-choice-b.png",
+      "sha256": "c03c41204e77ec7f8dc0726189b8b6eafad4a1d01278d9785602f568c5560e7a",
+      "dimensions": [
+        492,
+        321
+      ],
+      "usedBy": [
+        "garden-seven-q5"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "atlas": "quiz",
+      "cell": [
+        2,
+        2
+      ],
+      "processing": "独立格四边各向内裁 10 像素"
+    },
+    "start-choice-c": {
+      "file": "assets/start-choice-c.png",
+      "sha256": "19900ed8fc866628aad3219cb14b27d7dd5588f95601b804e2df187a5439e326",
+      "dimensions": [
+        492,
+        321
+      ],
+      "usedBy": [
+        "garden-seven-q5"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "atlas": "quiz",
+      "cell": [
+        2,
+        3
+      ],
+      "processing": "独立格四边各向内裁 10 像素"
+    },
+    "far-choice-a": {
+      "file": "assets/far-choice-a.png",
+      "sha256": "68b444943a0c6f44017390480558db0837240e78e97e62c07f8688cfcb87baa9",
+      "dimensions": [
+        492,
+        322
+      ],
+      "usedBy": [
+        "garden-seven-q6"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "da2877ef2babeda741dbb9c6573c97807082fff18950523cf67da15657369e87",
+      "sources": [
+        "rehearsal"
+      ]
+    },
+    "far-choice-b": {
+      "file": "assets/far-choice-b.png",
+      "sha256": "efbf915f2a641939af872dfc8ab5f264aa2c8e26e63571a89154cc23a252984f",
+      "dimensions": [
+        492,
+        322
+      ],
+      "usedBy": [
+        "garden-seven-q6"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "da2877ef2babeda741dbb9c6573c97807082fff18950523cf67da15657369e87",
+      "sources": [
+        "rehearsal"
+      ]
+    },
+    "far-choice-c": {
+      "file": "assets/far-choice-c.png",
+      "sha256": "87e3c6fd340ac8038f26882955804d4be5137c7bcd8337b5bd35bf3b9021488c",
+      "dimensions": [
+        492,
+        322
+      ],
+      "usedBy": [
+        "garden-seven-q6"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "da2877ef2babeda741dbb9c6573c97807082fff18950523cf67da15657369e87",
+      "sources": [
+        "rehearsal"
+      ]
+    },
+    "near-choice-a": {
+      "file": "assets/near-choice-a.png",
+      "sha256": "97e1a1de323d36b98374cb5f4eaa80c46e752ac01453948a6177475933e8b65d",
+      "dimensions": [
+        492,
+        322
+      ],
+      "usedBy": [
+        "garden-seven-q7"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "da2877ef2babeda741dbb9c6573c97807082fff18950523cf67da15657369e87",
+      "sources": [
+        "exhibit"
+      ]
+    },
+    "near-choice-b": {
+      "file": "assets/near-choice-b.png",
+      "sha256": "7296d17b9ea7f36f34c9978d074295f9e1110bef559e0e2bf5515d4c352ecf0f",
+      "dimensions": [
+        492,
+        322
+      ],
+      "usedBy": [
+        "garden-seven-q7"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "da2877ef2babeda741dbb9c6573c97807082fff18950523cf67da15657369e87",
+      "sources": [
+        "exhibit"
+      ]
+    },
+    "near-choice-c": {
+      "file": "assets/near-choice-c.png",
+      "sha256": "9e4f91ff971c8381ed042d4633fea9cd56cc3fbc4ef50717de3fe83c7470b047",
+      "dimensions": [
+        492,
+        322
+      ],
+      "usedBy": [
+        "garden-seven-q7"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "da2877ef2babeda741dbb9c6573c97807082fff18950523cf67da15657369e87",
+      "sources": [
+        "exhibit"
+      ]
+    },
+    "moon-choice-a": {
+      "file": "assets/moon-choice-a.png",
+      "sha256": "39be09992ee9d76286dcbb5dae17ff7bc2afec6b55c7d57bcacf4916bd84c185",
+      "dimensions": [
+        492,
+        322
+      ],
+      "usedBy": [
+        "garden-seven-q8"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "da2877ef2babeda741dbb9c6573c97807082fff18950523cf67da15657369e87",
+      "sources": [
+        "moon-details"
+      ]
+    },
+    "moon-choice-b": {
+      "file": "assets/moon-choice-b.png",
+      "sha256": "ed901b486794e5707200ec82f6cc425624256d70c5c6997423f9c282ad111f53",
+      "dimensions": [
+        492,
+        322
+      ],
+      "usedBy": [
+        "garden-seven-q8"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "da2877ef2babeda741dbb9c6573c97807082fff18950523cf67da15657369e87",
+      "sources": [
+        "moon-details"
+      ]
+    },
+    "moon-choice-c": {
+      "file": "assets/moon-choice-c.png",
+      "sha256": "75af2ff838d5919dd43ec042220dd7623d97268c44043573f68398a735216015",
+      "dimensions": [
+        492,
+        322
+      ],
+      "usedBy": [
+        "garden-seven-q8"
+      ],
+      "kind": "semantic-diagram",
+      "generator": "diagrams.py",
+      "generatorSha256": "da2877ef2babeda741dbb9c6573c97807082fff18950523cf67da15657369e87",
+      "sources": [
+        "moon-details"
+      ]
+    },
+    "nai": {
+      "kind": "courseware-kit-glyph",
+      "source": "lesson.json",
+      "sourceSha256": "cef7c53141837210d8df33749f6f3d3ff27e8e5a192f7a007b9d603f20045a60",
+      "glyph": "奶",
+      "usedBy": [
+        "sort-character-cards"
+      ]
+    },
+    "ma": {
+      "kind": "courseware-kit-glyph",
+      "source": "lesson.json",
+      "sourceSha256": "cef7c53141837210d8df33749f6f3d3ff27e8e5a192f7a007b9d603f20045a60",
+      "glyph": "妈",
+      "usedBy": [
+        "sort-character-cards"
+      ]
+    },
+    "jie": {
+      "kind": "courseware-kit-glyph",
+      "source": "lesson.json",
+      "sourceSha256": "cef7c53141837210d8df33749f6f3d3ff27e8e5a192f7a007b9d603f20045a60",
+      "glyph": "姐",
+      "usedBy": [
+        "sort-character-cards"
+      ]
+    },
+    "mei": {
+      "kind": "courseware-kit-glyph",
+      "source": "lesson.json",
+      "sourceSha256": "cef7c53141837210d8df33749f6f3d3ff27e8e5a192f7a007b9d603f20045a60",
+      "glyph": "妹",
+      "usedBy": [
+        "sort-character-cards"
+      ]
+    },
+    "ming": {
+      "kind": "courseware-kit-glyph",
+      "source": "lesson.json",
+      "sourceSha256": "cef7c53141837210d8df33749f6f3d3ff27e8e5a192f7a007b9d603f20045a60",
+      "glyph": "明",
+      "usedBy": [
+        "sort-character-cards"
+      ]
+    },
+    "wan": {
+      "kind": "courseware-kit-glyph",
+      "source": "lesson.json",
+      "sourceSha256": "cef7c53141837210d8df33749f6f3d3ff27e8e5a192f7a007b9d603f20045a60",
+      "glyph": "晚",
+      "usedBy": [
+        "sort-character-cards"
+      ]
+    },
+    "zuo": {
+      "kind": "courseware-kit-glyph",
+      "source": "lesson.json",
+      "sourceSha256": "cef7c53141837210d8df33749f6f3d3ff27e8e5a192f7a007b9d603f20045a60",
+      "glyph": "昨",
+      "usedBy": [
+        "sort-character-cards"
+      ]
+    },
+    "chun": {
+      "kind": "courseware-kit-glyph",
+      "source": "lesson.json",
+      "sourceSha256": "cef7c53141837210d8df33749f6f3d3ff27e8e5a192f7a007b9d603f20045a60",
+      "glyph": "春",
+      "usedBy": [
+        "sort-character-cards"
+      ]
+    },
+    "woman": {
+      "kind": "courseware-kit-glyph",
+      "source": "lesson.json",
+      "sourceSha256": "cef7c53141837210d8df33749f6f3d3ff27e8e5a192f7a007b9d603f20045a60",
+      "glyph": "女",
+      "usedBy": [
+        "sort-character-cards"
+      ]
+    },
+    "sun": {
+      "kind": "courseware-kit-glyph",
+      "source": "lesson.json",
+      "sourceSha256": "cef7c53141837210d8df33749f6f3d3ff27e8e5a192f7a007b9d603f20045a60",
+      "glyph": "日",
+      "usedBy": [
+        "sort-character-cards"
+      ]
+    }
+  }
+}

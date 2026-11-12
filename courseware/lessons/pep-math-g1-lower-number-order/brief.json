@@ -1,0 +1,211 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "数的顺序",
+  "binding": {
+    "editionId": "pep-math-g1-lower-2022-standard",
+    "revisionId": "directory-6205d2037284e91f10b25edd",
+    "nodeId": "2f7b0931-670f-4664-af31-876f2693654e",
+    "unitId": "acfb0386-a55f-4542-9d5d-619a3e2d9023"
+  },
+  "scenario": "小小展馆给百张门票分放进十层检票架。几张票被风吹落，老师和孩子从相邻的位置推断每张票原先放在哪里。",
+  "goals": [
+    "把1到100按十格一行排入表，能按前后顺序续数，并指出换行的起点。",
+    "用横行相邻差1、竖列相邻差10解释百数表里某格的位置，观察并验证有效斜格的关系。",
+    "按十位、个位和相同两位数字找格，能解释整十、第一行和100的边界表现。",
+    "从给定的格子推断百数表的局部空格，并能用相邻两条路径交叉核对。"
+  ],
+  "goalSources": [
+    {
+      "skill": "hundred-chart",
+      "target": "把1到100按十格一行排入表，能按前后顺序续数，并指出换行的起点。",
+      "source": "印32例4、印35练一练1及3前半；课件2～7"
+    },
+    {
+      "skill": "row-column-diagonal",
+      "target": "用横行相邻差1、竖列相邻差10解释百数表里某格的位置，观察并验证有效斜格的关系。",
+      "source": "印32；课件8～17；教学设计2"
+    },
+    {
+      "skill": "place-digit-pattern",
+      "target": "按十位、个位和相同两位数字找格，能解释整十、第一行和100的边界表现。",
+      "source": "印32；课件8～17及24～25；教学设计2～3"
+    },
+    {
+      "skill": "infer-missing-cells",
+      "target": "从给定的格子推断百数表的局部空格，并能用相邻两条路径交叉核对。",
+      "source": "印32两道做一做、印36练一练6；课件18～23；任务单2"
+    }
+  ],
+  "pageSequence": [
+    {
+      "key": "rack-of-hundred-tickets",
+      "kind": "teaching",
+      "plan": "老师示范散开的门票怎样按号顺排。十张一层，放好第一层，把第二层开头移到下一行最左格。"
+    },
+    {
+      "key": "right-one-per-slot",
+      "kind": "teaching",
+      "plan": "从票架取出一行放大，62右边紧接63；用实图和带箭头的相邻格推到下一张。"
+    },
+    {
+      "key": "next-row-start",
+      "kind": "teaching",
+      "plan": "沿路径走49、50再回到下行左边51。全表展示末格100到此为止。"
+    },
+    {
+      "key": "counting-platforms",
+      "kind": "game",
+      "plan": "用左右和跳跃依次数相邻门票，从短的顺数到跨行，再到倒数。方向符号和朗读先说明走前一张或后一张。"
+    },
+    {
+      "key": "down-by-one-row",
+      "kind": "teaching",
+      "plan": "在同一竖列给同一批门票增加一整条十格作对照，观察27到37、37到47各多10，最右列以个位0另验。"
+    },
+    {
+      "key": "mark-a-digit-pattern",
+      "kind": "teaching",
+      "plan": "用横划、圆点和角标三个可叠加标记，找十位是4、个位是4、两位数字相同的两位数，核查40和44。第一行和100作为边界另讲。"
+    },
+    {
+      "key": "two-ways-down-diagonally",
+      "kind": "teaching",
+      "plan": "用图形箭头分两步，从65向下再向左得74，向下再向右得76。逐步说明先多10，再少1或多1，斜边不到下行就停止。"
+    },
+    {
+      "key": "match-the-next-floor",
+      "kind": "game",
+      "plan": "实际落牌到相邻空位，找当前号正上或正下同列的号。目标符号常驻，上下方向由录音先给，得分取决于本级确定的邻格关系。"
+    },
+    {
+      "key": "rebuild-a-chart-fragment",
+      "kind": "teaching",
+      "plan": "教师以左上55恢复右下66。分别先横再竖、先竖再横，两条路交叉核对。"
+    },
+    {
+      "key": "take-turns-making-fragments",
+      "kind": "teaching",
+      "plan": "出一个全新局部票架，用3～5个相邻格请伙伴补。再短看跳一个数和一、二、三位票号的可见规律。"
+    },
+    {
+      "key": "picture-quiz",
+      "kind": "quiz",
+      "plan": "六道新票柜以外的图情境，给不同示例，听题后凭数字图、方向和位置选择。"
+    },
+    {
+      "key": "explain-the-number-routes",
+      "kind": "teaching",
+      "plan": "回到完整票架，老师总结横行、竖列、换行与斜格，请孩子用实画的几个格给家人出题。"
+    }
+  ],
+  "games": [
+    {
+      "page": "counting-platforms",
+      "template": "platformHop",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.platformHop",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "ordered_route",
+      "selection": "把数序作为有效落脚规则。使用 startLabel 和常驻方向提示，平台上是目标数字。route 只接受该方向连续的数，安排可误落的别号平台和实际间距。不能把顺序暗示成永远向右；通过录音和符号确定数序方向，关卡路线分别试飞。",
+      "levels": [
+        "起号16，依次落17、18、19；短路线并加一块可落的别号。",
+        "起号58，依次59、60、61；保留从整十转到下一行首格的对照讲解，落脚有高度变化。",
+        "起号88，角色从右往左依次落87、86、85、84；按真实反向平台倒数。"
+      ],
+      "demo": "老师指目标方向、起跳角色和第一张正确票，实际跳并落一次，听反馈后复位。",
+      "teacherAnchors": [
+        "game-goal",
+        "game-player",
+        "game-target"
+      ]
+    },
+    {
+      "page": "match-the-next-floor",
+      "template": "fallingTiles",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.fallingTiles",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "pair_match",
+      "selection": "落牌是找到同一列的相邻号，关卡以固定的百数表竖格箭头作 symbol。方向是关系提示，碰撞位置用游戏原横向相邻空格；教师在画面旁用竖列小图说明两者。pairs 按[落牌ID,底牌ID]方向列出，数值差固定10，需同时保留相同个位。底行严格6格。",
+      "levels": [
+        "向下一层，底行 [null,24,null,null,26,null]，pieces [34]，26是真实错邻干扰，慢落。",
+        "向上一层，底行 [null,63,null,null,78,null]，pieces [53,68]。",
+        "向下一层，底行 [null,32,null,46,null,57]，pieces [42,56,67]，三次不同落点并适度缩短间隔。"
+      ],
+      "demo": "指出规则箭头、下落牌和底部候选，移动一次并落到目标旁，显示匹配结果后复位。",
+      "teacherAnchors": [
+        "game-goal",
+        "game-player",
+        "game-target"
+      ]
+    }
+  ],
+  "quiz": [
+    {
+      "id": "find-the-horizontal-gap",
+      "skill": "同一行向右多1",
+      "prompt": "十二和十四之间，空格放哪张票？",
+      "answer": "13的号牌。",
+      "position": 3,
+      "rationale": "12向右一格多1，14向左一格少1，都指向13。"
+    },
+    {
+      "id": "fill-the-next-shelf",
+      "skill": "同一列向下多10",
+      "prompt": "同一竖列，三十八下方放哪张？",
+      "answer": "48的号牌。",
+      "position": 1,
+      "rationale": "同列向下多10，个位还是8。"
+    },
+    {
+      "id": "continue-at-row-start",
+      "skill": "数序跨行",
+      "prompt": "这一行排到三十。下一张放在哪里？",
+      "answer": "31放到下一行的第一格。",
+      "position": 2,
+      "rationale": "30之后是31，上一行满了，要回到下一行左边。"
+    },
+    {
+      "id": "spot-the-nine-in-tens",
+      "skill": "十位相同含整十位置",
+      "prompt": "哪张图标对了十位是九的号？",
+      "answer": "上行末格90和下一行最前面九格一起圈住的座位图。",
+      "position": 3,
+      "rationale": "90的十位也是9，91到99仍是9，100的十位是0。"
+    },
+    {
+      "id": "diagonal-left-down",
+      "skill": "斜向下左格差9",
+      "prompt": "从七十三先往下，再往左，停在哪？",
+      "answer": "82的站位照片。",
+      "position": 2,
+      "rationale": "向下从73到83，向左少1到82。"
+    },
+    {
+      "id": "check-the-ticket-cross",
+      "skill": "局部表双向核对",
+      "prompt": "空格上面是十五，右边二十六。填几？",
+      "answer": "25的号牌。",
+      "position": 1,
+      "rationale": "15向下加10是25，26向左少1也是25。"
+    }
+  ],
+  "afterClass": {
+    "familyTask": "与成人画一个百数表，遮住3～5个相邻格。孩子说清横、竖和换行规律，与家人轮流猜并核对；也可挑一条斜线路径检查。",
+    "weeklyQuestionSource": [
+      "横行逐格数与换行",
+      "竖列差10",
+      "数位标记与整十",
+      "斜线两步",
+      "局部空格交叉核对"
+    ],
+    "evidence": "课堂记录落脚、配对及图题；家庭画表和复述由成人观察，进展待观察。"
+  },
+  "artAndLanguage": "所有票号、格子、行列方向、角标、连线和图题均用代码精确绘制。游戏场景和独立角色图等磁盘恢复后再做。数字属于本课目标，计划使用箭头、数字、图形和口令支持遮字游玩。",
+  "authoring": {
+    "mode": "direct",
+    "model": "gpt-6.1-sol",
+    "bookAndCompanionScope": "印32整课，印35～36相关练习，印33～34比较另课边界，一课时34页官方配套。"
+  },
+  "officialNotesSha256": "5a900997b77a165b48d0cfe08db10e088c7e831e5e50cc68d122f8af007c0fdd"
+}

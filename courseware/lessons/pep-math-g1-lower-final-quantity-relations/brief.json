@@ -1,0 +1,84 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "数量关系",
+  "binding": {
+    "editionId": "pep-math-g1-lower-2022-standard",
+    "revisionId": "directory-6205d2037284e91f10b25edd",
+    "unitId": "3118eaa6-4e44-470a-b7ec-dab2ae9b29b5",
+    "nodeId": "609b84ce-34f1-42d6-9b70-872f882efdd3"
+  },
+  "scenario": "校园开放日的材料台需要核对两桌的物件、给两组备货，再计算展摊规定的优惠。孩子用合并图和对齐图找出所问，算完回到原图查一遍。",
+  "goals": [
+    "能在简单生活图中找出已知和所问，借图选择运算并用原有条件回查。",
+    "能用对齐图分辨较大量、较小量和差量，并根据所求选择加法或减法。",
+    "能从第二问倒查缺少的条件，先求出中间的实际量，再用于合计。",
+    "能先算两件商品的原价合计，再依据题中所给门槛判断是否减免并算出实际支出。"
+  ],
+  "goalEvidence": [
+    {"skill":"read-analyze-check","source":"印84数量关系、课件2至11及25、教案1至4、任务单1"},
+    {"skill":"find-the-unknown-in-a-comparison","source":"印83数量关系图、印86第2题、课件8至16、教案3至5、任务单1"},
+    {"skill":"use-the-first-answer","source":"印89第13题、课件17至19、教案5至6、任务单1"},
+    {"skill":"check-a-spending-threshold","source":"印88第9题、课件20至24、教案6至7、任务单2"}
+  ],
+  "pageSequence": [
+    {"key":"spot-what-we-need","kind":"teaching","title":"图里给了什么，要问什么","plan":"左台有11条纸带，右台有8条，先圈住两组再合并得19条。换到一盒31枚印章分出7枚，逐项点亮原有量、分出量和剩下量得24。教师带着孩子分别回查原图。"},
+    {"key":"same-difference-different-unknown","kind":"teaching","title":"一张对齐图能找三个量","plan":"两排纸扇为32和14，逐一对齐后差18。依次把差、较大一排、较小一排设为未知量，分别演示32减14、14加18、32减18。每次按原图回查相同部分和差段。"},
+    {"key":"sort-the-comparison-cards","kind":"interactive","title":"把问题图推到相应的托盘","plan":"带问号的对齐图标明要找较大一排、较小一排或差段。玩家要找数学关系对应的托盘并推动图卡到位。"},
+    {"key":"what-do-we-need-first","kind":"teaching","title":"第二问还缺哪一个量","plan":"蓝徽章有19个，比黄徽章少7个。先从两色合计找缺少的黄徽章数，画出黄排并得26个，再把26送入合计图得45个。用26减19和45减26分别回查。"},
+    {"key":"apply-the-stated-rule","kind":"teaching","title":"先算合计，再判断够不够","plan":"模拟展摊满40减6。先用18和22合成40，指出恰好达到也能减，实付34。再用23与24合成47，减6得41。最后用17与21合成38，仍按原价。只按题图这一条规则计算。"},
+    {"key":"deliver-the-needed-number","kind":"interactive","title":"把第一步的结果送到下一站","plan":"先判断哪一个量能作为下一步条件，取正确的数牌袋，再操控小车跨过移动道具到相应的总数或实付站。"},
+    {"key":"picture-check-one","kind":"quiz","title":"找所问，分辨比较图","plan":"老师预录逐题读小检查1至3。看合并框和对齐图，找总体、差量或实际数量。"},
+    {"key":"picture-check-two","kind":"quiz","title":"用第一步的量，再回查","plan":"老师预录逐题读小检查4至6。用第一问结果、题设优惠和逆向合并图独立作答。"},
+    {"key":"share-a-life-problem","kind":"teaching","title":"自己提个问题，画图说清楚","plan":"用材料台另一幅图示范把已知量、问号、算式和回查分步摆好。请孩子和家人从一件生活事物里找两个数量并提出一个问题。"}
+  ],
+  "games": [
+    {
+      "page": "sort-the-comparison-cards",
+      "template": "sortingDepot",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.sortingDepot",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "classification",
+      "reason": "卡上问号所在的部位决定它能进哪种托盘。较长排、较短排和差段用一致的图示突出，换颜色或位置后仍按关系判断。需要计划站位和推送路径。",
+      "levels": [
+        "同一情境的两张图，一张从16和9问差，另一张从9和多7问较大量。分别推到差段和长排托盘。场地开阔。",
+        "从30和18求差、从18与多12求较大一排、从30与少12求较小一排。三种托盘各一张，增加转弯。",
+        "用其他数量关系做四张图卡，两张问较小一排，另两张分别问较大一排和差。更换图卡物件与托盘位置，绕开柱子并调整推送顺序。"
+      ],
+      "demo": "高亮问号所指部位、搬运角色与目标托盘，实际送入一张图卡后即停。清空示范进度再用预录语音交接。"
+    },
+    {
+      "page": "deliver-the-needed-number",
+      "template": "listenDelivery",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.listenDelivery",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "listen_pick_deliver",
+      "reason": "取货按第一步算出的实际量或原价合计验收。送达必须继续用这个量得到第二问结果。孩子还需要选路线和时机穿过移动障碍。",
+      "levels": [
+        "一盒12个卡扣，另一盒少4个。先取8的图袋，再送到合计20的站点。单车道缓慢移动。",
+        "两单分别为21个且另一盒多5个、已知18个且比另一盒少6个。先取26和24，依次送到47和42的合计站。增加道路及方向变化。",
+        "模拟摊位满30减4。原价16加14先取30，送到实付26。原价11加12先取23，送到实付23。干扰站包含无条件减4的数。道路更紧凑。"
+      ],
+      "demo": "依次点亮第一步的已知图、车和对应图袋，实际取袋一次即停。复位清空货物，分别预录取袋和送达交接。"
+    }
+  ],
+  "quizPlan": [
+    {"skill":"read-analyze-check","task":"一盘13枚贴纸，另一盘9枚。老师问一共有几枚，选用来分析这个问题的图。","pictureOptions":["两排一一对齐、只圈多出来的部分","把13和9框在一个合计括号里","只圈有9枚的那一盘"],"correctPosition":2,"rationale":"所问是两盘合计，两组实际数量都应放到同一个合计框内。"},
+    {"skill":"find-the-unknown-in-a-comparison","task":"一排24块彩砖，另一排15块。长排多出几块？","pictureOptions":["框住相同的15块","框住两排合并的39块","圈出配对后多出的9块"],"correctPosition":3,"rationale":"两排对齐后去掉相同的15块，24减15得9。"},
+    {"skill":"find-the-unknown-in-a-comparison","task":"甲盒37枚种植牌，乙盒比甲盒少9枚。选乙盒的数量图。","pictureOptions":["两根十条和8个散块","四根十条和6个散块","9个散块"],"correctPosition":1,"rationale":"乙盒较少，37减9得28。9是差量。"},
+    {"skill":"use-the-first-answer","task":"第一卷纸绳27米，第二卷多8米。先求第二卷，再选两卷合计的长度图。","pictureOptions":["3个十米段和5个一米段","6个十米段和2个一米段","3个十米段和6个一米段"],"correctPosition":2,"rationale":"先求第二卷27加8得35米，再将27与35合并得62米。"},
+    {"skill":"check-a-spending-threshold","task":"模拟展摊满35减5。两件物品标价21元和16元，选实际付款图。","pictureOptions":["37元原价图","35元门槛图","32元付款图"],"correctPosition":3,"rationale":"21加16得37，达到35元门槛，37减5得32元。"},
+    {"skill":"read-analyze-check","task":"长排有31个，短排有12个。小华用31减12求出差19。哪张图能回查这个差？","pictureOptions":["把短排12和差段19合成长排31","把两排31和12都合进同一个总框","把长排31和差段19合到一起"],"correctPosition":1,"rationale":"短排和差段合起来应等于长排，12加19正好回到31。"}
+  ],
+  "presentation": "使用原创校园材料台和模拟展摊插图。合并框、对齐条、差段和传递箭头用准确的数学图示。每一屏突出当前所求，老师预录读题、操作、反馈及重听。遮住非目标文字仍可看图和作答。",
+  "evidence": {
+    "inClass": "记录孩子选择的图、完成的分类和取送动作以及图题结果。",
+    "realWorld": "口头说理、纸笔建模和真实生活应用需要现场观察，报告中记待观察。"
+  },
+  "afterClass": {
+    "familyTask":"和家人找两组同类小物件。先问相差多少，再换一种已知信息，问另一组实际有几件。用图标出所问并讲给家人听。口头与纸笔表现待观察。",
+    "weeklyQuestionSource":["从图找条件和问题并回查","同一相差关系的三类未知量","用第一问结果解第二问","根据原价和门槛求实付"],
+    "source":"印84数量关系、印86第2题、印88第9题、印89第13题、教案7、课件25至26、课练1"
+  }
+}

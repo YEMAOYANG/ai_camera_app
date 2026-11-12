@@ -1,0 +1,920 @@
+{
+  "schemaVersion": "mira.courseware.asset-provenance.v1",
+  "lesson": "pep-math-g1-upper-five-four-three-two-plus",
+  "reviewedAt": "2026-11-10T16:38:44.174471+08:00",
+  "status": "prevoice_thumbnail_and_count_checks_passed",
+  "interactivePageBudget": {
+    "swap-pair-play": 1638484,
+    "sort-by-total": 2178566
+  },
+  "missing": [],
+  "assets": [
+    {
+      "assetKey": "workshop-stage",
+      "path": "assets/workshop-stage.png",
+      "sha256": "89b2e206d4afe923b30c3c8dca83d8454fe992ee7a06adb544e079169dd9025d",
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/workshop-stage.png",
+      "generatedSourceSha256": "5fdcf123c486b0b751436c4e21f8afe4390d737726bb3ea092772174f834d13b",
+      "prompt": "Create one original landscape 16:9 stage illustration for a first-grade math lesson about a community kite-making workshop. Full-bleed matte gouache, fine paper grain, clean cut-paper contours, soft pine green, warm cream and tiny apricot and persimmon accents. The center 65 percent of the picture is quiet and relatively dark desaturated pine green with almost no detail, like a large empty green cutting mat viewed straight on, so foreground math diagrams and game elements can be overlaid. At the extreme upper and side margins, show a corner of an inviting sunlit Chinese neighborhood kite craft studio: an empty bamboo shelf, a single finished diamond-shaped kite with a long plain ribbon hung near the upper left, a spool by the upper right, and warm wood strips at both side edges. No people, no text, numbers, labels, watermarks, frames or panels. No counting objects in the central area. Keep all essential subjects away from edges and leave the bottom open for controls. Gentle, precise children's picture-book illustration, directly usable as a 1280x720 game background and textbook cover, no obvious digital gradients, no 3D.",
+      "promptSha256": "126a04a4b3792ead20bc0e50e45741fb610e691c73ad65fe07283d11241d2783",
+      "derivedBy": "sips -Z 1280, original 16:9 preserved",
+      "usedBy": [
+        "swap-pair-play",
+        "sort-by-total"
+      ],
+      "visualReview": "contact_sheet_subject_color_edges_passed_in_page_pending"
+    },
+    {
+      "assetKey": "ribbon-orange",
+      "path": "assets/ribbon-orange.png",
+      "sha256": "c2ef789297eb809fa7916d31aac9f499e080092c18230d38db7ac3b3819c3661",
+      "width": 512,
+      "height": 512,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/kite-cutouts.png",
+      "generatedSourceSha256": "0347c2411e4c6307a68209d85af9e75fd3622db25ad751a42321efea279e9689",
+      "prompt": "Create one atlas containing separate original picture assets for a first-grade lesson.\nUse 2 equal rows and 3 equal columns, with one fully visible object centered in each occupied cell. Keep wide empty margins around every object and between cells. No crossing cell boundaries, touching subjects, dividers, frames, text, letters, numbers, labels, logos or watermarks. Leave unused cells empty. Use true transparent alpha for the background, including the margins. Do not draw a checkerboard.\n\nKeep a consistent matte gouache and fine paper grain, with clean cut-paper contours. Use deep pine green, warm cream, apricot and persimmon as accents when appropriate. Keep the objects immediately recognizable and retain the real or lesson-specific colors and details in the descriptions. An object used for counting appears exactly once in its own cell.\n\nCell positions, in reading order:\nRow 1, column 1: One single short persimmon-orange rectangular paper kite tail tab, shape like a neat small rectangle with one clipped corner; face up, no folds, strong solid color, no strings. Use a very compact horizontal silhouette so its silhouette reads as exactly one piece when repeated at tiny size.\nRow 1, column 2: One single short turquoise-green rectangular paper kite tail tab, the same horizontal dimensions and clipped-corner shape as the orange paper tab; face up, no folds, no strings. Strong solid contrasting mint turquoise tone, reads as exactly one piece when repeated.\nRow 1, column 3: One small friendly mustard-yellow wooden wheeled craft trolley, three-quarter top-down view, chunky toy wheels, pale green empty tray, no person, facing right, easy to recognize and navigate with as a small game token.\nRow 2, column 1: The same mustard-yellow empty wooden craft trolley facing right, both chunky wheels turned a little as if rolling; same size, colors and three-quarter top-down viewing angle as above. No speed lines.\nRow 2, column 2: One tiny bright apricot diamond kite with a short pine green tail and one cream leaf motif, inset into a thick cream cut-paper sticker silhouette; no text, no shadow outside the sticker.\nRow 2, column 3: One single finished cream diamond-shaped bamboo kite with orange flower, pine green leaf decorations and one gently curved persimmon tail, compact square overall silhouette. No frame and no other objects. Children's gouache craft illustration.\n",
+      "promptSha256": "1677bb1b1621786bf6e10dbe4861b4c027eb8d2733894faa5197daa2be334c62",
+      "sourceCrop": [
+        0,
+        0,
+        512,
+        512
+      ],
+      "usedBy": [
+        "t3-9",
+        "t5-8",
+        "t4-7",
+        "t5-7",
+        "t4-8",
+        "t5-9",
+        "t3-8",
+        "t4-9",
+        "t9-3",
+        "t9-3r",
+        "t8-5r",
+        "t7-4r",
+        "t7-5r",
+        "t8-4r",
+        "t9-5r",
+        "t6-6r",
+        "station-11",
+        "station-12",
+        "station-13",
+        "station-14",
+        "teach-47-before",
+        "teach-47-after",
+        "teach-83",
+        "teach-38",
+        "teach-37",
+        "teach-38-more",
+        "teach-38-move",
+        "teach-38-shift",
+        "teach-56",
+        "teach-65",
+        "q-fill-start",
+        "q-fill-a",
+        "q-fill-b",
+        "q-fill-c",
+        "q-flip-start",
+        "q-flip-a",
+        "q-flip-b",
+        "q-flip-c",
+        "q-known-start",
+        "q-known-a",
+        "q-known-b",
+        "q-known-c",
+        "q-add-start",
+        "q-add-a",
+        "q-add-b",
+        "q-add-c",
+        "q-move-start",
+        "q-move-a",
+        "q-move-b",
+        "q-move-c",
+        "q-fast-start",
+        "q-fast-a",
+        "q-fast-b",
+        "q-fast-c"
+      ],
+      "visualReview": "contact_sheet_subject_color_edges_passed_in_page_pending"
+    },
+    {
+      "assetKey": "ribbon-green",
+      "path": "assets/ribbon-green.png",
+      "sha256": "5da994cfd33ddc9168dd19584ba2f12e72dcebb5aeb4f8cb7d2af15ae69aa846",
+      "width": 512,
+      "height": 512,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/kite-cutouts.png",
+      "generatedSourceSha256": "0347c2411e4c6307a68209d85af9e75fd3622db25ad751a42321efea279e9689",
+      "prompt": "Create one atlas containing separate original picture assets for a first-grade lesson.\nUse 2 equal rows and 3 equal columns, with one fully visible object centered in each occupied cell. Keep wide empty margins around every object and between cells. No crossing cell boundaries, touching subjects, dividers, frames, text, letters, numbers, labels, logos or watermarks. Leave unused cells empty. Use true transparent alpha for the background, including the margins. Do not draw a checkerboard.\n\nKeep a consistent matte gouache and fine paper grain, with clean cut-paper contours. Use deep pine green, warm cream, apricot and persimmon as accents when appropriate. Keep the objects immediately recognizable and retain the real or lesson-specific colors and details in the descriptions. An object used for counting appears exactly once in its own cell.\n\nCell positions, in reading order:\nRow 1, column 1: One single short persimmon-orange rectangular paper kite tail tab, shape like a neat small rectangle with one clipped corner; face up, no folds, strong solid color, no strings. Use a very compact horizontal silhouette so its silhouette reads as exactly one piece when repeated at tiny size.\nRow 1, column 2: One single short turquoise-green rectangular paper kite tail tab, the same horizontal dimensions and clipped-corner shape as the orange paper tab; face up, no folds, no strings. Strong solid contrasting mint turquoise tone, reads as exactly one piece when repeated.\nRow 1, column 3: One small friendly mustard-yellow wooden wheeled craft trolley, three-quarter top-down view, chunky toy wheels, pale green empty tray, no person, facing right, easy to recognize and navigate with as a small game token.\nRow 2, column 1: The same mustard-yellow empty wooden craft trolley facing right, both chunky wheels turned a little as if rolling; same size, colors and three-quarter top-down viewing angle as above. No speed lines.\nRow 2, column 2: One tiny bright apricot diamond kite with a short pine green tail and one cream leaf motif, inset into a thick cream cut-paper sticker silhouette; no text, no shadow outside the sticker.\nRow 2, column 3: One single finished cream diamond-shaped bamboo kite with orange flower, pine green leaf decorations and one gently curved persimmon tail, compact square overall silhouette. No frame and no other objects. Children's gouache craft illustration.\n",
+      "promptSha256": "1677bb1b1621786bf6e10dbe4861b4c027eb8d2733894faa5197daa2be334c62",
+      "sourceCrop": [
+        512,
+        0,
+        1024,
+        512
+      ],
+      "usedBy": [
+        "t3-9",
+        "t5-8",
+        "t4-7",
+        "t5-7",
+        "t4-8",
+        "t5-9",
+        "t3-8",
+        "t4-9",
+        "t9-3",
+        "t9-3r",
+        "t8-5r",
+        "t7-4r",
+        "t7-5r",
+        "t8-4r",
+        "t9-5r",
+        "t6-6r",
+        "station-11",
+        "station-12",
+        "station-13",
+        "station-14",
+        "teach-47-before",
+        "teach-47-after",
+        "teach-83",
+        "teach-38",
+        "teach-37",
+        "teach-38-more",
+        "teach-38-move",
+        "teach-38-shift",
+        "teach-56",
+        "teach-65",
+        "q-fill-start",
+        "q-fill-a",
+        "q-fill-b",
+        "q-fill-c",
+        "q-flip-start",
+        "q-flip-a",
+        "q-flip-b",
+        "q-flip-c",
+        "q-known-start",
+        "q-known-a",
+        "q-known-b",
+        "q-known-c",
+        "q-add-start",
+        "q-add-a",
+        "q-add-b",
+        "q-add-c",
+        "q-move-start",
+        "q-move-a",
+        "q-move-b",
+        "q-move-c",
+        "q-fast-start",
+        "q-fast-a",
+        "q-fast-b",
+        "q-fast-c"
+      ],
+      "visualReview": "contact_sheet_subject_color_edges_passed_in_page_pending"
+    },
+    {
+      "assetKey": "kite-cart",
+      "path": "assets/kite-cart.png",
+      "sha256": "cf70902adabf261f73aac6920e21a6018a6f9ccd9ab7efe120d2091921ee2474",
+      "width": 512,
+      "height": 512,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/kite-cutouts.png",
+      "generatedSourceSha256": "0347c2411e4c6307a68209d85af9e75fd3622db25ad751a42321efea279e9689",
+      "prompt": "Create one atlas containing separate original picture assets for a first-grade lesson.\nUse 2 equal rows and 3 equal columns, with one fully visible object centered in each occupied cell. Keep wide empty margins around every object and between cells. No crossing cell boundaries, touching subjects, dividers, frames, text, letters, numbers, labels, logos or watermarks. Leave unused cells empty. Use true transparent alpha for the background, including the margins. Do not draw a checkerboard.\n\nKeep a consistent matte gouache and fine paper grain, with clean cut-paper contours. Use deep pine green, warm cream, apricot and persimmon as accents when appropriate. Keep the objects immediately recognizable and retain the real or lesson-specific colors and details in the descriptions. An object used for counting appears exactly once in its own cell.\n\nCell positions, in reading order:\nRow 1, column 1: One single short persimmon-orange rectangular paper kite tail tab, shape like a neat small rectangle with one clipped corner; face up, no folds, strong solid color, no strings. Use a very compact horizontal silhouette so its silhouette reads as exactly one piece when repeated at tiny size.\nRow 1, column 2: One single short turquoise-green rectangular paper kite tail tab, the same horizontal dimensions and clipped-corner shape as the orange paper tab; face up, no folds, no strings. Strong solid contrasting mint turquoise tone, reads as exactly one piece when repeated.\nRow 1, column 3: One small friendly mustard-yellow wooden wheeled craft trolley, three-quarter top-down view, chunky toy wheels, pale green empty tray, no person, facing right, easy to recognize and navigate with as a small game token.\nRow 2, column 1: The same mustard-yellow empty wooden craft trolley facing right, both chunky wheels turned a little as if rolling; same size, colors and three-quarter top-down viewing angle as above. No speed lines.\nRow 2, column 2: One tiny bright apricot diamond kite with a short pine green tail and one cream leaf motif, inset into a thick cream cut-paper sticker silhouette; no text, no shadow outside the sticker.\nRow 2, column 3: One single finished cream diamond-shaped bamboo kite with orange flower, pine green leaf decorations and one gently curved persimmon tail, compact square overall silhouette. No frame and no other objects. Children's gouache craft illustration.\n",
+      "promptSha256": "1677bb1b1621786bf6e10dbe4861b4c027eb8d2733894faa5197daa2be334c62",
+      "sourceCrop": [
+        1024,
+        0,
+        1536,
+        512
+      ],
+      "usedBy": [
+        "sort-by-total"
+      ],
+      "visualReview": "contact_sheet_subject_color_edges_passed_in_page_pending"
+    },
+    {
+      "assetKey": "kite-cart-moving",
+      "path": "assets/kite-cart-moving.png",
+      "sha256": "ea0add71a4505edebab76d8543f3ceeb23b88be7bfed93334e1281364dd9a063",
+      "width": 512,
+      "height": 512,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/kite-cutouts.png",
+      "generatedSourceSha256": "0347c2411e4c6307a68209d85af9e75fd3622db25ad751a42321efea279e9689",
+      "prompt": "Create one atlas containing separate original picture assets for a first-grade lesson.\nUse 2 equal rows and 3 equal columns, with one fully visible object centered in each occupied cell. Keep wide empty margins around every object and between cells. No crossing cell boundaries, touching subjects, dividers, frames, text, letters, numbers, labels, logos or watermarks. Leave unused cells empty. Use true transparent alpha for the background, including the margins. Do not draw a checkerboard.\n\nKeep a consistent matte gouache and fine paper grain, with clean cut-paper contours. Use deep pine green, warm cream, apricot and persimmon as accents when appropriate. Keep the objects immediately recognizable and retain the real or lesson-specific colors and details in the descriptions. An object used for counting appears exactly once in its own cell.\n\nCell positions, in reading order:\nRow 1, column 1: One single short persimmon-orange rectangular paper kite tail tab, shape like a neat small rectangle with one clipped corner; face up, no folds, strong solid color, no strings. Use a very compact horizontal silhouette so its silhouette reads as exactly one piece when repeated at tiny size.\nRow 1, column 2: One single short turquoise-green rectangular paper kite tail tab, the same horizontal dimensions and clipped-corner shape as the orange paper tab; face up, no folds, no strings. Strong solid contrasting mint turquoise tone, reads as exactly one piece when repeated.\nRow 1, column 3: One small friendly mustard-yellow wooden wheeled craft trolley, three-quarter top-down view, chunky toy wheels, pale green empty tray, no person, facing right, easy to recognize and navigate with as a small game token.\nRow 2, column 1: The same mustard-yellow empty wooden craft trolley facing right, both chunky wheels turned a little as if rolling; same size, colors and three-quarter top-down viewing angle as above. No speed lines.\nRow 2, column 2: One tiny bright apricot diamond kite with a short pine green tail and one cream leaf motif, inset into a thick cream cut-paper sticker silhouette; no text, no shadow outside the sticker.\nRow 2, column 3: One single finished cream diamond-shaped bamboo kite with orange flower, pine green leaf decorations and one gently curved persimmon tail, compact square overall silhouette. No frame and no other objects. Children's gouache craft illustration.\n",
+      "promptSha256": "1677bb1b1621786bf6e10dbe4861b4c027eb8d2733894faa5197daa2be334c62",
+      "sourceCrop": [
+        0,
+        512,
+        512,
+        1024
+      ],
+      "usedBy": [
+        "sort-by-total"
+      ],
+      "visualReview": "contact_sheet_subject_color_edges_passed_in_page_pending"
+    },
+    {
+      "assetKey": "kite-sticker",
+      "path": "assets/kite-sticker.png",
+      "sha256": "150796e7e857f18bfb4e7d0d42adc3cf5e97bded37f5c197ca35cea2d066ac3a",
+      "width": 512,
+      "height": 512,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/kite-cutouts.png",
+      "generatedSourceSha256": "0347c2411e4c6307a68209d85af9e75fd3622db25ad751a42321efea279e9689",
+      "prompt": "Create one atlas containing separate original picture assets for a first-grade lesson.\nUse 2 equal rows and 3 equal columns, with one fully visible object centered in each occupied cell. Keep wide empty margins around every object and between cells. No crossing cell boundaries, touching subjects, dividers, frames, text, letters, numbers, labels, logos or watermarks. Leave unused cells empty. Use true transparent alpha for the background, including the margins. Do not draw a checkerboard.\n\nKeep a consistent matte gouache and fine paper grain, with clean cut-paper contours. Use deep pine green, warm cream, apricot and persimmon as accents when appropriate. Keep the objects immediately recognizable and retain the real or lesson-specific colors and details in the descriptions. An object used for counting appears exactly once in its own cell.\n\nCell positions, in reading order:\nRow 1, column 1: One single short persimmon-orange rectangular paper kite tail tab, shape like a neat small rectangle with one clipped corner; face up, no folds, strong solid color, no strings. Use a very compact horizontal silhouette so its silhouette reads as exactly one piece when repeated at tiny size.\nRow 1, column 2: One single short turquoise-green rectangular paper kite tail tab, the same horizontal dimensions and clipped-corner shape as the orange paper tab; face up, no folds, no strings. Strong solid contrasting mint turquoise tone, reads as exactly one piece when repeated.\nRow 1, column 3: One small friendly mustard-yellow wooden wheeled craft trolley, three-quarter top-down view, chunky toy wheels, pale green empty tray, no person, facing right, easy to recognize and navigate with as a small game token.\nRow 2, column 1: The same mustard-yellow empty wooden craft trolley facing right, both chunky wheels turned a little as if rolling; same size, colors and three-quarter top-down viewing angle as above. No speed lines.\nRow 2, column 2: One tiny bright apricot diamond kite with a short pine green tail and one cream leaf motif, inset into a thick cream cut-paper sticker silhouette; no text, no shadow outside the sticker.\nRow 2, column 3: One single finished cream diamond-shaped bamboo kite with orange flower, pine green leaf decorations and one gently curved persimmon tail, compact square overall silhouette. No frame and no other objects. Children's gouache craft illustration.\n",
+      "promptSha256": "1677bb1b1621786bf6e10dbe4861b4c027eb8d2733894faa5197daa2be334c62",
+      "sourceCrop": [
+        512,
+        512,
+        1024,
+        1024
+      ],
+      "usedBy": [
+        "swap-pair-play",
+        "sort-by-total"
+      ],
+      "visualReview": "contact_sheet_subject_color_edges_passed_in_page_pending"
+    },
+    {
+      "assetKey": "kite-finished",
+      "path": "assets/kite-finished.png",
+      "sha256": "3c7d1bd4e9964c3cd50c08f43d8660e460c25da3d31769613a0b96cb389d5420",
+      "width": 512,
+      "height": 512,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/kite-cutouts.png",
+      "generatedSourceSha256": "0347c2411e4c6307a68209d85af9e75fd3622db25ad751a42321efea279e9689",
+      "prompt": "Create one atlas containing separate original picture assets for a first-grade lesson.\nUse 2 equal rows and 3 equal columns, with one fully visible object centered in each occupied cell. Keep wide empty margins around every object and between cells. No crossing cell boundaries, touching subjects, dividers, frames, text, letters, numbers, labels, logos or watermarks. Leave unused cells empty. Use true transparent alpha for the background, including the margins. Do not draw a checkerboard.\n\nKeep a consistent matte gouache and fine paper grain, with clean cut-paper contours. Use deep pine green, warm cream, apricot and persimmon as accents when appropriate. Keep the objects immediately recognizable and retain the real or lesson-specific colors and details in the descriptions. An object used for counting appears exactly once in its own cell.\n\nCell positions, in reading order:\nRow 1, column 1: One single short persimmon-orange rectangular paper kite tail tab, shape like a neat small rectangle with one clipped corner; face up, no folds, strong solid color, no strings. Use a very compact horizontal silhouette so its silhouette reads as exactly one piece when repeated at tiny size.\nRow 1, column 2: One single short turquoise-green rectangular paper kite tail tab, the same horizontal dimensions and clipped-corner shape as the orange paper tab; face up, no folds, no strings. Strong solid contrasting mint turquoise tone, reads as exactly one piece when repeated.\nRow 1, column 3: One small friendly mustard-yellow wooden wheeled craft trolley, three-quarter top-down view, chunky toy wheels, pale green empty tray, no person, facing right, easy to recognize and navigate with as a small game token.\nRow 2, column 1: The same mustard-yellow empty wooden craft trolley facing right, both chunky wheels turned a little as if rolling; same size, colors and three-quarter top-down viewing angle as above. No speed lines.\nRow 2, column 2: One tiny bright apricot diamond kite with a short pine green tail and one cream leaf motif, inset into a thick cream cut-paper sticker silhouette; no text, no shadow outside the sticker.\nRow 2, column 3: One single finished cream diamond-shaped bamboo kite with orange flower, pine green leaf decorations and one gently curved persimmon tail, compact square overall silhouette. No frame and no other objects. Children's gouache craft illustration.\n",
+      "promptSha256": "1677bb1b1621786bf6e10dbe4861b4c027eb8d2733894faa5197daa2be334c62",
+      "sourceCrop": [
+        1024,
+        512,
+        1536,
+        1024
+      ],
+      "usedBy": [
+        "kite-ribbon-workbench",
+        "closing"
+      ],
+      "visualReview": "contact_sheet_subject_color_edges_passed_in_page_pending"
+    },
+    {
+      "assetKey": "t3-9",
+      "path": "assets/t3-9.png",
+      "sha256": "71162f3de8a961b10a375d63635f97b205d24debe72312e2c3b4a7f90dda2d8c",
+      "source": "Deterministic code placement of two original ImageGen paper tab sprites, numeric glyphs and ten frames",
+      "codeSource": "art-source/draw_math.py",
+      "diagramSpec": "art-source/math-diagrams.json",
+      "usedBy": [
+        "swap-pair-play",
+        "sort-by-total"
+      ],
+      "visualReview": "count_rule_tests_passed_contact_samples_reviewed_in_page_pending"
+    },
+    {
+      "assetKey": "t5-8",
+      "path": "assets/t5-8.png",
+      "sha256": "e225431b09f58e7df0d3702b7fc0da99868f5b8eea3190471c7330b80ef98357",
+      "source": "Deterministic code placement of two original ImageGen paper tab sprites, numeric glyphs and ten frames",
+      "codeSource": "art-source/draw_math.py",
+      "diagramSpec": "art-source/math-diagrams.json",
+      "usedBy": [
+        "swap-pair-play"
+      ],
+      "visualReview": "count_rule_tests_passed_contact_samples_reviewed_in_page_pending"
+    },
+    {
+      "assetKey": "t4-7",
+      "path": "assets/t4-7.png",
+      "sha256": "8331398096b010c5f25571e43cc8924c8ad911a0cba93c1ff10bacd3df3fd7bf",
+      "source": "Deterministic code placement of two original ImageGen paper tab sprites, numeric glyphs and ten frames",
+      "codeSource": "art-source/draw_math.py",
+      "diagramSpec": "art-source/math-diagrams.json",
+      "usedBy": [
+        "swap-pair-play"
+      ],
+      "visualReview": "count_rule_tests_passed_contact_samples_reviewed_in_page_pending"
+    },
+    {
+      "assetKey": "t5-7",
+      "path": "assets/t5-7.png",
+      "sha256": "e42432960c296a552b31ed9ce274ea91620d2406b179c1488d84c5ad2543ddf8",
+      "source": "Deterministic code placement of two original ImageGen paper tab sprites, numeric glyphs and ten frames",
+      "codeSource": "art-source/draw_math.py",
+      "diagramSpec": "art-source/math-diagrams.json",
+      "usedBy": [
+        "swap-pair-play"
+      ],
+      "visualReview": "count_rule_tests_passed_contact_samples_reviewed_in_page_pending"
+    },
+    {
+      "assetKey": "t4-8",
+      "path": "assets/t4-8.png",
+      "sha256": "00a1b7fbc43c9db040f0e86485d82d12772d794b13b232068fbe3eecd1800f75",
+      "source": "Deterministic code placement of two original ImageGen paper tab sprites, numeric glyphs and ten frames",
+      "codeSource": "art-source/draw_math.py",
+      "diagramSpec": "art-source/math-diagrams.json",
+      "usedBy": [
+        "swap-pair-play",
+        "sort-by-total"
+      ],
+      "visualReview": "count_rule_tests_passed_contact_samples_reviewed_in_page_pending"
+    },
+    {
+      "assetKey": "t5-9",
+      "path": "assets/t5-9.png",
+      "sha256": "2d728f106b5c2b84a438825aed9aceb8602c2025838ee1de24f79752fd02bec0",
+      "source": "Deterministic code placement of two original ImageGen paper tab sprites, numeric glyphs and ten frames",
+      "codeSource": "art-source/draw_math.py",
+      "diagramSpec": "art-source/math-diagrams.json",
+      "usedBy": [
+        "swap-pair-play",
+        "sort-by-total"
+      ],
+      "visualReview": "count_rule_tests_passed_contact_samples_reviewed_in_page_pending"
+    },
+    {
+      "assetKey": "t3-8",
+      "path": "assets/t3-8.png",
+      "sha256": "db1fb03dc6b2afc91339f153a049daabc53f4f787ddcc8eabcae75154a7e8b31",
+      "source": "Deterministic code placement of two original ImageGen paper tab sprites, numeric glyphs and ten frames",
+      "codeSource": "art-source/draw_math.py",
+      "diagramSpec": "art-source/math-diagrams.json",
+      "usedBy": [
+        "sort-by-total"
+      ],
+      "visualReview": "count_rule_tests_passed_contact_samples_reviewed_in_page_pending"
+    },
+    {
+      "assetKey": "t4-9",
+      "path": "assets/t4-9.png",
+      "sha256": "14beaf9e414d3e572add7f3bf603e24628068ccd7fcf89dd3664faf5fce2159e",
+      "source": "Deterministic code placement of two original ImageGen paper tab sprites, numeric glyphs and ten frames",
+      "codeSource": "art-source/draw_math.py",
+      "diagramSpec": "art-source/math-diagrams.json",
+      "usedBy": [
+        "sort-by-total"
+      ],
+      "visualReview": "count_rule_tests_passed_contact_samples_reviewed_in_page_pending"
+    },
+    {
+      "assetKey": "t9-3",
+      "path": "assets/t9-3.png",
+      "sha256": "fd17d540eb0f5651cf748fa5fa00c40b3418dfeeeb547b3cad148c5edf91804c",
+      "source": "Deterministic code placement of two original ImageGen paper tab sprites, numeric glyphs and ten frames",
+      "codeSource": "art-source/draw_math.py",
+      "diagramSpec": "art-source/math-diagrams.json",
+      "usedBy": [
+        "sort-by-total"
+      ],
+      "visualReview": "count_rule_tests_passed_contact_samples_reviewed_in_page_pending"
+    },
+    {
+      "assetKey": "t9-3r",
+      "path": "assets/t9-3r.png",
+      "sha256": "fd17d540eb0f5651cf748fa5fa00c40b3418dfeeeb547b3cad148c5edf91804c",
+      "source": "Deterministic code placement of two original ImageGen paper tab sprites, numeric glyphs and ten frames",
+      "codeSource": "art-source/draw_math.py",
+      "diagramSpec": "art-source/math-diagrams.json",
+      "usedBy": [
+        "swap-pair-play"
+      ],
+      "visualReview": "count_rule_tests_passed_contact_samples_reviewed_in_page_pending"
+    },
+    {
+      "assetKey": "t8-5r",
+      "path": "assets/t8-5r.png",
+      "sha256": "26f410b184055264862f33b946a8ee178f30f7b6534673820d77641fd4a70b99",
+      "source": "Deterministic code placement of two original ImageGen paper tab sprites, numeric glyphs and ten frames",
+      "codeSource": "art-source/draw_math.py",
+      "diagramSpec": "art-source/math-diagrams.json",
+      "usedBy": [
+        "swap-pair-play"
+      ],
+      "visualReview": "count_rule_tests_passed_contact_samples_reviewed_in_page_pending"
+    },
+    {
+      "assetKey": "t7-4r",
+      "path": "assets/t7-4r.png",
+      "sha256": "91cf9645a5a3e65fd908aa6e299b5d6ec5c6249ee85bc5149a92d5d592752549",
+      "source": "Deterministic code placement of two original ImageGen paper tab sprites, numeric glyphs and ten frames",
+      "codeSource": "art-source/draw_math.py",
+      "diagramSpec": "art-source/math-diagrams.json",
+      "usedBy": [
+        "swap-pair-play"
+      ],
+      "visualReview": "count_rule_tests_passed_contact_samples_reviewed_in_page_pending"
+    },
+    {
+      "assetKey": "t7-5r",
+      "path": "assets/t7-5r.png",
+      "sha256": "c6a4063effec1a5d1b21b79b16ca350576d0c8c07705dcd8ea6dafa06f0cc967",
+      "source": "Deterministic code placement of two original ImageGen paper tab sprites, numeric glyphs and ten frames",
+      "codeSource": "art-source/draw_math.py",
+      "diagramSpec": "art-source/math-diagrams.json",
+      "usedBy": [
+        "swap-pair-play"
+      ],
+      "visualReview": "count_rule_tests_passed_contact_samples_reviewed_in_page_pending"
+    },
+    {
+      "assetKey": "t8-4r",
+      "path": "assets/t8-4r.png",
+      "sha256": "d0a3e6071819c812718507f6f91b598f3e7ff2cead9c53329206809e73c22623",
+      "source": "Deterministic code placement of two original ImageGen paper tab sprites, numeric glyphs and ten frames",
+      "codeSource": "art-source/draw_math.py",
+      "diagramSpec": "art-source/math-diagrams.json",
+      "usedBy": [
+        "swap-pair-play"
+      ],
+      "visualReview": "count_rule_tests_passed_contact_samples_reviewed_in_page_pending"
+    },
+    {
+      "assetKey": "t9-5r",
+      "path": "assets/t9-5r.png",
+      "sha256": "eaca599dc25d12106700acce4bca27972f0366f26d949701f9b99e84a1931014",
+      "source": "Deterministic code placement of two original ImageGen paper tab sprites, numeric glyphs and ten frames",
+      "codeSource": "art-source/draw_math.py",
+      "diagramSpec": "art-source/math-diagrams.json",
+      "usedBy": [
+        "swap-pair-play"
+      ],
+      "visualReview": "count_rule_tests_passed_contact_samples_reviewed_in_page_pending"
+    },
+    {
+      "assetKey": "t6-6r",
+      "path": "assets/t6-6r.png",
+      "sha256": "f5cff353b60b2204aff04dab9decdee24aa41f76e9f61f5e75bd917bd5623f92",
+      "source": "Deterministic code placement of two original ImageGen paper tab sprites, numeric glyphs and ten frames",
+      "codeSource": "art-source/draw_math.py",
+      "diagramSpec": "art-source/math-diagrams.json",
+      "usedBy": [
+        "swap-pair-play"
+      ],
+      "visualReview": "count_rule_tests_passed_contact_samples_reviewed_in_page_pending"
+    },
+    {
+      "assetKey": "station-11",
+      "path": "assets/station-11.png",
+      "sha256": "95d4e68106b8ba263bc256244b993606360642906ff18948c0ceb4875bf6e786",
+      "source": "Deterministic code placement of two original ImageGen paper tab sprites, numeric glyphs and ten frames",
+      "codeSource": "art-source/draw_math.py",
+      "diagramSpec": "art-source/math-diagrams.json",
+      "usedBy": [
+        "sort-by-total"
+      ],
+      "visualReview": "count_rule_tests_passed_contact_samples_reviewed_in_page_pending"
+    },
+    {
+      "assetKey": "station-12",
+      "path": "assets/station-12.png",
+      "sha256": "ccd27d0f5ad36203446627c229b114322b183ed850dc324f1d8b15da41bc58ad",
+      "source": "Deterministic code placement of two original ImageGen paper tab sprites, numeric glyphs and ten frames",
+      "codeSource": "art-source/draw_math.py",
+      "diagramSpec": "art-source/math-diagrams.json",
+      "usedBy": [
+        "sort-by-total"
+      ],
+      "visualReview": "count_rule_tests_passed_contact_samples_reviewed_in_page_pending"
+    },
+    {
+      "assetKey": "station-13",
+      "path": "assets/station-13.png",
+      "sha256": "1380bc7d61983040690c251187ecfdc53d93fa999a750c15e57abffee4404d5f",
+      "source": "Deterministic code placement of two original ImageGen paper tab sprites, numeric glyphs and ten frames",
+      "codeSource": "art-source/draw_math.py",
+      "diagramSpec": "art-source/math-diagrams.json",
+      "usedBy": [
+        "sort-by-total"
+      ],
+      "visualReview": "count_rule_tests_passed_contact_samples_reviewed_in_page_pending"
+    },
+    {
+      "assetKey": "station-14",
+      "path": "assets/station-14.png",
+      "sha256": "bbe9dfc145df8ce2035a6d80dc24238e3b7112062f6576012e44db14693a5718",
+      "source": "Deterministic code placement of two original ImageGen paper tab sprites, numeric glyphs and ten frames",
+      "codeSource": "art-source/draw_math.py",
+      "diagramSpec": "art-source/math-diagrams.json",
+      "usedBy": [
+        "sort-by-total"
+      ],
+      "visualReview": "count_rule_tests_passed_contact_samples_reviewed_in_page_pending"
+    },
+    {
+      "assetKey": "teach-47-before",
+      "path": "assets/teach-47-before.png",
+      "sha256": "d7a55a40dcc2a6005ac66ddf3c2564387c29964400232173308256d1b0c831c9",
+      "source": "Deterministic code placement of two original ImageGen paper tab sprites, numeric glyphs and ten frames",
+      "codeSource": "art-source/draw_math.py",
+      "diagramSpec": "art-source/math-diagrams.json",
+      "usedBy": [
+        "still-make-ten"
+      ],
+      "visualReview": "count_rule_tests_passed_contact_samples_reviewed_in_page_pending"
+    },
+    {
+      "assetKey": "teach-47-after",
+      "path": "assets/teach-47-after.png",
+      "sha256": "f653a975aac9671534210a9b0519c57a2764e7823539291be1b4452fab3c1aa3",
+      "source": "Deterministic code placement of two original ImageGen paper tab sprites, numeric glyphs and ten frames",
+      "codeSource": "art-source/draw_math.py",
+      "diagramSpec": "art-source/math-diagrams.json",
+      "usedBy": [
+        "still-make-ten"
+      ],
+      "visualReview": "count_rule_tests_passed_contact_samples_reviewed_in_page_pending"
+    },
+    {
+      "assetKey": "teach-83",
+      "path": "assets/teach-83.png",
+      "sha256": "d080ddeba4f0c6fedd6e12a7faed9c81deb04cea6e089fba5c33062771368b9c",
+      "source": "Deterministic code placement of two original ImageGen paper tab sprites, numeric glyphs and ten frames",
+      "codeSource": "art-source/draw_math.py",
+      "diagramSpec": "art-source/math-diagrams.json",
+      "usedBy": [
+        "flip-what-we-know"
+      ],
+      "visualReview": "count_rule_tests_passed_contact_samples_reviewed_in_page_pending"
+    },
+    {
+      "assetKey": "teach-38",
+      "path": "assets/teach-38.png",
+      "sha256": "a119865c641bb9d0e555bacb0a1af5ee19cfbabdc60fec95a2d3de10b899c3dd",
+      "source": "Deterministic code placement of two original ImageGen paper tab sprites, numeric glyphs and ten frames",
+      "codeSource": "art-source/draw_math.py",
+      "diagramSpec": "art-source/math-diagrams.json",
+      "usedBy": [
+        "flip-what-we-know"
+      ],
+      "visualReview": "count_rule_tests_passed_contact_samples_reviewed_in_page_pending"
+    },
+    {
+      "assetKey": "teach-37",
+      "path": "assets/teach-37.png",
+      "sha256": "d99103150a1f970e116aedb8e6c161b3d2dec1e9e0ee09626136dfd55a2aea6b",
+      "source": "Deterministic code placement of two original ImageGen paper tab sprites, numeric glyphs and ten frames",
+      "codeSource": "art-source/draw_math.py",
+      "diagramSpec": "art-source/math-diagrams.json",
+      "usedBy": [
+        "one-more"
+      ],
+      "visualReview": "count_rule_tests_passed_contact_samples_reviewed_in_page_pending"
+    },
+    {
+      "assetKey": "teach-38-more",
+      "path": "assets/teach-38-more.png",
+      "sha256": "a119865c641bb9d0e555bacb0a1af5ee19cfbabdc60fec95a2d3de10b899c3dd",
+      "source": "Deterministic code placement of two original ImageGen paper tab sprites, numeric glyphs and ten frames",
+      "codeSource": "art-source/draw_math.py",
+      "diagramSpec": "art-source/math-diagrams.json",
+      "usedBy": [
+        "one-more"
+      ],
+      "visualReview": "count_rule_tests_passed_contact_samples_reviewed_in_page_pending"
+    },
+    {
+      "assetKey": "teach-38-move",
+      "path": "assets/teach-38-move.png",
+      "sha256": "a119865c641bb9d0e555bacb0a1af5ee19cfbabdc60fec95a2d3de10b899c3dd",
+      "source": "Deterministic code placement of two original ImageGen paper tab sprites, numeric glyphs and ten frames",
+      "codeSource": "art-source/draw_math.py",
+      "diagramSpec": "art-source/math-diagrams.json",
+      "usedBy": [
+        "move-one-only"
+      ],
+      "visualReview": "count_rule_tests_passed_contact_samples_reviewed_in_page_pending"
+    },
+    {
+      "assetKey": "teach-38-shift",
+      "path": "assets/teach-38-shift.png",
+      "sha256": "a984f8f37de41c088f793f17f0a6375db2855569a2bb099cb4764dd3d254c934",
+      "source": "Deterministic code placement of two original ImageGen paper tab sprites, numeric glyphs and ten frames",
+      "codeSource": "art-source/draw_math.py",
+      "diagramSpec": "art-source/math-diagrams.json",
+      "usedBy": [
+        "move-one-only"
+      ],
+      "visualReview": "count_rule_tests_passed_contact_samples_reviewed_in_page_pending"
+    },
+    {
+      "assetKey": "teach-56",
+      "path": "assets/teach-56.png",
+      "sha256": "7ec985cf56b2035840ad940e452f91bcdc232656e4e91a70c5e085e7339890ab",
+      "source": "Deterministic code placement of two original ImageGen paper tab sprites, numeric glyphs and ten frames",
+      "codeSource": "art-source/draw_math.py",
+      "diagramSpec": "art-source/math-diagrams.json",
+      "usedBy": [
+        "explain-own-method"
+      ],
+      "visualReview": "count_rule_tests_passed_contact_samples_reviewed_in_page_pending"
+    },
+    {
+      "assetKey": "teach-65",
+      "path": "assets/teach-65.png",
+      "sha256": "544d8994ff8eb957c493b81051a189ab1013c87cb5cffe0147ad8d82dde4c89b",
+      "source": "Deterministic code placement of two original ImageGen paper tab sprites, numeric glyphs and ten frames",
+      "codeSource": "art-source/draw_math.py",
+      "diagramSpec": "art-source/math-diagrams.json",
+      "usedBy": [
+        "explain-own-method"
+      ],
+      "visualReview": "count_rule_tests_passed_contact_samples_reviewed_in_page_pending"
+    },
+    {
+      "assetKey": "q-fill-start",
+      "path": "assets/q-fill-start.png",
+      "sha256": "69c02121ce7925394320b6665fc3b425d08b6697b520c8ff4fcdf4c40d09dc40",
+      "source": "Deterministic code placement of two original ImageGen paper tab sprites, numeric glyphs and ten frames",
+      "codeSource": "art-source/draw_math.py",
+      "diagramSpec": "art-source/math-diagrams.json",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "count_rule_tests_passed_contact_samples_reviewed_in_page_pending"
+    },
+    {
+      "assetKey": "q-fill-a",
+      "path": "assets/q-fill-a.png",
+      "sha256": "63754412656f49c1c0d240402c25197ac934f79bbc507510f8dea7143de1b4bd",
+      "source": "Deterministic code placement of two original ImageGen paper tab sprites, numeric glyphs and ten frames",
+      "codeSource": "art-source/draw_math.py",
+      "diagramSpec": "art-source/math-diagrams.json",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "count_rule_tests_passed_contact_samples_reviewed_in_page_pending"
+    },
+    {
+      "assetKey": "q-fill-b",
+      "path": "assets/q-fill-b.png",
+      "sha256": "ca332e7873aceffe9a4b0fb06284f268e2bdf750cde6b1df15d67a23c97dc83c",
+      "source": "Deterministic code placement of two original ImageGen paper tab sprites, numeric glyphs and ten frames",
+      "codeSource": "art-source/draw_math.py",
+      "diagramSpec": "art-source/math-diagrams.json",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "count_rule_tests_passed_contact_samples_reviewed_in_page_pending"
+    },
+    {
+      "assetKey": "q-fill-c",
+      "path": "assets/q-fill-c.png",
+      "sha256": "69c02121ce7925394320b6665fc3b425d08b6697b520c8ff4fcdf4c40d09dc40",
+      "source": "Deterministic code placement of two original ImageGen paper tab sprites, numeric glyphs and ten frames",
+      "codeSource": "art-source/draw_math.py",
+      "diagramSpec": "art-source/math-diagrams.json",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "count_rule_tests_passed_contact_samples_reviewed_in_page_pending"
+    },
+    {
+      "assetKey": "q-flip-start",
+      "path": "assets/q-flip-start.png",
+      "sha256": "2db93e61e1a5a10f6488d795dc2eab2a920ee197b96319861125ac1796f0ed69",
+      "source": "Deterministic code placement of two original ImageGen paper tab sprites, numeric glyphs and ten frames",
+      "codeSource": "art-source/draw_math.py",
+      "diagramSpec": "art-source/math-diagrams.json",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "count_rule_tests_passed_contact_samples_reviewed_in_page_pending"
+    },
+    {
+      "assetKey": "q-flip-a",
+      "path": "assets/q-flip-a.png",
+      "sha256": "2dcabdb40b30a5719a4972ae7e76821f2f4ef41cee2877535efc83bc6c33b9d6",
+      "source": "Deterministic code placement of two original ImageGen paper tab sprites, numeric glyphs and ten frames",
+      "codeSource": "art-source/draw_math.py",
+      "diagramSpec": "art-source/math-diagrams.json",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "count_rule_tests_passed_contact_samples_reviewed_in_page_pending"
+    },
+    {
+      "assetKey": "q-flip-b",
+      "path": "assets/q-flip-b.png",
+      "sha256": "58b6c9f55ba0c01d93df9a5fcdd5bf45f12fda66e5f198cca5c1d144d30e2b61",
+      "source": "Deterministic code placement of two original ImageGen paper tab sprites, numeric glyphs and ten frames",
+      "codeSource": "art-source/draw_math.py",
+      "diagramSpec": "art-source/math-diagrams.json",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "count_rule_tests_passed_contact_samples_reviewed_in_page_pending"
+    },
+    {
+      "assetKey": "q-flip-c",
+      "path": "assets/q-flip-c.png",
+      "sha256": "2db93e61e1a5a10f6488d795dc2eab2a920ee197b96319861125ac1796f0ed69",
+      "source": "Deterministic code placement of two original ImageGen paper tab sprites, numeric glyphs and ten frames",
+      "codeSource": "art-source/draw_math.py",
+      "diagramSpec": "art-source/math-diagrams.json",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "count_rule_tests_passed_contact_samples_reviewed_in_page_pending"
+    },
+    {
+      "assetKey": "q-known-start",
+      "path": "assets/q-known-start.png",
+      "sha256": "b44ed7468af5aeaff6576a094f52723b098688771019dde461e282b6faeff770",
+      "source": "Deterministic code placement of two original ImageGen paper tab sprites, numeric glyphs and ten frames",
+      "codeSource": "art-source/draw_math.py",
+      "diagramSpec": "art-source/math-diagrams.json",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "count_rule_tests_passed_contact_samples_reviewed_in_page_pending"
+    },
+    {
+      "assetKey": "q-known-a",
+      "path": "assets/q-known-a.png",
+      "sha256": "d080ddeba4f0c6fedd6e12a7faed9c81deb04cea6e089fba5c33062771368b9c",
+      "source": "Deterministic code placement of two original ImageGen paper tab sprites, numeric glyphs and ten frames",
+      "codeSource": "art-source/draw_math.py",
+      "diagramSpec": "art-source/math-diagrams.json",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "count_rule_tests_passed_contact_samples_reviewed_in_page_pending"
+    },
+    {
+      "assetKey": "q-known-b",
+      "path": "assets/q-known-b.png",
+      "sha256": "cd7ddd9fbe0ad5f7a8db17479ab42f3f383df945cd94bdf6e6d569d4ce8c92bd",
+      "source": "Deterministic code placement of two original ImageGen paper tab sprites, numeric glyphs and ten frames",
+      "codeSource": "art-source/draw_math.py",
+      "diagramSpec": "art-source/math-diagrams.json",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "count_rule_tests_passed_contact_samples_reviewed_in_page_pending"
+    },
+    {
+      "assetKey": "q-known-c",
+      "path": "assets/q-known-c.png",
+      "sha256": "2df4106f59be43a7f37ced0f1b9f314e2c4a6ba26a2f2bdf160fc9245c02e54a",
+      "source": "Deterministic code placement of two original ImageGen paper tab sprites, numeric glyphs and ten frames",
+      "codeSource": "art-source/draw_math.py",
+      "diagramSpec": "art-source/math-diagrams.json",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "count_rule_tests_passed_contact_samples_reviewed_in_page_pending"
+    },
+    {
+      "assetKey": "q-add-start",
+      "path": "assets/q-add-start.png",
+      "sha256": "79776e5d6c13e91e02141a4cc44f63e51fa33cdde50baa5fe04a44e6110d632a",
+      "source": "Deterministic code placement of two original ImageGen paper tab sprites, numeric glyphs and ten frames",
+      "codeSource": "art-source/draw_math.py",
+      "diagramSpec": "art-source/math-diagrams.json",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "count_rule_tests_passed_contact_samples_reviewed_in_page_pending"
+    },
+    {
+      "assetKey": "q-add-a",
+      "path": "assets/q-add-a.png",
+      "sha256": "c3cbcaf50247aaeab20528b111b54bec340f295a1189f0c7366d26937e07ac5a",
+      "source": "Deterministic code placement of two original ImageGen paper tab sprites, numeric glyphs and ten frames",
+      "codeSource": "art-source/draw_math.py",
+      "diagramSpec": "art-source/math-diagrams.json",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "count_rule_tests_passed_contact_samples_reviewed_in_page_pending"
+    },
+    {
+      "assetKey": "q-add-b",
+      "path": "assets/q-add-b.png",
+      "sha256": "5e3ccd9e1ffd4b321a3179b81e2f156f2e1998910be40e99e246452d368aeec1",
+      "source": "Deterministic code placement of two original ImageGen paper tab sprites, numeric glyphs and ten frames",
+      "codeSource": "art-source/draw_math.py",
+      "diagramSpec": "art-source/math-diagrams.json",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "count_rule_tests_passed_contact_samples_reviewed_in_page_pending"
+    },
+    {
+      "assetKey": "q-add-c",
+      "path": "assets/q-add-c.png",
+      "sha256": "e65a1141cb2f6349aeb000ed5df8208ef8224844f88db080ade6828197fc7184",
+      "source": "Deterministic code placement of two original ImageGen paper tab sprites, numeric glyphs and ten frames",
+      "codeSource": "art-source/draw_math.py",
+      "diagramSpec": "art-source/math-diagrams.json",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "count_rule_tests_passed_contact_samples_reviewed_in_page_pending"
+    },
+    {
+      "assetKey": "q-move-start",
+      "path": "assets/q-move-start.png",
+      "sha256": "69c02121ce7925394320b6665fc3b425d08b6697b520c8ff4fcdf4c40d09dc40",
+      "source": "Deterministic code placement of two original ImageGen paper tab sprites, numeric glyphs and ten frames",
+      "codeSource": "art-source/draw_math.py",
+      "diagramSpec": "art-source/math-diagrams.json",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "count_rule_tests_passed_contact_samples_reviewed_in_page_pending"
+    },
+    {
+      "assetKey": "q-move-a",
+      "path": "assets/q-move-a.png",
+      "sha256": "2d5dba2c55b703eee104f3a3ce3982efa5ce971b1337699a81ec855aa50b52c1",
+      "source": "Deterministic code placement of two original ImageGen paper tab sprites, numeric glyphs and ten frames",
+      "codeSource": "art-source/draw_math.py",
+      "diagramSpec": "art-source/math-diagrams.json",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "count_rule_tests_passed_contact_samples_reviewed_in_page_pending"
+    },
+    {
+      "assetKey": "q-move-b",
+      "path": "assets/q-move-b.png",
+      "sha256": "58b6c9f55ba0c01d93df9a5fcdd5bf45f12fda66e5f198cca5c1d144d30e2b61",
+      "source": "Deterministic code placement of two original ImageGen paper tab sprites, numeric glyphs and ten frames",
+      "codeSource": "art-source/draw_math.py",
+      "diagramSpec": "art-source/math-diagrams.json",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "count_rule_tests_passed_contact_samples_reviewed_in_page_pending"
+    },
+    {
+      "assetKey": "q-move-c",
+      "path": "assets/q-move-c.png",
+      "sha256": "d7a55a40dcc2a6005ac66ddf3c2564387c29964400232173308256d1b0c831c9",
+      "source": "Deterministic code placement of two original ImageGen paper tab sprites, numeric glyphs and ten frames",
+      "codeSource": "art-source/draw_math.py",
+      "diagramSpec": "art-source/math-diagrams.json",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "count_rule_tests_passed_contact_samples_reviewed_in_page_pending"
+    },
+    {
+      "assetKey": "q-fast-start",
+      "path": "assets/q-fast-start.png",
+      "sha256": "3a161a70484f842e5e9bf8ede8e1998e85dee71ab3856164cadd6af66adeed0f",
+      "source": "Deterministic code placement of two original ImageGen paper tab sprites, numeric glyphs and ten frames",
+      "codeSource": "art-source/draw_math.py",
+      "diagramSpec": "art-source/math-diagrams.json",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "count_rule_tests_passed_contact_samples_reviewed_in_page_pending"
+    },
+    {
+      "assetKey": "q-fast-a",
+      "path": "assets/q-fast-a.png",
+      "sha256": "ac17df0f6d8aab263b0d33d4d13a87371d8c7cb955093e336a271e9ecf2f74f9",
+      "source": "Deterministic code placement of two original ImageGen paper tab sprites, numeric glyphs and ten frames",
+      "codeSource": "art-source/draw_math.py",
+      "diagramSpec": "art-source/math-diagrams.json",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "count_rule_tests_passed_contact_samples_reviewed_in_page_pending"
+    },
+    {
+      "assetKey": "q-fast-b",
+      "path": "assets/q-fast-b.png",
+      "sha256": "530c42d1449b16d3d0946cb9758d3e05f8f5e4ac3bc81c5bcd9987875dc227c0",
+      "source": "Deterministic code placement of two original ImageGen paper tab sprites, numeric glyphs and ten frames",
+      "codeSource": "art-source/draw_math.py",
+      "diagramSpec": "art-source/math-diagrams.json",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "count_rule_tests_passed_contact_samples_reviewed_in_page_pending"
+    },
+    {
+      "assetKey": "q-fast-c",
+      "path": "assets/q-fast-c.png",
+      "sha256": "747b873492087d398cae39eb1543c93511bc83b6002aa8d036f1962ab3fd3016",
+      "source": "Deterministic code placement of two original ImageGen paper tab sprites, numeric glyphs and ten frames",
+      "codeSource": "art-source/draw_math.py",
+      "diagramSpec": "art-source/math-diagrams.json",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "count_rule_tests_passed_contact_samples_reviewed_in_page_pending"
+    }
+  ]
+}

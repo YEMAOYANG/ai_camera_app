@@ -1,0 +1,922 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "走近科学｜单元回顾",
+  "description": "人教鄂教版一年级上册第一单元回顾。根据看见的事提出问题，用合适方法找线索，记录发现并说说下一步。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小科老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Serena",
+      "avatar": "/avatars/teacher-2.png",
+      "color": "#287B94",
+      "persona": "耐心用普通话引导一年级孩子观察、提问、找证据，提醒操作安全。"
+    }
+  },
+  "images": {
+    "ask-look": {
+      "file": "assets/ask-look.png"
+    },
+    "ask-lookup": {
+      "file": "assets/ask-lookup.png"
+    },
+    "ask-make": {
+      "file": "assets/ask-make.png"
+    },
+    "ask-measure": {
+      "file": "assets/ask-measure.png"
+    },
+    "ask-test": {
+      "file": "assets/ask-test.png"
+    },
+    "depot-rover": {
+      "file": "assets/depot-rover.png"
+    },
+    "family-paper-observation": {
+      "file": "assets/family-paper-observation.png"
+    },
+    "label-problem": {
+      "file": "assets/label-problem.png"
+    },
+    "method-measure": {
+      "file": "assets/method-measure.png"
+    },
+    "method-observe": {
+      "file": "assets/method-observe.png"
+    },
+    "method-trio": {
+      "file": "assets/method-trio.png"
+    },
+    "paper-wing": {
+      "file": "assets/paper-wing.png"
+    },
+    "paper-wing-side": {
+      "file": "assets/paper-wing-side.png"
+    },
+    "q1-a": {
+      "file": "assets/q1-a.png"
+    },
+    "q1-b": {
+      "file": "assets/q1-b.png"
+    },
+    "q1-c": {
+      "file": "assets/q1-c.png"
+    },
+    "q1-scene": {
+      "file": "assets/q1-scene.png"
+    },
+    "q2-a": {
+      "file": "assets/q2-a.png"
+    },
+    "q2-b": {
+      "file": "assets/q2-b.png"
+    },
+    "q2-c": {
+      "file": "assets/q2-c.png"
+    },
+    "q3-a": {
+      "file": "assets/q3-a.png"
+    },
+    "q3-b": {
+      "file": "assets/q3-b.png"
+    },
+    "q3-c": {
+      "file": "assets/q3-c.png"
+    },
+    "q4-a": {
+      "file": "assets/q4-a.png"
+    },
+    "q4-b": {
+      "file": "assets/q4-b.png"
+    },
+    "q4-c": {
+      "file": "assets/q4-c.png"
+    },
+    "q5-a": {
+      "file": "assets/q5-a.png"
+    },
+    "q5-b": {
+      "file": "assets/q5-b.png"
+    },
+    "q5-c": {
+      "file": "assets/q5-c.png"
+    },
+    "q6-a": {
+      "file": "assets/q6-a.png"
+    },
+    "q6-b": {
+      "file": "assets/q6-b.png"
+    },
+    "q6-c": {
+      "file": "assets/q6-c.png"
+    },
+    "record-and-listen": {
+      "file": "assets/record-and-listen.png"
+    },
+    "science-workbench": {
+      "file": "assets/science-workbench.png"
+    },
+    "stand-test": {
+      "file": "assets/stand-test.png"
+    },
+    "use-look": {
+      "file": "assets/use-look.png"
+    },
+    "use-lookup": {
+      "file": "assets/use-lookup.png"
+    },
+    "use-make": {
+      "file": "assets/use-make.png"
+    },
+    "use-measure": {
+      "file": "assets/use-measure.png"
+    },
+    "use-test": {
+      "file": "assets/use-test.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "p01",
+      "type": "slide",
+      "title": "站不住的小名牌",
+      "template": "title-picture",
+      "data": {
+        "title": "站不住的小名牌",
+        "picture": "label-problem",
+        "caption": "先说看见了什么，再说想弄明白什么。"
+      },
+      "script": [
+        {
+          "say": "科学桌要开张，可小名牌一松手就躺下。你发现了什么？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "小满说：纸牌现在平平地躺在桌上。",
+          "by": "xiaoman"
+        },
+        {
+          "say": "眼睛已经看见纸牌躺下了，这是一条发现。"
+        },
+        {
+          "say": "可怎么让它自己站住呢？这是我们想解决的问题。"
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "你也把手掌平放，再立起来，想想纸牌哪里能靠一下。"
+        },
+        {
+          "say": "先说你想弄明白什么，再挑能帮上忙的办法。"
+        },
+        {
+          "say": "有了想问的事，我们就能挑工具去找线索啦。"
+        }
+      ]
+    },
+    {
+      "key": "p02",
+      "type": "slide",
+      "title": "细看和量一量",
+      "template": "two-columns",
+      "data": {
+        "title": "细看和量一量",
+        "left": {
+          "heading": "细看一处",
+          "body": "先看整个，再找细花纹。"
+        },
+        "left_picture": "method-observe",
+        "right": {
+          "heading": "比出长短",
+          "body": "从同一个起点量。"
+        },
+        "right_picture": "method-measure"
+      },
+      "script": [
+        {
+          "say": "桌上有两条纸带。想找细花纹，和想知道差多长，做法一样吗？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "先看整条是什么样，再从一头看到另一头。"
+        },
+        {
+          "say": "细纹太小，就用放大镜慢慢找，找到再指给同伴看。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "想知道差多长，把纸带的一头和尺的零刻线对齐。"
+        },
+        {
+          "say": "两条都这样量，才知道相差多少。"
+        },
+        {
+          "say": "找花纹要细看，想知道差多少就用尺来量。"
+        },
+        {
+          "say": "你指给我看，哪边在找花纹，哪边在找长度？"
+        }
+      ]
+    },
+    {
+      "key": "p03",
+      "type": "slide",
+      "title": "还有三种办法",
+      "template": "picture-points",
+      "data": {
+        "title": "还有三种办法",
+        "picture": "method-trio",
+        "points": [
+          "试一试，比较结果",
+          "动手做出要用的东西",
+          "找书图，核对已有做法"
+        ]
+      },
+      "script": [
+        {
+          "say": "一张纸牌还是站不住。除了细看，还能怎样找办法呢？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "朵朵说：我找到两种摆法，可哪种站得更稳呀？",
+          "by": "duoduo"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "用一样的桌面，拿同样的纸牌各试一次，看看结果。"
+        },
+        {
+          "say": "这样动手试来找答案，就是做实验。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "想让牌站住，可以给它折个小纸脚。动手做出来叫制作。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "想找已有的折法，就翻图册找对应那页，再照实物核对。"
+        },
+        {
+          "say": "要比较就试，想做出来就动手，找旧办法可以翻图册。"
+        },
+        {
+          "say": "有时我们会先查图，再做一个，最后试试好不好用。"
+        }
+      ]
+    },
+    {
+      "key": "p04",
+      "type": "interactive",
+      "title": "把问题送去找办法",
+      "page": "method-depot",
+      "widgetType": "game",
+      "startImage": "method-trio",
+      "script": [
+        {
+          "say": "工作台开张啦！每张问题图要送到能帮它的托盘。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#science-depot-demo-item"
+        },
+        {
+          "say": "先看这张纸带图。它要找的是小花纹，不是问长度。"
+        },
+        {
+          "highlight": "#science-depot-demo-dock"
+        },
+        {
+          "say": "带放大镜的托盘提醒我们，找细花纹要凑近看。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "让小车站到卡片后面，按箭头朝托盘推。"
+        },
+        {
+          "say": "推偏了，可以按回转键退一步，再想从哪边推。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "瞧，我只送这一张。另一张要知道差多长，该去哪里？"
+        },
+        {
+          "say": "轮到你啦！每次先看清问题，再把图卡送到合适的方法。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "depot-goal-one": "p02-8",
+        "depot-goal-two": "p03-11",
+        "depot-goal-three": "p07-7",
+        "depot-hint": "p01-8",
+        "depot-praise": "p07-8"
+      }
+    },
+    {
+      "key": "p05",
+      "type": "slide",
+      "title": "同一个纸翼，两种看法",
+      "template": "two-columns",
+      "data": {
+        "title": "同一个纸翼，两种看法",
+        "left": {
+          "heading": "从上面看",
+          "body": "看得到橙色的宽面。"
+        },
+        "left_picture": "paper-wing",
+        "right": {
+          "heading": "从侧面看",
+          "body": "看得到窄窄的纸边。"
+        },
+        "right_picture": "paper-wing-side"
+      },
+      "script": [
+        {
+          "say": "同一个纸翼换个方向看，你猜两边看着还那么宽吗？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "先从上面看整个，找到中间那条绿纸脊。"
+        },
+        {
+          "say": "看纸脊两边，橙色纸翼摊得宽宽的。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "换到侧面看，还是这张纸翼，却只看见窄窄的纸边。"
+        },
+        {
+          "say": "摊开手再转一转，比一比两次看到的边线。"
+        },
+        {
+          "say": "只盯同一个纸翼，拍下从上看和从侧看两种样子。"
+        },
+        {
+          "say": "小图要从上看，等纸翼显得宽，框住它再拍。"
+        },
+        {
+          "say": "小图要从侧面看，等纸翼只见窄边，框住它再拍。"
+        },
+        {
+          "say": "照片留下了那一刻的样子，两张放一起就能比啦。"
+        },
+        {
+          "say": "没拍中先挪虚线框，把纸翼重新框住，再看小图。"
+        },
+        {
+          "say": "纸翼还是原来那张，换方向看，见到的样子就不同。"
+        }
+      ]
+    },
+    {
+      "key": "p06",
+      "type": "interactive",
+      "title": "拍下纸翼的变化",
+      "page": "paper-wing-camera",
+      "widgetType": "game",
+      "startImage": "paper-wing",
+      "script": [
+        {
+          "say": "纸翼的画面会换方向。你能把两个样子都留下来吗？"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#science-shutter-goal"
+        },
+        {
+          "say": "先看上面的小图。第一张要拍从上面看到的宽样子。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "按箭头挪虚线框，让同一个纸翼留在框里。"
+        },
+        {
+          "highlight": "#science-shutter-goal"
+        },
+        {
+          "say": "光框住还不够。纸翼和小图一样宽时，再点快门。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "我拍一张给你看。下边留下的是刚刚拍到的样子。"
+        },
+        {
+          "say": "轮到你啦。看清小图，框住它，等到那个样子再拍。"
+        },
+        {
+          "say": "没拍中可以再等一会儿。侧面只见窄窄的纸边。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "photo-goal": "p05-8",
+        "photo-wide": "p05-9",
+        "photo-narrow": "p05-10",
+        "photo-praise": "p05-11",
+        "photo-hint": "p05-12"
+      },
+      "observationCard": {
+        "title": "纸翼两张照片",
+        "familyTask": "和家人转动同一张干净废纸，画下两次看到的样子，再轮流说一条发现和一个新问题。",
+        "levels": [
+          {
+            "label": "慢慢拍两张",
+            "trials": [
+              {
+                "id": "paper-wing-pair",
+                "label": "同一纸翼的两种看法",
+                "top": {
+                  "paper-wing": {
+                    "label": "展开的宽轮廓",
+                    "image": "paper-wing"
+                  }
+                },
+                "side": {
+                  "paper-wing-side": {
+                    "label": "露出窄纸边",
+                    "image": "paper-wing-side"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "label": "先找窄样子",
+            "trials": [
+              {
+                "id": "paper-wing-pair",
+                "label": "同一纸翼的两种看法",
+                "top": {
+                  "paper-wing": {
+                    "label": "展开的宽轮廓",
+                    "image": "paper-wing"
+                  }
+                },
+                "side": {
+                  "paper-wing-side": {
+                    "label": "露出窄纸边",
+                    "image": "paper-wing-side"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "label": "连续拍四张",
+            "trials": [
+              {
+                "id": "paper-wing-pair",
+                "label": "同一纸翼的两种看法",
+                "top": {
+                  "paper-wing": {
+                    "label": "展开的宽轮廓",
+                    "image": "paper-wing"
+                  }
+                },
+                "side": {
+                  "paper-wing-side": {
+                    "label": "露出窄纸边",
+                    "image": "paper-wing-side"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "key": "p07",
+      "type": "slide",
+      "title": "用记录回答，再提一问",
+      "template": "two-columns",
+      "data": {
+        "title": "用记录回答，再提一问",
+        "left": {
+          "heading": "试完看结果",
+          "body": "两张记录可以放在一起比。"
+        },
+        "left_picture": "stand-test",
+        "right": {
+          "heading": "听一听再问",
+          "body": "把发现说清楚，留下新问题。"
+        },
+        "right_picture": "record-and-listen"
+      },
+      "script": [
+        {
+          "say": "小名牌终于站住了。我们怎样让没在场的朋友也知道？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "同一张桌上，没纸脚时牌躺着，加上纸脚就站住了。看，两次都画下来了。"
+        },
+        {
+          "say": "说哪一次站住了，还要指给朋友看，你从哪里看出来。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "朵朵说有纸脚的站住了。我等她说完再指图，就知道她说的是哪次。大一点的牌呢？"
+        },
+        {
+          "say": "先想这回需要什么线索，再把问题送到能帮忙的方法。"
+        },
+        {
+          "say": "好，你找到能帮这个问题的办法啦。"
+        },
+        {
+          "say": "桌子和纸脚照旧，只换成大纸牌。松手看它倒没倒，才知道换牌有没有影响。"
+        }
+      ]
+    },
+    {
+      "key": "p08",
+      "type": "quiz",
+      "title": "先问什么，再怎么找",
+      "intro": [
+        "换几样新东西。听我说想弄明白什么，再选能帮忙的图。"
+      ],
+      "questions": [
+        {
+          "id": "science-review-q1",
+          "question": "杯子旁边有水。要找水从哪儿来，先看哪里？",
+          "skill": "science-question-focus",
+          "analysis": "先看杯口、杯边和旁边的水迹，找和水有关的线索。只看椅子或书架还帮不上忙。",
+          "answer": [
+            "B"
+          ],
+          "options": {
+            "A": {
+              "label": "椅子旁",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-a",
+                "alt": "手电筒照向没有水迹的椅脚"
+              }
+            },
+            "B": {
+              "label": "杯边和水迹",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-b",
+                "alt": "眼睛和放大镜朝杯边的水迹仔细找"
+              }
+            },
+            "C": {
+              "label": "书架旁",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-c",
+                "alt": "人站在书架旁找书"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "q1-scene",
+            "alt": "同一张矮桌上，一只杯子立在一片小水迹旁；另有椅子和书架，水迹来源尚未确定"
+          }
+        },
+        {
+          "id": "science-review-q2",
+          "question": "想看清石头上的小斑纹，哪种做法合适？",
+          "skill": "science-observe-details",
+          "analysis": "把石头的斑纹放到放大镜下面细看，就能比出哪一处有细斑。尺和空本子不帮我们看清细纹。",
+          "answer": [
+            "A"
+          ],
+          "options": {
+            "A": {
+              "label": "用放大镜看",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-a",
+                "alt": "同一斑纹石头置于一把放大镜下，镜内有更大的斑纹"
+              }
+            },
+            "B": {
+              "label": "拿尺比长度",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-b",
+                "alt": "同一石头旁放直尺"
+              }
+            },
+            "C": {
+              "label": "收好空本",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-c",
+                "alt": "同一石头旁只有一本合起的空白本"
+              }
+            }
+          }
+        },
+        {
+          "id": "science-review-q3",
+          "question": "想比两座积木塔的高低，哪张图量得合适？",
+          "skill": "science-measure-consistently",
+          "analysis": "两座塔都从桌面往上量。尺的起点和桌面对齐，量出来的高度才能比。",
+          "answer": [
+            "B"
+          ],
+          "options": {
+            "A": {
+              "label": "从半腰量",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-a",
+                "alt": "同一桌面上的两座塔，立尺的起点悬在左塔半腰，尺底和桌面之间露出明显空隙"
+              }
+            },
+            "B": {
+              "label": "从桌面起量",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-b",
+                "alt": "两座塔底落在同一桌面线，立尺的起点贴齐桌面"
+              }
+            },
+            "C": {
+              "label": "横放尺子",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-c",
+                "alt": "尺子横放在同一桌面"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p09",
+      "type": "quiz",
+      "title": "怎样试、记和看",
+      "intro": [
+        "这次想一想，哪张图让我们安全地试，也留下可以比较的发现。"
+      ],
+      "questions": [
+        {
+          "id": "science-review-q4",
+          "question": "想知道哪条斜坡让同一辆车滚得远，该怎么试？",
+          "skill": "science-experiment-fair-compare",
+          "analysis": "同一辆车分别从两条斜坡的起点松手，记下停的位置再比。只搭坡或只看图册，都还没有试。",
+          "answer": [
+            "C"
+          ],
+          "options": {
+            "A": {
+              "label": "做斜坡",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-a",
+                "alt": "手正在给一条斜坡加垫纸板，车停在旁边"
+              }
+            },
+            "B": {
+              "label": "翻图册",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-b",
+                "alt": "两条斜坡旁，手翻一页无字的绘图册"
+              }
+            },
+            "C": {
+              "label": "两条坡各试",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-c",
+                "alt": "两个并排时刻小图中，同一辆车分别在两条坡的起点松手"
+              }
+            }
+          }
+        },
+        {
+          "id": "science-review-q5",
+          "question": "想知道窗边那条纸带有没有变方向，哪张记录能拿来比？",
+          "skill": "science-compare-observation-records",
+          "analysis": "记同一条纸带在两个时刻的样子，才看得出它有没有变方向。只画一次或换了纸带，比较就不清楚。",
+          "answer": [
+            "C"
+          ],
+          "options": {
+            "A": {
+              "label": "只记一次",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-a",
+                "alt": "一张记录图里，同一窗边的一条橙纸带只有一次记录"
+              }
+            },
+            "B": {
+              "label": "换另一条",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-b",
+                "alt": "同一扇窗的两张记录。左边是宽的青蓝纸带，右边是短的橙色纸带。"
+              }
+            },
+            "C": {
+              "label": "同一条的两次",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-c",
+                "alt": "两张记录里同一窗同一条橙纸带，分别下垂和斜向一侧"
+              }
+            }
+          }
+        },
+        {
+          "id": "science-review-q6",
+          "question": "桌上有不认识的小颗粒，想先看形状。哪种做法安全？",
+          "skill": "science-safety-habit",
+          "analysis": "先告诉大人，隔着透明盖看。来历不明的东西不拿到嘴边，也不打开凑近闻。",
+          "answer": [
+            "A"
+          ],
+          "options": {
+            "A": {
+              "label": "请大人一起隔盖看",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-a",
+                "alt": "成人和孩子隔着完整透明带盖容器看其中的小颗粒"
+              }
+            },
+            "B": {
+              "label": "拿近嘴边",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-b",
+                "alt": "透明罐开着，孩子捏着一粒小颗粒靠近闭着的嘴，颗粒与嘴之间有空隙。"
+              }
+            },
+            "C": {
+              "label": "开盖凑近闻",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-c",
+                "alt": "孩子打开同一透明容器，脸凑向容器口"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p10",
+      "type": "slide",
+      "title": "和家人做一次小观察",
+      "template": "picture-points",
+      "data": {
+        "title": "和家人做一次小观察",
+        "picture": "family-paper-observation",
+        "points": [
+          "同一张纸，先猜再转",
+          "把两次样子画下来",
+          "互相听完，再问一个"
+        ]
+      },
+      "script": [
+        {
+          "say": "回家找一张干净的废纸，坐在桌边，请家人陪你转一转。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "我用双手转整张纸，直接看就行。用不着剪刀，也免得划到手。做完记得洗手。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先猜一猜，转一下以后，看起来会变宽还是变窄？"
+        },
+        {
+          "say": "转的时候只用这一张纸，别换成另一张呀。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "画两次看到的边线，指给家人看是哪儿不一样。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "你说完，再听家人怎么说。还想知道什么，再问一问。"
+        },
+        {
+          "say": "指着画说给家人听。家人得真的听见，才知道你发现了什么，再记下你的原话。"
+        }
+      ]
+    },
+    {
+      "key": "p11",
+      "type": "slide",
+      "title": "小科桌收工啦",
+      "template": "picture-points",
+      "data": {
+        "title": "小科桌收工啦",
+        "picture": "label-problem",
+        "points": [
+          "把看见的事变成问题",
+          "挑能帮忙的办法，试一试",
+          "留下发现，再问一句"
+        ]
+      },
+      "script": [
+        {
+          "say": "你还记得那张躺着的小名牌吗？我们是从哪里开始想的？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先说看见它倒了，再问怎样能让它站住。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "细节可以看，长短可以量，也可以试、动手做或查图册。"
+        },
+        {
+          "say": "先想你要知道什么，再选办法。屏幕上选图、拍照，记下的是这回练习。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "你亲手折个纸脚，再拿名牌试。家人亲眼看过，才知道你怎么做、试出了什么。"
+        },
+        {
+          "say": "要是还有新的好奇，留给下一次继续找呀。"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,216 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "比大小",
+  "binding": {
+    "editionId": "pep-math-g1-lower-2022-standard",
+    "revisionId": "directory-6205d2037284e91f10b25edd",
+    "nodeId": "ba1db695-94ad-4c0f-9faf-fff92c93f0b3",
+    "unitId": "acfb0386-a55f-4542-9d5d-619a3e2d9023"
+  },
+  "scenario": "展览工坊把木章装成十枚一排，再把两盘送到需要的柜口。老师和孩子通过整排和余下木章，判断左边多、右边多或一样多。",
+  "goals": [
+    "用每十归一组、计数器或数线验证两个100以内数的大小，并说出依据。",
+    "比较两个两位数，十位不同时先看整十；十位相同才继续看个位，两个数位都相同则相等。",
+    "按左右次序选用大于、小于或等于符号，交换两边时能核对符号方向。",
+    "用同一方法按序排列少量数、分类或填一位数字让比较成立。"
+  ],
+  "goalSources": [
+    {
+      "skill": "concrete-comparison",
+      "target": "用每十归一组、计数器或数线验证两个100以内数的大小，并说出依据。",
+      "source": "印33例5和做一做1，课件2～12，教学设计1～2"
+    },
+    {
+      "skill": "tens-before-ones",
+      "target": "比较两个两位数，十位不同时先看整十；十位相同才继续看个位，两个数位都相同则相等。",
+      "source": "印33例5，课件7～13，任务单1"
+    },
+    {
+      "skill": "comparison-symbols",
+      "target": "按左右次序选用大于、小于或等于符号，交换两边时能核对符号方向。",
+      "source": "印33做一做2，课件14～18，任务单2"
+    },
+    {
+      "skill": "apply-comparison",
+      "target": "用同一方法按序排列少量数、分类或填一位数字让比较成立。",
+      "source": "印36练一练4与7，课件19～22，任务单2"
+    }
+  ],
+  "pageSequence": [
+    {
+      "key": "open-the-stamp-workshop",
+      "kind": "teaching",
+      "plan": "先找明显较多的一盘；接近时把木章十枚成排，实画对齐再说谁多。"
+    },
+    {
+      "key": "compare-the-full-rows",
+      "kind": "teaching",
+      "plan": "用51和47说明一整排十能超过七枚散章。对齐两边相同的四排，再查看剩下的一排和散枚。"
+    },
+    {
+      "key": "compare-the-spare-stamps",
+      "kind": "teaching",
+      "plan": "用71和75比较相同的七排后看余数。计数器与成排木章同图切换，点出一珠分别表示一个十或一个一。"
+    },
+    {
+      "key": "turn-the-open-mouth",
+      "kind": "teaching",
+      "plan": "让相同的71和75左右换位，符号的开口朝较大数。用64和64对齐证明相等；不能按颜色或牌子的面积猜。"
+    },
+    {
+      "key": "one-digit-and-one-hundred",
+      "kind": "teaching",
+      "plan": "以8对15和97对100确认上下边界，先看更高的有效位，再看必要的下一位。百位的1表示一个百。"
+    },
+    {
+      "key": "drive-the-compare-snake",
+      "kind": "game",
+      "plan": "真实控制方向，依当前基准和符号吃到符合关系的牌。答对的牌成为下一轮基准，录音先说明读法。"
+    },
+    {
+      "key": "check-on-the-number-line",
+      "kind": "teaching",
+      "plan": "把59和60的号牌放在有方向的数线，后一格的60更大。对照从左到右的关系，数位不同的两个位置不能只看数字相同。"
+    },
+    {
+      "key": "keep-symbol-order",
+      "kind": "teaching",
+      "plan": "对照82和28的计数器，看同样数字交换位值后代表多少。再示范69、65、27三张牌排成从大到小。"
+    },
+    {
+      "key": "push-pairs-to-sign-docks",
+      "kind": "game",
+      "plan": "按图中左盘与右盘的固定顺序选择符号托盘，实际推进与落盘。含两位数同十位、不同十位及相等。"
+    },
+    {
+      "key": "choose-a-digit-that-works",
+      "kind": "teaching",
+      "plan": "用“□4大于34”的原创条件先摆出几张牌，依次核对。再说明题目若问最小，须选能成立的最小数字4。"
+    },
+    {
+      "key": "choose-between-two-numbers",
+      "kind": "teaching",
+      "plan": "在一条带方向的短数线上找比10大又比14小的号牌。手指沿11、12、13走，两头不收。用图和口述交代两个条件要同时成立。"
+    },
+    {
+      "key": "picture-quiz",
+      "kind": "quiz",
+      "plan": "六题原创数量图、计数器、位置图或票卡。老师逐题读，检查看十位、看个位、等号、符号方向、排序和条件。"
+    },
+    {
+      "key": "say-how-you-know",
+      "kind": "teaching",
+      "plan": "回到初始工坊，复述先看整十、再看散个、相同写等号；用整排、计数器和数线任选一种向家人讲理由。"
+    }
+  ],
+  "games": [
+    {
+      "page": "drive-the-compare-snake",
+      "template": "compareSnake",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.compareSnake",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "comparison",
+      "selection": "用数值 start 和每轮真实关系 gt/lt/eq。判定方向固定为候选与右栏基准相比，录音说“找一个比基准更大／更小／一样多的数”。关卡需有可达对错牌，选对后把新基准读出。沿用真实蛇身转向及碰撞。避免使用仅适用于0～10的 dots。",
+      "levels": [
+        "基准46，找大于它的，正确54，错误39；大格慢速。",
+        "基准62，先从58、69选更小的58，再从58、56选相等的58。两轮用不同入口。",
+        "基准76，先从79、74找更大的79，再从73、81找更小的73，再从73、70找相等的73；少量墙与三次转向。"
+      ],
+      "demo": "指侧栏规则、蛇头和正确牌，真走到并吃下第一张，展示基准变化后复位。",
+      "teacherAnchors": [
+        "game-goal",
+        "game-player",
+        "game-target"
+      ]
+    },
+    {
+      "page": "push-pairs-to-sign-docks",
+      "template": "sortingDepot",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.sortingDepot",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "classification",
+      "selection": "货件必须是图上固定左右排列的两张数量牌，必要时小图显示十连条与散章。sample 托盘图分别是大于、小于、等于的目标字形。group 按左数对右数的 gt/lt/eq 计算，同组落盘才计分。各图颜色和方向都不能泄漏组别。地图、货件和托盘数量按已批准模板填。",
+      "levels": [
+        "开阔两件，32对45进小于，70对68进大于。起始可向右推32、45到大于柜，作为真实首错测试。",
+        "三件带不同位置，84对84相等，21对12大于，55对56小于。",
+        "绕障碍四件，66对66相等，98对92大于，38对43与89对93均小于，安排两个同组小于托盘。"
+      ],
+      "demo": "实际推第一对牌进入与左右顺序相符的符号盘，停留听反馈，再复位。",
+      "teacherAnchors": [
+        "game-goal",
+        "game-player",
+        "game-target"
+      ]
+    }
+  ],
+  "quiz": [
+    {
+      "id": "count-the-stamp-trays",
+      "skill": "十位优先",
+      "prompt": "每排十枚木章。哪盘总数更多？",
+      "answer": "右盘六整排加一枚。",
+      "position": 2,
+      "rationale": "六整排多于五整排。一排十枚已经多于左盘额外的七枚。"
+    },
+    {
+      "id": "check-two-trays",
+      "skill": "同十位看个位",
+      "prompt": "两盘都有三整排。哪盘磁扣多？",
+      "answer": "左架有三满排和七枚散扣的图。",
+      "position": 1,
+      "rationale": "两边的三个十一样多，左边另外有七枚，右边没有散扣。"
+    },
+    {
+      "id": "balance-ticket-sign",
+      "skill": "数量相等",
+      "prompt": "两盘圆片，选中间的符号。",
+      "answer": "=。",
+      "position": 3,
+      "rationale": "每边都是两条十连、六枚散片，两边都是26。"
+    },
+    {
+      "id": "direction-on-the-platform",
+      "skill": "从左到右读符号",
+      "prompt": "左边十七，右边二十二。选哪个符号？",
+      "answer": "<。",
+      "position": 2,
+      "rationale": "17小于22，尖端朝左边较小的17，开口朝22。"
+    },
+    {
+      "id": "order-three-shelf-tags",
+      "skill": "三数排序",
+      "prompt": "三张货号从大到小，哪张图摆对？",
+      "answer": "36、33、19的顺序。",
+      "position": 1,
+      "rationale": "两个三十几都大于19，同十位的36再比33大。"
+    },
+    {
+      "id": "test-a-missing-ones-place",
+      "skill": "验证填位条件",
+      "prompt": "八十六小于八十几，个位选哪张？",
+      "answer": "数字9。",
+      "position": 3,
+      "rationale": "两边都是八个十。9大于6，选项1和3都小于6。"
+    }
+  ],
+  "afterClass": {
+    "familyTask": "用1～9的手写数字卡，孩子与成人各取两张组成一个两位数。互换卡的位置，分别判断谁大或一样大，并选一种办法说理由。",
+    "weeklyQuestionSource": [
+      "十位不同先看整十",
+      "十位相同看个位",
+      "等号和符号左右方向",
+      "两数和三数排序",
+      "缺位数字条件"
+    ],
+    "evidence": "课堂记录游戏真实方向操作、配对和答题。家庭组合卡和口述由成人观察，记录待观察。"
+  },
+  "artAndLanguage": "数码、符号、木章阵列、计数器及题图均用代码精确生成，游戏人物和场景图待磁盘恢复。目标数码与符号保持，非目标字可遮。",
+  "authoring": {
+    "mode": "direct",
+    "model": "gpt-6.1-sol",
+    "bookAndCompanionScope": "印33整课、印36比较练习与一课时31页官方配套。"
+  },
+  "officialNotesSha256": "7091e58e040c3e4aa44874a75a72c4fbc71d0ed19755e5ac7c8291e759d91847"
+}

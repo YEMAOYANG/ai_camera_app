@@ -1,0 +1,1063 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "口算加法（不进位）",
+  "description": "用整条十枚和散贴理解100以内不进位加法。",
+  "grade": 1,
+  "roster": {
+    "math": {
+      "name": "小数老师",
+      "role": "teacher",
+      "gender": "male",
+      "voice": "Ethan",
+      "avatar": "/teachers/ashu-math-v1.png",
+      "color": "#53726a",
+      "persona": "用简单准确的口语带孩子数整条和散贴，再算。"
+    }
+  },
+  "scenes": [
+    {
+      "key": "craft-show-stickers",
+      "type": "slide",
+      "title": "手工展收圆贴",
+      "template": "title-picture",
+      "data": {
+        "title": "手工展收圆贴",
+        "picture": "craft-sticker-table",
+        "caption": "哪两份合在一起？"
+      },
+      "script": [
+        {
+          "say": "手工展要布置啦。小桥准备了一些圆贴，还想添一点。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "这张托盘上有三条，每条十枚，还有四枚散的。"
+        },
+        {
+          "say": "旁边有补来的三枚。求补完一共几枚，要把这两份合起来。"
+        },
+        {
+          "say": "另一张订单说要添三条。三条和三枚是同样多吗？"
+        },
+        {
+          "say": "要先听清拿来的是一枚一枚，还是十枚一条。"
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "把两份合起来，要用加法。我们用图来想。"
+        }
+      ]
+    },
+    {
+      "key": "a-strip-is-ten",
+      "type": "slide",
+      "title": "一条十枚，一枚就是一",
+      "template": "two-columns",
+      "data": {
+        "title": "一条十枚，一枚就是一",
+        "left": {
+          "heading": "看一条",
+          "body": "1 个十"
+        },
+        "left_picture": "ten-dot-strip",
+        "right": {
+          "heading": "看三条四枚",
+          "body": "3 个十和 4 个一"
+        },
+        "right_picture": "stickers-34"
+      },
+      "script": [
+        {
+          "say": "一长条和一枚散贴都能拿起来。它们一样多吗？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "指着一条数。十个小格，各有一枚圆贴。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "这样一条表示一个十，也就是十枚。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "再找大托盘。三条有三十枚，散贴还有四枚。"
+        },
+        {
+          "say": "散贴没有放进整条里。数完整条，再接着数散贴。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "三个十和四个一合起来，是三十四。"
+        },
+        {
+          "say": "等会儿添圆贴时，看看添来的是条还是散贴。"
+        }
+      ]
+    },
+    {
+      "key": "add-loose-three",
+      "type": "slide",
+      "title": "加三枚散贴",
+      "template": "two-columns",
+      "data": {
+        "title": "加三枚散贴",
+        "left": {
+          "heading": "原来有三十四枚",
+          "body": "3 个十，4 个一"
+        },
+        "left_picture": "stickers-34",
+        "right": {
+          "heading": "加上三枚",
+          "body": "34 + 3 = 37"
+        },
+        "right_picture": "add-three-ones"
+      },
+      "script": [
+        {
+          "say": "三十四枚再添三枚散贴。该把三枚放在哪儿？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "原来是三条和四枚。先用手指找原来的散贴。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "三个十已经在条里，先放着。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "新来的也是散贴，放到四枚旁边，几个一合在一起。"
+        },
+        {
+          "say": "四加三等于七。整条还是三条，没动过。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "三个十和七个一是三十七。"
+        },
+        {
+          "say": "三十四加三，等于三十七。"
+        },
+        {
+          "say": "要是换成三条，你还会把它们放在散贴这里吗？"
+        }
+      ]
+    },
+    {
+      "key": "add-three-strips",
+      "type": "slide",
+      "title": "加三条整贴",
+      "template": "two-columns",
+      "data": {
+        "title": "加三条整贴",
+        "left": {
+          "heading": "原来有三十四枚",
+          "body": "3 个十，4 个一"
+        },
+        "left_picture": "stickers-34",
+        "right": {
+          "heading": "再添三条",
+          "body": "34 + 30 = 64"
+        },
+        "right_picture": "add-three-tens"
+      },
+      "script": [
+        {
+          "say": "这次添的是三条，每条十枚。和三枚一样吗？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "原来的三条与四枚，数量和刚才一样。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "三个十和四个一各有各的位置。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "新来的每条都有十枚，跟原来的三条放在一起。"
+        },
+        {
+          "say": "三个十加三个十，是六个十。散的四枚没动。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "六个十和四个一是六十四。"
+        },
+        {
+          "say": "三十四加三十，等于六十四。"
+        },
+        {
+          "say": "两个算式都看到一个三。一个是三个一，一个是三个十。"
+        },
+        {
+          "say": "先看单位，再决定要把什么合起来。"
+        },
+        {
+          "say": "把整条和散贴分开送。"
+        },
+        {
+          "say": "绕过隔板，整条和散贴分开送。"
+        },
+        {
+          "say": "有几条也有几枚，按单位送。"
+        },
+        {
+          "say": "先看它是成条，还是散的。"
+        },
+        {
+          "say": "看托盘图，从卡后面推。"
+        },
+        {
+          "say": "整条和散贴各归各位。"
+        }
+      ]
+    },
+    {
+      "key": "sort-the-counting-units",
+      "type": "interactive",
+      "title": "整条散贴分开送",
+      "page": "sort-the-counting-units",
+      "startImage": "sort-yard",
+      "widgetType": "learning-arcade",
+      "script": [
+        {
+          "say": "整理车要把两种卡送回托盘。先来看这一张。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#first-loose-card"
+        },
+        {
+          "say": "两枚圆贴各自分开，都是一个一个的散贴。"
+        },
+        {
+          "highlight": "#first-one-dock"
+        },
+        {
+          "say": "这个托盘画了一枚散贴。它装的是几个一。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "车在卡片后面。按一次右箭头，把它推到托盘。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "落在散贴托盘里，说明这一份送对了。示范就到这儿。"
+        },
+        {
+          "say": "另一张卡有成条的十格。它应该去和哪张图相同的托盘？"
+        },
+        {
+          "say": "你来从第一张开始。先看单位，再从背后推。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "sort-first": "add-three-strips-14",
+        "sort-two": "add-three-strips-15",
+        "sort-three": "add-three-strips-16",
+        "sort-hint": "add-three-strips-17",
+        "sort-help": "add-three-strips-18",
+        "sort-praise": "add-three-strips-19"
+      }
+    },
+    {
+      "key": "add-the-same-units",
+      "type": "slide",
+      "title": "两边都有整条和散贴",
+      "template": "two-columns",
+      "data": {
+        "title": "两边都有整条和散贴",
+        "left": {
+          "heading": "原来三十四枚",
+          "body": "30 + 4"
+        },
+        "left_picture": "stickers-34",
+        "right": {
+          "heading": "再添二十三枚",
+          "body": "34 + 23 = 57"
+        },
+        "right_picture": "add-twenty-three"
+      },
+      "script": [
+        {
+          "say": "添来二十三枚，既有整条，也有散贴。该从哪儿开始？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "原来的是三个十、四个一。请分别指给我看。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "三十四可以分成三十和四。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "新来的是两个十、三个一。整条和整条合。"
+        },
+        {
+          "say": "三十加二十，是五十。散贴也和散贴合。"
+        },
+        {
+          "say": "四加三，是七。七枚还不到十，直接留在散贴里。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "五个十和七个一合起来，是五十七。"
+        },
+        {
+          "say": "两个数里都有十和一，我们分开算，再合起来。"
+        }
+      ]
+    },
+    {
+      "key": "swap-the-positions",
+      "type": "slide",
+      "title": "换个顺序，也要看单位",
+      "template": "two-columns",
+      "data": {
+        "title": "换个顺序，也要看单位",
+        "left": {
+          "heading": "前面是四枚",
+          "body": "4 + 42 = 46\n42 + 4 = 46"
+        },
+        "left_picture": "example-four-plus-forty-two",
+        "right": {
+          "heading": "前面是四条",
+          "body": "40 + 42 = 82\n42 + 40 = 82"
+        },
+        "right_picture": "example-forty-plus-forty-two"
+      },
+      "script": [
+        {
+          "say": "四或四十写到了前面，还是只看它在前面吗？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "四个一加两个一得六个一，四个十留下。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "四加四十二得四十六。四十二加四也是四十六。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "四个十加四个十得八个十，两个一留下。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "四十加四十二得八十二。四十二加四也是八十二。"
+        },
+        {
+          "say": "先后换了，两份都没变。同样单位加在一起。"
+        },
+        {
+          "say": "现在听几张订单。听完可以在心里摆一摆。"
+        },
+        {
+          "say": "四十二加五。"
+        },
+        {
+          "say": "四十二加三十。"
+        },
+        {
+          "say": "二十三加四。"
+        },
+        {
+          "say": "三十一加二十。"
+        },
+        {
+          "say": "十五加四。"
+        },
+        {
+          "say": "三十一加二十四。"
+        },
+        {
+          "say": "五十二加二十七。"
+        },
+        {
+          "say": "六加五十三。"
+        },
+        {
+          "say": "四十加五十三。"
+        },
+        {
+          "say": "再看有哪些十，哪些一。"
+        },
+        {
+          "say": "先算同一单位，再找相合的数。"
+        },
+        {
+          "say": "这张订单和总数配对了。"
+        }
+      ]
+    },
+    {
+      "key": "match-the-order-total",
+      "type": "interactive",
+      "title": "接住正确的总数",
+      "page": "match-the-order-total",
+      "startImage": "tile-yard",
+      "widgetType": "learning-arcade",
+      "script": [
+        {
+          "say": "订单牌慢慢落下。四十二加五，会配哪张结果？"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#first-order-picture"
+        },
+        {
+          "say": "图上原来四条两枚。再添五枚，散贴成了七枚。"
+        },
+        {
+          "highlight": "#first-tile-destination"
+        },
+        {
+          "say": "整条还是四条，合成四十七。先找到这张总数。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "左右移动订单牌，挪到结果旁边的空格。"
+        },
+        {
+          "say": "这一张已经在空格上面。点落下，就能把它送下去。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "两张对上，就消掉了。我们只配这一张。"
+        },
+        {
+          "say": "换你从头做。听清加几，或者加几十，再选落下的位置。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "drop-42-5": "swap-the-positions-12",
+        "drop-42-30": "swap-the-positions-13",
+        "drop-23-4": "swap-the-positions-14",
+        "drop-31-20": "swap-the-positions-15",
+        "drop-15-4": "swap-the-positions-16",
+        "drop-31-24": "swap-the-positions-17",
+        "drop-52-27": "swap-the-positions-18",
+        "drop-6-53": "swap-the-positions-19",
+        "drop-40-53": "swap-the-positions-20",
+        "drop-hint": "swap-the-positions-21",
+        "drop-help": "swap-the-positions-22",
+        "drop-praise": "swap-the-positions-23"
+      }
+    },
+    {
+      "key": "check-new-orders",
+      "type": "quiz",
+      "title": "手工展的新订单",
+      "intro": [
+        "听订单，找符合的那张图。",
+        "没听清，可以点小喇叭再听。"
+      ],
+      "questions": [
+        {
+          "id": "nrg-q1",
+          "question": "二十二枚贴纸，再加六枚，一共有几枚？",
+          "skill": "两位数加一位数",
+          "answer": [
+            "B"
+          ],
+          "analysis": "两个十保留，两个一和六个一合成八个一。合起来二十八。",
+          "visual": {
+            "kind": "asset",
+            "image": "check-1-order",
+            "alt": "本题订单数量图"
+          },
+          "options": {
+            "A": {
+              "label": "图卡1",
+              "visual": {
+                "kind": "asset",
+                "image": "check-1-card-1",
+                "alt": "24枚圆贴"
+              }
+            },
+            "B": {
+              "label": "图卡2",
+              "visual": {
+                "kind": "asset",
+                "image": "check-1-card-2",
+                "alt": "28枚圆贴"
+              }
+            },
+            "C": {
+              "label": "图卡3",
+              "visual": {
+                "kind": "asset",
+                "image": "check-1-card-3",
+                "alt": "82枚圆贴"
+              }
+            }
+          }
+        },
+        {
+          "id": "nrg-q2",
+          "question": "五十四枚，再加二十枚，合起来是多少？",
+          "skill": "两位数加整十数",
+          "answer": [
+            "A"
+          ],
+          "analysis": "五个十加两个十是七个十，四个一原样保留，所以是七十四。",
+          "visual": {
+            "kind": "asset",
+            "image": "check-2-order",
+            "alt": "本题订单数量图"
+          },
+          "options": {
+            "A": {
+              "label": "图卡1",
+              "visual": {
+                "kind": "asset",
+                "image": "check-2-card-1",
+                "alt": "74枚圆贴"
+              }
+            },
+            "B": {
+              "label": "图卡2",
+              "visual": {
+                "kind": "asset",
+                "image": "check-2-card-2",
+                "alt": "56枚圆贴"
+              }
+            },
+            "C": {
+              "label": "图卡3",
+              "visual": {
+                "kind": "asset",
+                "image": "check-2-card-3",
+                "alt": "76枚圆贴"
+              }
+            }
+          }
+        },
+        {
+          "id": "nrg-q3",
+          "question": "四十二加十六等于多少？",
+          "skill": "两位数加两位数不进位",
+          "answer": [
+            "C"
+          ],
+          "analysis": "四十加十是五十，二加六是八，合成五十八。",
+          "visual": {
+            "kind": "asset",
+            "image": "check-3-order",
+            "alt": "本题订单数量图"
+          },
+          "options": {
+            "A": {
+              "label": "图卡1",
+              "visual": {
+                "kind": "asset",
+                "image": "check-3-card-1",
+                "alt": "48枚圆贴"
+              }
+            },
+            "B": {
+              "label": "图卡2",
+              "visual": {
+                "kind": "asset",
+                "image": "check-3-card-2",
+                "alt": "56枚圆贴"
+              }
+            },
+            "C": {
+              "label": "图卡3",
+              "visual": {
+                "kind": "asset",
+                "image": "check-3-card-3",
+                "alt": "58枚圆贴"
+              }
+            }
+          }
+        },
+        {
+          "id": "nrg-q4",
+          "question": "六加六十一，结果是多少？",
+          "skill": "一位数在前的加法",
+          "answer": [
+            "B"
+          ],
+          "analysis": "六是六个一，和六十一里的一个一相加；六个十不变，所以是六十七。",
+          "visual": {
+            "kind": "asset",
+            "image": "check-4-order",
+            "alt": "本题订单数量图"
+          },
+          "options": {
+            "A": {
+              "label": "图卡1",
+              "visual": {
+                "kind": "asset",
+                "image": "check-4-card-1",
+                "alt": "61枚圆贴"
+              }
+            },
+            "B": {
+              "label": "图卡2",
+              "visual": {
+                "kind": "asset",
+                "image": "check-4-card-2",
+                "alt": "67枚圆贴"
+              }
+            },
+            "C": {
+              "label": "图卡3",
+              "visual": {
+                "kind": "asset",
+                "image": "check-4-card-3",
+                "alt": "76枚圆贴"
+              }
+            }
+          }
+        },
+        {
+          "id": "nrg-q5",
+          "question": "先算三十六加三，再算三十六加三十。",
+          "skill": "比较个位和十位的变化",
+          "answer": [
+            "C"
+          ],
+          "analysis": "加三，个位变成九。加三十，十位变成六。两次结果依次是三十九和六十六。",
+          "visual": {
+            "kind": "asset",
+            "image": "check-5-order",
+            "alt": "本题订单数量图"
+          },
+          "options": {
+            "A": {
+              "label": "图卡1",
+              "visual": {
+                "kind": "asset",
+                "image": "check-5-card-1",
+                "alt": "第一张66枚，第二张39枚"
+              }
+            },
+            "B": {
+              "label": "图卡2",
+              "visual": {
+                "kind": "asset",
+                "image": "check-5-card-2",
+                "alt": "第一张39枚，第二张39枚"
+              }
+            },
+            "C": {
+              "label": "图卡3",
+              "visual": {
+                "kind": "asset",
+                "image": "check-5-card-3",
+                "alt": "第一张39枚，第二张66枚"
+              }
+            }
+          }
+        },
+        {
+          "id": "nrg-q6",
+          "question": "一盒四十四枚，另一盒二十五枚。一共几枚？",
+          "skill": "看图选择两组总数",
+          "answer": [
+            "A"
+          ],
+          "analysis": "两盒合起来。四个十和两个十合成六个十，四个一和五个一合成九个一。",
+          "visual": {
+            "kind": "asset",
+            "image": "check-6-order",
+            "alt": "本题订单数量图"
+          },
+          "options": {
+            "A": {
+              "label": "图卡1",
+              "visual": {
+                "kind": "asset",
+                "image": "check-6-card-1",
+                "alt": "69枚圆贴"
+              }
+            },
+            "B": {
+              "label": "图卡2",
+              "visual": {
+                "kind": "asset",
+                "image": "check-6-card-2",
+                "alt": "64枚圆贴"
+              }
+            },
+            "C": {
+              "label": "图卡3",
+              "visual": {
+                "kind": "asset",
+                "image": "check-6-card-3",
+                "alt": "49枚圆贴"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "tell-how-you-added",
+      "type": "slide",
+      "title": "回家说清楚哪一位变了",
+      "template": "picture-points",
+      "data": {
+        "title": "回家说清楚哪一位变了",
+        "picture": "craft-review-display",
+        "points": [
+          "几个一和几个一合",
+          "几个十和几个十合",
+          "算完再合成结果"
+        ]
+      },
+      "script": [
+        {
+          "say": "展台准备好了。你能给家人讲讲你是怎么算的吗？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "先看看来的是散贴、整条，还是两种都有。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "加散贴，就跟原来的散贴合。原来的整条可以留在那儿。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "加整条，就和原来的整条合。原来的散贴也留着。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "两份都带整条和散贴，就分别算，再合在一起。"
+        },
+        {
+          "say": "用纸画十格和单点，自己摆一个新订单。"
+        },
+        {
+          "say": "说一说哪一位变了。回纸书第四十四页上半页，还能再练。"
+        }
+      ]
+    }
+  ],
+  "images": {
+    "add-three-ones": {
+      "file": "assets/add-three-ones.png"
+    },
+    "add-three-tens": {
+      "file": "assets/add-three-tens.png"
+    },
+    "add-twenty-three": {
+      "file": "assets/add-twenty-three.png"
+    },
+    "check-1-card-1": {
+      "file": "assets/check-1-card-1.png"
+    },
+    "check-1-card-2": {
+      "file": "assets/check-1-card-2.png"
+    },
+    "check-1-card-3": {
+      "file": "assets/check-1-card-3.png"
+    },
+    "check-1-order": {
+      "file": "assets/check-1-order.png"
+    },
+    "check-2-card-1": {
+      "file": "assets/check-2-card-1.png"
+    },
+    "check-2-card-2": {
+      "file": "assets/check-2-card-2.png"
+    },
+    "check-2-card-3": {
+      "file": "assets/check-2-card-3.png"
+    },
+    "check-2-order": {
+      "file": "assets/check-2-order.png"
+    },
+    "check-3-card-1": {
+      "file": "assets/check-3-card-1.png"
+    },
+    "check-3-card-2": {
+      "file": "assets/check-3-card-2.png"
+    },
+    "check-3-card-3": {
+      "file": "assets/check-3-card-3.png"
+    },
+    "check-3-order": {
+      "file": "assets/check-3-order.png"
+    },
+    "check-4-card-1": {
+      "file": "assets/check-4-card-1.png"
+    },
+    "check-4-card-2": {
+      "file": "assets/check-4-card-2.png"
+    },
+    "check-4-card-3": {
+      "file": "assets/check-4-card-3.png"
+    },
+    "check-4-order": {
+      "file": "assets/check-4-order.png"
+    },
+    "check-5-card-1": {
+      "file": "assets/check-5-card-1.png"
+    },
+    "check-5-card-2": {
+      "file": "assets/check-5-card-2.png"
+    },
+    "check-5-card-3": {
+      "file": "assets/check-5-card-3.png"
+    },
+    "check-5-order": {
+      "file": "assets/check-5-order.png"
+    },
+    "check-6-card-1": {
+      "file": "assets/check-6-card-1.png"
+    },
+    "check-6-card-2": {
+      "file": "assets/check-6-card-2.png"
+    },
+    "check-6-card-3": {
+      "file": "assets/check-6-card-3.png"
+    },
+    "check-6-order": {
+      "file": "assets/check-6-order.png"
+    },
+    "craft-cart": {
+      "file": "assets/craft-cart.png"
+    },
+    "craft-cart-push": {
+      "file": "assets/craft-cart-push.png"
+    },
+    "craft-review-display": {
+      "file": "assets/craft-review-display.png"
+    },
+    "craft-sticker-badge": {
+      "file": "assets/craft-sticker-badge.png"
+    },
+    "craft-sticker-table": {
+      "file": "assets/craft-sticker-table.png"
+    },
+    "example-forty-plus-forty-two": {
+      "file": "assets/example-forty-plus-forty-two.png"
+    },
+    "example-four-plus-forty-two": {
+      "file": "assets/example-four-plus-forty-two.png"
+    },
+    "one-unit-marker": {
+      "file": "assets/one-unit-marker.png"
+    },
+    "order-15-4": {
+      "file": "assets/order-15-4.png"
+    },
+    "order-23-4": {
+      "file": "assets/order-23-4.png"
+    },
+    "order-31-20": {
+      "file": "assets/order-31-20.png"
+    },
+    "order-31-24": {
+      "file": "assets/order-31-24.png"
+    },
+    "order-40-53": {
+      "file": "assets/order-40-53.png"
+    },
+    "order-42-30": {
+      "file": "assets/order-42-30.png"
+    },
+    "order-42-5": {
+      "file": "assets/order-42-5.png"
+    },
+    "order-52-27": {
+      "file": "assets/order-52-27.png"
+    },
+    "order-6-53": {
+      "file": "assets/order-6-53.png"
+    },
+    "sort-loose-2": {
+      "file": "assets/sort-loose-2.png"
+    },
+    "sort-loose-3": {
+      "file": "assets/sort-loose-3.png"
+    },
+    "sort-loose-4": {
+      "file": "assets/sort-loose-4.png"
+    },
+    "sort-loose-6": {
+      "file": "assets/sort-loose-6.png"
+    },
+    "sort-loose-7": {
+      "file": "assets/sort-loose-7.png"
+    },
+    "sort-strip-1": {
+      "file": "assets/sort-strip-1.png"
+    },
+    "sort-strip-2": {
+      "file": "assets/sort-strip-2.png"
+    },
+    "sort-strip-3": {
+      "file": "assets/sort-strip-3.png"
+    },
+    "sort-strip-4": {
+      "file": "assets/sort-strip-4.png"
+    },
+    "sort-yard": {
+      "file": "assets/sort-yard.png"
+    },
+    "stickers-34": {
+      "file": "assets/stickers-34.png"
+    },
+    "ten-dot-strip": {
+      "file": "assets/ten-dot-strip.png"
+    },
+    "ten-unit-marker": {
+      "file": "assets/ten-unit-marker.png"
+    },
+    "tile-15-4": {
+      "file": "assets/tile-15-4.png"
+    },
+    "tile-23-4": {
+      "file": "assets/tile-23-4.png"
+    },
+    "tile-31-20": {
+      "file": "assets/tile-31-20.png"
+    },
+    "tile-31-24": {
+      "file": "assets/tile-31-24.png"
+    },
+    "tile-40-53": {
+      "file": "assets/tile-40-53.png"
+    },
+    "tile-42-30": {
+      "file": "assets/tile-42-30.png"
+    },
+    "tile-42-5": {
+      "file": "assets/tile-42-5.png"
+    },
+    "tile-52-27": {
+      "file": "assets/tile-52-27.png"
+    },
+    "tile-6-53": {
+      "file": "assets/tile-6-53.png"
+    },
+    "tile-yard": {
+      "file": "assets/tile-yard.png"
+    },
+    "total-19": {
+      "file": "assets/total-19.png"
+    },
+    "total-27": {
+      "file": "assets/total-27.png"
+    },
+    "total-47": {
+      "file": "assets/total-47.png"
+    },
+    "total-51": {
+      "file": "assets/total-51.png"
+    },
+    "total-55": {
+      "file": "assets/total-55.png"
+    },
+    "total-59": {
+      "file": "assets/total-59.png"
+    },
+    "total-72": {
+      "file": "assets/total-72.png"
+    },
+    "total-79": {
+      "file": "assets/total-79.png"
+    },
+    "total-93": {
+      "file": "assets/total-93.png"
+    }
+  }
+}

@@ -1,0 +1,191 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "解决问题｜七巧板",
+  "binding": {
+    "editionId": "pep-math-g1-lower-2022-standard",
+    "revisionId": "directory-6205d2037284e91f10b25edd",
+    "nodeId": "ba08a10c-649d-41fd-9bfc-faca1497585f",
+    "unitId": "00dd71f6-4bed-412c-951d-dc049bd461b4"
+  },
+  "scenario": "拼图展准备了三角门牌和方框。孩子拿一套七巧板给门牌配板、查接缝，再做自己的图案。",
+  "goals": [
+    "能数出一套七巧板的七块，分辨五块不同大小的三角形、正方形和平行四边形。",
+    "能借两块相同大小的三角形起步，试用三、四块七巧板拼三角形，并说明所用块和接合边。",
+    "能检查拼成的外轮廓、接缝与块数，将拼法迁移到长方形和正方形，尝试创意图案。"
+  ],
+  "goalSources": [
+    {
+      "skill": "inventory",
+      "target": "能数出一套七巧板的七块，分辨五块不同大小的三角形、正方形和平行四边形。",
+      "source": "印4、课件5～6"
+    },
+    {
+      "skill": "stepwise",
+      "target": "能借两块相同大小的三角形起步，试用三、四块七巧板拼三角形，并说明所用块和接合边。",
+      "source": "印4、教案2～3"
+    },
+    {
+      "skill": "check-transfer",
+      "target": "能检查拼成的外轮廓、接缝与块数，将拼法迁移到长方形和正方形，尝试创意图案。",
+      "source": "印4及印7第6题、课件19～23、课后练习1"
+    }
+  ],
+  "pageSequence": [
+    {
+      "key": "one-seven-piece-set",
+      "kind": "teaching",
+      "plan": "完整的正方形排成一套，打散后按形状和大小数板，教师指清图形、块数与展板的三角目标。"
+    },
+    {
+      "key": "sort-the-seven",
+      "kind": "teaching",
+      "plan": "展开并逐个数一套七巧板，辨认大、中、小三角板以及方板和斜方板。"
+    },
+    {
+      "key": "two-piece-trial",
+      "kind": "teaching",
+      "plan": "用两大或两小三角板沿合适直角边对齐，分别停留在未转、转动、贴合、沿外边检查四步。给出一三角板加一方板的错例及具体缝边。"
+    },
+    {
+      "key": "try-three-and-four",
+      "kind": "teaching",
+      "plan": "分别用两小三角形加方板、中板或平行四边形拼三块方案。留住已成的大三角形与另一块大三角板接合，说明三加一成四、外形仍是三角形。"
+    },
+    {
+      "key": "keep-the-triangle",
+      "kind": "teaching",
+      "plan": "比较平行四边形方案，保留三块成品并贴入一块同大的板，检查块数、接缝和三边。"
+    },
+    {
+      "key": "aim-to-complete",
+      "kind": "game",
+      "plan": "真实发射动作配能补齐缺口的七巧板部件，击中错误部件要看缝边再试。"
+    },
+    {
+      "key": "turn-for-new-shapes",
+      "kind": "teaching",
+      "plan": "两小块沿斜边拼方形，添加等大的正方形板变成长方形。示意形状变化源于摆法和组合，不能拉伸或遮叠板。"
+    },
+    {
+      "key": "trace-outer-outline",
+      "kind": "game",
+      "plan": "操纵走位，按当前外轮廓挑拼好的展品，考虑分割方式不同仍同类。"
+    },
+    {
+      "key": "picture-quiz",
+      "kind": "quiz",
+      "plan": "六道有录音的图题，正确位置均衡。"
+    },
+    {
+      "key": "tangram-exhibition",
+      "kind": "teaching",
+      "plan": "回放读目标、选板试拼、验轮廓三个步骤，认识传统益智玩具，并鼓励用整套板创作。"
+    }
+  ],
+  "games": [
+    {
+      "page": "aim-to-complete",
+      "template": "magnetMarbles",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.magnetMarbles",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "pair_match",
+      "selection": "以有向 pairs 判定。候选块图与目标缺口都按同一比例绘制，听老师指外轮廓和缺口，从三个移动靶中击中同形同大小、可合缝的板。无正确形状就不可得分，正确反馈画面显示合缝成形。",
+      "levels": [
+        "两张同类三角缺口，须分辨大小。",
+        "配小三角或方板，各补满三块方案。",
+        "用中板、斜方板或转过的大三角板补实。"
+      ],
+      "demo": "老师依次指待送板、对应缺口、方向键和发射键，实际只送一次，展示实拼图再清零。",
+      "teacherAnchors": [
+        "piece-on-table",
+        "game-target",
+        "aim-left",
+        "launch-piece",
+        "exact-result"
+      ]
+    },
+    {
+      "page": "trace-outer-outline",
+      "template": "compareSnake",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.compareSnake",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "shape_match",
+      "selection": "用 groups 对齐目标与实际已排好的组合，只按连续、无缺口且无重叠的外围轮廓归组。用大小一致、颜色与位置变化的错组，使玩家必须比较合成外框。上一组合变成参考时，同关后续正确食物仍属同一轮廓。",
+      "levels": [
+        "走位选两件拼成、无缝的三角形。",
+        "依次辨认三件、四件成品，并判断转向。",
+        "追踪相同的长方形外轮廓，排除正方形和错位方板。"
+      ],
+      "demo": "老师指右侧目标、待送成品和向上键，只走到一件正确展品，确认参考图跟随实际结果，再清零。",
+      "teacherAnchors": [
+        "game-goal",
+        "game-target",
+        "snake-forward"
+      ]
+    }
+  ],
+  "quiz": [
+    {
+      "id": "count-set",
+      "skill": "听懂七巧板组成",
+      "prompt": "看打散的一套七巧板。哪张卡正好标出了其中的五块三角板？",
+      "answer": "只标两大、两小和一中三角板",
+      "position": 2,
+      "rationale": "一套中的另外两块分别是正方形、平行四边形。"
+    },
+    {
+      "id": "two-pieces",
+      "skill": "同样三角形拼三角形",
+      "prompt": "目标外轮廓是三角形，哪一组两块板能贴紧拼出它？",
+      "answer": "两块一样大的三角形沿合适直角边贴合",
+      "position": 3,
+      "rationale": "两条合适的同长边相接，外轮廓有三条直边。"
+    },
+    {
+      "id": "three-pieces",
+      "skill": "三块组合",
+      "prompt": "哪一图用两小三角形和一个方块拼成一个三角形？",
+      "answer": "两小三角形和方块完整填成三角形",
+      "position": 1,
+      "rationale": "三块都用到，外边连成三边，内部没有空缝。"
+    },
+    {
+      "id": "check-before-display",
+      "skill": "看外轮廓及缝",
+      "prompt": "选一张可以送去展出的三角形拼图。要求无重叠、不漏缝。",
+      "answer": "四块恰好贴合的完整三角形",
+      "position": 2,
+      "rationale": "外边连好，板没有压住邻板，也没有留空。"
+    },
+    {
+      "id": "square-from-pair",
+      "skill": "正方形迁移",
+      "prompt": "两块一样大的小三角形换一种贴法。哪张图拼成了正方形？",
+      "answer": "沿斜边合成方形",
+      "position": 1,
+      "rationale": "两条斜边贴合后，外面是四条一样长的边。"
+    },
+    {
+      "id": "rectangle-plus-square",
+      "skill": "长方形迁移",
+      "prompt": "两小块先拼成一个方形。再加上一块方板，哪张图得到长方形？",
+      "answer": "两个等大正方形边贴边拼成的长方形",
+      "position": 3,
+      "rationale": "两边对齐，外轮廓是长方形，中间没有缝隙。"
+    }
+  ],
+  "afterClass": {
+    "familyTask": "用实体七巧板先拼一个两块的三角形，再试一次换成三至四块。最后从整套中拼一张创意图案，沿外边查一圈，告诉成人用了哪些板。",
+    "weeklyQuestionSource": [
+      "辨认七块组成",
+      "两或三块拼三角形",
+      "不重叠不漏缝",
+      "长方形正方形的迁移"
+    ],
+    "evidence": "线上记录选择和操控；实际转板、口述方法与创作由成人观察。"
+  },
+  "artAndLanguage": "所有可计数、可拼接的形状按同一组精确七巧板坐标绘制，课堂运动和错例保持板形与尺寸不变，不用生成图猜分割线。美术只承载展场、角色和装饰。读题、停顿和反馈均由语音完成，去掉非目标文字仍能操作。",
+  "officialNotesSha256": "26401fcf03c67ac0d927262addda5fcc2e98fa675c107eb19b9fad4585830de9"
+}

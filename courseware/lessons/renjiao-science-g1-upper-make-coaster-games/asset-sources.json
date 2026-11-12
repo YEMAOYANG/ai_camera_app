@@ -1,0 +1,344 @@
+{
+  "sourceLesson": "renjiao-science-g1-upper-make-coaster",
+  "pictureCacheSha256": "626112505471017eeb8d3e4c33a04070f5a4bcfc877c6475ff06465cd27535af",
+  "sourceReceipts": "output/courseware-lessons/renjiao-science-g1-upper-make-coaster/.media-dispatch/requests",
+  "assets": [
+    {
+      "id": "circle-methods",
+      "file": "circle-methods.png",
+      "sceneKeys": [
+        "circle-tools"
+      ],
+      "questionIds": [],
+      "drawingSource": "diagrams/circle-methods.svg",
+      "meaning": "并排说明按住圆盖沿边、固定两支笔间距、定线头并保持绳长；笔尖落在准确的示意边界。",
+      "sha256": "26eaec28178cfa51031156d2987e1f175e929dfae92988994fd7381afe6ada83",
+      "drawingSourceSha256": "96f17e503082133564ffd5249d9a2407556c8b33270c9f3ec4055cc62c8e51e0"
+    },
+    {
+      "id": "compass-equal",
+      "file": "compass-equal.png",
+      "sceneKeys": [],
+      "questionIds": [
+        "coaster-circle"
+      ],
+      "drawingSource": "diagrams/compass-equal.svg",
+      "meaning": "同样的距离",
+      "sha256": "97dc8568440f259a4b0f978ef376ffd857239ae728fca18f818c7313055bdd94",
+      "drawingSourceSha256": "a4c4bc4201fe95c5b4af8b6e7ec64fcb295504b184d6f383c13733065aea2cd7"
+    },
+    {
+      "id": "compass-long",
+      "file": "compass-long.png",
+      "sceneKeys": [],
+      "questionIds": [
+        "coaster-circle"
+      ],
+      "drawingSource": "diagrams/compass-long.svg",
+      "meaning": "更大的笔尖距离",
+      "sha256": "b6c37432416e3179dbb8ff0326ae509a41eacb0074bb675c27271efdcfbccab6",
+      "drawingSourceSha256": "0ade6004021872215273b129b29087731222bbed75966715d96001e0ede3dd4c"
+    },
+    {
+      "id": "compass-reference",
+      "file": "compass-reference.png",
+      "sceneKeys": [],
+      "questionIds": [
+        "coaster-circle"
+      ],
+      "drawingSource": "diagrams/compass-reference.svg",
+      "meaning": "原两笔尖距离",
+      "sha256": "c9703317e8f5762592dde66b6b8cd48092170026108c7acdcbc277767d00a7eb",
+      "drawingSourceSha256": "a0e6db20f56b57f5a43beb6880c53bd893438b19e9c261d540c1086ac38c1713"
+    },
+    {
+      "id": "compass-short",
+      "file": "compass-short.png",
+      "sceneKeys": [],
+      "questionIds": [
+        "coaster-circle"
+      ],
+      "drawingSource": "diagrams/compass-short.svg",
+      "meaning": "更小的笔尖距离",
+      "sha256": "f8dac90797df8006ee4ba630f33ff7c3e7fee06fd8a1fdd7ea52f227b3755b09",
+      "drawingSourceSha256": "fd2e3fc895f09880dd9abbbe535feb1c76942b37fcda8abe3685e26a040e86b6"
+    },
+    {
+      "id": "cut-corner",
+      "file": "cut-corner.png",
+      "sceneKeys": [],
+      "questionIds": [
+        "coaster-cut"
+      ],
+      "drawingSource": "diagrams/cut-corner.svg",
+      "meaning": "红色剪路从圆边切出去",
+      "sha256": "ccb3a7d4aaec57cf686ed05d6918e086d9315eb84071a62cdaf9f9ce92a0f51b",
+      "drawingSourceSha256": "00ecc8c602b8b256560801e4fd032e26777e01ecaa591c221e5d559f2cee0077"
+    },
+    {
+      "id": "cut-cross",
+      "file": "cut-cross.png",
+      "sceneKeys": [],
+      "questionIds": [
+        "coaster-cut"
+      ],
+      "drawingSource": "diagrams/cut-cross.svg",
+      "meaning": "红色剪路穿过圆内部",
+      "sha256": "f26c81a9597f073b347ff5fa2a2820a05494c0f8c007ebbbe739e4cf3f0242e2",
+      "drawingSourceSha256": "5f788eccb0448fcdfeac3246fdf95a2f67cb5ab7ecf0f2e94e74a467a868f8bb"
+    },
+    {
+      "id": "cut-edge",
+      "file": "cut-edge.png",
+      "sceneKeys": [],
+      "questionIds": [
+        "coaster-cut"
+      ],
+      "drawingSource": "diagrams/cut-edge.svg",
+      "meaning": "红色剪路从纸边进入后闭合沿圆线",
+      "sha256": "8a798a0b47082bc5d17571ed6961363d1a7fb4954e5bb1c7de794ea79bc49068",
+      "drawingSourceSha256": "99aa1ad1d88751a5b73841ab6be5ddbe483c6911bd56acde6e10ed629ac731fb"
+    },
+    {
+      "id": "cut-method",
+      "file": "cut-method.png",
+      "sceneKeys": [
+        "cut"
+      ],
+      "questionIds": [],
+      "drawingSource": "diagrams/cut-method.svg",
+      "meaning": "纸边到圆线、沿圆线继续剪、留下完整的圆后再装饰。",
+      "sha256": "89d0be80fb028633d57c065979983b0a12c830dbf7fc00e3697a6711c3b92a4f",
+      "drawingSourceSha256": "3a235dbf1426f3081e328dc936787462b39f4f34632b7fad91cb432b64fcc290"
+    },
+    {
+      "id": "flat-comparison",
+      "file": "flat-comparison.png",
+      "sceneKeys": [
+        "test"
+      ],
+      "questionIds": [],
+      "drawingSource": "diagrams/flat-comparison.svg",
+      "meaning": "上排从上看两张一样大的杯垫均覆盖空杯底，下排侧视对照左图右边翘起、右图整面铺平。",
+      "sha256": "ebf20103ebd1897265ad196d03790c97ad4566eea71ddd5fe0f5d92c87da9251",
+      "drawingSourceSha256": "ef4ace90c22ce3d84acba8139b77f56b852e9b8e5ea0b07f097ddacb940ab3e8"
+    },
+    {
+      "id": "lint-plan",
+      "file": "lint-plan.png",
+      "sceneKeys": [
+        "transfer"
+      ],
+      "questionIds": [],
+      "drawingSource": "diagrams/lint-plan.svg",
+      "meaning": "从左到右比较衣物上散开的毛、小粘板粘面朝下按角落、纸筒外侧带胶沿布面滚动。",
+      "sha256": "ad06c6951abb47a469878c8e2f928fcb92f1b42262159c9d12e2dceeeb0950c4",
+      "drawingSourceSha256": "def9a97301c2243bd13e971eed166a70fdcbbc15e3358443f15e6b3de6636c35"
+    },
+    {
+      "id": "paper",
+      "file": "paper.png",
+      "sceneKeys": [],
+      "questionIds": [
+        "coaster-material"
+      ],
+      "fingerprint": "5003873910e3a90d20eda5bac1da4c333388f1a02139dd1f065e8bc0e8111fce",
+      "sha256": "f52b1b831667ad6ad6d12ad88402ca26e3c38d42ddca4d9f64e982f7d0566ed9",
+      "prompt": "原创儿童科普绘本插画，统一圆润精细线条，明亮柔和橙绿配色，纯浅色背景，物体形态清楚，木质工作台；没有任何文字、字母、数字、标志、水印，不含表情符号，单一主体不画拼贴。主体：一张平整的绿色手工纸，略微翘角显示薄度，单个物品，纯浅色背景。",
+      "reuse": "同课已登记原创图，字节与合格缓存一致；逐张核对含义和裁切。",
+      "sourceRequestSha256": "244099b78724f4e7e3d48df49b7b4025c28b63edf5382fda8b596e3fe2b370ac",
+      "sourceResponseBodySha256": "6bb407ffbc813a4d24e8536105d1184f1d270d2501a38604e29a721cafd20377"
+    },
+    {
+      "id": "pencil",
+      "file": "pencil.png",
+      "sceneKeys": [
+        "circle"
+      ],
+      "questionIds": [
+        "coaster-material"
+      ],
+      "fingerprint": "58f445e5b02efa865278bf9e98b205c591d73874fa67badccd5c1b965395d5a5",
+      "sha256": "d7ef3a47ab1f7531f34aee561d1d90fd5710440797eafa6758d71ce05cbf0142",
+      "prompt": "原创儿童科普绘本插画，统一圆润精细线条，明亮柔和橙绿配色，纯浅色背景，物体形态清楚，木质工作台；没有任何文字、字母、数字、标志、水印，不含表情符号，单一主体不画拼贴。主体：一支完整的蓝色铅笔，笔尖清楚，单个物品。",
+      "reuse": "同课已登记原创图，字节与合格缓存一致；逐张核对含义和裁切。",
+      "sourceRequestSha256": "1ec20e005c1c4fc4e9d29cf0e791e175d43b7f7eb335c0ef0d273c0e1b467bce",
+      "sourceResponseBodySha256": "101db5d0941f439d2355bb2017b872716f13fda8e09abd0ab54f29393194d92c"
+    },
+    {
+      "id": "pillow-fibers",
+      "file": "pillow-fibers.png",
+      "sceneKeys": [],
+      "questionIds": [
+        "coaster-transfer"
+      ],
+      "drawingSource": "diagrams/pillow-fibers.svg",
+      "meaning": "靠垫表面可见三根毛，给出接触位置。",
+      "sha256": "10d172947bb36d5b2e899d6bb0e9bdfbf2a2160acf8c8bfae704dfb5dc15773c",
+      "drawingSourceSha256": "adc41a013b020a0ed4ac4c49d78c2a70a056687841faefd664637eed74871261"
+    },
+    {
+      "id": "pot-flat",
+      "file": "pot-flat.png",
+      "sceneKeys": [],
+      "questionIds": [
+        "coaster-retest"
+      ],
+      "drawingSource": "diagrams/pot-flat.svg",
+      "meaning": "同宽而平整",
+      "sha256": "7c11d87eddc28ce0673919b101fa508a304aad5dbdb72eec17cc6fb270fcfa4f",
+      "drawingSourceSha256": "d60b85077b45983786cdee9322fede123161548a308cfcb9208644f421b8d679"
+    },
+    {
+      "id": "pot-large",
+      "file": "pot-large.png",
+      "sceneKeys": [],
+      "questionIds": [
+        "coaster-retest"
+      ],
+      "drawingSource": "diagrams/pot-large.svg",
+      "meaning": "更宽但仍翘起",
+      "sha256": "f8fb16d7d6663887924f6126b3a5c4542eb0445bb57e171cd687c19bbb03d1f2",
+      "drawingSourceSha256": "90dd69b0011124d1e9fe63694628400be1afcc51bcaf1d06f0a0602dd4fe2834"
+    },
+    {
+      "id": "pot-reference",
+      "file": "pot-reference.png",
+      "sceneKeys": [],
+      "questionIds": [
+        "coaster-retest"
+      ],
+      "drawingSource": "diagrams/pot-reference.svg",
+      "meaning": "原盆底放得下，右边翘起",
+      "sha256": "93021a92f451565965f4d827550fae33dd0165574dd11c548636c0c31d58938f",
+      "drawingSourceSha256": "207894d053d67acbfeff6af1e01fc3d00683478f39dc7884bed18367d8ff31e7"
+    },
+    {
+      "id": "pot-small",
+      "file": "pot-small.png",
+      "sceneKeys": [],
+      "questionIds": [
+        "coaster-retest"
+      ],
+      "drawingSource": "diagrams/pot-small.svg",
+      "meaning": "平整但盆底越过两边",
+      "sha256": "960927c354d112894f38f2edc421066f305f6f63ea08cd9e9e6a6a1a350bf406",
+      "drawingSourceSha256": "abab1836b4ca1ec1dc38319e1bdc518122dadca69a9dc5daf1f8414e45564738"
+    },
+    {
+      "id": "roller-ends",
+      "file": "roller-ends.png",
+      "sceneKeys": [],
+      "questionIds": [
+        "coaster-transfer"
+      ],
+      "drawingSource": "diagrams/roller-ends.svg",
+      "meaning": "粘面只在两个端口",
+      "sha256": "75bd53b8f1eccf3f13bf164b32d4215d2888b355be9dde18236d2c93aa9bbece",
+      "drawingSourceSha256": "b20fa4b2e47bf8a7ae878153d592ab520c288defdaa1e3c24e902cf74ccbc141"
+    },
+    {
+      "id": "roller-in",
+      "file": "roller-in.png",
+      "sceneKeys": [],
+      "questionIds": [
+        "coaster-transfer"
+      ],
+      "drawingSource": "diagrams/roller-in.svg",
+      "meaning": "胶贴在内壁",
+      "sha256": "77c456f6d4635b47c9e51ea27d22e1c949d9441c0e6690f56bf77cbd809c1fb6",
+      "drawingSourceSha256": "f088691afc98279568c843e8cb3bc381d32efc873bf7e1e00e9a4edcbe9b3f72"
+    },
+    {
+      "id": "roller-out",
+      "file": "roller-out.png",
+      "sceneKeys": [],
+      "questionIds": [
+        "coaster-transfer"
+      ],
+      "drawingSource": "diagrams/roller-out.svg",
+      "meaning": "粘面露在外圈",
+      "sha256": "44593a15975848c3085adbc437a91db6d472130edd9332228ceb99056c4dc27b",
+      "drawingSourceSha256": "f3f2dc3b92e39ce53c7ae4e2056d378efdc9fe9cce6638c316fe458c64a6ff32"
+    },
+    {
+      "id": "round-lid",
+      "file": "round-lid.png",
+      "sceneKeys": [
+        "circle"
+      ],
+      "questionIds": [],
+      "fingerprint": "7a108583232399333fdb1db3e4d195d62a1a51fc01f194b8c533448d4df03dde",
+      "sha256": "7dd8bcb62d77dea1cf14715af13e4ee5f827cb2c9453d5996fa84a5411d46b2d",
+      "prompt": "原创儿童科普绘本插画，统一圆润精细线条，明亮柔和橙绿配色，纯浅色背景，物体形态清楚，木质工作台；没有任何文字、字母、数字、标志、水印，不含表情符号，单一主体不画拼贴。主体：一个平放的圆形绿色罐盖，俯视呈标准圆，边缘清楚，单个物品。",
+      "reuse": "同课已登记原创图，字节与合格缓存一致；逐张核对含义和裁切。",
+      "sourceRequestSha256": "c51319581460ef0fb597e8e8b601b5ff1c28eeeb168bae064a544c85c02384c8",
+      "sourceResponseBodySha256": "f7dea0b911ba54ddb98824d23d79d3516b7fc280c093b7b9db7e8404fd9f5c8a"
+    },
+    {
+      "id": "scissors",
+      "file": "scissors.png",
+      "sceneKeys": [],
+      "questionIds": [
+        "coaster-material"
+      ],
+      "fingerprint": "a2c83500eea0e7badda206e9a78312ca157f487601c82ceb525aee3ac5a0295f",
+      "sha256": "1f69d654a3cfb739b4f8c2351c40a0a9298d43b4c1cfeb57c88c447c3b6de16e",
+      "prompt": "原创儿童科普绘本插画，统一圆润精细线条，明亮柔和橙绿配色，纯浅色背景，物体形态清楚，木质工作台；没有任何文字、字母、数字、标志、水印，不含表情符号，单一主体不画拼贴。主体：一把圆头儿童安全剪刀，橙色手柄，刀刃闭合，完整清楚，单个物品。",
+      "reuse": "同课已登记原创图，字节与合格缓存一致；逐张核对含义和裁切。",
+      "sourceRequestSha256": "a99f7967fc1fe0a28dce41c42df4851cc89794845b181f71c41b4f8b3c97ed4c",
+      "sourceResponseBodySha256": "ffc53fce5447609f5deb3ed5a75ff44355651c8d8f0796fc2cc06fae153f1bd7"
+    },
+    {
+      "id": "string",
+      "file": "string.png",
+      "sceneKeys": [
+        "circle"
+      ],
+      "questionIds": [],
+      "fingerprint": "934c4a0bffb58a3be15cee2ee716d9a7be3a2289438fecaa37e7e1066fb28584",
+      "sha256": "f5098812c1833602e13970173fc6857af9eb21af3ea251625c10117abe823ff8",
+      "prompt": "原创儿童科普绘本插画，统一圆润精细线条，明亮柔和橙绿配色，纯浅色背景，物体形态清楚，木质工作台；没有任何文字、字母、数字、标志、水印，不含表情符号，单一主体不画拼贴。主体：一团浅橙色细绳，末端一小段伸直便于识别，单个物品。",
+      "reuse": "同课已登记原创图，字节与合格缓存一致；逐张核对含义和裁切。",
+      "sourceRequestSha256": "8798a980c0365ceeeaa22ae68d3d8f94ca86b9b6f574d6905340028d519b4853",
+      "sourceResponseBodySha256": "b2d045d2949988daac7ba3a76c2d485b202675f1e94622e7e0d1256603d5a752"
+    },
+    {
+      "id": "wide-coaster",
+      "file": "wide-coaster.png",
+      "sceneKeys": [
+        "cup"
+      ],
+      "questionIds": [],
+      "fingerprint": "3a2332fcae0cc12fffdca24be120f84f0ac1c892d4cab81e42a6c47589257a3f",
+      "sha256": "63f60fc09ab5e8a118259ef4aecfea715b6b22d6036c3c8ac8e83101652a2536",
+      "prompt": "原创儿童科普绘本插画，统一圆润精细线条，明亮柔和橙绿配色，纯浅色背景，物体形态清楚，木质工作台；没有任何文字、字母、数字、标志、水印，不含表情符号，单一主体不画拼贴。主体：俯视一个橙色空杯，圆纸杯垫比杯底大很多，杯底全部在垫子内，周围露出宽而均匀一圈圆垫，单一测试情境。",
+      "reuse": "同课已登记原创图，字节与合格缓存一致；逐张核对含义和裁切。",
+      "sourceRequestSha256": "b1feb4d579714c44782258071e5c59e4bb2f86a4771f51ce51e3ccd8146a0447",
+      "sourceResponseBodySha256": "cb2bf86dc109223f5939ef08e2f35bab169c90ec8b3c3d3794aeb01b838c188d"
+    },
+    {
+      "id": "workshop",
+      "file": "workshop.png",
+      "sceneKeys": [
+        "bench",
+        "recap"
+      ],
+      "questionIds": [],
+      "fingerprint": "435596e56020bb176d19a0e0af5caff90e222c2a204cf3bdb1cf64d152978bb5",
+      "sha256": "161b71ff4c1d1bdaaaf07813cc873bfb5ae53c2818f7663593d46a550db4b375",
+      "prompt": "原创儿童科普绘本插画，统一圆润精细线条，明亮柔和橙绿配色，纯浅色背景，物体形态清楚，木质工作台；没有任何文字、字母、数字、标志、水印，不含表情符号，单一主体不画拼贴。主体：短发穿青绿色上衣的六岁女孩与女老师在手工桌旁观察圆纸杯垫，杯垫上放空杯，旁有纸和儿童安全剪刀。",
+      "reuse": "同课已登记原创图，字节与合格缓存一致；逐张核对含义和裁切。",
+      "sourceRequestSha256": "53b284432feb7e8256575ab27340548c3e196499dfd5fe6b7237d1440b485924",
+      "sourceResponseBodySha256": "bf9480180c946c17f41c71ef6d249d5c7ec6c41b20df9611f2c9c48212996bcb"
+    }
+  ],
+  "excludedOldAssets": [
+    {
+      "id": "cut-circle",
+      "sha256": "27ebc489d31f9e59735223cd1d509f2179161284fd67cae9947049e11fca81da",
+      "reason": "旧资产字节也在同课拒用目录，已排除；采用原创几何剪路图。",
+      "record": "output/courseware-lessons/renjiao-science-g1-upper-make-coaster/rejected-media/cut-circle-27ebc489d31f9e59735223cd1d509f2179161284fd67cae9947049e11fca81da.png"
+    }
+  ]
+}

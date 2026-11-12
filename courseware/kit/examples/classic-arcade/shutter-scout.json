@@ -1,0 +1,11 @@
+{
+  "template": "shutterScout",
+  "title": "快门侦探",
+  "sub": "用取景框追着飞行目标，等姿势对了再按快门。",
+  "art": {"backdrop": "fern-clearing.webp", "sticker": "sticker.webp", "frames":["paper-butterfly.webp"]},
+  "levels": [
+    {"rate":0.64,"range":139,"aperture":144,"shots":[1,0,1],"hints":["先把目标放进取景框。","看看上面的样子，等它变到一样。"]},
+    {"rate":0.94,"range":226,"aperture":111,"shots":[0,1,0],"hints":["别追太快，在前面等一等。","拍姿势一样的那一刻。"]},
+    {"rate":1.29,"range":278,"aperture":86,"shots":[1,0,1,0],"hints":["先找位置，再等合适的一瞬间。","可以用大一些的取景框慢慢拍。"]}
+  ]
+}

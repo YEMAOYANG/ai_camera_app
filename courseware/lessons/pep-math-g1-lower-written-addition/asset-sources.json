@@ -1,0 +1,795 @@
+{
+  "schemaVersion": "mira.courseware.asset-sources.v1",
+  "inputs": {
+    "generatedAtlas": {
+      "file": "art-source/workshop-atlas.png",
+      "sha256": "275cc60e34d1aec52927c287ea15477488d905f9f0293e49461f8ce3459e396b",
+      "sourceTool": "Codex built-in imagegen",
+      "generatedArtifact": "exec-ff6a4d81-89b0-4400-8ad5-e0bb74457e52.png",
+      "transparentBackgroundRequested": true,
+      "originalReferenceImages": [],
+      "prompt": "Use case: illustration-story. Produce one original square production atlas for a first-grade math game set in a neighborhood badge-exhibit workshop. Keep a strict two-by-two equal grid with no printed labels, no grid lines, and no content crossing the cell boundaries. Overall style is fine paper texture, matte gouache, clean cut-paper shapes, deep pine green and warm cream with apricot and persimmon accents, soft daylight. No text, letters, numbers, logos, watermark, captions, countable piles or math diagrams. Top-left cell is a full-bleed warm scene of a tidy community exhibit check-in desk with two closed wooden trays on the countertop, quiet shelves behind, friendly and uncluttered, center-framed. Top-right cell is a different full-bleed quiet workshop with pale empty floor in the middle, low distant cabinets along the edges, subdued background to let moving game elements stand out. Bottom-left cell is transparent, with two separate small mint-green toy pushcarts facing right, left the resting frame and right an active rolling frame of the same recognizable cart, generous clear transparent margins. Bottom-right cell is transparent, with three clean separate isolated icons across a single row, left a small pine-green tabletop ball launcher angled upward, center a compact apricot marble with a paper sheen, right a persimmon-and-pine rosette reward sticker. No drop shadow or opaque paper background behind any bottom asset. Precise quantities and math text will be added as code outside this atlas."
+    },
+    "deterministicDiagrams": {
+      "file": "diagrams.py",
+      "sha256": "0dee2362a2b1a029e3a9813ab4b10bc42bbb205bff8c69d4b81a9d04fff89b7f",
+      "rules": "十格、十枚一条、散枚数量、竖式对齐和箭头由确定性代码绘制。"
+    }
+  },
+  "assets": {
+    "alignment-board": {
+      "kind": "deterministic-math-diagram",
+      "file": "assets/alignment-board.png",
+      "sha256": "61209585a6a0e666fb0bcd9db8ee393fb817b6259fe7a25dbb37af7863bafe9b",
+      "dimensions": [
+        500,
+        500
+      ],
+      "usedBy": [
+        "same-column"
+      ],
+      "source": "diagrams.py"
+    },
+    "apron-marble": {
+      "kind": "codex-builtin-imagegen",
+      "file": "assets/apron-marble.png",
+      "sha256": "88d3d67bd90d5d84bf3777f076839d4ea3efb210a5314f670c9bd1e629bdf4f2",
+      "dimensions": [
+        105,
+        103
+      ],
+      "usedBy": [
+        "pair-check"
+      ],
+      "source": "art-source/workshop-atlas.png",
+      "cropXYWH": [
+        890,
+        891,
+        122,
+        120
+      ],
+      "processing": "FFmpeg crop; Lanczos resize if needed; original alpha preserved"
+    },
+    "badge-sticker": {
+      "kind": "codex-builtin-imagegen",
+      "file": "assets/badge-sticker.png",
+      "sha256": "24bd054edad7a3f6c0d8151daa8fab473b5a990949dfa65ee3567939a5218457",
+      "dimensions": [
+        170,
+        210
+      ],
+      "usedBy": [
+        "sort-by-ones",
+        "pair-check"
+      ],
+      "source": "art-source/workshop-atlas.png",
+      "cropXYWH": [
+        1043,
+        819,
+        202,
+        250
+      ],
+      "processing": "FFmpeg crop; Lanczos resize if needed; original alpha preserved"
+    },
+    "closing-board": {
+      "kind": "deterministic-math-diagram",
+      "file": "assets/closing-board.png",
+      "sha256": "711abb8a38433c801731a5548fcabd51f76009cd56832ff04abc53235d15bebe",
+      "dimensions": [
+        440,
+        400
+      ],
+      "usedBy": [
+        "take-home"
+      ],
+      "source": "diagrams.py"
+    },
+    "diagnosis-board": {
+      "kind": "deterministic-math-diagram",
+      "file": "assets/diagnosis-board.png",
+      "sha256": "25d8cb4aba1538ae7164c0e11eeea5ce041f435baac0c3027d2e0356e689de33",
+      "dimensions": [
+        735,
+        555
+      ],
+      "usedBy": [
+        "diagnose"
+      ],
+      "source": "diagrams.py"
+    },
+    "dock-full": {
+      "kind": "deterministic-math-diagram",
+      "file": "assets/dock-full.png",
+      "sha256": "68e8cd8a1abe2deb39f48b3ce8218049fba431103a64389ed3bb1716390a96f8",
+      "dimensions": [
+        225,
+        225
+      ],
+      "usedBy": [
+        "sort-by-ones"
+      ],
+      "source": "diagrams.py"
+    },
+    "dock-under": {
+      "kind": "deterministic-math-diagram",
+      "file": "assets/dock-under.png",
+      "sha256": "e3ab9ddf7dbf63a814d167ee0d6edc1f24303ed4aa07dfe321a7647b1bb2ec6c",
+      "dimensions": [
+        225,
+        225
+      ],
+      "usedBy": [
+        "sort-by-ones"
+      ],
+      "source": "diagrams.py"
+    },
+    "exchange-board": {
+      "kind": "deterministic-math-diagram",
+      "file": "assets/exchange-board.png",
+      "sha256": "56105ba21d5c889ee3602cac76f3d11558b40db6e350fb7eb5ce8ed01b297b0f",
+      "dimensions": [
+        650,
+        470
+      ],
+      "usedBy": [
+        "carry-workshop"
+      ],
+      "source": "diagrams.py"
+    },
+    "no-carry-board": {
+      "kind": "deterministic-math-diagram",
+      "file": "assets/no-carry-board.png",
+      "sha256": "5d24de5a405f8b74df9867e2f19e296eaae06240864064593887d4ed3d335f65",
+      "dimensions": [
+        440,
+        400
+      ],
+      "usedBy": [
+        "no-carry"
+      ],
+      "source": "diagrams.py"
+    },
+    "p14-21": {
+      "kind": "deterministic-math-diagram",
+      "file": "assets/p14-21.png",
+      "sha256": "f7f60f6ca9537b6732649eff67b7ed1b084130de0a90123d55c0b06061830a86",
+      "dimensions": [
+        500,
+        500
+      ],
+      "usedBy": [
+        "pair-check"
+      ],
+      "source": "diagrams.py"
+    },
+    "p23-44": {
+      "kind": "deterministic-math-diagram",
+      "file": "assets/p23-44.png",
+      "sha256": "d6edcbac32409e7791caf1a4c52b4889f6e581b6aba3b91d383304c51afb3904",
+      "dimensions": [
+        500,
+        500
+      ],
+      "usedBy": [
+        "pair-check"
+      ],
+      "source": "diagrams.py"
+    },
+    "p27-16": {
+      "kind": "deterministic-math-diagram",
+      "file": "assets/p27-16.png",
+      "sha256": "fd177e3e5909bf58b439cea90375f43f0462092d636ba878336260683e093a74",
+      "dimensions": [
+        500,
+        500
+      ],
+      "usedBy": [
+        "pair-check"
+      ],
+      "source": "diagrams.py"
+    },
+    "p29-34": {
+      "kind": "deterministic-math-diagram",
+      "file": "assets/p29-34.png",
+      "sha256": "3effdd29c9e2263992089110f7fe2304699b20cf3985db104d4d6cb712b85e61",
+      "dimensions": [
+        500,
+        500
+      ],
+      "usedBy": [
+        "pair-check"
+      ],
+      "source": "diagrams.py"
+    },
+    "p46-14": {
+      "kind": "deterministic-math-diagram",
+      "file": "assets/p46-14.png",
+      "sha256": "df4d9036f27c0534681183c8a65a5b9dcaf8cf5d70e9e58a94a68319a181e9f2",
+      "dimensions": [
+        500,
+        500
+      ],
+      "usedBy": [
+        "pair-check"
+      ],
+      "source": "diagrams.py"
+    },
+    "p9-53": {
+      "kind": "deterministic-math-diagram",
+      "file": "assets/p9-53.png",
+      "sha256": "be98546b8a3d978c58767330e5b07a62688483a4f15ee45970c6d0c616d37356",
+      "dimensions": [
+        500,
+        500
+      ],
+      "usedBy": [
+        "pair-check"
+      ],
+      "source": "diagrams.py"
+    },
+    "pushcart-rest": {
+      "kind": "codex-builtin-imagegen",
+      "file": "assets/pushcart-rest.png",
+      "sha256": "2d4c50a1da40e353ecbcfd4b645599d3358356fe57576cdd6903b4be3657d962",
+      "dimensions": [
+        192,
+        200
+      ],
+      "usedBy": [
+        "sort-by-ones"
+      ],
+      "source": "art-source/workshop-atlas.png",
+      "cropXYWH": [
+        12,
+        813,
+        255,
+        265
+      ],
+      "processing": "FFmpeg crop; Lanczos resize if needed; original alpha preserved"
+    },
+    "pushcart-roll": {
+      "kind": "codex-builtin-imagegen",
+      "file": "assets/pushcart-roll.png",
+      "sha256": "531c6d0cd2959ea8745429c5648f821b46cacfba9ef21349638755ef485fbe6e",
+      "dimensions": [
+        215,
+        187
+      ],
+      "usedBy": [
+        "sort-by-ones"
+      ],
+      "source": "art-source/workshop-atlas.png",
+      "cropXYWH": [
+        295,
+        813,
+        305,
+        265
+      ],
+      "processing": "FFmpeg crop; Lanczos resize if needed; original alpha preserved"
+    },
+    "quiz-1-a": {
+      "kind": "deterministic-math-diagram",
+      "file": "assets/quiz-1-a.png",
+      "sha256": "18c5223f528ef87254eeff523c278f246b1bc6c8985abdbc51081b9e6e5551b1",
+      "dimensions": [
+        440,
+        400
+      ],
+      "usedBy": [
+        "picture-check"
+      ],
+      "source": "diagrams.py"
+    },
+    "quiz-1-b": {
+      "kind": "deterministic-math-diagram",
+      "file": "assets/quiz-1-b.png",
+      "sha256": "850d8cb337c932642cb2e84f56ca4469769528ce05ed4bf712016b90e029de82",
+      "dimensions": [
+        440,
+        400
+      ],
+      "usedBy": [
+        "picture-check"
+      ],
+      "source": "diagrams.py"
+    },
+    "quiz-1-c": {
+      "kind": "deterministic-math-diagram",
+      "file": "assets/quiz-1-c.png",
+      "sha256": "389020a1cd9ff996b4d376039d0f5f51ead1ded31550e5162279f6525fea8d77",
+      "dimensions": [
+        440,
+        400
+      ],
+      "usedBy": [
+        "picture-check"
+      ],
+      "source": "diagrams.py"
+    },
+    "quiz-1-context": {
+      "kind": "deterministic-math-diagram",
+      "file": "assets/quiz-1-context.png",
+      "sha256": "f86c500feab5a340a79184d426e2f8fed1eacae85aea196b4284babd252fe722",
+      "dimensions": [
+        500,
+        500
+      ],
+      "usedBy": [
+        "picture-check"
+      ],
+      "source": "diagrams.py"
+    },
+    "quiz-2-a": {
+      "kind": "deterministic-math-diagram",
+      "file": "assets/quiz-2-a.png",
+      "sha256": "8585d196df1bc15ead2d0069187fe5d619eb0708c5b599d3cf94d1fffc01ddf7",
+      "dimensions": [
+        470,
+        240
+      ],
+      "usedBy": [
+        "picture-check"
+      ],
+      "source": "diagrams.py"
+    },
+    "quiz-2-b": {
+      "kind": "deterministic-math-diagram",
+      "file": "assets/quiz-2-b.png",
+      "sha256": "814749c946593c1c50fce343212c0000007ad7d252f19eff3ed5be573af13dd5",
+      "dimensions": [
+        470,
+        240
+      ],
+      "usedBy": [
+        "picture-check"
+      ],
+      "source": "diagrams.py"
+    },
+    "quiz-2-c": {
+      "kind": "deterministic-math-diagram",
+      "file": "assets/quiz-2-c.png",
+      "sha256": "d94fe0df5681a3ce9b9b770e3a7ab187e7eccd4585f78cc18c5858f648c5f35e",
+      "dimensions": [
+        470,
+        240
+      ],
+      "usedBy": [
+        "picture-check"
+      ],
+      "source": "diagrams.py"
+    },
+    "quiz-2-context": {
+      "kind": "deterministic-math-diagram",
+      "file": "assets/quiz-2-context.png",
+      "sha256": "b5e5e70ad609ab70aa74b931d1968771d9111a084df36ecc5e811af56448f78c",
+      "dimensions": [
+        500,
+        500
+      ],
+      "usedBy": [
+        "picture-check"
+      ],
+      "source": "diagrams.py"
+    },
+    "quiz-3-a": {
+      "kind": "deterministic-math-diagram",
+      "file": "assets/quiz-3-a.png",
+      "sha256": "0f17595a5a4fb703e1b23ab451fff3272fbd826645b5e8cd54b4ac80a04456e7",
+      "dimensions": [
+        470,
+        240
+      ],
+      "usedBy": [
+        "picture-check"
+      ],
+      "source": "diagrams.py"
+    },
+    "quiz-3-b": {
+      "kind": "deterministic-math-diagram",
+      "file": "assets/quiz-3-b.png",
+      "sha256": "2b97a8a1347cee73cd2847bbcc82f467456f9e2f203e02b0cd788d7c9d38c747",
+      "dimensions": [
+        470,
+        240
+      ],
+      "usedBy": [
+        "picture-check"
+      ],
+      "source": "diagrams.py"
+    },
+    "quiz-3-c": {
+      "kind": "deterministic-math-diagram",
+      "file": "assets/quiz-3-c.png",
+      "sha256": "fe22ed7937ba34d7c6c5f39da75b20f3dee2b87cb71db26f54d66bf0cd423fc8",
+      "dimensions": [
+        470,
+        240
+      ],
+      "usedBy": [
+        "picture-check"
+      ],
+      "source": "diagrams.py"
+    },
+    "quiz-3-context": {
+      "kind": "deterministic-math-diagram",
+      "file": "assets/quiz-3-context.png",
+      "sha256": "41a543aebb3477031437710502e1c7f466341643fd48fb2c678aee13243e4a1e",
+      "dimensions": [
+        500,
+        500
+      ],
+      "usedBy": [
+        "picture-check"
+      ],
+      "source": "diagrams.py"
+    },
+    "quiz-4-a": {
+      "kind": "deterministic-math-diagram",
+      "file": "assets/quiz-4-a.png",
+      "sha256": "a493466098053864b18c6b6549502af0a5dc46b4bc33c9a184bd1909ec60258f",
+      "dimensions": [
+        440,
+        400
+      ],
+      "usedBy": [
+        "picture-check"
+      ],
+      "source": "diagrams.py"
+    },
+    "quiz-4-b": {
+      "kind": "deterministic-math-diagram",
+      "file": "assets/quiz-4-b.png",
+      "sha256": "5f442e4d47902bd5e689fd0b43e1e9ba814494619dab02ee766cae6a569e6baa",
+      "dimensions": [
+        440,
+        400
+      ],
+      "usedBy": [
+        "picture-check"
+      ],
+      "source": "diagrams.py"
+    },
+    "quiz-4-c": {
+      "kind": "deterministic-math-diagram",
+      "file": "assets/quiz-4-c.png",
+      "sha256": "f76c3c10ec0be7285140a7b2381a709418b1b37f76d43872ce2f77f980145e9f",
+      "dimensions": [
+        440,
+        400
+      ],
+      "usedBy": [
+        "picture-check"
+      ],
+      "source": "diagrams.py"
+    },
+    "quiz-4-context": {
+      "kind": "deterministic-math-diagram",
+      "file": "assets/quiz-4-context.png",
+      "sha256": "940d9a5e5e62fec7d5e39e5b3add46fb9a0ee3b1f2771d08b3043fcaa6de6ba3",
+      "dimensions": [
+        500,
+        500
+      ],
+      "usedBy": [
+        "picture-check"
+      ],
+      "source": "diagrams.py"
+    },
+    "quiz-5-a": {
+      "kind": "deterministic-math-diagram",
+      "file": "assets/quiz-5-a.png",
+      "sha256": "9dc41f11ce594b7ef368070b98d6e60f5747e7197d2816d3cbc7ecb29bc4d71a",
+      "dimensions": [
+        470,
+        240
+      ],
+      "usedBy": [
+        "picture-check"
+      ],
+      "source": "diagrams.py"
+    },
+    "quiz-5-b": {
+      "kind": "deterministic-math-diagram",
+      "file": "assets/quiz-5-b.png",
+      "sha256": "8158670859c7e0eb005ab53ab74577f8cfa4b982cef0face08b3a8b45a4cd4f4",
+      "dimensions": [
+        470,
+        240
+      ],
+      "usedBy": [
+        "picture-check"
+      ],
+      "source": "diagrams.py"
+    },
+    "quiz-5-c": {
+      "kind": "deterministic-math-diagram",
+      "file": "assets/quiz-5-c.png",
+      "sha256": "bab2d825729b856bd79bcc03113ca52d85dd36f2eb994ff4e85bcfd247c21829",
+      "dimensions": [
+        470,
+        240
+      ],
+      "usedBy": [
+        "picture-check"
+      ],
+      "source": "diagrams.py"
+    },
+    "quiz-5-context": {
+      "kind": "deterministic-math-diagram",
+      "file": "assets/quiz-5-context.png",
+      "sha256": "0d7ebe7d4630253a841db95be5fdb1be3b6742ad1dbb1e703eb6b819fe9647a3",
+      "dimensions": [
+        790,
+        490
+      ],
+      "usedBy": [
+        "picture-check"
+      ],
+      "source": "diagrams.py"
+    },
+    "result-35": {
+      "kind": "deterministic-math-diagram",
+      "file": "assets/result-35.png",
+      "sha256": "3fa31656bfa899f6cdd10298538f541e2d24f310e147ecbfb65a9a12510a2ca8",
+      "dimensions": [
+        470,
+        240
+      ],
+      "usedBy": [
+        "pair-check"
+      ],
+      "source": "diagrams.py"
+    },
+    "result-37": {
+      "kind": "deterministic-math-diagram",
+      "file": "assets/result-37.png",
+      "sha256": "a08f26bda14bf6796cf8be6ea83bbcfb1bc72219223c2cd54deecd6981d69492",
+      "dimensions": [
+        470,
+        240
+      ],
+      "usedBy": [
+        "pair-check"
+      ],
+      "source": "diagrams.py"
+    },
+    "result-43": {
+      "kind": "deterministic-math-diagram",
+      "file": "assets/result-43.png",
+      "sha256": "5d417dcbe604c0af16d060a67f6dc88129f8f4eccd867c3485966e142f516c08",
+      "dimensions": [
+        470,
+        240
+      ],
+      "usedBy": [
+        "pair-check"
+      ],
+      "source": "diagrams.py"
+    },
+    "result-50": {
+      "kind": "deterministic-math-diagram",
+      "file": "assets/result-50.png",
+      "sha256": "e60629f8ef4d32a7a2893f5089616d275b44a36c363be7d4a3798706796403dd",
+      "dimensions": [
+        470,
+        240
+      ],
+      "usedBy": [
+        "pair-check"
+      ],
+      "source": "diagrams.py"
+    },
+    "result-53": {
+      "kind": "deterministic-math-diagram",
+      "file": "assets/result-53.png",
+      "sha256": "f8a6cc1b692fcb31d0a0b2c149decd3e90a70b6326a62c36863d7bcd22af1271",
+      "dimensions": [
+        470,
+        240
+      ],
+      "usedBy": [
+        "pair-check"
+      ],
+      "source": "diagrams.py"
+    },
+    "result-60": {
+      "kind": "deterministic-math-diagram",
+      "file": "assets/result-60.png",
+      "sha256": "2b97a8a1347cee73cd2847bbcc82f467456f9e2f203e02b0cd788d7c9d38c747",
+      "dimensions": [
+        470,
+        240
+      ],
+      "usedBy": [
+        "pair-check"
+      ],
+      "source": "diagrams.py"
+    },
+    "result-62": {
+      "kind": "deterministic-math-diagram",
+      "file": "assets/result-62.png",
+      "sha256": "a432f419ed3c94233c8f260cca1116f79c64c75a50e4741fc0bb1066521cf7a5",
+      "dimensions": [
+        470,
+        240
+      ],
+      "usedBy": [
+        "pair-check"
+      ],
+      "source": "diagrams.py"
+    },
+    "result-63": {
+      "kind": "deterministic-math-diagram",
+      "file": "assets/result-63.png",
+      "sha256": "50bc96664113ed21693cc509607f9d5ee7b00c1f4679434cf4fa70e7b82f3ef8",
+      "dimensions": [
+        470,
+        240
+      ],
+      "usedBy": [
+        "pair-check"
+      ],
+      "source": "diagrams.py"
+    },
+    "result-67": {
+      "kind": "deterministic-math-diagram",
+      "file": "assets/result-67.png",
+      "sha256": "b63350d6c1df96b37eac76a7a0f7861d935c9a79e4ad1094e1e7ae08750758c9",
+      "dimensions": [
+        470,
+        240
+      ],
+      "usedBy": [
+        "pair-check"
+      ],
+      "source": "diagrams.py"
+    },
+    "sort-3-4": {
+      "kind": "deterministic-math-diagram",
+      "file": "assets/sort-3-4.png",
+      "sha256": "e2b27905ba7a2c8de8891a1ef3c73cd232943221026b8c3ff54451b29ad30be8",
+      "dimensions": [
+        225,
+        225
+      ],
+      "usedBy": [
+        "sort-by-ones"
+      ],
+      "source": "diagrams.py"
+    },
+    "sort-4-5": {
+      "kind": "deterministic-math-diagram",
+      "file": "assets/sort-4-5.png",
+      "sha256": "64748e4835d8d4c6c17f95fca245439a0e42be40d21f40583aedce6db3aa9c35",
+      "dimensions": [
+        225,
+        225
+      ],
+      "usedBy": [
+        "sort-by-ones"
+      ],
+      "source": "diagrams.py"
+    },
+    "sort-6-2": {
+      "kind": "deterministic-math-diagram",
+      "file": "assets/sort-6-2.png",
+      "sha256": "fe3d4ba269f0af2e940d5794db6ee6948161059d42b12895fc158f5fb1523745",
+      "dimensions": [
+        225,
+        225
+      ],
+      "usedBy": [
+        "sort-by-ones"
+      ],
+      "source": "diagrams.py"
+    },
+    "sort-6-4": {
+      "kind": "deterministic-math-diagram",
+      "file": "assets/sort-6-4.png",
+      "sha256": "31ae552927c5589a577d2b4e2a72766659ec7d813e644bcddd0a50bb9c0e1f3f",
+      "dimensions": [
+        225,
+        225
+      ],
+      "usedBy": [
+        "sort-by-ones"
+      ],
+      "source": "diagrams.py"
+    },
+    "sort-7-2": {
+      "kind": "deterministic-math-diagram",
+      "file": "assets/sort-7-2.png",
+      "sha256": "ec9d1de970a4f85b845980933611375b504b5bacff431ebbf6393da81e87ef2f",
+      "dimensions": [
+        225,
+        225
+      ],
+      "usedBy": [
+        "sort-by-ones"
+      ],
+      "source": "diagrams.py"
+    },
+    "sort-8-5": {
+      "kind": "deterministic-math-diagram",
+      "file": "assets/sort-8-5.png",
+      "sha256": "3da14035fbd40780fb99e493e7b3d352bc969b615d04eb5f29964c2a9914876f",
+      "dimensions": [
+        225,
+        225
+      ],
+      "usedBy": [
+        "sort-by-ones"
+      ],
+      "source": "diagrams.py"
+    },
+    "sort-8-6": {
+      "kind": "deterministic-math-diagram",
+      "file": "assets/sort-8-6.png",
+      "sha256": "0b76b554b2129c838203fae445b2a30d0f4cc0f091f7b607dd4952dbbb63153e",
+      "dimensions": [
+        225,
+        225
+      ],
+      "usedBy": [
+        "sort-by-ones"
+      ],
+      "source": "diagrams.py"
+    },
+    "workshop-cover": {
+      "kind": "codex-builtin-imagegen",
+      "file": "assets/workshop-cover.png",
+      "sha256": "d3ff321ae4638d8bd88c6e8e955527c8f311f21658bd52d498f61ae9c4d35e72",
+      "dimensions": [
+        620,
+        620
+      ],
+      "usedBy": [
+        "two-crates",
+        "sort-by-ones",
+        "pair-check"
+      ],
+      "source": "art-source/workshop-atlas.png",
+      "cropXYWH": [
+        0,
+        0,
+        620,
+        620
+      ],
+      "processing": "FFmpeg crop; Lanczos resize if needed; original alpha preserved"
+    },
+    "workshop-floor": {
+      "kind": "codex-builtin-imagegen",
+      "file": "assets/workshop-floor.png",
+      "sha256": "ce345b59ed607a26f06dddd6c81c6641ee8062acd6ad282f11b4b198769900d4",
+      "dimensions": [
+        960,
+        542
+      ],
+      "usedBy": [
+        "sort-by-ones",
+        "pair-check"
+      ],
+      "source": "art-source/workshop-atlas.png",
+      "cropXYWH": [
+        634,
+        163,
+        620,
+        350
+      ],
+      "processing": "FFmpeg crop; Lanczos resize if needed; original alpha preserved"
+    },
+    "zero-single-board": {
+      "kind": "deterministic-math-diagram",
+      "file": "assets/zero-single-board.png",
+      "sha256": "fc5ad3f813441f7fd9fd50735402b125a473423136fa6543fc1e578ca9bbc29f",
+      "dimensions": [
+        710,
+        442
+      ],
+      "usedBy": [
+        "zero-and-single"
+      ],
+      "source": "diagrams.py"
+    }
+  }
+}

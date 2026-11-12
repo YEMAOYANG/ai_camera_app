@@ -1,0 +1,199 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "读法和写法",
+  "binding": {
+    "editionId": "pep-math-g1-lower-2022-standard",
+    "revisionId": "directory-6205d2037284e91f10b25edd",
+    "unitId": "acfb0386-a55f-4542-9d5d-619a3e2d9023",
+    "nodeId": "e0fe1ec3-dc6a-4da3-8f94-d868461a40c0"
+  },
+  "authoredBy": "Codex /root/how_old",
+  "officialNotesSha256": "847eab7ebbbda1fa2bac56c6a8f43b3be5f0fccd30e5d613a301c2f8cda95542",
+  "scenario": "社区小邮局要给信卡贴上数量签。孩子先把信卡和计数器对应，沿迷宫取正确顺序的两张数卡，再听号送到对应的投递箱。",
+  "goals": [
+    "能把一组十张信卡和一张单卡分别对应计数器的十位一珠和个位一珠，说明珠子的位置决定所表示的量。",
+    "能从右往左确定个位和十位，听读或看图时从左边十位起，正确写出并读出两位数。",
+    "能用同数码异数位和两个数码换位的例子，说清计数单位和数量怎样变化。",
+    "能在个位没有珠子时写0占位，并读出整十数，区分五十和五。",
+    "能根据口头数名、数位描述和生活图找对对应的两位数，能和家人交换读写并说出数的组成。"
+  ],
+  "goalSources": [
+    {
+      "skill": "group-to-bead",
+      "target": "能把一组十张信卡和一张单卡分别对应计数器的十位一珠和个位一珠，说明珠子的位置决定所表示的量。",
+      "source": "印26、课件5～15"
+    },
+    {
+      "skill": "read-and-write",
+      "target": "能从右往左确定个位和十位，听读或看图时从左边十位起，正确写出并读出两位数。",
+      "source": "印26～27、教案2～4"
+    },
+    {
+      "skill": "same-digit-different-place",
+      "target": "能用同数码异数位和两个数码换位的例子，说清计数单位和数量怎样变化。",
+      "source": "印26的33、任务单2"
+    },
+    {
+      "skill": "zero-holder",
+      "target": "能在个位没有珠子时写0占位，并读出整十数，区分五十和五。",
+      "source": "印26的40、印27听写、教案2"
+    },
+    {
+      "skill": "listen-and-transfer",
+      "target": "能根据口头数名、数位描述和生活图找对对应的两位数，能和家人交换读写并说出数的组成。",
+      "source": "印27四项、课件18～29、课后练习1"
+    }
+  ],
+  "pageSequence": [
+    {
+      "key": "post-office",
+      "kind": "teaching",
+      "plan": "邮局信卡成组和零散都要登记，提出怎样从图写两位数。"
+    },
+    {
+      "key": "one-tray-one-bead",
+      "kind": "teaching",
+      "plan": "用42把信卡、十位珠和个位珠准确对应。"
+    },
+    {
+      "key": "find-and-read-places",
+      "kind": "teaching",
+      "plan": "从右找数位，读写从十位起；42和24换位比较。"
+    },
+    {
+      "key": "two-sixes",
+      "kind": "teaching",
+      "plan": "66的两个6分别指六组十和六个一。"
+    },
+    {
+      "key": "empty-ones-needs-zero",
+      "kind": "teaching",
+      "plan": "50的个位空，写0占位，对照5，读五十。"
+    },
+    {
+      "key": "read-one-ten",
+      "kind": "teaching",
+      "plan": "看17和10，十位只有一个十时，数名从十开始；对照有无散卡。"
+    },
+    {
+      "key": "take-the-number-cards",
+      "kind": "game",
+      "plan": "迷宫先碰十位再碰个位，整十也要取0；每次实际取卡后显示数位进度。"
+    },
+    {
+      "key": "hear-and-write",
+      "kind": "teaching",
+      "plan": "听到六十三，按单位说组成并从左到右写数卡。"
+    },
+    {
+      "key": "deliver-by-number",
+      "kind": "game",
+      "plan": "听实际数名，从可见计数器挑出对应货卡并走到实际号箱，错车/箱不计。"
+    },
+    {
+      "key": "picture-check",
+      "kind": "quiz",
+      "plan": "六道新图题，包括整十读写、同数字异位、两位数读写互换和情境应用。"
+    },
+    {
+      "key": "find-a-number-at-home",
+      "kind": "teaching",
+      "plan": "在生活票号中找两位数，跟家人我说你摆、指位反查；分开记录课件选择和家庭实物。"
+    }
+  ],
+  "games": [
+    {
+      "page": "take-the-number-cards",
+      "template": "bubbleMaze",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.bubbleMaze",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "ordered_route",
+      "selection": "由实际计数器先十位后个位生成取卡路线，整十的0也是必经卡。先碰个位不消耗卡也不推进；真实退出前完成全部取卡。",
+      "levels": [
+        "看3个十和4个一，依次取3、4。",
+        "空个位也取0，另有非空个位作对照。",
+        "交换两个数字的位置，按新计数器重新取两张。"
+      ],
+      "demo": "教师指计数器十位、对应路上卡和方向键，只走一步正确收卡后清零。",
+      "teacherAnchors": [
+        "game-player",
+        "game-target"
+      ]
+    },
+    {
+      "page": "deliver-by-number",
+      "template": "listenDelivery",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.listenDelivery",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "listen_pick_deliver",
+      "selection": "每单读具体数名，货卡只显示相应十位和个位珠数，找出正确的量后按对应数字送到真实号箱，调换数字的货卡及错误号箱都拒绝。",
+      "levels": [
+        "听三十一，和十三区分。",
+        "八十和八十三，分别看个位空与有珠。",
+        "两个交换顺序的数与一个独立数，按三单换读换投。"
+      ],
+      "demo": "教师指任务、珠数货卡和取货键，真实取起一次后清零，口头重申走到对应箱才算完成。",
+      "teacherAnchors": [
+        "game-player",
+        "game-target"
+      ]
+    }
+  ],
+  "quiz": [
+    {
+      "id": "abacus-to-label",
+      "skill": "计数器转换",
+      "prompt": "看计数器。哪张数卡写对了？",
+      "answer": "53",
+      "position": 1
+    },
+    {
+      "id": "same-digit-different-value",
+      "skill": "同数码异位",
+      "prompt": "八十八里，哪个八表示八个十？",
+      "answer": "左边的8",
+      "position": 2
+    },
+    {
+      "id": "empty-right-write-zero",
+      "skill": "整十占位",
+      "prompt": "听，六十。选写对的卡。",
+      "answer": "60",
+      "position": 3
+    },
+    {
+      "id": "listen-to-number",
+      "skill": "听数写数",
+      "prompt": "听，五十二。是哪张号码卡？",
+      "answer": "52",
+      "position": 2
+    },
+    {
+      "id": "packs-to-written-number",
+      "skill": "实物写数",
+      "prompt": "看整盒和散卡。该贴哪张号？",
+      "answer": "41",
+      "position": 3
+    },
+    {
+      "id": "written-number-to-packs",
+      "skill": "读号找正确量",
+      "prompt": "七十三号的信卡，选哪一份？",
+      "answer": "七组十、三个一",
+      "position": 1
+    }
+  ],
+  "afterClass": {
+    "familyTask": "找一张两位数票号，读给家人听；交换角色，一人说八十五或另一个整十数，一人摆卡并说明两个位置。",
+    "weeklyQuestionSource": [
+      "实物与两位珠",
+      "听数写数",
+      "同码换位",
+      "整十占位及生活读写"
+    ],
+    "evidence": "游戏和图题记录课内选择。家庭实物、摆卡与口述等待现场观察。"
+  },
+  "artAndLanguage": "代码精确画十张一盒、散件、两位计数器和数卡。内置imagegen绘原创邮局、人物及道具。遮去非目标字后仍能通过数位、珠数、数字、图形和教师口令解题。"
+}

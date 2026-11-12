@@ -47,18 +47,18 @@
       15
     ]
   },
-  "reviewedAt": "2026-11-06T04:38:19.114539+00:00",
-  "reviewedBy": "gpt-6.1-sol",
+  "reviewedAt": "2026-11-10T17:42:27+08:00",
+  "reviewedBy": "Codex production_support 核读全部配套；Codex garden_six 复核原书和本地哈希。",
   "reviewerKind": "ai",
   "reviewMethod": "逐页目视两份精确章节编号命中的官方备课记录：教学设计5+5页，课件14+26页，共50页；第一份设计第5页为空白。两位教师的记录均标第一课时，是同一课时的教学版本而非第二课时。视频未审看。 同册电子教材已逐页目视核读本课印刷第8–10页，查看封面、版权、目录及前后边界印刷第7、11页。",
   "objectives": [
-    "听懂并辨认hat与bird，理解where用于询问位置，知道where's是where is的缩写。",
-    "结合具体画面理解in表示在里面、on表示在上面、under表示在下面；根据老师口头指令移动画面中的鸟。",
-    "听懂Where's the bird?，借物品和位置图片尝试用It's in/on/under the hat.回答。",
-    "在新物品情境中听辨in、on、under，并和家人用身边物品练习询问位置；口头表达质量待成人观察。"
+    "听简短原创节奏句，辨认cat、bird、bag和hat，借图明确正在找什么。",
+    "听懂Where’s the bird?是在问位置，知道Where’s是Where is的缩写。",
+    "从清楚的开口、接触面和上下关系理解in、on、under，并尝试用完整的It’s句子答位置。",
+    "听辨新物品和参照物，轮流问答并用实物核对。完整课本对话与歌谣用纸书跟读，口头表现请成人观察。"
   ],
-  "keyPoint": "把in、on、under与实物位置建立对应，听懂询问并用完整的It's句子尝试回答。",
-  "difficultPoint": "区分物体处于容器内部、接触上表面、位于下方三种关系，不把看到物品或点击图片当作已经会说。",
+  "keyPoint": "先听清要找的物品，再看它和包、帽子或其他参照物的关系，用完整的It’s句子回答位置。",
+  "difficultPoint": "在里面要看开口和前沿，在上面要看接触的表面，在下面要看上下关系；换参照物也要听清。",
   "lessonBoundary": {
     "allHoursReviewed": true,
     "officialHours": [
@@ -88,7 +88,60 @@
     "textbookStart": "印刷第8页、电子页13为Module 2 Unit 1；上一页印刷第7页属于Module 1 Unit 2。",
     "textbookEnd": "印刷第10页、电子页15为本课末页；印刷第11页、电子页16开始Module 2 Unit 2。"
   },
-  "factChecks": [],
+  "factChecks": [
+    {
+      "claims": [
+        "原书活动1第一格是猫在包里，活动2寻找同一只鸟时帽子是参照物。"
+      ],
+      "sources": [
+        {
+          "resource": "textbook",
+          "pageRefs": [
+            8,
+            9
+          ],
+          "finding": "印8热身为猫在包里；印9主找鸟对话以帽子为参照。"
+        },
+        {
+          "resource": "teachingDesign",
+          "pageRefs": [
+            "218266 p4"
+          ],
+          "finding": "出版社教案第4页按原书用包，并引导学生看帽子里的鸟。"
+        },
+        {
+          "resource": "courseware",
+          "pageRefs": [
+            "218268 p4"
+          ],
+          "finding": "出版社课件第4页与原书袋内场景相合。"
+        }
+      ]
+    },
+    {
+      "claims": [
+        "Where’s用来询问位置。in、on、under分别表示内部、上面接触与下面。"
+      ],
+      "sources": [
+        {
+          "resource": "textbook",
+          "pageRefs": [
+            8,
+            9,
+            10
+          ],
+          "finding": "用where问位置，按图听辨in、on、under。"
+        },
+        {
+          "resource": "teachingDesign",
+          "pageRefs": [
+            "218266 p3–6"
+          ],
+          "finding": "用参照物的空间图练习三个位置词和完整问答。"
+        }
+      ]
+    }
+  ],
   "resources": {
     "teachingDesign": {
       "status": "reviewed",
@@ -135,6 +188,19 @@
         "第二份第1页说明已有bird、It's基础；目标为理解并运用in、on、under、Where's和It's，理解对话并尝试复述。",
         "第二份第2页通过教师指名询问让儿童感知where，课外动作歌曲含by，但by不列本课核心目标，本课不扩展。第3页通过手势和魔术情境对照位置、学习hat。",
         "第二份第4页安排看图问答、藏物找物、配音和完整情境表达；建议爱整理收纳。课后指向教材第9页活动2、第10页活动4及家长藏物游戏。第5页板书以同一只鸟与帽子呈现三种位置。"
+      ],
+      "publisherReviewed": [
+        {
+          "documentId": "218266",
+          "pageRefs": [
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "finding": "第7页仅上半页属本课。"
+        }
       ]
     },
     "courseware": {
@@ -233,15 +299,39 @@
         "第二份第1至8页为课题和热身、手势比较、魔术、hat引入；第9至17页分别呈现in、on、under及帽子、文具盒、桌子、箱子、树等情境。第9、12、15页的静态帽子页未完整显示所有动画对象，不把缺失动画当成观察证据。",
         "第二份第18至20页以狗在箱内、苹果在书上、狗在桌下练位置对应；第21至24页组织转盘问答、看图搭档对话、藏物找物和小魔术师表达。",
         "第二份第25页提醒收纳物品，第26页课后要求教材第9页活动2朗读、第10页活动4练习、和家长玩藏物游戏。"
+      ],
+      "publisherReviewed": [
+        {
+          "documentId": "218268",
+          "pageRefs": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13
+          ],
+          "finding": "Unit 1 第一课时。第3页与原书不一致的字幕已记录。"
+        }
       ]
     },
     "learningTaskSheet": {
       "status": "not_provided",
-      "evidence": "output/courseware-lessons/g1-english-23b3193916c0929d/official/legacy/records.json。精确章节两份官方备课记录均只有lesson_plan_design、classroom_record和teaching_assets，无单列学习任务单。"
+      "evidence": "output/courseware-lessons/g1-english-23b3193916c0929d/official/legacy/records.json。精确章节两份官方备课记录均只有lesson_plan_design、classroom_record和teaching_assets，无单列学习任务单。",
+      "publisherEvidence": "output/courseware-lessons/g1-english-23b3193916c0929d/official/publisher-m2/review.json"
     },
     "afterClassExercise": {
       "status": "not_provided",
-      "evidence": "output/courseware-lessons/g1-english-23b3193916c0929d/official/legacy/records.json。两份记录无单列课后练习。课后要求已审读：第一份设计第4页/课件第14页，第二份设计第4页/课件第26页。"
+      "evidence": "output/courseware-lessons/g1-english-23b3193916c0929d/official/legacy/records.json。两份记录无单列课后练习。课后要求已审读：第一份设计第4页/课件第14页，第二份设计第4页/课件第26页。",
+      "publisherEvidence": "output/courseware-lessons/g1-english-23b3193916c0929d/official/publisher-m2/review.json",
+      "relatedModuleOnly": "218235 为模块测试。用本课可核的目标另出题，整份试题留模块。"
     },
     "video": {
       "status": "waived",
@@ -249,6 +339,11 @@
       "resourceIds": [
         "8dd6aaee-eb45-1e5c-59ae-d2ad2d5148ad",
         "fd5409bf-5303-440a-d51e-a04f2a58091d"
+      ],
+      "publisherResourceIds": [
+        "207924",
+        "207925",
+        "207926"
       ]
     },
     "textbook": {
@@ -302,5 +397,46 @@
     "scope": "Official notes, original goals, narration, quiz and page code authored for this exact lesson.",
     "g7WaiverInherited": false
   },
-  "objectiveOrigin": "依据教材印刷第8–10页的四项活动和两份同课时官方备课资料整理。"
+  "objectiveOrigin": "依据教材印刷第8–10页的四项活动和两份同课时官方备课资料整理。",
+  "contentBoundary": "印8–10四项。原创节奏、布偶戏、游戏和看图题，纸书跟读原作。印8热身猫在包内；印9活动二找鸟时以帽为参照。相邻 Unit 2 与模块综合另课。",
+  "sourceConflicts": [
+    {
+      "point": "印8歌谣第一格的参照物",
+      "evidence": [
+        "电子教材印8（电子书13）",
+        "外研218268第3–4页",
+        "外研218266第4页"
+      ],
+      "decision": "教材第一格图文为包。出版社课件第3页字幕误写帽，第4页及教案第4页支持包。原创数字课先教bag，第二活动另学hat。"
+    }
+  ],
+  "publisherReview": {
+    "review": {
+      "path": "output/courseware-lessons/g1-english-23b3193916c0929d/official/publisher-m2/review.json",
+      "sha256": "6d1db0f6fe3d7c7738c0a42944e1684a6aaab360c9bf24e0ceea7d2ff85be56b"
+    },
+    "reviewedDocumentPages": 50,
+    "moduleEntryCount": 8,
+    "volumePagesChecked": 9,
+    "currentLesson": [
+      "218268 第1–13页",
+      "218266 第3–6页及第7页上方"
+    ],
+    "additionalReadback": "218267归Unit 2，218265归模块综合，218235仅以Unit 1位置目标参考"
+  },
+  "sourceCompleteness": {
+    "status": "exact_textbook_and_companions_reviewed",
+    "textbookReviewedPages": [
+      8,
+      9,
+      10
+    ],
+    "bookEvidenceFiles": 8,
+    "legacyStaticPages": 50,
+    "publisherModulePages": 50,
+    "nationalCurrentExactMatches": 0,
+    "legacyExactRecords": 2,
+    "standaloneEliteHttp403Meaning": "访问被拒，暂无该入口的存在性结论",
+    "video": "按原课及出版社记录的既有视频豁免"
+  }
 }

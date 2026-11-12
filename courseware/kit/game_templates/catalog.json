@@ -1,0 +1,1851 @@
+{
+  "schemaVersion": 1,
+  "eligibility": {
+    "status": "可用",
+    "ownerApprovedOnRequired": true
+  },
+  "ruleTypes": {
+    "sum_pair": {
+      "name": "两项相加等于指定总数",
+      "examples": [
+        {
+          "subject": "数学",
+          "grade": 1,
+          "lesson": "9 加几",
+          "use": "把 9 和 1 配成十"
+        },
+        {
+          "subject": "数学",
+          "grade": 1,
+          "lesson": "10 的认识",
+          "use": "找 4 和 6"
+        }
+      ]
+    },
+    "pair_match": {
+      "name": "给定语义配对关系",
+      "examples": [
+        {
+          "subject": "语文",
+          "grade": 1,
+          "lesson": "ai ei ui",
+          "use": "把声母和韵母拼成给定音节"
+        },
+        {
+          "subject": "英语",
+          "grade": 1,
+          "lesson": "Is it a dog?",
+          "use": "把英文单词和对应动物图配对"
+        }
+      ]
+    },
+    "ordered_route": {
+      "name": "按规定顺序收集或落脚",
+      "examples": [
+        {
+          "subject": "数学",
+          "grade": 1,
+          "lesson": "11～20 各数的认识",
+          "use": "从小到大依次经过数卡"
+        },
+        {
+          "subject": "数学",
+          "grade": 1,
+          "lesson": "认识 10",
+          "use": "从 10 开始倒数"
+        }
+      ]
+    },
+    "listen_order": {
+      "name": "按听到的顺序行动",
+      "examples": [
+        {
+          "subject": "英语",
+          "grade": 1,
+          "lesson": "Point to the door.",
+          "use": "按语音依次找到门、窗"
+        }
+      ]
+    },
+    "comparison": {
+      "name": "从候选中比较数量或大小",
+      "examples": [
+        {
+          "subject": "数学",
+          "grade": 1,
+          "lesson": "比大小",
+          "use": "听口令，比较两块平台的数字再跳"
+        }
+      ]
+    },
+    "relative_position": {
+      "name": "以参照物判断上下或同层",
+      "examples": [
+        {
+          "subject": "数学",
+          "grade": 1,
+          "lesson": "上、下、前、后",
+          "use": "飞到小旗的上方或下方"
+        }
+      ]
+    },
+    "split_quantity": {
+      "name": "把给定总量分成两份",
+      "examples": [
+        {
+          "subject": "数学",
+          "grade": 1,
+          "lesson": "6 和 7 的认识",
+          "use": "把 7 分成 3 和 4"
+        }
+      ]
+    },
+    "light_shadow": {
+      "name": "用灯的位置和距离控制影子",
+      "examples": [
+        {
+          "subject": "科学",
+          "grade": 1,
+          "lesson": "影子观察活动",
+          "use": "比较灯靠近或远离时的影子大小"
+        }
+      ]
+    },
+    "listen_match": {
+      "name": "按口令寻找对应图像或数量",
+      "examples": [
+        {
+          "subject": "英语",
+          "grade": 1,
+          "lesson": "How many?",
+          "use": "听 five 后瞄准五件物品的一组"
+        },
+        {
+          "subject": "英语",
+          "grade": 1,
+          "lesson": "Is it a dog?",
+          "use": "听词后发射到动物图"
+        }
+      ]
+    },
+    "shape_match": {
+      "name": "识别平面图形并找相同形状",
+      "examples": [
+        {
+          "subject": "数学",
+          "grade": 1,
+          "lesson": "认识图形",
+          "use": "找相同的圆形或三角形"
+        }
+      ]
+    },
+    "identity_match": {
+      "name": "辨认目标符号或图像",
+      "examples": [
+        {
+          "subject": "语文",
+          "grade": 1,
+          "lesson": "日月明",
+          "use": "飞向与目标相同的汉字"
+        }
+      ]
+    },
+    "observe_state": {
+      "name": "比较两个状态并抓住时机",
+      "examples": [
+        {
+          "subject": "科学",
+          "grade": 1,
+          "lesson": "观察动物",
+          "use": "拍下翅膀展开的一刻并回看"
+        }
+      ]
+    },
+    "exact_quantity": {
+      "name": "操作后取得或留下准确数量",
+      "examples": [
+        {
+          "subject": "数学",
+          "grade": 1,
+          "lesson": "认识 10",
+          "use": "只拿够十个物品"
+        }
+      ]
+    },
+    "one_to_one": {
+      "name": "把物件一一对应",
+      "examples": [
+        {
+          "subject": "数学",
+          "grade": 1,
+          "lesson": "数一数",
+          "use": "给每个目标套一个圈"
+        }
+      ]
+    },
+    "ordinal_position": {
+      "name": "从指定方向数第几个",
+      "examples": [
+        {
+          "subject": "数学",
+          "grade": 1,
+          "lesson": "第几",
+          "use": "从车头数第 3 节"
+        }
+      ]
+    },
+    "count_match": {
+      "name": "数出数量并匹配对应数字",
+      "examples": [
+        {
+          "subject": "数学",
+          "grade": 1,
+          "lesson": "1～5 的认识",
+          "use": "给三件物品匹配数字 3"
+        }
+      ]
+    },
+    "trace_path": {
+      "name": "按顺序经过笔画或观察路线",
+      "examples": [
+        {
+          "subject": "语文",
+          "grade": 1,
+          "lesson": "一二三",
+          "use": "沿正确笔顺走完每笔"
+        }
+      ]
+    },
+    "classification": {
+      "name": "只操作同类目标",
+      "examples": [
+        {
+          "subject": "科学",
+          "grade": 1,
+          "lesson": "各种各样的材料",
+          "use": "只收集相同材质的物品"
+        }
+      ]
+    },
+    "arithmetic_match": {
+      "name": "只操作等于目标值的算式",
+      "examples": [
+        {
+          "subject": "数学",
+          "grade": 1,
+          "lesson": "6 和 7 的加减法",
+          "use": "找到所有得数是 7 的算式"
+        }
+      ]
+    },
+    "pinyin_blend": {
+      "name": "把声母和带调韵母拼成指定音节",
+      "examples": [
+        {
+          "subject": "语文",
+          "grade": 1,
+          "lesson": "b p m f",
+          "use": "让 b 与 ā 合成 bā，让 m 与 ǎ 合成 mǎ。"
+        },
+        {
+          "subject": "语文",
+          "grade": 1,
+          "lesson": "d t n l",
+          "use": "从交错字片中拼出 dǎ、tā 等目标音节。"
+        }
+      ]
+    },
+    "symbol_merge": {
+      "name": "用两块指定内容合成目标",
+      "examples": [
+        {
+          "subject": "语文",
+          "grade": 1,
+          "lesson": "日月明",
+          "use": "滑动日字片与月字片，合出收藏格中的明。"
+        },
+        {
+          "subject": "数学",
+          "grade": 1,
+          "lesson": "6 和 7 的认识",
+          "use": "让两张数量片相加，拼出指定的总数。"
+        }
+      ]
+    },
+    "listen_pick_deliver": {
+      "name": "按听到的两步指令拿物品并送给指定对象",
+      "examples": [
+        {
+          "subject": "英语",
+          "grade": 1,
+          "lesson": "Is it a dog?",
+          "use": "听 Pick up the apple. Take it to the dog.，先拿苹果，再送给小狗。"
+        },
+        {
+          "subject": "英语",
+          "grade": 1,
+          "lesson": "Point to the door.",
+          "use": "沿用听动作指令的目标，换成课内图片和录音，按顺序完成两个动作。"
+        }
+      ]
+    },
+    "shape_compose": {
+      "name": "旋转图形并拼合轮廓",
+      "examples": [
+        {
+          "subject": "数学",
+          "grade": 1,
+          "lesson": "认识图形（二）",
+          "use": "转动小木块，让它恰好盖住桥面的相同轮廓。"
+        },
+        {
+          "subject": "数学",
+          "grade": 1,
+          "lesson": "图形的拼组",
+          "use": "把不同形状的拼片放进正确的空位，补完整个图。"
+        }
+      ]
+    }
+  },
+  "configuration": {
+    "classic": {
+      "levels": "3–5 关，可填 hints: [初次失误提示, 两次后提示]。",
+      "art": "backdrop、sticker、frames 和 icons（ID 到图片）；样例填文件名，课页用登记的图片。",
+      "cues": "按关数组，每关 goal/hint/hint2/praise，可选 steps（逐动作口令 ID）。",
+      "doneText": "可选完成页副标题。",
+      "voiceLead": "可选；等待当前关目标或过关录音播完，缺音时最长等十秒。",
+      "observation": "可选；sceneId 和 trials 声明模拟观察的俯视与侧视枚举，真人通关后才能读取。",
+      "stepVoiceLead": "可选。等待步骤切换后新口令播完再恢复操作，适合听指令玩法。"
+    },
+    "legacy": {
+      "levels": "每关 name、rounds；每轮含 goal、hint、hint2 和本模板配置。保留旧调用。"
+    }
+  },
+  "templates": [
+    {
+      "id": "fallingTiles",
+      "name": "凑十工坊",
+      "reference": "俄罗斯方块式落块消除",
+      "knowledgeRules": [
+        "sum_pair",
+        "pair_match"
+      ],
+      "controls": {
+        "keyboard": "← → 横移，↓ 加速，空格落下",
+        "mouse": "点击或按住对应的大号屏幕按钮",
+        "touch": "点击或按住对应的大号屏幕按钮"
+      },
+      "status": "可用",
+      "ownerApprovedOn": "2026-11-09",
+      "versions": [
+        {
+          "version": 1,
+          "entryPoint": "K.gameTemplates.fallingTiles",
+          "source": "courseware/kit/game_templates/fallingTiles.js",
+          "configuration": "classic",
+          "config": {
+            "bottom": "底行六格，null 为空",
+            "pieces": "依次落下的 ID 或数字",
+            "total / pairs / matches": "指定总和／有方向的 ID 配对／页面内 JS 判定函数，三选一",
+            "interval": "每下落一格的秒数",
+            "labels / symbol": "可选显示名和目标标志"
+          },
+          "example": "courseware/kit/examples/classic-arcade/falling-tiles.json",
+          "exampleLevels": 3,
+          "levels": {
+            "min": 3,
+            "max": 5
+          },
+          "difficulty": "先慢落、少量配对，逐关缩短下落间隔；末关连续处理更多方块。",
+          "autopilot": true,
+          "cues": {
+            "supported": true,
+            "exampleRecorded": true
+          },
+          "teacherAnchors": [
+            "game-goal",
+            "game-player",
+            "game-target"
+          ],
+          "preview": {
+            "page": "output/courseware-production/classic-arcade-v3/falling-tiles.html",
+            "clip": "output/courseware-production/classic-arcade-v3/clips/falling-tiles.mp4",
+            "screenshot": "output/courseware-production/classic-arcade-v3/screens/falling-tiles-play.jpg",
+            "assetsManifest": "output/courseware-production/classic-arcade-v3/asset-sources.json",
+            "voiceScript": "courseware/kit/examples/arcade-voice.json"
+          },
+          "status": "可用",
+          "ownerApprovedOn": "2026-11-09",
+          "teacherDemo": "firstAction",
+          "approvalEvidence": {
+            "handover": "output/courseware-production/game-handover.json",
+            "preview": "output/courseware-production/classic-arcade-v2/index.html",
+            "recordedAt": "2026-11-09T17:19:29.434192+08:00",
+            "quote": "这几个游戏可以"
+          }
+        }
+      ]
+    },
+    {
+      "id": "bubbleMaze",
+      "name": "泡泡车寻星",
+      "reference": "泡泡坦克与吃豆人迷宫",
+      "knowledgeRules": [
+        "ordered_route",
+        "listen_order"
+      ],
+      "controls": {
+        "keyboard": "方向键开车，空格喷泡泡",
+        "mouse": "点击或按住对应的大号屏幕按钮",
+        "touch": "点击或按住对应的大号屏幕按钮"
+      },
+      "status": "可用",
+      "ownerApprovedOn": "2026-11-09",
+      "versions": [
+        {
+          "version": 1,
+          "entryPoint": "K.gameTemplates.bubbleMaze",
+          "source": "courseware/kit/game_templates/bubbleMaze.js",
+          "configuration": "classic",
+          "config": {
+            "map": "4–7 行、6–13 列；# 墙，+ 可打通，S 起点，E 出口，. 通道，其余为目标 ID",
+            "route": "必须经过的目标顺序",
+            "step": "每格秒数",
+            "patrols": "可选巡游路线 y/from/to/speed",
+            "labels / listenOnly": "可选显示名；听指令时隐藏顶部目标 ID"
+          },
+          "example": "courseware/kit/examples/classic-arcade/bubble-maze.json",
+          "exampleLevels": 3,
+          "levels": {
+            "min": 3,
+            "max": 5
+          },
+          "difficulty": "首关无巡游，随后加巡游与岔路，末关更快、路线更长。",
+          "autopilot": true,
+          "cues": {
+            "supported": true,
+            "exampleRecorded": true
+          },
+          "teacherAnchors": [
+            "game-goal",
+            "game-player",
+            "game-target"
+          ],
+          "preview": {
+            "page": "output/courseware-production/classic-arcade-v3/bubble-maze.html",
+            "clip": "output/courseware-production/classic-arcade-v3/clips/bubble-maze.mp4",
+            "screenshot": "output/courseware-production/classic-arcade-v3/screens/bubble-maze-play.jpg",
+            "assetsManifest": "output/courseware-production/classic-arcade-v3/asset-sources.json",
+            "voiceScript": "courseware/kit/examples/arcade-voice.json"
+          },
+          "status": "可用",
+          "ownerApprovedOn": "2026-11-09",
+          "teacherDemo": "firstAction",
+          "approvalEvidence": {
+            "handover": "output/courseware-production/game-handover.json",
+            "preview": "output/courseware-production/classic-arcade-v2/index.html",
+            "recordedAt": "2026-11-09T17:19:29.434192+08:00",
+            "quote": "这几个游戏可以"
+          }
+        }
+      ]
+    },
+    {
+      "id": "platformHop",
+      "name": "云朵跳跳兔",
+      "reference": "超级玛丽式平台跳跃",
+      "knowledgeRules": [
+        "ordered_route",
+        "comparison"
+      ],
+      "controls": {
+        "keyboard": "← → 跑，↑ 或空格跳",
+        "mouse": "点击或按住对应的大号屏幕按钮",
+        "touch": "点击或按住对应的大号屏幕按钮"
+      },
+      "status": "可用",
+      "ownerApprovedOn": "2026-11-09",
+      "versions": [
+        {
+          "version": 1,
+          "entryPoint": "K.gameTemplates.platformHop",
+          "source": "courseware/kit/game_templates/platformHop.js",
+          "configuration": "classic",
+          "config": {
+            "platforms": "[x,y,宽度,ID] 列表，含唯一 start",
+            "route": "依次落脚的目标 ID",
+            "speed": "跑速（逻辑像素/秒）",
+            "prompt / startLabel / labels": "可选目标标志、起点标志和显示名"
+          },
+          "example": "courseware/kit/examples/classic-arcade/platform-hop.json",
+          "exampleLevels": 3,
+          "levels": {
+            "min": 3,
+            "max": 5
+          },
+          "difficulty": "先用宽平台近距离起跳，随后加速和加入干扰，末关多段跳。",
+          "autopilot": true,
+          "cues": {
+            "supported": true,
+            "exampleRecorded": true
+          },
+          "teacherAnchors": [
+            "game-goal",
+            "game-player",
+            "game-target"
+          ],
+          "preview": {
+            "page": "output/courseware-production/classic-arcade-v3/platform-hop.html",
+            "clip": "output/courseware-production/classic-arcade-v3/clips/platform-hop.mp4",
+            "screenshot": "output/courseware-production/classic-arcade-v3/screens/platform-hop-play.jpg",
+            "assetsManifest": "output/courseware-production/classic-arcade-v3/asset-sources.json",
+            "voiceScript": "courseware/kit/examples/arcade-voice.json"
+          },
+          "status": "可用",
+          "ownerApprovedOn": "2026-11-09",
+          "teacherDemo": "firstAction",
+          "approvalEvidence": {
+            "handover": "output/courseware-production/game-handover.json",
+            "preview": "output/courseware-production/classic-arcade-v2/index.html",
+            "recordedAt": "2026-11-09T17:19:29.434192+08:00",
+            "quote": "这几个游戏可以"
+          }
+        }
+      ]
+    },
+    {
+      "id": "shadowStage",
+      "name": "影子剧场",
+      "reference": "光影位置与缩放拼图",
+      "knowledgeRules": [
+        "light_shadow"
+      ],
+      "controls": {
+        "keyboard": "← → 横移灯，↑ ↓ 调远近，空格定格",
+        "mouse": "点击或按住对应的大号屏幕按钮",
+        "touch": "点击或按住对应的大号屏幕按钮"
+      },
+      "status": "可用",
+      "ownerApprovedOn": "2026-11-09",
+      "versions": [
+        {
+          "version": 1,
+          "entryPoint": "K.gameTemplates.shadowStage",
+          "source": "courseware/kit/game_templates/shadowStage.js",
+          "configuration": "classic",
+          "config": {
+            "shots": "目标列表 {x,d,shape}；shape 为 triangle/circle/square",
+            "tolerance": "影子对齐的容差"
+          },
+          "example": "courseware/kit/examples/classic-arcade/shadow-stage.json",
+          "exampleLevels": 3,
+          "levels": {
+            "min": 3,
+            "max": 5
+          },
+          "difficulty": "先给宽松轮廓，再缩小容差；末关连续对准三种影子。",
+          "autopilot": true,
+          "cues": {
+            "supported": true,
+            "exampleRecorded": true
+          },
+          "teacherAnchors": [
+            "game-goal",
+            "game-player",
+            "game-target"
+          ],
+          "preview": {
+            "page": "output/courseware-production/classic-arcade-v3/shadow-stage.html",
+            "clip": "output/courseware-production/classic-arcade-v3/clips/shadow-stage.mp4",
+            "screenshot": "output/courseware-production/classic-arcade-v3/screens/shadow-stage-play.jpg",
+            "assetsManifest": "output/courseware-production/classic-arcade-v3/asset-sources.json",
+            "voiceScript": "courseware/kit/examples/arcade-voice.json"
+          },
+          "status": "可用",
+          "ownerApprovedOn": "2026-11-09",
+          "teacherDemo": "firstAction",
+          "approvalEvidence": {
+            "handover": "output/courseware-production/game-handover.json",
+            "preview": "output/courseware-production/classic-arcade-v2/index.html",
+            "recordedAt": "2026-11-09T17:19:29.434192+08:00",
+            "quote": "这几个游戏可以"
+          }
+        }
+      ]
+    },
+    {
+      "id": "windCourier",
+      "name": "风翼邮差",
+      "reference": "飞行穿门街机",
+      "knowledgeRules": [
+        "relative_position"
+      ],
+      "controls": {
+        "keyboard": "↑ ↓ 调高度，空格减速",
+        "mouse": "点击或按住对应的大号屏幕按钮",
+        "touch": "点击或按住对应的大号屏幕按钮"
+      },
+      "status": "可用",
+      "ownerApprovedOn": "2026-11-09",
+      "versions": [
+        {
+          "version": 1,
+          "entryPoint": "K.gameTemplates.windCourier",
+          "source": "courseware/kit/game_templates/windCourier.js",
+          "configuration": "classic",
+          "config": {
+            "legs": "站台任务 {ref,shift}；ref 从上到下 0–2，shift 为 -1/0/1",
+            "speed": "前进速度",
+            "tolerance": "站台垂直容差"
+          },
+          "example": "courseware/kit/examples/classic-arcade/wind-courier.json",
+          "exampleLevels": 3,
+          "levels": {
+            "min": 3,
+            "max": 5
+          },
+          "difficulty": "固定参照、慢速飞行；逐关加快，末关混合上、下、同层。",
+          "autopilot": true,
+          "cues": {
+            "supported": true,
+            "exampleRecorded": true
+          },
+          "teacherAnchors": [
+            "game-goal",
+            "game-player",
+            "game-target"
+          ],
+          "preview": {
+            "page": "output/courseware-production/classic-arcade-v3/wind-courier.html",
+            "clip": "output/courseware-production/classic-arcade-v3/clips/wind-courier.mp4",
+            "screenshot": "output/courseware-production/classic-arcade-v3/screens/wind-courier-play.jpg",
+            "assetsManifest": "output/courseware-production/classic-arcade-v3/asset-sources.json",
+            "voiceScript": "courseware/kit/examples/arcade-voice.json"
+          },
+          "status": "可用",
+          "ownerApprovedOn": "2026-11-09",
+          "teacherDemo": "firstAction",
+          "approvalEvidence": {
+            "handover": "output/courseware-production/game-handover.json",
+            "preview": "output/courseware-production/classic-arcade-v2/index.html",
+            "recordedAt": "2026-11-09T17:19:29.434192+08:00",
+            "quote": "这几个游戏可以"
+          }
+        }
+      ]
+    },
+    {
+      "id": "magnetMarbles",
+      "name": "磁力弹珠",
+      "reference": "祖玛式发射与弹珠瞄准",
+      "knowledgeRules": [
+        "sum_pair",
+        "pair_match",
+        "listen_match"
+      ],
+      "controls": {
+        "keyboard": "← → 瞄准和飞行中微调，空格发射",
+        "mouse": "点击或按住对应的大号屏幕按钮",
+        "touch": "点击或按住对应的大号屏幕按钮"
+      },
+      "status": "可用",
+      "ownerApprovedOn": "2026-11-09",
+      "versions": [
+        {
+          "version": 1,
+          "entryPoint": "K.gameTemplates.magnetMarbles",
+          "source": "courseware/kit/game_templates/magnetMarbles.js",
+          "configuration": "classic",
+          "config": {
+            "targets": "移动靶 {x,value} 列表",
+            "queue": "发射物的 ID 或数字队列",
+            "total / pairs / matches": "指定总和／有方向的 ID 配对／页面内 JS 判定函数，三选一",
+            "speed / drift": "弹珠速度、靶漂移幅度",
+            "targetWidth / targetHeight": "可选靶尺寸",
+            "listenOnly / targetFallbackCounts / labels / symbol": "可选听词模式、图片缺失时的数量图、显示名和目标标志"
+          },
+          "example": "courseware/kit/examples/classic-arcade/magnet-marbles.json",
+          "exampleLevels": 3,
+          "levels": {
+            "min": 3,
+            "max": 5
+          },
+          "difficulty": "首关靶子漂移小；逐关加快，末关须在漂移中修正弹珠。",
+          "autopilot": true,
+          "cues": {
+            "supported": true,
+            "exampleRecorded": true
+          },
+          "teacherAnchors": [
+            "game-goal",
+            "game-player",
+            "game-target"
+          ],
+          "preview": {
+            "page": "output/courseware-production/classic-arcade-v3/magnet-marbles.html",
+            "clip": "output/courseware-production/classic-arcade-v3/clips/magnet-marbles.mp4",
+            "screenshot": "output/courseware-production/classic-arcade-v3/screens/magnet-marbles-play.jpg",
+            "assetsManifest": "output/courseware-production/classic-arcade-v3/asset-sources.json",
+            "voiceScript": "courseware/kit/examples/arcade-voice.json"
+          },
+          "status": "可用",
+          "ownerApprovedOn": "2026-11-09",
+          "teacherDemo": "firstAction",
+          "approvalEvidence": {
+            "handover": "output/courseware-production/game-handover.json",
+            "preview": "output/courseware-production/classic-arcade-v2/index.html",
+            "recordedAt": "2026-11-09T17:19:29.434192+08:00",
+            "quote": "这几个游戏可以"
+          }
+        }
+      ]
+    },
+    {
+      "id": "fireflySwing",
+      "name": "萤火虫荡星灯",
+      "reference": "绳索摆荡与切线跳跃",
+      "knowledgeRules": [
+        "shape_match",
+        "identity_match"
+      ],
+      "controls": {
+        "keyboard": "← → 换摆荡方向，空格松手",
+        "mouse": "点击或按住对应的大号屏幕按钮",
+        "touch": "点击或按住对应的大号屏幕按钮"
+      },
+      "status": "可用",
+      "ownerApprovedOn": "2026-11-09",
+      "versions": [
+        {
+          "version": 1,
+          "entryPoint": "K.gameTemplates.fireflySwing",
+          "source": "courseware/kit/game_templates/fireflySwing.js",
+          "configuration": "classic",
+          "config": {
+            "legs": "每段 {goal,targets:[{x,y,value},…]}，两个灯只有一个匹配",
+            "omega": "绕点摆动角速度",
+            "labels": "可选 ID 显示名"
+          },
+          "example": "courseware/kit/examples/classic-arcade/firefly-swing.json",
+          "exampleLevels": 3,
+          "levels": {
+            "min": 3,
+            "max": 5
+          },
+          "difficulty": "首关慢摆、两个落点，随后加快，末关点亮四盏指定图形的灯。",
+          "autopilot": true,
+          "cues": {
+            "supported": true,
+            "exampleRecorded": true
+          },
+          "teacherAnchors": [
+            "game-goal",
+            "game-player",
+            "game-target"
+          ],
+          "preview": {
+            "page": "output/courseware-production/classic-arcade-v3/firefly-swing.html",
+            "clip": "output/courseware-production/classic-arcade-v3/clips/firefly-swing.mp4",
+            "screenshot": "output/courseware-production/classic-arcade-v3/screens/firefly-swing-play.jpg",
+            "assetsManifest": "output/courseware-production/classic-arcade-v3/asset-sources.json",
+            "voiceScript": "courseware/kit/examples/arcade-voice.json"
+          },
+          "status": "可用",
+          "ownerApprovedOn": "2026-11-09",
+          "teacherDemo": "firstAction",
+          "approvalEvidence": {
+            "handover": "output/courseware-production/game-handover.json",
+            "preview": "output/courseware-production/classic-arcade-v2/index.html",
+            "recordedAt": "2026-11-09T17:19:29.434192+08:00",
+            "quote": "这几个游戏可以"
+          }
+        }
+      ]
+    },
+    {
+      "id": "shutterScout",
+      "name": "快门侦探",
+      "reference": "追焦摄影街机",
+      "knowledgeRules": [
+        "observe_state"
+      ],
+      "controls": {
+        "keyboard": "方向键移动取景框，空格拍照",
+        "mouse": "点击或按住对应的大号屏幕按钮",
+        "touch": "点击或按住对应的大号屏幕按钮"
+      },
+      "status": "可用",
+      "ownerApprovedOn": "2026-11-09",
+      "versions": [
+        {
+          "version": 1,
+          "entryPoint": "K.gameTemplates.shutterScout",
+          "source": "courseware/kit/game_templates/shutterScout.js",
+          "configuration": "classic",
+          "config": {
+            "shots": "需要拍到的状态顺序，0/1 两态",
+            "rate": "运动和状态切换速率",
+            "range": "水平摆动范围",
+        "aperture": "取景判定半宽",
+        "photoViews": "可选。启用时每关填 {top: 图片ID, side: 图片ID}，两个 ID 在 art.icons 分别登记同一物件的正交俯视与侧视图。shots 中 1 为俯视、0 为侧视，每关都要拍到两种。画面切换视图时使用原图比例。",
+        "observation": "photoViews 启用时必填。{sceneId, trials: {paired: {top: [俯视图片ID], side: [侧视图片ID]}}}，paired 可自定，只声明一个试次，两个枚举列齐各关对应图片 ID。家长观察卡按关用同一个试次 ID 和对应的图片 ID。真人全关拍完才导出，完成卡并排展示最后一关拍到的俯视图和侧视图。"
+          },
+          "example": "courseware/kit/examples/classic-arcade/shutter-scout.json",
+          "exampleLevels": 3,
+          "levels": {
+            "min": 3,
+            "max": 5
+          },
+          "difficulty": "慢动作和大取景框入门，逐关加快、缩框，末关快速追焦并拍四次。",
+          "autopilot": true,
+          "cues": {
+            "supported": true,
+            "exampleRecorded": true
+          },
+          "teacherAnchors": [
+            "game-goal",
+            "game-player",
+            "game-target"
+          ],
+          "preview": {
+            "page": "output/courseware-production/classic-arcade-v3/shutter-scout.html",
+            "clip": "output/courseware-production/classic-arcade-v3/clips/shutter-scout.mp4",
+            "screenshot": "output/courseware-production/classic-arcade-v3/screens/shutter-scout-play.jpg",
+            "assetsManifest": "output/courseware-production/classic-arcade-v3/asset-sources.json",
+            "voiceScript": "courseware/kit/examples/arcade-voice.json"
+          },
+          "status": "可用",
+          "ownerApprovedOn": "2026-11-09",
+          "teacherDemo": "firstAction",
+          "approvalEvidence": {
+            "handover": "output/courseware-production/game-handover.json",
+            "preview": "output/courseware-production/classic-arcade-v2/index.html",
+            "recordedAt": "2026-11-09T17:19:29.434192+08:00",
+            "quote": "这几个游戏可以"
+          }
+        }
+      ]
+    },
+    {
+      "id": "sortingDepot",
+      "name": "材料搬运站",
+      "reference": "推箱子（Sokoban）",
+      "knowledgeRules": [
+        "classification"
+      ],
+      "controls": {
+        "keyboard": "方向键走动和推物件，空格撤回一步；没有步骤可撤回时重来",
+        "mouse": "用鼠标点击或按住方向；点回转按钮撤回",
+        "touch": "按屏幕大方向键；点回转按钮撤回"
+      },
+      "status": "可用",
+      "ownerApprovedOn": "2026-11-09",
+      "versions": [
+        {
+          "version": 1,
+          "entryPoint": "K.gameTemplates.sortingDepot",
+          "source": "courseware/kit/game_templates/sortingDepot.js",
+          "configuration": "classic",
+          "config": {
+            "map": "4–7 行、6–12 列；# 墙、. 地板、S 起点。x/y 从 0 起。",
+            "items": "2–5 件待搬物 {x,y,token,group}；不同物件可以同组。",
+            "docks": "与物件同数量的托盘 {x,y,sample,group}，一盘一件；只有同组才能放入。",
+            "step": "连续移动的格间秒数。",
+            "labels": "可选缺图时的 ID 显示名，不能代替正式插图。"
+          },
+          "example": "courseware/kit/examples/classic-arcade/sorting-depot.json",
+          "exampleLevels": 3,
+          "levels": {
+            "min": 3,
+            "max": 5
+          },
+          "difficulty": "先在开阔区把两把不同材料的勺子送进托盘；第二关转弯并让路；末关绕柱连续送四件。",
+          "autopilot": true,
+          "cues": {
+            "supported": true,
+            "exampleRecorded": true
+          },
+          "teacherAnchors": [
+            "game-goal",
+            "game-player",
+            "game-target"
+          ],
+          "preview": {
+            "page": "output/courseware-production/classic-arcade-v3/sorting-depot.html",
+            "clip": "output/courseware-production/classic-arcade-v3/clips/sorting-depot.mp4",
+            "screenshot": "output/courseware-production/classic-arcade-v3/screens/sorting-depot-play.jpg",
+            "assetsManifest": "output/courseware-production/classic-arcade-v3/asset-sources.json",
+            "voiceScript": "courseware/kit/examples/arcade-voice.json"
+          },
+          "status": "可用",
+          "ownerApprovedOn": "2026-11-09",
+          "teacherDemo": "firstAction",
+          "approvalEvidence": {
+            "source": "ownerMessage",
+            "preview": "output/courseware-production/classic-arcade-v11/index.html",
+            "recordedAt": "2026-11-09T20:02:12+08:00",
+            "quote": "可以了，都标记为可用吧"
+          }
+        }
+      ]
+    },
+    {
+      "id": "slideMerge",
+      "name": "拼音滑轨",
+      "reference": "2048 式整盘滑动与收集合成",
+      "knowledgeRules": [
+        "pinyin_blend",
+        "symbol_merge"
+      ],
+      "controls": {
+        "keyboard": "方向键滑动整盘字片，空格重摆本关",
+        "mouse": "点击大方向按钮滑动，点回转重来",
+        "touch": "点大方向按钮滑动，点回转重来"
+      },
+      "status": "可用",
+      "ownerApprovedOn": "2026-11-09",
+      "versions": [
+        {
+          "version": 1,
+          "entryPoint": "K.gameTemplates.slideMerge",
+          "source": "courseware/kit/game_templates/slideMerge.js",
+          "configuration": "classic",
+          "config": {
+            "board": "4×4 数组，null 表示空格，放 2–8 个且数量为偶数的字片 ID 或数字。",
+            "walls": "可选。按行从 0 起的挡板格索引。挡板切开滑道。",
+            "pairs": "每条为 [字片, 伙伴, 合成结果]，两种滑动顺序都认同一配方。",
+            "targets": "收藏格目标列表，长度为字片数量的一半。只收当前需要的结果，可重复。",
+            "seconds": "每次滑动的间隔，0.15–0.40 秒。可用 labels 或 art.icons 表达各 ID。"
+          },
+          "example": "courseware/kit/examples/classic-arcade/pinyin-slide.json",
+          "exampleLevels": 3,
+          "levels": {
+            "min": 3,
+            "max": 5
+          },
+          "difficulty": "首关同排一滑即成。第二关加挡板和三个目标，需换向。挑战关两处挡板和四组交错字片，连滑七次才能完成。",
+          "autopilot": true,
+          "cues": {
+            "supported": true,
+            "exampleRecorded": true
+          },
+          "teacherAnchors": [
+            "game-goal",
+            "game-player",
+            "game-target"
+          ],
+          "preview": {
+            "page": "output/courseware-production/classic-arcade-v4/pinyin-slide.html",
+            "clip": "output/courseware-production/classic-arcade-v4/clips/pinyin-slide.mp4",
+            "screenshot": "output/courseware-production/classic-arcade-v4/screens/pinyin-slide-play.jpg",
+            "assetsManifest": "output/courseware-production/classic-arcade-v4/asset-sources.json",
+            "voiceScript": "courseware/kit/examples/arcade-voice.json"
+          },
+          "status": "可用",
+          "ownerApprovedOn": "2026-11-09",
+          "teacherDemo": "firstAction",
+          "approvalEvidence": {
+            "source": "ownerMessage",
+            "preview": "output/courseware-production/classic-arcade-v11/index.html",
+            "recordedAt": "2026-11-09T20:02:12+08:00",
+            "quote": "可以了，都标记为可用吧"
+          }
+        }
+      ]
+    },
+    {
+      "id": "listenDelivery",
+      "name": "听令邮车",
+      "reference": "青蛙过河式车道闪避与分段送货",
+      "knowledgeRules": [
+        "listen_pick_deliver",
+        "listen_match",
+        "listen_order"
+      ],
+      "controls": {
+        "keyboard": "方向键移动，空格拿取或交付",
+        "mouse": "点击或按住屏幕箭头，点包裹按钮拿取或交付",
+        "touch": "点屏幕大箭头，点包裹按钮拿取或交付"
+      },
+      "status": "可用",
+      "ownerApprovedOn": "2026-11-09",
+      "versions": [
+        {
+          "version": 1,
+          "entryPoint": "K.gameTemplates.listenDelivery",
+          "source": "courseware/kit/game_templates/listenDelivery.js",
+          "configuration": "classic",
+          "config": {
+            "pickup / drop": "底岸取货点／顶岸收件点，各填 2–4 条 [图片 ID, 列]。列从 0 起，共 9 列。",
+            "orders": "1–3 条 [要取的物品 ID, 收件人 ID]。每单按先取后送计两个动作。",
+            "lanes": "车道数组。各填 {row, speed, spacing, phase}，row 为 1–3，speed 正负控制方向。",
+            "step": "连续移动的间隔。声音建议给每单配取货和交付两条 cues.steps，并启用 voiceLead 和 stepVoiceLead。"
+          },
+          "example": "courseware/kit/examples/classic-arcade/listen-delivery.json",
+          "exampleLevels": 3,
+          "levels": {
+            "min": 3,
+            "max": 5
+          },
+          "difficulty": "第 1 关过一条慢速车道送一单。第 2 关双车道中间有安全岛，送两单。末关连续三条车道，三单换货物和收件人。",
+          "autopilot": true,
+          "cues": {
+            "supported": true,
+            "exampleRecorded": true
+          },
+          "teacherAnchors": [
+            "game-goal",
+            "game-player",
+            "game-target"
+          ],
+          "preview": {
+            "page": "output/courseware-production/classic-arcade-v12/listen-delivery.html",
+            "clip": "output/courseware-production/classic-arcade-v5/clips/listen-delivery.mp4",
+            "screenshot": "output/courseware-production/classic-arcade-v5/screens/listen-delivery-play.jpg",
+            "assetsManifest": "output/courseware-production/classic-arcade-v5/asset-sources.json",
+            "voiceScript": "courseware/kit/examples/arcade-voice.json"
+          },
+          "status": "可用",
+          "ownerApprovedOn": "2026-11-09",
+          "teacherDemo": "firstAction",
+          "approvalEvidence": {
+            "source": "ownerMessage",
+            "preview": "output/courseware-production/classic-arcade-v11/index.html",
+            "recordedAt": "2026-11-09T20:02:12+08:00",
+            "quote": "可以了，都标记为可用吧"
+          }
+        }
+      ]
+    },
+    {
+      "id": "compareSnake",
+      "name": "比大小小蛇",
+      "reference": "贪吃蛇式转弯、增长与绕行",
+      "knowledgeRules": [
+        "comparison",
+        "shape_match"
+      ],
+      "controls": {
+        "keyboard": "方向键转弯，空格回安全起点",
+        "mouse": "点大箭头转弯，点回转按钮回安全起点",
+        "touch": "点大箭头转弯，点回转按钮回安全起点"
+      },
+      "status": "可用",
+      "ownerApprovedOn": "2026-11-09",
+      "versions": [
+        {
+          "version": 1,
+          "entryPoint": "K.gameTemplates.compareSnake",
+          "source": "courseware/kit/game_templates/compareSnake.js",
+          "configuration": "classic",
+          "config": {
+            "start": "起始比较基准。吃对后把刚吃到的值作为新基准。",
+            "rounds": "1–4 轮。每轮 {relation, foods}。relation 为 gt/lt/eq/match。foods 为 [列, 行, 值]，位置从 0 起。",
+            "walls": "可选。10 列、6 行。底行留给安全起点，墙和食物放上面 5 行。",
+            "seconds": "每步 0.3–0.9 秒。两次失误后放慢，亮出当前允许吃的食物。",
+            "display / diagrams / groups": "dots 用十格点阵表示 0–10。图形或图像可配 diagrams 或 art.icons。match 可用 groups 把不同朝向归为同一类。"
+          },
+          "example": "courseware/kit/examples/classic-arcade/compare-snake.json",
+          "alternateExamples": [
+            "courseware/kit/examples/alternate/compare-snake-shapes.json"
+          ],
+          "exampleLevels": 4,
+          "levels": {
+            "min": 3,
+            "max": 5
+          },
+          "difficulty": "首关用慢速和短路线找更多。第二关找更少并绕墙。第三关找一样多，蛇长后要留回转空间。挑战关在三种关系之间切换。",
+          "autopilot": true,
+          "cues": {
+            "supported": true,
+            "exampleRecorded": true
+          },
+          "teacherAnchors": [
+            "game-goal",
+            "game-player",
+            "game-target"
+          ],
+          "preview": {
+            "page": "output/courseware-production/classic-arcade-v6/compare-snake.html",
+            "clip": "output/courseware-production/classic-arcade-v6/clips/compare-snake.mp4",
+            "screenshot": "output/courseware-production/classic-arcade-v6/screens/compare-snake-play.jpg",
+            "assetsManifest": "output/courseware-production/classic-arcade-v6/asset-sources.json",
+            "voiceScript": "courseware/kit/examples/arcade-voice.json"
+          },
+          "status": "可用",
+          "ownerApprovedOn": "2026-11-09",
+          "teacherDemo": "firstAction",
+          "alternatePreviews": [
+            {
+              "page": "output/courseware-production/classic-arcade-v6/compare-snake-shapes.html",
+              "screenshot": "output/courseware-production/classic-arcade-v6/screens/compare-snake-shapes-play.jpg",
+              "assetsManifest": "output/courseware-production/classic-arcade-v6/asset-sources.json",
+              "voiceScript": "courseware/kit/examples/arcade-voice.json"
+            }
+          ],
+          "approvalEvidence": {
+            "source": "ownerMessage",
+            "preview": "output/courseware-production/classic-arcade-v11/index.html",
+            "recordedAt": "2026-11-09T20:02:12+08:00",
+            "quote": "可以了，都标记为可用吧"
+          }
+        }
+      ]
+    },
+    {
+      "id": "orchardCatch",
+      "name": "双篮果园",
+      "reference": "Game & Watch《Egg》式接落物街机",
+      "knowledgeRules": [
+        "split_quantity",
+        "exact_quantity"
+      ],
+      "controls": {
+        "keyboard": "按住 ← → 移小车，空格换篮",
+        "mouse": "按住大箭头移车，点双箭头换篮",
+        "touch": "按住大箭头移车，点双箭头换篮"
+      },
+      "status": "可用",
+      "ownerApprovedOn": "2026-11-09",
+      "versions": [
+        {
+          "version": 1,
+          "entryPoint": "K.gameTemplates.orchardCatch",
+          "source": "courseware/kit/game_templates/orchardCatch.js",
+          "configuration": "classic",
+          "design": {
+            "arcadeLoop": "果串按时序从三个落点下落，左右移动把整串接住。落空时同一串重来，连着接准会加分。",
+            "knowledgeGate": "每串放进当前选定的一个篮，两篮的空格必须都恰好填满。只接住全部果子仍可能溢出，必须考虑后面还能怎样分。"
+          },
+          "config": {
+            "capacity": "左右篮各 1–8 格，所有果串的总数须等于两篮容量总和。",
+            "batches": "2–6 串，格式为 [数量, 落点]，数量 1–4，落点 0 / 1 / 2 分别为左 / 中 / 右。至少存在一套整串分法。",
+            "seconds": "每串的下落时间，2.4–7 秒。",
+            "catchRadius": "小车中心离落点的允许距离，76–146 逻辑像素。",
+            "wind": "可选。下落中横向偏移 -120 到 120，落点不变。",
+            "art.icons.fruit": "一个透明底的计数物件，代码按数量摆放。art.frames[0] 为小车。"
+          },
+          "example": "courseware/kit/examples/classic-arcade/orchard-catch.json",
+          "alternateExamples": [
+            "courseware/kit/examples/alternate/orchard-catch-snacks.json"
+          ],
+          "exampleLevels": 3,
+          "levels": {
+            "min": 3,
+            "max": 5
+          },
+          "difficulty": "首关把 5 分成 2 和 3，慢速宽判定。第二关把 7 分成 4 和 3，其中一篮合两串。挑战关把 10 分成 4 和 6，果串更快且随风摆动。两次失误后减速并放宽接住范围。",
+          "autopilot": true,
+          "cues": {
+            "supported": true,
+            "exampleRecorded": true
+          },
+          "teacherAnchors": [
+            "game-goal",
+            "game-player",
+            "game-target"
+          ],
+          "preview": {
+            "page": "output/courseware-production/classic-arcade-v9/orchard-catch.html",
+            "clip": "output/courseware-production/classic-arcade-v9/clips/orchard-catch.mp4",
+            "screenshot": "output/courseware-production/classic-arcade-v9/screens/orchard-catch-play.jpg",
+            "assetsManifest": "output/courseware-production/classic-arcade-v9/asset-sources.json",
+            "voiceScript": "courseware/kit/examples/arcade-voice.json"
+          },
+          "status": "可用",
+          "ownerApprovedOn": "2026-11-09",
+          "teacherDemo": "firstAction",
+          "approvalEvidence": {
+            "source": "ownerMessage",
+            "preview": "output/courseware-production/classic-arcade-v11/index.html",
+            "recordedAt": "2026-11-09T20:02:12+08:00",
+            "quote": "可以了，都标记为可用吧"
+          }
+        }
+      ]
+    },
+    {
+      "id": "shapeBridge",
+      "name": "拼桥工坊",
+      "reference": "俄罗斯方块式落块与旋转",
+      "knowledgeRules": [
+        "shape_compose",
+        "shape_match"
+      ],
+      "controls": {
+        "keyboard": "← → 移动，↑ 旋转，空格落下",
+        "mouse": "点击或按住大箭头移动，点旋转和落下按钮",
+        "touch": "点击或按住大箭头移动，点旋转和落下按钮"
+      },
+      "status": "可用",
+      "ownerApprovedOn": "2026-11-09",
+      "versions": [
+        {
+          "version": 1,
+          "entryPoint": "K.gameTemplates.shapeBridge",
+          "source": "courseware/kit/game_templates/shapeBridge.js",
+          "configuration": "classic",
+          "design": {
+            "arcadeLoop": "木块缓缓下落，边看桥上的空位边横移和旋转；越到后面，留给落块的时间越短。",
+            "knowledgeGate": "木块的形状、方向和覆盖的格子都与空位吻合才得分；补满后小兔过桥。"
+          },
+          "config": {
+            "slots": "2–4 个不重叠的空位，每个给 col（0–8）、cells（从 0 起的相连格坐标，2–5 格，宽高最多 3 格）、turns（可选的初始顺时针转动次数 0–3）。",
+            "seconds": "木块自行落下所需秒数，3–9。",
+            "art.frames": "小兔待命、过桥两帧透明图，图形本身由代码绘制。",
+            "cues": "每关提供 goal、hint、hint2、praise；voiceLead 等待目标语音结束。"
+          },
+          "example": "courseware/kit/examples/classic-arcade/shape-bridge.json",
+          "alternateExamples": [
+            "courseware/kit/examples/alternate/shape-bridge-roofs.json"
+          ],
+          "exampleLevels": 3,
+          "levels": {
+            "min": 3,
+            "max": 5
+          },
+          "difficulty": "首关慢速对齐长方形与正方形，第二关加入旋转，挑战关加快下落并用三种轮廓。连续两次失误后减速并亮出适合的空位。",
+          "autopilot": true,
+          "cues": {
+            "supported": true,
+            "exampleRecorded": true
+          },
+          "teacherAnchors": [
+            "game-goal",
+            "game-player",
+            "game-target"
+          ],
+          "preview": {
+            "page": "output/courseware-production/classic-arcade-v13/shape-bridge.html",
+            "clip": "output/courseware-production/classic-arcade-v13/clips/shape-bridge.mp4",
+            "screenshot": "output/courseware-production/classic-arcade-v13/screens/shape-bridge-play.jpg",
+            "assetsManifest": "output/courseware-production/classic-arcade-v13/asset-sources.json",
+            "voiceScript": "courseware/kit/examples/arcade-voice.json"
+          },
+          "status": "可用",
+          "ownerApprovedOn": "2026-11-09",
+          "teacherDemo": "firstAction",
+          "approvalEvidence": {
+            "source": "ownerMessage",
+            "preview": "output/courseware-production/classic-arcade-v11/index.html",
+            "recordedAt": "2026-11-09T20:02:12+08:00",
+            "quote": "可以了，都标记为可用吧"
+          }
+        }
+      ]
+    },
+    {
+      "id": "wordBubbles",
+      "name": "听词泡泡艇",
+      "reference": "打泡泡街机式移动瞄准",
+      "knowledgeRules": [
+        "listen_match"
+      ],
+      "controls": {
+        "keyboard": "按住 ← → 移动，空格吹泡泡",
+        "mouse": "按住大箭头开船，点泡泡按钮",
+        "touch": "按住大箭头开船，点泡泡按钮"
+      },
+      "status": "可用",
+      "ownerApprovedOn": "2026-11-09",
+      "versions": [
+        {
+          "version": 1,
+          "entryPoint": "K.gameTemplates.wordBubbles",
+          "source": "courseware/kit/game_templates/wordBubbles.js",
+          "configuration": "classic",
+          "design": {
+            "arcadeLoop": "小艇横移，泡泡需要一小段时间飞到漂动的图片，瞄准它将到达的位置。",
+            "knowledgeGate": "只有碰到老师刚念到的词对应的图才算接住；每回合用新语音指定目标。"
+          },
+          "config": {
+            "rounds": "每关 2–5 回合；target 是本次读到的语义 ID，cards 为 2–3 张不同的图，必须含 target。",
+            "drift": "图卡横向漂移振幅 0–60 逻辑像素。",
+            "pace": "图卡的漂移角速度 0.4–1.8 弧度每秒。",
+            "tolerance": "泡泡和图卡中心的横向允许距离 44–62 逻辑像素。",
+            "art.icons": "按语义 ID 注册单张图卡，art.frames 为小艇普通和吹泡泡两帧。",
+            "cues": "每关 steps 按 rounds 排列，另有 goal、hint、hint2、praise。voiceLead 与 stepVoiceLead 均开启。"
+          },
+          "example": "courseware/kit/examples/classic-arcade/word-bubbles.json",
+          "alternateExamples": [
+            "courseware/kit/examples/alternate/word-bubbles-pictures.json"
+          ],
+          "exampleLevels": 3,
+          "levels": {
+            "min": 3,
+            "max": 5
+          },
+          "difficulty": "首关两张图缓慢漂动、判定宽。第二关三张动物图漂得更快。挑战关混合动植物词，缩小判定。连续两次失误后减速、放宽判定并标亮目标。",
+          "autopilot": true,
+          "cues": {
+            "supported": true,
+            "exampleRecorded": true
+          },
+          "teacherAnchors": [
+            "game-goal",
+            "game-player",
+            "game-target"
+          ],
+          "preview": {
+            "page": "output/courseware-production/classic-arcade-v14/word-bubbles.html",
+            "clip": "output/courseware-production/classic-arcade-v14/clips/word-bubbles.mp4",
+            "screenshot": "output/courseware-production/classic-arcade-v14/screens/word-bubbles-play.jpg",
+            "assetsManifest": "output/courseware-production/classic-arcade-v14/asset-sources.json",
+            "voiceScript": "courseware/kit/examples/arcade-voice.json"
+          },
+          "status": "可用",
+          "ownerApprovedOn": "2026-11-09",
+          "teacherDemo": "firstAction",
+          "approvalEvidence": {
+            "source": "ownerMessage",
+            "preview": "output/courseware-production/classic-arcade-v11/index.html",
+            "recordedAt": "2026-11-09T20:02:12+08:00",
+            "quote": "可以了，都标记为可用吧"
+          }
+        }
+      ]
+    },
+    {
+      "id": "tideGates",
+      "name": "潮汐分流",
+      "reference": "实时拨闸分流谜题",
+      "knowledgeRules": [
+        "split_quantity"
+      ],
+      "controls": {
+        "keyboard": "← → 拨闸，空格减缓水滴",
+        "mouse": "点击或按住对应的大号屏幕按钮",
+        "touch": "点击或按住对应的大号屏幕按钮"
+      },
+      "status": "停用",
+      "ownerApprovedOn": null,
+      "versions": [
+        {
+          "version": 1,
+          "entryPoint": "K.gameTemplates.tideGates",
+          "source": "courseware/kit/game_templates/tideGates.js",
+          "configuration": "classic",
+          "config": {
+            "capacity": "左右水箱目标体积",
+            "drops": "依次到达的水滴体积",
+            "seconds": "水滴通过时间"
+          },
+          "example": "courseware/kit/examples/classic-arcade/tide-gates.json",
+          "exampleLevels": 3,
+          "levels": {
+            "min": 3,
+            "max": 5
+          },
+          "difficulty": "先慢后快，末关容量更大、水滴更多；目前是内部草案。",
+          "autopilot": true,
+          "cues": {
+            "supported": true,
+            "exampleRecorded": false
+          },
+          "teacherAnchors": [
+            "game-goal",
+            "game-player",
+            "game-target"
+          ],
+          "preview": null,
+          "status": "停用",
+          "ownerApprovedOn": null,
+          "teacherDemo": "firstAction"
+        }
+      ]
+    },
+    {
+      "id": "runner",
+      "name": "收集跑道",
+      "reference": "横版跑酷",
+      "knowledgeRules": [
+        "exact_quantity"
+      ],
+      "controls": {
+        "keyboard": null,
+        "mouse": "点按跳跃",
+        "touch": "点按跳跃"
+      },
+      "status": "停用",
+      "ownerApprovedOn": null,
+      "versions": [
+        {
+          "version": 1,
+          "entryPoint": "K.gameTemplates.runner",
+          "source": "courseware/kit/game_templates/runner.js",
+          "configuration": "legacy",
+          "config": {
+            "collect": "准确总量",
+            "track": "经过的物件组，含 value 和是否在空中的 airborne"
+          },
+          "example": "courseware/kit/examples/legacy-games/runner.json",
+          "exampleLevels": 3,
+          "levels": {
+            "min": 2,
+            "max": 3
+          },
+          "difficulty": "旧版兼容，由 rounds 和目标布局安排；不参与新课难度验收。",
+          "autopilot": true,
+          "cues": {
+            "supported": false,
+            "exampleRecorded": false
+          },
+          "teacherAnchors": [
+            "game-goal",
+            "game-player",
+            "game-target"
+          ],
+          "preview": null,
+          "status": "停用",
+          "ownerApprovedOn": null,
+          "teacherDemo": "legacyLoop"
+        }
+      ]
+    },
+    {
+      "id": "lily",
+      "name": "跳荷叶",
+      "reference": "过河跳台",
+      "knowledgeRules": [
+        "ordered_route",
+        "exact_quantity"
+      ],
+      "controls": {
+        "keyboard": null,
+        "mouse": "点按或拖动选水道",
+        "touch": "点按或拖动选水道"
+      },
+      "status": "停用",
+      "ownerApprovedOn": null,
+      "versions": [
+        {
+          "version": 1,
+          "entryPoint": "K.gameTemplates.lily",
+          "source": "courseware/kit/game_templates/lily.js",
+          "configuration": "legacy",
+          "config": {
+            "options": "落脚目标",
+            "answer": "正确水道下标",
+            "from": "可选起点提示"
+          },
+          "example": "courseware/kit/examples/legacy-games/lily.json",
+          "exampleLevels": 3,
+          "levels": {
+            "min": 2,
+            "max": 3
+          },
+          "difficulty": "旧版兼容，由 rounds 和目标布局安排；不参与新课难度验收。",
+          "autopilot": true,
+          "cues": {
+            "supported": false,
+            "exampleRecorded": false
+          },
+          "teacherAnchors": [
+            "game-goal",
+            "game-player",
+            "game-target"
+          ],
+          "preview": null,
+          "status": "停用",
+          "ownerApprovedOn": null,
+          "teacherDemo": "legacyLoop"
+        }
+      ]
+    },
+    {
+      "id": "ring",
+      "name": "套圈",
+      "reference": "游乐园套圈",
+      "knowledgeRules": [
+        "one_to_one",
+        "exact_quantity"
+      ],
+      "controls": {
+        "keyboard": null,
+        "mouse": "移动瞄准，点按松手",
+        "touch": "移动瞄准，点按松手"
+      },
+      "status": "停用",
+      "ownerApprovedOn": null,
+      "versions": [
+        {
+          "version": 1,
+          "entryPoint": "K.gameTemplates.ring",
+          "source": "courseware/kit/game_templates/ring.js",
+          "configuration": "legacy",
+          "config": {
+            "targets": "可套目标列表",
+            "rings": "圈数",
+            "matches": "可选允许套中的目标下标"
+          },
+          "example": "courseware/kit/examples/legacy-games/ring.json",
+          "exampleLevels": 3,
+          "levels": {
+            "min": 2,
+            "max": 3
+          },
+          "difficulty": "旧版兼容，由 rounds 和目标布局安排；不参与新课难度验收。",
+          "autopilot": true,
+          "cues": {
+            "supported": false,
+            "exampleRecorded": false
+          },
+          "teacherAnchors": [
+            "game-goal",
+            "game-player",
+            "game-target"
+          ],
+          "preview": null,
+          "status": "停用",
+          "ownerApprovedOn": null,
+          "teacherDemo": "legacyLoop"
+        }
+      ]
+    },
+    {
+      "id": "crane",
+      "name": "小吊车",
+      "reference": "游乐园抓娃娃",
+      "knowledgeRules": [
+        "ordinal_position"
+      ],
+      "controls": {
+        "keyboard": null,
+        "mouse": "扫到目标时点按放货",
+        "touch": "扫到目标时点按放货"
+      },
+      "status": "停用",
+      "ownerApprovedOn": null,
+      "versions": [
+        {
+          "version": 1,
+          "entryPoint": "K.gameTemplates.crane",
+          "source": "courseware/kit/game_templates/crane.js",
+          "configuration": "legacy",
+          "config": {
+            "cars": "车厢列表",
+            "cargo": "货物图示",
+            "drop": "指定车厢下标",
+            "engine": "车头方向"
+          },
+          "example": "courseware/kit/examples/legacy-games/crane.json",
+          "exampleLevels": 3,
+          "levels": {
+            "min": 2,
+            "max": 3
+          },
+          "difficulty": "旧版兼容，由 rounds 和目标布局安排；不参与新课难度验收。",
+          "autopilot": true,
+          "cues": {
+            "supported": false,
+            "exampleRecorded": false
+          },
+          "teacherAnchors": [
+            "game-goal",
+            "game-player",
+            "game-target"
+          ],
+          "preview": null,
+          "status": "停用",
+          "ownerApprovedOn": null,
+          "teacherDemo": "legacyLoop"
+        }
+      ]
+    },
+    {
+      "id": "parachute",
+      "name": "接降落伞",
+      "reference": "接落物",
+      "knowledgeRules": [
+        "count_match"
+      ],
+      "controls": {
+        "keyboard": null,
+        "mouse": "左右拖动篮子接物",
+        "touch": "左右拖动篮子接物"
+      },
+      "status": "停用",
+      "ownerApprovedOn": null,
+      "versions": [
+        {
+          "version": 1,
+          "entryPoint": "K.gameTemplates.parachute",
+          "source": "courseware/kit/game_templates/parachute.js",
+          "configuration": "legacy",
+          "config": {
+            "options": "同波下落的目标",
+            "answer": "正确目标下标"
+          },
+          "example": "courseware/kit/examples/legacy-games/parachute.json",
+          "exampleLevels": 3,
+          "levels": {
+            "min": 2,
+            "max": 3
+          },
+          "difficulty": "旧版兼容，由 rounds 和目标布局安排；不参与新课难度验收。",
+          "autopilot": true,
+          "cues": {
+            "supported": false,
+            "exampleRecorded": false
+          },
+          "teacherAnchors": [
+            "game-goal",
+            "game-player",
+            "game-target"
+          ],
+          "preview": null,
+          "status": "停用",
+          "ownerApprovedOn": null,
+          "teacherDemo": "legacyLoop"
+        }
+      ]
+    },
+    {
+      "id": "trace",
+      "name": "沿线开车",
+      "reference": "轨迹追踪",
+      "knowledgeRules": [
+        "trace_path"
+      ],
+      "controls": {
+        "keyboard": null,
+        "mouse": "按住角色沿轨迹拖动",
+        "touch": "按住角色沿轨迹拖动"
+      },
+      "status": "停用",
+      "ownerApprovedOn": null,
+      "versions": [
+        {
+          "version": 1,
+          "entryPoint": "K.gameTemplates.trace",
+          "source": "courseware/kit/game_templates/trace.js",
+          "configuration": "legacy",
+          "config": {
+            "strokes": "按顺序的画布点列",
+            "gridBox": "方格中心与边长",
+            "strokeEnds": "可选笔终点提示"
+          },
+          "example": "courseware/kit/examples/legacy-games/trace.json",
+          "exampleLevels": 3,
+          "levels": {
+            "min": 2,
+            "max": 3
+          },
+          "difficulty": "旧版兼容，由 rounds 和目标布局安排；不参与新课难度验收。",
+          "autopilot": true,
+          "cues": {
+            "supported": false,
+            "exampleRecorded": false
+          },
+          "teacherAnchors": [
+            "game-goal",
+            "game-player",
+            "game-target"
+          ],
+          "preview": null,
+          "status": "停用",
+          "ownerApprovedOn": null,
+          "teacherDemo": "legacyLoop"
+        }
+      ]
+    },
+    {
+      "id": "bumper",
+      "name": "碰碰车",
+      "reference": "碰碰车竞技场",
+      "knowledgeRules": [
+        "count_match",
+        "pair_match"
+      ],
+      "controls": {
+        "keyboard": null,
+        "mouse": "按住并驾驶到目标车旁",
+        "touch": "按住并驾驶到目标车旁"
+      },
+      "status": "停用",
+      "ownerApprovedOn": null,
+      "versions": [
+        {
+          "version": 1,
+          "entryPoint": "K.gameTemplates.bumper",
+          "source": "courseware/kit/game_templates/bumper.js",
+          "configuration": "legacy",
+          "config": {
+            "options": "碰撞目标列表",
+            "answer": "目标车下标",
+            "player": "可选玩家车图示"
+          },
+          "example": "courseware/kit/examples/legacy-games/bumper.json",
+          "exampleLevels": 3,
+          "levels": {
+            "min": 2,
+            "max": 3
+          },
+          "difficulty": "旧版兼容，由 rounds 和目标布局安排；不参与新课难度验收。",
+          "autopilot": true,
+          "cues": {
+            "supported": false,
+            "exampleRecorded": false
+          },
+          "teacherAnchors": [
+            "game-goal",
+            "game-player",
+            "game-target"
+          ],
+          "preview": null,
+          "status": "停用",
+          "ownerApprovedOn": null,
+          "teacherDemo": "legacyLoop"
+        }
+      ]
+    },
+    {
+      "id": "slingshot",
+      "name": "点灯弹弓",
+      "reference": "物理弹弓",
+      "knowledgeRules": [
+        "exact_quantity",
+        "classification"
+      ],
+      "controls": {
+        "keyboard": null,
+        "mouse": "拉弹弓再松手；数量模式点确认",
+        "touch": "拉弹弓再松手；数量模式点确认"
+      },
+      "status": "停用",
+      "ownerApprovedOn": null,
+      "versions": [
+        {
+          "version": 1,
+          "entryPoint": "K.gameTemplates.slingshot",
+          "source": "courseware/kit/game_templates/slingshot.js",
+          "configuration": "legacy",
+          "config": {
+            "lamps": "灯数量或视觉列表",
+            "turnOff": "准确灭灯数",
+            "matches": "匹配模式的目标下标"
+          },
+          "example": "courseware/kit/examples/legacy-games/slingshot.json",
+          "exampleLevels": 3,
+          "levels": {
+            "min": 2,
+            "max": 3
+          },
+          "difficulty": "旧版兼容，由 rounds 和目标布局安排；不参与新课难度验收。",
+          "autopilot": true,
+          "cues": {
+            "supported": false,
+            "exampleRecorded": false
+          },
+          "teacherAnchors": [
+            "game-goal",
+            "game-player",
+            "game-target"
+          ],
+          "preview": null,
+          "status": "停用",
+          "ownerApprovedOn": null,
+          "teacherDemo": "legacyLoop"
+        }
+      ]
+    },
+    {
+      "id": "fishing",
+      "name": "小船钓鱼",
+      "reference": "街机钓鱼",
+      "knowledgeRules": [
+        "pair_match",
+        "arithmetic_match"
+      ],
+      "controls": {
+        "keyboard": null,
+        "mouse": "左右驾船，点按下钩",
+        "touch": "左右驾船，点按下钩"
+      },
+      "status": "停用",
+      "ownerApprovedOn": null,
+      "versions": [
+        {
+          "version": 1,
+          "entryPoint": "K.gameTemplates.fishing",
+          "source": "courseware/kit/game_templates/fishing.js",
+          "configuration": "legacy",
+          "config": {
+            "options": "游鱼图示",
+            "matches": "应钓鱼的下标"
+          },
+          "example": "courseware/kit/examples/legacy-games/fishing.json",
+          "exampleLevels": 3,
+          "levels": {
+            "min": 2,
+            "max": 3
+          },
+          "difficulty": "旧版兼容，由 rounds 和目标布局安排；不参与新课难度验收。",
+          "autopilot": true,
+          "cues": {
+            "supported": false,
+            "exampleRecorded": false
+          },
+          "teacherAnchors": [
+            "game-goal",
+            "game-player",
+            "game-target"
+          ],
+          "preview": null,
+          "status": "停用",
+          "ownerApprovedOn": null,
+          "teacherDemo": "legacyLoop"
+        }
+      ]
+    },
+    {
+      "id": "slice",
+      "name": "切灯泡",
+      "reference": "水果忍者式划切",
+      "knowledgeRules": [
+        "classification",
+        "arithmetic_match"
+      ],
+      "controls": {
+        "keyboard": null,
+        "mouse": "按住并划过移动目标",
+        "touch": "按住并划过移动目标"
+      },
+      "status": "停用",
+      "ownerApprovedOn": null,
+      "versions": [
+        {
+          "version": 1,
+          "entryPoint": "K.gameTemplates.slice",
+          "source": "courseware/kit/game_templates/slice.js",
+          "configuration": "legacy",
+          "config": {
+            "options": "飞起物件图示",
+            "matches": "应划物件下标"
+          },
+          "example": "courseware/kit/examples/legacy-games/slice.json",
+          "exampleLevels": 3,
+          "levels": {
+            "min": 2,
+            "max": 3
+          },
+          "difficulty": "旧版兼容，由 rounds 和目标布局安排；不参与新课难度验收。",
+          "autopilot": true,
+          "cues": {
+            "supported": false,
+            "exampleRecorded": false
+          },
+          "teacherAnchors": [
+            "game-goal",
+            "game-player",
+            "game-target"
+          ],
+          "preview": null,
+          "status": "停用",
+          "ownerApprovedOn": null,
+          "teacherDemo": "legacyLoop"
+        }
+      ]
+    }
+  ]
+}

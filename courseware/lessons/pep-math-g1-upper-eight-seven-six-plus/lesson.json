@@ -1,0 +1,938 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "8、7、6 加几",
+  "grade": 1,
+  "description": "到海边花灯工坊找十格缺口，拆分灯片，比较两种凑十方法和交换加数。",
+  "roster": {
+    "teacher": {
+      "name": "小数老师",
+      "role": "teacher",
+      "gender": "male",
+      "voice": "Ethan",
+      "avatar": "/teachers/ashu-math-v1.png",
+      "color": "#437763",
+      "persona": "先请孩子指认数量，再用十格盒讲清为什么这样凑十。"
+    }
+  },
+  "images": {
+    "workshop-sunrise": {
+      "file": "assets/workshop-sunrise.png"
+    },
+    "catch-pier": {
+      "file": "assets/catch-pier.png"
+    },
+    "marble-pier": {
+      "file": "assets/marble-pier.png"
+    },
+    "lantern-night": {
+      "file": "assets/lantern-night.png"
+    },
+    "tile-amber": {
+      "file": "assets/tile-amber.png"
+    },
+    "tile-mint": {
+      "file": "assets/tile-mint.png"
+    },
+    "catch-cart": {
+      "file": "assets/catch-cart.png"
+    },
+    "launch-orb": {
+      "file": "assets/launch-orb.png"
+    },
+    "lantern-badge": {
+      "file": "assets/lantern-badge.png"
+    },
+    "gaps-panel": {
+      "file": "assets/gaps-panel.png"
+    },
+    "split-start": {
+      "file": "assets/split-start.png"
+    },
+    "split-result": {
+      "file": "assets/split-result.png"
+    },
+    "path-eight": {
+      "file": "assets/path-eight.png"
+    },
+    "path-seven": {
+      "file": "assets/path-seven.png"
+    },
+    "swap-first": {
+      "file": "assets/swap-first.png"
+    },
+    "swap-second": {
+      "file": "assets/swap-second.png"
+    },
+    "practice-start": {
+      "file": "assets/practice-start.png"
+    },
+    "practice-result": {
+      "file": "assets/practice-result.png"
+    },
+    "q1-main": {
+      "file": "assets/q1-main.png"
+    },
+    "q1-a": {
+      "file": "assets/q1-a.png"
+    },
+    "q1-b": {
+      "file": "assets/q1-b.png"
+    },
+    "q1-c": {
+      "file": "assets/q1-c.png"
+    },
+    "q2-main": {
+      "file": "assets/q2-main.png"
+    },
+    "q2-a": {
+      "file": "assets/q2-a.png"
+    },
+    "q2-b": {
+      "file": "assets/q2-b.png"
+    },
+    "q2-c": {
+      "file": "assets/q2-c.png"
+    },
+    "q3-main": {
+      "file": "assets/q3-main.png"
+    },
+    "q3-a": {
+      "file": "assets/q3-a.png"
+    },
+    "q3-b": {
+      "file": "assets/q3-b.png"
+    },
+    "q3-c": {
+      "file": "assets/q3-c.png"
+    },
+    "q4-main": {
+      "file": "assets/q4-main.png"
+    },
+    "q4-a": {
+      "file": "assets/q4-a.png"
+    },
+    "q4-b": {
+      "file": "assets/q4-b.png"
+    },
+    "q4-c": {
+      "file": "assets/q4-c.png"
+    },
+    "q5-main": {
+      "file": "assets/q5-main.png"
+    },
+    "q5-a": {
+      "file": "assets/q5-a.png"
+    },
+    "q5-b": {
+      "file": "assets/q5-b.png"
+    },
+    "q5-c": {
+      "file": "assets/q5-c.png"
+    },
+    "q6-main": {
+      "file": "assets/q6-main.png"
+    },
+    "q6-a": {
+      "file": "assets/q6-a.png"
+    },
+    "q6-b": {
+      "file": "assets/q6-b.png"
+    },
+    "q6-c": {
+      "file": "assets/q6-c.png"
+    },
+    "total-11": {
+      "file": "assets/total-11.png"
+    },
+    "total-13": {
+      "file": "assets/total-13.png"
+    },
+    "total-14": {
+      "file": "assets/total-14.png"
+    },
+    "total-15": {
+      "file": "assets/total-15.png"
+    },
+    "total-16": {
+      "file": "assets/total-16.png"
+    },
+    "total-17": {
+      "file": "assets/total-17.png"
+    },
+    "pair-7-6": {
+      "file": "assets/pair-7-6.png"
+    },
+    "pair-7-4": {
+      "file": "assets/pair-7-4.png"
+    },
+    "pair-8-7": {
+      "file": "assets/pair-8-7.png"
+    },
+    "pair-8-8": {
+      "file": "assets/pair-8-8.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "light-tile-piles",
+      "type": "slide",
+      "title": "海边花灯工坊",
+      "template": "title-picture",
+      "data": {
+        "title": "海边花灯工坊",
+        "picture": "workshop-sunrise",
+        "caption": "每个灯盒刚好能放十片"
+      },
+      "script": [
+        {
+          "say": "花灯工坊要把灯片装盒。盒里有八片，还能放几片？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "每只盒子有十个小格，一格只放一片。"
+        },
+        {
+          "say": "你记得九加几吗？盒里有九片时，只要补一片。"
+        },
+        {
+          "say": "那样做，是先把散片和九片合成一个十。"
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "今天盒里还可能先放八片、七片或六片。"
+        },
+        {
+          "say": "别急着把两堆从头数。先看看一个盒子还空几格。"
+        },
+        {
+          "say": "空几格，就找出同样多的灯片来填。"
+        }
+      ]
+    },
+    {
+      "key": "find-the-gap",
+      "type": "slide",
+      "title": "十格盒里空了几格",
+      "template": "title-picture",
+      "data": {
+        "title": "十格盒里空了几格",
+        "picture": "gaps-panel",
+        "caption": "先数空格，再决定补几片"
+      },
+      "script": [
+        {
+          "say": "三只十格盒，哪只要补的片最多？用手指一指。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "最上面的盒，第一排五片，第二排三片，还空两格。"
+        },
+        {
+          "say": "从另一堆挪两片，就能把八片补成十片。"
+        },
+        {
+          "say": "中间先放七片。数数空格，一、二、三，要补三片。"
+        },
+        {
+          "say": "最下面先放六片，第二排空四格，所以要补四片。"
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "先看盒里已经有几片，再数没有放东西的格。"
+        },
+        {
+          "say": "盒里已经有八片。左篮接够填空格的片数。"
+        },
+        {
+          "say": "盒里已经有七片。左篮接够填空格的片数。"
+        },
+        {
+          "say": "盒里已经有六片。左篮接够填空格的片数。"
+        }
+      ]
+    },
+    {
+      "key": "split-the-donor",
+      "type": "slide",
+      "title": "先从六片中取出要补的",
+      "template": "two-columns",
+      "data": {
+        "title": "先从六片中取出要补的",
+        "left": {
+          "heading": "盒里八片",
+          "body": "还空两格"
+        },
+        "right": {
+          "heading": "十格补满",
+          "body": "10＋4＝14"
+        },
+        "left_picture": "split-start",
+        "right_picture": "split-result"
+      },
+      "script": [
+        {
+          "say": "盒里八片，外面六片。怎么装才好一下看出有几片？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "先找盒里的两个空位。缺两格，就从六片中挪两片。"
+        },
+        {
+          "say": "把外面六片分成两片和四片。两片进盒，四片留着。"
+        },
+        {
+          "say": "这一串有几片？先看哪只篮还有空格。"
+        },
+        {
+          "say": "最后一串先数清。把它送进还缺这些片的篮。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "八片补进两片，盒里正好十片。"
+        },
+        {
+          "say": "外面的四片还在。十片和四片合起来，一共十四片。"
+        },
+        {
+          "say": "八片和六片合起来，找同样多的一张图。"
+        },
+        {
+          "say": "八片合三片，找合起来同样多的图。"
+        },
+        {
+          "say": "灯片按盒装，两个空位要用一小份来填。"
+        },
+        {
+          "say": "看看还差几格。灯片成串，不能从中间拆。"
+        },
+        {
+          "say": "落点亮了。先把车移过去，再看选的是哪个篮。"
+        },
+        {
+          "say": "两只篮子都刚好装满，补盒和剩下的分清了。"
+        },
+        {
+          "say": "首个办法是看空格、分开另一堆，最后数十和剩下。"
+        }
+      ]
+    },
+    {
+      "key": "partition-pickup",
+      "type": "interactive",
+      "title": "接灯片，补满十格",
+      "page": "partition-pickup",
+      "startImage": "catch-pier",
+      "widgetType": "learning-arcade",
+      "gameAudio": {
+        "box-eight": "find-the-gap-9",
+        "box-seven": "find-the-gap-10",
+        "box-six": "find-the-gap-11",
+        "catch-next": "split-the-donor-5",
+        "catch-rest": "split-the-donor-6",
+        "catch-hint": "split-the-donor-13",
+        "catch-help": "split-the-donor-14",
+        "catch-praise": "split-the-donor-15"
+      },
+      "script": [
+        {
+          "say": "装灯片的小车来了。左边篮子该接多少？"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#gap-proof"
+        },
+        {
+          "say": "十格盒里有八片，浅绿的两个位置是空的。"
+        },
+        {
+          "highlight": "#catch-fill-basket"
+        },
+        {
+          "say": "左篮的两格就是准备补进去的两片。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "左右箭头移小车，双箭头换篮。现在选的是左篮。"
+        },
+        {
+          "highlight": "#catch-first-batch"
+        },
+        {
+          "say": "这一串有两片，正好补空格。我让车在中间接它。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "这一串往中间落，车在亮线下等着。"
+        },
+        {
+          "say": "等灯片整串进篮，再看旁边的十格盒。"
+        },
+        {
+          "say": "左篮接够了，旁边十格盒也补满了。"
+        },
+        {
+          "say": "剩下的串留给另一个篮。现在你来，从第一串接起。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ]
+    },
+    {
+      "key": "two-directions",
+      "type": "slide",
+      "title": "先补哪一边都可以",
+      "template": "two-columns",
+      "data": {
+        "title": "先补哪一边都可以",
+        "left": {
+          "heading": "先给八片补",
+          "body": "8＋2＋5＝15"
+        },
+        "right": {
+          "heading": "先给七片补",
+          "body": "7＋3＋5＝15"
+        },
+        "left_picture": "path-eight",
+        "right_picture": "path-seven"
+      },
+      "script": [
+        {
+          "say": "现在有八片和七片。如果先给七片补，会算出多少？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "先给八片补。八还差二，所以把七片分成二和五。"
+        },
+        {
+          "say": "把两片放进盒，八和二凑成十，外面留下五片。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "也可以让七先凑十。七差三，就把八分成三和五。"
+        },
+        {
+          "say": "七片和三片装成十，外面还是五片，只是颜色不同。"
+        },
+        {
+          "say": "这两种办法都得到一盒十片和五片，一共十五片。"
+        },
+        {
+          "say": "只是换了从哪边挪，全部灯片都还在。"
+        }
+      ]
+    },
+    {
+      "key": "swap-order",
+      "type": "slide",
+      "title": "两堆换边，总数会变吗",
+      "template": "two-columns",
+      "data": {
+        "title": "两堆换边，总数会变吗",
+        "left": {
+          "heading": "先看六片",
+          "body": "6＋7＝13"
+        },
+        "right": {
+          "heading": "先看七片",
+          "body": "7＋6＝13"
+        },
+        "left_picture": "swap-first",
+        "right_picture": "swap-second"
+      },
+      "script": [
+        {
+          "say": "记灯片的人把两堆放反了。它们合起来还一样多吗？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "先看六片，再看七片。一共十三片。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "交换两个位置，先看七片，再看六片。"
+        },
+        {
+          "say": "没有加进新片，也没有拿走。两组还是原来那么多。"
+        },
+        {
+          "say": "知道六加七是十三，就能说出七加六也是十三。"
+        },
+        {
+          "say": "六片和七片并在一起。找两组换边后的图。"
+        },
+        {
+          "say": "四片和七片放在一起，找两组换边后的图。"
+        },
+        {
+          "say": "七片和八片放在一起，找两组换边后的图。"
+        },
+        {
+          "say": "只换顺序就行，每一堆的片数要原样保留。"
+        }
+      ]
+    },
+    {
+      "key": "same-total-targets",
+      "type": "interactive",
+      "title": "瞄准同样多的灯片",
+      "page": "same-total-targets",
+      "startImage": "marble-pier",
+      "widgetType": "learning-arcade",
+      "gameAudio": {
+        "shot-eight-six": "split-the-donor-10",
+        "shot-eight-three": "split-the-donor-11",
+        "shot-six-seven": "swap-order-8",
+        "shot-four-seven": "swap-order-9",
+        "shot-seven-eight": "swap-order-10",
+        "shot-six-eight": "show-a-way-7",
+        "shot-six-nine": "show-a-way-8",
+        "shot-eight-eight": "show-a-way-9",
+        "target-hint": "show-a-way-10",
+        "target-help": "show-a-way-11",
+        "target-praise": "show-a-way-12"
+      },
+      "script": [
+        {
+          "say": "弹珠要找一张同样多的图。先数清出发牌。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#count-preview"
+        },
+        {
+          "say": "左边出发牌有八片和六片。先挪两片凑十。"
+        },
+        {
+          "highlight": "#same-first-target"
+        },
+        {
+          "say": "看我指的靶。盒里十片，外面四片，总数一样。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "按左键转发射头，对准这个靶再点发射箭头。"
+        },
+        {
+          "say": "飞出去后还可以用左右键，让弹珠转一点。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "看弹珠沿着线飞过去。盯住同样多的靶。"
+        },
+        {
+          "say": "中了。两张图都表示十四片，才能配对得分。"
+        },
+        {
+          "say": "轮到你。先想一盒十和剩下几片，再瞄准。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ]
+    },
+    {
+      "key": "show-a-way",
+      "type": "slide",
+      "title": "你想用哪一种办法",
+      "template": "two-columns",
+      "data": {
+        "title": "你想用哪一种办法",
+        "left": {
+          "heading": "先想怎么补",
+          "body": "盒里7片，外面5片"
+        },
+        "right": {
+          "heading": "分出补十的一份",
+          "body": "10＋2＝12"
+        },
+        "left_picture": "practice-start",
+        "right_picture": "practice-result"
+      },
+      "script": [
+        {
+          "say": "盒里七片，外面五片。先停一停，你准备怎么装？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "说给家人听。盒子差几格，你要从五片中挪几片？"
+        },
+        {
+          "say": "看图，七片缺三。取三片去补，五片分成三和二。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "十格填满了，外面留下两片，合起来是十二片。"
+        },
+        {
+          "say": "六片合八片。先补十，再选同样多的图。"
+        },
+        {
+          "say": "六片合九片。先补十，再选同样多的图。"
+        },
+        {
+          "say": "八片合八片。先补十，再选同样多的图。"
+        },
+        {
+          "say": "先凑十，再找同样多的灯片。"
+        },
+        {
+          "say": "往亮起来的靶瞄准，飞出去后也能调整。"
+        },
+        {
+          "say": "这一批灯片都配上同样多的靶了。"
+        },
+        {
+          "say": "你可以请家人看着你摆，再说一次为什么这样分。"
+        }
+      ]
+    },
+    {
+      "key": "picture-check",
+      "type": "quiz",
+      "title": "换一批灯片来检查",
+      "intro": [
+        "换了一批花形灯片。先听完，再选能说明的图。",
+        "没听清，点小喇叭再听一次。"
+      ],
+      "questions": [
+        {
+          "id": "seaside-1",
+          "question": "要把这个十格盒填满，还得拿几片？",
+          "skill": "按十格空位判断七补几",
+          "answer": [
+            "B"
+          ],
+          "analysis": "十格盒已经放了七片，还空三格。拿三片就能填满。",
+          "visual": {
+            "kind": "asset",
+            "image": "q1-main",
+            "alt": "有七枚红色花形灯片的十格盒"
+          },
+          "options": {
+            "A": {
+              "label": "两片灯片",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-a",
+                "alt": "两片"
+              }
+            },
+            "B": {
+              "label": "三片灯片",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-b",
+                "alt": "三片"
+              }
+            },
+            "C": {
+              "label": "四片灯片",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-c",
+                "alt": "四片"
+              }
+            }
+          }
+        },
+        {
+          "id": "seaside-2",
+          "question": "盒里有六片。左盘填空格，另六片怎么分？",
+          "skill": "从六片里分出补六到十的一份",
+          "answer": [
+            "C"
+          ],
+          "analysis": "六片还差四片到十。把外面的六片分成四片和两片，左边四片填格，右边两片留下。",
+          "visual": {
+            "kind": "asset",
+            "image": "q2-main",
+            "alt": "十格盒已有六片，盒外另有六片"
+          },
+          "options": {
+            "A": {
+              "label": "左三右三",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-a",
+                "alt": "左三右三"
+              }
+            },
+            "B": {
+              "label": "左五右一",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-b",
+                "alt": "左五右一"
+              }
+            },
+            "C": {
+              "label": "左四右二",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-c",
+                "alt": "左四右二"
+              }
+            }
+          }
+        },
+        {
+          "id": "seaside-3",
+          "question": "把八片补成十片，外面的九片还会剩几片？",
+          "skill": "先给八补十，再判断余量",
+          "answer": [
+            "A"
+          ],
+          "analysis": "从九片里挪两片去补空格，九分成二和七。补满一盒，盒外还剩七片。",
+          "visual": {
+            "kind": "asset",
+            "image": "q3-main",
+            "alt": "十格盒已有八片，盒外有九片"
+          },
+          "options": {
+            "A": {
+              "label": "十和七",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-a",
+                "alt": "一满盒和七片"
+              }
+            },
+            "B": {
+              "label": "十和八",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-b",
+                "alt": "一满盒和八片"
+              }
+            },
+            "C": {
+              "label": "十和六",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-c",
+                "alt": "一满盒和六片"
+              }
+            }
+          }
+        },
+        {
+          "id": "seaside-4",
+          "question": "两盘只换左右。哪幅图摆完了？",
+          "skill": "交换两组位置，各自数量保留",
+          "answer": [
+            "B"
+          ],
+          "analysis": "原来左边六片、右边五片。换过来左边五片、右边六片，两堆的总数一样。",
+          "visual": {
+            "kind": "asset",
+            "image": "q4-main",
+            "alt": "左盘六片红灯片，右盘五片绿灯片"
+          },
+          "options": {
+            "A": {
+              "label": "第一种摆法",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-a",
+                "alt": "左红六右绿五"
+              }
+            },
+            "B": {
+              "label": "第二种摆法",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-b",
+                "alt": "左绿五右红六"
+              }
+            },
+            "C": {
+              "label": "第三种摆法",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-c",
+                "alt": "左绿五右红七"
+              }
+            }
+          }
+        },
+        {
+          "id": "seaside-5",
+          "question": "七片加九片。先给九补十，七片怎么分？",
+          "skill": "换另一边凑十，按该边空位拆分",
+          "answer": [
+            "C"
+          ],
+          "analysis": "九还差一。七要分成一和六，把一片填进盒，盒外还剩六片。",
+          "visual": {
+            "kind": "asset",
+            "image": "q5-main",
+            "alt": "十格盒放了九片，盒外有七片"
+          },
+          "options": {
+            "A": {
+              "label": "左三右四",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-a",
+                "alt": "左三右四"
+              }
+            },
+            "B": {
+              "label": "左二右五",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-b",
+                "alt": "左二右五"
+              }
+            },
+            "C": {
+              "label": "左一右六",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-c",
+                "alt": "左一右六"
+              }
+            }
+          }
+        },
+        {
+          "id": "seaside-6",
+          "question": "八片合四片。哪幅图能看出合起来有几片？",
+          "skill": "在新图中用凑十表示和",
+          "answer": [
+            "A"
+          ],
+          "analysis": "八还差二，四片分成两片和两片。一个十和两片合起来是十二片。",
+          "visual": {
+            "kind": "asset",
+            "image": "q6-main",
+            "alt": "十格盒放了八片，盒外有四片"
+          },
+          "options": {
+            "A": {
+              "label": "十和两片",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-a",
+                "alt": "满盒和两片"
+              }
+            },
+            "B": {
+              "label": "十和四片",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-b",
+                "alt": "满盒和四片"
+              }
+            },
+            "C": {
+              "label": "十和三片",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-c",
+                "alt": "满盒和三片"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "wrap-up",
+      "type": "slide",
+      "title": "花灯亮起来了",
+      "template": "title-picture",
+      "data": {
+        "title": "花灯亮起来了",
+        "picture": "lantern-night",
+        "caption": "看空格　分一分　凑成十　加剩下"
+      },
+      "script": [
+        {
+          "say": "现在花灯能亮了。装了很多片，我们怎么数得快？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "八片差两片，七片差三片，六片差四片。"
+        },
+        {
+          "say": "选好哪一边凑十，再从另一边分出正好能补的一份。"
+        },
+        {
+          "say": "盒里十片和外面的散片合起来，就是原来两组的总数。"
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "两种补法都能算。换两堆的位置，合起来也一样多。"
+        },
+        {
+          "say": "回家用纸片和家人摆一摆，先说缺几，再挪片。"
+        },
+        {
+          "say": "请家人听你说清，哪份凑十，哪份留下。"
+        }
+      ]
+    }
+  ]
+}

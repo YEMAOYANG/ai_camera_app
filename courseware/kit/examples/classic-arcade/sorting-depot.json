@@ -1,0 +1,59 @@
+{
+  "template": "sortingDepot",
+  "draft": true,
+  "title": "材料搬运站",
+  "sub": "从物件背后推，把木头和金属送到各自的托盘。",
+  "art": {
+    "backdrop": "marble-workshop.webp",
+    "sticker": "sticker.webp",
+    "frames": ["rover.webp", "rover-pop.webp"],
+    "icons": {"wood-spoon": "wood-spoon.webp", "metal-spoon": "metal-spoon.webp", "wood-block": "wood-block.webp", "metal-key": "metal-key.webp"}
+  },
+  "levels": [
+    {
+      "map": ["########", "#......#", "#.S....#", "#......#", "########"],
+      "step": 0.30,
+      "items": [
+        {"x": 3, "y": 2, "token": "wood-spoon", "group": "wood"},
+        {"x": 3, "y": 3, "token": "metal-spoon", "group": "metal"}
+      ],
+      "docks": [
+        {"x": 5, "y": 2, "sample": "wood-block", "group": "wood"},
+        {"x": 5, "y": 3, "sample": "metal-key", "group": "metal"}
+      ],
+      "hints": ["两把勺的形状像，做它们的材料一样吗？", "看看勺面是木纹还是银亮的，再推到发亮的同类托盘。"]
+    },
+    {
+      "map": ["#########", "#.......#", "#..#....#", "#.S.....#", "#.......#", "#########"],
+      "step": 0.23,
+      "items": [
+        {"x": 4, "y": 2, "token": "wood-block", "group": "wood"},
+        {"x": 4, "y": 4, "token": "metal-key", "group": "metal"},
+        {"x": 3, "y": 3, "token": "metal-spoon", "group": "metal"}
+      ],
+      "docks": [
+        {"x": 6, "y": 2, "sample": "wood-spoon", "group": "wood"},
+        {"x": 7, "y": 4, "sample": "metal-spoon", "group": "metal"},
+        {"x": 6, "y": 3, "sample": "metal-key", "group": "metal"}
+      ],
+      "hints": ["遇到墙，绕到物件的另一边再推。", "车能推不能拉。按回转按钮可以撤回一步。"]
+    },
+    {
+      "map": ["##########", "#........#", "#..#.....#", "#.S......#", "#....#...#", "#........#", "##########"],
+      "step": 0.19,
+      "items": [
+        {"x": 4, "y": 3, "token": "wood-spoon", "group": "wood"},
+        {"x": 7, "y": 4, "token": "wood-block", "group": "wood"},
+        {"x": 4, "y": 2, "token": "metal-key", "group": "metal"},
+        {"x": 4, "y": 5, "token": "metal-spoon", "group": "metal"}
+      ],
+      "docks": [
+        {"x": 7, "y": 3, "sample": "wood-block", "group": "wood"},
+        {"x": 8, "y": 4, "sample": "wood-spoon", "group": "wood"},
+        {"x": 8, "y": 2, "sample": "metal-spoon", "group": "metal"},
+        {"x": 7, "y": 5, "sample": "metal-key", "group": "metal"}
+      ],
+      "hints": ["先给别的物件留出路，再决定推哪一件。", "从不同方向看看还能不能推。没有可撤回的步骤时，按回转按钮重来。"]
+    }
+  ]
+}

@@ -1,0 +1,222 @@
+{
+  "schemaVersion": "mira.courseware.image-atlas-receipt.v1",
+  "atlasId": "cotton-story-a",
+  "background": "cream",
+  "sheetPixels": [
+    1254,
+    1254
+  ],
+  "assets": [
+    {
+      "assetKey": "cotton-opening",
+      "path": "assets/cotton-opening.png",
+      "sha256": "dc01dfff1cc0646325b10c2df085884cc74eaabb90c8853d541097023f252b42",
+      "width": 406,
+      "height": 406,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/cotton-story-a.png",
+      "generatedSourceSha256": "ed712972735faf6aa814ae167460238c554cfecbe08f226f186874dbeb5f905a",
+      "prompt": "Create one atlas containing separate original picture assets for a first-grade lesson.\nUse 3 equal rows and 3 equal columns, with one fully visible object centered in each occupied cell. Keep wide empty margins around every object and between cells. No crossing cell boundaries, touching subjects, dividers, frames, text, letters, numbers, labels, logos or watermarks. Leave unused cells empty. Use one flat, uniform warm cream background across the atlas.\n\nKeep a consistent matte gouache and fine paper grain, with clean cut-paper contours. Use deep pine green, warm cream, apricot and persimmon as accents when appropriate. Keep the objects immediately recognizable and retain the real or lesson-specific colors and details in the descriptions. An object used for counting appears exactly once in its own cell.\n\nCell positions, in reading order:\nRow 1, column 1: 纸偶小剧场，一株拟人棉花有低垂叶子和困惑的表情。前景下垂叶上有几只浅黄绿小椭圆蚜虫，枝头还没有白棉絮。小台边有一盆不同植物。不要画出版插画 Keep the drooping leaf and little aphids large enough to see. The same cotton girl appears in the healthy closing cell, before-and-after comparison.\nRow 1, column 2: 棉花叶近景，小椭圆形的浅黄绿蚜虫成群聚在同一叶上，女孩形状的纸偶在旁低头 Make the clustered aphids readable as tiny pale green oval insects with tiny legs, on the leaf surface.\nRow 1, column 3: 新舞台，燕子以叉尾飞来，低头棉花在下方相望，远背景很轻\nRow 2, column 1: 黑白有小红冠的啄木鸟贴树干，一侧有木纹的剖开树干，小虫在树干里面，右下有棉花角色 The exposed wood tunnel and its tiny worm need to be visibly inside the wood; keep it separate from the leaf.\nRow 2, column 2: 绿蛙向棉花姑娘跳来，后方分开可见稻苗与浅水，叶片不和稻苗重合 A distinct rice paddy with seedlings rising from shallow water must read at thumbnail size.\nRow 2, column 3: 深绿棉花叶上圆形橙红小瓢虫与小浅黄绿蚜虫相对，俯侧视只显示看不全的背面，避免生成错数背点 Show a distinct orange-red ladybug on the same leaf as visible pale green aphids. Show the two kinds close together, in oblique side view. The ladybug back is partially occluded by its perspective, with no countable full arrangement of spots.\nRow 3, column 1: 同一棉花纸偶挺直、笑脸，展开碧绿叶片、枝头显出白棉絮，叶上没有虫 Match the opening cotton girl silhouette and pale apricot face, but now upright, smiling, with lifted strong bright green leaves and distinct fluffy white cotton on the branches.\nRow 3, column 2: 单片萎下的棉花叶纸偶和一两只淡黄绿色小虫，近处无天空或动物\nRow 3, column 3: 大人和孩子并排坐读纸书，桌面放剪纸棉花和动物纸偶，无教材文字\n\nLesson art direction: 原创纸偶小剧场。细纸纹、哑光水粉、干净剪纸轮廓，深松绿和暖奶油底，杏色和柿橙点缀。背景安静、主体大、格间安全留白，纸偶剪影完整，无字无号无标识，不使用教材插图。斑点题恰好几个点由代码控制。 棉花角色始终以白棉、绿叶和暖杏小面庞呈现。老师的戏偶示范用新姿态，不生成书中文字。游戏小平台使用贴近角色和动作的横向裁片，素材底不参与猜答案。\nThese are independent square illustrations to crop, each with full silhouettes and clearly visible taught objects. Use consistent cotton-paper puppet design throughout, no text or labels, no official artwork or references. Keep a fixed 3 by 3 order. ",
+      "promptSha256": "b1f5d715d2ae1219844565d83308ce0f2133c0581b19a48cb2c5df14669ecbd1",
+      "sourceCrop": [
+        6,
+        6,
+        412,
+        412
+      ],
+      "usedBy": [
+        "开场讲解",
+        "开头结尾并排左图"
+      ],
+      "visualReview": "pending"
+    },
+    {
+      "assetKey": "aphids-on-leaves",
+      "path": "assets/aphids-on-leaves.png",
+      "sha256": "c8c1a2cd4584cc6ace1efbf798243fb3037410c02b45f9bb92ee4be6857fa05f",
+      "width": 406,
+      "height": 406,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/cotton-story-a.png",
+      "generatedSourceSha256": "ed712972735faf6aa814ae167460238c554cfecbe08f226f186874dbeb5f905a",
+      "prompt": "Create one atlas containing separate original picture assets for a first-grade lesson.\nUse 3 equal rows and 3 equal columns, with one fully visible object centered in each occupied cell. Keep wide empty margins around every object and between cells. No crossing cell boundaries, touching subjects, dividers, frames, text, letters, numbers, labels, logos or watermarks. Leave unused cells empty. Use one flat, uniform warm cream background across the atlas.\n\nKeep a consistent matte gouache and fine paper grain, with clean cut-paper contours. Use deep pine green, warm cream, apricot and persimmon as accents when appropriate. Keep the objects immediately recognizable and retain the real or lesson-specific colors and details in the descriptions. An object used for counting appears exactly once in its own cell.\n\nCell positions, in reading order:\nRow 1, column 1: 纸偶小剧场，一株拟人棉花有低垂叶子和困惑的表情。前景下垂叶上有几只浅黄绿小椭圆蚜虫，枝头还没有白棉絮。小台边有一盆不同植物。不要画出版插画 Keep the drooping leaf and little aphids large enough to see. The same cotton girl appears in the healthy closing cell, before-and-after comparison.\nRow 1, column 2: 棉花叶近景，小椭圆形的浅黄绿蚜虫成群聚在同一叶上，女孩形状的纸偶在旁低头 Make the clustered aphids readable as tiny pale green oval insects with tiny legs, on the leaf surface.\nRow 1, column 3: 新舞台，燕子以叉尾飞来，低头棉花在下方相望，远背景很轻\nRow 2, column 1: 黑白有小红冠的啄木鸟贴树干，一侧有木纹的剖开树干，小虫在树干里面，右下有棉花角色 The exposed wood tunnel and its tiny worm need to be visibly inside the wood; keep it separate from the leaf.\nRow 2, column 2: 绿蛙向棉花姑娘跳来，后方分开可见稻苗与浅水，叶片不和稻苗重合 A distinct rice paddy with seedlings rising from shallow water must read at thumbnail size.\nRow 2, column 3: 深绿棉花叶上圆形橙红小瓢虫与小浅黄绿蚜虫相对，俯侧视只显示看不全的背面，避免生成错数背点 Show a distinct orange-red ladybug on the same leaf as visible pale green aphids. Show the two kinds close together, in oblique side view. The ladybug back is partially occluded by its perspective, with no countable full arrangement of spots.\nRow 3, column 1: 同一棉花纸偶挺直、笑脸，展开碧绿叶片、枝头显出白棉絮，叶上没有虫 Match the opening cotton girl silhouette and pale apricot face, but now upright, smiling, with lifted strong bright green leaves and distinct fluffy white cotton on the branches.\nRow 3, column 2: 单片萎下的棉花叶纸偶和一两只淡黄绿色小虫，近处无天空或动物\nRow 3, column 3: 大人和孩子并排坐读纸书，桌面放剪纸棉花和动物纸偶，无教材文字\n\nLesson art direction: 原创纸偶小剧场。细纸纹、哑光水粉、干净剪纸轮廓，深松绿和暖奶油底，杏色和柿橙点缀。背景安静、主体大、格间安全留白，纸偶剪影完整，无字无号无标识，不使用教材插图。斑点题恰好几个点由代码控制。 棉花角色始终以白棉、绿叶和暖杏小面庞呈现。老师的戏偶示范用新姿态，不生成书中文字。游戏小平台使用贴近角色和动作的横向裁片，素材底不参与猜答案。\nThese are independent square illustrations to crop, each with full silhouettes and clearly visible taught objects. Use consistent cotton-paper puppet design throughout, no text or labels, no official artwork or references. Keep a fixed 3 by 3 order. ",
+      "promptSha256": "b1f5d715d2ae1219844565d83308ce0f2133c0581b19a48cb2c5df14669ecbd1",
+      "sourceCrop": [
+        424,
+        6,
+        830,
+        412
+      ],
+      "usedBy": [
+        "叶面蚜虫讲解",
+        "跳台开场叶面小图"
+      ],
+      "visualReview": "pending"
+    },
+    {
+      "assetKey": "swallow-paper-stage",
+      "path": "assets/swallow-paper-stage.png",
+      "sha256": "81d74feb8736d44fc83a420f8115a6d636f03b4752e63e1d2d679b4f3c0a8651",
+      "width": 406,
+      "height": 406,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/cotton-story-a.png",
+      "generatedSourceSha256": "ed712972735faf6aa814ae167460238c554cfecbe08f226f186874dbeb5f905a",
+      "prompt": "Create one atlas containing separate original picture assets for a first-grade lesson.\nUse 3 equal rows and 3 equal columns, with one fully visible object centered in each occupied cell. Keep wide empty margins around every object and between cells. No crossing cell boundaries, touching subjects, dividers, frames, text, letters, numbers, labels, logos or watermarks. Leave unused cells empty. Use one flat, uniform warm cream background across the atlas.\n\nKeep a consistent matte gouache and fine paper grain, with clean cut-paper contours. Use deep pine green, warm cream, apricot and persimmon as accents when appropriate. Keep the objects immediately recognizable and retain the real or lesson-specific colors and details in the descriptions. An object used for counting appears exactly once in its own cell.\n\nCell positions, in reading order:\nRow 1, column 1: 纸偶小剧场，一株拟人棉花有低垂叶子和困惑的表情。前景下垂叶上有几只浅黄绿小椭圆蚜虫，枝头还没有白棉絮。小台边有一盆不同植物。不要画出版插画 Keep the drooping leaf and little aphids large enough to see. The same cotton girl appears in the healthy closing cell, before-and-after comparison.\nRow 1, column 2: 棉花叶近景，小椭圆形的浅黄绿蚜虫成群聚在同一叶上，女孩形状的纸偶在旁低头 Make the clustered aphids readable as tiny pale green oval insects with tiny legs, on the leaf surface.\nRow 1, column 3: 新舞台，燕子以叉尾飞来，低头棉花在下方相望，远背景很轻\nRow 2, column 1: 黑白有小红冠的啄木鸟贴树干，一侧有木纹的剖开树干，小虫在树干里面，右下有棉花角色 The exposed wood tunnel and its tiny worm need to be visibly inside the wood; keep it separate from the leaf.\nRow 2, column 2: 绿蛙向棉花姑娘跳来，后方分开可见稻苗与浅水，叶片不和稻苗重合 A distinct rice paddy with seedlings rising from shallow water must read at thumbnail size.\nRow 2, column 3: 深绿棉花叶上圆形橙红小瓢虫与小浅黄绿蚜虫相对，俯侧视只显示看不全的背面，避免生成错数背点 Show a distinct orange-red ladybug on the same leaf as visible pale green aphids. Show the two kinds close together, in oblique side view. The ladybug back is partially occluded by its perspective, with no countable full arrangement of spots.\nRow 3, column 1: 同一棉花纸偶挺直、笑脸，展开碧绿叶片、枝头显出白棉絮，叶上没有虫 Match the opening cotton girl silhouette and pale apricot face, but now upright, smiling, with lifted strong bright green leaves and distinct fluffy white cotton on the branches.\nRow 3, column 2: 单片萎下的棉花叶纸偶和一两只淡黄绿色小虫，近处无天空或动物\nRow 3, column 3: 大人和孩子并排坐读纸书，桌面放剪纸棉花和动物纸偶，无教材文字\n\nLesson art direction: 原创纸偶小剧场。细纸纹、哑光水粉、干净剪纸轮廓，深松绿和暖奶油底，杏色和柿橙点缀。背景安静、主体大、格间安全留白，纸偶剪影完整，无字无号无标识，不使用教材插图。斑点题恰好几个点由代码控制。 棉花角色始终以白棉、绿叶和暖杏小面庞呈现。老师的戏偶示范用新姿态，不生成书中文字。游戏小平台使用贴近角色和动作的横向裁片，素材底不参与猜答案。\nThese are independent square illustrations to crop, each with full silhouettes and clearly visible taught objects. Use consistent cotton-paper puppet design throughout, no text or labels, no official artwork or references. Keep a fixed 3 by 3 order. ",
+      "promptSha256": "b1f5d715d2ae1219844565d83308ce0f2133c0581b19a48cb2c5df14669ecbd1",
+      "sourceCrop": [
+        842,
+        6,
+        1248,
+        412
+      ],
+      "usedBy": [
+        "第一次请求讲解",
+        "故事片序",
+        "跳台来客小图"
+      ],
+      "visualReview": "pending"
+    },
+    {
+      "assetKey": "woodpecker-paper-stage",
+      "path": "assets/woodpecker-paper-stage.png",
+      "sha256": "55f42f10c75b8cc7de4023494951e78f1dbd964b3f8032b72c925f440aedb5a7",
+      "width": 406,
+      "height": 406,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/cotton-story-a.png",
+      "generatedSourceSha256": "ed712972735faf6aa814ae167460238c554cfecbe08f226f186874dbeb5f905a",
+      "prompt": "Create one atlas containing separate original picture assets for a first-grade lesson.\nUse 3 equal rows and 3 equal columns, with one fully visible object centered in each occupied cell. Keep wide empty margins around every object and between cells. No crossing cell boundaries, touching subjects, dividers, frames, text, letters, numbers, labels, logos or watermarks. Leave unused cells empty. Use one flat, uniform warm cream background across the atlas.\n\nKeep a consistent matte gouache and fine paper grain, with clean cut-paper contours. Use deep pine green, warm cream, apricot and persimmon as accents when appropriate. Keep the objects immediately recognizable and retain the real or lesson-specific colors and details in the descriptions. An object used for counting appears exactly once in its own cell.\n\nCell positions, in reading order:\nRow 1, column 1: 纸偶小剧场，一株拟人棉花有低垂叶子和困惑的表情。前景下垂叶上有几只浅黄绿小椭圆蚜虫，枝头还没有白棉絮。小台边有一盆不同植物。不要画出版插画 Keep the drooping leaf and little aphids large enough to see. The same cotton girl appears in the healthy closing cell, before-and-after comparison.\nRow 1, column 2: 棉花叶近景，小椭圆形的浅黄绿蚜虫成群聚在同一叶上，女孩形状的纸偶在旁低头 Make the clustered aphids readable as tiny pale green oval insects with tiny legs, on the leaf surface.\nRow 1, column 3: 新舞台，燕子以叉尾飞来，低头棉花在下方相望，远背景很轻\nRow 2, column 1: 黑白有小红冠的啄木鸟贴树干，一侧有木纹的剖开树干，小虫在树干里面，右下有棉花角色 The exposed wood tunnel and its tiny worm need to be visibly inside the wood; keep it separate from the leaf.\nRow 2, column 2: 绿蛙向棉花姑娘跳来，后方分开可见稻苗与浅水，叶片不和稻苗重合 A distinct rice paddy with seedlings rising from shallow water must read at thumbnail size.\nRow 2, column 3: 深绿棉花叶上圆形橙红小瓢虫与小浅黄绿蚜虫相对，俯侧视只显示看不全的背面，避免生成错数背点 Show a distinct orange-red ladybug on the same leaf as visible pale green aphids. Show the two kinds close together, in oblique side view. The ladybug back is partially occluded by its perspective, with no countable full arrangement of spots.\nRow 3, column 1: 同一棉花纸偶挺直、笑脸，展开碧绿叶片、枝头显出白棉絮，叶上没有虫 Match the opening cotton girl silhouette and pale apricot face, but now upright, smiling, with lifted strong bright green leaves and distinct fluffy white cotton on the branches.\nRow 3, column 2: 单片萎下的棉花叶纸偶和一两只淡黄绿色小虫，近处无天空或动物\nRow 3, column 3: 大人和孩子并排坐读纸书，桌面放剪纸棉花和动物纸偶，无教材文字\n\nLesson art direction: 原创纸偶小剧场。细纸纹、哑光水粉、干净剪纸轮廓，深松绿和暖奶油底，杏色和柿橙点缀。背景安静、主体大、格间安全留白，纸偶剪影完整，无字无号无标识，不使用教材插图。斑点题恰好几个点由代码控制。 棉花角色始终以白棉、绿叶和暖杏小面庞呈现。老师的戏偶示范用新姿态，不生成书中文字。游戏小平台使用贴近角色和动作的横向裁片，素材底不参与猜答案。\nThese are independent square illustrations to crop, each with full silhouettes and clearly visible taught objects. Use consistent cotton-paper puppet design throughout, no text or labels, no official artwork or references. Keep a fixed 3 by 3 order. ",
+      "promptSha256": "b1f5d715d2ae1219844565d83308ce0f2133c0581b19a48cb2c5df14669ecbd1",
+      "sourceCrop": [
+        6,
+        424,
+        412,
+        830
+      ],
+      "usedBy": [
+        "第二次请求讲解",
+        "故事片序",
+        "跳台来客小图"
+      ],
+      "visualReview": "pending"
+    },
+    {
+      "assetKey": "frog-paper-stage",
+      "path": "assets/frog-paper-stage.png",
+      "sha256": "49d17ba4a1886d83f602e7c729a49e560f2200866ebadf9ea474254809b21059",
+      "width": 406,
+      "height": 406,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/cotton-story-a.png",
+      "generatedSourceSha256": "ed712972735faf6aa814ae167460238c554cfecbe08f226f186874dbeb5f905a",
+      "prompt": "Create one atlas containing separate original picture assets for a first-grade lesson.\nUse 3 equal rows and 3 equal columns, with one fully visible object centered in each occupied cell. Keep wide empty margins around every object and between cells. No crossing cell boundaries, touching subjects, dividers, frames, text, letters, numbers, labels, logos or watermarks. Leave unused cells empty. Use one flat, uniform warm cream background across the atlas.\n\nKeep a consistent matte gouache and fine paper grain, with clean cut-paper contours. Use deep pine green, warm cream, apricot and persimmon as accents when appropriate. Keep the objects immediately recognizable and retain the real or lesson-specific colors and details in the descriptions. An object used for counting appears exactly once in its own cell.\n\nCell positions, in reading order:\nRow 1, column 1: 纸偶小剧场，一株拟人棉花有低垂叶子和困惑的表情。前景下垂叶上有几只浅黄绿小椭圆蚜虫，枝头还没有白棉絮。小台边有一盆不同植物。不要画出版插画 Keep the drooping leaf and little aphids large enough to see. The same cotton girl appears in the healthy closing cell, before-and-after comparison.\nRow 1, column 2: 棉花叶近景，小椭圆形的浅黄绿蚜虫成群聚在同一叶上，女孩形状的纸偶在旁低头 Make the clustered aphids readable as tiny pale green oval insects with tiny legs, on the leaf surface.\nRow 1, column 3: 新舞台，燕子以叉尾飞来，低头棉花在下方相望，远背景很轻\nRow 2, column 1: 黑白有小红冠的啄木鸟贴树干，一侧有木纹的剖开树干，小虫在树干里面，右下有棉花角色 The exposed wood tunnel and its tiny worm need to be visibly inside the wood; keep it separate from the leaf.\nRow 2, column 2: 绿蛙向棉花姑娘跳来，后方分开可见稻苗与浅水，叶片不和稻苗重合 A distinct rice paddy with seedlings rising from shallow water must read at thumbnail size.\nRow 2, column 3: 深绿棉花叶上圆形橙红小瓢虫与小浅黄绿蚜虫相对，俯侧视只显示看不全的背面，避免生成错数背点 Show a distinct orange-red ladybug on the same leaf as visible pale green aphids. Show the two kinds close together, in oblique side view. The ladybug back is partially occluded by its perspective, with no countable full arrangement of spots.\nRow 3, column 1: 同一棉花纸偶挺直、笑脸，展开碧绿叶片、枝头显出白棉絮，叶上没有虫 Match the opening cotton girl silhouette and pale apricot face, but now upright, smiling, with lifted strong bright green leaves and distinct fluffy white cotton on the branches.\nRow 3, column 2: 单片萎下的棉花叶纸偶和一两只淡黄绿色小虫，近处无天空或动物\nRow 3, column 3: 大人和孩子并排坐读纸书，桌面放剪纸棉花和动物纸偶，无教材文字\n\nLesson art direction: 原创纸偶小剧场。细纸纹、哑光水粉、干净剪纸轮廓，深松绿和暖奶油底，杏色和柿橙点缀。背景安静、主体大、格间安全留白，纸偶剪影完整，无字无号无标识，不使用教材插图。斑点题恰好几个点由代码控制。 棉花角色始终以白棉、绿叶和暖杏小面庞呈现。老师的戏偶示范用新姿态，不生成书中文字。游戏小平台使用贴近角色和动作的横向裁片，素材底不参与猜答案。\nThese are independent square illustrations to crop, each with full silhouettes and clearly visible taught objects. Use consistent cotton-paper puppet design throughout, no text or labels, no official artwork or references. Keep a fixed 3 by 3 order. ",
+      "promptSha256": "b1f5d715d2ae1219844565d83308ce0f2133c0581b19a48cb2c5df14669ecbd1",
+      "sourceCrop": [
+        424,
+        424,
+        830,
+        830
+      ],
+      "usedBy": [
+        "第三次请求讲解",
+        "故事片序",
+        "跳台来客小图"
+      ],
+      "visualReview": "pending"
+    },
+    {
+      "assetKey": "helper-on-leaf",
+      "path": "assets/helper-on-leaf.png",
+      "sha256": "872045ee2d33a842d5e0d65ed4667ed872f8f3f7950755d176bbb3e39e54dd7b",
+      "width": 406,
+      "height": 406,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/cotton-story-a.png",
+      "generatedSourceSha256": "ed712972735faf6aa814ae167460238c554cfecbe08f226f186874dbeb5f905a",
+      "prompt": "Create one atlas containing separate original picture assets for a first-grade lesson.\nUse 3 equal rows and 3 equal columns, with one fully visible object centered in each occupied cell. Keep wide empty margins around every object and between cells. No crossing cell boundaries, touching subjects, dividers, frames, text, letters, numbers, labels, logos or watermarks. Leave unused cells empty. Use one flat, uniform warm cream background across the atlas.\n\nKeep a consistent matte gouache and fine paper grain, with clean cut-paper contours. Use deep pine green, warm cream, apricot and persimmon as accents when appropriate. Keep the objects immediately recognizable and retain the real or lesson-specific colors and details in the descriptions. An object used for counting appears exactly once in its own cell.\n\nCell positions, in reading order:\nRow 1, column 1: 纸偶小剧场，一株拟人棉花有低垂叶子和困惑的表情。前景下垂叶上有几只浅黄绿小椭圆蚜虫，枝头还没有白棉絮。小台边有一盆不同植物。不要画出版插画 Keep the drooping leaf and little aphids large enough to see. The same cotton girl appears in the healthy closing cell, before-and-after comparison.\nRow 1, column 2: 棉花叶近景，小椭圆形的浅黄绿蚜虫成群聚在同一叶上，女孩形状的纸偶在旁低头 Make the clustered aphids readable as tiny pale green oval insects with tiny legs, on the leaf surface.\nRow 1, column 3: 新舞台，燕子以叉尾飞来，低头棉花在下方相望，远背景很轻\nRow 2, column 1: 黑白有小红冠的啄木鸟贴树干，一侧有木纹的剖开树干，小虫在树干里面，右下有棉花角色 The exposed wood tunnel and its tiny worm need to be visibly inside the wood; keep it separate from the leaf.\nRow 2, column 2: 绿蛙向棉花姑娘跳来，后方分开可见稻苗与浅水，叶片不和稻苗重合 A distinct rice paddy with seedlings rising from shallow water must read at thumbnail size.\nRow 2, column 3: 深绿棉花叶上圆形橙红小瓢虫与小浅黄绿蚜虫相对，俯侧视只显示看不全的背面，避免生成错数背点 Show a distinct orange-red ladybug on the same leaf as visible pale green aphids. Show the two kinds close together, in oblique side view. The ladybug back is partially occluded by its perspective, with no countable full arrangement of spots.\nRow 3, column 1: 同一棉花纸偶挺直、笑脸，展开碧绿叶片、枝头显出白棉絮，叶上没有虫 Match the opening cotton girl silhouette and pale apricot face, but now upright, smiling, with lifted strong bright green leaves and distinct fluffy white cotton on the branches.\nRow 3, column 2: 单片萎下的棉花叶纸偶和一两只淡黄绿色小虫，近处无天空或动物\nRow 3, column 3: 大人和孩子并排坐读纸书，桌面放剪纸棉花和动物纸偶，无教材文字\n\nLesson art direction: 原创纸偶小剧场。细纸纹、哑光水粉、干净剪纸轮廓，深松绿和暖奶油底，杏色和柿橙点缀。背景安静、主体大、格间安全留白，纸偶剪影完整，无字无号无标识，不使用教材插图。斑点题恰好几个点由代码控制。 棉花角色始终以白棉、绿叶和暖杏小面庞呈现。老师的戏偶示范用新姿态，不生成书中文字。游戏小平台使用贴近角色和动作的横向裁片，素材底不参与猜答案。\nThese are independent square illustrations to crop, each with full silhouettes and clearly visible taught objects. Use consistent cotton-paper puppet design throughout, no text or labels, no official artwork or references. Keep a fixed 3 by 3 order. ",
+      "promptSha256": "b1f5d715d2ae1219844565d83308ce0f2133c0581b19a48cb2c5df14669ecbd1",
+      "sourceCrop": [
+        842,
+        424,
+        1248,
+        830
+      ],
+      "usedBy": [
+        "叶上帮助者并排板左图",
+        "故事片序",
+        "跳台来客小图"
+      ],
+      "visualReview": "pending"
+    },
+    {
+      "assetKey": "cotton-recovered",
+      "path": "assets/cotton-recovered.png",
+      "sha256": "e918464e2b6b389e45bb593a53d495cb5e0fdaf7eecfe72a3f5cc793b7eba32d",
+      "width": 406,
+      "height": 406,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/cotton-story-a.png",
+      "generatedSourceSha256": "ed712972735faf6aa814ae167460238c554cfecbe08f226f186874dbeb5f905a",
+      "prompt": "Create one atlas containing separate original picture assets for a first-grade lesson.\nUse 3 equal rows and 3 equal columns, with one fully visible object centered in each occupied cell. Keep wide empty margins around every object and between cells. No crossing cell boundaries, touching subjects, dividers, frames, text, letters, numbers, labels, logos or watermarks. Leave unused cells empty. Use one flat, uniform warm cream background across the atlas.\n\nKeep a consistent matte gouache and fine paper grain, with clean cut-paper contours. Use deep pine green, warm cream, apricot and persimmon as accents when appropriate. Keep the objects immediately recognizable and retain the real or lesson-specific colors and details in the descriptions. An object used for counting appears exactly once in its own cell.\n\nCell positions, in reading order:\nRow 1, column 1: 纸偶小剧场，一株拟人棉花有低垂叶子和困惑的表情。前景下垂叶上有几只浅黄绿小椭圆蚜虫，枝头还没有白棉絮。小台边有一盆不同植物。不要画出版插画 Keep the drooping leaf and little aphids large enough to see. The same cotton girl appears in the healthy closing cell, before-and-after comparison.\nRow 1, column 2: 棉花叶近景，小椭圆形的浅黄绿蚜虫成群聚在同一叶上，女孩形状的纸偶在旁低头 Make the clustered aphids readable as tiny pale green oval insects with tiny legs, on the leaf surface.\nRow 1, column 3: 新舞台，燕子以叉尾飞来，低头棉花在下方相望，远背景很轻\nRow 2, column 1: 黑白有小红冠的啄木鸟贴树干，一侧有木纹的剖开树干，小虫在树干里面，右下有棉花角色 The exposed wood tunnel and its tiny worm need to be visibly inside the wood; keep it separate from the leaf.\nRow 2, column 2: 绿蛙向棉花姑娘跳来，后方分开可见稻苗与浅水，叶片不和稻苗重合 A distinct rice paddy with seedlings rising from shallow water must read at thumbnail size.\nRow 2, column 3: 深绿棉花叶上圆形橙红小瓢虫与小浅黄绿蚜虫相对，俯侧视只显示看不全的背面，避免生成错数背点 Show a distinct orange-red ladybug on the same leaf as visible pale green aphids. Show the two kinds close together, in oblique side view. The ladybug back is partially occluded by its perspective, with no countable full arrangement of spots.\nRow 3, column 1: 同一棉花纸偶挺直、笑脸，展开碧绿叶片、枝头显出白棉絮，叶上没有虫 Match the opening cotton girl silhouette and pale apricot face, but now upright, smiling, with lifted strong bright green leaves and distinct fluffy white cotton on the branches.\nRow 3, column 2: 单片萎下的棉花叶纸偶和一两只淡黄绿色小虫，近处无天空或动物\nRow 3, column 3: 大人和孩子并排坐读纸书，桌面放剪纸棉花和动物纸偶，无教材文字\n\nLesson art direction: 原创纸偶小剧场。细纸纹、哑光水粉、干净剪纸轮廓，深松绿和暖奶油底，杏色和柿橙点缀。背景安静、主体大、格间安全留白，纸偶剪影完整，无字无号无标识，不使用教材插图。斑点题恰好几个点由代码控制。 棉花角色始终以白棉、绿叶和暖杏小面庞呈现。老师的戏偶示范用新姿态，不生成书中文字。游戏小平台使用贴近角色和动作的横向裁片，素材底不参与猜答案。\nThese are independent square illustrations to crop, each with full silhouettes and clearly visible taught objects. Use consistent cotton-paper puppet design throughout, no text or labels, no official artwork or references. Keep a fixed 3 by 3 order. ",
+      "promptSha256": "b1f5d715d2ae1219844565d83308ce0f2133c0581b19a48cb2c5df14669ecbd1",
+      "sourceCrop": [
+        6,
+        842,
+        412,
+        1248
+      ],
+      "usedBy": [
+        "开头结尾并排右图",
+        "故事片序",
+        "跳台结尾小图"
+      ],
+      "visualReview": "pending"
+    },
+    {
+      "assetKey": "sick-stage-prop",
+      "path": "assets/sick-stage-prop.png",
+      "sha256": "501ca6182223f1c487e8a12d23463c72009ad5c5e3672809490b01f8a91761e6",
+      "width": 385,
+      "height": 406,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/cotton-story-a.png",
+      "generatedSourceSha256": "ed712972735faf6aa814ae167460238c554cfecbe08f226f186874dbeb5f905a",
+      "prompt": "Create one atlas containing separate original picture assets for a first-grade lesson.\nUse 3 equal rows and 3 equal columns, with one fully visible object centered in each occupied cell. Keep wide empty margins around every object and between cells. No crossing cell boundaries, touching subjects, dividers, frames, text, letters, numbers, labels, logos or watermarks. Leave unused cells empty. Use one flat, uniform warm cream background across the atlas.\n\nKeep a consistent matte gouache and fine paper grain, with clean cut-paper contours. Use deep pine green, warm cream, apricot and persimmon as accents when appropriate. Keep the objects immediately recognizable and retain the real or lesson-specific colors and details in the descriptions. An object used for counting appears exactly once in its own cell.\n\nCell positions, in reading order:\nRow 1, column 1: 纸偶小剧场，一株拟人棉花有低垂叶子和困惑的表情。前景下垂叶上有几只浅黄绿小椭圆蚜虫，枝头还没有白棉絮。小台边有一盆不同植物。不要画出版插画 Keep the drooping leaf and little aphids large enough to see. The same cotton girl appears in the healthy closing cell, before-and-after comparison.\nRow 1, column 2: 棉花叶近景，小椭圆形的浅黄绿蚜虫成群聚在同一叶上，女孩形状的纸偶在旁低头 Make the clustered aphids readable as tiny pale green oval insects with tiny legs, on the leaf surface.\nRow 1, column 3: 新舞台，燕子以叉尾飞来，低头棉花在下方相望，远背景很轻\nRow 2, column 1: 黑白有小红冠的啄木鸟贴树干，一侧有木纹的剖开树干，小虫在树干里面，右下有棉花角色 The exposed wood tunnel and its tiny worm need to be visibly inside the wood; keep it separate from the leaf.\nRow 2, column 2: 绿蛙向棉花姑娘跳来，后方分开可见稻苗与浅水，叶片不和稻苗重合 A distinct rice paddy with seedlings rising from shallow water must read at thumbnail size.\nRow 2, column 3: 深绿棉花叶上圆形橙红小瓢虫与小浅黄绿蚜虫相对，俯侧视只显示看不全的背面，避免生成错数背点 Show a distinct orange-red ladybug on the same leaf as visible pale green aphids. Show the two kinds close together, in oblique side view. The ladybug back is partially occluded by its perspective, with no countable full arrangement of spots.\nRow 3, column 1: 同一棉花纸偶挺直、笑脸，展开碧绿叶片、枝头显出白棉絮，叶上没有虫 Match the opening cotton girl silhouette and pale apricot face, but now upright, smiling, with lifted strong bright green leaves and distinct fluffy white cotton on the branches.\nRow 3, column 2: 单片萎下的棉花叶纸偶和一两只淡黄绿色小虫，近处无天空或动物\nRow 3, column 3: 大人和孩子并排坐读纸书，桌面放剪纸棉花和动物纸偶，无教材文字\n\nLesson art direction: 原创纸偶小剧场。细纸纹、哑光水粉、干净剪纸轮廓，深松绿和暖奶油底，杏色和柿橙点缀。背景安静、主体大、格间安全留白，纸偶剪影完整，无字无号无标识，不使用教材插图。斑点题恰好几个点由代码控制。 棉花角色始终以白棉、绿叶和暖杏小面庞呈现。老师的戏偶示范用新姿态，不生成书中文字。游戏小平台使用贴近角色和动作的横向裁片，素材底不参与猜答案。\nThese are independent square illustrations to crop, each with full silhouettes and clearly visible taught objects. Use consistent cotton-paper puppet design throughout, no text or labels, no official artwork or references. Keep a fixed 3 by 3 order. ",
+      "promptSha256": "b1f5d715d2ae1219844565d83308ce0f2133c0581b19a48cb2c5df14669ecbd1",
+      "sourceCrop": [
+        424,
+        842,
+        809,
+        1248
+      ],
+      "usedBy": [
+        "故事片序",
+        "跳台开始卡"
+      ],
+      "visualReview": "pending"
+    },
+    {
+      "assetKey": "cotton-family",
+      "path": "assets/cotton-family.png",
+      "sha256": "8317cf9415bf46661134a7c709582e2c43b9a84953e9aec4a78623fffd3f2a61",
+      "width": 431,
+      "height": 414,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/cotton-story-a.png",
+      "generatedSourceSha256": "ed712972735faf6aa814ae167460238c554cfecbe08f226f186874dbeb5f905a",
+      "prompt": "Create one atlas containing separate original picture assets for a first-grade lesson.\nUse 3 equal rows and 3 equal columns, with one fully visible object centered in each occupied cell. Keep wide empty margins around every object and between cells. No crossing cell boundaries, touching subjects, dividers, frames, text, letters, numbers, labels, logos or watermarks. Leave unused cells empty. Use one flat, uniform warm cream background across the atlas.\n\nKeep a consistent matte gouache and fine paper grain, with clean cut-paper contours. Use deep pine green, warm cream, apricot and persimmon as accents when appropriate. Keep the objects immediately recognizable and retain the real or lesson-specific colors and details in the descriptions. An object used for counting appears exactly once in its own cell.\n\nCell positions, in reading order:\nRow 1, column 1: 纸偶小剧场，一株拟人棉花有低垂叶子和困惑的表情。前景下垂叶上有几只浅黄绿小椭圆蚜虫，枝头还没有白棉絮。小台边有一盆不同植物。不要画出版插画 Keep the drooping leaf and little aphids large enough to see. The same cotton girl appears in the healthy closing cell, before-and-after comparison.\nRow 1, column 2: 棉花叶近景，小椭圆形的浅黄绿蚜虫成群聚在同一叶上，女孩形状的纸偶在旁低头 Make the clustered aphids readable as tiny pale green oval insects with tiny legs, on the leaf surface.\nRow 1, column 3: 新舞台，燕子以叉尾飞来，低头棉花在下方相望，远背景很轻\nRow 2, column 1: 黑白有小红冠的啄木鸟贴树干，一侧有木纹的剖开树干，小虫在树干里面，右下有棉花角色 The exposed wood tunnel and its tiny worm need to be visibly inside the wood; keep it separate from the leaf.\nRow 2, column 2: 绿蛙向棉花姑娘跳来，后方分开可见稻苗与浅水，叶片不和稻苗重合 A distinct rice paddy with seedlings rising from shallow water must read at thumbnail size.\nRow 2, column 3: 深绿棉花叶上圆形橙红小瓢虫与小浅黄绿蚜虫相对，俯侧视只显示看不全的背面，避免生成错数背点 Show a distinct orange-red ladybug on the same leaf as visible pale green aphids. Show the two kinds close together, in oblique side view. The ladybug back is partially occluded by its perspective, with no countable full arrangement of spots.\nRow 3, column 1: 同一棉花纸偶挺直、笑脸，展开碧绿叶片、枝头显出白棉絮，叶上没有虫 Match the opening cotton girl silhouette and pale apricot face, but now upright, smiling, with lifted strong bright green leaves and distinct fluffy white cotton on the branches.\nRow 3, column 2: 单片萎下的棉花叶纸偶和一两只淡黄绿色小虫，近处无天空或动物\nRow 3, column 3: 大人和孩子并排坐读纸书，桌面放剪纸棉花和动物纸偶，无教材文字\n\nLesson art direction: 原创纸偶小剧场。细纸纹、哑光水粉、干净剪纸轮廓，深松绿和暖奶油底，杏色和柿橙点缀。背景安静、主体大、格间安全留白，纸偶剪影完整，无字无号无标识，不使用教材插图。斑点题恰好几个点由代码控制。 棉花角色始终以白棉、绿叶和暖杏小面庞呈现。老师的戏偶示范用新姿态，不生成书中文字。游戏小平台使用贴近角色和动作的横向裁片，素材底不参与猜答案。\nThese are independent square illustrations to crop, each with full silhouettes and clearly visible taught objects. Use consistent cotton-paper puppet design throughout, no text or labels, no official artwork or references. Keep a fixed 3 by 3 order. ",
+      "promptSha256": "b1f5d715d2ae1219844565d83308ce0f2133c0581b19a48cb2c5df14669ecbd1",
+      "sourceCrop": [
+        817,
+        834,
+        1248,
+        1248
+      ],
+      "usedBy": [
+        "纸书亲子共读收尾"
+      ],
+      "visualReview": "pending"
+    }
+  ]
+}

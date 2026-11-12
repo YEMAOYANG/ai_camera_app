@@ -1,0 +1,353 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "lesson": {
+    "editionId": "smartedu-english-six-year-g1-lower-sync-c8ae9406",
+    "revisionId": "directory-057e330e9b4c19ff0e6ab21e",
+    "nodeId": "f4f519d7-7a8d-309c-8627-20f5458b4707",
+    "unitId": "60ec8631-014b-3f9f-bffe-685a8877d2a2",
+    "lessonTitle": "Unit 2 They're little and cute.",
+    "unitTitle": "Module 6",
+    "subject": "english",
+    "gradeCode": "primary_1",
+    "volume": "lower",
+    "schoolSystem": "six_year"
+  },
+  "teacher": {
+    "code": "mira_english_standard",
+    "voice": "Jennifer",
+    "gender": "female"
+  },
+  "goals": [
+    {
+      "id": "g-strong",
+      "text": "从玩具在同一动作中举起积木的可见结果理解 strong，能在图和台词里认出 horse、little、big、cute、strong。",
+      "pageRefs": [
+        "教材印35 活动1–2",
+        "智慧备课教案1–3",
+        "外研218251第4–18页"
+      ]
+    },
+    {
+      "id": "g-and",
+      "text": "比较同一参照下的大小，听见 and 后核对同一组是否同时符合两个描述，识别符合的图片。",
+      "pageRefs": [
+        "教材印35 活动2和印36 活动3–4",
+        "外研218257第6–9页",
+        "外研218251第14–24页"
+      ]
+    },
+    {
+      "id": "g-yes-no",
+      "text": "听懂 Are they…? 问的是同一组的哪项特点，用肯定或否定线索选择相符图；成人可观察口头答句。",
+      "pageRefs": [
+        "教材印35 活动2与印37 活动5",
+        "智慧备课课件10–16",
+        "外研218257第7、10页"
+      ]
+    },
+    {
+      "id": "g-transfer",
+      "text": "将听到的描述用于新玩具图；课后指着自己画或找到的两只同类玩具，尝试问、答、说两个特点。",
+      "pageRefs": [
+        "教材印37 活动6",
+        "智慧备课教案4",
+        "外研218251第30–32页",
+        "外研218257第10页"
+      ]
+    }
+  ],
+  "keyPoint": [
+    "以可见画面支持 strong 与大小描述。",
+    "and 把同一组的两条描述连起来。",
+    "从肯否听辨走向指图问答。"
+  ],
+  "difficultPoint": [
+    "检查两条属性都符合，不按大小猜 strength。",
+    "否定回答只排除所问特征，仍需看其他线索。"
+  ],
+  "authoring": {
+    "method": "direct_authoring",
+    "author": "Codex GPT-6",
+    "nativeGenerationSubmitted": false,
+    "reviewedOfficialHours": [
+      "lesson_1",
+      "publisher_module6_period_2"
+    ],
+    "gameTemplates": [
+      {
+        "page": "listen-for-traits",
+        "id": "wordBubbles",
+        "version": 1,
+        "knowledgeRule": "listen_match",
+        "levels": 3,
+        "progression": "先听一条大小线索，再核同一组的大小和动作，末关只靠一条线索必有干扰。"
+      },
+      {
+        "page": "route-to-the-exhibit",
+        "id": "bubbleMaze",
+        "version": 1,
+        "knowledgeRule": "listen_order",
+        "levels": 3,
+        "progression": "先按肯否找展位，再按同组两条可见线索依次走到图标，末关有隔挡和移动障碍。"
+      }
+    ]
+  },
+  "pageSequence": [
+    {
+      "page": 1,
+      "sceneId": "exhibit-welcome",
+      "type": "slide",
+      "title": "玩具动物展要开门了",
+      "goalIds": [
+        "g-strong"
+      ],
+      "bookActivities": [
+        1
+      ],
+      "play": "原创新展厅设悬念，看见动物玩具的外形，再到操作桌看动作。"
+    },
+    {
+      "page": 2,
+      "sceneId": "see-strong",
+      "type": "slide",
+      "title": "积木离开地面了吗",
+      "goalIds": [
+        "g-strong"
+      ],
+      "bookActivities": [
+        1
+      ],
+      "play": "对比同一块积木有没有离地，理解 strong 与否定。"
+    },
+    {
+      "page": 3,
+      "sceneId": "two-groups-of-horses",
+      "type": "slide",
+      "title": "两群马站在同一条线上",
+      "goalIds": [
+        "g-and"
+      ],
+      "bookActivities": [
+        2
+      ],
+      "play": "用同一地线比两组马，听 little、big 和带 and 的描述。"
+    },
+    {
+      "page": 4,
+      "sceneId": "two-traits",
+      "type": "slide",
+      "title": "两条线索都要对",
+      "goalIds": [
+        "g-and"
+      ],
+      "bookActivities": [
+        2,
+        3
+      ],
+      "play": "在同样大的两张图里，比箱底是否离地，示范 and 要核对两条。"
+    },
+    {
+      "page": 5,
+      "sceneId": "small-can-lift",
+      "type": "slide",
+      "title": "小个头也能举起积木",
+      "goalIds": [
+        "g-and"
+      ],
+      "bookActivities": [
+        2,
+        4
+      ],
+      "play": "用小熊猫举箱的动作说明小个头也能有力气，复习两条。"
+    },
+    {
+      "page": 6,
+      "sceneId": "listen-for-traits",
+      "type": "interactive",
+      "title": "听线索，吹泡泡",
+      "goalIds": [
+        "g-and"
+      ],
+      "bookActivities": [
+        2,
+        3
+      ],
+      "play": "三关从一条大小到大小加动作；移动小艇瞄准，发泡泡命中才得分。"
+    },
+    {
+      "page": 7,
+      "sceneId": "answer-the-question",
+      "type": "slide",
+      "title": "问的是哪一条",
+      "goalIds": [
+        "g-yes-no"
+      ],
+      "bookActivities": [
+        2,
+        5
+      ],
+      "play": "同问句换所指对象，区分 Yes 与 No，说明否定只排除所问项。"
+    },
+    {
+      "page": 8,
+      "sceneId": "ask-another-clue",
+      "type": "slide",
+      "title": "再问一个线索",
+      "goalIds": [
+        "g-yes-no"
+      ],
+      "bookActivities": [
+        4,
+        5
+      ],
+      "play": "用地线和耳朵的线索猜组，继续按肯否和第二条信息缩小。"
+    },
+    {
+      "page": 9,
+      "sceneId": "route-to-the-exhibit",
+      "type": "interactive",
+      "title": "听问答，开车去展位",
+      "goalIds": [
+        "g-yes-no",
+        "g-transfer"
+      ],
+      "bookActivities": [
+        5
+      ],
+      "play": "沿地图按问答顺序开车；有挡块和巡游障碍，错展位不能得分。"
+    },
+    {
+      "page": 10,
+      "sceneId": "picture-check",
+      "type": "quiz",
+      "title": "换一场展览，听图小检查",
+      "goalIds": [
+        "g-strong",
+        "g-and",
+        "g-yes-no",
+        "g-transfer"
+      ],
+      "bookActivities": [
+        2,
+        3,
+        5,
+        6
+      ],
+      "play": "六题全用独立玩具新图，听一句选一张，答案位置均衡。"
+    },
+    {
+      "page": 11,
+      "sceneId": "exhibit-at-home",
+      "type": "slide",
+      "title": "把玩具介绍给家人",
+      "goalIds": [
+        "g-strong",
+        "g-and",
+        "g-yes-no",
+        "g-transfer"
+      ],
+      "bookActivities": [
+        4,
+        5,
+        6
+      ],
+      "play": "回看三个要点，邀请家人用实物或画练一问一答，回纸书读听。"
+    }
+  ],
+  "quiz": [
+    {
+      "id": "cute-q1",
+      "skill": "按可见动作理解 strong",
+      "target": "听 strong 选择正在举起同样大泡沫积木的一组，另两组未举起",
+      "correctPositionOneBased": 2,
+      "page": 10,
+      "question": "They’re strong.",
+      "reason": "第二张的箱子底下有空，说明这组把箱子抬起来了。其余两组的箱子还贴着地面。",
+      "optionAssetIds": [
+        "q1-dogs-ground",
+        "q1-dogs-lift",
+        "q1-cats-ground"
+      ]
+    },
+    {
+      "id": "cute-q2",
+      "skill": "听懂同一组两条描述",
+      "target": "听 big and strong 选择体型大且把积木举起来的一组，一张只有大、一张只有举起",
+      "correctPositionOneBased": 1,
+      "page": 10,
+      "question": "They’re big and strong.",
+      "reason": "第一组个头大，也把木箱抬离地面。第二组只有大，第三组抬起了箱子但个头小。",
+      "optionAssetIds": [
+        "q2-elephants-big-lift",
+        "q2-elephants-big-ground",
+        "q2-elephants-small-lift"
+      ]
+    },
+    {
+      "id": "cute-q3",
+      "skill": "听肯定回答选择图片",
+      "target": "听 Are they tall? Yes, they are. 选择共用基线下清楚的高组",
+      "correctPositionOneBased": 3,
+      "page": 10,
+      "question": "Are they tall? Yes, they are.",
+      "reason": "Yes 表示符合刚问的 tall。比较同一地线，长颈鹿这一组明显高过另外两组。",
+      "optionAssetIds": [
+        "q3-rabbits-low",
+        "q3-elephants-low",
+        "q3-giraffes-tall"
+      ]
+    },
+    {
+      "id": "cute-q4",
+      "skill": "听否定回答排除图片",
+      "target": "听 Are they big? No, they aren’t. 选择同标尺下清楚的较小组",
+      "correctPositionOneBased": 2,
+      "page": 10,
+      "question": "Are they big? No, they aren’t.",
+      "reason": "问的是大不大，No 排除了个头大的两组。第二组小象对照同一标记明显小。",
+      "optionAssetIds": [
+        "q4-horses-big",
+        "q4-elephants-little",
+        "q4-tigers-big"
+      ]
+    },
+    {
+      "id": "cute-q5",
+      "skill": "结合否定和种类线索猜一组",
+      "target": "否定强动作，另给种类线索；用新种类新情境并让两条都参与判断",
+      "correctPositionOneBased": 3,
+      "page": 10,
+      "question": "Are they strong? No. They’re tigers.",
+      "reason": "两条都要核对。第一组虎抬了箱子，第二组箱子在地面但它们是猫，第三组两条都符合。",
+      "optionAssetIds": [
+        "q5-tigers-lift",
+        "q5-cats-ground",
+        "q5-tigers-ground"
+      ]
+    },
+    {
+      "id": "cute-q6",
+      "skill": "把可见的大小和耳朵长度合起来听",
+      "target": "结合两条可见属性，选择大且耳朵长的一组，其他组只符合一条。",
+      "correctPositionOneBased": 1,
+      "page": 10,
+      "question": "They’re big. They have long ears.",
+      "reason": "第一组木兔个头大，耳朵也长。第二组耳朵长但小；第三组个头大，耳朵短。",
+      "optionAssetIds": [
+        "q6-rabbits-big",
+        "q6-rabbits-little",
+        "q6-cats-big"
+      ]
+    }
+  ],
+  "afterClass": {
+    "official": [
+      "教材活动6口头介绍动物玩具",
+      "外研模块测试相关题源",
+      "出版社教案第10页画动物并介绍"
+    ],
+    "inLesson": "六道新听图题核听辨，发音和即兴口头表达交家人观察。",
+    "atHome": "找两只同类玩具或画两只，指着它们，用 Are they…? 轮流问答，最后试着说两项特点。无需拍照、上传或录音。",
+    "weekly": "以可见动作、对比参照、并列双描述、肯否问答为周题源，不按主观喜好判可爱。"
+  }
+}

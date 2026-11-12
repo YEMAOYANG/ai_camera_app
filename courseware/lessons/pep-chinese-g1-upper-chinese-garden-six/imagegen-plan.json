@@ -1,0 +1,1623 @@
+{
+  "schemaVersion": "mira.courseware.imagegen-plan.v1",
+  "lesson": "pep-chinese-g1-upper-chinese-garden-six",
+  "mode": "codex_builtin_imagegen",
+  "status": "all_illustrations_integrated",
+  "sharedPrompt": "原创一年级中文课堂插画，细纸纹、哑光水粉、干净的剪纸轮廓，深松绿与暖奶油底，少量杏色与柿橙。画面安静，主体完整、轮廓明确，适合小屏。不要文字、数字、标志、边框水印、教材画风或已有角色。每张图单独交付；标明透明的图保留真实透明背景。",
+  "requests": [
+    {
+      "key": "school-clinic",
+      "file": "assets/illustrations/school-clinic.png",
+      "pages": [
+        "p01"
+      ],
+      "role": "职业与场所识字",
+      "framing": "16:9 横图；保持两半动作全幅",
+      "transparent": false,
+      "prompt": "干净的两场景并排插画。左侧是普通小学教室，一位老师指向没有字的黑板，两个坐在课桌前的小学生抬头听。右侧是医院诊室，一位医生用听诊器给坐着的孩子听诊，旁有检查床和一盏亮着的诊室灯。两边人物动作清楚，衣服区分，表情自然，四周留安全边缘。",
+      "status": "integrated",
+      "source": "assets/illustrations/source/school-clinic.png",
+      "sourceSha256": "130ac9a67be26a8fc183a0ba21ec30ce0d009fb3d9f769b3334d74617f905421",
+      "sourceSize": [
+        1672,
+        941
+      ],
+      "playbackSize": [
+        1200,
+        675
+      ],
+      "sha256": "dc56c5b9b47f361aaaa089d108615a28361e659eb4fd707b3cbac86a73a72097",
+      "bytes": 1233690,
+      "generationId": "exec-85151996-61f3-40c6-aea6-32b3b81e339c"
+    },
+    {
+      "key": "factory-gate",
+      "file": "assets/illustrations/factory-gate.png",
+      "pages": [
+        "p02"
+      ],
+      "role": "工厂工人与传达室门卫",
+      "framing": "16:9 横图；保持两半动作全幅",
+      "transparent": false,
+      "prompt": "左半为整洁工厂车间，一位戴安全帽的工人在传送带旁摆放零件；右半是学校入口，一位门卫在独立小值班室旁朝来访成人招手。建筑结构明确，两边互不串场。门卫不用警徽和制式警服。",
+      "status": "integrated",
+      "source": "assets/illustrations/source/factory-gate.png",
+      "sourceSha256": "47f17841f2313d4e9d2ce1d05e4e173e9607a83f024e0f72d8d402c1c3cd3df7",
+      "sourceSize": [
+        1672,
+        941
+      ],
+      "playbackSize": [
+        1200,
+        675
+      ],
+      "sha256": "3b33c82c120a638ce8a2a9d7304593c2c29df5c0e256c963f682320ea06a6830",
+      "bytes": 1248116,
+      "generationId": "exec-ba189513-b58c-4755-919f-587fd02c62e5"
+    },
+    {
+      "key": "street-signs",
+      "file": "assets/illustrations/street-signs.png",
+      "pages": [
+        "p09"
+      ],
+      "role": "场所招牌识字",
+      "framing": "7:5 横图；保留两块完整招牌",
+      "transparent": false,
+      "prompt": "一条安静的小镇街道。左边公交站台上有座椅和停靠的公交车，左侧空白站牌正对镜头。右边是图书归还入口，旁边有还书箱和叠起的书，空白横招牌正对镜头。两块招牌形状完整，放在各自上方的浅色空区；不得绘制文字。",
+      "status": "integrated",
+      "codeOverlays": [
+        {
+          "kind": "sign-lettering",
+          "text": "公交站",
+          "position": "左侧站台的正面空白牌中央",
+          "platePixels": [
+            162,
+            280,
+            634,
+            377
+          ],
+          "inkBoundsPixels": [
+            262.796,
+            286.5,
+            533.204,
+            370.5
+          ]
+        },
+        {
+          "kind": "sign-lettering",
+          "text": "图书归还处",
+          "position": "右侧入口正面空白横牌中央",
+          "platePixels": [
+            736,
+            252,
+            1438,
+            364
+          ],
+          "inkBoundsPixels": [
+            829.006,
+            261.0,
+            1344.994,
+            355.0
+          ]
+        }
+      ],
+      "source": "assets/illustrations/source/street-signs.png",
+      "sourceSha256": "bfd052b1a992e2a79dd0917df0fe121589ae5951e7d59e242607fcfc3aab0a38",
+      "sourceSize": [
+        1484,
+        1060
+      ],
+      "playbackSize": [
+        1120,
+        800
+      ],
+      "sha256": "4196574d8da1be26c1777b73a4e5f22f73e9cda2123f01e3b5cf1ac4da299507",
+      "bytes": 1469475,
+      "generationId": "exec-27af6596-af1d-490c-a9c0-d1cb18810902",
+      "overlaySource": "assets/illustrations/source/street-signs-lettering.svg"
+    },
+    {
+      "key": "rainy-courtyard",
+      "file": "assets/illustrations/rainy-courtyard.png",
+      "pages": [
+        "p10"
+      ],
+      "role": "看图写词说话",
+      "framing": "7:5 横图；全幅保留",
+      "transparent": false,
+      "prompt": "雨后的中国小镇院落。上方屋檐边停着一只小鸟；中景两个小朋友站在院里，一个伸手朝屋檐指，一个抬头看；下方湿石板有一片浅水洼，水里映出亮天。明确表现雨已经停，画面只有这两个人，手指方向、人物动作和水洼位置都可读。",
+      "status": "integrated",
+      "source": "assets/illustrations/source/rainy-courtyard.png",
+      "sourceSha256": "1b8ff2f9b7c9265b6f414c7a57c11c51589c66414b50c06f3c4a45cfcf145b37",
+      "sourceSize": [
+        1484,
+        1060
+      ],
+      "playbackSize": [
+        1120,
+        800
+      ],
+      "sha256": "f2e39b18bcbe29a522703ac54f1ba0a0830b0dafba24b71db46d2e8f742a213a",
+      "bytes": 1472488,
+      "generationId": "exec-941ffe3b-5f30-44bf-866a-cfa9afec72e3"
+    },
+    {
+      "key": "moon-imagery",
+      "file": "assets/illustrations/moon-imagery.png",
+      "pages": [
+        "p13",
+        "p14"
+      ],
+      "role": "古诗意象与接读背诵",
+      "framing": "7:5 横图；全幅保留",
+      "transparent": false,
+      "prompt": "原创新画的双景：左半一轮皎白圆月和一只光洁素净的白玉圆盘在视觉上相呼应；右半是一面正面圆形古镜，浅金细框，在高高的蓝灰云边显得微亮。两个圆形主体大小近似，安静、留白充足。没有宫殿人物、没有复制教材画面。",
+      "status": "integrated",
+      "source": "assets/illustrations/source/moon-imagery.png",
+      "sourceSha256": "c9197df9e5b5b8caea89654f31171e65e4fc68d6f29bac310ebbae5d02aeb4e3",
+      "sourceSize": [
+        1484,
+        1060
+      ],
+      "playbackSize": [
+        1120,
+        800
+      ],
+      "sha256": "41419921961f45fb163e4689ded6c259f1491474f16c758db923581ea6d415e9",
+      "bytes": 1336871,
+      "generationId": "exec-0a6c0a83-f274-4987-b6c4-c0916f3b2bc9"
+    },
+    {
+      "key": "squirrel-mole",
+      "file": "assets/illustrations/squirrel-mole.png",
+      "pages": [
+        "p15"
+      ],
+      "role": "亲子分角色读前两段",
+      "framing": "7:5 横图；全幅保留",
+      "transparent": false,
+      "prompt": "树边低矮的花生植株上有小小的黄色花。松鼠站着转头提问，蓬松大尾巴很明显；鼹鼠在旁抬头认真倾听，短肢、细尖吻、深灰色绒毛。两只动物自然站在花旁。只呈地上场景，先不露出果实，四周有安全留白。",
+      "status": "integrated",
+      "source": "assets/illustrations/source/squirrel-mole.png",
+      "sourceSha256": "ff45b0dceaffc9e0375101f331074807b728b81a0e4c43370080888661d3214f",
+      "sourceSize": [
+        1484,
+        1060
+      ],
+      "playbackSize": [
+        1120,
+        800
+      ],
+      "sha256": "14659fecfdc39b88ed6211234a928553a00a1f700885b708d4d5b1f8ffa4863d",
+      "bytes": 1514339,
+      "generationId": "exec-6db5cfa7-bd67-4d23-b276-017d3bf799f0"
+    },
+    {
+      "key": "peanut-clue",
+      "file": "assets/illustrations/peanut-clue.png",
+      "pages": [
+        "p16"
+      ],
+      "role": "找地下花生果实线索",
+      "framing": "7:5 横图；全幅保留",
+      "transparent": false,
+      "prompt": "清楚的花生植株侧视剖面。地上为低矮绿色枝叶和小黄色花；地面是一条清楚的水平土层分界；地下可见连在植株果针上的浅棕色花生荚果，果实没有长在叶、枝或土上。植株完整占中间，土层简单，区分泥土与荚果颜色。不要画文字、箭头、散落的花生仁。",
+      "status": "integrated",
+      "source": "assets/illustrations/source/peanut-clue.png",
+      "sourceSha256": "f1ded1fe4744ef7339b48928ca5c14b0b4f8586e0f4981709dfb04dff3ef2e86",
+      "sourceSize": [
+        1484,
+        1060
+      ],
+      "playbackSize": [
+        1120,
+        800
+      ],
+      "sha256": "9282dd9b543d8b6b9013b88c79f1f944c35a3a897b2bf976996206758cd79a17",
+      "bytes": 1337853,
+      "generationId": "exec-8e42c4d8-82e8-4eef-bcfd-c4692031fb3e"
+    },
+    {
+      "key": "garden-bubble-start",
+      "file": "assets/illustrations/garden-bubble-start.png",
+      "pages": [
+        "p06/start"
+      ],
+      "role": "听音游戏开始卡",
+      "framing": "16:9 横图；主体集中在中央安全区",
+      "transparent": false,
+      "prompt": "小镇清静水道的动作缩略图：一条杏橙色小艇在下方，船头短筒朝上，透明大泡泡垂直向上飞；上方并排两张浅奶油色圆角空卡，右左卡留空且清楚分开，一张泡泡正靠近左卡。构图只保留两卡、小艇、泡泡和安静的水道，不画字符。",
+      "status": "integrated",
+      "codeOverlays": [
+        {
+          "kind": "target-glyph",
+          "text": "n",
+          "position": "左侧空卡中央，泡泡接近此卡",
+          "targetAsset": "initial-n",
+          "platePixels": [
+            523,
+            164,
+            773,
+            422
+          ],
+          "inkBoundsPixels": [
+            602.588,
+            236.037,
+            693.413,
+            349.962
+          ]
+        },
+        {
+          "kind": "target-glyph",
+          "text": "l",
+          "position": "右侧空卡中央",
+          "targetAsset": "initial-l",
+          "platePixels": [
+            899,
+            164,
+            1149,
+            423
+          ],
+          "inkBoundsPixels": [
+            1014.55,
+            216.535,
+            1033.45,
+            370.465
+          ]
+        }
+      ],
+      "overlaySource": "assets/illustrations/source/garden-bubble-start-lettering.svg",
+      "source": "assets/illustrations/source/garden-bubble-start.png",
+      "sourceSha256": "8e9f68c6afeeffa095e99f0ea274954dede273d0a23b8f1e57c760b9c4fd2521",
+      "sourceSize": [
+        1672,
+        941
+      ],
+      "playbackSize": [
+        1120,
+        630
+      ],
+      "sha256": "deb495ad9fa02c2172bd3d7e3cc07c323506ba6da1274ace49efec5b15a1d283",
+      "bytes": 778953,
+      "generationId": "exec-230b88b2-34f2-4cc5-882b-50f3f2969114"
+    },
+    {
+      "key": "bubble-backdrop",
+      "file": "assets/illustrations/bubble-backdrop.png",
+      "pages": [
+        "p06/game"
+      ],
+      "role": "听音游戏场景底图",
+      "framing": "1280×720 横图；中央低对比",
+      "transparent": false,
+      "prompt": "安静的小镇河湾，边缘有少量芦苇和石头，青绿色水面平静，主体游戏区中央不出现角色、卡片、文字或高对比纹理，能与模板深绿边框和奶油卡形成层次。",
+      "status": "integrated",
+      "source": "assets/illustrations/source/bubble-backdrop.png",
+      "sourceSha256": "c84b5437f4298b725b5c2198b8aeea6ad08bca070948aa69b157f74f0a74c405",
+      "sourceSize": [
+        1672,
+        941
+      ],
+      "playbackSize": [
+        1120,
+        630
+      ],
+      "sha256": "df84fc867cf566ea6fa2ebccfc3b5862b4caeb0e35af126bf24a41adca34bdae",
+      "bytes": 816928,
+      "generationId": "exec-e276ce45-5f30-4cab-bccb-b03c7ab8acd8"
+    },
+    {
+      "key": "bubble-boat",
+      "file": "assets/illustrations/bubble-boat.png",
+      "pages": [
+        "p06/game"
+      ],
+      "role": "小艇常态帧",
+      "framing": "1:1 透明；右侧喷口",
+      "transparent": true,
+      "prompt": "单独一艘小小杏橙色泡泡艇，面朝画面右方，右端有短而明显的吹泡泡圆筒，奶油色船身边，侧视略俯角，轮廓清晰。角色完整、居中、透明底，四周留至少一成空间，喷口不要向上。",
+      "status": "integrated",
+      "source": "assets/illustrations/source/bubble-boat.png",
+      "sourceSha256": "6309486454d40184cb0a86218dd02b55e8be68ecbcd13f75f0570f0dedf402fa",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "playbackSize": [
+        320,
+        320
+      ],
+      "sha256": "0c8891c6cbd7ef959ad1101c475eadf0400ee08f056ee89b58d4bb9622ab6bab",
+      "bytes": 41208,
+      "generationId": "exec-f867537e-cfbd-44a7-95d9-aa59f4a26387"
+    },
+    {
+      "key": "bubble-boat-pop",
+      "file": "assets/illustrations/bubble-boat-pop.png",
+      "pages": [
+        "p06/game"
+      ],
+      "role": "小艇发泡泡帧",
+      "framing": "1:1 透明；和常态同锚点",
+      "transparent": true,
+      "prompt": "以 bubble-boat 常态图为参考，只在同一朝右喷口前加小圈泡沫和轻微压缩动作。船身颜色、尺度、轮廓和画布中心与常态逐项对齐；透明底，右向喷口完整。",
+      "status": "integrated",
+      "source": "assets/illustrations/source/bubble-boat-pop.png",
+      "sourceSha256": "ef922a45090ed9051c1966dd69d06a75e1fa04c8190282ed3f2bb1760f7e3d59",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "playbackSize": [
+        320,
+        320
+      ],
+      "sha256": "d9586cb5ca20dcf1ae9d8ae5e89caa91b5312e04e448a81dc078a1166a4a4056",
+      "bytes": 41069,
+      "generationId": "exec-8200a3c4-581d-4d7a-997c-4787767d70ec"
+    },
+    {
+      "key": "garden-depot-start",
+      "file": "assets/illustrations/garden-depot-start.png",
+      "pages": [
+        "p08/start"
+      ],
+      "role": "偏旁游戏开始卡",
+      "framing": "16:9 横图；主体集中在中央安全区",
+      "transparent": false,
+      "prompt": "从上往下略带倾斜看小镇仓库的短通道，左侧一个杏橙色小推车正推一张浅色空字卡，右侧两个方形浅绿托盘，各有空白平整正面用于后续加字。两处路径完全可读，只有这张字卡和两个托盘，无字无箭头。",
+      "status": "integrated",
+      "codeOverlays": [
+        {
+          "kind": "target-glyph",
+          "text": "松",
+          "position": "推车前的空字卡中央",
+          "targetAsset": "radical-song",
+          "sourceSha256": "42e44e45ae417c9b2581dc572f61a84b762cd820b226ef56490d43c75cab4dc8",
+          "platePixels": [
+            743,
+            333,
+            963,
+            556
+          ],
+          "inkBoundsPixels": [
+            782.0,
+            374.852,
+            924.0,
+            514.148
+          ]
+        },
+        {
+          "kind": "radical-glyph",
+          "source": "dock-mu",
+          "position": "松卡前方的空托盘中央",
+          "targetAsset": "dock-mu",
+          "sourceSha256": "1f57edfd095d7e184c6271bc56f554ce79f5cc235b8c59604c77725220182cfb",
+          "platePixels": [
+            1034,
+            226,
+            1315,
+            458
+          ],
+          "inkBoundsPixels": [
+            1105.719,
+            263.5,
+            1243.281,
+            420.5
+          ]
+        },
+        {
+          "kind": "radical-glyph",
+          "source": "dock-cao",
+          "position": "旁边另一只空托盘中央",
+          "targetAsset": "dock-cao",
+          "sourceSha256": "f61b77face3ecb5e733c12725e7c2018cfef3bbd88bc4659647f9b8d12ad3a14",
+          "platePixels": [
+            1034,
+            516,
+            1316,
+            755
+          ],
+          "inkBoundsPixels": [
+            1096.5,
+            599.24,
+            1253.5,
+            671.76
+          ]
+        }
+      ],
+      "overlaySource": "assets/illustrations/source/garden-depot-start-lettering.svg",
+      "source": "assets/illustrations/source/garden-depot-start.png",
+      "sourceSha256": "0fec29053350e8f8fdf32b6905887692d05aad96115711267ba76e9b49a88957",
+      "sourceSize": [
+        1672,
+        941
+      ],
+      "playbackSize": [
+        1120,
+        630
+      ],
+      "sha256": "06068e989347adcfd3ea313542d6aa04cda9353b7c1b29a0d6dcbeb5c78866e8",
+      "bytes": 821470,
+      "generationId": "exec-002a7e44-e5f4-4a68-9ee1-2e66be00d92a"
+    },
+    {
+      "key": "depot-backdrop",
+      "file": "assets/illustrations/depot-backdrop.png",
+      "pages": [
+        "p08/game"
+      ],
+      "role": "偏旁游戏场景底图",
+      "framing": "1280×720 横图；中央低对比",
+      "transparent": false,
+      "prompt": "小镇木质仓库静景，边角有几条安静的木纹和空置圆箱，中央是一整块低对比浅地面留给模板格子。不要把托盘、字卡、可操作角色画进背景。",
+      "status": "integrated",
+      "source": "assets/illustrations/source/depot-backdrop.png",
+      "sourceSha256": "450cccbd4e2e5c0c725207609d10e57500aec592e9cecd77c711c0eafae70c86",
+      "sourceSize": [
+        1672,
+        941
+      ],
+      "playbackSize": [
+        1120,
+        630
+      ],
+      "sha256": "49a99d826a679f9b679b0470fc08d0e81c290033dc4a85834f94f3db6a46ea02",
+      "bytes": 765313,
+      "generationId": "exec-390970d8-f373-44b9-bded-0bc38791d572"
+    },
+    {
+      "key": "depot-cart",
+      "file": "assets/illustrations/depot-cart.png",
+      "pages": [
+        "p08/game"
+      ],
+      "role": "小推车常态帧",
+      "framing": "1:1 透明；等距轻俯视",
+      "transparent": true,
+      "prompt": "一辆单独的杏橙色四轮小推车，仓库游戏用俯视略带侧面，上面是短短手把，轮廓在小图中清楚。居中完整，透明底，四周留一成。无字、无装载物。",
+      "status": "integrated",
+      "source": "assets/illustrations/source/depot-cart.png",
+      "sourceSha256": "26a19a5b2f2e0f72c830d997a1e40e75844858346b8237928029ca266bc6ecc4",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "playbackSize": [
+        320,
+        320
+      ],
+      "sha256": "c7e1a3d549b76faeedea3846d75de70d4f22be7be80d6c50ecae17274a6752e0",
+      "bytes": 51353,
+      "generationId": "exec-6ff3b7e8-56fb-49e3-8ff4-65f03e7d2531"
+    },
+    {
+      "key": "depot-cart-push",
+      "file": "assets/illustrations/depot-cart-push.png",
+      "pages": [
+        "p08/game"
+      ],
+      "role": "小推车推动帧",
+      "framing": "1:1 透明；和常态同锚点",
+      "transparent": true,
+      "prompt": "以 depot-cart 为参考，保持俯角、车身位置和大小，车把有一点压下动作，轮旁轻微有尘色。透明底，完整轮廓；不添加字卡或托盘。",
+      "status": "integrated",
+      "source": "assets/illustrations/source/depot-cart-push.png",
+      "sourceSha256": "0976ec84e158d90e3a480907beaaee4fea7bd699225f6f731298314efca3ba25",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "playbackSize": [
+        320,
+        320
+      ],
+      "sha256": "74cb87ee4e3686093e9b795450d1bdbef282d0465f045ed2e4a02d8334437743",
+      "bytes": 49728,
+      "generationId": "exec-5395fdb1-865e-4ab5-ad31-2cf776ace08b"
+    },
+    {
+      "key": "garden-reward",
+      "file": "assets/illustrations/garden-reward.png",
+      "pages": [
+        "p06/game",
+        "p08/game"
+      ],
+      "role": "两款游戏的奖励插画",
+      "framing": "1:1 透明",
+      "transparent": true,
+      "prompt": "单独一枚剪纸书签小徽章，青绿叶子从暖杏色打开的小书中伸出。无字无数字，清楚圆润，透明背景，四周留空间。",
+      "status": "integrated",
+      "source": "assets/illustrations/source/garden-reward.png",
+      "sourceSha256": "fe757ac1c89e9a79c53bdedc23db2298ebf709394eefad44a1b3fe1462c6b626",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "playbackSize": [
+        320,
+        320
+      ],
+      "sha256": "9dad4cfc57bb54f4c3a950295d991a739e262c8b85e63e1d5660c256f1aba2b3",
+      "bytes": 47591,
+      "generationId": "exec-312703ba-3e16-4be8-8a48-bc881ebc6f58"
+    },
+    {
+      "key": "q-library",
+      "file": "assets/illustrations/q-library.png",
+      "pages": [
+        "p17/garden-job-library"
+      ],
+      "role": "职业与场所题 A",
+      "framing": "4:3 横图；主体居中",
+      "transparent": false,
+      "prompt": "一眼能看懂的公共图书馆内部：多排书架满是竖放的书，近处有还书台与一辆空还书小车。不要画工作人员，不要招牌或可读书脊。",
+      "status": "integrated",
+      "source": "assets/illustrations/source/q-library.png",
+      "sourceSha256": "1b0793078f56ed00f706541110bb19f0ab209d09780fa3a59cae6403ebd28311",
+      "sourceSize": [
+        1448,
+        1086
+      ],
+      "playbackSize": [
+        640,
+        480
+      ],
+      "sha256": "5b65d64bd4ad22969e3b47277e7b880f3a7a58edc33f5516c1236b57d2f0c481",
+      "bytes": 178390,
+      "generationId": "exec-2e228ddf-5846-4b04-a42e-5a0728fd3b8b"
+    },
+    {
+      "key": "q-infirmary",
+      "file": "assets/illustrations/q-infirmary.png",
+      "pages": [
+        "p17/garden-job-library"
+      ],
+      "role": "职业与场所题 B",
+      "framing": "4:3 横图；主体居中",
+      "transparent": false,
+      "prompt": "校园医务室，干净检查床、一面布帘和桌边的听诊器，布局尺度与图书馆题图一致。不要书架，不画人物或字。",
+      "status": "integrated",
+      "source": "assets/illustrations/source/q-infirmary.png",
+      "sourceSha256": "d875316709b7c5976b0c93a2f4356e26656659f5f8881bdd08569bcc8de8e0cf",
+      "sourceSize": [
+        1448,
+        1086
+      ],
+      "playbackSize": [
+        640,
+        480
+      ],
+      "sha256": "1d590eb4eb1d2711a91a9c05fe278fadf27bc33637871a44d73e87b27df8343d",
+      "bytes": 196912,
+      "generationId": "exec-988c2c7c-7345-43e9-9762-926e26ffcc13"
+    },
+    {
+      "key": "q-dessert-shop",
+      "file": "assets/illustrations/q-dessert-shop.png",
+      "pages": [
+        "p17/garden-job-library"
+      ],
+      "role": "职业与场所题 C",
+      "framing": "4:3 横图；主体居中",
+      "transparent": false,
+      "prompt": "明亮的甜点小店内，一排透亮玻璃柜中放有几款蛋糕和小点心，旁边是点单柜台。不要人物、书架、招牌或字。",
+      "status": "integrated",
+      "source": "assets/illustrations/source/q-dessert-shop.png",
+      "sourceSha256": "38ddf2edbf6f1bcb36724693007bcdae95cae76af5e996cbe7dbb2eb0314dd6f",
+      "sourceSize": [
+        1448,
+        1086
+      ],
+      "playbackSize": [
+        640,
+        480
+      ],
+      "sha256": "44d302598704ec18f8b486542787c4f8988cebedf92f1345a6ea7c0a5b73a2b9",
+      "bytes": 185360,
+      "generationId": "exec-a63d1aa0-d1c6-4d3f-9c16-9b5f4b695a32"
+    },
+    {
+      "key": "q-bridge-closing",
+      "file": "assets/illustrations/q-bridge-closing.png",
+      "pages": [
+        "p17/garden-picture-sentence"
+      ],
+      "role": "听完整话题 A",
+      "framing": "4:3 横图；桥边动作手部可读",
+      "transparent": false,
+      "prompt": "雨后拱形小桥边，只有一个穿芥末黄雨衣的孩子。孩子两只手把已降下伞骨的伞向内收拢，伞尖朝下，布面呈明显收成窄束的状态。桥栏清楚，无第二个人。",
+      "status": "integrated",
+      "source": "assets/illustrations/source/q-bridge-closing.png",
+      "sourceSha256": "730cfb90aaf7f4a122a4d69a5e21ae8023a3214183bae6b9827cfac958ba94f0",
+      "sourceSize": [
+        1448,
+        1086
+      ],
+      "playbackSize": [
+        640,
+        480
+      ],
+      "sha256": "4f538278229d1e6337aba2ea395f5c977ce2746ef5c9ed4de7ce40ba59dbfe79",
+      "bytes": 195902,
+      "generationId": "exec-f175139f-fad4-4acf-b39c-99b2aec00b73"
+    },
+    {
+      "key": "q-bridge-opening",
+      "file": "assets/illustrations/q-bridge-opening.png",
+      "pages": [
+        "p17/garden-picture-sentence"
+      ],
+      "role": "听完整话题 B",
+      "framing": "4:3 横图；与题 A 同机位",
+      "transparent": false,
+      "prompt": "以 q-bridge-closing 的桥、人物和相机角度为参考。同一个穿芥末黄雨衣的孩子仍在桥边，正撑着一把已经完全打开的伞举过头顶。没有第二个人，打开的伞篷和收伞图明确不同。",
+      "status": "integrated",
+      "source": "assets/illustrations/source/q-bridge-opening.png",
+      "sourceSha256": "c47570ef31df965848e0e79ea360aff54462359ec91d77b07abcfd998108a2da",
+      "sourceSize": [
+        1448,
+        1086
+      ],
+      "playbackSize": [
+        640,
+        480
+      ],
+      "sha256": "0d5ba297b6b0110ef4fd501e83980d51855b66c98202878b219e1aba23e9ddf2",
+      "bytes": 176322,
+      "generationId": "exec-a343cc75-69f4-457c-a261-e764ec66c9e4"
+    },
+    {
+      "key": "q-bridge-pair",
+      "file": "assets/illustrations/q-bridge-pair.png",
+      "pages": [
+        "p17/garden-picture-sentence"
+      ],
+      "role": "听完整话题 C",
+      "framing": "4:3 横图；同 B 原图机位叠加单个青衣孩子",
+      "transparent": false,
+      "prompt": "以 q-bridge-closing 同一座桥和机位为参考。此图桥边恰好两个孩子，一黄衣一青衣；两人各手持一把伞，彼此可分开数清。四周没有其他人物。",
+      "status": "integrated",
+      "compositionSource": "assets/illustrations/source/q-bridge-pair-composition.json",
+      "compositionSourceSha256": "d618a59ee4c20577fb257b6476d0f6abd772be00c5c4aa20b5117650ac6ab98b",
+      "source": "assets/illustrations/source/q-bridge-pair-foreground.png",
+      "sourceSha256": "cda5c090fd96cd824779d13d8cd138be40bcfcdbec1c9c0c48829e5300fff269",
+      "sourceSize": [
+        1086,
+        1448
+      ],
+      "playbackSize": [
+        640,
+        480
+      ],
+      "sha256": "b7c6528ec6c21b93dee01a05295ba7a092cd3b5d77b055ccd95bbf936d3c3835",
+      "bytes": 171177,
+      "generationId": "exec-d544d1e0-59dd-46d1-b47b-ceb5e5c151d3"
+    },
+    {
+      "key": "q-curved-banana",
+      "file": "assets/illustrations/q-curved-banana.png",
+      "pages": [
+        "p17/garden-moon-shape"
+      ],
+      "role": "月亮形状题 A",
+      "framing": "4:3 横图；与其余两图同尺度",
+      "transparent": false,
+      "prompt": "暖奶油底中央只有一根轮廓清楚的弯香蕉，果柄完整，弧形明显。无盘子、无文字、无月亮。",
+      "status": "integrated",
+      "source": "assets/illustrations/source/q-curved-banana.png",
+      "sourceSha256": "850278f29ce3865067abd207bc333c67392074056b1f8dde880e4ac682bbd287",
+      "sourceSize": [
+        1448,
+        1086
+      ],
+      "generationId": "exec-0a685323-0d15-4a83-9a55-b85b97d34b3f",
+      "playbackSize": [
+        640,
+        480
+      ],
+      "sha256": "df6bc8e35f4deb5f5d6d12e73421028c6bcdb1d58c290e8aa831bd21388c40af",
+      "bytes": 242037
+    },
+    {
+      "key": "q-round-cookie",
+      "file": "assets/illustrations/q-round-cookie.png",
+      "pages": [
+        "p17/garden-moon-shape"
+      ],
+      "role": "月亮形状题 B",
+      "framing": "4:3 横图；正俯视圆形",
+      "transparent": false,
+      "prompt": "暖奶油底中央只有一块普通圆饼，从正上方看，外缘为清楚的圆，颜色浅金。不要盘子、其他食物、文字或月亮。",
+      "status": "integrated",
+      "source": "assets/illustrations/source/q-round-cookie.png",
+      "sourceSha256": "f2e95770e0a8da21ca6214d46bda2714ca8cf881e9ad5e29174a5da32c760c2c",
+      "sourceSize": [
+        1448,
+        1086
+      ],
+      "generationId": "exec-5c6840a8-9be6-4e8f-8005-c54db1d95faf",
+      "playbackSize": [
+        640,
+        480
+      ],
+      "sha256": "0e92fcb4e8cf60e3b52fe388b9e799de207506e5b02c822036ab0eb1ee608217",
+      "bytes": 249306
+    },
+    {
+      "key": "q-square-towel",
+      "file": "assets/illustrations/q-square-towel.png",
+      "pages": [
+        "p17/garden-moon-shape"
+      ],
+      "role": "月亮形状题 C",
+      "framing": "4:3 横图；正俯视方形",
+      "transparent": false,
+      "prompt": "暖奶油底中央只有一块平铺的浅青色方毛巾，从正上方看，四条边和四个角清楚。不要折叠、弧形阴影、花纹文字或其他东西。",
+      "status": "integrated",
+      "source": "assets/illustrations/source/q-square-towel.png",
+      "sourceSha256": "9616d18bc6640a0ce9c5033f774c1ede779f972c2d868d61e3f89698adcbc745",
+      "sourceSize": [
+        1448,
+        1086
+      ],
+      "generationId": "exec-63b615b6-28e9-48c1-b2c0-f0b4c42fead1",
+      "playbackSize": [
+        640,
+        480
+      ],
+      "sha256": "0b9921ddd9213ef84f2ea8514ed321e118fa805418b03a1463f465083e587d4e",
+      "bytes": 266545
+    },
+    {
+      "key": "q-peanut-soil",
+      "file": "assets/illustrations/q-peanut-soil.png",
+      "pages": [
+        "p17/garden-peanut-clue"
+      ],
+      "role": "花生果实线索题 A",
+      "framing": "4:3 横图；菜园剖面",
+      "transparent": false,
+      "prompt": "家庭小菜园收获时看到的花生植株剖面，取与教学图不同的近景角度。地面下土里露出仍连接果针的花生荚果；地面上有叶片。荚果呈带壳花生形态，土线和连接关系清晰，不加箭头或文字。",
+      "status": "integrated",
+      "source": "assets/illustrations/source/q-peanut-soil.png",
+      "sourceSha256": "819ad8221d019c8cfa4e19b54ace743e0de530fe4b65a95472a3db58f8ca8d7b",
+      "sourceSize": [
+        1448,
+        1086
+      ],
+      "playbackSize": [
+        512,
+        384
+      ],
+      "sha256": "53742aa383f5eb1fd3fa870e1e87a40d214b728c5dfb47e10529f45825b3181f",
+      "bytes": 152881,
+      "generationId": "exec-e41923bf-f801-432a-8f1e-5115ae6aa5aa"
+    },
+    {
+      "key": "q-peanut-bowl",
+      "file": "assets/illustrations/q-peanut-bowl.png",
+      "pages": [
+        "p17/garden-peanut-clue"
+      ],
+      "role": "花生果实线索题 B",
+      "framing": "4:3 横图；菜园工作台",
+      "transparent": false,
+      "prompt": "菜园旁的木工作台上有一只暖白碗，碗里几颗已采下的带壳花生。只有碗、荚果和简洁桌面，不出现植株、土层或从哪里采下的线索。",
+      "status": "integrated",
+      "source": "assets/illustrations/source/q-peanut-bowl.png",
+      "sourceSha256": "a3b342d8b8abdfa5a02d4f1dab8c613e9114c83f9932e09802469f5fde9926d8",
+      "sourceSize": [
+        1448,
+        1086
+      ],
+      "playbackSize": [
+        512,
+        384
+      ],
+      "sha256": "35ddd7943c2ecdc79b702a23f578176df2d5007c4133b56e3b74e8e3c0faabea",
+      "bytes": 138951,
+      "generationId": "exec-ee91b1f5-f318-401e-9c4d-e0b77fc9aabf"
+    },
+    {
+      "key": "q-peanut-flower",
+      "file": "assets/illustrations/q-peanut-flower.png",
+      "pages": [
+        "p17/garden-peanut-clue"
+      ],
+      "role": "花生果实线索题 C",
+      "framing": "4:3 横图；菜园花朵近景",
+      "transparent": false,
+      "prompt": "家庭菜园同种花生植株的地上近景，小黄色花在绿叶间，镜头只拍地面上方。不要露地下、果实或碗，不加箭头或文字。",
+      "status": "integrated",
+      "source": "assets/illustrations/source/q-peanut-flower.png",
+      "sourceSha256": "0e9565edbe01a69ee32e026cd90c06c3f226785588a6ed8caf158d771792c808",
+      "sourceSize": [
+        1448,
+        1086
+      ],
+      "playbackSize": [
+        512,
+        384
+      ],
+      "sha256": "2f14327942160f208df6f04fe7132c789c99afb99578b095f5b9edb3d8cea015",
+      "bytes": 129550,
+      "generationId": "exec-5ac23b92-3d03-476a-9dd8-91d0d9a4467d"
+    }
+  ],
+  "codeVisuals": [
+    {
+      "key": "grid-gong",
+      "file": "assets/code/grid-gong.png",
+      "pages": [
+        "p03"
+      ],
+      "role": "工逐笔田字格",
+      "size": [
+        840,
+        400
+      ],
+      "basis": "印刷80；第一课时课件28–30",
+      "spec": "横、竖、横；三帧各突出新增一笔，末横比首横稍长。",
+      "status": "rendered",
+      "source": "assets/code/source/grid-gong.svg",
+      "sourceSha256": "54073306b25500ec1f9082df13b9ac9bd8509099fa0d8e363e02a763fced7fa8",
+      "sha256": "a0a0aea6f1b1910c3c334bec42ec3f00a37e1e0917c550e31a238e38759eb065",
+      "bytes": 9725
+    },
+    {
+      "key": "grid-chang",
+      "file": "assets/code/grid-chang.png",
+      "pages": [
+        "p03"
+      ],
+      "role": "厂逐笔田字格",
+      "size": [
+        840,
+        400
+      ],
+      "basis": "印刷80；第一课时课件28、31–32",
+      "spec": "横、撇；两帧分别突出横和向左下的竖撇。",
+      "status": "rendered",
+      "source": "assets/code/source/grid-chang.svg",
+      "sourceSha256": "4443fc7acac1cc51b65c91b6697d6c32887d84ef5005b039030b3c9d87c655bf",
+      "sha256": "bc7a5ce18e42a04bf43d584c98f4422ae982660b2e610194b600266a326c2909",
+      "bytes": 9755
+    },
+    {
+      "key": "grid-men",
+      "file": "assets/code/grid-men.png",
+      "pages": [
+        "p04"
+      ],
+      "role": "门逐笔田字格",
+      "size": [
+        840,
+        400
+      ],
+      "basis": "印刷80；第一课时课件28、33–34",
+      "spec": "点、竖、横折钩；三帧新增笔准确可见。",
+      "status": "rendered",
+      "source": "assets/code/source/grid-men.svg",
+      "sourceSha256": "3a9111b5ad724282c6f20986d2648ac4215c4f685fd2515b35eed565b434661e",
+      "sha256": "64eab27b6750e8e75bad5ed493a18f816365f7347f4a5a6a4f898f790ae3ac4a",
+      "bytes": 11861
+    },
+    {
+      "key": "grid-wei",
+      "file": "assets/code/grid-wei.png",
+      "pages": [
+        "p04"
+      ],
+      "role": "卫逐笔田字格",
+      "size": [
+        840,
+        400
+      ],
+      "basis": "印刷80；第一课时课件28、35–36",
+      "spec": "横折钩、竖、横；三帧新增笔准确可见。",
+      "status": "rendered",
+      "source": "assets/code/source/grid-wei.svg",
+      "sourceSha256": "46ab68341745636f8fc34e480504e996396958f0b0f2a533b47eaf0411ec854c",
+      "sha256": "b143e321da84750db0c747da33b6cc2dc7cefd5ac9918519199e0f94263bf773",
+      "bytes": 12416
+    },
+    {
+      "key": "grid-yun",
+      "file": "assets/code/grid-yun.png",
+      "pages": [
+        "p11"
+      ],
+      "role": "云的上下次序",
+      "size": [
+        840,
+        400
+      ],
+      "basis": "印刷82；第二课时课件21–25",
+      "spec": "第一格只亮上部两横，第二格亮下部撇折和点；最终完整范字与教材同形。",
+      "status": "rendered",
+      "source": "assets/code/source/grid-yun.svg",
+      "sourceSha256": "507b1ba394b8a643639d790b5eaacedc2c114aa893d02624a95f81f54b289a4e",
+      "sha256": "ce7e5ea6432467088ebaade21e160a0f4cc00525d96f200e726deb4c43b58613",
+      "bytes": 12408
+    },
+    {
+      "key": "grid-nan",
+      "file": "assets/code/grid-nan.png",
+      "pages": [
+        "p11"
+      ],
+      "role": "男的上下次序",
+      "size": [
+        840,
+        400
+      ],
+      "basis": "印刷82；第二课时课件21–25",
+      "spec": "第一格只亮上部田，第二格亮下部力；部件中心按田字格定位。",
+      "status": "rendered",
+      "source": "assets/code/source/grid-nan.svg",
+      "sourceSha256": "3924215c82be91dd778d7ad94dae4e3bd9637f233c5afa0de87a82c1812428b8",
+      "sha256": "b4589dea4581cbee7d0b9ce246eb62b8b9baffd5ca810979fbdbe8238db88d50",
+      "bytes": 14140
+    },
+    {
+      "key": "grid-ye",
+      "file": "assets/code/grid-ye.png",
+      "pages": [
+        "p12"
+      ],
+      "role": "叶的左右次序",
+      "size": [
+        840,
+        400
+      ],
+      "basis": "印刷82；第二课时课件21–25",
+      "spec": "第一格只亮左口，第二格亮右十；口在左略小。",
+      "status": "rendered",
+      "source": "assets/code/source/grid-ye.svg",
+      "sourceSha256": "7f3449dac06431372ea08fbe0f60c4a3d3045b10ee2790901f28602c2c1b3365",
+      "sha256": "070009de24e6f8c225b952e41c455f1f0e0cb8a97187f0e61d272104da502e96",
+      "bytes": 10788
+    },
+    {
+      "key": "grid-zhu",
+      "file": "assets/code/grid-zhu.png",
+      "pages": [
+        "p12"
+      ],
+      "role": "竹的左右次序",
+      "size": [
+        840,
+        400
+      ],
+      "basis": "印刷82；第二课时课件21–25",
+      "spec": "第一格只亮左半三笔，第二格亮右半三笔，显示左竖和右竖钩的不同。",
+      "status": "rendered",
+      "source": "assets/code/source/grid-zhu.svg",
+      "sourceSha256": "63fadd3cf604827e39d4ed4bf0e41c4d84d62d8c0b472adc8b692febf7181227",
+      "sha256": "8efd47752b2c0ccf6e3b3b53c707cffd6964bdf7b31828aaab87c0ad5af39151",
+      "bytes": 14172
+    },
+    {
+      "key": "phonics-comparison",
+      "file": "assets/code/phonics-comparison.png",
+      "pages": [
+        "p05"
+      ],
+      "role": "声母三组对照",
+      "size": [
+        840,
+        400
+      ],
+      "basis": "印刷80；第一课时课件42–44",
+      "spec": "按教学顺序列三组大号目标字形 n/l、s/sh、z/zh。每组独立卡，保持小写和单字符间距，图旁不排提示段落。",
+      "status": "rendered",
+      "source": "assets/code/source/phonics-comparison.svg",
+      "sourceSha256": "fbf1218b7221be0f3f6f4da7ebb514efbc8fdb033b2bc8f1fb67ac0100d7376d",
+      "sha256": "df681e79d7b1611491a8de8061849d2ee6409b457024a943a576cd5d95ee5d6b",
+      "bytes": 17364
+    },
+    {
+      "key": "radical-comparison",
+      "file": "assets/code/radical-comparison.png",
+      "pages": [
+        "p07"
+      ],
+      "role": "部件位置对照",
+      "size": [
+        840,
+        400
+      ],
+      "basis": "印刷81；第一课时课件45–50",
+      "spec": "上组树林桃桥以暖橙标出左侧木部件，下组花草莲菜以暖橙标出草字头；字形其余部分深松绿。印刷体字形不能变形。",
+      "status": "rendered",
+      "source": "assets/code/source/radical-comparison.svg",
+      "sourceSha256": "a85acf08d42a615a6013b03c5f2b6f356cfb0ff00be69d750e1108139eb2c0ef",
+      "sha256": "0d1b8dc19e08b4d896d1bbbbbc2f6206180f3d6b390c0dc52a679b9484ec4e08",
+      "bytes": 51663
+    },
+    {
+      "key": "dock-mu",
+      "file": "assets/code/dock-mu.png",
+      "pages": [
+        "p08/game"
+      ],
+      "role": "托盘木字旁图形",
+      "size": [
+        240,
+        240
+      ],
+      "basis": "印刷81；第一课时课件45–47",
+      "spec": "画出木作左偏旁的常见形式，末笔点；和草字头牌同用 240×240 透明底，墨迹最长边占约 88%，其余等比缩放。",
+      "status": "rendered",
+      "source": "assets/code/source/dock-mu.svg",
+      "sourceSha256": "1f57edfd095d7e184c6271bc56f554ce79f5cc235b8c59604c77725220182cfb",
+      "sha256": "411b400679a1674694c7140cee8111d47a04a782c940868e82f93076f6f66d83",
+      "bytes": 4528
+    },
+    {
+      "key": "q-tip-lower",
+      "file": "assets/code/q-tip-lower.png",
+      "pages": [
+        "p17/garden-write-tip"
+      ],
+      "role": "尖字次序图 A",
+      "size": [
+        480,
+        240
+      ],
+      "basis": "第二课时教案1；规则变式",
+      "spec": "同一范字上部小为浅灰，下部大为暖橙；无数字和箭头。",
+      "status": "rendered",
+      "source": "assets/code/source/q-tip-lower.svg",
+      "sourceSha256": "a820d475a159e7f32680f80dfa0bf3e34246a0de53fdbc7afde062bce7c3f4f7",
+      "sha256": "022b7b5771f4349cb014d721ad1ab9ac3c387b8ef3b7b7a11fad55c525730875",
+      "bytes": 8377
+    },
+    {
+      "key": "q-tip-complete",
+      "file": "assets/code/q-tip-complete.png",
+      "pages": [
+        "p17/garden-write-tip"
+      ],
+      "role": "尖字次序图 B",
+      "size": [
+        480,
+        240
+      ],
+      "basis": "第二课时教案1；规则变式",
+      "spec": "与其他选项同一范字，上下两部件同时为暖橙；无数字和箭头。",
+      "status": "rendered",
+      "source": "assets/code/source/q-tip-complete.svg",
+      "sourceSha256": "df44cc45c6a17c04eff85b950facc2c22b9f0318077a0fb77c442b59fc6c51bf",
+      "sha256": "b761bbf2b9bfdf9a5b25637fc3f2ab3271d0e790c9658d8d6d3af093e65463a4",
+      "bytes": 8524
+    },
+    {
+      "key": "q-tip-upper",
+      "file": "assets/code/q-tip-upper.png",
+      "pages": [
+        "p17/garden-write-tip"
+      ],
+      "role": "尖字次序图 C",
+      "size": [
+        480,
+        240
+      ],
+      "basis": "第二课时教案1；规则变式",
+      "spec": "同一范字上部小为暖橙，下部大为浅灰；无数字和箭头。",
+      "status": "rendered",
+      "source": "assets/code/source/q-tip-upper.svg",
+      "sourceSha256": "5fad9d0ead4f936eabf8db47bb020e8961b18b153f9c599fdeb1c59612bacf7e",
+      "sha256": "a55802b977a76b6d809bfb8015f61f329301b32fa6092e5c181a503c6512be30",
+      "bytes": 8324
+    },
+    {
+      "key": "radical-song",
+      "file": "assets/code/radical-song.png",
+      "pages": [
+        "p08/game"
+      ],
+      "role": "偏旁游戏目标字形 松",
+      "size": [
+        240,
+        240
+      ],
+      "basis": "第一课时教案2、课件45–50；字形位置的原创练习",
+      "spec": "规范字形「松」，深松绿单色，透明底。以墨迹外框居中；最长边占画布约 88%，其余按字形等比缩放。避免模板卡框内重复留白。",
+      "status": "rendered",
+      "source": "assets/code/source/radical-song.svg",
+      "sourceSha256": "42e44e45ae417c9b2581dc572f61a84b762cd820b226ef56490d43c75cab4dc8",
+      "sha256": "a6821d611b888b3bd170dc338079fa00f27186b4ad29d2a9594dcded5b76d8e9",
+      "bytes": 11050
+    },
+    {
+      "key": "radical-miao",
+      "file": "assets/code/radical-miao.png",
+      "pages": [
+        "p08/game"
+      ],
+      "role": "偏旁游戏目标字形 苗",
+      "size": [
+        240,
+        240
+      ],
+      "basis": "第一课时教案2、课件45–50；字形位置的原创练习",
+      "spec": "规范字形「苗」，深松绿单色，透明底。以墨迹外框居中；最长边占画布约 88%，其余按字形等比缩放。避免模板卡框内重复留白。",
+      "status": "rendered",
+      "source": "assets/code/source/radical-miao.svg",
+      "sourceSha256": "3637abbed5fa7c054b8043f16c840e438e6c69b60e2cc44c187a2453c991fbcf",
+      "sha256": "7a3b881c6727f8cf11f1a21ae296b5e91a04604cf3e04ed6dd201889cbd12694",
+      "bytes": 3016
+    },
+    {
+      "key": "radical-zhi",
+      "file": "assets/code/radical-zhi.png",
+      "pages": [
+        "p08/game"
+      ],
+      "role": "偏旁游戏目标字形 枝",
+      "size": [
+        240,
+        240
+      ],
+      "basis": "第一课时教案2、课件45–50；字形位置的原创练习",
+      "spec": "规范字形「枝」，深松绿单色，透明底。以墨迹外框居中；最长边占画布约 88%，其余按字形等比缩放。避免模板卡框内重复留白。",
+      "status": "rendered",
+      "source": "assets/code/source/radical-zhi.svg",
+      "sourceSha256": "81039c78d5f0315bb4b666ed4e4d8ef2d0e6c7292e4b04d028209296ff47dc41",
+      "sha256": "d7ac592938d1838d94135df06cd6dd3a90b9059b867d891f92b77ac16252e1f1",
+      "bytes": 8921
+    },
+    {
+      "key": "radical-fen",
+      "file": "assets/code/radical-fen.png",
+      "pages": [
+        "p08/game"
+      ],
+      "role": "偏旁游戏目标字形 芬",
+      "size": [
+        240,
+        240
+      ],
+      "basis": "第一课时教案2、课件45–50；字形位置的原创练习",
+      "spec": "规范字形「芬」，深松绿单色，透明底。以墨迹外框居中；最长边占画布约 88%，其余按字形等比缩放。避免模板卡框内重复留白。",
+      "status": "rendered",
+      "source": "assets/code/source/radical-fen.svg",
+      "sourceSha256": "6d2ddee73c22369f759cdde2df583a51e00af14ced7856fc2479915fef058948",
+      "sha256": "f329ecd29580a12ae393640ee738afd57916fac30b796a3f27928c48edb3be09",
+      "bytes": 8493
+    },
+    {
+      "key": "radical-jing",
+      "file": "assets/code/radical-jing.png",
+      "pages": [
+        "p08/game"
+      ],
+      "role": "偏旁游戏目标字形 茎",
+      "size": [
+        240,
+        240
+      ],
+      "basis": "第一课时教案2、课件45–50；字形位置的原创练习",
+      "spec": "规范字形「茎」，深松绿单色，透明底。以墨迹外框居中；最长边占画布约 88%，其余按字形等比缩放。避免模板卡框内重复留白。",
+      "status": "rendered",
+      "source": "assets/code/source/radical-jing.svg",
+      "sourceSha256": "af422541e95003cb43835e1965b31b6eea38edc0851926f7d45578339930def8",
+      "sha256": "d58546ed392c9beb36b41e3243f8908566026a70381649528a3407fc26d7f098",
+      "bytes": 5756
+    },
+    {
+      "key": "radical-bai",
+      "file": "assets/code/radical-bai.png",
+      "pages": [
+        "p08/game"
+      ],
+      "role": "偏旁游戏目标字形 柏",
+      "size": [
+        240,
+        240
+      ],
+      "basis": "第一课时教案2、课件45–50；字形位置的原创练习",
+      "spec": "规范字形「柏」，深松绿单色，透明底。以墨迹外框居中；最长边占画布约 88%，其余按字形等比缩放。避免模板卡框内重复留白。",
+      "status": "rendered",
+      "source": "assets/code/source/radical-bai.svg",
+      "sourceSha256": "85e35509874e6b6f3d35fe6bd742376da2e0010f1c550682f3f2f3aa34268015",
+      "sha256": "c1a0830ca236aa71e14cae078bb8ea3a9eb395891d3526206a3c7952a459d62e",
+      "bytes": 5483
+    },
+    {
+      "key": "radical-feng",
+      "file": "assets/code/radical-feng.png",
+      "pages": [
+        "p08/game"
+      ],
+      "role": "偏旁游戏目标字形 枫",
+      "size": [
+        240,
+        240
+      ],
+      "basis": "第一课时教案2、课件45–50；字形位置的原创练习",
+      "spec": "规范字形「枫」，深松绿单色，透明底。以墨迹外框居中；最长边占画布约 88%，其余按字形等比缩放。避免模板卡框内重复留白。",
+      "status": "rendered",
+      "source": "assets/code/source/radical-feng.svg",
+      "sourceSha256": "281a29cb1d3d976f1ab9c4d98be6a1a6fe820a78c93c5f4b670a889e2d3810a4",
+      "sha256": "df1afec80c8275ba85488cd1d6b9aeae9da1dcbdc5c7897c24bc7f341282d98e",
+      "bytes": 10837
+    },
+    {
+      "key": "radical-yin",
+      "file": "assets/code/radical-yin.png",
+      "pages": [
+        "p08/game"
+      ],
+      "role": "偏旁游戏目标字形 荫",
+      "size": [
+        240,
+        240
+      ],
+      "basis": "第一课时教案2、课件45–50；字形位置的原创练习",
+      "spec": "规范字形「荫」，深松绿单色，透明底。以墨迹外框居中；最长边占画布约 88%，其余按字形等比缩放。避免模板卡框内重复留白。",
+      "status": "rendered",
+      "source": "assets/code/source/radical-yin.svg",
+      "sourceSha256": "e45b7c4b8b3ea5ec315248f333730102a2ae8dbea5f95cd41a4827e285beebaf",
+      "sha256": "d5e809c9f2740ca20836e33d0850a0e396ee50596c6dc87e8f6688b9002dec0d",
+      "bytes": 7350
+    },
+    {
+      "key": "radical-mo",
+      "file": "assets/code/radical-mo.png",
+      "pages": [
+        "p08/game"
+      ],
+      "role": "偏旁游戏目标字形 茉",
+      "size": [
+        240,
+        240
+      ],
+      "basis": "第一课时教案2、课件45–50；字形位置的原创练习",
+      "spec": "规范字形「茉」，深松绿单色，透明底。以墨迹外框居中；最长边占画布约 88%，其余按字形等比缩放。避免模板卡框内重复留白。",
+      "status": "rendered",
+      "source": "assets/code/source/radical-mo.svg",
+      "sourceSha256": "a76f3c11b15d4d18bccdbfb0c830d35576726baa3f4520a64cf256b3aeaa6cf3",
+      "sha256": "2b35c70d4908a0ad58c29f2cc13eb3de4f9f50ed3bb8320dc1aa968c3794bbec",
+      "bytes": 6696
+    },
+    {
+      "key": "dock-cao",
+      "file": "assets/code/dock-cao.png",
+      "pages": [
+        "p08/game"
+      ],
+      "role": "偏旁游戏目标字形 艹",
+      "size": [
+        240,
+        240
+      ],
+      "basis": "第一课时教案2、课件45–50；字形位置的原创练习",
+      "spec": "规范字形「艹」，深松绿单色，透明底。以墨迹外框居中；最长边占画布约 88%，其余按字形等比缩放。避免模板卡框内重复留白。",
+      "status": "rendered",
+      "source": "assets/code/source/dock-cao.svg",
+      "sourceSha256": "f61b77face3ecb5e733c12725e7c2018cfef3bbd88bc4659647f9b8d12ad3a14",
+      "sha256": "d21167faae7c469c1074c2fdf4111a5eeed53876f5f7bfe7b5b68005f0e559c6",
+      "bytes": 2688
+    }
+  ],
+  "builtInGlyphVisuals": [
+    {
+      "key": "initial-n",
+      "pages": [
+        "p06/game"
+      ],
+      "renderer": "courseware/tools/glyph_picture.py",
+      "spec": {
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "n"
+              }
+            ]
+          }
+        ],
+        "size": [
+          240,
+          240
+        ]
+      }
+    },
+    {
+      "key": "initial-l",
+      "pages": [
+        "p06/game"
+      ],
+      "renderer": "courseware/tools/glyph_picture.py",
+      "spec": {
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "l"
+              }
+            ]
+          }
+        ],
+        "size": [
+          240,
+          240
+        ]
+      }
+    },
+    {
+      "key": "initial-sh",
+      "pages": [
+        "p06/game",
+        "p17/garden-hear-comb"
+      ],
+      "renderer": "courseware/tools/glyph_picture.py",
+      "spec": {
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "sh"
+              }
+            ]
+          }
+        ],
+        "size": [
+          240,
+          240
+        ]
+      }
+    },
+    {
+      "key": "initial-s",
+      "pages": [
+        "p06/game",
+        "p17/garden-hear-comb"
+      ],
+      "renderer": "courseware/tools/glyph_picture.py",
+      "spec": {
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "s"
+              }
+            ]
+          }
+        ],
+        "size": [
+          240,
+          240
+        ]
+      }
+    },
+    {
+      "key": "initial-z",
+      "pages": [
+        "p06/game"
+      ],
+      "renderer": "courseware/tools/glyph_picture.py",
+      "spec": {
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "z"
+              }
+            ]
+          }
+        ],
+        "size": [
+          240,
+          240
+        ]
+      }
+    },
+    {
+      "key": "initial-zh",
+      "pages": [
+        "p06/game",
+        "p17/garden-hear-comb"
+      ],
+      "renderer": "courseware/tools/glyph_picture.py",
+      "spec": {
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "zh"
+              }
+            ]
+          }
+        ],
+        "size": [
+          240,
+          240
+        ]
+      }
+    },
+    {
+      "key": "q-glyph-sugar",
+      "pages": [
+        "p17/garden-radical-cotton"
+      ],
+      "renderer": "courseware/tools/glyph_picture.py",
+      "spec": {
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "糖"
+              }
+            ]
+          }
+        ],
+        "size": [
+          480,
+          240
+        ]
+      }
+    },
+    {
+      "key": "q-glyph-cotton",
+      "pages": [
+        "p17/garden-radical-cotton"
+      ],
+      "renderer": "courseware/tools/glyph_picture.py",
+      "spec": {
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "棉"
+              }
+            ]
+          }
+        ],
+        "size": [
+          480,
+          240
+        ]
+      }
+    },
+    {
+      "key": "q-glyph-scallion",
+      "pages": [
+        "p17/garden-radical-cotton"
+      ],
+      "renderer": "courseware/tools/glyph_picture.py",
+      "spec": {
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "葱"
+              }
+            ]
+          }
+        ],
+        "size": [
+          480,
+          240
+        ]
+      }
+    }
+  ],
+  "playbackIntegration": {
+    "maximumInteractivePageImageBytes": 3000000,
+    "firstFrames": "同一游戏的普通帧和动作帧用相同画布、位置和边缘，裁切留出运动余量。",
+    "overlayRule": "先验收无字底图；再在精确画面位置由代码加招牌、开始卡和字形。保留未合成原图以及最终 PNG 的各自哈希。",
+    "sourceEvidence": "每张入课图片保留实际提示词、生成回执或可复现的绘制依据、源哈希、播放 PNG 哈希和引用页面。所有标记 pending 的图片尚无正式媒体回执。",
+    "checks": [
+      "低阅读遮字检查",
+      "字形与笔画核对",
+      "题目干扰项可辨",
+      "互动开始、示范、答对和答错截图",
+      "按实际小屏位置验收"
+    ]
+  },
+  "sceneImageBudgets": {
+    "p06": {
+      "imageBytes": {
+        "bubble-backdrop": 816928,
+        "bubble-boat": 41208,
+        "bubble-boat-pop": 41069,
+        "garden-bubble-start": 778953,
+        "garden-reward": 47591,
+        "initial-l": 804,
+        "initial-n": 1813,
+        "initial-s": 3200,
+        "initial-sh": 4094,
+        "initial-z": 2231,
+        "initial-zh": 3060
+      },
+      "totalPlaybackImageBytes": 1740951,
+      "targetMaximumBytes": 3000000,
+      "remainingBytesAtTarget": 1259049,
+      "remainingImageKeys": [],
+      "builtInGlyphs": {
+        "initial-n": {
+          "bytes": 1813,
+          "sha256": "54426be79ac3a04c97ff7e7b7f57e9b567808e7580ad85a0f11d207f21b48942"
+        },
+        "initial-l": {
+          "bytes": 804,
+          "sha256": "6e79e33d2b446196c685716ce05ab28a447bf9bbfc8ce76d1faffeeec0314e19"
+        },
+        "initial-sh": {
+          "bytes": 4094,
+          "sha256": "f31214528f4c5b5d3d726583ac32da6521e2b84ba789b40cc25f38e154c59711"
+        },
+        "initial-s": {
+          "bytes": 3200,
+          "sha256": "c54cae957606aa3f69d2429828ef58115111b2916737bd04fcd7ced0b5a6524f"
+        },
+        "initial-z": {
+          "bytes": 2231,
+          "sha256": "2117db015e6c583f8d71abda36aca0847e4bb229c7c370934fec1b765980ddcc"
+        },
+        "initial-zh": {
+          "bytes": 3060,
+          "sha256": "1bac731d8f174a46aa17bd12902ccd5cec130b7a9644edf16a72c6be21fbf981"
+        }
+      }
+    },
+    "p08": {
+      "imageBytes": {
+        "depot-backdrop": 765313,
+        "depot-cart": 51353,
+        "depot-cart-push": 49728,
+        "dock-cao": 2688,
+        "dock-mu": 4528,
+        "garden-depot-start": 821470,
+        "garden-reward": 47591,
+        "radical-bai": 5483,
+        "radical-fen": 8493,
+        "radical-feng": 10837,
+        "radical-jing": 5756,
+        "radical-miao": 3016,
+        "radical-mo": 6696,
+        "radical-song": 11050,
+        "radical-yin": 7350,
+        "radical-zhi": 8921
+      },
+      "totalPlaybackImageBytes": 1810273,
+      "targetMaximumBytes": 3000000,
+      "remainingBytesAtTarget": 1189727,
+      "remainingImageKeys": []
+    },
+    "p17": {
+      "imageBytes": {
+        "initial-s": 3202,
+        "initial-sh": 4093,
+        "initial-zh": 3067,
+        "q-bridge-closing": 195902,
+        "q-bridge-opening": 176322,
+        "q-bridge-pair": 171177,
+        "q-curved-banana": 242037,
+        "q-dessert-shop": 185360,
+        "q-glyph-cotton": 3341,
+        "q-glyph-scallion": 6879,
+        "q-glyph-sugar": 4683,
+        "q-infirmary": 196912,
+        "q-library": 178390,
+        "q-round-cookie": 249306,
+        "q-square-towel": 266545,
+        "q-tip-complete": 8524,
+        "q-tip-lower": 8377,
+        "q-tip-upper": 8324,
+        "q-peanut-soil": 152881,
+        "q-peanut-bowl": 138951,
+        "q-peanut-flower": 129550
+      },
+      "totalPlaybackImageBytes": 2333823,
+      "targetMaximumBytes": 3000000,
+      "remainingImageKeys": [],
+      "remainingBytesAtTarget": 666177
+    }
+  }
+}

@@ -1,0 +1,3175 @@
+{
+  "schemaVersion": "mira.courseware.asset-sources.v1",
+  "lesson": "pep-chinese-g1-upper-little-boat",
+  "assets": [
+    {
+      "key": "curved-boat",
+      "file": "assets/illustrations/curved-boat.png",
+      "uses": [
+        "p01"
+      ],
+      "sourceType": "codex_builtin_imagegen",
+      "source": "assets/illustrations/source/curved-boat.png",
+      "sourceSha256": "394d6f6ea84e223a3291c5385c2bab83065748eb0d93c378373f32d8e5e89ec3",
+      "sourceSize": [
+        1774,
+        887
+      ],
+      "sha256": "40c62bdfe60dd5bcde5d125f8d9c490fc0f7eca2d8ea43cd7cafc522359cb7a0",
+      "prompt": "原创一年级中文课堂画面，细纸纹、哑光水粉、干净的剪纸轮廓，深松绿与暖奶油底，少量杏色和柿橙。仅在夜空主题使用低饱和深蓝。主体完整、背景安静、小屏可辨。不要文字、数字、标志、水印、教材原图风格或既有角色。透明件保留真实 alpha。\n安静水面上的一艘短小木舟，略俯侧视，船底明显弯起，船首与船尾各收尖。完整显出两端，不画遮住端头的桨、帆、人物；水线淡。\n横图 2:1。单艘低矮短木舟朝左，接近侧面稍俯视，船身整体明显向上弯，两个船端在左、右清楚向上挑尖，像一笔宽 U；留出安全边距，不加星星月亮，水面不遮轮廓。",
+      "imagegenEvidence": {
+        "generationId": "exec-227634bb-52de-4ad0-9724-8e94fd3e22e8",
+        "originPath": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-227634bb-52de-4ad0-9724-8e94fd3e22e8.png",
+        "intakeSha256": "394d6f6ea84e223a3291c5385c2bab83065748eb0d93c378373f32d8e5e89ec3",
+        "referenceKeys": []
+      },
+      "playbackDerivative": {
+        "format": "PNG RGB",
+        "size": [
+          1000,
+          500
+        ],
+        "bytes": 735380,
+        "operation": "Lanczos 等比缩小并无损编码，保留原图全幅。"
+      },
+      "referenceIds": [
+        "textbook84",
+        "hour1-shape"
+      ]
+    },
+    {
+      "key": "crescent-window",
+      "file": "assets/illustrations/crescent-window.png",
+      "uses": [
+        "p01"
+      ],
+      "sourceType": "codex_builtin_imagegen",
+      "source": "assets/illustrations/source/crescent-window.png",
+      "sourceSha256": "afd815b72cc951fa92aac63aa44854867d39e1930e1fd2eb3deef377ff137b8d",
+      "sourceSize": [
+        1774,
+        887
+      ],
+      "sha256": "ed384b2d33312bbf6e84f0c22952942ad6b9d6d479c60f55e698103989516216",
+      "prompt": "原创一年级中文课堂画面，细纸纹、哑光水粉、干净的剪纸轮廓，深松绿与暖奶油底，少量杏色和柿橙。仅在夜空主题使用低饱和深蓝。主体完整、背景安静、小屏可辨。不要文字、数字、标志、水印、教材原图风格或既有角色。透明件保留真实 alpha。\n傍晚从窗内向外看，一轮弯月在画面中央，亮面宽度清楚，完整弧线与两个尖端一眼可辨。窗框只在边缘，深蓝夜空安静，窗外无船。\n2:1横图。参照图只用于弧线朝向和画风：在没有文字的深靛蓝夜空正中，一轮浅奶杏色的向上开口的宽弯月，左右两尖都向上，最下方中段是连贯向下的外弧。画出不遮住月亮的窗框细边。全画只有一轮月，不画舟、水或人。",
+      "imagegenEvidence": {
+        "generationId": "exec-f70a7e61-7db1-4976-9794-4bb5e010a30d",
+        "originPath": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-f70a7e61-7db1-4976-9794-4bb5e010a30d.png",
+        "intakeSha256": "afd815b72cc951fa92aac63aa44854867d39e1930e1fd2eb3deef377ff137b8d",
+        "referenceKeys": [],
+        "reference": {
+          "key": "curved-boat",
+          "role": "弧线朝向和画风",
+          "source": "assets/illustrations/source/curved-boat.png",
+          "sourceSha256": "394d6f6ea84e223a3291c5385c2bab83065748eb0d93c378373f32d8e5e89ec3",
+          "originPath": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-227634bb-52de-4ad0-9724-8e94fd3e22e8.png"
+        }
+      },
+      "playbackDerivative": {
+        "format": "PNG RGB",
+        "size": [
+          1000,
+          500
+        ],
+        "bytes": 699823,
+        "operation": "Lanczos 等比缩小并无损编码，保留原图全幅。"
+      },
+      "referenceIds": [
+        "textbook84",
+        "hour1-shape"
+      ]
+    },
+    {
+      "key": "shape-moon",
+      "file": "assets/illustrations/shape-moon.png",
+      "uses": [
+        "p06"
+      ],
+      "sourceType": "codex_builtin_imagegen",
+      "source": "assets/illustrations/source/shape-moon.png",
+      "sourceSha256": "7bcfc8b3340550e6df82dbd713db7a5dd87d11ea163892629b999c20fabf5682",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "sha256": "498d6023444811e62f281c2a50760ef6ad2bb30c728ba95e458b7a50965b5714",
+      "prompt": "原创一年级中文课堂画面，细纸纹、哑光水粉、干净的剪纸轮廓，深松绿与暖奶油底，少量杏色和柿橙。仅在夜空主题使用低饱和深蓝。主体完整、背景安静、小屏可辨。不要文字、数字、标志、水印、教材原图风格或既有角色。透明件保留真实 alpha。\n单一奶杏色弯月剪纸，形状宽、连贯的外弧和内弧，两端清楚收尖。保证两个尖端在缩到32像素时还能分辨，不附星星或面孔。\n方图真透明。呈 U 型的单一暖杏宽弯月剪影，开口向上，左、右两个角都露全，留四周10%以上的透明边，纯剪纸形；不画星星、眼睛、轮廓投影、底板或纹样。保证在34像素保有两尖。",
+      "imagegenEvidence": {
+        "generationId": "exec-8d50a2be-a88b-450a-8bc3-0956db09280d",
+        "originPath": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-8d50a2be-a88b-450a-8bc3-0956db09280d.png",
+        "intakeSha256": "7bcfc8b3340550e6df82dbd713db7a5dd87d11ea163892629b999c20fabf5682",
+        "referenceKeys": []
+      },
+      "playbackDerivative": {
+        "format": "PNG RGBA",
+        "size": [
+          300,
+          300
+        ],
+        "bytes": 33255,
+        "operation": "Lanczos 等比缩小并无损编码，保留原图全幅和 alpha。"
+      },
+      "referenceIds": [
+        "textbook84",
+        "hour1-shape"
+      ]
+    },
+    {
+      "key": "sky-imagination",
+      "file": "assets/illustrations/sky-imagination.png",
+      "uses": [
+        "p09"
+      ],
+      "sourceType": "codex_builtin_imagegen",
+      "source": "assets/illustrations/source/sky-imagination.png",
+      "sourceSha256": "85ff74933ed0ba69714fb4f48b56a8682c8e8767018b6a955d5f54f67113a65e",
+      "sourceSize": [
+        1484,
+        1060
+      ],
+      "sha256": "294f8f4f9df2e2be93739c45f1e2bfbb8120489cd76361ecfee2dd4581570069",
+      "prompt": "原创一年级中文课堂画面，细纸纹、哑光水粉、干净的剪纸轮廓，深松绿与暖奶油底，少量杏色和柿橙。仅在夜空主题使用低饱和深蓝。主体完整、背景安静、小屏可辨。不要文字、数字、标志、水印、教材原图风格或既有角色。透明件保留真实 alpha。\n原创童诗想象场景。穿暖杏色外套、短黑发的孩子坐在一弯月亮船里，抬头朝上方亮亮的星点看。天空清楚是深蓝，没有海面、云端人物或交通工具。月亮两尖都完整，小星明暗和大小有变化，孩子侧脸看向星点。\n横图 7:5。参考图只取低饱和靛蓝夜色、向上开口的奶杏弯月和哑光细纸纹，不要窗框。全图重点是一艘由弯月形体本身组成的想象月亮船，里面一位原创短黑发孩子抬头看向上方几颗星点。孩子不坐在额外木船里，也不要月牙背后再画月。保持月的两尖与孩子完整。",
+      "imagegenEvidence": {
+        "generationId": "exec-522334e5-f900-448f-a43a-2b6dc7a5cb55",
+        "originPath": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-522334e5-f900-448f-a43a-2b6dc7a5cb55.png",
+        "intakeSha256": "85ff74933ed0ba69714fb4f48b56a8682c8e8767018b6a955d5f54f67113a65e",
+        "referenceKeys": [],
+        "reference": {
+          "key": "crescent-window",
+          "role": "同向弯月、靛蓝夜色和细纸纹",
+          "source": "assets/illustrations/source/crescent-window.png",
+          "sourceSha256": "afd815b72cc951fa92aac63aa44854867d39e1930e1fd2eb3deef377ff137b8d",
+          "originPath": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-f70a7e61-7db1-4976-9794-4bb5e010a30d.png"
+        }
+      },
+      "playbackDerivative": {
+        "format": "PNG RGB",
+        "size": [
+          840,
+          600
+        ],
+        "bytes": 635911,
+        "operation": "Lanczos 等比缩小并无损编码，保留原图全幅。"
+      },
+      "referenceIds": [
+        "textbook84",
+        "textbook85",
+        "hour2-imagination"
+      ]
+    },
+    {
+      "key": "snake-head",
+      "file": "assets/illustrations/snake-head.png",
+      "uses": [
+        "p06"
+      ],
+      "sourceType": "codex_builtin_imagegen",
+      "source": "assets/illustrations/source/p06-snake-atlas.png",
+      "sourceSha256": "d4d7a1dc30713b6160eb6f021f65839fc48b28f33200e19e2306ffd1224cd9a9",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "sourceCropBox": [
+        0,
+        0,
+        627,
+        627
+      ],
+      "sha256": "143d2882d8f594d7fa7f3a467e59dcd5c9960e78189f5901116af8766008e0f2",
+      "prompt": "一张真透明 RGBA 小游戏图集，方形 2列 × 2行，四个精确同尺寸方格，图中不画格或文字。每个资产在自己的格子居中，隔开10%以上透明边。固定次序为左上、右上、左下、右下：1. 单一幼儿友好绿色小蛇头，严格向右，左右两侧比例适合程序转向，剪纸圆形头部占画幅约75%，短小豆眼，后缘与身体片段可拼接。 2. 一个松绿色蛇身片段，正向右的侧视厚度与头部一致，半圆接头，主体居中，两端都不画脸或尾巴。 3. 一个松绿色蛇尾片段，宽端在右能接身体，向左渐细，厚度与蛇身体一致，边缘完整，主体居中。 4. 一枚杏色和深松绿的月亮小舟贴纸，弯月与尖头小船形成一个明快轮廓，留透明边，不画文字和数字。 绿色蛇头在右端有豆眼，鼻朝右；身片段是单个同色半圆接头的椭圆短节；尾片段粗端在右，左尖；三片同高度、中心同一垂直位置、色彩一致，无眼或斑点乱入身体。参考只给右下角贴纸的月形；只要三枚蛇片和一枚小舟贴纸，背景和格间都透明。原创细纸纹、哑光水粉、松绿、奶油与杏色。",
+      "imagegenEvidence": {
+        "generationId": "exec-9d695fd4-3fff-4b97-9998-059365405518",
+        "originPath": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-9d695fd4-3fff-4b97-9998-059365405518.png",
+        "intakeSha256": "d4d7a1dc30713b6160eb6f021f65839fc48b28f33200e19e2306ffd1224cd9a9",
+        "atlasKey": "p06-snake-atlas",
+        "actualReferenceKeys": []
+      },
+      "playbackDerivative": {
+        "format": "PNG RGBA",
+        "size": [
+          300,
+          300
+        ],
+        "bytes": 63769,
+        "operation": "以原图整数边界裁单个完整透明格，再 Lanczos 等比缩放和无损编码。"
+      }
+    },
+    {
+      "key": "snake-body",
+      "file": "assets/illustrations/snake-body.png",
+      "uses": [
+        "p06"
+      ],
+      "sourceType": "codex_builtin_imagegen",
+      "source": "assets/illustrations/source/p06-snake-atlas.png",
+      "sourceSha256": "d4d7a1dc30713b6160eb6f021f65839fc48b28f33200e19e2306ffd1224cd9a9",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "sourceCropBox": [
+        627,
+        0,
+        1254,
+        627
+      ],
+      "sha256": "38897438f7de146406b23febacb8c567a297b6715c4a1860b975f8612a1c43ed",
+      "prompt": "一张真透明 RGBA 小游戏图集，方形 2列 × 2行，四个精确同尺寸方格，图中不画格或文字。每个资产在自己的格子居中，隔开10%以上透明边。固定次序为左上、右上、左下、右下：1. 单一幼儿友好绿色小蛇头，严格向右，左右两侧比例适合程序转向，剪纸圆形头部占画幅约75%，短小豆眼，后缘与身体片段可拼接。 2. 一个松绿色蛇身片段，正向右的侧视厚度与头部一致，半圆接头，主体居中，两端都不画脸或尾巴。 3. 一个松绿色蛇尾片段，宽端在右能接身体，向左渐细，厚度与蛇身体一致，边缘完整，主体居中。 4. 一枚杏色和深松绿的月亮小舟贴纸，弯月与尖头小船形成一个明快轮廓，留透明边，不画文字和数字。 绿色蛇头在右端有豆眼，鼻朝右；身片段是单个同色半圆接头的椭圆短节；尾片段粗端在右，左尖；三片同高度、中心同一垂直位置、色彩一致，无眼或斑点乱入身体。参考只给右下角贴纸的月形；只要三枚蛇片和一枚小舟贴纸，背景和格间都透明。原创细纸纹、哑光水粉、松绿、奶油与杏色。",
+      "imagegenEvidence": {
+        "generationId": "exec-9d695fd4-3fff-4b97-9998-059365405518",
+        "originPath": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-9d695fd4-3fff-4b97-9998-059365405518.png",
+        "intakeSha256": "d4d7a1dc30713b6160eb6f021f65839fc48b28f33200e19e2306ffd1224cd9a9",
+        "atlasKey": "p06-snake-atlas",
+        "actualReferenceKeys": []
+      },
+      "playbackDerivative": {
+        "format": "PNG RGBA",
+        "size": [
+          300,
+          300
+        ],
+        "bytes": 48016,
+        "operation": "以原图整数边界裁单个完整透明格，再 Lanczos 等比缩放和无损编码。"
+      }
+    },
+    {
+      "key": "snake-tail",
+      "file": "assets/illustrations/snake-tail.png",
+      "uses": [
+        "p06"
+      ],
+      "sourceType": "codex_builtin_imagegen",
+      "source": "assets/illustrations/source/p06-snake-atlas.png",
+      "sourceSha256": "d4d7a1dc30713b6160eb6f021f65839fc48b28f33200e19e2306ffd1224cd9a9",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "sourceCropBox": [
+        0,
+        627,
+        627,
+        1254
+      ],
+      "sha256": "34643b2b7e43e54263e611f9ce847237a991f9064bc8245c3ad75ebd47db0511",
+      "prompt": "一张真透明 RGBA 小游戏图集，方形 2列 × 2行，四个精确同尺寸方格，图中不画格或文字。每个资产在自己的格子居中，隔开10%以上透明边。固定次序为左上、右上、左下、右下：1. 单一幼儿友好绿色小蛇头，严格向右，左右两侧比例适合程序转向，剪纸圆形头部占画幅约75%，短小豆眼，后缘与身体片段可拼接。 2. 一个松绿色蛇身片段，正向右的侧视厚度与头部一致，半圆接头，主体居中，两端都不画脸或尾巴。 3. 一个松绿色蛇尾片段，宽端在右能接身体，向左渐细，厚度与蛇身体一致，边缘完整，主体居中。 4. 一枚杏色和深松绿的月亮小舟贴纸，弯月与尖头小船形成一个明快轮廓，留透明边，不画文字和数字。 绿色蛇头在右端有豆眼，鼻朝右；身片段是单个同色半圆接头的椭圆短节；尾片段粗端在右，左尖；三片同高度、中心同一垂直位置、色彩一致，无眼或斑点乱入身体。参考只给右下角贴纸的月形；只要三枚蛇片和一枚小舟贴纸，背景和格间都透明。原创细纸纹、哑光水粉、松绿、奶油与杏色。",
+      "imagegenEvidence": {
+        "generationId": "exec-9d695fd4-3fff-4b97-9998-059365405518",
+        "originPath": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-9d695fd4-3fff-4b97-9998-059365405518.png",
+        "intakeSha256": "d4d7a1dc30713b6160eb6f021f65839fc48b28f33200e19e2306ffd1224cd9a9",
+        "atlasKey": "p06-snake-atlas",
+        "actualReferenceKeys": []
+      },
+      "playbackDerivative": {
+        "format": "PNG RGBA",
+        "size": [
+          300,
+          300
+        ],
+        "bytes": 38794,
+        "operation": "以原图整数边界裁单个完整透明格，再 Lanczos 等比缩放和无损编码。"
+      }
+    },
+    {
+      "key": "boat-reward",
+      "file": "assets/illustrations/boat-reward.png",
+      "uses": [
+        "p06",
+        "p08"
+      ],
+      "sourceType": "codex_builtin_imagegen",
+      "source": "assets/illustrations/source/p06-snake-atlas.png",
+      "sourceSha256": "d4d7a1dc30713b6160eb6f021f65839fc48b28f33200e19e2306ffd1224cd9a9",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "sourceCropBox": [
+        627,
+        627,
+        1254,
+        1254
+      ],
+      "sha256": "fe08445eaed02dc296990a1a30c914c2a83d96ced9a650ea9ad66e9cba227b46",
+      "prompt": "一张真透明 RGBA 小游戏图集，方形 2列 × 2行，四个精确同尺寸方格，图中不画格或文字。每个资产在自己的格子居中，隔开10%以上透明边。固定次序为左上、右上、左下、右下：1. 单一幼儿友好绿色小蛇头，严格向右，左右两侧比例适合程序转向，剪纸圆形头部占画幅约75%，短小豆眼，后缘与身体片段可拼接。 2. 一个松绿色蛇身片段，正向右的侧视厚度与头部一致，半圆接头，主体居中，两端都不画脸或尾巴。 3. 一个松绿色蛇尾片段，宽端在右能接身体，向左渐细，厚度与蛇身体一致，边缘完整，主体居中。 4. 一枚杏色和深松绿的月亮小舟贴纸，弯月与尖头小船形成一个明快轮廓，留透明边，不画文字和数字。 绿色蛇头在右端有豆眼，鼻朝右；身片段是单个同色半圆接头的椭圆短节；尾片段粗端在右，左尖；三片同高度、中心同一垂直位置、色彩一致，无眼或斑点乱入身体。参考只给右下角贴纸的月形；只要三枚蛇片和一枚小舟贴纸，背景和格间都透明。原创细纸纹、哑光水粉、松绿、奶油与杏色。",
+      "imagegenEvidence": {
+        "generationId": "exec-9d695fd4-3fff-4b97-9998-059365405518",
+        "originPath": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-9d695fd4-3fff-4b97-9998-059365405518.png",
+        "intakeSha256": "d4d7a1dc30713b6160eb6f021f65839fc48b28f33200e19e2306ffd1224cd9a9",
+        "atlasKey": "p06-snake-atlas",
+        "actualReferenceKeys": [
+          "shape-moon"
+        ]
+      },
+      "playbackDerivative": {
+        "format": "PNG RGBA",
+        "size": [
+          300,
+          300
+        ],
+        "bytes": 54494,
+        "operation": "以原图整数边界裁单个完整透明格，再 Lanczos 等比缩放和无损编码。"
+      },
+      "referenceIds": [
+        "textbook84",
+        "hour1-shape"
+      ]
+    },
+    {
+      "key": "shape-boat",
+      "file": "assets/illustrations/shape-boat.png",
+      "uses": [
+        "p06"
+      ],
+      "sourceType": "codex_builtin_imagegen",
+      "source": "assets/illustrations/source/p06-shape-atlas-clean.png",
+      "sourceSha256": "9182289a967eb433bccab742c4b7719aac39b4b168bbc0a9381f9a81afc8a5d6",
+      "sourceSize": [
+        1536,
+        1024
+      ],
+      "sourceCropBox": [
+        0,
+        0,
+        512,
+        512
+      ],
+      "sha256": "0afb9d7a54d37d17aaa81fa554fb1fffe16535b324a691d144f4c2a80e7c273d",
+      "prompt": "Edit the supplied transparent 3-column-by-2-row sprite sheet. This is a background-extraction correction only. Preserve the same six clear object silhouettes and same locations, including the two pointed ends, orientation, scale, and hand-cut paper texture. Delete all fuzzy surrounding orange light, soft gradients, colored glow, cast shadows, and rim glow. Only the hard-edged six paper objects remain, solid opaque interiors with slight normal edge antialiasing only. Everywhere outside their hard silhouettes is exactly empty, true zero-alpha including the whole gutters. Flat matte paper, no light emission. No colored halo, drop shadows, gradients, panels, black fill, paper background, or checkerboard. Do not add or remove shapes. Keep same 3:2 landscape and 6 exact cells.",
+      "imagegenEvidence": {
+        "generationId": "exec-dae3b62b-9748-433b-a3ee-ff0e6dd2bcc9",
+        "originPath": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-dae3b62b-9748-433b-a3ee-ff0e6dd2bcc9.png",
+        "intakeSha256": "9182289a967eb433bccab742c4b7719aac39b4b168bbc0a9381f9a81afc8a5d6",
+        "atlasKey": "p06-shape-atlas-clean",
+        "priorReferenceStatus": "reference_only_rejected_alpha_glow"
+      },
+      "playbackDerivative": {
+        "format": "PNG RGBA",
+        "size": [
+          300,
+          300
+        ],
+        "bytes": 20213,
+        "operation": "原512²透明格以 Lanczos 等比缩到256²，按同一形状标尺和本格 alpha≥128 实形中心置于300²透明画布；无损编码。",
+        "halfTilePlacement": [
+          14,
+          16
+        ]
+      },
+      "referenceIds": [
+        "textbook84",
+        "hour1-shape"
+      ]
+    },
+    {
+      "key": "shape-crescent-side",
+      "file": "assets/illustrations/shape-crescent-side.png",
+      "uses": [
+        "p06"
+      ],
+      "sourceType": "codex_builtin_imagegen",
+      "source": "assets/illustrations/source/p06-shape-atlas-clean.png",
+      "sourceSha256": "9182289a967eb433bccab742c4b7719aac39b4b168bbc0a9381f9a81afc8a5d6",
+      "sourceSize": [
+        1536,
+        1024
+      ],
+      "sourceCropBox": [
+        512,
+        0,
+        1024,
+        512
+      ],
+      "sha256": "7c983b5796bb882e65cd809e4417711b84553963c9215656364305f7ad06487e",
+      "prompt": "Edit the supplied transparent 3-column-by-2-row sprite sheet. This is a background-extraction correction only. Preserve the same six clear object silhouettes and same locations, including the two pointed ends, orientation, scale, and hand-cut paper texture. Delete all fuzzy surrounding orange light, soft gradients, colored glow, cast shadows, and rim glow. Only the hard-edged six paper objects remain, solid opaque interiors with slight normal edge antialiasing only. Everywhere outside their hard silhouettes is exactly empty, true zero-alpha including the whole gutters. Flat matte paper, no light emission. No colored halo, drop shadows, gradients, panels, black fill, paper background, or checkerboard. Do not add or remove shapes. Keep same 3:2 landscape and 6 exact cells.",
+      "imagegenEvidence": {
+        "generationId": "exec-dae3b62b-9748-433b-a3ee-ff0e6dd2bcc9",
+        "originPath": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-dae3b62b-9748-433b-a3ee-ff0e6dd2bcc9.png",
+        "intakeSha256": "9182289a967eb433bccab742c4b7719aac39b4b168bbc0a9381f9a81afc8a5d6",
+        "atlasKey": "p06-shape-atlas-clean",
+        "priorReferenceStatus": "reference_only_rejected_alpha_glow"
+      },
+      "playbackDerivative": {
+        "format": "PNG RGBA",
+        "size": [
+          300,
+          300
+        ],
+        "bytes": 27169,
+        "operation": "原512²透明格以 Lanczos 等比缩到256²，按同一形状标尺和本格 alpha≥128 实形中心置于300²透明画布；无损编码。",
+        "halfTilePlacement": [
+          12,
+          23
+        ]
+      },
+      "referenceIds": [
+        "textbook84",
+        "hour1-shape"
+      ]
+    },
+    {
+      "key": "shape-boat-side",
+      "file": "assets/illustrations/shape-boat-side.png",
+      "uses": [
+        "p06"
+      ],
+      "sourceType": "codex_builtin_imagegen",
+      "source": "assets/illustrations/source/p06-shape-atlas-clean.png",
+      "sourceSha256": "9182289a967eb433bccab742c4b7719aac39b4b168bbc0a9381f9a81afc8a5d6",
+      "sourceSize": [
+        1536,
+        1024
+      ],
+      "sourceCropBox": [
+        1024,
+        0,
+        1536,
+        512
+      ],
+      "sha256": "28f6cde254a70f35c6818564455c045cab670c31611c3eb914c2ae8018ecce8a",
+      "prompt": "Edit the supplied transparent 3-column-by-2-row sprite sheet. This is a background-extraction correction only. Preserve the same six clear object silhouettes and same locations, including the two pointed ends, orientation, scale, and hand-cut paper texture. Delete all fuzzy surrounding orange light, soft gradients, colored glow, cast shadows, and rim glow. Only the hard-edged six paper objects remain, solid opaque interiors with slight normal edge antialiasing only. Everywhere outside their hard silhouettes is exactly empty, true zero-alpha including the whole gutters. Flat matte paper, no light emission. No colored halo, drop shadows, gradients, panels, black fill, paper background, or checkerboard. Do not add or remove shapes. Keep same 3:2 landscape and 6 exact cells.",
+      "imagegenEvidence": {
+        "generationId": "exec-dae3b62b-9748-433b-a3ee-ff0e6dd2bcc9",
+        "originPath": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-dae3b62b-9748-433b-a3ee-ff0e6dd2bcc9.png",
+        "intakeSha256": "9182289a967eb433bccab742c4b7719aac39b4b168bbc0a9381f9a81afc8a5d6",
+        "atlasKey": "p06-shape-atlas-clean",
+        "priorReferenceStatus": "reference_only_rejected_alpha_glow"
+      },
+      "playbackDerivative": {
+        "format": "PNG RGBA",
+        "size": [
+          300,
+          300
+        ],
+        "bytes": 22803,
+        "operation": "原512²透明格以 Lanczos 等比缩到256²，按同一形状标尺和本格 alpha≥128 实形中心置于300²透明画布；无损编码。",
+        "halfTilePlacement": [
+          28,
+          30
+        ]
+      },
+      "referenceIds": [
+        "textbook84",
+        "hour1-shape"
+      ]
+    },
+    {
+      "key": "shape-disc",
+      "file": "assets/illustrations/shape-disc.png",
+      "uses": [
+        "p06"
+      ],
+      "sourceType": "codex_builtin_imagegen",
+      "source": "assets/illustrations/source/p06-shape-atlas-clean.png",
+      "sourceSha256": "9182289a967eb433bccab742c4b7719aac39b4b168bbc0a9381f9a81afc8a5d6",
+      "sourceSize": [
+        1536,
+        1024
+      ],
+      "sourceCropBox": [
+        0,
+        512,
+        512,
+        1024
+      ],
+      "sha256": "5557c22a168634aed3b21c60ff2cf5b6de4edece9891f6fd4641ce2571173817",
+      "prompt": "Edit the supplied transparent 3-column-by-2-row sprite sheet. This is a background-extraction correction only. Preserve the same six clear object silhouettes and same locations, including the two pointed ends, orientation, scale, and hand-cut paper texture. Delete all fuzzy surrounding orange light, soft gradients, colored glow, cast shadows, and rim glow. Only the hard-edged six paper objects remain, solid opaque interiors with slight normal edge antialiasing only. Everywhere outside their hard silhouettes is exactly empty, true zero-alpha including the whole gutters. Flat matte paper, no light emission. No colored halo, drop shadows, gradients, panels, black fill, paper background, or checkerboard. Do not add or remove shapes. Keep same 3:2 landscape and 6 exact cells.",
+      "imagegenEvidence": {
+        "generationId": "exec-dae3b62b-9748-433b-a3ee-ff0e6dd2bcc9",
+        "originPath": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-dae3b62b-9748-433b-a3ee-ff0e6dd2bcc9.png",
+        "intakeSha256": "9182289a967eb433bccab742c4b7719aac39b4b168bbc0a9381f9a81afc8a5d6",
+        "atlasKey": "p06-shape-atlas-clean",
+        "priorReferenceStatus": "reference_only_rejected_alpha_glow"
+      },
+      "playbackDerivative": {
+        "format": "PNG RGBA",
+        "size": [
+          300,
+          300
+        ],
+        "bytes": 48352,
+        "operation": "原512²透明格以 Lanczos 等比缩到256²，按同一形状标尺和本格 alpha≥128 实形中心置于300²透明画布；无损编码。",
+        "halfTilePlacement": [
+          24,
+          22
+        ]
+      },
+      "referenceIds": [
+        "textbook84",
+        "hour1-shape"
+      ]
+    },
+    {
+      "key": "shape-rounded",
+      "file": "assets/illustrations/shape-rounded.png",
+      "uses": [
+        "p06"
+      ],
+      "sourceType": "codex_builtin_imagegen",
+      "source": "assets/illustrations/source/p06-shape-atlas-clean.png",
+      "sourceSha256": "9182289a967eb433bccab742c4b7719aac39b4b168bbc0a9381f9a81afc8a5d6",
+      "sourceSize": [
+        1536,
+        1024
+      ],
+      "sourceCropBox": [
+        512,
+        512,
+        1024,
+        1024
+      ],
+      "sha256": "e2bf956593fa19104680802e5e5945cab7e14fb9d6952bfbb716c8bb80396519",
+      "prompt": "Edit the supplied transparent 3-column-by-2-row sprite sheet. This is a background-extraction correction only. Preserve the same six clear object silhouettes and same locations, including the two pointed ends, orientation, scale, and hand-cut paper texture. Delete all fuzzy surrounding orange light, soft gradients, colored glow, cast shadows, and rim glow. Only the hard-edged six paper objects remain, solid opaque interiors with slight normal edge antialiasing only. Everywhere outside their hard silhouettes is exactly empty, true zero-alpha including the whole gutters. Flat matte paper, no light emission. No colored halo, drop shadows, gradients, panels, black fill, paper background, or checkerboard. Do not add or remove shapes. Keep same 3:2 landscape and 6 exact cells.",
+      "imagegenEvidence": {
+        "generationId": "exec-dae3b62b-9748-433b-a3ee-ff0e6dd2bcc9",
+        "originPath": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-dae3b62b-9748-433b-a3ee-ff0e6dd2bcc9.png",
+        "intakeSha256": "9182289a967eb433bccab742c4b7719aac39b4b168bbc0a9381f9a81afc8a5d6",
+        "atlasKey": "p06-shape-atlas-clean",
+        "priorReferenceStatus": "reference_only_rejected_alpha_glow"
+      },
+      "playbackDerivative": {
+        "format": "PNG RGBA",
+        "size": [
+          300,
+          300
+        ],
+        "bytes": 21257,
+        "operation": "原512²透明格以 Lanczos 等比缩到256²，按同一形状标尺和本格 alpha≥128 实形中心置于300²透明画布；无损编码。",
+        "halfTilePlacement": [
+          24,
+          28
+        ]
+      },
+      "referenceIds": [
+        "textbook84",
+        "hour1-shape"
+      ]
+    },
+    {
+      "key": "shape-straight",
+      "file": "assets/illustrations/shape-straight.png",
+      "uses": [
+        "p06"
+      ],
+      "sourceType": "codex_builtin_imagegen",
+      "source": "assets/illustrations/source/p06-shape-atlas-clean.png",
+      "sourceSha256": "9182289a967eb433bccab742c4b7719aac39b4b168bbc0a9381f9a81afc8a5d6",
+      "sourceSize": [
+        1536,
+        1024
+      ],
+      "sourceCropBox": [
+        1024,
+        512,
+        1536,
+        1024
+      ],
+      "sha256": "fe387c34255de26540a5461479ee6e061b8d6ff4ed8e1e834c545dd62b0b3a49",
+      "prompt": "Edit the supplied transparent 3-column-by-2-row sprite sheet. This is a background-extraction correction only. Preserve the same six clear object silhouettes and same locations, including the two pointed ends, orientation, scale, and hand-cut paper texture. Delete all fuzzy surrounding orange light, soft gradients, colored glow, cast shadows, and rim glow. Only the hard-edged six paper objects remain, solid opaque interiors with slight normal edge antialiasing only. Everywhere outside their hard silhouettes is exactly empty, true zero-alpha including the whole gutters. Flat matte paper, no light emission. No colored halo, drop shadows, gradients, panels, black fill, paper background, or checkerboard. Do not add or remove shapes. Keep same 3:2 landscape and 6 exact cells.",
+      "imagegenEvidence": {
+        "generationId": "exec-dae3b62b-9748-433b-a3ee-ff0e6dd2bcc9",
+        "originPath": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-dae3b62b-9748-433b-a3ee-ff0e6dd2bcc9.png",
+        "intakeSha256": "9182289a967eb433bccab742c4b7719aac39b4b168bbc0a9381f9a81afc8a5d6",
+        "atlasKey": "p06-shape-atlas-clean",
+        "priorReferenceStatus": "reference_only_rejected_alpha_glow"
+      },
+      "playbackDerivative": {
+        "format": "PNG RGBA",
+        "size": [
+          300,
+          300
+        ],
+        "bytes": 12458,
+        "operation": "原512²透明格以 Lanczos 等比缩到256²，按同一形状标尺和本格 alpha≥128 实形中心置于300²透明画布；无损编码。",
+        "halfTilePlacement": [
+          26,
+          24
+        ]
+      },
+      "referenceIds": [
+        "textbook84",
+        "hour1-shape"
+      ]
+    },
+    {
+      "key": "snake-backdrop",
+      "file": "assets/illustrations/snake-backdrop.png",
+      "uses": [
+        "p06"
+      ],
+      "sourceType": "codex_builtin_imagegen",
+      "source": "assets/illustrations/source/snake-backdrop.png",
+      "sourceSha256": "ae039b410f9cd5fb8653bc727c46651c1dc9554be5a167af023ca61c53476c1c",
+      "sourceSize": [
+        1672,
+        941
+      ],
+      "sha256": "6b405976d42b439891894d6d72d36512ef4438df7017e270e383506fd3c8d688",
+      "prompt": "横图 16:9，原创细纸纹与哑光水粉剪纸。俯视安静纸纹花园，松绿深浅层次。中心是可覆盖大棋盘的低对比干净平面，只在四角点少量植物。无方格、道具、道路、光纹或人物；四边可见。 中央86%连续无界线，较淡的低饱和松绿色底，色差小。少量角落植物远离中间，不在中央做框、光斑、地砖或道具。严禁文字数字。",
+      "imagegenEvidence": {
+        "generationId": "exec-c1204bb6-719a-4dad-adc7-21e7f4e8aedc",
+        "originPath": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-c1204bb6-719a-4dad-adc7-21e7f4e8aedc.png",
+        "intakeSha256": "ae039b410f9cd5fb8653bc727c46651c1dc9554be5a167af023ca61c53476c1c",
+        "referenceKeys": []
+      },
+      "playbackDerivative": {
+        "format": "PNG RGB",
+        "size": [
+          1280,
+          720
+        ],
+        "bytes": 1218985,
+        "operation": "Lanczos 全幅适配逻辑画布；1672×941 到16:9仅约0.053%比例调整，无裁切。"
+      }
+    },
+    {
+      "key": "snake-start",
+      "file": "assets/illustrations/snake-start.png",
+      "uses": [
+        "p06"
+      ],
+      "sourceType": "deterministic_composition_of_codex_imagegen",
+      "source": "assets/illustrations/source/snake-start-composition.json",
+      "sourceSha256": "33c17458041eff130da991e71928de64bb0caa155e512b302b724d397e8b49c6",
+      "sha256": "549322f19bebaa17e7073fd41812ee2d65f7e4ea72bebdfdae4f7aefb35daebb",
+      "inputAssets": [
+        "snake-backdrop",
+        "snake-tail",
+        "snake-body",
+        "snake-head",
+        "shape-moon",
+        "shape-boat",
+        "shape-disc"
+      ],
+      "playbackDerivative": {
+        "format": "PNG RGB",
+        "size": [
+          1280,
+          720
+        ],
+        "bytes": 1158956,
+        "operation": "正式 ImageGen 背景与同一游戏蛇片、参照月、尖舟和圆盘按可编辑图层合成。"
+      },
+      "referenceIds": [
+        "textbook84",
+        "hour1-shape"
+      ]
+    },
+    {
+      "key": "delivery-cart",
+      "sourceType": "codex_builtin_imagegen_atlas_crop",
+      "source": "art-source/p08-post-vehicles-and-recipients.png",
+      "sourceSha256": "08a7609a7f0be5700fd2fe89955a982f3ee4cefd4655a69e501dd59dd7957e44",
+      "sha256": "bd170ff20bd2314802630637e221e971d194b56d092cb1bfbd1186207bf61695",
+      "file": "assets/delivery-cart.png",
+      "atlasId": "p08-post-vehicles-and-recipients",
+      "sourceCrop": [
+        0,
+        0,
+        512,
+        512
+      ],
+      "uses": [
+        "p08"
+      ],
+      "sourceSize": [
+        1536,
+        1024
+      ],
+      "prompt": "Create one production sprite atlas for the first-grade Chinese lesson 《小小的船》's delivery game. Transparent RGBA, strictly three columns × two rows of equal square cells, 3:2 landscape overall. Each cell contains one independent sprite, optically centered, all four edges and the entire invisible gutters fully transparent with at least 13% alpha-zero margin. Exactly this row-major order. Row 1 left: empty warm-orange toy postal van facing right, simple high three-quarter top view, visible low cargo bed, dark wheels, matte pine-green trim. Row 1 middle: precisely the same orange postal van at the same scale, angle and anchor, with its small cargo gate raised and no item in the bed. Row 1 right: simple longer cream-apricot toy traffic car facing right, high top view with dark wheels and dusky teal windshield, visually distinct from the postal van. Row 2 left: only a light apricot rabbit face with two long ears and small friendly nose, ears fully in view. Row 2 middle: only a full side view green turtle pointing right, clear rounded shell, head, four stubby legs, no plaque. Row 2 right: only a warm apricot cat face with two triangular ears and visible whiskers, no collar or neck. Matte gouache, fine paper grain limited to the opaque objects, clean cut-paper edges, original child-friendly art in warm cream, pine green, apricot and persimmon orange. All six silhouettes readable at 30 pixels, postal van recognizable at 22 pixels. No scene, no ground, no shadow, no glow, no colored aura, no translucent blur outside the silhouettes, no lettering, numbers, grid, checkerboard, badges, logos, watermark, or extra objects.",
+      "promptSha256": "1ce090b7ceb41addd4141727c31c7b3f6091a9d440aad0b22ef313df92c53a73",
+      "playbackDerivative": {
+        "format": "PNG RGBA",
+        "size": [
+          300,
+          300
+        ],
+        "bytes": 73464,
+        "operation": "按留档像素框裁切，透明通道完整，等比缩至 300px 长边。"
+      }
+    },
+    {
+      "key": "delivery-cart-load",
+      "sourceType": "codex_builtin_imagegen_atlas_crop",
+      "source": "art-source/p08-post-vehicles-and-recipients.png",
+      "sourceSha256": "08a7609a7f0be5700fd2fe89955a982f3ee4cefd4655a69e501dd59dd7957e44",
+      "sha256": "c5e65b5d21f0df59b043a5f2fa5eeb9d3ce4829800d2ef7729a0689b25793f29",
+      "file": "assets/delivery-cart-load.png",
+      "atlasId": "p08-post-vehicles-and-recipients",
+      "sourceCrop": [
+        512,
+        0,
+        1024,
+        512
+      ],
+      "uses": [
+        "p08"
+      ],
+      "sourceSize": [
+        1536,
+        1024
+      ],
+      "prompt": "Create one production sprite atlas for the first-grade Chinese lesson 《小小的船》's delivery game. Transparent RGBA, strictly three columns × two rows of equal square cells, 3:2 landscape overall. Each cell contains one independent sprite, optically centered, all four edges and the entire invisible gutters fully transparent with at least 13% alpha-zero margin. Exactly this row-major order. Row 1 left: empty warm-orange toy postal van facing right, simple high three-quarter top view, visible low cargo bed, dark wheels, matte pine-green trim. Row 1 middle: precisely the same orange postal van at the same scale, angle and anchor, with its small cargo gate raised and no item in the bed. Row 1 right: simple longer cream-apricot toy traffic car facing right, high top view with dark wheels and dusky teal windshield, visually distinct from the postal van. Row 2 left: only a light apricot rabbit face with two long ears and small friendly nose, ears fully in view. Row 2 middle: only a full side view green turtle pointing right, clear rounded shell, head, four stubby legs, no plaque. Row 2 right: only a warm apricot cat face with two triangular ears and visible whiskers, no collar or neck. Matte gouache, fine paper grain limited to the opaque objects, clean cut-paper edges, original child-friendly art in warm cream, pine green, apricot and persimmon orange. All six silhouettes readable at 30 pixels, postal van recognizable at 22 pixels. No scene, no ground, no shadow, no glow, no colored aura, no translucent blur outside the silhouettes, no lettering, numbers, grid, checkerboard, badges, logos, watermark, or extra objects.",
+      "promptSha256": "1ce090b7ceb41addd4141727c31c7b3f6091a9d440aad0b22ef313df92c53a73",
+      "playbackDerivative": {
+        "format": "PNG RGBA",
+        "size": [
+          300,
+          300
+        ],
+        "bytes": 74654,
+        "operation": "按留档像素框裁切，透明通道完整，等比缩至 300px 长边。"
+      }
+    },
+    {
+      "key": "delivery-glider",
+      "sourceType": "codex_builtin_imagegen_atlas_crop",
+      "source": "art-source/p08-post-vehicles-and-recipients.png",
+      "sourceSha256": "08a7609a7f0be5700fd2fe89955a982f3ee4cefd4655a69e501dd59dd7957e44",
+      "sha256": "221a3f0a3ee668a6d47b9a6d2f8fbb6cb056e6a0c380716b385640ae7be077bc",
+      "file": "assets/delivery-glider.png",
+      "atlasId": "p08-post-vehicles-and-recipients",
+      "sourceCrop": [
+        1024,
+        0,
+        1536,
+        512
+      ],
+      "uses": [
+        "p08"
+      ],
+      "sourceSize": [
+        1536,
+        1024
+      ],
+      "prompt": "Create one production sprite atlas for the first-grade Chinese lesson 《小小的船》's delivery game. Transparent RGBA, strictly three columns × two rows of equal square cells, 3:2 landscape overall. Each cell contains one independent sprite, optically centered, all four edges and the entire invisible gutters fully transparent with at least 13% alpha-zero margin. Exactly this row-major order. Row 1 left: empty warm-orange toy postal van facing right, simple high three-quarter top view, visible low cargo bed, dark wheels, matte pine-green trim. Row 1 middle: precisely the same orange postal van at the same scale, angle and anchor, with its small cargo gate raised and no item in the bed. Row 1 right: simple longer cream-apricot toy traffic car facing right, high top view with dark wheels and dusky teal windshield, visually distinct from the postal van. Row 2 left: only a light apricot rabbit face with two long ears and small friendly nose, ears fully in view. Row 2 middle: only a full side view green turtle pointing right, clear rounded shell, head, four stubby legs, no plaque. Row 2 right: only a warm apricot cat face with two triangular ears and visible whiskers, no collar or neck. Matte gouache, fine paper grain limited to the opaque objects, clean cut-paper edges, original child-friendly art in warm cream, pine green, apricot and persimmon orange. All six silhouettes readable at 30 pixels, postal van recognizable at 22 pixels. No scene, no ground, no shadow, no glow, no colored aura, no translucent blur outside the silhouettes, no lettering, numbers, grid, checkerboard, badges, logos, watermark, or extra objects.",
+      "promptSha256": "1ce090b7ceb41addd4141727c31c7b3f6091a9d440aad0b22ef313df92c53a73",
+      "playbackDerivative": {
+        "format": "PNG RGBA",
+        "size": [
+          300,
+          300
+        ],
+        "bytes": 74862,
+        "operation": "按留档像素框裁切，透明通道完整，等比缩至 300px 长边。"
+      }
+    },
+    {
+      "key": "recipient-rabbit",
+      "sourceType": "codex_builtin_imagegen_atlas_crop",
+      "source": "art-source/p08-post-vehicles-and-recipients.png",
+      "sourceSha256": "08a7609a7f0be5700fd2fe89955a982f3ee4cefd4655a69e501dd59dd7957e44",
+      "sha256": "a9dc88cd738357ff6452e9bf41d43f08a4978c0ae18050d572cf822690082a9f",
+      "file": "assets/recipient-rabbit.png",
+      "atlasId": "p08-post-vehicles-and-recipients",
+      "sourceCrop": [
+        0,
+        512,
+        512,
+        1024
+      ],
+      "uses": [
+        "p08"
+      ],
+      "sourceSize": [
+        1536,
+        1024
+      ],
+      "prompt": "Create one production sprite atlas for the first-grade Chinese lesson 《小小的船》's delivery game. Transparent RGBA, strictly three columns × two rows of equal square cells, 3:2 landscape overall. Each cell contains one independent sprite, optically centered, all four edges and the entire invisible gutters fully transparent with at least 13% alpha-zero margin. Exactly this row-major order. Row 1 left: empty warm-orange toy postal van facing right, simple high three-quarter top view, visible low cargo bed, dark wheels, matte pine-green trim. Row 1 middle: precisely the same orange postal van at the same scale, angle and anchor, with its small cargo gate raised and no item in the bed. Row 1 right: simple longer cream-apricot toy traffic car facing right, high top view with dark wheels and dusky teal windshield, visually distinct from the postal van. Row 2 left: only a light apricot rabbit face with two long ears and small friendly nose, ears fully in view. Row 2 middle: only a full side view green turtle pointing right, clear rounded shell, head, four stubby legs, no plaque. Row 2 right: only a warm apricot cat face with two triangular ears and visible whiskers, no collar or neck. Matte gouache, fine paper grain limited to the opaque objects, clean cut-paper edges, original child-friendly art in warm cream, pine green, apricot and persimmon orange. All six silhouettes readable at 30 pixels, postal van recognizable at 22 pixels. No scene, no ground, no shadow, no glow, no colored aura, no translucent blur outside the silhouettes, no lettering, numbers, grid, checkerboard, badges, logos, watermark, or extra objects.",
+      "promptSha256": "1ce090b7ceb41addd4141727c31c7b3f6091a9d440aad0b22ef313df92c53a73",
+      "playbackDerivative": {
+        "format": "PNG RGBA",
+        "size": [
+          300,
+          300
+        ],
+        "bytes": 78902,
+        "operation": "按留档像素框裁切，透明通道完整，等比缩至 300px 长边。"
+      }
+    },
+    {
+      "key": "recipient-turtle",
+      "sourceType": "codex_builtin_imagegen_atlas_crop",
+      "source": "art-source/p08-post-vehicles-and-recipients.png",
+      "sourceSha256": "08a7609a7f0be5700fd2fe89955a982f3ee4cefd4655a69e501dd59dd7957e44",
+      "sha256": "3e40189f0da6be0949a5cf5ec4d783a48ae1145fabfb59a2be75ebcaf55c9a07",
+      "file": "assets/recipient-turtle.png",
+      "atlasId": "p08-post-vehicles-and-recipients",
+      "sourceCrop": [
+        512,
+        512,
+        1024,
+        1024
+      ],
+      "uses": [
+        "p08"
+      ],
+      "sourceSize": [
+        1536,
+        1024
+      ],
+      "prompt": "Create one production sprite atlas for the first-grade Chinese lesson 《小小的船》's delivery game. Transparent RGBA, strictly three columns × two rows of equal square cells, 3:2 landscape overall. Each cell contains one independent sprite, optically centered, all four edges and the entire invisible gutters fully transparent with at least 13% alpha-zero margin. Exactly this row-major order. Row 1 left: empty warm-orange toy postal van facing right, simple high three-quarter top view, visible low cargo bed, dark wheels, matte pine-green trim. Row 1 middle: precisely the same orange postal van at the same scale, angle and anchor, with its small cargo gate raised and no item in the bed. Row 1 right: simple longer cream-apricot toy traffic car facing right, high top view with dark wheels and dusky teal windshield, visually distinct from the postal van. Row 2 left: only a light apricot rabbit face with two long ears and small friendly nose, ears fully in view. Row 2 middle: only a full side view green turtle pointing right, clear rounded shell, head, four stubby legs, no plaque. Row 2 right: only a warm apricot cat face with two triangular ears and visible whiskers, no collar or neck. Matte gouache, fine paper grain limited to the opaque objects, clean cut-paper edges, original child-friendly art in warm cream, pine green, apricot and persimmon orange. All six silhouettes readable at 30 pixels, postal van recognizable at 22 pixels. No scene, no ground, no shadow, no glow, no colored aura, no translucent blur outside the silhouettes, no lettering, numbers, grid, checkerboard, badges, logos, watermark, or extra objects.",
+      "promptSha256": "1ce090b7ceb41addd4141727c31c7b3f6091a9d440aad0b22ef313df92c53a73",
+      "playbackDerivative": {
+        "format": "PNG RGBA",
+        "size": [
+          300,
+          300
+        ],
+        "bytes": 74340,
+        "operation": "按留档像素框裁切，透明通道完整，等比缩至 300px 长边。"
+      }
+    },
+    {
+      "key": "recipient-cat",
+      "sourceType": "codex_builtin_imagegen_atlas_crop",
+      "source": "art-source/p08-post-vehicles-and-recipients.png",
+      "sourceSha256": "08a7609a7f0be5700fd2fe89955a982f3ee4cefd4655a69e501dd59dd7957e44",
+      "sha256": "21216f56b1201f9330f137cac73c4c765ba5932d72ef0382cfd474180b9def03",
+      "file": "assets/recipient-cat.png",
+      "atlasId": "p08-post-vehicles-and-recipients",
+      "sourceCrop": [
+        1024,
+        512,
+        1536,
+        1024
+      ],
+      "uses": [
+        "p08"
+      ],
+      "sourceSize": [
+        1536,
+        1024
+      ],
+      "prompt": "Create one production sprite atlas for the first-grade Chinese lesson 《小小的船》's delivery game. Transparent RGBA, strictly three columns × two rows of equal square cells, 3:2 landscape overall. Each cell contains one independent sprite, optically centered, all four edges and the entire invisible gutters fully transparent with at least 13% alpha-zero margin. Exactly this row-major order. Row 1 left: empty warm-orange toy postal van facing right, simple high three-quarter top view, visible low cargo bed, dark wheels, matte pine-green trim. Row 1 middle: precisely the same orange postal van at the same scale, angle and anchor, with its small cargo gate raised and no item in the bed. Row 1 right: simple longer cream-apricot toy traffic car facing right, high top view with dark wheels and dusky teal windshield, visually distinct from the postal van. Row 2 left: only a light apricot rabbit face with two long ears and small friendly nose, ears fully in view. Row 2 middle: only a full side view green turtle pointing right, clear rounded shell, head, four stubby legs, no plaque. Row 2 right: only a warm apricot cat face with two triangular ears and visible whiskers, no collar or neck. Matte gouache, fine paper grain limited to the opaque objects, clean cut-paper edges, original child-friendly art in warm cream, pine green, apricot and persimmon orange. All six silhouettes readable at 30 pixels, postal van recognizable at 22 pixels. No scene, no ground, no shadow, no glow, no colored aura, no translucent blur outside the silhouettes, no lettering, numbers, grid, checkerboard, badges, logos, watermark, or extra objects.",
+      "promptSha256": "1ce090b7ceb41addd4141727c31c7b3f6091a9d440aad0b22ef313df92c53a73",
+      "playbackDerivative": {
+        "format": "PNG RGBA",
+        "size": [
+          300,
+          300
+        ],
+        "bytes": 83490,
+        "operation": "按留档像素框裁切，透明通道完整，等比缩至 300px 长边。"
+      }
+    },
+    {
+      "key": "parcel-yellow-leaf",
+      "sourceType": "codex_builtin_imagegen_atlas_crop",
+      "source": "art-source/p08-parcels-and-yarn.png",
+      "sourceSha256": "4641ad47aff7dc8345da95b3f3ba108b7444af8cd922a72bfe9318645547995a",
+      "sha256": "00b922d178b19898f8a8cababcef5bbb33b8c0bcc46438c7d291d001bf3ff9e3",
+      "file": "assets/parcel-yellow-leaf.png",
+      "atlasId": "p08-parcels-and-yarn",
+      "sourceCrop": [
+        0,
+        0,
+        512,
+        512
+      ],
+      "uses": [
+        "p08"
+      ],
+      "sourceSize": [
+        1536,
+        1024
+      ],
+      "prompt": "Create one genuinely transparent six-cell production sprite atlas for a first-grade Chinese delivery and listening lesson. Exactly 3 equal columns × 2 equal rows of square cells, overall 3:2 landscape. Every sprite is separate and centered with all margins and gutters alpha zero, no texture outside the object. Use exactly this order. Top left: a single complete golden-yellow oval fall leaf, short stalk and simple midrib, tilted up-right. Top middle: the exact same silhouette, size, tilt and stalk as the yellow leaf, but solid fresh medium green. Top right: one red knitted scarf laid out as a long horizontal soft strip with visible short fringe at both ends, front-three-quarter view, moderately saturated warm red. Bottom left: the exact same long horizontal scarf with same scale and fringe, clear medium blue instead of red. Bottom middle: one medium-blue round knitted cap with visibly rounded crown and broad knitted cuff, side-three-quarter view, a compact round silhouette clearly unlike a scarf, no pom-pom or logo. Bottom right: one medium-green round yarn ball, simple distinct curved yarn strands and a single short loose end, no other accessory. Original fine paper grain, matte gouache and crisp paper-cut edges, low-detail silhouettes intentionally recognizable at 30px. Keep the scarf and cap blue vivid and clearly different in silhouette. Flat crisp opacity, empty true transparent outer area, no blur, glow, shadow, grid, text, letters, numbers, watermark, logos, people, or background.",
+      "promptSha256": "380bea834c2c0d6621c8eee2878992c8621751a0867c4974b8b9d09eedbfed1c",
+      "playbackDerivative": {
+        "format": "PNG RGBA",
+        "size": [
+          300,
+          300
+        ],
+        "bytes": 54239,
+        "operation": "按留档像素框裁切，透明通道完整，等比缩至 300px 长边。"
+      }
+    },
+    {
+      "key": "parcel-green-leaf",
+      "sourceType": "codex_builtin_imagegen_atlas_crop",
+      "source": "art-source/p08-parcels-and-yarn.png",
+      "sourceSha256": "4641ad47aff7dc8345da95b3f3ba108b7444af8cd922a72bfe9318645547995a",
+      "sha256": "1e1b6a42f63f13e7f51d2d693a7b428da870e8e6f6438f5120ba52af1890b6df",
+      "file": "assets/parcel-green-leaf.png",
+      "atlasId": "p08-parcels-and-yarn",
+      "sourceCrop": [
+        512,
+        0,
+        1008,
+        512
+      ],
+      "uses": [
+        "p08"
+      ],
+      "sourceSize": [
+        1536,
+        1024
+      ],
+      "prompt": "Create one genuinely transparent six-cell production sprite atlas for a first-grade Chinese delivery and listening lesson. Exactly 3 equal columns × 2 equal rows of square cells, overall 3:2 landscape. Every sprite is separate and centered with all margins and gutters alpha zero, no texture outside the object. Use exactly this order. Top left: a single complete golden-yellow oval fall leaf, short stalk and simple midrib, tilted up-right. Top middle: the exact same silhouette, size, tilt and stalk as the yellow leaf, but solid fresh medium green. Top right: one red knitted scarf laid out as a long horizontal soft strip with visible short fringe at both ends, front-three-quarter view, moderately saturated warm red. Bottom left: the exact same long horizontal scarf with same scale and fringe, clear medium blue instead of red. Bottom middle: one medium-blue round knitted cap with visibly rounded crown and broad knitted cuff, side-three-quarter view, a compact round silhouette clearly unlike a scarf, no pom-pom or logo. Bottom right: one medium-green round yarn ball, simple distinct curved yarn strands and a single short loose end, no other accessory. Original fine paper grain, matte gouache and crisp paper-cut edges, low-detail silhouettes intentionally recognizable at 30px. Keep the scarf and cap blue vivid and clearly different in silhouette. Flat crisp opacity, empty true transparent outer area, no blur, glow, shadow, grid, text, letters, numbers, watermark, logos, people, or background.",
+      "promptSha256": "380bea834c2c0d6621c8eee2878992c8621751a0867c4974b8b9d09eedbfed1c",
+      "playbackDerivative": {
+        "format": "PNG RGBA",
+        "size": [
+          291,
+          300
+        ],
+        "bytes": 64556,
+        "operation": "按留档像素框裁切，透明通道完整，等比缩至 300px 长边。"
+      }
+    },
+    {
+      "key": "parcel-red-scarf",
+      "sourceType": "codex_builtin_imagegen_atlas_crop",
+      "source": "art-source/p08-parcels-and-yarn.png",
+      "sourceSha256": "4641ad47aff7dc8345da95b3f3ba108b7444af8cd922a72bfe9318645547995a",
+      "sha256": "3fe10a9468795a1ae29fa5a0a8b33253943abc83257d37cfd26211b2a2e9f45f",
+      "file": "assets/parcel-red-scarf.png",
+      "atlasId": "p08-parcels-and-yarn",
+      "sourceCrop": [
+        1008,
+        0,
+        1536,
+        512
+      ],
+      "uses": [
+        "p08"
+      ],
+      "sourceSize": [
+        1536,
+        1024
+      ],
+      "prompt": "Create one genuinely transparent six-cell production sprite atlas for a first-grade Chinese delivery and listening lesson. Exactly 3 equal columns × 2 equal rows of square cells, overall 3:2 landscape. Every sprite is separate and centered with all margins and gutters alpha zero, no texture outside the object. Use exactly this order. Top left: a single complete golden-yellow oval fall leaf, short stalk and simple midrib, tilted up-right. Top middle: the exact same silhouette, size, tilt and stalk as the yellow leaf, but solid fresh medium green. Top right: one red knitted scarf laid out as a long horizontal soft strip with visible short fringe at both ends, front-three-quarter view, moderately saturated warm red. Bottom left: the exact same long horizontal scarf with same scale and fringe, clear medium blue instead of red. Bottom middle: one medium-blue round knitted cap with visibly rounded crown and broad knitted cuff, side-three-quarter view, a compact round silhouette clearly unlike a scarf, no pom-pom or logo. Bottom right: one medium-green round yarn ball, simple distinct curved yarn strands and a single short loose end, no other accessory. Original fine paper grain, matte gouache and crisp paper-cut edges, low-detail silhouettes intentionally recognizable at 30px. Keep the scarf and cap blue vivid and clearly different in silhouette. Flat crisp opacity, empty true transparent outer area, no blur, glow, shadow, grid, text, letters, numbers, watermark, logos, people, or background.",
+      "promptSha256": "380bea834c2c0d6621c8eee2878992c8621751a0867c4974b8b9d09eedbfed1c",
+      "playbackDerivative": {
+        "format": "PNG RGBA",
+        "size": [
+          300,
+          291
+        ],
+        "bytes": 53975,
+        "operation": "按留档像素框裁切，透明通道完整，等比缩至 300px 长边。"
+      }
+    },
+    {
+      "key": "parcel-blue-scarf",
+      "sourceType": "codex_builtin_imagegen_atlas_crop",
+      "source": "art-source/p08-parcels-and-yarn.png",
+      "sourceSha256": "4641ad47aff7dc8345da95b3f3ba108b7444af8cd922a72bfe9318645547995a",
+      "sha256": "1a8eddf9f772cb0164b25cfb660e0c9178de55a212c5053df277e498d4514e9e",
+      "file": "assets/parcel-blue-scarf.png",
+      "atlasId": "p08-parcels-and-yarn",
+      "sourceCrop": [
+        0,
+        512,
+        512,
+        1024
+      ],
+      "uses": [
+        "p08"
+      ],
+      "sourceSize": [
+        1536,
+        1024
+      ],
+      "prompt": "Create one genuinely transparent six-cell production sprite atlas for a first-grade Chinese delivery and listening lesson. Exactly 3 equal columns × 2 equal rows of square cells, overall 3:2 landscape. Every sprite is separate and centered with all margins and gutters alpha zero, no texture outside the object. Use exactly this order. Top left: a single complete golden-yellow oval fall leaf, short stalk and simple midrib, tilted up-right. Top middle: the exact same silhouette, size, tilt and stalk as the yellow leaf, but solid fresh medium green. Top right: one red knitted scarf laid out as a long horizontal soft strip with visible short fringe at both ends, front-three-quarter view, moderately saturated warm red. Bottom left: the exact same long horizontal scarf with same scale and fringe, clear medium blue instead of red. Bottom middle: one medium-blue round knitted cap with visibly rounded crown and broad knitted cuff, side-three-quarter view, a compact round silhouette clearly unlike a scarf, no pom-pom or logo. Bottom right: one medium-green round yarn ball, simple distinct curved yarn strands and a single short loose end, no other accessory. Original fine paper grain, matte gouache and crisp paper-cut edges, low-detail silhouettes intentionally recognizable at 30px. Keep the scarf and cap blue vivid and clearly different in silhouette. Flat crisp opacity, empty true transparent outer area, no blur, glow, shadow, grid, text, letters, numbers, watermark, logos, people, or background.",
+      "promptSha256": "380bea834c2c0d6621c8eee2878992c8621751a0867c4974b8b9d09eedbfed1c",
+      "playbackDerivative": {
+        "format": "PNG RGBA",
+        "size": [
+          300,
+          300
+        ],
+        "bytes": 55220,
+        "operation": "按留档像素框裁切，透明通道完整，等比缩至 300px 长边。"
+      }
+    },
+    {
+      "key": "parcel-blue-cap",
+      "sourceType": "codex_builtin_imagegen_atlas_crop",
+      "source": "art-source/p08-parcels-and-yarn.png",
+      "sourceSha256": "4641ad47aff7dc8345da95b3f3ba108b7444af8cd922a72bfe9318645547995a",
+      "sha256": "42bb492bb6d04bbe8826d4ce326bb601ff22ede10cb93ce50fef688ae5d079ab",
+      "file": "assets/parcel-blue-cap.png",
+      "atlasId": "p08-parcels-and-yarn",
+      "sourceCrop": [
+        512,
+        512,
+        1024,
+        1024
+      ],
+      "uses": [
+        "p08"
+      ],
+      "sourceSize": [
+        1536,
+        1024
+      ],
+      "prompt": "Create one genuinely transparent six-cell production sprite atlas for a first-grade Chinese delivery and listening lesson. Exactly 3 equal columns × 2 equal rows of square cells, overall 3:2 landscape. Every sprite is separate and centered with all margins and gutters alpha zero, no texture outside the object. Use exactly this order. Top left: a single complete golden-yellow oval fall leaf, short stalk and simple midrib, tilted up-right. Top middle: the exact same silhouette, size, tilt and stalk as the yellow leaf, but solid fresh medium green. Top right: one red knitted scarf laid out as a long horizontal soft strip with visible short fringe at both ends, front-three-quarter view, moderately saturated warm red. Bottom left: the exact same long horizontal scarf with same scale and fringe, clear medium blue instead of red. Bottom middle: one medium-blue round knitted cap with visibly rounded crown and broad knitted cuff, side-three-quarter view, a compact round silhouette clearly unlike a scarf, no pom-pom or logo. Bottom right: one medium-green round yarn ball, simple distinct curved yarn strands and a single short loose end, no other accessory. Original fine paper grain, matte gouache and crisp paper-cut edges, low-detail silhouettes intentionally recognizable at 30px. Keep the scarf and cap blue vivid and clearly different in silhouette. Flat crisp opacity, empty true transparent outer area, no blur, glow, shadow, grid, text, letters, numbers, watermark, logos, people, or background.",
+      "promptSha256": "380bea834c2c0d6621c8eee2878992c8621751a0867c4974b8b9d09eedbfed1c",
+      "playbackDerivative": {
+        "format": "PNG RGBA",
+        "size": [
+          300,
+          300
+        ],
+        "bytes": 116074,
+        "operation": "按留档像素框裁切，透明通道完整，等比缩至 300px 长边。"
+      }
+    },
+    {
+      "key": "q-green-yarn",
+      "file": "assets/illustrations/q-green-yarn.png",
+      "uses": [
+        "p14"
+      ],
+      "sourceType": "deterministic_composition_of_codex_imagegen",
+      "source": "art-source/q-green-yarn-composition.json",
+      "sourceSha256": "729812f5cd52c8afddbf61294be550ad5e3b794d1c0b0e1519993f8cadb0cbe8",
+      "sha256": "0e49b81423732f7027e2ec6deaba633d5dc2ec0e8556b1ca17991d0bd6c5ec07",
+      "inputAssets": [],
+      "playbackDerivative": {
+        "format": "PNG RGB",
+        "size": [
+          480,
+          480
+        ],
+        "bytes": 99068,
+        "operation": "本课已登记的内置 ImageGen 图片按可编辑图层等比合成。"
+      },
+      "priorAsset": {
+        "key": "q-green-yarn",
+        "sourceType": "codex_builtin_imagegen_atlas_crop",
+        "source": "art-source/p08-parcels-and-yarn.png",
+        "sourceSha256": "4641ad47aff7dc8345da95b3f3ba108b7444af8cd922a72bfe9318645547995a",
+        "sha256": "901cc30c09ef77bcfe55cd743c6dc0dfe57e9d9ef17268199a42bfe357c2fa6c",
+        "file": "assets/q-green-yarn.png",
+        "atlasId": "p08-parcels-and-yarn",
+        "sourceCrop": [
+          1024,
+          512,
+          1536,
+          1024
+        ],
+        "uses": [
+          "p14"
+        ],
+        "sourceSize": [
+          1536,
+          1024
+        ],
+        "prompt": "Create one genuinely transparent six-cell production sprite atlas for a first-grade Chinese delivery and listening lesson. Exactly 3 equal columns × 2 equal rows of square cells, overall 3:2 landscape. Every sprite is separate and centered with all margins and gutters alpha zero, no texture outside the object. Use exactly this order. Top left: a single complete golden-yellow oval fall leaf, short stalk and simple midrib, tilted up-right. Top middle: the exact same silhouette, size, tilt and stalk as the yellow leaf, but solid fresh medium green. Top right: one red knitted scarf laid out as a long horizontal soft strip with visible short fringe at both ends, front-three-quarter view, moderately saturated warm red. Bottom left: the exact same long horizontal scarf with same scale and fringe, clear medium blue instead of red. Bottom middle: one medium-blue round knitted cap with visibly rounded crown and broad knitted cuff, side-three-quarter view, a compact round silhouette clearly unlike a scarf, no pom-pom or logo. Bottom right: one medium-green round yarn ball, simple distinct curved yarn strands and a single short loose end, no other accessory. Original fine paper grain, matte gouache and crisp paper-cut edges, low-detail silhouettes intentionally recognizable at 30px. Keep the scarf and cap blue vivid and clearly different in silhouette. Flat crisp opacity, empty true transparent outer area, no blur, glow, shadow, grid, text, letters, numbers, watermark, logos, people, or background.",
+        "promptSha256": "380bea834c2c0d6621c8eee2878992c8621751a0867c4974b8b9d09eedbfed1c",
+        "playbackDerivative": {
+          "format": "PNG RGBA",
+          "size": [
+            300,
+            300
+          ],
+          "bytes": 98226,
+          "operation": "按留档像素框裁切，透明通道完整，等比缩至 300px 长边。"
+        }
+      },
+      "sourceInputs": {
+        "yarn-atlas-crop": {
+          "file": "assets/q-green-yarn.png",
+          "sha256": "901cc30c09ef77bcfe55cd743c6dc0dfe57e9d9ef17268199a42bfe357c2fa6c"
+        }
+      }
+    },
+    {
+      "key": "q-drum-beside",
+      "sourceType": "codex_builtin_imagegen_atlas_crop",
+      "source": "art-source/p14-position-and-gaze.png",
+      "sourceSha256": "eda2bf62fe84052f0f308270defff8cd8efb55ce6cdedf1c94fc0f65b9702539",
+      "sha256": "ced9c2841667e6b288329a2164e381a55c2374ce48a432b60cfe2eda090b3f52",
+      "file": "assets/q-drum-beside.png",
+      "atlasId": "p14-position-and-gaze",
+      "sourceCrop": [
+        0,
+        0,
+        512,
+        512
+      ],
+      "uses": [
+        "p14"
+      ],
+      "sourceSize": [
+        1536,
+        1024
+      ],
+      "prompt": "Create one production atlas of SIX separate square mini illustrations for a first-grade Chinese comprehension quiz in the lesson 《小小的船》. Overall 3:2 landscape, exactly three equal columns and two equal rows. The unseen tile edges must lie at exact thirds of width and half height. Clean flat uniform warm cream at all tile edges and in the gutters. Each panel is an independent square mini scene with 12% padding, so that cropping produces six complete images. No borders, lettering, numbers, arrows, watermarks, decorative icons or panel labels. The picture-book style is matte gouache with fine paper grain, clear paper-cut shapes, warm cream, pine green, apricot and persimmon, quiet low-saturation indigo only at night. All subjects must remain unambiguous at a 96px thumbnail. TOP ROW is three nearly identical front-three-quarter-overhead studies with the same low wide open woven apricot basket and one tiny red-rim round drum. Repeat the basket camera and centered size exactly across all three. Left: the small drum is BESIDE the basket to its right, fully outside, each object contacting the ground separately. Middle: the drum is BEHIND the basket, slightly right, its lower third hidden by the back wall of the basket, but the entire oval opening is visible empty. Right: drum sits entirely INSIDE the basket, below its upper rim, with the basket wall and surrounding inner space visibly enclosing it. No drumsticks. BOTTOM ROW is three original distinct mini scenes using the same short-black-haired child in an apricot coat. Left: the child on a quiet riverbank unmistakably tilts head and gaze DOWN toward pale star-like reflections on the dark water below; visible shoreline and absolutely no stars above the head. Middle: the child unmistakably gazes UP at two clearly white clouds in a bright blue DAY sky, no stars. Right: a warm interior with a recognizable window, the child unmistakably tips the face UP toward several clear stars in the dark blue NIGHT sky beyond the window, no water or clouds. For the bottom three panels, keep head and eye direction clearly legible, use side profiles and simple shapes. Do not let any object touch any tile margin.",
+      "promptSha256": "62d6590889dcedae92439c37e93c3098d60b3ea8753cb3934e3a9d09090b2d2c",
+      "playbackDerivative": {
+        "format": "PNG RGB",
+        "size": [
+          480,
+          480
+        ],
+        "bytes": 303863,
+        "operation": "按留档像素框整格裁切并等比缩小。"
+      }
+    },
+    {
+      "key": "q-drum-behind",
+      "sourceType": "codex_builtin_imagegen_atlas_crop",
+      "source": "art-source/p14-position-and-gaze.png",
+      "sourceSha256": "eda2bf62fe84052f0f308270defff8cd8efb55ce6cdedf1c94fc0f65b9702539",
+      "sha256": "f602d136bf66cc63ac58ca36ea9305d8f4a32b282c55261012723dead5bdc1bb",
+      "file": "assets/q-drum-behind.png",
+      "atlasId": "p14-position-and-gaze",
+      "sourceCrop": [
+        512,
+        0,
+        1024,
+        512
+      ],
+      "uses": [
+        "p14"
+      ],
+      "sourceSize": [
+        1536,
+        1024
+      ],
+      "prompt": "Create one production atlas of SIX separate square mini illustrations for a first-grade Chinese comprehension quiz in the lesson 《小小的船》. Overall 3:2 landscape, exactly three equal columns and two equal rows. The unseen tile edges must lie at exact thirds of width and half height. Clean flat uniform warm cream at all tile edges and in the gutters. Each panel is an independent square mini scene with 12% padding, so that cropping produces six complete images. No borders, lettering, numbers, arrows, watermarks, decorative icons or panel labels. The picture-book style is matte gouache with fine paper grain, clear paper-cut shapes, warm cream, pine green, apricot and persimmon, quiet low-saturation indigo only at night. All subjects must remain unambiguous at a 96px thumbnail. TOP ROW is three nearly identical front-three-quarter-overhead studies with the same low wide open woven apricot basket and one tiny red-rim round drum. Repeat the basket camera and centered size exactly across all three. Left: the small drum is BESIDE the basket to its right, fully outside, each object contacting the ground separately. Middle: the drum is BEHIND the basket, slightly right, its lower third hidden by the back wall of the basket, but the entire oval opening is visible empty. Right: drum sits entirely INSIDE the basket, below its upper rim, with the basket wall and surrounding inner space visibly enclosing it. No drumsticks. BOTTOM ROW is three original distinct mini scenes using the same short-black-haired child in an apricot coat. Left: the child on a quiet riverbank unmistakably tilts head and gaze DOWN toward pale star-like reflections on the dark water below; visible shoreline and absolutely no stars above the head. Middle: the child unmistakably gazes UP at two clearly white clouds in a bright blue DAY sky, no stars. Right: a warm interior with a recognizable window, the child unmistakably tips the face UP toward several clear stars in the dark blue NIGHT sky beyond the window, no water or clouds. For the bottom three panels, keep head and eye direction clearly legible, use side profiles and simple shapes. Do not let any object touch any tile margin.",
+      "promptSha256": "62d6590889dcedae92439c37e93c3098d60b3ea8753cb3934e3a9d09090b2d2c",
+      "playbackDerivative": {
+        "format": "PNG RGB",
+        "size": [
+          480,
+          480
+        ],
+        "bytes": 306848,
+        "operation": "按留档像素框整格裁切并等比缩小。"
+      }
+    },
+    {
+      "key": "q-drum-inside",
+      "sourceType": "codex_builtin_imagegen_atlas_crop",
+      "source": "art-source/p14-position-and-gaze.png",
+      "sourceSha256": "eda2bf62fe84052f0f308270defff8cd8efb55ce6cdedf1c94fc0f65b9702539",
+      "sha256": "bff0a893d27b51c51b2d8349f49885cab859264424af9109ec35bd74d317bb46",
+      "file": "assets/q-drum-inside.png",
+      "atlasId": "p14-position-and-gaze",
+      "sourceCrop": [
+        1024,
+        0,
+        1536,
+        512
+      ],
+      "uses": [
+        "p14"
+      ],
+      "sourceSize": [
+        1536,
+        1024
+      ],
+      "prompt": "Create one production atlas of SIX separate square mini illustrations for a first-grade Chinese comprehension quiz in the lesson 《小小的船》. Overall 3:2 landscape, exactly three equal columns and two equal rows. The unseen tile edges must lie at exact thirds of width and half height. Clean flat uniform warm cream at all tile edges and in the gutters. Each panel is an independent square mini scene with 12% padding, so that cropping produces six complete images. No borders, lettering, numbers, arrows, watermarks, decorative icons or panel labels. The picture-book style is matte gouache with fine paper grain, clear paper-cut shapes, warm cream, pine green, apricot and persimmon, quiet low-saturation indigo only at night. All subjects must remain unambiguous at a 96px thumbnail. TOP ROW is three nearly identical front-three-quarter-overhead studies with the same low wide open woven apricot basket and one tiny red-rim round drum. Repeat the basket camera and centered size exactly across all three. Left: the small drum is BESIDE the basket to its right, fully outside, each object contacting the ground separately. Middle: the drum is BEHIND the basket, slightly right, its lower third hidden by the back wall of the basket, but the entire oval opening is visible empty. Right: drum sits entirely INSIDE the basket, below its upper rim, with the basket wall and surrounding inner space visibly enclosing it. No drumsticks. BOTTOM ROW is three original distinct mini scenes using the same short-black-haired child in an apricot coat. Left: the child on a quiet riverbank unmistakably tilts head and gaze DOWN toward pale star-like reflections on the dark water below; visible shoreline and absolutely no stars above the head. Middle: the child unmistakably gazes UP at two clearly white clouds in a bright blue DAY sky, no stars. Right: a warm interior with a recognizable window, the child unmistakably tips the face UP toward several clear stars in the dark blue NIGHT sky beyond the window, no water or clouds. For the bottom three panels, keep head and eye direction clearly legible, use side profiles and simple shapes. Do not let any object touch any tile margin.",
+      "promptSha256": "62d6590889dcedae92439c37e93c3098d60b3ea8753cb3934e3a9d09090b2d2c",
+      "playbackDerivative": {
+        "format": "PNG RGB",
+        "size": [
+          480,
+          480
+        ],
+        "bytes": 302962,
+        "operation": "按留档像素框整格裁切并等比缩小。"
+      }
+    },
+    {
+      "key": "q-water-reflection",
+      "sourceType": "codex_builtin_imagegen_atlas_crop",
+      "source": "art-source/p14-position-and-gaze.png",
+      "sourceSha256": "eda2bf62fe84052f0f308270defff8cd8efb55ce6cdedf1c94fc0f65b9702539",
+      "sha256": "041e4e62fb71c30235b8302adaa0d38b942b862d9ab187da0b28415e3d03a1a1",
+      "file": "assets/q-water-reflection.png",
+      "atlasId": "p14-position-and-gaze",
+      "sourceCrop": [
+        0,
+        512,
+        512,
+        1024
+      ],
+      "uses": [
+        "p14"
+      ],
+      "sourceSize": [
+        1536,
+        1024
+      ],
+      "prompt": "Create one production atlas of SIX separate square mini illustrations for a first-grade Chinese comprehension quiz in the lesson 《小小的船》. Overall 3:2 landscape, exactly three equal columns and two equal rows. The unseen tile edges must lie at exact thirds of width and half height. Clean flat uniform warm cream at all tile edges and in the gutters. Each panel is an independent square mini scene with 12% padding, so that cropping produces six complete images. No borders, lettering, numbers, arrows, watermarks, decorative icons or panel labels. The picture-book style is matte gouache with fine paper grain, clear paper-cut shapes, warm cream, pine green, apricot and persimmon, quiet low-saturation indigo only at night. All subjects must remain unambiguous at a 96px thumbnail. TOP ROW is three nearly identical front-three-quarter-overhead studies with the same low wide open woven apricot basket and one tiny red-rim round drum. Repeat the basket camera and centered size exactly across all three. Left: the small drum is BESIDE the basket to its right, fully outside, each object contacting the ground separately. Middle: the drum is BEHIND the basket, slightly right, its lower third hidden by the back wall of the basket, but the entire oval opening is visible empty. Right: drum sits entirely INSIDE the basket, below its upper rim, with the basket wall and surrounding inner space visibly enclosing it. No drumsticks. BOTTOM ROW is three original distinct mini scenes using the same short-black-haired child in an apricot coat. Left: the child on a quiet riverbank unmistakably tilts head and gaze DOWN toward pale star-like reflections on the dark water below; visible shoreline and absolutely no stars above the head. Middle: the child unmistakably gazes UP at two clearly white clouds in a bright blue DAY sky, no stars. Right: a warm interior with a recognizable window, the child unmistakably tips the face UP toward several clear stars in the dark blue NIGHT sky beyond the window, no water or clouds. For the bottom three panels, keep head and eye direction clearly legible, use side profiles and simple shapes. Do not let any object touch any tile margin.",
+      "promptSha256": "62d6590889dcedae92439c37e93c3098d60b3ea8753cb3934e3a9d09090b2d2c",
+      "playbackDerivative": {
+        "format": "PNG RGB",
+        "size": [
+          480,
+          480
+        ],
+        "bytes": 338707,
+        "operation": "按留档像素框整格裁切并等比缩小。"
+      }
+    },
+    {
+      "key": "q-day-clouds",
+      "sourceType": "codex_builtin_imagegen_atlas_crop",
+      "source": "art-source/p14-position-and-gaze.png",
+      "sourceSha256": "eda2bf62fe84052f0f308270defff8cd8efb55ce6cdedf1c94fc0f65b9702539",
+      "sha256": "ab039461ac60e8322a7d57b4dba9b07d40bac952b636421e2d6a6f008fe21d3d",
+      "file": "assets/q-day-clouds.png",
+      "atlasId": "p14-position-and-gaze",
+      "sourceCrop": [
+        512,
+        512,
+        1024,
+        1024
+      ],
+      "uses": [
+        "p14"
+      ],
+      "sourceSize": [
+        1536,
+        1024
+      ],
+      "prompt": "Create one production atlas of SIX separate square mini illustrations for a first-grade Chinese comprehension quiz in the lesson 《小小的船》. Overall 3:2 landscape, exactly three equal columns and two equal rows. The unseen tile edges must lie at exact thirds of width and half height. Clean flat uniform warm cream at all tile edges and in the gutters. Each panel is an independent square mini scene with 12% padding, so that cropping produces six complete images. No borders, lettering, numbers, arrows, watermarks, decorative icons or panel labels. The picture-book style is matte gouache with fine paper grain, clear paper-cut shapes, warm cream, pine green, apricot and persimmon, quiet low-saturation indigo only at night. All subjects must remain unambiguous at a 96px thumbnail. TOP ROW is three nearly identical front-three-quarter-overhead studies with the same low wide open woven apricot basket and one tiny red-rim round drum. Repeat the basket camera and centered size exactly across all three. Left: the small drum is BESIDE the basket to its right, fully outside, each object contacting the ground separately. Middle: the drum is BEHIND the basket, slightly right, its lower third hidden by the back wall of the basket, but the entire oval opening is visible empty. Right: drum sits entirely INSIDE the basket, below its upper rim, with the basket wall and surrounding inner space visibly enclosing it. No drumsticks. BOTTOM ROW is three original distinct mini scenes using the same short-black-haired child in an apricot coat. Left: the child on a quiet riverbank unmistakably tilts head and gaze DOWN toward pale star-like reflections on the dark water below; visible shoreline and absolutely no stars above the head. Middle: the child unmistakably gazes UP at two clearly white clouds in a bright blue DAY sky, no stars. Right: a warm interior with a recognizable window, the child unmistakably tips the face UP toward several clear stars in the dark blue NIGHT sky beyond the window, no water or clouds. For the bottom three panels, keep head and eye direction clearly legible, use side profiles and simple shapes. Do not let any object touch any tile margin.",
+      "promptSha256": "62d6590889dcedae92439c37e93c3098d60b3ea8753cb3934e3a9d09090b2d2c",
+      "playbackDerivative": {
+        "format": "PNG RGB",
+        "size": [
+          480,
+          480
+        ],
+        "bytes": 318492,
+        "operation": "按留档像素框整格裁切并等比缩小。"
+      }
+    },
+    {
+      "key": "q-window-stars",
+      "sourceType": "codex_builtin_imagegen_atlas_crop",
+      "source": "art-source/p14-position-and-gaze.png",
+      "sourceSha256": "eda2bf62fe84052f0f308270defff8cd8efb55ce6cdedf1c94fc0f65b9702539",
+      "sha256": "90fcb97bca9c8098641be6655e196028f7418de5c4272de2ee1acf61a625ac9d",
+      "file": "assets/q-window-stars.png",
+      "atlasId": "p14-position-and-gaze",
+      "sourceCrop": [
+        1024,
+        512,
+        1536,
+        1024
+      ],
+      "uses": [
+        "p14"
+      ],
+      "sourceSize": [
+        1536,
+        1024
+      ],
+      "prompt": "Create one production atlas of SIX separate square mini illustrations for a first-grade Chinese comprehension quiz in the lesson 《小小的船》. Overall 3:2 landscape, exactly three equal columns and two equal rows. The unseen tile edges must lie at exact thirds of width and half height. Clean flat uniform warm cream at all tile edges and in the gutters. Each panel is an independent square mini scene with 12% padding, so that cropping produces six complete images. No borders, lettering, numbers, arrows, watermarks, decorative icons or panel labels. The picture-book style is matte gouache with fine paper grain, clear paper-cut shapes, warm cream, pine green, apricot and persimmon, quiet low-saturation indigo only at night. All subjects must remain unambiguous at a 96px thumbnail. TOP ROW is three nearly identical front-three-quarter-overhead studies with the same low wide open woven apricot basket and one tiny red-rim round drum. Repeat the basket camera and centered size exactly across all three. Left: the small drum is BESIDE the basket to its right, fully outside, each object contacting the ground separately. Middle: the drum is BEHIND the basket, slightly right, its lower third hidden by the back wall of the basket, but the entire oval opening is visible empty. Right: drum sits entirely INSIDE the basket, below its upper rim, with the basket wall and surrounding inner space visibly enclosing it. No drumsticks. BOTTOM ROW is three original distinct mini scenes using the same short-black-haired child in an apricot coat. Left: the child on a quiet riverbank unmistakably tilts head and gaze DOWN toward pale star-like reflections on the dark water below; visible shoreline and absolutely no stars above the head. Middle: the child unmistakably gazes UP at two clearly white clouds in a bright blue DAY sky, no stars. Right: a warm interior with a recognizable window, the child unmistakably tips the face UP toward several clear stars in the dark blue NIGHT sky beyond the window, no water or clouds. For the bottom three panels, keep head and eye direction clearly legible, use side profiles and simple shapes. Do not let any object touch any tile margin.",
+      "promptSha256": "62d6590889dcedae92439c37e93c3098d60b3ea8753cb3934e3a9d09090b2d2c",
+      "playbackDerivative": {
+        "format": "PNG RGB",
+        "size": [
+          480,
+          480
+        ],
+        "bytes": 316714,
+        "operation": "按留档像素框整格裁切并等比缩小。"
+      }
+    },
+    {
+      "key": "room-pinwheel",
+      "sourceType": "codex_builtin_imagegen_atlas_crop",
+      "source": "art-source/p04-p05-p14-room-and-knit.png",
+      "sourceSha256": "5c9cd2237bce1d82b922aa9d6a3853cbb8c4362ff17009abe7e9a8ac0013ecd5",
+      "sha256": "45b88a9c7abf0a4cf7591e3fafd470c5745c597a0b328a3a88bd1904c2c6e198",
+      "file": "assets/room-pinwheel.png",
+      "atlasId": "p04-p05-p14-room-and-knit",
+      "sourceCrop": [
+        0,
+        0,
+        627,
+        627
+      ],
+      "uses": [
+        "p04"
+      ],
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "prompt": "Create one opaque original four-cell children's lesson art atlas in a precise 2×2 grid, equal square cells and a square overall image. All objects and story contents within their own quadrant, with uninterrupted warm-cream margins and gutters and no drawn grid lines. Fine paper grain, matte gouache, clean cut-paper edges, warm cream, pine green, apricot and persimmon, high readability at small sizes. Top-left: a simple warm room with an intact wall and a clear window frame. On a low shelf below the window, a single four-blade colorful paper pinwheel with a visible stick is planted in a small clay pot; a visibly empty open-top box sits on the same shelf separately to its side, with a gap. No other toy. Top-right: a front-facing plain wooden doorway, slightly open door. Two long vertical outer jambs and one unbroken horizontal lintel are prominent and all entirely within the frame, dark pine green contrasted against cream walls and pale floor. A child peeks through the narrow opening behind the door, not covering the main outer frame. Bottom-left: on exactly flat pale warm cream with no other object, one long medium-blue knitted scarf positioned diagonally lower left to upper right, new ribbed knit pattern, visibly knitted with short fringe. Bottom-right: exact same long scarf design, size, angle, framing, layout, fringe, and light as bottom-left, but clear bright leaf-green color. Scarf shadows subtle and identical; no text, lettering, digits, labels, glyphs, watermark, frames, arrows or extra pictures. Keep an empty 10% margin around the outer silhouette of each image.",
+      "promptSha256": "d311ca14263af37d6661c61c8c13b0ae0b5b842f141b38d7cbf1b319b0e4a7f6",
+      "playbackDerivative": {
+        "format": "PNG RGB",
+        "size": [
+          600,
+          600
+        ],
+        "bytes": 553105,
+        "operation": "按留档像素框整格裁切并等比缩小。"
+      }
+    },
+    {
+      "key": "plain-door",
+      "sourceType": "codex_builtin_imagegen_atlas_crop",
+      "source": "art-source/p04-p05-p14-room-and-knit.png",
+      "sourceSha256": "5c9cd2237bce1d82b922aa9d6a3853cbb8c4362ff17009abe7e9a8ac0013ecd5",
+      "sha256": "ca8d356a91bbb13d6e9a7def5ee1571f813e1cdf2e11c3792cd402f454183d10",
+      "file": "assets/plain-door.png",
+      "atlasId": "p04-p05-p14-room-and-knit",
+      "sourceCrop": [
+        627,
+        0,
+        1254,
+        627
+      ],
+      "uses": [
+        "p05"
+      ],
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "prompt": "Create one opaque original four-cell children's lesson art atlas in a precise 2×2 grid, equal square cells and a square overall image. All objects and story contents within their own quadrant, with uninterrupted warm-cream margins and gutters and no drawn grid lines. Fine paper grain, matte gouache, clean cut-paper edges, warm cream, pine green, apricot and persimmon, high readability at small sizes. Top-left: a simple warm room with an intact wall and a clear window frame. On a low shelf below the window, a single four-blade colorful paper pinwheel with a visible stick is planted in a small clay pot; a visibly empty open-top box sits on the same shelf separately to its side, with a gap. No other toy. Top-right: a front-facing plain wooden doorway, slightly open door. Two long vertical outer jambs and one unbroken horizontal lintel are prominent and all entirely within the frame, dark pine green contrasted against cream walls and pale floor. A child peeks through the narrow opening behind the door, not covering the main outer frame. Bottom-left: on exactly flat pale warm cream with no other object, one long medium-blue knitted scarf positioned diagonally lower left to upper right, new ribbed knit pattern, visibly knitted with short fringe. Bottom-right: exact same long scarf design, size, angle, framing, layout, fringe, and light as bottom-left, but clear bright leaf-green color. Scarf shadows subtle and identical; no text, lettering, digits, labels, glyphs, watermark, frames, arrows or extra pictures. Keep an empty 10% margin around the outer silhouette of each image.",
+      "promptSha256": "d311ca14263af37d6661c61c8c13b0ae0b5b842f141b38d7cbf1b319b0e4a7f6",
+      "playbackDerivative": {
+        "format": "PNG RGB",
+        "size": [
+          600,
+          600
+        ],
+        "bytes": 536775,
+        "operation": "按留档像素框整格裁切并等比缩小。"
+      }
+    },
+    {
+      "key": "q-blue-knit",
+      "sourceType": "codex_builtin_imagegen_atlas_crop",
+      "source": "art-source/p04-p05-p14-room-and-knit.png",
+      "sourceSha256": "5c9cd2237bce1d82b922aa9d6a3853cbb8c4362ff17009abe7e9a8ac0013ecd5",
+      "sha256": "739d7bd9ec5016a322ad322c612afd3bc93e8bdcb33cb5b1d1f3771956437d64",
+      "file": "assets/q-blue-knit.png",
+      "atlasId": "p04-p05-p14-room-and-knit",
+      "sourceCrop": [
+        0,
+        627,
+        627,
+        1254
+      ],
+      "uses": [
+        "p14"
+      ],
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "prompt": "Create one opaque original four-cell children's lesson art atlas in a precise 2×2 grid, equal square cells and a square overall image. All objects and story contents within their own quadrant, with uninterrupted warm-cream margins and gutters and no drawn grid lines. Fine paper grain, matte gouache, clean cut-paper edges, warm cream, pine green, apricot and persimmon, high readability at small sizes. Top-left: a simple warm room with an intact wall and a clear window frame. On a low shelf below the window, a single four-blade colorful paper pinwheel with a visible stick is planted in a small clay pot; a visibly empty open-top box sits on the same shelf separately to its side, with a gap. No other toy. Top-right: a front-facing plain wooden doorway, slightly open door. Two long vertical outer jambs and one unbroken horizontal lintel are prominent and all entirely within the frame, dark pine green contrasted against cream walls and pale floor. A child peeks through the narrow opening behind the door, not covering the main outer frame. Bottom-left: on exactly flat pale warm cream with no other object, one long medium-blue knitted scarf positioned diagonally lower left to upper right, new ribbed knit pattern, visibly knitted with short fringe. Bottom-right: exact same long scarf design, size, angle, framing, layout, fringe, and light as bottom-left, but clear bright leaf-green color. Scarf shadows subtle and identical; no text, lettering, digits, labels, glyphs, watermark, frames, arrows or extra pictures. Keep an empty 10% margin around the outer silhouette of each image.",
+      "promptSha256": "d311ca14263af37d6661c61c8c13b0ae0b5b842f141b38d7cbf1b319b0e4a7f6",
+      "playbackDerivative": {
+        "format": "PNG RGB",
+        "size": [
+          480,
+          480
+        ],
+        "bytes": 333069,
+        "operation": "按留档像素框整格裁切并等比缩小。"
+      }
+    },
+    {
+      "key": "q-green-knit",
+      "sourceType": "codex_builtin_imagegen_atlas_crop",
+      "source": "art-source/p04-p05-p14-room-and-knit.png",
+      "sourceSha256": "5c9cd2237bce1d82b922aa9d6a3853cbb8c4362ff17009abe7e9a8ac0013ecd5",
+      "sha256": "5134977195adf7130a878b552d4ef80dd9b58df09d29c91282f35a6b9b26c6b7",
+      "file": "assets/q-green-knit.png",
+      "atlasId": "p04-p05-p14-room-and-knit",
+      "sourceCrop": [
+        627,
+        627,
+        1254,
+        1254
+      ],
+      "uses": [
+        "p14"
+      ],
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "prompt": "Create one opaque original four-cell children's lesson art atlas in a precise 2×2 grid, equal square cells and a square overall image. All objects and story contents within their own quadrant, with uninterrupted warm-cream margins and gutters and no drawn grid lines. Fine paper grain, matte gouache, clean cut-paper edges, warm cream, pine green, apricot and persimmon, high readability at small sizes. Top-left: a simple warm room with an intact wall and a clear window frame. On a low shelf below the window, a single four-blade colorful paper pinwheel with a visible stick is planted in a small clay pot; a visibly empty open-top box sits on the same shelf separately to its side, with a gap. No other toy. Top-right: a front-facing plain wooden doorway, slightly open door. Two long vertical outer jambs and one unbroken horizontal lintel are prominent and all entirely within the frame, dark pine green contrasted against cream walls and pale floor. A child peeks through the narrow opening behind the door, not covering the main outer frame. Bottom-left: on exactly flat pale warm cream with no other object, one long medium-blue knitted scarf positioned diagonally lower left to upper right, new ribbed knit pattern, visibly knitted with short fringe. Bottom-right: exact same long scarf design, size, angle, framing, layout, fringe, and light as bottom-left, but clear bright leaf-green color. Scarf shadows subtle and identical; no text, lettering, digits, labels, glyphs, watermark, frames, arrows or extra pictures. Keep an empty 10% margin around the outer silhouette of each image.",
+      "promptSha256": "d311ca14263af37d6661c61c8c13b0ae0b5b842f141b38d7cbf1b319b0e4a7f6",
+      "playbackDerivative": {
+        "format": "PNG RGB",
+        "size": [
+          480,
+          480
+        ],
+        "bytes": 331758,
+        "operation": "按留档像素框整格裁切并等比缩小。"
+      }
+    },
+    {
+      "key": "boat-word-view",
+      "file": "assets/illustrations/curved-boat.png",
+      "uses": [
+        "p02"
+      ],
+      "sourceType": "codex_builtin_imagegen",
+      "source": "assets/illustrations/source/curved-boat.png",
+      "sourceSha256": "394d6f6ea84e223a3291c5385c2bab83065748eb0d93c378373f32d8e5e89ec3",
+      "sourceSize": [
+        1774,
+        887
+      ],
+      "sha256": "40c62bdfe60dd5bcde5d125f8d9c490fc0f7eca2d8ea43cd7cafc522359cb7a0",
+      "prompt": "原创一年级中文课堂画面，细纸纹、哑光水粉、干净的剪纸轮廓，深松绿与暖奶油底，少量杏色和柿橙。仅在夜空主题使用低饱和深蓝。主体完整、背景安静、小屏可辨。不要文字、数字、标志、水印、教材原图风格或既有角色。透明件保留真实 alpha。\n安静水面上的一艘短小木舟，略俯侧视，船底明显弯起，船首与船尾各收尖。完整显出两端，不画遮住端头的桨、帆、人物；水线淡。\n横图 2:1。单艘低矮短木舟朝左，接近侧面稍俯视，船身整体明显向上弯，两个船端在左、右清楚向上挑尖，像一笔宽 U；留出安全边距，不加星星月亮，水面不遮轮廓。",
+      "imagegenEvidence": {
+        "generationId": "exec-227634bb-52de-4ad0-9724-8e94fd3e22e8",
+        "originPath": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-227634bb-52de-4ad0-9724-8e94fd3e22e8.png",
+        "intakeSha256": "394d6f6ea84e223a3291c5385c2bab83065748eb0d93c378373f32d8e5e89ec3",
+        "referenceKeys": []
+      },
+      "playbackDerivative": {
+        "format": "PNG RGB",
+        "size": [
+          1000,
+          500
+        ],
+        "bytes": 735380,
+        "operation": "Lanczos 等比缩小并无损编码，保留原图全幅。"
+      },
+      "referenceIds": [
+        "textbook84",
+        "hour1-shape"
+      ],
+      "reusedSourceAssetKey": "curved-boat",
+      "reuseReason": "原图已在本课登记，同一图义可在本页沿用。"
+    },
+    {
+      "key": "delivery-backdrop",
+      "file": "assets/illustrations/snake-backdrop.png",
+      "uses": [
+        "p08"
+      ],
+      "sourceType": "codex_builtin_imagegen",
+      "source": "assets/illustrations/source/snake-backdrop.png",
+      "sourceSha256": "ae039b410f9cd5fb8653bc727c46651c1dc9554be5a167af023ca61c53476c1c",
+      "sourceSize": [
+        1672,
+        941
+      ],
+      "sha256": "6b405976d42b439891894d6d72d36512ef4438df7017e270e383506fd3c8d688",
+      "prompt": "横图 16:9，原创细纸纹与哑光水粉剪纸。俯视安静纸纹花园，松绿深浅层次。中心是可覆盖大棋盘的低对比干净平面，只在四角点少量植物。无方格、道具、道路、光纹或人物；四边可见。 中央86%连续无界线，较淡的低饱和松绿色底，色差小。少量角落植物远离中间，不在中央做框、光斑、地砖或道具。严禁文字数字。",
+      "imagegenEvidence": {
+        "generationId": "exec-c1204bb6-719a-4dad-adc7-21e7f4e8aedc",
+        "originPath": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-c1204bb6-719a-4dad-adc7-21e7f4e8aedc.png",
+        "intakeSha256": "ae039b410f9cd5fb8653bc727c46651c1dc9554be5a167af023ca61c53476c1c",
+        "referenceKeys": []
+      },
+      "playbackDerivative": {
+        "format": "PNG RGB",
+        "size": [
+          1280,
+          720
+        ],
+        "bytes": 1218985,
+        "operation": "Lanczos 全幅适配逻辑画布；1672×941 到16:9仅约0.053%比例调整，无裁切。"
+      },
+      "reusedSourceAssetKey": "snake-backdrop",
+      "reuseReason": "原图已在本课登记，同一图义可在本页沿用。"
+    },
+    {
+      "key": "word-moon-boat",
+      "file": "assets/illustrations/word-moon-boat.png",
+      "uses": [
+        "p03"
+      ],
+      "sourceType": "deterministic_composition_of_codex_imagegen",
+      "source": "art-source/word-moon-boat-composition.json",
+      "sourceSha256": "9796d353bae20800a2257ed0cccdbbaac6fb41096ddd3dc98a5716463b5991f2",
+      "sha256": "456a68b11b3115f2a55e235fd78e69d72da3d24b1a40c62b815e5434c3e4be2d",
+      "inputAssets": [
+        "crescent-window",
+        "curved-boat"
+      ],
+      "playbackDerivative": {
+        "format": "PNG RGB",
+        "size": [
+          840,
+          450
+        ],
+        "bytes": 205250,
+        "operation": "本课已登记的内置 ImageGen 图片按可编辑图层等比合成。"
+      }
+    },
+    {
+      "key": "read-two-panels",
+      "file": "assets/illustrations/read-two-panels.png",
+      "uses": [
+        "p10"
+      ],
+      "sourceType": "deterministic_composition_of_codex_imagegen",
+      "source": "art-source/read-two-panels-composition.json",
+      "sourceSha256": "b4c38458bbf29397e8b2c2ddd96446ea7ac1c2f55309f2661933508d5f91036d",
+      "sha256": "d249dfc04203945a5b11f890923535a2d3f1203c859ca0db661786ec25763e99",
+      "inputAssets": [
+        "crescent-window",
+        "curved-boat",
+        "sky-imagination"
+      ],
+      "playbackDerivative": {
+        "format": "PNG RGB",
+        "size": [
+          840,
+          600
+        ],
+        "bytes": 317709,
+        "operation": "本课已登记的内置 ImageGen 图片按可编辑图层等比合成。"
+      }
+    },
+    {
+      "key": "parcel-phrases",
+      "file": "assets/illustrations/parcel-phrases.png",
+      "uses": [
+        "p07"
+      ],
+      "sourceType": "deterministic_composition_of_codex_imagegen",
+      "source": "art-source/parcel-phrases-composition.json",
+      "sourceSha256": "d5a78aa9582d7035b46fd437b6c0e2ec2c7349a19844743d5ad3e0f4c54aa763",
+      "sha256": "c351059d242744e955fadda0d400f442469698ebcada89c59124fbd6b3dbdc4f",
+      "inputAssets": [
+        "parcel-yellow-leaf",
+        "parcel-red-scarf",
+        "parcel-blue-scarf",
+        "parcel-blue-cap",
+        "recipient-rabbit",
+        "recipient-turtle",
+        "recipient-cat"
+      ],
+      "playbackDerivative": {
+        "format": "PNG RGB",
+        "size": [
+          840,
+          600
+        ],
+        "bytes": 167644,
+        "operation": "本课已登记的内置 ImageGen 图片按可编辑图层等比合成。"
+      }
+    },
+    {
+      "key": "delivery-start",
+      "file": "assets/illustrations/delivery-start.png",
+      "uses": [
+        "p08"
+      ],
+      "sourceType": "deterministic_composition_of_codex_imagegen",
+      "source": "art-source/delivery-start-composition.json",
+      "sourceSha256": "7b032bec6e80f31df3fef896fb5a3bcf3ded8cd42a4e6dacaac06d89f4bccf0e",
+      "sha256": "a4752d752ba953af90e4f100fdc0476200f9963ee1be28cf680bcc7c54df9db3",
+      "inputAssets": [
+        "delivery-backdrop",
+        "delivery-glider",
+        "recipient-turtle",
+        "recipient-rabbit",
+        "parcel-green-leaf",
+        "parcel-yellow-leaf",
+        "delivery-cart"
+      ],
+      "playbackDerivative": {
+        "format": "PNG P",
+        "size": [
+          1280,
+          720
+        ],
+        "bytes": 545350,
+        "operation": "本课已登记的内置 ImageGen 图片按可编辑图层等比合成。"
+      }
+    },
+    {
+      "key": "radical-flash",
+      "file": "assets/code/radical-flash.png",
+      "uses": [
+        "p05"
+      ],
+      "source": "art-source/diagrams/radical-flash.svg",
+      "sourceSha256": "15d9efd0b1022a7856c87d1f0be5e27a4ef7507d7bd059e443d65670652af34b",
+      "sha256": "4ef7f395251d91f05ad2421d6d4ccc4ba4ea2cc466a582c8b39a0c5b735451c4",
+      "sourceType": "deterministic_semantic_diagram",
+      "referenceIds": [
+        "textbook84"
+      ],
+      "playbackDerivative": {
+        "format": "PNG RGBA",
+        "size": [
+          960,
+          480
+        ],
+        "bytes": 8684,
+        "operation": "可编辑 SVG 按精确图形或笔顺光栅化。"
+      }
+    },
+    {
+      "key": "strokes-moon",
+      "file": "assets/code/strokes-moon.png",
+      "uses": [
+        "p11"
+      ],
+      "source": "art-source/diagrams/strokes-moon.svg",
+      "sourceSha256": "facdd7b309a7b2c98a7689544b83eca92f4128e9ecf32bd8a11b5b213b74dce9",
+      "sha256": "38d6e263b5631e75332559244e04c3db67ff9c544a3ca3230a300afcbbd9e8e1",
+      "sourceType": "deterministic_semantic_diagram",
+      "referenceIds": [
+        "textbook84",
+        "hour1-writing",
+        "hour2-writing"
+      ],
+      "playbackDerivative": {
+        "format": "PNG RGBA",
+        "size": [
+          960,
+          480
+        ],
+        "bytes": 11500,
+        "operation": "可编辑 SVG 按精确图形或笔顺光栅化。"
+      }
+    },
+    {
+      "key": "strokes-child",
+      "file": "assets/code/strokes-child.png",
+      "uses": [
+        "p11"
+      ],
+      "source": "art-source/diagrams/strokes-child.svg",
+      "sourceSha256": "f92751c65ff0f4ce393e3714e90076217a32210382169749d351f0f7a49f0970",
+      "sha256": "af32f303c1ab4eaf3071900727b968ec0a0ee4d587e902239b3da753d67d45a7",
+      "sourceType": "deterministic_semantic_diagram",
+      "referenceIds": [
+        "textbook84",
+        "hour1-writing",
+        "hour2-writing"
+      ],
+      "playbackDerivative": {
+        "format": "PNG RGBA",
+        "size": [
+          960,
+          480
+        ],
+        "bytes": 10102,
+        "operation": "可编辑 SVG 按精确图形或笔顺光栅化。"
+      }
+    },
+    {
+      "key": "strokes-head",
+      "file": "assets/code/strokes-head.png",
+      "uses": [
+        "p12"
+      ],
+      "source": "art-source/diagrams/strokes-head.svg",
+      "sourceSha256": "6b463e639b6bb86eb370467ff2d3b484b130da999aa9898fbba4210afe04f111",
+      "sha256": "914e01c7337e2b5334660f0d214c480e3bb64c880ca017e6132c465a3376fb26",
+      "sourceType": "deterministic_semantic_diagram",
+      "referenceIds": [
+        "textbook84",
+        "hour1-writing",
+        "hour2-writing"
+      ],
+      "playbackDerivative": {
+        "format": "PNG RGBA",
+        "size": [
+          840,
+          600
+        ],
+        "bytes": 17022,
+        "operation": "可编辑 SVG 按精确图形或笔顺光栅化。"
+      }
+    },
+    {
+      "key": "strokes-inside",
+      "file": "assets/code/strokes-inside.png",
+      "uses": [
+        "p13"
+      ],
+      "source": "art-source/diagrams/strokes-inside.svg",
+      "sourceSha256": "82136d8b3c41c5edf9e632528fed357fa4df4960bf9001043597203410be975d",
+      "sha256": "4e6860b503b2e8635adafdf90cafd4c5b6c59e8ab28f8c7068cdecc0e7b7c258",
+      "sourceType": "deterministic_semantic_diagram",
+      "referenceIds": [
+        "textbook84",
+        "hour1-writing",
+        "hour2-writing"
+      ],
+      "playbackDerivative": {
+        "format": "PNG RGBA",
+        "size": [
+          960,
+          480
+        ],
+        "bytes": 12403,
+        "operation": "可编辑 SVG 按精确图形或笔顺光栅化。"
+      }
+    },
+    {
+      "key": "strokes-see",
+      "file": "assets/code/strokes-see.png",
+      "uses": [
+        "p13"
+      ],
+      "source": "art-source/diagrams/strokes-see.svg",
+      "sourceSha256": "6fa9f93765695c1d13822c061bc97d9979171550a2b0b9600603970d9eb0adbf",
+      "sha256": "5ea57c906947d8a0222b6656f202a878ab6901bedc8fcc96c10448586843ad74",
+      "sourceType": "deterministic_semantic_diagram",
+      "referenceIds": [
+        "textbook84",
+        "hour1-writing",
+        "hour2-writing"
+      ],
+      "playbackDerivative": {
+        "format": "PNG RGBA",
+        "size": [
+          960,
+          480
+        ],
+        "bytes": 11522,
+        "operation": "可编辑 SVG 按精确图形或笔顺光栅化。"
+      }
+    },
+    {
+      "key": "q-gourd-shape",
+      "file": "assets/code/q-gourd-shape.png",
+      "uses": [
+        "p14"
+      ],
+      "source": "art-source/diagrams/q-gourd-shape.svg",
+      "sourceSha256": "4f78949b42298763a45e46ac54ddea15f772904967ea752ce1307fda89d347f8",
+      "sha256": "729fc0fa1192721fd1c6e457ce558a86ada0db4746a727dabddcdb3454dc1aec",
+      "sourceType": "deterministic_semantic_diagram",
+      "referenceIds": [
+        "textbook84"
+      ],
+      "playbackDerivative": {
+        "format": "PNG RGBA",
+        "size": [
+          480,
+          360
+        ],
+        "bytes": 5470,
+        "operation": "可编辑 SVG 按精确图形或笔顺光栅化。"
+      }
+    },
+    {
+      "key": "q-pod-shape",
+      "file": "assets/code/q-pod-shape.png",
+      "uses": [
+        "p14"
+      ],
+      "source": "art-source/diagrams/q-pod-shape.svg",
+      "sourceSha256": "2495b68c3a4a87ce1f13c4fc6bfdc203016fd45f1a083f0fef7ae617c3f5d23d",
+      "sha256": "49f94fd6f57d03e845fabe842271dbb9c28d1ce2f1ccedce99333ea52e5ef3f7",
+      "sourceType": "deterministic_semantic_diagram",
+      "referenceIds": [
+        "textbook84"
+      ],
+      "playbackDerivative": {
+        "format": "PNG RGBA",
+        "size": [
+          480,
+          360
+        ],
+        "bytes": 4369,
+        "operation": "可编辑 SVG 按精确图形或笔顺光栅化。"
+      }
+    },
+    {
+      "key": "q-straight-shape",
+      "file": "assets/code/q-straight-shape.png",
+      "uses": [
+        "p14"
+      ],
+      "source": "art-source/diagrams/q-straight-shape.svg",
+      "sourceSha256": "a73f7da85e0857703f065bc630bf2e7d6c7dfbfd27792b0abeae8e97f45503ae",
+      "sha256": "2f53932e618eb3f6aa6bc52e054ade0004a56d1957bfb98a78ad82febc2cf6da",
+      "sourceType": "deterministic_semantic_diagram",
+      "referenceIds": [
+        "textbook84"
+      ],
+      "playbackDerivative": {
+        "format": "PNG RGBA",
+        "size": [
+          480,
+          360
+        ],
+        "bytes": 3454,
+        "operation": "可编辑 SVG 按精确图形或笔顺光栅化。"
+      }
+    },
+    {
+      "key": "q-word-flash",
+      "file": "assets/code/q-word-flash.png",
+      "uses": [
+        "p14"
+      ],
+      "source": "art-source/diagrams/glyph-cards.json",
+      "sourceSha256": "6598a947d2aec441a0c27a749347344960222e0cd734e30064b4779a993e3490",
+      "sha256": "bb48024e9ad9407699ba7affd2e185201a66280c515f1796085242e0ca105417",
+      "sourceType": "deterministic_glyph_card",
+      "referenceIds": [
+        "textbook84"
+      ],
+      "playbackDerivative": {
+        "format": "PNG RGB",
+        "size": [
+          480,
+          360
+        ],
+        "bytes": 9407,
+        "operation": "简体楷体同底同字号居中渲染。"
+      }
+    },
+    {
+      "key": "q-word-together",
+      "file": "assets/code/q-word-together.png",
+      "uses": [
+        "p14"
+      ],
+      "source": "art-source/diagrams/glyph-cards.json",
+      "sourceSha256": "6598a947d2aec441a0c27a749347344960222e0cd734e30064b4779a993e3490",
+      "sha256": "b09b0308ede063c5ebc1f3f5e2dfbfc64ba45bfcfaede6b2f00c254940568965",
+      "sourceType": "deterministic_glyph_card",
+      "referenceIds": [
+        "textbook84"
+      ],
+      "playbackDerivative": {
+        "format": "PNG RGB",
+        "size": [
+          480,
+          360
+        ],
+        "bytes": 8737,
+        "operation": "简体楷体同底同字号居中渲染。"
+      }
+    },
+    {
+      "key": "q-word-sun",
+      "file": "assets/code/q-word-sun.png",
+      "uses": [
+        "p14"
+      ],
+      "source": "art-source/diagrams/glyph-cards.json",
+      "sourceSha256": "6598a947d2aec441a0c27a749347344960222e0cd734e30064b4779a993e3490",
+      "sha256": "66f50c8a8fbdeab58f4fb165455d3209a3de08a43e72c0b9cd23cd562c3b5598",
+      "sourceType": "deterministic_glyph_card",
+      "referenceIds": [
+        "textbook84"
+      ],
+      "playbackDerivative": {
+        "format": "PNG RGB",
+        "size": [
+          480,
+          360
+        ],
+        "bytes": 6616,
+        "operation": "简体楷体同底同字号居中渲染。"
+      }
+    },
+    {
+      "key": "q-see-hook",
+      "file": "assets/code/q-see-hook.png",
+      "uses": [
+        "p14"
+      ],
+      "source": "art-source/diagrams/q-see-hook.svg",
+      "sourceSha256": "87e0ab1e3bba3d1f52a0526efe3b37e0e4873955eafe5f3e95bdd2b6249fdf21",
+      "sha256": "0b8a4b7243de6a12ae9f008880fd0889c29d73915bd5bc4a694821c4d851ef12",
+      "sourceType": "deterministic_semantic_diagram",
+      "referenceIds": [
+        "textbook84",
+        "hour1-writing",
+        "hour2-writing"
+      ],
+      "playbackDerivative": {
+        "format": "PNG RGBA",
+        "size": [
+          480,
+          360
+        ],
+        "bytes": 5349,
+        "operation": "可编辑 SVG 按精确图形或笔顺光栅化。"
+      }
+    },
+    {
+      "key": "q-see-no-hook",
+      "file": "assets/code/q-see-no-hook.png",
+      "uses": [
+        "p14"
+      ],
+      "source": "art-source/diagrams/q-see-no-hook.svg",
+      "sourceSha256": "fd490e111d296c1ac485a0f33dfec8d97720e98cc91c7e24335661d3b4b2d81b",
+      "sha256": "6ea1211a5283c269e9922e9700198eead59378e04ec0789faecbe5f74a0165df",
+      "sourceType": "deterministic_semantic_diagram",
+      "referenceIds": [
+        "textbook84",
+        "hour1-writing",
+        "hour2-writing"
+      ],
+      "playbackDerivative": {
+        "format": "PNG RGBA",
+        "size": [
+          480,
+          360
+        ],
+        "bytes": 4746,
+        "operation": "可编辑 SVG 按精确图形或笔顺光栅化。"
+      }
+    },
+    {
+      "key": "q-see-no-vertical",
+      "file": "assets/code/q-see-no-vertical.png",
+      "uses": [
+        "p14"
+      ],
+      "source": "art-source/diagrams/q-see-no-vertical.svg",
+      "sourceSha256": "4aa1297c1ab3290eb4617d130d0b77aa951dc66db835809e92a4cc843ce3d307",
+      "sha256": "e0513bc42c301f4553420131b88c6a1d27ba358ab06a2f342d9f32af70339057",
+      "sourceType": "deterministic_semantic_diagram",
+      "referenceIds": [
+        "textbook84",
+        "hour1-writing",
+        "hour2-writing"
+      ],
+      "playbackDerivative": {
+        "format": "PNG RGBA",
+        "size": [
+          480,
+          360
+        ],
+        "bytes": 6918,
+        "operation": "可编辑 SVG 按精确图形或笔顺光栅化。"
+      }
+    }
+  ],
+  "officialReferences": {
+    "textbook84": {
+      "path": "output/courseware-lessons/pep-chinese-g1-upper-little-boat/official/textbook-pages/book-089.png",
+      "sha256": "dc0e5e14de01ba057512cb75fb3269116029a830609709e46860463ccab0f2ef"
+    },
+    "hour1-shape": {
+      "path": "output/courseware-lessons/pep-chinese-g1-upper-little-boat/official/lesson_1/courseware-30.jpg",
+      "sha256": "697738fba869eed1a0903e914e9acac187e38028522c887f81033eccdfdd1b58"
+    },
+    "textbook85": {
+      "path": "output/courseware-lessons/pep-chinese-g1-upper-little-boat/official/textbook-pages/book-090.png",
+      "sha256": "ca4a195a8eac82831c413e31a978ce90543b89b95e0e387ed72f17d42c8e7e7d"
+    },
+    "hour2-imagination": {
+      "path": "output/courseware-lessons/pep-chinese-g1-upper-little-boat/official/lesson_2/courseware-16.jpg",
+      "sha256": "79f180d92a8dc506720dd2f056cd4fd2993085a6df63ed98a00c60facc62b17a"
+    }
+  },
+  "sceneImageBudgets": {
+    "p01": {
+      "imageBytes": {
+        "curved-boat": 735380,
+        "crescent-window": 699823
+      },
+      "totalPlaybackImageBytes": 1435203,
+      "targetMaximumBytes": 3000000,
+      "remainingBytesAtTarget": 1564797,
+      "remainingImageKeys": []
+    },
+    "p06": {
+      "imageBytes": {
+        "boat-reward": 54494,
+        "shape-boat": 20213,
+        "shape-boat-side": 22803,
+        "shape-crescent-side": 27169,
+        "shape-disc": 48352,
+        "shape-moon": 33255,
+        "shape-rounded": 21257,
+        "shape-straight": 12458,
+        "snake-backdrop": 1218985,
+        "snake-body": 48016,
+        "snake-head": 63769,
+        "snake-start": 1158956,
+        "snake-tail": 38794
+      },
+      "totalPlaybackImageBytes": 2768521,
+      "targetMaximumBytes": 3000000,
+      "remainingBytesAtTarget": 231479,
+      "remainingImageKeys": []
+    },
+    "p09": {
+      "imageBytes": {
+        "sky-imagination": 635911
+      },
+      "totalPlaybackImageBytes": 635911,
+      "targetMaximumBytes": 3000000,
+      "remainingBytesAtTarget": 2364089,
+      "remainingImageKeys": []
+    },
+    "p08": {
+      "imageBytes": {
+        "boat-reward": 54494,
+        "delivery-cart": 73464,
+        "delivery-cart-load": 74654,
+        "delivery-glider": 74862,
+        "recipient-rabbit": 78902,
+        "recipient-turtle": 74340,
+        "recipient-cat": 83490,
+        "parcel-yellow-leaf": 54239,
+        "parcel-green-leaf": 64556,
+        "parcel-red-scarf": 53975,
+        "parcel-blue-scarf": 55220,
+        "parcel-blue-cap": 116074,
+        "delivery-backdrop": 1218985,
+        "delivery-start": 545350
+      },
+      "totalPlaybackImageBytes": 2622605,
+      "targetMaximumBytes": 3000000,
+      "remainingBytesAtTarget": 377395,
+      "remainingImageKeys": []
+    }
+  },
+  "sceneVisualChecks": {
+    "p01": {
+      "curved-boat": {
+        "asset": "curved-boat",
+        "template": "two-columns",
+        "element": "image_right-picture",
+        "nativeRect": [
+          535,
+          190,
+          400,
+          200
+        ],
+        "previewAt640x360": [
+          256,
+          128
+        ],
+        "method": "调用真实讲解页排版器取得图框，按该矩形和 640×360 等比缩图目视。",
+        "finding": "单艘木舟左右尖端、弯曲底部与水面边界均完整可辨，主体不截切，画面无字。"
+      },
+      "shapeComparison": {
+        "assets": [
+          "crescent-window",
+          "curved-boat"
+        ],
+        "template": "two-columns",
+        "nativeRects": {
+          "image_left-picture": [
+            65,
+            190,
+            400,
+            200
+          ],
+          "image_right-picture": [
+            535,
+            190,
+            400,
+            200
+          ]
+        },
+        "previewViewport": [
+          640,
+          360
+        ],
+        "eachPreviewImageSize": [
+          256,
+          128
+        ],
+        "method": "实际讲解页排版器给出两图框，按卡片位置同屏缩图目视。",
+        "finding": "两图均保留全幅，弧线同朝向。弯月与木舟各自的尖端完整，向下弯的弧边清楚，窗框不遮月，水面不遮舟。"
+      }
+    },
+    "p06": {
+      "shape-moon": {
+        "runtimeTemplate": "courseware/kit/game_templates/compareSnake.js",
+        "runtimeTemplateSha256": "4c256f16078f9e5c26d0cb5c1919d978a60021f26795d74067c6a88ea5322082",
+        "sourceAlpha": {
+          "size": [
+            1254,
+            1254
+          ],
+          "zeroAlphaPixels": 1291448,
+          "alpha128OrAbove": 268265,
+          "alpha230OrAbove": 266223,
+          "fullAlphaPixels": 598,
+          "alpha128Bounds": [
+            139,
+            329,
+            1107,
+            1044
+          ],
+          "pixelCount": 1572516
+        },
+        "playbackAlpha": {
+          "size": [
+            300,
+            300
+          ],
+          "zeroAlphaPixels": 73279,
+          "alpha128OrAbove": 15362,
+          "alpha230OrAbove": 14975,
+          "fullAlphaPixels": 578,
+          "alpha128Bounds": [
+            33,
+            79,
+            265,
+            250
+          ],
+          "pixelCount": 90000
+        },
+        "referenceAt640x360": {
+          "size": [
+            61,
+            61
+          ],
+          "zeroAlphaPixels": 2819,
+          "alpha128OrAbove": 633,
+          "alpha230OrAbove": 564,
+          "fullAlphaPixels": 106,
+          "alpha128Bounds": [
+            7,
+            17,
+            54,
+            51
+          ],
+          "pixelCount": 3721
+        },
+        "smallTokenStressAt640x360": {
+          "size": [
+            34,
+            34
+          ],
+          "zeroAlphaPixels": 805,
+          "alpha128OrAbove": 193,
+          "alpha230OrAbove": 161,
+          "fullAlphaPixels": 52,
+          "alpha128Bounds": [
+            4,
+            10,
+            30,
+            28
+          ],
+          "pixelCount": 1156
+        },
+        "finding": "正式右侧参照实际缩为 61×61，另外在普通图卡 34×34 缩图做更严检查。真透明区域延续，奶杏轮廓与内外弧和两个尖端都能辨认。"
+      },
+      "p06-snake-atlas": {
+        "runtimeTemplate": "courseware/kit/game_templates/compareSnake.js",
+        "runtimeTemplateSha256": "4c256f16078f9e5c26d0cb5c1919d978a60021f26795d74067c6a88ea5322082",
+        "runtimeCSS": "courseware/kit/game_templates/classic.css",
+        "runtimeCSSSha256": "c00a04237ab596c1315384d508b653f82a49ab0a62f581c926e778c374673839",
+        "crops": {
+          "snake-head": {
+            "rect": [
+              0,
+              0,
+              627,
+              627
+            ],
+            "cropAlpha": {
+              "size": [
+                627,
+                627
+              ],
+              "alpha0": 244358,
+              "alpha128OrAbove": 138222,
+              "alpha230OrAbove": 137344,
+              "nonzeroBox": [
+                0,
+                11,
+                627,
+                627
+              ],
+              "alpha128Box": [
+                75,
+                127,
+                567,
+                537
+              ]
+            },
+            "playbackAlpha": {
+              "size": [
+                300,
+                300
+              ],
+              "alpha0": 56038,
+              "alpha128OrAbove": 31638,
+              "alpha230OrAbove": 31339,
+              "nonzeroBox": [
+                0,
+                6,
+                300,
+                296
+              ],
+              "alpha128Box": [
+                36,
+                61,
+                271,
+                257
+              ]
+            },
+            "at640x360": {
+              "size": [
+                32,
+                32
+              ],
+              "alpha0": 541,
+              "alpha128OrAbove": 359,
+              "alpha230OrAbove": 333,
+              "nonzeroBox": [
+                1,
+                4,
+                32,
+                30
+              ],
+              "alpha128Box": [
+                4,
+                6,
+                29,
+                27
+              ]
+            }
+          },
+          "snake-body": {
+            "rect": [
+              627,
+              0,
+              1254,
+              627
+            ],
+            "cropAlpha": {
+              "size": [
+                627,
+                627
+              ],
+              "alpha0": 277236,
+              "alpha128OrAbove": 102007,
+              "alpha230OrAbove": 101263,
+              "nonzeroBox": [
+                0,
+                0,
+                613,
+                627
+              ],
+              "alpha128Box": [
+                34,
+                219,
+                558,
+                460
+              ]
+            },
+            "playbackAlpha": {
+              "size": [
+                300,
+                300
+              ],
+              "alpha0": 63827,
+              "alpha128OrAbove": 23415,
+              "alpha230OrAbove": 22997,
+              "nonzeroBox": [
+                0,
+                0,
+                291,
+                297
+              ],
+              "alpha128Box": [
+                16,
+                105,
+                267,
+                220
+              ]
+            },
+            "at640x360": {
+              "size": [
+                31,
+                31
+              ],
+              "alpha0": 604,
+              "alpha128OrAbove": 251,
+              "alpha230OrAbove": 223,
+              "nonzeroBox": [
+                0,
+                0,
+                30,
+                25
+              ],
+              "alpha128Box": [
+                2,
+                11,
+                28,
+                23
+              ]
+            }
+          },
+          "snake-tail": {
+            "rect": [
+              0,
+              627,
+              627,
+              1254
+            ],
+            "cropAlpha": {
+              "size": [
+                627,
+                627
+              ],
+              "alpha0": 303343,
+              "alpha128OrAbove": 79512,
+              "alpha230OrAbove": 78729,
+              "nonzeroBox": [
+                0,
+                0,
+                627,
+                627
+              ],
+              "alpha128Box": [
+                81,
+                181,
+                582,
+                415
+              ]
+            },
+            "playbackAlpha": {
+              "size": [
+                300,
+                300
+              ],
+              "alpha0": 69663,
+              "alpha128OrAbove": 18192,
+              "alpha230OrAbove": 17931,
+              "nonzeroBox": [
+                0,
+                8,
+                284,
+                300
+              ],
+              "alpha128Box": [
+                39,
+                87,
+                278,
+                199
+              ]
+            },
+            "at640x360": {
+              "size": [
+                31,
+                31
+              ],
+              "alpha0": 661,
+              "alpha128OrAbove": 195,
+              "alpha230OrAbove": 169,
+              "nonzeroBox": [
+                1,
+                6,
+                31,
+                31
+              ],
+              "alpha128Box": [
+                4,
+                9,
+                29,
+                21
+              ]
+            }
+          },
+          "boat-reward": {
+            "rect": [
+              627,
+              627,
+              1254,
+              1254
+            ],
+            "cropAlpha": {
+              "size": [
+                627,
+                627
+              ],
+              "alpha0": 276373,
+              "alpha128OrAbove": 102261,
+              "alpha230OrAbove": 100557,
+              "nonzeroBox": [
+                1,
+                0,
+                578,
+                627
+              ],
+              "alpha128Box": [
+                48,
+                119,
+                539,
+                500
+              ]
+            },
+            "playbackAlpha": {
+              "size": [
+                300,
+                300
+              ],
+              "alpha0": 63389,
+              "alpha128OrAbove": 23380,
+              "alpha230OrAbove": 22841,
+              "nonzeroBox": [
+                1,
+                0,
+                264,
+                258
+              ],
+              "alpha128Box": [
+                23,
+                57,
+                258,
+                239
+              ]
+            },
+            "at640x360": {
+              "size": [
+                74,
+                74
+              ],
+              "alpha0": 3614,
+              "alpha128OrAbove": 1416,
+              "alpha230OrAbove": 1302,
+              "nonzeroBox": [
+                3,
+                8,
+                66,
+                62
+              ],
+              "alpha128Box": [
+                6,
+                14,
+                64,
+                59
+              ]
+            }
+          }
+        },
+        "method": "用模板的 80 逻辑像素中心距、24 逻辑像素连接线、头 72×64 / 其余 62×64 逻辑图框和尾随角，按 640×360 缩图检查直行与转弯；完成贴纸按 148×148 逻辑尺寸。",
+        "finding": "实显头 32×32、身和尾 31×31、贴纸 74×74；头右脸和上转脸清楚，身尾与程序连接线连续，尾粗端在右向前，月牙帆船贴纸完整；中央接缝 alpha 最大1，四格的实形均无裁伤。"
+      },
+      "p06-shape-atlas-clean": {
+        "method": "在模板实际奶油色卡底上合成全部六形，检查拥挤30px、普通34px、参照61px。",
+        "finding": "两条尖舟与转向月同时有弯边和两尖；圆盘、钝圆弧、直边纸梭的轮廓彼此清楚不同。卡底目视无光晕。三档下离 alpha≥128 主体三像素以外 alpha 最大1。",
+        "smallAlpha": {
+          "shape-boat": {
+            "30": {
+              "size": [
+                30,
+                30
+              ],
+              "alpha0": 735,
+              "alpha128OrAbove": 70,
+              "alpha230OrAbove": 49,
+              "alpha128Bounds": [
+                5,
+                12,
+                25,
+                19
+              ],
+              "alphaOutside3pxFromCoreMax": 1
+            },
+            "34": {
+              "size": [
+                34,
+                34
+              ],
+              "alpha0": 956,
+              "alpha128OrAbove": 92,
+              "alpha230OrAbove": 68,
+              "alpha128Bounds": [
+                5,
+                13,
+                29,
+                21
+              ],
+              "alphaOutside3pxFromCoreMax": 1
+            },
+            "61": {
+              "size": [
+                61,
+                61
+              ],
+              "alpha0": 3233,
+              "alpha128OrAbove": 296,
+              "alpha230OrAbove": 252,
+              "alpha128Bounds": [
+                9,
+                23,
+                52,
+                38
+              ],
+              "alphaOutside3pxFromCoreMax": 1
+            }
+          },
+          "shape-crescent-side": {
+            "30": {
+              "size": [
+                30,
+                30
+              ],
+              "alpha0": 676,
+              "alpha128OrAbove": 101,
+              "alpha230OrAbove": 76,
+              "alpha128Bounds": [
+                7,
+                6,
+                22,
+                24
+              ],
+              "alphaOutside3pxFromCoreMax": 1
+            },
+            "34": {
+              "size": [
+                34,
+                34
+              ],
+              "alpha0": 893,
+              "alpha128OrAbove": 130,
+              "alpha230OrAbove": 102,
+              "alpha128Bounds": [
+                8,
+                7,
+                25,
+                27
+              ],
+              "alphaOutside3pxFromCoreMax": 1
+            },
+            "61": {
+              "size": [
+                61,
+                61
+              ],
+              "alpha0": 3060,
+              "alpha128OrAbove": 423,
+              "alpha230OrAbove": 363,
+              "alpha128Bounds": [
+                14,
+                12,
+                46,
+                49
+              ],
+              "alphaOutside3pxFromCoreMax": 1
+            }
+          },
+          "shape-boat-side": {
+            "30": {
+              "size": [
+                30,
+                30
+              ],
+              "alpha0": 718,
+              "alpha128OrAbove": 74,
+              "alpha230OrAbove": 48,
+              "alpha128Bounds": [
+                5,
+                9,
+                25,
+                22
+              ],
+              "alphaOutside3pxFromCoreMax": 1
+            },
+            "34": {
+              "size": [
+                34,
+                34
+              ],
+              "alpha0": 938,
+              "alpha128OrAbove": 94,
+              "alpha230OrAbove": 69,
+              "alpha128Bounds": [
+                6,
+                10,
+                29,
+                25
+              ],
+              "alphaOutside3pxFromCoreMax": 1
+            },
+            "61": {
+              "size": [
+                61,
+                61
+              ],
+              "alpha0": 3160,
+              "alpha128OrAbove": 301,
+              "alpha230OrAbove": 260,
+              "alpha128Bounds": [
+                10,
+                17,
+                51,
+                44
+              ],
+              "alphaOutside3pxFromCoreMax": 1
+            }
+          },
+          "shape-disc": {
+            "30": {
+              "size": [
+                30,
+                30
+              ],
+              "alpha0": 541,
+              "alpha128OrAbove": 256,
+              "alpha230OrAbove": 234,
+              "alpha128Bounds": [
+                6,
+                6,
+                24,
+                24
+              ],
+              "alphaOutside3pxFromCoreMax": 1
+            },
+            "34": {
+              "size": [
+                34,
+                34
+              ],
+              "alpha0": 707,
+              "alpha128OrAbove": 329,
+              "alpha230OrAbove": 305,
+              "alpha128Bounds": [
+                7,
+                7,
+                27,
+                27
+              ],
+              "alphaOutside3pxFromCoreMax": 1
+            },
+            "61": {
+              "size": [
+                61,
+                61
+              ],
+              "alpha0": 2445,
+              "alpha128OrAbove": 1068,
+              "alpha230OrAbove": 1018,
+              "alpha128Bounds": [
+                12,
+                12,
+                49,
+                49
+              ],
+              "alphaOutside3pxFromCoreMax": 1
+            }
+          },
+          "shape-rounded": {
+            "30": {
+              "size": [
+                30,
+                30
+              ],
+              "alpha0": 726,
+              "alpha128OrAbove": 88,
+              "alpha230OrAbove": 61,
+              "alpha128Bounds": [
+                4,
+                11,
+                26,
+                19
+              ],
+              "alphaOutside3pxFromCoreMax": 0
+            },
+            "34": {
+              "size": [
+                34,
+                34
+              ],
+              "alpha0": 943,
+              "alpha128OrAbove": 103,
+              "alpha230OrAbove": 87,
+              "alpha128Bounds": [
+                5,
+                13,
+                29,
+                21
+              ],
+              "alphaOutside3pxFromCoreMax": 0
+            },
+            "61": {
+              "size": [
+                61,
+                61
+              ],
+              "alpha0": 3190,
+              "alpha128OrAbove": 349,
+              "alpha230OrAbove": 305,
+              "alpha128Bounds": [
+                9,
+                23,
+                52,
+                38
+              ],
+              "alphaOutside3pxFromCoreMax": 0
+            }
+          },
+          "shape-straight": {
+            "30": {
+              "size": [
+                30,
+                30
+              ],
+              "alpha0": 782,
+              "alpha128OrAbove": 46,
+              "alpha230OrAbove": 26,
+              "alpha128Bounds": [
+                6,
+                13,
+                24,
+                17
+              ],
+              "alphaOutside3pxFromCoreMax": 1
+            },
+            "34": {
+              "size": [
+                34,
+                34
+              ],
+              "alpha0": 1014,
+              "alpha128OrAbove": 57,
+              "alpha230OrAbove": 36,
+              "alpha128Bounds": [
+                7,
+                15,
+                27,
+                19
+              ],
+              "alphaOutside3pxFromCoreMax": 1
+            },
+            "61": {
+              "size": [
+                61,
+                61
+              ],
+              "alpha0": 3392,
+              "alpha128OrAbove": 182,
+              "alpha230OrAbove": 147,
+              "alpha128Bounds": [
+                10,
+                26,
+                51,
+                35
+              ],
+              "alphaOutside3pxFromCoreMax": 1
+            }
+          }
+        }
+      },
+      "snake-backdrop": {
+        "size": [
+          1280,
+          720
+        ],
+        "finding": "淡松绿色连续中心可承托棋盘，装饰在四角，满幅无文字。"
+      },
+      "snake-start": {
+        "runtimeCSS": "courseware/kit/game_templates/classic.css",
+        "runtimeCSSSha256": "c00a04237ab596c1315384d508b653f82a49ab0a62f581c926e778c374673839",
+        "fit": "centered cover",
+        "outerFrame": [
+          350,
+          155
+        ],
+        "nativeContent": [
+          342,
+          147
+        ],
+        "at640OuterFrame": [
+          175,
+          77.5
+        ],
+        "at640Content": [
+          171,
+          73.5
+        ],
+        "visibleSourceRect": [
+          0,
+          84.91,
+          1280,
+          635.09
+        ],
+        "foregroundAlpha128Bounds": {
+          "snake-tail": [
+            174,
+            452,
+            294,
+            508
+          ],
+          "snake-body": [
+            301,
+            462,
+            426,
+            519
+          ],
+          "snake-head": [
+            449,
+            438,
+            570,
+            539
+          ],
+          "shape-moon": [
+            950,
+            163,
+            1109,
+            280
+          ],
+          "shape-boat": [
+            619,
+            318,
+            803,
+            383
+          ],
+          "shape-disc": [
+            941,
+            407,
+            1064,
+            533
+          ]
+        },
+        "finding": "真实开始卡 350×155 居中 cover，640×360 下的约171×74图内，小蛇向右、尖舟、右上月参照及圆盘各自可辨，前景无裁切。"
+      }
+    },
+    "p09": {
+      "sky-imagination": {
+        "template": "picture-points",
+        "element": "image_picture",
+        "nativeRect": [
+          50,
+          112,
+          420,
+          300
+        ],
+        "previewAt640x360": [
+          269,
+          192
+        ],
+        "method": "真实讲解页排版器得到图框，再按 640×360 等比缩图目视。",
+        "finding": "孩子完整，脸和眼睛朝上方星点，双手放在膝上。月船两尖及内外弧都完整，深蓝夜空和大小不一的星点清楚。月形本身就是想象的小船。画面无字、无水面、无额外船。"
+      }
+    },
+    "p08": {
+      "checkedAssets": [
+        "delivery-cart",
+        "delivery-cart-load",
+        "delivery-glider",
+        "parcel-blue-cap",
+        "parcel-blue-scarf",
+        "parcel-green-leaf",
+        "parcel-red-scarf",
+        "parcel-yellow-leaf",
+        "recipient-cat",
+        "recipient-rabbit",
+        "recipient-turtle"
+      ],
+      "method": "在奶油底联系图逐件检查类型、色彩、完整轮廓和透明轮廓。",
+      "findings": "邮车两帧的角度、底盘和车轮位置近似对齐，路车有不同轮廓。兔耳、龟壳和猫须辨别明显。绿黄叶形近似，围巾同类而颜色不同，蓝帽与蓝围巾轮廓不同。游戏小屏和最终页画面实测待做。"
+    },
+    "p04": {
+      "checkedAssets": [
+        "room-pinwheel"
+      ],
+      "findings": "窗框内外和室内搁板清楚，风车有叶片与长柄，空盒与花盆并排分开。"
+    },
+    "p05": {
+      "checkedAssets": [
+        "plain-door"
+      ],
+      "findings": "深绿色门框两竖一横连续，门缝里的孩子和斜开的橙色门板都不遮外框。"
+    },
+    "p14": {
+      "checkedAssets": [
+        "q-blue-knit",
+        "q-day-clouds",
+        "q-drum-behind",
+        "q-drum-beside",
+        "q-drum-inside",
+        "q-green-knit",
+        "q-green-yarn",
+        "q-water-reflection",
+        "q-window-stars"
+      ],
+      "findings": "鼓在篮右边、篮后和篮内的遮挡关系能区分。三张视线图可区分低头看水中反光、抬头看白云和抬头看窗外星星。两色围巾形状角度相近，绿色毛线团是明显异类。最终小屏与题卡同底检查待做。"
+    },
+    "writingDiagrams": {
+      "assets": [
+        "radical-flash",
+        "strokes-moon",
+        "strokes-child",
+        "strokes-head",
+        "strokes-inside",
+        "strokes-see",
+        "q-gourd-shape",
+        "q-pod-shape",
+        "q-straight-shape",
+        "q-word-flash",
+        "q-word-together",
+        "q-word-sun",
+        "q-see-hook",
+        "q-see-no-hook",
+        "q-see-no-vertical"
+      ],
+      "method": "逐格与教材印84和正式任务单核对，离线检查可编辑SVG、PNG尺寸及无裁切。",
+      "finding": "月、儿、头、里、见按四、二、五、七、四笔逐格累积。每格当前笔单独着色。见的三个末笔选项分别为有竖有上钩、有竖无钩、无竖有钩。形状题各图底色和线色一致。小屏课堂仍待实测。"
+    }
+  },
+  "atlasSources": {
+    "p06-snake-atlas": {
+      "source": "assets/illustrations/source/p06-snake-atlas.png",
+      "sourceSha256": "d4d7a1dc30713b6160eb6f021f65839fc48b28f33200e19e2306ffd1224cd9a9",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "bytes": 992059,
+      "generationId": "exec-9d695fd4-3fff-4b97-9998-059365405518",
+      "originPath": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-9d695fd4-3fff-4b97-9998-059365405518.png",
+      "prompt": "一张真透明 RGBA 小游戏图集，方形 2列 × 2行，四个精确同尺寸方格，图中不画格或文字。每个资产在自己的格子居中，隔开10%以上透明边。固定次序为左上、右上、左下、右下：1. 单一幼儿友好绿色小蛇头，严格向右，左右两侧比例适合程序转向，剪纸圆形头部占画幅约75%，短小豆眼，后缘与身体片段可拼接。 2. 一个松绿色蛇身片段，正向右的侧视厚度与头部一致，半圆接头，主体居中，两端都不画脸或尾巴。 3. 一个松绿色蛇尾片段，宽端在右能接身体，向左渐细，厚度与蛇身体一致，边缘完整，主体居中。 4. 一枚杏色和深松绿的月亮小舟贴纸，弯月与尖头小船形成一个明快轮廓，留透明边，不画文字和数字。 绿色蛇头在右端有豆眼，鼻朝右；身片段是单个同色半圆接头的椭圆短节；尾片段粗端在右，左尖；三片同高度、中心同一垂直位置、色彩一致，无眼或斑点乱入身体。参考只给右下角贴纸的月形；只要三枚蛇片和一枚小舟贴纸，背景和格间都透明。原创细纸纹、哑光水粉、松绿、奶油与杏色。",
+      "reference": {
+        "key": "shape-moon",
+        "role": "仅供右下角贴纸的月形",
+        "source": "assets/illustrations/source/shape-moon.png",
+        "sourceSha256": "7bcfc8b3340550e6df82dbd713db7a5dd87d11ea163892629b999c20fabf5682",
+        "originPath": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-8d50a2be-a88b-450a-8bc3-0956db09280d.png"
+      },
+      "alpha": {
+        "size": [
+          1254,
+          1254
+        ],
+        "alpha0": 1101310,
+        "alpha128OrAbove": 422002,
+        "alpha230OrAbove": 417893,
+        "nonzeroBox": [
+          0,
+          0,
+          1240,
+          1254
+        ],
+        "alpha128Box": [
+          75,
+          127,
+          1185,
+          1127
+        ]
+      },
+      "seamMaximumAlpha": {
+        "verticalExact": 1,
+        "horizontalExact": 1
+      },
+      "cropCoordinateOrder": "[left, top, right, bottom]，右下界不包含",
+      "crops": {
+        "snake-head": [
+          0,
+          0,
+          627,
+          627
+        ],
+        "snake-body": [
+          627,
+          0,
+          1254,
+          627
+        ],
+        "snake-tail": [
+          0,
+          627,
+          627,
+          1254
+        ],
+        "boat-reward": [
+          627,
+          627,
+          1254,
+          1254
+        ]
+      }
+    },
+    "p06-shape-atlas-clean": {
+      "source": "assets/illustrations/source/p06-shape-atlas-clean.png",
+      "sourceSha256": "9182289a967eb433bccab742c4b7719aac39b4b168bbc0a9381f9a81afc8a5d6",
+      "sourceSize": [
+        1536,
+        1024
+      ],
+      "bytes": 1601138,
+      "generationId": "exec-dae3b62b-9748-433b-a3ee-ff0e6dd2bcc9",
+      "originPath": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-dae3b62b-9748-433b-a3ee-ff0e6dd2bcc9.png",
+      "prompt": "Edit the supplied transparent 3-column-by-2-row sprite sheet. This is a background-extraction correction only. Preserve the same six clear object silhouettes and same locations, including the two pointed ends, orientation, scale, and hand-cut paper texture. Delete all fuzzy surrounding orange light, soft gradients, colored glow, cast shadows, and rim glow. Only the hard-edged six paper objects remain, solid opaque interiors with slight normal edge antialiasing only. Everywhere outside their hard silhouettes is exactly empty, true zero-alpha including the whole gutters. Flat matte paper, no light emission. No colored halo, drop shadows, gradients, panels, black fill, paper background, or checkerboard. Do not add or remove shapes. Keep same 3:2 landscape and 6 exact cells.",
+      "sourceAlpha": {
+        "size": [
+          1536,
+          1024
+        ],
+        "alpha0": 1272110,
+        "alpha128OrAbove": 254278,
+        "alpha230OrAbove": 250754,
+        "alpha128Bounds": [
+          59,
+          73,
+          1484,
+          952
+        ],
+        "alphaOutside3pxFromCoreMax": 3
+      },
+      "seamMaximumAlpha": {
+        "512": 1,
+        "1024": 1,
+        "512-y": 1
+      },
+      "priorSource": {
+        "path": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-a8e540fe-038d-48f9-8970-9111922571ac.png",
+        "sha256": "72a32a5cb2c0480d5eb041a455e3a7c1d8aa2ec2f5471f61b45c5521636bcbf6",
+        "status": "reference_only_rejected_alpha_glow",
+        "prompt": "一张真透明 RGBA 角色图集，精确 3 列 × 2 行，等大的正方格，整体横向 3:2。不能画格子、字、数字、边框或底板。每个资产独立居中，四周留至少10%真透明空白。前两张参考分别是本课的木舟主体形状和弯月剪纸。照以下固定顺序画，每个格只画一种形状，横竖分界都不可碰。左至右、上至下：1. 单一木舟侧影，形状借鉴弯月的下弧，左右两个端头向上清楚收尖。主体橙棕，侧面内部只用一块明暗色，背景透明，不附水、桨、帆。 2. 只旋转参考弯月的朝向，让两端改朝右上，两个尖端都完整；颜色和剪纸边相同，不新增道具。 3. 同样完整尖头木舟剪纸朝向旋转约35度，仍从侧面看清左右两头尖与下弧，边缘留空。 4. 单一杏色的圆盘剪纸，正对画面，圆周完整，没有一点尖角或不圆弧面，不画花纹。 5. 一片弯弯的宽木片，像弧形手把，明确两端都钝圆，边缘只有圆角，不出现尖头。与尖木舟在低清晰度小图上有明显区别。 6. 一个细长橙棕纸梭，两端都尖，连接尖端的轮廓全为明显直线，绝无弯弧。纯色剪纸，不画桨或其他配件。 两个木舟同色同形，仅旋转；圆盘标准圆；宽钝圆弧形不尖；细长直线纸梭两头尖且不能弯。原创细纸纹、哑光水粉、简明剪纸轮廓；游戏内目标最小34px，形状靠轮廓区分。",
+        "referenceInputs": [
+          {
+            "path": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-227634bb-52de-4ad0-9724-8e94fd3e22e8.png",
+            "sha256": "394d6f6ea84e223a3291c5385c2bab83065748eb0d93c378373f32d8e5e89ec3"
+          },
+          {
+            "path": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-8d50a2be-a88b-450a-8bc3-0956db09280d.png",
+            "sha256": "7bcfc8b3340550e6df82dbd713db7a5dd87d11ea163892629b999c20fabf5682"
+          }
+        ]
+      },
+      "crops": {
+        "shape-boat": {
+          "sourceCropBox": [
+            0,
+            0,
+            512,
+            512
+          ],
+          "halfTilePlacement": [
+            14,
+            16
+          ]
+        },
+        "shape-crescent-side": {
+          "sourceCropBox": [
+            512,
+            0,
+            1024,
+            512
+          ],
+          "halfTilePlacement": [
+            12,
+            23
+          ]
+        },
+        "shape-boat-side": {
+          "sourceCropBox": [
+            1024,
+            0,
+            1536,
+            512
+          ],
+          "halfTilePlacement": [
+            28,
+            30
+          ]
+        },
+        "shape-disc": {
+          "sourceCropBox": [
+            0,
+            512,
+            512,
+            1024
+          ],
+          "halfTilePlacement": [
+            24,
+            22
+          ]
+        },
+        "shape-rounded": {
+          "sourceCropBox": [
+            512,
+            512,
+            1024,
+            1024
+          ],
+          "halfTilePlacement": [
+            24,
+            28
+          ]
+        },
+        "shape-straight": {
+          "sourceCropBox": [
+            1024,
+            512,
+            1536,
+            1024
+          ],
+          "halfTilePlacement": [
+            26,
+            24
+          ]
+        }
+      },
+      "cropCoordinateOrder": "[left, top, right, bottom]，右下界不包含"
+    },
+    "p08-post-vehicles-and-recipients": {
+      "source": "art-source/p08-post-vehicles-and-recipients.png",
+      "sourceSha256": "08a7609a7f0be5700fd2fe89955a982f3ee4cefd4655a69e501dd59dd7957e44",
+      "originPath": "/Users/sqcopenclaw/.codex/generated_images/01a1c43e-779d-76c1-9193-2b50ab5e491a/exec-a3c72046-6399-4b9f-9431-b24a48fa90a6.png",
+      "sourceSize": [
+        1536,
+        1024
+      ],
+      "receipt": "art-source/p08-post-vehicles-and-recipients.receipt.json",
+      "receiptSha256": "3735573c9dcca96c9fafb281fedec3ec5b8baa85f863cbb49840a67176babb33",
+      "plan": "art-source/p08-post-vehicles-and-recipients.plan.json",
+      "prompt": "Create one production sprite atlas for the first-grade Chinese lesson 《小小的船》's delivery game. Transparent RGBA, strictly three columns × two rows of equal square cells, 3:2 landscape overall. Each cell contains one independent sprite, optically centered, all four edges and the entire invisible gutters fully transparent with at least 13% alpha-zero margin. Exactly this row-major order. Row 1 left: empty warm-orange toy postal van facing right, simple high three-quarter top view, visible low cargo bed, dark wheels, matte pine-green trim. Row 1 middle: precisely the same orange postal van at the same scale, angle and anchor, with its small cargo gate raised and no item in the bed. Row 1 right: simple longer cream-apricot toy traffic car facing right, high top view with dark wheels and dusky teal windshield, visually distinct from the postal van. Row 2 left: only a light apricot rabbit face with two long ears and small friendly nose, ears fully in view. Row 2 middle: only a full side view green turtle pointing right, clear rounded shell, head, four stubby legs, no plaque. Row 2 right: only a warm apricot cat face with two triangular ears and visible whiskers, no collar or neck. Matte gouache, fine paper grain limited to the opaque objects, clean cut-paper edges, original child-friendly art in warm cream, pine green, apricot and persimmon orange. All six silhouettes readable at 30 pixels, postal van recognizable at 22 pixels. No scene, no ground, no shadow, no glow, no colored aura, no translucent blur outside the silhouettes, no lettering, numbers, grid, checkerboard, badges, logos, watermark, or extra objects.",
+      "promptSha256": "1ce090b7ceb41addd4141727c31c7b3f6091a9d440aad0b22ef313df92c53a73",
+      "visualReview": "米色底离线逐件核对。每件图形完整且彼此可分辨。最终游戏和题图画面实测待做。"
+    },
+    "p08-parcels-and-yarn": {
+      "source": "art-source/p08-parcels-and-yarn.png",
+      "sourceSha256": "4641ad47aff7dc8345da95b3f3ba108b7444af8cd922a72bfe9318645547995a",
+      "originPath": "/Users/sqcopenclaw/.codex/generated_images/01a1c43e-779d-76c1-9193-2b50ab5e491a/exec-233aaaa2-e299-4298-a5f4-3fda430ccc93.png",
+      "sourceSize": [
+        1536,
+        1024
+      ],
+      "receipt": "art-source/p08-parcels-and-yarn.receipt.json",
+      "receiptSha256": "ea0cbf87093b65365d9d8dc852675be64388db1474ab9780b7d9679fa3a2b43e",
+      "plan": "art-source/p08-parcels-and-yarn.plan.json",
+      "prompt": "Create one genuinely transparent six-cell production sprite atlas for a first-grade Chinese delivery and listening lesson. Exactly 3 equal columns × 2 equal rows of square cells, overall 3:2 landscape. Every sprite is separate and centered with all margins and gutters alpha zero, no texture outside the object. Use exactly this order. Top left: a single complete golden-yellow oval fall leaf, short stalk and simple midrib, tilted up-right. Top middle: the exact same silhouette, size, tilt and stalk as the yellow leaf, but solid fresh medium green. Top right: one red knitted scarf laid out as a long horizontal soft strip with visible short fringe at both ends, front-three-quarter view, moderately saturated warm red. Bottom left: the exact same long horizontal scarf with same scale and fringe, clear medium blue instead of red. Bottom middle: one medium-blue round knitted cap with visibly rounded crown and broad knitted cuff, side-three-quarter view, a compact round silhouette clearly unlike a scarf, no pom-pom or logo. Bottom right: one medium-green round yarn ball, simple distinct curved yarn strands and a single short loose end, no other accessory. Original fine paper grain, matte gouache and crisp paper-cut edges, low-detail silhouettes intentionally recognizable at 30px. Keep the scarf and cap blue vivid and clearly different in silhouette. Flat crisp opacity, empty true transparent outer area, no blur, glow, shadow, grid, text, letters, numbers, watermark, logos, people, or background.",
+      "promptSha256": "380bea834c2c0d6621c8eee2878992c8621751a0867c4974b8b9d09eedbfed1c",
+      "visualReview": "米色底离线逐件核对。每件图形完整且彼此可分辨。最终游戏和题图画面实测待做。"
+    },
+    "p14-position-and-gaze": {
+      "source": "art-source/p14-position-and-gaze.png",
+      "sourceSha256": "eda2bf62fe84052f0f308270defff8cd8efb55ce6cdedf1c94fc0f65b9702539",
+      "originPath": "/Users/sqcopenclaw/.codex/generated_images/01a1c43e-779d-76c1-9193-2b50ab5e491a/exec-5dd0754f-480e-41aa-b4db-aab2ab26debb.png",
+      "sourceSize": [
+        1536,
+        1024
+      ],
+      "receipt": "art-source/p14-position-and-gaze.receipt.json",
+      "receiptSha256": "d5a99772109be85486a31b97a5c574bea3d6c705a707820256da1637f7fb44b1",
+      "prompt": "Create one production atlas of SIX separate square mini illustrations for a first-grade Chinese comprehension quiz in the lesson 《小小的船》. Overall 3:2 landscape, exactly three equal columns and two equal rows. The unseen tile edges must lie at exact thirds of width and half height. Clean flat uniform warm cream at all tile edges and in the gutters. Each panel is an independent square mini scene with 12% padding, so that cropping produces six complete images. No borders, lettering, numbers, arrows, watermarks, decorative icons or panel labels. The picture-book style is matte gouache with fine paper grain, clear paper-cut shapes, warm cream, pine green, apricot and persimmon, quiet low-saturation indigo only at night. All subjects must remain unambiguous at a 96px thumbnail. TOP ROW is three nearly identical front-three-quarter-overhead studies with the same low wide open woven apricot basket and one tiny red-rim round drum. Repeat the basket camera and centered size exactly across all three. Left: the small drum is BESIDE the basket to its right, fully outside, each object contacting the ground separately. Middle: the drum is BEHIND the basket, slightly right, its lower third hidden by the back wall of the basket, but the entire oval opening is visible empty. Right: drum sits entirely INSIDE the basket, below its upper rim, with the basket wall and surrounding inner space visibly enclosing it. No drumsticks. BOTTOM ROW is three original distinct mini scenes using the same short-black-haired child in an apricot coat. Left: the child on a quiet riverbank unmistakably tilts head and gaze DOWN toward pale star-like reflections on the dark water below; visible shoreline and absolutely no stars above the head. Middle: the child unmistakably gazes UP at two clearly white clouds in a bright blue DAY sky, no stars. Right: a warm interior with a recognizable window, the child unmistakably tips the face UP toward several clear stars in the dark blue NIGHT sky beyond the window, no water or clouds. For the bottom three panels, keep head and eye direction clearly legible, use side profiles and simple shapes. Do not let any object touch any tile margin.",
+      "promptSha256": "62d6590889dcedae92439c37e93c3098d60b3ea8753cb3934e3a9d09090b2d2c",
+      "visualReview": "目视核对分格的教学含义和物件边缘。待合课后检查实际小屏。",
+      "plan": "art-source/p14-position-and-gaze.plan.json"
+    },
+    "p04-p05-p14-room-and-knit": {
+      "source": "art-source/p04-p05-p14-room-and-knit.png",
+      "sourceSha256": "5c9cd2237bce1d82b922aa9d6a3853cbb8c4362ff17009abe7e9a8ac0013ecd5",
+      "originPath": "/Users/sqcopenclaw/.codex/generated_images/01a1c43e-779d-76c1-9193-2b50ab5e491a/exec-363bdc94-dfc4-4ce3-9a8d-0a309a88ac2e.png",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "receipt": "art-source/p04-p05-p14-room-and-knit.receipt.json",
+      "receiptSha256": "456c4e3c1ca9386f5864e27da2498ffed7dd4dd9171d9c5ddd417f67aa91e519",
+      "prompt": "Create one opaque original four-cell children's lesson art atlas in a precise 2×2 grid, equal square cells and a square overall image. All objects and story contents within their own quadrant, with uninterrupted warm-cream margins and gutters and no drawn grid lines. Fine paper grain, matte gouache, clean cut-paper edges, warm cream, pine green, apricot and persimmon, high readability at small sizes. Top-left: a simple warm room with an intact wall and a clear window frame. On a low shelf below the window, a single four-blade colorful paper pinwheel with a visible stick is planted in a small clay pot; a visibly empty open-top box sits on the same shelf separately to its side, with a gap. No other toy. Top-right: a front-facing plain wooden doorway, slightly open door. Two long vertical outer jambs and one unbroken horizontal lintel are prominent and all entirely within the frame, dark pine green contrasted against cream walls and pale floor. A child peeks through the narrow opening behind the door, not covering the main outer frame. Bottom-left: on exactly flat pale warm cream with no other object, one long medium-blue knitted scarf positioned diagonally lower left to upper right, new ribbed knit pattern, visibly knitted with short fringe. Bottom-right: exact same long scarf design, size, angle, framing, layout, fringe, and light as bottom-left, but clear bright leaf-green color. Scarf shadows subtle and identical; no text, lettering, digits, labels, glyphs, watermark, frames, arrows or extra pictures. Keep an empty 10% margin around the outer silhouette of each image.",
+      "promptSha256": "d311ca14263af37d6661c61c8c13b0ae0b5b842f141b38d7cbf1b319b0e4a7f6",
+      "visualReview": "目视核对分格的教学含义和物件边缘。待合课后检查实际小屏。",
+      "layout": {
+        "rows": 2,
+        "columns": 2
+      }
+    }
+  }
+}

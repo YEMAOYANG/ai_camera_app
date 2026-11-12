@@ -1,0 +1,128 @@
+{
+  "schemaVersion": "mira.courseware.asset-sources.v1",
+  "assets": {
+    "studio": {
+      "file": "assets/studio.png",
+      "sha256": "382443e5cdadc5743395ee751aceb17e1e15752a73f82d3b03a9fbf559d2617f",
+      "usedBy": [
+        "collect",
+        "aim",
+        "fish"
+      ],
+      "origin": "沿用本课旧版已登记的原创工坊图，逐图核对颜色、裁切和题材。",
+      "sourceAsset": "courseware/lessons/pep-math-g1-upper-add-subtract6and7/assets/studio.png",
+      "prompt": "pictures.json#studio",
+      "priorCacheFingerprint": "900f8df7776a1ba5956beb5e76245a32fdf8877a2e1a39da1305e1d3e35267a3"
+    },
+    "join-forward": {
+      "file": "assets/join-forward.png",
+      "sha256": "42e455919ec132d5d8e21e32505bb456e41a9e0989173d3eb5cea604b967bbbd",
+      "usedBy": [
+        "join"
+      ],
+      "origin": "课件作者按精确数量编码绘制。",
+      "source": "diagrams.py"
+    },
+    "join-reverse": {
+      "file": "assets/join-reverse.png",
+      "sha256": "bd8d7abf8a0ef714f84a3803f6c3396ca0434886e064a8e64342de2f634452f3",
+      "usedBy": [
+        "join"
+      ],
+      "origin": "课件作者按精确数量编码绘制。",
+      "source": "diagrams.py"
+    },
+    "take-three": {
+      "file": "assets/take-three.png",
+      "sha256": "895644f7b9216b6c25eaf6818ac9b150c113e993c782771a379b6bee0876cd89",
+      "usedBy": [
+        "subtract"
+      ],
+      "origin": "课件作者按精确数量编码绘制。",
+      "source": "diagrams.py"
+    },
+    "take-four": {
+      "file": "assets/take-four.png",
+      "sha256": "3960d1c263552e8952ea4777e64c54ef58363a025ac75d72781aae0b8e2503ea",
+      "usedBy": [
+        "subtract"
+      ],
+      "origin": "课件作者按精确数量编码绘制。",
+      "source": "diagrams.py"
+    },
+    "groups-seven": {
+      "file": "assets/groups-seven.png",
+      "sha256": "ef7ca9ab9b5b08d5787972eb22015ba97cb80516bcf024be52c72e80b2ec7330",
+      "usedBy": [
+        "four-ways"
+      ],
+      "origin": "课件作者按精确数量编码绘制。",
+      "source": "diagrams.py"
+    },
+    "equal-six": {
+      "file": "assets/equal-six.png",
+      "sha256": "d6645bb98ff8338585f986350aba15ae2be7c00e534294ffcfcb780803d673a7",
+      "usedBy": [
+        "same-groups"
+      ],
+      "origin": "课件作者按精确数量编码绘制。",
+      "source": "diagrams.py"
+    },
+    "fish-equal": {
+      "file": "assets/fish-equal.png",
+      "sha256": "c67cbe38f591b29e7654d34eb63cf783602d576ee4c7901160d8a3fc5596a9fb",
+      "usedBy": [
+        "fish"
+      ],
+      "origin": "课件作者按精确数量编码绘制。",
+      "source": "diagrams.py"
+    },
+    "fish-seven": {
+      "file": "assets/fish-seven.png",
+      "sha256": "f5f9c12b8b451532feb1d4e8a87ac303912d60ca6105f01e8206bf54a65cd6a2",
+      "usedBy": [
+        "fish"
+      ],
+      "origin": "课件作者按精确数量编码绘制。",
+      "source": "diagrams.py"
+    },
+    "fish-six": {
+      "file": "assets/fish-six.png",
+      "sha256": "57d236d0a2c99eac6f96abaf65d202b70253ba7db7d44d9cd69c77b99a80fe1b",
+      "usedBy": [
+        "fish"
+      ],
+      "origin": "课件作者按精确数量编码绘制。",
+      "source": "diagrams.py"
+    },
+    "tickets": {
+      "file": "assets/tickets.png",
+      "sha256": "a817d787fa04cc2064b8280ddd5a58e11969ffb17138a229d08845983496fcc2",
+      "usedBy": [
+        "sum-delivery"
+      ],
+      "origin": "课件作者按精确数量编码绘制。",
+      "source": "diagrams.py"
+    },
+    "socks": {
+      "file": "assets/socks.png",
+      "sha256": "57626aa3608b390fff9d41926d9e4ccac9bcd18771033ca3eda462f33a167cd6",
+      "usedBy": [
+        "left-on-rack"
+      ],
+      "origin": "课件作者按精确数量编码绘制。",
+      "source": "diagrams.py"
+    },
+    "tags": {
+      "file": "assets/tags.png",
+      "sha256": "347199b2e8ae08aa67e4dc9b8ac2c3454ea35e1a8ccacca8a29afbb393a92cda",
+      "usedBy": [
+        "missing-tag"
+      ],
+      "origin": "课件作者按精确数量编码绘制。",
+      "source": "diagrams.py"
+    }
+  },
+  "glyphs": "num-* 由 courseware.tools.glyph_picture 按 lesson.json 的单数字规格绘制。",
+  "games": "小游戏使用共享 K.game 引擎和模板。跑酷数量点与弹弓灯数由关卡配置确定，钓鱼的分组数量图由 diagrams.py 绘制。"
+}

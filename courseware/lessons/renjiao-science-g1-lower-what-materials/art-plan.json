@@ -1,0 +1,486 @@
+{
+  "schemaVersion": "mira.courseware.lesson-art-plan.v1",
+  "status": "pending_formal_imagegen",
+  "houseStyle": "细纸纹、哑光水粉、干净剪纸，深松绿和暖奶油底，杏色点缀。严格留透明边，不加文字、数字或品牌。每一图仅描述本课样本可见特征。",
+  "pairReview": "三组同物件须保持同材质、配色、形状与部件数量；正交俯视和侧视一眼可区分。选用前记录正式哈希，逐张补齐两类原页依据。",
+  "atlases": [
+    {
+      "atlasId": "materials-camera-views",
+      "rows": 3,
+      "columns": 3,
+      "background": "transparent",
+      "assets": [
+        {
+          "assetKey": "material-top-stool",
+          "description": "Orthographic above a single child-sized round navy cloth padded stool. A broad weave and peach stitching ring, exactly this model as row 2 col 1. Legs hidden by the larger disk. No second object.",
+          "usedBy": [
+            "material-photo-pairs",
+            "each-part-has-a-job"
+          ]
+        },
+        {
+          "assetKey": "material-top-case",
+          "description": "Orthographic above a small one-compartment rounded light teal transparent plastic classroom craft case with white inside and a large apricot thread spool visible through the unclouded lid. One tiny brushed silver latch at front. Same case as row 2 col 2.",
+          "usedBy": [
+            "material-photo-pairs",
+            "evidence-not-a-guess"
+          ]
+        },
+        {
+          "assetKey": "material-top-clipboard",
+          "description": "Orthographic above a single slim honey-colored wooden clipboard, silver spring clamp at north edge holding plain cream card with one pale sage spot. Same board as row 2 col 3. No writing.",
+          "usedBy": [
+            "material-photo-pairs"
+          ]
+        },
+        {
+          "assetKey": "material-side-stool",
+          "description": "Orthographic true front elevation of row 1 col 1 stool. Same navy cloth top and peach stitched rim above the same wood frame; three visible honey wooden legs with obvious grain, clear shallow padded rim. Do not change color or shape.",
+          "usedBy": [
+            "material-photo-pairs",
+            "each-part-has-a-job"
+          ]
+        },
+        {
+          "assetKey": "material-side-case",
+          "description": "Orthographic true front elevation of row 1 col 2 case. Same light teal plastic lid, shallow body and apricot spool faintly visible inside. Show metal latch on front center clearly, fully seated, no additional hinge on front.",
+          "usedBy": [
+            "material-photo-pairs",
+            "evidence-not-a-guess"
+          ]
+        },
+        {
+          "assetKey": "material-side-clipboard",
+          "description": "Orthographic low side elevation of row 1 col 3 clipboard with honey wood board edge, plain cream card and small silver clip mechanism lifted above the card to show shape. No fictitious loose parts; one clipboard only.",
+          "usedBy": [
+            "material-photo-pairs"
+          ]
+        },
+        {
+          "assetKey": "material-camera",
+          "description": "Isolated pine green classroom camera with bronze rim and small button, no lettering. Compact front-view icon.",
+          "usedBy": [
+            "material-photo-pairs"
+          ]
+        },
+        {
+          "assetKey": "camera-workbench",
+          "description": "Flat muted natural cork-colored matte inspection worktop as a soft rectangular texture; empty and quiet.",
+          "usedBy": [
+            "material-photo-pairs"
+          ]
+        },
+        {
+          "assetKey": "materials-badge",
+          "description": "Isolated quiet apricot magnifying glass over a wood grain sample, simple recognizable small sticker silhouette.",
+          "usedBy": [
+            "material-docks"
+          ]
+        }
+      ]
+    },
+    {
+      "atlasId": "materials-swatch-and-cart",
+      "rows": 3,
+      "columns": 3,
+      "background": "transparent",
+      "assets": [
+        {
+          "assetKey": "swatch-wood",
+          "description": "Honey oak sample rectangle, boldly visible grain and end grain, rounded safe edges.",
+          "usedBy": [
+            "material-docks",
+            "seven-sample-materials",
+            "picture-quiz"
+          ]
+        },
+        {
+          "assetKey": "swatch-plastic",
+          "description": "Warm brown molded plastic rounded sample, clean rolled edge and molded seam, no grain, clay brown comparable to oak.",
+          "usedBy": [
+            "material-docks",
+            "seven-sample-materials"
+          ]
+        },
+        {
+          "assetKey": "swatch-cloth",
+          "description": "Rolled-over square of dark olive woven cloth, strongly visible crossed threads and a rounded folded corner.",
+          "usedBy": [
+            "material-docks",
+            "seven-sample-materials",
+            "picture-quiz"
+          ]
+        },
+        {
+          "assetKey": "swatch-paper",
+          "description": "A flat folded piece of unprinted off-white heavyweight paper with one crisp corner, thin edge, no cloth texture.",
+          "usedBy": [
+            "material-docks",
+            "seven-sample-materials"
+          ]
+        },
+        {
+          "assetKey": "swatch-glass",
+          "description": "One greenish-clear sample with rounded safe edges, a pale bright streak and visible background through the middle.",
+          "usedBy": [
+            "material-docks",
+            "seven-sample-materials"
+          ]
+        },
+        {
+          "assetKey": "swatch-metal",
+          "description": "One smooth muted silver plate sample with clear small bright highlight and softly rounded corners, neutral silver.",
+          "usedBy": [
+            "material-docks",
+            "seven-sample-materials",
+            "picture-quiz"
+          ]
+        },
+        {
+          "assetKey": "swatch-stone",
+          "description": "One chunky mottled gray sandstone sample tile, many visible grains, fully distinct from shiny metal.",
+          "usedBy": [
+            "material-docks",
+            "seven-sample-materials"
+          ]
+        },
+        {
+          "assetKey": "material-cart-idle",
+          "description": "Child-safe exhibit trolley, apricot body, pine green handle and two visible rubber wheels, three-quarter view, resting, small sprite.",
+          "usedBy": [
+            "material-docks"
+          ]
+        },
+        {
+          "assetKey": "material-cart-move",
+          "description": "Exactly same trolley as row 3 col 2, slight rolling lean and wheel motion, no speed lines beyond silhouette.",
+          "usedBy": [
+            "material-docks"
+          ]
+        }
+      ]
+    },
+    {
+      "atlasId": "materials-sortable-objects",
+      "rows": 3,
+      "columns": 3,
+      "background": "transparent",
+      "assets": [
+        {
+          "assetKey": "wood-tray",
+          "description": "Same shallow rounded rectangular tray as row 1 col 2, same honey-brown color, but obvious large flowing wood grain and visible pale end grain in near side. No logo.",
+          "usedBy": [
+            "material-docks",
+            "same-shape-different-material",
+            "material-workbench"
+          ]
+        },
+        {
+          "assetKey": "plastic-tray",
+          "description": "Same size and honey-brown shallow rounded rectangular tray as row 1 col 1, visibly molded rounded rim and glossy clean even color, no grain and no painted fake wood.",
+          "usedBy": [
+            "material-docks",
+            "same-shape-different-material"
+          ]
+        },
+        {
+          "assetKey": "wood-box",
+          "description": "An open pale honey wood square organizer box with obvious grain on the exposed side and end grain, no metal fasteners.",
+          "usedBy": [
+            "material-docks"
+          ]
+        },
+        {
+          "assetKey": "wood-frame",
+          "description": "An empty simple honey oak picture frame, no glass, no backing, obvious clean wood grain. Small-size readable.",
+          "usedBy": [
+            "material-docks",
+            "material-workbench"
+          ]
+        },
+        {
+          "assetKey": "cloth-pouch",
+          "description": "A plain blue drawstring fabric pouch in the same fabric, woven and loosely folded, no zipper or metal.",
+          "usedBy": [
+            "material-docks",
+            "material-workbench"
+          ]
+        },
+        {
+          "assetKey": "paper-card",
+          "description": "One folded blank ivory card with thin crisp paper edges and unfolded white corners, no text, not a book.",
+          "usedBy": [
+            "material-docks"
+          ]
+        },
+        {
+          "assetKey": "glass-dish",
+          "description": "One thick clear glass shallow fluted dish, see-through center and translucent green edge; no liquid or label.",
+          "usedBy": [
+            "material-docks"
+          ]
+        },
+        {
+          "assetKey": "metal-bell",
+          "description": "One entirely silver metal tabletop dome bell, closed body, bold highlight and fully metallic button, no wood or plastic base.",
+          "usedBy": [
+            "material-docks"
+          ]
+        },
+        {
+          "assetKey": "stone-tile",
+          "description": "One small low stone paving tile, clearly stippled pebble-colored grains and chipped-looking visual edge, smooth handling not shown.",
+          "usedBy": [
+            "material-docks"
+          ]
+        }
+      ]
+    },
+    {
+      "atlasId": "materials-new-quiz-objects",
+      "rows": 3,
+      "columns": 3,
+      "background": "transparent",
+      "assets": [
+        {
+          "assetKey": "quiz-knit-glove",
+          "description": "One plain sage knit glove, wool stitches prominent, no paper or metal.",
+          "usedBy": [
+            "picture-quiz"
+          ]
+        },
+        {
+          "assetKey": "quiz-cardboard-tube",
+          "description": "One small uncoated brown paperboard tube, angled to show rolled thin layers on rim. No markings or contents.",
+          "usedBy": [
+            "picture-quiz"
+          ]
+        },
+        {
+          "assetKey": "quiz-stone-marker",
+          "description": "One plain speckled granite garden marker with contrasting coarse stone grains, no sign writing.",
+          "usedBy": [
+            "picture-quiz"
+          ]
+        },
+        {
+          "assetKey": "quiz-snap-base",
+          "description": "One simple dark plum canvas fastening strap with a large round brushed silver press snap clearly visible around the right middle; one clearly separated fastener, show cloth stitching too.",
+          "usedBy": [
+            "picture-quiz"
+          ]
+        },
+        {
+          "assetKey": "quiz-bright-cap",
+          "description": "One isolated silver bottle cap, one prominent bright oval reflection on its face, muted graphite rim, no bottle, no letters.",
+          "usedBy": [
+            "picture-quiz"
+          ]
+        },
+        {
+          "assetKey": "quiz-wood-ruler",
+          "description": "One unmarked chunky honey wood straight edge with clear wood grain, long narrow bar, no numbers or ticks.",
+          "usedBy": [
+            "picture-quiz"
+          ]
+        },
+        {
+          "assetKey": "quiz-plastic-ruler",
+          "description": "Same shape straight edge as wood one, turquoise molded plastic with round corners and glossy rim, no numbers or ticks.",
+          "usedBy": [
+            "picture-quiz"
+          ]
+        },
+        {
+          "assetKey": "quiz-wooden-gear",
+          "description": "One wooden craft cog with bold honey grain, rounded teeth, and central hole, no metal.",
+          "usedBy": [
+            "picture-quiz"
+          ]
+        },
+        {
+          "assetKey": "quiz-metal-and-plastic",
+          "description": "Two clearly separated small items side by side: shiny all-metal office clip, turquoise molded plastic fork. No overlap.",
+          "usedBy": [
+            "picture-quiz"
+          ]
+        }
+      ]
+    },
+    {
+      "atlasId": "materials-record-and-corner",
+      "rows": 3,
+      "columns": 3,
+      "background": "transparent",
+      "assets": [
+        {
+          "assetKey": "quiz-record-touch",
+          "description": "One result card illustration showing an index finger touching a silver cap; close side view; same cap as provided reference, no writing or ticks.",
+          "usedBy": [
+            "picture-quiz"
+          ]
+        },
+        {
+          "assetKey": "quiz-record-smell",
+          "description": "One result card illustration showing a nose near the same cap as reference; show only cropped profile and cap with clear separation, no writing.",
+          "usedBy": [
+            "picture-quiz"
+          ]
+        },
+        {
+          "assetKey": "quiz-record-highlight",
+          "description": "One result card illustration showing only the same cap as reference with one visible bright highlight, no hands, no nose, no writing.",
+          "usedBy": [
+            "picture-quiz"
+          ]
+        },
+        {
+          "assetKey": "quiz-cloth-around-corner",
+          "description": "Simple cross section of a cream rectangular display-board corner with blue woven cloth wrapping its right-angle bend, clearly drapes down the vertical face, no fingers.",
+          "usedBy": [
+            "picture-quiz"
+          ]
+        },
+        {
+          "assetKey": "quiz-wood-at-corner",
+          "description": "Same cream display-board corner at the same viewpoint, with straight honey wooden sample touching horizontal top only. No other objects.",
+          "usedBy": [
+            "picture-quiz"
+          ]
+        },
+        {
+          "assetKey": "quiz-stone-at-corner",
+          "description": "Same cream display-board corner at same viewpoint, with flat speckled gray stone tile lying on the top only, stops at the right angle.",
+          "usedBy": [
+            "picture-quiz"
+          ]
+        },
+        {
+          "assetKey": "workbench-cover",
+          "description": "Original quiet primary-school exhibit table with a wood tray, small wood picture frame and a blue fabric drawstring pouch clearly arranged from left to right, few objects. No signage or writing.",
+          "usedBy": [
+            "material-workbench"
+          ]
+        },
+        {
+          "assetKey": "sorting-workbench",
+          "description": "Muted apricot and pine green display hall worktop texture, almost flat composition, no objects obstruct the playing board.",
+          "usedBy": [
+            "material-docks"
+          ]
+        },
+        {
+          "assetKey": "home-material-record",
+          "description": "A family desk with an open simple blank notebook, a sturdy storage caddy and two clearly distinct details on it, no people or location clues, no lettering.",
+          "usedBy": [
+            "home-material-observation"
+          ]
+        }
+      ]
+    }
+  ],
+  "compositions": {
+    "wood-object-comparison": {
+      "layout": "two cards",
+      "sources": [
+        "wood-tray",
+        "wood-frame"
+      ],
+      "uses": [
+        "material-workbench"
+      ]
+    },
+    "seven-material-samples": {
+      "layout": "three visible groups, first has wood/cloth/paper, middle glass/plastic, last metal/stone",
+      "sources": [
+        "swatch-wood",
+        "swatch-cloth",
+        "swatch-paper",
+        "swatch-glass",
+        "swatch-plastic",
+        "swatch-metal",
+        "swatch-stone"
+      ],
+      "uses": [
+        "seven-sample-materials"
+      ]
+    },
+    "two-trays-compare": {
+      "layout": "two equally sized same-scale trays on warm cards",
+      "sources": [
+        "wood-tray",
+        "plastic-tray"
+      ],
+      "uses": [
+        "same-shape-different-material",
+        "material-docks"
+      ]
+    },
+    "stool-detail": {
+      "layout": "side shows whole and legs, top shows fabric",
+      "sources": [
+        "material-side-stool",
+        "material-top-stool"
+      ],
+      "uses": [
+        "each-part-has-a-job"
+      ]
+    },
+    "photo-start-cover": {
+      "layout": "side by side photo cards, camera at upper center",
+      "sources": [
+        "material-top-stool",
+        "material-side-stool",
+        "material-camera"
+      ],
+      "uses": [
+        "material-photo-pairs"
+      ]
+    },
+    "material-record-example": {
+      "layout": "top photo and side photo together with one untouched blank area for pending touch",
+      "sources": [
+        "material-top-case",
+        "material-side-case"
+      ],
+      "uses": [
+        "evidence-not-a-guess"
+      ]
+    },
+    "quiz-fabric-snap-stimulus": {
+      "layout": "crop centered on press snap and add exact ring after inspecting art coordinates",
+      "sources": [
+        "quiz-snap-base"
+      ],
+      "uses": [
+        "picture-quiz"
+      ]
+    },
+    "quiz-wood-and-plastic-rulers": {
+      "layout": "two equal-size cards",
+      "sources": [
+        "quiz-wood-ruler",
+        "quiz-plastic-ruler"
+      ],
+      "uses": [
+        "picture-quiz"
+      ]
+    },
+    "quiz-wood-and-gear": {
+      "layout": "two equal-size cards",
+      "sources": [
+        "quiz-wood-ruler",
+        "quiz-wooden-gear"
+      ],
+      "uses": [
+        "picture-quiz"
+      ]
+    }
+  },
+  "finishedSemanticDiagrams": [
+    "same-ring-comparison",
+    "window-clear",
+    "window-wood",
+    "window-metal"
+  ]
+}

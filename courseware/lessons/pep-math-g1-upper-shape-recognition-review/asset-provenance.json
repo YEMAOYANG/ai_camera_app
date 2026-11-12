@@ -1,0 +1,1410 @@
+{
+  "schemaVersion": "mira.courseware.asset-provenance.v1",
+  "atlasReceipts": {
+    "kite-workshop": {
+      "path": "art-source/kite-workshop.receipt.json",
+      "sha256": "5147c7459d9abc306e1ff766e42f3bb122a2f2db63c124de10c35a4aa159aedd"
+    }
+  },
+  "geometry": {
+    "pieces": {
+      "piece-thin": {
+        "cylinder": 41
+      },
+      "piece-wide": {
+        "cylinder": 62
+      },
+      "piece-four": {
+        "size": [
+          2,
+          2,
+          1
+        ]
+      },
+      "piece-row": {
+        "size": [
+          3,
+          1,
+          1
+        ]
+      },
+      "piece-pair": {
+        "size": [
+          1,
+          2,
+          1
+        ]
+      },
+      "piece-wall": {
+        "size": [
+          2,
+          1,
+          2
+        ]
+      },
+      "piece-beam": {
+        "size": [
+          4,
+          1,
+          1
+        ]
+      }
+    },
+    "gapBoards": {
+      "base-thin": {
+        "cylinder": 41
+      },
+      "base-wide": {
+        "cylinder": 62
+      },
+      "base-four": {
+        "size": [
+          2,
+          2,
+          1
+        ],
+        "goal": [
+          2,
+          2,
+          2
+        ]
+      },
+      "base-row": {
+        "size": [
+          3,
+          1,
+          1
+        ],
+        "goal": [
+          3,
+          1,
+          2
+        ]
+      },
+      "base-pair": {
+        "size": [
+          1,
+          2,
+          1
+        ],
+        "goal": [
+          1,
+          2,
+          2
+        ]
+      },
+      "base-wall": {
+        "size": [
+          2,
+          1,
+          1
+        ],
+        "goal": [
+          2,
+          1,
+          3
+        ]
+      },
+      "base-beam": {
+        "size": [
+          4,
+          1,
+          1
+        ],
+        "goal": [
+          4,
+          1,
+          2
+        ]
+      }
+    },
+    "target": [
+      [
+        0,
+        0,
+        0
+      ],
+      [
+        1,
+        0,
+        0
+      ],
+      [
+        2,
+        0,
+        0
+      ],
+      [
+        0,
+        1,
+        0
+      ],
+      [
+        1,
+        1,
+        0
+      ],
+      [
+        2,
+        1,
+        0
+      ]
+    ],
+    "known": [
+      [
+        0,
+        0,
+        0
+      ],
+      [
+        1,
+        0,
+        0
+      ]
+    ],
+    "remainder": [
+      [
+        2,
+        0,
+        0
+      ],
+      [
+        0,
+        1,
+        0
+      ],
+      [
+        1,
+        1,
+        0
+      ],
+      [
+        2,
+        1,
+        0
+      ]
+    ]
+  },
+  "assets": {
+    "ball-directions": {
+      "path": "assets/ball-directions.png",
+      "sha256": "8bd3383f90a43139b4e42032730b0b674304e7bbb81c0c9091ab4f5ce12e2219",
+      "bytes": 18044,
+      "source": "deterministic solid geometry",
+      "renderSource": "art-source/solid-diagrams.mjs",
+      "renderSourceSha256": "7940d6a96d5362069618c25062fd7ffb556d8a687ae1d5e358fba95b9f058885",
+      "inputs": {},
+      "visualReview": "geometry and crop reviewed",
+      "usedBy": [
+        "round-solids"
+      ],
+      "derivativeConsumers": []
+    },
+    "base-beam": {
+      "path": "assets/base-beam.png",
+      "sha256": "734b4fadc688158338a49d28cb3f8f215b388a8a8a8f1751a87bca774dd2ecd7",
+      "bytes": 4111,
+      "source": "deterministic solid geometry",
+      "renderSource": "art-source/solid-diagrams.mjs",
+      "renderSourceSha256": "7940d6a96d5362069618c25062fd7ffb556d8a687ae1d5e358fba95b9f058885",
+      "inputs": {},
+      "visualReview": "geometry and crop reviewed",
+      "usedBy": [
+        "complete-the-solid"
+      ],
+      "derivativeConsumers": []
+    },
+    "base-four": {
+      "path": "assets/base-four.png",
+      "sha256": "9431e439473f2faf013e7b40608f66e53a66cb1891839eb80dde2720e01596b7",
+      "bytes": 5500,
+      "source": "deterministic solid geometry",
+      "renderSource": "art-source/solid-diagrams.mjs",
+      "renderSourceSha256": "7940d6a96d5362069618c25062fd7ffb556d8a687ae1d5e358fba95b9f058885",
+      "inputs": {},
+      "visualReview": "geometry and crop reviewed",
+      "usedBy": [
+        "complete-the-solid"
+      ],
+      "derivativeConsumers": []
+    },
+    "base-pair": {
+      "path": "assets/base-pair.png",
+      "sha256": "ca7bf1e5c6918125571784b2dfc2422b2e7ac2f10be290376261578442448fd5",
+      "bytes": 5332,
+      "source": "deterministic solid geometry",
+      "renderSource": "art-source/solid-diagrams.mjs",
+      "renderSourceSha256": "7940d6a96d5362069618c25062fd7ffb556d8a687ae1d5e358fba95b9f058885",
+      "inputs": {},
+      "visualReview": "geometry and crop reviewed",
+      "usedBy": [
+        "complete-the-solid"
+      ],
+      "derivativeConsumers": []
+    },
+    "base-row": {
+      "path": "assets/base-row.png",
+      "sha256": "855195ec661d1acb5063ce395c0cfb145de0680115f0916d357a03891b6f1388",
+      "bytes": 4098,
+      "source": "deterministic solid geometry",
+      "renderSource": "art-source/solid-diagrams.mjs",
+      "renderSourceSha256": "7940d6a96d5362069618c25062fd7ffb556d8a687ae1d5e358fba95b9f058885",
+      "inputs": {},
+      "visualReview": "geometry and crop reviewed",
+      "usedBy": [
+        "complete-the-solid"
+      ],
+      "derivativeConsumers": []
+    },
+    "base-thin": {
+      "path": "assets/base-thin.png",
+      "sha256": "00e1eb68cebf03df1c4caacc9debd7c642eec4a79cd1ca6e9d063dcaee49f74d",
+      "bytes": 6107,
+      "source": "deterministic solid geometry",
+      "renderSource": "art-source/solid-diagrams.mjs",
+      "renderSourceSha256": "7940d6a96d5362069618c25062fd7ffb556d8a687ae1d5e358fba95b9f058885",
+      "inputs": {},
+      "visualReview": "geometry and crop reviewed",
+      "usedBy": [
+        "complete-the-solid"
+      ],
+      "derivativeConsumers": [
+        "stack-opening"
+      ]
+    },
+    "base-wall": {
+      "path": "assets/base-wall.png",
+      "sha256": "4a01ab5e640b9993bef5c30310ae058cb656afca149f92b501c8ec97c6300f07",
+      "bytes": 4245,
+      "source": "deterministic solid geometry",
+      "renderSource": "art-source/solid-diagrams.mjs",
+      "renderSourceSha256": "7940d6a96d5362069618c25062fd7ffb556d8a687ae1d5e358fba95b9f058885",
+      "inputs": {},
+      "visualReview": "geometry and crop reviewed",
+      "usedBy": [
+        "complete-the-solid"
+      ],
+      "derivativeConsumers": []
+    },
+    "base-wide": {
+      "path": "assets/base-wide.png",
+      "sha256": "ca046d11750db5df3508d13f8f1ddd8ac7bc1c65caaf2cc847c47fe360b585cd",
+      "bytes": 7938,
+      "source": "deterministic solid geometry",
+      "renderSource": "art-source/solid-diagrams.mjs",
+      "renderSourceSha256": "7940d6a96d5362069618c25062fd7ffb556d8a687ae1d5e358fba95b9f058885",
+      "inputs": {},
+      "visualReview": "geometry and crop reviewed",
+      "usedBy": [
+        "complete-the-solid"
+      ],
+      "derivativeConsumers": [
+        "stack-opening"
+      ]
+    },
+    "built-beam": {
+      "path": "assets/built-beam.png",
+      "sha256": "e685d2ae6ae950c746216e1efe6af4d04f254c455a8500f6a3a55b684f8ccb79",
+      "bytes": 3122,
+      "source": "deterministic solid geometry",
+      "renderSource": "art-source/solid-diagrams.mjs",
+      "renderSourceSha256": "7940d6a96d5362069618c25062fd7ffb556d8a687ae1d5e358fba95b9f058885",
+      "inputs": {},
+      "visualReview": "geometry and crop reviewed",
+      "usedBy": [
+        "complete-the-solid"
+      ],
+      "derivativeConsumers": []
+    },
+    "built-four": {
+      "path": "assets/built-four.png",
+      "sha256": "a9a9b56e0a04e81f1835f6e58456d69937b4963f159432058d7425d3e89f3c01",
+      "bytes": 4162,
+      "source": "deterministic solid geometry",
+      "renderSource": "art-source/solid-diagrams.mjs",
+      "renderSourceSha256": "7940d6a96d5362069618c25062fd7ffb556d8a687ae1d5e358fba95b9f058885",
+      "inputs": {},
+      "visualReview": "geometry and crop reviewed",
+      "usedBy": [
+        "complete-the-solid"
+      ],
+      "derivativeConsumers": []
+    },
+    "built-pair": {
+      "path": "assets/built-pair.png",
+      "sha256": "c4c6305522114d1a96df45c4a1f6f92e1dee53f2621546bb2b3b1a6e7e531368",
+      "bytes": 4060,
+      "source": "deterministic solid geometry",
+      "renderSource": "art-source/solid-diagrams.mjs",
+      "renderSourceSha256": "7940d6a96d5362069618c25062fd7ffb556d8a687ae1d5e358fba95b9f058885",
+      "inputs": {},
+      "visualReview": "geometry and crop reviewed",
+      "usedBy": [
+        "complete-the-solid"
+      ],
+      "derivativeConsumers": []
+    },
+    "built-row": {
+      "path": "assets/built-row.png",
+      "sha256": "e42bb83a79a19ad3617522f8a71b4d14b786787ae8764ef8bebdc0d250f80b5c",
+      "bytes": 3199,
+      "source": "deterministic solid geometry",
+      "renderSource": "art-source/solid-diagrams.mjs",
+      "renderSourceSha256": "7940d6a96d5362069618c25062fd7ffb556d8a687ae1d5e358fba95b9f058885",
+      "inputs": {},
+      "visualReview": "geometry and crop reviewed",
+      "usedBy": [
+        "complete-the-solid"
+      ],
+      "derivativeConsumers": []
+    },
+    "built-thin": {
+      "path": "assets/built-thin.png",
+      "sha256": "b36f200509e81718bc3c125f919721767dc95b2107aa6f3b7bfabfb10baad7e5",
+      "bytes": 5122,
+      "source": "deterministic solid geometry",
+      "renderSource": "art-source/solid-diagrams.mjs",
+      "renderSourceSha256": "7940d6a96d5362069618c25062fd7ffb556d8a687ae1d5e358fba95b9f058885",
+      "inputs": {},
+      "visualReview": "geometry and crop reviewed",
+      "usedBy": [
+        "complete-the-solid"
+      ],
+      "derivativeConsumers": []
+    },
+    "built-wall": {
+      "path": "assets/built-wall.png",
+      "sha256": "8af0322f92c4f4a38693ee963ce0bcf3fd6044a51feca0e2399062b8f8ba28f9",
+      "bytes": 3563,
+      "source": "deterministic solid geometry",
+      "renderSource": "art-source/solid-diagrams.mjs",
+      "renderSourceSha256": "7940d6a96d5362069618c25062fd7ffb556d8a687ae1d5e358fba95b9f058885",
+      "inputs": {},
+      "visualReview": "geometry and crop reviewed",
+      "usedBy": [
+        "complete-the-solid"
+      ],
+      "derivativeConsumers": []
+    },
+    "built-wide": {
+      "path": "assets/built-wide.png",
+      "sha256": "07a0e365f380b216dc25c7cd763dcdf65fd523db3ac49d51be0b9266b0875a50",
+      "bytes": 6356,
+      "source": "deterministic solid geometry",
+      "renderSource": "art-source/solid-diagrams.mjs",
+      "renderSourceSha256": "7940d6a96d5362069618c25062fd7ffb556d8a687ae1d5e358fba95b9f058885",
+      "inputs": {},
+      "visualReview": "geometry and crop reviewed",
+      "usedBy": [
+        "complete-the-solid"
+      ],
+      "derivativeConsumers": []
+    },
+    "cart-push": {
+      "path": "assets/cart-push.png",
+      "sha256": "3332901f73002251110fa2f5e6755fc1ef2c7e56012cffe02e5db7547a6c4958",
+      "bytes": 73482,
+      "source": "Codex built-in image_gen, reused classroom cart",
+      "sourceLessonAsset": "courseware/lessons/pep-chinese-g1-upper-chinese-garden-eight/assets/cart-push.png",
+      "sourceReceipt": "courseware/lessons/pep-chinese-g1-upper-chinese-garden-eight/art-source/exhibit-game-sprites.receipt.json",
+      "sourceReceiptSha256": "eca305de7e154b57f073455027d05e9904a117deccf37851df0450fdb956c270",
+      "generatedSource": "courseware/lessons/pep-chinese-g1-upper-chinese-garden-eight/art-source/exhibit-game-sprites.png",
+      "generatedSourceSha256": "17be7d4e20e74261cc48678f0c040cc6bfae250d4e257467d7f5dbb5ea20a69f",
+      "prompt": "Use case: illustration-game sprite atlas. ONE exact 3-column by 2-row atlas with SIX isolated distinct sprites, transparent background with true alpha, generous transparent gutters at exact thirds and half, no mat, shadow or colored backdrop. Warm first-grade community exhibit, hand-cut matte gouache, subtle paper texture, pine, apricot and warm cream, bold silhouette readable at 45 pixels. No text, numerals, markings, flags with writing, no crops. Top row left to right: (1) compact pine-green low wooden pushcart seen in friendly three-quarter top view, cart's two visible rounded tan wheels on the near side and short apricot handle, empty bed, resting state; (2) exact same pine cart and same scale/angle, pushing state with an apricot handle angled slightly forward and wheels with amber highlights, no motion streak beyond sprite; (3) simple bright persimmon paper lantern cutout, rounded, gold tassel, single object. Bottom row: (4) overhead toy skiff shaped like a wide oval with a pointed bow facing RIGHT, deep pine outer hull, aqua inner deck, a large pale cream circular bubble nozzle on the pointed RIGHT bow, no propeller; (5) exact same overhead RIGHT-facing skiff silhouette and scale, active state with same pale nozzle glowing light aqua and an attached tiny pale bubble emerging RIGHT, keep the bubble inside this tile; (6) single round teal achievement badge in the shape of a painted water ripple, one large pearl bubble and two smaller pearl bubbles over pine water, no writing. This atlas will be cropped into independent assets, so place each sprite centered inside its own cell with ample truly transparent padding.",
+      "promptSha256": "a543fd02c6f4195cbb659c6cc72991b08158e28d63695e11868b0613c729dc33",
+      "sourceCrop": [
+        542,
+        44,
+        1002,
+        511
+      ],
+      "visualReview": "source and exact reuse verified",
+      "usedBy": [
+        "sort-solid-blocks"
+      ],
+      "derivativeConsumers": []
+    },
+    "cart-rest": {
+      "path": "assets/cart-rest.png",
+      "sha256": "9aabeded7e32e79528fc5df930e93005f52b74868ea13364706ea3ec618e1c63",
+      "bytes": 75687,
+      "source": "Codex built-in image_gen, reused classroom cart",
+      "sourceLessonAsset": "courseware/lessons/pep-chinese-g1-upper-chinese-garden-eight/assets/cart-rest.png",
+      "sourceReceipt": "courseware/lessons/pep-chinese-g1-upper-chinese-garden-eight/art-source/exhibit-game-sprites.receipt.json",
+      "sourceReceiptSha256": "eca305de7e154b57f073455027d05e9904a117deccf37851df0450fdb956c270",
+      "generatedSource": "courseware/lessons/pep-chinese-g1-upper-chinese-garden-eight/art-source/exhibit-game-sprites.png",
+      "generatedSourceSha256": "17be7d4e20e74261cc48678f0c040cc6bfae250d4e257467d7f5dbb5ea20a69f",
+      "prompt": "Use case: illustration-game sprite atlas. ONE exact 3-column by 2-row atlas with SIX isolated distinct sprites, transparent background with true alpha, generous transparent gutters at exact thirds and half, no mat, shadow or colored backdrop. Warm first-grade community exhibit, hand-cut matte gouache, subtle paper texture, pine, apricot and warm cream, bold silhouette readable at 45 pixels. No text, numerals, markings, flags with writing, no crops. Top row left to right: (1) compact pine-green low wooden pushcart seen in friendly three-quarter top view, cart's two visible rounded tan wheels on the near side and short apricot handle, empty bed, resting state; (2) exact same pine cart and same scale/angle, pushing state with an apricot handle angled slightly forward and wheels with amber highlights, no motion streak beyond sprite; (3) simple bright persimmon paper lantern cutout, rounded, gold tassel, single object. Bottom row: (4) overhead toy skiff shaped like a wide oval with a pointed bow facing RIGHT, deep pine outer hull, aqua inner deck, a large pale cream circular bubble nozzle on the pointed RIGHT bow, no propeller; (5) exact same overhead RIGHT-facing skiff silhouette and scale, active state with same pale nozzle glowing light aqua and an attached tiny pale bubble emerging RIGHT, keep the bubble inside this tile; (6) single round teal achievement badge in the shape of a painted water ripple, one large pearl bubble and two smaller pearl bubbles over pine water, no writing. This atlas will be cropped into independent assets, so place each sprite centered inside its own cell with ample truly transparent padding.",
+      "promptSha256": "a543fd02c6f4195cbb659c6cc72991b08158e28d63695e11868b0613c729dc33",
+      "sourceCrop": [
+        30,
+        44,
+        490,
+        511
+      ],
+      "visualReview": "source and exact reuse verified",
+      "usedBy": [
+        "sort-solid-blocks"
+      ],
+      "derivativeConsumers": []
+    },
+    "cube-layers": {
+      "path": "assets/cube-layers.png",
+      "sha256": "c162b8c500a057bab126f5cf57ede48e48d66691b94f4ee46792ea4bfee5dc6b",
+      "bytes": 17169,
+      "source": "deterministic solid geometry",
+      "renderSource": "art-source/solid-diagrams.mjs",
+      "renderSourceSha256": "7940d6a96d5362069618c25062fd7ffb556d8a687ae1d5e358fba95b9f058885",
+      "inputs": {},
+      "visualReview": "geometry and crop reviewed",
+      "usedBy": [
+        "fill-two-layers"
+      ],
+      "derivativeConsumers": []
+    },
+    "cylinder-positions": {
+      "path": "assets/cylinder-positions.png",
+      "sha256": "89bad21fa516b814140ccea1486e11d4e1b452854b1c7ca6561454b54ae9a7da",
+      "bytes": 12792,
+      "source": "deterministic solid geometry",
+      "renderSource": "art-source/solid-diagrams.mjs",
+      "renderSourceSha256": "7940d6a96d5362069618c25062fd7ffb556d8a687ae1d5e358fba95b9f058885",
+      "inputs": {},
+      "visualReview": "geometry and crop reviewed",
+      "usedBy": [
+        "round-solids"
+      ],
+      "derivativeConsumers": []
+    },
+    "cylinder-stack-compare": {
+      "path": "assets/cylinder-stack-compare.png",
+      "sha256": "a19b669ca66f4f5bf16a902c666caf59f062ee19beaa46e5d9288eb16fc3f83f",
+      "bytes": 27429,
+      "source": "deterministic solid geometry",
+      "renderSource": "art-source/solid-diagrams.mjs",
+      "renderSourceSha256": "7940d6a96d5362069618c25062fd7ffb556d8a687ae1d5e358fba95b9f058885",
+      "inputs": {
+        "stack-aligned": "8c3c9ce3d04b3ac9d031c75cbde743a43b6674831ea917a6f3249d1335f82a02",
+        "stack-offset": "4ed0553b33d053f6bc45c17968a0c16df1a2a5d2a10979b4785a449449766a26",
+        "stack-mismatch": "bf4a04163bbe5c8dbc4d2fe656560b16071254c1d48b9263672e2a9164b0b2c0"
+      },
+      "visualReview": "geometry and crop reviewed",
+      "usedBy": [
+        "stack-a-cylinder"
+      ],
+      "derivativeConsumers": []
+    },
+    "family-map": {
+      "path": "assets/family-map.png",
+      "sha256": "0c7a220c81a979f26d4c1d54e3db6fcd3c13e2739170dc199bc79cc480bd1f0c",
+      "width": 378,
+      "height": 380,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/kite-workshop.png",
+      "generatedSourceSha256": "67339ab3075be7ef1a9025845f8ce4e9cf2e6c65b07c0375d27df09414095634",
+      "promptSha256": "1414ebec48cd9dfa69de822e229745c5124bd87aa6c1965351ce5c60163e8dbf",
+      "sourceCrop": [
+        432,
+        835,
+        830,
+        1235
+      ],
+      "bytes": 262076,
+      "receipt": "art-source/kite-workshop.receipt.json",
+      "visualReview": "atlas crop reviewed",
+      "usedBy": [],
+      "derivativeConsumers": [
+        "home-example"
+      ]
+    },
+    "fit-practice": {
+      "path": "assets/fit-practice.png",
+      "sha256": "1e1b7325b25fdf654dfee483aabf80a7e783506ef0fdce4d542295991e6f1e78",
+      "bytes": 11833,
+      "source": "deterministic solid geometry",
+      "renderSource": "art-source/solid-diagrams.mjs",
+      "renderSourceSha256": "7940d6a96d5362069618c25062fd7ffb556d8a687ae1d5e358fba95b9f058885",
+      "inputs": {},
+      "visualReview": "geometry and crop reviewed",
+      "usedBy": [],
+      "derivativeConsumers": [
+        "lab-problem"
+      ]
+    },
+    "flat-box-positions": {
+      "path": "assets/flat-box-positions.png",
+      "sha256": "f626cc3f39066a8dcc263c458f3840a6071433f95c48b4357c1c4798ee25cb86",
+      "bytes": 8701,
+      "source": "deterministic solid geometry",
+      "renderSource": "art-source/solid-diagrams.mjs",
+      "renderSourceSha256": "7940d6a96d5362069618c25062fd7ffb556d8a687ae1d5e358fba95b9f058885",
+      "inputs": {},
+      "visualReview": "geometry and crop reviewed",
+      "usedBy": [
+        "flat-faces"
+      ],
+      "derivativeConsumers": []
+    },
+    "flat-cube-faces": {
+      "path": "assets/flat-cube-faces.png",
+      "sha256": "fd5a4899bcea78a49b2410e62e2bbabe6284ebee39b81e6b2d4a6ecd05e97ec5",
+      "bytes": 9885,
+      "source": "deterministic solid geometry",
+      "renderSource": "art-source/solid-diagrams.mjs",
+      "renderSourceSha256": "7940d6a96d5362069618c25062fd7ffb556d8a687ae1d5e358fba95b9f058885",
+      "inputs": {},
+      "visualReview": "geometry and crop reviewed",
+      "usedBy": [
+        "flat-faces"
+      ],
+      "derivativeConsumers": []
+    },
+    "home-example": {
+      "path": "assets/home-example.png",
+      "sha256": "e96957acfda4312706a5d7d77d6d8dba74edb2009f04c7c365c14744644f17ed",
+      "bytes": 241527,
+      "source": "deterministic solid geometry",
+      "renderSource": "art-source/solid-diagrams.mjs",
+      "renderSourceSha256": "7940d6a96d5362069618c25062fd7ffb556d8a687ae1d5e358fba95b9f058885",
+      "inputs": {
+        "family-map": "0c7a220c81a979f26d4c1d54e3db6fcd3c13e2739170dc199bc79cc480bd1f0c",
+        "sample-long": "177eeacdeea974dcc357316dc2d37fb665452e2d09282d52df7d6073794138e6",
+        "sample-cylinder": "b227d3643d2f3f949667d54e21321a7ccc1bc132dd890b400be245ba65cc2653",
+        "sample-cube": "78a2000fbd35e3fbbfe5fa3ddaef61c8c38a575ae2f51caa536e61ee535e3ad8",
+        "sample-ball": "6ac3520b36e270da2c50513b6f8838b3f004f0f2aab69a7960b11154815a1cc3"
+      },
+      "visualReview": "geometry and crop reviewed",
+      "usedBy": [
+        "review-and-build"
+      ],
+      "derivativeConsumers": []
+    },
+    "kite-sticker": {
+      "path": "assets/kite-sticker.png",
+      "sha256": "75c98ad369a8e6d3f50b172050d63cbdc3a7b0db7cd0516dc5c466f9dea7c4d5",
+      "width": 380,
+      "height": 377,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/kite-workshop.png",
+      "generatedSourceSha256": "67339ab3075be7ef1a9025845f8ce4e9cf2e6c65b07c0375d27df09414095634",
+      "promptSha256": "1414ebec48cd9dfa69de822e229745c5124bd87aa6c1965351ce5c60163e8dbf",
+      "sourceCrop": [
+        848,
+        835,
+        1251,
+        1235
+      ],
+      "bytes": 199092,
+      "receipt": "art-source/kite-workshop.receipt.json",
+      "visualReview": "atlas crop reviewed",
+      "usedBy": [
+        "complete-the-solid",
+        "sort-solid-blocks"
+      ],
+      "derivativeConsumers": []
+    },
+    "lab-background": {
+      "path": "assets/lab-background.png",
+      "sha256": "4d444b6586b154f8077b7db6b69835b87fc8f63fef83064eea42062d84f3dd13",
+      "width": 380,
+      "height": 370,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/kite-workshop.png",
+      "generatedSourceSha256": "67339ab3075be7ef1a9025845f8ce4e9cf2e6c65b07c0375d27df09414095634",
+      "promptSha256": "1414ebec48cd9dfa69de822e229745c5124bd87aa6c1965351ce5c60163e8dbf",
+      "sourceCrop": [
+        848,
+        426,
+        1251,
+        818
+      ],
+      "bytes": 232161,
+      "receipt": "art-source/kite-workshop.receipt.json",
+      "visualReview": "atlas crop reviewed",
+      "usedBy": [
+        "complete-the-solid",
+        "sort-solid-blocks"
+      ],
+      "derivativeConsumers": []
+    },
+    "lab-invitation": {
+      "path": "assets/lab-invitation.png",
+      "sha256": "2966462bb03df1c01913f7803db788d604d90567145f2e8c45c229a98af85370",
+      "bytes": 247918,
+      "source": "deterministic solid geometry",
+      "renderSource": "art-source/solid-diagrams.mjs",
+      "renderSourceSha256": "7940d6a96d5362069618c25062fd7ffb556d8a687ae1d5e358fba95b9f058885",
+      "inputs": {
+        "lab-welcome": "88a1e4bab415697542f55bd27c9d952f4a02ebb6ab7375757e8c231d5ac89526",
+        "sample-build": "f35c88069dc8f175e46613b2570c571ae2194d500fc8742141d03170f696853f"
+      },
+      "visualReview": "geometry and crop reviewed",
+      "usedBy": [
+        "open-lab"
+      ],
+      "derivativeConsumers": []
+    },
+    "lab-plan": {
+      "path": "assets/lab-plan.png",
+      "sha256": "5f3016d3876a6b27de6101f353f0f619a566462ecfb9ad0fd045cf25409100a3",
+      "width": 380,
+      "height": 378,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/kite-workshop.png",
+      "generatedSourceSha256": "67339ab3075be7ef1a9025845f8ce4e9cf2e6c65b07c0375d27df09414095634",
+      "promptSha256": "1414ebec48cd9dfa69de822e229745c5124bd87aa6c1965351ce5c60163e8dbf",
+      "sourceCrop": [
+        12,
+        835,
+        414,
+        1235
+      ],
+      "bytes": 260622,
+      "receipt": "art-source/kite-workshop.receipt.json",
+      "visualReview": "atlas crop reviewed",
+      "usedBy": [],
+      "derivativeConsumers": [
+        "lab-problem"
+      ]
+    },
+    "lab-problem": {
+      "path": "assets/lab-problem.png",
+      "sha256": "0d78bb8cbc0419b211b8bd63ffa4469c543f695b08c1beed900d0c3c88a41aee",
+      "bytes": 249450,
+      "source": "deterministic solid geometry",
+      "renderSource": "art-source/solid-diagrams.mjs",
+      "renderSourceSha256": "7940d6a96d5362069618c25062fd7ffb556d8a687ae1d5e358fba95b9f058885",
+      "inputs": {
+        "lab-plan": "5f3016d3876a6b27de6101f353f0f619a566462ecfb9ad0fd045cf25409100a3",
+        "fit-practice": "1e1b7325b25fdf654dfee483aabf80a7e783506ef0fdce4d542295991e6f1e78"
+      },
+      "visualReview": "geometry and crop reviewed",
+      "usedBy": [
+        "check-a-new-build"
+      ],
+      "derivativeConsumers": []
+    },
+    "lab-welcome": {
+      "path": "assets/lab-welcome.png",
+      "sha256": "88a1e4bab415697542f55bd27c9d952f4a02ebb6ab7375757e8c231d5ac89526",
+      "width": 380,
+      "height": 377,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/kite-workshop.png",
+      "generatedSourceSha256": "67339ab3075be7ef1a9025845f8ce4e9cf2e6c65b07c0375d27df09414095634",
+      "promptSha256": "1414ebec48cd9dfa69de822e229745c5124bd87aa6c1965351ce5c60163e8dbf",
+      "sourceCrop": [
+        12,
+        10,
+        414,
+        409
+      ],
+      "bytes": 261214,
+      "receipt": "art-source/kite-workshop.receipt.json",
+      "visualReview": "atlas crop reviewed",
+      "usedBy": [],
+      "derivativeConsumers": [
+        "lab-invitation"
+      ]
+    },
+    "life-ball": {
+      "path": "assets/life-ball.png",
+      "sha256": "6d869d0d00c3a6d4651f987e109bd7983ed50b7a1c460b9f9f09f2a808844e2d",
+      "width": 380,
+      "height": 374,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/kite-workshop.png",
+      "generatedSourceSha256": "67339ab3075be7ef1a9025845f8ce4e9cf2e6c65b07c0375d27df09414095634",
+      "promptSha256": "1414ebec48cd9dfa69de822e229745c5124bd87aa6c1965351ce5c60163e8dbf",
+      "sourceCrop": [
+        432,
+        426,
+        830,
+        818
+      ],
+      "bytes": 200729,
+      "receipt": "art-source/kite-workshop.receipt.json",
+      "visualReview": "atlas crop reviewed",
+      "usedBy": [],
+      "derivativeConsumers": [
+        "life-shapes"
+      ]
+    },
+    "life-cube": {
+      "path": "assets/life-cube.png",
+      "sha256": "d45277bead953b272803a2a8c091a070195603abe0fa5c1c3183699ca47f478e",
+      "width": 380,
+      "height": 376,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/kite-workshop.png",
+      "generatedSourceSha256": "67339ab3075be7ef1a9025845f8ce4e9cf2e6c65b07c0375d27df09414095634",
+      "promptSha256": "1414ebec48cd9dfa69de822e229745c5124bd87aa6c1965351ce5c60163e8dbf",
+      "sourceCrop": [
+        848,
+        10,
+        1251,
+        409
+      ],
+      "bytes": 210149,
+      "receipt": "art-source/kite-workshop.receipt.json",
+      "visualReview": "atlas crop reviewed",
+      "usedBy": [],
+      "derivativeConsumers": [
+        "life-shapes"
+      ]
+    },
+    "life-cylinder": {
+      "path": "assets/life-cylinder.png",
+      "sha256": "9bf46f95637427cd382605a0302b450e868978813763a7aad5757bd3a2e8b04f",
+      "width": 380,
+      "height": 371,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/kite-workshop.png",
+      "generatedSourceSha256": "67339ab3075be7ef1a9025845f8ce4e9cf2e6c65b07c0375d27df09414095634",
+      "promptSha256": "1414ebec48cd9dfa69de822e229745c5124bd87aa6c1965351ce5c60163e8dbf",
+      "sourceCrop": [
+        12,
+        426,
+        414,
+        818
+      ],
+      "bytes": 196424,
+      "receipt": "art-source/kite-workshop.receipt.json",
+      "visualReview": "atlas crop reviewed",
+      "usedBy": [],
+      "derivativeConsumers": [
+        "life-shapes"
+      ]
+    },
+    "life-long-box": {
+      "path": "assets/life-long-box.png",
+      "sha256": "41834b7b0720976599f9e421861b95417d0920ffe25180cecfbc27e704e8f931",
+      "width": 379,
+      "height": 380,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/kite-workshop.png",
+      "generatedSourceSha256": "67339ab3075be7ef1a9025845f8ce4e9cf2e6c65b07c0375d27df09414095634",
+      "promptSha256": "1414ebec48cd9dfa69de822e229745c5124bd87aa6c1965351ce5c60163e8dbf",
+      "sourceCrop": [
+        432,
+        10,
+        830,
+        409
+      ],
+      "bytes": 207808,
+      "receipt": "art-source/kite-workshop.receipt.json",
+      "visualReview": "atlas crop reviewed",
+      "usedBy": [],
+      "derivativeConsumers": [
+        "life-shapes"
+      ]
+    },
+    "life-shapes": {
+      "path": "assets/life-shapes.png",
+      "sha256": "961dd3ef89cb6e84820f58163e052461ca0880d6cb7fc9df7b2207c66cbf444a",
+      "bytes": 230683,
+      "source": "deterministic solid geometry",
+      "renderSource": "art-source/solid-diagrams.mjs",
+      "renderSourceSha256": "7940d6a96d5362069618c25062fd7ffb556d8a687ae1d5e358fba95b9f058885",
+      "inputs": {
+        "life-long-box": "41834b7b0720976599f9e421861b95417d0920ffe25180cecfbc27e704e8f931",
+        "life-cube": "d45277bead953b272803a2a8c091a070195603abe0fa5c1c3183699ca47f478e",
+        "life-cylinder": "9bf46f95637427cd382605a0302b450e868978813763a7aad5757bd3a2e8b04f",
+        "life-ball": "6d869d0d00c3a6d4651f987e109bd7983ed50b7a1c460b9f9f09f2a808844e2d"
+      },
+      "visualReview": "geometry and crop reviewed",
+      "usedBy": [
+        "objects-around-us"
+      ],
+      "derivativeConsumers": []
+    },
+    "piece-beam": {
+      "path": "assets/piece-beam.png",
+      "sha256": "317b716fc6a0808143f75b693a81baf410cf41b9028e9892a967abc980f1e1d1",
+      "bytes": 2784,
+      "source": "deterministic solid geometry",
+      "renderSource": "art-source/solid-diagrams.mjs",
+      "renderSourceSha256": "7940d6a96d5362069618c25062fd7ffb556d8a687ae1d5e358fba95b9f058885",
+      "inputs": {},
+      "visualReview": "geometry and crop reviewed",
+      "usedBy": [
+        "complete-the-solid"
+      ],
+      "derivativeConsumers": []
+    },
+    "piece-four": {
+      "path": "assets/piece-four.png",
+      "sha256": "06e3d5dabb21767062e99d4e51aaef4ef3f2360abb0c16ce8ad12b38532c08ee",
+      "bytes": 3574,
+      "source": "deterministic solid geometry",
+      "renderSource": "art-source/solid-diagrams.mjs",
+      "renderSourceSha256": "7940d6a96d5362069618c25062fd7ffb556d8a687ae1d5e358fba95b9f058885",
+      "inputs": {},
+      "visualReview": "geometry and crop reviewed",
+      "usedBy": [
+        "complete-the-solid"
+      ],
+      "derivativeConsumers": []
+    },
+    "piece-pair": {
+      "path": "assets/piece-pair.png",
+      "sha256": "d638072533ec5a932b95775fdef3d366a4d19774172304bd75d04be31235ef89",
+      "bytes": 3474,
+      "source": "deterministic solid geometry",
+      "renderSource": "art-source/solid-diagrams.mjs",
+      "renderSourceSha256": "7940d6a96d5362069618c25062fd7ffb556d8a687ae1d5e358fba95b9f058885",
+      "inputs": {},
+      "visualReview": "geometry and crop reviewed",
+      "usedBy": [
+        "complete-the-solid"
+      ],
+      "derivativeConsumers": []
+    },
+    "piece-row": {
+      "path": "assets/piece-row.png",
+      "sha256": "baeec39ddee34890e5807600be967813396846302834cd3e07c03725486dd93c",
+      "bytes": 2822,
+      "source": "deterministic solid geometry",
+      "renderSource": "art-source/solid-diagrams.mjs",
+      "renderSourceSha256": "7940d6a96d5362069618c25062fd7ffb556d8a687ae1d5e358fba95b9f058885",
+      "inputs": {},
+      "visualReview": "geometry and crop reviewed",
+      "usedBy": [
+        "complete-the-solid"
+      ],
+      "derivativeConsumers": []
+    },
+    "piece-thin": {
+      "path": "assets/piece-thin.png",
+      "sha256": "5300ad94f447f629e5dc8b02a02c7e1ea8263197a48e0e71cdac8f41c4ee6fb4",
+      "bytes": 4277,
+      "source": "deterministic solid geometry",
+      "renderSource": "art-source/solid-diagrams.mjs",
+      "renderSourceSha256": "7940d6a96d5362069618c25062fd7ffb556d8a687ae1d5e358fba95b9f058885",
+      "inputs": {},
+      "visualReview": "geometry and crop reviewed",
+      "usedBy": [
+        "complete-the-solid"
+      ],
+      "derivativeConsumers": [
+        "stack-opening"
+      ]
+    },
+    "piece-wall": {
+      "path": "assets/piece-wall.png",
+      "sha256": "8441a8ec364f23b9682f432029899caa9b93ac41a08fd39ef5607b9f506c01bc",
+      "bytes": 3189,
+      "source": "deterministic solid geometry",
+      "renderSource": "art-source/solid-diagrams.mjs",
+      "renderSourceSha256": "7940d6a96d5362069618c25062fd7ffb556d8a687ae1d5e358fba95b9f058885",
+      "inputs": {},
+      "visualReview": "geometry and crop reviewed",
+      "usedBy": [
+        "complete-the-solid"
+      ],
+      "derivativeConsumers": []
+    },
+    "piece-wide": {
+      "path": "assets/piece-wide.png",
+      "sha256": "8e289202b32e7816e857d444557ceea092eb910923f35549b794aa72ecbaafaf",
+      "bytes": 5271,
+      "source": "deterministic solid geometry",
+      "renderSource": "art-source/solid-diagrams.mjs",
+      "renderSourceSha256": "7940d6a96d5362069618c25062fd7ffb556d8a687ae1d5e358fba95b9f058885",
+      "inputs": {},
+      "visualReview": "geometry and crop reviewed",
+      "usedBy": [
+        "complete-the-solid"
+      ],
+      "derivativeConsumers": []
+    },
+    "q-ball": {
+      "path": "assets/q-ball.png",
+      "sha256": "d8dd5afc95ab386ca395184ad1ada07e9ff4c02c9af7a2b1b9af5507171733eb",
+      "bytes": 12683,
+      "source": "deterministic solid geometry",
+      "renderSource": "art-source/solid-diagrams.mjs",
+      "renderSourceSha256": "7940d6a96d5362069618c25062fd7ffb556d8a687ae1d5e358fba95b9f058885",
+      "inputs": {},
+      "visualReview": "geometry and crop reviewed",
+      "usedBy": [
+        "picture-check:two-circular-faces"
+      ],
+      "derivativeConsumers": []
+    },
+    "q-cube": {
+      "path": "assets/q-cube.png",
+      "sha256": "d8063b21f2455062a2c63648fef592d4d67b6172e1a51162275368a3e17ad831",
+      "bytes": 3696,
+      "source": "deterministic solid geometry",
+      "renderSource": "art-source/solid-diagrams.mjs",
+      "renderSourceSha256": "7940d6a96d5362069618c25062fd7ffb556d8a687ae1d5e358fba95b9f058885",
+      "inputs": {},
+      "visualReview": "geometry and crop reviewed",
+      "usedBy": [
+        "picture-check:all-square-faces"
+      ],
+      "derivativeConsumers": []
+    },
+    "q-cube-eight": {
+      "path": "assets/q-cube-eight.png",
+      "sha256": "c80053fa5f3aed34058334e4bf54df5c68b25ed5ba7f78fedd6d4e24cae5f283",
+      "bytes": 4625,
+      "source": "deterministic solid geometry",
+      "renderSource": "art-source/solid-diagrams.mjs",
+      "renderSourceSha256": "7940d6a96d5362069618c25062fd7ffb556d8a687ae1d5e358fba95b9f058885",
+      "inputs": {},
+      "visualReview": "geometry and crop reviewed",
+      "usedBy": [
+        "picture-check:two-layer-cube"
+      ],
+      "derivativeConsumers": []
+    },
+    "q-cube-flat": {
+      "path": "assets/q-cube-flat.png",
+      "sha256": "7bfa547c344ee0998ec6a7073a628fd5bea7b13a8c46653676ac4b2beb1eb0c4",
+      "bytes": 4070,
+      "source": "deterministic solid geometry",
+      "renderSource": "art-source/solid-diagrams.mjs",
+      "renderSourceSha256": "7940d6a96d5362069618c25062fd7ffb556d8a687ae1d5e358fba95b9f058885",
+      "inputs": {},
+      "visualReview": "geometry and crop reviewed",
+      "usedBy": [
+        "picture-check:two-layer-cube"
+      ],
+      "derivativeConsumers": []
+    },
+    "q-cylinder": {
+      "path": "assets/q-cylinder.png",
+      "sha256": "338ce1aa331c14b291b7cfd8b06effb232ca00e303e3c7d074a29e9d3cce7c29",
+      "bytes": 4638,
+      "source": "deterministic solid geometry",
+      "renderSource": "art-source/solid-diagrams.mjs",
+      "renderSourceSha256": "7940d6a96d5362069618c25062fd7ffb556d8a687ae1d5e358fba95b9f058885",
+      "inputs": {},
+      "visualReview": "geometry and crop reviewed",
+      "usedBy": [
+        "picture-check:all-square-faces",
+        "picture-check:two-circular-faces"
+      ],
+      "derivativeConsumers": []
+    },
+    "q-cylinder-side": {
+      "path": "assets/q-cylinder-side.png",
+      "sha256": "42fa28662f04df110f0c6313f1cf929ea2ddefa24dd523dbf1a7e9035093cefa",
+      "bytes": 4963,
+      "source": "deterministic solid geometry",
+      "renderSource": "art-source/solid-diagrams.mjs",
+      "renderSourceSha256": "7940d6a96d5362069618c25062fd7ffb556d8a687ae1d5e358fba95b9f058885",
+      "inputs": {},
+      "visualReview": "geometry and crop reviewed",
+      "usedBy": [
+        "picture-check:stable-cylinder"
+      ],
+      "derivativeConsumers": []
+    },
+    "q-cylinder-tilt": {
+      "path": "assets/q-cylinder-tilt.png",
+      "sha256": "aad63672dfcdafc74346bf8b3e43d2a4365217aa90489672bf15e257ce43703e",
+      "bytes": 6986,
+      "source": "deterministic solid geometry",
+      "renderSource": "art-source/solid-diagrams.mjs",
+      "renderSourceSha256": "7940d6a96d5362069618c25062fd7ffb556d8a687ae1d5e358fba95b9f058885",
+      "inputs": {},
+      "visualReview": "geometry and crop reviewed",
+      "usedBy": [
+        "picture-check:stable-cylinder"
+      ],
+      "derivativeConsumers": []
+    },
+    "q-cylinder-upright": {
+      "path": "assets/q-cylinder-upright.png",
+      "sha256": "fb54a538067a4708a35d7a50f254a415bd8c6033caf9aa6018aebb7cfca1aa1a",
+      "bytes": 4820,
+      "source": "deterministic solid geometry",
+      "renderSource": "art-source/solid-diagrams.mjs",
+      "renderSourceSha256": "7940d6a96d5362069618c25062fd7ffb556d8a687ae1d5e358fba95b9f058885",
+      "inputs": {},
+      "visualReview": "geometry and crop reviewed",
+      "usedBy": [
+        "picture-check:stable-cylinder"
+      ],
+      "derivativeConsumers": []
+    },
+    "q-eight-slab": {
+      "path": "assets/q-eight-slab.png",
+      "sha256": "2444b4c5f0863a2b3bd5d56661180a2b3f92d71dba65e2b76c4018187a09bd08",
+      "bytes": 3448,
+      "source": "deterministic solid geometry",
+      "renderSource": "art-source/solid-diagrams.mjs",
+      "renderSourceSha256": "7940d6a96d5362069618c25062fd7ffb556d8a687ae1d5e358fba95b9f058885",
+      "inputs": {},
+      "visualReview": "geometry and crop reviewed",
+      "usedBy": [
+        "picture-check:two-layer-cube"
+      ],
+      "derivativeConsumers": []
+    },
+    "q-fit-flat": {
+      "path": "assets/q-fit-flat.png",
+      "sha256": "58615416c76d6c8b3fbe8f4f9cc89ead5a35d93002d66682962bd3e055651300",
+      "bytes": 3747,
+      "source": "deterministic solid geometry",
+      "renderSource": "art-source/solid-diagrams.mjs",
+      "renderSourceSha256": "7940d6a96d5362069618c25062fd7ffb556d8a687ae1d5e358fba95b9f058885",
+      "inputs": {},
+      "visualReview": "geometry and crop reviewed",
+      "usedBy": [
+        "picture-check:fill-the-corner"
+      ],
+      "derivativeConsumers": []
+    },
+    "q-fit-piece": {
+      "path": "assets/q-fit-piece.png",
+      "sha256": "976608919dc35091d8aaa7e9e233e2da7270d48ff858738d7723175aef7b7e84",
+      "bytes": 3884,
+      "source": "deterministic solid geometry",
+      "renderSource": "art-source/solid-diagrams.mjs",
+      "renderSourceSha256": "7940d6a96d5362069618c25062fd7ffb556d8a687ae1d5e358fba95b9f058885",
+      "inputs": {},
+      "visualReview": "geometry and crop reviewed",
+      "usedBy": [
+        "picture-check:fill-the-corner"
+      ],
+      "derivativeConsumers": []
+    },
+    "q-fit-row": {
+      "path": "assets/q-fit-row.png",
+      "sha256": "d67be46beb4312b0dbd8b9211f0b5b231e74c7881b751588c4b1c1a37e960888",
+      "bytes": 2775,
+      "source": "deterministic solid geometry",
+      "renderSource": "art-source/solid-diagrams.mjs",
+      "renderSourceSha256": "7940d6a96d5362069618c25062fd7ffb556d8a687ae1d5e358fba95b9f058885",
+      "inputs": {},
+      "visualReview": "geometry and crop reviewed",
+      "usedBy": [
+        "picture-check:fill-the-corner"
+      ],
+      "derivativeConsumers": []
+    },
+    "q-gap-plan": {
+      "path": "assets/q-gap-plan.png",
+      "sha256": "9605b106e57a469ea4262b5b2963df42e39535f745bea11819b7a2cc9b45e443",
+      "bytes": 4947,
+      "source": "deterministic solid geometry",
+      "renderSource": "art-source/solid-diagrams.mjs",
+      "renderSourceSha256": "7940d6a96d5362069618c25062fd7ffb556d8a687ae1d5e358fba95b9f058885",
+      "inputs": {},
+      "visualReview": "geometry and crop reviewed",
+      "usedBy": [
+        "picture-check:fill-the-corner"
+      ],
+      "derivativeConsumers": []
+    },
+    "q-long": {
+      "path": "assets/q-long.png",
+      "sha256": "9a7b41381f59396b9bf90c731623c6ba7aa7efe63e3728090c435fe3e825c11e",
+      "bytes": 3527,
+      "source": "deterministic solid geometry",
+      "renderSource": "art-source/solid-diagrams.mjs",
+      "renderSourceSha256": "7940d6a96d5362069618c25062fd7ffb556d8a687ae1d5e358fba95b9f058885",
+      "inputs": {},
+      "visualReview": "geometry and crop reviewed",
+      "usedBy": [
+        "picture-check:all-square-faces",
+        "picture-check:two-circular-faces"
+      ],
+      "derivativeConsumers": []
+    },
+    "q-stack-aligned": {
+      "path": "assets/q-stack-aligned.png",
+      "sha256": "7e885c5b90a0104e0a59dc87c3501770e4de8c8c7bc28eaa3d131f6132ac6ecc",
+      "bytes": 5245,
+      "source": "deterministic solid geometry",
+      "renderSource": "art-source/solid-diagrams.mjs",
+      "renderSourceSha256": "7940d6a96d5362069618c25062fd7ffb556d8a687ae1d5e358fba95b9f058885",
+      "inputs": {},
+      "visualReview": "geometry and crop reviewed",
+      "usedBy": [
+        "picture-check:stack-round-caps"
+      ],
+      "derivativeConsumers": []
+    },
+    "q-stack-mismatch": {
+      "path": "assets/q-stack-mismatch.png",
+      "sha256": "607dde7a9eef4091b3270358eaf1fecac373a7107db83fbea12ea8b9418ba45e",
+      "bytes": 6057,
+      "source": "deterministic solid geometry",
+      "renderSource": "art-source/solid-diagrams.mjs",
+      "renderSourceSha256": "7940d6a96d5362069618c25062fd7ffb556d8a687ae1d5e358fba95b9f058885",
+      "inputs": {},
+      "visualReview": "geometry and crop reviewed",
+      "usedBy": [
+        "picture-check:stack-round-caps"
+      ],
+      "derivativeConsumers": []
+    },
+    "q-stack-offset": {
+      "path": "assets/q-stack-offset.png",
+      "sha256": "03ea7f550a0e9fc237adabb0aeb3aabb539361397d33b6b25d082aa9b2afd59b",
+      "bytes": 6105,
+      "source": "deterministic solid geometry",
+      "renderSource": "art-source/solid-diagrams.mjs",
+      "renderSourceSha256": "7940d6a96d5362069618c25062fd7ffb556d8a687ae1d5e358fba95b9f058885",
+      "inputs": {},
+      "visualReview": "geometry and crop reviewed",
+      "usedBy": [
+        "picture-check:stack-round-caps"
+      ],
+      "derivativeConsumers": []
+    },
+    "rectangles-join": {
+      "path": "assets/rectangles-join.png",
+      "sha256": "ea29423aa4f21169ddc08aefdab60079c5e71458703cdef7b84be60a5377d9eb",
+      "bytes": 9155,
+      "source": "deterministic solid geometry",
+      "renderSource": "art-source/solid-diagrams.mjs",
+      "renderSourceSha256": "7940d6a96d5362069618c25062fd7ffb556d8a687ae1d5e358fba95b9f058885",
+      "inputs": {},
+      "visualReview": "geometry and crop reviewed",
+      "usedBy": [
+        "build-a-long-block"
+      ],
+      "derivativeConsumers": []
+    },
+    "sample-ball": {
+      "path": "assets/sample-ball.png",
+      "sha256": "6ac3520b36e270da2c50513b6f8838b3f004f0f2aab69a7960b11154815a1cc3",
+      "bytes": 12942,
+      "source": "deterministic solid geometry",
+      "renderSource": "art-source/solid-diagrams.mjs",
+      "renderSourceSha256": "7940d6a96d5362069618c25062fd7ffb556d8a687ae1d5e358fba95b9f058885",
+      "inputs": {},
+      "visualReview": "geometry and crop reviewed",
+      "usedBy": [
+        "sort-solid-blocks"
+      ],
+      "derivativeConsumers": [
+        "home-example"
+      ]
+    },
+    "sample-build": {
+      "path": "assets/sample-build.png",
+      "sha256": "f35c88069dc8f175e46613b2570c571ae2194d500fc8742141d03170f696853f",
+      "bytes": 15000,
+      "source": "deterministic solid geometry",
+      "renderSource": "art-source/solid-diagrams.mjs",
+      "renderSourceSha256": "7940d6a96d5362069618c25062fd7ffb556d8a687ae1d5e358fba95b9f058885",
+      "inputs": {},
+      "visualReview": "geometry and crop reviewed",
+      "usedBy": [
+        "complete-the-solid",
+        "sort-solid-blocks"
+      ],
+      "derivativeConsumers": [
+        "lab-invitation"
+      ]
+    },
+    "sample-cube": {
+      "path": "assets/sample-cube.png",
+      "sha256": "78a2000fbd35e3fbbfe5fa3ddaef61c8c38a575ae2f51caa536e61ee535e3ad8",
+      "bytes": 3757,
+      "source": "deterministic solid geometry",
+      "renderSource": "art-source/solid-diagrams.mjs",
+      "renderSourceSha256": "7940d6a96d5362069618c25062fd7ffb556d8a687ae1d5e358fba95b9f058885",
+      "inputs": {},
+      "visualReview": "geometry and crop reviewed",
+      "usedBy": [
+        "sort-solid-blocks"
+      ],
+      "derivativeConsumers": [
+        "home-example",
+        "sort-opening"
+      ]
+    },
+    "sample-cylinder": {
+      "path": "assets/sample-cylinder.png",
+      "sha256": "b227d3643d2f3f949667d54e21321a7ccc1bc132dd890b400be245ba65cc2653",
+      "bytes": 4768,
+      "source": "deterministic solid geometry",
+      "renderSource": "art-source/solid-diagrams.mjs",
+      "renderSourceSha256": "7940d6a96d5362069618c25062fd7ffb556d8a687ae1d5e358fba95b9f058885",
+      "inputs": {},
+      "visualReview": "geometry and crop reviewed",
+      "usedBy": [
+        "sort-solid-blocks"
+      ],
+      "derivativeConsumers": [
+        "home-example"
+      ]
+    },
+    "sample-long": {
+      "path": "assets/sample-long.png",
+      "sha256": "177eeacdeea974dcc357316dc2d37fb665452e2d09282d52df7d6073794138e6",
+      "bytes": 2981,
+      "source": "deterministic solid geometry",
+      "renderSource": "art-source/solid-diagrams.mjs",
+      "renderSourceSha256": "7940d6a96d5362069618c25062fd7ffb556d8a687ae1d5e358fba95b9f058885",
+      "inputs": {},
+      "visualReview": "geometry and crop reviewed",
+      "usedBy": [
+        "sort-solid-blocks"
+      ],
+      "derivativeConsumers": [
+        "home-example",
+        "sort-opening"
+      ]
+    },
+    "sort-opening": {
+      "path": "assets/sort-opening.png",
+      "sha256": "ce585c981f1082e0619deb17e418bc12f467bc4cc0653f5a5b0aaf8918a3fc29",
+      "bytes": 14819,
+      "source": "deterministic solid geometry",
+      "renderSource": "art-source/solid-diagrams.mjs",
+      "renderSourceSha256": "7940d6a96d5362069618c25062fd7ffb556d8a687ae1d5e358fba95b9f058885",
+      "inputs": {
+        "token-long": "c40df80fd788340c6ae98d5e74fe00570167c02c95339dbc93bef97f65ff48c1",
+        "sample-long": "177eeacdeea974dcc357316dc2d37fb665452e2d09282d52df7d6073794138e6",
+        "sample-cube": "78a2000fbd35e3fbbfe5fa3ddaef61c8c38a575ae2f51caa536e61ee535e3ad8"
+      },
+      "visualReview": "geometry and crop reviewed",
+      "usedBy": [
+        "sort-solid-blocks"
+      ],
+      "derivativeConsumers": []
+    },
+    "stack-aligned": {
+      "path": "assets/stack-aligned.png",
+      "sha256": "8c3c9ce3d04b3ac9d031c75cbde743a43b6674831ea917a6f3249d1335f82a02",
+      "bytes": 5608,
+      "source": "deterministic solid geometry",
+      "renderSource": "art-source/solid-diagrams.mjs",
+      "renderSourceSha256": "7940d6a96d5362069618c25062fd7ffb556d8a687ae1d5e358fba95b9f058885",
+      "inputs": {},
+      "visualReview": "geometry and crop reviewed",
+      "usedBy": [],
+      "derivativeConsumers": [
+        "cylinder-stack-compare"
+      ]
+    },
+    "stack-mismatch": {
+      "path": "assets/stack-mismatch.png",
+      "sha256": "bf4a04163bbe5c8dbc4d2fe656560b16071254c1d48b9263672e2a9164b0b2c0",
+      "bytes": 6364,
+      "source": "deterministic solid geometry",
+      "renderSource": "art-source/solid-diagrams.mjs",
+      "renderSourceSha256": "7940d6a96d5362069618c25062fd7ffb556d8a687ae1d5e358fba95b9f058885",
+      "inputs": {},
+      "visualReview": "geometry and crop reviewed",
+      "usedBy": [],
+      "derivativeConsumers": [
+        "cylinder-stack-compare"
+      ]
+    },
+    "stack-offset": {
+      "path": "assets/stack-offset.png",
+      "sha256": "4ed0553b33d053f6bc45c17968a0c16df1a2a5d2a10979b4785a449449766a26",
+      "bytes": 6344,
+      "source": "deterministic solid geometry",
+      "renderSource": "art-source/solid-diagrams.mjs",
+      "renderSourceSha256": "7940d6a96d5362069618c25062fd7ffb556d8a687ae1d5e358fba95b9f058885",
+      "inputs": {},
+      "visualReview": "geometry and crop reviewed",
+      "usedBy": [],
+      "derivativeConsumers": [
+        "cylinder-stack-compare"
+      ]
+    },
+    "stack-opening": {
+      "path": "assets/stack-opening.png",
+      "sha256": "e8ba2be7f1bdc53c86d3387cd7a373313bc8f0531a5f7f8d77a3319a7877559e",
+      "bytes": 29926,
+      "source": "deterministic solid geometry",
+      "renderSource": "art-source/solid-diagrams.mjs",
+      "renderSourceSha256": "7940d6a96d5362069618c25062fd7ffb556d8a687ae1d5e358fba95b9f058885",
+      "inputs": {
+        "piece-thin": "5300ad94f447f629e5dc8b02a02c7e1ea8263197a48e0e71cdac8f41c4ee6fb4",
+        "base-thin": "00e1eb68cebf03df1c4caacc9debd7c642eec4a79cd1ca6e9d063dcaee49f74d",
+        "base-wide": "ca046d11750db5df3508d13f8f1ddd8ac7bc1c65caaf2cc847c47fe360b585cd"
+      },
+      "visualReview": "geometry and crop reviewed",
+      "usedBy": [
+        "complete-the-solid"
+      ],
+      "derivativeConsumers": []
+    },
+    "token-ball": {
+      "path": "assets/token-ball.png",
+      "sha256": "e99677d6139e35c05024bff2685d87fef27fae4003366e9a62afd7bc87519846",
+      "bytes": 10958,
+      "source": "deterministic solid geometry",
+      "renderSource": "art-source/solid-diagrams.mjs",
+      "renderSourceSha256": "7940d6a96d5362069618c25062fd7ffb556d8a687ae1d5e358fba95b9f058885",
+      "inputs": {},
+      "visualReview": "geometry and crop reviewed",
+      "usedBy": [
+        "sort-solid-blocks"
+      ],
+      "derivativeConsumers": []
+    },
+    "token-cube": {
+      "path": "assets/token-cube.png",
+      "sha256": "1b564e84d6fc46c24e40065ea9a81d0789f1a2c566d4c7b2a1850330988b0627",
+      "bytes": 3702,
+      "source": "deterministic solid geometry",
+      "renderSource": "art-source/solid-diagrams.mjs",
+      "renderSourceSha256": "7940d6a96d5362069618c25062fd7ffb556d8a687ae1d5e358fba95b9f058885",
+      "inputs": {},
+      "visualReview": "geometry and crop reviewed",
+      "usedBy": [
+        "sort-solid-blocks"
+      ],
+      "derivativeConsumers": []
+    },
+    "token-cylinder": {
+      "path": "assets/token-cylinder.png",
+      "sha256": "79760ac7401bf3917b90ad82e1ec1dbbc4c6a20c04267f3f6f401620a0212e65",
+      "bytes": 4950,
+      "source": "deterministic solid geometry",
+      "renderSource": "art-source/solid-diagrams.mjs",
+      "renderSourceSha256": "7940d6a96d5362069618c25062fd7ffb556d8a687ae1d5e358fba95b9f058885",
+      "inputs": {},
+      "visualReview": "geometry and crop reviewed",
+      "usedBy": [
+        "sort-solid-blocks"
+      ],
+      "derivativeConsumers": []
+    },
+    "token-long": {
+      "path": "assets/token-long.png",
+      "sha256": "c40df80fd788340c6ae98d5e74fe00570167c02c95339dbc93bef97f65ff48c1",
+      "bytes": 3630,
+      "source": "deterministic solid geometry",
+      "renderSource": "art-source/solid-diagrams.mjs",
+      "renderSourceSha256": "7940d6a96d5362069618c25062fd7ffb556d8a687ae1d5e358fba95b9f058885",
+      "inputs": {},
+      "visualReview": "geometry and crop reviewed",
+      "usedBy": [
+        "sort-solid-blocks"
+      ],
+      "derivativeConsumers": [
+        "sort-opening"
+      ]
+    },
+    "two-cubes-long": {
+      "path": "assets/two-cubes-long.png",
+      "sha256": "43fa2550731ad21bbe6ae741038f52a2ef305796bdb531554e91ea078ace36ea",
+      "bytes": 8463,
+      "source": "deterministic solid geometry",
+      "renderSource": "art-source/solid-diagrams.mjs",
+      "renderSourceSha256": "7940d6a96d5362069618c25062fd7ffb556d8a687ae1d5e358fba95b9f058885",
+      "inputs": {},
+      "visualReview": "geometry and crop reviewed",
+      "usedBy": [
+        "build-a-long-block"
+      ],
+      "derivativeConsumers": []
+    }
+  },
+  "scope": "源图、完整拼搭、错误摆法及大小对照已核。另验小屏与有声交接。"
+}

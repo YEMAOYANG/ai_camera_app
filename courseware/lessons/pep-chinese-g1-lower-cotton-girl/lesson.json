@@ -1,0 +1,1405 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "棉花姑娘",
+  "description": "借纸偶和图序讲述棉花姑娘，学角色对话、字形和颜色短语。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小语老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Serena",
+      "avatar": "/avatars/teacher-2.png",
+      "color": "#D65A8C",
+      "persona": "用清楚温和的短句带一年级孩子复述和看图读词。"
+    }
+  },
+  "images": {
+    "aphids-on-leaves": {
+      "file": "assets/aphids-on-leaves.png"
+    },
+    "cotton-cart": {
+      "file": "assets/cotton-cart.png"
+    },
+    "cotton-cart-move": {
+      "file": "assets/cotton-cart-move.png"
+    },
+    "cotton-child-jump": {
+      "file": "assets/cotton-child-jump.png"
+    },
+    "cotton-child-ready": {
+      "file": "assets/cotton-child-ready.png"
+    },
+    "cotton-child-run": {
+      "file": "assets/cotton-child-run.png"
+    },
+    "cotton-family": {
+      "file": "assets/cotton-family.png"
+    },
+    "cotton-opening": {
+      "file": "assets/cotton-opening.png"
+    },
+    "cotton-before-after": {
+      "file": "assets/cotton-before-after.png"
+    },
+    "cotton-sticker": {
+      "file": "assets/cotton-sticker.png"
+    },
+    "dock-leaf": {
+      "file": "assets/dock-leaf.png"
+    },
+    "dock-paddy": {
+      "file": "assets/dock-paddy.png"
+    },
+    "dock-sky": {
+      "file": "assets/dock-sky.png"
+    },
+    "dock-trunk": {
+      "file": "assets/dock-trunk.png"
+    },
+    "frog-paper-stage": {
+      "file": "assets/frog-paper-stage.png"
+    },
+    "hop-aphids": {
+      "file": "assets/hop-aphids.png"
+    },
+    "hop-backdrop": {
+      "file": "assets/hop-backdrop.png"
+    },
+    "hop-end": {
+      "file": "assets/hop-end.png"
+    },
+    "hop-frog": {
+      "file": "assets/hop-frog.png"
+    },
+    "hop-ladybug": {
+      "file": "assets/hop-ladybug.png"
+    },
+    "hop-spots": {
+      "file": "assets/hop-spots.png"
+    },
+    "hop-start": {
+      "file": "assets/hop-start.png"
+    },
+    "hop-swallow": {
+      "file": "assets/hop-swallow.png"
+    },
+    "hop-woodpecker": {
+      "file": "assets/hop-woodpecker.png"
+    },
+    "locations-board": {
+      "file": "assets/locations-board.png"
+    },
+    "new-colors-board": {
+      "file": "assets/new-colors-board.png"
+    },
+    "plot-cards": {
+      "file": "assets/plot-cards.png"
+    },
+    "puppet-frog": {
+      "file": "assets/puppet-frog.png"
+    },
+    "puppet-ladybug": {
+      "file": "assets/puppet-ladybug.png"
+    },
+    "puppet-swallow": {
+      "file": "assets/puppet-swallow.png"
+    },
+    "puppet-woodpecker": {
+      "file": "assets/puppet-woodpecker.png"
+    },
+    "quiz-1-a": {
+      "file": "assets/quiz-1-a.png"
+    },
+    "quiz-1-b": {
+      "file": "assets/quiz-1-b.png"
+    },
+    "quiz-1-c": {
+      "file": "assets/quiz-1-c.png"
+    },
+    "quiz-2-a": {
+      "file": "assets/quiz-2-a.png"
+    },
+    "quiz-2-b": {
+      "file": "assets/quiz-2-b.png"
+    },
+    "quiz-2-c": {
+      "file": "assets/quiz-2-c.png"
+    },
+    "quiz-3-a": {
+      "file": "assets/quiz-3-a.png"
+    },
+    "quiz-3-b": {
+      "file": "assets/quiz-3-b.png"
+    },
+    "quiz-3-c": {
+      "file": "assets/quiz-3-c.png"
+    },
+    "quiz-4-a": {
+      "file": "assets/quiz-4-a.png"
+    },
+    "quiz-4-b": {
+      "file": "assets/quiz-4-b.png"
+    },
+    "quiz-4-c": {
+      "file": "assets/quiz-4-c.png"
+    },
+    "quiz-5-a": {
+      "file": "assets/quiz-5-a.png"
+    },
+    "quiz-5-b": {
+      "file": "assets/quiz-5-b.png"
+    },
+    "quiz-5-c": {
+      "file": "assets/quiz-5-c.png"
+    },
+    "quiz-6-a": {
+      "file": "assets/quiz-6-a.png"
+    },
+    "quiz-6-b": {
+      "file": "assets/quiz-6-b.png"
+    },
+    "quiz-6-c": {
+      "file": "assets/quiz-6-c.png"
+    },
+    "quiz-7-a": {
+      "file": "assets/quiz-7-a.png"
+    },
+    "quiz-7-b": {
+      "file": "assets/quiz-7-b.png"
+    },
+    "quiz-7-c": {
+      "file": "assets/quiz-7-c.png"
+    },
+    "reader-voices": {
+      "file": "assets/reader-voices.png"
+    },
+    "scroll-cotton": {
+      "file": "assets/scroll-cotton.png"
+    },
+    "helper-leaf-and-spots": {
+      "file": "assets/helper-leaf-and-spots.png"
+    },
+    "sort-backdrop": {
+      "file": "assets/sort-backdrop.png"
+    },
+    "sort-start": {
+      "file": "assets/sort-start.png"
+    },
+    "swallow-paper-stage": {
+      "file": "assets/swallow-paper-stage.png"
+    },
+    "woodpecker-paper-stage": {
+      "file": "assets/woodpecker-paper-stage.png"
+    },
+    "write-hai-gan": {
+      "file": "assets/write-hai-gan.png"
+    },
+    "write-kong-xing": {
+      "file": "assets/write-kong-xing.png"
+    },
+    "write-shen": {
+      "file": "assets/write-shen.png"
+    },
+    "write-ta-jiu": {
+      "file": "assets/write-ta-jiu.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "looking-at-cotton",
+      "type": "slide",
+      "title": "纸偶小剧场来了谁",
+      "template": "picture-points",
+      "data": {
+        "title": "纸偶小剧场来了谁",
+        "picture": "cotton-opening",
+        "points": [
+          "棉 mián",
+          "姑 gū",
+          "娘 niáng",
+          "看看叶子"
+        ]
+      },
+      "script": [
+        {
+          "say": "一株小棉花来当故事主角。她的样子怎么和旁边的不同？"
+        },
+        {
+          "say": "先看画面，再听这位角色的名字。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "图里这株是棉花。棉，第二声，左边是木字旁。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "姑娘的姑读第一声。姑娘这个词在这儿叫故事里的角色。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "娘单念时读第二声，姑娘连起来说时，后面轻一些。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "画里这一株棉花低着头。先看叶子，有些小东西趴在那里。"
+        },
+        {
+          "say": "认出名字了。棉花姑娘不舒服，下一页看看是什么在叶子上。"
+        }
+      ]
+    },
+    {
+      "key": "who-can-help",
+      "type": "slide",
+      "title": "第一幕，叶子上发生了什么",
+      "template": "picture-points",
+      "data": {
+        "title": "第一幕，叶子上发生了什么",
+        "picture": "aphids-on-leaves",
+        "points": [
+          "叶上的蚜虫",
+          "病 bìng",
+          "她 tā",
+          "治病 zhì bìng"
+        ]
+      },
+      "script": [
+        {
+          "say": "棉花姑娘为什么不舒服？先看叶面，再听她的心情。"
+        },
+        {
+          "say": "小点点就在叶子上。你能指给我看吗？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "故事开头先看棉花叶上许多小蚜虫。"
+        },
+        {
+          "say": "它们趴在叶面上，棉花姑娘因此不舒服。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "生病的病有病字头。读生病时，病是第四声。跟读：病，声往下，收后鼻音。字头半包丙。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "她，第一声，左边是女字旁。这里的她指棉花姑娘。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "治，第四声。棉花病了，治病就是想办法让她好起来。跟读：治。舌尖翘起，声音往下落。"
+        },
+        {
+          "say": "盼着就是很想等到。你能用着急又清楚的声音说一句求助吗？"
+        }
+      ]
+    },
+    {
+      "key": "swallow-in-the-sky",
+      "type": "slide",
+      "title": "先来的是燕子，能帮上忙吗",
+      "template": "picture-points",
+      "data": {
+        "title": "先来的是燕子，能帮上忙吗",
+        "picture": "swallow-paper-stage",
+        "points": [
+          "燕 yàn",
+          "帮 bāng",
+          "害 hài",
+          "别 bié"
+        ]
+      },
+      "script": [
+        {
+          "say": "来了一个会飞的角色。棉花姑娘为什么马上开口？"
+        },
+        {
+          "say": "她盼了很久。我们听听这位来客会在哪里帮忙。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "接第一位来客，找燕子飞来的图。"
+        },
+        {
+          "say": "燕，第四声。叉尾的燕子来了。她问：能请你捉捉叶上的虫吗？"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "帮，第一声。有人遇到难处，你搭一把手，就是帮忙。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "害，第四声。叶上的蚜虫给她带来麻烦，在故事里叫害虫。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "别，第二声。再找别人，就是再找另一位伙伴。"
+        },
+        {
+          "say": "燕子轻声答：我捉的是空中的飞虫，请再找一位伙伴吧。"
+        },
+        {
+          "say": "燕子说清了缘由，也给了建议。叶面和空中是两个地方。"
+        }
+      ]
+    },
+    {
+      "key": "woodpecker-in-the-trunk",
+      "type": "slide",
+      "title": "啄木鸟说的是树干里面",
+      "template": "picture-points",
+      "data": {
+        "title": "啄木鸟说的是树干里面",
+        "picture": "woodpecker-paper-stage",
+        "points": [
+          "第二位来客",
+          "树干 gàn",
+          "里和上"
+        ]
+      },
+      "script": [
+        {
+          "say": "又飞来一位朋友。它指的地方和叶面一样吗？"
+        },
+        {
+          "say": "看看树的粗茎，再看看棉花的薄叶。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "接第二位来客，找啄木鸟来到棉花旁的图。"
+        },
+        {
+          "say": "她问啄木鸟：你能帮我捉捉叶上的小虫吗？"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "树干的干读第四声。看图，树长长的这部分是树干。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "啄木鸟答：我会捉树干里面的虫，请你再问问别的伙伴吧。"
+        },
+        {
+          "say": "树干里和叶子上，是两个不同的位置。"
+        },
+        {
+          "say": "它先说自己能做什么，再请她找伙伴，答得礼貌又清楚。"
+        }
+      ]
+    },
+    {
+      "key": "frog-in-the-field",
+      "type": "slide",
+      "title": "第三位来的是青蛙",
+      "template": "picture-points",
+      "data": {
+        "title": "第三位来的是青蛙",
+        "picture": "frog-paper-stage",
+        "points": [
+          "青蛙来了",
+          "水田里",
+          "说清原因"
+        ]
+      },
+      "script": [
+        {
+          "say": "叶面的问题还在。第三位是走来的，还是跳来的？"
+        },
+        {
+          "say": "看她的表情，又遇到一位朋友，她有些高兴。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "接第三位来客，找青蛙跳来的图。"
+        },
+        {
+          "say": "她问青蛙：叶上有小虫，能请你帮我把它们捉走吗？"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "青蛙答：我能在水田捉虫，你再问问别的伙伴，好吗？"
+        },
+        {
+          "say": "图上稻苗下面有浅水。叶上的蚜虫还在原处。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "青蛙说了自己能去的地方，也给了建议。叶面和水田不一样。"
+        },
+        {
+          "say": "三次都问到了，问题还没解决。谁来了以后事情才变了？"
+        }
+      ]
+    },
+    {
+      "key": "small-spotted-helper",
+      "type": "slide",
+      "title": "圆圆的小帮手是谁",
+      "template": "picture-points",
+      "data": {
+        "title": "圆圆的小帮手是谁",
+        "picture": "helper-leaf-and-spots",
+        "points": [
+          "到叶面",
+          "惊 jīng 奇 qí",
+          "斑点数一数"
+        ]
+      },
+      "script": [
+        {
+          "say": "有些圆圆的小家伙飞来。先别猜名字，看它们做了什么。"
+        },
+        {
+          "say": "看左边的叶面。小帮手和蚜虫在哪里？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "接帮上忙的画面，找瓢虫来到棉花叶上的图。"
+        },
+        {
+          "say": "七星瓢虫把蚜虫吃掉了。这一次，帮忙的地方对上了。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "小瓢虫真帮了忙，她没想到。看惊奇的惊，读第一声。"
+        },
+        {
+          "say": "奇在惊奇里读第二声。没想到这么小的伙伴帮了忙，这就叫惊奇。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "看右边纸偶的背。点着数，一共有七个斑点。"
+        },
+        {
+          "say": "接它们介绍自己的画面，找背上画着七点的瓢虫。"
+        },
+        {
+          "say": "她先惊奇，知道答案后又高兴。下一幕的叶子会是什么颜色？"
+        }
+      ]
+    },
+    {
+      "key": "green-and-white",
+      "type": "slide",
+      "title": "最后一幕，棉花长成什么样",
+      "template": "picture-points",
+      "data": {
+        "title": "最后一幕，棉花长成什么样",
+        "picture": "cotton-before-after",
+        "points": [
+          "碧绿的叶",
+          "雪白的棉",
+          "好起来",
+          "把先后接起来"
+        ]
+      },
+      "script": [
+        {
+          "say": "剧场把开头和结尾并排放。棉花姑娘哪里有变化？"
+        },
+        {
+          "say": "先看左边下垂的叶子，再看右边的绿叶和白棉。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "故事最后新叶绿绿的。说碧绿碧绿，听起来绿得更鲜亮。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "棉花白得像雪。说雪白雪白，让听的人更能想出白的样子。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "接结尾，找绿叶、白棉和笑脸都出现的画面。"
+        },
+        {
+          "say": "叶上的蚜虫没了，棉花姑娘好起来，露出笑脸。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "她原来着急，后来惊奇，最后高兴。讲故事要把这些变化排好。"
+        },
+        {
+          "say": "试着说说，谁做的事和她要解决的问题正好对上？"
+        }
+      ]
+    },
+    {
+      "key": "where-they-work",
+      "type": "slide",
+      "title": "帮忙的地点，哪一张对得上",
+      "template": "picture-points",
+      "data": {
+        "title": "帮忙的地点，哪一张对得上",
+        "picture": "locations-board",
+        "points": [
+          "空中 · 树干里",
+          "水田 · 叶面",
+          "先想再推"
+        ]
+      },
+      "script": [
+        {
+          "say": "纸偶要站到自己的故事布景前。怎样一眼看出几个地方不同？"
+        },
+        {
+          "say": "先找虫在哪里，再想角色刚才说了什么。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "在故事里，把燕子和啄木鸟送去空中、树干里的布景。"
+        },
+        {
+          "say": "辨位置时看树干里面，也看看空中飞着的小虫。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "接着把青蛙送到水田。稻苗下面有浅水。"
+        },
+        {
+          "say": "挑战里还有棉花叶。七星瓢虫在这一幕来到叶子上。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "先想这个角色在故事里到哪里帮忙。"
+        },
+        {
+          "say": "可以撤一步，绕到画牌后面，再往亮起的地方推。"
+        },
+        {
+          "say": "每张纸偶都有合适的布景。推对了画会留在那里。"
+        }
+      ]
+    },
+    {
+      "key": "story-rehearsal",
+      "type": "slide",
+      "title": "用一句线索，接一张故事画",
+      "template": "picture-points",
+      "data": {
+        "title": "用一句线索，接一张故事画",
+        "picture": "plot-cards",
+        "points": [
+          "起因",
+          "来客",
+          "最后发生什么",
+          "重听线索"
+        ]
+      },
+      "script": [
+        {
+          "say": "剧场拍了好些画。怎么知道哪张是这一段的下一幕？"
+        },
+        {
+          "say": "先记哪件事发生了，再记哪位角色来了。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先录开头，找棉花叶上趴着蚜虫的画面。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "先是燕子，然后啄木鸟，再是青蛙。每次来客做的事不同。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "圆圆的小帮手上了棉花叶，然后棉花姑娘好起来。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "听一听这一幕发生了什么，再跑跳。"
+        },
+        {
+          "say": "跳到台边再起跳，去接亮着的那张图。"
+        },
+        {
+          "say": "故事牌接好了。从哪一张开始讲，就从哪一张画想起。"
+        }
+      ]
+    },
+    {
+      "key": "sort-the-stage",
+      "type": "interactive",
+      "title": "帮纸偶找到故事里的位置",
+      "page": "sort-the-stage",
+      "widgetType": "game",
+      "startImage": "sort-start",
+      "script": [
+        {
+          "say": "小剧场马上开演。这些纸偶要先搬到合适的布景旁。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#cotton-first-card"
+        },
+        {
+          "say": "这是燕子的牌，认清它在空中飞的样子。"
+        },
+        {
+          "highlight": "#cotton-first-dock"
+        },
+        {
+          "say": "看托盘图。这个地方在空中，燕子的故事牌推到这儿。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "用箭头把小车开到牌后面，往牌的方向走，就能推。"
+        },
+        {
+          "say": "画牌推错可以退一步，换个方向再试。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "我只推一张。换你来摆，牌和小车先回到原位。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "stage-sort-first": "where-they-work-4",
+        "stage-sort-next": "where-they-work-7",
+        "stage-sort-last": "where-they-work-8",
+        "stage-sort-hint": "where-they-work-10",
+        "stage-sort-help": "where-they-work-11",
+        "stage-sort-praise": "where-they-work-12"
+      }
+    },
+    {
+      "key": "jump-through-story",
+      "type": "interactive",
+      "title": "跳上下一张故事牌",
+      "page": "jump-through-story",
+      "widgetType": "game",
+      "startImage": "hop-start",
+      "script": [
+        {
+          "say": "故事牌散在不同台上。按故事的先后，帮小导演一张张接回来。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#cotton-hop-listen"
+        },
+        {
+          "say": "先听线索。头一幕是棉花叶上的蚜虫。"
+        },
+        {
+          "highlight": "#cotton-first-platform"
+        },
+        {
+          "say": "看这一张。叶面有小虫，还没出现来帮忙的人。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "控制小演员走到台边，按跳跃，落到这张故事牌。"
+        },
+        {
+          "say": "每接一幕再听下一句。台子高低不同，先看落脚的位置。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "我只跳到第一张就停。你来时从第一张重新开始。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "stage-hop-aphids": "story-rehearsal-4",
+        "stage-hop-swallow": "swallow-in-the-sky-4",
+        "stage-hop-woodpecker": "woodpecker-in-the-trunk-4",
+        "stage-hop-frog": "frog-in-the-field-4",
+        "stage-hop-ladybug": "small-spotted-helper-4",
+        "stage-hop-spots": "small-spotted-helper-11",
+        "stage-hop-end": "green-and-white-8",
+        "stage-hop-hint": "story-rehearsal-10",
+        "stage-hop-help": "story-rehearsal-11",
+        "stage-hop-praise": "story-rehearsal-12"
+      }
+    },
+    {
+      "key": "read-with-feeling",
+      "type": "slide",
+      "title": "一句请求，怎么读给别人听",
+      "template": "picture-points",
+      "data": {
+        "title": "一句请求，怎么读给别人听",
+        "picture": "reader-voices",
+        "points": [
+          "请求",
+          "礼貌回答",
+          "惊奇",
+          "高兴"
+        ]
+      },
+      "script": [
+        {
+          "say": "广播站的新纸偶丢了一个铃铛。怎样请伙伴帮找，听起来真诚？"
+        },
+        {
+          "say": "同样是说话，想请人帮忙和忽然发现，声音会一样吗？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "请你帮我找找木铃，好吗？声音清楚，听得出着急和礼貌。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "真想帮你呀，可我还得先收好纸偶。请问问门边的伙伴，好吗？"
+        },
+        {
+          "say": "先轻声回答，说为什么这会儿帮不了，再请对方去找谁。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "咦，木铃在蓝布下面呀？问的时候把声音稍稍抬起来。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "找到木铃啦！读到这里，可以让声音轻快些。"
+        },
+        {
+          "say": "翻开纸书，把棉花姑娘和伙伴的话分开读。请大人听听语气。"
+        }
+      ]
+    },
+    {
+      "key": "repeat-the-colors",
+      "type": "slide",
+      "title": "把两个字再说一遍，颜色更鲜明",
+      "template": "picture-points",
+      "data": {
+        "title": "把两个字再说一遍，颜色更鲜明",
+        "picture": "new-colors-board",
+        "points": [
+          "碧绿碧绿",
+          "雪白雪白",
+          "火红火红",
+          "说给别人听"
+        ]
+      },
+      "script": [
+        {
+          "say": "道具桌上有三样东西。怎么把颜色说得让别人一下就能想到？"
+        },
+        {
+          "say": "试着先说一遍颜色，再把同样的两个字重复一遍。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "这张纸绿得很鲜亮，可以说碧绿碧绿的纸。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "这条围巾白得很干净，可以说雪白雪白的围巾。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "这面彩旗红得很鲜亮，可以说火红火红的彩旗。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "把颜色说两遍，后面加这个东西的名字。"
+        },
+        {
+          "say": "你挑个新东西试试。先看它的颜色，再说完整。"
+        },
+        {
+          "say": "画面里只有一样东西也能说两遍。重复的是两个字的颜色词。"
+        }
+      ]
+    },
+    {
+      "key": "write-ta-and-jiu",
+      "type": "slide",
+      "title": "她和久，纸上怎么写",
+      "template": "picture-points",
+      "data": {
+        "title": "她和久，纸上怎么写",
+        "picture": "write-ta-jiu",
+        "points": [
+          "她 · 女左也右",
+          "久 · 最后是捺"
+        ]
+      },
+      "script": [
+        {
+          "say": "她和久都带有撇。我们先找这两个字从哪一笔开始。"
+        },
+        {
+          "say": "请把眼睛放在新亮出的那一笔上。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "她先写左边的撇点、撇、提。女字旁收得窄一些。"
+        },
+        {
+          "say": "右边也先写横折钩，再写竖，最后是竖弯钩。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "久先写撇，再写横撇。第三笔是捺，向右下舒展开。"
+        },
+        {
+          "say": "听顺序在空中比画，再请大人看你在田字格里怎么写。"
+        }
+      ]
+    },
+    {
+      "key": "write-hai-and-gan",
+      "type": "slide",
+      "title": "还和干，先后要写对",
+      "template": "picture-points",
+      "data": {
+        "title": "还和干，先后要写对",
+        "picture": "write-hai-gan",
+        "points": [
+          "还 · 先不后走之",
+          "干 · 中间最后竖"
+        ]
+      },
+      "script": [
+        {
+          "say": "看到走之先别急着写。这个还字，先写的是哪一部分？"
+        },
+        {
+          "say": "先对照两边，再看田字格中间的位置。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "还先写不，横、撇、竖、点。"
+        },
+        {
+          "say": "再写走之，先点，再横折折撇，最后平捺。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "干先写两横，上横较短，下横较长。"
+        },
+        {
+          "say": "第三笔是竖，沿着竖中线写下来。树干的干读第四声。"
+        },
+        {
+          "say": "写时看走之是不是后写的，干的两横有没有一长一短。"
+        }
+      ]
+    },
+    {
+      "key": "write-kong-and-xing",
+      "type": "slide",
+      "title": "空和星，上下怎样摆",
+      "template": "picture-points",
+      "data": {
+        "title": "空和星，上下怎样摆",
+        "picture": "write-kong-xing",
+        "points": [
+          "空 · 穴在上",
+          "星 · 日上生下"
+        ]
+      },
+      "script": [
+        {
+          "say": "星和空的上半边，哪个有日，哪个像小屋顶？"
+        },
+        {
+          "say": "看清上面是什么，再接下面的笔画。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "空上面写点、点、横钩、撇、点。下边写工。"
+        },
+        {
+          "say": "工是横、竖、横。最下面一横放稳。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "星先写日，竖、横折、横、横。"
+        },
+        {
+          "say": "下面是生，撇、横、横、竖、横，底横伸开一点。"
+        },
+        {
+          "say": "两字都先上后下。请大人看看，你的上下有没有挤在一起。"
+        }
+      ]
+    },
+    {
+      "key": "write-shen",
+      "type": "slide",
+      "title": "身的长撇最后经过哪里",
+      "template": "picture-points",
+      "data": {
+        "title": "身的长撇最后经过哪里",
+        "picture": "write-shen",
+        "points": [
+          "撇、竖、横折钩",
+          "中间三横",
+          "末笔长撇"
+        ]
+      },
+      "script": [
+        {
+          "say": "身的哪一笔在最后？我们顺着田字格看它的方向。"
+        },
+        {
+          "say": "先看第一笔，再数中间的短横。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先撇，再竖，再写横折钩，让两边成形。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "接着写三横，把里面的横间隔开。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "最后从右上向左下撇出，方向别反。"
+        },
+        {
+          "say": "在纸上写一遍，请大人看最后一撇和中间的横。"
+        }
+      ]
+    },
+    {
+      "key": "picture-quiz",
+      "type": "quiz",
+      "title": "听一听，哪张画能说明",
+      "intro": [
+        "听老师读完，再选最合适的一张。"
+      ],
+      "questions": [
+        {
+          "id": "why-ask-help",
+          "question": "要做一张开场海报。哪幅近景能说明棉花姑娘为什么想请别人帮忙？",
+          "skill": "story-cause",
+          "answer": [
+            "B"
+          ],
+          "analysis": "开头的问题是棉花叶上有蚜虫。这张近景画出了要解决的问题。",
+          "options": {
+            "A": {
+              "label": "小虫在空中",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-1-a",
+                "alt": "远处空中几只飞虫，棉花叶面干净"
+              }
+            },
+            "B": {
+              "label": "蚜虫在叶面",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-1-b",
+                "alt": "从叶背斜看一组小蚜虫趴在棉花叶上"
+              }
+            },
+            "C": {
+              "label": "水田有小虫",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-1-c",
+                "alt": "稻苗和水面附近有小虫，画面没有棉花叶"
+              }
+            }
+          }
+        },
+        {
+          "id": "wood-inside",
+          "question": "故事的配画要找能捉树干里虫子的角色。哪位来客合适？",
+          "skill": "where-they-help",
+          "answer": [
+            "A"
+          ],
+          "analysis": "故事中啄木鸟说它捉树干里的虫，所以选啄木鸟。",
+          "options": {
+            "A": {
+              "label": "啄木鸟",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-2-a",
+                "alt": "转头停在竖树干边的啄木鸟新姿态"
+              }
+            },
+            "B": {
+              "label": "燕子",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-2-b",
+                "alt": "燕子飞过画面，叉尾清楚"
+              }
+            },
+            "C": {
+              "label": "青蛙",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-2-c",
+                "alt": "绿色青蛙站在水田的小泥坡"
+              }
+            }
+          }
+        },
+        {
+          "id": "count-seven",
+          "question": "布景师做了三张纸瓢虫。选出背上正好七点的那张。",
+          "skill": "spots",
+          "answer": [
+            "C"
+          ],
+          "analysis": "这张画背上正好七点。数时一颗一颗看，别把头算进去。",
+          "options": {
+            "A": {
+              "label": "六个点",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-3-a",
+                "alt": "一只橙红纸瓢虫，两侧各三点"
+              }
+            },
+            "B": {
+              "label": "八个点",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-3-b",
+                "alt": "一只橙红纸瓢虫，两侧各四点"
+              }
+            },
+            "C": {
+              "label": "七个点",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-3-c",
+                "alt": "一只橙红纸瓢虫，两侧各三点，中间一颗"
+              }
+            }
+          }
+        },
+        {
+          "id": "ask-a-friend",
+          "question": "小演员想拿桌面另一边的纸船。哪张画是他刚开口请同伴帮忙的时候？",
+          "skill": "dialogue",
+          "answer": [
+            "B"
+          ],
+          "analysis": "纸船还在桌面另一边。小演员看着伙伴，开口指给他看。这是在请伙伴帮忙。",
+          "options": {
+            "A": {
+              "label": "自己把船放回",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-4-a",
+                "alt": "小演员背对同伴，已经把船放回箱子"
+              }
+            },
+            "B": {
+              "label": "指着船请同伴帮忙",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-4-b",
+                "alt": "小演员面向同伴，开口指向桌面另一边的纸船"
+              }
+            },
+            "C": {
+              "label": "拿到船后道谢",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-4-c",
+                "alt": "小演员已接过同伴递来的船，双手在胸前致谢"
+              }
+            }
+          }
+        },
+        {
+          "id": "red-new-prop",
+          "question": "舞台换了一件新道具。听，火红火红的小灯笼。哪张图是它？",
+          "skill": "color-words",
+          "answer": [
+            "A"
+          ],
+          "analysis": "火红火红形容鲜亮的红。这件小灯笼的颜色和词对得上。",
+          "options": {
+            "A": {
+              "label": "鲜红灯笼",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-5-a",
+                "alt": "同样形状的鲜红色布灯笼"
+              }
+            },
+            "B": {
+              "label": "绿色灯笼",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-5-b",
+                "alt": "同样形状的松绿色布灯笼"
+              }
+            },
+            "C": {
+              "label": "白色灯笼",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-5-c",
+                "alt": "同样形状的雪白色布灯笼"
+              }
+            }
+          }
+        },
+        {
+          "id": "write-hai-first",
+          "question": "制字卡时只能先画还的前四笔。哪张卡做对了？",
+          "skill": "writing-order",
+          "answer": [
+            "C"
+          ],
+          "analysis": "还先写里面的不，四笔写完，再写走之。",
+          "options": {
+            "A": {
+              "label": "先写走之",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-6-a",
+                "alt": "相同田字格只画左下走之"
+              }
+            },
+            "B": {
+              "label": "提前加点",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-6-b",
+                "alt": "相同田字格只有不的前三笔，加走之第一点"
+              }
+            },
+            "C": {
+              "label": "先写不",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-6-c",
+                "alt": "相同田字格右上只有完整的不"
+              }
+            }
+          }
+        },
+        {
+          "id": "choose-ending",
+          "question": "第二次排练要换一张结尾新图。哪张图能看出棉花姑娘已经好起来？",
+          "skill": "story-ending",
+          "answer": [
+            "B"
+          ],
+          "analysis": "结尾有健康的绿叶和洁白棉花，棉花姑娘也很高兴。",
+          "options": {
+            "A": {
+              "label": "垂叶上有虫",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-7-a",
+                "alt": "棉花姑娘低头，垂叶有小蚜虫"
+              }
+            },
+            "B": {
+              "label": "新叶白棉",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-7-b",
+                "alt": "绿叶展开，枝头洁白棉花露出来，棉花姑娘笑"
+              }
+            },
+            "C": {
+              "label": "绿色水田",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-7-c",
+                "alt": "一个满是稻苗的水田，青蛙在水边，不出现棉花姑娘"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "closing",
+      "type": "slide",
+      "title": "把故事按先后讲给家人",
+      "template": "picture-points",
+      "data": {
+        "title": "把故事按先后讲给家人",
+        "picture": "cotton-family",
+        "points": [
+          "先三次求助",
+          "小瓢虫相帮",
+          "把话读出感情",
+          "说颜色、写好字"
+        ]
+      },
+      "script": [
+        {
+          "say": "纸偶剧场要关灯了。你能说说一开始发生了什么吗？"
+        },
+        {
+          "say": "再想想来了哪几位伙伴，最后哪一位真正帮上了忙。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "叶上有蚜虫，她先请燕子、啄木鸟和青蛙。"
+        },
+        {
+          "say": "三位说的地点和棉花叶不同，所以都没帮上忙。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "七星瓢虫来到叶上，吃掉蚜虫。后来叶子绿，棉花白。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "和家人翻纸书分角色读。请求、回答和惊奇的语气有变化。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "找一个新物品，说两个字重复的颜色词。再写几个课里的字。"
+        },
+        {
+          "say": "请大人看看你写的笔顺，也听听你把故事讲清楚了没有。"
+        }
+      ]
+    }
+  ]
+}

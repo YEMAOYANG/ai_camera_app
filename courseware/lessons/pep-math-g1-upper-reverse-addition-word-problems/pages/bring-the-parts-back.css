@@ -1,0 +1,25 @@
+#return-proof {
+  position: absolute;
+  left: 26px;
+  top: 230px;
+  width: 195px;
+  padding: 10px;
+  box-sizing: border-box;
+  border: 5px solid #2d5b47;
+  border-radius: 18px;
+  background: #fff6e6;
+  pointer-events: none;
+  z-index: 2;
+}
+#return-proof[hidden] { display: none; }
+#return-proof img { display: block; width: 100%; height: auto; border-radius: 8px; }
+#finish .card:has(.return-finish-proof) { padding-block: 15px; }
+#finish .card:has(.return-finish-proof) .big img { width: 91px; height: 91px; }
+.return-finish-proof {
+  display: block;
+  height: 155px;
+  width: auto;
+  margin: 6px auto 14px;
+  border-radius: 12px;
+  border: 3px solid #347863;
+}

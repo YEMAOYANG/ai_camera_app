@@ -1,0 +1,155 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "lesson": "整理和复习",
+  "binding": {
+    "editionId": "pep-math-g1-lower-2022-standard",
+    "revisionId": "directory-6205d2037284e91f10b25edd",
+    "nodeId": "59aa1e2b-5ed0-44f9-b420-e22573cada98",
+    "unitId": "00dd71f6-4bed-412c-951d-dc049bd461b4",
+    "lessonTitle": "整理和复习",
+    "unitTitle": "一 认识平面图形",
+    "gradeCode": "primary_1",
+    "subject": "math",
+    "volume": "lower",
+    "schoolSystem": "six_year",
+    "classHours": [
+      "lesson_1"
+    ],
+    "teachingRevision": "1",
+    "classHour": "complete"
+  },
+  "teacherCode": "ethan",
+  "goals": [
+    "从立体物体上指出一个平的面，认出它能描出的平面图形，并说明摸到的是整件物体的一面。",
+    "按边是直是弯、直边有几条来给图形分类，并用边和角说明转过方向或改变大小后为什么仍属同一种。",
+    "看准点子图上的角并顺次围合，用边和角检查画成的形；找出图案反复出现的最小一段并续下一形。",
+    "按每行砖缝的方向画线补全，或用完整一行减去已有块数，再把各行缺块合起来。",
+    "从拼好图的外轮廓和内部接缝往回看，说明几块怎样合成整体、整体可以怎样分，回顾转、比、画的用途。"
+  ],
+  "objectiveSource": "印5正文、印6–7单元练习与官方一课时33页；以实际教材平面图形为准。",
+  "story": "新来的小小展馆要把找形卡、边角档案和墙面饰带整理好。把发现记录成一张展馆地图，再带着办法回到家。",
+  "pageOrder": [
+    {
+      "id": "entry",
+      "focus": "用空展柜发问，串起找面、分类与画补。"
+    },
+    {
+      "id": "find-a-face",
+      "focus": "看木柜、积木、截面和圆盒盖。用描边图连接物体一面与平面图形。"
+    },
+    {
+      "id": "choose-a-rule",
+      "focus": "一套五种形先按直弯分，再在直边组按条数分。先说明规则，再归类。"
+    },
+    {
+      "id": "turn-and-check",
+      "focus": "点子图顺次连角，关合外圈；看同样方片旋转与放大后的边角不变。"
+    },
+    {
+      "id": "sort-the-gallery",
+      "focus": "推车实际运送卡片。以样牌的直弯或边数判组，颜色和方向都不作规则。"
+    },
+    {
+      "id": "see-a-repeat",
+      "focus": "从两次同样的小段识别重复，空位逐个推回单元的开头。"
+    },
+    {
+      "id": "pattern-corridor",
+      "focus": "按装饰条空位的次序驾驶车补图，可走错站后重试；标记已补前缀。"
+    },
+    {
+      "id": "wall-seams",
+      "focus": "观察不同砖行的真实错缝，补线定位每块。本课原创缺1、3、2。"
+    },
+    {
+      "id": "wall-check",
+      "focus": "用一行完整长度与已有块比较，再把三个结果合起来核对。"
+    },
+    {
+      "id": "whole-and-parts",
+      "focus": "一张展牌的整体外轮廓和内部拼线，拼分相互验证。用两块不等宽长方形示范。"
+    },
+    {
+      "id": "six-picture-check",
+      "focus": "找面、按特征分类、点子图、接重复、数缺块、整体与部分。"
+    },
+    {
+      "id": "tell-it-at-home",
+      "focus": "复盘描边留形、旋转对齐、叠比边角、找小段、画砖缝和看外轮廓；讲给家人。"
+    }
+  ],
+  "games": [
+    {
+      "page": "sort-the-gallery",
+      "template": "sortingDepot",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.sortingDepot",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "classification",
+      "levels": [
+        "两件先按直边和弯边分。",
+        "三件直边卡按三条和四条分。",
+        "四件有旋转和大小变化，再按三条和四条分。"
+      ],
+      "demo": "先圈推车，再圈首张有直边的卡和同组托盘。只推入首张一次，复位让孩子玩。"
+    },
+    {
+      "page": "pattern-corridor",
+      "template": "bubbleMaze",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.bubbleMaze",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "ordered_route",
+      "levels": [
+        "方、三角两形一段，续两枚。",
+        "圆、斜四边、三角三形一段，续三枚。",
+        "方、方、三角、圆为一段，从段中断开，续三枚；路线更长。"
+      ],
+      "demo": "圈展带的已知小段、首个空位与小车，老师说出为什么从段头接，再走一个站。孩子交接复位。"
+    }
+  ],
+  "pictureQuiz": [
+    {
+      "skill": "物体的面",
+      "question": "哪件物体标出的那一面，描一圈是正方形？",
+      "answer": "B",
+      "design": "选择同尺度的框盒长面、方木积木选中面、圆盒圆盖。"
+    },
+    {
+      "skill": "平面图形分类",
+      "question": "哪一组的每张图都有四条直边？",
+      "answer": "C",
+      "design": "三组各三枚、同色不同朝向；一组混三角、一组混圆，正确组为转过的方形、长方形、斜四边形。"
+    },
+    {
+      "skill": "点子图与辨形",
+      "question": "哪幅图把四个角顺着连好，围成了一个正方形？",
+      "answer": "A",
+      "design": "同四个角三种路径：完整边界、缺一条、交叉。"
+    },
+    {
+      "skill": "图形重复规律",
+      "question": "听听小段怎么重复。空位接哪个形？",
+      "answer": "B",
+      "design": "背景用圆、三角、斜四边重复两次再放圆，正解三角。"
+    },
+    {
+      "skill": "画图和逐行计数",
+      "question": "只补墙里的白色空处，要几块整砖？",
+      "answer": "C",
+      "design": "中排两端半砖已经砌好。只补白色空处，上排缺2块整砖，中排缺3块整砖。选4、6、5，以同样小砖堆图示量。"
+    },
+    {
+      "skill": "拼分与外轮廓",
+      "question": "哪两块合起来能正好填满这块长方形展牌？",
+      "answer": "A",
+      "design": "题干为4×2轮廓中间竖虚线，正确图两张2×2方片；其余图共宽不足或形状不合。"
+    }
+  ],
+  "afterClass": {
+    "route": "家长与孩子从安全的家用物找一个平面，描边或在纸上画，再换方向比一比并说明理由；合法纸书印6–7提供完整单元练习与选做思考题。",
+    "observation": "家庭口头解释与纸书活动待观察。"
+  },
+  "weeklyQuestionSource": "本课6道原创图片题进入周练候选；正式G7合格并上架后由流水线登记。",
+  "evidenceBoundary": "G0审读材料不进入孩子媒体。前课拼组和七巧板只串联，整套原练习保留纸书。"
+}

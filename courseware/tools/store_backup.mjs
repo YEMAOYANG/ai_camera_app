@@ -81,8 +81,10 @@ async function head(client, config, key) {
   catch (e) { if (absent(e)) return null; throw e; }
 }
 
-export async function verifyObject(client, config, file, remote, output) {
+export async function verifyObject(client, config, file, remote, output, requireVersionedEncryption = false) {
   if (!remote?.ETag || remote.ContentLength !== file.byteSize) throw Error('Remote backup identity mismatch');
+  if (requireVersionedEncryption && (!remote.VersionId || remote.VersionId === 'null'
+      || remote.ServerSideEncryption !== 'AES256')) throw Error('COS recovery object lacks versioning or AES256');
   const result = await client.send(new GetObjectCommand({Bucket: config.bucket, Key: file.objectKey,
     IfMatch: remote.ETag, ...(remote.VersionId ? {VersionId: remote.VersionId} : {})}));
   let size = 0;
@@ -116,6 +118,13 @@ export async function uploadBackup(directory, dependencies = {}) {
     const prefix = `备份/课件恢复/v1/${archive?.sha256}/`;
     const receipt = validateReceipt({schemaVersion: SCHEMA, archiveSha256: archive?.sha256,
       files: files.map(f => ({...f, objectKey: prefix + f.path}))});
+    if (dependencies.primaryReceipt) {
+      const primary = validateReceipt(dependencies.primaryReceipt);
+      const matches = receipt.files.length === primary.files.length && receipt.files.every(file =>
+        primary.files.some(saved => saved.path === file.path && saved.sha256 === file.sha256
+          && saved.byteSize === file.byteSize));
+      if (!matches) throw Error('Local backup differs from the primary recovery receipt');
+    }
     const config = dependencies.config || readConfig();
     const client = dependencies.client || clientFor(config, {maxAttempts: 1});
     const verified = [];
@@ -134,11 +143,11 @@ export async function uploadBackup(directory, dependencies = {}) {
         } finally { body.destroy(); }
         remote = await head(client, config, file.objectKey);
       }
-      verified.push(await verifyObject(client, config, file, remote));
+      verified.push(await verifyObject(client, config, file, remote, undefined, dependencies.requireVersionedEncryption));
     }
     const result = {...receipt, files: verified, storage: identity(config), verifiedAt: new Date().toISOString(),
       complete: true, localSourcesRetained: true};
-    await writeReceipt(directory, result);
+    await writeReceipt(dependencies.receiptDirectory || directory, result);
     return result;
   } finally { await lock.close(); await fsp.unlink(path.join(directory, '.upload.lock')); }
 }
@@ -154,6 +163,8 @@ export async function fetchBackup(receipt, destination, dependencies = {}) {
   const files = [];
   for (const file of receipt.files) {
     const remote = await head(client, config, file.objectKey);
+    if (dependencies.requireVersionedEncryption && (file.versionId !== remote?.VersionId
+        || file.etag !== remote?.ETag)) throw Error('COS recovery object version changed');
     const filename = path.join(destination, file.path);
     await fsp.mkdir(path.dirname(filename), {recursive: true, mode: 0o700});
     await noLinks(path.dirname(filename));
@@ -162,7 +173,7 @@ export async function fetchBackup(receipt, destination, dependencies = {}) {
       files.push(await verifyObject(client, config, file, remote, async chunk => {
         let offset = 0;
         while (offset < chunk.length) offset += (await handle.write(chunk, offset, chunk.length - offset)).bytesWritten;
-      }));
+      }, dependencies.requireVersionedEncryption));
       await handle.sync();
     } finally { await handle.close(); }
   }
@@ -172,20 +183,40 @@ export async function fetchBackup(receipt, destination, dependencies = {}) {
   return result;
 }
 
+export async function mirrorBackup(directory, workspace, dependencies = {}) {
+  await noLinks(workspace);
+  const primaryPath = await noLinks(path.join(directory, 'remote-verification.json'));
+  const primary = validateReceipt(JSON.parse(await fsp.readFile(primaryPath, 'utf8')));
+  const source = identity(dependencies.sourceConfig || readConfig());
+  const target = dependencies.config || readConfig(undefined, 'COS_TARGET');
+  if (primary.complete !== true || !Object.keys(source).every(key => source[key] === primary.storage?.[key])
+      || target.provider !== 'tencent-cos' || source.endpoint === identity(target).endpoint) {
+    throw Error('Independent COS target and exact primary storage receipt required');
+  }
+  const options = {...dependencies, config: target, requireVersionedEncryption: true};
+  const uploaded = await uploadBackup(directory, {...options, primaryReceipt: primary, receiptDirectory: workspace});
+  const downloaded = await fetchBackup(uploaded, path.join(workspace, 'download'), options);
+  return {uploaded, downloaded};
+}
+
 async function main(argv) {
   const command = argv.shift(), options = {};
   while (argv.length) {
     const name = argv.shift(), value = argv.shift();
-    if (!['--backup', '--receipt', '--destination'].includes(name) || !value || options[name]) throw Error('Invalid backup options');
+    if (!['--backup', '--receipt', '--destination', '--workspace'].includes(name) || !value || options[name]) throw Error('Invalid backup options');
     options[name] = value;
   }
   const config = readConfig();
   let result;
+  if (command === 'mirror-cos' && Object.keys(options).length === 2 && options['--backup'] && options['--workspace']) {
+    console.log(JSON.stringify(await mirrorBackup(options['--backup'], options['--workspace'], {sourceConfig: config})));
+    return;
+  }
   if (command === 'upload' && Object.keys(options).join() === '--backup') result = await uploadBackup(options['--backup'], {config});
   else if (command === 'fetch' && Object.keys(options).length === 2 && options['--receipt'] && options['--destination']) {
     await noLinks(options['--receipt']);
     result = await fetchBackup(JSON.parse(await fsp.readFile(options['--receipt'], 'utf8')), options['--destination'], {config});
-  } else throw Error('Use upload --backup DIR or fetch --receipt FILE --destination NEW_DIR');
+  } else throw Error('Use upload --backup DIR, fetch --receipt FILE --destination NEW_DIR, or mirror-cos --backup DIR --workspace DIR');
   console.log(JSON.stringify({complete: result.complete, storage: result.storage, files: result.files.length,
     bytes: result.files.reduce((n, f) => n + f.byteSize, 0), archiveSha256: result.archiveSha256}));
 }

@@ -1,0 +1,784 @@
+{
+  "schemaVersion": "mira.courseware.builtin-imagegen-plan.v1",
+  "title": "猫和兔",
+  "candidateOf": "renjiao-science-g1-upper-cat-and-rabbit-games-v2",
+  "legacySourceAudit": {
+    "station": {
+      "sha256": "25b2b8ae7da9e0f37a91a31c71a237806d3687178c10aa05014f93d98e00510b",
+      "provider": "qwen",
+      "requestSha256": "9347f7950d0ae21e71e32775db280bd37fd89188b62216b1a982d8548bf05236",
+      "responseSha256": "fcecd7d4f4c6456fa2b1d92b28b66ad7be8471645ac975a57ab5ed7be537cf86",
+      "cacheFingerprint": "b99e1cae4b2e792ced88284925493ad9354816eba67a7ef0df6d4edeca36134b"
+    },
+    "cat-orange": {
+      "sha256": "969392fe3293d74d092f5a40cb1957b248ae48dc152dd81dba439d9714784928",
+      "provider": "qwen",
+      "requestSha256": "277c06fba3d65f6d8927f47017ec07775ab6622a5a7552cef82b40b8f21725f5",
+      "responseSha256": "fca5fdfabf7bf3bc942da266c693e8a8c06eb32017045fa2d93b2073a0d35d62",
+      "cacheFingerprint": "0346776a3c7594256fe0fd41fed2b3a723943285a48b45a7860a0fbdf3c2f775"
+    },
+    "cat-gray": {
+      "sha256": "3f9e1f082a4023104b52e8dd811f8b2dc3ac2b149ac5ba68fe8f3c33764187ba",
+      "provider": "qwen",
+      "requestSha256": "839890ff9b78ba8fe4d3f4a1079b760d53e231faaba73c5ff7685bedc86fe4f7",
+      "responseSha256": "60197ddc56425aa718efb1afdd585b2a449b7d818e4875e24913fde0b7ff00ca",
+      "cacheFingerprint": "368a84cf41d56e4ec57c2e74c7dd4bb006016e8183350d1afe3b66ea6c401b68"
+    },
+    "rabbit-brown": {
+      "sha256": "2b27d3de7702607544160a57ff37243ae3c3e533df7b90df9ed788d5207bfb1d",
+      "provider": "qwen",
+      "requestSha256": "9d351496272614cb36f90201ecbeaddfec400ab1fb6d942adc8e013a30de3f6f",
+      "responseSha256": "eb193b3f5bd55eadd417dcac547606af90a2cb03b16c3bf225361677d0ba097b",
+      "cacheFingerprint": "0a51fe0f938aa9420084bf5e31590794587398ff65fcd6f2643b25dc4698ccb1"
+    },
+    "rabbit-white": {
+      "sha256": "25e21fd88f5e174bd32d92caaf64c3cc98ad88c339eabc29f819fdeac0f922f4",
+      "provider": "qwen",
+      "requestSha256": "4fa8367039a312af59d32ce847b97e78913e2619faeba2da164c698825c6b6e4",
+      "responseSha256": "bf9e2e088345dee06fe639aa5785ed415ead839bdb6424d1191028b3e3062f03",
+      "cacheFingerprint": "06b4bdfc9727a39ea1a0533777eb86f4f1ee41ca19fb48195cea155c080c3fdb"
+    },
+    "cat-tail": {
+      "sha256": "719a1cf1eb85130e25ec346edeef0428221d4cc7164903f707179ded632d0184",
+      "provider": "qwen",
+      "requestSha256": "c2d7678d7a8ef2efe6a09e730562bdb8239cba777917a05786a627239e1d75f9",
+      "responseSha256": "58627aec1570b55eeb624a33dd9b3d8350dcc0ce5c66caf892f2d8b97d5a0a80",
+      "cacheFingerprint": "bbd6598859c06748b74047227c52d353f75f58be4dd36eaebcaec390779adfe9"
+    },
+    "cat-ear": {
+      "sha256": "43fd8ba6e79456fd916a2f4fca8312da36def6035a1413586410d499ddd9ade1",
+      "provider": "qwen",
+      "requestSha256": "757e7ec51286394b3d612323804709cbd2773ecc745ff4664c239e8f97cae427",
+      "responseSha256": "b5ec35f3b9e5e87666c1f937f035338e44702d6a9d74b405e839819985daf07f",
+      "cacheFingerprint": "0d7a28c407db4e5d81176572b542b994b2f3a505996d1997f96492bb9a5584db"
+    },
+    "pad": {
+      "sha256": "8fe36f12c078b8668feb2cf41480958a53493628e3b299522d21df07551c84e0",
+      "provider": "qwen",
+      "requestSha256": "7384e356d755a1e34212b2191d579d905579441f5b930cd1dd226ecb63bea71d",
+      "responseSha256": "18fc7621005df0a4dfc1bb35763d67389878a69be24e7ed89ff51aa04807aeb4",
+      "cacheFingerprint": "2dc4332987e0d9ac5e844f14854580c89eb639244b0c02cff22dd6f2a0fdaeee"
+    },
+    "table-bare": {
+      "sha256": "acef2861ce5ced4e218dadd96642cff2f22e98f93046115572b717d9869cccac",
+      "provider": "qwen",
+      "requestSha256": "de9aea367218f0c096b6199165bf658ec4ee13824b33133c15faa19c0aa22318",
+      "responseSha256": "b9c0c44e2fd52f5679e9138a9493ac9894adb1bc8a21d3ecead8270b65ae6d31",
+      "cacheFingerprint": "c36d21a53225b0c6d507471c8beaacb1cd780660b50e95ad87019d2a8231fddb"
+    },
+    "table-soft": {
+      "sha256": "d26aaa8e37797aa7faa57624d40cdc72caf93d467a8ac1fbf35816c4bb794f10",
+      "provider": "qwen",
+      "requestSha256": "233d5b0fd7c0c505592f0cf5b3b7b3f168bf433f2e09cb278d37262d91c29915",
+      "responseSha256": "055f79b8ac96bf396c342a55136f1b0414820d3c8d950846d4c94f16f7b14e6d",
+      "cacheFingerprint": "45d18702f3f8bba246a70fb780d0e93d3df2c9b2c03d353834426169289a6787"
+    },
+    "cat-eye-bright": {
+      "sha256": "a9ea1be0e7152f41047e78c41405d39da2eb1fd04d5ff6a0d412276d30e2f977",
+      "provider": "qwen",
+      "requestSha256": "8f434cdc93a60cd47791b94f9afc1dcac585e5900b174ecec526bfdc525b83ba",
+      "responseSha256": "c3948c224b0426fe7802063de2315c7373a849de0879f8238cc08443ff57eb46",
+      "cacheFingerprint": "af10ab5f178bf4b7980b34152072b102fda1f3cf10964db3f0e17950c07e5953"
+    },
+    "cat-eye-dim": {
+      "sha256": "6ff8cc7edc560a1cf4990cbbbe3aaaa65f5229b0f3e8993b729b979774f6d8b0",
+      "provider": "qwen",
+      "requestSha256": "6947d0ef9a0c636fd3788f9e43ef824b3abb395ab5910d48c094a4c4b8760ea7",
+      "responseSha256": "680e010a4c4e73b2343d61d1dcaff0e63a14442622f055723935d0afa95ed0f9",
+      "cacheFingerprint": "9a83a9cb2238561306b830e5374097f7ea779738813965cf8c449d9ea2642633"
+    },
+    "cat-climb": {
+      "sha256": "1217272d881645994f43833ee1110ec3149087b2d98df536201948ab23127d64",
+      "provider": "qwen",
+      "requestSha256": "8dcd92b0858004c3c45db8c4d814f5ff48aa1549601bc8170606069f41f4ef38",
+      "responseSha256": "4a8a4876f2fc87a9442bb7152a16c6785e75fd69fe3e3f59e1e67924b21c569a",
+      "cacheFingerprint": "0f9991e3ce47901dd2bc34f120b2f877dfd90bf842d15af0f8f262e54d9ef19b"
+    },
+    "claw": {
+      "sha256": "1b000f8af5b1dd444952341bd28f8f8a69c67b55e38c860565aa1d701ed25d34",
+      "provider": "qwen",
+      "requestSha256": "6d0846f43e3a927213119c2ea31d7f69a876529280e3b0499d6a144926813556",
+      "responseSha256": "42db53d9b83646999123e838b6367023c4adad93cdd1d9a8c946d69441283007",
+      "cacheFingerprint": "6e76d3a1bfd3d88efdc2bada2c1a412f600e241ab4bb5367c0f6fb414d12813e"
+    },
+    "rabbit-ear": {
+      "sha256": "722a5b8ee65172af68c7dcfba352304a97e98698ccf5d21b90d604315d6b1a3f",
+      "provider": "qwen",
+      "requestSha256": "b8eb03e86ed4ebe40aeff2b9e25b22791ef7eedd3be85ce77317d6d6b05a2340",
+      "responseSha256": "94349f7d22c5555bec7ef5c96f1861d6022cdb43924b386e81e04fd5c4b59fe7",
+      "cacheFingerprint": "26555cd688cf7683658633501a5b3fe5b6c5021b6e65e6c2547e30a3c04f9800"
+    },
+    "hindleg": {
+      "sha256": "5dd2a2098a26951aea779987bbdd818da55456ebe8c60d5b80335d8b40615768",
+      "provider": "qwen",
+      "requestSha256": "4316cc8f5e51d95851653289cf3c7f44a1beaf75d06c4477b62c68dfad4b366f",
+      "responseSha256": "f6444306f444d2f265e5b487ff0faf5471c9f93c9147c507205a8260010c2ca1",
+      "cacheFingerprint": "930ec9d28c5a79b6bab56e257a79c526284778c0f1e45744345a5631e6eda45f"
+    },
+    "rabbit-jump": {
+      "sha256": "f41953e82c494aec64ee861e44e7cac8dbd173cf95f1832e0f42c286f4b79778",
+      "provider": "qwen",
+      "requestSha256": "4f1afee1a4f6a9061b5a55c87212e7409f1ec07896a66cc16281ce5816caf47b",
+      "responseSha256": "9547a244175546217fab70c323a07b63671e361affadc66376a36054148dda07",
+      "cacheFingerprint": "62c5328d03d6d942e0851565798e397bbc7dc0767aa227d5a8dfa4967ec495b1"
+    },
+    "cat-walk": {
+      "sha256": "75e8e943fcb26766a7ac157fb6276f81af369e09af7817f7dea82710c85df2e2",
+      "provider": "qwen",
+      "requestSha256": "80e6ebd4e7b5484fbd3d61488c9c2c126694cd50511ee86c8b20cb81b1b19755",
+      "responseSha256": "128fba9b5175bc06c30058de5ce30daf95c4eb11be2ceb328b60ee2769c31dff",
+      "cacheFingerprint": "f6cf96ec4ece43ff2b01b313d1d7a483d92ffa937f336d9c02e77e4df0ebef09"
+    },
+    "listen-bare": {
+      "sha256": "f4ee1710ff6d5be24fad5037fc654791a5e5119074f962cc532183cb2a8e1cc6",
+      "provider": "qwen",
+      "requestSha256": "7917859a080aff357b7549646c58546d31548e2769d7b72b3debac5a2af626f2",
+      "responseSha256": "ddb6f58d6a867705575116a7e30e6fe5c0dbfdaf7c5a5b80289da5264daf9385",
+      "cacheFingerprint": "8f6c14c2f5cb09cc260e5e3bd0f8e4f7a982cbb4933d151bf0b168209945310e"
+    },
+    "listen-cup": {
+      "sha256": "12c42123c70d0142c73fb00674342cabcfff4ee2cf86486f7dd4b7558092aac3",
+      "provider": "qwen",
+      "requestSha256": "f3ba5a99abffb7ec284e26448ada9957a5073962f2ee60fe7ca9a6e5688ac3e2",
+      "responseSha256": "bde88974b320c095d29c1206836d79f48151644a41dc96b78f4ece29abeb4bf6",
+      "cacheFingerprint": "1e55e3598aa9de9a51604604dc3cb4c3588ee2275e60a8535786782cf2dc8498"
+    },
+    "listen-cone": {
+      "sha256": "deff16bd494ce8e3ea34a78105a0071a45154b224dba3cf7c83928ec9e5ec6ae",
+      "provider": "qwen",
+      "requestSha256": "ada2b5f418f2434399ef0dcf55882418ead32f75d88c2986b68f54c718ade22a",
+      "responseSha256": "a382b78feab3227185308fe2e9600fb602352dd3696f62d26e817f654cabc25b",
+      "cacheFingerprint": "0db5fce33efbddbab6a6aed41a5b70ac39260c6a8a4ff1010a77f61193b464a2"
+    },
+    "wash": {
+      "sha256": "050385ea4fedf8452ad36f2e3d495292a7507007865fed76db4f2d8cf4a835be",
+      "provider": "qwen",
+      "requestSha256": "0b1b4c0c4ff174bba2ff2d2f4d8cd0133bb142d2aaf919e05fc868bf007f5a64",
+      "responseSha256": "7c7ea16fbcc7fd547fb92c41ce39f179fbf3f35fb779f98ff0065e5f84a7d090",
+      "cacheFingerprint": "8a1eae62056875232b935cd49ad64e6e1fba42577b708464472a86ad89b186d6"
+    },
+    "gloves": {
+      "sha256": "cff80a1fecf38b0bf2c446e2bb094746814a988254ab5c653507e4dd999e25b7",
+      "provider": "qwen",
+      "requestSha256": "88f43ed985fa058f66b1770fa827d44fc363774a5dbc6027fc0311d1d06ed6ab",
+      "responseSha256": "e08ccae3d3e01626043e021b5e9aace4a0d1e1476d7ea1c706c15414be3b9af5",
+      "cacheFingerprint": "4e49d4ff21b50073bad56e0173cf0060b7502c492251a3732a9e95812c620f04"
+    },
+    "tell-adult": {
+      "sha256": "8cf72309a70ca1eb48b91f6d46dcd229872850a134cdd2d49540ea23d7f69463",
+      "provider": "qwen",
+      "requestSha256": "3ce7b7e2d8459d6fd47e94410f52fa4386bf041f0f539e06fe78036273a082d8",
+      "responseSha256": "22e3705854dc80d0221788dbe58f0bddd2af64a93100074119d4359501d70f65",
+      "cacheFingerprint": "129229130030180ac4a5fe9e8586ce1ff57007e8d566ebd33bffb891b5567021"
+    },
+    "listen-strip": {
+      "sha256": "e61391be1e4e801205fab36f8bd9f73390fb030365ba3a395fb70a63a72b0c0d",
+      "provider": "composed-qwen",
+      "inputs": [
+        "listen-bare",
+        "listen-cup",
+        "listen-cone"
+      ]
+    },
+    "care-strip": {
+      "sha256": "dc37ad2581b930079e786966c47820eade25897660cd24d9e494aa24cfc251cb",
+      "provider": "composed-qwen",
+      "inputs": [
+        "wash",
+        "gloves",
+        "tell-adult"
+      ]
+    },
+    "cat-eyes": {
+      "sha256": "b29795f1c6343d35a166869c15626a580c843d0a64f023cea4390ff011ede7bf",
+      "provider": "composed-qwen",
+      "inputs": [
+        "cat-eye-bright",
+        "cat-eye-dim"
+      ]
+    },
+    "climb-pair": {
+      "sha256": "e9e20ecdc128c18d3c3946e05e42a8ddde43a53c43089fbe23c3683b444611a6",
+      "provider": "composed-qwen",
+      "inputs": [
+        "cat-climb",
+        "claw"
+      ]
+    },
+    "rabbit-move": {
+      "sha256": "dd4c33b905a152b4c50a3cc5dc8039b97c3a624a24fa7fe376556d50eecf6b9e",
+      "provider": "composed-qwen",
+      "inputs": [
+        "hindleg",
+        "rabbit-jump"
+      ]
+    }
+  },
+  "requiredImagegenCalls": 21,
+  "assets": [
+    {
+      "key": "station",
+      "file": "assets/station.png",
+      "aspectIntent": "16:9",
+      "mode": "generate",
+      "usedBy": [
+        "order.picture",
+        "lens.canvasOrStart"
+      ],
+      "prompt": "Use case: scientific-educational\nAsset type: 一年级科学课的讲解、游戏或图片小检查\nPrimary request: 安静室内观察角。一位成年人和一位一年级女孩坐在左侧，女孩拿着一本摊开的无字画本。在右侧各自舒适的位置，一只橘白家猫和一只白色立耳兔安静待着。两种动物分开，耳朵、尾巴和轮廓可辨，孩子离它们有距离，手留在本子上。没有笼栏遮脸或抓抱。\nComposition: 横图按 16:9 使用，所有关键内容都放在画面中央 82% 高度内，四周有空白，留出裁切余量。\nStyle and constraints: 统一风格为一年级科学绘本，温暖的哑光水粉与细铅笔线，清爽暖白底，柔和一致的自然光。教学特征比装饰细节更显眼，低龄小屏能认。动物保持真实骨骼、自然眼睛和毛色，动物不拟人。不要字、数字、箭头、标签、水印或边框。\nInput image 1 is a character and style reference for the orange cat. Input image 2 is a character reference for the white rabbit. Draw a fresh unified scene. Keep the natural animal anatomy and the same fine-pencil/gouache appearance. Both animals are separately resting on the right, with the short ears and long tail of the cat and the long ears and short tail of the rabbit readable even on a small cover. Do not collage or border the animals. Keep the adults and child clearly human, and the notebook blank with no marks.",
+      "state": "accepted_static_pending_small_screen",
+      "referenceAsset": "cat-orange",
+      "referenceRole": "style_and_animal_design",
+      "sha256": "7153e97ebfe8b6c5ea410ac6ca585ef368282ca2f2921d33b69dade69f2503b8",
+      "dimensions": [
+        1672,
+        941
+      ]
+    },
+    {
+      "key": "cat-gray",
+      "file": "assets/cat-gray.png",
+      "aspectIntent": "16:9",
+      "mode": "generate",
+      "usedBy": [
+        "lens.canvasOrStart",
+        "quick-check.look-at-tail.stem"
+      ],
+      "prompt": "Use case: scientific-educational\nAsset type: 课堂双窗中被放大实际图像局部\nPrimary request: 一只灰白短毛家猫，灰背、白胸和白脚，短尖立耳是第一关观察重点。左侧脸部清楚能找到眼鼻，耳形为猫的比例，右侧有一根完整细长尾巴。四脚自然支撑。 完整身体在画面中央，最高耳尖距上缘至少 11%，最低脚距下缘至少 11%。视线与动物躯干大约齐平，低视角侧面略三分之四，均头朝左、尾朝右，轻微脚下投影。耳尖、尾端和脚完整，按真实结构交代自然遮挡，不能添脚，也别让轮廓和背景同色。\nComposition: 横图按 16:9 使用，所有关键内容都放在画面中央 82% 高度内，四周有空白，留出裁切余量。\nStyle and constraints: 统一风格为一年级科学绘本，温暖的哑光水粉与细铅笔线，清爽暖白底，柔和一致的自然光。教学特征比装饰细节更显眼，低龄小屏能认。动物保持真实骨骼、自然眼睛和毛色，动物不拟人。不要字、数字、箭头、标签、水印或边框。",
+      "state": "accepted_style_anchor",
+      "sha256": "74b90c6442ffdb8928d58699b1bdf6d92878de626633c231de1079ee355cb285",
+      "dimensions": [
+        1672,
+        941
+      ]
+    },
+    {
+      "key": "rabbit-white",
+      "file": "assets/rabbit-white.png",
+      "aspectIntent": "16:9",
+      "mode": "generate",
+      "usedBy": [
+        "lens.canvasOrStart"
+      ],
+      "prompt": "Use case: scientific-educational\nAsset type: 课堂双窗中被放大实际图像局部\nPrimary request: 一只普通白色立耳兔，耳内淡粉，两只长耳清楚竖立。前脚自然较小，健壮的弯曲后腿和长后脚能辨。身体右侧短尾像一个小团，与白色背景有浅灰阴影分隔。 完整身体在画面中央，最高耳尖距上缘至少 11%，最低脚距下缘至少 11%。视线与动物躯干大约齐平，低视角侧面略三分之四，均头朝左、尾朝右，轻微脚下投影。耳尖、尾端和脚完整，按真实结构交代自然遮挡，不能添脚，也别让轮廓和背景同色。\nComposition: 横图按 16:9 使用，所有关键内容都放在画面中央 82% 高度内，四周有空白，留出裁切余量。\nStyle and constraints: 统一风格为一年级科学绘本，温暖的哑光水粉与细铅笔线，清爽暖白底，柔和一致的自然光。教学特征比装饰细节更显眼，低龄小屏能认。动物保持真实骨骼、自然眼睛和毛色，动物不拟人。不要字、数字、箭头、标签、水印或边框。\nInput image 1: 仅作低视角、留白、纸色、细铅笔线和哑光水粉画风参考；保持这些视觉条件，完整换成白色立耳家兔，所有猫的部位都换掉。兔子的骨骼、姿势和长耳短尾必须符合兔自身，不套猫的躯体。",
+      "state": "accepted_first_round_pair",
+      "referenceAsset": "cat-gray",
+      "referenceRole": "style_and_camera_reference",
+      "sha256": "95107d88cc7d9e4d5fd988f1abbf7eb359de8be324a211cf30c8a13dc235539d",
+      "dimensions": [
+        1672,
+        941
+      ]
+    },
+    {
+      "key": "cat-orange",
+      "file": "assets/cat-orange.png",
+      "aspectIntent": "16:9",
+      "mode": "generate",
+      "usedBy": [
+        "compare.left_picture",
+        "lens.canvasOrStart",
+        "quick-check.before-snack.stem"
+      ],
+      "prompt": "Use case: scientific-educational\nAsset type: 课堂双窗中被放大实际图像局部\nPrimary request: 一只普通橘白短毛家猫，短尖三角耳和长而自然下弯的尾巴非常清楚，四肢自然支撑、脚掌不重叠成一团。长尾根从后躯接出，完整尾尖靠右。 完整身体在画面中央，最高耳尖距上缘至少 11%，最低脚距下缘至少 11%。视线与动物躯干大约齐平，低视角侧面略三分之四，均头朝左、尾朝右，轻微脚下投影。耳尖、尾端和脚完整，按真实结构交代自然遮挡，不能添脚，也别让轮廓和背景同色。\nComposition: 横图按 16:9 使用，所有关键内容都放在画面中央 82% 高度内，四周有空白，留出裁切余量。\nStyle and constraints: 统一风格为一年级科学绘本，温暖的哑光水粉与细铅笔线，清爽暖白底，柔和一致的自然光。教学特征比装饰细节更显眼，低龄小屏能认。动物保持真实骨骼、自然眼睛和毛色，动物不拟人。不要字、数字、箭头、标签、水印或边框。\nInput image 1: 只参考低视角、主体与留白、纸色、细铅笔线和哑光水粉画风。改画一只不同的橘白猫，毛色、面部斑纹和尾巴姿态要明显不同。尾巴从右侧臀部向下自然垂，尾尖再柔和向上弯，整条尾与身体相接并保留在画面内，不举到背部上方。",
+      "state": "accepted_static_pending_small_screen",
+      "referenceAsset": "cat-gray",
+      "referenceRole": "style_and_camera_reference",
+      "sha256": "c14b0c28ac1ef0837e01f33f09d981d2fece993fff184411bf630ffb1867b587",
+      "dimensions": [
+        1672,
+        941
+      ]
+    },
+    {
+      "key": "rabbit-brown",
+      "file": "assets/rabbit-brown.png",
+      "aspectIntent": "16:9",
+      "mode": "generate",
+      "usedBy": [
+        "compare.right_picture",
+        "lens.canvasOrStart"
+      ],
+      "prompt": "Use case: scientific-educational\nAsset type: 课堂双窗中被放大实际图像局部\nPrimary request: 一只普通棕色立耳兔，耳内淡粉，短圆尾在身体右端明显向外突起，轮廓比身体浅。长耳、短前脚、较长的强健后脚清楚。按头左尾右绘画，游戏只会镜像其中一幅。 完整身体在画面中央，最高耳尖距上缘至少 11%，最低脚距下缘至少 11%。视线与动物躯干大约齐平，低视角侧面略三分之四，均头朝左、尾朝右，轻微脚下投影。耳尖、尾端和脚完整，按真实结构交代自然遮挡，不能添脚，也别让轮廓和背景同色。\nComposition: 横图按 16:9 使用，所有关键内容都放在画面中央 82% 高度内，四周有空白，留出裁切余量。\nStyle and constraints: 统一风格为一年级科学绘本，温暖的哑光水粉与细铅笔线，清爽暖白底，柔和一致的自然光。教学特征比装饰细节更显眼，低龄小屏能认。动物保持真实骨骼、自然眼睛和毛色，动物不拟人。不要字、数字、箭头、标签、水印或边框。\nInput image 1: 只参考纸面、低视角、光线和绘法。另画一只不同的棕色立耳兔，暖栗棕毛色，眼周与背上有自然深浅，姿态略蹲。保持头朝左；短团尾要在右端完整外露、与背部色调有分离，小小一团而非长尾。",
+      "state": "accepted_static_pending_small_screen",
+      "referenceAsset": "rabbit-white",
+      "referenceRole": "style_and_camera_reference",
+      "sha256": "dcc525ce1ca8de76a1e95c3dea3a8cea73f68dfbbe9a7ce082111019ae1c80a4",
+      "dimensions": [
+        1672,
+        941
+      ]
+    },
+    {
+      "key": "table-bare",
+      "file": "assets/table-bare.png",
+      "aspectIntent": "1:1",
+      "mode": "generate",
+      "usedBy": [
+        "soft-pad.left_picture",
+        "quiet.canvasOrStart",
+        "quick-check.softer-step.A"
+      ],
+      "prompt": "Use case: scientific-educational\nAsset type: 一年级科学课的讲解、游戏或图片小检查\nPrimary request: 同一张浅原木桌上的指尖模拟。固定相机以斜侧近景只拍一只孩子的手和桌面，食指与中指像两只小脚轻轻触桌，另外三指自然弯曲。两指落点和裸桌接触处清晰。画面没有其他物品。\nComposition: 正方形近景，最重要的形状在中间，边缘留出空白，不截断所教部位。\nStyle and constraints: 统一风格为一年级科学绘本，温暖的哑光水粉与细铅笔线，清爽暖白底，柔和一致的自然光。教学特征比装饰细节更显眼，低龄小屏能认。动物保持真实骨骼、自然眼睛和毛色，动物不拟人。不要字、数字、箭头、标签、水印或边框。\nInput image 1: 只参考纸色、浅色自然光和铅笔水粉绘本画法，整张图是没有猫的手指试验。只画一只正常五指的右手，从画面右上伸入；食指和中指的两枚指尖在画面中下方接触同一水平的桌面，手和桌的接触处不能被挡住；不要软垫。",
+      "state": "accepted_static_pending_small_screen",
+      "referenceAsset": "cat-gray",
+      "referenceRole": "style_reference",
+      "sha256": "12dedcaa6718f7fbaaa71c78c1dba785a1330c8eb0ae1a626a8ebca6d05730d9",
+      "dimensions": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "key": "table-soft",
+      "file": "assets/table-soft.png",
+      "aspectIntent": "1:1",
+      "mode": "edit",
+      "referenceAsset": "table-bare",
+      "referenceRole": "edit_target",
+      "usedBy": [
+        "soft-pad.right_picture",
+        "quiet.canvasOrStart",
+        "quick-check.softer-step.C"
+      ],
+      "prompt": "Use case: scientific-educational\nAsset type: 一年级科学课的讲解、游戏或图片小检查\nPrimary request: 图一是与本图成对比较的编辑底图。维持同一只手的手型、手指姿势、桌面、桌纹、取景、光线和背景。唯一材料变化是在两个落点之间、手指正下方加一块看得清的浅金黄色厚海绵，小孔自然可见。按海绵厚度让同样两指的指尖触在海绵上，桌面不要另加物品。\nComposition: 正方形近景，最重要的形状在中间，边缘留出空白，不截断所教部位。\nStyle and constraints: 统一风格为一年级科学绘本，温暖的哑光水粉与细铅笔线，清爽暖白底，柔和一致的自然光。教学特征比装饰细节更显眼，低龄小屏能认。动物保持真实骨骼、自然眼睛和毛色，动物不拟人。不要字、数字、箭头、标签、水印或边框。\nInput image 1: 编辑底图。保留画布比例、背景线、浅木桌纹、阴影风格、右上进来的右手、两指的左右间距与角度，只把一块亮金黄有小孔的矩形海绵放在两枚指尖之下并支撑两点。海绵要真实落在原木桌上，宽度约画面一半，露出一条厚边可识别。两个指尖随厚度竖直抬高，指尖贴上海绵上面，不陷进海绵或遮住它。",
+      "state": "accepted_static_pending_small_screen",
+      "sha256": "5c0d700aa7e9507407ebee37be84a3056227ce5b11abde3d53ef930ca36218f1",
+      "dimensions": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "key": "cat-ear",
+      "file": "assets/cat-ear.png",
+      "aspectIntent": "1:1",
+      "mode": "generate",
+      "usedBy": [
+        "quick-check.look-at-tail.B"
+      ],
+      "prompt": "Use case: scientific-educational\nAsset type: 一年级科学课的讲解、游戏或图片小检查\nPrimary request: 普通橙猫一侧短小三角耳及邻近头部的科学观察近景，耳廓完整、自然朝上，明确是猫耳，背景简洁。\nComposition: 正方形近景，最重要的形状在中间，边缘留出空白，不截断所教部位。\nStyle and constraints: 统一风格为一年级科学绘本，温暖的哑光水粉与细铅笔线，清爽暖白底，柔和一致的自然光。教学特征比装饰细节更显眼，低龄小屏能认。动物保持真实骨骼、自然眼睛和毛色，动物不拟人。不要字、数字、箭头、标签、水印或边框。\nInput image 1: 只参考橘猫的耳形、毛色与同一画风。做新的正方形科学近照。短尖三角猫耳为焦点，完整立在头顶，可见耳尖、耳廓和耳根，配少量额头与一只自然猫眼用来辨认；相对头部比例真实，不能像兔耳一样细长。只画橘猫自己的耳朵。",
+      "state": "accepted_static_pending_small_screen",
+      "referenceAsset": "cat-orange",
+      "referenceRole": "style_reference",
+      "sha256": "d65bd2af32cecd6e73c9cc498ddab9ec52e4dc7643d861d85765667dafb5ef61",
+      "dimensions": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "key": "cat-eyes",
+      "file": "assets/cat-eyes.png",
+      "aspectIntent": "16:9",
+      "mode": "generate",
+      "usedBy": [
+        "cat-special.right_picture"
+      ],
+      "prompt": "Use case: scientific-educational\nAsset type: 一年级科学课的讲解、游戏或图片小检查\nPrimary request: 在一幅横向比较图中并列两个同宽近景，中间一条干净的浅底缝。左右画完全同一只灰白猫正面脸，位置、距离、脸形、条纹和金绿色虹膜都相同。左边自然明亮，两个眼睛中央的黑瞳孔是窄竖缝。右边自然柔暗但眼睛清晰，两个黑瞳孔明显变宽近圆，仍看得见虹膜边。只变光亮和瞳孔，不加对照箭头、文字、光源、发光眼睛或人手。\nComposition: 横图按 16:9 使用，所有关键内容都放在画面中央 82% 高度内，四周有空白，留出裁切余量。\nStyle and constraints: 统一风格为一年级科学绘本，温暖的哑光水粉与细铅笔线，清爽暖白底，柔和一致的自然光。教学特征比装饰细节更显眼，低龄小屏能认。动物保持真实骨骼、自然眼睛和毛色，动物不拟人。不要字、数字、箭头、标签、水印或边框。\nInput image 1: 请用这只灰白猫的毛色、脸型、鼻子和纸面画风。新图左右两半必须是同一只猫的同尺寸正面脸，两个头的眼睛高度对齐。左半瞳孔为明显的细黑竖线，右半瞳孔为黑色宽椭圆近圆，黑瞳孔与虹膜有清晰边界；自然光亮度不同，仍看得到右边脸和两眼。不要画成猫闭眼、虹膜颜色变化或发光。",
+      "state": "accepted_static_pending_small_screen",
+      "referenceAsset": "cat-gray",
+      "referenceRole": "identity_and_style_reference",
+      "sha256": "667a5361c2630a56e69cbf199942bd75e7b7492cc5c6aa71f141ba969997b3da",
+      "dimensions": [
+        1672,
+        941
+      ]
+    },
+    {
+      "key": "cat-tail",
+      "file": "assets/cat-tail.png",
+      "aspectIntent": "1:1",
+      "mode": "generate",
+      "usedBy": [
+        "quick-check.look-at-tail.A"
+      ],
+      "prompt": "Use case: scientific-educational\nAsset type: 一年级科学课的讲解、游戏或图片小检查\nPrimary request: 普通橙白家猫长尾及尾根附近少量后躯的科学观察近景，长尾自然弯曲，完整不裁尾尖，不能画成兔子的短圆尾。\nComposition: 正方形近景，最重要的形状在中间，边缘留出空白，不截断所教部位。\nStyle and constraints: 统一风格为一年级科学绘本，温暖的哑光水粉与细铅笔线，清爽暖白底，柔和一致的自然光。教学特征比装饰细节更显眼，低龄小屏能认。动物保持真实骨骼、自然眼睛和毛色，动物不拟人。不要字、数字、箭头、标签、水印或边框。\nInput image 1: 参考自然短毛、柔和纸色和水粉铅笔画法；输出是新的正方形局部。只出现臀部边缘和一整条完整弯曲的橘白长尾，像一枚宽弧，尾根连在后躯，尾尖有清楚白毛。不画头、耳朵、人手或额外肢体。",
+      "state": "accepted_static_pending_small_screen",
+      "referenceAsset": "cat-orange",
+      "referenceRole": "style_reference",
+      "sha256": "aab9984819a783da6ca1965407d933a4bea292ec17b5c791defb606638eafd31",
+      "dimensions": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "key": "cat-walk",
+      "file": "assets/cat-walk.png",
+      "aspectIntent": "1:1",
+      "mode": "generate",
+      "usedBy": [
+        "quick-check.softer-step.stem"
+      ],
+      "prompt": "Use case: scientific-educational\nAsset type: 一年级科学课的讲解、游戏或图片小检查\nPrimary request: 一只橙白家猫在平坦木地板上自然缓步走动的清楚情境，四脚和长尾完整，猫身体比例真实，地面没有物品或危险，不用声音波纹、箭头或字。\nComposition: 正方形近景，最重要的形状在中间，边缘留出空白，不截断所教部位。\nStyle and constraints: 统一风格为一年级科学绘本，温暖的哑光水粉与细铅笔线，清爽暖白底，柔和一致的自然光。教学特征比装饰细节更显眼，低龄小屏能认。动物保持真实骨骼、自然眼睛和毛色，动物不拟人。不要字、数字、箭头、标签、水印或边框。\nInput image 1: 参考橘白猫外形与细致绘本画法；另画同一只猫在原木地板自然缓步，一只前脚刚刚抬离地，其余脚有自然支撑。站姿变成轻步，头和尾与四肢都在正方图幅内，不画跑跳、声波、地毯或海绵。",
+      "state": "accepted_static_pending_small_screen",
+      "referenceAsset": "cat-orange",
+      "referenceRole": "identity_and_style_reference",
+      "sha256": "706fe21e1a14efff17d98826d497bd7736dfd0a7c71447141035dafd9d25e64a",
+      "dimensions": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "key": "climb-pair",
+      "file": "assets/climb-pair.png",
+      "aspectIntent": "16:9",
+      "mode": "generate",
+      "usedBy": [
+        "cat-special.left_picture"
+      ],
+      "prompt": "Use case: scientific-educational\nAsset type: 一年级科学课的讲解、游戏或图片小检查\nPrimary request: 在一幅横向比较图中，左边画一只灰白猫离地很近，正在用前爪抓住粗树干，树根和平地可见。右边画同一只灰白猫同一动作的前爪外侧特写，几枚自然弯曲的淡色尖爪从趾端伸出勾住粗树皮，猫掌底朝树皮，肉垫隐藏，爪背灰白毛。两个同宽画面间留浅底缝。无血、无危险高处、无人牵扯。\nComposition: 横图按 16:9 使用，所有关键内容都放在画面中央 82% 高度内，四周有空白，留出裁切余量。\nStyle and constraints: 统一风格为一年级科学绘本，温暖的哑光水粉与细铅笔线，清爽暖白底，柔和一致的自然光。教学特征比装饰细节更显眼，低龄小屏能认。动物保持真实骨骼、自然眼睛和毛色，动物不拟人。不要字、数字、箭头、标签、水印或边框。\nInput image 1: 只参考这只灰白猫的真实毛色、脸和画法。左侧低处贴住粗树干攀爬，前脚着树，后脚靠近地面。右侧镜头紧贴同一动作，一只覆灰白毛的猫前脚背在树皮左边，浅色弯爪的尖端插进粗树皮小缝。爪向着树，不向读者，镜头看不到脚底肉垫，粗树皮与尖爪颜色有对比。",
+      "state": "accepted_static_pending_small_screen",
+      "referenceAsset": "cat-gray",
+      "referenceRole": "identity_and_style_reference",
+      "sha256": "b87c3e250a4ab9833e4e2b9f9fde7b97119635d3b414e118a9e03602e42db921",
+      "dimensions": [
+        1672,
+        941
+      ]
+    },
+    {
+      "key": "gloves",
+      "file": "assets/gloves.png",
+      "aspectIntent": "1:1",
+      "mode": "generate",
+      "usedBy": [
+        "quick-check.before-snack.B",
+        "care-strip"
+      ],
+      "prompt": "Use case: scientific-educational\nAsset type: 一年级科学课的讲解、游戏或图片小检查\nPrimary request: 成年人戴着手套清洁空的动物食盆和用具的清楚动作图卡，动物不在旁边，手套和刷洗动作明显，使用普通清水，不出现化学瓶或文字。\nComposition: 正方形近景，最重要的形状在中间，边缘留出空白，不截断所教部位。\nStyle and constraints: 统一风格为一年级科学绘本，温暖的哑光水粉与细铅笔线，清爽暖白底，柔和一致的自然光。教学特征比装饰细节更显眼，低龄小屏能认。动物保持真实骨骼、自然眼睛和毛色，动物不拟人。不要字、数字、箭头、标签、水印或边框。\nInput image 1: 只参考柔和的铅笔水粉风格和暖白色。另画一张正方形动作卡，一双成年人戴着柔绿橡胶家务手套的手，一只手扶稳木台上的宽浅宠物食碗，另一只拿一把短柄清洁刷刷洗空碗。手套明显覆盖手和腕，刷子和空碗同时清楚。与洗手卡容易分辨，不出现水龙头、动物、消毒剂或化学品。",
+      "state": "accepted_static_pending_small_screen",
+      "referenceAsset": "wash",
+      "referenceRole": "style_reference",
+      "sha256": "95070ef6a341aa259d37f2704cb4608172e28d2bf3f82cae0c51b06009cf326e",
+      "dimensions": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "key": "listen-bare",
+      "file": "assets/listen-bare.png",
+      "aspectIntent": "1:1",
+      "mode": "generate",
+      "usedBy": [
+        "quick-check.first-listen.B",
+        "listen-strip"
+      ],
+      "prompt": "Use case: scientific-educational\nAsset type: baseline listening method in an elementary science workbook\nSquare scientific education card, natural muted gouache and fine pencil on warm white paper, gentle classroom light. One clearly adult science teacher with neat brown bobbed hair, plain pale-yellow crew-neck shirt, seated at an empty light-wood table. Chest-up three-quarter view facing left, near ear and face clearly visible. Keep all teaching details within the image. No text, marks, watermarks, jewelry, other people or animals.\nShe listens directly. Both hands rest comfortably on the table. The area next to her ear is clear with no objects.",
+      "state": "accepted_static_pending_small_screen",
+      "rejectedAttempts": [
+        {
+          "outcome": "moderation_blocked",
+          "httpStatus": 400,
+          "requestId": "147077bc-e12b-438b-bed8-f42eaa89cc81",
+          "recordedAt": "2026-11-09T08:33:18.480485+00:00",
+          "referenceAsset": "station",
+          "prompt": "Use case: scientific-educational\nAsset type: 一年级科学课的讲解、游戏或图片小检查\nPrimary request: 正方形胸部以上近景。一个齐下巴浅棕短发、斜刘海和棕眼睛的小女孩穿素浅黄色圆领短袖，坐在浅木桌前，脸略朝画面左，画面右侧耳朵完整清楚。她的双手自然平放桌面，耳边没有任何东西，平静直接听。桌面占底部五分之一。\nComposition: 正方形近景，最重要的形状在中间，边缘留出空白，不截断所教部位。\nStyle and constraints: 统一风格为一年级科学绘本，温暖的哑光水粉与细铅笔线，清爽暖白底，柔和一致的自然光。教学特征比装饰细节更显眼，低龄小屏能认。动物保持真实骨骼、自然眼睛和毛色，动物不拟人。不要字、数字、箭头、标签、水印或边框。\nInput image 1: 只参考暖白纸色、细铅笔水粉、自然儿童形象和柔和光。新图是单独一个短发小女孩，身体转向略左，右耳露出不被发丝遮。素黄圆领短袖，双手自然放在浅木桌上，不举手，正常听远处的声音。无任何书、耳机、铃、纸卷、动物。正方形，脸和双手都完整可见。",
+          "promptSha256": "d56ec56197e8ac560e63a266b976df8324271df932706f8883ae9780c7b7ce91"
+        }
+      ],
+      "sha256": "13ec4b5e5083b43738f4957257698d26abbd5766226b32602da58ed4c6cbebc2",
+      "dimensions": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "key": "listen-cone",
+      "file": "assets/listen-cone.png",
+      "aspectIntent": "1:1",
+      "mode": "edit",
+      "referenceAsset": "listen-bare",
+      "referenceRole": "edit_target",
+      "usedBy": [
+        "quick-check.first-listen.C",
+        "listen-strip"
+      ],
+      "prompt": "Use case: scientific-educational\nAsset type: controlled comparison for listening with a paper cone\nSquare scientific education card, natural muted gouache and fine pencil on warm white paper, gentle classroom light. One clearly adult science teacher with neat brown bobbed hair, plain pale-yellow crew-neck shirt, seated at an empty light-wood table. Chest-up three-quarter view facing left, near ear and face clearly visible. Keep all teaching details within the image. No text, marks, watermarks, jewelry, other people or animals.\nInput image 1 is the baseline edit target. Keep the same adult and scene. Move only her nearer hand so she supports a plain rolled paper listening cone beside her near ear. Its small end stops just outside the outer ear, with a small visible gap. The broad open end points outward to the right and its hollow opening is visible. It must be level with and beside the ear, behind the eye and clear of the mouth. The paper cone never enters or covers the ear canal. The other hand remains on the table.\nKeep the source image unchanged except the right-side hand and cone. Draw the paper cone horizontally, with its narrow left end at viewer-right outer ear height and broad open end aimed sideways toward the right edge. The listening gap at the ear is visible. The mouth, nose and eye are unobstructed. The cone is unmarked matte cream paper with a rolled seam and a visible hollow opening.",
+      "state": "accepted_static_pending_small_screen",
+      "sha256": "6ca97424547179b99f18d4b23eab074bf560fc92ac013d7a7c21a34bde44f80b",
+      "dimensions": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "key": "listen-cup",
+      "file": "assets/listen-cup.png",
+      "aspectIntent": "1:1",
+      "mode": "edit",
+      "referenceAsset": "listen-bare",
+      "referenceRole": "edit_target",
+      "usedBy": [
+        "quick-check.softer-step.B",
+        "quick-check.first-listen.A",
+        "listen-strip"
+      ],
+      "prompt": "Use case: scientific-educational\nAsset type: controlled comparison for listening with a cupped hand\nSquare scientific education card, natural muted gouache and fine pencil on warm white paper, gentle classroom light. One clearly adult science teacher with neat brown bobbed hair, plain pale-yellow crew-neck shirt, seated at an empty light-wood table. Chest-up three-quarter view facing left, near ear and face clearly visible. Keep all teaching details within the image. No text, marks, watermarks, jewelry, other people or animals.\nInput image 1 is the baseline edit target. Keep the same adult, identical framing, face, shirt, tabletop and lighting. Move only her nearer hand up beside and behind the near ear, palm gently cupped like a curved shell. The palm stays off the opening, the ear remains visible. Keep the other hand resting on the table.\nUse the existing adult teacher illustration exactly as framing. Show a clearly rounded hand positioned at the viewer-right ear without touching or obscuring the ear canal. Make the edge of the cupped palm visibly separate from the ear.",
+      "state": "accepted_static_pending_small_screen",
+      "sha256": "167617f1d16a8a6a1bcfd5f1b0f8b34e34e06d6b0412a837051bd61b2737bb57",
+      "dimensions": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "key": "pad",
+      "file": "assets/pad.png",
+      "aspectIntent": "1:1",
+      "mode": "generate",
+      "usedBy": [
+        "quick-check.look-at-tail.C"
+      ],
+      "prompt": "Use case: scientific-educational\nAsset type: 一年级科学课的讲解、游戏或图片小检查\nPrimary request: 猫一只抬起前爪的掌面近景，真实厚实粉灰色肉垫清楚，保留少量毛和爪轮廓，肉垫是主体，无手持、无剪爪、无伤口，不拟成人手。\nComposition: 正方形近景，最重要的形状在中间，边缘留出空白，不截断所教部位。\nStyle and constraints: 统一风格为一年级科学绘本，温暖的哑光水粉与细铅笔线，清爽暖白底，柔和一致的自然光。教学特征比装饰细节更显眼，低龄小屏能认。动物保持真实骨骼、自然眼睛和毛色，动物不拟人。不要字、数字、箭头、标签、水印或边框。\nInput image 1: 只参考橘白毛质与铅笔水粉画风。做新的独立正方形科学近景，真实猫前爪掌面自然举起，四枚小趾垫和一枚较宽的中央掌垫清楚，颜色粉灰不反光，垫子周围有柔毛。收住爪尖；不画其他脚、手、人指、工具、血迹或字。",
+      "state": "accepted_static_pending_small_screen",
+      "referenceAsset": "cat-orange",
+      "referenceRole": "style_reference",
+      "sha256": "2ab01991247a70aebcf01a122250247656d951cb5cd92cbb3628327bf2e67582",
+      "dimensions": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "key": "rabbit-ear",
+      "file": "assets/rabbit-ear.png",
+      "aspectIntent": "1:1",
+      "mode": "generate",
+      "usedBy": [
+        "rabbit-special.right_picture",
+        "quick-check.first-listen.stem"
+      ],
+      "prompt": "Use case: scientific-educational\nAsset type: 一年级科学课的讲解、游戏或图片小检查\nPrimary request: 普通白兔头部及两只长长竖耳的科学观察近景，耳朵长度明显大于猫耳，耳内自然浅粉，耳尖完整。\nComposition: 正方形近景，最重要的形状在中间，边缘留出空白，不截断所教部位。\nStyle and constraints: 统一风格为一年级科学绘本，温暖的哑光水粉与细铅笔线，清爽暖白底，柔和一致的自然光。教学特征比装饰细节更显眼，低龄小屏能认。动物保持真实骨骼、自然眼睛和毛色，动物不拟人。不要字、数字、箭头、标签、水印或边框。\nInput image 1: 用同一只白兔的毛色、淡粉耳内和绘本画风。另画它头和长耳的正方形特写，两个耳尖完整且在画面边缘内留白，耳形自然长而向上。头稍偏侧面，眼睛、白毛和耳朵相连，强调耳部，少量脖子可见。不要手、人、纸筒或其它动物。",
+      "state": "accepted_static_pending_small_screen",
+      "referenceAsset": "rabbit-white",
+      "referenceRole": "identity_and_style_reference",
+      "sha256": "a629482e5f2a11f40c014dc7657ac5b984ed5a3de05516ee62dfcfe111695989",
+      "dimensions": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "key": "rabbit-move",
+      "file": "assets/rabbit-move.png",
+      "aspectIntent": "16:9",
+      "mode": "generate",
+      "usedBy": [
+        "rabbit-special.left_picture"
+      ],
+      "prompt": "Use case: scientific-educational\nAsset type: 一年级科学课的讲解、游戏或图片小检查\nPrimary request: 在一幅横向连贯比较图中，左边画棕色立耳兔的后半身近景，圆短尾与屈曲强壮的后腿、长后脚清楚，蹲在平地上。右边画同一只棕兔在平地上自然小幅跳起的完整侧影，强壮后腿向后伸、前脚向前，身体离地很近。两个同宽画面间留浅底缝。耳、尾、脚和地面都不截断，没有高台、障碍、残影或箭头。\nComposition: 横图按 16:9 使用，所有关键内容都放在画面中央 82% 高度内，四周有空白，留出裁切余量。\nStyle and constraints: 统一风格为一年级科学绘本，温暖的哑光水粉与细铅笔线，清爽暖白底，柔和一致的自然光。教学特征比装饰细节更显眼，低龄小屏能认。动物保持真实骨骼、自然眼睛和毛色，动物不拟人。不要字、数字、箭头、标签、水印或边框。\nInput image 1: 用同一只暖栗棕立耳兔的毛色、脸型和细致绘本画法。左边近景把后腿与贴地长后脚画大，后脚向身体前方收，短尾保留。右图同一只兔在平地上自然小跳，画完整四肢，自然蹬地后的两只长后脚伸在身体后方；前脚朝前，离地低。两画面有清楚的视觉分隔，不放字或箭头。",
+      "state": "accepted_static_pending_small_screen",
+      "referenceAsset": "rabbit-brown",
+      "referenceRole": "identity_and_style_reference",
+      "sha256": "0d9ae356126040673d4d7518dec900457cacc1031e6b419c9b873577429f4ff3",
+      "dimensions": [
+        1672,
+        941
+      ]
+    },
+    {
+      "key": "tell-adult",
+      "file": "assets/tell-adult.png",
+      "aspectIntent": "1:1",
+      "mode": "generate",
+      "usedBy": [
+        "quick-check.before-snack.C",
+        "care-strip"
+      ],
+      "prompt": "Use case: scientific-educational\nAsset type: first-grade picture option for showing a hand to a trusted adult\nA safe everyday family scene. A fully clothed schoolboy in a plain blue long-sleeve top stands beside his fully clothed parent in a light-ochre cardigan. The parent crouches at his eye level and listens attentively. He holds one open hand slightly out in front of him at waist level to show his palm, while the parent looks directly at it and keeps a mobile phone down in their other hand. The boy's palm and both people's visible faces are in the central area and easy to understand in a small square image. Natural muted gouache and fine pencil on warm white paper, soft daylight. No medical procedure, no marks on the hand, no injury detail, no animal, no text, no logos.",
+      "state": "accepted_static_pending_small_screen",
+      "sha256": "d28e6e68d9ea90670e2df13cc86f907865fbefba2a0765f9cbbcba4e98022166",
+      "dimensions": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "key": "wash",
+      "file": "assets/wash.png",
+      "aspectIntent": "1:1",
+      "mode": "generate",
+      "usedBy": [
+        "quick-check.before-snack.A",
+        "care-strip"
+      ],
+      "prompt": "Use case: scientific-educational\nAsset type: 一年级科学课的讲解、游戏或图片小检查\nPrimary request: 儿童接触动物后洗手动作图卡，女孩在水池用肥皂泡沫认真洗双手，水龙头、手部和清水关系清楚，背景简洁，无动物、无文字。\nComposition: 正方形近景，最重要的形状在中间，边缘留出空白，不截断所教部位。\nStyle and constraints: 统一风格为一年级科学绘本，温暖的哑光水粉与细铅笔线，清爽暖白底，柔和一致的自然光。教学特征比装饰细节更显眼，低龄小屏能认。动物保持真实骨骼、自然眼睛和毛色，动物不拟人。不要字、数字、箭头、标签、水印或边框。\nFor a first-grade hygiene lesson, use a clean square close-up of only two ordinary hands and wrists in a ceramic sink. One hand rubs the other with clearly visible white soap lather under a modest stream from a silver faucet. Both hands and the lather should be large and easy to distinguish in a 90 px picture choice. No person or animal needs to be shown. Soft pencil and matte gouache in warm white, gentle daylight.",
+      "state": "accepted_static_pending_small_screen",
+      "sha256": "85c9c87d874a1f93a16cbfc654a8f662da433ed3d3f424d52233a8ae95df1902",
+      "dimensions": [
+        1254,
+        1254
+      ]
+    }
+  ],
+  "compositions": {
+    "listen-strip": {
+      "inputs": [
+        "listen-bare",
+        "listen-cup",
+        "listen-cone"
+      ],
+      "usedBy": [
+        "listen.picture"
+      ]
+    },
+    "care-strip": {
+      "inputs": [
+        "wash",
+        "gloves",
+        "tell-adult"
+      ],
+      "usedBy": [
+        "care.picture"
+      ]
+    }
+  },
+  "review": [
+    "内置请求和文件 SHA 逐图核对",
+    "所有彩图按完整页和 640×360 实玩验收",
+    "每个小检查重看三图并做新 G7",
+    "配音台词逐项比较，符合原台词及槽位才复用已冻结录音"
+  ],
+  "comparisonWindowGeometry": {
+    "coordinateSpace": "每张全身图保留比例后裁出的 1024×576 视域。目标值为图内像素中心；镜像先变换 x，再验收。",
+    "normalization": "等比居中适配16:9视域，验证所有耳尖、尾端、脚均在视域内。若需调整构图，用本关目标可见性决定，不能拉伸。",
+    "recordSize": [
+      352,
+      224
+    ],
+    "allowedCenterX": [
+      176,
+      848
+    ],
+    "toleranceX": 91,
+    "legacyFirstRound": {
+      "left": {
+        "asset": "cat-gray",
+        "mirrored": false,
+        "earX": 246
+      },
+      "right": {
+        "asset": "rabbit-white",
+        "mirrored": false,
+        "earX": 418
+      },
+      "commonY": 120,
+      "goalCrop": {
+        "asset": "rabbit-brown",
+        "source": [
+          250,
+          2,
+          264,
+          192
+        ]
+      }
+    },
+    "legacySecondRound": {
+      "left": {
+        "asset": "cat-orange",
+        "mirrored": false,
+        "tailX": 818
+      },
+      "right": {
+        "asset": "rabbit-brown",
+        "mirrored": true,
+        "tailX": 226
+      },
+      "commonY": 355,
+      "goalCrop": {
+        "asset": "rabbit-white",
+        "source": [
+          665,
+          318,
+          208,
+          151
+        ]
+      }
+    },
+    "state": "原坐标仅供对照。生成后重新登记每张视域和四个局部，验收两关，截不全就回到新图重做。",
+    "firstRoundAccepted": {
+      "left": {
+        "asset": "cat-gray",
+        "mirrored": false,
+        "earX": 264
+      },
+      "right": {
+        "asset": "rabbit-white",
+        "mirrored": false,
+        "earX": 346
+      },
+      "commonY": 120,
+      "cropScaleEqual": true,
+      "state": "生成原图及配对几何已看，当前记录轴落在两只动物耳部中心。",
+      "goalCrop": {
+        "asset": "rabbit-brown",
+        "source": [
+          213,
+          8,
+          308,
+          224
+        ]
+      }
+    },
+    "secondRoundAccepted": {
+      "left": {
+        "asset": "cat-orange",
+        "mirrored": false,
+        "tailX": 772
+      },
+      "right": {
+        "asset": "rabbit-brown",
+        "mirrored": true,
+        "tailX": 260
+      },
+      "commonY": 325,
+      "crop": [
+        400,
+        256
+      ],
+      "cropScaleEqual": true,
+      "goalCrop": {
+        "asset": "rabbit-white",
+        "source": [
+          649,
+          268,
+          176,
+          128
+        ]
+      },
+      "state": "已检查两张原图和局部范围，仍须整页触屏验收。"
+    }
+  },
+  "experimentGeometry": {
+    "conditionCards": [
+      "table-bare",
+      "table-soft"
+    ],
+    "pressHitBox": [
+      559,
+      511,
+      162,
+      134
+    ],
+    "recordPanelBoxes": [
+      [
+        47,
+        502,
+        510,
+        166
+      ],
+      [
+        723,
+        502,
+        510,
+        166
+      ]
+    ],
+    "requirement": "两张照片的手型和桌面一致，只改海绵，结果栏要能一眼认出材料。试脚和波纹为有物理意义的代码示意。"
+  },
+  "styleAnchor": "cat-gray"
+}

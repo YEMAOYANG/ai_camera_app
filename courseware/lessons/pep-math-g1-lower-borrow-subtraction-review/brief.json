@@ -1,0 +1,230 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "整理和复习｜20以内的退位减法",
+  "binding": {
+    "editionId": "pep-math-g1-lower-2022-standard",
+    "revisionId": "directory-6205d2037284e91f10b25edd",
+    "unitId": "2eeba665-272f-4a55-b064-2be484fc77e4",
+    "nodeId": "080af136-a527-42a5-8367-b6855c2b2935"
+  },
+  "authoredBy": "Codex /root/how_old",
+  "officialNotesSha256": "dba16169fa1409c9780e146ef7b6ccaf518f363cca525586aa34e591389c5381",
+  "scenario": "社区读书展办算式路标和书签补给，孩子沿规律找算式卡，再把题图的所求量送到正确位置。",
+  "goals": [
+    "能用破十、连减或想加算减说清同一道20以内退位减法，能用加法复原核对。",
+    "把20以内的退位减法按被减数和减数填入45格表，认出个位够减的式子不进退位表。",
+    "观察并解释同行、同列及斜向两数同增同减时的差，用一个已知式推算或比较另一个。",
+    "根据图片先分清总量、已知部分与所求部分，排除无关量，再用减法求未知量或补全同差算式。",
+    "能按顺序解决简单两步题，用三个数讲一个部分和整体的故事，并向家人说明做法。"
+  ],
+  "goalSources": [
+    {
+      "skill": "review-methods",
+      "target": "能用破十、连减或想加算减说清同一道20以内退位减法，能用加法复原核对。",
+      "source": "印20上半、课件3～6"
+    },
+    {
+      "skill": "complete-the-table",
+      "target": "把20以内的退位减法按被减数和减数填入45格表，认出个位够减的式子不进退位表。",
+      "source": "印20及任务单1"
+    },
+    {
+      "skill": "three-directions",
+      "target": "观察并解释同行、同列及斜向两数同增同减时的差，用一个已知式推算或比较另一个。",
+      "source": "印20及课件9～15"
+    },
+    {
+      "skill": "use-relevant-amounts",
+      "target": "根据图片先分清总量、已知部分与所求部分，排除无关量，再用减法求未知量或补全同差算式。",
+      "source": "印21第2～4、印22第5～6、教案3"
+    },
+    {
+      "skill": "transfer-and-explain",
+      "target": "能按顺序解决简单两步题，用三个数讲一个部分和整体的故事，并向家人说明做法。",
+      "source": "印22第7～9及成长档案"
+    }
+  ],
+  "pageSequence": [
+    {
+      "key": "review-at-the-exhibit",
+      "kind": "teaching",
+      "plan": "用新情境14减8辨认总数与已知部分，回忆已经学过的算法。"
+    },
+    {
+      "key": "three-ways-to-check",
+      "kind": "teaching",
+      "plan": "同一14减8的破十和连减明确不同拆法，再用8加6回原量。"
+    },
+    {
+      "key": "restore-to-check",
+      "kind": "teaching",
+      "plan": "让两部分在精确图上合回十四，解释想加算减。"
+    },
+    {
+      "key": "fill-the-table",
+      "kind": "teaching",
+      "plan": "完整45格一览，不依赖原书图；放大表边界，检验遗漏和排除不退位的式子。"
+    },
+    {
+      "key": "check-the-whole-table",
+      "kind": "teaching",
+      "plan": "补完空格，展示四十五格和末行边界，区分十九减九。"
+    },
+    {
+      "key": "read-row-and-column",
+      "kind": "teaching",
+      "plan": "用放大行列、箭头及实物单位解释固定哪个数。"
+    },
+    {
+      "key": "diagonal-keeps-the-difference",
+      "kind": "teaching",
+      "plan": "对齐斜向三格的余量，两种量各多一或各少一；补一张同差牌。"
+    },
+    {
+      "key": "hop-along-the-table",
+      "kind": "game",
+      "plan": "用实际走跳沿纵列、横行、斜线逐关落到满足规则的下一格。"
+    },
+    {
+      "key": "find-the-relevant-part",
+      "kind": "teaching",
+      "plan": "图示总量分成两部分，找出所求并排除无关数量。"
+    },
+    {
+      "key": "infer-a-missing-number",
+      "kind": "teaching",
+      "plan": "用同差或加减互逆补未知数，借原有量对比大小及找指定差的一对数。"
+    },
+    {
+      "key": "compare-differences",
+      "kind": "teaching",
+      "plan": "解释固定原数比较差；用对齐量条找一对差五的量。"
+    },
+    {
+      "key": "move-to-the-right-result",
+      "kind": "game",
+      "plan": "用真实推箱走位，按题图算出所求，推入对应数量的格子。"
+    },
+    {
+      "key": "two-steps-and-a-story",
+      "kind": "teaching",
+      "plan": "练两步运算、队伍中点名者包含在总数，任选三数组织原创故事。"
+    },
+    {
+      "key": "picture-check",
+      "kind": "quiz",
+      "plan": "六题使用独立案例，不复述授课或游戏实际练过的计算。"
+    },
+    {
+      "key": "growth-and-family",
+      "kind": "teaching",
+      "plan": "自己指表读一条规律并说缘由，用实体和家人摆一道未讲过的退位题。"
+    }
+  ],
+  "games": [
+    {
+      "page": "hop-along-the-table",
+      "template": "platformHop",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.platformHop",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "ordered_route",
+      "selection": "目标路径分别由同列固定减数、同行固定原数、同差斜线算法生成。只有实际按顺序落地才开下一平台，不能跳过正确站；无高亮或颜色预告答案。",
+      "levels": [
+        "固定减8，原数逐格大1。",
+        "固定原来15，减数逐格小1。",
+        "两数同加1，差保持9。"
+      ],
+      "demo": "教师指目标规律、第一正确平台和实际跳跃键，真跳一次后清空。",
+      "teacherAnchors": [
+        "route-direction",
+        "game-player",
+        "game-target",
+        "jump-to-card",
+        "landed-quantity"
+      ]
+    },
+    {
+      "page": "move-to-the-right-result",
+      "template": "sortingDepot",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.sortingDepot",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "classification",
+      "selection": "箱上是实际缺量、遮住未知数或同差题图，指定的求解结果是唯一组别。推错格拒绝。每关改变箱与结果的相对位置及目标值。",
+      "levels": [
+        "已知整体和部分，找到余量。",
+        "用逆运算求两个不同的未知数。",
+        "选择相关量、算两步结果与比较差，排到实际数量。"
+      ],
+      "demo": "教师指带图的箱、结果站及方向键，只推对一次后清零。",
+      "teacherAnchors": [
+        "large-task-card",
+        "first-answer-dock",
+        "push-down-to-result",
+        "parked-amount"
+      ]
+    }
+  ],
+  "quiz": [
+    {
+      "id": "only-borrowing",
+      "skill": "区分退位表范围",
+      "prompt": "一组十和散的四张。哪张卡要拆开一组十？",
+      "answer": "十四减六",
+      "position": 1,
+      "rationale": "散着的四张不够拿六张，需要从十里取。拿四张或两张，只用散的就够。"
+    },
+    {
+      "id": "down-a-column",
+      "skill": "同列减数不变",
+      "prompt": "减法表里，十六减八下边一格是哪张？",
+      "answer": "十七减八",
+      "position": 2,
+      "rationale": "同一列减数八不变，往下一格原数多一。十六变成十七。"
+    },
+    {
+      "id": "right-along-row",
+      "skill": "同行差变大",
+      "prompt": "从十六减九往右一格，余量怎样变？",
+      "answer": "余量多一",
+      "position": 3,
+      "rationale": "同行的原数十六不变。向右少减一个，余量就多一个。"
+    },
+    {
+      "id": "left-down-the-diagonal",
+      "skill": "同差斜线",
+      "prompt": "哪张卡和十一减五余得同样多？",
+      "answer": "十减四",
+      "position": 2,
+      "rationale": "原数和取走的数各少一个。十一减五和十减四都得六。"
+    },
+    {
+      "id": "ignore-unrelated",
+      "skill": "只找相关数量",
+      "prompt": "十七盆花，左边八盆。右边有几盆？",
+      "answer": "九盆花",
+      "position": 3,
+      "rationale": "要求右边的花，从十七盆里减左边八盆，余九盆。剪刀不是花盆。"
+    },
+    {
+      "id": "line-needs-the-middle",
+      "skill": "两步找队列的一部分",
+      "prompt": "队伍十六人。标记孩子左边七人，右边几人？",
+      "answer": "右边八人",
+      "position": 1,
+      "rationale": "左边七人，再加标记的这个孩子，一共八人。十六减八，右边八人。"
+    }
+  ],
+  "afterClass": {
+    "familyTask": "任选一道没示范的退位减法，摆两种方法并用加法核查；指表说一组规律，再选三个数向成人讲故事。",
+    "weeklyQuestionSource": [
+      "判断退位范围",
+      "表的三方向",
+      "同差缺数与比较",
+      "相关量和两步"
+    ],
+    "evidence": "数字课记录选择、走跳和归类。实物摆放与家庭口述待观察。"
+  },
+  "artAndLanguage": "算式表、数字、数量、关系路径均由代码精确生成。内置 imagegen 用于原创场景和独立实物，数量仅代码排。行列斜使用方向和分组，不只靠颜色。"
+}

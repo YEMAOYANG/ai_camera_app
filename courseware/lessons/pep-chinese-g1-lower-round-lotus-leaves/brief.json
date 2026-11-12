@@ -1,0 +1,165 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "荷叶圆圆",
+  "binding": {
+    "editionId": "pep-chinese-g1-lower-2022-standard",
+    "revisionId": "directory-b30168cf88d5ee5709335698",
+    "unitId": "2a9f8ec3-0486-4664-9478-9ace5cebb956",
+    "nodeId": "7d621557-8548-4052-8179-a408130e01ee"
+  },
+  "goals": [
+    "在荷塘画面和词语中认读珠、摇、篮、亮、晶、停、坪、展、透、翅、膀、朵，能用生活例子或动作说出摇篮、停机坪、亮晶晶、展开、透明和一朵朵的大意。",
+    "根据小水珠、蜻蜓、青蛙和小鱼在叶上或叶下做的事，解释它们为什么把荷叶想成摇篮、停机坪、歌台和凉伞。",
+    "观察机、台、伞、唱、朵、美的结构和田字格占位，认识朵字第二笔横折弯，回到纸上写。",
+    "能用两个合适的叠词描述一件生活物品；看图理清角色先说什么、接着做什么，在纸书练有感情的朗读和背诵。"
+  ],
+  "scenario": "池边有一场荷塘声音展。小小布展员用同一片荷叶的不同想象搭四张展签，再听动作给画面配音。",
+  "pageSequence": [
+    {
+      "key": "pond-open",
+      "plan": "先看一片荷叶的轮廓和颜色，听说两个特点。"
+    },
+    {
+      "key": "drop-on-the-leaf",
+      "plan": "看小水珠躺与亮晶晶，理解摇篮，认珠摇篮亮晶。"
+    },
+    {
+      "key": "dragonfly-lands",
+      "plan": "看蜻蜓立、展开及透明的意思，认停坪展透翅膀。"
+    },
+    {
+      "key": "frog-and-fish",
+      "plan": "比较蹲唱在上、游在下，理解歌台凉伞和一朵朵。"
+    },
+    {
+      "key": "role-depot",
+      "plan": "实时搬运，把角色牌与想象物件对应。"
+    },
+    {
+      "key": "first-writing",
+      "plan": "机台伞的结构、中心位置，转入纸写。"
+    },
+    {
+      "key": "motion-meaning",
+      "plan": "用原创动作帮助理解展开、蹲、躺和叶下游，示范一句的意思停顿。"
+    },
+    {
+      "key": "pond-marbles",
+      "plan": "听动作找对应画面，移动、瞄准和发射，第一错只提示。"
+    },
+    {
+      "key": "second-writing",
+      "plan": "朵字横折弯，辨无钩；美唱结构和占位。"
+    },
+    {
+      "key": "two-descriptions",
+      "plan": "用熟悉物品示范两个叠词各说一个特点。"
+    },
+    {
+      "key": "paper-reading",
+      "plan": "用角色、想象与动作图做提示，回纸书朗读背诵。"
+    },
+    {
+      "key": "picture-check",
+      "plan": "原创动作用途、透明、叶上叶下、横折弯及描述图题。"
+    },
+    {
+      "key": "closing",
+      "plan": "回顾角色与称呼、字形、两个特点和亲子读书。"
+    }
+  ],
+  "games": [
+    {
+      "page": "role-depot",
+      "template": "sortingDepot",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.sortingDepot",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "classification",
+      "selection": "推着不同角色牌找故事想象里的物件。托盘显示原创新摇篮、停机坪、歌台或凉伞，不复用角色图片。",
+      "levels": [
+        "两角色，两处开阔位置。",
+        "三角色，交换托盘位置并绕柱。",
+        "四角色、不同托盘，需规划留空。"
+      ],
+      "demo": "先亮角色，再亮对应物件和推车，送一张即停；移交恢复首关。"
+    },
+    {
+      "page": "pond-marbles",
+      "template": "magnetMarbles",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.magnetMarbles",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "listen_match",
+      "selection": "动作录音指定哪种身体姿势或叶上叶下，转向弹珠命中图卡。靶上只有有意义的图片，默认不显示答案。",
+      "levels": [
+        "三幅姿势图听两次，移动慢，图相距远。",
+        "三图相邻，增加停立展翅。",
+        "听三条不同动作，四图漂得更快。"
+      ],
+      "demo": "先听动作，亮与句子相符的示范图和发射口，命中一次后恢复首关。"
+    }
+  ],
+  "quizPlan": [
+    {
+      "skill": "story-relation",
+      "prompt": "要表演小水珠。哪件道具能表现它把荷叶当成的东西？",
+      "answer": "摇篮",
+      "position": 2,
+      "rationale": "小水珠在叶子上躺着，想到的是能躺下休息的摇篮。"
+    },
+    {
+      "skill": "story-relation",
+      "prompt": "哪张图能表现蜻蜓想象的地方？",
+      "answer": "让飞机停的地方",
+      "position": 3,
+      "rationale": "蜻蜓站在叶上展开翅膀，想象荷叶像让飞机停下来的停机坪。"
+    },
+    {
+      "skill": "above-and-below",
+      "prompt": "哪张图贴出了小鱼在故事里的位置？",
+      "answer": "小鱼在叶下",
+      "position": 1,
+      "rationale": "小鱼在叶子的下边游。叶在上，小鱼在下，像有一把伞。"
+    },
+    {
+      "skill": "word-in-context",
+      "prompt": "透过哪张小窗，还能看清后面的叶子？",
+      "answer": "透明小窗",
+      "position": 2,
+      "rationale": "中间的小窗挡着叶子时，叶子的形状仍能看见，这个窗面是透明的。"
+    },
+    {
+      "skill": "two-descriptions",
+      "prompt": "展览要一件圆圆的、紫紫的道具。哪张图合适？",
+      "answer": "紫球",
+      "position": 3,
+      "rationale": "圆圆的说外形，紫紫的说颜色。紫球同时有这两个特点。"
+    },
+    {
+      "skill": "stroke",
+      "prompt": "看三张笔画图。哪张画的是朵字的第二笔？",
+      "answer": "横折弯",
+      "position": 1,
+      "rationale": "这一笔叫横折弯，短横后向下折，再向右圆弯，末尾没有钩。"
+    },
+    {
+      "skill": "ordered-actions",
+      "prompt": "按课文里的先后给小青蛙排动作。哪张排对了？",
+      "answer": "先蹲再唱",
+      "position": 2,
+      "rationale": "先把腿弯下去蹲稳，再张嘴唱。声音说的先后，要和图对起来。"
+    }
+  ],
+  "afterClass": {
+    "familyTask": "打开纸书看角色图，先读再用四张图提示背诵。各选一个物品说两个特点，再写机台伞唱朵美请大人看。",
+    "weeklyQuestionSource": [
+      "四角色、动作与想象物件",
+      "词语语境与两个特点",
+      "叶上叶下",
+      "朵的横折弯及其他字的结构"
+    ],
+    "evidence": "图题和操作为线上证据；纸笔、实际朗读、背诵和口头描述待观察。"
+  },
+  "artAndReading": "使用本课内置 ImageGen 插画和原创精确田字格。遮掉无关文字后仍能看图、听题并完成首个动作。"
+}

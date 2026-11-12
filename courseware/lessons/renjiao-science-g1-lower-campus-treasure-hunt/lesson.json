@@ -1,0 +1,974 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "校园“寻宝”",
+  "grade": 1,
+  "description": "在原创校园模型里读线索、画路线、开车按次序找地标，再比较同一门口的两种照片。",
+  "roster": {
+    "teacher": {
+      "name": "小科老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Serena",
+      "avatar": "/avatars/teacher-2.png",
+      "color": "#287B94",
+      "persona": "鼓励孩子先读再画，给出清楚可验证的线索。"
+    }
+  },
+  "images": {
+    "ambiguous-faces": {
+      "file": "assets/ambiguous-faces.png"
+    },
+    "blue-book": {
+      "file": "assets/blue-book.png"
+    },
+    "blue-bucket": {
+      "file": "assets/blue-bucket.png"
+    },
+    "camera-background": {
+      "file": "assets/camera-background.png"
+    },
+    "campus-camera": {
+      "file": "assets/campus-camera.png"
+    },
+    "campus-opening": {
+      "file": "assets/campus-opening.png"
+    },
+    "checkpoint-front-music": {
+      "file": "assets/checkpoint-front-music.png"
+    },
+    "checkpoint-front-reading": {
+      "file": "assets/checkpoint-front-reading.png"
+    },
+    "checkpoint-front-studio": {
+      "file": "assets/checkpoint-front-studio.png"
+    },
+    "checkpoint-top-music": {
+      "file": "assets/checkpoint-top-music.png"
+    },
+    "checkpoint-top-reading": {
+      "file": "assets/checkpoint-top-reading.png"
+    },
+    "checkpoint-top-studio": {
+      "file": "assets/checkpoint-top-studio.png"
+    },
+    "clue-sequence": {
+      "file": "assets/clue-sequence.png"
+    },
+    "direction-tools": {
+      "file": "assets/direction-tools.png"
+    },
+    "door-camera-cover": {
+      "file": "assets/door-camera-cover.png"
+    },
+    "family-map": {
+      "file": "assets/family-map.png"
+    },
+    "maze-background": {
+      "file": "assets/maze-background.png"
+    },
+    "maze-compass": {
+      "file": "assets/maze-compass.png"
+    },
+    "natural-clues": {
+      "file": "assets/natural-clues.png"
+    },
+    "notice-board": {
+      "file": "assets/notice-board.png"
+    },
+    "ochre-bench": {
+      "file": "assets/ochre-bench.png"
+    },
+    "plum-drum": {
+      "file": "assets/plum-drum.png"
+    },
+    "pot-plant": {
+      "file": "assets/pot-plant.png"
+    },
+    "q1-a": {
+      "file": "assets/q1-a.png"
+    },
+    "q1-b": {
+      "file": "assets/q1-b.png"
+    },
+    "q1-c": {
+      "file": "assets/q1-c.png"
+    },
+    "q2-a": {
+      "file": "assets/q2-a.png"
+    },
+    "q2-b": {
+      "file": "assets/q2-b.png"
+    },
+    "q2-c": {
+      "file": "assets/q2-c.png"
+    },
+    "q2-stimulus": {
+      "file": "assets/q2-stimulus.png"
+    },
+    "q3-a": {
+      "file": "assets/q3-a.png"
+    },
+    "q3-b": {
+      "file": "assets/q3-b.png"
+    },
+    "q3-c": {
+      "file": "assets/q3-c.png"
+    },
+    "q3-stimulus": {
+      "file": "assets/q3-stimulus.png"
+    },
+    "q4-a": {
+      "file": "assets/q4-a.png"
+    },
+    "q4-b": {
+      "file": "assets/q4-b.png"
+    },
+    "q4-c": {
+      "file": "assets/q4-c.png"
+    },
+    "q5-a": {
+      "file": "assets/q5-a.png"
+    },
+    "q5-b": {
+      "file": "assets/q5-b.png"
+    },
+    "q5-c": {
+      "file": "assets/q5-c.png"
+    },
+    "q6-a": {
+      "file": "assets/q6-a.png"
+    },
+    "q6-b": {
+      "file": "assets/q6-b.png"
+    },
+    "q6-c": {
+      "file": "assets/q6-c.png"
+    },
+    "scout-idle": {
+      "file": "assets/scout-idle.png"
+    },
+    "scout-move": {
+      "file": "assets/scout-move.png"
+    },
+    "teaching-map": {
+      "file": "assets/teaching-map.png"
+    },
+    "treasure-tin": {
+      "file": "assets/treasure-tin.png"
+    },
+    "wind-chime": {
+      "file": "assets/wind-chime.png"
+    },
+    "wood-palette": {
+      "file": "assets/wood-palette.png"
+    },
+    "wrong-map": {
+      "file": "assets/wrong-map.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "one-clue-two-possibilities",
+      "title": "哪句话能找到同一处",
+      "type": "slide",
+      "template": "two-columns",
+      "data": {
+        "title": "哪句话能找到同一处",
+        "left": {
+          "heading": "北楼要寻宝",
+          "body": "校园模型"
+        },
+        "right": {
+          "heading": "两个人听到同一句话",
+          "body": "宝盒在你前面"
+        },
+        "left_picture": "campus-opening",
+        "right_picture": "ambiguous-faces"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "北楼藏了一只小铜盒。我们来当寻宝队，先读清线索再走。"
+        },
+        {
+          "say": "小队一起走。路上慢一点，不追跑，也不进没开放的门。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "有人只说宝盒在你前面。请指指绿帽的前面，再指黄帽的前面。"
+        },
+        {
+          "say": "绿帽朝书那边，黄帽朝鼓那边。他们从不同地方、朝不同方向看。"
+        },
+        {
+          "say": "想让两个人找同一处，就要说清从哪儿出发，脸朝哪儿。"
+        },
+        {
+          "say": "再补上走到哪件物品旁。同伴找到那个地标，就知道该停了。"
+        }
+      ]
+    },
+    {
+      "key": "mark-the-route-first",
+      "title": "听一段，画一段",
+      "type": "slide",
+      "template": "picture-points",
+      "data": {
+        "title": "听一段，画一段",
+        "picture": "clue-sequence",
+        "points": [
+          "圈起点",
+          "定方向和格数",
+          "标转弯和目标"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "打开寻宝卡。先用手指找四个小图，它们按先后排好了。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "第一张是花盆。出发点在花盆这一格，先用圈记下来。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "方向标上东朝右。从起点往东走三格，一格只算一步。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "走三格到长凳。把长凳当作第二段的起点，再朝北去绘本门。"
+        },
+        {
+          "say": "每段画个箭头。箭尾写在哪里出发，箭头指向这一段到的地方。"
+        },
+        {
+          "say": "停一停，重听口令。看看上一个对的地标。"
+        },
+        {
+          "say": "从上一个对的地标，重新找方向和下一站。"
+        }
+      ]
+    },
+    {
+      "key": "check-the-drawn-map",
+      "title": "手指先走，再出发",
+      "type": "slide",
+      "template": "picture-points",
+      "data": {
+        "title": "手指先走，再出发",
+        "picture": "teaching-map",
+        "points": [
+          "从花盆那格开始",
+          "到长凳停一下",
+          "向北两格到绘本门"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "路线画好了。脚还不用动，先用手指沿着图上的路走。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "找到花盆那一格。手指压在出发点上，从这里开始数。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "朝东就是图上的右边。一、二、三，第三格是长凳。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "在长凳停一下。下一段从长凳向北，数两格就到绘本门。"
+        },
+        {
+          "say": "记住，换一段就换一个出发点。要看清是从哪里开始数。"
+        },
+        {
+          "say": "从花盆旁出发，向东四格到蓝桶。"
+        },
+        {
+          "say": "从蓝桶向北两格，到鼓牌那里。"
+        },
+        {
+          "say": "从鼓牌向东两格，到小旗出口。"
+        },
+        {
+          "say": "从绘本标记向西四格，到长凳。"
+        },
+        {
+          "say": "刚才朝西。从长凳向右转，朝北四格到风铃。"
+        },
+        {
+          "say": "从风铃向东四格，到小旗出口。"
+        },
+        {
+          "say": "从长凳标记向东五格，到调色板。"
+        },
+        {
+          "say": "从调色板向北三格，到铜盒。"
+        },
+        {
+          "say": "从铜盒向西四格，到公告牌。"
+        },
+        {
+          "say": "从公告牌向南两格，到小旗出口。"
+        }
+      ]
+    },
+    {
+      "key": "draw-then-drive",
+      "title": "按寻宝卡走到下一站",
+      "type": "interactive",
+      "page": "draw-then-drive",
+      "widgetType": "game",
+      "startImage": "teaching-map",
+      "script": [
+        {
+          "say": "刚才先画了路线。现在给新线索开车，每段都要停在对的地标。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#hunt-compass"
+        },
+        {
+          "say": "看方向标。东向右，北向上。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "小车在花盆的标记旁，第一段从这里出发。"
+        },
+        {
+          "highlight": "#game-target"
+        },
+        {
+          "say": "蓝桶在东边四格。我要用向右的箭头，数着格子去蓝桶。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "第一站到了。下一段从蓝桶重新找起点和方向。"
+        },
+        {
+          "say": "轮到你啦。每到一站听清下一段，左下角的喇叭可以重听。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "hunt-hint": "mark-the-route-first-10",
+        "hunt-help": "mark-the-route-first-11",
+        "hunt-plant-to-bucket": "check-the-drawn-map-10",
+        "hunt-bucket-to-drum": "check-the-drawn-map-11",
+        "hunt-drum-exit": "check-the-drawn-map-12",
+        "hunt-book-to-bench": "check-the-drawn-map-13",
+        "hunt-turn-right-chime": "check-the-drawn-map-14",
+        "hunt-chime-exit": "check-the-drawn-map-15",
+        "hunt-bench-to-palette": "check-the-drawn-map-16",
+        "hunt-palette-to-tin": "check-the-drawn-map-17",
+        "hunt-tin-to-board": "check-the-drawn-map-18",
+        "hunt-board-exit": "check-the-drawn-map-19",
+        "hunt-praise": "retrace-and-fix-1"
+      }
+    },
+    {
+      "key": "retrace-and-fix",
+      "title": "走错了，从哪里查",
+      "type": "slide",
+      "template": "two-columns",
+      "data": {
+        "title": "走错了，从哪里查",
+        "left": {
+          "heading": "第一队走到蓝桶",
+          "body": "第二段走偏了"
+        },
+        "right": {
+          "heading": "第二队到绘本门",
+          "body": "回到长凳重新指北"
+        },
+        "left_picture": "wrong-map",
+        "right_picture": "teaching-map"
+      },
+      "script": [
+        {
+          "say": "顺序和地标都核对过了。你走完了这条寻宝路。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "第一队没找到绘本门。别忙着从头跑，先找最后一个对的地方。"
+        },
+        {
+          "say": "他们从花盆向东到了长凳。这一段对，两张图的箭头一样。"
+        },
+        {
+          "say": "再用手指追第二个箭头。它往下到蓝桶，走成了向南。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "回到长凳，找地图方向标。北朝上，绘本门就在长凳的北边。"
+        },
+        {
+          "say": "口令如果只说向右转，还得说明刚才面对哪边。"
+        },
+        {
+          "say": "可以改成从长凳朝北走两格。再找绘本图样核对到了没有。"
+        },
+        {
+          "say": "请从上面拍，认清门在走廊哪一段。"
+        },
+        {
+          "say": "请从走廊这一侧拍，认清门牌和旁边的东西。"
+        },
+        {
+          "say": "对照上面的小图，拍下同一扇门的一种看法。"
+        },
+        {
+          "say": "先把完整的门口画面移到虚线框里。"
+        },
+        {
+          "say": "等画面和上面的小图是同一个角度，再拍。"
+        }
+      ]
+    },
+    {
+      "key": "verify-the-door",
+      "title": "在同一扇门前拍两张照",
+      "type": "interactive",
+      "page": "verify-the-door",
+      "widgetType": "game",
+      "startImage": "door-camera-cover",
+      "script": [
+        {
+          "say": "我们已经走到了门口。来拍两张，核对地图上的门和眼前的门。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#door-preview"
+        },
+        {
+          "say": "先看上面的小图。第一张从上面拍，能看出门在走廊哪一段。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "我按箭头移虚线框，让整个门口画面进来。"
+        },
+        {
+          "highlight": "#game-target"
+        },
+        {
+          "say": "画面和小图一样，我才按右下角圆圆的快门。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "下边留下一张照片。下一张从走廊这一侧拍，要等画面换过来。"
+        },
+        {
+          "say": "轮到你啦。比两张照片里的门牌和旁边的地标。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "observationCard": {
+        "title": "同一扇门的两种看法",
+        "familyTask": "和家人选安全开放的地方，先画两段简短路线。到一个地标先停下，比对纸图和眼前的门或物件，再用自己的话给家人指路。实地观察后再记录，不必拍摄上传。",
+        "levels": [
+          {
+            "label": "绘本门",
+            "trials": [
+              {
+                "id": "one-door-two-views",
+                "label": "绘本门的地图与走廊样子",
+                "top": {
+                  "checkpoint-top-reading": {
+                    "label": "从上面看，绘本门在西侧",
+                    "image": "checkpoint-top-reading"
+                  }
+                },
+                "side": {
+                  "checkpoint-front-reading": {
+                    "label": "从走廊正面看，蓝书牌在绿门上，门旁有长凳",
+                    "image": "checkpoint-front-reading"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "label": "小鼓门",
+            "trials": [
+              {
+                "id": "one-door-two-views",
+                "label": "小鼓门的地图与走廊样子",
+                "top": {
+                  "checkpoint-top-music": {
+                    "label": "从上面看，小鼓门在中间",
+                    "image": "checkpoint-top-music"
+                  }
+                },
+                "side": {
+                  "checkpoint-front-music": {
+                    "label": "从走廊正面看，鼓牌在金色门上，门旁有盆栽",
+                    "image": "checkpoint-front-music"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "label": "画室门",
+            "trials": [
+              {
+                "id": "one-door-two-views",
+                "label": "画室门的地图与走廊样子",
+                "top": {
+                  "checkpoint-top-studio": {
+                    "label": "从上面看，画室门在东侧",
+                    "image": "checkpoint-top-studio"
+                  }
+                },
+                "side": {
+                  "checkpoint-front-studio": {
+                    "label": "从走廊正面看，调色板在红门上，门旁有公告板",
+                    "image": "checkpoint-front-studio"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gameAudio": {
+        "door-top": "retrace-and-fix-10",
+        "door-front": "retrace-and-fix-11",
+        "door-goal": "retrace-and-fix-12",
+        "door-hint": "retrace-and-fix-13",
+        "door-help": "retrace-and-fix-14",
+        "door-praise": "compare-checkpoint-1"
+      }
+    },
+    {
+      "key": "compare-checkpoint",
+      "title": "这两张是不是同一扇门",
+      "type": "slide",
+      "template": "two-columns",
+      "data": {
+        "title": "这两张是不是同一扇门",
+        "left": {
+          "heading": "从上面看",
+          "body": "门在走廊中间"
+        },
+        "right": {
+          "heading": "从走廊看",
+          "body": "同一面鼓牌"
+        },
+        "left_picture": "checkpoint-top-music",
+        "right_picture": "checkpoint-front-music"
+      },
+      "script": [
+        {
+          "say": "两种看法都拍到了。找出两张照片里一样的地标。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "这张从上面看。小鼓牌在三个门位的中间。"
+        },
+        {
+          "say": "找门旁的盆栽。地图给了我们相对位置。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "站在走廊看，还是金色门上方的鼓牌，旁边还是那盆绿植。"
+        },
+        {
+          "say": "如果看到书牌，就知道走错门了。回到最近的地标再核对。"
+        },
+        {
+          "say": "我们找的不光是一个颜色。门牌和旁边的地标都要对上。"
+        }
+      ]
+    },
+    {
+      "key": "five-direction-clues",
+      "title": "遇到不确定的线索",
+      "type": "slide",
+      "template": "two-columns",
+      "data": {
+        "title": "遇到不确定的线索",
+        "left": {
+          "heading": "现场会看到",
+          "body": "苔藓、花盘和积雪"
+        },
+        "right": {
+          "heading": "再拿工具核对",
+          "body": "方向图和指南针"
+        },
+        "left_picture": "natural-clues",
+        "right_picture": "direction-tools"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "树皮上的苔藓长在哪一面，和潮湿、遮阴都有关系。"
+        },
+        {
+          "say": "成熟向日葵的花盘常朝东。两边坡面的雪也可能融得不一样快。"
+        },
+        {
+          "say": "看到这些，可以记下来。先别只凭这一样东西定方向。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "找写清方向的路牌，或者对照方向图和指南针。"
+        },
+        {
+          "say": "先认出指南针上指北的一端，再和图上的北对起来。"
+        },
+        {
+          "say": "也可以请大人用一个确定的地标核对。走在安全的路上。"
+        }
+      ]
+    },
+    {
+      "key": "picture-quiz",
+      "type": "quiz",
+      "title": "六张新寻宝卡",
+      "intro": [
+        "听清提示。先找起点和地标，再选能说明走法的图。"
+      ],
+      "questions": [
+        {
+          "id": "correct-start",
+          "skill": "hunt-start-and-heading",
+          "question": "从公告牌下面一格出发，面朝西。哪张图对？",
+          "answer": [
+            "B"
+          ],
+          "analysis": "先找公告牌下面一格。北朝上，西在图的左边，所以人偶箭头朝左。",
+          "options": {
+            "A": {
+              "label": "在公告牌下面，箭头向东",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-a",
+                "alt": "在公告牌下面，箭头向东"
+              }
+            },
+            "B": {
+              "label": "在公告牌下面，箭头向西",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-b",
+                "alt": "在公告牌下面，箭头向西"
+              }
+            },
+            "C": {
+              "label": "在花盆下面，箭头向西",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-c",
+                "alt": "在花盆下面，箭头向西"
+              }
+            }
+          }
+        },
+        {
+          "id": "first-turn",
+          "skill": "hunt-route-order",
+          "question": "从红旗向北到风铃，再向东到公告牌。选对的路线。",
+          "answer": [
+            "A"
+          ],
+          "analysis": "先从红旗向上到风铃，再从风铃向右到公告牌。两段的起点不同。",
+          "options": {
+            "A": {
+              "label": "向上到风铃，再右转到公告牌",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-a",
+                "alt": "向上到风铃，再右转到公告牌"
+              }
+            },
+            "B": {
+              "label": "向右到鼓牌，再向上到公告牌",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-b",
+                "alt": "向右到鼓牌，再向上到公告牌"
+              }
+            },
+            "C": {
+              "label": "向上到风铃，再往西",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-c",
+                "alt": "向上到风铃，再往西"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "q2-stimulus",
+            "alt": "红旗在左下，风铃在旗北，公告牌在风铃东面，鼓牌在旗右边"
+          }
+        },
+        {
+          "id": "right-while-facing-west",
+          "skill": "hunt-body-right",
+          "question": "黄帽面朝西。哪个标记在他右手方向？",
+          "answer": [
+            "C"
+          ],
+          "analysis": "面朝西时，身子的右手方向是北。方向标的北朝上，调色板在那边。",
+          "options": {
+            "A": {
+              "label": "蓝水桶",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-a",
+                "alt": "蓝水桶"
+              }
+            },
+            "B": {
+              "label": "铜风铃",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-b",
+                "alt": "铜风铃"
+              }
+            },
+            "C": {
+              "label": "木调色板",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-c",
+                "alt": "木调色板"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "q3-stimulus",
+            "alt": "黄帽箭头朝图左，蓝桶在他左方，风铃在他右方，调色板在他上方"
+          }
+        },
+        {
+          "id": "fix-one-clue",
+          "skill": "hunt-restore-missing-information",
+          "question": "哪张提示图把出发点和身体朝向都说清了？",
+          "answer": [
+            "B"
+          ],
+          "analysis": "先给出圆点标的出发处，再用人偶的箭头指明要朝哪里。",
+          "options": {
+            "A": {
+              "label": "有一个起点圆点，没有箭头",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-a",
+                "alt": "有一个起点圆点，没有箭头"
+              }
+            },
+            "B": {
+              "label": "绿帽在有起点记号的垫子上，箭头指北",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-b",
+                "alt": "绿帽在有起点记号的垫子上，箭头指北"
+              }
+            },
+            "C": {
+              "label": "两个人面向相反，没有起点标记",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-c",
+                "alt": "两个人面向相反，没有起点标记"
+              }
+            }
+          }
+        },
+        {
+          "id": "beside-a-landmark",
+          "skill": "hunt-landmark-check",
+          "question": "铜盒在垫子靠花盆的一边。哪张图对？",
+          "answer": [
+            "C"
+          ],
+          "analysis": "先找共同参照花盆。铜盒在垫子上离花盆最近的一边。",
+          "options": {
+            "A": {
+              "label": "铜盒在垫子的左边",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-a",
+                "alt": "铜盒在垫子的左边"
+              }
+            },
+            "B": {
+              "label": "铜盒在垫子上边的中间",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-b",
+                "alt": "铜盒在垫子上边的中间"
+              }
+            },
+            "C": {
+              "label": "铜盒在垫子靠近右边花盆的一侧",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-c",
+                "alt": "铜盒在垫子靠近右边花盆的一侧"
+              }
+            }
+          }
+        },
+        {
+          "id": "check-nature-clue",
+          "skill": "hunt-reliable-direction-check",
+          "question": "看到树上有苔藓。哪组工具能用来核对方向？",
+          "answer": [
+            "A"
+          ],
+          "analysis": "先认指南针标出的北，再和方向图核对。苔藓和雪痕只能提供线索。",
+          "options": {
+            "A": {
+              "label": "指南针与有方向标的折叠地图",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-a",
+                "alt": "指南针与有方向标的折叠地图"
+              }
+            },
+            "B": {
+              "label": "一片长苔藓的树皮",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-b",
+                "alt": "一片长苔藓的树皮"
+              }
+            },
+            "C": {
+              "label": "两边雪量不同的坡面",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-c",
+                "alt": "两边雪量不同的坡面"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "make-your-own-clue",
+      "title": "换你给家人一条线索",
+      "type": "slide",
+      "template": "picture-points",
+      "data": {
+        "title": "换你给家人一条线索",
+        "picture": "family-map",
+        "points": [
+          "写清出发点",
+          "分段说方向",
+          "用地标核对"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "今天我们先读、先画，再照路线慢慢找。走错了就回去核对。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "和家人一起选安全的地方。先定个看得见的出发标记。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "画两段路。每段说从哪里开始，朝哪边，到哪件东西旁停。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "到了终点，用门牌或旁边的物品核对。找到后，把走法说一遍。"
+        },
+        {
+          "say": "如果家人走错了，看看有没有漏说起点、面向或转弯的地方。"
+        },
+        {
+          "say": "家里的路线要真正走过才记下来。今天先和小科老师说再见。"
+        }
+      ]
+    }
+  ]
+}

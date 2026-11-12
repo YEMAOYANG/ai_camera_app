@@ -1,0 +1,91 @@
+{
+  "schemaVersion": "mira.courseware.imagegen-plan.v1",
+  "mode": "builtin_native_imagegen",
+  "state": "realized_single_native_plate",
+  "plates": [
+    {
+      "id": "flag-workshop-landscapes",
+      "transparent": false,
+      "prompt": "Four even crop-ready quadrants, one independent 3:2 scene each. School fair flag-craft workshop in a Chinese primary school. Matte gouache, pine green, warm cream paper grain, apricot and persimmon highlights, clean cut-paper silhouettes. No lettering, numerals or count-critical decorations. Top left: two Chinese first-grade children at a wooden assembly counter and fabric rolls in a light class workshop, clear focal point. Top right: calm display room and empty side shelves, neutral center and floor for sliding arithmetic. Bottom left: sunlit empty open workshop floor for a marble stage, quiet background and room for overlay. Bottom right: child telling a parent how to pack paper at home with a warm window. No borders or panel labels."
+    },
+    {
+      "id": "flag-workshop-sprites",
+      "transparent": true,
+      "prompt": "Strictly equal three columns by two rows on transparent canvas, asset centered in 55 percent of each tile with generous clear margins. Matte gouache and paper-cut edge, warm apricot, persimmon orange, deep pine. Top left: tiny woodland chipmunk mascot standing still, looking toward the right. Top center: same mascot hops happily, preserve scale. Top right: a clear warm amber glass marble. Bottom left: single star-shaped ribbon completion sticker. Bottom center: single green ticket-shaped completion sticker with tiny sprout pictogram. Bottom right empty. No background, text, numbers, floor or shadows."
+    }
+  ],
+  "plannedAssets": {
+    "cover-workshop": {
+      "file": "assets/cover-workshop.png",
+      "plate": "flag-workshop-landscapes",
+      "cell": "top-left"
+    },
+    "slide-backdrop": {
+      "file": "assets/slide-backdrop.png",
+      "plate": "flag-workshop-landscapes",
+      "cell": "top-right"
+    },
+    "aim-backdrop": {
+      "file": "assets/aim-backdrop.png",
+      "plate": "flag-workshop-landscapes",
+      "cell": "bottom-left"
+    },
+    "family-workshop": {
+      "file": "assets/family-workshop.png",
+      "plate": "flag-workshop-landscapes",
+      "cell": "bottom-right"
+    },
+    "chipmunk-ready": {
+      "file": "assets/chipmunk-ready.png",
+      "plate": "flag-workshop-sprites",
+      "cell": "top-left"
+    },
+    "chipmunk-hop": {
+      "file": "assets/chipmunk-hop.png",
+      "plate": "flag-workshop-sprites",
+      "cell": "top-center"
+    },
+    "amber-marble": {
+      "file": "assets/amber-marble.png",
+      "plate": "flag-workshop-sprites",
+      "cell": "top-right"
+    },
+    "rosette-sticker": {
+      "file": "assets/rosette-sticker.png",
+      "plate": "flag-workshop-sprites",
+      "cell": "bottom-left"
+    },
+    "delivery-sticker": {
+      "file": "assets/delivery-sticker.png",
+      "plate": "flag-workshop-sprites",
+      "cell": "bottom-center"
+    }
+  },
+  "actualPlate": {
+    "file": "art-source/flag-workshop-combined.png",
+    "sha256": "f9d4bcdd4fb17b906caeea4a494b1724532ce99a518c98f58cb22d7cd357ecde",
+    "generator": "Codex built-in image_gen",
+    "prompt": "Create one crop-ready 3 by 3 atlas of nine original game and lesson art assets for a Chinese primary-school paper pennant workshop. The atlas should be a landscape 1536×1024 composition with strictly equal thirds horizontally and vertically. Put each asset fully within its cell, with a clear minimum 18 px gutter on all sides. True transparent alpha between assets, around the sprites, and outside the four rectangular scenes. No visible checkerboard, background montage, labels, words, digits, logos, or borders around the atlas.\n\nArt direction across all nine: fine warm paper grain, matte gouache colors, clean layered cut-paper edges, deep pine green and warm cream, apricot and persimmon accents. Calm, clear silhouettes for first graders and very small displays. Keep the first four pictures exactly straight-edged 16:9 landscapes with no slant, independent and centered in their cells. Real counting material is added separately as exact diagrams. Do not put groups of countable pennants, marbles or tokens in any scene.\n\nRow 1 column 1: story illustration. Two Chinese first-grade children in a school fair paper-pennant workshop, a girl with a black bob and persimmon sweater and a boy with short dark hair and a pine-green top. They are working together around a low wooden workbench with big plain apricot and cream paper rolls and a nearly empty tray. Calm cheerful expressions; clean crop. No words.\nRow 1 column 2: warm workshop for sliding cards, front-on at child height. Paper shelves and a storage bench only at far edges, center and floor wide open, pale apricot plaster wall, calm well-lit central space for a grid. No people or loose objects.\nRow 1 column 3: sunlit open workshop floor for an aiming game, distinct from the sliding scene. Deep pine lower walls, warm cream high wall, one very subtle angled shaft of golden window light from far right, shelves limited to edges, empty center and floor. No people, no targets or marbles.\nRow 2 column 1: story illustration. The same black-bob girl with persimmon sweater shows her smiling parent a plain paper roll and shallow empty tray at home near a softly lit window. Simple table, warm cream daylight, clearly different scene from the school workshop.\nRow 2 column 2: isolated small woodland chipmunk mascot, facing right in a calm standing-ready pose, whole paws and striped curled tail fully visible, warm rust brown with cream cheeks, small pine-green apron, clean transparent edge and no shadow.\nRow 2 column 3: the identical right-facing chipmunk in a low happy hop, same shape, stripes, apron and visual scale, all paws and tail fully visible, transparent edge, no shadow.\nRow 3 column 1: single amber glass marble with one warm clear glossy highlight and an apricot swirl, clearly round, cutout on transparent alpha.\nRow 3 column 2: single orange star-shaped paper prize rosette with a warm cream center and two small folded ribbons, no words.\nRow 3 column 3: single green ticket-shaped paper prize sticker with scalloped corners and one small pale apricot sprout pictogram, no words or digits.",
+    "promptSha256": "d2961a4796eb38aa40546c0b6d39275b0e63d237230cd6b30eff0c9a403b8ddf",
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "requestedTransparent": true,
+    "assets": [
+      "cover-workshop",
+      "slide-backdrop",
+      "aim-backdrop",
+      "family-workshop",
+      "chipmunk-ready",
+      "chipmunk-hop",
+      "amber-marble",
+      "rosette-sticker",
+      "delivery-sticker"
+    ],
+    "recordedAt": "2026-11-11T06:36:54.379590+08:00",
+    "officialReferencesAttached": false,
+    "nativeGeneratedPath": "/Users/sqcopenclaw/.codex/generated_images/01a1c77a-d547-72b1-a262-029c7f4a40e5/exec-45b183cf-455f-4049-809a-8f6a83196302.png",
+    "receipts": "asset-sources.json"
+  }
+}

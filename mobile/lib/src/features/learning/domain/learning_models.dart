@@ -566,6 +566,82 @@ class LearningAnswerResult {
   }
 }
 
+class LearningObservationView {
+  const LearningObservationView({
+    required this.label,
+    required this.imageSha256,
+  });
+
+  final String label;
+  final String imageSha256;
+
+  static LearningObservationView? fromJson(Object? value) {
+    final json = _mapOrNull(value);
+    final label = _string(json?['label']);
+    final sha = _string(json?['imageSha256']);
+    if (label.isEmpty || !RegExp(r'^[0-9a-f]{64}$').hasMatch(sha)) return null;
+    return LearningObservationView(label: label, imageSha256: sha);
+  }
+}
+
+typedef LearningObservationTrial = ({
+  String label,
+  LearningObservationView top,
+  LearningObservationView side,
+});
+typedef LearningObservationLevel = ({
+  String label,
+  List<LearningObservationTrial> trials,
+});
+
+class LearningObservationCard {
+  const LearningObservationCard({
+    required this.title,
+    required this.familyTask,
+    required this.levels,
+  });
+
+  final String title;
+  final String familyTask;
+  final List<LearningObservationLevel> levels;
+
+  static LearningObservationCard? fromJson(Object? value) {
+    final json = _mapOrNull(value);
+    if (json == null || json['kind'] != 'simulation') return null;
+    final title = _string(json['title']);
+    final task = _string(json['familyTask']);
+    final rawLevels = json['levels'];
+    if (title.isEmpty ||
+        task.isEmpty ||
+        rawLevels is! List ||
+        rawLevels.isEmpty) {
+      return null;
+    }
+    final levels = <LearningObservationLevel>[];
+    for (final value in rawLevels) {
+      final level = _mapOrNull(value);
+      final label = _string(level?['label']);
+      final rawTrials = level?['trials'];
+      if (label.isEmpty || rawTrials is! List || rawTrials.isEmpty) return null;
+      final trials = <LearningObservationTrial>[];
+      for (final value in rawTrials) {
+        final trial = _mapOrNull(value);
+        final label = _string(trial?['label']);
+        final top = LearningObservationView.fromJson(trial?['top']);
+        final side = LearningObservationView.fromJson(trial?['side']);
+        if (label.isEmpty || top == null || side == null) return null;
+        trials.add((label: label, top: top, side: side));
+      }
+      levels.add((label: label, trials: List.unmodifiable(trials)));
+    }
+    return LearningObservationCard(
+      title: title,
+      familyTask: task,
+      levels: List.unmodifiable(levels),
+    );
+  }
+}
+
 class LearningReport {
   const LearningReport({
     required this.id,
@@ -590,6 +666,7 @@ class LearningReport {
     this.subjectCode = '',
     this.score = 0,
     this.strengths = const [],
+    this.observationCards = const [],
   });
 
   final String id;
@@ -614,6 +691,7 @@ class LearningReport {
   final String subjectCode;
   final int score;
   final List<String> strengths;
+  final List<LearningObservationCard> observationCards;
 
   bool get isScored => outcomeMode == 'scored_deterministic';
 
@@ -627,6 +705,7 @@ class LearningReport {
   }
 
   factory LearningReport.fromJson(Map<String, dynamic> json) {
+    final cards = json['observationCards'];
     return LearningReport(
       id: _string(json['id'], fallback: _string(json['reportId'])),
       summary: _string(json['summary'], fallback: _string(json['conclusion'])),
@@ -674,6 +753,12 @@ class LearningReport {
       subjectCode: _string(json['subject']),
       score: _integer(json['score']),
       strengths: _stringList(json['strengths']),
+      observationCards: cards is List
+          ? cards
+                .map(LearningObservationCard.fromJson)
+                .whereType<LearningObservationCard>()
+                .toList(growable: false)
+          : const [],
     );
   }
 }

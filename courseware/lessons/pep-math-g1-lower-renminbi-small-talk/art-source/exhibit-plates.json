@@ -1,0 +1,74 @@
+{
+  "source": "art-source/exhibit-plates.png",
+  "sha256": "9671ab570afdfcd3638db784f0703d31b78f76d310d75ce4996f8a5963d024e5",
+  "origin": "builtin-imagegen",
+  "prompt": "Landscape 3 columns by 2 rows contact sheet exactly, six independent full-bleed equal cells with no separators or gutters, hard boundaries, nothing crossing cells. Original classroom and museum teaching illustrations for Chinese grade one, handmade fine warm paper grain, matte paper-cut watercolour gouache, warm cream, pine and moss with apricot, simple large focal shapes, natural perspective. No text, no glyphs, numbers, signs, money, official currency imagery, or lettering anywhere. Upper left: two curious young Chinese schoolchildren at a small classroom museum table, holding a magnifier and studying plain exhibit picture cards, wood display panel behind. Upper center: empty quiet classroom museum gallery backdrop, very pale sage walls, floor low in composition, soft plain center to overlay arcade game, warm window light on edges, no prominent objects in central space. Upper right: distinct oblique view from below of the Potala Palace in Lhasa, authentic red central buildings and terraced white wings rising on the hillside from left foreground, sky in muted dusty blue, no visible modern signs. Lower left: close-up of a child's two hands lifting a plain ivory translucent square practice swatch in front of a bright window with light rays and a faint leaf watermark-like outline visible only where light passes through; the swatch is a plain square without markings or borders, not money. Lower center: close view of a child's hands tilting a blank square practice swatch towards the light, one shiny green and orange small round reflective patch on swatch, folded angle obvious. Lower right: close-up of one child's fingertip touching a tactile raised strip of three simple deep green ridges on a plain square practice swatch laid flat on a desk, make touch action clearly different from tilting or lifting. Every illustration clear and simple at small sizes.",
+  "outputs": {
+    "exhibit-cover": {
+      "path": "assets/exhibit-cover.png",
+      "crop": [
+        0,
+        0,
+        512,
+        512
+      ],
+      "sha256": "e10da09dc92ac2c401e3cd5ba88a7916343193dc629a5230fdc0145dfde25cc0",
+      "bytes": 175614
+    },
+    "gallery-backdrop": {
+      "path": "assets/gallery-backdrop.png",
+      "crop": [
+        512,
+        0,
+        1024,
+        512
+      ],
+      "sha256": "540b4792b8af08d90f11c2e88f90945f70219ca24ac77224b4c127bdcf798495",
+      "bytes": 178038
+    },
+    "potala-quiz": {
+      "path": "assets/potala-quiz.png",
+      "crop": [
+        1024,
+        0,
+        1536,
+        512
+      ],
+      "sha256": "a1967fa751663eac0f38bf03436a1c0989cf125ac23a4a7f0c854a9b1ccd5800",
+      "bytes": 182290
+    },
+    "see-through": {
+      "path": "assets/see-through.png",
+      "crop": [
+        0,
+        512,
+        512,
+        1024
+      ],
+      "sha256": "1bdf796984025e35fc1210013f18acb4f81af77a7638e1efa149c6b1f17f65c0",
+      "bytes": 151666
+    },
+    "tilt-swatch": {
+      "path": "assets/tilt-swatch.png",
+      "crop": [
+        512,
+        512,
+        1024,
+        1024
+      ],
+      "sha256": "4c33a1e7963c7a44091bbfc3bd14981502c95d2000ac3b7a60abc44b41949141",
+      "bytes": 141812
+    },
+    "touch-swatch": {
+      "path": "assets/touch-swatch.png",
+      "crop": [
+        1024,
+        512,
+        1536,
+        1024
+      ],
+      "sha256": "731560955f3bb23f0a040699fdaed748495015b143f79bbd208b4b5c1006dade",
+      "bytes": 198026
+    }
+  }
+}

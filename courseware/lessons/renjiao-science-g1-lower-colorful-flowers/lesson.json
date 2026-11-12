@@ -1,0 +1,1009 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "多彩的花",
+  "grade": 1,
+  "description": "观察颜色和花形，给同一朵花拍两种角度，比较典型样本的花瓣和花蕊。",
+  "roster": {
+    "teacher": {
+      "name": "小科老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Serena",
+      "avatar": "/avatars/teacher-2.png",
+      "color": "#287B94",
+      "persona": "自然清楚地带孩子看、比、画，给出可见的根据。"
+    }
+  },
+  "images": {
+    "bell-and-butterfly": {
+      "file": "assets/bell-and-butterfly.png"
+    },
+    "cress-top": {
+      "file": "assets/cress-top.png"
+    },
+    "flower-camera": {
+      "file": "assets/flower-camera.png"
+    },
+    "flower-cart-idle": {
+      "file": "assets/flower-cart-idle.png"
+    },
+    "flower-cart-move": {
+      "file": "assets/flower-cart-move.png"
+    },
+    "flower-pair-cover": {
+      "file": "assets/flower-pair-cover.png"
+    },
+    "flower-side-cross": {
+      "file": "assets/flower-side-cross.png"
+    },
+    "flower-side-peach": {
+      "file": "assets/flower-side-peach.png"
+    },
+    "flower-side-trumpet": {
+      "file": "assets/flower-side-trumpet.png"
+    },
+    "flower-sketch": {
+      "file": "assets/flower-sketch.png"
+    },
+    "flower-top-cross": {
+      "file": "assets/flower-top-cross.png"
+    },
+    "flower-top-peach": {
+      "file": "assets/flower-top-peach.png"
+    },
+    "flower-top-trumpet": {
+      "file": "assets/flower-top-trumpet.png"
+    },
+    "funnel-and-cross": {
+      "file": "assets/funnel-and-cross.png"
+    },
+    "glory-side": {
+      "file": "assets/glory-side.png"
+    },
+    "golden-bell": {
+      "file": "assets/golden-bell.png"
+    },
+    "pea-flower": {
+      "file": "assets/pea-flower.png"
+    },
+    "peach-center": {
+      "file": "assets/peach-center.png"
+    },
+    "peach-petal": {
+      "file": "assets/peach-petal.png"
+    },
+    "peach-top": {
+      "file": "assets/peach-top.png"
+    },
+    "photo-backdrop": {
+      "file": "assets/photo-backdrop.png"
+    },
+    "pink-trumpet": {
+      "file": "assets/pink-trumpet.png"
+    },
+    "press-at-home": {
+      "file": "assets/press-at-home.png"
+    },
+    "q1-a": {
+      "file": "assets/q1-a.png"
+    },
+    "q1-b": {
+      "file": "assets/q1-b.png"
+    },
+    "q1-c": {
+      "file": "assets/q1-c.png"
+    },
+    "q2-a": {
+      "file": "assets/q2-a.png"
+    },
+    "q2-b": {
+      "file": "assets/q2-b.png"
+    },
+    "q2-c": {
+      "file": "assets/q2-c.png"
+    },
+    "q2-stimulus": {
+      "file": "assets/q2-stimulus.png"
+    },
+    "q3-a": {
+      "file": "assets/q3-a.png"
+    },
+    "q3-b": {
+      "file": "assets/q3-b.png"
+    },
+    "q3-c": {
+      "file": "assets/q3-c.png"
+    },
+    "q4-a": {
+      "file": "assets/q4-a.png"
+    },
+    "q4-b": {
+      "file": "assets/q4-b.png"
+    },
+    "q4-c": {
+      "file": "assets/q4-c.png"
+    },
+    "q5-a": {
+      "file": "assets/q5-a.png"
+    },
+    "q5-b": {
+      "file": "assets/q5-b.png"
+    },
+    "q5-c": {
+      "file": "assets/q5-c.png"
+    },
+    "q5-stimulus": {
+      "file": "assets/q5-stimulus.png"
+    },
+    "q6-a": {
+      "file": "assets/q6-a.png"
+    },
+    "q6-b": {
+      "file": "assets/q6-b.png"
+    },
+    "q6-c": {
+      "file": "assets/q6-c.png"
+    },
+    "rose-structure": {
+      "file": "assets/rose-structure.png"
+    },
+    "sample-comparison": {
+      "file": "assets/sample-comparison.png"
+    },
+    "school-flower-cover": {
+      "file": "assets/school-flower-cover.png"
+    },
+    "shape-bell": {
+      "file": "assets/shape-bell.png"
+    },
+    "shape-butterfly": {
+      "file": "assets/shape-butterfly.png"
+    },
+    "shape-cross": {
+      "file": "assets/shape-cross.png"
+    },
+    "shape-trumpet": {
+      "file": "assets/shape-trumpet.png"
+    },
+    "smell-safely": {
+      "file": "assets/smell-safely.png"
+    },
+    "sort-background": {
+      "file": "assets/sort-background.png"
+    },
+    "unusual-gallery-a": {
+      "file": "assets/unusual-gallery-a.png"
+    },
+    "unusual-gallery-b": {
+      "file": "assets/unusual-gallery-b.png"
+    },
+    "yellow-cross": {
+      "file": "assets/yellow-cross.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "flower-table",
+      "title": "花坛里哪儿不一样",
+      "type": "slide",
+      "template": "two-columns",
+      "data": {
+        "title": "花坛里哪儿不一样",
+        "left": {
+          "heading": "校园花坛",
+          "body": "先远远看"
+        },
+        "right": {
+          "heading": "三朵花放在一起",
+          "body": "颜色和瓣层"
+        },
+        "left_picture": "school-flower-cover",
+        "right_picture": "sample-comparison"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "校园花坛开了好多花。先不采，让眼睛看看哪几朵最显眼。"
+        },
+        {
+          "say": "小科老师带来几张花的观察图。我们挑一朵，试着介绍给同伴。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "这朵浅粉的是桃花。花瓣在外面围了一圈，里面还能看到细细的东西。"
+        },
+        {
+          "say": "另一朵也是粉色，花瓣一层叠一层。把两朵指给同伴看看。"
+        },
+        {
+          "say": "再看黄色的一朵，四片从四边展开，外边就和粉色花不同。"
+        },
+        {
+          "say": "有实物时，可以放在一起比大小。照片放大了，要先看看原来的大小。"
+        }
+      ]
+    },
+    {
+      "key": "safe-looking",
+      "title": "花要怎样观察才安全",
+      "type": "slide",
+      "template": "picture-points",
+      "data": {
+        "title": "花要怎样观察才安全",
+        "picture": "smell-safely",
+        "points": [
+          "用眼睛看",
+          "大人同意才扇闻",
+          "花不入口"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "先用眼睛看清花的颜色、外边和中间。陌生的花只用眼睛看。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "和大人一起观察，不用随手把花摘下来。"
+        },
+        {
+          "say": "如果大人确认样本安全，也同意你摸，可以用指尖轻轻摸。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "要闻已确认安全的花，可以用手轻轻扇一点气味过来。"
+        },
+        {
+          "say": "鼻子不用贴过去。闻不出来，也可以把这项先留空。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "观察的花不要放进嘴里。照片也不能替我们闻气味。"
+        }
+      ]
+    },
+    {
+      "key": "compare-flower-shapes",
+      "title": "花的外形像什么",
+      "type": "slide",
+      "template": "two-columns",
+      "data": {
+        "title": "花的外形像什么",
+        "left": {
+          "heading": "漏斗和十字",
+          "body": "牵牛花与诸葛菜"
+        },
+        "right": {
+          "heading": "钟和蝴蝶",
+          "body": "金铃花与豌豆花"
+        },
+        "left_picture": "funnel-and-cross",
+        "right_picture": "bell-and-butterfly"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "牵牛花像个小喇叭。侧面看，口大，往下面收窄。"
+        },
+        {
+          "say": "诸葛菜这朵从上看，有四片花瓣向四边伸出，像一个十字。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "金铃花垂下来，下面开口，像一只小钟。"
+        },
+        {
+          "say": "豌豆花有一片宽瓣和两侧的瓣。摊开的样子，像蝴蝶张开翅膀。"
+        },
+        {
+          "say": "你可以想到别的东西。用手指出哪里像，说出自己的根据。"
+        },
+        {
+          "say": "同一种外形也能有不同颜色。要比形状，就先别管颜色。"
+        },
+        {
+          "say": "看花的外边，把花卡推到外形相像的托盘。"
+        },
+        {
+          "say": "比口和底的样子，再看花是不是四瓣向四边展开。"
+        },
+        {
+          "say": "再看两侧像翅膀的花形，和下垂的钟形。"
+        },
+        {
+          "say": "先看花的外边，和托盘里的轮廓比一比。"
+        },
+        {
+          "say": "绕到卡片后面用车推，按回转键可以撤回。"
+        }
+      ]
+    },
+    {
+      "key": "sketch-a-flower",
+      "title": "把看见的花形画下来",
+      "type": "slide",
+      "template": "two-columns",
+      "data": {
+        "title": "把看见的花形画下来",
+        "left": {
+          "heading": "上面看原样",
+          "body": "先找外边"
+        },
+        "right": {
+          "heading": "再对照记录",
+          "body": "外边与中间都画"
+        },
+        "left_picture": "cress-top",
+        "right_picture": "flower-sketch"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "现在从上面观察这朵诸葛菜。先用手指沿外边走一圈。"
+        },
+        {
+          "say": "从中间往外看，一片、两片、三片、四片，四片朝不同方向伸开。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "我先画四片向外伸开的花瓣，再记下花中间看见的小点和短线。"
+        },
+        {
+          "say": "只把看见的画下来，回头把记录和原来的花放一起看。"
+        },
+        {
+          "say": "也可以给同伴说，你画了哪几处。没闻过的气味先不写。"
+        },
+        {
+          "say": "接下来给一朵花从不同角度拍照，看看还能发现什么。"
+        },
+        {
+          "say": "请从上面拍，等画面和小图是同一个角度。"
+        },
+        {
+          "say": "请从侧面拍，等画面和小图是同一个角度。"
+        },
+        {
+          "say": "看上面的小图，拍同一朵花的一个角度。"
+        },
+        {
+          "say": "把整朵花的画面放进虚线框。"
+        },
+        {
+          "say": "等大图和小图是同一个角度，再按快门。"
+        }
+      ]
+    },
+    {
+      "key": "flower-photo-pairs",
+      "title": "给同一朵花拍两张照",
+      "type": "interactive",
+      "page": "flower-photo-pairs",
+      "widgetType": "game",
+      "startImage": "flower-pair-cover",
+      "script": [
+        {
+          "say": "先猜一猜。同一朵牵牛花，从上面和侧面看有什么不一样？"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#flower-preview"
+        },
+        {
+          "say": "先看小图。第一张从上面拍，能看见展开的花口。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "我按箭头移动虚线框，让整朵花进到框里。"
+        },
+        {
+          "highlight": "#game-target"
+        },
+        {
+          "say": "花的角度和小图一样，我才按右下角的圆快门。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "下边留下第一张照片。下一张要等到花露出侧面的样子。"
+        },
+        {
+          "say": "轮到你啦。把两个角度都留下，再比一比哪张能看清花口。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "observationCard": {
+        "title": "同一朵花的两种看法",
+        "familyTask": "和大人观察一朵熟悉的花，不随意采，不入口。从上面和侧面各看一次，画下花形和真实看到的部位。未经成人确认，别触摸或闻；没观察到的先留空。",
+        "levels": [
+          {
+            "label": "牵牛花",
+            "trials": [
+              {
+                "id": "same-flower-two-views",
+                "label": "牵牛花的两个观察角度",
+                "top": {
+                  "flower-top-trumpet": {
+                    "label": "从上面看宽圆的花口",
+                    "image": "flower-top-trumpet"
+                  }
+                },
+                "side": {
+                  "flower-side-trumpet": {
+                    "label": "侧看口宽、管底窄，像小喇叭",
+                    "image": "flower-side-trumpet"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "label": "诸葛菜花",
+            "trials": [
+              {
+                "id": "same-flower-two-views",
+                "label": "诸葛菜花的两个观察角度",
+                "top": {
+                  "flower-top-cross": {
+                    "label": "从上面看四瓣向四边伸开",
+                    "image": "flower-top-cross"
+                  }
+                },
+                "side": {
+                  "flower-side-cross": {
+                    "label": "侧看花瓣摊开，花心在中间",
+                    "image": "flower-side-cross"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "label": "桃花",
+            "trials": [
+              {
+                "id": "same-flower-two-views",
+                "label": "桃花的两个观察角度",
+                "top": {
+                  "flower-top-peach": {
+                    "label": "从上面看粉色花瓣和中央细细的花蕊",
+                    "image": "flower-top-peach"
+                  }
+                },
+                "side": {
+                  "flower-side-peach": {
+                    "label": "侧看花瓣浅浅围起，中央有细丝",
+                    "image": "flower-side-peach"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gameAudio": {
+        "flower-photo-top": "sketch-a-flower-9",
+        "flower-photo-side": "sketch-a-flower-10",
+        "flower-photo-goal": "sketch-a-flower-11",
+        "flower-photo-hint": "sketch-a-flower-12",
+        "flower-photo-help": "sketch-a-flower-13",
+        "flower-photo-praise": "find-petals-and-center-1"
+      }
+    },
+    {
+      "key": "sort-flower-shapes",
+      "title": "花形样本分类站",
+      "type": "interactive",
+      "page": "sort-flower-shapes",
+      "widgetType": "game",
+      "startImage": "funnel-and-cross",
+      "script": [
+        {
+          "say": "拍了照片，我们按外形把样本整理到托盘里。先看花卡。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#game-target"
+        },
+        {
+          "say": "这朵的开口宽，另一端窄，像漏斗。先记住它的外边。"
+        },
+        {
+          "highlight": "#first-shape-dock"
+        },
+        {
+          "say": "这个托盘也有上宽下窄的样子。这里接漏斗形的花。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "小车要绕到花卡后面，先挪一格，再转个方向推到托盘。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "看，花卡进了外形相像的托盘。我们再找别的样本。"
+        },
+        {
+          "say": "轮到你啦。车只能推，走错一步可以用回转键。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "flower-sort-a": "compare-flower-shapes-9",
+        "flower-sort-b": "compare-flower-shapes-10",
+        "flower-sort-c": "compare-flower-shapes-11",
+        "flower-sort-hint": "compare-flower-shapes-12",
+        "flower-sort-help": "compare-flower-shapes-13",
+        "flower-sort-praise": "find-petals-and-center-2"
+      }
+    },
+    {
+      "key": "find-petals-and-center",
+      "title": "先找外面，再找中间",
+      "type": "slide",
+      "template": "two-columns",
+      "data": {
+        "title": "先找外面，再找中间",
+        "left": {
+          "heading": "外面宽宽的一片",
+          "body": "花瓣"
+        },
+        "right": {
+          "heading": "中间细细的部分",
+          "body": "花蕊"
+        },
+        "left_picture": "peach-petal",
+        "right_picture": "peach-center"
+      },
+      "script": [
+        {
+          "say": "同一朵花从两个角度都拍到了。可以比比花口和中间。"
+        },
+        {
+          "say": "你看清了花的外边，把相像的花放到了一起。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "回到照片里的桃花。外面这一片粉粉的、宽宽的，叫花瓣。"
+        },
+        {
+          "say": "沿着外边指一圈。还能找到其他花瓣吗？"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "移到花中间。你能看到几根细细的丝，还有它们的小尖吗？"
+        },
+        {
+          "say": "这类在花中间的部分叫花蕊。它们和外面宽宽的花瓣不一样。"
+        },
+        {
+          "say": "等会儿再换一朵。看看外面和中间是不是还能找到。"
+        }
+      ]
+    },
+    {
+      "key": "two-flowers-same-parts",
+      "title": "两朵花有哪些相同处",
+      "type": "slide",
+      "template": "picture-points",
+      "data": {
+        "title": "两朵花有哪些相同处",
+        "picture": "rose-structure",
+        "points": [
+          "先看颜色和外形",
+          "再找花瓣",
+          "最后找花蕊"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "左边是蔷薇，右边是桃花。它们的颜色和外形不完全一样。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先用眼睛看两朵花。左边偏白，右边是粉色。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "在这两个样本上，外面都能找到一片片宽宽的花瓣。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "移到中间，两朵也都能找到花蕊。用手指分别指一指。"
+        },
+        {
+          "say": "看不清时可以换个角度。只说我们实际看清的地方。"
+        }
+      ]
+    },
+    {
+      "key": "unusual-flower-gallery",
+      "title": "还有许多特别的花",
+      "type": "slide",
+      "template": "two-columns",
+      "data": {
+        "title": "还有许多特别的花",
+        "left": {
+          "heading": "特别的外形",
+          "body": "大王花、西番莲、鹭兰"
+        },
+        "right": {
+          "heading": "一串也能观察",
+          "body": "炮仗花、铃兰"
+        },
+        "left_picture": "unusual-gallery-a",
+        "right_picture": "unusual-gallery-b"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "看这朵大王花，外面厚厚的，还带斑点。中间有个深深的开口。"
+        },
+        {
+          "say": "西番莲中央有一圈细细的紫线，往四周散开。"
+        },
+        {
+          "say": "鹭兰两边伸开白白的细边，像白鸟张开了翅膀。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "炮仗花又细又长，橙色的几朵挨着，像一串小鞭炮。"
+        },
+        {
+          "say": "铃兰一朵朵垂下来，白色的小口像一个个铃铛。"
+        },
+        {
+          "say": "你最想画哪一种？告诉同伴你看见的哪一处最特别。"
+        }
+      ]
+    },
+    {
+      "key": "picture-quiz",
+      "type": "quiz",
+      "title": "找出花图里的线索",
+      "intro": [
+        "换几张图试一试。先听清要找哪里，再指一指。"
+      ],
+      "questions": [
+        {
+          "id": "open-and-narrow",
+          "skill": "flower-funnel",
+          "question": "哪朵花开口宽，另一端收窄，像小喇叭？",
+          "answer": [
+            "B"
+          ],
+          "analysis": "粉红花从侧面看有宽口和窄管，轮廓像小喇叭。",
+          "options": {
+            "A": {
+              "label": "豌豆花两边像翅膀",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-a",
+                "alt": "豌豆花两边像翅膀"
+              }
+            },
+            "B": {
+              "label": "侧面看开口宽、另一端窄的粉红花",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-b",
+                "alt": "侧面看开口宽、另一端窄的粉红花"
+              }
+            },
+            "C": {
+              "label": "外面五瓣、中央有花蕊的白花",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-c",
+                "alt": "外面五瓣、中央有花蕊的白花"
+              }
+            }
+          }
+        },
+        {
+          "id": "find-flower-center",
+          "skill": "flower-center",
+          "question": "哪张图圈出了白花的花蕊？",
+          "answer": [
+            "A"
+          ],
+          "analysis": "花蕊是花中间细细的部分。外面宽宽的一片是花瓣。",
+          "options": {
+            "A": {
+              "label": "圈住中间许多细丝和小尖",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-a",
+                "alt": "圈住中间许多细丝和小尖"
+              }
+            },
+            "B": {
+              "label": "圈住外面宽宽的一片花瓣",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-b",
+                "alt": "圈住外面宽宽的一片花瓣"
+              }
+            },
+            "C": {
+              "label": "圈住花瓣旁边的空处",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-c",
+                "alt": "圈住花瓣旁边的空处"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "q2-stimulus",
+            "alt": "外面是一圈白花瓣，中间有一丛黄色花蕊"
+          }
+        },
+        {
+          "id": "same-outline",
+          "skill": "flower-shape-not-color",
+          "question": "哪两朵颜色不同，却都像十字形？",
+          "answer": [
+            "C"
+          ],
+          "analysis": "这朵淡紫和这朵黄色，都有四片花瓣向四边展开。颜色不决定外形。",
+          "options": {
+            "A": {
+              "label": "紫花一个圆口、另一个四瓣",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-a",
+                "alt": "紫花一个圆口、另一个四瓣"
+              }
+            },
+            "B": {
+              "label": "粉色蝶形与粉色五瓣",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-b",
+                "alt": "粉色蝶形与粉色五瓣"
+              }
+            },
+            "C": {
+              "label": "淡紫四瓣与黄色四瓣，向四边展开",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-c",
+                "alt": "淡紫四瓣与黄色四瓣，向四边展开"
+              }
+            }
+          }
+        },
+        {
+          "id": "safe-waft",
+          "skill": "flower-safe-observation",
+          "question": "大人同意闻这朵花。哪张图做对了？",
+          "answer": [
+            "B"
+          ],
+          "analysis": "站开一点，用手轻轻把气味扇过来。鼻子不贴着花。",
+          "options": {
+            "A": {
+              "label": "俯身把鼻子贴近花",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-a",
+                "alt": "俯身把鼻子贴近花"
+              }
+            },
+            "B": {
+              "label": "站开一些，用手轻轻扇闻",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-b",
+                "alt": "站开一些，用手轻轻扇闻"
+              }
+            },
+            "C": {
+              "label": "站开用眼睛看，还没有做闻的动作",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-c",
+                "alt": "站开用眼睛看，还没有做闻的动作"
+              }
+            }
+          }
+        },
+        {
+          "id": "draw-what-is-visible",
+          "skill": "flower-picture-record",
+          "question": "哪张记录画了花的外边，也画了中间？",
+          "answer": [
+            "C"
+          ],
+          "analysis": "有四片花瓣的外边，也有中间看见的小点和短线，两个部分都记到了。",
+          "options": {
+            "A": {
+              "label": "只画了中间",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-a",
+                "alt": "只画了中间"
+              }
+            },
+            "B": {
+              "label": "画的是圆环外边",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-b",
+                "alt": "画的是圆环外边"
+              }
+            },
+            "C": {
+              "label": "画了四瓣外边和中间",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-c",
+                "alt": "画了四瓣外边和中间"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "q5-stimulus",
+            "alt": "黄色四瓣花从上面看，四片朝四边伸开，中间有小点"
+          }
+        },
+        {
+          "id": "unusual-flower-analogy",
+          "skill": "flower-wing-analogy",
+          "question": "哪朵花像白鸟张开了翅膀？",
+          "answer": [
+            "A"
+          ],
+          "analysis": "鹭兰两边白白的细边伸开，像鸟的翅膀。",
+          "options": {
+            "A": {
+              "label": "鹭兰左右白白的花瓣向外伸展",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-a",
+                "alt": "鹭兰左右白白的花瓣向外伸展"
+              }
+            },
+            "B": {
+              "label": "一串朝下的小白钟",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-b",
+                "alt": "一串朝下的小白钟"
+              }
+            },
+            "C": {
+              "label": "一串细长的橙花",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-c",
+                "alt": "一串细长的橙花"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "flower-note-at-home",
+      "title": "和家人留一份花的记录",
+      "type": "slide",
+      "template": "picture-points",
+      "data": {
+        "title": "和家人留一份花的记录",
+        "picture": "press-at-home",
+        "points": [
+          "找一朵熟悉的花",
+          "换角度画下来",
+          "先爱护花"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "今天先看花的外形，再看花瓣和花蕊，还给同一朵花拍了两种样子。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "和大人一起看一朵熟悉的花。别随意摘，也别把花放进嘴里。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "先从上面，再从侧面看。画一画外边和看得见的中间部分。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "如果有大人同意收集的花，可以请大人帮忙用纸夹着做压花。"
+        },
+        {
+          "say": "把真看到的记下来。没有闻过的气味，先别替它写答案。"
+        },
+        {
+          "say": "今天的观察就到这里。下次带上你的发现来分享。"
+        }
+      ]
+    }
+  ]
+}

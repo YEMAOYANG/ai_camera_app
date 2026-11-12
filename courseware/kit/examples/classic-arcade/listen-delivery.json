@@ -1,0 +1,54 @@
+{
+  "template": "listenDelivery",
+  "draft": true,
+  "title": "听令邮车",
+  "sub": "听英语拿货，穿过车道，再送给指定的动物。",
+  "voiceLead": true,
+  "stepVoiceLead": true,
+  "art": {
+    "backdrop": "garden.webp",
+    "sticker": "sticker.webp",
+    "frames": ["rover.webp", "rover-pop.webp", "glider.webp"],
+    "icons": {
+      "apple": "apple.webp",
+      "banana": "banana.webp",
+      "carrot": "carrot.webp",
+      "dog": "dog.webp",
+      "cat": "cat.webp",
+      "rabbit": "rabbit.webp"
+    }
+  },
+  "levels": [
+    {
+      "pickup": [["apple", 3], ["banana", 6]],
+      "drop": [["dog", 3], ["cat", 6]],
+      "orders": [["apple", "dog"]],
+      "lanes": [{"row": 2, "speed": 0.9, "spacing": 5.7, "phase": 0}],
+      "step": 0.33,
+      "hints": ["再听听，老师说的是谁？", "路变慢了，看看发亮的地方。"]
+    },
+    {
+      "pickup": [["apple", 2], ["banana", 6], ["carrot", 8]],
+      "drop": [["dog", 1], ["cat", 5], ["rabbit", 7]],
+      "orders": [["banana", "cat"], ["apple", "rabbit"]],
+      "lanes": [
+        {"row": 1, "speed": -1.25, "spacing": 4.6, "phase": 2},
+        {"row": 3, "speed": 1.36, "spacing": 4.6, "phase": 1}
+      ],
+      "step": 0.26,
+      "hints": ["可以在中间的草地停一停，再听一遍。", "慢慢来，亮起来的地方就是这一步要去的。"]
+    },
+    {
+      "pickup": [["apple", 1], ["banana", 4], ["carrot", 7]],
+      "drop": [["dog", 6], ["cat", 2], ["rabbit", 4]],
+      "orders": [["carrot", "dog"], ["banana", "rabbit"], ["apple", "cat"]],
+      "lanes": [
+        {"row": 1, "speed": -1.8, "spacing": 3.9, "phase": 0.7},
+        {"row": 2, "speed": 1.65, "spacing": 4, "phase": 2.2},
+        {"row": 3, "speed": -1.6, "spacing": 3.9, "phase": 1.4}
+      ],
+      "step": 0.20,
+      "hints": ["等前面的路空出一点，再往前走。", "飞机慢下来了。看看亮起来的地方，也可以重听。"]
+    }
+  ]
+}

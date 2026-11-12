@@ -1,0 +1,23 @@
+#cv #ready .pic { object-fit: contain; background: #fff5df; }
+#unknown-preview {
+  position: absolute;
+  left: 22px;
+  top: 215px;
+  width: 172px;
+  display: grid;
+  gap: 10px;
+  z-index: 2;
+  pointer-events: none;
+}
+#unknown-preview[hidden] { display: none; }
+#nearby-quantity-card {
+  width: 100%;
+  height: 128px;
+  object-fit: contain;
+  border-radius: 10px;
+  background: #fff5df;
+  box-shadow: 0 0 0 4px #75b0a4;
+}
+#unknown-trays { display: grid; grid-template-columns: repeat(2, 1fr); gap: 5px; }
+#unknown-trays img { width: 100%; height: 60px; object-fit: contain; background: #fff5df; }
+#unknown-trays img:last-child { width: 83px; grid-column: 1 / -1; justify-self: center; }

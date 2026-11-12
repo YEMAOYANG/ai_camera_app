@@ -1,0 +1,41 @@
+#game-speaker {
+  position: absolute;
+  left: 139px;
+  top: 136px;
+  width: 179px;
+  height: 232px;
+  overflow: hidden;
+  border-radius: 24px;
+  background: #fff4d8d9;
+  pointer-events: none;
+  z-index: 1;
+}
+
+#game-speaker img {
+  display: block;
+  width: 235px;
+  height: 235px;
+  max-width: none;
+  margin-left: -28px;
+  object-fit: contain;
+}
+
+#game-speaker span {
+  position: absolute;
+  right: 9px;
+  top: 12px;
+  padding: 3px 8px;
+  border-radius: 12px;
+  color: #fff4d8;
+  background: #294c42;
+  font-weight: 800;
+  font-size: 26px;
+}
+
+#demo-near-perch {
+  left: 381.5px;
+  top: 127.5px;
+  width: 67px;
+  height: 67px;
+  border-radius: 14px;
+}

@@ -1,0 +1,1232 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "文具的家",
+  "description": "听故事看前后变化、把文具送回家，学写六个字并在新情境里读组词。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小语老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Serena",
+      "avatar": "/avatars/teacher-2.png",
+      "color": "#D65A8C",
+      "persona": "用简短清楚的普通话带孩子观察和整理。"
+    }
+  },
+  "images": {
+    "lost-stationery-board": {
+      "file": "assets/lost-stationery-board.png"
+    },
+    "home-dialogue-board": {
+      "file": "assets/home-dialogue-board.png"
+    },
+    "quick-action-board": {
+      "file": "assets/quick-action-board.png"
+    },
+    "stationery-case-board": {
+      "file": "assets/stationery-case-board.png"
+    },
+    "check-stationery-board": {
+      "file": "assets/check-stationery-board.png"
+    },
+    "delivery-practice-board": {
+      "file": "assets/delivery-practice-board.png"
+    },
+    "delivery-start": {
+      "file": "assets/delivery-start.png"
+    },
+    "write-bi-zhi-board": {
+      "file": "assets/write-bi-zhi-board.png"
+    },
+    "write-dao-board": {
+      "file": "assets/write-dao-board.png"
+    },
+    "write-fang-board": {
+      "file": "assets/write-fang-board.png"
+    },
+    "write-ping-an-board": {
+      "file": "assets/write-ping-an-board.png"
+    },
+    "new-words-board": {
+      "file": "assets/new-words-board.png"
+    },
+    "flat-words-board": {
+      "file": "assets/flat-words-board.png"
+    },
+    "companion-words-board": {
+      "file": "assets/companion-words-board.png"
+    },
+    "words-start": {
+      "file": "assets/words-start.png"
+    },
+    "stationery-sticker": {
+      "file": "assets/stationery-sticker.png"
+    },
+    "pencil": {
+      "file": "assets/pencil.png"
+    },
+    "eraser": {
+      "file": "assets/eraser.png"
+    },
+    "sharpener": {
+      "file": "assets/sharpener.png"
+    },
+    "case": {
+      "file": "assets/case.png"
+    },
+    "cubby": {
+      "file": "assets/cubby.png"
+    },
+    "palette": {
+      "file": "assets/palette.png"
+    },
+    "delivery-rover": {
+      "file": "assets/delivery-rover.png"
+    },
+    "delivery-rover-load": {
+      "file": "assets/delivery-rover-load.png"
+    },
+    "word-boat": {
+      "file": "assets/word-boat.png"
+    },
+    "word-boat-pop": {
+      "file": "assets/word-boat-pop.png"
+    },
+    "delivery-backdrop": {
+      "file": "assets/delivery-backdrop.png"
+    },
+    "word-backdrop": {
+      "file": "assets/word-backdrop.png"
+    },
+    "fresh-book": {
+      "file": "assets/fresh-book.png"
+    },
+    "new-year": {
+      "file": "assets/new-year.png"
+    },
+    "safe-home": {
+      "file": "assets/safe-home.png"
+    },
+    "flat-path": {
+      "file": "assets/flat-path.png"
+    },
+    "partners": {
+      "file": "assets/partners.png"
+    },
+    "together": {
+      "file": "assets/together.png"
+    },
+    "quiz-1-a": {
+      "file": "assets/quiz-1-a.png"
+    },
+    "quiz-1-b": {
+      "file": "assets/quiz-1-b.png"
+    },
+    "quiz-1-c": {
+      "file": "assets/quiz-1-c.png"
+    },
+    "quiz-2-a": {
+      "file": "assets/quiz-2-a.png"
+    },
+    "quiz-2-b": {
+      "file": "assets/quiz-2-b.png"
+    },
+    "quiz-2-c": {
+      "file": "assets/quiz-2-c.png"
+    },
+    "quiz-3-a": {
+      "file": "assets/quiz-3-a.png"
+    },
+    "quiz-3-b": {
+      "file": "assets/quiz-3-b.png"
+    },
+    "quiz-3-c": {
+      "file": "assets/quiz-3-c.png"
+    },
+    "quiz-4-a": {
+      "file": "assets/quiz-4-a.png"
+    },
+    "quiz-4-b": {
+      "file": "assets/quiz-4-b.png"
+    },
+    "quiz-4-c": {
+      "file": "assets/quiz-4-c.png"
+    },
+    "quiz-5-a": {
+      "file": "assets/quiz-5-a.png"
+    },
+    "quiz-5-b": {
+      "file": "assets/quiz-5-b.png"
+    },
+    "quiz-5-c": {
+      "file": "assets/quiz-5-c.png"
+    },
+    "quiz-6-a": {
+      "file": "assets/quiz-6-a.png"
+    },
+    "quiz-6-b": {
+      "file": "assets/quiz-6-b.png"
+    },
+    "quiz-6-c": {
+      "file": "assets/quiz-6-c.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "missing-pencil-and-eraser",
+      "type": "slide",
+      "title": "想再用，文具去哪儿了",
+      "template": "picture-points",
+      "data": {
+        "title": "想再用，文具去哪儿了",
+        "picture": "lost-stationery-board",
+        "points": [
+          "文具 · 具",
+          "铅笔 · 铅",
+          "橡皮 · 新"
+        ]
+      },
+      "script": [
+        {
+          "say": "文具要开个小展。先看贝贝遇到的难题。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "文具是学习时用的物品。看具字，里面有三横。"
+        },
+        {
+          "say": "三横之间留点空。先看字形，再读文具。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "故事开始，贝贝用过一次铅笔，后来找不到了。"
+        },
+        {
+          "say": "指一指图中带尖的铅笔。再找铅笔的第一个字，铅。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "橡皮也只用过一回，再想用就找不着。"
+        },
+        {
+          "say": "指一指新字。贝贝想要新的橡皮，就是还没用过的。"
+        },
+        {
+          "say": "铅笔和橡皮用完随手放，下回就难找，也容易丢。"
+        }
+      ]
+    },
+    {
+      "key": "mother-helps-beibei",
+      "type": "slide",
+      "title": "两个人怎样把话说出来",
+      "template": "picture-points",
+      "data": {
+        "title": "两个人怎样把话说出来",
+        "picture": "home-dialogue-board",
+        "points": [
+          "着急地说",
+          "亲切地提醒",
+          "平 · 平安"
+        ]
+      },
+      "script": [
+        {
+          "say": "读纸书时，听一听贝贝和妈妈的口气。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "老师换一句新话。我的彩笔去哪儿了呀？"
+        },
+        {
+          "say": "想快点找到，问得急一点，尾音等着回答。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "听第二句。咱们先想想，彩笔放哪儿合适呢？"
+        },
+        {
+          "say": "声音柔和些。中间的逗号处，歇一下再说。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "妈妈用回家打比方。指着平字，平安就是人好好的。"
+        },
+        {
+          "say": "平读第二声。给文具找一个固定的家，就好找。"
+        }
+      ]
+    },
+    {
+      "key": "one-action-then-the-next",
+      "type": "slide",
+      "title": "一件事刚做完，下一件就来",
+      "template": "picture-points",
+      "data": {
+        "title": "一件事刚做完，下一件就来",
+        "picture": "quick-action-board",
+        "points": [
+          "先做的事",
+          "接着做的事",
+          "听停顿"
+        ]
+      },
+      "script": [
+        {
+          "say": "两幅图连起来，能说清动作接得有多快。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "图里先合上书。把先做的事接在一字后面。"
+        },
+        {
+          "say": "可以说，米米一合上书，先在这里停一下。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "后一幅是把书放回架子，刚合上就去放。"
+        },
+        {
+          "say": "把两段连起来，米米一合上书，就放回书架。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "逗号把前后动作隔一下。前一个动作刚完。"
+        },
+        {
+          "say": "轮到你说。找两件接着做的事，请大人听一听。"
+        }
+      ]
+    },
+    {
+      "key": "box-and-check",
+      "type": "slide",
+      "title": "文具的家是什么",
+      "template": "picture-points",
+      "data": {
+        "title": "文具的家是什么",
+        "picture": "stationery-case-board",
+        "points": [
+          "盒 · 皿字底",
+          "这些 · 从此",
+          "先归位"
+        ]
+      },
+      "script": [
+        {
+          "say": "妈妈请贝贝想想，文具能回哪儿。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "贝贝想到书包里的文具盒。右图是盒字，跟老师读。"
+        },
+        {
+          "say": "红色皿字底像浅盘。比上边的口宽，底下有一长横。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "指这些的些。这些文具，就是眼前这几样学习用品。"
+        },
+        {
+          "say": "指从此的此。从此就是从这个时候起。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "从那天起，她把文具放回盒里。放学再仔细检查。"
+        },
+        {
+          "say": "放回固定的家，下一次想用，就知道去哪儿找。"
+        }
+      ]
+    },
+    {
+      "key": "put-and-check",
+      "type": "slide",
+      "title": "放好以后，怎样逐件看看",
+      "template": "picture-points",
+      "data": {
+        "title": "放好以后，怎样逐件看看",
+        "picture": "check-stationery-board",
+        "points": [
+          "仔细检查 · 仔、检、查",
+          "所有 · 所",
+          "小伙伴 · 伙和伴",
+          "手边试试"
+        ]
+      },
+      "script": [
+        {
+          "say": "放学时，贝贝多做了一步。看看她在做什么。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "指仔细的仔。贝贝慢慢看清每一件，这样看叫仔细。"
+        },
+        {
+          "say": "指检查。检的木在左，查的木在上。她挨个看。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "指所有的所。所有就是铅笔、橡皮、转笔刀都算上。"
+        },
+        {
+          "say": "指着图看看，这一组都回到盒里了吗？一样也别漏。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "贝贝把文具当小伙伴。伙和伴的左边都有单人旁。"
+        },
+        {
+          "say": "伙右边是火，伴右边是半。指着词签连起来读伙伴。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "放好是第一步，看看有没有漏是第二步。"
+        },
+        {
+          "say": "等放学或收完桌面，你也能这样做一遍。"
+        }
+      ]
+    },
+    {
+      "key": "delivery-practice",
+      "type": "slide",
+      "title": "先听拿什么，再听送哪里",
+      "template": "picture-points",
+      "data": {
+        "title": "先听拿什么，再听送哪里",
+        "picture": "delivery-practice-board",
+        "points": [
+          "听三种文具",
+          "回到盒里",
+          "出发前听清"
+        ]
+      },
+      "script": [
+        {
+          "say": "整理车来帮忙。听清楚拿什么，再想送到哪儿。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先拿铅笔。找细长、尖尖的那支。"
+        },
+        {
+          "say": "现在拿橡皮。找能擦掉铅笔痕的那块。"
+        },
+        {
+          "say": "这回拿转笔刀。找有圆孔的小盒子。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "把拿到的文具送回文具盒，到了再放下。"
+        },
+        {
+          "say": "书架放书，颜料盘放颜色。文具回它自己的家。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "先重听这一单，再看该去哪里。"
+        },
+        {
+          "say": "看看发亮的站点。路空一些再走。"
+        },
+        {
+          "say": "拿对又送到了盒里，文具到家啦。"
+        }
+      ]
+    },
+    {
+      "key": "take-stationery-home",
+      "type": "interactive",
+      "title": "听令送文具回家",
+      "page": "take-stationery-home",
+      "widgetType": "game",
+      "startImage": "delivery-start",
+      "script": [
+        {
+          "say": "收桌小车开过来了。先听听，要帮哪件文具。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#station-first-pencil"
+        },
+        {
+          "say": "这回拿铅笔。尖尖的笔头在这张图上。"
+        },
+        {
+          "highlight": "#station-first-box"
+        },
+        {
+          "say": "对面是打开的文具盒。最后送到那个格子。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "用箭头开过去，停在东西旁边再点方形键。"
+        },
+        {
+          "say": "我先拿对一件就停。去对面时先等路空一些。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "轮到你，从第一单重来。把它放进盒才送完。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "deliver-pencil": "delivery-practice-3",
+        "deliver-eraser": "delivery-practice-4",
+        "deliver-sharpener": "delivery-practice-5",
+        "deliver-box": "delivery-practice-7",
+        "deliver-hint": "delivery-practice-10",
+        "deliver-help": "delivery-practice-11",
+        "deliver-praise": "delivery-practice-12"
+      }
+    },
+    {
+      "key": "write-bi-zhi",
+      "type": "slide",
+      "title": "笔和知怎样分部写",
+      "template": "picture-points",
+      "data": {
+        "title": "笔和知怎样分部写",
+        "picture": "write-bi-zhi-board",
+        "points": [
+          "笔 · 竹字头",
+          "知 · 左点右口",
+          "各试一格"
+        ]
+      },
+      "script": [
+        {
+          "say": "先看笔和知。一个上下排，一个左右摆。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先写两个小组。撇、横、点，再撇、横、点。"
+        },
+        {
+          "say": "下面写毛，撇、横、横，最后写竖弯钩。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "知左边先写撇、横、横、撇、点。"
+        },
+        {
+          "say": "右边口写竖、横折、横。左边末笔是点。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "竹字头在上面收一些，笔的钩朝上收。"
+        },
+        {
+          "say": "看橙色。笔字末笔向上钩，知左边末笔是点。各试一格。"
+        },
+        {
+          "say": "知左右留空。写完请大人看看点和钩。"
+        }
+      ]
+    },
+    {
+      "key": "write-dao",
+      "type": "slide",
+      "title": "道字的走之怎样写",
+      "template": "picture-points",
+      "data": {
+        "title": "道字的走之怎样写",
+        "picture": "write-dao-board",
+        "points": [
+          "先写首",
+          "再写走之",
+          "纸上指给大人看"
+        ]
+      },
+      "script": [
+        {
+          "say": "看道字。先写右上边的首，再给它加走之。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "首开头点、撇、横、撇。接着写下面的目。"
+        },
+        {
+          "say": "目是竖、横折、横、横、横。里面的横留些空。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "走之先写点，第二笔是横折折撇，一笔连着。"
+        },
+        {
+          "say": "接着写捺。平捺向右展开，像托住上面的首。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "看图找走之的第二笔，转折时不要提笔。"
+        },
+        {
+          "say": "慢慢写一格，请大人看先后、转折和最后的捺。"
+        }
+      ]
+    },
+    {
+      "key": "write-fang",
+      "type": "slide",
+      "title": "放字左右两边怎样写",
+      "template": "picture-points",
+      "data": {
+        "title": "放字左右两边怎样写",
+        "picture": "write-fang-board",
+        "points": [
+          "先写方",
+          "再写右边",
+          "试着对照"
+        ]
+      },
+      "script": [
+        {
+          "say": "整理时用到放字。看它的左边和右边。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "左边方，按点、横、横折钩、撇写。"
+        },
+        {
+          "say": "先写弯着收钩的笔，再把撇伸向左下。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "右边先写撇、横，再写撇和捺。"
+        },
+        {
+          "say": "最后的捺伸向右下。两边都要给对方留点空。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "找左边拐弯的小钩，再找右边斜伸出去的捺。"
+        },
+        {
+          "say": "请大人看左右部件有没有挤在一块儿。"
+        }
+      ]
+    },
+    {
+      "key": "write-ping-an",
+      "type": "slide",
+      "title": "平和安的末笔在哪儿",
+      "template": "picture-points",
+      "data": {
+        "title": "平和安的末笔在哪儿",
+        "picture": "write-ping-an-board",
+        "points": [
+          "平 · 五笔",
+          "安 · 六笔",
+          "纸上对照"
+        ]
+      },
+      "script": [
+        {
+          "say": "平安两个字排在一起。各自怎样在格里站稳？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先写横，再写点和撇，接着写长横。"
+        },
+        {
+          "say": "最后一竖从中间落下去，两边都留一点空。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "安上面先点、点、横钩，写好宝盖。"
+        },
+        {
+          "say": "下面的女写撇点、撇、横。末横往两边展开。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "平的最后一笔是竖，安的最后一笔是横。"
+        },
+        {
+          "say": "在纸上各写一格，请家人指给你看这两笔。"
+        }
+      ]
+    },
+    {
+      "key": "new-word-family",
+      "type": "slide",
+      "title": "新字可以和谁搭一搭",
+      "template": "picture-points",
+      "data": {
+        "title": "新字可以和谁搭一搭",
+        "picture": "new-words-board",
+        "points": [
+          "新书",
+          "新年",
+          "新手",
+          "清新"
+        ]
+      },
+      "script": [
+        {
+          "say": "一个新字，换一个搭档，意思就跟着变。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "找刚拿到手、还没用过的新书。"
+        },
+        {
+          "say": "新书的意思是新得到的书，可以说一本新书。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "找家人在过新年、相互问好的画面。"
+        },
+        {
+          "say": "新年是新的一年。看到灯笼，也听听大家说什么。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "刚学骑车，手还不熟练，可以说是新手。"
+        },
+        {
+          "say": "刚学做一件事，都可以用新手来介绍自己。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "打开窗子，觉得空气新鲜舒服，可以说清新。"
+        },
+        {
+          "say": "跟老师读清新。这个新放在词的后面。"
+        }
+      ]
+    },
+    {
+      "key": "flat-word-family",
+      "type": "slide",
+      "title": "听听平字的几个朋友",
+      "template": "picture-points",
+      "data": {
+        "title": "听听平字的几个朋友",
+        "picture": "flat-words-board",
+        "points": [
+          "平安",
+          "平地",
+          "平时 · 平常"
+        ]
+      },
+      "script": [
+        {
+          "say": "平安和平地都带平。看看它们说什么。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "找小朋友回到家，家人放心的画面。"
+        },
+        {
+          "say": "平安说的是人好好的，平平安安到了家。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "找没有明显起伏、平平的一块地。"
+        },
+        {
+          "say": "画里地面平平展开，能说大家走到了平地上。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "平时我会收好书包，说的是平日里常做的事。"
+        },
+        {
+          "say": "今天和平常一样，表示和通常的日子差不多。"
+        }
+      ]
+    },
+    {
+      "key": "companion-word-family",
+      "type": "slide",
+      "title": "几个人怎样一起做",
+      "template": "picture-points",
+      "data": {
+        "title": "几个人怎样一起做",
+        "picture": "companion-words-board",
+        "points": [
+          "伙伴",
+          "结伴",
+          "做伴 · 相伴",
+          "听清再配图"
+        ]
+      },
+      "script": [
+        {
+          "say": "伴读第四声。看看和谁一起做一件事。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "找两位小伙伴一起做手工的图。"
+        },
+        {
+          "say": "小伙伴可以一起玩，也能一起完成一件事。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "找两个小朋友结伴去拿画纸的画。"
+        },
+        {
+          "say": "结伴说大家约好一起行动，朝一个地方走。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "小宁陪我等车，可以说她来给我做伴。"
+        },
+        {
+          "say": "两个人一路相伴，就是路上相互陪着。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "想想听到的词说的是哪件事，再看图。"
+        },
+        {
+          "say": "图卡慢了。找亮起来的那张，再吹。"
+        },
+        {
+          "say": "你给听到的词配上了画面。"
+        }
+      ]
+    },
+    {
+      "key": "listen-and-find-word-family",
+      "type": "interactive",
+      "title": "听词开艇找画面",
+      "page": "listen-and-find-word-family",
+      "widgetType": "game",
+      "startImage": "words-start",
+      "script": [
+        {
+          "say": "词语小展还缺几张图。听一句，帮我接一张。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#word-listen-mark"
+        },
+        {
+          "say": "先听这句。我们要接刚拿到手的新书。"
+        },
+        {
+          "highlight": "#word-first-book"
+        },
+        {
+          "say": "这张画的是没用过的书，另一张在过新年。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "按左右箭头，开到书那张图的下面。"
+        },
+        {
+          "say": "对准后点圆钮。泡泡往上飞，碰到画就接住。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "我接一张就停。你从头开，没听清可以重听。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "word-new-book": "new-word-family-3",
+        "word-new-year": "new-word-family-6",
+        "word-safe": "flat-word-family-3",
+        "word-flat": "flat-word-family-6",
+        "word-partners": "companion-word-family-3",
+        "word-together": "companion-word-family-6",
+        "word-hint": "companion-word-family-12",
+        "word-help": "companion-word-family-13",
+        "word-praise": "companion-word-family-14"
+      }
+    },
+    {
+      "key": "picture-quiz",
+      "type": "quiz",
+      "title": "听老师说，选合适的图",
+      "intro": [
+        "先听一题，再挑一张符合意思的画。"
+      ],
+      "questions": [
+        {
+          "id": "stationery-home",
+          "question": "贝贝给铅笔和橡皮找了一个家。哪张图画出了那个家？",
+          "skill": "story-before-after",
+          "answer": [
+            "B"
+          ],
+          "analysis": "贝贝想到了书包里的文具盒，铅笔、橡皮等可以放回盒里。",
+          "options": {
+            "A": {
+              "label": "抽屉",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-1-a",
+                "alt": "桌子下打开一个有书的木抽屉"
+              }
+            },
+            "B": {
+              "label": "书包里的文具盒",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-1-b",
+                "alt": "打开的书包里有一个带拉链的长文具盒"
+              }
+            },
+            "C": {
+              "label": "颜料盘",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-1-c",
+                "alt": "圆形颜料盘上有几种颜色"
+              }
+            }
+          }
+        },
+        {
+          "id": "first-did-not-find",
+          "question": "故事开头，贝贝再想用橡皮时，遇到了什么事？",
+          "skill": "story-before-after",
+          "answer": [
+            "A"
+          ],
+          "analysis": "她已经用过橡皮，再想用时找不着。手空空的那幅图表现了这件事。",
+          "options": {
+            "A": {
+              "label": "找不着橡皮",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-2-a",
+                "alt": "小朋友摊开两手找，桌上没有橡皮"
+              }
+            },
+            "B": {
+              "label": "拿到橡皮",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-2-b",
+                "alt": "小朋友把粉色橡皮举在手中"
+              }
+            },
+            "C": {
+              "label": "正在用橡皮",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-2-c",
+                "alt": "小朋友在用粉色橡皮擦纸上的铅笔线"
+              }
+            }
+          }
+        },
+        {
+          "id": "end-of-school-check",
+          "question": "哪张图画了打开文具盒，仔细检查每一件文具？",
+          "skill": "word-groups-and-application",
+          "answer": [
+            "C"
+          ],
+          "analysis": "仔细检查要打开盒子，看看铅笔、橡皮和转笔刀每一件在不在。",
+          "options": {
+            "A": {
+              "label": "合盒放包里",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-3-a",
+                "alt": "小朋友把合起来的盒子塞进书包"
+              }
+            },
+            "B": {
+              "label": "只拿铅笔",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-3-b",
+                "alt": "小朋友拿起桌面上一支铅笔，盒子合着"
+              }
+            },
+            "C": {
+              "label": "打开逐件看",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-3-c",
+                "alt": "小朋友低头指着打开的盒子里三件不同文具"
+              }
+            }
+          }
+        },
+        {
+          "id": "listen-sequence",
+          "question": "一放下画笔，就把盖子盖上。哪组图的顺序对？",
+          "skill": "speak-with-pauses",
+          "answer": [
+            "A"
+          ],
+          "analysis": "画笔先进盒，手再盖上盖子。放下画笔和盖上紧接着发生。",
+          "options": {
+            "A": {
+              "label": "放好再盖",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-4-a",
+                "alt": "左边把画笔放进黄色开口盒，右边双手盖上盒子"
+              }
+            },
+            "B": {
+              "label": "先盖再放",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-4-b",
+                "alt": "左边双手盖上盒，右边才把画笔放进去"
+              }
+            },
+            "C": {
+              "label": "没有放画笔",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-4-c",
+                "alt": "左边孩子摸着闭合的盒，右边盖子仍合上，未做放画笔动作"
+              }
+            }
+          }
+        },
+        {
+          "id": "dish-radical",
+          "question": "听文具盒的盒。哪张字卡亮出皿字底？",
+          "skill": "character-list",
+          "answer": [
+            "C"
+          ],
+          "analysis": "皿字底在盒的下面，像一个扁扁的容器。",
+          "options": {
+            "A": {
+              "label": "亮了人字头",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-5-a",
+                "alt": "橙色在盒字的最上方"
+              }
+            },
+            "B": {
+              "label": "亮了中间口",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-5-b",
+                "alt": "橙色在盒字的中间一块"
+              }
+            },
+            "C": {
+              "label": "亮了皿字底",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-5-c",
+                "alt": "橙色在盒字下方完整的皿字底"
+              }
+            }
+          }
+        },
+        {
+          "id": "listen-companion",
+          "question": "谁和伙伴结伴，抬着同一张画纸走？",
+          "skill": "word-groups-and-application",
+          "answer": [
+            "B"
+          ],
+          "analysis": "两个人一起朝同一处走，手里拿着一张画纸，表现结伴做事。",
+          "options": {
+            "A": {
+              "label": "一个人去",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-6-a",
+                "alt": "一个小朋友独自走到纸架边"
+              }
+            },
+            "B": {
+              "label": "两人结伴",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-6-b",
+                "alt": "两个小朋友并排一起拿一张画纸"
+              }
+            },
+            "C": {
+              "label": "各走一边",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-6-c",
+                "alt": "两个小朋友朝相反方向走，各拿各的东西"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "all-stationery-at-home",
+      "type": "slide",
+      "title": "文具回家了，再看一看",
+      "template": "picture-points",
+      "data": {
+        "title": "文具回家了，再看一看",
+        "picture": "stationery-sticker",
+        "points": [
+          "前后对照",
+          "实际整理",
+          "回纸书读"
+        ]
+      },
+      "script": [
+        {
+          "say": "这张文具贴纸送给你。回想贝贝前后的做法。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "贝贝起初再想用就找不到，后来把文具归到盒里。"
+        },
+        {
+          "say": "听了妈妈的提醒，为了不再丢，她每天放学逐件查。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "现在可以把自己的文具放好，再一件一件确认。"
+        },
+        {
+          "say": "请家人和你一起看看，铅笔、橡皮和转笔刀在吗？"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "和大人翻纸书，换角色读贝贝和妈妈的对话。"
+        },
+        {
+          "say": "挑几个组词造句，再选两个字写给家人看。"
+        }
+      ]
+    }
+  ]
+}

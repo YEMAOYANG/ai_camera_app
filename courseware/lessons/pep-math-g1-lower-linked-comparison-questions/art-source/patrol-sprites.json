@@ -1,0 +1,68 @@
+{
+  "source": "art-source/patrol-sprites.png",
+  "sha256": "46e348c007fb3c4082f25361758c05199e82bd8b86ac68a7743e7902557b0f09",
+  "origin": "builtin-imagegen",
+  "prompt": "Transparent background sprite sheet, exact 3 columns by 2 rows, six isolated assets, each centered in its own equally sized cell with very generous transparent margins, no cell outlines, no overlap, no drop shadow, no text or numbers. Handmade finely grained matte gouache paper cut children's picture-book style, warm cream, apricot, sage and pine. Same rabbit silhouette in first three assets and same vehicle in fourth and fifth assets. Top left: small cream rabbit in sage green outdoor patrol vest, strict side view facing right, standing on two feet. Top middle: same side-facing rabbit in one lively running pose. Top right: same rabbit in a distinct jumping pose with fore and hind feet off the ground. Bottom left: tiny orange electric utility cart, overhead 3/4 view, facing up, clearly chunky. Bottom middle: same tiny orange utility cart with a little cream parcel in its rear rack, facing up. Bottom right: sage green maintenance truck, side view facing right, clearly distinguishable as a moving road obstacle. No other objects, no scene backdrop, no surface, only these six sprites with real transparency.",
+  "outputs": {
+    "rabbit-ready": {
+      "path": "assets/rabbit-ready.png",
+      "crop": [
+        0,
+        0,
+        512,
+        512
+      ],
+      "sha256": "c7e53ab2d19d4248824606fe907731e3bd0d7778cf8f1d47d7261913c113320b"
+    },
+    "rabbit-run": {
+      "path": "assets/rabbit-run.png",
+      "crop": [
+        512,
+        0,
+        1024,
+        512
+      ],
+      "sha256": "d29da38f20eaa1919083b164a0447e921d1786812a41861f802dcaa021d85e2b"
+    },
+    "rabbit-jump": {
+      "path": "assets/rabbit-jump.png",
+      "crop": [
+        1024,
+        0,
+        1536,
+        512
+      ],
+      "sha256": "988e9339d81a27e1770b4a5a52a0080d7f6ccc02ebe2b73e89906e32e3b18579"
+    },
+    "cart-ready": {
+      "path": "assets/cart-ready.png",
+      "crop": [
+        0,
+        512,
+        512,
+        1024
+      ],
+      "sha256": "abc71b8676ac7bf5b69b4e8994be2401332e96a66e148b0fd4610b7a657a1336"
+    },
+    "cart-loaded": {
+      "path": "assets/cart-loaded.png",
+      "crop": [
+        512,
+        512,
+        1024,
+        1024
+      ],
+      "sha256": "32d58617827c784bdc37835910e924267396f83a6d5094598fb1b2fa4d490bbf"
+    },
+    "maintenance-truck": {
+      "path": "assets/maintenance-truck.png",
+      "crop": [
+        1024,
+        512,
+        1536,
+        1024
+      ],
+      "sha256": "abe4874b70ac96b92645532a73b663740ee044c73ded8cb18c2731e2b9a888b0"
+    }
+  }
+}

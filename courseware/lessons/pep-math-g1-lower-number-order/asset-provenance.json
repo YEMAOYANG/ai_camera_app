@@ -1,0 +1,4527 @@
+{
+  "schemaVersion": "mira.courseware.asset-provenance.v1",
+  "visualPhase": "exact_diagrams_complete_illustrated_game_art_pending_disk",
+  "numberPlan": {
+    "rows": 10,
+    "columns": 10,
+    "first": 1,
+    "last": 100,
+    "model": "10 * row + col + 1"
+  },
+  "assets": {
+    "build-first-two-rows": {
+      "path": "assets/build-first-two-rows.png",
+      "sha256": "d31d73e4cbeba0c39369f86405daf2e7a265f8347fbd46a4c00de0bfb06d3e67",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "counting-platforms",
+        "rack-of-hundred-tickets"
+      ],
+      "chartProof": {
+        "rows": [
+          [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10
+          ],
+          [
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20
+          ]
+        ],
+        "matrix": [
+          [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              0,
+              2
+            ],
+            [
+              0,
+              3
+            ],
+            [
+              0,
+              4
+            ],
+            [
+              0,
+              5
+            ],
+            [
+              0,
+              6
+            ],
+            [
+              0,
+              7
+            ],
+            [
+              0,
+              8
+            ],
+            [
+              0,
+              9
+            ]
+          ],
+          [
+            [
+              1,
+              0
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              1,
+              3
+            ],
+            [
+              1,
+              4
+            ],
+            [
+              1,
+              5
+            ],
+            [
+              1,
+              6
+            ],
+            [
+              1,
+              7
+            ],
+            [
+              1,
+              8
+            ],
+            [
+              1,
+              9
+            ]
+          ]
+        ],
+        "active": [
+          1,
+          10,
+          11
+        ],
+        "hidden": [],
+        "route": []
+      }
+    },
+    "cross-proven-66": {
+      "path": "assets/cross-proven-66.png",
+      "sha256": "607e623c0d961c1046abf2ce3166ac005c6b97d78004047d7ccc1f280260745e",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "rebuild-a-chart-fragment"
+      ],
+      "chartProof": {
+        "rows": [
+          [
+            55,
+            56
+          ],
+          [
+            65,
+            66
+          ]
+        ],
+        "matrix": [
+          [
+            [
+              5,
+              4
+            ],
+            [
+              5,
+              5
+            ]
+          ],
+          [
+            [
+              6,
+              4
+            ],
+            [
+              6,
+              5
+            ]
+          ]
+        ],
+        "active": [
+          55,
+          56,
+          65,
+          66
+        ],
+        "hidden": [],
+        "route": [
+          [
+            55,
+            56
+          ],
+          [
+            56,
+            66
+          ],
+          [
+            55,
+            65
+          ],
+          [
+            65,
+            66
+          ]
+        ]
+      }
+    },
+    "cross-two-checks": {
+      "path": "assets/cross-two-checks.png",
+      "sha256": "ec2c75a936f913d9fdab2520f300e701c0467077afc1b02198b1e897d95692ab",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "rebuild-a-chart-fragment"
+      ],
+      "chartProof": {
+        "rows": [
+          [
+            55,
+            56
+          ],
+          [
+            65,
+            66
+          ]
+        ],
+        "matrix": [
+          [
+            [
+              5,
+              4
+            ],
+            [
+              5,
+              5
+            ]
+          ],
+          [
+            [
+              6,
+              4
+            ],
+            [
+              6,
+              5
+            ]
+          ]
+        ],
+        "active": [
+          55,
+          66
+        ],
+        "hidden": [
+          66
+        ],
+        "route": []
+      }
+    },
+    "first-ticket-row": {
+      "path": "assets/first-ticket-row.png",
+      "sha256": "9a3d60accfb2db21f28523040e436ab1e1125ec478baa380f1027a42a1c0d34c",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "rack-of-hundred-tickets"
+      ],
+      "chartProof": {
+        "rows": [
+          [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10
+          ],
+          [
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20
+          ]
+        ],
+        "matrix": [
+          [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              0,
+              2
+            ],
+            [
+              0,
+              3
+            ],
+            [
+              0,
+              4
+            ],
+            [
+              0,
+              5
+            ],
+            [
+              0,
+              6
+            ],
+            [
+              0,
+              7
+            ],
+            [
+              0,
+              8
+            ],
+            [
+              0,
+              9
+            ]
+          ],
+          [
+            [
+              1,
+              0
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              1,
+              3
+            ],
+            [
+              1,
+              4
+            ],
+            [
+              1,
+              5
+            ],
+            [
+              1,
+              6
+            ],
+            [
+              1,
+              7
+            ],
+            [
+              1,
+              8
+            ],
+            [
+              1,
+              9
+            ]
+          ]
+        ],
+        "active": [
+          1,
+          10,
+          11
+        ],
+        "hidden": [
+          2,
+          5,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+        ],
+        "route": []
+      }
+    },
+    "full-hundred-chart": {
+      "path": "assets/full-hundred-chart.png",
+      "sha256": "e9414542c221e8cbbb242b0792fe1bf030d45d376843f511b3d9f10886098d9e",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "explain-the-number-routes",
+        "next-row-start"
+      ],
+      "chartProof": {
+        "rows": [
+          [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10
+          ],
+          [
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20
+          ],
+          [
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30
+          ],
+          [
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40
+          ],
+          [
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50
+          ],
+          [
+            51,
+            52,
+            53,
+            54,
+            55,
+            56,
+            57,
+            58,
+            59,
+            60
+          ],
+          [
+            61,
+            62,
+            63,
+            64,
+            65,
+            66,
+            67,
+            68,
+            69,
+            70
+          ],
+          [
+            71,
+            72,
+            73,
+            74,
+            75,
+            76,
+            77,
+            78,
+            79,
+            80
+          ],
+          [
+            81,
+            82,
+            83,
+            84,
+            85,
+            86,
+            87,
+            88,
+            89,
+            90
+          ],
+          [
+            91,
+            92,
+            93,
+            94,
+            95,
+            96,
+            97,
+            98,
+            99,
+            100
+          ]
+        ],
+        "active": [
+          49,
+          50,
+          51,
+          100
+        ],
+        "hidden": [],
+        "marks": {}
+      }
+    },
+    "home-draw-your-own": {
+      "path": "assets/home-draw-your-own.png",
+      "sha256": "f4a438baec2e7c45982937671c9b7baa3b66200214ebd37253b189c269e5e793",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "explain-the-number-routes"
+      ],
+      "chartProof": {
+        "rows": [
+          [
+            4,
+            5
+          ],
+          [
+            14,
+            15
+          ]
+        ],
+        "matrix": [
+          [
+            [
+              0,
+              3
+            ],
+            [
+              0,
+              4
+            ]
+          ],
+          [
+            [
+              1,
+              3
+            ],
+            [
+              1,
+              4
+            ]
+          ]
+        ],
+        "active": [
+          5,
+          14
+        ],
+        "hidden": [
+          4,
+          15
+        ],
+        "route": []
+      }
+    },
+    "hop-proof-17": {
+      "path": "assets/hop-proof-17.png",
+      "sha256": "0e11172debda618db4d6ed063b3cd7c331b6d72713ad52180fe58065f2f4f744",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "counting-platforms"
+      ],
+      "chartProof": {
+        "rows": [
+          [
+            16,
+            17
+          ]
+        ],
+        "matrix": [
+          [
+            [
+              1,
+              5
+            ],
+            [
+              1,
+              6
+            ]
+          ]
+        ],
+        "active": [
+          16,
+          17
+        ],
+        "hidden": [],
+        "route": [
+          [
+            16,
+            17
+          ]
+        ]
+      }
+    },
+    "hop-proof-18": {
+      "path": "assets/hop-proof-18.png",
+      "sha256": "7369007e9d651d0d9e95fac23390ce2d0c118d67feafd65de371cd2dbe32d3d2",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "counting-platforms"
+      ],
+      "chartProof": {
+        "rows": [
+          [
+            17,
+            18
+          ]
+        ],
+        "matrix": [
+          [
+            [
+              1,
+              6
+            ],
+            [
+              1,
+              7
+            ]
+          ]
+        ],
+        "active": [
+          17,
+          18
+        ],
+        "hidden": [],
+        "route": [
+          [
+            17,
+            18
+          ]
+        ]
+      }
+    },
+    "hop-proof-19": {
+      "path": "assets/hop-proof-19.png",
+      "sha256": "b1ba95bbce32e1fc3e6c9cc103149cde09b4461a5fb5251f867f326f7ccd5f7b",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "counting-platforms"
+      ],
+      "chartProof": {
+        "rows": [
+          [
+            18,
+            19
+          ]
+        ],
+        "matrix": [
+          [
+            [
+              1,
+              7
+            ],
+            [
+              1,
+              8
+            ]
+          ]
+        ],
+        "active": [
+          18,
+          19
+        ],
+        "hidden": [],
+        "route": [
+          [
+            18,
+            19
+          ]
+        ]
+      }
+    },
+    "hop-proof-59": {
+      "path": "assets/hop-proof-59.png",
+      "sha256": "80cfb6e9683690f145f9474dd31e2caee1749141a4d2c0db96267f777408214d",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "counting-platforms"
+      ],
+      "chartProof": {
+        "rows": [
+          [
+            58,
+            59
+          ]
+        ],
+        "matrix": [
+          [
+            [
+              5,
+              7
+            ],
+            [
+              5,
+              8
+            ]
+          ]
+        ],
+        "active": [
+          58,
+          59
+        ],
+        "hidden": [],
+        "route": [
+          [
+            58,
+            59
+          ]
+        ]
+      }
+    },
+    "hop-proof-60": {
+      "path": "assets/hop-proof-60.png",
+      "sha256": "4964fe9ebd390b356fbf3d3db76bf97c77a9d867e262bb0f60128fe2ee916851",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "counting-platforms"
+      ],
+      "chartProof": {
+        "rows": [
+          [
+            59,
+            60
+          ]
+        ],
+        "matrix": [
+          [
+            [
+              5,
+              8
+            ],
+            [
+              5,
+              9
+            ]
+          ]
+        ],
+        "active": [
+          59,
+          60
+        ],
+        "hidden": [],
+        "route": [
+          [
+            59,
+            60
+          ]
+        ]
+      }
+    },
+    "hop-proof-61": {
+      "path": "assets/hop-proof-61.png",
+      "sha256": "c3fa4f76c2227f180b7912444dfa7863e4f9c1f012bd916f37b2938b17b27057",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "counting-platforms"
+      ],
+      "chartProof": {
+        "rows": [
+          [
+            51,
+            52,
+            53,
+            54,
+            55,
+            56,
+            57,
+            58,
+            59,
+            60
+          ],
+          [
+            61,
+            62,
+            63,
+            64,
+            65,
+            66,
+            67,
+            68,
+            69,
+            70
+          ]
+        ],
+        "matrix": [
+          [
+            [
+              5,
+              0
+            ],
+            [
+              5,
+              1
+            ],
+            [
+              5,
+              2
+            ],
+            [
+              5,
+              3
+            ],
+            [
+              5,
+              4
+            ],
+            [
+              5,
+              5
+            ],
+            [
+              5,
+              6
+            ],
+            [
+              5,
+              7
+            ],
+            [
+              5,
+              8
+            ],
+            [
+              5,
+              9
+            ]
+          ],
+          [
+            [
+              6,
+              0
+            ],
+            [
+              6,
+              1
+            ],
+            [
+              6,
+              2
+            ],
+            [
+              6,
+              3
+            ],
+            [
+              6,
+              4
+            ],
+            [
+              6,
+              5
+            ],
+            [
+              6,
+              6
+            ],
+            [
+              6,
+              7
+            ],
+            [
+              6,
+              8
+            ],
+            [
+              6,
+              9
+            ]
+          ]
+        ],
+        "active": [
+          60,
+          61
+        ],
+        "hidden": [],
+        "route": [
+          [
+            60,
+            61,
+            "wrap"
+          ]
+        ]
+      }
+    },
+    "hop-proof-84": {
+      "path": "assets/hop-proof-84.png",
+      "sha256": "bb0a488f101875d8fdfedca82cbda693ebb97ca400a0e5e3a438ccfd4ad0af73",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "counting-platforms"
+      ],
+      "chartProof": {
+        "rows": [
+          [
+            84,
+            85
+          ]
+        ],
+        "matrix": [
+          [
+            [
+              8,
+              3
+            ],
+            [
+              8,
+              4
+            ]
+          ]
+        ],
+        "active": [
+          85,
+          84
+        ],
+        "hidden": [],
+        "route": [
+          [
+            85,
+            84
+          ]
+        ]
+      }
+    },
+    "hop-proof-85": {
+      "path": "assets/hop-proof-85.png",
+      "sha256": "add3ce5ae3c38c50083779a4187bdc9085c72afd7adf2f9d324ce3a1090a4168",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "counting-platforms"
+      ],
+      "chartProof": {
+        "rows": [
+          [
+            85,
+            86
+          ]
+        ],
+        "matrix": [
+          [
+            [
+              8,
+              4
+            ],
+            [
+              8,
+              5
+            ]
+          ]
+        ],
+        "active": [
+          86,
+          85
+        ],
+        "hidden": [],
+        "route": [
+          [
+            86,
+            85
+          ]
+        ]
+      }
+    },
+    "hop-proof-86": {
+      "path": "assets/hop-proof-86.png",
+      "sha256": "dfcd35c6761de1959bf74e4bdd15191d4802ef98598f76ac2d8729e5e6d5e5b3",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "counting-platforms"
+      ],
+      "chartProof": {
+        "rows": [
+          [
+            86,
+            87
+          ]
+        ],
+        "matrix": [
+          [
+            [
+              8,
+              5
+            ],
+            [
+              8,
+              6
+            ]
+          ]
+        ],
+        "active": [
+          87,
+          86
+        ],
+        "hidden": [],
+        "route": [
+          [
+            87,
+            86
+          ]
+        ]
+      }
+    },
+    "hop-proof-87": {
+      "path": "assets/hop-proof-87.png",
+      "sha256": "b113de95cfa136a48a064e2e548f8f873addbd86f39a12cc33027df5b4fd1080",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "counting-platforms"
+      ],
+      "chartProof": {
+        "rows": [
+          [
+            87,
+            88
+          ]
+        ],
+        "matrix": [
+          [
+            [
+              8,
+              6
+            ],
+            [
+              8,
+              7
+            ]
+          ]
+        ],
+        "active": [
+          88,
+          87
+        ],
+        "hidden": [],
+        "route": [
+          [
+            88,
+            87
+          ]
+        ]
+      }
+    },
+    "hop-ready": {
+      "path": "assets/hop-ready.png",
+      "sha256": "fa4625d109907efdf27eea6a02f01924290225fdd96ae1d2acd415b3765660f4",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "counting-platforms"
+      ],
+      "chartProof": {
+        "rows": [
+          [
+            15,
+            16,
+            17,
+            18,
+            19
+          ]
+        ],
+        "matrix": [
+          [
+            [
+              1,
+              4
+            ],
+            [
+              1,
+              5
+            ],
+            [
+              1,
+              6
+            ],
+            [
+              1,
+              7
+            ],
+            [
+              1,
+              8
+            ]
+          ]
+        ],
+        "active": [
+          16
+        ],
+        "hidden": [
+          17,
+          18,
+          19
+        ],
+        "route": []
+      }
+    },
+    "left-diagonal-65": {
+      "path": "assets/left-diagonal-65.png",
+      "sha256": "da7dfeb6d0144382019c97aa975a1a252bd11899fb104a46be562fc5d0fc4cd0",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "two-ways-down-diagonally"
+      ],
+      "chartProof": {
+        "rows": [
+          [
+            64,
+            65,
+            66
+          ],
+          [
+            74,
+            75,
+            76
+          ]
+        ],
+        "matrix": [
+          [
+            [
+              6,
+              3
+            ],
+            [
+              6,
+              4
+            ],
+            [
+              6,
+              5
+            ]
+          ],
+          [
+            [
+              7,
+              3
+            ],
+            [
+              7,
+              4
+            ],
+            [
+              7,
+              5
+            ]
+          ]
+        ],
+        "active": [
+          65,
+          75,
+          74
+        ],
+        "hidden": [],
+        "route": [
+          [
+            65,
+            75
+          ],
+          [
+            75,
+            74
+          ]
+        ]
+      }
+    },
+    "partner-new-fragment": {
+      "path": "assets/partner-new-fragment.png",
+      "sha256": "616dabd34c34486777ee03f3c33c6fde210bb301c6d20ef25d4e9d86e434fe33",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "take-turns-making-fragments"
+      ],
+      "chartProof": {
+        "rows": [
+          [
+            76,
+            77
+          ],
+          [
+            86,
+            87
+          ],
+          [
+            96,
+            97
+          ]
+        ],
+        "matrix": [
+          [
+            [
+              7,
+              5
+            ],
+            [
+              7,
+              6
+            ]
+          ],
+          [
+            [
+              8,
+              5
+            ],
+            [
+              8,
+              6
+            ]
+          ],
+          [
+            [
+              9,
+              5
+            ],
+            [
+              9,
+              6
+            ]
+          ]
+        ],
+        "active": [
+          77,
+          87,
+          96
+        ],
+        "hidden": [
+          76,
+          86,
+          97
+        ],
+        "route": []
+      }
+    },
+    "q-diagonal-stem": {
+      "path": "assets/q-diagonal-stem.png",
+      "sha256": "f7b72a0d1be3910b3392cc7216606cad3b0b7dccb7b35553e0d7d974ccd3c64b",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "quiz:diagonal-left-down"
+      ],
+      "chartProof": {
+        "rows": [
+          [
+            72,
+            73,
+            74
+          ],
+          [
+            82,
+            83,
+            84
+          ]
+        ],
+        "matrix": [
+          [
+            [
+              7,
+              1
+            ],
+            [
+              7,
+              2
+            ],
+            [
+              7,
+              3
+            ]
+          ],
+          [
+            [
+              8,
+              1
+            ],
+            [
+              8,
+              2
+            ],
+            [
+              8,
+              3
+            ]
+          ]
+        ],
+        "active": [
+          73
+        ],
+        "hidden": [
+          72,
+          74,
+          82,
+          83,
+          84
+        ],
+        "route": [
+          [
+            73,
+            83
+          ],
+          [
+            83,
+            82
+          ]
+        ]
+      }
+    },
+    "q-fragment-stem": {
+      "path": "assets/q-fragment-stem.png",
+      "sha256": "05984a78df59ab3820a948d4d3a9a1e738fb8ffdb002e6328f33b6a514bda9d9",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "quiz:check-the-ticket-cross"
+      ],
+      "chartProof": {
+        "rows": [
+          [
+            15,
+            16
+          ],
+          [
+            25,
+            26
+          ]
+        ],
+        "matrix": [
+          [
+            [
+              1,
+              4
+            ],
+            [
+              1,
+              5
+            ]
+          ],
+          [
+            [
+              2,
+              4
+            ],
+            [
+              2,
+              5
+            ]
+          ]
+        ],
+        "active": [
+          25
+        ],
+        "hidden": [
+          16,
+          25
+        ],
+        "route": []
+      }
+    },
+    "q-horizontal-gap": {
+      "path": "assets/q-horizontal-gap.png",
+      "sha256": "4bedbd1339f1fc9312ba45ea0b81059cc52f02194be530891ac9f68e3c3be9e5",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "quiz:find-the-horizontal-gap"
+      ],
+      "chartProof": {
+        "rows": [
+          [
+            12,
+            13,
+            14
+          ]
+        ],
+        "matrix": [
+          [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              1,
+              3
+            ]
+          ]
+        ],
+        "active": [
+          13
+        ],
+        "hidden": [
+          13
+        ],
+        "route": []
+      }
+    },
+    "q-tens-a": {
+      "path": "assets/q-tens-a.png",
+      "sha256": "02a912c0b530a4071320fa192ab5b2f1611c36f31c05ac0b4d5a577999e6e388",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "quiz:spot-the-nine-in-tens"
+      ],
+      "chartProof": {
+        "rows": [
+          [
+            81,
+            82,
+            83,
+            84,
+            85,
+            86,
+            87,
+            88,
+            89,
+            90
+          ],
+          [
+            91,
+            92,
+            93,
+            94,
+            95,
+            96,
+            97,
+            98,
+            99,
+            100
+          ]
+        ],
+        "matrix": [
+          [
+            [
+              8,
+              0
+            ],
+            [
+              8,
+              1
+            ],
+            [
+              8,
+              2
+            ],
+            [
+              8,
+              3
+            ],
+            [
+              8,
+              4
+            ],
+            [
+              8,
+              5
+            ],
+            [
+              8,
+              6
+            ],
+            [
+              8,
+              7
+            ],
+            [
+              8,
+              8
+            ],
+            [
+              8,
+              9
+            ]
+          ],
+          [
+            [
+              9,
+              0
+            ],
+            [
+              9,
+              1
+            ],
+            [
+              9,
+              2
+            ],
+            [
+              9,
+              3
+            ],
+            [
+              9,
+              4
+            ],
+            [
+              9,
+              5
+            ],
+            [
+              9,
+              6
+            ],
+            [
+              9,
+              7
+            ],
+            [
+              9,
+              8
+            ],
+            [
+              9,
+              9
+            ]
+          ]
+        ],
+        "active": [],
+        "hidden": [],
+        "route": []
+      }
+    },
+    "q-tens-b": {
+      "path": "assets/q-tens-b.png",
+      "sha256": "827258daf1a54adc7272eefc690f40df85903c0cf21bdec7f1f1495f8ed4831c",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "quiz:spot-the-nine-in-tens"
+      ],
+      "chartProof": {
+        "rows": [
+          [
+            81,
+            82,
+            83,
+            84,
+            85,
+            86,
+            87,
+            88,
+            89,
+            90
+          ],
+          [
+            91,
+            92,
+            93,
+            94,
+            95,
+            96,
+            97,
+            98,
+            99,
+            100
+          ]
+        ],
+        "matrix": [
+          [
+            [
+              8,
+              0
+            ],
+            [
+              8,
+              1
+            ],
+            [
+              8,
+              2
+            ],
+            [
+              8,
+              3
+            ],
+            [
+              8,
+              4
+            ],
+            [
+              8,
+              5
+            ],
+            [
+              8,
+              6
+            ],
+            [
+              8,
+              7
+            ],
+            [
+              8,
+              8
+            ],
+            [
+              8,
+              9
+            ]
+          ],
+          [
+            [
+              9,
+              0
+            ],
+            [
+              9,
+              1
+            ],
+            [
+              9,
+              2
+            ],
+            [
+              9,
+              3
+            ],
+            [
+              9,
+              4
+            ],
+            [
+              9,
+              5
+            ],
+            [
+              9,
+              6
+            ],
+            [
+              9,
+              7
+            ],
+            [
+              9,
+              8
+            ],
+            [
+              9,
+              9
+            ]
+          ]
+        ],
+        "active": [],
+        "hidden": [],
+        "route": []
+      }
+    },
+    "q-tens-c": {
+      "path": "assets/q-tens-c.png",
+      "sha256": "1303ca4221c3feb198a6ad01cccb3a2be02e9a4e831e6d83072b0822ba4a5482",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "quiz:spot-the-nine-in-tens"
+      ],
+      "chartProof": {
+        "rows": [
+          [
+            81,
+            82,
+            83,
+            84,
+            85,
+            86,
+            87,
+            88,
+            89,
+            90
+          ],
+          [
+            91,
+            92,
+            93,
+            94,
+            95,
+            96,
+            97,
+            98,
+            99,
+            100
+          ]
+        ],
+        "matrix": [
+          [
+            [
+              8,
+              0
+            ],
+            [
+              8,
+              1
+            ],
+            [
+              8,
+              2
+            ],
+            [
+              8,
+              3
+            ],
+            [
+              8,
+              4
+            ],
+            [
+              8,
+              5
+            ],
+            [
+              8,
+              6
+            ],
+            [
+              8,
+              7
+            ],
+            [
+              8,
+              8
+            ],
+            [
+              8,
+              9
+            ]
+          ],
+          [
+            [
+              9,
+              0
+            ],
+            [
+              9,
+              1
+            ],
+            [
+              9,
+              2
+            ],
+            [
+              9,
+              3
+            ],
+            [
+              9,
+              4
+            ],
+            [
+              9,
+              5
+            ],
+            [
+              9,
+              6
+            ],
+            [
+              9,
+              7
+            ],
+            [
+              9,
+              8
+            ],
+            [
+              9,
+              9
+            ]
+          ]
+        ],
+        "active": [],
+        "hidden": [],
+        "route": []
+      }
+    },
+    "q-tens-stem": {
+      "path": "assets/q-tens-stem.png",
+      "sha256": "eeac66fef9381369649f68a437195ee89b91c16b14f30e8f7691882ef6174ee8",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "quiz:spot-the-nine-in-tens"
+      ],
+      "chartProof": {
+        "rows": [
+          [
+            81,
+            82,
+            83,
+            84,
+            85,
+            86,
+            87,
+            88,
+            89,
+            90
+          ],
+          [
+            91,
+            92,
+            93,
+            94,
+            95,
+            96,
+            97,
+            98,
+            99,
+            100
+          ]
+        ],
+        "matrix": [
+          [
+            [
+              8,
+              0
+            ],
+            [
+              8,
+              1
+            ],
+            [
+              8,
+              2
+            ],
+            [
+              8,
+              3
+            ],
+            [
+              8,
+              4
+            ],
+            [
+              8,
+              5
+            ],
+            [
+              8,
+              6
+            ],
+            [
+              8,
+              7
+            ],
+            [
+              8,
+              8
+            ],
+            [
+              8,
+              9
+            ]
+          ],
+          [
+            [
+              9,
+              0
+            ],
+            [
+              9,
+              1
+            ],
+            [
+              9,
+              2
+            ],
+            [
+              9,
+              3
+            ],
+            [
+              9,
+              4
+            ],
+            [
+              9,
+              5
+            ],
+            [
+              9,
+              6
+            ],
+            [
+              9,
+              7
+            ],
+            [
+              9,
+              8
+            ],
+            [
+              9,
+              9
+            ]
+          ]
+        ],
+        "active": [],
+        "hidden": [],
+        "route": []
+      }
+    },
+    "q-ticket-11": {
+      "path": "assets/q-ticket-11.png",
+      "sha256": "9ef4aa4aee2056e2c85bad6b172160eb568d8e704f122c803ba7846b42734077",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "quiz:find-the-horizontal-gap"
+      ],
+      "chartProof": {
+        "number": 11,
+        "location": [
+          1,
+          0
+        ]
+      }
+    },
+    "q-ticket-13": {
+      "path": "assets/q-ticket-13.png",
+      "sha256": "d98696d345b546134a45f4547a41204925fdf52ea0ff439255845db96738ff88",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "quiz:find-the-horizontal-gap"
+      ],
+      "chartProof": {
+        "number": 13,
+        "location": [
+          1,
+          2
+        ]
+      }
+    },
+    "q-ticket-15": {
+      "path": "assets/q-ticket-15.png",
+      "sha256": "97a24c259dc94da1565ae897517004fb8cdcde0040caa18685d6e324552a5524",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "quiz:find-the-horizontal-gap"
+      ],
+      "chartProof": {
+        "number": 15,
+        "location": [
+          1,
+          4
+        ]
+      }
+    },
+    "q-ticket-25": {
+      "path": "assets/q-ticket-25.png",
+      "sha256": "0da0182e959f93e37bed69fc3181e19526b5c87aa74d1301a6627b015073d713",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "quiz:check-the-ticket-cross"
+      ],
+      "chartProof": {
+        "number": 25,
+        "location": [
+          2,
+          4
+        ]
+      }
+    },
+    "q-ticket-27": {
+      "path": "assets/q-ticket-27.png",
+      "sha256": "7dc3205ee11e213fc5f15a2502a9384c1b93f5357223dbb4452e6cb5b1efba1a",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "quiz:check-the-ticket-cross"
+      ],
+      "chartProof": {
+        "number": 27,
+        "location": [
+          2,
+          6
+        ]
+      }
+    },
+    "q-ticket-35": {
+      "path": "assets/q-ticket-35.png",
+      "sha256": "9f2927af799178e9693dbb1d5bfc3cacd58126f38e09042ec4ed4744253299bb",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "quiz:check-the-ticket-cross"
+      ],
+      "chartProof": {
+        "number": 35,
+        "location": [
+          3,
+          4
+        ]
+      }
+    },
+    "q-ticket-39": {
+      "path": "assets/q-ticket-39.png",
+      "sha256": "134b7aab706158febebaf3b66e6f88e9126b24cc353453d8bae4fd83e93ecca8",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "quiz:fill-the-next-shelf"
+      ],
+      "chartProof": {
+        "number": 39,
+        "location": [
+          3,
+          8
+        ]
+      }
+    },
+    "q-ticket-47": {
+      "path": "assets/q-ticket-47.png",
+      "sha256": "652256f81fea6c411dca837889a6f46e5040444909271a4405435b0fbf5c1643",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "quiz:fill-the-next-shelf"
+      ],
+      "chartProof": {
+        "number": 47,
+        "location": [
+          4,
+          6
+        ]
+      }
+    },
+    "q-ticket-48": {
+      "path": "assets/q-ticket-48.png",
+      "sha256": "99d78e26a6d566e43d26f3d3f2d2242879e33674b3502e6d366144b8a3ade63c",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "quiz:fill-the-next-shelf"
+      ],
+      "chartProof": {
+        "number": 48,
+        "location": [
+          4,
+          7
+        ]
+      }
+    },
+    "q-ticket-81": {
+      "path": "assets/q-ticket-81.png",
+      "sha256": "9a32e8864dd57bdddcaa0af5929ecd412afb874432050e98cc4d99c6e9c22813",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "quiz:diagonal-left-down"
+      ],
+      "chartProof": {
+        "number": 81,
+        "location": [
+          8,
+          0
+        ]
+      }
+    },
+    "q-ticket-82": {
+      "path": "assets/q-ticket-82.png",
+      "sha256": "92a721e13f44a967ec8728787e04ee394f203e14a25f2c042cb8334db2e419e4",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "quiz:diagonal-left-down"
+      ],
+      "chartProof": {
+        "number": 82,
+        "location": [
+          8,
+          1
+        ]
+      }
+    },
+    "q-ticket-92": {
+      "path": "assets/q-ticket-92.png",
+      "sha256": "32c32c9bc475736ab93be7b8b5decf204cf45648c88f73fe6910486bb524c11a",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "quiz:diagonal-left-down"
+      ],
+      "chartProof": {
+        "number": 92,
+        "location": [
+          9,
+          1
+        ]
+      }
+    },
+    "q-vertical-gap": {
+      "path": "assets/q-vertical-gap.png",
+      "sha256": "4fd17cce0f359c41fab54b366f68ec7c61f832fb6640afa135b65e14816cbd30",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "quiz:fill-the-next-shelf"
+      ],
+      "chartProof": {
+        "rows": [
+          [
+            28
+          ],
+          [
+            38
+          ],
+          [
+            48
+          ]
+        ],
+        "matrix": [
+          [
+            [
+              2,
+              7
+            ]
+          ],
+          [
+            [
+              3,
+              7
+            ]
+          ],
+          [
+            [
+              4,
+              7
+            ]
+          ]
+        ],
+        "active": [
+          48
+        ],
+        "hidden": [
+          48
+        ],
+        "route": []
+      }
+    },
+    "q-wrap-a": {
+      "path": "assets/q-wrap-a.png",
+      "sha256": "df817e624dfba94d42a03b2e6260d521bb29eb3399c4d38b304f7d71a54e1b9c",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "quiz:continue-at-row-start"
+      ],
+      "chartProof": {
+        "rows": [
+          [
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30
+          ],
+          [
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40
+          ]
+        ],
+        "matrix": [
+          [
+            [
+              2,
+              0
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              2,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              2,
+              4
+            ],
+            [
+              2,
+              5
+            ],
+            [
+              2,
+              6
+            ],
+            [
+              2,
+              7
+            ],
+            [
+              2,
+              8
+            ],
+            [
+              2,
+              9
+            ]
+          ],
+          [
+            [
+              3,
+              0
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              3,
+              2
+            ],
+            [
+              3,
+              3
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              3,
+              5
+            ],
+            [
+              3,
+              6
+            ],
+            [
+              3,
+              7
+            ],
+            [
+              3,
+              8
+            ],
+            [
+              3,
+              9
+            ]
+          ]
+        ],
+        "active": [
+          30,
+          32
+        ],
+        "hidden": [
+          31,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40
+        ],
+        "route": []
+      }
+    },
+    "q-wrap-b": {
+      "path": "assets/q-wrap-b.png",
+      "sha256": "b9fd4d7c9821fc4c1aeed2ebceacbb852a4aa7b3144e64dc52f9710f6484f15b",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "quiz:continue-at-row-start"
+      ],
+      "chartProof": {
+        "rows": [
+          [
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30
+          ],
+          [
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40
+          ]
+        ],
+        "matrix": [
+          [
+            [
+              2,
+              0
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              2,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              2,
+              4
+            ],
+            [
+              2,
+              5
+            ],
+            [
+              2,
+              6
+            ],
+            [
+              2,
+              7
+            ],
+            [
+              2,
+              8
+            ],
+            [
+              2,
+              9
+            ]
+          ],
+          [
+            [
+              3,
+              0
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              3,
+              2
+            ],
+            [
+              3,
+              3
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              3,
+              5
+            ],
+            [
+              3,
+              6
+            ],
+            [
+              3,
+              7
+            ],
+            [
+              3,
+              8
+            ],
+            [
+              3,
+              9
+            ]
+          ]
+        ],
+        "active": [
+          30,
+          31
+        ],
+        "hidden": [
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40
+        ],
+        "route": []
+      }
+    },
+    "q-wrap-c": {
+      "path": "assets/q-wrap-c.png",
+      "sha256": "8dbec097df1c48663615e3b9f18dffd1705d3ddd6ed2843b6323a8e3b6ebe9ac",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "quiz:continue-at-row-start"
+      ],
+      "chartProof": {
+        "rows": [
+          [
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30
+          ],
+          [
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40
+          ]
+        ],
+        "matrix": [
+          [
+            [
+              2,
+              0
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              2,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              2,
+              4
+            ],
+            [
+              2,
+              5
+            ],
+            [
+              2,
+              6
+            ],
+            [
+              2,
+              7
+            ],
+            [
+              2,
+              8
+            ],
+            [
+              2,
+              9
+            ]
+          ],
+          [
+            [
+              3,
+              0
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              3,
+              2
+            ],
+            [
+              3,
+              3
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              3,
+              5
+            ],
+            [
+              3,
+              6
+            ],
+            [
+              3,
+              7
+            ],
+            [
+              3,
+              8
+            ],
+            [
+              3,
+              9
+            ]
+          ]
+        ],
+        "active": [
+          30,
+          40
+        ],
+        "hidden": [
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39
+        ],
+        "route": []
+      }
+    },
+    "q-wrap-stem": {
+      "path": "assets/q-wrap-stem.png",
+      "sha256": "306743f625e96752ca956138e59cc172d90243e94923b95df3720aad66fbc2de",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "quiz:continue-at-row-start"
+      ],
+      "chartProof": {
+        "rows": [
+          [
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30
+          ],
+          [
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40
+          ]
+        ],
+        "matrix": [
+          [
+            [
+              2,
+              0
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              2,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              2,
+              4
+            ],
+            [
+              2,
+              5
+            ],
+            [
+              2,
+              6
+            ],
+            [
+              2,
+              7
+            ],
+            [
+              2,
+              8
+            ],
+            [
+              2,
+              9
+            ]
+          ],
+          [
+            [
+              3,
+              0
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              3,
+              2
+            ],
+            [
+              3,
+              3
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              3,
+              5
+            ],
+            [
+              3,
+              6
+            ],
+            [
+              3,
+              7
+            ],
+            [
+              3,
+              8
+            ],
+            [
+              3,
+              9
+            ]
+          ]
+        ],
+        "active": [
+          30
+        ],
+        "hidden": [
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40
+        ],
+        "route": []
+      }
+    },
+    "right-diagonal-65": {
+      "path": "assets/right-diagonal-65.png",
+      "sha256": "bddc561af997f0671ac5eb90640f44e58a8c44e050315af5b96c28bb879ebf5a",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "two-ways-down-diagonally"
+      ],
+      "chartProof": {
+        "rows": [
+          [
+            64,
+            65,
+            66
+          ],
+          [
+            74,
+            75,
+            76
+          ]
+        ],
+        "matrix": [
+          [
+            [
+              6,
+              3
+            ],
+            [
+              6,
+              4
+            ],
+            [
+              6,
+              5
+            ]
+          ],
+          [
+            [
+              7,
+              3
+            ],
+            [
+              7,
+              4
+            ],
+            [
+              7,
+              5
+            ]
+          ]
+        ],
+        "active": [
+          65,
+          75,
+          76
+        ],
+        "hidden": [],
+        "route": [
+          [
+            65,
+            75
+          ],
+          [
+            75,
+            76
+          ]
+        ]
+      }
+    },
+    "row-62-to-64": {
+      "path": "assets/row-62-to-64.png",
+      "sha256": "c568f81cdaef52bd3987d30c2ac1897a3ae136f6a14d552bdf56c17a50d55fad",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "right-one-per-slot"
+      ],
+      "chartProof": {
+        "rows": [
+          [
+            61,
+            62,
+            63,
+            64,
+            65
+          ]
+        ],
+        "matrix": [
+          [
+            [
+              6,
+              0
+            ],
+            [
+              6,
+              1
+            ],
+            [
+              6,
+              2
+            ],
+            [
+              6,
+              3
+            ],
+            [
+              6,
+              4
+            ]
+          ]
+        ],
+        "active": [
+          62,
+          63
+        ],
+        "hidden": [],
+        "route": [
+          [
+            62,
+            63
+          ]
+        ]
+      }
+    },
+    "row-middle-gap": {
+      "path": "assets/row-middle-gap.png",
+      "sha256": "5322b516a170efa556692b837d04bf4045acbaca5034d211fbc3b6aa2a7f7ec0",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "right-one-per-slot"
+      ],
+      "chartProof": {
+        "rows": [
+          [
+            62,
+            63,
+            64
+          ]
+        ],
+        "matrix": [
+          [
+            [
+              6,
+              1
+            ],
+            [
+              6,
+              2
+            ],
+            [
+              6,
+              3
+            ]
+          ]
+        ],
+        "active": [
+          63
+        ],
+        "hidden": [
+          63
+        ],
+        "route": []
+      }
+    },
+    "rule-down": {
+      "path": "assets/rule-down.png",
+      "sha256": "33a52acd5df0a456d7d0aafc9365687e9ddcc009bf79dc198659694098b757f3",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "match-the-next-floor"
+      ],
+      "chartProof": {
+        "mode": "down"
+      }
+    },
+    "rule-left": {
+      "path": "assets/rule-left.png",
+      "sha256": "5fe7928948f1effd9a0d43e283a19778e3e1d4c04fffe8e20cba9c37eb7b2a8e",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "counting-platforms"
+      ],
+      "chartProof": {
+        "mode": "left"
+      }
+    },
+    "rule-right": {
+      "path": "assets/rule-right.png",
+      "sha256": "fa0d43960fab7306c7122f185a74a80cebde54a02a66c74a40c56c56846ca412",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "counting-platforms"
+      ],
+      "chartProof": {
+        "mode": "right"
+      }
+    },
+    "rule-up": {
+      "path": "assets/rule-up.png",
+      "sha256": "c860c6baaa6de018d42a278002672d71bdc292d070708211cf647b477045fc0c",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "match-the-next-floor"
+      ],
+      "chartProof": {
+        "mode": "up"
+      }
+    },
+    "same-column-27": {
+      "path": "assets/same-column-27.png",
+      "sha256": "feea57f70c2a5e095ad104fbb21bde15fe6f75470f7a58a5843be62b1161c290",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "down-by-one-row",
+        "match-the-next-floor"
+      ],
+      "chartProof": {
+        "rows": [
+          [
+            27
+          ],
+          [
+            37
+          ],
+          [
+            47
+          ]
+        ],
+        "matrix": [
+          [
+            [
+              2,
+              6
+            ]
+          ],
+          [
+            [
+              3,
+              6
+            ]
+          ],
+          [
+            [
+              4,
+              6
+            ]
+          ]
+        ],
+        "active": [
+          27,
+          37,
+          47
+        ],
+        "hidden": [],
+        "route": [
+          [
+            27,
+            37
+          ],
+          [
+            37,
+            47
+          ]
+        ]
+      }
+    },
+    "same-column-zero": {
+      "path": "assets/same-column-zero.png",
+      "sha256": "cf774927acd9f8caff6341aa8f651e3d431d9ba0b29f914349f7e590bcabfe3f",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "down-by-one-row"
+      ],
+      "chartProof": {
+        "rows": [
+          [
+            70
+          ],
+          [
+            80
+          ],
+          [
+            90
+          ],
+          [
+            100
+          ]
+        ],
+        "matrix": [
+          [
+            [
+              6,
+              9
+            ]
+          ],
+          [
+            [
+              7,
+              9
+            ]
+          ],
+          [
+            [
+              8,
+              9
+            ]
+          ],
+          [
+            [
+              9,
+              9
+            ]
+          ]
+        ],
+        "active": [
+          70,
+          80,
+          90,
+          100
+        ],
+        "hidden": [],
+        "route": []
+      }
+    },
+    "skip-a-ticket": {
+      "path": "assets/skip-a-ticket.png",
+      "sha256": "8fc18ed2dfecbc1c4bd339da5b1e75acd4c82baff807fa64cade35c9708ac4d8",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "take-turns-making-fragments"
+      ],
+      "chartProof": {
+        "rows": [
+          [
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27
+          ]
+        ],
+        "matrix": [
+          [
+            [
+              2,
+              0
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              2,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              2,
+              4
+            ],
+            [
+              2,
+              5
+            ],
+            [
+              2,
+              6
+            ]
+          ]
+        ],
+        "active": [
+          21,
+          23,
+          25,
+          27
+        ],
+        "hidden": [],
+        "route": []
+      }
+    },
+    "three-digit-marks": {
+      "path": "assets/three-digit-marks.png",
+      "sha256": "0f12a7921ee8f64d8f33e2ec7bc8ce2aead74b8f0b77fee588412b708a5fbdb2",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "mark-a-digit-pattern"
+      ],
+      "chartProof": {
+        "rows": [
+          [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10
+          ],
+          [
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20
+          ],
+          [
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30
+          ],
+          [
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40
+          ],
+          [
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50
+          ],
+          [
+            51,
+            52,
+            53,
+            54,
+            55,
+            56,
+            57,
+            58,
+            59,
+            60
+          ],
+          [
+            61,
+            62,
+            63,
+            64,
+            65,
+            66,
+            67,
+            68,
+            69,
+            70
+          ],
+          [
+            71,
+            72,
+            73,
+            74,
+            75,
+            76,
+            77,
+            78,
+            79,
+            80
+          ],
+          [
+            81,
+            82,
+            83,
+            84,
+            85,
+            86,
+            87,
+            88,
+            89,
+            90
+          ],
+          [
+            91,
+            92,
+            93,
+            94,
+            95,
+            96,
+            97,
+            98,
+            99,
+            100
+          ]
+        ],
+        "active": [
+          40,
+          44,
+          100
+        ],
+        "hidden": [],
+        "marks": {
+          "4": [
+            "ones"
+          ],
+          "11": [
+            "same"
+          ],
+          "14": [
+            "ones"
+          ],
+          "22": [
+            "same"
+          ],
+          "24": [
+            "ones"
+          ],
+          "33": [
+            "same"
+          ],
+          "34": [
+            "ones"
+          ],
+          "40": [
+            "tens"
+          ],
+          "41": [
+            "tens"
+          ],
+          "42": [
+            "tens"
+          ],
+          "43": [
+            "tens"
+          ],
+          "44": [
+            "tens",
+            "ones",
+            "same"
+          ],
+          "45": [
+            "tens"
+          ],
+          "46": [
+            "tens"
+          ],
+          "47": [
+            "tens"
+          ],
+          "48": [
+            "tens"
+          ],
+          "49": [
+            "tens"
+          ],
+          "54": [
+            "ones"
+          ],
+          "55": [
+            "same"
+          ],
+          "64": [
+            "ones"
+          ],
+          "66": [
+            "same"
+          ],
+          "74": [
+            "ones"
+          ],
+          "77": [
+            "same"
+          ],
+          "84": [
+            "ones"
+          ],
+          "88": [
+            "same"
+          ],
+          "94": [
+            "ones"
+          ],
+          "99": [
+            "same"
+          ]
+        }
+      }
+    },
+    "ticket-15": {
+      "path": "assets/ticket-15.png",
+      "sha256": "97a24c259dc94da1565ae897517004fb8cdcde0040caa18685d6e324552a5524",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "counting-platforms"
+      ],
+      "chartProof": {
+        "number": 15,
+        "location": [
+          1,
+          4
+        ]
+      }
+    },
+    "ticket-16": {
+      "path": "assets/ticket-16.png",
+      "sha256": "9386dcbe43c73cf1bb3f704f29f7b877a63132ddc39cceaa4ddb0d9f414ec1dc",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "counting-platforms"
+      ],
+      "chartProof": {
+        "number": 16,
+        "location": [
+          1,
+          5
+        ]
+      }
+    },
+    "ticket-17": {
+      "path": "assets/ticket-17.png",
+      "sha256": "d8490150e206c329671bf7e1e0890f80ef66770c96493e27fccb9ec52f1503b0",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "counting-platforms"
+      ],
+      "chartProof": {
+        "number": 17,
+        "location": [
+          1,
+          6
+        ]
+      }
+    },
+    "ticket-18": {
+      "path": "assets/ticket-18.png",
+      "sha256": "8f2f7fe37445501f0f6920b8aabfbac49ca20f78ce9cd8548ad973443a692234",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "counting-platforms"
+      ],
+      "chartProof": {
+        "number": 18,
+        "location": [
+          1,
+          7
+        ]
+      }
+    },
+    "ticket-19": {
+      "path": "assets/ticket-19.png",
+      "sha256": "e3d017b6517087ccd900b3f0e2c3c0f9dd33932a76efe488033aa0df6c618312",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "counting-platforms"
+      ],
+      "chartProof": {
+        "number": 19,
+        "location": [
+          1,
+          8
+        ]
+      }
+    },
+    "ticket-20": {
+      "path": "assets/ticket-20.png",
+      "sha256": "1b05b5e939f5f5f0855dc8bb1e6a288c9f511f9fb9aa01afe7badd65768833cc",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "counting-platforms"
+      ],
+      "chartProof": {
+        "number": 20,
+        "location": [
+          1,
+          9
+        ]
+      }
+    },
+    "ticket-24": {
+      "path": "assets/ticket-24.png",
+      "sha256": "0be384008b23ba2cfb9e76ae38f1387a1c1f90a1626b845e14c0fd4b3b170c08",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "match-the-next-floor"
+      ],
+      "chartProof": {
+        "number": 24,
+        "location": [
+          2,
+          3
+        ]
+      }
+    },
+    "ticket-26": {
+      "path": "assets/ticket-26.png",
+      "sha256": "e6c3fc63f3cca9815f175229895b93ce9ccfe9ab41a021c9ca5b158df5d9b6e2",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "match-the-next-floor"
+      ],
+      "chartProof": {
+        "number": 26,
+        "location": [
+          2,
+          5
+        ]
+      }
+    },
+    "ticket-32": {
+      "path": "assets/ticket-32.png",
+      "sha256": "82bf75fdcc65771e89731cde215873d46e5538c208226eedc0ae75d008ddb18d",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "match-the-next-floor"
+      ],
+      "chartProof": {
+        "number": 32,
+        "location": [
+          3,
+          1
+        ]
+      }
+    },
+    "ticket-34": {
+      "path": "assets/ticket-34.png",
+      "sha256": "9d0ca326a013c667a0a53d5f734d63438f44ccf12559993b3826c63e7322f501",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "match-the-next-floor"
+      ],
+      "chartProof": {
+        "number": 34,
+        "location": [
+          3,
+          3
+        ]
+      }
+    },
+    "ticket-42": {
+      "path": "assets/ticket-42.png",
+      "sha256": "7afaa73252943462be587d3c0dc36dde1ab7e90071dc67634d88fe28dc4e8a7a",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "match-the-next-floor"
+      ],
+      "chartProof": {
+        "number": 42,
+        "location": [
+          4,
+          1
+        ]
+      }
+    },
+    "ticket-46": {
+      "path": "assets/ticket-46.png",
+      "sha256": "b6a0bfdcfe3bc05ae16d54bbbc096b0a9d36df18c0ae11f0b7363e0ea93bde7c",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "match-the-next-floor"
+      ],
+      "chartProof": {
+        "number": 46,
+        "location": [
+          4,
+          5
+        ]
+      }
+    },
+    "ticket-53": {
+      "path": "assets/ticket-53.png",
+      "sha256": "bdc3d222a574573e49807e61bf51dbc43b0b240142af235a8d221c9ed3947ce7",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "match-the-next-floor"
+      ],
+      "chartProof": {
+        "number": 53,
+        "location": [
+          5,
+          2
+        ]
+      }
+    },
+    "ticket-56": {
+      "path": "assets/ticket-56.png",
+      "sha256": "c753d0c6b1cd524d34107a6eb7a652cebd9590e749b5197f7b416e31bb475bcb",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "match-the-next-floor"
+      ],
+      "chartProof": {
+        "number": 56,
+        "location": [
+          5,
+          5
+        ]
+      }
+    },
+    "ticket-57": {
+      "path": "assets/ticket-57.png",
+      "sha256": "210d347f3a21df6f64773c758fe93ccdd563adb4428a60433bf32a0416b5e875",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "counting-platforms",
+        "match-the-next-floor"
+      ],
+      "chartProof": {
+        "number": 57,
+        "location": [
+          5,
+          6
+        ]
+      }
+    },
+    "ticket-58": {
+      "path": "assets/ticket-58.png",
+      "sha256": "7aff14970417c9f6f8bce84556450750209f0fca4d69c7fe56ac6d53c610265c",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "counting-platforms"
+      ],
+      "chartProof": {
+        "number": 58,
+        "location": [
+          5,
+          7
+        ]
+      }
+    },
+    "ticket-59": {
+      "path": "assets/ticket-59.png",
+      "sha256": "235c3db687e0f168ba88b3e35e428967a057d41d7bd3a29391b96223314bb941",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "counting-platforms"
+      ],
+      "chartProof": {
+        "number": 59,
+        "location": [
+          5,
+          8
+        ]
+      }
+    },
+    "ticket-60": {
+      "path": "assets/ticket-60.png",
+      "sha256": "dbc38b3ab9d7e1e32f2a02f9c66c21191688a20980839871e2c74b7756860fcf",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "counting-platforms"
+      ],
+      "chartProof": {
+        "number": 60,
+        "location": [
+          5,
+          9
+        ]
+      }
+    },
+    "ticket-61": {
+      "path": "assets/ticket-61.png",
+      "sha256": "09333b6526c50eb619a9cd42dcdd99387ca0020928475fa1fd329a54141042cc",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "counting-platforms"
+      ],
+      "chartProof": {
+        "number": 61,
+        "location": [
+          6,
+          0
+        ]
+      }
+    },
+    "ticket-62": {
+      "path": "assets/ticket-62.png",
+      "sha256": "74595adcc1ffb6935f81e7e41f88c11fad4771270dfb82840167951367a9a311",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "counting-platforms"
+      ],
+      "chartProof": {
+        "number": 62,
+        "location": [
+          6,
+          1
+        ]
+      }
+    },
+    "ticket-63": {
+      "path": "assets/ticket-63.png",
+      "sha256": "abe438b94e2d88e00c8b8b8db31c8da10871a7db66fdc8172e1119ffba7ef25a",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "match-the-next-floor"
+      ],
+      "chartProof": {
+        "number": 63,
+        "location": [
+          6,
+          2
+        ]
+      }
+    },
+    "ticket-67": {
+      "path": "assets/ticket-67.png",
+      "sha256": "a7a4a69f44d0b35de64549fd435c587032994d9834db44d57d2c39ac158e8dd0",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "match-the-next-floor"
+      ],
+      "chartProof": {
+        "number": 67,
+        "location": [
+          6,
+          6
+        ]
+      }
+    },
+    "ticket-68": {
+      "path": "assets/ticket-68.png",
+      "sha256": "50c6055bac46dbadbf7b091ed61e5d80dfc3dd71addd6a959367608001ddeed1",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "match-the-next-floor"
+      ],
+      "chartProof": {
+        "number": 68,
+        "location": [
+          6,
+          7
+        ]
+      }
+    },
+    "ticket-78": {
+      "path": "assets/ticket-78.png",
+      "sha256": "937285bef2ce535753b4191a32fce71437eaa7e2813355b5db81ae389af725d3",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "match-the-next-floor"
+      ],
+      "chartProof": {
+        "number": 78,
+        "location": [
+          7,
+          7
+        ]
+      }
+    },
+    "ticket-83": {
+      "path": "assets/ticket-83.png",
+      "sha256": "9081f74afee146924ac39c853fdb9576d7ad461a0da8caae79e9b3bda2d09d92",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "counting-platforms"
+      ],
+      "chartProof": {
+        "number": 83,
+        "location": [
+          8,
+          2
+        ]
+      }
+    },
+    "ticket-84": {
+      "path": "assets/ticket-84.png",
+      "sha256": "2dc259505a45ba60d12d2f5494070984b724e883f719ac4f07885aecd85aafea",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "counting-platforms"
+      ],
+      "chartProof": {
+        "number": 84,
+        "location": [
+          8,
+          3
+        ]
+      }
+    },
+    "ticket-85": {
+      "path": "assets/ticket-85.png",
+      "sha256": "301201c949cd3cf1c092793198d8f0e483cf8da1605c1e5e9c12d5665d84437c",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "counting-platforms"
+      ],
+      "chartProof": {
+        "number": 85,
+        "location": [
+          8,
+          4
+        ]
+      }
+    },
+    "ticket-86": {
+      "path": "assets/ticket-86.png",
+      "sha256": "d8d436532ef8a7d765b59f2e545b88c097138284bb852950a1ee3275d6a5e884",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "counting-platforms"
+      ],
+      "chartProof": {
+        "number": 86,
+        "location": [
+          8,
+          5
+        ]
+      }
+    },
+    "ticket-87": {
+      "path": "assets/ticket-87.png",
+      "sha256": "8304ab6527ce31ccefef13ad7cdf524c4ab726ffca517d39bbd94e70489dccaf",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "counting-platforms"
+      ],
+      "chartProof": {
+        "number": 87,
+        "location": [
+          8,
+          6
+        ]
+      }
+    },
+    "ticket-88": {
+      "path": "assets/ticket-88.png",
+      "sha256": "cdc4b993509b01a351a67f344dfc1c1dda99288d9873730c270eda4ba29cfb00",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "counting-platforms"
+      ],
+      "chartProof": {
+        "number": 88,
+        "location": [
+          8,
+          7
+        ]
+      }
+    },
+    "ticket-89": {
+      "path": "assets/ticket-89.png",
+      "sha256": "b5e866d0a59565f2b8a7dfb85c725503068e637796d3218afb3261ce3897f7d2",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "counting-platforms"
+      ],
+      "chartProof": {
+        "number": 89,
+        "location": [
+          8,
+          8
+        ]
+      }
+    },
+    "tile-proof-34": {
+      "path": "assets/tile-proof-34.png",
+      "sha256": "4c0e812f56f7054939742eb7ca2fc884445783bbff0a341f6977c0f327e57c9c",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "match-the-next-floor"
+      ],
+      "chartProof": {
+        "rows": [
+          [
+            24
+          ],
+          [
+            34
+          ]
+        ],
+        "matrix": [
+          [
+            [
+              2,
+              3
+            ]
+          ],
+          [
+            [
+              3,
+              3
+            ]
+          ]
+        ],
+        "active": [
+          34,
+          24
+        ],
+        "hidden": [],
+        "route": [
+          [
+            24,
+            34
+          ]
+        ]
+      }
+    },
+    "tile-proof-42": {
+      "path": "assets/tile-proof-42.png",
+      "sha256": "ee41a3651deeffb1dc23270b5df931c8986c1ef05315138dad6d62b08016b8c3",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "match-the-next-floor"
+      ],
+      "chartProof": {
+        "rows": [
+          [
+            32
+          ],
+          [
+            42
+          ]
+        ],
+        "matrix": [
+          [
+            [
+              3,
+              1
+            ]
+          ],
+          [
+            [
+              4,
+              1
+            ]
+          ]
+        ],
+        "active": [
+          42,
+          32
+        ],
+        "hidden": [],
+        "route": [
+          [
+            32,
+            42
+          ]
+        ]
+      }
+    },
+    "tile-proof-53": {
+      "path": "assets/tile-proof-53.png",
+      "sha256": "eea48fcf7419a74ac7c9280daf6de306ae3c5aceb66b35d01936368d93580c3c",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "match-the-next-floor"
+      ],
+      "chartProof": {
+        "rows": [
+          [
+            53
+          ],
+          [
+            63
+          ]
+        ],
+        "matrix": [
+          [
+            [
+              5,
+              2
+            ]
+          ],
+          [
+            [
+              6,
+              2
+            ]
+          ]
+        ],
+        "active": [
+          53,
+          63
+        ],
+        "hidden": [],
+        "route": [
+          [
+            63,
+            53
+          ]
+        ]
+      }
+    },
+    "tile-proof-56": {
+      "path": "assets/tile-proof-56.png",
+      "sha256": "d5b29fc46a1c60bdd0776fdbe9f7b586a475dca685233134a5081ea114316221",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "match-the-next-floor"
+      ],
+      "chartProof": {
+        "rows": [
+          [
+            46
+          ],
+          [
+            56
+          ]
+        ],
+        "matrix": [
+          [
+            [
+              4,
+              5
+            ]
+          ],
+          [
+            [
+              5,
+              5
+            ]
+          ]
+        ],
+        "active": [
+          56,
+          46
+        ],
+        "hidden": [],
+        "route": [
+          [
+            46,
+            56
+          ]
+        ]
+      }
+    },
+    "tile-proof-67": {
+      "path": "assets/tile-proof-67.png",
+      "sha256": "f108e4b06cd22b3593c3415e36ba8e3dcd221fab0b26933d6087b06c74d0d180",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "match-the-next-floor"
+      ],
+      "chartProof": {
+        "rows": [
+          [
+            57
+          ],
+          [
+            67
+          ]
+        ],
+        "matrix": [
+          [
+            [
+              5,
+              6
+            ]
+          ],
+          [
+            [
+              6,
+              6
+            ]
+          ]
+        ],
+        "active": [
+          67,
+          57
+        ],
+        "hidden": [],
+        "route": [
+          [
+            57,
+            67
+          ]
+        ]
+      }
+    },
+    "tile-proof-68": {
+      "path": "assets/tile-proof-68.png",
+      "sha256": "8cf9f985fcdc135cd895323124fb6026c6527b108644cb4a53eced0730b67f35",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "match-the-next-floor"
+      ],
+      "chartProof": {
+        "rows": [
+          [
+            68
+          ],
+          [
+            78
+          ]
+        ],
+        "matrix": [
+          [
+            [
+              6,
+              7
+            ]
+          ],
+          [
+            [
+              7,
+              7
+            ]
+          ]
+        ],
+        "active": [
+          68,
+          78
+        ],
+        "hidden": [],
+        "route": [
+          [
+            78,
+            68
+          ]
+        ]
+      }
+    },
+    "tiles-ready": {
+      "path": "assets/tiles-ready.png",
+      "sha256": "04a9e60fa11b66807bb3f927afcdc1ea534fb69d236803450bff5e7e206a940b",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "match-the-next-floor"
+      ],
+      "chartProof": {
+        "rows": [
+          [
+            24
+          ],
+          [
+            34
+          ]
+        ],
+        "matrix": [
+          [
+            [
+              2,
+              3
+            ]
+          ],
+          [
+            [
+              3,
+              3
+            ]
+          ]
+        ],
+        "active": [
+          24
+        ],
+        "hidden": [
+          34
+        ],
+        "route": []
+      }
+    },
+    "wrap-whole-rows": {
+      "path": "assets/wrap-whole-rows.png",
+      "sha256": "3f9b5014a7d1c92a1e6a945145105e12c04ed15fb01a3620600f97dae4f65208",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "next-row-start"
+      ],
+      "chartProof": {
+        "rows": [
+          [
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50
+          ],
+          [
+            51,
+            52,
+            53,
+            54,
+            55,
+            56,
+            57,
+            58,
+            59,
+            60
+          ]
+        ],
+        "matrix": [
+          [
+            [
+              4,
+              0
+            ],
+            [
+              4,
+              1
+            ],
+            [
+              4,
+              2
+            ],
+            [
+              4,
+              3
+            ],
+            [
+              4,
+              4
+            ],
+            [
+              4,
+              5
+            ],
+            [
+              4,
+              6
+            ],
+            [
+              4,
+              7
+            ],
+            [
+              4,
+              8
+            ],
+            [
+              4,
+              9
+            ]
+          ],
+          [
+            [
+              5,
+              0
+            ],
+            [
+              5,
+              1
+            ],
+            [
+              5,
+              2
+            ],
+            [
+              5,
+              3
+            ],
+            [
+              5,
+              4
+            ],
+            [
+              5,
+              5
+            ],
+            [
+              5,
+              6
+            ],
+            [
+              5,
+              7
+            ],
+            [
+              5,
+              8
+            ],
+            [
+              5,
+              9
+            ]
+          ]
+        ],
+        "active": [
+          49,
+          50,
+          51
+        ],
+        "hidden": [],
+        "route": [
+          [
+            50,
+            51,
+            "wrap"
+          ]
+        ]
+      }
+    },
+    "zoom-four-pattern": {
+      "path": "assets/zoom-four-pattern.png",
+      "sha256": "6bd5bee1273d8d6fddcbe8ca80f6aa48872c5a48fd42a8e965d67bf1acc6aacd",
+      "source": "exact_hundred_chart_render",
+      "renderSource": "art-source/number-chart.mjs",
+      "renderSourceSha256": "8bcc87fd63df1d7fdecfe545ab682def06a76580b1b7fbde77fb987080341f40",
+      "usedBy": [
+        "mark-a-digit-pattern"
+      ],
+      "chartProof": {
+        "rows": [
+          [
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40
+          ],
+          [
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50
+          ]
+        ],
+        "matrix": [
+          [
+            [
+              3,
+              0
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              3,
+              2
+            ],
+            [
+              3,
+              3
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              3,
+              5
+            ],
+            [
+              3,
+              6
+            ],
+            [
+              3,
+              7
+            ],
+            [
+              3,
+              8
+            ],
+            [
+              3,
+              9
+            ]
+          ],
+          [
+            [
+              4,
+              0
+            ],
+            [
+              4,
+              1
+            ],
+            [
+              4,
+              2
+            ],
+            [
+              4,
+              3
+            ],
+            [
+              4,
+              4
+            ],
+            [
+              4,
+              5
+            ],
+            [
+              4,
+              6
+            ],
+            [
+              4,
+              7
+            ],
+            [
+              4,
+              8
+            ],
+            [
+              4,
+              9
+            ]
+          ]
+        ],
+        "active": [
+          40,
+          44
+        ],
+        "hidden": [],
+        "route": []
+      }
+    }
+  }
+}

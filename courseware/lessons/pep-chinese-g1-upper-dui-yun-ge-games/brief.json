@@ -1,0 +1,173 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "lesson": "对韵歌",
+  "goals": [
+    "认读对、歌、雨、风、虫、清、绿、桃、红，结合图片和生活词语理解字义。",
+    "看图理解儿歌中的自然现象、动植物和山水春景，知道对子的两边搭配相关事物。",
+    "听示范并按词和对子有节奏地接读，理解两边字数相同和风、虫、红的押韵，回原教材朗读全歌并借四行图意线索尝试背诵，成人观察实际朗读背诵。",
+    "认识绞丝旁和笔画提，按示范练写云、雨、虫、山、水；纸笔字形与笔顺请大人观察。"
+  ],
+  "keyPoint": "九字认读、相关事物配对和完整朗读；五字书写示范。",
+  "difficultPoint": "理解两字对子及景物词，保持押韵节奏；纸笔书写由大人观察。",
+  "officialHours": [
+    "lesson_1",
+    "lesson_2"
+  ],
+  "pageSequence": [
+    {
+      "key": "p01",
+      "type": "slide",
+      "title": "一人说，一人接"
+    },
+    {
+      "key": "p02",
+      "type": "slide",
+      "title": "看天气，认雨和风"
+    },
+    {
+      "key": "p03",
+      "type": "slide",
+      "title": "给花和虫找同类"
+    },
+    {
+      "key": "p04",
+      "type": "slide",
+      "title": "走进山水春景"
+    },
+    {
+      "key": "p04a",
+      "type": "slide",
+      "title": "找找绿和红的左边"
+    },
+    {
+      "key": "p05",
+      "type": "slide",
+      "title": "两边数一数"
+    },
+    {
+      "key": "p06",
+      "type": "interactive",
+      "title": "落块接对子"
+    },
+    {
+      "key": "p07",
+      "type": "slide",
+      "title": "听句尾，跟着读",
+      "readingFlow": "注明人教统编语文一年级上册（2024年审定，2024年8月版）第73页，逐行范读四行韵语。孩子用四段图意接读和试背，由家人观察字音、停顿与顺序。"
+    },
+    {
+      "key": "p08",
+      "type": "slide",
+      "title": "先写云、雨、虫"
+    },
+    {
+      "key": "p09",
+      "type": "interactive",
+      "title": "推车送图卡"
+    },
+    {
+      "key": "p10",
+      "type": "slide",
+      "title": "看清山和水"
+    },
+    {
+      "key": "p11",
+      "type": "quiz",
+      "title": "小检查：换个地方找对子"
+    },
+    {
+      "key": "p12",
+      "type": "slide",
+      "title": "把四行歌带回家"
+    }
+  ],
+  "interactionPlan": {
+    "p06": "图块落在能配对的图卡旁才得分。三关逐步从一对增加到三对，减少下落时间。花与树、鸟与虫用教材图意，雨和风是同属天气的原创配对练习。",
+    "p09": "从图卡背后开车，把图卡推到同类别托盘。三关由两件增加到四件，增加类别及绕路。提的方向、收笔和虫的六笔由 p08 指导，在纸上练习。"
+  },
+  "gameHandoff": {
+    "requestId": "dui-yun-ge-existing-games-release-gaps",
+    "status": "approved_template_configuration_pending_real_audio_and_g6",
+    "p06": {
+      "entryPoint": "K.gameTemplates.fallingTiles",
+      "version": 1,
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "pair_match",
+      "teacherAnchors": {
+        "game-player": "落下的花图",
+        "game-goal": "底下一排图卡",
+        "demo-tree": "首关树图"
+      },
+      "firstAction": "老师先暂停指图，向右挪落块，再落到树图旁。配好一对即停，回首关交给孩子。",
+      "cueReferences": {
+        "pair-goal": "p05-11",
+        "pair-hint": "p05-12",
+        "pair-help": "p03-9",
+        "pair-praise": "p05-13"
+      }
+    },
+    "p09": {
+      "entryPoint": "K.gameTemplates.sortingDepot",
+      "version": 1,
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "classification",
+      "teacherAnchors": {
+        "game-player": "小车",
+        "demo-flower": "首关花卡起始位置，推车开始时取消高亮",
+        "demo-plant-dock": "首关树图托盘"
+      },
+      "firstAction": "老师先暂停指图，从花卡后方把它推到树图托盘。送入第一张卡即停，回首关交给孩子。",
+      "cueReferences": {
+        "depot-goal": "p03-10",
+        "depot-hint": "p03-11",
+        "depot-help": "p03-9",
+        "depot-praise": "p03-12"
+      }
+    },
+    "visuals": "两页均用本课已有登记插画与道具，开场图用实际游戏对象组成。遮住非目标文字仍可用语音、图卡和操控按钮开始。",
+    "g6": "待绑定实音后验收三种尺寸、初始态、教师示范、首次错题反馈和正确反馈；同规则自动通关两次并确认复位。"
+  },
+  "quiz": {
+    "mode": "picture-options",
+    "questionCount": 4,
+    "skills": [
+      "借图认雨",
+      "找同类对子",
+      "理解山水景色",
+      "识别绞丝旁"
+    ],
+    "newContext": "用窗上雨滴、黄鸭和瓢虫、山谷河流，以及独立的字形卡作题。",
+    "coverageLimits": [
+      "借图认雨一题只记录选中雨字，其他八字的认读不由本题推断。",
+      "p05 教两边字数相同，p07 教节奏和押韵，p12 回顾；字数与押韵列为周测变式题源，当前小检查没有对应题。",
+      "字形题识别绞丝旁；纸笔写字另观察，归类游戏记录的操作不代表书写能力。"
+    ],
+    "unobserved": [
+      "成人观察真实朗读、背诵和纸笔书写"
+    ]
+  },
+  "afterClass": {
+    "sourceTasks": [
+      "第1课时课后练习第1页：朗读，认对歌雨风虫，写云虫雨。",
+      "第2课时课后练习第1页：朗读背诵，认清绿桃红，练写山水。"
+    ],
+    "destination": "回原书印刷第73页，先用图、词和拼音复习九个认读字。和家人交换前后半句对读，合书按天气、花树鸟虫、山水、柳桃四段试背，再对照范字练写云、雨、虫、山、水。朗读、背诵和纸笔书写标为待观察。课件的目标、课后练习要点和小检查技能作为周测题源。"
+  },
+  "authoring": {
+    "authorModels": [
+      "gpt-6.1-sol"
+    ],
+    "gameDeliveryAuthor": {
+      "model": "gpt-6.1-sol",
+      "threadId": "01a1bfa9-523f-7d33-96d3-f76a23538938",
+      "turnId": "01a1c0c5-3cbf-7942-80c0-ca1d5cf9d584"
+    },
+    "sourceMode": "direct",
+    "textbookQuotation": {
+      "scope": "仅 p07 逐行范读教材四行韵语，其他讲解、题目及游戏内容原创。",
+      "source": "人民教育出版社，统编语文一年级上册，2024年审定，2024年8月版，第六单元识字第5课《对韵歌》，印刷第73页，数字图第78页。",
+      "ownerQuote": "《对韵歌》：允许老师逐行范读教材的四行韵语，注明出处；其余讲解仍原创。这个例外只限这一课。",
+      "confirmedAt": "2026-11-10T14:54:07+08:00"
+    }
+  }
+}

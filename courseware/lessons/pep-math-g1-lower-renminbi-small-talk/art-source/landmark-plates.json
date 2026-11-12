@@ -1,0 +1,74 @@
+{
+  "source": "art-source/landmark-plates.png",
+  "sha256": "6cde78d3a5384bf862d46f83f64fdc8ba90b545817dde383d9f670051969ea85",
+  "origin": "builtin-imagegen",
+  "prompt": "Make one landscape contact sheet exactly THREE columns by TWO rows of six separate full-bleed original landmark illustrations, no gaps or borders, each landscape completely confined to its own equal cell, absolutely NO labels, letters, words, numbers, seals, banners, or banknote designs. Educational picture-book plates, authentic recognizability of the real places for first graders, matte paper-cut silhouettes with restrained watercolor gouache and fine warm ivory paper grain, natural colors in sage, warm gray, apricot, moss and deep pine, clear midday light. Upper left: the Great Hall of the People in Beijing, low very long symmetrical pale-beige facade viewed from the front from ground height, prominent uninterrupted horizontal roof and many tall slender columns, clean paving, no people, no flags, no lettering, DO NOT show the red Tiananmen gate. Upper middle: Potala Palace in Lhasa, high view of the entire stepped complex on a hill, white wings and reddish central upper blocks, tiny high mountains, unmistakable Tibetan palace. Upper right: Guilin Li River with smooth, steep isolated karst cone hills, quietly reflective flat water and bamboo on one edge, no canyon walls. Lower left: Yangtze Three Gorges, one blue river winds tightly between high jagged continuous rocky walls on both sides, steep long ridges, no separate cone hills. Lower middle: Mount Tai in Shandong with close rocky slopes and a distinct stone steps path winding up to a small traditional high mountain gate with dark red columns and grey roof, warm layered pine ridges, no river, no characters. Lower right: the Three Pools Mirroring the Moon site in Hangzhou West Lake, calm broad pale blue lake with small pagoda-shaped stone lantern towers standing in the water, distant willows on low banks, towers clearly visible, no land mountains dominating. No person or framing element crosses a cell boundary.",
+  "outputs": {
+    "hall": {
+      "path": "assets/hall.png",
+      "crop": [
+        0,
+        0,
+        512,
+        512
+      ],
+      "sha256": "1c9a43af7044ed560ab79b3b9db758156c6c90a689d8e75dc7b1debbc4233b7a",
+      "bytes": 169944
+    },
+    "potala": {
+      "path": "assets/potala.png",
+      "crop": [
+        512,
+        0,
+        1024,
+        512
+      ],
+      "sha256": "e534e3bc6f74b42a700088eb6448d7a2da043e237d6fdffb82b7518516410f38",
+      "bytes": 177806
+    },
+    "guilin": {
+      "path": "assets/guilin.png",
+      "crop": [
+        1024,
+        0,
+        1536,
+        512
+      ],
+      "sha256": "78f62b91ea0953a25dea67c42a548b7e45fd46c631b4ee7a38cedf6317014b86",
+      "bytes": 179730
+    },
+    "gorges": {
+      "path": "assets/gorges.png",
+      "crop": [
+        0,
+        512,
+        512,
+        1024
+      ],
+      "sha256": "85144d9d4489216faff9e265e8ce6ab37a190a7f14c2dc130bc43466fcbb153a",
+      "bytes": 185711
+    },
+    "taishan": {
+      "path": "assets/taishan.png",
+      "crop": [
+        512,
+        512,
+        1024,
+        1024
+      ],
+      "sha256": "052d9b3d7c73d27f98700a3b8c279e1dc3c272490063eb403cd0d48908d3d90f",
+      "bytes": 200539
+    },
+    "westlake": {
+      "path": "assets/westlake.png",
+      "crop": [
+        1024,
+        512,
+        1536,
+        1024
+      ],
+      "sha256": "1233d15642c84d2235dfb192a4beb35a6a64b7f5a0f7f6e0fa10da2c419542ac",
+      "bytes": 175116
+    }
+  }
+}

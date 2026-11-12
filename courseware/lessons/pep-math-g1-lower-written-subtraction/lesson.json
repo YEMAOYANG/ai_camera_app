@@ -1,0 +1,422 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "笔算减法",
+  "description": "在公园补给站用整盒和散袋看懂数位，学习两位数笔算减法和退一当十。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小数老师",
+      "role": "teacher",
+      "gender": "male",
+      "voice": "Ethan",
+      "avatar": "/teachers/ashu-math-v1.png",
+      "color": "#437763",
+      "persona": "陪孩子用盒、散袋和竖式解释为什么这样减。"
+    }
+  },
+  "images": {
+    "supply-backdrop-panel": {"file": "assets/supply-backdrop-panel.png"},
+    "supply-backdrop": {"file": "assets/supply-backdrop.png"},
+    "closed-supply-box": {"file": "assets/closed-supply-box.png"},
+    "park-sparrow": {"file": "assets/park-sparrow.png"},
+    "park-snake": {"file": "assets/park-snake.png"},
+    "feather-sticker": {"file": "assets/feather-sticker.png"},
+    "teach-unit-guide": {"file": "assets/teach-unit-guide.png"},
+    "teach-direct-setup": {"file": "assets/teach-direct-setup.png"},
+    "teach-direct-answer": {"file": "assets/teach-direct-answer.png"},
+    "teach-borrow-before": {"file": "assets/teach-borrow-before.png"},
+    "teach-borrow-after": {"file": "assets/teach-borrow-after.png"},
+    "teach-zero-before": {"file": "assets/teach-zero-before.png"},
+    "teach-zero-after": {"file": "assets/teach-zero-after.png"},
+    "teach-single-subtrahend": {"file": "assets/teach-single-subtrahend.png"},
+    "teach-single-difference": {"file": "assets/teach-single-difference.png"},
+    "teach-repair-results": {"file": "assets/teach-repair-results.png"},
+    "teach-repair-align": {"file": "assets/teach-repair-align.png"},
+    "tile-ledger-54-23": {"file": "assets/tile-ledger-54-23.png"},
+    "tile-ledger-82-37": {"file": "assets/tile-ledger-82-37.png"},
+    "tile-ledger-70-6": {"file": "assets/tile-ledger-70-6.png"},
+    "tile-stock-10": {"file": "assets/tile-stock-10.png"},
+    "tile-stock-23": {"file": "assets/tile-stock-23.png"},
+    "tile-stock-31": {"file": "assets/tile-stock-31.png"},
+    "tile-stock-32": {"file": "assets/tile-stock-32.png"},
+    "tile-stock-45": {"file": "assets/tile-stock-45.png"},
+    "tile-stock-55": {"file": "assets/tile-stock-55.png"},
+    "tile-stock-64": {"file": "assets/tile-stock-64.png"},
+    "tile-stock-74": {"file": "assets/tile-stock-74.png"},
+    "q-direct-prompt": {"file": "assets/q-direct-prompt.png"},
+    "q-direct-a": {"file": "assets/q-direct-a.png"},
+    "q-direct-b": {"file": "assets/q-direct-b.png"},
+    "q-direct-c": {"file": "assets/q-direct-c.png"},
+    "q-exchange-prompt": {"file": "assets/q-exchange-prompt.png"},
+    "q-exchange-a": {"file": "assets/q-exchange-a.png"},
+    "q-exchange-b": {"file": "assets/q-exchange-b.png"},
+    "q-exchange-c": {"file": "assets/q-exchange-c.png"},
+    "q-zero-prompt": {"file": "assets/q-zero-prompt.png"},
+    "q-zero-a": {"file": "assets/q-zero-a.png"},
+    "q-zero-b": {"file": "assets/q-zero-b.png"},
+    "q-zero-c": {"file": "assets/q-zero-c.png"},
+    "q-align-prompt": {"file": "assets/q-align-prompt.png"},
+    "q-align-a": {"file": "assets/q-align-a.png"},
+    "q-align-b": {"file": "assets/q-align-b.png"},
+    "q-align-c": {"file": "assets/q-align-c.png"},
+    "q-short-prompt": {"file": "assets/q-short-prompt.png"},
+    "q-short-a": {"file": "assets/q-short-a.png"},
+    "q-short-b": {"file": "assets/q-short-b.png"},
+    "q-short-c": {"file": "assets/q-short-c.png"},
+    "q-fix-prompt": {"file": "assets/q-fix-prompt.png"},
+    "q-fix-a": {"file": "assets/q-fix-a.png"},
+    "q-fix-b": {"file": "assets/q-fix-b.png"},
+    "q-fix-c": {"file": "assets/q-fix-c.png"}
+  },
+  "scenes": [
+    {
+      "key": "borrow-basics",
+      "type": "slide",
+      "title": "原有多少，送走多少",
+      "template": "two-columns",
+      "data": {
+        "title": "原有多少，送走多少",
+        "left": {"heading": "补给站要记账", "body": "送走一部分，还剩多少？"},
+        "right": {"heading": "一盒是十袋", "body": "整盒和散袋分开放。"},
+        "left_picture": "supply-backdrop-panel",
+        "right_picture": "teach-unit-guide"
+      },
+      "script": [
+        {"say": "今天来公园补给站帮忙。送走一部分，还剩多少？"},
+        {"spotlight": "left-picture"},
+        {"say": "补给站把每十袋装一盒。剩下不够一盒的，放在旁边。"},
+        {"spotlight": "right-picture"},
+        {"say": "先看左边的盒子，一整盒就是一个十。"},
+        {"say": "右边是三只散袋。一只散袋就是一个一。"},
+        {"say": "一盒和三只散袋合起来，是十三袋。"},
+        {"spotlight": "left-heading"},
+        {"say": "记账先问清，原来有多少袋，后来送走多少袋。"},
+        {"say": "从原有的里面减去送走的，就知道还剩多少。"},
+        {"say": "把盒和散袋分开记，算起来就有顺序。"},
+        {"say": "先数右边已有的，再数打算取的。"}
+      ]
+    },
+    {
+      "key": "same-place",
+      "type": "slide",
+      "title": "个位对个位，十位对十位",
+      "template": "two-columns",
+      "data": {
+        "title": "个位对个位，十位对十位",
+        "left": {"heading": "先分两种数位", "body": "原有七十六袋，送走二十三袋。"},
+        "right": {"heading": "从个位算起", "body": "散袋够减，可以直接算。"},
+        "left_picture": "teach-direct-setup",
+        "right_picture": "teach-direct-answer"
+      },
+      "script": [
+        {"say": "原有七十六袋，送走二十三袋。还剩多少袋？"},
+        {"spotlight": "left-picture"},
+        {"say": "上排七盒六袋，下排要拿两盒三袋。"},
+        {"spotlight": "right-picture"},
+        {"say": "先写七十六，再在下面写二十三。前面写上减号。"},
+        {"say": "七和二都数整盒，所以放在十位，上下对齐。"},
+        {"say": "六和三都数散袋，所以在右边的个位对齐。"},
+        {"spotlight": "right-heading"},
+        {"say": "先看个位，六袋够取三袋。六减三得三。"},
+        {"say": "再看十位，七盒减两盒，剩五盒。"},
+        {"say": "横线下面，右边写三，左边写五。还剩五十三袋。"},
+        {"say": "个位够减就直接减。先算散袋，再算整盒。"},
+        {"say": "找比右边散袋少的一组。少一点，够取。"},
+        {"say": "找和右边一样多的一组。一样多，也够取。"},
+        {"say": "对着亮起的格数一数，看看谁多谁少。"}
+      ]
+    },
+    {
+      "key": "split-one-ten",
+      "type": "slide",
+      "title": "个位不够，拆一个十",
+      "template": "two-columns",
+      "data": {
+        "title": "个位不够，拆一个十",
+        "left": {"heading": "六盒三袋", "body": "要拿两盒七袋，散袋不够。"},
+        "right": {"heading": "一盒拆成十袋", "body": "变成五盒十三袋，还是六十三。"},
+        "left_picture": "teach-borrow-before",
+        "right_picture": "teach-borrow-after"
+      },
+      "script": [
+        {"say": "这次有六十三袋，要送走二十七袋。先看哪一位？"},
+        {"spotlight": "left-picture"},
+        {"say": "先看右边的个位。原来三只散袋，不够拿走七只。"},
+        {"say": "我们不能反过来用七减三，要想办法拿够七袋。"},
+        {"spotlight": "right-picture"},
+        {"say": "从六盒里拆一盒。拆出的十袋和原来的三袋合起来。"},
+        {"say": "现在是五盒、十三只散袋。袋子的总数没有变。"},
+        {"say": "在十位的六上面点个小圆点，记住已经退了一个十。"},
+        {"say": "十三减七得六，在横线下面的个位写六。"},
+        {"say": "十位剩五盒，拿走两盒剩三盒。十位写三。"},
+        {"say": "三盒和六只散袋，合起来就是三十六袋。"},
+        {"say": "找比右边散袋多的一组。取这么多，就得拆盒。"},
+        {"say": "个位不够，先拆一盒。十位记得少一盒。"},
+        {"say": "要是先算十位，后来才拆盒，十位就得重算。"}
+      ]
+    },
+    {
+      "key": "enough-to-remove",
+      "type": "interactive",
+      "title": "小蛇比散袋",
+      "widgetType": "game",
+      "page": "enough-to-remove",
+      "startImage": "supply-backdrop",
+      "script": [
+        {"say": "先比一比。要取的散袋多于手里的，才需要拆盒。"},
+        {"setState": {"pause": true, "demo": true, "level": 1}},
+        {"highlight": "#snake-demo-voice"},
+        {"say": "点左下角的小喇叭，可以重听这一轮找哪种。"},
+        {"highlight": "#game-goal"},
+        {"say": "这一轮找比右边少的一组。少一点，够取。"},
+        {"say": "要是口令说一样多，就找正好相等的那一组。"},
+        {"say": "要是口令说更多，就找比右边多的一组。"},
+        {"highlight": "#snake-demo-foods"},
+        {"say": "深色点才算散袋。先数右边，再数你选的。"},
+        {"say": "再数一次，对照亮起的那一组，看看多还是少。"},
+        {"highlight": "#snake-demo-pad"},
+        {"say": "点箭头让小蛇转弯。迷路了，可以点回起点键。"},
+        {"setState": {"pause": false}},
+        {"say": "看小蛇往哪儿走。留意它怎么绕开不合适的卡。"},
+        {"say": "下一次出发前，先看右边换成了哪个数量。"},
+        {"say": "现在换你。小蛇会回起点，重新从第一关开始。"},
+        {"setState": {"pause": false, "demo": false, "level": 1}}
+      ],
+      "gameAudio": {
+        "pick-less": "same-place-13",
+        "pick-same": "same-place-14",
+        "pick-more": "split-one-ten-12",
+        "count-again": "borrow-basics-12",
+        "compare-lit": "same-place-15",
+        "nice-compare": "family-recap-4"
+      }
+    },
+    {
+      "key": "zero-in-ones",
+      "type": "slide",
+      "title": "个位是零，也能退一当十",
+      "template": "two-columns",
+      "data": {
+        "title": "个位是零，也能退一当十",
+        "left": {"heading": "原来没有散袋", "body": "八十袋要送走二十六袋。"},
+        "right": {"heading": "拆开一盒", "body": "七盒和十只散袋，还是八十。"},
+        "left_picture": "teach-zero-before",
+        "right_picture": "teach-zero-after"
+      },
+      "script": [
+        {"say": "现在有八十袋，要拿走二十六袋。想先拿六只散袋。"},
+        {"spotlight": "left-picture"},
+        {"say": "八十的个位是零。右边空着，原来一只散袋也没有。"},
+        {"say": "左边有整盒。从八盒里拆开一盒，能拿到十只散袋。"},
+        {"spotlight": "right-picture"},
+        {"say": "拆盒后数散袋，这时有十个一。"},
+        {"say": "十只里面拿走六只，个位剩四。"},
+        {"say": "十位上的小点提醒我们，原来八盒，现在只剩七盒。"},
+        {"say": "七盒再送走两盒，剩五盒。五盒和四袋是五十四。"},
+        {"say": "八十里的零不能省，因为它说明原来没有散袋。"},
+        {"say": "原来没有散袋时，拆一盒就能换来十只。"}
+      ]
+    },
+    {
+      "key": "one-digit-cases",
+      "type": "slide",
+      "title": "一位减数和一位的差",
+      "template": "two-columns",
+      "data": {
+        "title": "一位减数和一位的差",
+        "left": {"heading": "六十四减八", "body": "只拿散袋，八对准个位。"},
+        "right": {"heading": "六十八减六十四", "body": "没有整盒剩下，差只写四。"},
+        "left_picture": "teach-single-subtrahend",
+        "right_picture": "teach-single-difference"
+      },
+      "script": [
+        {"say": "原来六十四袋，只拿走八袋。八该写在哪一列？"},
+        {"spotlight": "left-picture"},
+        {"say": "八说的是八只散袋，写在四的正下方。"},
+        {"say": "四不够减八，先拆一盒。十四减八，散袋剩六只。"},
+        {"say": "整盒原来有六，拆掉一盒，剩五盒。差是五十六。"},
+        {"spotlight": "right-picture"},
+        {"say": "再看六十八减六十四。先算八减四，剩四只散袋。"},
+        {"say": "六盒都送走了。一个十也没剩，横线下面只写四。"},
+        {"say": "这个四仍写在个位。左边的十位不用再写零。"}
+      ]
+    },
+    {
+      "key": "match-remaining",
+      "type": "interactive",
+      "title": "竖式落块",
+      "widgetType": "game",
+      "page": "match-remaining",
+      "startImage": "supply-backdrop",
+      "script": [
+        {"say": "这次要把每张竖式卡，送到还剩多少的图旁边。"},
+        {"setState": {"pause": true, "demo": true, "level": 1}},
+        {"highlight": "#tiles-demo-record"},
+        {"say": "看右边的大竖式。个位够减，就按原来的数减。"},
+        {"say": "个位不够时先拆盒。个位算完，再算十位。"},
+        {"say": "原来没有散袋时，拆一盒就有十只散袋。"},
+        {"highlight": "#game-player"},
+        {"say": "上面的记录卡会落下。先想让它停在哪一格。"},
+        {"highlight": "#game-target"},
+        {"say": "先算出还剩多少，再看下面的余量图。"},
+        {"say": "如果拆过一盒，核对时要把那个十减掉。"},
+        {"highlight": "#tiles-demo-pad"},
+        {"say": "用左右键移到图卡旁的空格，点大键快速落下。"},
+        {"setState": {"pause": false}},
+        {"say": "看竖式卡落到哪一列。留意它和哪张图挨着。"},
+        {"say": "数剩下的盒和袋，别把已经送走的算进去。"},
+        {"say": "现在轮到你，竖式卡会回到第一张。"},
+        {"setState": {"pause": false, "demo": false, "level": 1}}
+      ],
+      "gameAudio": {
+        "ledger-first": "same-place-12",
+        "ledger-borrow": "split-one-ten-13",
+        "ledger-zero": "zero-in-ones-11",
+        "ledger-check": "repair-record-11",
+        "ledger-recheck": "repair-record-12",
+        "ledger-praise": "family-recap-5"
+      }
+    },
+    {
+      "key": "repair-record",
+      "type": "slide",
+      "title": "算得不一样，先查这三步",
+      "template": "two-columns",
+      "data": {
+        "title": "算得不一样，先查这三步",
+        "left": {"heading": "倒着减，或忘了退位", "body": "对照六十三减二十七。"},
+        "right": {"heading": "查数位有没有排齐", "body": "八只散袋要在个位。"},
+        "left_picture": "teach-repair-results",
+        "right_picture": "teach-repair-align"
+      },
+      "script": [
+        {"say": "有两张卡写的是六十三减二十七，结果却不一样。"},
+        {"spotlight": "left-picture"},
+        {"say": "第一张写四十四。它把三不够减七，倒过来减了。"},
+        {"say": "第二张写四十六。它拆了盒，十位却还按六盒算。"},
+        {"say": "该先算十三减七，再算五盒减两盒，得到三十六。"},
+        {"spotlight": "right-picture"},
+        {"say": "右边把八写在六的下面，就把八只当成八盒了。"},
+        {"say": "八要往右移一列，写在个位的四下面。"},
+        {"say": "还有一个核对办法，把送走的和剩下的合起来。"},
+        {"say": "二十七加三十六是六十三，跟原来一样多。"},
+        {"say": "先算还剩多少，再数图上的整盒和散袋。"},
+        {"say": "如果拆过一盒，十位少一个十。再核对一次。"}
+      ]
+    },
+    {
+      "key": "picture-check",
+      "type": "quiz",
+      "title": "六张新记录",
+      "intro": [
+        "换一批新记录。听老师读题，再看图点一张。",
+        "没听清可以重听，图小的时候可以放大看。"
+      ],
+      "questions": [
+        {
+          "id": "direct-remainder",
+          "question": "原有八十五袋，拿走四十二袋。哪张图是剩下的？",
+          "skill": "同数位对齐和不退位",
+          "answer": ["B"],
+          "analysis": "五减二得三袋，八盒减四盒得四盒，一共四十三袋。",
+          "visual": {"kind": "asset", "image": "q-direct-prompt", "alt": "八盒五袋，取四盒两袋"},
+          "options": {
+            "A": {"label": "四盒两袋", "visual": {"kind": "asset", "image": "q-direct-a", "alt": "四盒两袋"}},
+            "B": {"label": "四盒三袋", "visual": {"kind": "asset", "image": "q-direct-b", "alt": "四盒三袋"}},
+            "C": {"label": "三盒三袋", "visual": {"kind": "asset", "image": "q-direct-c", "alt": "三盒三袋"}}
+          }
+        },
+        {
+          "id": "exchange-remainder",
+          "question": "原有七十五袋，拿走四十八袋。还剩下哪一组？",
+          "skill": "退一十当十后求余量",
+          "answer": ["C"],
+          "analysis": "拆一盒后，十五减八得七袋，六盒减四盒得两盒，剩二十七袋。",
+          "visual": {"kind": "asset", "image": "q-exchange-prompt", "alt": "七盒五袋，取四盒八袋"},
+          "options": {
+            "A": {"label": "三盒七袋", "visual": {"kind": "asset", "image": "q-exchange-a", "alt": "三盒七袋"}},
+            "B": {"label": "三盒三袋", "visual": {"kind": "asset", "image": "q-exchange-b", "alt": "三盒三袋"}},
+            "C": {"label": "两盒七袋", "visual": {"kind": "asset", "image": "q-exchange-c", "alt": "两盒七袋"}}
+          }
+        },
+        {
+          "id": "zero-first-step",
+          "question": "九十袋要取二十四袋。拆盒后还没拿，哪张对？",
+          "skill": "原个位为零时换一个十",
+          "answer": ["A"],
+          "analysis": "一盒换成十只散袋，整盒由九变八。还没拿走，合起来仍是九十袋。",
+          "visual": {"kind": "asset", "image": "q-zero-prompt", "alt": "九盒零袋，要取两盒四袋"},
+          "options": {
+            "A": {"label": "八盒十袋", "visual": {"kind": "asset", "image": "q-zero-a", "alt": "八盒十袋"}},
+            "B": {"label": "九盒十袋", "visual": {"kind": "asset", "image": "q-zero-b", "alt": "九盒十袋"}},
+            "C": {"label": "八盒一袋", "visual": {"kind": "asset", "image": "q-zero-c", "alt": "八盒一袋"}}
+          }
+        },
+        {
+          "id": "align-single",
+          "question": "七十二袋要拿走六袋。哪张竖式把六写对了？",
+          "skill": "一位减数与个位对齐",
+          "answer": ["B"],
+          "analysis": "六是六个一，要写在七十二的个位二下面，不能放进十位。",
+          "visual": {"kind": "asset", "image": "q-align-prompt", "alt": "七盒两袋，取六只散袋"},
+          "options": {
+            "A": {"label": "六在七下面", "visual": {"kind": "asset", "image": "q-align-a", "alt": "六在十位七下面"}},
+            "B": {"label": "六在二下面", "visual": {"kind": "asset", "image": "q-align-b", "alt": "六在个位二下面"}},
+            "C": {"label": "把六写在上面", "visual": {"kind": "asset", "image": "q-align-c", "alt": "六写在上面，七十二写在下面"}}
+          }
+        },
+        {
+          "id": "single-digit-difference",
+          "question": "五十八袋送走五十四袋，只剩四袋。哪张写法对？",
+          "skill": "一位数的差不写前导零",
+          "answer": ["C"],
+          "analysis": "一个十也没剩。只在个位写四，十位空着。",
+          "visual": {"kind": "asset", "image": "q-short-prompt", "alt": "五盒八袋，取五盒四袋"},
+          "options": {
+            "A": {"label": "十位四，个位零", "visual": {"kind": "asset", "image": "q-short-a", "alt": "差写四十"}},
+            "B": {"label": "十位零，个位四", "visual": {"kind": "asset", "image": "q-short-b", "alt": "差在四前面又写了零"}},
+            "C": {"label": "只在个位写四", "visual": {"kind": "asset", "image": "q-short-c", "alt": "只在个位写四，十位空着"}}
+          }
+        },
+        {
+          "id": "fix-missed-borrow",
+          "question": "八十六减三十九，忘把十位减一。哪张图对？",
+          "skill": "辨认并修正漏退位",
+          "answer": ["A"],
+          "analysis": "十六减九得七袋。拆过一盒，十位要算七减三，正确剩四十七袋。",
+          "visual": {"kind": "asset", "image": "q-fix-prompt", "alt": "八十六减三十九，有退位点但差误写五十七"},
+          "options": {
+            "A": {"label": "四盒七袋", "visual": {"kind": "asset", "image": "q-fix-a", "alt": "四盒七袋"}},
+            "B": {"label": "五盒七袋", "visual": {"kind": "asset", "image": "q-fix-b", "alt": "五盒七袋"}},
+            "C": {"label": "五盒三袋", "visual": {"kind": "asset", "image": "q-fix-c", "alt": "五盒三袋"}}
+          }
+        }
+      ]
+    },
+    {
+      "key": "family-recap",
+      "type": "slide",
+      "title": "把减法的每一步讲清楚",
+      "template": "two-columns",
+      "data": {
+        "title": "把减法的每一步讲清楚",
+        "left": {"heading": "先对齐，再从个位算", "body": "不够时退一个十，换十个一。"},
+        "right": {"heading": "找一道家里的减法题", "body": "试着摆一摆，再把两部分加回去。"},
+        "left_picture": "closed-supply-box",
+        "right_picture": "park-sparrow"
+      },
+      "script": [
+        {"say": "做笔算减法，先把相同数位上下对齐。"},
+        {"spotlight": "left-heading"},
+        {"say": "从个位开始算。够减就直接减，不够就拆一个十。"},
+        {"say": "拿之前先数清，够不够一比就知道。"},
+        {"say": "把余量按盒和袋核对，记录就清楚了。"},
+        {"say": "退位时，个位多十个一，十位少一个十。"},
+        {"spotlight": "right-heading"},
+        {"say": "和家人找一种可以分盒的东西，摆出一道剩余问题。"},
+        {"say": "请家人听你说，哪一步要拆盒，拆开后还有多少。"},
+        {"say": "最后把取走的和剩下的加回去，看看是不是原来的数。"}
+      ]
+    }
+  ]
+}

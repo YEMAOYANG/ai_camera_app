@@ -1,0 +1,1150 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "两位数加一位数（进位）",
+  "grade": 1,
+  "description": "先合个位，十个一换成一个十，再合原整十；练习恰满十、交换加数与查错。",
+  "roster": {
+    "teacher": {
+      "name": "小数老师",
+      "role": "teacher",
+      "gender": "male",
+      "voice": "Ethan",
+      "avatar": "/avatars/teacher-1.png",
+      "color": "#286956",
+      "persona": "先引导孩子看懂真实数量，配合图说清每一步。"
+    }
+  },
+  "images": {
+    "crate-26-9": {
+      "file": "assets/crate-26-9.png"
+    },
+    "crate-35-8": {
+      "file": "assets/crate-35-8.png"
+    },
+    "crate-38-5": {
+      "file": "assets/crate-38-5.png"
+    },
+    "crate-47-6": {
+      "file": "assets/crate-47-6.png"
+    },
+    "crate-63-7": {
+      "file": "assets/crate-63-7.png"
+    },
+    "crate-7-58": {
+      "file": "assets/crate-7-58.png"
+    },
+    "crate-76-6": {
+      "file": "assets/crate-76-6.png"
+    },
+    "crate-84-7": {
+      "file": "assets/crate-84-7.png"
+    },
+    "crate-9-45": {
+      "file": "assets/crate-9-45.png"
+    },
+    "depot-ready": {
+      "file": "assets/depot-ready.png"
+    },
+    "dock-35": {
+      "file": "assets/dock-35.png"
+    },
+    "dock-43": {
+      "file": "assets/dock-43.png"
+    },
+    "dock-53": {
+      "file": "assets/dock-53.png"
+    },
+    "dock-54": {
+      "file": "assets/dock-54.png"
+    },
+    "dock-65": {
+      "file": "assets/dock-65.png"
+    },
+    "dock-70": {
+      "file": "assets/dock-70.png"
+    },
+    "dock-82": {
+      "file": "assets/dock-82.png"
+    },
+    "dock-91": {
+      "file": "assets/dock-91.png"
+    },
+    "family-69-plus-6": {
+      "file": "assets/family-69-plus-6.png"
+    },
+    "family-verify-75": {
+      "file": "assets/family-verify-75.png"
+    },
+    "lesson-13-exchange": {
+      "file": "assets/lesson-13-exchange.png"
+    },
+    "lesson-13-loose": {
+      "file": "assets/lesson-13-loose.png"
+    },
+    "lesson-27-plus-6": {
+      "file": "assets/lesson-27-plus-6.png"
+    },
+    "lesson-27-split": {
+      "file": "assets/lesson-27-split.png"
+    },
+    "lesson-33-equations": {
+      "file": "assets/lesson-33-equations.png"
+    },
+    "lesson-33-finished": {
+      "file": "assets/lesson-33-finished.png"
+    },
+    "lesson-48-plus-9": {
+      "file": "assets/lesson-48-plus-9.png"
+    },
+    "lesson-52-plus-4": {
+      "file": "assets/lesson-52-plus-4.png"
+    },
+    "lesson-52-plus-9": {
+      "file": "assets/lesson-52-plus-9.png"
+    },
+    "lesson-57-audit": {
+      "file": "assets/lesson-57-audit.png"
+    },
+    "lesson-64-finished": {
+      "file": "assets/lesson-64-finished.png"
+    },
+    "lesson-72-plus-8": {
+      "file": "assets/lesson-72-plus-8.png"
+    },
+    "lesson-8-plus-56": {
+      "file": "assets/lesson-8-plus-56.png"
+    },
+    "lesson-80-finished": {
+      "file": "assets/lesson-80-finished.png"
+    },
+    "order-26-9": {
+      "file": "assets/order-26-9.png"
+    },
+    "order-35-8": {
+      "file": "assets/order-35-8.png"
+    },
+    "order-38-5": {
+      "file": "assets/order-38-5.png"
+    },
+    "order-47-6": {
+      "file": "assets/order-47-6.png"
+    },
+    "order-63-7": {
+      "file": "assets/order-63-7.png"
+    },
+    "order-7-58": {
+      "file": "assets/order-7-58.png"
+    },
+    "order-76-6": {
+      "file": "assets/order-76-6.png"
+    },
+    "order-84-7": {
+      "file": "assets/order-84-7.png"
+    },
+    "order-9-45": {
+      "file": "assets/order-9-45.png"
+    },
+    "packed-26-9": {
+      "file": "assets/packed-26-9.png"
+    },
+    "packed-35-8": {
+      "file": "assets/packed-35-8.png"
+    },
+    "packed-38-5": {
+      "file": "assets/packed-38-5.png"
+    },
+    "packed-47-6": {
+      "file": "assets/packed-47-6.png"
+    },
+    "packed-63-7": {
+      "file": "assets/packed-63-7.png"
+    },
+    "packed-7-58": {
+      "file": "assets/packed-7-58.png"
+    },
+    "packed-76-6": {
+      "file": "assets/packed-76-6.png"
+    },
+    "packed-84-7": {
+      "file": "assets/packed-84-7.png"
+    },
+    "packed-9-45": {
+      "file": "assets/packed-9-45.png"
+    },
+    "q-audit-65-8": {
+      "file": "assets/q-audit-65-8.png"
+    },
+    "q-audit-a": {
+      "file": "assets/q-audit-a.png"
+    },
+    "q-audit-b": {
+      "file": "assets/q-audit-b.png"
+    },
+    "q-audit-c": {
+      "file": "assets/q-audit-c.png"
+    },
+    "q-exact-54-6": {
+      "file": "assets/q-exact-54-6.png"
+    },
+    "q-exact-a": {
+      "file": "assets/q-exact-a.png"
+    },
+    "q-exact-b": {
+      "file": "assets/q-exact-b.png"
+    },
+    "q-exact-c": {
+      "file": "assets/q-exact-c.png"
+    },
+    "q-fill-a": {
+      "file": "assets/q-fill-a.png"
+    },
+    "q-fill-b": {
+      "file": "assets/q-fill-b.png"
+    },
+    "q-fill-c": {
+      "file": "assets/q-fill-c.png"
+    },
+    "q-fill-empty-frame": {
+      "file": "assets/q-fill-empty-frame.png"
+    },
+    "q-final-67-5": {
+      "file": "assets/q-final-67-5.png"
+    },
+    "q-final-a": {
+      "file": "assets/q-final-a.png"
+    },
+    "q-final-b": {
+      "file": "assets/q-final-b.png"
+    },
+    "q-final-c": {
+      "file": "assets/q-final-c.png"
+    },
+    "q-first-49-6": {
+      "file": "assets/q-first-49-6.png"
+    },
+    "q-first-a": {
+      "file": "assets/q-first-a.png"
+    },
+    "q-first-b": {
+      "file": "assets/q-first-b.png"
+    },
+    "q-first-c": {
+      "file": "assets/q-first-c.png"
+    },
+    "q-left-7-76": {
+      "file": "assets/q-left-7-76.png"
+    },
+    "q-left-a": {
+      "file": "assets/q-left-a.png"
+    },
+    "q-left-b": {
+      "file": "assets/q-left-b.png"
+    },
+    "q-left-c": {
+      "file": "assets/q-left-c.png"
+    },
+    "tile-new-3": {
+      "file": "assets/tile-new-3.png"
+    },
+    "tile-new-4": {
+      "file": "assets/tile-new-4.png"
+    },
+    "tile-new-5": {
+      "file": "assets/tile-new-5.png"
+    },
+    "tile-new-6": {
+      "file": "assets/tile-new-6.png"
+    },
+    "tile-new-7": {
+      "file": "assets/tile-new-7.png"
+    },
+    "tile-new-8": {
+      "file": "assets/tile-new-8.png"
+    },
+    "tile-new-9": {
+      "file": "assets/tile-new-9.png"
+    },
+    "tile-old-5": {
+      "file": "assets/tile-old-5.png"
+    },
+    "tile-old-7": {
+      "file": "assets/tile-old-7.png"
+    },
+    "tile-old-8": {
+      "file": "assets/tile-old-8.png"
+    },
+    "tile-old-9": {
+      "file": "assets/tile-old-9.png"
+    },
+    "tile-proof-5-6": {
+      "file": "assets/tile-proof-5-6.png"
+    },
+    "tile-proof-7-6": {
+      "file": "assets/tile-proof-7-6.png"
+    },
+    "tile-proof-7-9": {
+      "file": "assets/tile-proof-7-9.png"
+    },
+    "tile-proof-8-3": {
+      "file": "assets/tile-proof-8-3.png"
+    },
+    "tile-proof-8-5": {
+      "file": "assets/tile-proof-8-5.png"
+    },
+    "tile-proof-8-8": {
+      "file": "assets/tile-proof-8-8.png"
+    },
+    "tile-proof-9-4": {
+      "file": "assets/tile-proof-9-4.png"
+    },
+    "tile-proof-9-7": {
+      "file": "assets/tile-proof-9-7.png"
+    },
+    "tiles-ready": {
+      "file": "assets/tiles-ready.png"
+    },
+    "bookmark-tiles-start": {
+      "file": "assets/bookmark-tiles-start.png"
+    },
+    "bookmark-worktable": {
+      "file": "assets/bookmark-worktable.png"
+    },
+    "bookmark-depot-start": {
+      "file": "assets/bookmark-depot-start.png"
+    },
+    "bookmark-workroom": {
+      "file": "assets/bookmark-workroom.png"
+    },
+    "bookmark-cart": {
+      "file": "assets/bookmark-cart.png"
+    },
+    "bookmark-cart-push": {
+      "file": "assets/bookmark-cart-push.png"
+    },
+    "bookmark-award": {
+      "file": "assets/bookmark-award.png"
+    },
+    "bookmark-parcel-award": {
+      "file": "assets/bookmark-parcel-award.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "unpack-the-ones",
+      "type": "slide",
+      "title": "先认出两套和两堆",
+      "template": "two-columns",
+      "data": {
+        "title": "先认出两套和两堆",
+        "left": {
+          "heading": "阅读角来收书签",
+          "body": "看旧书签与新书签。"
+        },
+        "left_picture": "lesson-27-plus-6",
+        "right": {
+          "heading": "整套和散张分开",
+          "body": "原有两套，另有七张和六张。"
+        },
+        "right_picture": "lesson-27-split"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "社区阅读角要数书签。原有二十七张，又送来六张。"
+        },
+        {
+          "say": "一套有十张。猜一猜，这次会不会多一套？"
+        },
+        {
+          "say": "先找已经装好的套。旧套不用拆开，也不会丢掉。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "二十七里有两个十和七个一。两套就是二十张。"
+        },
+        {
+          "say": "右边新来的六张，也是一个一个数的。"
+        },
+        {
+          "say": "七个一和六个一用的是同一种单位，可以先合起来。"
+        },
+        {
+          "say": "把两套留在旁边，接下来只看两堆散张。"
+        }
+      ]
+    },
+    {
+      "key": "fill-one-ten-frame",
+      "type": "slide",
+      "title": "十格排满，换成一套",
+      "template": "two-columns",
+      "data": {
+        "title": "十格排满，换成一套",
+        "left": {
+          "heading": "先合两个散堆",
+          "body": "两堆合起来是十三张。"
+        },
+        "left_picture": "lesson-13-loose",
+        "right": {
+          "heading": "把其中十张换成一套",
+          "body": "这两部分还是十三张。"
+        },
+        "right_picture": "lesson-13-exchange"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "七张加六张，是十三张。能把十格放满吗？"
+        },
+        {
+          "say": "按格放，一格只放一张。先装七张，再添新书签。"
+        },
+        {
+          "say": "添进三张就刚好装满。新来的还剩三张。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "把框里十张一起套好。这一套正好代表一个十。"
+        },
+        {
+          "say": "框外三张没有套起来，仍然是三个一。"
+        },
+        {
+          "say": "一套和三张还是十三张。刚才只换了装法。"
+        },
+        {
+          "say": "剩下的三张要留着，换出来的这一套也要留着。"
+        }
+      ]
+    },
+    {
+      "key": "put-back-original-tens",
+      "type": "slide",
+      "title": "原来的两套也要数上",
+      "template": "two-columns",
+      "data": {
+        "title": "原来的两套也要数上",
+        "left": {
+          "heading": "新套加入原来的套",
+          "body": "两套加一套，再加三张。"
+        },
+        "left_picture": "lesson-33-finished",
+        "right": {
+          "heading": "两步口算一起记",
+          "body": "先合个位，再与原整十合。"
+        },
+        "right_picture": "lesson-33-equations"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "刚才原来两套留在旁边。现在可以把它们移回来。"
+        },
+        {
+          "say": "原来两套，新装一套，一共三套。"
+        },
+        {
+          "say": "三套是三十张，再添三张，合起来三十三张。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "记口算时，先写七加六等于十三。"
+        },
+        {
+          "say": "再写二十加十三等于三十三。十三里面已经有新十。"
+        },
+        {
+          "say": "两个数里同是零散张的先合，原有整套最后接回来。"
+        },
+        {
+          "say": "现在答阅读角的问题，一共三十三张。"
+        },
+        {
+          "say": "看两堆散张。把它们配成十一张。"
+        },
+        {
+          "say": "这次每对两堆合起来是十三张。"
+        },
+        {
+          "say": "这次配成十六张。配好一对，再看下一堆。"
+        },
+        {
+          "say": "先数落下这一堆，再数下面挨着的一堆。"
+        },
+        {
+          "say": "两堆加一加。只在总数对时让两块挨着。"
+        },
+        {
+          "say": "配对合好，刚好换出一套，余张保留。"
+        }
+      ]
+    },
+    {
+      "key": "compare-the-frames",
+      "type": "slide",
+      "title": "什么时候才能换一套",
+      "template": "two-columns",
+      "data": {
+        "title": "什么时候才能换一套",
+        "left": {
+          "heading": "两堆没够十",
+          "body": "合了六张，十格还没满。"
+        },
+        "left_picture": "lesson-52-plus-4",
+        "right": {
+          "heading": "两堆够十",
+          "body": "合了十一张，换一套余一张。"
+        },
+        "right_picture": "lesson-52-plus-9"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "两盒原来都有五十二张。猜哪盒会多装一套？"
+        },
+        {
+          "say": "第一盒添四张。原来散的两张和四张合成六张。"
+        },
+        {
+          "say": "六张不到十，只能仍放散张。原来五套不变。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "第二盒添九张。原来两张和九张合成十一张。"
+        },
+        {
+          "say": "十格够放满一套，框外余一张。现在有六套。"
+        },
+        {
+          "say": "两盒都先合个位。能否多一套，要看散件够不够十。"
+        },
+        {
+          "say": "接下来先练这一小步，原有整套不进落块盘。"
+        }
+      ]
+    },
+    {
+      "key": "pair-loose-bookmarks",
+      "type": "interactive",
+      "title": "给落下的散书签找搭档",
+      "widgetType": "courseware_game",
+      "page": "pair-loose-bookmarks",
+      "startImage": "bookmark-tiles-start",
+      "script": [
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#loose-target-total"
+        },
+        {
+          "say": "这关只算两堆散张。一对要合成十一张。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "落下来的是新来的六张。先不碰整套。"
+        },
+        {
+          "highlight": "#first-old-loose"
+        },
+        {
+          "say": "底下左边是原来的五张。五加六，正好十一张。"
+        },
+        {
+          "highlight": "#drop-bookmark-tile"
+        },
+        {
+          "say": "老师把落块向左挪一格，和那五张挨着，再落下。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "highlight": "#tile-result"
+        },
+        {
+          "say": "这对真的配好了。右边满十装一套，另有一张。"
+        },
+        {
+          "say": "现在你从头来。先数两堆，再移和落。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "tiles-eleven": "put-back-original-tens-9",
+        "tiles-thirteen": "put-back-original-tens-10",
+        "tiles-sixteen": "put-back-original-tens-11",
+        "tiles-hint": "put-back-original-tens-12",
+        "tiles-help": "put-back-original-tens-13",
+        "tiles-praise": "put-back-original-tens-14"
+      }
+    },
+    {
+      "key": "just-one-full-tray",
+      "type": "slide",
+      "title": "恰好满十，个位留下什么",
+      "template": "two-columns",
+      "data": {
+        "title": "恰好满十，个位留下什么",
+        "left": {
+          "heading": "七套之外只合散张",
+          "body": "两张加八张，十格正好满。"
+        },
+        "left_picture": "lesson-72-plus-8",
+        "right": {
+          "heading": "八套，零张散件",
+          "body": "80 的 0 记没有散张。"
+        },
+        "right_picture": "lesson-80-finished"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "阅读角原有七十二张，又送来八张。先算哪里？"
+        },
+        {
+          "say": "原来七套先放好。只拿两张散件和新来的八张。"
+        },
+        {
+          "say": "二加八等于十。每一格都满了，框外有没有余张？"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "框外一张也不剩。新装一套，合上原来的七套。"
+        },
+        {
+          "say": "七十加十等于八十。个位没有散张，用零占位。"
+        },
+        {
+          "say": "不是还剩十张散的。那十张已经换成一套了。"
+        },
+        {
+          "say": "十位多了一套，书签张数没有凭空多出来。"
+        }
+      ]
+    },
+    {
+      "key": "read-the-other-way",
+      "type": "slide",
+      "title": "一位数放左边也先合散张",
+      "template": "two-columns",
+      "data": {
+        "title": "一位数放左边也先合散张",
+        "left": {
+          "heading": "先看见左边来的八张",
+          "body": "八张和右边的六张同是散件。"
+        },
+        "left_picture": "lesson-8-plus-56",
+        "right": {
+          "heading": "原有整套最后合回来",
+          "body": "8＋6＝14，50＋14＝64。"
+        },
+        "right_picture": "lesson-64-finished"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "这张来货单把八写在前面。原有的是五十六张。"
+        },
+        {
+          "say": "看看右边，里面五套整十、六张散件。"
+        },
+        {
+          "say": "左边八张全是散的，能和右边哪一堆合？"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "八个一和六个一合成十四。够装一套，余四张。"
+        },
+        {
+          "say": "原来五套添一套，一共六套，再添四张是六十四。"
+        },
+        {
+          "say": "换个顺序写，哪堆是散张没有变。"
+        },
+        {
+          "say": "下一关看全箱，别把散张小计当成最后的总数。"
+        },
+        {
+          "say": "先合散张，再数原来的套。把箱推去总数相符的码头。"
+        },
+        {
+          "say": "有一箱正好换一套。没有余张，仍要加上新套。"
+        },
+        {
+          "say": "有的卡把一位数放左边。找出两堆散张，再合总数。"
+        },
+        {
+          "say": "再看看，新装的一套有没有算进去？"
+        },
+        {
+          "say": "先数原套，散张里满十添一套，余张只数一次。"
+        },
+        {
+          "say": "总数对上了。看换好的整套和余张。"
+        }
+      ]
+    },
+    {
+      "key": "deliver-regrouped-bookmarks",
+      "type": "interactive",
+      "title": "把书签送进正确的总数柜",
+      "widgetType": "courseware_game",
+      "page": "deliver-regrouped-bookmarks",
+      "startImage": "bookmark-depot-start",
+      "script": [
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#depot-order"
+        },
+        {
+          "say": "左边放大的是三十八加五。原有三套和八张散的。"
+        },
+        {
+          "highlight": "#game-target"
+        },
+        {
+          "say": "再添五张。八加五是十三，够一套，还余三张。"
+        },
+        {
+          "highlight": "#first-total-dock"
+        },
+        {
+          "say": "三套添一套是四套，三张留下。找四十三号柜。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "让小车先绕到箱子上方。下面才是正确的柜。"
+        },
+        {
+          "highlight": "#push-bookmark-crate"
+        },
+        {
+          "say": "接着按向下推。老师只送这一箱。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "highlight": "#depot-result"
+        },
+        {
+          "say": "送到了，右图留着四套和三张。新套只数一次。"
+        },
+        {
+          "say": "轮到你从头做。看每箱三部分，先合散张再推。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "docks-two": "read-the-other-way-9",
+        "docks-three": "read-the-other-way-10",
+        "docks-four": "read-the-other-way-11",
+        "docks-hint": "read-the-other-way-12",
+        "docks-help": "read-the-other-way-13",
+        "docks-praise": "read-the-other-way-14"
+      }
+    },
+    {
+      "key": "audit-the-tens",
+      "type": "slide",
+      "title": "检查新套有没有漏算或重算",
+      "template": "two-columns",
+      "data": {
+        "title": "检查新套有没有漏算或重算",
+        "left": {
+          "heading": "先追踪刚装好的套",
+          "body": "48＋9，散张先合成17。"
+        },
+        "left_picture": "lesson-48-plus-9",
+        "right": {
+          "heading": "原套、换好的套、余张",
+          "body": "四套添一套，加七张。"
+        },
+        "right_picture": "lesson-57-audit"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "有四十八张，又来了九张。两堆散张合成多少？"
+        },
+        {
+          "say": "八加九等于十七。请用手指沿图追到新装的套。"
+        },
+        {
+          "say": "十七分成新的一套和余下的七张。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "有人只记四套和七张。少数的是新装的一套。"
+        },
+        {
+          "say": "也有人数了五套，又把同一新套加一次，那会多十张。"
+        },
+        {
+          "say": "原四套和新一套，一共五套。再加余七张，是五十七。"
+        },
+        {
+          "say": "用手指查这三部分，每一张只数一次。"
+        }
+      ]
+    },
+    {
+      "key": "picture-check",
+      "type": "quiz",
+      "title": "看书签图，检验换组",
+      "intro": [
+        "每一题先听老师问哪一步，再看托盘或书签套。",
+        "选一张图，想想你会怎样解释。"
+      ],
+      "questions": [
+        {
+          "id": "which-loose-groups-fill",
+          "question": "哪一盒的两堆散书签合在一起，能装满一套？",
+          "skill": "判别满十",
+          "visual": {
+            "kind": "asset",
+            "image": "q-fill-empty-frame",
+            "alt": "一个空的十格托盘"
+          },
+          "answer": [
+            "b"
+          ],
+          "analysis": "五十八这盒有八张散的。再添四张是十二张，能装满一套。另外两盒的散张不到十。",
+          "options": {
+            "a": {
+              "label": "三十四再添五张",
+              "visual": {
+                "kind": "asset",
+                "image": "q-fill-a",
+                "alt": "三十四再添五张"
+              }
+            },
+            "b": {
+              "label": "五十八再添四张",
+              "visual": {
+                "kind": "asset",
+                "image": "q-fill-b",
+                "alt": "五十八再添四张"
+              }
+            },
+            "c": {
+              "label": "六十二再添三张",
+              "visual": {
+                "kind": "asset",
+                "image": "q-fill-c",
+                "alt": "六十二再添三张"
+              }
+            }
+          }
+        },
+        {
+          "id": "which-is-the-first-sum",
+          "question": "四十九加六，先合两堆散张。哪张只画了这一步的结果？",
+          "skill": "两堆同单位相加",
+          "visual": {
+            "kind": "asset",
+            "image": "q-first-49-6",
+            "alt": "四套加左边九张散件和右边六张新散件"
+          },
+          "answer": [
+            "a"
+          ],
+          "analysis": "先用九张散的加六张，得到十五张。一套和五张是十五。原有四套这一步还没合。",
+          "options": {
+            "a": {
+              "label": "一套和五张",
+              "visual": {
+                "kind": "asset",
+                "image": "q-first-a",
+                "alt": "一套和五张"
+              }
+            },
+            "b": {
+              "label": "五套和五张",
+              "visual": {
+                "kind": "asset",
+                "image": "q-first-b",
+                "alt": "五套和五张"
+              }
+            },
+            "c": {
+              "label": "一套和四张",
+              "visual": {
+                "kind": "asset",
+                "image": "q-first-c",
+                "alt": "一套和四张"
+              }
+            }
+          }
+        },
+        {
+          "id": "which-is-the-final-picture",
+          "question": "六十七加五，选换好后总量的图。",
+          "skill": "原套和新套合计",
+          "visual": {
+            "kind": "asset",
+            "image": "q-final-67-5",
+            "alt": "六套加七张旧散件和五张新散件"
+          },
+          "answer": [
+            "c"
+          ],
+          "analysis": "七加五得十二。换成一套余两张。原来六套也要数，共七套两张，七十二。",
+          "options": {
+            "a": {
+              "label": "六套两张",
+              "visual": {
+                "kind": "asset",
+                "image": "q-final-a",
+                "alt": "六套两张"
+              }
+            },
+            "b": {
+              "label": "八套两张",
+              "visual": {
+                "kind": "asset",
+                "image": "q-final-b",
+                "alt": "八套两张"
+              }
+            },
+            "c": {
+              "label": "七套两张",
+              "visual": {
+                "kind": "asset",
+                "image": "q-final-c",
+                "alt": "七套两张"
+              }
+            }
+          }
+        },
+        {
+          "id": "pick-the-full-tray-result",
+          "question": "五十四加六，哪张是装完的图？",
+          "skill": "恰好满十与个位零",
+          "visual": {
+            "kind": "asset",
+            "image": "q-exact-54-6",
+            "alt": "五套加四张旧散件和六张新散件"
+          },
+          "answer": [
+            "b"
+          ],
+          "analysis": "四加六正好十张，装成一套。新套加原来五套，成六套。没有散张，写六十。",
+          "options": {
+            "a": {
+              "label": "五套和零张",
+              "visual": {
+                "kind": "asset",
+                "image": "q-exact-a",
+                "alt": "五套和零张"
+              }
+            },
+            "b": {
+              "label": "六套和零张",
+              "visual": {
+                "kind": "asset",
+                "image": "q-exact-b",
+                "alt": "六套和零张"
+              }
+            },
+            "c": {
+              "label": "六套和一张",
+              "visual": {
+                "kind": "asset",
+                "image": "q-exact-c",
+                "alt": "六套和一张"
+              }
+            }
+          }
+        },
+        {
+          "id": "one-digit-on-the-left",
+          "question": "七加七十六，先合散张后全站共多少？",
+          "skill": "交换位置仍先合个位",
+          "visual": {
+            "kind": "asset",
+            "image": "q-left-7-76",
+            "alt": "左边七张，右边七套和六张散件"
+          },
+          "answer": [
+            "a"
+          ],
+          "analysis": "左边七张和右边六张都是散件。十三换一套余三张。再加原来七套，一共八套三张。",
+          "options": {
+            "a": {
+              "label": "八套和三张",
+              "visual": {
+                "kind": "asset",
+                "image": "q-left-a",
+                "alt": "八套和三张"
+              }
+            },
+            "b": {
+              "label": "七套和三张",
+              "visual": {
+                "kind": "asset",
+                "image": "q-left-b",
+                "alt": "七套和三张"
+              }
+            },
+            "c": {
+              "label": "八套和两张",
+              "visual": {
+                "kind": "asset",
+                "image": "q-left-c",
+                "alt": "八套和两张"
+              }
+            }
+          }
+        },
+        {
+          "id": "find-the-lost-ten",
+          "question": "六十五加八少算一套。哪张图把它补回来了？",
+          "skill": "补回漏计的新十",
+          "visual": {
+            "kind": "asset",
+            "image": "q-audit-65-8",
+            "alt": "六套旧书签加五张和八张，错记六套和三张"
+          },
+          "answer": [
+            "c"
+          ],
+          "analysis": "五加八是十三。三张留在外面，十张已换成一套。把新套补回去，共七套和三张。",
+          "options": {
+            "a": {
+              "label": "六套和三张",
+              "visual": {
+                "kind": "asset",
+                "image": "q-audit-a",
+                "alt": "六套和三张"
+              }
+            },
+            "b": {
+              "label": "八套和三张",
+              "visual": {
+                "kind": "asset",
+                "image": "q-audit-b",
+                "alt": "八套和三张"
+              }
+            },
+            "c": {
+              "label": "七套和三张",
+              "visual": {
+                "kind": "asset",
+                "image": "q-audit-c",
+                "alt": "七套和三张"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "show-your-family",
+      "type": "slide",
+      "title": "把装一套的原因讲给家人",
+      "template": "two-columns",
+      "data": {
+        "title": "把装一套的原因讲给家人",
+        "left": {
+          "heading": "用纸条摆一摆",
+          "body": "69＋6，先合散的九和六。"
+        },
+        "left_picture": "family-69-plus-6",
+        "right": {
+          "heading": "用两种办法核对",
+          "body": "先换套，或接着数六张。"
+        },
+        "right_picture": "family-verify-75"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "回家可以用纸条当书签，或在纸上画出两堆散张。"
+        },
+        {
+          "say": "试试六十九加六。整套不拆，先合散着的九和六。"
+        },
+        {
+          "say": "零散共十五。把其中十张围成一套，余五张。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "六个十添一个十，再加五张，合成七十五。"
+        },
+        {
+          "say": "请家人从六十九接着数六下，也会到七十五。"
+        },
+        {
+          "say": "今天先合相同单位，满十换一套，再合原来的整十。"
+        },
+        {
+          "say": "哪怕换过装法，总量也没变。试着讲给家人听。"
+        }
+      ]
+    }
+  ]
+}

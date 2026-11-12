@@ -1,0 +1,110 @@
+{
+  "scene": {
+    "key": "p03",
+    "type": "interactive",
+    "title": "积木跳跳台",
+    "page": "face-hop",
+    "widgetType": "learning-arcade",
+    "startImage": "hop-workbench",
+    "gameAudio": {
+      "hop-contact": "p06-12",
+      "hop-on-face": "p06-13",
+      "hop-hint": "p06-14",
+      "hop-help": "p06-15",
+      "hop-height": "p08-12",
+      "hop-praise": "p08-13"
+    },
+    "script": [
+      {
+        "say": "木台上是同一块积木。小兔要跳到哪一站？"
+      },
+      {
+        "setState": {
+          "demo": true,
+          "level": 1,
+          "pause": true
+        }
+      },
+      {
+        "highlight": "#game-player"
+      },
+      {
+        "say": "用手比一比，积木翻个面，贴住台子的地方变了吗？"
+      },
+      {
+        "highlight": "#face-hop-demo-wide"
+      },
+      {
+        "say": "我们先求稳。宽面贴台，底下托住的地方就大。"
+      },
+      {
+        "setState": {
+          "pause": false
+        }
+      },
+      {
+        "say": "看，小兔落在宽面贴台的那块。选对才接着跳。"
+      },
+      {
+        "say": "按方向键跑，再按空格跳。屏幕大按钮也能玩。"
+      },
+      {
+        "say": "轮到你啦。听清要比哪一项，再挑落脚的台子。"
+      },
+      {
+        "setState": {
+          "demo": false,
+          "level": 1,
+          "pause": false
+        }
+      }
+    ]
+  },
+  "images": {
+    "hop-workbench": {
+      "file": "assets/hop-workbench.png"
+    },
+    "hop-sticker": {
+      "file": "assets/hop-sticker.png"
+    },
+    "hop-rabbit-ready": {
+      "file": "assets/hop-rabbit-ready.png"
+    },
+    "hop-rabbit-run": {
+      "file": "assets/hop-rabbit-run.png"
+    },
+    "hop-rabbit-jump": {
+      "file": "assets/hop-rabbit-jump.png"
+    },
+    "hop-edge-board": {
+      "file": "assets/hop-edge-board.png"
+    },
+    "hop-edge-brick": {
+      "file": "assets/hop-edge-brick.png"
+    },
+    "hop-end-board": {
+      "file": "assets/hop-end-board.png"
+    },
+    "hop-end-brick": {
+      "file": "assets/hop-end-brick.png"
+    },
+    "hop-end-case": {
+      "file": "assets/hop-end-case.png"
+    },
+    "hop-side-cylinder": {
+      "file": "assets/hop-side-cylinder.png"
+    },
+    "hop-upright-cylinder": {
+      "file": "assets/hop-upright-cylinder.png"
+    },
+    "hop-wide-board": {
+      "file": "assets/hop-wide-board.png"
+    },
+    "hop-wide-brick": {
+      "file": "assets/hop-wide-brick.png"
+    },
+    "hop-wide-case": {
+      "file": "assets/hop-wide-case.png"
+    }
+  }
+}

@@ -1,0 +1,184 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "数量关系",
+  "binding": {
+    "editionId": "pep-math-g1-upper-2022-standard",
+    "revisionId": "directory-ede7a8c63c337cf95a03fe79",
+    "unitId": "198f382f-ded4-40ac-affe-a926f4577287",
+    "nodeId": "7a3e2077-4227-49aa-9f0f-6d07aa1313ff"
+  },
+  "scenario": "小区灯船节的折纸灯工作台。孩子在灯没移动、又添灯、取走灯、盖住灯等情境里，画出两个部分和整体。",
+  "production": "复习课讲解页平均约160字，互动页约130字。每个目标给一个不同的生活例子、一个清楚的图示和一次核对。",
+  "goals": [
+    "听清图和话提供的已知量与问题，按读题、解答、回查的次序解决。",
+    "把增加、两组合并、反求原来三种情境画成同一个合并关系，解释同一加法。",
+    "知道总数和一个部分时，用减法找另一部分；用同一组数说明加减的关系。",
+    "用相反动作或图核对方法和结果，再根据算式画图、说新故事。"
+  ],
+  "goalDetails": [
+    {
+      "skill": "read-relations",
+      "target": "听清图和话提供的已知量与问题，按读题、解答、回查的次序解决。",
+      "source": "教材印105上半、印107第3题；教案2～3、5"
+    },
+    {
+      "skill": "same-addition",
+      "target": "把增加、两组合并、反求原来三种情境画成同一个合并关系，解释同一加法。",
+      "source": "教材印105上半；教案2～4，课件6～17"
+    },
+    {
+      "skill": "find-a-part",
+      "target": "知道总数和一个部分时，用减法找另一部分；用同一组数说明加减的关系。",
+      "source": "教材印105上半减法图；教案4，课件20～24"
+    },
+    {
+      "skill": "check-and-invent",
+      "target": "用相反动作或图核对方法和结果，再根据算式画图、说新故事。",
+      "source": "教材印107第3题；教案3、5，任务单1～2与练习1"
+    }
+  ],
+  "pageSequence": [
+    {
+      "key": "lantern-questions",
+      "kind": "teaching",
+      "plan": "灯船节布置手工灯，先听问题辨认两组和整体，用已知的数量检查还缺哪一块。"
+    },
+    {
+      "key": "read-and-solve",
+      "kind": "teaching",
+      "plan": "先看六盏，再有三盏来到；用图、列式和倒推核对三步解决一共多少。"
+    },
+    {
+      "key": "same-addition-stories",
+      "kind": "teaching",
+      "plan": "比较增加、左右分开、送走后求原来三个场景，对照同一个六和三合成九的模型。"
+    },
+    {
+      "key": "choose-the-operation",
+      "kind": "interactive",
+      "plan": "开推车把关系牌送到合并或找一部分的托盘，根据问号落在整体还是一部分分组。"
+    },
+    {
+      "key": "find-the-hidden-part",
+      "kind": "teaching",
+      "plan": "同样九盏灯，已知移走三盏或露出六盏，画整组再找另一个部分。"
+    },
+    {
+      "key": "connect-add-and-subtract",
+      "kind": "teaching",
+      "plan": "同一张整体图解释六加三等于九、九减三等于六、九减六等于三，并按原动作核查。"
+    },
+    {
+      "key": "repair-the-model",
+      "kind": "interactive",
+      "plan": "根据图和听到的问题辨认缺的是总量还是一部分，瞄准数量和关系相合的答案格。"
+    },
+    {
+      "key": "check-and-ask",
+      "kind": "teaching",
+      "plan": "一个新场景由图和话给两条信息，问原数并核对，再让孩子改成另一个可答的问题。"
+    },
+    {
+      "key": "tell-a-new-story",
+      "kind": "teaching",
+      "plan": "看一条减法，分别画拿走和藏起的故事，说明它们为什么能用同一算式。"
+    },
+    {
+      "key": "picture-check",
+      "kind": "quiz",
+      "plan": "用全新的六种物件及数检查问号范围、同式异题、找一部分、逆向核查。"
+    },
+    {
+      "key": "relationship-map",
+      "kind": "teaching",
+      "plan": "逐项点亮知识图，回顾读题、决定合并或找一部分、检查；邀请孩子画图编题。"
+    }
+  ],
+  "games": [
+    {
+      "page": "choose-the-operation",
+      "template": "sortingDepot",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.sortingDepot",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "classification",
+      "selection": "用两种不同问号位置决定应合并还是找一部分。图面动作相似时也要依据条件和问题。图示加号与减号托盘，不能靠物件颜色猜。推箱路线沿用正式碰撞规则。",
+      "levels": [
+        "两张牌、两种问题。",
+        "三张牌，加入送走后求原来和遮住找一部分。",
+        "四张牌，同一个故事动作但问题不同，加入转弯。"
+      ],
+      "demo": "点亮待送问题、问号、目标托盘和方向键。只送一张，交接首关清零。"
+    },
+    {
+      "page": "repair-the-model",
+      "template": "magnetMarbles",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.magnetMarbles",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "pair_match",
+      "selection": "当前图展示已知两部分或整体与一部分，目标图包含关系符号和完整的结果。要按题意判断关系和数值，两者都合才接受。",
+      "levels": [
+        "两轮一加一减，固定答图。",
+        "三轮，干扰项有相同数值但不同关系。",
+        "三轮，略有漂移，加入送走后的逆向、遮挡和核查。"
+      ],
+      "demo": "先把当前题图放大，点出目标牌和弹珠。仅发射并成功一次，清零交接。"
+    }
+  ],
+  "quizPlan": [
+    {
+      "skill": "read-relations",
+      "prompt": "两组珠子，问一共有多少。哪张图圈对了？",
+      "answer": "把左四颗和右七颗两组都围在一起",
+      "position": 2,
+      "rationale": "问一共要把两组都算上。"
+    },
+    {
+      "skill": "same-addition",
+      "prompt": "哪张扇子的图也要把五和六合起来？",
+      "answer": "两边各放五把和六把，括起整体",
+      "position": 3,
+      "rationale": "两个部分分别是五和六，要找它们合起来的数。"
+    },
+    {
+      "skill": "same-addition",
+      "prompt": "端走四个小碟，桌上剩九个。原有小碟是哪张？",
+      "answer": "四加九一共十三个小碟",
+      "position": 1,
+      "rationale": "求动作以前。端走的和桌上留下的都算。"
+    },
+    {
+      "skill": "find-a-part",
+      "prompt": "原有十二颗木扣，露出五颗。布下藏了几颗？",
+      "answer": "七颗木扣",
+      "position": 2,
+      "rationale": "知道整体十二和露出的五，布下是另一部分。"
+    },
+    {
+      "skill": "find-a-part",
+      "prompt": "十五条彩纸拿走六条。选还剩的彩纸图。",
+      "answer": "还剩九条彩纸",
+      "position": 1,
+      "rationale": "从整体里去掉六条，留下九条。"
+    },
+    {
+      "skill": "check-and-invent",
+      "prompt": "八枚邮票又添六枚，算得十四。划掉后来添的，哪张图能还原？",
+      "answer": "把十四枚里的六枚新邮票圈出去，余下八枚",
+      "position": 3,
+      "rationale": "去掉后来添的六枚，重新得到原有八枚，能核对关系。"
+    }
+  ],
+  "afterClass": {
+    "familyTask": "写一条减法，分别画走掉了一部分和被盖住一部分的故事，说清原来和要找的数量，再用图核对。",
+    "weeklyQuestionSource": [
+      "从图和话找条件与问题",
+      "不同情境的合并关系",
+      "已知整体与一个部分",
+      "逆向核查与换问法"
+    ],
+    "evidence": "记录线上选图和游戏动作；实际口述、画图和自编问题由家人观察。"
+  },
+  "artAndLanguage": "用原创节日灯和纸工材料；每样只生成一个，由代码逐个排出精确数。孩子听题、看整体框和问号位置完成。"
+}

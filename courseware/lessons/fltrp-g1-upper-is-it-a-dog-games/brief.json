@@ -1,0 +1,230 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "lesson": "Unit 1 Is it a dog?",
+  "goals": [
+    "听懂 dog、monkey、kite 和故事里的 monster，能从图中指出相应对象。",
+    "听懂并尝试用 Is it a ...? 确认一个猜测，知道 it 指眼前正在说的事物。",
+    "把听到的猜测与揭示后的真实对象比较，正确区分 Yes, it is. 和 No, it isn't.，并尝试用简短句补充真实对象。",
+    "能看出图案像动物的风筝仍是 kite，能先用线索猜，再看完整证据修正猜测。",
+    "在新情境中轮流提问和回答，能听懂故事里的求助词 Help，并请成人实际观察自己的口语表现。"
+  ],
+  "keyPoint": "听懂并运用 Is it a ...? 对猜测作确认，再依据看到的真实对象作肯定或否定回答。",
+  "difficultPoint": "把外形线索和实际类别区分开。同一张风筝可能画得像狗或怪兽，看到线和风筝整体以后要按真实物品回应。",
+  "pageSequence": [
+    {
+      "page": 1,
+      "type": "slide",
+      "title": "听听猴子和怪兽",
+      "play": "图片依次高亮，听辨开头有点像的 monkey 和 monster，再按听到的词指相应的图。",
+      "assetKeys": [
+        "monkey",
+        "monster"
+      ],
+      "textbookPrintedPages": [
+        38,
+        39,
+        40
+      ]
+    },
+    {
+      "page": 2,
+      "type": "slide",
+      "title": "没看全，先问一句",
+      "play": "指着盖布、问一个猜测、换末尾的物品词。",
+      "assetKeys": [
+        "exhibit-cover"
+      ],
+      "textbookPrintedPages": [
+        38,
+        39
+      ]
+    },
+    {
+      "page": 3,
+      "type": "slide",
+      "title": "看实物，回一句",
+      "play": "同一个问句放到两种实物前，按证据分别作肯定和否定。",
+      "assetKeys": [
+        "dog",
+        "dog-kite"
+      ],
+      "textbookPrintedPages": [
+        38,
+        39,
+        40
+      ]
+    },
+    {
+      "page": 4,
+      "type": "slide",
+      "title": "猫脸图案和猫",
+      "play": "沿着牵线看到完整风筝，听辨 cat 和 kite，追溯故事里人物改猜的依据。",
+      "assetKeys": [
+        "cat",
+        "cat-kite"
+      ],
+      "textbookPrintedPages": [
+        38,
+        39
+      ]
+    },
+    {
+      "page": 5,
+      "type": "interactive",
+      "title": "接住风筝卡",
+      "play": "实时移动接物台，只接实物是风筝的展品卡。第一关普通风筝，第二关猫脸风筝与小猫，第三关狗脸风筝与小狗并加近似干扰。错过或接错有提示可再试。",
+      "assetKeys": [
+        "exhibit-cover",
+        "kite",
+        "cat",
+        "cat-kite",
+        "dog",
+        "dog-kite",
+        "monkey",
+        "monster"
+      ],
+      "textbookPrintedPages": [
+        38,
+        39
+      ]
+    },
+    {
+      "page": 6,
+      "type": "interactive",
+      "title": "开车送回话卡",
+      "play": "驾驶回话车追碰有实物证据的移动卡。依据同一口头猜测，区分真狗、像狗的风筝和新揭晓的动物。每次转向前先说肯定或否定，口语留待成人观察。",
+      "assetKeys": [
+        "exhibit-cover",
+        "dog",
+        "dog-kite",
+        "monkey",
+        "cat",
+        "game-pair-dog",
+        "game-pair-monkey",
+        "game-pair-dog-kite",
+        "game-pair-cat"
+      ],
+      "textbookPrintedPages": [
+        39,
+        40
+      ]
+    },
+    {
+      "page": 7,
+      "type": "slide",
+      "title": "开口求助，再换角色",
+      "play": "由求助场景听懂 Help，并用新物品两人轮流问答、交换角色。",
+      "assetKeys": [
+        "help-scene"
+      ],
+      "textbookPrintedPages": [
+        39,
+        40
+      ]
+    },
+    {
+      "page": 8,
+      "type": "quiz",
+      "title": "新展位的小检查",
+      "play": "六道独立迁移听辨题，全部配教师读题、图片选项和解析。",
+      "assetKeys": [
+        "quiz-dog",
+        "quiz-monkey",
+        "quiz-kite",
+        "quiz-cat",
+        "quiz-monster",
+        "quiz-cat-kite",
+        "quiz-dog-kite",
+        "quiz-help",
+        "quiz-reading",
+        "quiz-waving",
+        "quiz-pair-cat-match",
+        "quiz-pair-cat-different",
+        "quiz-pair-dog-match",
+        "quiz-pair-dog-different"
+      ],
+      "textbookPrintedPages": [
+        38,
+        39,
+        40
+      ]
+    },
+    {
+      "page": 9,
+      "type": "slide",
+      "title": "把猜谜台带回家",
+      "play": "依次回顾听词、猜、按证据作答、求助和交换角色。",
+      "assetKeys": [],
+      "textbookPrintedPages": [
+        38,
+        39,
+        40
+      ]
+    }
+  ],
+  "quiz": [
+    {
+      "id": "heard-yes",
+      "page": 8,
+      "skill": "听懂肯定答语并认出实际对象",
+      "target": "问的是小狗，回答说猜对了，所以找草地上的小狗。"
+    },
+    {
+      "id": "heard-correction",
+      "page": 8,
+      "skill": "听懂否定答语后的更正",
+      "target": "先否定猫的猜测，再告诉你真实物品是风筝。找有尾带和线轴的展品图。"
+    },
+    {
+      "id": "reply-yes",
+      "page": 8,
+      "skill": "用完整实物证据肯定猜测",
+      "target": "问的是猫，图上也是猫。两张小猫图表示猜测和实物相同。"
+    },
+    {
+      "id": "reply-no",
+      "page": 8,
+      "skill": "找出否定猜测的实物证据",
+      "target": "一张是猜的小狗，另一张是实际的怪兽玩偶。问的和看见的对不上，要否定。"
+    },
+    {
+      "id": "real-category",
+      "page": 8,
+      "skill": "区分动物图案和真实物品",
+      "target": "线索说实物是风筝、图案是小狗。找带风筝线和尾带的狗脸风筝。"
+    },
+    {
+      "id": "hear-help",
+      "page": 8,
+      "skill": "听懂故事里的求助语",
+      "target": "风筝线卡在椅子旁，孩子指给大人看，请大人来帮她，所以这时会喊 Help!"
+    }
+  ],
+  "afterClass": {
+    "official": [
+      "教材印刷40页活动4要求同伴轮流猜图。",
+      "出版社模块教案第7页和第13页分别布置跟读、画图复述和换角色问答。"
+    ],
+    "inLesson": "末页请孩子和家人轮流藏图、问、揭图、回话。未现场观察的口语、纸笔和学习掌握程度标为待观察。",
+    "weekly": "听词指图、听懂猜测、根据完整图肯定或否定、区分图案和真实物品、辨认求助场景。周测更换展品、问答组合和求助背景，另行配音核题。"
+  },
+  "authoring": {
+    "mode": "direct_codex",
+    "owner": "/root/dog_english",
+    "existingSourcesReused": [
+      "教材与官方资料审读笔记",
+      "已登记的正式教学与题图素材",
+      "教师档案",
+      "教材限定的目标英语词与句型"
+    ],
+    "newContent": [
+      "授课和游戏台词",
+      "情境、讲解与互动",
+      "小检查题目与解析"
+    ],
+    "rights": "只使用原书限定的单词和目标句型，原教材画面及整段文本没有放进课件。",
+    "authorModels": [
+      "gpt-6.1-sol"
+    ]
+  }
+}

@@ -16,8 +16,8 @@ const source={endpoint:'http://source.invalid:9000',bucket:'study',prefix:'mira-
 const target={endpoint:'https://cos.ap-guangzhou.myqcloud.com',bucket:'study-1350855375',prefix:'mira-courseware/v1',region:'ap-guangzhou',
   provider:'tencent-cos',addressingStyle:'virtual',accessKeyId:'target-id',secretAccessKey:'target-secret'};
 
-function clients(targetBytes,{bytes=Buffer.from('{"课程":"原稿"}')}={}){
-  const key='课程/真实对象.json',sourceCalls=[],targetCalls=[];
+function clients(targetBytes,{bytes=Buffer.from('{"课程":"原稿"}'),key='课程/真实对象.json'}={}){
+  const sourceCalls=[],targetCalls=[];
   const sourceClient={async send(command){
     sourceCalls.push(command);const name=command.constructor.name,input=command.input;
     if(name==='HeadBucketCommand')return {};
@@ -82,6 +82,65 @@ test('standard source MD5 lets COS prove a new object without a second full down
   const journal=(await fs.readdir(directory)).find(name=>name.endsWith('.jsonl'));
   const receipt=JSON.parse((await fs.readFile(path.join(directory,journal),'utf8')).split('\n')[0]);
   assert.equal(receipt.integrityCheck,'cos-content-md5+source-sha256');
+});
+
+test('a directory prefix bounds both inventories and rejects any object outside the directory',async t=>{
+  const directory=await fs.realpath(await fs.mkdtemp(path.join(os.tmpdir(),'cos-mirror-test-')));t.after(()=>fs.rm(directory,{recursive:true,force:true}));
+  const f=clients(),prefix='课程/';
+  const dependencies={source,target,sourceClient:f.sourceClient,targetClient:f.targetClient};
+  const options={command:'mirror',concurrency:1,state:directory,prefix};
+  const result=await runMirror(options,dependencies);
+  assert.equal(result.prefix,prefix);
+  assert.equal(result.verifiedObjects,1);
+  assert.equal(result.complete,true);
+  const listings=f.sourceCalls.concat(f.targetCalls).filter(call=>call.constructor.name==='ListObjectsV2Command');
+  assert.equal(listings.length,2);
+  assert(listings.every(call=>call.input.Prefix===prefix));
+  await assert.rejects(runMirror({...options,prefix:'课程'},dependencies),/directory prefix/);
+  await assert.rejects(runMirror({...options,prefix:'别的课/'},dependencies),/outside its declared scope/);
+  assert.equal(f.targetCalls.filter(call=>call.constructor.name==='PutObjectCommand').length,1);
+  const sourceSend=f.sourceClient.send.bind(f.sourceClient);
+  f.sourceClient.send=async command=>{
+    const response=await sourceSend(command);
+    if(response.Contents)response.Contents.push({...response.Contents[0],Key:f.key+'.supplement'});
+    return response;
+  };
+  const partial=await runMirror({...options,limit:1},dependencies);
+  assert.equal(partial.sourceObjects,2);
+  assert.equal(partial.verifiedObjects,1);
+  assert.equal(partial.complete,false);
+});
+
+test('a verified archive receipt isolates one release in a shared directory and checks its source before PUT',async t=>{
+  const directory=await fs.realpath(await fs.mkdtemp(path.join(os.tmpdir(),'cos-mirror-test-')));t.after(()=>fs.rm(directory,{recursive:true,force:true}));
+  const prefix='英语/外研社/一年级上册/2026-11-09/How many/';
+  const f=clients(undefined,{key:prefix+'selected.json'});
+  const sourceSend=f.sourceClient.send.bind(f.sourceClient);
+  f.sourceClient.send=async command=>{
+    const response=await sourceSend(command);
+    if(response.Contents)response.Contents.push({...response.Contents[0],Key:prefix+'prior.json'});
+    return response;
+  };
+  const filename=path.join(directory,'verified-complete.json');
+  const {endpoint,bucket,region}=source;
+  const receipt={schemaVersion:'mira.course-archive.verification.v1',archiveId:'selected-archive',complete:true,
+    storage:{endpoint,bucket,region},objects:[{objectKey:f.key,byteSize:f.bytes.length,etag:etag(f.bytes),sha256:'0'.repeat(64)}]};
+  const options={command:'mirror',concurrency:1,state:directory,'archive-receipt':filename};
+  const dependencies={source,target,sourceClient:f.sourceClient,targetClient:f.targetClient};
+  await fs.writeFile(filename,JSON.stringify(receipt));
+  await assert.rejects(runMirror(options,dependencies),/incomplete/);
+  assert(!f.targetCalls.some(call=>call.constructor.name==='PutObjectCommand'));
+  receipt.objects[0].sha256=crypto.createHash('sha256').update(f.bytes).digest('hex');
+  await fs.writeFile(filename,JSON.stringify(receipt));
+  const result=await runMirror(options,dependencies);
+  assert.equal(result.archiveId,receipt.archiveId);
+  assert.equal(result.sourceObjects,1);
+  assert.equal(result.complete,true);
+  const puts=f.targetCalls.filter(call=>call.constructor.name==='PutObjectCommand');
+  assert.deepEqual(puts.map(call=>call.input.Key),[f.key]);
+  const readback=await runMirror({...options,command:'verify'},dependencies);
+  assert.equal(readback.verifiedObjects,1);
+  assert(f.targetCalls.some(call=>call.constructor.name==='GetObjectCommand'&&call.input.Key===f.key));
 });
 
 test('a large mirror object is fully read from the source before its target upload starts',async t=>{

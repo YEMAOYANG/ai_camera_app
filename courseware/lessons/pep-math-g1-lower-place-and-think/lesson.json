@@ -1,0 +1,1123 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "摆一摆，想一想",
+  "grade": 1,
+  "description": "在两格固定用完圆片，一次挪一枚，记录、预测、逆查并辨别每位九枚的上限。",
+  "roster": {
+    "teacher": {
+      "name": "小数老师",
+      "role": "teacher",
+      "gender": "male",
+      "voice": "Ethan",
+      "avatar": "/avatars/teacher-1.png",
+      "color": "#286956",
+      "persona": "每次只请孩子挪一枚，再说两格的变化。"
+    }
+  },
+  "images": {
+    "budget-3": {
+      "file": "assets/budget-3.png"
+    },
+    "budget-4": {
+      "file": "assets/budget-4.png"
+    },
+    "budget-5": {
+      "file": "assets/budget-5.png"
+    },
+    "budget-6": {
+      "file": "assets/budget-6.png"
+    },
+    "depot-ready": {
+      "file": "assets/depot-ready.png"
+    },
+    "family-blank-mat": {
+      "file": "assets/family-blank-mat.png"
+    },
+    "family-paper-discs": {
+      "file": "assets/family-paper-discs.png"
+    },
+    "five-complete": {
+      "file": "assets/five-complete.png"
+    },
+    "four-down": {
+      "file": "assets/four-down.png"
+    },
+    "four-up": {
+      "file": "assets/four-up.png"
+    },
+    "game-mat-11": {
+      "file": "assets/game-mat-11.png"
+    },
+    "game-mat-12": {
+      "file": "assets/game-mat-12.png"
+    },
+    "game-mat-13": {
+      "file": "assets/game-mat-13.png"
+    },
+    "game-mat-14": {
+      "file": "assets/game-mat-14.png"
+    },
+    "game-mat-20": {
+      "file": "assets/game-mat-20.png"
+    },
+    "game-mat-21": {
+      "file": "assets/game-mat-21.png"
+    },
+    "game-mat-22": {
+      "file": "assets/game-mat-22.png"
+    },
+    "game-mat-23": {
+      "file": "assets/game-mat-23.png"
+    },
+    "game-mat-31": {
+      "file": "assets/game-mat-31.png"
+    },
+    "game-mat-32": {
+      "file": "assets/game-mat-32.png"
+    },
+    "game-mat-33": {
+      "file": "assets/game-mat-33.png"
+    },
+    "game-mat-40": {
+      "file": "assets/game-mat-40.png"
+    },
+    "game-mat-41": {
+      "file": "assets/game-mat-41.png"
+    },
+    "game-mat-42": {
+      "file": "assets/game-mat-42.png"
+    },
+    "game-mat-5": {
+      "file": "assets/game-mat-5.png"
+    },
+    "game-mat-51": {
+      "file": "assets/game-mat-51.png"
+    },
+    "large-mat-11": {
+      "file": "assets/large-mat-11.png"
+    },
+    "large-mat-12": {
+      "file": "assets/large-mat-12.png"
+    },
+    "large-mat-13": {
+      "file": "assets/large-mat-13.png"
+    },
+    "large-mat-14": {
+      "file": "assets/large-mat-14.png"
+    },
+    "large-mat-2": {
+      "file": "assets/large-mat-2.png"
+    },
+    "large-mat-20": {
+      "file": "assets/large-mat-20.png"
+    },
+    "large-mat-21": {
+      "file": "assets/large-mat-21.png"
+    },
+    "large-mat-22": {
+      "file": "assets/large-mat-22.png"
+    },
+    "large-mat-23": {
+      "file": "assets/large-mat-23.png"
+    },
+    "large-mat-31": {
+      "file": "assets/large-mat-31.png"
+    },
+    "large-mat-32": {
+      "file": "assets/large-mat-32.png"
+    },
+    "large-mat-33": {
+      "file": "assets/large-mat-33.png"
+    },
+    "large-mat-4": {
+      "file": "assets/large-mat-4.png"
+    },
+    "large-mat-40": {
+      "file": "assets/large-mat-40.png"
+    },
+    "large-mat-41": {
+      "file": "assets/large-mat-41.png"
+    },
+    "large-mat-42": {
+      "file": "assets/large-mat-42.png"
+    },
+    "large-mat-5": {
+      "file": "assets/large-mat-5.png"
+    },
+    "large-mat-50": {
+      "file": "assets/large-mat-50.png"
+    },
+    "large-mat-51": {
+      "file": "assets/large-mat-51.png"
+    },
+    "maze-exit": {
+      "file": "assets/maze-exit.png"
+    },
+    "maze-ready": {
+      "file": "assets/maze-ready.png"
+    },
+    "move-left": {
+      "file": "assets/move-left.png"
+    },
+    "move-right": {
+      "file": "assets/move-right.png"
+    },
+    "nine-prediction": {
+      "file": "assets/nine-prediction.png"
+    },
+    "one-in-ones": {
+      "file": "assets/one-in-ones.png"
+    },
+    "one-in-tens": {
+      "file": "assets/one-in-tens.png"
+    },
+    "q-eight-budget": {
+      "file": "assets/q-eight-budget.png"
+    },
+    "q-eleven-a": {
+      "file": "assets/q-eleven-a.png"
+    },
+    "q-eleven-b": {
+      "file": "assets/q-eleven-b.png"
+    },
+    "q-eleven-budget": {
+      "file": "assets/q-eleven-budget.png"
+    },
+    "q-eleven-c": {
+      "file": "assets/q-eleven-c.png"
+    },
+    "q-move-a-44": {
+      "file": "assets/q-move-a-44.png"
+    },
+    "q-move-b-26": {
+      "file": "assets/q-move-b-26.png"
+    },
+    "q-move-c-45": {
+      "file": "assets/q-move-c-45.png"
+    },
+    "q-move-start-35": {
+      "file": "assets/q-move-start-35.png"
+    },
+    "q-new-board-43": {
+      "file": "assets/q-new-board-43.png"
+    },
+    "q-number-10": {
+      "file": "assets/q-number-10.png"
+    },
+    "q-number-17": {
+      "file": "assets/q-number-17.png"
+    },
+    "q-number-34": {
+      "file": "assets/q-number-34.png"
+    },
+    "q-number-36": {
+      "file": "assets/q-number-36.png"
+    },
+    "q-number-43": {
+      "file": "assets/q-number-43.png"
+    },
+    "q-number-6": {
+      "file": "assets/q-number-6.png"
+    },
+    "q-number-62": {
+      "file": "assets/q-number-62.png"
+    },
+    "q-number-7": {
+      "file": "assets/q-number-7.png"
+    },
+    "q-number-8": {
+      "file": "assets/q-number-8.png"
+    },
+    "q-number-9": {
+      "file": "assets/q-number-9.png"
+    },
+    "q-reverse-54-72": {
+      "file": "assets/q-reverse-54-72.png"
+    },
+    "q-seven-budget": {
+      "file": "assets/q-seven-budget.png"
+    },
+    "same-six-diagonal": {
+      "file": "assets/same-six-diagonal.png"
+    },
+    "six-record-error": {
+      "file": "assets/six-record-error.png"
+    },
+    "six-record-fixed": {
+      "file": "assets/six-record-fixed.png"
+    },
+    "ten-cannot-fit-one-side": {
+      "file": "assets/ten-cannot-fit-one-side.png"
+    },
+    "ten-legal-record": {
+      "file": "assets/ten-legal-record.png"
+    },
+    "three-complete": {
+      "file": "assets/three-complete.png"
+    },
+    "three-missing-21": {
+      "file": "assets/three-missing-21.png"
+    },
+    "two-disc-record": {
+      "file": "assets/two-disc-record.png"
+    },
+    "two-discs-move": {
+      "file": "assets/two-discs-move.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "same-disc-new-place",
+      "type": "slide",
+      "title": "同一枚圆片，放在哪格",
+      "template": "two-columns",
+      "data": {
+        "title": "同一枚圆片，放在哪格",
+        "left": {
+          "heading": "放右边个位",
+          "body": "一个一，写1。"
+        },
+        "left_picture": "one-in-ones",
+        "right": {
+          "heading": "放左边十位",
+          "body": "一个十，写10。"
+        },
+        "right_picture": "one-in-tens"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "灯牌工坊有两格。一枚圆片能摆出不同的数。"
+        },
+        {
+          "say": "放进右边个位，一枚表示一个一。"
+        },
+        {
+          "say": "左边没有圆片，只写一个一，不在最前面写零。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "拿同一枚圆片放进左边十位。现在它表示一个十。"
+        },
+        {
+          "say": "个位空着，要写零占位。合起来写十。"
+        },
+        {
+          "say": "前后都只用一枚。改变的是放在哪个数位。"
+        }
+      ]
+    },
+    {
+      "key": "move-one-record-once",
+      "type": "slide",
+      "title": "用两枚圆片，把三种摆齐",
+      "template": "two-columns",
+      "data": {
+        "title": "用两枚圆片，把三种摆齐",
+        "left": {
+          "heading": "挪一枚到左边",
+          "body": "用满两枚，片数没变。"
+        },
+        "left_picture": "two-discs-move",
+        "right": {
+          "heading": "摆完就记一行",
+          "body": "2、11、20，三种都在。"
+        },
+        "right_picture": "two-disc-record"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "给灯牌两枚圆片，必须两枚都用上。"
+        },
+        {
+          "say": "先全放右边个位，写二。接着向左挪一枚。"
+        },
+        {
+          "say": "左边一个十，右边一个一，写十一。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "再挪剩下那枚，左边两个十，右边空，写二十。"
+        },
+        {
+          "say": "每挪一次就记一行。整齐记录有三个数。"
+        },
+        {
+          "say": "左右摆的位置变了，手里一直只有两枚。"
+        }
+      ]
+    },
+    {
+      "key": "find-the-missing-placement",
+      "type": "slide",
+      "title": "三枚的记录少了哪一种",
+      "template": "two-columns",
+      "data": {
+        "title": "三枚的记录少了哪一种",
+        "left": {
+          "heading": "这里漏了一行",
+          "body": "数位上的圆片还能帮我们复原。"
+        },
+        "left_picture": "three-missing-21",
+        "right": {
+          "heading": "从个位一路挪到十位",
+          "body": "3、12、21、30。"
+        },
+        "right_picture": "three-complete"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "用三枚试试。这份记录第三行还没写数。"
+        },
+        {
+          "say": "先核对左边。十位两枚，右边还剩一枚。"
+        },
+        {
+          "say": "两枚在十位是二十。再添右边的一个一，二十一。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "全部放右边是三。挪一枚到左边，是十二。"
+        },
+        {
+          "say": "再挪一枚是二十一。最后全在左边，是三十。"
+        },
+        {
+          "say": "左边从没有到一枚、两枚、三枚，每种只记一次。"
+        }
+      ]
+    },
+    {
+      "key": "one-way-and-back",
+      "type": "slide",
+      "title": "从两头开始，得到同一批数",
+      "template": "two-columns",
+      "data": {
+        "title": "从两头开始，得到同一批数",
+        "left": {
+          "heading": "从个位开始",
+          "body": "左边逐枚多，数逐个变大。"
+        },
+        "left_picture": "four-up",
+        "right": {
+          "heading": "从十位开始",
+          "body": "右边逐枚多，数逐个变小。"
+        },
+        "right_picture": "four-down"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "用四枚时，可以先全放在右边，摆出四。"
+        },
+        {
+          "say": "每次向左挪一枚。左边多一枚，右边少一枚。"
+        },
+        {
+          "say": "这样排出四、十三、二十二、三十一、四十。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "也能从全放左边的四十开始，每次向右挪一枚。"
+        },
+        {
+          "say": "两张表的方向不同，同一个摆法都只出现一次。"
+        },
+        {
+          "say": "左边可有零到四枚。一个也没跳过，所以没有漏。"
+        },
+        {
+          "say": "五枚也能照着做。先听接下来游戏的方向。"
+        },
+        {
+          "say": "两枚先放个位。把一枚挪向十位，找下一张图。"
+        },
+        {
+          "say": "继续从个位挪一枚到十位。"
+        },
+        {
+          "say": "四枚先在个位。每次只向十位挪一枚。"
+        },
+        {
+          "say": "五枚先在十位。每次只向个位挪一枚。"
+        },
+        {
+          "say": "继续从十位挪一枚到个位。"
+        },
+        {
+          "say": "按顺序找齐了。沿小路到门口。"
+        },
+        {
+          "say": "想一想，只挪一枚后，两格各有多少？"
+        },
+        {
+          "say": "一边多一枚，另一边少一枚，圆片总数不变。"
+        },
+        {
+          "say": "没有漏下或重复盘面，这一站通过。"
+        }
+      ]
+    },
+    {
+      "key": "follow-the-disc-route",
+      "type": "interactive",
+      "title": "沿摆片顺序走",
+      "widgetType": "courseware_game",
+      "page": "follow-the-disc-route",
+      "startImage": "maze-ready",
+      "script": [
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#current-disc-mat"
+        },
+        {
+          "say": "左图现在是两枚都在个位。盘面箭头说往十位挪。"
+        },
+        {
+          "highlight": "#game-target"
+        },
+        {
+          "say": "找一枚在左、一枚在右的盘面。这才只挪过一枚。"
+        },
+        {
+          "highlight": "#move-to-next-mat"
+        },
+        {
+          "say": "小车往右能碰到它。盘面挪片方向和车方向不同。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "highlight": "#previous-disc-mat"
+        },
+        {
+          "say": "小车收到下一张。左图已变成十一，右图还留着二。"
+        },
+        {
+          "say": "现在换你。每次看当前盘面，只找挪一枚后的图。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "maze-two-left": "one-way-and-back-9",
+        "maze-left-again": "one-way-and-back-10",
+        "maze-four-left": "one-way-and-back-11",
+        "maze-five-right": "one-way-and-back-12",
+        "maze-right-again": "one-way-and-back-13",
+        "maze-exit": "one-way-and-back-14",
+        "maze-hint": "one-way-and-back-15",
+        "maze-help": "one-way-and-back-16",
+        "maze-praise": "one-way-and-back-17"
+      }
+    },
+    {
+      "key": "same-count-along-a-diagonal",
+      "type": "slide",
+      "title": "一共能有多少种摆法",
+      "template": "two-columns",
+      "data": {
+        "title": "一共能有多少种摆法",
+        "left": {
+          "heading": "五枚从两端核对",
+          "body": "一共六行，片数没变。"
+        },
+        "left_picture": "five-complete",
+        "right": {
+          "heading": "九枚看十位有几种",
+          "body": "十位能从0枚数到9枚。"
+        },
+        "right_picture": "nine-prediction"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "五枚全在个位时先记一行，之后能挪五次。"
+        },
+        {
+          "say": "每次只挪一枚，每次多记一种。最后一共六行。"
+        },
+        {
+          "say": "一到九枚都可以从全右挪到全左，两端都摆得下。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "九枚从左边零枚开始，可以一路挪到左边九枚。"
+        },
+        {
+          "say": "开始先记一种，再挪九次。九枚能摆十个数。"
+        },
+        {
+          "say": "全在个位写九，全在十位写九十。"
+        },
+        {
+          "say": "这十种摆法的圆片数一样，写出的数却不一样。"
+        }
+      ]
+    },
+    {
+      "key": "count-discs-not-the-value",
+      "type": "slide",
+      "title": "查片数，再看有没有跳步",
+      "template": "two-columns",
+      "data": {
+        "title": "查片数，再看有没有跳步",
+        "left": {
+          "heading": "坐标表上的斜排",
+          "body": "一格向下、一格向左，总片数一样。"
+        },
+        "left_picture": "same-six-diagonal",
+        "right": {
+          "heading": "六枚的盘面记录",
+          "body": "先数两格，再核对挪动顺序。"
+        },
+        "right_picture": "six-record-error"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "这张表从零开始，横看个位，竖看十位。"
+        },
+        {
+          "say": "斜着向左下走，十位多一枚，个位少一枚。"
+        },
+        {
+          "say": "所以标出来的斜排一直用六枚。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "写着三十四。按这个数，要用三加四枚。"
+        },
+        {
+          "say": "那要七枚，可图上只有六枚。应写三十三。"
+        },
+        {
+          "say": "另外从四十二到六十跨了两步，漏下五十一。"
+        },
+        {
+          "say": "先逐行数片，再按每次只挪一枚核对。"
+        },
+        {
+          "say": "数十位和个位的圆片，一共几枚就去几枚盒。"
+        },
+        {
+          "say": "这次有三个盒。先数清两格，再往盒子推。"
+        },
+        {
+          "say": "不同的数也能用同样多的圆片。请分别送。"
+        },
+        {
+          "say": "再数一次，两格合起来用了几枚？"
+        },
+        {
+          "say": "从一边数起，另一边接着数。每枚只数一次。"
+        },
+        {
+          "say": "圆片数和材料盒的数量对上了。"
+        }
+      ]
+    },
+    {
+      "key": "fix-the-six-disc-record",
+      "type": "slide",
+      "title": "把六枚的记录补完整",
+      "template": "two-columns",
+      "data": {
+        "title": "把六枚的记录补完整",
+        "left": {
+          "heading": "刚才漏写的一行",
+          "body": "先核两格各用了几枚。"
+        },
+        "left_picture": "six-record-error",
+        "right": {
+          "heading": "修好的七行",
+          "body": "6、15、24、33、42、51、60。"
+        },
+        "right_picture": "six-record-fixed"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "我们把记录修一次。中间三加三才正好是六枚。"
+        },
+        {
+          "say": "两边都是三枚，写三十三。右边的三表示三个一。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "四十二后只移一枚，左边五枚，右边一枚。"
+        },
+        {
+          "say": "所以先写五十一，再写六十。现在看修好的表。"
+        },
+        {
+          "say": "从第一行到最后一行，每次都只改变一枚的位置。"
+        },
+        {
+          "say": "七行都用六枚。圆片的个数和组成的数要分开。"
+        }
+      ]
+    },
+    {
+      "key": "sort-the-disc-budgets",
+      "type": "interactive",
+      "title": "把盘面推回材料盒",
+      "widgetType": "courseware_game",
+      "page": "sort-the-disc-budgets",
+      "startImage": "depot-ready",
+      "script": [
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#depot-disc-preview"
+        },
+        {
+          "say": "左图是一枚在十位，两枚在个位。这个数是十二。"
+        },
+        {
+          "highlight": "#game-target"
+        },
+        {
+          "say": "我们只问用了几枚。两格加起来用了三枚。"
+        },
+        {
+          "highlight": "#first-three-disc-dock"
+        },
+        {
+          "say": "找到画着三枚圆片的盒。不是找十二枚。"
+        },
+        {
+          "highlight": "#push-disc-mat"
+        },
+        {
+          "say": "绕到这张盘面上方，按向下，老师只推好一张。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "highlight": "#depot-parked-discs"
+        },
+        {
+          "say": "真的进了三枚盒。对着右图的盘面和盒再数一次。"
+        },
+        {
+          "say": "现在从头轮到你，先数两格再推。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "sort-first": "count-discs-not-the-value-9",
+        "sort-three": "count-discs-not-the-value-10",
+        "sort-repeat": "count-discs-not-the-value-11",
+        "sort-hint": "count-discs-not-the-value-12",
+        "sort-help": "count-discs-not-the-value-13",
+        "sort-praise": "count-discs-not-the-value-14"
+      }
+    },
+    {
+      "key": "ten-discs-have-limits",
+      "type": "slide",
+      "title": "十枚要守住两个格子的上限",
+      "template": "two-columns",
+      "data": {
+        "title": "十枚要守住两个格子的上限",
+        "left": {
+          "heading": "两端不能照搬",
+          "body": "一格最多九枚。"
+        },
+        "left_picture": "ten-cannot-fit-one-side",
+        "right": {
+          "heading": "十位从1枚数到9枚",
+          "body": "19、28一直到91，共九种。"
+        },
+        "right_picture": "ten-legal-record"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "十枚都放一格，还能照这样记数吗？"
+        },
+        {
+          "say": "每一位只记零到九。个位满十枚要进位。"
+        },
+        {
+          "say": "十位放满十枚，也不能留成两位板里的十枚。"
+        },
+        {
+          "say": "十和一百可以用进位表示，但那时只剩一枚标记。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "这次规定十枚都留在两格，先摆左一右九。"
+        },
+        {
+          "say": "每次向左挪一枚，到左九右一就停。"
+        },
+        {
+          "say": "从一枚到九枚有九种。这里不能用多一种的办法。"
+        }
+      ]
+    },
+    {
+      "key": "picture-check",
+      "type": "quiz",
+      "title": "看盘面，找新摆法",
+      "intro": [
+        "每一题先听清问数值、片数，还是摆法数。",
+        "看圆片、数位或记录，再选一张图。"
+      ],
+      "questions": [
+        {
+          "id": "read-a-new-board",
+          "question": "看两格，摆出的数是哪一个？",
+          "skill": "数位与读数",
+          "visual": {
+            "kind": "asset",
+            "image": "q-new-board-43",
+            "alt": "十位四枚，个位三枚"
+          },
+          "answer": [
+            "b"
+          ],
+          "analysis": "十位有四枚，表示四个十。个位有三枚，表示三个一。组成四十三。",
+          "options": {
+            "a": {
+              "label": "三十四",
+              "visual": {
+                "kind": "asset",
+                "image": "q-number-34",
+                "alt": "三十四"
+              }
+            },
+            "b": {
+              "label": "四十三",
+              "visual": {
+                "kind": "asset",
+                "image": "q-number-43",
+                "alt": "四十三"
+              }
+            },
+            "c": {
+              "label": "七",
+              "visual": {
+                "kind": "asset",
+                "image": "q-number-7",
+                "alt": "七"
+              }
+            }
+          }
+        },
+        {
+          "id": "move-one-to-the-tens",
+          "question": "把个位一枚移到十位。选挪完的图。",
+          "skill": "固定总片数挪一片",
+          "visual": {
+            "kind": "asset",
+            "image": "q-move-start-35",
+            "alt": "十位三枚，个位五枚"
+          },
+          "answer": [
+            "a"
+          ],
+          "analysis": "左边多一枚到四，右边少一枚到四，总数仍是八枚。选左四右四。",
+          "options": {
+            "a": {
+              "label": "左四右四",
+              "visual": {
+                "kind": "asset",
+                "image": "q-move-a-44",
+                "alt": "左四右四"
+              }
+            },
+            "b": {
+              "label": "左二右六",
+              "visual": {
+                "kind": "asset",
+                "image": "q-move-b-26",
+                "alt": "左二右六"
+              }
+            },
+            "c": {
+              "label": "左四右五",
+              "visual": {
+                "kind": "asset",
+                "image": "q-move-c-45",
+                "alt": "左四右五"
+              }
+            }
+          }
+        },
+        {
+          "id": "predict-seven",
+          "question": "七枚都用上，一共能摆出几个数？",
+          "skill": "1到9枚的种数",
+          "visual": {
+            "kind": "asset",
+            "image": "q-seven-budget",
+            "alt": "盒内七枚同样圆片"
+          },
+          "answer": [
+            "c"
+          ],
+          "analysis": "全放个位先有一种。往十位每次移一枚，能移七次，一共有八种。",
+          "options": {
+            "a": {
+              "label": "七种",
+              "visual": {
+                "kind": "asset",
+                "image": "q-number-7",
+                "alt": "七种"
+              }
+            },
+            "b": {
+              "label": "十种",
+              "visual": {
+                "kind": "asset",
+                "image": "q-number-10",
+                "alt": "十种"
+              }
+            },
+            "c": {
+              "label": "八种",
+              "visual": {
+                "kind": "asset",
+                "image": "q-number-8",
+                "alt": "八种"
+              }
+            }
+          }
+        },
+        {
+          "id": "remove-a-wrong-card",
+          "question": "只用八枚。哪张记录需要换掉？",
+          "skill": "反查片数",
+          "visual": {
+            "kind": "asset",
+            "image": "q-eight-budget",
+            "alt": "盒内八枚圆片"
+          },
+          "answer": [
+            "b"
+          ],
+          "analysis": "十七和六十二的两个数字加起来都是八。三十六用了三加六共九枚，需要换掉。",
+          "options": {
+            "a": {
+              "label": "十七",
+              "visual": {
+                "kind": "asset",
+                "image": "q-number-17",
+                "alt": "十七"
+              }
+            },
+            "b": {
+              "label": "三十六",
+              "visual": {
+                "kind": "asset",
+                "image": "q-number-36",
+                "alt": "三十六"
+              }
+            },
+            "c": {
+              "label": "六十二",
+              "visual": {
+                "kind": "asset",
+                "image": "q-number-62",
+                "alt": "六十二"
+              }
+            }
+          }
+        },
+        {
+          "id": "pick-a-valid-over-nine-split",
+          "question": "十一枚都要用。哪张两格都能摆？",
+          "skill": "每个数位至多九枚",
+          "visual": {
+            "kind": "asset",
+            "image": "q-eleven-budget",
+            "alt": "盒内十一枚圆片"
+          },
+          "answer": [
+            "a"
+          ],
+          "analysis": "两格各最多九枚。左九右二都合规，一共十一枚；另外两张有一格摆了十枚。",
+          "options": {
+            "a": {
+              "label": "左九右二",
+              "visual": {
+                "kind": "asset",
+                "image": "q-eleven-a",
+                "alt": "左九右二"
+              }
+            },
+            "b": {
+              "label": "左十右一",
+              "visual": {
+                "kind": "asset",
+                "image": "q-eleven-b",
+                "alt": "左十右一"
+              }
+            },
+            "c": {
+              "label": "左一右十",
+              "visual": {
+                "kind": "asset",
+                "image": "q-eleven-c",
+                "alt": "左一右十"
+              }
+            }
+          }
+        },
+        {
+          "id": "reverse-count-matching-pair",
+          "question": "五十四和七十二，各用了几枚？",
+          "skill": "由数字反推两格总片数",
+          "visual": {
+            "kind": "asset",
+            "image": "q-reverse-54-72",
+            "alt": "五十四和七十二两张数卡"
+          },
+          "answer": [
+            "c"
+          ],
+          "analysis": "五十四用五枚和四枚，七十二用七枚和两枚。两张都用九枚。",
+          "options": {
+            "a": {
+              "label": "各八枚",
+              "visual": {
+                "kind": "asset",
+                "image": "q-number-8",
+                "alt": "各八枚"
+              }
+            },
+            "b": {
+              "label": "各六枚",
+              "visual": {
+                "kind": "asset",
+                "image": "q-number-6",
+                "alt": "各六枚"
+              }
+            },
+            "c": {
+              "label": "各九枚",
+              "visual": {
+                "kind": "asset",
+                "image": "q-number-9",
+                "alt": "各九枚"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "make-your-own-disc-board",
+      "type": "slide",
+      "title": "和家人做一张摆片记录",
+      "template": "two-columns",
+      "data": {
+        "title": "和家人做一张摆片记录",
+        "left": {
+          "heading": "准备同样的纸圆片",
+          "body": "先约好每一枚都要用上。"
+        },
+        "left_picture": "family-paper-discs",
+        "right": {
+          "heading": "画出两个数位格",
+          "body": "从一端挪，写下每一种。"
+        },
+        "right_picture": "family-blank-mat"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "回家可以剪几枚一样大的纸圆片，请家人一起摆。"
+        },
+        {
+          "say": "选一个没摆过的片数。先说好，一枚也不能剩。"
+        },
+        {
+          "say": "也可以自己画圆片，用手指沿位置挪。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "画好十位和个位。从一端开始，挪一枚记一行。"
+        },
+        {
+          "say": "换家人从另一端摆，比较是不是同一批数。"
+        },
+        {
+          "say": "再请家人随便指一个数，猜它用了几枚。"
+        },
+        {
+          "say": "如果试更多圆片，先记住每格最多九枚。"
+        }
+      ]
+    }
+  ]
+}

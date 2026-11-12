@@ -1,0 +1,16 @@
+#finish .card:has(.crow-film-strip) { padding-block: 14px 18px; }
+#finish .card:has(.crow-film-strip) .big img { width: 92px; height: 92px; }
+.crow-film-strip {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin: 7px auto 15px;
+}
+.crow-film-strip img {
+  width: 118px;
+  height: 104px;
+  object-fit: contain;
+  border: 2px solid #377d6c;
+  border-radius: 14px;
+  background: #fff5e2;
+}

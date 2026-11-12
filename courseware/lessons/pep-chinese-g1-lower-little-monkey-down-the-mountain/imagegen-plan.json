@@ -1,0 +1,343 @@
+{
+  "schemaVersion": "mira.courseware.imagegen-plan.v1",
+  "status": "awaiting_local_disk",
+  "format": "codex_builtin_imagegen_atlases",
+  "style": "原创一年级影偶小剧场。细纸纹、哑光水粉、干净剪纸轮廓，深松绿和暖奶油底，杏色和柿橙点缀。安静背景、清楚前景。不含任何字母、文字、数字、标识和水印。动物和孩子主体在各自格内完整，格间有安全白边。只参考教学动作，不沿用原书插图或角色服装。",
+  "continuity": "主角是一只暖棕色圆耳猴，卷尾巴、松绿背带和杏色领巾。每格保留同样剪影。场记车是横向铜杏色圆顶小车，小艇是薄荷绿纸船式泡泡艇。动作图同一个后台小演员，短黑发、柿橙围裙、松绿袖口。前景物件明显大于景物。",
+  "atlases": [
+    {
+      "id": "story-forest",
+      "grid": [
+        4,
+        4
+      ],
+      "panels": [
+        {
+          "key": "corn-stage",
+          "scene": "远看成排玉米秆与许多饱满玉米棒，小猴在小径到达地头，还没有拿玉米。"
+        },
+        {
+          "key": "break-corn",
+          "scene": "小猴双手压弯一根连在秆上的玉米棒，连接处刚折开，不能像切割。"
+        },
+        {
+          "key": "carry-corn",
+          "scene": "小猴向右走，一根玉米棒横放在一边肩头，一手扶住，另一只手空着。"
+        },
+        {
+          "key": "peach-stage",
+          "scene": "桃树下的小猴仰看枝上许多又大又红的桃子，远景留地面供拼接。"
+        },
+        {
+          "key": "throw-corn",
+          "scene": "近景，小猴在桃树旁张开手，已经离手的玉米棒正落向地面，树枝挂有红桃。"
+        },
+        {
+          "key": "pick-peach",
+          "scene": "近景，小猴抬手把单只红桃从挂在眼前的枝上取下，枝梗与手一眼可分。"
+        },
+        {
+          "key": "melon-stage",
+          "scene": "小猴站在满地西瓜与藤叶旁，向下看个头大的圆西瓜，场景里留一条去路。"
+        },
+        {
+          "key": "cupped-peaches",
+          "scene": "小猴双手掌心向上托几个桃子，桃子位于手掌上，身后看得出是瓜地。"
+        },
+        {
+          "key": "hug-melon",
+          "scene": "小猴双臂环抱一个圆西瓜贴在身前，走在回家的小径，手掌不用从下方托。"
+        },
+        {
+          "key": "rabbit-chase",
+          "scene": "同一回家小径，带绿纹的瓜落在后方，小猴在后面跑，兔子蹦跳在前。三者不重叠。"
+        },
+        {
+          "key": "rabbit-in-woods",
+          "scene": "小兔向浓密树间跑，耳朵和白色尾巴清楚，还没有被碰到；不要画人在林中。"
+        },
+        {
+          "key": "empty-house",
+          "scene": "小猴站在山脚小屋门前，两手张开让掌心可见，双手没有物件。"
+        },
+        {
+          "key": "throw-peaches",
+          "scene": "从另一角度看瓜地，小猴伸开的手掌已空，几个桃子正落到瓜藤旁，不同于仍托桃的图。"
+        },
+        {
+          "key": "new-trip-practice",
+          "scene": "小猴手里握一条长红丝带，望向路边一枚松果，小屋前奶奶远远等候。"
+        },
+        {
+          "key": "scarf-example",
+          "scene": "一条杏色毛线围巾舒展铺开，一端自然软垂，有清楚绒布折纹，背景奶油色。"
+        },
+        {
+          "key": "home-retell-board",
+          "scene": "剧终，孩子和大人对坐在桌边，桌上放无字影偶册和小猴影偶，画面留白。"
+        }
+      ]
+    },
+    {
+      "id": "actor-actions",
+      "grid": [
+        3,
+        3
+      ],
+      "panels": [
+        {
+          "key": "act-break-icon",
+          "scene": "正面近景，双手把一根带连接槽的短柿橙色软泡沫棒掰成两截，左右手各抓一截，两段分开，断面居中。"
+        },
+        {
+          "key": "act-pick-icon",
+          "scene": "小演员从道具树枝摘下一朵大布花，短枝梗刚离开，举手位置高于肩。"
+        },
+        {
+          "key": "act-shoulder-icon",
+          "scene": "长纸卷放在一边肩膀上，演员用近侧手在肩旁扶住，纸卷另一端越过肩头，另一只手空着。"
+        },
+        {
+          "key": "act-cup-icon",
+          "scene": "演员两手掌心向上并拢托住小纸袋，双手和小袋与身体隔开。"
+        },
+        {
+          "key": "act-hug-icon",
+          "scene": "演员双臂把大靠垫围在胸前，手掌不托在底部。"
+        },
+        {
+          "key": "act-ball-hug-icon",
+          "scene": "演员两臂从左右环抱一只大红软布球，球贴在胸前，手在球的两侧。"
+        },
+        {
+          "key": "act-ball-cup-icon",
+          "scene": "演员两掌从下方托住同一红软布球，球与胸口有明显空隙，手不从左右围住。"
+        },
+        {
+          "key": "act-ball-toss-icon",
+          "scene": "演员手指刚松开，同一红软布球完全离开双手，斜向上飞，弧形动线与手不重合。"
+        },
+        {
+          "key": "story-chair",
+          "scene": "浅奶油背景单件道具，空着的松绿木凳和无字卷纸，作为后台练习拼板的开场小画。"
+        }
+      ]
+    },
+    {
+      "id": "arcade-layers",
+      "grid": [
+        3,
+        3
+      ],
+      "panels": [
+        {
+          "key": "maze-backdrop",
+          "scene": "安静山脚剧场背景，黄昏林坡、木地板、松绿侧幕，中间干净暗一点，给九到十一列棋盘腾出视线。"
+        },
+        {
+          "key": "action-backdrop",
+          "scene": "绿蓝纸做的静水与影偶布景边缘，背景纹理低对比，不画人物和文字。"
+        },
+        {
+          "key": "monkey-sticker",
+          "scene": "浅薄荷单色底，单枚剪纸贴纸，松绿背带杏围巾的卷尾猴举起一张无字小画。"
+        },
+        {
+          "key": "maze-rover",
+          "scene": "浅薄荷单色底，单独的场记车游戏精灵，顶视稍带斜视，柿橙车头朝右，清晰分层车轮，居中留足裁剪。"
+        },
+        {
+          "key": "maze-rover-pop",
+          "scene": "同一场记车同朝向，车头多一枚正吹出的纸泡泡，车轮底座与普通帧一致。"
+        },
+        {
+          "key": "action-boat",
+          "scene": "浅薄荷单色底，单独的纸艇游戏精灵，长轴朝右，右端清晰喷口，奶油色剪纸边与小艇为一个整体。"
+        },
+        {
+          "key": "action-boat-pop",
+          "scene": "同一纸艇同朝向，右端喷口多一枚纸泡泡，艇底和普通帧一致。"
+        },
+        {
+          "key": "maze-start",
+          "scene": "横向海报构图，场记车在林边棋盘的起点，玉米地卡、桃树卡、瓜地卡沿走道分布，出口一面小旗。"
+        },
+        {
+          "key": "action-start",
+          "scene": "横向海报构图，纸艇在下，两个动作剪影卡浮在上方，一个掰软道具，一个摘布花。艇头泡泡向上。"
+        }
+      ]
+    },
+    {
+      "id": "quiz-poses",
+      "grid": [
+        3,
+        3
+      ],
+      "panels": [
+        {
+          "key": "quiz-2-a",
+          "scene": "新演员是短发戴绿帽女孩，把长泡沫木条放在一边肩上，单手扶着，另一手空着。"
+        },
+        {
+          "key": "quiz-2-b",
+          "scene": "同女孩，腰前两手掌向上托同一泡沫木条，木条离肩。"
+        },
+        {
+          "key": "quiz-2-c",
+          "scene": "同女孩，双臂从左右围住同一木条，把木条贴胸前抱住。"
+        },
+        {
+          "key": "quiz-3-a",
+          "scene": "新演员，手指松开，几枚纸石头已从两手飞出，沿一条弧线，物件明显离手。"
+        },
+        {
+          "key": "quiz-3-b",
+          "scene": "同演员，双臂围住装纸石头的敞口纸袋，袋贴胸前，露出几枚石头。"
+        },
+        {
+          "key": "quiz-3-c",
+          "scene": "同演员，两手掌向上合拢托着几枚小纸石头，手与物件近景且没有袋子。"
+        },
+        {
+          "key": "quiz-6-a",
+          "scene": "新版彩纸家门，小猴走到门口时只拿一片明显的大叶，花束单独留在后方路边。"
+        },
+        {
+          "key": "quiz-6-b",
+          "scene": "同家门和视角，小猴走到门口张开两只空手，花束和一片大叶都单独留在后方路边。"
+        },
+        {
+          "key": "quiz-6-c",
+          "scene": "同家门和视角，小猴走到门口拿着一束显眼的花，叶子留在后方路边。"
+        }
+      ]
+    },
+    {
+      "id": "quiz-storybook",
+      "grid": [
+        3,
+        3
+      ],
+      "panels": [
+        {
+          "key": "quiz-story-a1",
+          "scene": "新视角，主角小猴侧面抱瓜走。"
+        },
+        {
+          "key": "quiz-story-a2",
+          "scene": "同角色仍抱瓜，小兔从不远处跑过。"
+        },
+        {
+          "key": "quiz-story-a3",
+          "scene": "同角色仍抱瓜进家门，没有别的东西。"
+        },
+        {
+          "key": "quiz-story-b1",
+          "scene": "侧面的长路旁落有一根玉米棒与几个红桃，路另一端向前延伸。"
+        },
+        {
+          "key": "quiz-story-b2",
+          "scene": "西瓜落在路边，远一点的小猴向前跑。"
+        },
+        {
+          "key": "quiz-story-b3",
+          "scene": "小兔正从树间跑走，较远的小猴两手空，没能追到。"
+        },
+        {
+          "key": "quiz-story-c1",
+          "scene": "新视角，主角小猴抱瓜看见小兔。"
+        },
+        {
+          "key": "quiz-story-c2",
+          "scene": "同角色跟着小兔沿路跑，瓜在路旁。"
+        },
+        {
+          "key": "quiz-story-c3",
+          "scene": "不同结果，主角和小兔并排牵手到家门。"
+        }
+      ]
+    }
+  ],
+  "compositions": {
+    "break-carry-board": [
+      "break-corn",
+      "carry-corn"
+    ],
+    "empty-handed-board": [
+      "throw-corn",
+      "throw-peaches",
+      "rabbit-chase",
+      "empty-house"
+    ],
+    "same-prop-two-traits": [
+      "peach-stage",
+      "melon-stage",
+      "scarf-example"
+    ],
+    "first-three-route": [
+      "corn-stage",
+      "peach-stage",
+      "melon-stage"
+    ],
+    "next-story-cuts": [
+      "hug-melon",
+      "rabbit-chase",
+      "rabbit-in-woods",
+      "empty-house"
+    ],
+    "practice-actions-board": [
+      "story-chair",
+      "act-break-icon",
+      "act-pick-icon",
+      "act-shoulder-icon",
+      "act-cup-icon",
+      "act-hug-icon",
+      "act-ball-toss-icon"
+    ],
+    "one-ball-action-board": [
+      "act-ball-hug-icon",
+      "act-ball-cup-icon",
+      "act-ball-toss-icon"
+    ],
+    "quiz-1-a": [
+      "quiz-story-a1",
+      "quiz-story-a2",
+      "quiz-story-a3"
+    ],
+    "quiz-1-b": [
+      "quiz-story-b1",
+      "quiz-story-b2",
+      "quiz-story-b3"
+    ],
+    "quiz-1-c": [
+      "quiz-story-c1",
+      "quiz-story-c2",
+      "quiz-story-c3"
+    ]
+  },
+  "mapIconSources": {
+    "map-corn-icon": "corn-stage",
+    "map-peach-icon": "peach-stage",
+    "map-melon-icon": "melon-stage",
+    "map-throw-icon": "throw-corn",
+    "map-pick-icon": "pick-peach",
+    "map-carry-icon": "cupped-peaches",
+    "map-hug-icon": "hug-melon",
+    "map-chase-icon": "rabbit-chase",
+    "map-woods-icon": "rabbit-in-woods",
+    "map-home-icon": "empty-house"
+  },
+  "codeDrawn": [
+    "write-gao-xing",
+    "write-zhe-wang",
+    "write-gua-tu",
+    "write-jin",
+    "quiz-4-a",
+    "quiz-4-b",
+    "quiz-4-c",
+    "quiz-5-a",
+    "quiz-5-b",
+    "quiz-5-c"
+  ]
+}

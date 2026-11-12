@@ -1,0 +1,87 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "数与运算",
+  "binding": {
+    "editionId": "pep-math-g1-lower-2022-standard",
+    "revisionId": "directory-6205d2037284e91f10b25edd",
+    "unitId": "3118eaa6-4e44-470a-b7ec-dab2ae9b29b5",
+    "nodeId": "50b6d028-968b-449b-bd4c-f29b04919156"
+  },
+  "scenario": "数学教具整理站要把数轴、计数架和捆棒图收进同一张复习图。孩子按顺序走过数字台，用十条和散块验算，再把一处发现留给同伴看。",
+  "goals": [
+    "能在100以内按一定步长数数，借助数轴或数位比较大小，并说明10个十与1个百的关系。",
+    "能用十和一表示一个数并读写，理解相同数字在不同数位代表不同数量。",
+    "能把100以内加减法的相同数位对应起来，用小棒或计数器说明满十进一和不够减时退一，并与口算或竖式对应。",
+    "能围绕一个100以内的数整理读写、组成、比较和运算的联系，并指着图说明其中一处。"
+  ],
+  "goalEvidence": [
+    {"skill":"count-and-compare","source":"印83与印84数与运算图示、课件4至11及16、教案2至3、任务单1"},
+    {"skill":"read-place-value","source":"印84百十个位图、课件5至7及12至15、教案3至5、任务单2"},
+    {"skill":"same-place-add-subtract","source":"印83上方运算图、印84数与运算、课件19至26、教案5至7、任务单2至3"},
+    {"skill":"connect-the-number-ideas","source":"印83上方知识图、课件3及16至18、教案2及8、任务单1、课练1"}
+  ],
+  "pageSequence": [
+    {"key":"follow-and-compare-counts","kind":"teaching","title":"数轴上向右是更大的数","plan":"依次点亮56、57、58，再用图比较56和62的十位及56和59的个位。数轴刻度等距，老师说明每次向右走过几格，数就增加多少。"},
+    {"key":"ten-tens-make-a-hundred","kind":"teaching","title":"十个十合成一个百","plan":"逐组点亮十根十条，合成一个百格，再把一个百放到百位。指着百、十、个三列读出100，解释后面两个0表示没有零散的十和一。"},
+    {"key":"hop-along-counting-patterns","kind":"interactive","title":"沿着数数的路线跳","plan":"先听起点和每次加几，孩子预测下一台，再跑跳到相应数字上。最后一关从十进步长切换到添一个一组成100。"},
+    {"key":"compare-digits-in-places","kind":"teaching","title":"两个相同的数字各表示什么","plan":"把66画成6根十条和6个散块，再逐项移到十位与个位。对照64的十条、散块及计数架，按数位读写，说明位置改变数量含义。"},
+    {"key":"build-a-number-map","kind":"teaching","title":"给一个数画出几条联系","plan":"以68为中心，用6个十与8个一表示组成，画数字卡和老师读法，接上它在67与69之间的位置，再用同一个数连到68减20的数位图。"},
+    {"key":"add-and-subtract-in-place","kind":"teaching","title":"一和一算，十和十算","plan":"对齐24和53的十位与个位，先合个位再合十位得77。再用68减20展示只拿去两根十条，个位散块仍为8。"},
+    {"key":"make-a-new-ten","kind":"teaching","title":"个位刚好满十也要进一","plan":"用36加24演示十个散块捆成一个十。把新十条移到十位，十位合成6，个位剩0。再以35加27说明换十后个位也可能有剩余。"},
+    {"key":"open-a-ten-for-subtraction","kind":"teaching","title":"个位不够减，先打开一个十","plan":"用72减35逐步点亮十位拿下一根十条、个位添进十个一，得6个十和12个一，再分别减3个十及5个一。最后用竖式标记对应动作并核对37。"},
+    {"key":"aim-at-the-correct-result","kind":"interactive","title":"找到运算结果，再瞄准图靶","plan":"语音和两列计数图给出待算的加减。孩子按位值算出结果，再用弹珠击中相应的十条和散块组合。"},
+    {"key":"picture-quiz-one","kind":"quiz","title":"看顺序与数位图","plan":"老师预录逐题读小检查1至3，核查比较、读数和知识图上的组成。"},
+    {"key":"picture-quiz-two","kind":"quiz","title":"用十和一算一算","plan":"老师预录逐题读小检查4至6，核查同位、满十和退一。"},
+    {"key":"explain-the-link-at-home","kind":"teaching","title":"选一张图说一个发现","plan":"回看知识图和换十图，让孩子选择一处能讲清楚的联系。请家人听孩子指着图说明它表示几个十和几个一。"}
+  ],
+  "games": [
+    {
+      "page": "hop-along-counting-patterns",
+      "template": "platformHop",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.platformHop",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "ordered_route",
+      "reason": "玩家须按口令给出的计数单位找到下一块数字台。只有顺序正确的真实落台解锁检查点，控制跑跳距离与时机也是通关条件。",
+      "levels": [
+        "从62起逐个数，按63、64、65落台，台面宽，跳距短。",
+        "从47起每次添5，按52、57、62落台，增加把每次添的5错当作最后数字或只添1的干扰台。",
+        "从69起每次添10，先到79、89、99，再听新口令添1到100。台面高低变化，加入把个位和十位调换的干扰台。"
+      ],
+      "demo": "依次点亮起点数、跑跳角色和下一块台，完成一次正确落台后停住。复位后用预录口令交接。"
+    },
+    {
+      "page": "aim-at-the-correct-result",
+      "template": "magnetMarbles",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.magnetMarbles",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "pair_match",
+      "reason": "运算图及预录指令和唯一正确的位值图靶配对。图靶用等宽十条和散块显示计算结果，同色且移动，玩家要按数位算出结果，再调整发射方向。",
+      "levels": [
+        "听52加30与67减4，分别匹配82和63的位值图。加上只错动另一数位的干扰，靶子漂移很小。",
+        "听27加16和64减7，分别匹配43和57。加入少进一个十或少退一个十的干扰，靶子缓慢移动。",
+        "听49加21与85减37，分别匹配70和48。遇到个位正好满十及两位数退位，靶子漂移增大，要在飞行中修正。"
+      ],
+      "demo": "依次高亮运算图、发射器和靶图，实际击中一次后立即停下。清空示范进度，用预录语音交接。"
+    }
+  ],
+  "quizPlan": [
+    {"skill":"count-and-compare","task":"数轴上标出了76。哪张数字卡应该放在76的右边？","pictureOptions":["71数字卡","81数字卡","76数字卡"],"correctPosition":2,"rationale":"81比76大，应放右边。71在左边，76在同一刻度。"},
+    {"skill":"read-place-value","task":"看图有7根十条和4个散块。选读作七十四的数字卡。","pictureOptions":["47数字卡","70数字卡","74数字卡"],"correctPosition":3,"rationale":"7根十条表示7个十，4个散块表示4个一，写作74。"},
+    {"skill":"connect-the-number-ideas","task":"复习图中央是23。哪张图应接到表示数组成的枝上？","pictureOptions":["2根十条和3个散块","3根十条和2个散块","只标出23前后位置的数轴"],"correctPosition":1,"rationale":"23由2个十和3个一组成。数轴图可以说明顺序，3个十和2个一组成32。"},
+    {"skill":"same-place-add-subtract","task":"计数架是83。拿走2个十以后，哪张图表示剩下的数？","pictureOptions":["8根十条和1个散块","6根十条和3个散块","6根十条和5个散块"],"correctPosition":2,"rationale":"8个十减去2个十剩6个十，个位仍是3，结果是63。"},
+    {"skill":"same-place-add-subtract","task":"用图把54和16合起来。选正确的结果图。","pictureOptions":["6根十条、个位空","6根十条和9个散块","7根十条、个位空"],"correctPosition":3,"rationale":"4个一与6个一刚好换成1个十，再加原有的6个十得70。"},
+    {"skill":"same-place-add-subtract","task":"用72减26。个位不够减，交换后正确的结果图是哪张？","pictureOptions":["4根十条和6个散块","5根十条和6个散块","4根十条和4个散块"],"correctPosition":1,"rationale":"把72换成6个十和12个一，12减6得6，6个十减2个十得4个十，结果是46。"}
+  ],
+  "presentation": "用统一的十条、散块、百格、计数架和数轴图示，所有数量和刻度用程序精确绘制。老师逐项点亮计数单位和交换前后位置，并预录玩法、读题、反馈和重听。数字和计数单位是本课内容。遮住其他文字仍可看图和操作。",
+  "evidence": {
+    "inClass": "记录孩子的数字落台、位值图匹配及小检查结果。",
+    "realWorld": "向家人解释数位和绘制纸笔知识图需要现场观察。学习报告中的这两项记待观察。"
+  },
+  "afterClass": {
+    "familyTask":"和家人任选一个两位数，画出十条与散块，读出它，再找比它大1和小1的数。选一条联系指着图讲清楚。口头和纸笔表现待观察。",
+    "weeklyQuestionSource":["100以内数的顺序和大小比较","十、个位与读写组成","同数位相加减","满十进一及退一换十","从知识图找一处联系"],
+    "source":"印83关联图与印84数与运算、教案8、课件27至28、课练1"
+  }
+}

@@ -1,0 +1,1012 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "观察校园里的植物",
+  "grade": 1,
+  "description": "比较两株黄花、观察整株与局部，用拓印、配对和两视角实拍把可见证据留进观察簿。",
+  "roster": {
+    "teacher": {
+      "name": "小科老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Serena",
+      "avatar": "/avatars/teacher-2.png",
+      "color": "#287B94",
+      "persona": "自然清楚，和孩子边看边想，给足时间找可见证据。"
+    }
+  },
+  "images": {
+    "bark-steps": {
+      "file": "assets/bark-steps.png"
+    },
+    "campus-cover": {
+      "file": "assets/campus-cover.png"
+    },
+    "campus-plant-camera": {
+      "file": "assets/campus-plant-camera.png"
+    },
+    "campus-variety": {
+      "file": "assets/campus-variety.png"
+    },
+    "clue-forsythia": {
+      "file": "assets/clue-forsythia.png"
+    },
+    "clue-jasmine": {
+      "file": "assets/clue-jasmine.png"
+    },
+    "clue-pine": {
+      "file": "assets/clue-pine.png"
+    },
+    "clue-willow": {
+      "file": "assets/clue-willow.png"
+    },
+    "cork-background": {
+      "file": "assets/cork-background.png"
+    },
+    "garden-background": {
+      "file": "assets/garden-background.png"
+    },
+    "garden-care": {
+      "file": "assets/garden-care.png"
+    },
+    "home-record": {
+      "file": "assets/home-record.png"
+    },
+    "observation-marble": {
+      "file": "assets/observation-marble.png"
+    },
+    "pine-whole-bark": {
+      "file": "assets/pine-whole-bark.png"
+    },
+    "plant-photo-start": {
+      "file": "assets/plant-photo-start.png"
+    },
+    "plant-side-forsythia": {
+      "file": "assets/plant-side-forsythia.png"
+    },
+    "plant-side-jasmine": {
+      "file": "assets/plant-side-jasmine.png"
+    },
+    "plant-side-willow": {
+      "file": "assets/plant-side-willow.png"
+    },
+    "plant-top-forsythia": {
+      "file": "assets/plant-top-forsythia.png"
+    },
+    "plant-top-jasmine": {
+      "file": "assets/plant-top-jasmine.png"
+    },
+    "plant-top-willow": {
+      "file": "assets/plant-top-willow.png"
+    },
+    "q1-a": {
+      "file": "assets/q1-a.png"
+    },
+    "q1-b": {
+      "file": "assets/q1-b.png"
+    },
+    "q1-c": {
+      "file": "assets/q1-c.png"
+    },
+    "q2-a": {
+      "file": "assets/q2-a.png"
+    },
+    "q2-b": {
+      "file": "assets/q2-b.png"
+    },
+    "q2-c": {
+      "file": "assets/q2-c.png"
+    },
+    "q3-a": {
+      "file": "assets/q3-a.png"
+    },
+    "q3-b": {
+      "file": "assets/q3-b.png"
+    },
+    "q3-c": {
+      "file": "assets/q3-c.png"
+    },
+    "q4-a": {
+      "file": "assets/q4-a.png"
+    },
+    "q4-b": {
+      "file": "assets/q4-b.png"
+    },
+    "q4-c": {
+      "file": "assets/q4-c.png"
+    },
+    "q4-stimulus": {
+      "file": "assets/q4-stimulus.png"
+    },
+    "q5-a": {
+      "file": "assets/q5-a.png"
+    },
+    "q5-b": {
+      "file": "assets/q5-b.png"
+    },
+    "q5-c": {
+      "file": "assets/q5-c.png"
+    },
+    "q6-a": {
+      "file": "assets/q6-a.png"
+    },
+    "q6-b": {
+      "file": "assets/q6-b.png"
+    },
+    "q6-c": {
+      "file": "assets/q6-c.png"
+    },
+    "report-card": {
+      "file": "assets/report-card.png"
+    },
+    "two-yellow-plants": {
+      "file": "assets/two-yellow-plants.png"
+    },
+    "whole-forsythia": {
+      "file": "assets/whole-forsythia.png"
+    },
+    "whole-jasmine": {
+      "file": "assets/whole-jasmine.png"
+    },
+    "whole-pine": {
+      "file": "assets/whole-pine.png"
+    },
+    "whole-willow": {
+      "file": "assets/whole-willow.png"
+    },
+    "whole-willow-detail": {
+      "file": "assets/whole-willow-detail.png"
+    },
+    "willow-sign": {
+      "file": "assets/willow-sign.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "school-plant-walk",
+      "title": "沿着小路找植物",
+      "type": "slide",
+      "template": "two-columns",
+      "data": {
+        "title": "沿着小路找植物",
+        "left": {
+          "heading": "松风校园",
+          "body": "留在步道"
+        },
+        "right": {
+          "heading": "植物小图册",
+          "body": "先看整株"
+        },
+        "left_picture": "campus-cover",
+        "right_picture": "campus-variety"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "今天我们当松风校园的观察员。路边有哪些植物？"
+        },
+        {
+          "say": "走在路上，手先不碰。遇到特别的，停下来看。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "图册上有黄花、高高的树，也有贴近地面的草。"
+        },
+        {
+          "say": "你先看到哪一株？指一指最显眼的地方。"
+        },
+        {
+          "say": "我先看到柳树。它的许多枝条垂得像长长的线。"
+        },
+        {
+          "say": "有些花离得远，看不出细处。我们先记住整株的样子。"
+        }
+      ]
+    },
+    {
+      "key": "same-yellow-different",
+      "title": "同样黄，哪里不一样",
+      "type": "slide",
+      "template": "picture-points",
+      "data": {
+        "title": "同样黄，哪里不一样",
+        "picture": "two-yellow-plants",
+        "points": [
+          "两株都有黄花",
+          "比枝条",
+          "看一朵花"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "有人把两株都喊成了迎春。右边真的是迎春吗？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "两株都开黄花。只听到黄色，还没办法选是哪一株。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "左边迎春的枝向下弯。右边连翘不少枝向上伸。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "放大一朵数一数。迎春这朵六片，连翘这朵四瓣。"
+        },
+        {
+          "say": "这朵迎春六片，别的也可能有五片。看到几片记几片。"
+        },
+        {
+          "say": "先说枝条的样子，再说一朵花的样子。两条线索一起比。"
+        },
+        {
+          "say": "指指向上伸的枝，再找四瓣那朵。两条线索都在右边。"
+        }
+      ]
+    },
+    {
+      "key": "whole-then-detail",
+      "title": "从整株看到一根枝",
+      "type": "slide",
+      "template": "picture-points",
+      "data": {
+        "title": "从整株看到一根枝",
+        "picture": "whole-willow-detail",
+        "points": [
+          "远看一整株",
+          "近看一根枝",
+          "画下真实看到的"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "看左边，从树顶看到树脚。柳枝在哪里弯下来？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "树顶和树脚都画到了，这是整株。从安全的路边看。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "右边只放大一根枝，上面挂着好几片细长的叶。"
+        },
+        {
+          "say": "我们用眼睛移近，或者把镜头拉近，枝条还留在树上。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "画整株时画大样子。画这一枝时，留位置画细长叶。"
+        },
+        {
+          "say": "从上面看叶怎么排。换到侧面，看叶朝哪儿垂。"
+        },
+        {
+          "say": "换个角度找侧面。等枝进框，就把实际看到的画面留下。"
+        },
+        {
+          "say": "看小图要哪个角度，让枝进到框里再拍。"
+        },
+        {
+          "say": "先移箭头，把整根枝放进虚线框。"
+        },
+        {
+          "say": "等一等，枝的角度要和上面小图一样。"
+        },
+        {
+          "say": "拍到了。留下两张，等会儿看看哪张更容易看清叶。"
+        }
+      ]
+    },
+    {
+      "key": "rub-the-bark",
+      "title": "把树皮的纹路拓下来",
+      "type": "slide",
+      "template": "two-columns",
+      "data": {
+        "title": "把树皮的纹路拓下来",
+        "left": {
+          "heading": "先认出这株松树",
+          "body": "再看树皮"
+        },
+        "right": {
+          "heading": "纸、蜡笔和拓印",
+          "body": "从左往右看"
+        },
+        "left_picture": "pine-whole-bark",
+        "right_picture": "bark-steps"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "先看整株松树。能把这块树皮的纹路留在纸上吗？"
+        },
+        {
+          "say": "请大人先找安全、完整的树皮。站稳做，别攀爬。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "第一步，把纸平平贴在树皮上，一只手按住纸。"
+        },
+        {
+          "say": "第二步，把蜡笔横着拿，用它的侧面涂。"
+        },
+        {
+          "say": "从上往下，从左往右，轻轻地涂过纸面。"
+        },
+        {
+          "say": "第三步，取下纸，看看纸上留下了哪些纹路。"
+        },
+        {
+          "say": "写下这棵树的名称，就知道拓印来自哪里。"
+        },
+        {
+          "say": "纸留下纹路，树皮还在树上。不能掰，也不能剥。"
+        },
+        {
+          "say": "指给同伴看。先贴什么，再用什么，最后留下什么？"
+        }
+      ]
+    },
+    {
+      "key": "campus-plant-photos",
+      "title": "给同一枝拍两种角度",
+      "type": "interactive",
+      "page": "campus-plant-photos",
+      "widgetType": "game",
+      "startImage": "plant-photo-start",
+      "script": [
+        {
+          "say": "小相机要拍同一根迎春枝。换个角度能看到什么？"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#plant-preview"
+        },
+        {
+          "say": "先看上面的小图。第一张俯拍，看黄花怎样沿枝散开。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "我用箭头让虚线框跟着枝，等枝进框。"
+        },
+        {
+          "highlight": "#game-target"
+        },
+        {
+          "say": "角度也和小图一样了，就按右下角圆圆的快门。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "底下留下俯视照。换侧面还能看到枝条弯下去。"
+        },
+        {
+          "say": "轮到你。每关拍两种角度，把实际拍到的图留在卡里。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "plant-photo-top": "whole-then-detail-10",
+        "plant-photo-side": "whole-then-detail-11",
+        "plant-photo-goal": "whole-then-detail-12",
+        "plant-photo-hint": "whole-then-detail-13",
+        "plant-photo-help": "whole-then-detail-14",
+        "plant-photo-praise": "whole-then-detail-15"
+      },
+      "observationCard": {
+        "title": "三根枝的两种观察照片",
+        "familyTask": "和大人在安全的公共步道看一株熟悉植物。先画整株，再画一处叶、花或树皮，记下真实看到的一点。名称不确定就先记编号。不攀折，不剥皮，不入口，没看到的留空。",
+        "levels": [
+          {
+            "label": "迎春",
+            "trials": [
+              {
+                "id": "same-branch-two-views",
+                "label": "迎春同一根枝的两种角度",
+                "top": {
+                  "plant-top-jasmine": {
+                    "label": "俯看同一根弯枝，黄花沿枝散开",
+                    "image": "plant-top-jasmine"
+                  }
+                },
+                "side": {
+                  "plant-side-jasmine": {
+                    "label": "侧看同一根枝的弯弧和黄花",
+                    "image": "plant-side-jasmine"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "label": "连翘",
+            "trials": [
+              {
+                "id": "same-branch-two-views",
+                "label": "连翘同一根枝的两种角度",
+                "top": {
+                  "plant-top-forsythia": {
+                    "label": "俯看同一根枝，黄花靠近枝条",
+                    "image": "plant-top-forsythia"
+                  }
+                },
+                "side": {
+                  "plant-side-forsythia": {
+                    "label": "侧看同一根枝向上伸，黄花沿枝展开",
+                    "image": "plant-side-forsythia"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "label": "柳树",
+            "trials": [
+              {
+                "id": "same-branch-two-views",
+                "label": "柳树同一根枝的两种角度",
+                "top": {
+                  "plant-top-willow": {
+                    "label": "俯看同一根枝上的多片窄长叶",
+                    "image": "plant-top-willow"
+                  }
+                },
+                "side": {
+                  "plant-side-willow": {
+                    "label": "侧看同一根枝上的窄长叶向下垂",
+                    "image": "plant-side-willow"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "key": "match-plant-evidence",
+      "title": "植物线索对对碰",
+      "type": "interactive",
+      "page": "match-plant-evidence",
+      "widgetType": "game",
+      "startImage": "two-yellow-plants",
+      "script": [
+        {
+          "say": "观察簿的局部小图走丢了。你能给它们找到整株吗？"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "弹珠上是这朵六瓣黄花。先在上面找枝向下弯的迎春。"
+        },
+        {
+          "highlight": "#game-target"
+        },
+        {
+          "say": "我找到左边。用左箭头转过去，让亮点朝向那一株。"
+        },
+        {
+          "highlight": "#plant-launch"
+        },
+        {
+          "say": "看准了，按右边的发射键。弹珠把局部线索送过去。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "跟着弹珠看，它会不会飞到枝条弯下来的迎春？"
+        },
+        {
+          "say": "轮到你。两株同是黄色时，先比枝条和花的样子。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "marble-goal": "report-what-you-saw-11",
+        "marble-hint": "report-what-you-saw-12",
+        "marble-help": "report-what-you-saw-13",
+        "marble-praise": "report-what-you-saw-14",
+        "marble-jasmine": "report-what-you-saw-15",
+        "marble-forsythia": "report-what-you-saw-16",
+        "marble-willow": "report-what-you-saw-17",
+        "marble-pine": "report-what-you-saw-18"
+      }
+    },
+    {
+      "key": "report-what-you-saw",
+      "title": "给同伴介绍一株植物",
+      "type": "slide",
+      "template": "picture-points",
+      "data": {
+        "title": "给同伴介绍一株植物",
+        "picture": "report-card",
+        "points": [
+          "记下名字",
+          "画整株和一处",
+          "说出看见的特点"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "同伴问我们看到了什么。观察簿里该放哪些线索？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "确认名字就写迎春。还认不出，就先记成一号植物。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "左边画枝向下弯，右边补一朵六瓣黄花。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "这是迎春。枝往下弯，这一朵花我数到了六片花瓣。"
+        },
+        {
+          "say": "没有闻过，气味先留空。看过的细节才放进记录。"
+        },
+        {
+          "say": "给同伴说两句。先说是哪一株，再说看到的特点。"
+        },
+        {
+          "say": "回想怎么配图。看弹珠是哪一处，再找对应的整株图。"
+        },
+        {
+          "say": "先看弹珠上的小图。它画的是花、叶，还是树皮？"
+        },
+        {
+          "say": "同是黄花就比枝和花形。看清楚了再发射。"
+        },
+        {
+          "say": "配上了。局部和整株能一起放进观察簿。"
+        },
+        {
+          "say": "这朵有六片黄瓣。找枝向下弯的迎春。"
+        },
+        {
+          "say": "这朵黄花分成四瓣。找这株枝向上伸的连翘。"
+        },
+        {
+          "say": "这根枝挂着细长的叶。找整株枝叶垂下的柳树。"
+        },
+        {
+          "say": "这片树皮有长纹。找我们刚才观察过的那株松树。"
+        }
+      ]
+    },
+    {
+      "key": "meet-the-gardener",
+      "title": "谁在照顾校园里的植物",
+      "type": "slide",
+      "template": "picture-points",
+      "data": {
+        "title": "谁在照顾校园里的植物",
+        "picture": "garden-care",
+        "points": [
+          "把小苗种下去",
+          "给植物浇水",
+          "需要时请园艺师修剪"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "校园里的植物有人照顾。看，园艺师正蹲下来查看花坛。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "园艺师会选合适的位置，把小苗种下去，再照看它长大。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "园艺师会给植物浇水。不同植物需要的水也不同。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "需要修枝时，园艺师会用合适的工具。小朋友不剪枝。"
+        },
+        {
+          "say": "右边是有人养护的花坛。走在路上，给工作人员留出地方。"
+        },
+        {
+          "say": "遇到园艺师，可以问问这株叫什么，再看看标识牌。"
+        }
+      ]
+    },
+    {
+      "key": "make-a-plant-sign",
+      "title": "做一块认得出的标识牌",
+      "type": "slide",
+      "template": "picture-points",
+      "data": {
+        "title": "做一块认得出的标识牌",
+        "picture": "willow-sign",
+        "points": [
+          "确认名字",
+          "放上图",
+          "写一条查过的特点"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "又来了一位观察员。什么样的小牌能帮她认出柳树？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "和老师核对名字，再写柳树。拿不准就请教大人。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "左边放整株，右边放一根枝。还不识字也能找一找。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "挑一条可见的特点，枝条下垂。拿牌去和树比一比。"
+        },
+        {
+          "say": "请同伴试认。要是她认不出，再把线索说清楚。"
+        },
+        {
+          "say": "请大人帮忙摆牌。别钉进树里，也别挡住小路。"
+        }
+      ]
+    },
+    {
+      "key": "picture-quiz",
+      "type": "quiz",
+      "title": "校园观察员的图题",
+      "intro": [
+        "听一听要找什么。每题选一幅图，再看看哪条线索帮了你。"
+      ],
+      "questions": [
+        {
+          "id": "whole-willow",
+          "skill": "whole-vs-local",
+          "question": "哪一张把树顶到树脚的整株都画下来了？",
+          "answer": [
+            "B"
+          ],
+          "analysis": "中间从树顶画到树脚。另外两张只画了枝或树皮。",
+          "options": {
+            "A": {
+              "label": "一根带窄长叶的柳枝",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-a",
+                "alt": "一根带窄长叶的柳枝"
+              }
+            },
+            "B": {
+              "label": "从树顶到树脚的整株柳树",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-b",
+                "alt": "从树顶到树脚的整株柳树"
+              }
+            },
+            "C": {
+              "label": "一小块树皮的纹路",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-c",
+                "alt": "一小块树皮的纹路"
+              }
+            }
+          }
+        },
+        {
+          "id": "both-clues",
+          "skill": "compare-visible-features",
+          "question": "哪组同时把枝和一朵花画清楚了？",
+          "answer": [
+            "A"
+          ],
+          "analysis": "左边放大了枝和一朵花。能比枝形，也能比花瓣。",
+          "options": {
+            "A": {
+              "label": "两根枝和两朵放大的黄花",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-a",
+                "alt": "两根枝和两朵放大的黄花"
+              }
+            },
+            "B": {
+              "label": "只有两个黄点",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-b",
+                "alt": "只有两个黄点"
+              }
+            },
+            "C": {
+              "label": "两株植物的整体图",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-c",
+                "alt": "两株植物的整体图"
+              }
+            }
+          }
+        },
+        {
+          "id": "bark-rubbing-order",
+          "skill": "bark-rubbing-steps",
+          "question": "从左到右，哪组是拓树皮的顺序？",
+          "answer": [
+            "C"
+          ],
+          "analysis": "先贴好纸，再横拿蜡笔轻轻涂，最后取下纸看纹路。",
+          "options": {
+            "A": {
+              "label": "纹路、蜡笔、贴纸",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-a",
+                "alt": "纹路、蜡笔、贴纸"
+              }
+            },
+            "B": {
+              "label": "贴纸、纹路、蜡笔",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-b",
+                "alt": "贴纸、纹路、蜡笔"
+              }
+            },
+            "C": {
+              "label": "贴纸、蜡笔、纹路",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-c",
+                "alt": "贴纸、蜡笔、纹路"
+              }
+            }
+          }
+        },
+        {
+          "id": "willow-branch-match",
+          "skill": "same-plant-whole-and-part",
+          "question": "这根枝上的叶又窄又长，它最可能是哪一株的枝？",
+          "answer": [
+            "B"
+          ],
+          "analysis": "中间是柳树，许多细枝下垂。小图的叶也向下垂。",
+          "options": {
+            "A": {
+              "label": "松树，枝叶团较深",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-a",
+                "alt": "松树，枝叶团较深"
+              }
+            },
+            "B": {
+              "label": "柳树，许多细枝下垂",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-b",
+                "alt": "柳树，许多细枝下垂"
+              }
+            },
+            "C": {
+              "label": "迎春，有向外弯的枝和黄花",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-c",
+                "alt": "迎春，有向外弯的枝和黄花"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "q4-stimulus",
+            "alt": "从侧面看，一根弯枝的多片窄长叶朝下"
+          }
+        },
+        {
+          "id": "record-both-parts",
+          "skill": "complete-photo-evidence",
+          "question": "要介绍这株松树和它的树皮纹路，带哪组照片？",
+          "answer": [
+            "C"
+          ],
+          "analysis": "右边两张合起来能看整株样子，也能看局部树皮的纹路。",
+          "options": {
+            "A": {
+              "label": "只带松树整株照片",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-a",
+                "alt": "只带松树整株照片"
+              }
+            },
+            "B": {
+              "label": "只带树皮局部照片",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-b",
+                "alt": "只带树皮局部照片"
+              }
+            },
+            "C": {
+              "label": "松树整株和树皮局部各一张",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-c",
+                "alt": "松树整株和树皮局部各一张"
+              }
+            }
+          }
+        },
+        {
+          "id": "sign-with-matching-clue",
+          "skill": "evidence-based-plant-sign",
+          "question": "哪块松树牌有整株图，还有实际看到的树皮线索？",
+          "answer": [
+            "A"
+          ],
+          "analysis": "左边有整株松树和树皮纹路，能对上观察记录。",
+          "options": {
+            "A": {
+              "label": "松树整株和带纹路的树皮",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-a",
+                "alt": "松树整株和带纹路的树皮"
+              }
+            },
+            "B": {
+              "label": "只有整株松树",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-b",
+                "alt": "只有整株松树"
+              }
+            },
+            "C": {
+              "label": "松树整株和一根宽圆叶小枝",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-c",
+                "alt": "松树整株和一根宽圆叶小枝"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "home-plant-observation",
+      "title": "和大人做一张观察卡",
+      "type": "slide",
+      "template": "picture-points",
+      "data": {
+        "title": "和大人做一张观察卡",
+        "picture": "home-record",
+        "points": [
+          "站在安全的路边",
+          "画整株和一处",
+          "只记实际看到的"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "和大人去看一株认识的植物。你想把哪一处画下来？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "站在安全路边，先看整株。别进花坛，也不攀折。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "再看一根枝、一片叶或树皮。画在旁边，说出一点。"
+        },
+        {
+          "say": "看不清就换个位置。不剥树皮，不把叶花放进嘴里。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "记下名称或编号。没看到的留空，等下次再观察。"
+        },
+        {
+          "say": "不用写住址或学校名。带回两幅图，请同伴来猜。"
+        }
+      ]
+    }
+  ]
+}

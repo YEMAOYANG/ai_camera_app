@@ -1,0 +1,99 @@
+{
+  "schemaVersion": "mira.courseware.asset-plan.v1",
+  "style": "同一系列儿童图画书游戏美术：细干纸纹与哑光水粉，圆润剪纸轮廓，前后景明度分离，深松绿、暖米色，杏橙和柿红作亮点。轮廓清楚，纹理安静，不用通用教材剪贴画。",
+  "source": "Codex built-in imagegen",
+  "inputs": [
+    {
+      "id": "harbor-backdrop",
+      "destination": "art-source/harbor-backdrop.png",
+      "kind": "generated-scene",
+      "status": "verified_local",
+      "transparent": false,
+      "usedIn": [
+        "harbor-three"
+      ],
+      "prompt": "同一系列儿童图画书游戏美术：细干纸纹与哑光水粉，圆润剪纸轮廓，前后景明度分离，深松绿、暖米色，杏橙和柿红作亮点。轮廓清楚，纹理安静，不用通用教材剪贴画。 宽画幅儿童玩具港湾，俯视略带侧角度，纸质木栈桥和低矮水草在上方和两侧，画面中间下方是一整片明亮平静的海绿水面，留给之后由代码排列三只船。水面只有极淡水纹，没有船、浮标、人、鸟、漂浮物、字、数字、标志、水印。",
+      "sha256": "5c22732b9b715059795dea2c361eb7ac015aa53936d1ebb848bb82f7a8d72ea6"
+    },
+    {
+      "id": "wooden-boat-single",
+      "destination": "art-source/wooden-boat-single.png",
+      "kind": "generated-object",
+      "status": "verified_local",
+      "transparent": true,
+      "usedIn": [
+        "harbor-three",
+        "four-boats",
+        "four-boats-tagged",
+        "boats-one-four",
+        "boats-five-seven",
+        "boats-eight-ten",
+        "six-boats-line",
+        "six-boats-pairs"
+      ],
+      "prompt": "同一系列儿童图画书游戏美术：细干纸纹与哑光水粉，圆润剪纸轮廓，前后景明度分离，深松绿、暖米色，杏橙和柿红作亮点。轮廓清楚，纹理安静，不用通用教材剪贴画。 真透明背景，单独一只完整的玩具小帆船。柿橙单片三角帆，深松绿小木船身，简洁俯侧视，图像填满中央，四周透明边距。小尺寸仍看清船身和帆，边缘干净，影子限于船身底部。仅一个完整物件，没有倒影、第二只船、文字、数字、海面、浮标或装饰。",
+      "sha256": "5668628513ff8193f1c8f8132f1ab8e083f9cfdac3c2c1c7e4e84581da579268"
+    },
+    {
+      "id": "scallop-shell-single",
+      "destination": "art-source/scallop-shell-single.png",
+      "kind": "generated-object",
+      "status": "verified_local",
+      "transparent": true,
+      "usedIn": [
+        "shells-4",
+        "shells-5",
+        "shells-6",
+        "shells-7",
+        "shells-8",
+        "shells-9",
+        "shells-10"
+      ],
+      "prompt": "同一系列儿童图画书游戏美术：细干纸纹与哑光水粉，圆润剪纸轮廓，前后景明度分离，深松绿、暖米色，杏橙和柿红作亮点。轮廓清楚，纹理安静，不用通用教材剪贴画。 真透明背景，正上方视角，单独一枚完整的扇形贝壳，杏粉色扇面，清楚简洁的放射纹，单一闭合轮廓。尺寸缩小后仍好辨认。无背景、倒影、沙粒、第二枚贝壳、文字、数字、标记。",
+      "sha256": "a3a57f0365c970283e93cdae7238fbf71ef009de8135cefda32f7d4195222999"
+    }
+  ],
+  "compositions": {
+    "source": "quantity_compositions.py",
+    "harbor-three": "用码头背景与三次相同帆船图叠放，船的轮廓完全分开。",
+    "four-boats": "同一四船布局，用于逐一指认。",
+    "four-boats-tagged": "沿用同一四船布局，在每只船下画 1–4 标记，最后一个为强调色。",
+    "boats-one-four": "四个横排，依次摆 1、2、3、4 只船；右侧课件逐项高亮。",
+    "boats-five-seven": "三个横排，依次摆 5、6、7 只船。",
+    "boats-eight-ten": "三个横排，依次摆 8、9、10 只船。",
+    "six-boats-line": "同样六只船排一行。",
+    "six-boats-pairs": "同样六只船排三行，每行两只。",
+    "shells-4-through-10": "只用单枚贝壳素材，各图排精确数量。10 的题图固定上下各五，9 的题图上下五和四。"
+  },
+  "digitCards": {
+    "source": "lesson.json 中 glyph 配置",
+    "reason": "数码本身是本课教学对象，统一用代码绘制，不用颜色暗示答案。"
+  },
+  "verification": [
+    "保留每项最终提示词、内置 imagegen 来源和源文件 SHA-256。",
+    "检查透明通道、无字、边缘完整和单物身份。",
+    "实际小屏核对逐页图义和数量。",
+    "游戏模板获准后，另登记每个游戏的背景、角色动作帧和道具特效。"
+  ],
+  "provenanceManifest": "asset-provenance.json",
+  "gameCompositions": {
+    "source": "game_compositions.py",
+    "registeredSharedInputs": [
+      "rover",
+      "rover-pop"
+    ],
+    "outputIds": [
+      "game-harbor",
+      "game-rover",
+      "game-rover-pop",
+      "game-shell",
+      "boat-target-1",
+      "boat-target-2",
+      "boat-target-3",
+      "boat-target-4",
+      "boat-target-6",
+      "boat-target-8"
+    ],
+    "notes": "两款游戏沿用本课港湾背景。泡泡车复用已批准的两帧透明图；贝壳是弹珠及过关贴纸。船队卡按真实单船数量摆放。"
+  }
+}

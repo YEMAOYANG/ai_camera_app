@@ -5,6 +5,7 @@ generates goes to a work folder outside git. Every step is cached and repeatable
 exit code 0 only when no step failed and there is no error issue.
 """
 import argparse
+from functools import partial
 import json
 import sys
 import time
@@ -17,6 +18,10 @@ STEPS = ('pictures', 'build', 'check', 'audit', 'play')
 
 class LaneError(Exception):
     pass
+
+
+def require_dispatched_media(*_args, **_kwargs):
+    raise RuntimeError('Run courseware.tools.media_dispatch for the missing media first.')
 
 
 def _load(path):
@@ -105,10 +110,16 @@ def main(argv=None):
     parser.add_argument('--steps', default=','.join(STEPS), help='comma separated subset of ' + ', '.join(STEPS))
     parser.add_argument('--endpoint', default='http://127.0.0.1:3100')
     parser.add_argument('--jobs', type=int, default=4)
+    parser.add_argument('--play-jobs', type=int, choices=range(1, 5), default=1,
+                        help='independent parallel browser groups for autoplay')
+    parser.add_argument('--cached-media-only', action='store_true',
+                        help='use validated media caches and fail on any missing paid media')
     args = parser.parse_args(argv)
+    cache_guard = {'post': require_dispatched_media, 'sleep': lambda _delay: None} if args.cached_media_only else {}
     try:
         result = run_lesson(args.lesson, args.work, stage_id=args.stage_id, steps=[s for s in args.steps.split(',') if s],
-                            endpoint=args.endpoint, jobs=args.jobs)
+                            endpoint=args.endpoint, jobs=args.jobs,
+                            run_play=partial(autoplay.play_body, jobs=args.play_jobs), **cache_guard)
     except (LaneError, build.BuildError, voice.VoiceError, picture.PictureError) as exc:
         print(f'{type(exc).__name__}: {exc.args[0]}: {exc.args[1] if len(exc.args) > 1 else ""}', file=sys.stderr)
         return 1

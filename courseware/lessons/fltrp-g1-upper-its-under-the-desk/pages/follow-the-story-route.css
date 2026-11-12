@@ -1,0 +1,23 @@
+.story-pictures {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-auto-rows: 82px;
+  gap: 8px;
+  padding: 8px;
+  background: #fff5dfeb;
+  border: 3px solid #547c68;
+  border-radius: 16px;
+  box-sizing: border-box;
+}
+.story-pictures img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.story-pictures[hidden],
+.story-pictures img[hidden] {
+  display: none;
+}
+#station-gallery {
+  grid-auto-rows: 94px;
+}

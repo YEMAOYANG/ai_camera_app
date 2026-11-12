@@ -1,0 +1,2040 @@
+{
+  "schemaVersion": "mira.courseware.asset-sources.v1",
+  "lesson": "fltrp-g1-lower-theyre-cows",
+  "assets": [
+    {
+      "key": "farm-gate",
+      "file": "assets/farm-gate.png",
+      "sourceType": "codex_imagegen",
+      "sha256": "d3e603bac8fa49567d180debb4f0ebafb74a3b65880bab67d228239010a32954",
+      "size": [
+        879,
+        435
+      ],
+      "derivation": {
+        "operation": "quadrant_crop",
+        "box": [
+          4,
+          4,
+          883,
+          439
+        ]
+      },
+      "provider": "Codex built-in imagegen",
+      "source": "art-source/farm-scenes.png",
+      "sourceSha256": "352f928db45b1bf025242c5a2c7094834e2e14854c0ee417c606f051d56cef03",
+      "prompt": "2×2 paper gouache landscapes: farm gate, pond, empty egg shed, orchard; no people, animals or text.",
+      "packaged": false
+    },
+    {
+      "key": "farm-pond",
+      "file": "assets/farm-pond.png",
+      "sourceType": "codex_imagegen",
+      "sha256": "75f1ef821f795aefb06c9e55fc9ac8b2183ed6007f102488880438e3297ef5ba",
+      "size": [
+        879,
+        435
+      ],
+      "derivation": {
+        "operation": "quadrant_crop",
+        "box": [
+          891,
+          4,
+          1770,
+          439
+        ]
+      },
+      "provider": "Codex built-in imagegen",
+      "source": "art-source/farm-scenes.png",
+      "sourceSha256": "352f928db45b1bf025242c5a2c7094834e2e14854c0ee417c606f051d56cef03",
+      "prompt": "2×2 paper gouache landscapes: farm gate, pond, empty egg shed, orchard; no people, animals or text.",
+      "packaged": true
+    },
+    {
+      "key": "farm-shed",
+      "file": "assets/farm-shed.png",
+      "sourceType": "codex_imagegen",
+      "sha256": "1a3529227771dc81224fff557ae00d9a5bae95789e6b2437aad0779eaef231ce",
+      "size": [
+        879,
+        435
+      ],
+      "derivation": {
+        "operation": "quadrant_crop",
+        "box": [
+          4,
+          447,
+          883,
+          882
+        ]
+      },
+      "provider": "Codex built-in imagegen",
+      "source": "art-source/farm-scenes.png",
+      "sourceSha256": "352f928db45b1bf025242c5a2c7094834e2e14854c0ee417c606f051d56cef03",
+      "prompt": "2×2 paper gouache landscapes: farm gate, pond, empty egg shed, orchard; no people, animals or text.",
+      "packaged": true
+    },
+    {
+      "key": "farm-orchard",
+      "file": "assets/farm-orchard.png",
+      "sourceType": "codex_imagegen",
+      "sha256": "6abcafa004acd3827c8180976ea177e99bb139140d1eb385988585d5b7f07fbc",
+      "size": [
+        879,
+        435
+      ],
+      "derivation": {
+        "operation": "quadrant_crop",
+        "box": [
+          891,
+          447,
+          1770,
+          882
+        ]
+      },
+      "provider": "Codex built-in imagegen",
+      "source": "art-source/farm-scenes.png",
+      "sourceSha256": "352f928db45b1bf025242c5a2c7094834e2e14854c0ee417c606f051d56cef03",
+      "prompt": "2×2 paper gouache landscapes: farm gate, pond, empty egg shed, orchard; no people, animals or text.",
+      "packaged": false
+    },
+    {
+      "key": "cow",
+      "file": "assets/cow.png",
+      "sourceType": "codex_imagegen",
+      "sha256": "0281fd96128c8d951b97aded7fd8e58c1575b3f6b6bc3b44ede51d9c5ab8f84e",
+      "size": [
+        407,
+        355
+      ],
+      "derivation": {
+        "operation": "quadrant_crop_chroma",
+        "box": [
+          0,
+          0,
+          443,
+          443
+        ]
+      },
+      "provider": "Codex built-in imagegen",
+      "source": "art-source/teaching-animals.png",
+      "sourceSha256": "ac4731eb9d4c964beed2061257fa6f8d9d84bf69cbfcbac756ef428060b68fbb",
+      "prompt": "4×2 paper gouache on flat blue: one cow, pig, duck, hen, dog, cat, songbird, egg.",
+      "packaged": false
+    },
+    {
+      "key": "pig",
+      "file": "assets/pig.png",
+      "sourceType": "codex_imagegen",
+      "sha256": "21bb11116b06acff1e080dd39bb9109ebf99a242b7eac6389d3e7c07a202a1d5",
+      "size": [
+        378,
+        310
+      ],
+      "derivation": {
+        "operation": "quadrant_crop_chroma",
+        "box": [
+          443,
+          0,
+          886,
+          443
+        ]
+      },
+      "provider": "Codex built-in imagegen",
+      "source": "art-source/teaching-animals.png",
+      "sourceSha256": "ac4731eb9d4c964beed2061257fa6f8d9d84bf69cbfcbac756ef428060b68fbb",
+      "prompt": "4×2 paper gouache on flat blue: one cow, pig, duck, hen, dog, cat, songbird, egg.",
+      "packaged": false
+    },
+    {
+      "key": "duck",
+      "file": "assets/duck.png",
+      "sourceType": "codex_imagegen",
+      "sha256": "f32eeb10c28d383a313ba7e305e4061f8e7ae2d7a02007051bfcfb8aeca5287d",
+      "size": [
+        341,
+        361
+      ],
+      "derivation": {
+        "operation": "quadrant_crop_chroma",
+        "box": [
+          886,
+          0,
+          1329,
+          443
+        ]
+      },
+      "provider": "Codex built-in imagegen",
+      "source": "art-source/teaching-animals.png",
+      "sourceSha256": "ac4731eb9d4c964beed2061257fa6f8d9d84bf69cbfcbac756ef428060b68fbb",
+      "prompt": "4×2 paper gouache on flat blue: one cow, pig, duck, hen, dog, cat, songbird, egg.",
+      "packaged": false
+    },
+    {
+      "key": "hen",
+      "file": "assets/hen.png",
+      "sourceType": "codex_imagegen",
+      "sha256": "23ee6774677718137df1be472cb7e46643daf85c251f6b2f33c46b40d3ab1671",
+      "size": [
+        333,
+        374
+      ],
+      "derivation": {
+        "operation": "quadrant_crop_chroma",
+        "box": [
+          1329,
+          0,
+          1772,
+          443
+        ]
+      },
+      "provider": "Codex built-in imagegen",
+      "source": "art-source/teaching-animals.png",
+      "sourceSha256": "ac4731eb9d4c964beed2061257fa6f8d9d84bf69cbfcbac756ef428060b68fbb",
+      "prompt": "4×2 paper gouache on flat blue: one cow, pig, duck, hen, dog, cat, songbird, egg.",
+      "packaged": false
+    },
+    {
+      "key": "dog",
+      "file": "assets/dog.png",
+      "sourceType": "codex_imagegen",
+      "sha256": "c8d943f3d12d221a9058bf312561eefc6503c0ec99583f3281f4700ce34157c2",
+      "size": [
+        379,
+        357
+      ],
+      "derivation": {
+        "operation": "quadrant_crop_chroma",
+        "box": [
+          0,
+          443,
+          443,
+          886
+        ]
+      },
+      "provider": "Codex built-in imagegen",
+      "source": "art-source/teaching-animals.png",
+      "sourceSha256": "ac4731eb9d4c964beed2061257fa6f8d9d84bf69cbfcbac756ef428060b68fbb",
+      "prompt": "4×2 paper gouache on flat blue: one cow, pig, duck, hen, dog, cat, songbird, egg.",
+      "packaged": false
+    },
+    {
+      "key": "cat",
+      "file": "assets/cat.png",
+      "sourceType": "codex_imagegen",
+      "sha256": "0bc938da9a783ff7fdffd5e14878a1d6e43b40a56b04f86ea4ea206773919731",
+      "size": [
+        325,
+        372
+      ],
+      "derivation": {
+        "operation": "quadrant_crop_chroma",
+        "box": [
+          443,
+          443,
+          886,
+          886
+        ]
+      },
+      "provider": "Codex built-in imagegen",
+      "source": "art-source/teaching-animals.png",
+      "sourceSha256": "ac4731eb9d4c964beed2061257fa6f8d9d84bf69cbfcbac756ef428060b68fbb",
+      "prompt": "4×2 paper gouache on flat blue: one cow, pig, duck, hen, dog, cat, songbird, egg.",
+      "packaged": false
+    },
+    {
+      "key": "bird",
+      "file": "assets/bird.png",
+      "sourceType": "codex_imagegen",
+      "sha256": "377fbd12915ea1b10d87e760577551aae53fb3d64a6a0ec7dda0515185f0bf15",
+      "size": [
+        358,
+        318
+      ],
+      "derivation": {
+        "operation": "quadrant_crop_chroma",
+        "box": [
+          886,
+          443,
+          1329,
+          886
+        ]
+      },
+      "provider": "Codex built-in imagegen",
+      "source": "art-source/teaching-animals.png",
+      "sourceSha256": "ac4731eb9d4c964beed2061257fa6f8d9d84bf69cbfcbac756ef428060b68fbb",
+      "prompt": "4×2 paper gouache on flat blue: one cow, pig, duck, hen, dog, cat, songbird, egg.",
+      "packaged": false
+    },
+    {
+      "key": "egg",
+      "file": "assets/egg.png",
+      "sourceType": "codex_imagegen",
+      "sha256": "a5ccd192191235d02a170342a3b2418fbfdb539efac967c3314db81b1166c39c",
+      "size": [
+        238,
+        305
+      ],
+      "derivation": {
+        "operation": "quadrant_crop_chroma",
+        "box": [
+          1329,
+          443,
+          1772,
+          886
+        ]
+      },
+      "provider": "Codex built-in imagegen",
+      "source": "art-source/teaching-animals.png",
+      "sourceSha256": "ac4731eb9d4c964beed2061257fa6f8d9d84bf69cbfcbac756ef428060b68fbb",
+      "prompt": "4×2 paper gouache on flat blue: one cow, pig, duck, hen, dog, cat, songbird, egg.",
+      "packaged": true
+    },
+    {
+      "key": "quiz-duck",
+      "file": "assets/quiz-duck.png",
+      "sourceType": "codex_imagegen",
+      "sha256": "ebf3dce9ded84311616e9ef5a9f9a7e8ecabf14ab3a66adb8200558cd4fbf142",
+      "size": [
+        375,
+        370
+      ],
+      "derivation": {
+        "operation": "quadrant_crop_chroma",
+        "box": [
+          0,
+          0,
+          443,
+          443
+        ]
+      },
+      "provider": "Codex built-in imagegen",
+      "source": "art-source/quiz-animals.png",
+      "sourceSha256": "db4fa4cbcd45a357f2159d9b23e1dfb24b88916784422fafd6123d98730d40cc",
+      "prompt": "4×2 separate quiz atlas on flat magenta: mallard, russet hen, brown-spotted cow, pale egg, cream dog, striped cat, gold songbird, empty wicker basket.",
+      "packaged": false
+    },
+    {
+      "key": "quiz-hen",
+      "file": "assets/quiz-hen.png",
+      "sourceType": "codex_imagegen",
+      "sha256": "da8d54ec4a56abdd5cb91aedb65ecfcf010b31c08bc705e9d7d523150aebd6b8",
+      "size": [
+        333,
+        378
+      ],
+      "derivation": {
+        "operation": "quadrant_crop_chroma",
+        "box": [
+          443,
+          0,
+          886,
+          443
+        ]
+      },
+      "provider": "Codex built-in imagegen",
+      "source": "art-source/quiz-animals.png",
+      "sourceSha256": "db4fa4cbcd45a357f2159d9b23e1dfb24b88916784422fafd6123d98730d40cc",
+      "prompt": "4×2 separate quiz atlas on flat magenta: mallard, russet hen, brown-spotted cow, pale egg, cream dog, striped cat, gold songbird, empty wicker basket.",
+      "packaged": false
+    },
+    {
+      "key": "quiz-cow",
+      "file": "assets/quiz-cow.png",
+      "sourceType": "codex_imagegen",
+      "sha256": "464b68e7c1c9cb8efecd07293d4a975404087abb3fded1f62ec598846cd3d69a",
+      "size": [
+        428,
+        366
+      ],
+      "derivation": {
+        "operation": "quadrant_crop_chroma",
+        "box": [
+          886,
+          0,
+          1329,
+          443
+        ]
+      },
+      "provider": "Codex built-in imagegen",
+      "source": "art-source/quiz-animals.png",
+      "sourceSha256": "db4fa4cbcd45a357f2159d9b23e1dfb24b88916784422fafd6123d98730d40cc",
+      "prompt": "4×2 separate quiz atlas on flat magenta: mallard, russet hen, brown-spotted cow, pale egg, cream dog, striped cat, gold songbird, empty wicker basket.",
+      "packaged": false
+    },
+    {
+      "key": "quiz-egg",
+      "file": "assets/quiz-egg.png",
+      "sourceType": "codex_imagegen",
+      "sha256": "7ac91e2c422488d67a2590d3ba7155af73f80fee05dc32b95d72c3afe1d5e470",
+      "size": [
+        252,
+        323
+      ],
+      "derivation": {
+        "operation": "quadrant_crop_chroma",
+        "box": [
+          1329,
+          0,
+          1772,
+          443
+        ]
+      },
+      "provider": "Codex built-in imagegen",
+      "source": "art-source/quiz-animals.png",
+      "sourceSha256": "db4fa4cbcd45a357f2159d9b23e1dfb24b88916784422fafd6123d98730d40cc",
+      "prompt": "4×2 separate quiz atlas on flat magenta: mallard, russet hen, brown-spotted cow, pale egg, cream dog, striped cat, gold songbird, empty wicker basket.",
+      "packaged": false
+    },
+    {
+      "key": "quiz-dog",
+      "file": "assets/quiz-dog.png",
+      "sourceType": "codex_imagegen",
+      "sha256": "38469439e146dbaf69bb4308cef7e4d92e1feea3f2d56e341e9eecd95eb2ad04",
+      "size": [
+        393,
+        367
+      ],
+      "derivation": {
+        "operation": "quadrant_crop_chroma",
+        "box": [
+          0,
+          443,
+          443,
+          886
+        ]
+      },
+      "provider": "Codex built-in imagegen",
+      "source": "art-source/quiz-animals.png",
+      "sourceSha256": "db4fa4cbcd45a357f2159d9b23e1dfb24b88916784422fafd6123d98730d40cc",
+      "prompt": "4×2 separate quiz atlas on flat magenta: mallard, russet hen, brown-spotted cow, pale egg, cream dog, striped cat, gold songbird, empty wicker basket.",
+      "packaged": false
+    },
+    {
+      "key": "quiz-cat",
+      "file": "assets/quiz-cat.png",
+      "sourceType": "codex_imagegen",
+      "sha256": "e8b4f8fa65a9941946e572c53bbd0f8b23fea47366af1c6edef21bf49f4c03e5",
+      "size": [
+        394,
+        374
+      ],
+      "derivation": {
+        "operation": "quadrant_crop_chroma",
+        "box": [
+          443,
+          443,
+          886,
+          886
+        ]
+      },
+      "provider": "Codex built-in imagegen",
+      "source": "art-source/quiz-animals.png",
+      "sourceSha256": "db4fa4cbcd45a357f2159d9b23e1dfb24b88916784422fafd6123d98730d40cc",
+      "prompt": "4×2 separate quiz atlas on flat magenta: mallard, russet hen, brown-spotted cow, pale egg, cream dog, striped cat, gold songbird, empty wicker basket.",
+      "packaged": false
+    },
+    {
+      "key": "quiz-bird",
+      "file": "assets/quiz-bird.png",
+      "sourceType": "codex_imagegen",
+      "sha256": "f025e172a9f749c2a41eebb0c446c5d4f709b185704783725ed6387e6aa44623",
+      "size": [
+        369,
+        332
+      ],
+      "derivation": {
+        "operation": "quadrant_crop_chroma",
+        "box": [
+          886,
+          443,
+          1329,
+          886
+        ]
+      },
+      "provider": "Codex built-in imagegen",
+      "source": "art-source/quiz-animals.png",
+      "sourceSha256": "db4fa4cbcd45a357f2159d9b23e1dfb24b88916784422fafd6123d98730d40cc",
+      "prompt": "4×2 separate quiz atlas on flat magenta: mallard, russet hen, brown-spotted cow, pale egg, cream dog, striped cat, gold songbird, empty wicker basket.",
+      "packaged": false
+    },
+    {
+      "key": "quiz-basket",
+      "file": "assets/quiz-basket.png",
+      "sourceType": "codex_imagegen",
+      "sha256": "240bd339c484618e86376c199dc5fceab91f38eda6c3e1571e341665980a50c4",
+      "size": [
+        334,
+        367
+      ],
+      "derivation": {
+        "operation": "quadrant_crop_chroma",
+        "box": [
+          1329,
+          443,
+          1772,
+          886
+        ]
+      },
+      "provider": "Codex built-in imagegen",
+      "source": "art-source/quiz-animals.png",
+      "sourceSha256": "db4fa4cbcd45a357f2159d9b23e1dfb24b88916784422fafd6123d98730d40cc",
+      "prompt": "4×2 separate quiz atlas on flat magenta: mallard, russet hen, brown-spotted cow, pale egg, cream dog, striped cat, gold songbird, empty wicker basket.",
+      "packaged": false
+    },
+    {
+      "key": "farm-welcome",
+      "file": "assets/farm-welcome.png",
+      "sourceType": "code_drawn",
+      "sha256": "16f94097732ec5ce9c4043d3153137645b38504966f41fb8aac5fd8947fbc6b9",
+      "size": [
+        810,
+        412
+      ],
+      "derivation": {
+        "operation": "compose_images",
+        "scene": "farm-gate",
+        "sprites": [
+          [
+            "cow",
+            35,
+            236,
+            212,
+            146
+          ],
+          [
+            "duck",
+            311,
+            276,
+            149,
+            119
+          ],
+          [
+            "hen",
+            610,
+            258,
+            143,
+            131,
+            true
+          ]
+        ]
+      },
+      "packaged": true
+    },
+    {
+      "key": "sound-yard",
+      "file": "assets/sound-yard.png",
+      "sourceType": "code_drawn",
+      "sha256": "5d68585bd0a367933924ba0da1709c8bbdb81ba5019a9d955dae13407dc8d290",
+      "size": [
+        810,
+        412
+      ],
+      "derivation": {
+        "operation": "compose_images",
+        "scene": "farm-orchard",
+        "sprites": [
+          [
+            "dog",
+            48,
+            264,
+            100,
+            105
+          ],
+          [
+            "dog",
+            143,
+            241,
+            106,
+            110,
+            true
+          ],
+          [
+            "cat",
+            294,
+            246,
+            108,
+            113
+          ],
+          [
+            "cat",
+            396,
+            270,
+            105,
+            103,
+            true
+          ],
+          [
+            "bird",
+            553,
+            251,
+            100,
+            104
+          ],
+          [
+            "bird",
+            660,
+            267,
+            105,
+            104,
+            true
+          ]
+        ]
+      },
+      "packaged": true
+    },
+    {
+      "key": "cow-one",
+      "file": "assets/cow-one.png",
+      "sourceType": "code_drawn",
+      "sha256": "b9c06d8e9ea93e4f708914ebf502c34b0c162ffe31757668e52037dceb098450",
+      "size": [
+        600,
+        354
+      ],
+      "derivation": {
+        "operation": "repeat_silhouette",
+        "species": "cow",
+        "count": 1,
+        "boxes": [
+          [
+            145,
+            15,
+            310,
+            324
+          ]
+        ],
+        "palette": null
+      },
+      "packaged": true
+    },
+    {
+      "key": "cow-group",
+      "file": "assets/cow-group.png",
+      "sourceType": "code_drawn",
+      "sha256": "31cea0b952aabf06c01342657afafd298e102972c420a23e396f66f6d746a056",
+      "size": [
+        600,
+        354
+      ],
+      "derivation": {
+        "operation": "repeat_silhouette",
+        "species": "cow",
+        "count": 3,
+        "boxes": [
+          [
+            5,
+            90,
+            191,
+            225
+          ],
+          [
+            203,
+            38,
+            194,
+            252
+          ],
+          [
+            402,
+            89,
+            191,
+            227
+          ]
+        ],
+        "palette": null
+      },
+      "packaged": true
+    },
+    {
+      "key": "pig-one",
+      "file": "assets/pig-one.png",
+      "sourceType": "code_drawn",
+      "sha256": "e8cdb8ed1f0846b279a20aef782526a2debc5943eb1186c420c200f2dd91f1aa",
+      "size": [
+        600,
+        354
+      ],
+      "derivation": {
+        "operation": "repeat_silhouette",
+        "species": "pig",
+        "count": 1,
+        "boxes": [
+          [
+            145,
+            15,
+            310,
+            324
+          ]
+        ],
+        "palette": null
+      },
+      "packaged": true
+    },
+    {
+      "key": "pig-group",
+      "file": "assets/pig-group.png",
+      "sourceType": "code_drawn",
+      "sha256": "d2df1de32ce8b1014c5440f5626bdefd0945f314e4c2ead5903f82ab8bca774a",
+      "size": [
+        600,
+        354
+      ],
+      "derivation": {
+        "operation": "repeat_silhouette",
+        "species": "pig",
+        "count": 3,
+        "boxes": [
+          [
+            5,
+            90,
+            191,
+            225
+          ],
+          [
+            203,
+            38,
+            194,
+            252
+          ],
+          [
+            402,
+            89,
+            191,
+            227
+          ]
+        ],
+        "palette": null
+      },
+      "packaged": true
+    },
+    {
+      "key": "duck-one",
+      "file": "assets/duck-one.png",
+      "sourceType": "code_drawn",
+      "sha256": "781ade8fd34600ede2543e886b7d3d7b343f9890ca93bf685560707d988f42e9",
+      "size": [
+        600,
+        354
+      ],
+      "derivation": {
+        "operation": "repeat_silhouette",
+        "species": "duck",
+        "count": 1,
+        "boxes": [
+          [
+            145,
+            15,
+            310,
+            324
+          ]
+        ],
+        "palette": null
+      },
+      "packaged": true
+    },
+    {
+      "key": "duck-group",
+      "file": "assets/duck-group.png",
+      "sourceType": "code_drawn",
+      "sha256": "6a48f6af64fcac098ebc48964379a5df9c8a35f2adf7a4cf7443a4da1d2cbb2e",
+      "size": [
+        600,
+        354
+      ],
+      "derivation": {
+        "operation": "repeat_silhouette",
+        "species": "duck",
+        "count": 3,
+        "boxes": [
+          [
+            5,
+            90,
+            191,
+            225
+          ],
+          [
+            203,
+            38,
+            194,
+            252
+          ],
+          [
+            402,
+            89,
+            191,
+            227
+          ]
+        ],
+        "palette": null
+      },
+      "packaged": true
+    },
+    {
+      "key": "hen-one",
+      "file": "assets/hen-one.png",
+      "sourceType": "code_drawn",
+      "sha256": "ff12209006e8f4ed89e6709eaaf58c7a2041227f30cbe34ecc5e33413103352f",
+      "size": [
+        600,
+        354
+      ],
+      "derivation": {
+        "operation": "repeat_silhouette",
+        "species": "hen",
+        "count": 1,
+        "boxes": [
+          [
+            145,
+            15,
+            310,
+            324
+          ]
+        ],
+        "palette": null
+      },
+      "packaged": false
+    },
+    {
+      "key": "hen-group",
+      "file": "assets/hen-group.png",
+      "sourceType": "code_drawn",
+      "sha256": "544cd091254e7b19024ca71781c1daf4781e274864022dfffa9bccbc0103bf0e",
+      "size": [
+        600,
+        354
+      ],
+      "derivation": {
+        "operation": "repeat_silhouette",
+        "species": "hen",
+        "count": 3,
+        "boxes": [
+          [
+            5,
+            90,
+            191,
+            225
+          ],
+          [
+            203,
+            38,
+            194,
+            252
+          ],
+          [
+            402,
+            89,
+            191,
+            227
+          ]
+        ],
+        "palette": null
+      },
+      "packaged": true
+    },
+    {
+      "key": "dog-one",
+      "file": "assets/dog-one.png",
+      "sourceType": "code_drawn",
+      "sha256": "6ebf23d036c5b15c7d74cd81ae8933cbca0e90821b62f2428349c0bed51cd1e1",
+      "size": [
+        600,
+        354
+      ],
+      "derivation": {
+        "operation": "repeat_silhouette",
+        "species": "dog",
+        "count": 1,
+        "boxes": [
+          [
+            145,
+            15,
+            310,
+            324
+          ]
+        ],
+        "palette": null
+      },
+      "packaged": false
+    },
+    {
+      "key": "dog-group",
+      "file": "assets/dog-group.png",
+      "sourceType": "code_drawn",
+      "sha256": "0b075d28d06deba16cd0330fbc5dba8fa1acf3210226a43059fcd5f54058ca4d",
+      "size": [
+        600,
+        354
+      ],
+      "derivation": {
+        "operation": "repeat_silhouette",
+        "species": "dog",
+        "count": 3,
+        "boxes": [
+          [
+            5,
+            90,
+            191,
+            225
+          ],
+          [
+            203,
+            38,
+            194,
+            252
+          ],
+          [
+            402,
+            89,
+            191,
+            227
+          ]
+        ],
+        "palette": null
+      },
+      "packaged": true
+    },
+    {
+      "key": "cat-one",
+      "file": "assets/cat-one.png",
+      "sourceType": "code_drawn",
+      "sha256": "71f9860f89e16d25a5375011da884f1e0c1a4594d94eab0118e0777d9c903ac4",
+      "size": [
+        600,
+        354
+      ],
+      "derivation": {
+        "operation": "repeat_silhouette",
+        "species": "cat",
+        "count": 1,
+        "boxes": [
+          [
+            145,
+            15,
+            310,
+            324
+          ]
+        ],
+        "palette": null
+      },
+      "packaged": false
+    },
+    {
+      "key": "cat-group",
+      "file": "assets/cat-group.png",
+      "sourceType": "code_drawn",
+      "sha256": "4ba37cefa72494d3d0090f9f386ed385d6e6076c08b7b49bb54c6932d9e418dc",
+      "size": [
+        600,
+        354
+      ],
+      "derivation": {
+        "operation": "repeat_silhouette",
+        "species": "cat",
+        "count": 3,
+        "boxes": [
+          [
+            5,
+            90,
+            191,
+            225
+          ],
+          [
+            203,
+            38,
+            194,
+            252
+          ],
+          [
+            402,
+            89,
+            191,
+            227
+          ]
+        ],
+        "palette": null
+      },
+      "packaged": true
+    },
+    {
+      "key": "bird-one",
+      "file": "assets/bird-one.png",
+      "sourceType": "code_drawn",
+      "sha256": "81b8f888b9396b46b5f4fb689e40ef29e287410c2c52951d8cf6d048d08b2b11",
+      "size": [
+        600,
+        354
+      ],
+      "derivation": {
+        "operation": "repeat_silhouette",
+        "species": "bird",
+        "count": 1,
+        "boxes": [
+          [
+            145,
+            15,
+            310,
+            324
+          ]
+        ],
+        "palette": null
+      },
+      "packaged": false
+    },
+    {
+      "key": "bird-group",
+      "file": "assets/bird-group.png",
+      "sourceType": "code_drawn",
+      "sha256": "f840f12519f0d08d44d5e925a337bf8da63727ce0757259365ad0847abe8d410",
+      "size": [
+        600,
+        354
+      ],
+      "derivation": {
+        "operation": "repeat_silhouette",
+        "species": "bird",
+        "count": 3,
+        "boxes": [
+          [
+            5,
+            90,
+            191,
+            225
+          ],
+          [
+            203,
+            38,
+            194,
+            252
+          ],
+          [
+            402,
+            89,
+            191,
+            227
+          ]
+        ],
+        "palette": null
+      },
+      "packaged": true
+    },
+    {
+      "key": "q1-three-hens",
+      "file": "assets/q1-three-hens.png",
+      "sourceType": "code_drawn",
+      "sha256": "afd729315d04fc750b02ce2598b77389a36590881f7c3acf2bb4ef2ffc085811",
+      "size": [
+        480,
+        295
+      ],
+      "derivation": {
+        "operation": "repeat_silhouette",
+        "species": "quiz-hen",
+        "count": 3,
+        "boxes": [
+          [
+            14,
+            90,
+            146,
+            157
+          ],
+          [
+            165,
+            67,
+            151,
+            157
+          ],
+          [
+            320,
+            89,
+            146,
+            157
+          ]
+        ],
+        "palette": [
+          "#dfedf0",
+          "#94c3b9",
+          "#487c71"
+        ]
+      },
+      "packaged": true
+    },
+    {
+      "key": "q1-one-duck",
+      "file": "assets/q1-one-duck.png",
+      "sourceType": "code_drawn",
+      "sha256": "afd439b9f665e8826d817e7152e3832f418490353e86c8d89dd84c55b849243d",
+      "size": [
+        480,
+        295
+      ],
+      "derivation": {
+        "operation": "repeat_silhouette",
+        "species": "quiz-duck",
+        "count": 1,
+        "boxes": [
+          [
+            130,
+            42,
+            220,
+            210
+          ]
+        ],
+        "palette": [
+          "#dfedf0",
+          "#94c3b9",
+          "#487c71"
+        ]
+      },
+      "packaged": true
+    },
+    {
+      "key": "q1-one-hen",
+      "file": "assets/q1-one-hen.png",
+      "sourceType": "code_drawn",
+      "sha256": "30a7ed0f54e15e1b98c2e4f5d35d945fb61e3d4e2324bebf2e26b1e518eaf70c",
+      "size": [
+        480,
+        295
+      ],
+      "derivation": {
+        "operation": "repeat_silhouette",
+        "species": "quiz-hen",
+        "count": 1,
+        "boxes": [
+          [
+            130,
+            42,
+            220,
+            210
+          ]
+        ],
+        "palette": [
+          "#dfedf0",
+          "#94c3b9",
+          "#487c71"
+        ]
+      },
+      "packaged": true
+    },
+    {
+      "key": "q2-cows",
+      "file": "assets/q2-cows.png",
+      "sourceType": "code_drawn",
+      "sha256": "04495b1367ce1d4ce9990cd9dfa52859e01eb0b7a359f4efd5aa03ae86a53a9c",
+      "size": [
+        480,
+        295
+      ],
+      "derivation": {
+        "operation": "repeat_silhouette",
+        "species": "quiz-cow",
+        "count": 2,
+        "boxes": [
+          [
+            49,
+            73,
+            176,
+            174
+          ],
+          [
+            255,
+            73,
+            176,
+            174
+          ]
+        ],
+        "palette": [
+          "#faead6",
+          "#e8bd7b",
+          "#996d48"
+        ]
+      },
+      "packaged": true
+    },
+    {
+      "key": "q2-ducks",
+      "file": "assets/q2-ducks.png",
+      "sourceType": "code_drawn",
+      "sha256": "811a68bd82cf422083b60a4231ee9b440cc03f8148fc41a7d281db7344a594ae",
+      "size": [
+        480,
+        295
+      ],
+      "derivation": {
+        "operation": "repeat_silhouette",
+        "species": "quiz-duck",
+        "count": 2,
+        "boxes": [
+          [
+            49,
+            73,
+            176,
+            174
+          ],
+          [
+            255,
+            73,
+            176,
+            174
+          ]
+        ],
+        "palette": [
+          "#faead6",
+          "#e8bd7b",
+          "#996d48"
+        ]
+      },
+      "packaged": true
+    },
+    {
+      "key": "q2-chickens",
+      "file": "assets/q2-chickens.png",
+      "sourceType": "code_drawn",
+      "sha256": "9da55f03736322e4df00ae060f32101f1903bc8e7dcc9dfb06b7313cabc5c3a9",
+      "size": [
+        480,
+        295
+      ],
+      "derivation": {
+        "operation": "repeat_silhouette",
+        "species": "quiz-hen",
+        "count": 2,
+        "boxes": [
+          [
+            49,
+            73,
+            176,
+            174
+          ],
+          [
+            255,
+            73,
+            176,
+            174
+          ]
+        ],
+        "palette": [
+          "#faead6",
+          "#e8bd7b",
+          "#996d48"
+        ]
+      },
+      "packaged": true
+    },
+    {
+      "key": "q4-cats",
+      "file": "assets/q4-cats.png",
+      "sourceType": "code_drawn",
+      "sha256": "b58c85f369f0fdd87d38de42bf77945ed42680f00dd95d5b839dda7020fdbdd7",
+      "size": [
+        480,
+        295
+      ],
+      "derivation": {
+        "operation": "repeat_silhouette",
+        "species": "quiz-cat",
+        "count": 3,
+        "boxes": [
+          [
+            14,
+            90,
+            146,
+            157
+          ],
+          [
+            165,
+            67,
+            151,
+            157
+          ],
+          [
+            320,
+            89,
+            146,
+            157
+          ]
+        ],
+        "palette": [
+          "#e1ecd9",
+          "#a0bc77",
+          "#52714e"
+        ]
+      },
+      "packaged": true
+    },
+    {
+      "key": "q4-dogs",
+      "file": "assets/q4-dogs.png",
+      "sourceType": "code_drawn",
+      "sha256": "effbf44630dfc6b035095ae3bfe497d1311f266e5a15b64d0a7aeab0ac60c4ba",
+      "size": [
+        480,
+        295
+      ],
+      "derivation": {
+        "operation": "repeat_silhouette",
+        "species": "quiz-dog",
+        "count": 3,
+        "boxes": [
+          [
+            14,
+            90,
+            146,
+            157
+          ],
+          [
+            165,
+            67,
+            151,
+            157
+          ],
+          [
+            320,
+            89,
+            146,
+            157
+          ]
+        ],
+        "palette": [
+          "#e1ecd9",
+          "#a0bc77",
+          "#52714e"
+        ]
+      },
+      "packaged": true
+    },
+    {
+      "key": "q4-birds",
+      "file": "assets/q4-birds.png",
+      "sourceType": "code_drawn",
+      "sha256": "e7c6b901d3631be509686dea3b66faf4ef74b93dce9ebcd7ea7721a1e3c67093",
+      "size": [
+        480,
+        295
+      ],
+      "derivation": {
+        "operation": "repeat_silhouette",
+        "species": "quiz-bird",
+        "count": 3,
+        "boxes": [
+          [
+            14,
+            90,
+            146,
+            157
+          ],
+          [
+            165,
+            67,
+            151,
+            157
+          ],
+          [
+            320,
+            89,
+            146,
+            157
+          ]
+        ],
+        "palette": [
+          "#e1ecd9",
+          "#a0bc77",
+          "#52714e"
+        ]
+      },
+      "packaged": true
+    },
+    {
+      "key": "tray-eleven",
+      "file": "assets/tray-eleven.png",
+      "sourceType": "code_drawn",
+      "sha256": "c40a8955f36dcb8dd49eccd512a7dc9770256cb3cf501c319c578deb44d44539",
+      "size": [
+        560,
+        338
+      ],
+      "derivation": {
+        "operation": "exact_egg_tray",
+        "filled": 11,
+        "spare": 0,
+        "eggKey": "egg",
+        "boxes": [
+          [
+            90,
+            96,
+            43,
+            61
+          ],
+          [
+            156,
+            96,
+            43,
+            61
+          ],
+          [
+            222,
+            96,
+            43,
+            61
+          ],
+          [
+            288,
+            96,
+            43,
+            61
+          ],
+          [
+            354,
+            96,
+            43,
+            61
+          ],
+          [
+            420,
+            96,
+            43,
+            61
+          ],
+          [
+            90,
+            183,
+            43,
+            61
+          ],
+          [
+            156,
+            183,
+            43,
+            61
+          ],
+          [
+            222,
+            183,
+            43,
+            61
+          ],
+          [
+            288,
+            183,
+            43,
+            61
+          ],
+          [
+            354,
+            183,
+            43,
+            61
+          ]
+        ]
+      },
+      "packaged": false
+    },
+    {
+      "key": "tray-one-more",
+      "file": "assets/tray-one-more.png",
+      "sourceType": "code_drawn",
+      "sha256": "1b366800068743e253b259287ee6a82cfb114763cbfbc64c8429ce40c2c19c6b",
+      "size": [
+        560,
+        338
+      ],
+      "derivation": {
+        "operation": "exact_egg_tray",
+        "filled": 11,
+        "spare": 1,
+        "eggKey": "egg",
+        "boxes": [
+          [
+            66,
+            96,
+            43,
+            61
+          ],
+          [
+            132,
+            96,
+            43,
+            61
+          ],
+          [
+            198,
+            96,
+            43,
+            61
+          ],
+          [
+            264,
+            96,
+            43,
+            61
+          ],
+          [
+            330,
+            96,
+            43,
+            61
+          ],
+          [
+            396,
+            96,
+            43,
+            61
+          ],
+          [
+            66,
+            183,
+            43,
+            61
+          ],
+          [
+            132,
+            183,
+            43,
+            61
+          ],
+          [
+            198,
+            183,
+            43,
+            61
+          ],
+          [
+            264,
+            183,
+            43,
+            61
+          ],
+          [
+            330,
+            183,
+            43,
+            61
+          ],
+          [
+            488,
+            126,
+            49,
+            70
+          ]
+        ]
+      },
+      "packaged": true
+    },
+    {
+      "key": "tray-twelve",
+      "file": "assets/tray-twelve.png",
+      "sourceType": "code_drawn",
+      "sha256": "e796b2bf530e6df0f8c41a21db6ecbaa3ad259a2541f87109e1a8c227c7961d7",
+      "size": [
+        560,
+        338
+      ],
+      "derivation": {
+        "operation": "exact_egg_tray",
+        "filled": 12,
+        "spare": 0,
+        "eggKey": "egg",
+        "boxes": [
+          [
+            90,
+            96,
+            43,
+            61
+          ],
+          [
+            156,
+            96,
+            43,
+            61
+          ],
+          [
+            222,
+            96,
+            43,
+            61
+          ],
+          [
+            288,
+            96,
+            43,
+            61
+          ],
+          [
+            354,
+            96,
+            43,
+            61
+          ],
+          [
+            420,
+            96,
+            43,
+            61
+          ],
+          [
+            90,
+            183,
+            43,
+            61
+          ],
+          [
+            156,
+            183,
+            43,
+            61
+          ],
+          [
+            222,
+            183,
+            43,
+            61
+          ],
+          [
+            288,
+            183,
+            43,
+            61
+          ],
+          [
+            354,
+            183,
+            43,
+            61
+          ],
+          [
+            420,
+            183,
+            43,
+            61
+          ]
+        ]
+      },
+      "packaged": true
+    },
+    {
+      "key": "q3-ten-eggs",
+      "file": "assets/q3-ten-eggs.png",
+      "sourceType": "code_drawn",
+      "sha256": "5b1e8507f2539fafd0024a903f713a311d04150cb6c811df260def926cf8b167",
+      "size": [
+        560,
+        338
+      ],
+      "derivation": {
+        "operation": "exact_egg_tray",
+        "filled": 10,
+        "spare": 0,
+        "eggKey": "quiz-egg",
+        "boxes": [
+          [
+            90,
+            96,
+            43,
+            61
+          ],
+          [
+            156,
+            96,
+            43,
+            61
+          ],
+          [
+            222,
+            96,
+            43,
+            61
+          ],
+          [
+            288,
+            96,
+            43,
+            61
+          ],
+          [
+            354,
+            96,
+            43,
+            61
+          ],
+          [
+            420,
+            96,
+            43,
+            61
+          ],
+          [
+            90,
+            183,
+            43,
+            61
+          ],
+          [
+            156,
+            183,
+            43,
+            61
+          ],
+          [
+            222,
+            183,
+            43,
+            61
+          ],
+          [
+            288,
+            183,
+            43,
+            61
+          ]
+        ]
+      },
+      "packaged": true
+    },
+    {
+      "key": "q3-nine-eggs",
+      "file": "assets/q3-nine-eggs.png",
+      "sourceType": "code_drawn",
+      "sha256": "c65dc0f89645efee1cc034bfcd0ee9573778f54cab1d9514687773eccaec87a0",
+      "size": [
+        560,
+        338
+      ],
+      "derivation": {
+        "operation": "exact_egg_tray",
+        "filled": 9,
+        "spare": 0,
+        "eggKey": "quiz-egg",
+        "boxes": [
+          [
+            90,
+            96,
+            43,
+            61
+          ],
+          [
+            156,
+            96,
+            43,
+            61
+          ],
+          [
+            222,
+            96,
+            43,
+            61
+          ],
+          [
+            288,
+            96,
+            43,
+            61
+          ],
+          [
+            354,
+            96,
+            43,
+            61
+          ],
+          [
+            420,
+            96,
+            43,
+            61
+          ],
+          [
+            90,
+            183,
+            43,
+            61
+          ],
+          [
+            156,
+            183,
+            43,
+            61
+          ],
+          [
+            222,
+            183,
+            43,
+            61
+          ]
+        ]
+      },
+      "packaged": true
+    },
+    {
+      "key": "q3-eleven-eggs",
+      "file": "assets/q3-eleven-eggs.png",
+      "sourceType": "code_drawn",
+      "sha256": "d06a15aa2a34f9402bab3d8d19e0b118b5466ffc8bdd6cd9c4fe00d1b3c426a6",
+      "size": [
+        560,
+        338
+      ],
+      "derivation": {
+        "operation": "exact_egg_tray",
+        "filled": 11,
+        "spare": 0,
+        "eggKey": "quiz-egg",
+        "boxes": [
+          [
+            90,
+            96,
+            43,
+            61
+          ],
+          [
+            156,
+            96,
+            43,
+            61
+          ],
+          [
+            222,
+            96,
+            43,
+            61
+          ],
+          [
+            288,
+            96,
+            43,
+            61
+          ],
+          [
+            354,
+            96,
+            43,
+            61
+          ],
+          [
+            420,
+            96,
+            43,
+            61
+          ],
+          [
+            90,
+            183,
+            43,
+            61
+          ],
+          [
+            156,
+            183,
+            43,
+            61
+          ],
+          [
+            222,
+            183,
+            43,
+            61
+          ],
+          [
+            288,
+            183,
+            43,
+            61
+          ],
+          [
+            354,
+            183,
+            43,
+            61
+          ]
+        ]
+      },
+      "packaged": true
+    },
+    {
+      "key": "farm-wrap",
+      "file": "assets/farm-wrap.png",
+      "sourceType": "code_drawn",
+      "sha256": "d833a559c18cbb48b0823c756c43affe85e2f363abdcf375cca2c110b2d1bf96",
+      "size": [
+        810,
+        412
+      ],
+      "derivation": {
+        "operation": "compose_images",
+        "scene": "farm-orchard",
+        "sprites": [
+          [
+            "pig",
+            29,
+            232,
+            169,
+            137
+          ],
+          [
+            "cow",
+            216,
+            237,
+            133,
+            116
+          ],
+          [
+            "cow",
+            360,
+            244,
+            122,
+            109,
+            true
+          ],
+          [
+            "tray-twelve",
+            514,
+            212,
+            271,
+            164
+          ]
+        ]
+      },
+      "packaged": true
+    },
+    {
+      "key": "sound-pond",
+      "file": "assets/sound-pond.png",
+      "sourceType": "code_drawn",
+      "sha256": "1374709858ca8d31a296dbadaeb55251fd7c3615a62c6b827ab12db674937217",
+      "size": [
+        260,
+        180
+      ],
+      "derivation": {
+        "operation": "draw_speaker",
+        "colors": [
+          "#e1f3ed",
+          "#387064"
+        ]
+      },
+      "packaged": true
+    },
+    {
+      "key": "sound-barn",
+      "file": "assets/sound-barn.png",
+      "sourceType": "code_drawn",
+      "sha256": "7580e2a1dd5993170a29f0c090f09e985460fd17fc88c87672b6604a5d2a90ec",
+      "size": [
+        260,
+        180
+      ],
+      "derivation": {
+        "operation": "draw_speaker",
+        "colors": [
+          "#f8e9cc",
+          "#946237"
+        ]
+      },
+      "packaged": true
+    },
+    {
+      "key": "sound-orchard",
+      "file": "assets/sound-orchard.png",
+      "sourceType": "code_drawn",
+      "sha256": "67d362e50341c71422a0b6fe9aa25ff0ac075965c3ab20575adc95be2b3920f9",
+      "size": [
+        260,
+        180
+      ],
+      "derivation": {
+        "operation": "draw_speaker",
+        "colors": [
+          "#e8efcf",
+          "#446c52"
+        ]
+      },
+      "packaged": true
+    },
+    {
+      "key": "quiz-tray-stem",
+      "file": "assets/quiz-tray-stem.png",
+      "sourceType": "code_drawn",
+      "sha256": "6e05177713dcdd17bc5c1bd7b73010239fa55a02b8d701e0749b27478acda9be",
+      "size": [
+        260,
+        180
+      ],
+      "derivation": {
+        "operation": "compose_symbol",
+        "sprite": "quiz-basket"
+      },
+      "packaged": true
+    },
+    {
+      "key": "marble",
+      "file": "assets/marble.png",
+      "sourceType": "code_drawn",
+      "sha256": "38bd9b76d23e748104b065d25dfc8373222ab1247cd5b83a916dbd17cf353e85",
+      "size": [
+        160,
+        160
+      ],
+      "derivation": {
+        "operation": "draw_marble"
+      },
+      "packaged": true
+    },
+    {
+      "key": "egg-cart",
+      "file": "assets/egg-cart.png",
+      "sourceType": "code_drawn",
+      "sha256": "b427a93a714dd845a119a664d12ad7d825f0b8a7b84447f65dd39c88fb9dee5e",
+      "size": [
+        342,
+        190
+      ],
+      "derivation": {
+        "operation": "draw_wicker_cart"
+      },
+      "packaged": true
+    },
+    {
+      "key": "farm-badge",
+      "file": "assets/farm-badge.png",
+      "sourceType": "code_drawn",
+      "sha256": "783240fd7eec3d71a3fbcf53e3c1d5f6036d7953ab1e48a0450808ed0d17f723",
+      "size": [
+        240,
+        240
+      ],
+      "derivation": {
+        "operation": "draw_badge_and_compose",
+        "sprite": "hen"
+      },
+      "packaged": true
+    },
+    {
+      "key": "observe-fence",
+      "file": "assets/observe-fence.png",
+      "sourceType": "code_drawn",
+      "sha256": "2c20ba3a96fb2ffa4cc3feede8ef9244473001a41ce5ee2417190b139513904c",
+      "size": [
+        480,
+        284
+      ],
+      "derivation": {
+        "operation": "draw_fence_sign",
+        "meaning": "observe-fence"
+      },
+      "packaged": true
+    },
+    {
+      "key": "hands-outside",
+      "file": "assets/hands-outside.png",
+      "sourceType": "code_drawn",
+      "sha256": "9aaf8851c8dfb51ff2bb8debfd96142fe98b25418cab4b3bcbdcd63838d8f2c9",
+      "size": [
+        480,
+        284
+      ],
+      "derivation": {
+        "operation": "draw_fence_sign",
+        "meaning": "hands-outside"
+      },
+      "packaged": true
+    }
+  ]
+}

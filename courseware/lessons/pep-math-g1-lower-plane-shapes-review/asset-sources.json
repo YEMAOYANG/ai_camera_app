@@ -1,0 +1,461 @@
+{
+  "schemaVersion": "mira.courseware.asset-sources.v1",
+  "generatedBy": "Codex built-in ImageGen and exact geometric diagrams",
+  "imagegenPlan": "courseware/lessons/pep-math-g1-lower-plane-shapes-review/imagegen-plan.json",
+  "plates": {
+    "illustration-atlas": {
+      "file": "art-source/illustration-atlas.png",
+      "sha256": "02be1943b14ba8d8dbf41ff343dc9bdd106b02150fec4b0c8551c86340591507",
+      "builtinArtifact": "/Users/sqcopenclaw/.codex/generated_images/01a1c43f-547c-7830-949b-fcad1c9a9c7d/exec-57c73f44-72d9-453c-99ec-5d27fb834f58.png",
+      "prompt": "Create a professional four-panel 2 by 2 contact sheet for a Chinese grade-one geometry lesson set at a tiny museum of shapes. A single landscape 3:2 canvas; all four equal rectangles in perfect quadrants with clean division exactly at 50 percent; no gutters, frames, text, numbers, signs, glyphs or labels. Every quadrant is an independently crop-ready, wide environment illustration. Style all panels consistently in art-directed fine paper texture, matte opaque gouache, delicately cut paper edges, warm ivory and deep pine, apricot and persimmon accents; quiet child-level readability, no gradients, no glossy 3D. Top left: Chinese boy with cropped dark hair and olive overalls and Chinese girl with dark bob and apricot sweater excitedly unpacking museum supplies at a timber exhibition workshop, near side and no text; clear main object group toward the lower center right, airy warm wall at top. Top right: warm timber sorting workshop, front facing straight-on and symmetrical, big EMPTY pale wheat floor in middle, pine cabinet and fabric only at edges; no characters, no tables in middle. Bottom left: warmly lit indoor museum arcade with tiled floor, pine windows, apricot trim and an EMPTY bright central floor for a game overlay, tiny plants at far side only; no characters. Bottom right: same Chinese girl at home showing a small wooden block face to a seated parent near a paper sheet, warm pine curtains, calm right-leaning composition, no text. Geometry taught on separate exact diagrams, keep background decoration secondary.",
+      "transparent": false
+    },
+    "sprite-atlas": {
+      "file": "art-source/sprite-atlas.png",
+      "sha256": "dccfe378c9428efda4a6358f97cf8f81224ce4ca55e18ef3d092d58d1c412db4",
+      "builtinArtifact": "/Users/sqcopenclaw/.codex/generated_images/01a1c43f-547c-7830-949b-fcad1c9a9c7d/exec-2876f36a-0016-42b3-9a82-fb5b235b541b.png",
+      "prompt": "One 3:2 landscape cutout atlas with real transparent background and exactly six independent isolated asset silhouettes. Neat 3 columns by 2 rows of equal cells, one object centered in each cell, each fitting within inner 58% of its cell, extra transparent empty gutters, do not cross cell boundaries. Paper cutout gouache, matte pine, cream, apricot and persimmon, same tiny school shape museum world; strong silhouettes for 50 pixel display; no outlines drawn as dividing grid, no floor or cast shadow, no lettering, numerals or symbols. Row 1 left: toy yellow push cart seen from above slightly front, body box and two wheels, nose points to right. Row 1 center: same yellow push cart nose to right tipped very slightly in action and a little off-white dust directly behind its wheels, no artifacts. Row 1 right: handsome small pine museum sticker badge with a soft apricot border and no lettering or star text. Row 2 left: top-down toy apricot bubble rover points RIGHT, has distinct right-facing nose, cream windows and pine wheels. Row 2 center: exact same top-down apricot rover points RIGHT with three little bubbles close to right-facing nose, no trails across cells. Row 2 right: softly painted award rosette with cream paper and dark pine ribbon, no text. Each position independently crop-ready.",
+      "transparent": true
+    }
+  },
+  "assets": {
+    "cover-museum": {
+      "file": "assets/cover-museum.png",
+      "sha256": "fff23a7c70fe2a00f02a38ba2fd183c162c95722fe2b63df2cac6ff087bc367a",
+      "type": "imagegen_plate_crop",
+      "plate": "illustration-atlas",
+      "box": [
+        0,
+        0,
+        768,
+        512
+      ],
+      "purpose": "课件插画和互动环境"
+    },
+    "depot-backdrop": {
+      "file": "assets/depot-backdrop.png",
+      "sha256": "8df2c815dbae34325ed4158d0cbea5daca8973d5d9dbf7be0f6d11e34866488e",
+      "type": "imagegen_plate_crop",
+      "plate": "illustration-atlas",
+      "box": [
+        768,
+        40,
+        1536,
+        472
+      ],
+      "purpose": "课件插画和互动环境"
+    },
+    "hall-backdrop": {
+      "file": "assets/hall-backdrop.png",
+      "sha256": "f19c57622b8ceeade9aa695730a9f71bc4f3c1e87adaac63a15e12254d5cce17",
+      "type": "imagegen_plate_crop",
+      "plate": "illustration-atlas",
+      "box": [
+        0,
+        552,
+        768,
+        984
+      ],
+      "purpose": "课件插画和互动环境"
+    },
+    "family-shape": {
+      "file": "assets/family-shape.png",
+      "sha256": "02fc00a3ed223e03c28ac4fad76097b12e6093ab49e5654557a83022692d03c1",
+      "type": "imagegen_plate_crop",
+      "plate": "illustration-atlas",
+      "box": [
+        768,
+        512,
+        1536,
+        1024
+      ],
+      "purpose": "课件插画和互动环境"
+    },
+    "sort-cart": {
+      "file": "assets/sort-cart.png",
+      "sha256": "ce95d7f8a1aa236e38fa92eb487f0141b03e05919571feaa3a41e044c2a08ef0",
+      "type": "imagegen_plate_crop",
+      "plate": "sprite-atlas",
+      "box": [
+        96,
+        113,
+        440,
+        445
+      ],
+      "purpose": "透明游戏动帧或贴纸"
+    },
+    "sort-cart-push": {
+      "file": "assets/sort-cart-push.png",
+      "sha256": "0ab66f1165e8729db7e6dc7bcaa16b7c62886ee5ba3ce27d5e5827f53bd8e4b0",
+      "type": "imagegen_plate_crop",
+      "plate": "sprite-atlas",
+      "box": [
+        568,
+        115,
+        964,
+        440
+      ],
+      "purpose": "透明游戏动帧或贴纸"
+    },
+    "museum-sticker": {
+      "file": "assets/museum-sticker.png",
+      "sha256": "5ee916b613242ea703dedbf8edb8ac00cd2c32c0bd0ea8a45964e941badaf2bc",
+      "type": "imagegen_plate_crop",
+      "plate": "sprite-atlas",
+      "box": [
+        1067,
+        105,
+        1477,
+        442
+      ],
+      "purpose": "透明游戏动帧或贴纸"
+    },
+    "maze-rover": {
+      "file": "assets/maze-rover.png",
+      "sha256": "0e8b5ac5f762ee838a557448d7b31afdd6caeb07d82dc7c36ddbfc85789aea08",
+      "type": "imagegen_plate_crop",
+      "plate": "sprite-atlas",
+      "box": [
+        87,
+        628,
+        439,
+        901
+      ],
+      "purpose": "透明游戏动帧或贴纸"
+    },
+    "maze-rover-pop": {
+      "file": "assets/maze-rover-pop.png",
+      "sha256": "9bf88e9cfe3e602f5c1c10c05a651c8c9f898b41b7db88f685f03a2a52875bb3",
+      "type": "imagegen_plate_crop",
+      "plate": "sprite-atlas",
+      "box": [
+        539,
+        628,
+        1000,
+        900
+      ],
+      "purpose": "透明游戏动帧或贴纸"
+    },
+    "ribbon-sticker": {
+      "file": "assets/ribbon-sticker.png",
+      "sha256": "f0e6da388784afde2f978762043f9ad2c3792df17fd95d3978a76fa316906105",
+      "type": "imagegen_plate_crop",
+      "plate": "sprite-atlas",
+      "box": [
+        1129,
+        584,
+        1410,
+        950
+      ],
+      "purpose": "透明游戏动帧或贴纸"
+    },
+    "token-square": {
+      "file": "assets/token-square.png",
+      "sha256": "8213c32e852aacdd0ddcffd302fa88a9a77d9b5d730e6a3e6e6ef74cb67e9343",
+      "type": "precise_code_diagram",
+      "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 144 144\" width=\"144\" height=\"144\"><g transform=\"translate(72 72) rotate(0) scale(1.35)\" fill=\"#79b5a0\" stroke=\"#294f42\" stroke-width=\"5\" stroke-linejoin=\"round\"><path d=\"M-33 -33H33V33H-33Z\"/></g></svg>",
+      "meaning": "游戏图形卡 square，精确外轮廓。"
+    },
+    "token-tilt-square": {
+      "file": "assets/token-tilt-square.png",
+      "sha256": "604831fed2c3d4edd167d26b16b563b12863795cfc757eda21d113a0a60913eb",
+      "type": "precise_code_diagram",
+      "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 144 144\" width=\"144\" height=\"144\"><g transform=\"translate(72 72) rotate(45) scale(1.35)\" fill=\"#79b5a0\" stroke=\"#294f42\" stroke-width=\"5\" stroke-linejoin=\"round\"><path d=\"M-33 -33H33V33H-33Z\"/></g></svg>",
+      "meaning": "游戏图形卡 tilt-square，精确外轮廓。"
+    },
+    "token-rect": {
+      "file": "assets/token-rect.png",
+      "sha256": "bcd3c9f4838db486f2a966b326ca036613ffb311844f467b5c5d3d5c7aa47c0d",
+      "type": "precise_code_diagram",
+      "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 144 144\" width=\"144\" height=\"144\"><g transform=\"translate(72 72) rotate(0) scale(1.35)\" fill=\"#79b5a0\" stroke=\"#294f42\" stroke-width=\"5\" stroke-linejoin=\"round\"><path d=\"M-43 -26H43V26H-43Z\"/></g></svg>",
+      "meaning": "游戏图形卡 rect，精确外轮廓。"
+    },
+    "token-tall-rect": {
+      "file": "assets/token-tall-rect.png",
+      "sha256": "e2336ec50e04d1549857c63bf08c5bfb9783ce2379f16b57d49f3656082f5098",
+      "type": "precise_code_diagram",
+      "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 144 144\" width=\"144\" height=\"144\"><g transform=\"translate(72 72) rotate(90) scale(1.35)\" fill=\"#79b5a0\" stroke=\"#294f42\" stroke-width=\"5\" stroke-linejoin=\"round\"><path d=\"M-43 -26H43V26H-43Z\"/></g></svg>",
+      "meaning": "游戏图形卡 tall-rect，精确外轮廓。"
+    },
+    "token-tri": {
+      "file": "assets/token-tri.png",
+      "sha256": "a782705b7e68c608ad1f57d8dad1076f9aa185bc9ce174dcb50d195d82cc58c2",
+      "type": "precise_code_diagram",
+      "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 144 144\" width=\"144\" height=\"144\"><g transform=\"translate(72 72) rotate(0) scale(1.35)\" fill=\"#79b5a0\" stroke=\"#294f42\" stroke-width=\"5\" stroke-linejoin=\"round\"><path d=\"M-44 31L-2 -39L44 31Z\"/></g></svg>",
+      "meaning": "游戏图形卡 tri，精确外轮廓。"
+    },
+    "token-turn-tri": {
+      "file": "assets/token-turn-tri.png",
+      "sha256": "44970fe8474bdb8690f465b7f12428cbaf1dfee132251c60a06c12c00d37f3c3",
+      "type": "precise_code_diagram",
+      "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 144 144\" width=\"144\" height=\"144\"><g transform=\"translate(72 72) rotate(90) scale(1.35)\" fill=\"#79b5a0\" stroke=\"#294f42\" stroke-width=\"5\" stroke-linejoin=\"round\"><path d=\"M-44 31L-2 -39L44 31Z\"/></g></svg>",
+      "meaning": "游戏图形卡 turn-tri，精确外轮廓。"
+    },
+    "token-slant": {
+      "file": "assets/token-slant.png",
+      "sha256": "d53d95d55278ea222fbff99be6ff102fb85f1d2a1de9cee0ab1667529470f928",
+      "type": "precise_code_diagram",
+      "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 144 144\" width=\"144\" height=\"144\"><g transform=\"translate(72 72) rotate(0) scale(1.35)\" fill=\"#79b5a0\" stroke=\"#294f42\" stroke-width=\"5\" stroke-linejoin=\"round\"><path d=\"M-45 28H21L45 -28H-21Z\"/></g></svg>",
+      "meaning": "游戏图形卡 slant，精确外轮廓。"
+    },
+    "token-round": {
+      "file": "assets/token-round.png",
+      "sha256": "445a2c39ba00cd6ce615908c5db65ad454f4f8190d63ecf7b3a4b8e0a96ea541",
+      "type": "precise_code_diagram",
+      "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 144 144\" width=\"144\" height=\"144\"><g transform=\"translate(72 72) rotate(0) scale(1.35)\" fill=\"#79b5a0\" stroke=\"#294f42\" stroke-width=\"5\" stroke-linejoin=\"round\"><circle r=\"36\"/></g></svg>",
+      "meaning": "游戏图形卡 round，精确外轮廓。"
+    },
+    "token-curve": {
+      "file": "assets/token-curve.png",
+      "sha256": "b4fd1e25e088751c36ef76296bbc74a88d9f96999c31b3a3398c38b218f78866",
+      "type": "precise_code_diagram",
+      "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 144 144\" width=\"144\" height=\"144\"><g transform=\"translate(72 72) rotate(0) scale(1.35)\" fill=\"#294f42\" stroke=\"#294f42\" stroke-width=\"5\" stroke-linejoin=\"round\"><path d=\"M-40 13Q-12 -40 18 2Q30 17 40 -12\" fill=\"none\" stroke-linecap=\"round\"/></g></svg>",
+      "meaning": "游戏图形卡 curve，精确外轮廓。"
+    },
+    "token-straight": {
+      "file": "assets/token-straight.png",
+      "sha256": "8fa70c8d007a89cf5d02b3abd281fd7c65840dfe0f2bc9ba618cd74765c647f3",
+      "type": "precise_code_diagram",
+      "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 144 144\" width=\"144\" height=\"144\"><g transform=\"translate(72 72) rotate(0) scale(1.35)\" fill=\"#294f42\" stroke=\"#294f42\" stroke-width=\"5\" stroke-linejoin=\"round\"><path d=\"M-39 24L2 -23L39 24\" fill=\"none\" stroke-linecap=\"round\"/></g></svg>",
+      "meaning": "游戏图形卡 straight，精确外轮廓。"
+    },
+    "token-blank": {
+      "file": "assets/token-blank.png",
+      "sha256": "3d30c7ad9aa22286dfa8cad094e18bfc23a0a8d1cf69dede844937a4d2ff55f1",
+      "type": "precise_code_diagram",
+      "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 144 144\" width=\"144\" height=\"144\"><g transform=\"translate(72 72) rotate(0) scale(1.35)\" fill=\"#fff3dc\" stroke=\"#294f42\" stroke-width=\"5\" stroke-linejoin=\"round\"><rect x=\"-35\" y=\"-35\" width=\"70\" height=\"70\" rx=\"9\" fill=\"none\" stroke-dasharray=\"7 5\"/></g></svg>",
+      "meaning": "游戏图形卡 blank，精确外轮廓。"
+    },
+    "rule-edge": {
+      "file": "assets/rule-edge.png",
+      "sha256": "d1a5160acffab70460ce1cbad802bb29d6b3d6916bbfb219a5ebb9a4b404df0c",
+      "type": "precise_code_diagram",
+      "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 300 128\" width=\"300\" height=\"128\"><rect x=\"2\" y=\"2\" width=\"296\" height=\"124\" fill=\"#fff5e3\" stroke=\"#e4d8b7\" stroke-width=\"3\" rx=\"26\"/><g transform=\"translate(73 64) rotate(0) scale(1.08)\" fill=\"#294f42\" stroke=\"#294f42\" stroke-width=\"6\" stroke-linejoin=\"round\"><path d=\"M-39 24L2 -23L39 24\" fill=\"none\" stroke-linecap=\"round\"/></g><g transform=\"translate(221 64) rotate(0) scale(1.08)\" fill=\"#294f42\" stroke=\"#294f42\" stroke-width=\"6\" stroke-linejoin=\"round\"><path d=\"M-40 13Q-12 -40 18 2Q30 17 40 -12\" fill=\"none\" stroke-linecap=\"round\"/></g></svg>",
+      "meaning": "关卡比较依据示意。"
+    },
+    "rule-count": {
+      "file": "assets/rule-count.png",
+      "sha256": "f4cf5eed9c1f784a586bed9871ce6ff28af709d43c7ef3edfa947bd04580f8d9",
+      "type": "precise_code_diagram",
+      "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 300 128\" width=\"300\" height=\"128\"><rect x=\"2\" y=\"2\" width=\"296\" height=\"124\" fill=\"#fff5e3\" stroke=\"#e4d8b7\" stroke-width=\"3\" rx=\"26\"/><g transform=\"translate(73 64) rotate(0) scale(1.08)\" fill=\"#79b5a0\" stroke=\"#294f42\" stroke-width=\"6\" stroke-linejoin=\"round\"><path d=\"M-44 31L-2 -39L44 31Z\"/></g><g transform=\"translate(221 64) rotate(0) scale(1.08)\" fill=\"#79b5a0\" stroke=\"#294f42\" stroke-width=\"6\" stroke-linejoin=\"round\"><path d=\"M-43 -26H43V26H-43Z\"/></g></svg>",
+      "meaning": "关卡比较依据示意。"
+    },
+    "faces-overview": {
+      "file": "assets/faces-overview.png",
+      "sha256": "a2e1ede84ea09254c5826fc36b7284124353e1a1704abcbf3753e7d5ee0481e5",
+      "type": "precise_code_diagram",
+      "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 790 466\" width=\"790\" height=\"466\"><rect x=\"2\" y=\"2\" width=\"786\" height=\"462\" fill=\"#fff5e3\" stroke=\"#e4d8b7\" stroke-width=\"3\" rx=\"26\"/><g transform=\"translate(71 117) scale(1.09)\"><polygon points=\"-27,-35 57,-35 57,12 -27,12\" fill=\"#c2aa78\" stroke=\"#294f42\" stroke-width=\"3\" stroke-linejoin=\"round\"/><polygon points=\"-47,-19 37,-19 57,-35 -27,-35\" fill=\"#b4a67a\" stroke=\"#294f42\" stroke-width=\"3\" stroke-linejoin=\"round\"/><polygon points=\"37,-19 37,28 57,12 57,-35\" fill=\"#b4a67a\" stroke=\"#294f42\" stroke-width=\"3\" stroke-linejoin=\"round\"/><polygon points=\"37,28 -47,28 -27,12 57,12\" fill=\"#b4a67a\" stroke=\"#294f42\" stroke-width=\"3\" stroke-linejoin=\"round\"/><polygon points=\"-47,28 -47,-19 -27,-35 -27,12\" fill=\"#b4a67a\" stroke=\"#294f42\" stroke-width=\"3\" stroke-linejoin=\"round\"/><polygon points=\"-47,-19 37,-19 37,28 -47,28\" fill=\"#f8c571\" stroke=\"#294f42\" stroke-width=\"3\" stroke-linejoin=\"round\"/></g><line x1=\"136\" y1=\"117\" x2=\"176\" y2=\"117\" stroke=\"#294f42\" stroke-width=\"5\" stroke-linecap=\"round\"/><polygon points=\"165,109 176,117 165,125\" fill=\"#294f42\" stroke=\"#294f42\" stroke-width=\"1\" stroke-linejoin=\"round\"/><g transform=\"translate(224 117) rotate(0) scale(0.89)\" fill=\"#79b5a0\" stroke=\"#294f42\" stroke-width=\"4\" stroke-linejoin=\"round\"><path d=\"M-43 -26H43V26H-43Z\"/></g><g transform=\"translate(331 117) scale(1.09)\"><polygon points=\"-18,-45 51,-45 51,24 -18,24\" fill=\"#c2aa78\" stroke=\"#294f42\" stroke-width=\"3\" stroke-linejoin=\"round\"/><polygon points=\"-38,-29 31,-29 51,-45 -18,-45\" fill=\"#b4a67a\" stroke=\"#294f42\" stroke-width=\"3\" stroke-linejoin=\"round\"/><polygon points=\"31,-29 31,40 51,24 51,-45\" fill=\"#b4a67a\" stroke=\"#294f42\" stroke-width=\"3\" stroke-linejoin=\"round\"/><polygon points=\"31,40 -38,40 -18,24 51,24\" fill=\"#b4a67a\" stroke=\"#294f42\" stroke-width=\"3\" stroke-linejoin=\"round\"/><polygon points=\"-38,40 -38,-29 -18,-45 -18,24\" fill=\"#b4a67a\" stroke=\"#294f42\" stroke-width=\"3\" stroke-linejoin=\"round\"/><polygon points=\"-38,-29 31,-29 31,40 -38,40\" fill=\"#f8c571\" stroke=\"#294f42\" stroke-width=\"3\" stroke-linejoin=\"round\"/></g><line x1=\"396\" y1=\"117\" x2=\"436\" y2=\"117\" stroke=\"#294f42\" stroke-width=\"5\" stroke-linecap=\"round\"/><polygon points=\"425,109 436,117 425,125\" fill=\"#294f42\" stroke=\"#294f42\" stroke-width=\"1\" stroke-linejoin=\"round\"/><g transform=\"translate(484 117) rotate(0) scale(0.89)\" fill=\"#79b5a0\" stroke=\"#294f42\" stroke-width=\"4\" stroke-linejoin=\"round\"><path d=\"M-33 -33H33V33H-33Z\"/></g><g transform=\"translate(591 117) scale(1.09)\"><polygon points=\"-24,19 13,-47 57,19\" fill=\"#c2aa78\" stroke=\"#294f42\" stroke-width=\"3\" stroke-linejoin=\"round\"/><polygon points=\"-44,35 -7,-31 13,-47 -24,19\" fill=\"#b4a67a\" stroke=\"#294f42\" stroke-width=\"3\" stroke-linejoin=\"round\"/><polygon points=\"-7,-31 37,35 57,19 13,-47\" fill=\"#b4a67a\" stroke=\"#294f42\" stroke-width=\"3\" stroke-linejoin=\"round\"/><polygon points=\"37,35 -44,35 -24,19 57,19\" fill=\"#b4a67a\" stroke=\"#294f42\" stroke-width=\"3\" stroke-linejoin=\"round\"/><polygon points=\"-44,35 -7,-31 37,35\" fill=\"#f8c571\" stroke=\"#294f42\" stroke-width=\"3\" stroke-linejoin=\"round\"/></g><line x1=\"656\" y1=\"117\" x2=\"696\" y2=\"117\" stroke=\"#294f42\" stroke-width=\"5\" stroke-linecap=\"round\"/><polygon points=\"685,109 696,117 685,125\" fill=\"#294f42\" stroke=\"#294f42\" stroke-width=\"1\" stroke-linejoin=\"round\"/><g transform=\"translate(744 117) rotate(0) scale(0.89)\" fill=\"#79b5a0\" stroke=\"#294f42\" stroke-width=\"4\" stroke-linejoin=\"round\"><path d=\"M-44 31L-2 -39L44 31Z\"/></g><g transform=\"translate(198 350) scale(1.09)\"><polygon points=\"-25,11 45,11 65,-46 -5,-46\" fill=\"#c2aa78\" stroke=\"#294f42\" stroke-width=\"3\" stroke-linejoin=\"round\"/><polygon points=\"-45,27 25,27 45,11 -25,11\" fill=\"#b4a67a\" stroke=\"#294f42\" stroke-width=\"3\" stroke-linejoin=\"round\"/><polygon points=\"25,27 45,-30 65,-46 45,11\" fill=\"#b4a67a\" stroke=\"#294f42\" stroke-width=\"3\" stroke-linejoin=\"round\"/><polygon points=\"45,-30 -25,-30 -5,-46 65,-46\" fill=\"#b4a67a\" stroke=\"#294f42\" stroke-width=\"3\" stroke-linejoin=\"round\"/><polygon points=\"-25,-30 -45,27 -25,11 -5,-46\" fill=\"#b4a67a\" stroke=\"#294f42\" stroke-width=\"3\" stroke-linejoin=\"round\"/><polygon points=\"-45,27 25,27 45,-30 -25,-30\" fill=\"#f8c571\" stroke=\"#294f42\" stroke-width=\"3\" stroke-linejoin=\"round\"/></g><line x1=\"263\" y1=\"350\" x2=\"303\" y2=\"350\" stroke=\"#294f42\" stroke-width=\"5\" stroke-linecap=\"round\"/><polygon points=\"292,342 303,350 292,358\" fill=\"#294f42\" stroke=\"#294f42\" stroke-width=\"1\" stroke-linejoin=\"round\"/><g transform=\"translate(351 350) rotate(0) scale(0.89)\" fill=\"#79b5a0\" stroke=\"#294f42\" stroke-width=\"4\" stroke-linejoin=\"round\"><path d=\"M-45 28H21L45 -28H-21Z\"/></g><g transform=\"translate(458 350) scale(1.09)\"><path d=\"M-42 -31V22C-42 47 42 47 42 22V-31\" fill=\"#bd8463\" stroke=\"#294f42\" stroke-width=\"3\"/><ellipse cy=\"-31\" rx=\"42\" ry=\"20\" fill=\"#f8c571\" stroke=\"#294f42\" stroke-width=\"3\"/></g><line x1=\"523\" y1=\"350\" x2=\"563\" y2=\"350\" stroke=\"#294f42\" stroke-width=\"5\" stroke-linecap=\"round\"/><polygon points=\"552,342 563,350 552,358\" fill=\"#294f42\" stroke=\"#294f42\" stroke-width=\"1\" stroke-linejoin=\"round\"/><g transform=\"translate(611 350) rotate(0) scale(0.89)\" fill=\"#79b5a0\" stroke=\"#294f42\" stroke-width=\"4\" stroke-linejoin=\"round\"><circle r=\"36\"/></g></svg>",
+      "meaning": "五种物体选定面的描边。圆柱选圆形底面。"
+    },
+    "sort-edges": {
+      "file": "assets/sort-edges.png",
+      "sha256": "2a34bec1e2b462b35b259f8690723b8c3229b30ce28c44deddd504fa363f772f",
+      "type": "precise_code_diagram",
+      "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 720 344\" width=\"720\" height=\"344\"><rect x=\"2\" y=\"2\" width=\"716\" height=\"340\" fill=\"#fff5e3\" stroke=\"#e4d8b7\" stroke-width=\"3\" rx=\"26\"/><rect x=\"28\" y=\"56\" width=\"157\" height=\"233\" fill=\"#fbe1be\" stroke=\"none\" stroke-width=\"0\" rx=\"22\"/><rect x=\"216\" y=\"56\" width=\"476\" height=\"233\" fill=\"#e0ebd1\" stroke=\"none\" stroke-width=\"0\" rx=\"22\"/><g transform=\"translate(104 167) rotate(0) scale(1.19)\" fill=\"#79b5a0\" stroke=\"#294f42\" stroke-width=\"4\" stroke-linejoin=\"round\"><circle r=\"36\"/></g><g transform=\"translate(272 167) rotate(0) scale(0.92)\" fill=\"#79b5a0\" stroke=\"#294f42\" stroke-width=\"4\" stroke-linejoin=\"round\"><path d=\"M-44 31L-2 -39L44 31Z\"/></g><g transform=\"translate(382 167) rotate(90) scale(0.92)\" fill=\"#79b5a0\" stroke=\"#294f42\" stroke-width=\"4\" stroke-linejoin=\"round\"><path d=\"M-43 -26H43V26H-43Z\"/></g><g transform=\"translate(492 167) rotate(45) scale(0.92)\" fill=\"#79b5a0\" stroke=\"#294f42\" stroke-width=\"4\" stroke-linejoin=\"round\"><path d=\"M-33 -33H33V33H-33Z\"/></g><g transform=\"translate(602 167) rotate(0) scale(0.92)\" fill=\"#79b5a0\" stroke=\"#294f42\" stroke-width=\"4\" stroke-linejoin=\"round\"><path d=\"M-45 28H21L45 -28H-21Z\"/></g></svg>",
+      "meaning": "同一套卡先按只有弯边与直边分类。"
+    },
+    "sort-count": {
+      "file": "assets/sort-count.png",
+      "sha256": "37c942930ffa831eccfb9cb21160c536c796bff5288fb34bb4eb8fc80483556a",
+      "type": "precise_code_diagram",
+      "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 720 344\" width=\"720\" height=\"344\"><rect x=\"2\" y=\"2\" width=\"716\" height=\"340\" fill=\"#fff5e3\" stroke=\"#e4d8b7\" stroke-width=\"3\" rx=\"26\"/><rect x=\"28\" y=\"56\" width=\"157\" height=\"233\" fill=\"#fbe1be\" stroke=\"none\" stroke-width=\"0\" rx=\"22\"/><rect x=\"216\" y=\"56\" width=\"476\" height=\"233\" fill=\"#e0ebd1\" stroke=\"none\" stroke-width=\"0\" rx=\"22\"/><g transform=\"translate(104 167) rotate(0) scale(1.19)\" fill=\"#79b5a0\" stroke=\"#294f42\" stroke-width=\"4\" stroke-linejoin=\"round\"><path d=\"M-44 31L-2 -39L44 31Z\"/></g><g transform=\"translate(293 167) rotate(90) scale(1.2)\" fill=\"#79b5a0\" stroke=\"#294f42\" stroke-width=\"4\" stroke-linejoin=\"round\"><path d=\"M-43 -26H43V26H-43Z\"/></g><g transform=\"translate(453 167) rotate(45) scale(1.2)\" fill=\"#79b5a0\" stroke=\"#294f42\" stroke-width=\"4\" stroke-linejoin=\"round\"><path d=\"M-33 -33H33V33H-33Z\"/></g><g transform=\"translate(613 167) rotate(0) scale(1.2)\" fill=\"#79b5a0\" stroke=\"#294f42\" stroke-width=\"4\" stroke-linejoin=\"round\"><path d=\"M-45 28H21L45 -28H-21Z\"/></g></svg>",
+      "meaning": "在直边组继续按三条和四条分。"
+    },
+    "dot-square": {
+      "file": "assets/dot-square.png",
+      "sha256": "d151574ed66ee48f5acfbd8cee8e0bc37dd21558ae31e3dd819386a7435c061f",
+      "type": "precise_code_diagram",
+      "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 600 370\" width=\"600\" height=\"370\"><rect x=\"2\" y=\"2\" width=\"596\" height=\"366\" fill=\"#fff5e3\" stroke=\"#e4d8b7\" stroke-width=\"3\" rx=\"26\"/><circle cx=\"60\" cy=\"46\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"115\" cy=\"46\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"170\" cy=\"46\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"225\" cy=\"46\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"280\" cy=\"46\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"335\" cy=\"46\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"390\" cy=\"46\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"445\" cy=\"46\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"500\" cy=\"46\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"555\" cy=\"46\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"60\" cy=\"101\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"115\" cy=\"101\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"170\" cy=\"101\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"225\" cy=\"101\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"280\" cy=\"101\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"335\" cy=\"101\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"390\" cy=\"101\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"445\" cy=\"101\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"500\" cy=\"101\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"555\" cy=\"101\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"60\" cy=\"156\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"115\" cy=\"156\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"170\" cy=\"156\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"225\" cy=\"156\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"280\" cy=\"156\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"335\" cy=\"156\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"390\" cy=\"156\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"445\" cy=\"156\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"500\" cy=\"156\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"555\" cy=\"156\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"60\" cy=\"211\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"115\" cy=\"211\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"170\" cy=\"211\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"225\" cy=\"211\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"280\" cy=\"211\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"335\" cy=\"211\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"390\" cy=\"211\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"445\" cy=\"211\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"500\" cy=\"211\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"555\" cy=\"211\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"60\" cy=\"266\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"115\" cy=\"266\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"170\" cy=\"266\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"225\" cy=\"266\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"280\" cy=\"266\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"335\" cy=\"266\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"390\" cy=\"266\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"445\" cy=\"266\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"500\" cy=\"266\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"555\" cy=\"266\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"60\" cy=\"321\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"115\" cy=\"321\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"170\" cy=\"321\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"225\" cy=\"321\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"280\" cy=\"321\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"335\" cy=\"321\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"390\" cy=\"321\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"445\" cy=\"321\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"500\" cy=\"321\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"555\" cy=\"321\" r=\"3.7\" fill=\"#b4c3ae\"/><polygon points=\"170,101 335,101 335,266 170,266\" fill=\"#e5bc7470\" stroke=\"#294f42\" stroke-width=\"7\" stroke-linejoin=\"round\"/><circle cx=\"170\" cy=\"101\" r=\"9\" fill=\"#ad613d\"/><circle cx=\"335\" cy=\"101\" r=\"9\" fill=\"#ad613d\"/><circle cx=\"335\" cy=\"266\" r=\"9\" fill=\"#ad613d\"/><circle cx=\"170\" cy=\"266\" r=\"9\" fill=\"#ad613d\"/></svg>",
+      "meaning": "四个等距且相邻边直角的点顺时针围合。"
+    },
+    "turn-square": {
+      "file": "assets/turn-square.png",
+      "sha256": "981ac67bf089b5706cf31820438fcb8c387a8cd739e25c49aa396429250ad072",
+      "type": "precise_code_diagram",
+      "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 600 370\" width=\"600\" height=\"370\"><rect x=\"2\" y=\"2\" width=\"596\" height=\"366\" fill=\"#fff5e3\" stroke=\"#e4d8b7\" stroke-width=\"3\" rx=\"26\"/><circle cx=\"32\" cy=\"50\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"85\" cy=\"50\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"138\" cy=\"50\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"191\" cy=\"50\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"244\" cy=\"50\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"297\" cy=\"50\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"350\" cy=\"50\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"403\" cy=\"50\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"456\" cy=\"50\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"509\" cy=\"50\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"562\" cy=\"50\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"32\" cy=\"103\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"85\" cy=\"103\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"138\" cy=\"103\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"191\" cy=\"103\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"244\" cy=\"103\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"297\" cy=\"103\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"350\" cy=\"103\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"403\" cy=\"103\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"456\" cy=\"103\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"509\" cy=\"103\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"562\" cy=\"103\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"32\" cy=\"156\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"85\" cy=\"156\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"138\" cy=\"156\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"191\" cy=\"156\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"244\" cy=\"156\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"297\" cy=\"156\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"350\" cy=\"156\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"403\" cy=\"156\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"456\" cy=\"156\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"509\" cy=\"156\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"562\" cy=\"156\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"32\" cy=\"209\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"85\" cy=\"209\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"138\" cy=\"209\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"191\" cy=\"209\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"244\" cy=\"209\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"297\" cy=\"209\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"350\" cy=\"209\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"403\" cy=\"209\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"456\" cy=\"209\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"509\" cy=\"209\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"562\" cy=\"209\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"32\" cy=\"262\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"85\" cy=\"262\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"138\" cy=\"262\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"191\" cy=\"262\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"244\" cy=\"262\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"297\" cy=\"262\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"350\" cy=\"262\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"403\" cy=\"262\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"456\" cy=\"262\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"509\" cy=\"262\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"562\" cy=\"262\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"32\" cy=\"315\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"85\" cy=\"315\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"138\" cy=\"315\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"191\" cy=\"315\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"244\" cy=\"315\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"297\" cy=\"315\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"350\" cy=\"315\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"403\" cy=\"315\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"456\" cy=\"315\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"509\" cy=\"315\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"562\" cy=\"315\" r=\"3.7\" fill=\"#b4c3ae\"/><g transform=\"translate(164 174) rotate(0) scale(1.55)\" fill=\"#79b5a0\" stroke=\"#294f42\" stroke-width=\"4\" stroke-linejoin=\"round\"><path d=\"M-33 -33H33V33H-33Z\"/></g><line x1=\"245\" y1=\"174\" x2=\"317\" y2=\"174\" stroke=\"#294f42\" stroke-width=\"5\" stroke-linecap=\"round\"/><polygon points=\"306,166 317,174 306,182\" fill=\"#294f42\" stroke=\"#294f42\" stroke-width=\"1\" stroke-linejoin=\"round\"/><g transform=\"translate(443 174) rotate(45) scale(1.55)\" fill=\"#79b5a0\" stroke=\"#294f42\" stroke-width=\"4\" stroke-linejoin=\"round\"><path d=\"M-33 -33H33V33H-33Z\"/></g></svg>",
+      "meaning": "相同正方形旋转45度，边长和角度保持。"
+    },
+    "repeat-lesson": {
+      "file": "assets/repeat-lesson.png",
+      "sha256": "8616ca269d8c4d63175d8d6cba347373193856e30e36c683d7678b564cadd495",
+      "type": "precise_code_diagram",
+      "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 780 440\" width=\"780\" height=\"440\"><rect x=\"2\" y=\"2\" width=\"776\" height=\"436\" fill=\"#fff5e3\" stroke=\"#e4d8b7\" stroke-width=\"3\" rx=\"26\"/><rect x=\"44\" y=\"110\" width=\"237\" height=\"175\" fill=\"#f3e6ba\" stroke=\"none\" stroke-width=\"0\" rx=\"19\"/><rect x=\"282\" y=\"110\" width=\"237\" height=\"175\" fill=\"#f3e6ba\" stroke=\"none\" stroke-width=\"0\" rx=\"19\"/><g transform=\"translate(103 199) rotate(0) scale(0.98)\" fill=\"#79b5a0\" stroke=\"#294f42\" stroke-width=\"4\" stroke-linejoin=\"round\"><circle r=\"36\"/></g><g transform=\"translate(222 199) rotate(0) scale(0.98)\" fill=\"#79b5a0\" stroke=\"#294f42\" stroke-width=\"4\" stroke-linejoin=\"round\"><path d=\"M-45 28H21L45 -28H-21Z\"/></g><g transform=\"translate(341 199) rotate(0) scale(0.98)\" fill=\"#79b5a0\" stroke=\"#294f42\" stroke-width=\"4\" stroke-linejoin=\"round\"><circle r=\"36\"/></g><g transform=\"translate(460 199) rotate(0) scale(0.98)\" fill=\"#79b5a0\" stroke=\"#294f42\" stroke-width=\"4\" stroke-linejoin=\"round\"><path d=\"M-45 28H21L45 -28H-21Z\"/></g><g transform=\"translate(579 199) rotate(0) scale(0.98)\" fill=\"#79b5a0\" stroke=\"#294f42\" stroke-width=\"4\" stroke-linejoin=\"round\"><circle r=\"36\"/></g><g transform=\"translate(698 199) rotate(0) scale(0.98)\" fill=\"#79b5a0\" stroke=\"#294f42\" stroke-width=\"4\" stroke-linejoin=\"round\"><rect x=\"-35\" y=\"-35\" width=\"70\" height=\"70\" rx=\"9\" fill=\"none\" stroke-dasharray=\"7 5\"/></g><line x1=\"47\" y1=\"315\" x2=\"278\" y2=\"315\" stroke=\"#bc6f4a\" stroke-width=\"6\" stroke-linecap=\"round\"/><line x1=\"285\" y1=\"315\" x2=\"516\" y2=\"315\" stroke=\"#bc6f4a\" stroke-width=\"6\" stroke-linecap=\"round\"/></svg>",
+      "meaning": "圆、斜四边形小段重复两次，下一段只放了圆。"
+    },
+    "wall-opening": {
+      "file": "assets/wall-opening.png",
+      "sha256": "ae82ecbd606c6b50c15cdcb147141fe9e5ff8f1a93a13b0f60813048c197a6cf",
+      "type": "precise_code_diagram",
+      "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 700 390\" width=\"700\" height=\"390\"><rect x=\"2\" y=\"2\" width=\"696\" height=\"386\" fill=\"#fff5e3\" stroke=\"#e4d8b7\" stroke-width=\"3\" rx=\"26\"/><defs><clipPath id=\"walls\"><rect x=\"50\" y=\"71\" width=\"600\" height=\"234\"/></clipPath></defs><g clip-path=\"url(#walls)\"><rect x=\"50\" y=\"71\" width=\"100\" height=\"78\" fill=\"#f0bb69\" stroke=\"#294f42\" stroke-width=\"3\" rx=\"0\"/><rect x=\"150\" y=\"71\" width=\"100\" height=\"78\" fill=\"#f0bb69\" stroke=\"#294f42\" stroke-width=\"3\" rx=\"0\"/><rect x=\"350\" y=\"71\" width=\"100\" height=\"78\" fill=\"#f0bb69\" stroke=\"#294f42\" stroke-width=\"3\" rx=\"0\"/><rect x=\"450\" y=\"71\" width=\"100\" height=\"78\" fill=\"#f0bb69\" stroke=\"#294f42\" stroke-width=\"3\" rx=\"0\"/><rect x=\"550\" y=\"71\" width=\"100\" height=\"78\" fill=\"#f0bb69\" stroke=\"#294f42\" stroke-width=\"3\" rx=\"0\"/><rect x=\"0\" y=\"149\" width=\"100\" height=\"78\" fill=\"#e89560\" stroke=\"#294f42\" stroke-width=\"3\" rx=\"0\"/><rect x=\"100\" y=\"149\" width=\"100\" height=\"78\" fill=\"#e89560\" stroke=\"#294f42\" stroke-width=\"3\" rx=\"0\"/><rect x=\"500\" y=\"149\" width=\"100\" height=\"78\" fill=\"#e89560\" stroke=\"#294f42\" stroke-width=\"3\" rx=\"0\"/><rect x=\"600\" y=\"149\" width=\"100\" height=\"78\" fill=\"#e89560\" stroke=\"#294f42\" stroke-width=\"3\" rx=\"0\"/><rect x=\"50\" y=\"227\" width=\"100\" height=\"78\" fill=\"#d6a67a\" stroke=\"#294f42\" stroke-width=\"3\" rx=\"0\"/><rect x=\"350\" y=\"227\" width=\"100\" height=\"78\" fill=\"#d6a67a\" stroke=\"#294f42\" stroke-width=\"3\" rx=\"0\"/><rect x=\"450\" y=\"227\" width=\"100\" height=\"78\" fill=\"#d6a67a\" stroke=\"#294f42\" stroke-width=\"3\" rx=\"0\"/><rect x=\"550\" y=\"227\" width=\"100\" height=\"78\" fill=\"#d6a67a\" stroke=\"#294f42\" stroke-width=\"3\" rx=\"0\"/></g><rect x=\"50\" y=\"71\" width=\"600\" height=\"234\" fill=\"none\" stroke=\"#294f42\" stroke-width=\"5\" rx=\"0\"/></svg>",
+      "meaning": "错缝新砖墙自上而下缺1、3、2块；缺砖不预画。"
+    },
+    "wall-seams-drawn": {
+      "file": "assets/wall-seams-drawn.png",
+      "sha256": "a1fc33819c801d70098c298dcda5c7786763857726bd8fc81413b46ef89b3fd8",
+      "type": "precise_code_diagram",
+      "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 700 390\" width=\"700\" height=\"390\"><rect x=\"2\" y=\"2\" width=\"696\" height=\"386\" fill=\"#fff5e3\" stroke=\"#e4d8b7\" stroke-width=\"3\" rx=\"26\"/><defs><clipPath id=\"walls\"><rect x=\"50\" y=\"71\" width=\"600\" height=\"234\"/></clipPath></defs><g clip-path=\"url(#walls)\"><rect x=\"50\" y=\"71\" width=\"100\" height=\"78\" fill=\"#f0bb69\" stroke=\"#294f42\" stroke-width=\"3\" rx=\"0\"/><rect x=\"150\" y=\"71\" width=\"100\" height=\"78\" fill=\"#f0bb69\" stroke=\"#294f42\" stroke-width=\"3\" rx=\"0\"/><rect x=\"250\" y=\"71\" width=\"100\" height=\"78\" fill=\"#f5e3bb\" stroke=\"#ad6745\" stroke-width=\"3\" rx=\"0\"/><line x1=\"253\" y1=\"76\" x2=\"253\" y2=\"144\" stroke=\"#ad6745\" stroke-width=\"4\" stroke-dasharray=\"5 8\" stroke-linecap=\"round\"/><rect x=\"350\" y=\"71\" width=\"100\" height=\"78\" fill=\"#f0bb69\" stroke=\"#294f42\" stroke-width=\"3\" rx=\"0\"/><rect x=\"450\" y=\"71\" width=\"100\" height=\"78\" fill=\"#f0bb69\" stroke=\"#294f42\" stroke-width=\"3\" rx=\"0\"/><rect x=\"550\" y=\"71\" width=\"100\" height=\"78\" fill=\"#f0bb69\" stroke=\"#294f42\" stroke-width=\"3\" rx=\"0\"/><rect x=\"0\" y=\"149\" width=\"100\" height=\"78\" fill=\"#e89560\" stroke=\"#294f42\" stroke-width=\"3\" rx=\"0\"/><rect x=\"100\" y=\"149\" width=\"100\" height=\"78\" fill=\"#e89560\" stroke=\"#294f42\" stroke-width=\"3\" rx=\"0\"/><rect x=\"200\" y=\"149\" width=\"100\" height=\"78\" fill=\"#f5e3bb\" stroke=\"#ad6745\" stroke-width=\"3\" rx=\"0\"/><line x1=\"203\" y1=\"154\" x2=\"203\" y2=\"222\" stroke=\"#ad6745\" stroke-width=\"4\" stroke-dasharray=\"5 8\" stroke-linecap=\"round\"/><rect x=\"300\" y=\"149\" width=\"100\" height=\"78\" fill=\"#f5e3bb\" stroke=\"#ad6745\" stroke-width=\"3\" rx=\"0\"/><line x1=\"303\" y1=\"154\" x2=\"303\" y2=\"222\" stroke=\"#ad6745\" stroke-width=\"4\" stroke-dasharray=\"5 8\" stroke-linecap=\"round\"/><rect x=\"400\" y=\"149\" width=\"100\" height=\"78\" fill=\"#f5e3bb\" stroke=\"#ad6745\" stroke-width=\"3\" rx=\"0\"/><line x1=\"403\" y1=\"154\" x2=\"403\" y2=\"222\" stroke=\"#ad6745\" stroke-width=\"4\" stroke-dasharray=\"5 8\" stroke-linecap=\"round\"/><rect x=\"500\" y=\"149\" width=\"100\" height=\"78\" fill=\"#e89560\" stroke=\"#294f42\" stroke-width=\"3\" rx=\"0\"/><rect x=\"600\" y=\"149\" width=\"100\" height=\"78\" fill=\"#e89560\" stroke=\"#294f42\" stroke-width=\"3\" rx=\"0\"/><rect x=\"50\" y=\"227\" width=\"100\" height=\"78\" fill=\"#d6a67a\" stroke=\"#294f42\" stroke-width=\"3\" rx=\"0\"/><rect x=\"150\" y=\"227\" width=\"100\" height=\"78\" fill=\"#f5e3bb\" stroke=\"#ad6745\" stroke-width=\"3\" rx=\"0\"/><line x1=\"153\" y1=\"232\" x2=\"153\" y2=\"300\" stroke=\"#ad6745\" stroke-width=\"4\" stroke-dasharray=\"5 8\" stroke-linecap=\"round\"/><rect x=\"250\" y=\"227\" width=\"100\" height=\"78\" fill=\"#f5e3bb\" stroke=\"#ad6745\" stroke-width=\"3\" rx=\"0\"/><line x1=\"253\" y1=\"232\" x2=\"253\" y2=\"300\" stroke=\"#ad6745\" stroke-width=\"4\" stroke-dasharray=\"5 8\" stroke-linecap=\"round\"/><rect x=\"350\" y=\"227\" width=\"100\" height=\"78\" fill=\"#d6a67a\" stroke=\"#294f42\" stroke-width=\"3\" rx=\"0\"/><rect x=\"450\" y=\"227\" width=\"100\" height=\"78\" fill=\"#d6a67a\" stroke=\"#294f42\" stroke-width=\"3\" rx=\"0\"/><rect x=\"550\" y=\"227\" width=\"100\" height=\"78\" fill=\"#d6a67a\" stroke=\"#294f42\" stroke-width=\"3\" rx=\"0\"/></g><rect x=\"50\" y=\"71\" width=\"600\" height=\"234\" fill=\"none\" stroke=\"#294f42\" stroke-width=\"5\" rx=\"0\"/></svg>",
+      "meaning": "沿每行原缝分出缺砖，标出1、3、2合6块。"
+    },
+    "wall-full-reference": {
+      "file": "assets/wall-full-reference.png",
+      "sha256": "6a6a258817ec21bd639689b45f92c0d25915a16e3a9470d727f857fcb6e5a8dc",
+      "type": "precise_code_diagram",
+      "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 700 390\" width=\"700\" height=\"390\"><rect x=\"2\" y=\"2\" width=\"696\" height=\"386\" fill=\"#fff5e3\" stroke=\"#e4d8b7\" stroke-width=\"3\" rx=\"26\"/><defs><clipPath id=\"walls\"><rect x=\"50\" y=\"71\" width=\"600\" height=\"234\"/></clipPath></defs><g clip-path=\"url(#walls)\"><rect x=\"50\" y=\"71\" width=\"100\" height=\"78\" fill=\"#f0bb69\" stroke=\"#294f42\" stroke-width=\"3\" rx=\"0\"/><rect x=\"150\" y=\"71\" width=\"100\" height=\"78\" fill=\"#f0bb69\" stroke=\"#294f42\" stroke-width=\"3\" rx=\"0\"/><rect x=\"250\" y=\"71\" width=\"100\" height=\"78\" fill=\"#f0bb69\" stroke=\"#294f42\" stroke-width=\"3\" rx=\"0\"/><rect x=\"350\" y=\"71\" width=\"100\" height=\"78\" fill=\"#f0bb69\" stroke=\"#294f42\" stroke-width=\"3\" rx=\"0\"/><rect x=\"450\" y=\"71\" width=\"100\" height=\"78\" fill=\"#f0bb69\" stroke=\"#294f42\" stroke-width=\"3\" rx=\"0\"/><rect x=\"550\" y=\"71\" width=\"100\" height=\"78\" fill=\"#f0bb69\" stroke=\"#294f42\" stroke-width=\"3\" rx=\"0\"/><rect x=\"0\" y=\"149\" width=\"100\" height=\"78\" fill=\"#e89560\" stroke=\"#294f42\" stroke-width=\"3\" rx=\"0\"/><rect x=\"100\" y=\"149\" width=\"100\" height=\"78\" fill=\"#e89560\" stroke=\"#294f42\" stroke-width=\"3\" rx=\"0\"/><rect x=\"200\" y=\"149\" width=\"100\" height=\"78\" fill=\"#e89560\" stroke=\"#294f42\" stroke-width=\"3\" rx=\"0\"/><rect x=\"300\" y=\"149\" width=\"100\" height=\"78\" fill=\"#e89560\" stroke=\"#294f42\" stroke-width=\"3\" rx=\"0\"/><rect x=\"400\" y=\"149\" width=\"100\" height=\"78\" fill=\"#e89560\" stroke=\"#294f42\" stroke-width=\"3\" rx=\"0\"/><rect x=\"500\" y=\"149\" width=\"100\" height=\"78\" fill=\"#e89560\" stroke=\"#294f42\" stroke-width=\"3\" rx=\"0\"/><rect x=\"600\" y=\"149\" width=\"100\" height=\"78\" fill=\"#e89560\" stroke=\"#294f42\" stroke-width=\"3\" rx=\"0\"/><rect x=\"50\" y=\"227\" width=\"100\" height=\"78\" fill=\"#d6a67a\" stroke=\"#294f42\" stroke-width=\"3\" rx=\"0\"/><rect x=\"150\" y=\"227\" width=\"100\" height=\"78\" fill=\"#d6a67a\" stroke=\"#294f42\" stroke-width=\"3\" rx=\"0\"/><rect x=\"250\" y=\"227\" width=\"100\" height=\"78\" fill=\"#d6a67a\" stroke=\"#294f42\" stroke-width=\"3\" rx=\"0\"/><rect x=\"350\" y=\"227\" width=\"100\" height=\"78\" fill=\"#d6a67a\" stroke=\"#294f42\" stroke-width=\"3\" rx=\"0\"/><rect x=\"450\" y=\"227\" width=\"100\" height=\"78\" fill=\"#d6a67a\" stroke=\"#294f42\" stroke-width=\"3\" rx=\"0\"/><rect x=\"550\" y=\"227\" width=\"100\" height=\"78\" fill=\"#d6a67a\" stroke=\"#294f42\" stroke-width=\"3\" rx=\"0\"/></g><rect x=\"50\" y=\"71\" width=\"600\" height=\"234\" fill=\"none\" stroke=\"#294f42\" stroke-width=\"5\" rx=\"0\"/></svg>",
+      "meaning": "三行等长，每行长6整砖；中行两端半块合一整块。"
+    },
+    "whole-and-parts": {
+      "file": "assets/whole-and-parts.png",
+      "sha256": "853af4795dcfca93c0f17acafcfb828050c5bb3e4062be3a3b67699b65d4c35f",
+      "type": "precise_code_diagram",
+      "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 760 415\" width=\"760\" height=\"415\"><rect x=\"2\" y=\"2\" width=\"756\" height=\"411\" fill=\"#fff5e3\" stroke=\"#e4d8b7\" stroke-width=\"3\" rx=\"26\"/><rect x=\"44\" y=\"62\" width=\"104\" height=\"155\" fill=\"#79b5a0\" stroke=\"#294f42\" stroke-width=\"4\" rx=\"0\"/><rect x=\"177\" y=\"62\" width=\"188\" height=\"155\" fill=\"#e89560\" stroke=\"#294f42\" stroke-width=\"4\" rx=\"0\"/><line x1=\"387\" y1=\"139\" x2=\"441\" y2=\"139\" stroke=\"#294f42\" stroke-width=\"5\" stroke-linecap=\"round\"/><polygon points=\"430,131 441,139 430,147\" fill=\"#294f42\" stroke=\"#294f42\" stroke-width=\"1\" stroke-linejoin=\"round\"/><rect x=\"451\" y=\"62\" width=\"104\" height=\"155\" fill=\"#79b5a0\" stroke=\"#294f42\" stroke-width=\"4\" rx=\"0\"/><rect x=\"555\" y=\"62\" width=\"188\" height=\"155\" fill=\"#e89560\" stroke=\"#294f42\" stroke-width=\"4\" rx=\"0\"/><line x1=\"451\" y1=\"249\" x2=\"743\" y2=\"249\" stroke=\"#b6714d\" stroke-width=\"7\" stroke-linecap=\"round\"/><line x1=\"451\" y1=\"243\" x2=\"451\" y2=\"260\" stroke=\"#b6714d\" stroke-width=\"7\" stroke-linecap=\"round\"/><line x1=\"743\" y1=\"243\" x2=\"743\" y2=\"260\" stroke=\"#b6714d\" stroke-width=\"7\" stroke-linecap=\"round\"/></svg>",
+      "meaning": "等高的不等宽两长方形完全贴合，外边构成更宽的长方形。"
+    },
+    "q1-a": {
+      "file": "assets/q1-a.png",
+      "sha256": "a77be6063afa0610a1af2f711867620934809ae3a2dda40a6c236dd9c879c243",
+      "type": "precise_code_diagram",
+      "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 370 300\" width=\"370\" height=\"300\"><rect x=\"2\" y=\"2\" width=\"366\" height=\"296\" fill=\"#fff5e3\" stroke=\"#e4d8b7\" stroke-width=\"3\" rx=\"26\"/><g transform=\"translate(179 157) scale(2.25)\"><polygon points=\"-27,-35 57,-35 57,12 -27,12\" fill=\"#c2aa78\" stroke=\"#294f42\" stroke-width=\"3\" stroke-linejoin=\"round\"/><polygon points=\"-47,-19 37,-19 57,-35 -27,-35\" fill=\"#b4a67a\" stroke=\"#294f42\" stroke-width=\"3\" stroke-linejoin=\"round\"/><polygon points=\"37,-19 37,28 57,12 57,-35\" fill=\"#b4a67a\" stroke=\"#294f42\" stroke-width=\"3\" stroke-linejoin=\"round\"/><polygon points=\"37,28 -47,28 -27,12 57,12\" fill=\"#b4a67a\" stroke=\"#294f42\" stroke-width=\"3\" stroke-linejoin=\"round\"/><polygon points=\"-47,28 -47,-19 -27,-35 -27,12\" fill=\"#b4a67a\" stroke=\"#294f42\" stroke-width=\"3\" stroke-linejoin=\"round\"/><polygon points=\"-47,-19 37,-19 37,28 -47,28\" fill=\"#f8c571\" stroke=\"#294f42\" stroke-width=\"3\" stroke-linejoin=\"round\"/></g></svg>",
+      "meaning": "题1物体高亮面为rect。"
+    },
+    "q1-b": {
+      "file": "assets/q1-b.png",
+      "sha256": "9d70558d08d8b594543f200b936f48eda9c8042543ac31b3fcc1ecdff0a6e9a9",
+      "type": "precise_code_diagram",
+      "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 370 300\" width=\"370\" height=\"300\"><rect x=\"2\" y=\"2\" width=\"366\" height=\"296\" fill=\"#fff5e3\" stroke=\"#e4d8b7\" stroke-width=\"3\" rx=\"26\"/><g transform=\"translate(179 157) scale(2.25)\"><polygon points=\"-18,-45 51,-45 51,24 -18,24\" fill=\"#c2aa78\" stroke=\"#294f42\" stroke-width=\"3\" stroke-linejoin=\"round\"/><polygon points=\"-38,-29 31,-29 51,-45 -18,-45\" fill=\"#b4a67a\" stroke=\"#294f42\" stroke-width=\"3\" stroke-linejoin=\"round\"/><polygon points=\"31,-29 31,40 51,24 51,-45\" fill=\"#b4a67a\" stroke=\"#294f42\" stroke-width=\"3\" stroke-linejoin=\"round\"/><polygon points=\"31,40 -38,40 -18,24 51,24\" fill=\"#b4a67a\" stroke=\"#294f42\" stroke-width=\"3\" stroke-linejoin=\"round\"/><polygon points=\"-38,40 -38,-29 -18,-45 -18,24\" fill=\"#b4a67a\" stroke=\"#294f42\" stroke-width=\"3\" stroke-linejoin=\"round\"/><polygon points=\"-38,-29 31,-29 31,40 -38,40\" fill=\"#f8c571\" stroke=\"#294f42\" stroke-width=\"3\" stroke-linejoin=\"round\"/></g></svg>",
+      "meaning": "题1物体高亮面为square。"
+    },
+    "q1-c": {
+      "file": "assets/q1-c.png",
+      "sha256": "15ca95d31b48d0adc6cbf1d4b92b3d4dbda033f5fd2de22980d5699759c4274a",
+      "type": "precise_code_diagram",
+      "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 370 300\" width=\"370\" height=\"300\"><rect x=\"2\" y=\"2\" width=\"366\" height=\"296\" fill=\"#fff5e3\" stroke=\"#e4d8b7\" stroke-width=\"3\" rx=\"26\"/><g transform=\"translate(179 157) scale(2.25)\"><path d=\"M-42 -31V22C-42 47 42 47 42 22V-31\" fill=\"#bd8463\" stroke=\"#294f42\" stroke-width=\"3\"/><ellipse cy=\"-31\" rx=\"42\" ry=\"20\" fill=\"#f8c571\" stroke=\"#294f42\" stroke-width=\"3\"/></g></svg>",
+      "meaning": "题1物体高亮面为round。"
+    },
+    "q2-a": {
+      "file": "assets/q2-a.png",
+      "sha256": "b2fd55956cbb1862c283161e40fcf1bb2b6a583d96f752b09596cbe11096c4e2",
+      "type": "precise_code_diagram",
+      "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 385 280\" width=\"385\" height=\"280\"><rect x=\"2\" y=\"2\" width=\"381\" height=\"276\" fill=\"#fff5e3\" stroke=\"#e4d8b7\" stroke-width=\"3\" rx=\"26\"/><g transform=\"translate(75 137) rotate(45) scale(1.05)\" fill=\"#79b5a0\" stroke=\"#294f42\" stroke-width=\"4\" stroke-linejoin=\"round\"><path d=\"M-33 -33H33V33H-33Z\"/></g><g transform=\"translate(193 137) rotate(0) scale(1.05)\" fill=\"#79b5a0\" stroke=\"#294f42\" stroke-width=\"4\" stroke-linejoin=\"round\"><path d=\"M-45 28H21L45 -28H-21Z\"/></g><g transform=\"translate(311 137) rotate(18) scale(1.05)\" fill=\"#79b5a0\" stroke=\"#294f42\" stroke-width=\"4\" stroke-linejoin=\"round\"><path d=\"M-44 31L-2 -39L44 31Z\"/></g></svg>",
+      "meaning": "题2同色边数检查组 ['square', 'slant', 'tri']。"
+    },
+    "q2-b": {
+      "file": "assets/q2-b.png",
+      "sha256": "d81c085d165bfc2f57ad15d0a7c1ee06fa672b33048bd2f6084175c0cdce119f",
+      "type": "precise_code_diagram",
+      "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 385 280\" width=\"385\" height=\"280\"><rect x=\"2\" y=\"2\" width=\"381\" height=\"276\" fill=\"#fff5e3\" stroke=\"#e4d8b7\" stroke-width=\"3\" rx=\"26\"/><g transform=\"translate(75 137) rotate(0) scale(1.05)\" fill=\"#79b5a0\" stroke=\"#294f42\" stroke-width=\"4\" stroke-linejoin=\"round\"><path d=\"M-43 -26H43V26H-43Z\"/></g><g transform=\"translate(193 137) rotate(0) scale(1.05)\" fill=\"#79b5a0\" stroke=\"#294f42\" stroke-width=\"4\" stroke-linejoin=\"round\"><circle r=\"36\"/></g><g transform=\"translate(311 137) rotate(0) scale(1.05)\" fill=\"#79b5a0\" stroke=\"#294f42\" stroke-width=\"4\" stroke-linejoin=\"round\"><path d=\"M-33 -33H33V33H-33Z\"/></g></svg>",
+      "meaning": "题2同色边数检查组 ['rect', 'round', 'square']。"
+    },
+    "q2-c": {
+      "file": "assets/q2-c.png",
+      "sha256": "24244743faaf4b307a824982372e40787c7bc971a0a9418ddcbd611895e2869e",
+      "type": "precise_code_diagram",
+      "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 385 280\" width=\"385\" height=\"280\"><rect x=\"2\" y=\"2\" width=\"381\" height=\"276\" fill=\"#fff5e3\" stroke=\"#e4d8b7\" stroke-width=\"3\" rx=\"26\"/><g transform=\"translate(75 137) rotate(45) scale(1.05)\" fill=\"#79b5a0\" stroke=\"#294f42\" stroke-width=\"4\" stroke-linejoin=\"round\"><path d=\"M-33 -33H33V33H-33Z\"/></g><g transform=\"translate(193 137) rotate(90) scale(1.05)\" fill=\"#79b5a0\" stroke=\"#294f42\" stroke-width=\"4\" stroke-linejoin=\"round\"><path d=\"M-43 -26H43V26H-43Z\"/></g><g transform=\"translate(311 137) rotate(0) scale(1.05)\" fill=\"#79b5a0\" stroke=\"#294f42\" stroke-width=\"4\" stroke-linejoin=\"round\"><path d=\"M-45 28H21L45 -28H-21Z\"/></g></svg>",
+      "meaning": "题2同色边数检查组 ['square', 'rect', 'slant']。"
+    },
+    "q3-a": {
+      "file": "assets/q3-a.png",
+      "sha256": "4988436c46990336ad1b668362defe5b9cfd69fdbcb47bb54ecbaf35d60d2d6e",
+      "type": "precise_code_diagram",
+      "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 400 305\" width=\"400\" height=\"305\"><rect x=\"2\" y=\"2\" width=\"396\" height=\"301\" fill=\"#fff5e3\" stroke=\"#e4d8b7\" stroke-width=\"3\" rx=\"26\"/><circle cx=\"60\" cy=\"49\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"116\" cy=\"49\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"172\" cy=\"49\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"228\" cy=\"49\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"284\" cy=\"49\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"340\" cy=\"49\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"60\" cy=\"105\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"116\" cy=\"105\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"172\" cy=\"105\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"228\" cy=\"105\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"284\" cy=\"105\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"340\" cy=\"105\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"60\" cy=\"161\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"116\" cy=\"161\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"172\" cy=\"161\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"228\" cy=\"161\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"284\" cy=\"161\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"340\" cy=\"161\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"60\" cy=\"217\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"116\" cy=\"217\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"172\" cy=\"217\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"228\" cy=\"217\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"284\" cy=\"217\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"340\" cy=\"217\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"60\" cy=\"273\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"116\" cy=\"273\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"172\" cy=\"273\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"228\" cy=\"273\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"284\" cy=\"273\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"340\" cy=\"273\" r=\"3.7\" fill=\"#b4c3ae\"/><line x1=\"116\" y1=\"49\" x2=\"284\" y2=\"49\" stroke=\"#294f42\" stroke-width=\"7\" stroke-linecap=\"round\"/><line x1=\"284\" y1=\"49\" x2=\"284\" y2=\"217\" stroke=\"#294f42\" stroke-width=\"7\" stroke-linecap=\"round\"/><line x1=\"284\" y1=\"217\" x2=\"116\" y2=\"217\" stroke=\"#294f42\" stroke-width=\"7\" stroke-linecap=\"round\"/><line x1=\"116\" y1=\"217\" x2=\"116\" y2=\"49\" stroke=\"#294f42\" stroke-width=\"7\" stroke-linecap=\"round\"/><circle cx=\"116\" cy=\"49\" r=\"8\" fill=\"#b56a46\"/><circle cx=\"284\" cy=\"49\" r=\"8\" fill=\"#b56a46\"/><circle cx=\"284\" cy=\"217\" r=\"8\" fill=\"#b56a46\"/><circle cx=\"116\" cy=\"217\" r=\"8\" fill=\"#b56a46\"/></svg>",
+      "meaning": "题3点子图路径 [(0, 1), (1, 2), (2, 3), (3, 0)]。"
+    },
+    "q3-b": {
+      "file": "assets/q3-b.png",
+      "sha256": "aacbe524b28d5449ef5c6e54fe957b6debe9eafa38fdd3e877994676c766ef3f",
+      "type": "precise_code_diagram",
+      "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 400 305\" width=\"400\" height=\"305\"><rect x=\"2\" y=\"2\" width=\"396\" height=\"301\" fill=\"#fff5e3\" stroke=\"#e4d8b7\" stroke-width=\"3\" rx=\"26\"/><circle cx=\"60\" cy=\"49\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"116\" cy=\"49\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"172\" cy=\"49\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"228\" cy=\"49\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"284\" cy=\"49\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"340\" cy=\"49\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"60\" cy=\"105\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"116\" cy=\"105\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"172\" cy=\"105\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"228\" cy=\"105\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"284\" cy=\"105\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"340\" cy=\"105\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"60\" cy=\"161\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"116\" cy=\"161\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"172\" cy=\"161\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"228\" cy=\"161\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"284\" cy=\"161\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"340\" cy=\"161\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"60\" cy=\"217\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"116\" cy=\"217\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"172\" cy=\"217\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"228\" cy=\"217\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"284\" cy=\"217\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"340\" cy=\"217\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"60\" cy=\"273\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"116\" cy=\"273\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"172\" cy=\"273\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"228\" cy=\"273\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"284\" cy=\"273\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"340\" cy=\"273\" r=\"3.7\" fill=\"#b4c3ae\"/><line x1=\"116\" y1=\"49\" x2=\"284\" y2=\"49\" stroke=\"#294f42\" stroke-width=\"7\" stroke-linecap=\"round\"/><line x1=\"284\" y1=\"49\" x2=\"284\" y2=\"217\" stroke=\"#294f42\" stroke-width=\"7\" stroke-linecap=\"round\"/><line x1=\"284\" y1=\"217\" x2=\"116\" y2=\"217\" stroke=\"#294f42\" stroke-width=\"7\" stroke-linecap=\"round\"/><circle cx=\"116\" cy=\"49\" r=\"8\" fill=\"#b56a46\"/><circle cx=\"284\" cy=\"49\" r=\"8\" fill=\"#b56a46\"/><circle cx=\"284\" cy=\"217\" r=\"8\" fill=\"#b56a46\"/><circle cx=\"116\" cy=\"217\" r=\"8\" fill=\"#b56a46\"/></svg>",
+      "meaning": "题3点子图路径 [(0, 1), (1, 2), (2, 3)]。"
+    },
+    "q3-c": {
+      "file": "assets/q3-c.png",
+      "sha256": "ae768b408826fda9a483781382bf8f211696096b7ab126b635817f80edc2c654",
+      "type": "precise_code_diagram",
+      "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 400 305\" width=\"400\" height=\"305\"><rect x=\"2\" y=\"2\" width=\"396\" height=\"301\" fill=\"#fff5e3\" stroke=\"#e4d8b7\" stroke-width=\"3\" rx=\"26\"/><circle cx=\"60\" cy=\"49\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"116\" cy=\"49\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"172\" cy=\"49\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"228\" cy=\"49\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"284\" cy=\"49\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"340\" cy=\"49\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"60\" cy=\"105\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"116\" cy=\"105\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"172\" cy=\"105\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"228\" cy=\"105\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"284\" cy=\"105\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"340\" cy=\"105\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"60\" cy=\"161\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"116\" cy=\"161\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"172\" cy=\"161\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"228\" cy=\"161\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"284\" cy=\"161\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"340\" cy=\"161\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"60\" cy=\"217\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"116\" cy=\"217\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"172\" cy=\"217\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"228\" cy=\"217\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"284\" cy=\"217\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"340\" cy=\"217\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"60\" cy=\"273\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"116\" cy=\"273\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"172\" cy=\"273\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"228\" cy=\"273\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"284\" cy=\"273\" r=\"3.7\" fill=\"#b4c3ae\"/><circle cx=\"340\" cy=\"273\" r=\"3.7\" fill=\"#b4c3ae\"/><line x1=\"116\" y1=\"49\" x2=\"284\" y2=\"217\" stroke=\"#294f42\" stroke-width=\"7\" stroke-linecap=\"round\"/><line x1=\"284\" y1=\"217\" x2=\"284\" y2=\"49\" stroke=\"#294f42\" stroke-width=\"7\" stroke-linecap=\"round\"/><line x1=\"284\" y1=\"49\" x2=\"116\" y2=\"217\" stroke=\"#294f42\" stroke-width=\"7\" stroke-linecap=\"round\"/><line x1=\"116\" y1=\"217\" x2=\"116\" y2=\"49\" stroke=\"#294f42\" stroke-width=\"7\" stroke-linecap=\"round\"/><circle cx=\"116\" cy=\"49\" r=\"8\" fill=\"#b56a46\"/><circle cx=\"284\" cy=\"49\" r=\"8\" fill=\"#b56a46\"/><circle cx=\"284\" cy=\"217\" r=\"8\" fill=\"#b56a46\"/><circle cx=\"116\" cy=\"217\" r=\"8\" fill=\"#b56a46\"/></svg>",
+      "meaning": "题3点子图路径 [(0, 2), (2, 1), (1, 3), (3, 0)]。"
+    },
+    "q4-stimulus": {
+      "file": "assets/q4-stimulus.png",
+      "sha256": "7f57654af7c3ba313c023be56df13d10c495126a6d96e917b04de4db63fc4b6b",
+      "type": "precise_code_diagram",
+      "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 1000 305\" width=\"1000\" height=\"305\"><rect x=\"2\" y=\"2\" width=\"996\" height=\"301\" fill=\"#fff5e3\" stroke=\"#e4d8b7\" stroke-width=\"3\" rx=\"26\"/><g transform=\"translate(80 144) rotate(0) scale(1.1)\" fill=\"#79b5a0\" stroke=\"#294f42\" stroke-width=\"4\" stroke-linejoin=\"round\"><circle r=\"36\"/></g><g transform=\"translate(200 144) rotate(0) scale(1.1)\" fill=\"#79b5a0\" stroke=\"#294f42\" stroke-width=\"4\" stroke-linejoin=\"round\"><path d=\"M-44 31L-2 -39L44 31Z\"/></g><g transform=\"translate(320 144) rotate(0) scale(1.1)\" fill=\"#79b5a0\" stroke=\"#294f42\" stroke-width=\"4\" stroke-linejoin=\"round\"><path d=\"M-45 28H21L45 -28H-21Z\"/></g><g transform=\"translate(440 144) rotate(0) scale(1.1)\" fill=\"#79b5a0\" stroke=\"#294f42\" stroke-width=\"4\" stroke-linejoin=\"round\"><circle r=\"36\"/></g><g transform=\"translate(560 144) rotate(0) scale(1.1)\" fill=\"#79b5a0\" stroke=\"#294f42\" stroke-width=\"4\" stroke-linejoin=\"round\"><path d=\"M-44 31L-2 -39L44 31Z\"/></g><g transform=\"translate(680 144) rotate(0) scale(1.1)\" fill=\"#79b5a0\" stroke=\"#294f42\" stroke-width=\"4\" stroke-linejoin=\"round\"><path d=\"M-45 28H21L45 -28H-21Z\"/></g><g transform=\"translate(800 144) rotate(0) scale(1.1)\" fill=\"#79b5a0\" stroke=\"#294f42\" stroke-width=\"4\" stroke-linejoin=\"round\"><circle r=\"36\"/></g><g transform=\"translate(920 144) rotate(0) scale(1.1)\" fill=\"#79b5a0\" stroke=\"#294f42\" stroke-width=\"4\" stroke-linejoin=\"round\"><rect x=\"-35\" y=\"-35\" width=\"70\" height=\"70\" rx=\"9\" fill=\"none\" stroke-dasharray=\"7 5\"/></g></svg>",
+      "meaning": "题4重复单元圆、三角形、斜四边形，题干到第三次开头圆形，空位应接三角。"
+    },
+    "q4-a": {
+      "file": "assets/q4-a.png",
+      "sha256": "791cb2e29fe7ea5a50b0f7dc3ca983078a66d6e03ee0634c9cd9ef92e98fc2d5",
+      "type": "precise_code_diagram",
+      "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 370 285\" width=\"370\" height=\"285\"><rect x=\"2\" y=\"2\" width=\"366\" height=\"281\" fill=\"#fff5e3\" stroke=\"#e4d8b7\" stroke-width=\"3\" rx=\"26\"/><g transform=\"translate(185 139) rotate(0) scale(2.24)\" fill=\"#79b5a0\" stroke=\"#294f42\" stroke-width=\"4\" stroke-linejoin=\"round\"><circle r=\"36\"/></g></svg>",
+      "meaning": "题4单一候选图形 round"
+    },
+    "q4-b": {
+      "file": "assets/q4-b.png",
+      "sha256": "8accebaa1a2b5b9c42f8d58d70167434b5a73529318b1612b8c25b0b2a58d223",
+      "type": "precise_code_diagram",
+      "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 370 285\" width=\"370\" height=\"285\"><rect x=\"2\" y=\"2\" width=\"366\" height=\"281\" fill=\"#fff5e3\" stroke=\"#e4d8b7\" stroke-width=\"3\" rx=\"26\"/><g transform=\"translate(185 139) rotate(0) scale(2.24)\" fill=\"#79b5a0\" stroke=\"#294f42\" stroke-width=\"4\" stroke-linejoin=\"round\"><path d=\"M-44 31L-2 -39L44 31Z\"/></g></svg>",
+      "meaning": "题4单一候选图形 tri"
+    },
+    "q4-c": {
+      "file": "assets/q4-c.png",
+      "sha256": "398de6d319d2a654e71a34dda160afa3ae7744f05bc5cdc2f3ace796b49d4002",
+      "type": "precise_code_diagram",
+      "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 370 285\" width=\"370\" height=\"285\"><rect x=\"2\" y=\"2\" width=\"366\" height=\"281\" fill=\"#fff5e3\" stroke=\"#e4d8b7\" stroke-width=\"3\" rx=\"26\"/><g transform=\"translate(185 139) rotate(0) scale(2.24)\" fill=\"#79b5a0\" stroke=\"#294f42\" stroke-width=\"4\" stroke-linejoin=\"round\"><path d=\"M-45 28H21L45 -28H-21Z\"/></g></svg>",
+      "meaning": "题4单一候选图形 slant"
+    },
+    "q5-stimulus": {
+      "file": "assets/q5-stimulus.png",
+      "sha256": "65dfaf8156c2dea38b36b2b563e098be40bb5d70dee94c78180e2024885a9b0e",
+      "type": "precise_code_diagram",
+      "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 700 390\" width=\"700\" height=\"390\"><rect x=\"2\" y=\"2\" width=\"696\" height=\"386\" fill=\"#fff5e3\" stroke=\"#e4d8b7\" stroke-width=\"3\" rx=\"26\"/><defs><clipPath id=\"walls\"><rect x=\"50\" y=\"71\" width=\"600\" height=\"234\"/></clipPath></defs><g clip-path=\"url(#walls)\"><rect x=\"50\" y=\"71\" width=\"100\" height=\"78\" fill=\"#f0bb69\" stroke=\"#294f42\" stroke-width=\"3\" rx=\"0\"/><rect x=\"350\" y=\"71\" width=\"100\" height=\"78\" fill=\"#f0bb69\" stroke=\"#294f42\" stroke-width=\"3\" rx=\"0\"/><rect x=\"450\" y=\"71\" width=\"100\" height=\"78\" fill=\"#f0bb69\" stroke=\"#294f42\" stroke-width=\"3\" rx=\"0\"/><rect x=\"550\" y=\"71\" width=\"100\" height=\"78\" fill=\"#f0bb69\" stroke=\"#294f42\" stroke-width=\"3\" rx=\"0\"/><rect x=\"0\" y=\"149\" width=\"100\" height=\"78\" fill=\"#e89560\" stroke=\"#294f42\" stroke-width=\"3\" rx=\"0\"/><rect x=\"100\" y=\"149\" width=\"100\" height=\"78\" fill=\"#e89560\" stroke=\"#294f42\" stroke-width=\"3\" rx=\"0\"/><rect x=\"500\" y=\"149\" width=\"100\" height=\"78\" fill=\"#e89560\" stroke=\"#294f42\" stroke-width=\"3\" rx=\"0\"/><rect x=\"600\" y=\"149\" width=\"100\" height=\"78\" fill=\"#e89560\" stroke=\"#294f42\" stroke-width=\"3\" rx=\"0\"/><rect x=\"50\" y=\"227\" width=\"100\" height=\"78\" fill=\"#d6a67a\" stroke=\"#294f42\" stroke-width=\"3\" rx=\"0\"/><rect x=\"150\" y=\"227\" width=\"100\" height=\"78\" fill=\"#d6a67a\" stroke=\"#294f42\" stroke-width=\"3\" rx=\"0\"/><rect x=\"250\" y=\"227\" width=\"100\" height=\"78\" fill=\"#d6a67a\" stroke=\"#294f42\" stroke-width=\"3\" rx=\"0\"/><rect x=\"350\" y=\"227\" width=\"100\" height=\"78\" fill=\"#d6a67a\" stroke=\"#294f42\" stroke-width=\"3\" rx=\"0\"/><rect x=\"450\" y=\"227\" width=\"100\" height=\"78\" fill=\"#d6a67a\" stroke=\"#294f42\" stroke-width=\"3\" rx=\"0\"/><rect x=\"550\" y=\"227\" width=\"100\" height=\"78\" fill=\"#d6a67a\" stroke=\"#294f42\" stroke-width=\"3\" rx=\"0\"/></g><rect x=\"50\" y=\"71\" width=\"600\" height=\"234\" fill=\"none\" stroke=\"#294f42\" stroke-width=\"5\" rx=\"0\"/></svg>",
+      "meaning": "题5另排砖缝，三行缺2、3、0合5。"
+    },
+    "q5-a": {
+      "file": "assets/q5-a.png",
+      "sha256": "74b5e81f36e2369cbac2e8943c83ce2c4907b6911c451300dcb666681fae4618",
+      "type": "precise_code_diagram",
+      "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 370 276\" width=\"370\" height=\"276\"><rect x=\"2\" y=\"2\" width=\"366\" height=\"272\" fill=\"#fff5e3\" stroke=\"#e4d8b7\" stroke-width=\"3\" rx=\"26\"/><rect x=\"54\" y=\"87\" width=\"77\" height=\"40\" fill=\"#e89560\" stroke=\"#294f42\" stroke-width=\"3\" rx=\"3\"/><rect x=\"147\" y=\"87\" width=\"77\" height=\"40\" fill=\"#e89560\" stroke=\"#294f42\" stroke-width=\"3\" rx=\"3\"/><rect x=\"240\" y=\"87\" width=\"77\" height=\"40\" fill=\"#e89560\" stroke=\"#294f42\" stroke-width=\"3\" rx=\"3\"/><rect x=\"54\" y=\"147\" width=\"77\" height=\"40\" fill=\"#e89560\" stroke=\"#294f42\" stroke-width=\"3\" rx=\"3\"/></svg>",
+      "meaning": "题5图片表达4块砖。"
+    },
+    "q5-b": {
+      "file": "assets/q5-b.png",
+      "sha256": "d9ad9dea38e0235a25708bd58f9328e98e60b6d4260399fc49d2762ec9530119",
+      "type": "precise_code_diagram",
+      "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 370 276\" width=\"370\" height=\"276\"><rect x=\"2\" y=\"2\" width=\"366\" height=\"272\" fill=\"#fff5e3\" stroke=\"#e4d8b7\" stroke-width=\"3\" rx=\"26\"/><rect x=\"54\" y=\"87\" width=\"77\" height=\"40\" fill=\"#e89560\" stroke=\"#294f42\" stroke-width=\"3\" rx=\"3\"/><rect x=\"147\" y=\"87\" width=\"77\" height=\"40\" fill=\"#e89560\" stroke=\"#294f42\" stroke-width=\"3\" rx=\"3\"/><rect x=\"240\" y=\"87\" width=\"77\" height=\"40\" fill=\"#e89560\" stroke=\"#294f42\" stroke-width=\"3\" rx=\"3\"/><rect x=\"54\" y=\"147\" width=\"77\" height=\"40\" fill=\"#e89560\" stroke=\"#294f42\" stroke-width=\"3\" rx=\"3\"/><rect x=\"147\" y=\"147\" width=\"77\" height=\"40\" fill=\"#e89560\" stroke=\"#294f42\" stroke-width=\"3\" rx=\"3\"/><rect x=\"240\" y=\"147\" width=\"77\" height=\"40\" fill=\"#e89560\" stroke=\"#294f42\" stroke-width=\"3\" rx=\"3\"/></svg>",
+      "meaning": "题5图片表达6块砖。"
+    },
+    "q5-c": {
+      "file": "assets/q5-c.png",
+      "sha256": "72ef95798726d8d31a29806970a8c8ac39b99ce9be20c5485b96d148e5d0c91d",
+      "type": "precise_code_diagram",
+      "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 370 276\" width=\"370\" height=\"276\"><rect x=\"2\" y=\"2\" width=\"366\" height=\"272\" fill=\"#fff5e3\" stroke=\"#e4d8b7\" stroke-width=\"3\" rx=\"26\"/><rect x=\"54\" y=\"87\" width=\"77\" height=\"40\" fill=\"#e89560\" stroke=\"#294f42\" stroke-width=\"3\" rx=\"3\"/><rect x=\"147\" y=\"87\" width=\"77\" height=\"40\" fill=\"#e89560\" stroke=\"#294f42\" stroke-width=\"3\" rx=\"3\"/><rect x=\"240\" y=\"87\" width=\"77\" height=\"40\" fill=\"#e89560\" stroke=\"#294f42\" stroke-width=\"3\" rx=\"3\"/><rect x=\"54\" y=\"147\" width=\"77\" height=\"40\" fill=\"#e89560\" stroke=\"#294f42\" stroke-width=\"3\" rx=\"3\"/><rect x=\"147\" y=\"147\" width=\"77\" height=\"40\" fill=\"#e89560\" stroke=\"#294f42\" stroke-width=\"3\" rx=\"3\"/></svg>",
+      "meaning": "题5图片表达5块砖。"
+    },
+    "q6-stimulus": {
+      "file": "assets/q6-stimulus.png",
+      "sha256": "bbeed0066e7fce0f6d3e3a2bdc3490b65331704a22f440af01259af2917e5f00",
+      "type": "precise_code_diagram",
+      "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 560 300\" width=\"560\" height=\"300\"><rect x=\"2\" y=\"2\" width=\"556\" height=\"296\" fill=\"#fff5e3\" stroke=\"#e4d8b7\" stroke-width=\"3\" rx=\"26\"/><rect x=\"84\" y=\"53\" width=\"392\" height=\"196\" fill=\"none\" stroke=\"#294f42\" stroke-width=\"7\" rx=\"0\"/><line x1=\"280\" y1=\"53\" x2=\"280\" y2=\"249\" stroke=\"#aa6f4a\" stroke-width=\"5\" stroke-dasharray=\"10 12\" stroke-linecap=\"round\"/></svg>",
+      "meaning": "题6长方形长为宽的两倍，正中虚线，精确1:2。"
+    },
+    "q6-a": {
+      "file": "assets/q6-a.png",
+      "sha256": "8062c6bcfbe5e30ef492eeeb86a3b18a9df1c978c4236555f9374c50ad09ee28",
+      "type": "precise_code_diagram",
+      "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 370 276\" width=\"370\" height=\"276\"><rect x=\"2\" y=\"2\" width=\"366\" height=\"272\" fill=\"#fff5e3\" stroke=\"#e4d8b7\" stroke-width=\"3\" rx=\"26\"/><rect x=\"53\" y=\"79\" width=\"106\" height=\"106\" fill=\"#79b5a0\" stroke=\"#294f42\" stroke-width=\"5\" rx=\"0\"/><rect x=\"195\" y=\"79\" width=\"106\" height=\"106\" fill=\"#e89560\" stroke=\"#294f42\" stroke-width=\"5\" rx=\"0\"/></svg>",
+      "meaning": "题6两部分等比例图，第二块宽106，三角形=False。"
+    },
+    "q6-b": {
+      "file": "assets/q6-b.png",
+      "sha256": "1c3ea35170154a84f4bd1abb386fcacef02c041365725967e5d272225a584463",
+      "type": "precise_code_diagram",
+      "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 370 276\" width=\"370\" height=\"276\"><rect x=\"2\" y=\"2\" width=\"366\" height=\"272\" fill=\"#fff5e3\" stroke=\"#e4d8b7\" stroke-width=\"3\" rx=\"26\"/><rect x=\"53\" y=\"79\" width=\"106\" height=\"106\" fill=\"#79b5a0\" stroke=\"#294f42\" stroke-width=\"5\" rx=\"0\"/><rect x=\"195\" y=\"79\" width=\"70\" height=\"106\" fill=\"#e89560\" stroke=\"#294f42\" stroke-width=\"5\" rx=\"0\"/></svg>",
+      "meaning": "题6两部分等比例图，第二块宽70，三角形=False。"
+    },
+    "q6-c": {
+      "file": "assets/q6-c.png",
+      "sha256": "2a09ff35525b3c9689069e2466a113a53dc920afe4b0c3a95592cf02d0a4c9e0",
+      "type": "precise_code_diagram",
+      "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 370 276\" width=\"370\" height=\"276\"><rect x=\"2\" y=\"2\" width=\"366\" height=\"272\" fill=\"#fff5e3\" stroke=\"#e4d8b7\" stroke-width=\"3\" rx=\"26\"/><rect x=\"53\" y=\"79\" width=\"106\" height=\"106\" fill=\"#79b5a0\" stroke=\"#294f42\" stroke-width=\"5\" rx=\"0\"/><polygon points=\"195,185 301,185 301,79\" fill=\"#e89560\" stroke=\"#294f42\" stroke-width=\"5\" stroke-linejoin=\"round\"/></svg>",
+      "meaning": "题6两部分等比例图，第二块宽106，三角形=True。"
+    }
+  }
+}

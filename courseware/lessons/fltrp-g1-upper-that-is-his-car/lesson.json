@@ -1,0 +1,1070 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "Unit 2 That is his car.",
+  "description": "在社区手作日的招领台听懂家人的称呼、物品归属和远近，再用一张小图做介绍。",
+  "grade": 1,
+  "roster": {
+    "mia": {
+      "name": "Mia 老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Jennifer",
+      "avatar": "/teachers/coco-english-v1.png",
+      "color": "#557B76",
+      "persona": "用适合六岁孩子的短句引导听和说，先让孩子观察或猜，再示范完整英语。"
+    }
+  },
+  "images": {
+    "return-desk-art": {
+      "file": "assets/illustrations/return-desk-art.png"
+    },
+    "sibling-art": {
+      "file": "assets/illustrations/sibling-art.png"
+    },
+    "owners-art": {
+      "file": "assets/illustrations/owners-art.png"
+    },
+    "sort-plan-art": {
+      "file": "assets/illustrations/sort-plan-art.png"
+    },
+    "position-art": {
+      "file": "assets/illustrations/position-art.png"
+    },
+    "car-story": {
+      "file": "assets/illustrations/car-story.png"
+    },
+    "rhythm-art": {
+      "file": "assets/illustrations/rhythm-art.png"
+    },
+    "album-art": {
+      "file": "assets/illustrations/album-art.png"
+    },
+    "depot-start": {
+      "file": "assets/illustrations/depot-start.png"
+    },
+    "bubble-start": {
+      "file": "assets/illustrations/bubble-start.png"
+    },
+    "depot-backdrop": {
+      "file": "assets/illustrations/depot-backdrop.png"
+    },
+    "bubble-backdrop": {
+      "file": "assets/illustrations/bubble-backdrop.png"
+    },
+    "depot-cart": {
+      "file": "assets/illustrations/depot-cart.png"
+    },
+    "depot-cart-push": {
+      "file": "assets/illustrations/depot-cart-push.png"
+    },
+    "bubble-boat": {
+      "file": "assets/illustrations/bubble-boat.png"
+    },
+    "bubble-boat-pop": {
+      "file": "assets/illustrations/bubble-boat-pop.png"
+    },
+    "home-sticker": {
+      "file": "assets/illustrations/home-sticker.png"
+    },
+    "owner-ben": {
+      "file": "assets/illustrations/owner-ben.png"
+    },
+    "owner-lili": {
+      "file": "assets/illustrations/owner-lili.png"
+    },
+    "item-book": {
+      "file": "assets/illustrations/item-book.png"
+    },
+    "item-pen": {
+      "file": "assets/illustrations/item-pen.png"
+    },
+    "item-bag": {
+      "file": "assets/illustrations/item-bag.png"
+    },
+    "item-desk": {
+      "file": "assets/illustrations/item-desk.png"
+    },
+    "near-book": {
+      "file": "assets/illustrations/near-book.png"
+    },
+    "near-car": {
+      "file": "assets/illustrations/near-car.png"
+    },
+    "near-ball": {
+      "file": "assets/illustrations/near-ball.png"
+    },
+    "near-desk": {
+      "file": "assets/illustrations/near-desk.png"
+    },
+    "near-pen": {
+      "file": "assets/illustrations/near-pen.png"
+    },
+    "far-book": {
+      "file": "assets/illustrations/far-book.png"
+    },
+    "far-car": {
+      "file": "assets/illustrations/far-car.png"
+    },
+    "far-ball": {
+      "file": "assets/illustrations/far-ball.png"
+    },
+    "far-desk": {
+      "file": "assets/illustrations/far-desk.png"
+    },
+    "far-pen": {
+      "file": "assets/illustrations/far-pen.png"
+    },
+    "q1-sister": {
+      "file": "assets/illustrations/q1-sister.png"
+    },
+    "q1-brother": {
+      "file": "assets/illustrations/q1-brother.png"
+    },
+    "q1-grandpa": {
+      "file": "assets/illustrations/q1-grandpa.png"
+    },
+    "q2-her-bag": {
+      "file": "assets/illustrations/q2-her-bag.png"
+    },
+    "q2-his-bag": {
+      "file": "assets/illustrations/q2-his-bag.png"
+    },
+    "q2-her-pen": {
+      "file": "assets/illustrations/q2-her-pen.png"
+    },
+    "q3-his-book": {
+      "file": "assets/illustrations/q3-his-book.png"
+    },
+    "q3-her-ball": {
+      "file": "assets/illustrations/q3-her-ball.png"
+    },
+    "q3-his-ball": {
+      "file": "assets/illustrations/q3-his-ball.png"
+    },
+    "q4-near-his": {
+      "file": "assets/illustrations/q4-near-his.png"
+    },
+    "q4-far-his": {
+      "file": "assets/illustrations/q4-far-his.png"
+    },
+    "q4-far-her": {
+      "file": "assets/illustrations/q4-far-her.png"
+    },
+    "q5-near-far-her": {
+      "file": "assets/illustrations/q5-near-far-her.png"
+    },
+    "q5-near-far-swap": {
+      "file": "assets/illustrations/q5-near-far-swap.png"
+    },
+    "q5-far-near-her": {
+      "file": "assets/illustrations/q5-far-near-her.png"
+    },
+    "q6-sister-near-book": {
+      "file": "assets/illustrations/q6-sister-near-book.png"
+    },
+    "q6-brother-far-book": {
+      "file": "assets/illustrations/q6-brother-far-book.png"
+    },
+    "q6-sister-far-book": {
+      "file": "assets/illustrations/q6-sister-far-book.png"
+    },
+    "cue-objects-art": {
+      "file": "assets/illustrations/cue-objects-art.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "return-desk",
+      "type": "slide",
+      "title": "招领台开张",
+      "template": "title-picture",
+      "data": {
+        "title": "招领台开张",
+        "picture": "return-desk-art",
+        "caption": "Who owns it?"
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "See the lost and found desk."
+        },
+        {
+          "say": "有个小汽车忘在桌上了。是谁带来的？"
+        },
+        {
+          "say": "玛雅来认东西。她带来了一张自己的家庭小图。"
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "Who owns it?"
+        },
+        {
+          "say": "我们先听她介绍谁，再找那个人的东西。"
+        },
+        {
+          "say": "东西摆在一起，也可能属于不同的人。"
+        },
+        {
+          "say": "今天我们来做招领小帮手。先听清楚，再动手还。"
+        }
+      ]
+    },
+    {
+      "key": "sibling-pictures",
+      "type": "slide",
+      "title": "听玛雅介绍家人",
+      "template": "picture-points",
+      "data": {
+        "title": "听玛雅介绍家人",
+        "picture": "sibling-art",
+        "points": [
+          "Maya",
+          "my brother",
+          "my sister"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "看看这张家庭小图。谁正在介绍家人？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "This is Maya."
+        },
+        {
+          "say": "说话的人是玛雅。她说的家人都从她来认。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "This is my brother."
+        },
+        {
+          "say": "玛雅指着自己的兄弟本。哥哥和弟弟都可以这样说。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "This is my sister."
+        },
+        {
+          "say": "她又指自己的姐妹莉莉。姐姐和妹妹都可以这样说。"
+        },
+        {
+          "say": "现在你指着一张家人图。"
+        },
+        {
+          "say": "先找到说话的人，再选一个称呼。"
+        }
+      ]
+    },
+    {
+      "key": "his-her-objects",
+      "type": "slide",
+      "title": "看清是谁的",
+      "template": "picture-points",
+      "data": {
+        "title": "看清是谁的",
+        "picture": "owners-art",
+        "points": [
+          "Ben and his book",
+          "Lili and her pen",
+          "先找主人，再找物品"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "本和莉莉把物品放到招领台，等着领回去。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "This is Ben. This is his book."
+        },
+        {
+          "say": "先介绍本，再说这本书属于他。我们用 his。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "This is Lili. This is her pen."
+        },
+        {
+          "say": "莉莉放下的是笔。我们刚说到莉莉，所以用 her。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "两件东西靠得很近。听清谁带来的，才能找对主人。"
+        },
+        {
+          "say": "下一轮交换东西，归属也会变。每回先听新线索。"
+        }
+      ]
+    },
+    {
+      "key": "sort-cues",
+      "type": "slide",
+      "title": "听一句，再还一件",
+      "template": "picture-points",
+      "data": {
+        "title": "听一句，再还一件",
+        "picture": "sort-plan-art",
+        "points": [
+          "Book and pen",
+          "Desk, bag and pen",
+          "听完再推"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "招领台的照片告诉你该把东西还给谁。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "His book. Her pen."
+        },
+        {
+          "say": "这一轮，书给本，笔给莉莉。看两人的照片。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "Her desk. His bag and pen."
+        },
+        {
+          "say": "His desk and bag. Her book and pen."
+        },
+        {
+          "say": "换一轮，主人也可能换。把物品词和主人一起听。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "Listen again. Who owns it?"
+        },
+        {
+          "say": "绕到物品后面再推。也可以先撤回一步。"
+        },
+        {
+          "say": "Nice work. The things are back!"
+        }
+      ]
+    },
+    {
+      "key": "owner-depot",
+      "type": "interactive",
+      "title": "把东西还给家人",
+      "page": "owner-depot",
+      "widgetType": "simulation",
+      "startImage": "depot-start",
+      "gameAudio": {
+        "owners-one": "sort-cues-4",
+        "owners-two": "sort-cues-7",
+        "owners-three": "sort-cues-8",
+        "owners-hint": "sort-cues-11",
+        "owners-help": "sort-cues-12",
+        "owners-praise": "sort-cues-13"
+      },
+      "script": [
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#first-owner"
+        },
+        {
+          "say": "这是本的照片。本的东西要到这个托盘里。"
+        },
+        {
+          "highlight": "#game-target"
+        },
+        {
+          "say": "His book."
+        },
+        {
+          "say": "先听主人，再看这本书。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "让小车到书的后面。按右箭头，书才往前走。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "看小车往哪边推，等书进了托盘，再看它停在哪儿。"
+        },
+        {
+          "say": "现在轮到你。听完再推，没听清就点小喇叭。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ]
+    },
+    {
+      "key": "from-the-speaker",
+      "type": "slide",
+      "title": "说话的人站在哪儿",
+      "template": "picture-points",
+      "data": {
+        "title": "说话的人站在哪儿",
+        "picture": "position-art",
+        "points": [
+          "This is his book.",
+          "That is his book.",
+          "主人没变，his留着"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "本的书还在桌上。玛雅先站在书旁边。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "This is his book."
+        },
+        {
+          "say": "玛雅离书很近。她指着手边的书，说 this。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "现在她走远了。请你看看，书还在原来的地方。"
+        },
+        {
+          "say": "That is his book."
+        },
+        {
+          "say": "从玛雅站的地方看，书远了。她改说 that。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "这一直是本的书。远近变了，his 还是他的。"
+        },
+        {
+          "say": "你也可以走近走远，对同一本书分别说两句。"
+        }
+      ]
+    },
+    {
+      "key": "car-owner",
+      "type": "slide",
+      "title": "爸爸的车和本的玩具车",
+      "template": "picture-points",
+      "data": {
+        "title": "爸爸的车和本的玩具车",
+        "picture": "car-story",
+        "points": [
+          "Dad and his car",
+          "Ben and his toy car",
+          "看清指的是哪辆车"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "门外停着一辆车。玛雅先指着自己的爸爸。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "This is my father."
+        },
+        {
+          "say": "That is his car."
+        },
+        {
+          "say": "那是一辆真车，在门外。它属于爸爸。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "招领台上也有小汽车。这辆玩具汽车是本的。"
+        },
+        {
+          "say": "That is his toy car."
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "两个东西都叫车。先听介绍了谁，再看指的是哪一辆。"
+        }
+      ]
+    },
+    {
+      "key": "listen-cues",
+      "type": "slide",
+      "title": "听近远，也听物品",
+      "template": "picture-points",
+      "data": {
+        "title": "听近远，也听物品",
+        "picture": "cue-objects-art",
+        "points": [
+          "Lili and her ball",
+          "Lili and her desk",
+          "Ben and his pen"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "换一轮了。莉莉有球和小桌子，本带来一支笔。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "跟着玛雅先走近，再走远。听她怎么指同一个球。"
+        },
+        {
+          "say": "This is her ball."
+        },
+        {
+          "say": "That is her ball."
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "换成小桌子，主人还是莉莉。离得远近照样要看。"
+        },
+        {
+          "say": "This is her desk."
+        },
+        {
+          "say": "That is her desk."
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "现在说的是本的笔。先找说话的人，再看笔在哪里。"
+        },
+        {
+          "say": "This is his pen."
+        },
+        {
+          "say": "That is his pen."
+        },
+        {
+          "say": "Listen again. Is it near or far?"
+        },
+        {
+          "say": "先找说话的孩子，再看看物品放在哪里。"
+        },
+        {
+          "say": "You heard the word and the place!"
+        }
+      ]
+    },
+    {
+      "key": "listen-and-find",
+      "type": "interactive",
+      "title": "听近远，吹泡泡",
+      "page": "listen-and-find",
+      "widgetType": "simulation",
+      "startImage": "bubble-start",
+      "gameAudio": {
+        "near-book": "from-the-speaker-4",
+        "far-book": "from-the-speaker-8",
+        "far-car": "car-owner-9",
+        "near-ball": "listen-cues-5",
+        "far-ball": "listen-cues-6",
+        "near-desk": "listen-cues-9",
+        "far-desk": "listen-cues-10",
+        "near-pen": "listen-cues-13",
+        "far-pen": "listen-cues-14",
+        "distance-hint": "listen-cues-15",
+        "distance-help": "listen-cues-16",
+        "distance-praise": "listen-cues-17"
+      },
+      "script": [
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#game-goal"
+        },
+        {
+          "say": "上面两张图都是书。看看它离说话的人近不近。"
+        },
+        {
+          "highlight": "#game-target"
+        },
+        {
+          "say": "听，This is his book. 先想想该选哪幅。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "按左右箭头，把小艇对过去，再按圆圈吹泡泡。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "看泡泡往哪飞。等碰到书图，再看看泡泡里是哪幅。"
+        },
+        {
+          "say": "轮到你。听物品名，也听开头，再对准你选的图。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ]
+    },
+    {
+      "key": "rhythm-turns",
+      "type": "slide",
+      "title": "跟节奏说家人和物品",
+      "template": "picture-points",
+      "data": {
+        "title": "跟节奏说家人和物品",
+        "picture": "rhythm-art",
+        "points": [
+          "指一指家人",
+          "再指那件物品",
+          "换一张图再说"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "我们一拍指家人，一拍再指东西。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "This is my brother."
+        },
+        {
+          "say": "先指本，让别人知道你在说谁。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "That is his bag."
+        },
+        {
+          "say": "再指离自己远的书包。现在给你一点时间跟说。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "This is my sister."
+        },
+        {
+          "say": "That is her ball."
+        },
+        {
+          "say": "换了人也换了东西。试着拍两下，把两句说完。"
+        }
+      ]
+    },
+    {
+      "key": "my-picture",
+      "type": "slide",
+      "title": "画一张小图，说两句",
+      "template": "picture-points",
+      "data": {
+        "title": "画一张小图，说两句",
+        "picture": "album-art",
+        "points": [
+          "画一位家人",
+          "画一件家人的物品",
+          "先说人，再说物"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "纸上这张小图是我自己想出来的家人。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "我先画一位奶奶。你也可以画一个想象的家庭。"
+        },
+        {
+          "say": "This is my grandma."
+        },
+        {
+          "say": "右边有两张照片。上面是奶奶，下面是爷爷。"
+        },
+        {
+          "say": "This is my grandpa."
+        },
+        {
+          "say": "我在纸上画的是上面的奶奶，再画她的铅笔。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "我把奶奶的铅笔画在手边。你看，纸上还有奶奶的样子。"
+        },
+        {
+          "say": "This is her pencil."
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "先指人，再说这件东西属于谁。"
+        },
+        {
+          "say": "按暂停，画一人一物。换到远一点的位置再说。"
+        },
+        {
+          "say": "请家人听你真的说了什么，还能换一件东西试试。"
+        }
+      ]
+    },
+    {
+      "key": "picture-check",
+      "type": "quiz",
+      "title": "听两句，选一幅新图",
+      "intro": [
+        "这几幅图都换了小故事。先听清，再选。",
+        "你可以重听一遍，再点你想选的图。"
+      ],
+      "questions": [
+        {
+          "id": "q-intro-brother",
+          "question": "玛雅正在介绍自己的家人。This is my brother.",
+          "skill": "hear-sibling-words",
+          "answer": [
+            "B"
+          ],
+          "analysis": "玛雅在介绍自己的家人。brother 指她的兄弟。图里她指着男孩本的照片。",
+          "options": {
+            "A": {
+              "label": "玛雅指家人小图里的姐妹莉莉",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-sister",
+                "alt": "玛雅指家人小图里的姐妹莉莉"
+              }
+            },
+            "B": {
+              "label": "玛雅指家人小图里的兄弟本",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-brother",
+                "alt": "玛雅指家人小图里的兄弟本"
+              }
+            },
+            "C": {
+              "label": "玛雅指家人小图里的爷爷",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-grandpa",
+                "alt": "玛雅指家人小图里的爷爷"
+              }
+            }
+          }
+        },
+        {
+          "id": "q-sister-bag",
+          "question": "This is my sister. Find her bag.",
+          "skill": "identify-the-owner",
+          "answer": [
+            "A"
+          ],
+          "analysis": "先听到她介绍自己的姐妹，再听her bag。要同时找到莉莉和归她的书包。",
+          "options": {
+            "A": {
+              "label": "莉莉头像和属于她的书包",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-her-bag",
+                "alt": "莉莉头像和属于她的书包"
+              }
+            },
+            "B": {
+              "label": "本头像和属于他的书包",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-his-bag",
+                "alt": "本头像和属于他的书包"
+              }
+            },
+            "C": {
+              "label": "莉莉头像和属于她的笔",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-her-pen",
+                "alt": "莉莉头像和属于她的笔"
+              }
+            }
+          }
+        },
+        {
+          "id": "q-brother-ball",
+          "question": "This is my brother. Find his ball.",
+          "skill": "identify-the-owner",
+          "answer": [
+            "C"
+          ],
+          "analysis": "his说的是刚提到的兄弟本，ball是球。选他头像和球在一起的图。",
+          "options": {
+            "A": {
+              "label": "本头像和他的书",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-his-book",
+                "alt": "本头像和他的书"
+              }
+            },
+            "B": {
+              "label": "莉莉头像和她的球",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-her-ball",
+                "alt": "莉莉头像和她的球"
+              }
+            },
+            "C": {
+              "label": "本头像和他的球",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-his-ball",
+                "alt": "本头像和他的球"
+              }
+            }
+          }
+        },
+        {
+          "id": "q-far-pencil",
+          "question": "This is Grandpa. That is his pencil.",
+          "skill": "distance-and-ownership",
+          "answer": [
+            "B"
+          ],
+          "analysis": "that说铅笔离说话的孩子较远。his说明铅笔属于刚介绍的爷爷。",
+          "options": {
+            "A": {
+              "label": "铅笔在玛雅身边，旁边是爷爷头像",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-near-his",
+                "alt": "铅笔在玛雅身边，旁边是爷爷头像"
+              }
+            },
+            "B": {
+              "label": "铅笔远离玛雅，旁边是爷爷头像",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-far-his",
+                "alt": "铅笔远离玛雅，旁边是爷爷头像"
+              }
+            },
+            "C": {
+              "label": "铅笔远离玛雅，旁边是奶奶头像",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-far-her",
+                "alt": "铅笔远离玛雅，旁边是奶奶头像"
+              }
+            }
+          }
+        },
+        {
+          "id": "q-book-two-positions",
+          "question": "This is her book. That is her book.",
+          "skill": "distance-and-ownership",
+          "answer": [
+            "A"
+          ],
+          "analysis": "第一次指书用this，书离玛雅近。第二次用that，书离玛雅远。两次都说her book，主人一直是莉莉。",
+          "options": {
+            "A": {
+              "label": "两幅中书都归莉莉，先离玛雅近再离她远",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-near-far-her",
+                "alt": "两幅中书都归莉莉，先离玛雅近再离她远"
+              }
+            },
+            "B": {
+              "label": "书先归莉莉，远处的书换成本的",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-near-far-swap",
+                "alt": "书先归莉莉，远处的书换成本的"
+              }
+            },
+            "C": {
+              "label": "书都归莉莉，先远后近",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-far-near-her",
+                "alt": "书都归莉莉，先远后近"
+              }
+            }
+          }
+        },
+        {
+          "id": "q-two-sentences",
+          "question": "This is my sister. That is her book.",
+          "skill": "family-picture-talk",
+          "answer": [
+            "C"
+          ],
+          "analysis": "先指身边的姐妹莉莉，再指远处的书。her让我们知道书属于莉莉。",
+          "options": {
+            "A": {
+              "label": "玛雅介绍身边的莉莉，莉莉的书也在身边",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-sister-near-book",
+                "alt": "玛雅介绍身边的莉莉，莉莉的书也在身边"
+              }
+            },
+            "B": {
+              "label": "玛雅介绍身边的本，远处是本的书",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-brother-far-book",
+                "alt": "玛雅介绍身边的本，远处是本的书"
+              }
+            },
+            "C": {
+              "label": "玛雅介绍身边的莉莉，远处是莉莉的书",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-sister-far-book",
+                "alt": "玛雅介绍身边的莉莉，远处是莉莉的书"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "closing",
+      "type": "slide",
+      "title": "招领台要收工了",
+      "template": "summary",
+      "data": {
+        "title": "招领台要收工了",
+        "items": [
+          "先听家人的称呼",
+          "this和that看站位",
+          "his和her看主人",
+          "用两句完整介绍"
+        ]
+      },
+      "script": [
+        {
+          "say": "招领台收工了。哪两条线索帮你把东西还对？"
+        },
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "听到 brother 或 sister，先在图里找到那位家人。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "先找说话的人。手边的用 this，远一点的用 that。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "再找东西属于谁。刚说到本，可以说 his。"
+        },
+        {
+          "say": "刚说到莉莉，就用 her。东西的样子没有替你选主人。"
+        },
+        {
+          "spotlight": "item-4"
+        },
+        {
+          "say": "翻到纸书第五十九到六十一页。"
+        },
+        {
+          "say": "指着图，和家人练说。"
+        },
+        {
+          "say": "用自己的小图介绍一人和一件东西，请家人听听。"
+        }
+      ]
+    }
+  ]
+}

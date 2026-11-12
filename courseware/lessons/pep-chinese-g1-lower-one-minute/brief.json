@@ -1,0 +1,231 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "一分钟",
+  "binding": {
+    "editionId": "pep-chinese-g1-lower-2022-standard",
+    "revisionId": "directory-b30168cf88d5ee5709335698",
+    "nodeId": "2571950e-83e9-436f-bc4f-32a4b1780d14",
+    "unitId": "e7efd7e6-2a62-4a7b-9ebc-c8a5632c5f11"
+  },
+  "scenario": "学校故事工坊收到顺序打乱的声音和情节卡。孩子帮讲述员找回元元上学的经过，再讲一个自己的时间发现。",
+  "goals": [
+    "借图和语音听懂六段先后，用线索说明多睡一分钟后来为什么迟到二十分钟。",
+    "用要是与就说出一种可能的经过，区分实际发生与推想，体会人物语气。",
+    "在语境认读十二字，辨背的两种语音和已己字形，按规范练写七字。",
+    "在成人计时下试做一分钟活动，口头报告实际结果。"
+  ],
+  "goalSources": [
+    {
+      "skill": "story-cause",
+      "target": "借图和语音听懂六段先后，用线索说明多睡一分钟后来为什么迟到二十分钟。",
+      "source": "印81～82、第一课时课件4～16、第二课时教案1～2"
+    },
+    {
+      "skill": "conditional-speech",
+      "target": "用要是与就说出一种可能的经过，区分实际发生与推想，体会人物语气。",
+      "source": "印83、第二课时课件13～21、教案2～3"
+    },
+    {
+      "skill": "read-and-write",
+      "target": "在语境认读十二字，辨背的两种语音和已己字形，按规范练写七字。",
+      "source": "印83、两课时写字页、GF 0023—2020"
+    },
+    {
+      "skill": "one-minute-observation",
+      "target": "在成人计时下试做一分钟活动，口头报告实际结果。",
+      "source": "印83、第二课时课后练习1"
+    }
+  ],
+  "pageSequence": [
+    {
+      "key": "the-clock-and-the-seat",
+      "kind": "teaching",
+      "plan": "闹钟响了，元元怎么想。钟 · 闹钟。再等一小会儿。坐起来。"
+    },
+    {
+      "key": "carry-the-bag",
+      "kind": "teaching",
+      "plan": "洗脸、吃饭，再背书包。洗脸 · 吃早饭。背 · 第一声。后背 · 第四声。"
+    },
+    {
+      "key": "wait-at-the-crossing",
+      "kind": "teaching",
+      "plan": "路口为什么要等一下。灯 · 红灯。等 · 第三声。信号允许再走。着急的语气。"
+    },
+    {
+      "key": "bus-then-walking",
+      "kind": "teaching",
+      "plan": "公交走了，元元怎么办。错过公交。等了又等。决 · 定。"
+    },
+    {
+      "key": "the-classroom-clock",
+      "kind": "teaching",
+      "plan": "到教室时，已经怎样了。迟 · 表 · 位。已 · 经。两字看看。后悔与原因。"
+    },
+    {
+      "key": "put-the-pictures-in-order",
+      "kind": "teaching",
+      "plan": "故事画面按什么顺序排。出门以前。沿路和到校。接齐再去小旗。"
+    },
+    {
+      "key": "story-board-route",
+      "kind": "game",
+      "plan": "泡泡车排故事图。"
+    },
+    {
+      "key": "if-another-minute",
+      "kind": "teaching",
+      "plan": "要是早点，可能怎样。实际已经发生。要是 · 就。继续接着想。试说一句。"
+    },
+    {
+      "key": "hear-the-picture-cue",
+      "kind": "teaching",
+      "plan": "听同一个字，想一想动作。闹钟 · 手表。等 · 坐。背的两种意思。再听再配。"
+    },
+    {
+      "key": "catch-the-meaning",
+      "kind": "game",
+      "plan": "泡泡艇听词找画。"
+    },
+    {
+      "key": "write-yuan-che",
+      "kind": "teaching",
+      "plan": "元和车的最后一笔。元 · 四笔。车 · 四笔。纸上照一照。"
+    },
+    {
+      "key": "write-deng-zhan",
+      "kind": "teaching",
+      "plan": "灯和站的两边怎么摆。灯 · 左火右丁。站 · 左立右占。两边留空。"
+    },
+    {
+      "key": "write-zuo",
+      "kind": "teaching",
+      "plan": "坐字的底下怎么收。先写两组。再写下面。纸上试写。"
+    },
+    {
+      "key": "write-lao-shi",
+      "kind": "teaching",
+      "plan": "老和师开头怎么写。老 · 六笔。师 · 六笔。写好给人看。"
+    },
+    {
+      "key": "try-a-real-minute",
+      "kind": "teaching",
+      "plan": "一分钟，自己试一试。大人负责计时。用平常的速度。响了才数。说实测结果。"
+    },
+    {
+      "key": "picture-quiz",
+      "kind": "quiz",
+      "plan": "听老师说，再选图。"
+    },
+    {
+      "key": "try-it-at-home",
+      "kind": "teaching",
+      "plan": "带一张闹钟贴纸回家。说清实际。说一种可能。量自己的时间。"
+    }
+  ],
+  "games": [
+    {
+      "page": "story-board-route",
+      "template": "bubbleMaze",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.bubbleMaze",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "ordered_route",
+      "selection": "在讲故事棋盘里开车并按口令的事件先后收图。收走一幅才播下一幕。交通画面是故事卡。",
+      "levels": [
+        "慢速从闹钟、起床、背书包三幅按序到出口。",
+        "错过绿灯、路边等到过街、公交开走。加一个普通棋盘岔路。",
+        "错过公交、等不到车、步行、教室已上课。温和棋盘巡游增加操控难度。"
+      ],
+      "demo": "指起点、移动角色和第一幅当前事件图，移动取得第一幅后停，显示图卡入序，再清空交接。",
+      "teacherAnchors": [
+        "minute-route-listen",
+        "minute-first-alarm",
+        "game-player"
+      ]
+    },
+    {
+      "page": "catch-the-meaning",
+      "template": "wordBubbles",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.wordBubbles",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "listen_match",
+      "selection": "真人口令先播完，rounds 每轮绑唯一语义图。横移、看漂移、发泡，只有命中所听情境图得分。一次失败可重听，第二次提示画面具体部位。",
+      "levels": [
+        "两图低漂移，听叫醒人的闹钟或老师抬手看的手表。",
+        "三图中找排队等车和孩子坐好等动作。",
+        "听背上篮筐或指到后背，在同人同背景的三图中命中当前目标。"
+      ],
+      "demo": "指刚听到的物品图、小艇、发射按钮，只做一次提前量命中，图卡收住后清空交接。",
+      "teacherAnchors": [
+        "minute-word-listen",
+        "minute-first-clock",
+        "game-player"
+      ]
+    }
+  ],
+  "quiz": [
+    {
+      "id": "cause-before-result",
+      "prompt": "按故事排卡。哪件事发生在出门以前？",
+      "skill": "story-cause",
+      "position": 2,
+      "answer": "还想再睡",
+      "rationale": "闹钟响后又拉起被子，还没出门。车站和教室都在出门以后。"
+    },
+    {
+      "id": "listen-to-the-word",
+      "prompt": "把水壶背在背上。哪张图做对了？",
+      "skill": "read-and-write",
+      "position": 1,
+      "answer": "背在身后",
+      "rationale": "用带子把水壶驮在身后，是背在背上。这个动作的背读第一声。"
+    },
+    {
+      "id": "which-already",
+      "prompt": "听，已经到了。已经用哪张字卡里的字？",
+      "skill": "read-and-write",
+      "position": 3,
+      "answer": "已",
+      "rationale": "已经写已。己用于自己，巳的形状又不同。"
+    },
+    {
+      "id": "fresh-if-then",
+      "prompt": "要是你提早坐好，演出刚开始时会看到哪幅图？",
+      "skill": "conditional-speech",
+      "position": 2,
+      "answer": "刚开场",
+      "rationale": "手把布帘拉开，小兔纸偶刚露面，是开场。两只纸偶在表演是开场以后。单看合着的帘子，分不清是演出前还是演出后。"
+    },
+    {
+      "id": "first-strokes",
+      "prompt": "写元时，两横和一撇写好了。接着写哪笔？",
+      "skill": "read-and-write",
+      "position": 3,
+      "answer": "竖弯钩",
+      "rationale": "最后写竖弯钩，先竖，再向右弯，末尾向上收钩。"
+    },
+    {
+      "id": "one-minute-trial",
+      "prompt": "想知道一分钟能摆几张卡。哪种做法合适？",
+      "skill": "one-minute-observation",
+      "position": 1,
+      "answer": "计时后数",
+      "rationale": "请大人设一分钟，自己用平常速度摆，听到停后数已经摆好的卡。"
+    }
+  ],
+  "afterClass": {
+    "familyTask": "成人陪翻纸书读全文，挑一处说实际和可能的经过。再由成人计时，孩子在安全的室内自然走路或坐下写字，结束后报告数量。",
+    "weeklyQuestionSource": [
+      "故事起因结果",
+      "条件句推断",
+      "背的多音与已己",
+      "规范书写关键笔",
+      "一分钟实测"
+    ],
+    "evidence": "线上记录选图和操控。朗读、口语、笔顺和实际计时由成人观察，报告记待观察。"
+  },
+  "artAndLanguage": "原创故事工坊和重绘情节。路口用行人信号、斑马线和人在路缘等候说明安全。钟声和录音让顺序可听，遮住非目标文字仍可玩。田字格笔画轨迹用代码画，拼音留画面，中文录音说第几声。",
+  "officialNotesSha256": "27d3949e6be204db22b50716dfb8913102d2ca25e634bed3555deef34d2c4dfa"
+}

@@ -1,0 +1,106 @@
+{
+  "atlasId": "theatre-sprites",
+  "columns": 3,
+  "rows": 3,
+  "background": "transparent",
+  "assets": [
+    {
+      "assetKey": "usher-stand",
+      "description": "光影剧场小演员站姿",
+      "usedBy": [
+        "hop-between"
+      ],
+      "crop": [
+        0,
+        0,
+        418,
+        429
+      ]
+    },
+    {
+      "assetKey": "usher-run",
+      "description": "同一演员向右跑",
+      "usedBy": [
+        "hop-between"
+      ],
+      "crop": [
+        418,
+        0,
+        836,
+        429
+      ]
+    },
+    {
+      "assetKey": "usher-hop",
+      "description": "同一演员向右小跳",
+      "usedBy": [
+        "hop-between"
+      ],
+      "crop": [
+        836,
+        0,
+        1254,
+        429
+      ]
+    },
+    {
+      "assetKey": "queue-child",
+      "description": "供精确排位的正面孩子单体",
+      "usedBy": [
+        "open",
+        "two-markers",
+        "draw-and-check"
+      ],
+      "crop": [
+        0,
+        429,
+        418,
+        857
+      ]
+    },
+    {
+      "assetKey": "flag-blue",
+      "description": "蓝色定位旗",
+      "usedBy": [
+        "two-markers",
+        "draw-and-check",
+        "hop-between"
+      ],
+      "crop": [
+        418,
+        429,
+        836,
+        857
+      ]
+    },
+    {
+      "assetKey": "flag-orange",
+      "description": "橙色定位旗",
+      "usedBy": [
+        "two-markers",
+        "draw-and-check",
+        "hop-between"
+      ],
+      "crop": [
+        836,
+        429,
+        1254,
+        857
+      ]
+    },
+    {
+      "assetKey": "theatre-star",
+      "description": "无字星形剧场贴纸",
+      "usedBy": [
+        "hop-between",
+        "match-the-middle"
+      ],
+      "crop": [
+        0,
+        857,
+        418,
+        1254
+      ]
+    }
+  ]
+}

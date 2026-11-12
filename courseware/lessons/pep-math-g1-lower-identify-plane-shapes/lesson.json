@@ -1,0 +1,972 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "认识平面图形",
+  "grade": 1,
+  "description": "在印章修补铺描物件的平面，看边角分类，再用点阵和印样创作。",
+  "roster": {
+    "teacher": {
+      "name": "小数老师",
+      "role": "teacher",
+      "gender": "male",
+      "voice": "Ethan",
+      "avatar": "/teachers/ashu-math-v1.png",
+      "color": "#437763",
+      "persona": "从生活物件的平面出发，和孩子指边、数角、找同类。"
+    }
+  },
+  "images": {
+    "block-first-face": {
+      "file": "assets/block-first-face.png"
+    },
+    "block-other-face": {
+      "file": "assets/block-other-face.png"
+    },
+    "choose-a-face": {
+      "file": "assets/choose-a-face.png"
+    },
+    "circle-amber": {
+      "file": "assets/circle-amber.png"
+    },
+    "circle-lilac": {
+      "file": "assets/circle-lilac.png"
+    },
+    "circle-ref": {
+      "file": "assets/circle-ref.png"
+    },
+    "compare-corners": {
+      "file": "assets/compare-corners.png"
+    },
+    "curve-and-segments": {
+      "file": "assets/curve-and-segments.png"
+    },
+    "cylinder-sphere": {
+      "file": "assets/cylinder-sphere.png"
+    },
+    "firefly-rest": {
+      "file": "assets/firefly-rest.png"
+    },
+    "firefly-wing": {
+      "file": "assets/firefly-wing.png"
+    },
+    "night-court": {
+      "file": "assets/night-court.png"
+    },
+    "pin-board-lines": {
+      "file": "assets/pin-board-lines.png"
+    },
+    "q-circle-paper": {
+      "file": "assets/q-circle-paper.png"
+    },
+    "q-face-long-box": {
+      "file": "assets/q-face-long-box.png"
+    },
+    "q-face-square-box": {
+      "file": "assets/q-face-square-box.png"
+    },
+    "q-face-tin": {
+      "file": "assets/q-face-tin.png"
+    },
+    "q-flat-ball": {
+      "file": "assets/q-flat-ball.png"
+    },
+    "q-flat-jar": {
+      "file": "assets/q-flat-jar.png"
+    },
+    "q-flat-wedge": {
+      "file": "assets/q-flat-wedge.png"
+    },
+    "q-long-paper": {
+      "file": "assets/q-long-paper.png"
+    },
+    "q-long-turned": {
+      "file": "assets/q-long-turned.png"
+    },
+    "q-not-square": {
+      "file": "assets/q-not-square.png"
+    },
+    "q-pegs-circle": {
+      "file": "assets/q-pegs-circle.png"
+    },
+    "q-pegs-rect": {
+      "file": "assets/q-pegs-rect.png"
+    },
+    "q-pegs-tri": {
+      "file": "assets/q-pegs-tri.png"
+    },
+    "q-pin-board": {
+      "file": "assets/q-pin-board.png"
+    },
+    "q-sign": {
+      "file": "assets/q-sign.png"
+    },
+    "q-sign-good": {
+      "file": "assets/q-sign-good.png"
+    },
+    "q-sign-rectangle": {
+      "file": "assets/q-sign-rectangle.png"
+    },
+    "q-sign-trap": {
+      "file": "assets/q-sign-trap.png"
+    },
+    "q-square": {
+      "file": "assets/q-square.png"
+    },
+    "q-turn-reference": {
+      "file": "assets/q-turn-reference.png"
+    },
+    "q-window-circle": {
+      "file": "assets/q-window-circle.png"
+    },
+    "q-window-quad": {
+      "file": "assets/q-window-quad.png"
+    },
+    "q-window-triangle": {
+      "file": "assets/q-window-triangle.png"
+    },
+    "q-windows-board": {
+      "file": "assets/q-windows-board.png"
+    },
+    "rabbit-idle": {
+      "file": "assets/rabbit-idle.png"
+    },
+    "rabbit-push": {
+      "file": "assets/rabbit-push.png"
+    },
+    "rect-coral": {
+      "file": "assets/rect-coral.png"
+    },
+    "rect-ref": {
+      "file": "assets/rect-ref.png"
+    },
+    "rect-turned": {
+      "file": "assets/rect-turned.png"
+    },
+    "shape-families": {
+      "file": "assets/shape-families.png"
+    },
+    "shop-bench": {
+      "file": "assets/shop-bench.png"
+    },
+    "slant-blue": {
+      "file": "assets/slant-blue.png"
+    },
+    "slant-green": {
+      "file": "assets/slant-green.png"
+    },
+    "slant-lilac": {
+      "file": "assets/slant-lilac.png"
+    },
+    "slant-ref": {
+      "file": "assets/slant-ref.png"
+    },
+    "sorting-floor": {
+      "file": "assets/sorting-floor.png"
+    },
+    "square-lime": {
+      "file": "assets/square-lime.png"
+    },
+    "square-ref": {
+      "file": "assets/square-ref.png"
+    },
+    "square-turned": {
+      "file": "assets/square-turned.png"
+    },
+    "stamp-badge": {
+      "file": "assets/stamp-badge.png"
+    },
+    "stamp-picture": {
+      "file": "assets/stamp-picture.png"
+    },
+    "triangle-down": {
+      "file": "assets/triangle-down.png"
+    },
+    "triangle-lean": {
+      "file": "assets/triangle-lean.png"
+    },
+    "triangle-left": {
+      "file": "assets/triangle-left.png"
+    },
+    "triangle-ref": {
+      "file": "assets/triangle-ref.png"
+    },
+    "wedge-trace": {
+      "file": "assets/wedge-trace.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "open-the-shop",
+      "type": "slide",
+      "title": "印章修补铺开门啦",
+      "template": "title-picture",
+      "data": {
+        "title": "印章修补铺开门啦",
+        "picture": "shop-bench",
+        "caption": "找一个面，描一圈"
+      },
+      "script": [
+        {
+          "say": "修补铺收到一叠空卡。怎样把物件的形状留在纸上？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "桌上可以放盒子，也可以放会滚的球。"
+        },
+        {
+          "say": "你猜哪件能稳稳贴住纸，沿着边走一圈？"
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "我们要找的是一个面。先找平平的地方，再动笔。"
+        },
+        {
+          "say": "沿它和纸贴在一起的边描，拿开以后就有一条轮廓。"
+        },
+        {
+          "say": "看看描出的图形，再给同类图形找一个家。"
+        }
+      ]
+    },
+    {
+      "key": "outline-bench",
+      "type": "slide",
+      "title": "同一块积木能描什么",
+      "template": "two-columns",
+      "data": {
+        "title": "同一块积木能描什么",
+        "left": {
+          "heading": "贴较长的一面",
+          "body": "沿边绕一圈"
+        },
+        "left_picture": "block-first-face",
+        "right": {
+          "heading": "换一面贴纸",
+          "body": "另一张也有四个方角"
+        },
+        "right_picture": "block-other-face"
+      },
+      "script": [
+        {
+          "say": "我有一块积木。把它换个面压在纸上，会描得一样吗？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "先让长长的这一面贴住纸，沿着贴纸的边走一圈。"
+        },
+        {
+          "say": "抬起积木。纸上只留下那一个面的形状。"
+        },
+        {
+          "say": "这个轮廓有四条直边、四个方角，是长方形。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "现在换个方向，让较短的一面贴着纸，再描一次。"
+        },
+        {
+          "say": "这次也有四个方角，可是长的边比刚才短些。"
+        },
+        {
+          "say": "同一块积木换一面，描出的轮廓可能不一样。"
+        },
+        {
+          "say": "请用手指照着图，绕边走回起点。"
+        }
+      ]
+    },
+    {
+      "key": "round-face-or-ball",
+      "type": "slide",
+      "title": "谁有能贴平纸的圆面",
+      "template": "title-picture",
+      "data": {
+        "title": "谁有能贴平纸的圆面",
+        "picture": "cylinder-sphere",
+        "caption": "圆柱有平底　球没有平面"
+      },
+      "script": [
+        {
+          "say": "圆罐和球看起来都圆。能不能用同样的办法描圆？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "看左边的圆罐。它的底是平平的，可以稳稳贴在纸上。"
+        },
+        {
+          "say": "沿着贴纸的那一圈描，拿开罐子，就得到一个圆。"
+        },
+        {
+          "say": "再看右边的球。从这边看，它的外轮廓像个圆。"
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "球滚一滚，只有一小处碰着纸，没有平平的一整面。"
+        },
+        {
+          "say": "看见一个圆样的外轮廓，和用平面描出圆，是两回事。"
+        },
+        {
+          "say": "先找能贴平的面，再说能描出什么。"
+        }
+      ]
+    },
+    {
+      "key": "five-families",
+      "type": "slide",
+      "title": "先看边，再数角",
+      "template": "title-picture",
+      "data": {
+        "title": "先看边，再数角",
+        "picture": "shape-families",
+        "caption": "圆　三角形　正方形　长方形　平行四边形"
+      },
+      "script": [
+        {
+          "say": "这五张印样该怎么分？先找绕一圈都弯弯的那张。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "上排左边是圆，边连成弯弯的一圈，没有角。"
+        },
+        {
+          "say": "先找没有角的圆。"
+        },
+        {
+          "say": "上排中间的图形，数一圈有三条直边和三个角。"
+        },
+        {
+          "say": "三角形，找三条直边。"
+        },
+        {
+          "say": "上排右边是正方形。四条边一样长，四个角方方的。"
+        },
+        {
+          "say": "正方形，四条边一样长。"
+        },
+        {
+          "say": "下排左边是我们常见的长方形。四个角也都方方的。"
+        },
+        {
+          "say": "找两长两短、四个方角的长方形。"
+        },
+        {
+          "say": "下排右边是斜的平行四边形。对着的两条边成一组。"
+        },
+        {
+          "say": "找斜的平行四边形。"
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "圆看弯边，三角形数三边。四边图形还要看角和边。"
+        }
+      ]
+    },
+    {
+      "key": "look-past-tilt",
+      "type": "slide",
+      "title": "转个方向，边和角还在",
+      "template": "title-picture",
+      "data": {
+        "title": "转个方向，边和角还在",
+        "picture": "compare-corners",
+        "caption": "看边和角，别只看朝向"
+      },
+      "script": [
+        {
+          "say": "三个图都能斜着摆。只看到斜，就能知道是哪一类吗？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "看左边。转动以后，四条边一样长，四个角还是方角。"
+        },
+        {
+          "say": "中间那张也转斜了，四个角方方的，两条长、两条短。"
+        },
+        {
+          "say": "右边这张有两组对边各自平行，可它的角不是方角。"
+        },
+        {
+          "say": "红边是一组，另两条边也是一组。各组方向相同。"
+        },
+        {
+          "say": "长方形和正方形的两组对边也平行。"
+        },
+        {
+          "say": "游戏里另开一格，放这种角不方方的平行四边形样例。"
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "把圆片和三角形送到同类托盘。"
+        },
+        {
+          "say": "看方角和边长，再给四边图形找托盘。"
+        },
+        {
+          "say": "颜色不一样，也要找同一类。"
+        },
+        {
+          "say": "还有样片没归位。再看看边和角。"
+        },
+        {
+          "say": "转一转，看边和角。"
+        },
+        {
+          "say": "提示亮了，可以绕到卡片背后再推。"
+        },
+        {
+          "say": "看形状归位，换过朝向也找得到。"
+        }
+      ]
+    },
+    {
+      "key": "shape-sample-shelves",
+      "type": "interactive",
+      "title": "给形状卡找托盘",
+      "page": "shape-sample-shelves",
+      "startImage": "sorting-floor",
+      "widgetType": "learning-arcade",
+      "gameAudio": {
+        "sort-round-one": "look-past-tilt-10",
+        "sort-round-two": "look-past-tilt-11",
+        "sort-round-three": "look-past-tilt-12",
+        "sort-next": "look-past-tilt-13",
+        "sort-hint": "look-past-tilt-14",
+        "sort-help": "look-past-tilt-15",
+        "sort-praise": "look-past-tilt-16"
+      },
+      "script": [
+        {
+          "say": "小兔要把样片放回托盘。先看这张该去哪里。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#sample-first-tile"
+        },
+        {
+          "say": "橙色样片边弯弯的，没有角，是圆。"
+        },
+        {
+          "highlight": "#sample-first-dock"
+        },
+        {
+          "say": "右边蓝绿色的样例也是圆。换色不换类。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "小兔站在样片背后，向右走一步就能推过去。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "看看样片进了圆托盘。我们只送这一张。"
+        },
+        {
+          "say": "现在轮到你，先看边和角，再按箭头。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ]
+    },
+    {
+      "key": "hidden-faces",
+      "type": "slide",
+      "title": "先找印样，再找物件的面",
+      "template": "two-columns",
+      "data": {
+        "title": "先找印样，再找物件的面",
+        "left": {
+          "heading": "平平的三角面",
+          "body": "沿三条直边描"
+        },
+        "left_picture": "wedge-trace",
+        "right": {
+          "heading": "选一个想要的印样",
+          "body": "贴平纸面再描"
+        },
+        "right_picture": "choose-a-face"
+      },
+      "script": [
+        {
+          "say": "修补铺要补一张三角印。怎样从物件上找出来？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "看木楔这个平平的面。沿一圈能数出三条直边。"
+        },
+        {
+          "say": "把这个面贴在纸上，沿三边描，就是三角形。"
+        },
+        {
+          "say": "别只看物件外面像什么，先找到要贴纸的这一面。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "换成细长的印样，可以找盒子上细长的平面。"
+        },
+        {
+          "say": "想印圆，可以从有圆平底的物件里找。"
+        },
+        {
+          "say": "看上面想找的形状，再想往哪边松手。"
+        },
+        {
+          "say": "虚线对着亮灯时再松手。"
+        },
+        {
+          "say": "你看准了形状，也找准了飞过去的方向。"
+        }
+      ]
+    },
+    {
+      "key": "spotlight-match",
+      "type": "interactive",
+      "title": "荡到同类的灯牌",
+      "page": "spotlight-match",
+      "startImage": "night-court",
+      "widgetType": "learning-arcade",
+      "gameAudio": {
+        "swing-circle": "five-families-4",
+        "swing-triangle": "five-families-6",
+        "swing-square": "five-families-8",
+        "swing-slant": "five-families-12",
+        "swing-rect": "five-families-10",
+        "swing-hint": "hidden-faces-9",
+        "swing-help": "hidden-faces-10",
+        "swing-praise": "hidden-faces-11"
+      },
+      "script": [
+        {
+          "say": "两个灯牌里，哪一个跟上面的轮廓同类？"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#swing-goal"
+        },
+        {
+          "say": "上面是一圈弯边，没有角。我们要找圆。"
+        },
+        {
+          "highlight": "#swing-first-lamp"
+        },
+        {
+          "say": "灯牌上的圆小，颜色也不同。它的边还是弯弯的一圈，没有角，所以还是圆。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "萤火虫会转。用左右键换方向，箭头键松手。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "等虚线朝同类灯牌，再松手飞过去。"
+        },
+        {
+          "say": "只点亮这一盏。我们看它能不能落在圆牌上。"
+        },
+        {
+          "say": "轮到你。先认轮廓，再等方向对准。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ]
+    },
+    {
+      "key": "pin-board",
+      "type": "slide",
+      "title": "用直线段在点阵上围图",
+      "template": "two-columns",
+      "data": {
+        "title": "用直线段在点阵上围图",
+        "left": {
+          "heading": "沿点连直线",
+          "body": "数边和角"
+        },
+        "left_picture": "pin-board-lines",
+        "right": {
+          "heading": "比较圆边与折线",
+          "body": "直线一段一段接"
+        },
+        "right_picture": "curve-and-segments"
+      },
+      "script": [
+        {
+          "say": "纸上有一排排的点。只用直直的线，能围出哪些图形？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "从一个点出发，每次用直线连到另一个点。"
+        },
+        {
+          "say": "四边一样长、四角方方的，就围出一个转向的正方形。"
+        },
+        {
+          "say": "换三个点，让三条直边接成一圈，就围成三角形。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "圆的边一直在弯，中间没有一段是直直的。"
+        },
+        {
+          "say": "用许多短直线连起来，看着像圆，还是有拐角。"
+        },
+        {
+          "say": "所以这种一段段连点的办法，围不出真正的圆。"
+        },
+        {
+          "say": "你也可以在纸上选几个点，连好后说说围出了什么。"
+        }
+      ]
+    },
+    {
+      "key": "picture-check",
+      "type": "quiz",
+      "title": "换一批印样来检查",
+      "intro": [
+        "先听题，再看边和角，选一张符合的图。",
+        "没听清，可以点小喇叭再听。"
+      ],
+      "questions": [
+        {
+          "id": "flat-circle",
+          "question": "要沿能贴平纸的面描圆，该拿哪一件？",
+          "skill": "从实物平面反查圆形",
+          "answer": [
+            "B"
+          ],
+          "analysis": "圆罐有能贴平纸的圆底。球没有平面，木楔可描的这面是三角形。",
+          "visual": {
+            "kind": "asset",
+            "image": "q-circle-paper",
+            "alt": "纸上有一条圆形轮廓"
+          },
+          "options": {
+            "A": {
+              "label": "图一",
+              "visual": {
+                "kind": "asset",
+                "image": "q-flat-ball",
+                "alt": "圆球"
+              }
+            },
+            "B": {
+              "label": "图二",
+              "visual": {
+                "kind": "asset",
+                "image": "q-flat-jar",
+                "alt": "有圆平底的调料罐"
+              }
+            },
+            "C": {
+              "label": "图三",
+              "visual": {
+                "kind": "asset",
+                "image": "q-flat-wedge",
+                "alt": "三角木楔"
+              }
+            }
+          }
+        },
+        {
+          "id": "rotated-square",
+          "question": "哪张转过方向后还是正方形？",
+          "skill": "用等长边与方角辨认旋转的正方形",
+          "answer": [
+            "A"
+          ],
+          "analysis": "第一张虽然转过方向，四条边仍一样长，四个角也仍是方角。",
+          "visual": {
+            "kind": "asset",
+            "image": "q-turn-reference",
+            "alt": "端正的正方形和转动箭头"
+          },
+          "options": {
+            "A": {
+              "label": "图一",
+              "visual": {
+                "kind": "asset",
+                "image": "q-square",
+                "alt": "旋转的正方形"
+              }
+            },
+            "B": {
+              "label": "图二",
+              "visual": {
+                "kind": "asset",
+                "image": "q-long-turned",
+                "alt": "旋转的细长长方形"
+              }
+            },
+            "C": {
+              "label": "图三",
+              "visual": {
+                "kind": "asset",
+                "image": "q-not-square",
+                "alt": "角不方的平行四边形"
+              }
+            }
+          }
+        },
+        {
+          "id": "triangles-in-a-window",
+          "question": "哪扇小窗围出了三角形？",
+          "skill": "找三条直边和三个角",
+          "answer": [
+            "C"
+          ],
+          "analysis": "第三扇窗有三条直边和三个角。朝向变了，边数和角数没有变。",
+          "visual": {
+            "kind": "asset",
+            "image": "q-windows-board",
+            "alt": "三张不同形状的小窗"
+          },
+          "options": {
+            "A": {
+              "label": "图一",
+              "visual": {
+                "kind": "asset",
+                "image": "q-window-circle",
+                "alt": "圆窗"
+              }
+            },
+            "B": {
+              "label": "图二",
+              "visual": {
+                "kind": "asset",
+                "image": "q-window-quad",
+                "alt": "斜四边形窗"
+              }
+            },
+            "C": {
+              "label": "图三",
+              "visual": {
+                "kind": "asset",
+                "image": "q-window-triangle",
+                "alt": "朝左的不等边三角窗"
+              }
+            }
+          }
+        },
+        {
+          "id": "which-flat-face",
+          "question": "要描出图中的细长长方形，选哪个物件？",
+          "skill": "从长方形反查物件的平面",
+          "answer": [
+            "B"
+          ],
+          "analysis": "细长纸盒的正面平平的，有四个方角，长和短的边与样子相符。",
+          "visual": {
+            "kind": "asset",
+            "image": "q-long-paper",
+            "alt": "纸上的细长长方形"
+          },
+          "options": {
+            "A": {
+              "label": "图一",
+              "visual": {
+                "kind": "asset",
+                "image": "q-face-square-box",
+                "alt": "正面为正方形的小盒"
+              }
+            },
+            "B": {
+              "label": "图二",
+              "visual": {
+                "kind": "asset",
+                "image": "q-face-long-box",
+                "alt": "正面细长的纸盒"
+              }
+            },
+            "C": {
+              "label": "图三",
+              "visual": {
+                "kind": "asset",
+                "image": "q-face-tin",
+                "alt": "有圆面的矮罐"
+              }
+            }
+          }
+        },
+        {
+          "id": "straight-pegs",
+          "question": "只用直线段连点，哪种图形不能原样围出？",
+          "skill": "区分直线段和圆的弯边",
+          "answer": [
+            "C"
+          ],
+          "analysis": "圆的边一直弯曲。用短直线围出的只能像圆，拐角还是在。",
+          "visual": {
+            "kind": "asset",
+            "image": "q-pin-board",
+            "alt": "新点阵中有一段直线"
+          },
+          "options": {
+            "A": {
+              "label": "图一",
+              "visual": {
+                "kind": "asset",
+                "image": "q-pegs-rect",
+                "alt": "长方形"
+              }
+            },
+            "B": {
+              "label": "图二",
+              "visual": {
+                "kind": "asset",
+                "image": "q-pegs-tri",
+                "alt": "三角形"
+              }
+            },
+            "C": {
+              "label": "图三",
+              "visual": {
+                "kind": "asset",
+                "image": "q-pegs-circle",
+                "alt": "圆"
+              }
+            }
+          }
+        },
+        {
+          "id": "slanted-sign",
+          "question": "哪张印模和标记是同类的斜四边形？",
+          "skill": "辨认斜的平行四边形样例",
+          "answer": [
+            "A"
+          ],
+          "analysis": "第一张两组对边各自平行，而且没有方角。转斜的长方形仍有四个方角。",
+          "visual": {
+            "kind": "asset",
+            "image": "q-sign",
+            "alt": "斜的平行四边形标记"
+          },
+          "options": {
+            "A": {
+              "label": "图一",
+              "visual": {
+                "kind": "asset",
+                "image": "q-sign-good",
+                "alt": "同类斜平行四边形"
+              }
+            },
+            "B": {
+              "label": "图二",
+              "visual": {
+                "kind": "asset",
+                "image": "q-sign-rectangle",
+                "alt": "转过方向的长方形"
+              }
+            },
+            "C": {
+              "label": "图三",
+              "visual": {
+                "kind": "asset",
+                "image": "q-sign-trap",
+                "alt": "只有一组对边平行的四边形"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "make-a-stamp-picture",
+      "type": "slide",
+      "title": "做一张自己的印样画",
+      "template": "title-picture",
+      "data": {
+        "title": "做一张自己的印样画",
+        "picture": "stamp-picture",
+        "caption": "贴平　描边　组成一幅画"
+      },
+      "script": [
+        {
+          "say": "看这幅小船。你能指一指每个印样用了什么图形？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "圆是月亮。三角形当帆，细长长方形当码头。"
+        },
+        {
+          "say": "小船身用了斜的平行四边形。你也可以换一个图案。"
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "先找能贴平纸面的物件，再沿边描出轮廓。"
+        },
+        {
+          "say": "描完可以转着摆，也可以上色，看看形状有没有变。"
+        },
+        {
+          "say": "回家找安全的物件，画好后给家人指一指。"
+        },
+        {
+          "say": "告诉家人你选了哪一面，它留下的轮廓是什么。"
+        }
+      ]
+    }
+  ]
+}

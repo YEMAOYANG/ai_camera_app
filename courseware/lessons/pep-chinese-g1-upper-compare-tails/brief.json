@@ -1,0 +1,190 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "比尾巴",
+  "binding": {
+    "editionId": "pep-chinese-g1-upper-2022-standard",
+    "revisionId": "20260924-directory-3",
+    "nodeId": "u8-l1",
+    "unitId": "unit-8-reading",
+    "classHours": [
+      "lesson_1",
+      "lesson_2"
+    ]
+  },
+  "goals": [
+    "观察本课六种动物尾巴的长短、轮廓和形状，能指图给出比较依据。",
+    "认读比、尾、巴、谁、长、短、把、伞、兔、最、公，认识提手旁、斜刀头和八字头。",
+    "听出问题和回答，看到问号试着读出发问语气，听清特征再答，并仿说。",
+    "按笔顺书空或练写比、巴、长、公，认识竖提，注意田字格位置。"
+  ],
+  "keyPoint": "比较尾巴形状，认读目标字，听清问的是什么再答。",
+  "difficultPoint": "读出发问语气、按特征仿说，注意竖提连笔及四字笔顺和格位。",
+  "afterClass": {
+    "paperTextbook": "翻开印95–96，孩子自己读，听问题与回答，再借插图按顺序背。",
+    "writing": "比、巴、长、公各写一个，家人观察笔顺与格位。",
+    "transfer": "一起找新动物照片，一人问尾巴特征，另一人完整回答并指出依据。",
+    "observation": "未实际看到时，朗读、背诵、书写和仿说待观察。"
+  },
+  "scenario": "孩子和小语老师布置尾巴照片馆，从整身照看到尾巴局部，听清再作答。",
+  "pageSequence": [
+    {
+      "key": "opening",
+      "type": "slide",
+      "title": "尾巴照片馆",
+      "focus": "从整只动物身上找到尾巴，比较同一部分。"
+    },
+    {
+      "key": "length",
+      "type": "slide",
+      "title": "比一比尾巴的长短",
+      "focus": "对比同图猴与兔，学比、尾、巴、长、短、兔和斜刀头。"
+    },
+    {
+      "key": "umbrella",
+      "type": "slide",
+      "title": "松鼠的尾巴像什么",
+      "focus": "比较松鼠尾巴轮廓与雨伞，学把的提手旁和伞。"
+    },
+    {
+      "key": "fans",
+      "type": "slide",
+      "title": "看清弯、扁和展开",
+      "focus": "比较公鸡、鸭和孔雀，学公、八字头和最。"
+    },
+    {
+      "key": "questions",
+      "type": "slide",
+      "title": "听听问题是怎么问的",
+      "focus": "用原创问答认识谁、问号，听清特征再答。"
+    },
+    {
+      "key": "word-station",
+      "type": "slide",
+      "title": "听词找字卡",
+      "focus": "用生活词语认读易混字和准备游戏口令。"
+    },
+    {
+      "key": "bubble-dock",
+      "type": "interactive",
+      "title": "听准了再吹泡泡",
+      "focus": "移动并瞄准目标字卡，示范后清零交手。"
+    },
+    {
+      "key": "photo-orders",
+      "type": "slide",
+      "title": "照片要放进哪扇窗",
+      "focus": "分辨全身照和局部尾照，听取与送的口令。"
+    },
+    {
+      "key": "tail-post",
+      "type": "interactive",
+      "title": "尾巴照片邮车",
+      "focus": "听描述取动物全身照，再送对尾巴局部窗。"
+    },
+    {
+      "key": "write-bi-chang",
+      "type": "slide",
+      "title": "先看清竖提",
+      "focus": "逐笔示范比、长，书空并留纸笔观察。"
+    },
+    {
+      "key": "write-ba-gong",
+      "type": "slide",
+      "title": "看格子写巴和公",
+      "focus": "逐笔示范巴、公，观察竖弯钩和八字头。"
+    },
+    {
+      "key": "picture-check",
+      "type": "quiz",
+      "title": "找找新照片里的线索",
+      "focus": "新图查外形、识字、问答和笔形。"
+    },
+    {
+      "key": "closing",
+      "type": "slide",
+      "title": "把一组问答带回家",
+      "focus": "小猫尾巴原创问答；纸书第95–96页朗读背诵。"
+    }
+  ],
+  "games": [
+    {
+      "key": "bubble-dock",
+      "template": "wordBubbles",
+      "version": 1,
+      "status": "可用",
+      "entryPoint": "K.gameTemplates.wordBubbles",
+      "example": "courseware/kit/examples/classic-arcade/word-bubbles.json",
+      "knowledgeRule": "listen_match",
+      "winRule": "泡泡只在打中语音点名的目标汉字时得分。遮住非目标文字仍可按图标移动发射。",
+      "levels": [
+        "两卡两题，慢漂移。",
+        "三卡三题，加大漂移。",
+        "三卡四题，字形相近、命中范围收窄。"
+      ],
+      "teacherHandoff": "实际目标区、小艇、第一张正确卡依次点亮。示范命中一次后清零放手。"
+    },
+    {
+      "key": "tail-post",
+      "template": "listenDelivery",
+      "version": 1,
+      "status": "可用",
+      "entryPoint": "K.gameTemplates.listenDelivery",
+      "example": "courseware/kit/examples/classic-arcade/listen-delivery.json",
+      "knowledgeRule": "listen_pick_deliver",
+      "winRule": "听尾巴特征取整身照片，听局部线索送到正确的窗。取错或送错均不能推进。",
+      "levels": [
+        "两种图，一条慢车道，送一单。",
+        "三种图，两条车道，送两单。",
+        "三种图，三条车道，送三单。"
+      ],
+      "teacherHandoff": "实际收件区、邮车、首单取件点依次点亮。示范只取一张，然后清零交手。"
+    }
+  ],
+  "gameCatalog": {
+    "path": "courseware/kit/game_templates/catalog.json",
+    "sha256": "1f04d478644e68af67bc264bf46227ece3d94d9c4070e8a8dd219846a48f4753"
+  },
+  "quizPlan": [
+    {
+      "key": "long-tail",
+      "goal": "观察本课六种动物尾巴的长短、轮廓和形状，能指图给出比较依据。",
+      "focus": "新图中根据尾巴长度判断。"
+    },
+    {
+      "key": "flat-tail",
+      "goal": "观察本课六种动物尾巴的长短、轮廓和形状，能指图给出比较依据。",
+      "focus": "在新局部照片中找扁形。"
+    },
+    {
+      "key": "target-tu",
+      "goal": "认读比、尾、巴、谁、长、短、把、伞、兔、最、公，认识提手旁、斜刀头和八字头。",
+      "focus": "听小兔选目标字兔。"
+    },
+    {
+      "key": "target-gong",
+      "goal": "认读比、尾、巴、谁、长、短、把、伞、兔、最、公，认识提手旁、斜刀头和八字头。",
+      "focus": "听公园选目标字公。"
+    },
+    {
+      "key": "question-cue",
+      "goal": "听出问题和回答，看到问号试着读出发问语气，听清特征再答，并仿说。",
+      "focus": "听原创问句，找能回答的相应照片。"
+    },
+    {
+      "key": "upward-stroke",
+      "goal": "按笔顺书空或练写比、巴、长、公，认识竖提，注意田字格位置。",
+      "focus": "找竖提笔形。"
+    }
+  ],
+  "authorship": {
+    "sourceMode": "direct",
+    "authorModels": [
+      "gpt-6.1-sol"
+    ]
+  },
+  "assetPlan": "内置原创动物、场景和独立测验图。字形和笔顺精确绘制；登记原图和衍生。",
+  "readingAuthorization": {
+    "approved": false,
+    "decision": "课件使用原创句子、目标字词和教材指页。原文、课文录音、歌曲和教材插图不入包，原文朗读及背诵留纸书。"
+  }
+}

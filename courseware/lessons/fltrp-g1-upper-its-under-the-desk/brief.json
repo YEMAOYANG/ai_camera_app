@@ -1,0 +1,195 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "It's under the desk.",
+  "binding": {
+    "editionId": "smartedu-english-six-year-g1-upper-sync-af05bc77",
+    "revisionId": "20260928-metadata-1",
+    "nodeId": "3a038077-7cc2-368f-a468-73472db9f6a8",
+    "unitId": "8b0ad0a3-68ea-3d69-b489-77cc1e66067a"
+  },
+  "scenario": "图书角的布偶整理队。新来的小松鼠拿着彩色夹子和小道具，老师请孩子听问句，在桌下、凳面和收纳袋里帮助找。",
+  "goals": [
+    "借图听懂一次问候和简短年龄问答，认出谁在说话、接下来在找什么。",
+    "听懂Where’s…?询问人或物的位置，并根据清楚的参照物理解和说出under、on、in。",
+    "跟随连环画的时间变化，用当前画面更新位置并尝试用两三幅图复述。",
+    "和家人拿原创道具轮流问位置、作答并查验，完整朗读用合法纸书。"
+  ],
+  "pageSequence": [
+    {
+      "key": "reading-corner",
+      "kind": "teaching",
+      "title": "图书角来了两位布偶"
+    },
+    {
+      "key": "ask-for-the-clip",
+      "kind": "teaching",
+      "title": "先听清在找什么"
+    },
+    {
+      "key": "on-in-under",
+      "kind": "teaching",
+      "title": "同一个夹子的三个位置"
+    },
+    {
+      "key": "clip-moves",
+      "kind": "teaching",
+      "title": "换一把椅子，重新听"
+    },
+    {
+      "key": "other-props",
+      "kind": "teaching",
+      "title": "换道具时听清名词"
+    },
+    {
+      "key": "hear-the-position",
+      "kind": "interactive",
+      "title": "听一句，吹泡泡"
+    },
+    {
+      "key": "where-is-it-now",
+      "kind": "teaching",
+      "title": "布偶换地方了"
+    },
+    {
+      "key": "find-next",
+      "kind": "teaching",
+      "title": "按听到的先后找"
+    },
+    {
+      "key": "follow-the-story-route",
+      "kind": "interactive",
+      "title": "听先后，去找布偶"
+    },
+    {
+      "key": "ask-a-friend",
+      "kind": "teaching",
+      "title": "你来问，我来找"
+    },
+    {
+      "key": "picture-check",
+      "kind": "quiz",
+      "title": "听一句，找一幅新图"
+    },
+    {
+      "key": "recap",
+      "kind": "teaching",
+      "title": "听清谁，再说在哪里"
+    }
+  ],
+  "games": [
+    {
+      "page": "hear-the-position",
+      "template": "wordBubbles",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.wordBubbles",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "listen_match",
+      "selection": "图中用同物和清楚参照物对比三种位置。听到的物体、参照物和关系都需相符，击中才算。应展示桌面厚度、足底空间及开口轮廓。",
+      "levels": [
+        "两轮低速，两幅同物相同家具的上与下对照。",
+        "三轮加入容器内部和外侧邻近图。",
+        "三至四轮换家具位置，混合物体与关系的干扰。"
+      ],
+      "demo": "先圈两幅图、固定的首个桌下目标和小艇，命中一次后复位。每句关卡口令播完再操作。"
+    },
+    {
+      "page": "follow-the-story-route",
+      "template": "bubbleMaze",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.bubbleMaze",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "listen_order",
+      "selection": "小车按听到的时序寻找同一布偶。右侧放大图包含本关的全部图站，顺序与正确路线不同。左侧只保留已找到的图，按实际找到的先后显示。",
+      "levels": [
+        "两处状态短直路，先台上再台下。",
+        "三个状态有分叉，依次在架面、箱内、椅下。",
+        "三至四个状态，图站顺序和左右摆法变化，靠录音回听和位置判断。"
+      ],
+      "demo": "圈小车、右边放大图、椅面第一站和出口旗。只走到第一站后暂停，保留第一幅已找到的图；交接时清空。"
+    }
+  ],
+  "quizPlan": [
+    {
+      "skill": "greet-and-find-the-focus",
+      "prompt": "Hi, Hazel. Where’s the eraser?",
+      "answer": "一块紫色橡皮",
+      "position": 2,
+      "rationale": "问候之后听到eraser。它在找橡皮。"
+    },
+    {
+      "skill": "locate-with-a-reference",
+      "prompt": "It’s under the chair.",
+      "answer": "小车停在椅子下面",
+      "position": 1,
+      "rationale": "小车在椅面以下，椅脚中间。"
+    },
+    {
+      "skill": "locate-with-a-reference",
+      "prompt": "Where’s the pencil? It’s in the bag.",
+      "answer": "铅笔在袋子里面",
+      "position": 3,
+      "rationale": "铅笔在蓝袋子里面，可以看见袋口和前沿。"
+    },
+    {
+      "skill": "follow-position-changes",
+      "prompt": "First on the chair, then in the bag.",
+      "answer": "橡皮先在椅面上，后在袋子里",
+      "position": 2,
+      "rationale": "先找椅面上的橡皮，再找蓝袋子里的同一块橡皮。"
+    },
+    {
+      "skill": "ask-and-answer-where",
+      "prompt": "Where’s the car? It’s on the desk.",
+      "answer": "小车放在桌面上",
+      "position": 3,
+      "rationale": "问的是小车。桌面接触小车，说明小车在桌面上。"
+    },
+    {
+      "skill": "ask-and-answer-where",
+      "prompt": "Where’s the car? It’s in the box.",
+      "answer": "小车在盒子里面",
+      "position": 1,
+      "rationale": "car是小车。小车在敞口盒里，盒沿挡住了一点。"
+    }
+  ],
+  "afterClass": {
+    "familyTask": "用纸偶、盒子和凳子按位置变换玩问答，家人听是否说出位置和参照物。另用合法纸书印72～73共读或交换角色。",
+    "weeklyQuestionSource": [
+      "识别说话者和要找的对象",
+      "参照物与under/on/in",
+      "听先后更新地点",
+      "问答和现场核对"
+    ],
+    "evidence": "线上记录图题和操作，真实朗读与口语问答由家人观察。"
+  },
+  "artAndLanguage": "原创图书角和布偶，确保桌下空间、表面接触和容器开口清楚。位置题可用代码做固定几何标记，非目标文字由音频承担。",
+  "goalEvidence": [
+    {
+      "skill": "greet-and-find-the-focus",
+      "target": "听懂简短问候和年龄导入，指认谁说话和正在找的人物或物件。",
+      "source": "原书印72前两格及随后问位置"
+    },
+    {
+      "skill": "locate-with-a-reference",
+      "target": "用参照物与接触关系理解under、on、in，听答后找图。",
+      "source": "原书印72末格与印73后两处"
+    },
+    {
+      "skill": "follow-position-changes",
+      "target": "跟踪连环画中对象移动，按先后说此刻在哪里。",
+      "source": "原书印73椅子上到书包里"
+    },
+    {
+      "skill": "ask-and-answer-where",
+      "target": "用简短问答找东西，跟家人交换角色并核对所说位置。",
+      "source": "原书印72～73问答格；依据教材整理的原创家庭练习"
+    }
+  ],
+  "teacherCode": "mira_english_standard",
+  "authoring": {
+    "sourceMode": "direct",
+    "authorModels": [
+      "gpt-6.1-sol"
+    ]
+  }
+}

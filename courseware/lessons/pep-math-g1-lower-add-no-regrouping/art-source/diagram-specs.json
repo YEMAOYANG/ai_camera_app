@@ -1,0 +1,1287 @@
+{
+  "schemaVersion": "mira.courseware.lesson-diagram-specs.v1",
+  "assets": [
+    {
+      "key": "craft-sticker-table",
+      "uses": [
+        "craft-show-stickers"
+      ],
+      "semantics": {
+        "originalScene": "原创手工展桌，孩子与收纳容器；前景叠两份数量教具",
+        "groups": [
+          {
+            "value": 34,
+            "tens": 3,
+            "ones": 4
+          },
+          {
+            "value": 3,
+            "tens": 0,
+            "ones": 3
+          }
+        ]
+      }
+    },
+    {
+      "key": "ten-dot-strip",
+      "uses": [
+        "a-strip-is-ten"
+      ],
+      "semantics": {
+        "value": 10,
+        "tens": 1,
+        "ones": 0
+      }
+    },
+    {
+      "key": "stickers-34",
+      "uses": [
+        "a-strip-is-ten",
+        "add-loose-three",
+        "add-three-strips",
+        "add-the-same-units"
+      ],
+      "semantics": {
+        "value": 34,
+        "tens": 3,
+        "ones": 4
+      }
+    },
+    {
+      "key": "add-three-ones",
+      "uses": [
+        "add-loose-three"
+      ],
+      "semantics": {
+        "before": [
+          {
+            "value": 34,
+            "tens": 3,
+            "ones": 4
+          },
+          {
+            "value": 3,
+            "tens": 0,
+            "ones": 3
+          }
+        ],
+        "after": {
+          "value": 37,
+          "tens": 3,
+          "ones": 7
+        },
+        "transition": "two separate operands then an arrow to total"
+      }
+    },
+    {
+      "key": "add-three-tens",
+      "uses": [
+        "add-three-strips"
+      ],
+      "semantics": {
+        "before": [
+          {
+            "value": 34,
+            "tens": 3,
+            "ones": 4
+          },
+          {
+            "value": 30,
+            "tens": 3,
+            "ones": 0
+          }
+        ],
+        "after": {
+          "value": 64,
+          "tens": 6,
+          "ones": 4
+        },
+        "transition": "two separate operands then an arrow to total"
+      }
+    },
+    {
+      "key": "one-unit-marker",
+      "uses": [
+        "sort-the-counting-units"
+      ],
+      "semantics": {
+        "value": 1,
+        "tens": 0,
+        "ones": 1
+      }
+    },
+    {
+      "key": "sort-loose-2",
+      "uses": [
+        "sort-the-counting-units"
+      ],
+      "semantics": {
+        "value": 2,
+        "tens": 0,
+        "ones": 2
+      }
+    },
+    {
+      "key": "sort-loose-3",
+      "uses": [
+        "sort-the-counting-units"
+      ],
+      "semantics": {
+        "value": 3,
+        "tens": 0,
+        "ones": 3
+      }
+    },
+    {
+      "key": "sort-loose-4",
+      "uses": [
+        "sort-the-counting-units"
+      ],
+      "semantics": {
+        "value": 4,
+        "tens": 0,
+        "ones": 4
+      }
+    },
+    {
+      "key": "sort-loose-6",
+      "uses": [
+        "sort-the-counting-units"
+      ],
+      "semantics": {
+        "value": 6,
+        "tens": 0,
+        "ones": 6
+      }
+    },
+    {
+      "key": "sort-loose-7",
+      "uses": [
+        "sort-the-counting-units"
+      ],
+      "semantics": {
+        "value": 7,
+        "tens": 0,
+        "ones": 7
+      }
+    },
+    {
+      "key": "sort-strip-1",
+      "uses": [
+        "sort-the-counting-units"
+      ],
+      "semantics": {
+        "value": 10,
+        "tens": 1,
+        "ones": 0
+      }
+    },
+    {
+      "key": "sort-strip-2",
+      "uses": [
+        "sort-the-counting-units"
+      ],
+      "semantics": {
+        "value": 20,
+        "tens": 2,
+        "ones": 0
+      }
+    },
+    {
+      "key": "sort-strip-3",
+      "uses": [
+        "sort-the-counting-units"
+      ],
+      "semantics": {
+        "value": 30,
+        "tens": 3,
+        "ones": 0
+      }
+    },
+    {
+      "key": "sort-strip-4",
+      "uses": [
+        "sort-the-counting-units"
+      ],
+      "semantics": {
+        "value": 40,
+        "tens": 4,
+        "ones": 0
+      }
+    },
+    {
+      "key": "ten-unit-marker",
+      "uses": [
+        "sort-the-counting-units"
+      ],
+      "semantics": {
+        "value": 10,
+        "tens": 1,
+        "ones": 0
+      }
+    },
+    {
+      "key": "add-twenty-three",
+      "uses": [
+        "add-the-same-units"
+      ],
+      "semantics": {
+        "before": [
+          {
+            "value": 34,
+            "tens": 3,
+            "ones": 4
+          },
+          {
+            "value": 23,
+            "tens": 2,
+            "ones": 3
+          }
+        ],
+        "after": {
+          "value": 57,
+          "tens": 5,
+          "ones": 7
+        },
+        "transition": "two separate operands then an arrow to total"
+      }
+    },
+    {
+      "key": "example-four-plus-forty-two",
+      "uses": [
+        "swap-the-positions"
+      ],
+      "semantics": {
+        "before": [
+          {
+            "value": 4,
+            "tens": 0,
+            "ones": 4
+          },
+          {
+            "value": 42,
+            "tens": 4,
+            "ones": 2
+          }
+        ],
+        "after": {
+          "value": 46,
+          "tens": 4,
+          "ones": 6
+        },
+        "transition": "two separate operands then an arrow to total"
+      }
+    },
+    {
+      "key": "example-forty-plus-forty-two",
+      "uses": [
+        "swap-the-positions"
+      ],
+      "semantics": {
+        "before": [
+          {
+            "value": 40,
+            "tens": 4,
+            "ones": 0
+          },
+          {
+            "value": 42,
+            "tens": 4,
+            "ones": 2
+          }
+        ],
+        "after": {
+          "value": 82,
+          "tens": 8,
+          "ones": 2
+        },
+        "transition": "two separate operands then an arrow to total"
+      }
+    },
+    {
+      "key": "order-15-4",
+      "uses": [
+        "match-the-order-total"
+      ],
+      "semantics": {
+        "operands": [
+          {
+            "value": 15,
+            "tens": 1,
+            "ones": 5
+          },
+          {
+            "value": 4,
+            "tens": 0,
+            "ones": 4
+          }
+        ],
+        "formula": "15 + 4",
+        "resultVisible": false,
+        "format": "order"
+      }
+    },
+    {
+      "key": "order-23-4",
+      "uses": [
+        "match-the-order-total"
+      ],
+      "semantics": {
+        "operands": [
+          {
+            "value": 23,
+            "tens": 2,
+            "ones": 3
+          },
+          {
+            "value": 4,
+            "tens": 0,
+            "ones": 4
+          }
+        ],
+        "formula": "23 + 4",
+        "resultVisible": false,
+        "format": "order"
+      }
+    },
+    {
+      "key": "order-31-20",
+      "uses": [
+        "match-the-order-total"
+      ],
+      "semantics": {
+        "operands": [
+          {
+            "value": 31,
+            "tens": 3,
+            "ones": 1
+          },
+          {
+            "value": 20,
+            "tens": 2,
+            "ones": 0
+          }
+        ],
+        "formula": "31 + 20",
+        "resultVisible": false,
+        "format": "order"
+      }
+    },
+    {
+      "key": "order-31-24",
+      "uses": [
+        "match-the-order-total"
+      ],
+      "semantics": {
+        "operands": [
+          {
+            "value": 31,
+            "tens": 3,
+            "ones": 1
+          },
+          {
+            "value": 24,
+            "tens": 2,
+            "ones": 4
+          }
+        ],
+        "formula": "31 + 24",
+        "resultVisible": false,
+        "format": "order"
+      }
+    },
+    {
+      "key": "order-40-53",
+      "uses": [
+        "match-the-order-total"
+      ],
+      "semantics": {
+        "operands": [
+          {
+            "value": 40,
+            "tens": 4,
+            "ones": 0
+          },
+          {
+            "value": 53,
+            "tens": 5,
+            "ones": 3
+          }
+        ],
+        "formula": "40 + 53",
+        "resultVisible": false,
+        "format": "order"
+      }
+    },
+    {
+      "key": "order-42-30",
+      "uses": [
+        "match-the-order-total"
+      ],
+      "semantics": {
+        "operands": [
+          {
+            "value": 42,
+            "tens": 4,
+            "ones": 2
+          },
+          {
+            "value": 30,
+            "tens": 3,
+            "ones": 0
+          }
+        ],
+        "formula": "42 + 30",
+        "resultVisible": false,
+        "format": "order"
+      }
+    },
+    {
+      "key": "order-42-5",
+      "uses": [
+        "match-the-order-total"
+      ],
+      "semantics": {
+        "operands": [
+          {
+            "value": 42,
+            "tens": 4,
+            "ones": 2
+          },
+          {
+            "value": 5,
+            "tens": 0,
+            "ones": 5
+          }
+        ],
+        "formula": "42 + 5",
+        "resultVisible": false,
+        "format": "order"
+      }
+    },
+    {
+      "key": "order-52-27",
+      "uses": [
+        "match-the-order-total"
+      ],
+      "semantics": {
+        "operands": [
+          {
+            "value": 52,
+            "tens": 5,
+            "ones": 2
+          },
+          {
+            "value": 27,
+            "tens": 2,
+            "ones": 7
+          }
+        ],
+        "formula": "52 + 27",
+        "resultVisible": false,
+        "format": "order"
+      }
+    },
+    {
+      "key": "order-6-53",
+      "uses": [
+        "match-the-order-total"
+      ],
+      "semantics": {
+        "operands": [
+          {
+            "value": 6,
+            "tens": 0,
+            "ones": 6
+          },
+          {
+            "value": 53,
+            "tens": 5,
+            "ones": 3
+          }
+        ],
+        "formula": "6 + 53",
+        "resultVisible": false,
+        "format": "order"
+      }
+    },
+    {
+      "key": "tile-15-4",
+      "uses": [
+        "match-the-order-total"
+      ],
+      "semantics": {
+        "operands": [
+          {
+            "value": 15,
+            "tens": 1,
+            "ones": 5
+          },
+          {
+            "value": 4,
+            "tens": 0,
+            "ones": 4
+          }
+        ],
+        "formula": "15 + 4",
+        "resultVisible": false,
+        "format": "tile"
+      }
+    },
+    {
+      "key": "tile-23-4",
+      "uses": [
+        "match-the-order-total"
+      ],
+      "semantics": {
+        "operands": [
+          {
+            "value": 23,
+            "tens": 2,
+            "ones": 3
+          },
+          {
+            "value": 4,
+            "tens": 0,
+            "ones": 4
+          }
+        ],
+        "formula": "23 + 4",
+        "resultVisible": false,
+        "format": "tile"
+      }
+    },
+    {
+      "key": "tile-31-20",
+      "uses": [
+        "match-the-order-total"
+      ],
+      "semantics": {
+        "operands": [
+          {
+            "value": 31,
+            "tens": 3,
+            "ones": 1
+          },
+          {
+            "value": 20,
+            "tens": 2,
+            "ones": 0
+          }
+        ],
+        "formula": "31 + 20",
+        "resultVisible": false,
+        "format": "tile"
+      }
+    },
+    {
+      "key": "tile-31-24",
+      "uses": [
+        "match-the-order-total"
+      ],
+      "semantics": {
+        "operands": [
+          {
+            "value": 31,
+            "tens": 3,
+            "ones": 1
+          },
+          {
+            "value": 24,
+            "tens": 2,
+            "ones": 4
+          }
+        ],
+        "formula": "31 + 24",
+        "resultVisible": false,
+        "format": "tile"
+      }
+    },
+    {
+      "key": "tile-40-53",
+      "uses": [
+        "match-the-order-total"
+      ],
+      "semantics": {
+        "operands": [
+          {
+            "value": 40,
+            "tens": 4,
+            "ones": 0
+          },
+          {
+            "value": 53,
+            "tens": 5,
+            "ones": 3
+          }
+        ],
+        "formula": "40 + 53",
+        "resultVisible": false,
+        "format": "tile"
+      }
+    },
+    {
+      "key": "tile-42-30",
+      "uses": [
+        "match-the-order-total"
+      ],
+      "semantics": {
+        "operands": [
+          {
+            "value": 42,
+            "tens": 4,
+            "ones": 2
+          },
+          {
+            "value": 30,
+            "tens": 3,
+            "ones": 0
+          }
+        ],
+        "formula": "42 + 30",
+        "resultVisible": false,
+        "format": "tile"
+      }
+    },
+    {
+      "key": "tile-42-5",
+      "uses": [
+        "match-the-order-total"
+      ],
+      "semantics": {
+        "operands": [
+          {
+            "value": 42,
+            "tens": 4,
+            "ones": 2
+          },
+          {
+            "value": 5,
+            "tens": 0,
+            "ones": 5
+          }
+        ],
+        "formula": "42 + 5",
+        "resultVisible": false,
+        "format": "tile"
+      }
+    },
+    {
+      "key": "tile-52-27",
+      "uses": [
+        "match-the-order-total"
+      ],
+      "semantics": {
+        "operands": [
+          {
+            "value": 52,
+            "tens": 5,
+            "ones": 2
+          },
+          {
+            "value": 27,
+            "tens": 2,
+            "ones": 7
+          }
+        ],
+        "formula": "52 + 27",
+        "resultVisible": false,
+        "format": "tile"
+      }
+    },
+    {
+      "key": "tile-6-53",
+      "uses": [
+        "match-the-order-total"
+      ],
+      "semantics": {
+        "operands": [
+          {
+            "value": 6,
+            "tens": 0,
+            "ones": 6
+          },
+          {
+            "value": 53,
+            "tens": 5,
+            "ones": 3
+          }
+        ],
+        "formula": "6 + 53",
+        "resultVisible": false,
+        "format": "tile"
+      }
+    },
+    {
+      "key": "total-19",
+      "uses": [
+        "match-the-order-total"
+      ],
+      "semantics": {
+        "value": 19,
+        "tens": 1,
+        "ones": 9,
+        "numericTarget": true
+      }
+    },
+    {
+      "key": "total-27",
+      "uses": [
+        "match-the-order-total"
+      ],
+      "semantics": {
+        "value": 27,
+        "tens": 2,
+        "ones": 7,
+        "numericTarget": true
+      }
+    },
+    {
+      "key": "total-47",
+      "uses": [
+        "match-the-order-total"
+      ],
+      "semantics": {
+        "value": 47,
+        "tens": 4,
+        "ones": 7,
+        "numericTarget": true
+      }
+    },
+    {
+      "key": "total-51",
+      "uses": [
+        "match-the-order-total"
+      ],
+      "semantics": {
+        "value": 51,
+        "tens": 5,
+        "ones": 1,
+        "numericTarget": true
+      }
+    },
+    {
+      "key": "total-55",
+      "uses": [
+        "match-the-order-total"
+      ],
+      "semantics": {
+        "value": 55,
+        "tens": 5,
+        "ones": 5,
+        "numericTarget": true
+      }
+    },
+    {
+      "key": "total-59",
+      "uses": [
+        "match-the-order-total"
+      ],
+      "semantics": {
+        "value": 59,
+        "tens": 5,
+        "ones": 9,
+        "numericTarget": true
+      }
+    },
+    {
+      "key": "total-72",
+      "uses": [
+        "match-the-order-total"
+      ],
+      "semantics": {
+        "value": 72,
+        "tens": 7,
+        "ones": 2,
+        "numericTarget": true
+      }
+    },
+    {
+      "key": "total-79",
+      "uses": [
+        "match-the-order-total"
+      ],
+      "semantics": {
+        "value": 79,
+        "tens": 7,
+        "ones": 9,
+        "numericTarget": true
+      }
+    },
+    {
+      "key": "total-93",
+      "uses": [
+        "match-the-order-total"
+      ],
+      "semantics": {
+        "value": 93,
+        "tens": 9,
+        "ones": 3,
+        "numericTarget": true
+      }
+    },
+    {
+      "key": "check-1-order",
+      "uses": [
+        "nrg-q1"
+      ],
+      "semantics": {
+        "kind": "quiz operands",
+        "groups": [
+          {
+            "value": 22,
+            "tens": 2,
+            "ones": 2
+          },
+          {
+            "value": 6,
+            "tens": 0,
+            "ones": 6
+          }
+        ],
+        "resultVisible": false
+      }
+    },
+    {
+      "key": "check-1-card-1",
+      "uses": [
+        "nrg-q1"
+      ],
+      "semantics": {
+        "kind": "quiz answer model",
+        "distinctArt": true,
+        "option": {
+          "value": 24,
+          "tens": 2,
+          "ones": 4
+        }
+      }
+    },
+    {
+      "key": "check-1-card-2",
+      "uses": [
+        "nrg-q1"
+      ],
+      "semantics": {
+        "kind": "quiz answer model",
+        "distinctArt": true,
+        "option": {
+          "value": 28,
+          "tens": 2,
+          "ones": 8
+        }
+      }
+    },
+    {
+      "key": "check-1-card-3",
+      "uses": [
+        "nrg-q1"
+      ],
+      "semantics": {
+        "kind": "quiz answer model",
+        "distinctArt": true,
+        "option": {
+          "value": 82,
+          "tens": 8,
+          "ones": 2
+        }
+      }
+    },
+    {
+      "key": "check-2-order",
+      "uses": [
+        "nrg-q2"
+      ],
+      "semantics": {
+        "kind": "quiz operands",
+        "groups": [
+          {
+            "value": 54,
+            "tens": 5,
+            "ones": 4
+          },
+          {
+            "value": 20,
+            "tens": 2,
+            "ones": 0
+          }
+        ],
+        "resultVisible": false
+      }
+    },
+    {
+      "key": "check-2-card-1",
+      "uses": [
+        "nrg-q2"
+      ],
+      "semantics": {
+        "kind": "quiz answer model",
+        "distinctArt": true,
+        "option": {
+          "value": 74,
+          "tens": 7,
+          "ones": 4
+        }
+      }
+    },
+    {
+      "key": "check-2-card-2",
+      "uses": [
+        "nrg-q2"
+      ],
+      "semantics": {
+        "kind": "quiz answer model",
+        "distinctArt": true,
+        "option": {
+          "value": 56,
+          "tens": 5,
+          "ones": 6
+        }
+      }
+    },
+    {
+      "key": "check-2-card-3",
+      "uses": [
+        "nrg-q2"
+      ],
+      "semantics": {
+        "kind": "quiz answer model",
+        "distinctArt": true,
+        "option": {
+          "value": 76,
+          "tens": 7,
+          "ones": 6
+        }
+      }
+    },
+    {
+      "key": "check-3-order",
+      "uses": [
+        "nrg-q3"
+      ],
+      "semantics": {
+        "kind": "quiz operands",
+        "groups": [
+          {
+            "value": 42,
+            "tens": 4,
+            "ones": 2
+          },
+          {
+            "value": 16,
+            "tens": 1,
+            "ones": 6
+          }
+        ],
+        "resultVisible": false
+      }
+    },
+    {
+      "key": "check-3-card-1",
+      "uses": [
+        "nrg-q3"
+      ],
+      "semantics": {
+        "kind": "quiz answer model",
+        "distinctArt": true,
+        "option": {
+          "value": 48,
+          "tens": 4,
+          "ones": 8
+        }
+      }
+    },
+    {
+      "key": "check-3-card-2",
+      "uses": [
+        "nrg-q3"
+      ],
+      "semantics": {
+        "kind": "quiz answer model",
+        "distinctArt": true,
+        "option": {
+          "value": 56,
+          "tens": 5,
+          "ones": 6
+        }
+      }
+    },
+    {
+      "key": "check-3-card-3",
+      "uses": [
+        "nrg-q3"
+      ],
+      "semantics": {
+        "kind": "quiz answer model",
+        "distinctArt": true,
+        "option": {
+          "value": 58,
+          "tens": 5,
+          "ones": 8
+        }
+      }
+    },
+    {
+      "key": "check-4-order",
+      "uses": [
+        "nrg-q4"
+      ],
+      "semantics": {
+        "kind": "quiz operands",
+        "groups": [
+          {
+            "value": 6,
+            "tens": 0,
+            "ones": 6
+          },
+          {
+            "value": 61,
+            "tens": 6,
+            "ones": 1
+          }
+        ],
+        "resultVisible": false
+      }
+    },
+    {
+      "key": "check-4-card-1",
+      "uses": [
+        "nrg-q4"
+      ],
+      "semantics": {
+        "kind": "quiz answer model",
+        "distinctArt": true,
+        "option": {
+          "value": 61,
+          "tens": 6,
+          "ones": 1
+        }
+      }
+    },
+    {
+      "key": "check-4-card-2",
+      "uses": [
+        "nrg-q4"
+      ],
+      "semantics": {
+        "kind": "quiz answer model",
+        "distinctArt": true,
+        "option": {
+          "value": 67,
+          "tens": 6,
+          "ones": 7
+        }
+      }
+    },
+    {
+      "key": "check-4-card-3",
+      "uses": [
+        "nrg-q4"
+      ],
+      "semantics": {
+        "kind": "quiz answer model",
+        "distinctArt": true,
+        "option": {
+          "value": 76,
+          "tens": 7,
+          "ones": 6
+        }
+      }
+    },
+    {
+      "key": "check-5-order",
+      "uses": [
+        "nrg-q5"
+      ],
+      "semantics": {
+        "kind": "quiz operands",
+        "groups": [
+          [
+            {
+              "value": 36,
+              "tens": 3,
+              "ones": 6
+            },
+            {
+              "value": 3,
+              "tens": 0,
+              "ones": 3
+            }
+          ],
+          [
+            {
+              "value": 36,
+              "tens": 3,
+              "ones": 6
+            },
+            {
+              "value": 30,
+              "tens": 3,
+              "ones": 0
+            }
+          ]
+        ],
+        "resultVisible": false
+      }
+    },
+    {
+      "key": "check-5-card-1",
+      "uses": [
+        "nrg-q5"
+      ],
+      "semantics": {
+        "kind": "quiz answer model",
+        "distinctArt": true,
+        "option": [
+          {
+            "value": 66,
+            "tens": 6,
+            "ones": 6
+          },
+          {
+            "value": 39,
+            "tens": 3,
+            "ones": 9
+          }
+        ]
+      }
+    },
+    {
+      "key": "check-5-card-2",
+      "uses": [
+        "nrg-q5"
+      ],
+      "semantics": {
+        "kind": "quiz answer model",
+        "distinctArt": true,
+        "option": [
+          {
+            "value": 39,
+            "tens": 3,
+            "ones": 9
+          },
+          {
+            "value": 39,
+            "tens": 3,
+            "ones": 9
+          }
+        ]
+      }
+    },
+    {
+      "key": "check-5-card-3",
+      "uses": [
+        "nrg-q5"
+      ],
+      "semantics": {
+        "kind": "quiz answer model",
+        "distinctArt": true,
+        "option": [
+          {
+            "value": 39,
+            "tens": 3,
+            "ones": 9
+          },
+          {
+            "value": 66,
+            "tens": 6,
+            "ones": 6
+          }
+        ]
+      }
+    },
+    {
+      "key": "check-6-order",
+      "uses": [
+        "nrg-q6"
+      ],
+      "semantics": {
+        "kind": "quiz operands",
+        "groups": [
+          {
+            "value": 44,
+            "tens": 4,
+            "ones": 4
+          },
+          {
+            "value": 25,
+            "tens": 2,
+            "ones": 5
+          }
+        ],
+        "resultVisible": false
+      }
+    },
+    {
+      "key": "check-6-card-1",
+      "uses": [
+        "nrg-q6"
+      ],
+      "semantics": {
+        "kind": "quiz answer model",
+        "distinctArt": true,
+        "option": {
+          "value": 69,
+          "tens": 6,
+          "ones": 9
+        }
+      }
+    },
+    {
+      "key": "check-6-card-2",
+      "uses": [
+        "nrg-q6"
+      ],
+      "semantics": {
+        "kind": "quiz answer model",
+        "distinctArt": true,
+        "option": {
+          "value": 64,
+          "tens": 6,
+          "ones": 4
+        }
+      }
+    },
+    {
+      "key": "check-6-card-3",
+      "uses": [
+        "nrg-q6"
+      ],
+      "semantics": {
+        "kind": "quiz answer model",
+        "distinctArt": true,
+        "option": {
+          "value": 49,
+          "tens": 4,
+          "ones": 9
+        }
+      }
+    },
+    {
+      "key": "craft-review-display",
+      "uses": [
+        "tell-how-you-added"
+      ],
+      "semantics": {
+        "models": [
+          {
+            "value": 32,
+            "tens": 3,
+            "ones": 2
+          },
+          {
+            "value": 5,
+            "tens": 0,
+            "ones": 5
+          },
+          {
+            "value": 20,
+            "tens": 2,
+            "ones": 0
+          }
+        ],
+        "kind": "three separate demonstration cards, no arithmetic result implied"
+      }
+    }
+  ]
+}

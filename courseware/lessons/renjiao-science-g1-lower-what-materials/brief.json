@@ -1,0 +1,227 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "它们是用什么材料做的",
+  "binding": {
+    "editionId": "smartedu-science-six-year-g1-lower-e231dd57",
+    "revisionId": "directory-359f40a6afba915101f297d3",
+    "unitId": "634de0db-e962-4954-9be8-abfd7415579e",
+    "nodeId": "bc45e288-47b7-4afe-ac36-dd331104630c"
+  },
+  "goals": [
+    "能区分物品名称和材料名称，识别木材、金属、玻璃、布、塑料、石材和纸等常见材料。",
+    "按整件到局部观察，比较样本的光泽、透明等可见特征；成人核过的安全样本才可轻摸并据实记下。",
+    "按指定部位使用的材料分类，辨认同用途不同材料和不同物品同材料。",
+    "能指出同一物品的不同部位及其材料，并用部位的用途解释选材。"
+  ],
+  "goalSources": [
+    "印35–36、教案1–2",
+    "印37、任务单1",
+    "印38–39、任务单2",
+    "印39、教案4"
+  ],
+  "scenario": "原创松风校园展台。孩子先给相似的用品找材料线索，再为展台找可见的双视角证据，最后说为什么给各部位选不同材料。",
+  "pageSequence": [
+    {
+      "key": "material-workbench",
+      "kind": "teaching",
+      "plan": "展台任务，区分物品和材料。"
+    },
+    {
+      "key": "seven-sample-materials",
+      "kind": "teaching",
+      "plan": "按样本介绍七种材料及常见实例。"
+    },
+    {
+      "key": "same-method-fair-compare",
+      "kind": "teaching",
+      "plan": "同样的图样放样片后比较透明和反光；实物触感待观察。"
+    },
+    {
+      "key": "same-shape-different-material",
+      "kind": "teaching",
+      "plan": "同形同用途的木托盘和塑料托盘比较材料线索。"
+    },
+    {
+      "key": "material-docks",
+      "kind": "game",
+      "plan": "推车按对象材料送到真实材料样片托盘。"
+    },
+    {
+      "key": "each-part-has-a-job",
+      "kind": "teaching",
+      "plan": "凳面和凳腿用材、可见线索及各部位用途。"
+    },
+    {
+      "key": "material-photo-pairs",
+      "kind": "game",
+      "plan": "同物实际普通输入拍俯侧，提取不同部位的视觉线索。"
+    },
+    {
+      "key": "evidence-not-a-guess",
+      "kind": "teaching",
+      "plan": "把已见和待观察分开，解释为什么分类、为什么选材。"
+    },
+    {
+      "key": "picture-quiz",
+      "kind": "quiz",
+      "plan": "六道新对象或情境，覆盖材料分类、比较、不同部位及可靠记录。"
+    },
+    {
+      "key": "home-material-observation",
+      "kind": "teaching",
+      "plan": "和成人实际观察一物两部位，留下图和真实证据。"
+    }
+  ],
+  "games": [
+    {
+      "page": "material-docks",
+      "template": "sortingDepot",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.sortingDepot",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "classification",
+      "selection": "孩子搬运物件，只有所用材料相符才入盘。首关同形同色托盘按木/塑料区分；后续重复木材且有不同外形，再用纸、玻璃、金属和石材。",
+      "levels": [
+        [
+          "木托盘",
+          "塑料托盘"
+        ],
+        [
+          "木盒",
+          "布袋",
+          "木框"
+        ],
+        [
+          "纸卡",
+          "玻璃碟",
+          "金属铃",
+          "石砖"
+        ]
+      ]
+    },
+    {
+      "page": "material-photo-pairs",
+      "template": "shutterScout",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.shutterScout",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "observe_state",
+      "selection": "同一件复合物品实际俯侧拍摄，按取景角度留下可见部位，不把质感视觉演成触觉结论。",
+      "levels": [
+        {
+          "object": "木腿布面凳",
+          "shotOrder": [
+            "top",
+            "side"
+          ]
+        },
+        {
+          "object": "透明工具盒",
+          "shotOrder": [
+            "side",
+            "top",
+            "side"
+          ]
+        },
+        {
+          "object": "木底夹板",
+          "shotOrder": [
+            "top",
+            "side",
+            "top",
+            "side"
+          ]
+        }
+      ]
+    }
+  ],
+  "quiz": [
+    {
+      "id": "paper-object",
+      "skill": "material-versus-object",
+      "prompt": "哪件物品的主体是用纸做的？",
+      "answer": "B",
+      "optionImages": [
+        "quiz-knit-glove",
+        "quiz-cardboard-tube",
+        "quiz-stone-marker"
+      ]
+    },
+    {
+      "id": "see-through-sample",
+      "skill": "controlled-transparency",
+      "prompt": "隔着哪块样片，还能看清后面的蓝三角？",
+      "answer": "A",
+      "optionImages": [
+        "window-clear",
+        "window-wood",
+        "window-metal"
+      ]
+    },
+    {
+      "id": "different-things-same-material",
+      "skill": "classify-by-material",
+      "prompt": "哪组的两件物品都能送到木样片盘？",
+      "answer": "C",
+      "optionImages": [
+        "quiz-wood-and-plastic-rulers",
+        "quiz-metal-and-plastic",
+        "quiz-wood-and-gear"
+      ]
+    },
+    {
+      "id": "material-at-the-clasp",
+      "skill": "identify-material-by-part",
+      "prompt": "小布包上圈起来的搭扣用什么做？",
+      "answer": "B",
+      "optionImages": [
+        "swatch-wood",
+        "swatch-metal",
+        "swatch-cloth"
+      ]
+    },
+    {
+      "id": "record-seen-evidence",
+      "skill": "only-record-observed",
+      "prompt": "只看过瓶盖，哪张卡只记看见的线索？",
+      "answer": "C",
+      "optionImages": [
+        "quiz-record-touch",
+        "quiz-record-smell",
+        "quiz-record-highlight"
+      ]
+    },
+    {
+      "id": "fold-around-corner",
+      "skill": "choose-material-for-use",
+      "prompt": "要给展板包住拐角，哪块样片合适？",
+      "answer": "A",
+      "optionImages": [
+        "quiz-cloth-around-corner",
+        "quiz-wood-at-corner",
+        "quiz-stone-at-corner"
+      ]
+    }
+  ],
+  "afterClass": {
+    "familyTask": "和大人观察家中一件熟悉的收纳用品。先画整件，再圈两个部位，记下看见的材料线索。大人确认干净、无尖边的样本才轻摸。玻璃由大人展示，陌生物品不闻不尝。没观察的先留空。",
+    "weeklyQuestionSource": [
+      "材料和物品",
+      "同方法对照",
+      "按所用材料分类",
+      "各部位选材和真实证据"
+    ]
+  },
+  "observationPlan": {
+    "scene": "material-photo-pairs",
+    "trialId": "same-object-two-views",
+    "simulatedResult": "普通输入完成三个物品后，才导出同一件的俯侧照片；口述、实物触感、亲子结果待观察。",
+    "familyPractice": "和大人观察家中一件熟悉的收纳用品。先画整件，再圈两个部位，记下看见的材料线索。大人确认干净、无尖边的样本才轻摸。玻璃由大人展示，陌生物品不闻不尝。没观察的先留空。"
+  },
+  "mediaStatus": {
+    "art": "pending_formal_imagegen_disk_hold",
+    "build": "pending_registered_art",
+    "browser": "pending_disk_hold",
+    "voice": "pending_independent_review_and_authorization"
+  }
+}

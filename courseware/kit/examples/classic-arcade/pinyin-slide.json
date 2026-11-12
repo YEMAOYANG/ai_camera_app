@@ -1,0 +1,39 @@
+{
+  "template": "slideMerge",
+  "draft": true,
+  "title": "拼音滑轨",
+  "sub": "让字片沿滑轨碰头，拼出收藏格里的音节。",
+  "art": {
+    "backdrop": "clouds.webp",
+    "sticker": "sticker.webp",
+    "frames": ["rabbit-ready.webp", "rabbit-jump.webp"]
+  },
+  "levels": [
+    {
+      "board": [[null, null, null, null], ["b", null, "ā", null], [null, null, null, null], [null, null, null, null]],
+      "pairs": [["b", "ā", "bā"]],
+      "targets": ["bā"],
+      "labels": {"ā": "ɑ̄", "bā": "bɑ̄"},
+      "seconds": 0.36,
+      "hints": ["字片沿同一条轨道滑，看看它们在哪一排。", "试试发亮的方向，把两片滑到一起。"]
+    },
+    {
+      "board": [["b", null, "p", "ā"], [null, null, null, null], ["ō", null, "m", "ǎ"], [null, null, null, null]],
+      "walls": [5],
+      "pairs": [["b", "ā", "bā"], ["p", "ō", "pō"], ["m", "ǎ", "mǎ"]],
+      "targets": ["bā", "pō", "mǎ"],
+      "labels": {"ā": "ɑ̄", "bā": "bɑ̄", "ǎ": "ɑ̌", "mǎ": "mɑ̌"},
+      "seconds": 0.27,
+      "hints": ["挡板会截住字片，换条轨道试试。", "跟着亮箭头挪一挪，再找能拼成一对的字片。"]
+    },
+    {
+      "board": [["p", "ú", null, "ā"], [null, null, "m", null], ["b", null, "ō", null], [null, "ǎ", "f", null]],
+      "walls": [5, 11],
+      "pairs": [["b", "ā", "bā"], ["p", "ō", "pō"], ["m", "ǎ", "mǎ"], ["f", "ú", "fú"]],
+      "targets": ["bā", "pō", "mǎ", "fú"],
+      "labels": {"ā": "ɑ̄", "bā": "bɑ̄", "ǎ": "ɑ̌", "mǎ": "mɑ̌"},
+      "seconds": 0.19,
+      "hints": ["先把一对滑到同一条轨道，再想下一步。", "试试亮箭头。想从头摆，也可以按回转键。"]
+    }
+  ]
+}

@@ -1,0 +1,86 @@
+{
+  "atlasId": "delivery-atlas",
+  "rows": 2,
+  "columns": 3,
+  "background": "transparent",
+  "assets": [
+    {
+      "assetKey": "truck-still",
+      "description": "后台送货车静止帧",
+      "usedBy": [
+        "costume-delivery"
+      ],
+      "crop": [
+        40,
+        99,
+        495,
+        454
+      ]
+    },
+    {
+      "assetKey": "truck-moving",
+      "description": "后台送货车行动帧",
+      "usedBy": [
+        "costume-delivery"
+      ],
+      "crop": [
+        541,
+        100,
+        996,
+        454
+      ]
+    },
+    {
+      "assetKey": "lane-cart",
+      "description": "路过的薄荷色小车",
+      "usedBy": [
+        "costume-delivery"
+      ],
+      "crop": [
+        1053,
+        77,
+        1504,
+        462
+      ]
+    },
+    {
+      "assetKey": "shelf-front",
+      "description": "两层橙色木道具架",
+      "usedBy": [
+        "where-to-put-it"
+      ],
+      "crop": [
+        24,
+        588,
+        494,
+        973
+      ]
+    },
+    {
+      "assetKey": "stage-door",
+      "description": "琥珀色侧门",
+      "usedBy": [
+        "another-person"
+      ],
+      "crop": [
+        580,
+        526,
+        1008,
+        968
+      ]
+    },
+    {
+      "assetKey": "blank-ticket",
+      "description": "空白剧场票",
+      "usedBy": [
+        "ticket-row"
+      ],
+      "crop": [
+        1014,
+        635,
+        1514,
+        904
+      ]
+    }
+  ]
+}

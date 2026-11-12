@@ -1,0 +1,1146 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "简单加、减法",
+  "grade": 1,
+  "description": "在风筝节补给站点清一盒十和散件，比较合起来与拿走一份，听材料单给收货站送货。",
+  "roster": {
+    "teacher": {
+      "name": "小数老师",
+      "role": "teacher",
+      "gender": "male",
+      "voice": "Ethan",
+      "avatar": "/teachers/ashu-math-v1.png",
+      "color": "#437763",
+      "persona": "带孩子用原有数量、加入或拿走的数量解释简单加减法。"
+    }
+  },
+  "images": {
+    "box-and-eight": {
+      "file": "assets/box-and-eight.png"
+    },
+    "counter-add-four": {
+      "file": "assets/counter-add-four.png"
+    },
+    "counter-remove-four": {
+      "file": "assets/counter-remove-four.png"
+    },
+    "courier-load": {
+      "file": "assets/courier-load.png"
+    },
+    "courier-ready": {
+      "file": "assets/courier-ready.png"
+    },
+    "courier-yard": {
+      "file": "assets/courier-yard.png"
+    },
+    "dock-12": {
+      "file": "assets/dock-12.png"
+    },
+    "dock-14": {
+      "file": "assets/dock-14.png"
+    },
+    "dock-16": {
+      "file": "assets/dock-16.png"
+    },
+    "dock-17": {
+      "file": "assets/dock-17.png"
+    },
+    "dock-18": {
+      "file": "assets/dock-18.png"
+    },
+    "festival-close": {
+      "file": "assets/festival-close.png"
+    },
+    "festival-open": {
+      "file": "assets/festival-open.png"
+    },
+    "festival-sticker": {
+      "file": "assets/festival-sticker.png"
+    },
+    "operation-part": {
+      "file": "assets/operation-part.png"
+    },
+    "operation-total": {
+      "file": "assets/operation-total.png"
+    },
+    "q1-a": {
+      "file": "assets/q1-a.png"
+    },
+    "q1-b": {
+      "file": "assets/q1-b.png"
+    },
+    "q1-c": {
+      "file": "assets/q1-c.png"
+    },
+    "q1-main": {
+      "file": "assets/q1-main.png"
+    },
+    "q2-a": {
+      "file": "assets/q2-a.png"
+    },
+    "q2-b": {
+      "file": "assets/q2-b.png"
+    },
+    "q2-c": {
+      "file": "assets/q2-c.png"
+    },
+    "q2-main": {
+      "file": "assets/q2-main.png"
+    },
+    "q3-a": {
+      "file": "assets/q3-a.png"
+    },
+    "q3-b": {
+      "file": "assets/q3-b.png"
+    },
+    "q3-c": {
+      "file": "assets/q3-c.png"
+    },
+    "q3-main": {
+      "file": "assets/q3-main.png"
+    },
+    "q4-a": {
+      "file": "assets/q4-a.png"
+    },
+    "q4-b": {
+      "file": "assets/q4-b.png"
+    },
+    "q4-c": {
+      "file": "assets/q4-c.png"
+    },
+    "q4-main": {
+      "file": "assets/q4-main.png"
+    },
+    "q5-a": {
+      "file": "assets/q5-a.png"
+    },
+    "q5-b": {
+      "file": "assets/q5-b.png"
+    },
+    "q5-c": {
+      "file": "assets/q5-c.png"
+    },
+    "q5-main": {
+      "file": "assets/q5-main.png"
+    },
+    "q6-a": {
+      "file": "assets/q6-a.png"
+    },
+    "q6-b": {
+      "file": "assets/q6-b.png"
+    },
+    "q6-c": {
+      "file": "assets/q6-c.png"
+    },
+    "q6-main": {
+      "file": "assets/q6-main.png"
+    },
+    "rem-02": {
+      "file": "assets/rem-02.png"
+    },
+    "rem-06": {
+      "file": "assets/rem-06.png"
+    },
+    "rem-09": {
+      "file": "assets/rem-09.png"
+    },
+    "rem-10": {
+      "file": "assets/rem-10.png"
+    },
+    "rem-12": {
+      "file": "assets/rem-12.png"
+    },
+    "rem-13": {
+      "file": "assets/rem-13.png"
+    },
+    "rem-15": {
+      "file": "assets/rem-15.png"
+    },
+    "roles-add": {
+      "file": "assets/roles-add.png"
+    },
+    "roles-minus": {
+      "file": "assets/roles-minus.png"
+    },
+    "stock-11": {
+      "file": "assets/stock-11.png"
+    },
+    "stock-12": {
+      "file": "assets/stock-12.png"
+    },
+    "stock-13": {
+      "file": "assets/stock-13.png"
+    },
+    "stock-14": {
+      "file": "assets/stock-14.png"
+    },
+    "stock-16": {
+      "file": "assets/stock-16.png"
+    },
+    "stock-18": {
+      "file": "assets/stock-18.png"
+    },
+    "stock-19": {
+      "file": "assets/stock-19.png"
+    },
+    "take-12-10": {
+      "file": "assets/take-12-10.png"
+    },
+    "take-14-01": {
+      "file": "assets/take-14-01.png"
+    },
+    "take-14-04": {
+      "file": "assets/take-14-04.png"
+    },
+    "take-15-03": {
+      "file": "assets/take-15-03.png"
+    },
+    "take-16-06": {
+      "file": "assets/take-16-06.png"
+    },
+    "take-16-10": {
+      "file": "assets/take-16-10.png"
+    },
+    "take-17-02": {
+      "file": "assets/take-17-02.png"
+    },
+    "take-17-07": {
+      "file": "assets/take-17-07.png"
+    },
+    "take-19-10": {
+      "file": "assets/take-19-10.png"
+    },
+    "take-eight": {
+      "file": "assets/take-eight.png"
+    },
+    "take-the-ten": {
+      "file": "assets/take-the-ten.png"
+    },
+    "tile-workbench": {
+      "file": "assets/tile-workbench.png"
+    },
+    "traffic-cart": {
+      "file": "assets/traffic-cart.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "open",
+      "type": "slide",
+      "title": "补给站开门啦",
+      "template": "title-picture",
+      "data": {
+        "title": "补给站开门啦",
+        "picture": "festival-open",
+        "caption": "一盒十枚，盒外的逐个数"
+      },
+      "script": [
+        {
+          "say": "风筝节开场了。补给站该怎么点清材料呢？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "等会儿会来一盒扣子和几枚散扣。盒子该算一枚吗？"
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "我们数的是扣子。每盒装满十枚，就先记作十。"
+        },
+        {
+          "say": "盒外的扣子还没有成盒。它们要一枚一枚数。"
+        },
+        {
+          "say": "把一盒十和外面的几枚一起数，就能知道一共有几枚。"
+        },
+        {
+          "say": "有人来借材料，还得数留下多少。你愿意来帮忙吗？"
+        }
+      ]
+    },
+    {
+      "key": "compose",
+      "type": "slide",
+      "title": "一盒十加八枚",
+      "template": "picture-points",
+      "data": {
+        "title": "一盒十加八枚",
+        "picture": "box-and-eight",
+        "points": [
+          "一盒里有十枚",
+          "盒外有八枚",
+          "10＋8＝18"
+        ]
+      },
+      "script": [
+        {
+          "say": "一盒和外面这堆，要一起装袋。总共有多少？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "盒子里两排，每排五枚，合起来是十枚。"
+        },
+        {
+          "say": "先把这一盒记作十。盒里的扣子不再重新数。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "从十接着数外面八枚。每指一枚，就往后数一个。"
+        },
+        {
+          "say": "十一、十二、十三、十四、十五、十六、十七、十八。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "一盒十和八个一合起来是十八。写成十加八等于十八。"
+        },
+        {
+          "say": "如果只把盒外的八枚拿走，袋里还会有什么呢？"
+        }
+      ]
+    },
+    {
+      "key": "inverse",
+      "type": "slide",
+      "title": "同一袋，拿走不同一份",
+      "template": "two-columns",
+      "data": {
+        "title": "同一袋，拿走不同一份",
+        "left": {
+          "heading": "拿走八枚",
+          "body": "18－8＝10，留下一盒十"
+        },
+        "left_picture": "take-eight",
+        "right": {
+          "heading": "拿走一盒十",
+          "body": "18－10＝8，留下八枚散件"
+        },
+        "right_picture": "take-the-ten"
+      },
+      "script": [
+        {
+          "say": "还是刚才的十八枚。两个人借的东西一样多吗？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "先看左边。划掉的是盒外八枚，盒子没有拿走。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "所以十八减八等于十。剩下的十枚还在盒里。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "再从十八枚开始。右边拿走一整盒，外面八枚还在。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "一整盒是十。十八减十等于八。这回剩的是散件。"
+        },
+        {
+          "say": "同一个整体，拿走哪一份，就剩下另一份。"
+        },
+        {
+          "say": "算一算，底卡拿走一份后，还留下多少？"
+        },
+        {
+          "say": "先找原来的数，再看拿掉几。"
+        },
+        {
+          "say": "要落在同一行挨着，别压在底卡上面。"
+        },
+        {
+          "say": "余量配对啦。刚才少的是整盒，还是散件？"
+        }
+      ]
+    },
+    {
+      "key": "match-workbench",
+      "type": "interactive",
+      "title": "余量配对工坊",
+      "page": "match-workbench",
+      "widgetType": "learning-arcade",
+      "startImage": "tile-workbench",
+      "gameAudio": {
+        "tile-goal": "inverse-11",
+        "tile-hint": "inverse-12",
+        "tile-help": "inverse-13",
+        "tile-praise": "inverse-14"
+      },
+      "script": [
+        {
+          "say": "上面掉下来一张图卡。它能和哪张底卡配成一对？"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#tile-demo-first-card"
+        },
+        {
+          "say": "先看我指的底卡。原来有十四枚，要拿走四枚。"
+        },
+        {
+          "say": "四枚是盒外的全部散件。盒里的十枚还留着。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "看要落下的卡。只有一盒，正好表示剩下十枚。"
+        },
+        {
+          "highlight": "#game-target"
+        },
+        {
+          "say": "用左右键挪到隔壁。淡淡的影子是落下的位置。"
+        },
+        {
+          "say": "按快落键，落块和底卡在同一行挨着，就能配对。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "这张落块配上啦。下次先算余量，再看落点。"
+        },
+        {
+          "say": "现在你来。遇到没配上，想想拿走的是哪一份。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ]
+    },
+    {
+      "key": "change-ones",
+      "type": "slide",
+      "title": "只添去几个一",
+      "template": "two-columns",
+      "data": {
+        "title": "只添去几个一",
+        "left": {
+          "heading": "拨进四颗",
+          "body": "12＋4＝16，整十没有变"
+        },
+        "left_picture": "counter-add-four",
+        "right": {
+          "heading": "拨出四颗",
+          "body": "16－4＝12，整十没有变"
+        },
+        "right_picture": "counter-remove-four"
+      },
+      "script": [
+        {
+          "say": "这回把扣子记在计数器上。添四枚，要拨哪一边？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "左杆的一颗是一个十。右杆原有两颗，是两个一。"
+        },
+        {
+          "say": "再添四枚，就在右杆拨进四颗。两颗加四颗变六颗。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "十位还是一颗。一个十和六个一，就是十六。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "从十六枚里拿走四枚散件。只拨出右杆的四颗。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "右边六颗去四颗，还剩两颗。一个十和两个一是十二。"
+        },
+        {
+          "say": "这两次都只添去散件。盒子里原来的十枚没有动。"
+        },
+        {
+          "say": "添后不满十个一，去掉的也没超过原有的散件。"
+        }
+      ]
+    },
+    {
+      "key": "choose-operation",
+      "type": "slide",
+      "title": "先看问号在哪里",
+      "template": "two-columns",
+      "data": {
+        "title": "先看问号在哪里",
+        "left": {
+          "heading": "问合起来多少",
+          "body": "12＋2＝14，求全体用加"
+        },
+        "left_picture": "operation-total",
+        "right": {
+          "heading": "问另一份多少",
+          "body": "16－3＝13，知道全体求一份用减"
+        },
+        "right_picture": "operation-part"
+      },
+      "script": [
+        {
+          "say": "两份绳结图都有问号。我们要找的都是总数吗？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "左图两份都知道，有十二个和两个。问号在括线下面。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "括线把两份连起来。问合起来多少，用十二加二。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "右图括线下面已经有十六。左边这一份是三个。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "问号在另一份上。用总数十六减去三个，还剩十三。"
+        },
+        {
+          "say": "先找问号，再决定算什么。问全体和问一份，算法不同。"
+        }
+      ]
+    },
+    {
+      "key": "roles-add",
+      "type": "slide",
+      "title": "加式里的两个加数与和",
+      "template": "picture-points",
+      "data": {
+        "title": "加式里的两个加数与和",
+        "picture": "roles-add",
+        "points": [
+          "12 是原来的一份",
+          "4 是添进的一份",
+          "16 是两份的和"
+        ]
+      },
+      "script": [
+        {
+          "say": "刚才十二枚再添四枚。加法里的三个数，各是哪一份？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先有十二枚。十二放在加号前面，是一个加数。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "后来添四枚。四放在加号后面，也是一个加数。"
+        },
+        {
+          "say": "两个加数说的是原来一份和添进来一份。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "现在两份合起来有十六枚。等号后面的十六叫和。"
+        },
+        {
+          "say": "说一遍，两个加数合起来，得到的是和。"
+        },
+        {
+          "say": "等一会儿送货，要去和新数量相同的站点。"
+        }
+      ]
+    },
+    {
+      "key": "roles-minus",
+      "type": "slide",
+      "title": "减式里的三个数",
+      "template": "picture-points",
+      "data": {
+        "title": "减式里的三个数",
+        "picture": "roles-minus",
+        "points": [
+          "16 是原来的全体",
+          "4 是拿走的数量",
+          "12 是剩下的差"
+        ]
+      },
+      "script": [
+        {
+          "say": "又有人来借扣子。十六减四，三个数各说什么？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "原来一共有十六枚。从十六里往外拿，它叫被减数。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "这次拿走四枚。减号后面的四叫减数。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "留下十二枚。等号后面的十二，就是减出来的差。"
+        },
+        {
+          "say": "要知道余下多少，先找全体，再去掉拿走的数。"
+        },
+        {
+          "say": "一会儿如果听见去掉，就去找能表示差的图。"
+        }
+      ]
+    },
+    {
+      "key": "dispatch-add",
+      "type": "slide",
+      "title": "收到添散件的材料单",
+      "template": "picture-points",
+      "data": {
+        "title": "收到添散件的材料单",
+        "picture": "stock-12",
+        "points": [
+          "先拿原来的材料",
+          "算添完以后几枚",
+          "送到相同数量的计数器"
+        ]
+      },
+      "script": [
+        {
+          "say": "送货车接到新单。为什么取货图和收货图会不一样？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "下面的图说原来有几枚。先找对这一份，才能拿货。"
+        },
+        {
+          "say": "从下面取十二枚。找一盒十和两枚散扣。"
+        },
+        {
+          "say": "取十三枚，一盒十加三枚散扣。"
+        },
+        {
+          "say": "找十一枚，一盒十，外面还有一枚。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "听清要添几枚。用外面的散扣数加上添来的数。"
+        },
+        {
+          "say": "在原来的数上添五枚。去上面找添完的图。"
+        },
+        {
+          "say": "再添三枚散扣，送去和新数量相同的图。"
+        },
+        {
+          "say": "添六枚散扣。想好新数，再往上送。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "上面要找添完的计数器。十位仍是一颗，换的是个位。"
+        }
+      ]
+    },
+    {
+      "key": "dispatch-minus",
+      "type": "slide",
+      "title": "收到借走散件的材料单",
+      "template": "picture-points",
+      "data": {
+        "title": "收到借走散件的材料单",
+        "picture": "stock-18",
+        "points": [
+          "取货仍找原数",
+          "从散件里去掉",
+          "交到余量图"
+        ]
+      },
+      "script": [
+        {
+          "say": "另一张单要借材料。我们该把原数直接送上去吗？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "取十八枚，先认整盒，再数外面八枚。"
+        },
+        {
+          "say": "取十九枚，一盒十和外面九枚。"
+        },
+        {
+          "say": "找十六枚。外面有六枚，整盒也要带上。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "去掉四枚散扣，找还剩多少的图。"
+        },
+        {
+          "say": "从散件里去掉五枚。算好还剩几，再送货。"
+        },
+        {
+          "say": "借走的是散件。看看外面还剩几枚，整盒十没有动。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "选表示余量的计数器。拿进车里的图帮你记原数。"
+        },
+        {
+          "say": "先分清这次取原来的数，还是要找改完的数。"
+        },
+        {
+          "say": "整盒十先留住。想清散件的变化，再看亮处。"
+        },
+        {
+          "say": "送到啦。你把添去之后的数量算清了。"
+        }
+      ]
+    },
+    {
+      "key": "deliver-materials",
+      "type": "interactive",
+      "title": "风筝节送货车",
+      "page": "deliver-materials",
+      "widgetType": "learning-arcade",
+      "startImage": "courier-yard",
+      "gameAudio": {
+        "delivery-hint": "dispatch-minus-12",
+        "delivery-help": "dispatch-minus-13",
+        "delivery-praise": "dispatch-minus-14",
+        "stock-twelve": "dispatch-add-4",
+        "plus-five": "dispatch-add-9",
+        "stock-thirteen": "dispatch-add-5",
+        "plus-three": "dispatch-add-10",
+        "stock-eighteen": "dispatch-minus-3",
+        "minus-four": "dispatch-minus-7",
+        "stock-eleven": "dispatch-add-6",
+        "plus-six": "dispatch-add-11",
+        "stock-nineteen": "dispatch-minus-4",
+        "minus-five": "dispatch-minus-8",
+        "stock-sixteen": "dispatch-minus-5"
+      },
+      "script": [
+        {
+          "say": "车已经到了。先去哪儿，再去哪里交货？"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#delivery-first-stock"
+        },
+        {
+          "say": "先看下面。这个取货台是一盒十和两枚散扣。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "小车站在取货台，按装卸键就能拿货。"
+        },
+        {
+          "say": "我只拿这份十二枚。送到哪里，等你听完单子再算。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "你看，车边的框记下了原来的数量。"
+        },
+        {
+          "highlight": "#delivery-road"
+        },
+        {
+          "say": "上去交货要经过车道。先等别的车过去。"
+        },
+        {
+          "highlight": "#delivery-receiving"
+        },
+        {
+          "say": "上面的图是不同收货台。算清添去后的数，再选一站。"
+        },
+        {
+          "say": "轮到你啦。方向键或屏幕箭头能开车，方键能装卸。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ]
+    },
+    {
+      "key": "picture-check",
+      "type": "quiz",
+      "title": "换一批材料来检查",
+      "intro": [
+        "换了一批图卡。听题，再用刚才的办法选图。",
+        "没听清可以点小喇叭，听完再选。"
+      ],
+      "questions": [
+        {
+          "id": "festival-q1",
+          "question": "一盒有十枚徽章，又添一枚。哪张图表示合起来的数量？",
+          "skill": "十和一个一合成总量",
+          "answer": [
+            "A"
+          ],
+          "analysis": "一盒是一个十，添进的一枚是一个一。合起来是十一枚。",
+          "visual": {
+            "kind": "asset",
+            "image": "q1-main",
+            "alt": "一盒十枚徽章，右边另添一枚"
+          },
+          "options": {
+            "A": {
+              "label": "一盒十枚和一枚散徽章",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-a",
+                "alt": "一盒十枚和一枚散徽章"
+              }
+            },
+            "B": {
+              "label": "一盒十枚徽章",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-b",
+                "alt": "一盒十枚徽章"
+              }
+            },
+            "C": {
+              "label": "一盒十枚和两枚散徽章",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-c",
+                "alt": "一盒十枚和两枚散徽章"
+              }
+            }
+          }
+        },
+        {
+          "id": "festival-q2",
+          "question": "盒里十枚，盒外九枚。拿走整盒，哪张图是剩下的？",
+          "skill": "从整体中减去一个十",
+          "answer": [
+            "C"
+          ],
+          "analysis": "拿走整盒就是拿走十枚。盒外九枚没有动，所以留下九枚。",
+          "visual": {
+            "kind": "asset",
+            "image": "q2-main",
+            "alt": "一盒磁贴已划去，盒外有九枚"
+          },
+          "options": {
+            "A": {
+              "label": "一盒十枚磁贴",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-a",
+                "alt": "一盒十枚磁贴"
+              }
+            },
+            "B": {
+              "label": "一盒十枚和九枚散磁贴",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-b",
+                "alt": "一盒十枚和九枚散磁贴"
+              }
+            },
+            "C": {
+              "label": "九枚散磁贴",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-c",
+                "alt": "九枚散磁贴"
+              }
+            }
+          }
+        },
+        {
+          "id": "festival-q3",
+          "question": "计数器上是十二。个位添七颗，哪张图是添完的？",
+          "skill": "个位添几时保留原来的十位",
+          "answer": [
+            "B"
+          ],
+          "analysis": "个位原有两颗，添七颗得九颗。十位仍是一颗，所以是十九。",
+          "visual": {
+            "kind": "asset",
+            "image": "q3-main",
+            "alt": "十位一颗，个位两颗"
+          },
+          "options": {
+            "A": {
+              "label": "计数器表示十八",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-a",
+                "alt": "计数器表示十八"
+              }
+            },
+            "B": {
+              "label": "计数器表示十九",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-b",
+                "alt": "计数器表示十九"
+              }
+            },
+            "C": {
+              "label": "计数器表示十二",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-c",
+                "alt": "计数器表示十二"
+              }
+            }
+          }
+        },
+        {
+          "id": "festival-q4",
+          "question": "有十七枚纽扣，从散件里拿走六枚。哪幅图是剩下的？",
+          "skill": "从十几个里减去部分散件",
+          "answer": [
+            "A"
+          ],
+          "analysis": "盒外七枚拿走六枚，只剩一枚散件。整盒十枚仍在，合起来十一枚。",
+          "visual": {
+            "kind": "asset",
+            "image": "q4-main",
+            "alt": "一盒十枚与七枚散纽扣，其中六枚被划去"
+          },
+          "options": {
+            "A": {
+              "label": "一盒十枚和一枚散纽扣",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-a",
+                "alt": "一盒十枚和一枚散纽扣"
+              }
+            },
+            "B": {
+              "label": "一盒十枚和六枚散纽扣",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-b",
+                "alt": "一盒十枚和六枚散纽扣"
+              }
+            },
+            "C": {
+              "label": "七枚散纽扣",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-c",
+                "alt": "七枚散纽扣"
+              }
+            }
+          }
+        },
+        {
+          "id": "festival-q5",
+          "question": "一共十五片彩纸，借走两片。哪张算式卡能算留下几片？",
+          "skill": "根据全体和已知部分选减法",
+          "answer": [
+            "B"
+          ],
+          "analysis": "原来的全体是十五片，借走两片，求留下的数量，用十五减二等于十三。",
+          "visual": {
+            "kind": "asset",
+            "image": "q5-main",
+            "alt": "十五片彩纸中有两片被划去"
+          },
+          "options": {
+            "A": {
+              "label": "十五加二等于十七",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-a",
+                "alt": "十五加二等于十七"
+              }
+            },
+            "B": {
+              "label": "十五减二等于十三",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-b",
+                "alt": "十五减二等于十三"
+              }
+            },
+            "C": {
+              "label": "十五减三等于十二",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-c",
+                "alt": "十五减三等于十二"
+              }
+            }
+          }
+        },
+        {
+          "id": "festival-q6",
+          "question": "十四加三等于十七。哪张图圈的是这道加法算式的和？",
+          "skill": "把加法的和指回合起来的量",
+          "answer": [
+            "C"
+          ],
+          "analysis": "十四和三是两个加数。合起来是十七，等号后面的十七叫和。",
+          "visual": {
+            "kind": "asset",
+            "image": "q6-main",
+            "alt": "十四加三等于十七的算式"
+          },
+          "options": {
+            "A": {
+              "label": "圈十四",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-a",
+                "alt": "圈十四"
+              }
+            },
+            "B": {
+              "label": "圈三",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-b",
+                "alt": "圈三"
+              }
+            },
+            "C": {
+              "label": "圈十七",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-c",
+                "alt": "圈十七"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "recap",
+      "type": "slide",
+      "title": "下次点货，也用这几步",
+      "template": "picture-points",
+      "data": {
+        "title": "下次点货，也用这几步",
+        "picture": "festival-close",
+        "points": [
+          "一个十和几个一合起来",
+          "去掉一份，留下另一份",
+          "添去散件，整十可不变",
+          "先看问号，再选算法"
+        ]
+      },
+      "script": [
+        {
+          "say": "风筝节的材料都送到了。下次点货，你会先看什么？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先认一盒十，再数外面的散件。合起来就是总数。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "总数已经知道，拿走一份，留下另一份。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "只动散件，添完不满十，拿走的也不超过原有的。"
+        },
+        {
+          "say": "这时原来的一盒十还在，计数器的十位不变。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "问合起来多少，用加法，得到的是和。"
+        },
+        {
+          "say": "问留下多少，用减法，得到的是差。"
+        },
+        {
+          "say": "和家人装一盒十，再添几枚，或去掉几个散件。"
+        },
+        {
+          "say": "请家人把你说的数和实际摆出的数对一对。"
+        }
+      ]
+    }
+  ]
+}

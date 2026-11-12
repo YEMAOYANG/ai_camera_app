@@ -1,0 +1,1138 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "口算减法（不退位）",
+  "description": "在种苗站分清几个十和几个一，从相同计数单位里取走，求剩余。",
+  "grade": 1,
+  "roster": {
+    "math": {
+      "name": "小数老师",
+      "role": "teacher",
+      "gender": "male",
+      "voice": "Ethan",
+      "avatar": "/teachers/ashu-math-v1.png",
+      "color": "#53726a",
+      "persona": "请孩子看一眼整盘散盆，再按数量和单位解释取走与剩下。"
+    }
+  },
+  "scenes": [
+    {
+      "key": "seedling-station",
+      "type": "slide",
+      "title": "种苗站还剩多少",
+      "template": "title-picture",
+      "data": {
+        "title": "种苗站还剩多少",
+        "picture": "seedling-station-welcome",
+        "caption": "原来 → 取走 → 剩下"
+      },
+      "script": [
+        {
+          "say": "种苗站要给花坛送几盆小苗。架上原来有多少？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "看，整盘排在左边。右边还有几盆是散的。"
+        },
+        {
+          "say": "订单说要从这堆里送走四盆。取走以后，架上会更多吗？"
+        },
+        {
+          "say": "四盆本来就在这一堆里。要从原有的数量里去掉它们。"
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "知道原来和取走，求还剩多少，用减法。"
+        },
+        {
+          "say": "先分清楚哪些是一盘十盆，哪些是一盆一盆的。"
+        }
+      ]
+    },
+    {
+      "key": "read-the-trays",
+      "type": "slide",
+      "title": "一盘十盆，散盆数一",
+      "template": "two-columns",
+      "data": {
+        "title": "一盘十盆，散盆数一",
+        "left": {
+          "heading": "看一整盘",
+          "body": "1 个十"
+        },
+        "right": {
+          "heading": "看同一份总数",
+          "body": "5 个十和 7 个一"
+        },
+        "left_picture": "model-10",
+        "right_picture": "model-57"
+      },
+      "script": [
+        {
+          "say": "一盘和一盆都能拿起来。它们各有几盆？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "这个盘正好有十格。一格摆一盆，十格全摆满。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "一整盘是一个十，不要当作一盆。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "架上有五整盘，还有七盆散苗。"
+        },
+        {
+          "say": "先数整盘，再数散盆。每盆只算一次。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "五个十和七个一，合起来五十七。"
+        },
+        {
+          "say": "今天拿走的散盆够数时，整盘不需要拆开。"
+        }
+      ]
+    },
+    {
+      "key": "take-away-ones",
+      "type": "slide",
+      "title": "取走几盆散苗",
+      "template": "two-columns",
+      "data": {
+        "title": "取走几盆散苗",
+        "left": {
+          "heading": "先看原来",
+          "body": "57"
+        },
+        "right": {
+          "heading": "送走四盆",
+          "body": "57 − 4 = 53"
+        },
+        "left_picture": "model-57",
+        "right_picture": "step-57-minus-4"
+      },
+      "script": [
+        {
+          "say": "有五十七盆，要送走四盆。先从哪一边拿？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "先指原来的七盆散苗。五整盘先放着。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "五十七是五个十和七个一。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "四盆是一盆一盆的，从七盆散苗里拿四盆。"
+        },
+        {
+          "say": "七减四等于三。剩下的整盘还是五盘。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "五个十和三个一，合起来五十三。"
+        },
+        {
+          "say": "五十七减四，等于五十三。"
+        }
+      ]
+    },
+    {
+      "key": "take-away-tens",
+      "type": "slide",
+      "title": "取走几整盘",
+      "template": "two-columns",
+      "data": {
+        "title": "取走几整盘",
+        "left": {
+          "heading": "先看原来",
+          "body": "57"
+        },
+        "right": {
+          "heading": "送走四十盆",
+          "body": "57 − 40 = 17"
+        },
+        "left_picture": "model-57",
+        "right_picture": "step-57-minus-40"
+      },
+      "script": [
+        {
+          "say": "还是五十七盆。这回要送走四十盆，该从哪边拿？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "先找整盘。四十盆正好是四盘。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "原来有五个十，右边还有七个一。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "从五个十里面拿四个十，剩一个十。"
+        },
+        {
+          "say": "七盆散苗没有拿走，仍然是七个一。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "一个十和七个一，合成十七。"
+        },
+        {
+          "say": "五十七减四十，等于十七。"
+        },
+        {
+          "say": "减四盆和减四十盆，找的单位不一样。"
+        }
+      ]
+    },
+    {
+      "key": "take-both-units",
+      "type": "slide",
+      "title": "两种都要取走",
+      "template": "two-columns",
+      "data": {
+        "title": "两种都要取走",
+        "left": {
+          "heading": "先看原来的两组",
+          "body": "57 = 50 + 7"
+        },
+        "right": {
+          "heading": "送走二十四盆",
+          "body": "57 − 24 = 33"
+        },
+        "left_picture": "model-57",
+        "right_picture": "step-57-minus-24"
+      },
+      "script": [
+        {
+          "say": "订单要送走二十四盆。它里面有几个十、几个一？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "先看架上。原来有五整盘和七散盆。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "五十七分成五十和七。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "二十四是两盘四盆。从五盘中拿两盘，剩三盘。"
+        },
+        {
+          "say": "从七盆散苗中拿四盆，剩三盆。两边都够拿。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "剩三盘三盆，是三十三。"
+        },
+        {
+          "say": "五十七减二十四，等于三十三。"
+        },
+        {
+          "say": "拿走的那一份移到另一边，数剩下时不再算它。"
+        },
+        {
+          "say": "下面是几张新订单。先找原来，再听取走多少。"
+        },
+        {
+          "say": "从四十六盆里取走两盆。"
+        },
+        {
+          "say": "从五十八盆里取走六盆。"
+        },
+        {
+          "say": "从六十五盆里取走三十盆。"
+        },
+        {
+          "say": "从八十二盆里取走四十盆。"
+        },
+        {
+          "say": "从七十六盆里取走三十四盆。"
+        },
+        {
+          "say": "从六十八盆里取走二十五盆。"
+        },
+        {
+          "say": "从九十七盆里取走四十三盆。"
+        },
+        {
+          "say": "送到叶子站。"
+        },
+        {
+          "say": "送到太阳站。"
+        },
+        {
+          "say": "送到花朵站。"
+        },
+        {
+          "say": "再听是整盘、散盆，还是都有。"
+        },
+        {
+          "say": "看亮起的数量图，停稳再按方键。"
+        },
+        {
+          "say": "取走的份数对，剩下的都在架上。"
+        }
+      ]
+    },
+    {
+      "key": "deliver-the-removed-share",
+      "type": "interactive",
+      "title": "开车送走指定的一份",
+      "page": "deliver-the-removed-share",
+      "startImage": "seedling-delivery-yard",
+      "widgetType": "learning-arcade",
+      "script": [
+        {
+          "say": "我们要送走一份小苗。第一张订单要从四十六盆里拿两盆。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#first-removal-card"
+        },
+        {
+          "say": "找两盆散苗。旁边有两整盘，虽然也是两个，单位不同。"
+        },
+        {
+          "highlight": "#first-removal-bay"
+        },
+        {
+          "say": "车停在两盆这张图上。停稳，再点一次方键。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "这一回只拿到车上。送到站后，架上的剩余才会出现。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "拿到了。刚才没拿走整盘，你看到对了吗？"
+        },
+        {
+          "say": "一会儿还要听送到哪儿。开过车道时先看一眼。"
+        },
+        {
+          "say": "现在轮到你。从第一张重新拿，再开到正确的站。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "take-2": "take-both-units-14",
+        "take-6": "take-both-units-15",
+        "take-30": "take-both-units-16",
+        "take-40": "take-both-units-17",
+        "take-34": "take-both-units-18",
+        "take-25": "take-both-units-19",
+        "take-43": "take-both-units-20",
+        "to-green": "take-both-units-21",
+        "to-sun": "take-both-units-22",
+        "to-flower": "take-both-units-23",
+        "truck-hint": "take-both-units-24",
+        "truck-help": "take-both-units-25",
+        "truck-praise": "take-both-units-26"
+      }
+    },
+    {
+      "key": "zero-in-one-place",
+      "type": "slide",
+      "title": "一位剩零，怎样说",
+      "template": "two-columns",
+      "data": {
+        "title": "一位剩零，怎样说",
+        "left": {
+          "heading": "六十八减八",
+          "body": "68 − 8 = 60"
+        },
+        "right": {
+          "heading": "六十八减六十",
+          "body": "68 − 60 = 8"
+        },
+        "left_picture": "step-68-minus-8",
+        "right_picture": "step-68-minus-60"
+      },
+      "script": [
+        {
+          "say": "取走后，有一边空了。你能把架上剩的读出来吗？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "拿走八盆散苗，散盆空了。整盘还有六盘。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "个位剩零，六个十是六十。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "拿走六整盘，整盘空了，散盆还有八盆。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "没有十，只剩八个一，结果写八。"
+        },
+        {
+          "say": "同一个六十八，取走的单位一换，剩下就不同。"
+        },
+        {
+          "say": "听几道新订单。先算，再找画着剩余的图。"
+        },
+        {
+          "say": "三十九减三。"
+        },
+        {
+          "say": "四十六减三十。"
+        },
+        {
+          "say": "六十六减六。"
+        },
+        {
+          "say": "六十六减六十。"
+        },
+        {
+          "say": "七十七减二十四。"
+        },
+        {
+          "say": "八十六减二十五。"
+        },
+        {
+          "say": "九十四减五十三。"
+        },
+        {
+          "say": "六十八减二十三。"
+        },
+        {
+          "say": "再看从哪个单位里取。"
+        },
+        {
+          "say": "对准发亮的图，再点发射。"
+        },
+        {
+          "say": "数清剩下的，弹珠打中了。"
+        }
+      ]
+    },
+    {
+      "key": "aim-at-whats-left",
+      "type": "interactive",
+      "title": "瞄准架上的剩余",
+      "page": "aim-at-whats-left",
+      "startImage": "seedling-marble-yard",
+      "widgetType": "learning-arcade",
+      "script": [
+        {
+          "say": "听到三十九减三。弹珠要找哪一张剩余图？"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#first-remain-problem"
+        },
+        {
+          "say": "左边是三整盘九散盆，取走的是三散盆。"
+        },
+        {
+          "highlight": "#first-remain-target"
+        },
+        {
+          "say": "还剩三整盘六散盆。三十六在中间这张。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "先用左右转方向。对准那张，再点发射。"
+        },
+        {
+          "say": "这一回弹珠正对中间，只要发射一次。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "看弹珠飞向表示剩余的那张图。"
+        },
+        {
+          "say": "换成别的数时，先想每一边剩多少。弹珠飞时也能微调。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "diff-39-3": "zero-in-one-place-12",
+        "diff-46-30": "zero-in-one-place-13",
+        "diff-66-6": "zero-in-one-place-14",
+        "diff-66-60": "zero-in-one-place-15",
+        "diff-77-24": "zero-in-one-place-16",
+        "diff-86-25": "zero-in-one-place-17",
+        "diff-94-53": "zero-in-one-place-18",
+        "diff-68-23": "zero-in-one-place-19",
+        "marble-hint": "zero-in-one-place-20",
+        "marble-help": "zero-in-one-place-21",
+        "marble-praise": "zero-in-one-place-22"
+      }
+    },
+    {
+      "key": "new-seedling-tasks",
+      "type": "quiz",
+      "title": "种苗站的新任务",
+      "intro": [
+        "先听题，再找表示剩余的图。",
+        "没听清，可以点小喇叭。"
+      ],
+      "questions": [
+        {
+          "id": "nob-q1",
+          "question": "四十三盆，送走两盆，还剩多少？",
+          "skill": "两位数减一位数",
+          "answer": [
+            "A"
+          ],
+          "analysis": "三个一减两个一还剩一个一，四个十不动，剩四十一盆。",
+          "visual": {
+            "kind": "asset",
+            "image": "check-1-task",
+            "alt": "原有和取走图"
+          },
+          "options": {
+            "A": {
+              "label": "图卡1",
+              "visual": {
+                "kind": "asset",
+                "image": "check-1-card-1",
+                "alt": "剩下41盆"
+              }
+            },
+            "B": {
+              "label": "图卡2",
+              "visual": {
+                "kind": "asset",
+                "image": "check-1-card-2",
+                "alt": "剩下23盆"
+              }
+            },
+            "C": {
+              "label": "图卡3",
+              "visual": {
+                "kind": "asset",
+                "image": "check-1-card-3",
+                "alt": "剩下42盆"
+              }
+            }
+          }
+        },
+        {
+          "id": "nob-q2",
+          "question": "七十四盆，送走三十盆，还剩多少？",
+          "skill": "两位数减整十数",
+          "answer": [
+            "B"
+          ],
+          "analysis": "七个十减三个十得四个十，四个一不动，剩四十四盆。",
+          "visual": {
+            "kind": "asset",
+            "image": "check-2-task",
+            "alt": "原有和取走图"
+          },
+          "options": {
+            "A": {
+              "label": "图卡1",
+              "visual": {
+                "kind": "asset",
+                "image": "check-2-card-1",
+                "alt": "剩下71盆"
+              }
+            },
+            "B": {
+              "label": "图卡2",
+              "visual": {
+                "kind": "asset",
+                "image": "check-2-card-2",
+                "alt": "剩下44盆"
+              }
+            },
+            "C": {
+              "label": "图卡3",
+              "visual": {
+                "kind": "asset",
+                "image": "check-2-card-3",
+                "alt": "剩下47盆"
+              }
+            }
+          }
+        },
+        {
+          "id": "nob-q3",
+          "question": "八十五减四十二，剩下多少？",
+          "skill": "两位数减两位数不退位",
+          "answer": [
+            "C"
+          ],
+          "analysis": "八个十减四个十还剩四个十，五个一减两个一还剩三个一，合成四十三。",
+          "visual": {
+            "kind": "asset",
+            "image": "check-3-task",
+            "alt": "原有和取走图"
+          },
+          "options": {
+            "A": {
+              "label": "图卡1",
+              "visual": {
+                "kind": "asset",
+                "image": "check-3-card-1",
+                "alt": "剩下47盆"
+              }
+            },
+            "B": {
+              "label": "图卡2",
+              "visual": {
+                "kind": "asset",
+                "image": "check-3-card-2",
+                "alt": "剩下45盆"
+              }
+            },
+            "C": {
+              "label": "图卡3",
+              "visual": {
+                "kind": "asset",
+                "image": "check-3-card-3",
+                "alt": "剩下43盆"
+              }
+            }
+          }
+        },
+        {
+          "id": "nob-q4",
+          "question": "六十九减九，哪张图表示剩下的？",
+          "skill": "个位减完余零",
+          "answer": [
+            "A"
+          ],
+          "analysis": "九个一都拿走，个位是零。六个十还在，就是六十。",
+          "visual": {
+            "kind": "asset",
+            "image": "check-4-task",
+            "alt": "原有和取走图"
+          },
+          "options": {
+            "A": {
+              "label": "图卡1",
+              "visual": {
+                "kind": "asset",
+                "image": "check-4-card-1",
+                "alt": "剩下60盆"
+              }
+            },
+            "B": {
+              "label": "图卡2",
+              "visual": {
+                "kind": "asset",
+                "image": "check-4-card-2",
+                "alt": "剩下9盆"
+              }
+            },
+            "C": {
+              "label": "图卡3",
+              "visual": {
+                "kind": "asset",
+                "image": "check-4-card-3",
+                "alt": "剩下6盆"
+              }
+            }
+          }
+        },
+        {
+          "id": "nob-q5",
+          "question": "先算九十六减四，再算九十六减四十。",
+          "skill": "比较减几个一与几个十",
+          "answer": [
+            "C"
+          ],
+          "analysis": "减四，个位剩二，得九十二。减四十，十位剩五，得五十六。",
+          "visual": {
+            "kind": "asset",
+            "image": "check-5-task",
+            "alt": "原有和取走图"
+          },
+          "options": {
+            "A": {
+              "label": "图卡1",
+              "visual": {
+                "kind": "asset",
+                "image": "check-5-card-1",
+                "alt": "先剩56盆，后剩92盆"
+              }
+            },
+            "B": {
+              "label": "图卡2",
+              "visual": {
+                "kind": "asset",
+                "image": "check-5-card-2",
+                "alt": "先剩92盆，后剩92盆"
+              }
+            },
+            "C": {
+              "label": "图卡3",
+              "visual": {
+                "kind": "asset",
+                "image": "check-5-card-3",
+                "alt": "先剩92盆，后剩56盆"
+              }
+            }
+          }
+        },
+        {
+          "id": "nob-q6",
+          "question": "架上八十二盆，送走三十一盆。还有几盆？",
+          "skill": "从图中求剩余",
+          "answer": [
+            "B"
+          ],
+          "analysis": "原来八盘两盆，送走三盘一盆。剩五盘一盆，一共五十一盆。",
+          "visual": {
+            "kind": "asset",
+            "image": "check-6-task",
+            "alt": "原有和取走图"
+          },
+          "options": {
+            "A": {
+              "label": "图卡1",
+              "visual": {
+                "kind": "asset",
+                "image": "check-6-card-1",
+                "alt": "剩下50盆"
+              }
+            },
+            "B": {
+              "label": "图卡2",
+              "visual": {
+                "kind": "asset",
+                "image": "check-6-card-2",
+                "alt": "剩下51盆"
+              }
+            },
+            "C": {
+              "label": "图卡3",
+              "visual": {
+                "kind": "asset",
+                "image": "check-6-card-3",
+                "alt": "剩下61盆"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "explain-the-remainder",
+      "type": "slide",
+      "title": "把取走和剩下讲清楚",
+      "template": "picture-points",
+      "data": {
+        "title": "把取走和剩下讲清楚",
+        "picture": "seedling-review-map",
+        "points": [
+          "从几个一里取",
+          "从几个十里取",
+          "两边分别取"
+        ]
+      },
+      "script": [
+        {
+          "say": "小苗都送好啦。给家人讲讲，怎么算架上还有多少？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "先找到原来有多少，听清要取走的是哪一份。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "几个一从几个一里减。"
+        },
+        {
+          "say": "整盘不动，散盆少了。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "几个十从几个十里减。"
+        },
+        {
+          "say": "整盘少了，散盆不动。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "两种都要取，就分别减，再把剩下的合起来。"
+        },
+        {
+          "say": "你也可以摆一摆，看看拿走哪一边，再读出剩下的数。"
+        }
+      ]
+    }
+  ],
+  "images": {
+    "before-46": {
+      "file": "assets/before-46.png"
+    },
+    "before-58": {
+      "file": "assets/before-58.png"
+    },
+    "before-65": {
+      "file": "assets/before-65.png"
+    },
+    "before-68": {
+      "file": "assets/before-68.png"
+    },
+    "before-76": {
+      "file": "assets/before-76.png"
+    },
+    "before-82": {
+      "file": "assets/before-82.png"
+    },
+    "before-97": {
+      "file": "assets/before-97.png"
+    },
+    "check-1-card-1": {
+      "file": "assets/check-1-card-1.png"
+    },
+    "check-1-card-2": {
+      "file": "assets/check-1-card-2.png"
+    },
+    "check-1-card-3": {
+      "file": "assets/check-1-card-3.png"
+    },
+    "check-1-task": {
+      "file": "assets/check-1-task.png"
+    },
+    "check-2-card-1": {
+      "file": "assets/check-2-card-1.png"
+    },
+    "check-2-card-2": {
+      "file": "assets/check-2-card-2.png"
+    },
+    "check-2-card-3": {
+      "file": "assets/check-2-card-3.png"
+    },
+    "check-2-task": {
+      "file": "assets/check-2-task.png"
+    },
+    "check-3-card-1": {
+      "file": "assets/check-3-card-1.png"
+    },
+    "check-3-card-2": {
+      "file": "assets/check-3-card-2.png"
+    },
+    "check-3-card-3": {
+      "file": "assets/check-3-card-3.png"
+    },
+    "check-3-task": {
+      "file": "assets/check-3-task.png"
+    },
+    "check-4-card-1": {
+      "file": "assets/check-4-card-1.png"
+    },
+    "check-4-card-2": {
+      "file": "assets/check-4-card-2.png"
+    },
+    "check-4-card-3": {
+      "file": "assets/check-4-card-3.png"
+    },
+    "check-4-task": {
+      "file": "assets/check-4-task.png"
+    },
+    "check-5-card-1": {
+      "file": "assets/check-5-card-1.png"
+    },
+    "check-5-card-2": {
+      "file": "assets/check-5-card-2.png"
+    },
+    "check-5-card-3": {
+      "file": "assets/check-5-card-3.png"
+    },
+    "check-5-task": {
+      "file": "assets/check-5-task.png"
+    },
+    "check-6-card-1": {
+      "file": "assets/check-6-card-1.png"
+    },
+    "check-6-card-2": {
+      "file": "assets/check-6-card-2.png"
+    },
+    "check-6-card-3": {
+      "file": "assets/check-6-card-3.png"
+    },
+    "check-6-task": {
+      "file": "assets/check-6-task.png"
+    },
+    "model-10": {
+      "file": "assets/model-10.png"
+    },
+    "model-57": {
+      "file": "assets/model-57.png"
+    },
+    "problem-39-minus-3": {
+      "file": "assets/problem-39-minus-3.png"
+    },
+    "problem-46-minus-30": {
+      "file": "assets/problem-46-minus-30.png"
+    },
+    "problem-66-minus-6": {
+      "file": "assets/problem-66-minus-6.png"
+    },
+    "problem-66-minus-60": {
+      "file": "assets/problem-66-minus-60.png"
+    },
+    "problem-68-minus-23": {
+      "file": "assets/problem-68-minus-23.png"
+    },
+    "problem-77-minus-24": {
+      "file": "assets/problem-77-minus-24.png"
+    },
+    "problem-86-minus-25": {
+      "file": "assets/problem-86-minus-25.png"
+    },
+    "problem-94-minus-53": {
+      "file": "assets/problem-94-minus-53.png"
+    },
+    "quantity-2": {
+      "file": "assets/quantity-2.png"
+    },
+    "quantity-20": {
+      "file": "assets/quantity-20.png"
+    },
+    "quantity-25": {
+      "file": "assets/quantity-25.png"
+    },
+    "quantity-3": {
+      "file": "assets/quantity-3.png"
+    },
+    "quantity-30": {
+      "file": "assets/quantity-30.png"
+    },
+    "quantity-34": {
+      "file": "assets/quantity-34.png"
+    },
+    "quantity-4": {
+      "file": "assets/quantity-4.png"
+    },
+    "quantity-40": {
+      "file": "assets/quantity-40.png"
+    },
+    "quantity-43": {
+      "file": "assets/quantity-43.png"
+    },
+    "quantity-52": {
+      "file": "assets/quantity-52.png"
+    },
+    "quantity-6": {
+      "file": "assets/quantity-6.png"
+    },
+    "remaining-35": {
+      "file": "assets/remaining-35.png"
+    },
+    "remaining-42": {
+      "file": "assets/remaining-42.png"
+    },
+    "remaining-43": {
+      "file": "assets/remaining-43.png"
+    },
+    "remaining-44": {
+      "file": "assets/remaining-44.png"
+    },
+    "remaining-52": {
+      "file": "assets/remaining-52.png"
+    },
+    "remaining-54": {
+      "file": "assets/remaining-54.png"
+    },
+    "seedling-badge": {
+      "file": "assets/seedling-badge.png"
+    },
+    "seedling-cart": {
+      "file": "assets/seedling-cart.png"
+    },
+    "seedling-delivery-yard": {
+      "file": "assets/seedling-delivery-yard.png"
+    },
+    "seedling-marble": {
+      "file": "assets/seedling-marble.png"
+    },
+    "seedling-marble-yard": {
+      "file": "assets/seedling-marble-yard.png"
+    },
+    "seedling-review-map": {
+      "file": "assets/seedling-review-map.png"
+    },
+    "seedling-station-welcome": {
+      "file": "assets/seedling-station-welcome.png"
+    },
+    "seedling-traffic": {
+      "file": "assets/seedling-traffic.png"
+    },
+    "shot-39-minus-3": {
+      "file": "assets/shot-39-minus-3.png"
+    },
+    "shot-46-minus-30": {
+      "file": "assets/shot-46-minus-30.png"
+    },
+    "shot-66-minus-6": {
+      "file": "assets/shot-66-minus-6.png"
+    },
+    "shot-66-minus-60": {
+      "file": "assets/shot-66-minus-60.png"
+    },
+    "shot-68-minus-23": {
+      "file": "assets/shot-68-minus-23.png"
+    },
+    "shot-77-minus-24": {
+      "file": "assets/shot-77-minus-24.png"
+    },
+    "shot-86-minus-25": {
+      "file": "assets/shot-86-minus-25.png"
+    },
+    "shot-94-minus-53": {
+      "file": "assets/shot-94-minus-53.png"
+    },
+    "station-flower": {
+      "file": "assets/station-flower.png"
+    },
+    "station-leaf": {
+      "file": "assets/station-leaf.png"
+    },
+    "station-sun": {
+      "file": "assets/station-sun.png"
+    },
+    "step-57-minus-24": {
+      "file": "assets/step-57-minus-24.png"
+    },
+    "step-57-minus-4": {
+      "file": "assets/step-57-minus-4.png"
+    },
+    "step-57-minus-40": {
+      "file": "assets/step-57-minus-40.png"
+    },
+    "step-68-minus-60": {
+      "file": "assets/step-68-minus-60.png"
+    },
+    "step-68-minus-8": {
+      "file": "assets/step-68-minus-8.png"
+    },
+    "target-16": {
+      "file": "assets/target-16.png"
+    },
+    "target-34": {
+      "file": "assets/target-34.png"
+    },
+    "target-36": {
+      "file": "assets/target-36.png"
+    },
+    "target-41": {
+      "file": "assets/target-41.png"
+    },
+    "target-45": {
+      "file": "assets/target-45.png"
+    },
+    "target-53": {
+      "file": "assets/target-53.png"
+    },
+    "target-57": {
+      "file": "assets/target-57.png"
+    },
+    "target-6": {
+      "file": "assets/target-6.png"
+    },
+    "target-60": {
+      "file": "assets/target-60.png"
+    },
+    "target-61": {
+      "file": "assets/target-61.png"
+    },
+    "target-65": {
+      "file": "assets/target-65.png"
+    }
+  }
+}

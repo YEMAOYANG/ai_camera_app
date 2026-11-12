@@ -1,0 +1,1187 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "100以内简单的加、减法",
+  "description": "人教版一年级下册。用原创彩旗工坊看几个十和几个一如何合并或取走，并用同一组成检查四个相关算式。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小数老师",
+      "role": "teacher",
+      "gender": "male",
+      "voice": "Ethan",
+      "avatar": "/teachers/ashu-math-v1.png",
+      "color": "#437763",
+      "persona": "用孩子能数到的旗串和散旗解释哪份合入、哪份拿走，邀请孩子指图核算。"
+    }
+  },
+  "images": {
+    "unit-key": {
+      "file": "assets/unit-key.png"
+    },
+    "three-then-four": {
+      "file": "assets/three-then-four.png"
+    },
+    "thirty-plus-forty": {
+      "file": "assets/thirty-plus-forty.png"
+    },
+    "forty-plus-thirty": {
+      "file": "assets/forty-plus-thirty.png"
+    },
+    "sixty-and-seven": {
+      "file": "assets/sixty-and-seven.png"
+    },
+    "seven-and-sixty": {
+      "file": "assets/seven-and-sixty.png"
+    },
+    "beads-seventy": {
+      "file": "assets/beads-seventy.png"
+    },
+    "beads-sixty-seven": {
+      "file": "assets/beads-sixty-seven.png"
+    },
+    "take-three-tens": {
+      "file": "assets/take-three-tens.png"
+    },
+    "take-four-tens": {
+      "file": "assets/take-four-tens.png"
+    },
+    "take-seven-singles": {
+      "file": "assets/take-seven-singles.png"
+    },
+    "take-six-tens": {
+      "file": "assets/take-six-tens.png"
+    },
+    "delivery-take-loose": {
+      "file": "assets/delivery-take-loose.png"
+    },
+    "delivery-take-tens": {
+      "file": "assets/delivery-take-tens.png"
+    },
+    "facts-for-sixty-seven": {
+      "file": "assets/facts-for-sixty-seven.png"
+    },
+    "tile-3": {
+      "file": "assets/tile-3.png"
+    },
+    "tile-4": {
+      "file": "assets/tile-4.png"
+    },
+    "tile-6": {
+      "file": "assets/tile-6.png"
+    },
+    "tile-7": {
+      "file": "assets/tile-7.png"
+    },
+    "tile-8": {
+      "file": "assets/tile-8.png"
+    },
+    "tile-9": {
+      "file": "assets/tile-9.png"
+    },
+    "tile-10": {
+      "file": "assets/tile-10.png"
+    },
+    "tile-19": {
+      "file": "assets/tile-19.png"
+    },
+    "tile-20": {
+      "file": "assets/tile-20.png"
+    },
+    "tile-28": {
+      "file": "assets/tile-28.png"
+    },
+    "tile-30": {
+      "file": "assets/tile-30.png"
+    },
+    "tile-37": {
+      "file": "assets/tile-37.png"
+    },
+    "tile-40": {
+      "file": "assets/tile-40.png"
+    },
+    "tile-46": {
+      "file": "assets/tile-46.png"
+    },
+    "tile-50": {
+      "file": "assets/tile-50.png"
+    },
+    "tile-54": {
+      "file": "assets/tile-54.png"
+    },
+    "tile-60": {
+      "file": "assets/tile-60.png"
+    },
+    "tile-64": {
+      "file": "assets/tile-64.png"
+    },
+    "tile-70": {
+      "file": "assets/tile-70.png"
+    },
+    "tile-80": {
+      "file": "assets/tile-80.png"
+    },
+    "order-first": {
+      "file": "assets/order-first.png"
+    },
+    "order-take-four": {
+      "file": "assets/order-take-four.png"
+    },
+    "order-take-sixty": {
+      "file": "assets/order-take-sixty.png"
+    },
+    "order-take-three": {
+      "file": "assets/order-take-three.png"
+    },
+    "order-take-eighty": {
+      "file": "assets/order-take-eighty.png"
+    },
+    "q1-stimulus": {
+      "file": "assets/q1-stimulus.png"
+    },
+    "q2-stimulus": {
+      "file": "assets/q2-stimulus.png"
+    },
+    "q3-stimulus": {
+      "file": "assets/q3-stimulus.png"
+    },
+    "q4-stimulus": {
+      "file": "assets/q4-stimulus.png"
+    },
+    "q5-stimulus": {
+      "file": "assets/q5-stimulus.png"
+    },
+    "q6-stimulus": {
+      "file": "assets/q6-stimulus.png"
+    },
+    "q1-a": {
+      "file": "assets/q1-a.png"
+    },
+    "q1-b": {
+      "file": "assets/q1-b.png"
+    },
+    "q1-c": {
+      "file": "assets/q1-c.png"
+    },
+    "q2-a": {
+      "file": "assets/q2-a.png"
+    },
+    "q2-b": {
+      "file": "assets/q2-b.png"
+    },
+    "q2-c": {
+      "file": "assets/q2-c.png"
+    },
+    "q3-a": {
+      "file": "assets/q3-a.png"
+    },
+    "q3-b": {
+      "file": "assets/q3-b.png"
+    },
+    "q3-c": {
+      "file": "assets/q3-c.png"
+    },
+    "q4-a": {
+      "file": "assets/q4-a.png"
+    },
+    "q4-b": {
+      "file": "assets/q4-b.png"
+    },
+    "q4-c": {
+      "file": "assets/q4-c.png"
+    },
+    "q5-a": {
+      "file": "assets/q5-a.png"
+    },
+    "q5-b": {
+      "file": "assets/q5-b.png"
+    },
+    "q5-c": {
+      "file": "assets/q5-c.png"
+    },
+    "q6-a": {
+      "file": "assets/q6-a.png"
+    },
+    "q6-b": {
+      "file": "assets/q6-b.png"
+    },
+    "q6-c": {
+      "file": "assets/q6-c.png"
+    },
+    "cover-workshop": {
+      "file": "assets/cover-workshop.png"
+    },
+    "slide-backdrop": {
+      "file": "assets/slide-backdrop.png"
+    },
+    "aim-backdrop": {
+      "file": "assets/aim-backdrop.png"
+    },
+    "family-workshop": {
+      "file": "assets/family-workshop.png"
+    },
+    "chipmunk-ready": {
+      "file": "assets/chipmunk-ready.png"
+    },
+    "chipmunk-hop": {
+      "file": "assets/chipmunk-hop.png"
+    },
+    "amber-marble": {
+      "file": "assets/amber-marble.png"
+    },
+    "rosette-sticker": {
+      "file": "assets/rosette-sticker.png"
+    },
+    "delivery-sticker": {
+      "file": "assets/delivery-sticker.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "visit-flag-workshop",
+      "type": "slide",
+      "title": "100以内简单的加、减法",
+      "template": "two-columns",
+      "data": {
+        "title": "100以内简单的加、减法",
+        "left": {
+          "heading": "彩旗工坊",
+          "body": "游园会要领彩旗。"
+        },
+        "left_picture": "cover-workshop",
+        "right": {
+          "heading": "整串一眼数十，散旗一面一面数",
+          "body": "一条满串有10面。"
+        },
+        "right_picture": "unit-key"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "你好，我是小数老师。彩旗工坊正在给游园会准备彩旗。"
+        },
+        {
+          "say": "有的旗子已经夹成一串，有的还单独放在盘里。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "左边这一串，请从第一面开始数。"
+        },
+        {
+          "say": "一、二、三、四、五、六、七、八、九、十。"
+        },
+        {
+          "say": "满满一串有十面，看到整串就可以按十数。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "右边只有一面散旗，散旗要一面一面数。"
+        },
+        {
+          "say": "今天我们用整串和散旗算一共有多少，还能算出拿走后剩多少。"
+        },
+        {
+          "say": "先认出图上的两种旗，再跟我去取货。"
+        }
+      ]
+    },
+    {
+      "key": "put-tens-together",
+      "type": "slide",
+      "title": "把两份整串旗合起来",
+      "template": "two-columns",
+      "data": {
+        "title": "把两份整串旗合起来",
+        "left": {
+          "heading": "三串和四串",
+          "body": "每串十面，分别是30面和40面。"
+        },
+        "left_picture": "three-then-four",
+        "right": {
+          "heading": "合在十位上",
+          "body": "七个十就是70。"
+        },
+        "right_picture": "beads-seventy"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "左边工位送来三串，右边送来四串。"
+        },
+        {
+          "say": "一串都是十面。三串是三个十，四串是四个十。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "先数串数。三个十和四个十合起来是七个十。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "我用计数器核对。十位上一颗珠代表十面。"
+        },
+        {
+          "say": "先拨三颗，再拨四颗，一共拨了七颗。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "个位空着，因为两份都只有整串。"
+        },
+        {
+          "say": "七个十就是七十，所以一共七十面。"
+        },
+        {
+          "say": "说给自己听，我们刚才数的是几串，每串又是多少面？"
+        }
+      ]
+    },
+    {
+      "key": "swap-the-tens",
+      "type": "slide",
+      "title": "换一换送来的顺序",
+      "template": "two-columns",
+      "data": {
+        "title": "换一换送来的顺序",
+        "left": {
+          "heading": "先送三串，再送四串",
+          "body": "30＋40＝70"
+        },
+        "left_picture": "thirty-plus-forty",
+        "right": {
+          "heading": "先送四串，再送三串",
+          "body": "40＋30＝70"
+        },
+        "right_picture": "forty-plus-thirty"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "看第一回。三串先来，四串后到。"
+        },
+        {
+          "say": "三十加四十，把三个十和四个十放在一起。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "合起来是七个十，所以是七十。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "这回让四串先来，三串后到。"
+        },
+        {
+          "say": "请从前往后数，还是原来的七串，每串十面。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "四十加三十也等于七十。"
+        },
+        {
+          "say": "送来的顺序换了，合在一起的旗子都还是原来的。"
+        },
+        {
+          "say": "再指一指两张图，哪一回先来的那份更多？"
+        }
+      ]
+    },
+    {
+      "key": "remove-whole-tens",
+      "type": "slide",
+      "title": "同一批旗子，拿走不同的整串",
+      "template": "two-columns",
+      "data": {
+        "title": "同一批旗子，拿走不同的整串",
+        "left": {
+          "heading": "七串取走三串",
+          "body": "70－30＝40"
+        },
+        "left_picture": "take-three-tens",
+        "right": {
+          "heading": "七串取走四串",
+          "body": "70－40＝30"
+        },
+        "right_picture": "take-four-tens"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "总盘有七串。右边虚线盘装要拿走的旗。"
+        },
+        {
+          "say": "第一张单拿走三串，也就是三十面。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "七个十去掉三个十，左边还留下四个十，四十面。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "另一回从原来同样的七串开始。虚线盘里这次有四串。"
+        },
+        {
+          "say": "拿走四个十，原来的七串就剩三串。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "所以七十减四十等于三十。"
+        },
+        {
+          "say": "左图拿三串，右图拿四串。每回先认清拿走哪一份。"
+        },
+        {
+          "say": "把取走的放回剩下的一份，就能核对原来共有七串。"
+        },
+        {
+          "say": "订单要六个十。看两张整串卡，往能碰头的方向滑。"
+        },
+        {
+          "say": "现在有两张订单。先看每张要几串、几面散旗，再配两张卡。"
+        },
+        {
+          "say": "这回有三张订单，还有挡板。换方向，找能让合用的牌碰头的路。"
+        },
+        {
+          "say": "先看两张卡合起来有几串、几面散旗。对得上订单吗？"
+        },
+        {
+          "say": "往上下左右滑，把同一订单的两张卡放到一条路，再让它们碰头。"
+        },
+        {
+          "say": "这两份合起来正好是订单的数量，成品入架了。"
+        }
+      ]
+    },
+    {
+      "key": "slide-to-fill-orders",
+      "type": "interactive",
+      "title": "滑轨拼好订单",
+      "page": "slide-to-fill-orders",
+      "widgetType": "simulation",
+      "startImage": "slide-backdrop",
+      "script": [
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#slide-order-guide"
+        },
+        {
+          "say": "左边这张订单要六个十，合起来六十面。"
+        },
+        {
+          "highlight": "#first-twenty"
+        },
+        {
+          "say": "滑道左边有两串，是二十面。"
+        },
+        {
+          "highlight": "#first-forty"
+        },
+        {
+          "say": "右边有四串，是四十面。两串和四串能拼成六串。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "看我按向左，让两张卡在同一条滑道碰头。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "卡片滑过去的时候，注意两份十面旗会合在哪里。"
+        },
+        {
+          "highlight": "#first-shelf-tray"
+        },
+        {
+          "say": "两张卡碰头，六串成品进了右边的架子。"
+        },
+        {
+          "say": "换你来。按箭头滑动。要重来这一关，就按回转键。"
+        },
+        {
+          "say": "先看订单，再试路线。碰头的两张要合成需要的数量。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "slide-tens": "remove-whole-tens-13",
+        "slide-mixed": "remove-whole-tens-14",
+        "slide-three": "remove-whole-tens-15",
+        "slide-hint": "remove-whole-tens-16",
+        "slide-help": "remove-whole-tens-17",
+        "slide-praise": "remove-whole-tens-18"
+      }
+    },
+    {
+      "key": "combine-tens-and-ones",
+      "type": "slide",
+      "title": "整串加散旗，合起来是多少",
+      "template": "two-columns",
+      "data": {
+        "title": "整串加散旗，合起来是多少",
+        "left": {
+          "heading": "六串加七面散旗",
+          "body": "60和7是不同的两份。"
+        },
+        "left_picture": "sixty-and-seven",
+        "right": {
+          "heading": "数一数两根杆",
+          "body": "十位6颗，个位7颗。"
+        },
+        "right_picture": "beads-sixty-seven"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "今天还来了一份货。左边是六串，右边是七面散旗。"
+        },
+        {
+          "say": "六串可以按十数。十、二十、三十、四十、五十、六十。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "七面散旗继续按一面一面数，数到六十七。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "到计数器上拨。六个十在十位拨六颗。"
+        },
+        {
+          "say": "七个一在个位拨七颗。两根杆表示的单位不一样。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "六个十和七个一合起来是六十七。"
+        },
+        {
+          "say": "所以六十加七等于六十七。"
+        },
+        {
+          "say": "如果先送来七面散旗，后送六串，总量还是一样。"
+        }
+      ]
+    },
+    {
+      "key": "remove-loose-or-bundles",
+      "type": "slide",
+      "title": "从六十七中，分别拿走一份",
+      "template": "two-columns",
+      "data": {
+        "title": "从六十七中，分别拿走一份",
+        "left": {
+          "heading": "取走散旗",
+          "body": "67－7＝60"
+        },
+        "left_picture": "take-seven-singles",
+        "right": {
+          "heading": "取走全部整串",
+          "body": "67－60＝7"
+        },
+        "right_picture": "take-six-tens"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "整盘是六十七。左图右边的虚线盘装七面散旗。"
+        },
+        {
+          "say": "把散旗全拿走，六串还留在桌上。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "六十七减七，剩六个十，就是六十。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "换回完整的一盘。右图现在取走六串整旗。"
+        },
+        {
+          "say": "拿走的是六个十。七面散旗原样留下来。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "六十七减六十，剩七个一，就是七。"
+        },
+        {
+          "say": "开始都是六十七。拿走的两份不同，留下的也不同。"
+        },
+        {
+          "say": "请指图说，哪回留下的是整串？哪回留下的是散旗？"
+        }
+      ]
+    },
+    {
+      "key": "four-facts-from-one-tray",
+      "type": "slide",
+      "title": "两部分和总量能互相核对",
+      "template": "two-columns",
+      "data": {
+        "title": "两部分和总量能互相核对",
+        "left": {
+          "heading": "交换先到的那一份",
+          "body": "7＋60＝67"
+        },
+        "left_picture": "seven-and-sixty",
+        "right": {
+          "heading": "同一盘里的四个关系",
+          "body": "两种合并顺序，两次分别拿走。"
+        },
+        "right_picture": "facts-for-sixty-seven"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "看这张图，七面散旗先到，六串接着来。"
+        },
+        {
+          "say": "七加六十也是六十七。两种顺序合在一起，一样多。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "这里还画着原来的两份。把它们一起圈住，总量是六十七。"
+        },
+        {
+          "say": "加法把两份放在一起。先说哪一份都行。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "减法从总量出发。拿走散旗，就剩整串。"
+        },
+        {
+          "say": "拿走整串，就剩散旗。记住每一次取走的是哪份。"
+        },
+        {
+          "say": "用一张图，就能把两个加法和两个减法都查清。"
+        },
+        {
+          "say": "想一想，把剩下的和拿走的放在一起，会回到哪个数？"
+        },
+        {
+          "say": "这一单原有八十面旗，取走三十面。找剩下的，再发射。"
+        },
+        {
+          "say": "原有六十四面旗。这一单只拿走四面散旗，找剩下的。"
+        },
+        {
+          "say": "还是原来的六十四面。这次拿走六串，也就是六十面。"
+        },
+        {
+          "say": "原有七十三面。虚线盘拿走三面散旗，找留下来的。"
+        },
+        {
+          "say": "原有八十七面。这次拿走八十面，找留下来的。"
+        },
+        {
+          "say": "虚线盘是拿走的。看左边实际留下了什么。"
+        },
+        {
+          "say": "数留下的整条和散旗。用箭头转向，再按发射。"
+        },
+        {
+          "say": "命中的牌和留下的数量一样多，取货单核对好了。"
+        }
+      ]
+    },
+    {
+      "key": "aim-at-the-remainder",
+      "type": "interactive",
+      "title": "瞄准留下来的旗",
+      "page": "aim-at-the-remainder",
+      "widgetType": "simulation",
+      "startImage": "aim-backdrop",
+      "script": [
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#current-order"
+        },
+        {
+          "say": "看这张取货单。开始有八串，一共八十面旗。"
+        },
+        {
+          "say": "虚线盘里有三串，那三十面要拿走。左边是留下的。"
+        },
+        {
+          "highlight": "#game-target"
+        },
+        {
+          "say": "原来的八串拿走三串，剩五串。找五十面的牌。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "我先向右瞄准，再按发射，让弹珠飞到那张牌。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "弹珠飞起来了。飞的方向也可以用左右箭头稍微调一调。"
+        },
+        {
+          "highlight": "#confirmed-remainder"
+        },
+        {
+          "say": "碰到五十面的牌，右边留下刚核对好的数量。"
+        },
+        {
+          "say": "换你操作。用左右转向，按发射。每张新单都要重新听。"
+        },
+        {
+          "say": "后面有两张单从同样多的旗开始。要特别听清拿走的是哪份。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "aim-first": "four-facts-from-one-tray-12",
+        "aim-take-four": "four-facts-from-one-tray-13",
+        "aim-take-sixty": "four-facts-from-one-tray-14",
+        "aim-take-three": "four-facts-from-one-tray-15",
+        "aim-take-eighty": "four-facts-from-one-tray-16",
+        "aim-hint": "four-facts-from-one-tray-17",
+        "aim-help": "four-facts-from-one-tray-18",
+        "aim-praise": "four-facts-from-one-tray-19"
+      }
+    },
+    {
+      "key": "check-what-stays-in-the-box",
+      "type": "slide",
+      "title": "交货前查一查",
+      "template": "two-columns",
+      "data": {
+        "title": "交货前查一查",
+        "left": {
+          "heading": "散旗送到教室",
+          "body": "84拿走4，箱里留80。"
+        },
+        "left_picture": "delivery-take-loose",
+        "right": {
+          "heading": "整串送去操场",
+          "body": "84拿走80，箱里留4。"
+        },
+        "right_picture": "delivery-take-tens"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "工坊原有八串，还有四面散旗。合起来八十四面。"
+        },
+        {
+          "say": "第一张单只领四面散旗。请找虚线盘里的那一份。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "散旗拿走后，箱里还留八个十，八十面。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "另一张单从原来八十四面开始，这次领八串。"
+        },
+        {
+          "say": "整串全拿走，左边只留四面散旗。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "用拿走的和剩下的再合一次，八十和四合起来八十四。"
+        },
+        {
+          "say": "两张单要分别算。每一回都先说原来的总量。"
+        },
+        {
+          "say": "你也试着问我一单。说拿走哪一份，再告诉我留下多少。"
+        }
+      ]
+    },
+    {
+      "key": "picture-quiz",
+      "type": "quiz",
+      "title": "听题，看图选一选",
+      "intro": [
+        "先看每份有几条十件，再数散件。",
+        "需要时，点小喇叭重听。"
+      ],
+      "questions": [
+        {
+          "id": "combine-packed-lanterns",
+          "skill": "combine-tens",
+          "question": "一串灯加四串灯，一共有多少盏？",
+          "analysis": "每串十盏。一串加四串是五串，五个十就是五十盏。",
+          "answer": [
+            "B"
+          ],
+          "visual": {
+            "kind": "asset",
+            "image": "q1-stimulus",
+            "alt": "两盘分别有一串灯和四串灯，每串十盏。"
+          },
+          "options": {
+            "A": {
+              "label": "一串十盏和四盏散灯",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-a",
+                "alt": "一串十盏和四盏散灯"
+              }
+            },
+            "B": {
+              "label": "五串各十盏",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-b",
+                "alt": "五串各十盏"
+              }
+            },
+            "C": {
+              "label": "四串各十盏",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-c",
+                "alt": "四串各十盏"
+              }
+            }
+          }
+        },
+        {
+          "id": "take-crates-from-ninety",
+          "skill": "remove-tens",
+          "question": "九十枚印章拿走五十枚，剩哪一盘？",
+          "analysis": "九个十去掉五个十，剩四个十，也就是四十枚。",
+          "answer": [
+            "A"
+          ],
+          "visual": {
+            "kind": "asset",
+            "image": "q2-stimulus",
+            "alt": "九十枚印章中，虚线框里的五条十枚要取走。"
+          },
+          "options": {
+            "A": {
+              "label": "四条各十枚",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-a",
+                "alt": "四条各十枚"
+              }
+            },
+            "B": {
+              "label": "五条各十枚",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-b",
+                "alt": "五条各十枚"
+              }
+            },
+            "C": {
+              "label": "九条各十枚",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-c",
+                "alt": "九条各十枚"
+              }
+            }
+          }
+        },
+        {
+          "id": "add-six-loose-stamps",
+          "skill": "compose-tens-and-ones",
+          "question": "八条印章加六枚散印章，一共有多少？",
+          "analysis": "一条有十枚。八个十加六个一，合成八十六枚。",
+          "answer": [
+            "C"
+          ],
+          "visual": {
+            "kind": "asset",
+            "image": "q3-stimulus",
+            "alt": "一盘有八条各十枚，另一盘有六枚散印章。"
+          },
+          "options": {
+            "A": {
+              "label": "八条各十枚",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-a",
+                "alt": "八条各十枚"
+              }
+            },
+            "B": {
+              "label": "六条各十枚加八枚",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-b",
+                "alt": "六条各十枚加八枚"
+              }
+            },
+            "C": {
+              "label": "八条各十枚加六枚",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-c",
+                "alt": "八条各十枚加六枚"
+              }
+            }
+          }
+        },
+        {
+          "id": "leave-the-full-packets",
+          "skill": "remove-ones",
+          "question": "六十九盏灯，拿走散着的九盏。剩多少？",
+          "analysis": "拿走的是九盏散灯。原来的六串都留下，六个十是六十盏。",
+          "answer": [
+            "A"
+          ],
+          "visual": {
+            "kind": "asset",
+            "image": "q4-stimulus",
+            "alt": "总量六十九，虚线盘里九盏散灯。"
+          },
+          "options": {
+            "A": {
+              "label": "六串各十盏",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-a",
+                "alt": "六串各十盏"
+              }
+            },
+            "B": {
+              "label": "六盏散灯",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-b",
+                "alt": "六盏散灯"
+              }
+            },
+            "C": {
+              "label": "九盏散灯",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-c",
+                "alt": "九盏散灯"
+              }
+            }
+          }
+        },
+        {
+          "id": "leave-the-loose-pieces",
+          "skill": "remove-tens-from-mixed",
+          "question": "九十五枚印章拿走九十枚，还剩多少？",
+          "analysis": "九条十枚一起拿走，留下五枚散印章。",
+          "answer": [
+            "C"
+          ],
+          "visual": {
+            "kind": "asset",
+            "image": "q5-stimulus",
+            "alt": "总量九十五，虚线盘里九条各十枚。"
+          },
+          "options": {
+            "A": {
+              "label": "九条各十枚",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-a",
+                "alt": "九条各十枚"
+              }
+            },
+            "B": {
+              "label": "一条十枚和五枚散章",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-b",
+                "alt": "一条十枚和五枚散章"
+              }
+            },
+            "C": {
+              "label": "五枚散章",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-c",
+                "alt": "五枚散章"
+              }
+            }
+          }
+        },
+        {
+          "id": "pick-the-four-facts",
+          "skill": "check-part-whole-family",
+          "question": "二十和四合成二十四。哪张算式卡都对？",
+          "analysis": "两次相加都等于二十四。拿走四枚剩二十，拿走二十枚剩四。",
+          "answer": [
+            "B"
+          ],
+          "visual": {
+            "kind": "asset",
+            "image": "q6-stimulus",
+            "alt": "一盘有两条各十枚，另一盘有四枚散章。"
+          },
+          "options": {
+            "A": {
+              "label": "最后一个减法写余二十",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-a",
+                "alt": "最后一个减法写余二十"
+              }
+            },
+            "B": {
+              "label": "两加两减都对应同一组",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-b",
+                "alt": "两加两减都对应同一组"
+              }
+            },
+            "C": {
+              "label": "减去四枚写余四",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-c",
+                "alt": "减去四枚写余四"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "tell-the-two-parts-at-home",
+      "type": "slide",
+      "title": "把两部分的故事带回家",
+      "template": "picture-points",
+      "data": {
+        "title": "把两部分的故事带回家",
+        "picture": "family-workshop",
+        "points": [
+          "把两份合起来",
+          "拿走其中一份",
+          "用另一份查一遍"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "今天你帮工坊算清了旗子。还能说出刚才怎么算的吗？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "可以和家人拿安全的大纸片，摆成每条十张，再留几张散片。"
+        },
+        {
+          "say": "先请家人说几条和几张散片，跟你一起算合起来有多少。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "把其中一份拿走，说一说是哪一份。"
+        },
+        {
+          "say": "再指着留下来的那份，告诉家人一共有多少张。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "把拿走的放回去，看看是不是原来的总数。"
+        },
+        {
+          "say": "也试试交换先说的两份，再分别拿走不同的一份。"
+        },
+        {
+          "say": "请家人听你用同一张图说清两种加法和两种减法。下次见。"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,204 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "校园“寻宝”",
+  "binding": {
+    "editionId": "smartedu-science-six-year-g1-lower-e231dd57",
+    "revisionId": "directory-359f40a6afba915101f297d3",
+    "nodeId": "8270c23c-2a60-4cd3-9258-b7e81d88cc4f",
+    "unitId": "133c2c07-4952-4ded-962b-03d98fd0358b"
+  },
+  "scenario": "原创小校园要办纸盒寻宝。先把听到的地标画成路线，找到宝物后替另一组改写线索。",
+  "goals": [
+    "能从口头寻宝提示找出出发点、场地方向、相对方位、步数或地标。",
+    "能先用方向标校对方向，按提示在平面图上画路线、依次经过地标到达目标。",
+    "能说明找到了哪里、怎么找到；发现漏掉朝向或参照时，给同伴补全可执行的提示。",
+    "能区分有方向标示的工具与情境性自然线索，用安全方式相互核对。"
+  ],
+  "goalSources": [
+    {
+      "skill": "listen-to-clue",
+      "target": "能从口头寻宝提示找出出发点、场地方向、相对方位、步数或地标。",
+      "source": "印9、课件6～8"
+    },
+    {
+      "skill": "draw-then-navigate",
+      "target": "能先用方向标校对方向，按提示在平面图上画路线、依次经过地标到达目标。",
+      "source": "印10、任务单1～2"
+    },
+    {
+      "skill": "test-and-revise",
+      "target": "能说明找到了哪里、怎么找到；发现漏掉朝向或参照时，给同伴补全可执行的提示。",
+      "source": "印10～11、课件10～13"
+    },
+    {
+      "skill": "compare-tools",
+      "target": "能区分有方向标示的工具与情境性自然线索，用安全方式相互核对。",
+      "source": "印12、课件14～16"
+    }
+  ],
+  "pageSequence": [
+    {
+      "key": "one-clue-two-possibilities",
+      "kind": "teaching",
+      "plan": "同一虚构校园里，两个小队听到一句漏了起点或朝向的线索，老师用脚印和人物图指出哪里还没说清。"
+    },
+    {
+      "key": "mark-the-route-first",
+      "kind": "teaching",
+      "plan": "从口头线索逐段亮起点、面向、步数、转折和目的附近参照，显示方向标与路线，示范先画、后走。"
+    },
+    {
+      "key": "check-the-drawn-map",
+      "kind": "teaching",
+      "plan": "教师在完整新格图先描路线，花盆向东三格到长凳、再北两格到绘本门；每段从前站重新数。"
+    },
+    {
+      "key": "draw-then-drive",
+      "kind": "game",
+      "plan": "开车依次到地标，错后重听并回看最后一个正确信息。"
+    },
+    {
+      "key": "retrace-and-fix",
+      "kind": "teaching",
+      "plan": "把两组实际走法并排，一组在路口选错方向。请孩子指出怎么修改提示。补足身体朝向，并对照固定场地方向。"
+    },
+    {
+      "key": "verify-the-door",
+      "kind": "game",
+      "plan": "同一扇门先从平面看走廊位置，再从走廊正面找对应门牌和地标，记录两种角度。"
+    },
+    {
+      "key": "compare-checkpoint",
+      "kind": "teaching",
+      "plan": "对照小鼓门两图，检验地图位置、门牌和旁边的盆栽。"
+    },
+    {
+      "key": "five-direction-clues",
+      "kind": "teaching",
+      "plan": "画路牌和方向图、指南针，再示意苔藓、成熟向日葵、坡面融雪三种情境的观察。区分观察线索和可互证方向工具。"
+    },
+    {
+      "key": "picture-quiz",
+      "kind": "quiz",
+      "plan": "六道图题，教师读口令和反馈，三处正确位置各两次。"
+    },
+    {
+      "key": "make-your-own-clue",
+      "kind": "teaching",
+      "plan": "把起点、方向、路线、参照物整理成四张概念图卡。成人陪着做纸图或安全小组实地实践，孩子给同伴一句可验证的提示。"
+    }
+  ],
+  "games": [
+    {
+      "page": "draw-then-drive",
+      "template": "bubbleMaze",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.bubbleMaze",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "listen_order",
+      "selection": "原创校园鸟瞰用明确方向标、起点箭头与地标图。先停在教师逐段亮起点与转折的画线页，再进实时游戏听口令开车。目标按路线上可达顺序，所说的方向和步数经地图节点复核；需要严格步数时用独立走廊锁定该段。出站或经过错误岔路不能取宝。",
+      "levels": [
+        "花盆向东4格到蓝桶，向北2格到鼓牌，向东2格到出口。",
+        "绘本标记向西4格到长凳，按刚才的身体朝向右转即北，北4格到风铃，再东4格。",
+        "长凳向东5格到调色板，北3格到铜盒，西4格到公告牌，南2格到出口。"
+      ],
+      "demo": "先点北向箭头与起点，再示范一步方向键、一个图卡关键信息，重置后实玩。",
+      "teacherAnchors": [
+        "hunt-compass",
+        "game-player",
+        "game-target"
+      ]
+    },
+    {
+      "page": "verify-the-door",
+      "template": "shutterScout",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.shutterScout",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "observe_state",
+      "selection": "以已批准快门侦探替换风翼邮差。核心是按路线到站后，用俯视布局和走廊正面共同确认同一地标；模板按角度和取景判定实际抓拍，并能导出本次成对观察。",
+      "levels": [
+        "绘本门俯视和正面",
+        "小鼓门正面、俯视、正面",
+        "画室门俯视和正面交替"
+      ],
+      "demo": "教师亮首张小图、取景框和目标，实际拍第一张并重置。",
+      "teacherAnchors": [
+        "door-preview",
+        "game-player",
+        "game-target"
+      ],
+      "observationPlan": {
+        "sceneId": "scene-verify-the-door",
+        "trialId": "one-door-two-views",
+        "levels": [
+          "reading",
+          "music",
+          "studio"
+        ],
+        "complete": "仅正常输入完成整轮才保存对应三组模拟图片。家庭安全实地观察待观察。"
+      }
+    }
+  ],
+  "quiz": [
+    {
+      "id": "correct-start",
+      "skill": "确定起点和面向",
+      "prompt": "从公告牌下面一格出发，面朝西。哪张图对？",
+      "answer": "在公告牌下面，箭头向西",
+      "position": 2,
+      "rationale": "先找公告牌下面一格。北朝上，西在图的左边，所以人偶箭头朝左。"
+    },
+    {
+      "id": "first-turn",
+      "skill": "把方向连成路线",
+      "prompt": "从红旗向北到风铃，再向东到公告牌。选对的路线。",
+      "answer": "向上到风铃，再右转到公告牌",
+      "position": 1,
+      "rationale": "先从红旗向上到风铃，再从风铃向右到公告牌。两段的起点不同。"
+    },
+    {
+      "id": "right-while-facing-west",
+      "skill": "身体朝向和左右",
+      "prompt": "黄帽面朝西。哪个标记在他右手方向？",
+      "answer": "木调色板",
+      "position": 3,
+      "rationale": "面朝西时，身子的右手方向是北。方向标的北朝上，调色板在那边。"
+    },
+    {
+      "id": "fix-one-clue",
+      "skill": "发现遗漏信息",
+      "prompt": "哪张提示图把出发点和身体朝向都说清了？",
+      "answer": "绿帽在有起点记号的垫子上，箭头指北",
+      "position": 2,
+      "rationale": "先给出圆点标的出发处，再用人偶的箭头指明要朝哪里。"
+    },
+    {
+      "id": "beside-a-landmark",
+      "skill": "用参照物确定终点",
+      "prompt": "铜盒在垫子靠花盆的一边。哪张图对？",
+      "answer": "铜盒在垫子靠近右边花盆的一侧",
+      "position": 3,
+      "rationale": "先找共同参照花盆。铜盒在垫子上离花盆最近的一边。"
+    },
+    {
+      "id": "check-nature-clue",
+      "skill": "核实自然线索",
+      "prompt": "看到树上有苔藓。哪组工具能用来核对方向？",
+      "answer": "指南针与有方向标的折叠地图",
+      "position": 1,
+      "rationale": "先认指南针标出的北，再和方向图核对。苔藓和雪痕只能提供线索。"
+    }
+  ],
+  "afterClass": {
+    "familyTask": "成人在家用虚构纸图，或在安全的熟悉场地一起从固定站点出发。孩子画路线、读提示、同行找一张安全纸卡，再交换写线索。只在平地慢走，避开交通、攀爬和隐私地标。",
+    "weeklyQuestionSource": [
+      "从口令取起点与方向",
+      "按顺序走并找参照",
+      "比较相对方向与固定方向",
+      "选可核对的辨向线索"
+    ],
+    "evidence": "线上只记录图题与游戏操作；实地同行、画图及口头说明由成人观察，无需上传位置数据。"
+  },
+  "artAndLanguage": "统一固定北向、地标、路径及人物鼻尖或朝向箭头，几何用核过的矢量叠层。课件原图不用作学生端美术，非目标文本遮住后仍可听口令、看图完成。"
+}

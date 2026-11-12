@@ -1,0 +1,1083 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "Unit 2 There are two footballs under my desk.",
+  "description": "在原创器材角听辨球类、数量和方位，再用 There is / There are 描述图上的位置。",
+  "grade": 1,
+  "roster": {
+    "mia": {
+      "name": "Mia 老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Jennifer",
+      "avatar": "/teachers/coco-english-v1.png",
+      "color": "#526d6d",
+      "persona": "用自然短句引导孩子听完、点数、找参照物，再口头描述。"
+    }
+  },
+  "scenes": [
+    {
+      "key": "sports-corner",
+      "type": "slide",
+      "title": "球滚到哪儿了",
+      "template": "title-picture",
+      "data": {
+        "title": "球滚到哪儿了",
+        "picture": "opening-corner",
+        "caption": "Where are the balls?"
+      },
+      "script": [
+        {
+          "say": "体育课快开始啦。打开器材箱，小球去哪儿了？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "小雨看见了课桌。手指顺着桌面往下找。"
+        },
+        {
+          "say": "桌腿中间有黑白花纹。你能数出几个球吗？"
+        },
+        {
+          "say": "先别搬。试着把看见的位置说给我听。"
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "Where are the balls?"
+        },
+        {
+          "say": "先认出是什么球，再看有几只、在哪儿。"
+        }
+      ]
+    },
+    {
+      "key": "three-ball-types",
+      "type": "slide",
+      "title": "听出三种球",
+      "template": "title-picture",
+      "data": {
+        "title": "听出三种球",
+        "picture": "ball-types",
+        "caption": "football · basketball · ping-pong ball"
+      },
+      "script": [
+        {
+          "say": "三种球排好了。先听声音，再用手指一指。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "左边有黑白相间的块。"
+        },
+        {
+          "say": "Football."
+        },
+        {
+          "say": "中间的球是橙色，表面有几条弯线。"
+        },
+        {
+          "say": "Basketball."
+        },
+        {
+          "say": "右边这只是小小的黄球。"
+        },
+        {
+          "say": "Ping-pong ball."
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "再听一次。先指右边，再指左边。"
+        },
+        {
+          "say": "Ping-pong ball. Football."
+        },
+        {
+          "say": "等会儿有好几只球。听到词，先找对这一种。"
+        }
+      ]
+    },
+    {
+      "key": "desk-and-place",
+      "type": "slide",
+      "title": "桌面上与桌子下",
+      "template": "two-columns",
+      "data": {
+        "title": "桌面上与桌子下",
+        "left": {
+          "heading": "桌面托住球",
+          "body": "on the desk"
+        },
+        "left_picture": "two-footballs-on-desk",
+        "right": {
+          "heading": "球在桌腿中间",
+          "body": "under the desk"
+        },
+        "right_picture": "two-footballs-under-desk"
+      },
+      "script": [
+        {
+          "say": "两张图都画了两个足球。它们的位置一样吗？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "左图球挨着桌面，由桌面托住。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "On the desk."
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "右图从桌面往下看，球到了桌腿中间。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "Under the desk."
+        },
+        {
+          "say": "桌面就是参照。光看球在整张图的高处或低处，还不够。"
+        },
+        {
+          "say": "There are two footballs under the desk."
+        },
+        {
+          "say": "There are two footballs on the desk."
+        },
+        {
+          "say": "现在换球，还是先找桌面。"
+        },
+        {
+          "say": "Two basketballs under the desk."
+        }
+      ]
+    },
+    {
+      "key": "look-in-the-box",
+      "type": "slide",
+      "title": "球在箱子里面",
+      "template": "two-columns",
+      "data": {
+        "title": "球在箱子里面",
+        "left": {
+          "heading": "先数这里",
+          "body": "Three ping-pong balls"
+        },
+        "left_picture": "three-ping-pong-in-box",
+        "right": {
+          "heading": "再看看这里",
+          "body": "Five ping-pong balls"
+        },
+        "right_picture": "five-ping-pong-in-box"
+      },
+      "script": [
+        {
+          "say": "还有一些小球滚进了开口箱。先找箱沿。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "箱沿遮住球的一小部分，球在开口里面。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "Three ping-pong balls in the box."
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "另一张也是在箱里，数出来的数量变了。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "Five ping-pong balls in the box."
+        },
+        {
+          "say": "in the box 是箱里。"
+        },
+        {
+          "say": "放到桌面，位置就变了。"
+        },
+        {
+          "say": "Three ping-pong balls on the desk."
+        },
+        {
+          "say": "再听一遍。先找参照物，再找球。"
+        },
+        {
+          "say": "待会儿用泡泡船。"
+        },
+        {
+          "say": "把船移到发亮的图卡下。"
+        },
+        {
+          "say": "听清了。球和位置都对了！"
+        }
+      ]
+    },
+    {
+      "key": "one-and-many",
+      "type": "slide",
+      "title": "一只和多只怎么说",
+      "template": "two-columns",
+      "data": {
+        "title": "一只和多只怎么说",
+        "left": {
+          "heading": "一只篮球",
+          "body": "There is a basketball."
+        },
+        "left_picture": "one-basketball-under-chair",
+        "right": {
+          "heading": "两只篮球",
+          "body": "There are two basketballs."
+        },
+        "right_picture": "two-basketballs-under-chair"
+      },
+      "script": [
+        {
+          "say": "换成椅子。两张图的篮球都在椅子下。什么变了？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "左边只数一次。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "There is a basketball."
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "右边指一个数一个。One, two."
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "There are two basketballs."
+        },
+        {
+          "say": "一只用 There is，多只用 There are。"
+        },
+        {
+          "say": "数清几个，也要听清球名。"
+        },
+        {
+          "say": "句尾还能加上位置。"
+        },
+        {
+          "say": "There are two balls under the chair."
+        },
+        {
+          "say": "再听三句。留意哪个球换了、哪个位置换了。"
+        },
+        {
+          "say": "There is a basketball under the chair."
+        },
+        {
+          "say": "There is a football under the chair."
+        },
+        {
+          "say": "There is a basketball on the chair."
+        }
+      ]
+    },
+    {
+      "key": "hear-and-bubble",
+      "type": "interactive",
+      "title": "听完整句话再碰泡泡",
+      "page": "hear-and-bubble",
+      "startImage": "equipment-corner",
+      "widgetType": "learning-arcade",
+      "gameAudio": {
+        "bubble-under-two": "desk-and-place-11",
+        "bubble-on-two": "desk-and-place-12",
+        "bubble-desk-basket-two": "desk-and-place-14",
+        "bubble-in-three": "look-in-the-box-5",
+        "bubble-in-five": "look-in-the-box-9",
+        "bubble-on-three": "look-in-the-box-12",
+        "bubble-chair-basket": "one-and-many-15",
+        "bubble-chair-foot": "one-and-many-16",
+        "bubble-chair-on": "one-and-many-17",
+        "bubble-hint": "look-in-the-box-13",
+        "bubble-help": "look-in-the-box-15",
+        "bubble-praise": "look-in-the-box-16"
+      },
+      "script": [
+        {
+          "say": "两个球都一样，我还得听见它们在哪里。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#game-goal"
+        },
+        {
+          "say": "先听，没听清就点小喇叭。"
+        },
+        {
+          "highlight": "#first-place-card"
+        },
+        {
+          "say": "我听到 under the desk。"
+        },
+        {
+          "say": "这张的两个足球在桌下。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "按箭头把船移到这张图下，再按圆圈吹泡泡。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "看，泡泡碰到找对的图了。这一次示范到这里。"
+        },
+        {
+          "say": "你来试。要把球、几个、在哪儿都听完。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ]
+    },
+    {
+      "key": "listen-and-act",
+      "type": "slide",
+      "title": "听口令，做一个动作",
+      "template": "two-columns",
+      "data": {
+        "title": "听口令，做一个动作",
+        "left": {
+          "heading": "帽子还没戴上",
+          "body": "Listen first"
+        },
+        "left_picture": "child-no-hat",
+        "right": {
+          "heading": "帽子戴好了",
+          "body": "Put on your hat."
+        },
+        "right_picture": "child-hat"
+      },
+      "script": [
+        {
+          "say": "帮忙收好球以后，小雨准备去操场。看，她在等一句话。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "你也可以用手比一比。先听完，再做。"
+        },
+        {
+          "say": "Put on your hat."
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "她把帽子戴在头上了。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "Put on your hat."
+        },
+        {
+          "say": "没有帽子，就用手比个帽檐。"
+        },
+        {
+          "say": "纸书第四十九页还有别的动作。"
+        },
+        {
+          "say": "接下来换成送球。听完要拿什么，还要听送到哪里。"
+        },
+        {
+          "say": "先听拿取的口令。Pick up 就是拿起来。"
+        },
+        {
+          "say": "Pick up two footballs."
+        },
+        {
+          "say": "Pick up one basketball."
+        },
+        {
+          "say": "Pick up three ping-pong balls."
+        },
+        {
+          "say": "用手比一比，这三句分别要拿几个。"
+        }
+      ]
+    },
+    {
+      "key": "pick-up-the-gear",
+      "type": "slide",
+      "title": "先听拿什么，再听放在哪儿",
+      "template": "title-picture",
+      "data": {
+        "title": "先听拿什么，再听放在哪儿",
+        "picture": "show-two-on-chair",
+        "caption": "Pick up · Put"
+      },
+      "script": [
+        {
+          "say": "拿和放是两条口令。先听拿什么。"
+        },
+        {
+          "say": "Pick up two basketballs."
+        },
+        {
+          "say": "Pick up three footballs."
+        },
+        {
+          "say": "Pick up four ping-pong balls."
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "现在听下一条。这句要你把多个物品放到桌子下。"
+        },
+        {
+          "say": "Put them under the desk."
+        },
+        {
+          "say": "如果只有一个，听这句。"
+        },
+        {
+          "say": "Put it on the desk."
+        },
+        {
+          "say": "再练两条，想想要找哪个参照物。"
+        },
+        {
+          "say": "Put them in the box."
+        },
+        {
+          "say": "Put them under the chair."
+        },
+        {
+          "say": "也可以把几只都放在桌面上。"
+        },
+        {
+          "say": "Put them on the desk."
+        },
+        {
+          "say": "听球和只数，再看它要去哪里。"
+        },
+        {
+          "say": "看亮起的图，再按方键。"
+        },
+        {
+          "say": "你听对了，球送到了。"
+        }
+      ]
+    },
+    {
+      "key": "move-and-deliver",
+      "type": "interactive",
+      "title": "送到图上指定的地方",
+      "page": "move-and-deliver",
+      "startImage": "equipment-corner",
+      "widgetType": "learning-arcade",
+      "gameAudio": {
+        "load-foot-two": "listen-and-act-13",
+        "load-basket-one": "listen-and-act-14",
+        "load-ping-three": "listen-and-act-15",
+        "load-ping-four": "pick-up-the-gear-4",
+        "load-basket-two": "pick-up-the-gear-2",
+        "load-foot-three": "pick-up-the-gear-3",
+        "drop-below": "pick-up-the-gear-7",
+        "drop-top": "pick-up-the-gear-9",
+        "drop-box": "pick-up-the-gear-11",
+        "drop-chair": "pick-up-the-gear-12",
+        "drop-top-many": "pick-up-the-gear-14",
+        "deliver-hint": "pick-up-the-gear-15",
+        "deliver-help": "pick-up-the-gear-16",
+        "deliver-praise": "pick-up-the-gear-17"
+      },
+      "script": [
+        {
+          "say": "这辆车先拿球。听到下一条口令，它才知道送到哪儿。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#delivery-replay-anchor"
+        },
+        {
+          "say": "点小喇叭，可以重听。"
+        },
+        {
+          "highlight": "#first-gear-card"
+        },
+        {
+          "say": "听到两个足球。放大的图上，黑白球正好两个。"
+        },
+        {
+          "highlight": "#first-pickup-spot"
+        },
+        {
+          "say": "车正停在同样的图上。点方键，先拿球。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "看到右边出现这组球，说明拿到了。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "拿到以后，还要听地点。"
+        },
+        {
+          "say": "每个小圆点标出放球的位置。"
+        },
+        {
+          "say": "桌上的点贴着桌面，桌下的点在桌腿中间。听口令再送。"
+        },
+        {
+          "say": "现在从第一张换你开，停稳后用方键交付。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ]
+    },
+    {
+      "key": "picture-check",
+      "type": "quiz",
+      "title": "听完再找新图",
+      "intro": [
+        "听完口令，选一张相符的图。",
+        "没听清，可以再点小喇叭。"
+      ],
+      "questions": [
+        {
+          "id": "gear-q1",
+          "question": "Point to the basketball.",
+          "skill": "球类词汇",
+          "answer": [
+            "B"
+          ],
+          "analysis": "第二张是有弯线的橙色篮球。第一张是黑白足球，第三张是小乒乓球。",
+          "visual": {
+            "kind": "asset",
+            "image": "q1-listen",
+            "alt": "器材箱听题图标"
+          },
+          "options": {
+            "A": {
+              "label": "图卡1",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-card-1",
+                "alt": "一只足球"
+              }
+            },
+            "B": {
+              "label": "图卡2",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-card-2",
+                "alt": "一只篮球"
+              }
+            },
+            "C": {
+              "label": "图卡3",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-card-3",
+                "alt": "一只乒乓球"
+              }
+            }
+          }
+        },
+        {
+          "id": "gear-q2",
+          "question": "There are three footballs on the desk.",
+          "skill": "同球同量辨on/under",
+          "answer": [
+            "A"
+          ],
+          "analysis": "要三只，也要在桌面上。第二张三只在桌子下，第三张桌上只有两只。",
+          "visual": {
+            "kind": "asset",
+            "image": "q2-listen",
+            "alt": "器材箱听题图标"
+          },
+          "options": {
+            "A": {
+              "label": "图卡1",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-card-1",
+                "alt": "桌上三只足球"
+              }
+            },
+            "B": {
+              "label": "图卡2",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-card-2",
+                "alt": "桌下三只足球"
+              }
+            },
+            "C": {
+              "label": "图卡3",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-card-3",
+                "alt": "桌上两只足球"
+              }
+            }
+          }
+        },
+        {
+          "id": "gear-q3",
+          "question": "There is a basketball under the desk.",
+          "skill": "一件和多件",
+          "answer": [
+            "C"
+          ],
+          "analysis": "听到 There is a，找一只。第三张一只在桌下，另外两张数量或位置变了。",
+          "visual": {
+            "kind": "asset",
+            "image": "q3-listen",
+            "alt": "器材箱听题图标"
+          },
+          "options": {
+            "A": {
+              "label": "图卡1",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-card-1",
+                "alt": "桌下两只篮球"
+              }
+            },
+            "B": {
+              "label": "图卡2",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-card-2",
+                "alt": "桌上一只篮球"
+              }
+            },
+            "C": {
+              "label": "图卡3",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-card-3",
+                "alt": "桌下一只篮球"
+              }
+            }
+          }
+        },
+        {
+          "id": "gear-q4",
+          "question": "There are two footballs on the chair.",
+          "skill": "同量球类位置一起核",
+          "answer": [
+            "B"
+          ],
+          "analysis": "第二张两只足球在椅面上。第一张是篮球，第三张的足球在椅子下。",
+          "visual": {
+            "kind": "asset",
+            "image": "q4-listen",
+            "alt": "器材箱听题图标"
+          },
+          "options": {
+            "A": {
+              "label": "图卡1",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-card-1",
+                "alt": "椅面两只篮球"
+              }
+            },
+            "B": {
+              "label": "图卡2",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-card-2",
+                "alt": "椅面两只足球"
+              }
+            },
+            "C": {
+              "label": "图卡3",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-card-3",
+                "alt": "椅子下两只足球"
+              }
+            }
+          }
+        },
+        {
+          "id": "gear-q5",
+          "question": "Two ping-pong balls under the chair.",
+          "skill": "参照物桌椅区分",
+          "answer": [
+            "C"
+          ],
+          "analysis": "第三张正好两只，位置在椅子下。第一张用的是课桌，第二张有三只。",
+          "visual": {
+            "kind": "asset",
+            "image": "q5-listen",
+            "alt": "器材箱听题图标"
+          },
+          "options": {
+            "A": {
+              "label": "图卡1",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-card-1",
+                "alt": "桌下两只乒乓球"
+              }
+            },
+            "B": {
+              "label": "图卡2",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-card-2",
+                "alt": "椅子下三只乒乓球"
+              }
+            },
+            "C": {
+              "label": "图卡3",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-card-3",
+                "alt": "椅子下两只乒乓球"
+              }
+            }
+          }
+        },
+        {
+          "id": "gear-q6",
+          "question": "Four ping-pong balls in the box.",
+          "skill": "in 和 on",
+          "answer": [
+            "A"
+          ],
+          "analysis": "第一张有四只在开口箱里。第二张四只在桌上，第三张箱里只有三只。",
+          "visual": {
+            "kind": "asset",
+            "image": "q6-listen",
+            "alt": "器材箱听题图标"
+          },
+          "options": {
+            "A": {
+              "label": "图卡1",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-card-1",
+                "alt": "箱里四只乒乓球"
+              }
+            },
+            "B": {
+              "label": "图卡2",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-card-2",
+                "alt": "桌上四只乒乓球"
+              }
+            },
+            "C": {
+              "label": "图卡3",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-card-3",
+                "alt": "箱里三只乒乓球"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "show-your-place",
+      "type": "slide",
+      "title": "自己摆一摆，说一说",
+      "template": "two-columns",
+      "data": {
+        "title": "自己摆一摆，说一说",
+        "left": {
+          "heading": "桌面上",
+          "body": "on the desk"
+        },
+        "left_picture": "show-three-on-desk",
+        "right": {
+          "heading": "箱子里",
+          "body": "in the box"
+        },
+        "right_picture": "three-ping-pong-in-box"
+      },
+      "script": [
+        {
+          "say": "收好啦。现在请你给家人留一条找球的线索。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "看这一组，数一下。One, two, three."
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "There are three basketballs on the desk."
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "再看开口箱。球在箱口的里面，箱沿遮住一点球。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "Three ping-pong balls in the box."
+        },
+        {
+          "say": "家里可以换成几块积木或几个纸球。把它们摆在看得见的地方。"
+        },
+        {
+          "say": "先数，再说是什么、在哪里。家人听完试着找。"
+        },
+        {
+          "say": "再回到纸书第四十七到四十九页，找球、唱歌或做动作。"
+        }
+      ]
+    }
+  ],
+  "images": {
+    "cart": {
+      "file": "assets/cart.png"
+    },
+    "boat": {
+      "file": "assets/boat.png"
+    },
+    "star": {
+      "file": "assets/star.png"
+    },
+    "child-no-hat": {
+      "file": "assets/child-no-hat.png"
+    },
+    "child-hat": {
+      "file": "assets/child-hat.png"
+    },
+    "equipment-corner": {
+      "file": "assets/equipment-corner.png"
+    },
+    "two-footballs-under-desk": {
+      "file": "assets/two-footballs-under-desk.png"
+    },
+    "two-footballs-on-desk": {
+      "file": "assets/two-footballs-on-desk.png"
+    },
+    "one-football-under-desk": {
+      "file": "assets/one-football-under-desk.png"
+    },
+    "one-basketball-under-chair": {
+      "file": "assets/one-basketball-under-chair.png"
+    },
+    "two-basketballs-under-chair": {
+      "file": "assets/two-basketballs-under-chair.png"
+    },
+    "one-football-under-chair": {
+      "file": "assets/one-football-under-chair.png"
+    },
+    "one-basketball-on-chair": {
+      "file": "assets/one-basketball-on-chair.png"
+    },
+    "three-ping-pong-in-box": {
+      "file": "assets/three-ping-pong-in-box.png"
+    },
+    "three-ping-pong-on-desk": {
+      "file": "assets/three-ping-pong-on-desk.png"
+    },
+    "five-ping-pong-in-box": {
+      "file": "assets/five-ping-pong-in-box.png"
+    },
+    "two-basketballs-on-desk": {
+      "file": "assets/two-basketballs-on-desk.png"
+    },
+    "two-basketballs-under-desk": {
+      "file": "assets/two-basketballs-under-desk.png"
+    },
+    "at-top": {
+      "file": "assets/at-top.png"
+    },
+    "at-bottom": {
+      "file": "assets/at-bottom.png"
+    },
+    "inside-box": {
+      "file": "assets/inside-box.png"
+    },
+    "below-chair": {
+      "file": "assets/below-chair.png"
+    },
+    "load-football-2": {
+      "file": "assets/load-football-2.png"
+    },
+    "load-football-3": {
+      "file": "assets/load-football-3.png"
+    },
+    "load-basketball-1": {
+      "file": "assets/load-basketball-1.png"
+    },
+    "load-basketball-2": {
+      "file": "assets/load-basketball-2.png"
+    },
+    "load-basketball-3": {
+      "file": "assets/load-basketball-3.png"
+    },
+    "load-ping-pong-2": {
+      "file": "assets/load-ping-pong-2.png"
+    },
+    "load-ping-pong-3": {
+      "file": "assets/load-ping-pong-3.png"
+    },
+    "load-ping-pong-4": {
+      "file": "assets/load-ping-pong-4.png"
+    },
+    "q1-listen": {
+      "file": "assets/q1-listen.png"
+    },
+    "q2-listen": {
+      "file": "assets/q2-listen.png"
+    },
+    "q3-listen": {
+      "file": "assets/q3-listen.png"
+    },
+    "q4-listen": {
+      "file": "assets/q4-listen.png"
+    },
+    "q5-listen": {
+      "file": "assets/q5-listen.png"
+    },
+    "q6-listen": {
+      "file": "assets/q6-listen.png"
+    },
+    "q1-card-1": {
+      "file": "assets/q1-card-1.png"
+    },
+    "q1-card-2": {
+      "file": "assets/q1-card-2.png"
+    },
+    "q1-card-3": {
+      "file": "assets/q1-card-3.png"
+    },
+    "q2-card-1": {
+      "file": "assets/q2-card-1.png"
+    },
+    "q2-card-2": {
+      "file": "assets/q2-card-2.png"
+    },
+    "q2-card-3": {
+      "file": "assets/q2-card-3.png"
+    },
+    "q3-card-1": {
+      "file": "assets/q3-card-1.png"
+    },
+    "q3-card-2": {
+      "file": "assets/q3-card-2.png"
+    },
+    "q3-card-3": {
+      "file": "assets/q3-card-3.png"
+    },
+    "q4-card-1": {
+      "file": "assets/q4-card-1.png"
+    },
+    "q4-card-2": {
+      "file": "assets/q4-card-2.png"
+    },
+    "q4-card-3": {
+      "file": "assets/q4-card-3.png"
+    },
+    "q5-card-1": {
+      "file": "assets/q5-card-1.png"
+    },
+    "q5-card-2": {
+      "file": "assets/q5-card-2.png"
+    },
+    "q5-card-3": {
+      "file": "assets/q5-card-3.png"
+    },
+    "q6-card-1": {
+      "file": "assets/q6-card-1.png"
+    },
+    "q6-card-2": {
+      "file": "assets/q6-card-2.png"
+    },
+    "q6-card-3": {
+      "file": "assets/q6-card-3.png"
+    },
+    "opening-corner": {
+      "file": "assets/opening-corner.png"
+    },
+    "ball-types": {
+      "file": "assets/ball-types.png"
+    },
+    "show-three-on-desk": {
+      "file": "assets/show-three-on-desk.png"
+    },
+    "show-two-on-chair": {
+      "file": "assets/show-two-on-chair.png"
+    }
+  }
+}

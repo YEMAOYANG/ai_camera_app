@@ -1,0 +1,202 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "十几减5、4、3、2",
+  "binding": {
+    "editionId": "pep-math-g1-lower-2022-standard",
+    "revisionId": "directory-6205d2037284e91f10b25edd",
+    "nodeId": "090d7805-fe17-41f0-8352-73c079fe6ac4",
+    "unitId": "2eeba665-272f-4a55-b064-2be484fc77e4"
+  },
+  "scenario": "社区手工坊分出要借走的彩夹，把每盘的余量画在十格盘上，再把余量一样的两张卡并排归档。",
+  "goals": [
+    "用破十、连减或想加算减计算十几减5、4、3、2，并用加回去核对。",
+    "看图比较原有数量相同、去掉数量相同两种情形，从一个已知算式推算另一个。",
+    "找出余数相同的算式，用实物说明原有和去掉数量同增同减时，余数保持不变。"
+  ],
+  "goalSources": [
+    {
+      "skill": "subtract-and-check",
+      "target": "用破十、连减或想加算减计算十几减5、4、3、2，并用加回去核对。",
+      "source": "印16例4、课件7～14、教案2～3"
+    },
+    {
+      "skill": "one-quantity-fixed",
+      "target": "看图比较原有数量相同、去掉数量相同两种情形，从一个已知算式推算另一个。",
+      "source": "印16做一做、课件13和15～17、教案3～4"
+    },
+    {
+      "skill": "same-remainder",
+      "target": "找出余数相同的算式，用实物说明原有和去掉数量同增同减时，余数保持不变。",
+      "source": "印16数学游戏、课件18～20、任务单2"
+    }
+  ],
+  "pageSequence": [
+    {
+      "key": "clip-trays",
+      "kind": "teaching",
+      "plan": "展示原有、送出和留下三处。整十用实物格表示，借用前一课的算法做一个短回想。"
+    },
+    {
+      "key": "break-ten",
+      "kind": "teaching",
+      "plan": "取 12−5 或同范围原创组合，先指出十格和额外两个，再打开一组十，去掉5，合数余量。"
+    },
+    {
+      "key": "count-down-to-ten",
+      "kind": "teaching",
+      "plan": "复用同一个总数和取走数量。分两次取走，先到10，再取剩余部分；用箭头对齐比较两次共去5。"
+    },
+    {
+      "key": "add-the-part-back",
+      "kind": "teaching",
+      "plan": "把去掉的一组与留下的一组重新合回一盘来验算。再用 11−4 迁移，并画出一加两减的关系。"
+    },
+    {
+      "key": "take-two",
+      "kind": "teaching",
+      "plan": "专页用11减2，破十先从十取二、连减先取一再取一，均余九。"
+    },
+    {
+      "key": "choose-the-missing-part",
+      "kind": "game",
+      "plan": "瞄准并发射已送出的数量，命中能合回指定总数的剩余量。"
+    },
+    {
+      "key": "compare-one-change",
+      "kind": "teaching",
+      "plan": "固定取走三个比较11、12、13的余量；13的散数够取，不拆十。"
+    },
+    {
+      "key": "compare-fixed-total",
+      "kind": "teaching",
+      "plan": "独立比较原数12减3、4、5，及原数11减2、3、4；每多拿一个，少留一个。"
+    },
+    {
+      "key": "find-equal-remainders",
+      "kind": "teaching",
+      "plan": "两条整十格逐格对齐，多出来的原有物正是多去掉的那一件。比较 11−2、12−3 与 13−4，同余数9可用等号连。"
+    },
+    {
+      "key": "pair-the-trays",
+      "kind": "game",
+      "plan": "落块游戏用真正的列移动和下落，将不同操作卡与相同余数的底卡配对。"
+    },
+    {
+      "key": "picture-quiz",
+      "kind": "quiz",
+      "plan": "六个有录音的图题，目标算式保留，数量、分组与被取走痕迹靠图可见。"
+    },
+    {
+      "key": "explain-to-family",
+      "kind": "teaching",
+      "plan": "回看哪一份量没变，哪两份一起变。留一个用实物验算和向家人解释的任务。"
+    }
+  ],
+  "games": [
+    {
+      "page": "choose-the-missing-part",
+      "template": "magnetMarbles",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.magnetMarbles",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "sum_pair",
+      "selection": "用每关真实 total 与数字靶判定。每次先播报目标总数及送出数量；同一关总数固定，发射物可变。用准确可数的十框、取走标记、靶盘小物图表示数字，移去非目标文字后仍能玩。错靶不计；正确图合回原盘。",
+      "levels": [
+        "原有11，依次用去掉2、3、4对准余数9、8、7。",
+        "原有12，依次用去掉3、4、5对准余数9、8、7。",
+        "原有13，依次用去掉4、5对准余数9、8，靶含可数干扰，漂移稍快。"
+      ],
+      "demo": "教师先指目标盘、待发射的去掉数量、移动靶。真实发射一次，停在合回总数的反馈后清零。",
+      "teacherAnchors": [
+        "whole-tray",
+        "borrowed-clips",
+        "game-target",
+        "release-the-marble",
+        "put-back-proof"
+      ]
+    },
+    {
+      "page": "pair-the-trays",
+      "template": "fallingTiles",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.fallingTiles",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "pair_match",
+      "selection": "六格底行放若干操作卡与空格。用有向 pairs 检查上落卡与底卡的运算结果相同，显示等比例的十框或余量条，结合录音与目标算式。各关的底卡余量不同以保持当前目标明确；错落后仍可依模板重玩。",
+      "levels": [
+        "慢落，分别连接 12−3 与 11−2、12−4 与 11−3。",
+        "增加第三组 12−5 与 11−4，底卡换列。",
+        "底卡为12减3、12减4、12减5。落块为13减5、13减4、11减4，分别归档余8、9、7。"
+      ],
+      "demo": "教师依次指落卡、底卡和移动操作，实际移动并配成一组，看到共同余数，再清零正式开始。",
+      "teacherAnchors": [
+        "falling-clip-card",
+        "demo-bottom-card",
+        "drop-comparison-card",
+        "same-remainder-card"
+      ]
+    }
+  ],
+  "quiz": [
+    {
+      "id": "what-is-left",
+      "skill": "破十找余量",
+      "prompt": "花摊有十四朵纸花，送走五朵。还剩哪束？",
+      "answer": "九朵纸花",
+      "position": 2,
+      "rationale": "整十里拿五朵还余五朵，合上原来散着的四朵，余九朵。"
+    },
+    {
+      "id": "check-add-back",
+      "skill": "加回核对",
+      "prompt": "十一张记录牌取走五张。哪组能合回十一？",
+      "answer": "六张纸牌",
+      "position": 1,
+      "rationale": "五和六合起来刚好是十一，所以十一减五余六。"
+    },
+    {
+      "id": "same-removal",
+      "skill": "固定取走量",
+      "prompt": "两岸都搬走四条纸船。哪幅图的余量对？",
+      "answer": "左岸十条，右岸十一条",
+      "position": 3,
+      "rationale": "十四减四得十。右岸原来多一条，取走一样多，右岸就余十一条。"
+    },
+    {
+      "id": "one-extra-original",
+      "skill": "固定取走量推算",
+      "prompt": "大盘原来多一块。取走同样多，大盘余几块？",
+      "answer": "七块饼干",
+      "position": 2,
+      "rationale": "取走同样多，原来多一块的大盘仍多一块，小盘六块，大盘就有七块。"
+    },
+    {
+      "id": "fixed-original",
+      "skill": "固定原有数量",
+      "prompt": "两盒各十六支。左借三支，右借四支。哪幅对？",
+      "answer": "左余十三，右余十二",
+      "position": 3,
+      "rationale": "左盒十六减三余十三。右盒原来一样多，多借一支，少余一支。"
+    },
+    {
+      "id": "same-difference",
+      "skill": "两个量同增",
+      "prompt": "这架十六棵苗移走五棵。哪张卡的余量一样？",
+      "answer": "十五棵移走四棵",
+      "position": 1,
+      "rationale": "十五比十六少一棵，移走的四也比五少一棵，两边都余十一棵。"
+    }
+  ],
+  "afterClass": {
+    "familyTask": "用实体夹子摆18减5和17减4并加回核对；告诉家人两盘余量为什么相同。",
+    "weeklyQuestionSource": [
+      "退位减法与加回去核对",
+      "固定总数的差",
+      "固定取走数量的差",
+      "不同算式同差"
+    ],
+    "evidence": "课堂只记录游戏操作和答题。实际摆物与口述由家人观察。"
+  },
+  "artAndLanguage": "生成插画只作空间和人物。十格盘、夹子计数、移走轨迹、两列余量和所有选图按同一程序图精确绘制。去掉位置既用移动轮廓也用遮罩纹理区分，颜色不单独提示答案。播放中文老师录音和失败反馈。",
+  "officialNotesSha256": "046c07ed7ae30b842509371f96ca1571ff5b0fb370f5fa57556329999d9d5ff4"
+}

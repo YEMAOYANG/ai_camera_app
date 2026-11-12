@@ -1,0 +1,1142 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "11～20 的认识",
+  "description": "在风车工坊先数十根一捆，再读写十一到二十，沿数线找邻居和近路。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小数老师",
+      "role": "teacher",
+      "gender": "male",
+      "voice": "Ethan",
+      "avatar": "/teachers/ashu-math-v1.png",
+      "color": "#306357",
+      "persona": "先请孩子猜，再一起动手。用看得见的小棒、珠子和脚步讲明白每一步。"
+    }
+  },
+  "images": {
+    "counter-eighteen": {
+      "file": "assets/counter-eighteen.png"
+    },
+    "counter-eleven": {
+      "file": "assets/counter-eleven.png"
+    },
+    "counter-seventeen": {
+      "file": "assets/counter-seventeen.png"
+    },
+    "counter-sixteen": {
+      "file": "assets/counter-sixteen.png"
+    },
+    "counter-twenty": {
+      "file": "assets/counter-twenty.png"
+    },
+    "line-gap-eighteen": {
+      "file": "assets/line-gap-eighteen.png"
+    },
+    "line-paths-seventeen": {
+      "file": "assets/line-paths-seventeen.png"
+    },
+    "line-start-sixteen": {
+      "file": "assets/line-start-sixteen.png"
+    },
+    "line-zero-twenty": {
+      "file": "assets/line-zero-twenty.png"
+    },
+    "pages-fourteen-sixteen": {
+      "file": "assets/pages-fourteen-sixteen.png"
+    },
+    "pages-seventeen-twenty": {
+      "file": "assets/pages-seventeen-twenty.png"
+    },
+    "rods-nineteen-arrival": {
+      "file": "assets/rods-nineteen-arrival.png"
+    },
+    "rods-thirteen": {
+      "file": "assets/rods-thirteen.png"
+    },
+    "rods-twenty": {
+      "file": "assets/rods-twenty.png"
+    },
+    "tiles-10-loose": {
+      "file": "assets/tiles-10-loose.png"
+    },
+    "tiles-11-loose": {
+      "file": "assets/tiles-11-loose.png"
+    },
+    "tiles-12-loose": {
+      "file": "assets/tiles-12-loose.png"
+    },
+    "tiles-fifteen": {
+      "file": "assets/tiles-fifteen.png"
+    },
+    "tiles-sixteen": {
+      "file": "assets/tiles-sixteen.png"
+    },
+    "tiles-twelve-boxed": {
+      "file": "assets/tiles-twelve-boxed.png"
+    },
+    "number-3": {
+      "glyph": {
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "3"
+              }
+            ]
+          }
+        ],
+        "size": [
+          480,
+          240
+        ]
+      }
+    },
+    "number-4": {
+      "glyph": {
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "4"
+              }
+            ]
+          }
+        ],
+        "size": [
+          480,
+          240
+        ]
+      }
+    },
+    "number-5": {
+      "glyph": {
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "5"
+              }
+            ]
+          }
+        ],
+        "size": [
+          480,
+          240
+        ]
+      }
+    },
+    "number-11": {
+      "glyph": {
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "11"
+              }
+            ]
+          }
+        ],
+        "size": [
+          480,
+          240
+        ]
+      }
+    },
+    "number-15": {
+      "glyph": {
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "15"
+              }
+            ]
+          }
+        ],
+        "size": [
+          480,
+          240
+        ]
+      }
+    },
+    "number-16": {
+      "glyph": {
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "16"
+              }
+            ]
+          }
+        ],
+        "size": [
+          480,
+          240
+        ]
+      }
+    },
+    "number-17": {
+      "glyph": {
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "17"
+              }
+            ]
+          }
+        ],
+        "size": [
+          480,
+          240
+        ]
+      }
+    },
+    "number-18": {
+      "glyph": {
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "18"
+              }
+            ]
+          }
+        ],
+        "size": [
+          480,
+          240
+        ]
+      }
+    },
+    "number-20": {
+      "glyph": {
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "20"
+              }
+            ]
+          }
+        ],
+        "size": [
+          480,
+          240
+        ]
+      }
+    },
+    "game-rods-1": {
+      "file": "assets/game-rods-1.png"
+    },
+    "game-rods-2": {
+      "file": "assets/game-rods-2.png"
+    },
+    "game-rods-3": {
+      "file": "assets/game-rods-3.png"
+    },
+    "game-rods-4": {
+      "file": "assets/game-rods-4.png"
+    },
+    "game-rods-5": {
+      "file": "assets/game-rods-5.png"
+    },
+    "game-rods-6": {
+      "file": "assets/game-rods-6.png"
+    },
+    "game-rods-7": {
+      "file": "assets/game-rods-7.png"
+    },
+    "game-rods-8": {
+      "file": "assets/game-rods-8.png"
+    },
+    "game-rods-9": {
+      "file": "assets/game-rods-9.png"
+    },
+    "game-bundle": {
+      "file": "assets/game-bundle.png"
+    },
+    "arcade-kiln": {
+      "file": "assets/arcade-kiln.png"
+    },
+    "arcade-clouds": {
+      "file": "assets/arcade-clouds.png"
+    },
+    "arcade-rabbit-ready": {
+      "file": "assets/arcade-rabbit-ready.png"
+    },
+    "arcade-rabbit-run": {
+      "file": "assets/arcade-rabbit-run.png"
+    },
+    "arcade-rabbit-jump": {
+      "file": "assets/arcade-rabbit-jump.png"
+    },
+    "arcade-sticker": {
+      "file": "assets/arcade-sticker.png"
+    },
+    "line-locate-thirteen": {
+      "file": "assets/line-locate-thirteen.png"
+    },
+    "line-gap-nineteen": {
+      "file": "assets/line-gap-nineteen.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "one-bundle",
+      "type": "slide",
+      "title": "一眼看出有几根",
+      "template": "picture-points",
+      "data": {
+        "title": "一眼看出有几根",
+        "picture": "rods-thirteen",
+        "points": [
+          "先看一捆",
+          "再数散棒",
+          "读作十三"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "给风车架备小棒啦。咦，一根一根数，数到哪儿容易忘？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "伸出手指，先圈住绑在一起的那一捆。"
+        },
+        {
+          "say": "猜猜看，知道了这一捆有几根，还得从一数起吗？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "这一捆已经数过了，十根绑在一起，正好是一个十。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "从十接着数右边三根，十一、十二、十三。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "一个十和三个一合起来是十三，左边写一，右边写三。"
+        },
+        {
+          "say": "十一到十九都先读十，因为都有一捆。散棒剩几根，就接着念几。"
+        },
+        {
+          "say": "下次再搬来一捆，我们先认一捆是十，数起来就快啦。"
+        },
+        {
+          "say": "方向键左右挪，空格让它落下。把凑满十根的两块挨着放。"
+        },
+        {
+          "say": "看落点的浅影子，试试把小棒放在隔壁一格。"
+        },
+        {
+          "say": "先数地上有几根，再想还差几根够十。"
+        },
+        {
+          "say": "好棒呀，十根小棒进了同一捆！"
+        }
+      ]
+    },
+    {
+      "key": "new-bundle",
+      "type": "slide",
+      "title": "再来一根会怎样",
+      "template": "two-columns",
+      "data": {
+        "title": "再来一根会怎样",
+        "left": {
+          "heading": "一捆九根，又来一根",
+          "body": "散棒凑满十根"
+        },
+        "left_picture": "rods-nineteen-arrival",
+        "right": {
+          "heading": "同一批小棒",
+          "body": "两捆，一根也没剩"
+        },
+        "right_picture": "rods-twenty"
+      },
+      "script": [
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "小棒架上有十九根。又送来一根，这回怎么收呢？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "看，送来的在上边。用手比一下，把它推到散棒旁。"
+        },
+        {
+          "say": "散棒原来有九根，多这一根，正好十根呀！"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "十根可以扎一捆。先猜猜，扎好以后还剩几根散棒？"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "哇，散棒都进新的一捆了。原来那一捆也还在。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "两捆就是两个十，合起来是二十。"
+        },
+        {
+          "say": "绳子只把棒拢起来，小棒一根没多，一根没少。"
+        }
+      ]
+    },
+    {
+      "key": "where-the-bead-sits",
+      "type": "slide",
+      "title": "同一个一，意思会变",
+      "template": "two-columns",
+      "data": {
+        "title": "同一个一，意思会变",
+        "left": {
+          "heading": "十一",
+          "body": "十位是1，个位也是1"
+        },
+        "left_picture": "counter-eleven",
+        "right": {
+          "heading": "二十",
+          "body": "十位是2，个位写0"
+        },
+        "right_picture": "counter-twenty"
+      },
+      "script": [
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "小棒要用珠子记下来。你看，两边都拨一颗，会一样多吗？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "从右边数，第一根是个位，一颗珠只记一根散棒。"
+        },
+        {
+          "say": "再向左一位是十位。这儿一颗珠，就记一捆十根。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "所以十一写两个一，左边是一捆，右边是一根。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "刚才二十根全扎了捆。两捆记在左边，右边该拨珠吗？"
+        },
+        {
+          "say": "没有散棒，右边就空着，表示一个一也没有。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "可写数时不能只写二。右边要写零，让二留在十位。"
+        },
+        {
+          "say": "珠子在哪一根杆上，告诉我们它在记一根，还是一捆。"
+        }
+      ]
+    },
+    {
+      "key": "packing",
+      "type": "interactive",
+      "title": "小棒装箱",
+      "page": "packing",
+      "widgetType": "learning-arcade",
+      "startImage": "arcade-kiln",
+      "gameAudio": {
+        "pack-goal": "one-bundle-14",
+        "pack-hint": "one-bundle-15",
+        "pack-help": "one-bundle-16",
+        "pack-done": "one-bundle-17"
+      },
+      "script": [
+        {
+          "say": "风车架等着整捆小棒呢。你来当装箱员，好吗？"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#game-target"
+        },
+        {
+          "say": "看底下这一排。底下有四根，想想还缺几根才到十？"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "pause": false
+          }
+        },
+        {
+          "say": "从天上来的是六根。四根和六根凑在一起，正好十根。"
+        },
+        {
+          "say": "我往左挪一格，再按空格。小棒落在隔壁，刚刚好。"
+        },
+        {
+          "highlight": "#bundle-crate"
+        },
+        {
+          "say": "叮，箱子里多了一捆！数目没有变，只是绑到一起。"
+        },
+        {
+          "say": "轮到你啦！按左右箭头挪位置，按大落下键就能快落。"
+        },
+        {
+          "say": "先看浅影子落在哪儿，再决定放手。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ]
+    },
+    {
+      "key": "one-step-on-the-line",
+      "type": "slide",
+      "title": "数线上的邻居",
+      "template": "title-picture",
+      "data": {
+        "title": "数线上的邻居",
+        "picture": "line-zero-twenty",
+        "caption": "每一小格一样长，相邻两数差1"
+      },
+      "script": [
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "十五号架两旁住着谁？用手指当一辆小车，我们去看看。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "先停在十五。向右只走一小格，猜猜会停在哪儿？"
+        },
+        {
+          "say": "右边到十六。顺着数时，每走一格，数就大一。"
+        },
+        {
+          "say": "现在从十五往左退一格。咦，这回到了十四。"
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "十四、十五、十六相挨着，中间没有跳过别的数。"
+        },
+        {
+          "say": "小车往右开，数越来越大。倒着往左开，数越来越小。"
+        },
+        {
+          "say": "两个方向的第一站，正是十五的两个邻居。"
+        },
+        {
+          "say": "往大的一边走。从脚下的数接着数，跳到紧挨着的一站。"
+        },
+        {
+          "say": "这回倒着数。每跳一步，要到小一格的台子。"
+        },
+        {
+          "say": "先看看脚下的数字和两旁的邻居。"
+        },
+        {
+          "say": "朝要去的方向，手指比着数一格，再跑起来跳。"
+        }
+      ]
+    },
+    {
+      "key": "find-and-fill",
+      "type": "slide",
+      "title": "找刻度，补路标",
+      "template": "two-columns",
+      "data": {
+        "title": "找刻度，补路标",
+        "left": {
+          "heading": "十三在哪一道刻度",
+          "body": "从10向右走3格，到13"
+        },
+        "left_picture": "line-locate-thirteen",
+        "right": {
+          "heading": "这一格缺了哪个数",
+          "body": "从20向左退1格，填19"
+        },
+        "right_picture": "line-gap-nineteen"
+      },
+      "script": [
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "风车路标上有两个空位置，我们能找出来吗？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "先认出零、十、二十。要找十三，从十接着数更快。"
+        },
+        {
+          "say": "手指放在十上。十三会在十的哪一边？"
+        },
+        {
+          "say": "十三比十要大，往右跨一小格，停在十一的刻度。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "再走一格是十二，再走一格是十三。橙点就在这儿。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "另一段路上，十八和二十中间掉了一张牌。"
+        },
+        {
+          "say": "从二十往左退一格。二十的前一个数是什么呢？"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "是十九。补进去，十八、十九、二十正好挨着。"
+        },
+        {
+          "say": "从认得的数出发，一格数一个，路标就找得回来。"
+        }
+      ]
+    },
+    {
+      "key": "shorter-route",
+      "type": "slide",
+      "title": "走哪边，脚步少",
+      "template": "picture-points",
+      "data": {
+        "title": "走哪边，脚步少",
+        "picture": "line-paths-seventeen",
+        "points": [
+          "往左到10，走7格",
+          "往右到20，走3格",
+          "17离20更近"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "小车停在十七，十号站和二十号站，哪一站少走几步呢？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "两条路都从十七出发。手指放在起点，先别急着选。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "向左数从十七到十的弯弯线，一小格算一步，共走七步。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "再回到十七，向右走过十八、十九、二十，只走三步。"
+        },
+        {
+          "say": "小格一样长，三步比七步少，路就短。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "所以十七离二十更近。咱们比的是步数。"
+        },
+        {
+          "say": "换个起点，你也能用手指走一走，再看看哪边近。"
+        },
+        {
+          "say": "从脚下数到两端，各有几格？往步子少的一端跳。"
+        },
+        {
+          "say": "一个间隔算一步，脚下的数不用算一步。"
+        },
+        {
+          "say": "两边都从脚下开始数，格子少的一边路更短。"
+        },
+        {
+          "say": "哇，你数着小格跳到了目的地！"
+        }
+      ]
+    },
+    {
+      "key": "number-track",
+      "type": "interactive",
+      "title": "兔兔数线跳",
+      "page": "number-track",
+      "widgetType": "learning-arcade",
+      "startImage": "arcade-clouds",
+      "gameAudio": {
+        "track-up": "one-step-on-the-line-11",
+        "track-down": "one-step-on-the-line-12",
+        "track-hint": "one-step-on-the-line-13",
+        "track-help": "one-step-on-the-line-14",
+        "track-near": "shorter-route-13",
+        "track-steps": "shorter-route-14",
+        "track-compare": "shorter-route-15",
+        "track-done": "shorter-route-16"
+      },
+      "script": [
+        {
+          "say": "风车顶上的兔兔想找下一站。给它指一条路吧！"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#track-guide"
+        },
+        {
+          "say": "数线就在台子下面。两站之间的小格一样长。"
+        },
+        {
+          "say": "旗子在十一。要找大一的邻居，你猜该往哪边跳？"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "pause": false
+          }
+        },
+        {
+          "say": "看兔兔往右跳一格，落在十二。下一站是大一的数。"
+        },
+        {
+          "say": "按箭头跑，再按空格跳。用屏幕上的大按钮也能玩。"
+        },
+        {
+          "say": "你来试试，每次先找邻居，再把脚落在那块台上。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ]
+    },
+    {
+      "key": "page-and-amount",
+      "type": "slide",
+      "title": "页码和张数，各说什么",
+      "template": "two-columns",
+      "data": {
+        "title": "页码和张数，各说什么",
+        "left": {
+          "heading": "第15页在哪里",
+          "body": "14、15、16是页码"
+        },
+        "left_picture": "pages-fourteen-sixteen",
+        "right": {
+          "heading": "有15张纸片",
+          "body": "一组十张，外面五张"
+        },
+        "right_picture": "tiles-fifteen"
+      },
+      "script": [
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "风车书要翻到第十五页。旁边又写着十五张纸，意思一样吗？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "手指先点十四，再往后找一页。十五就在这儿。"
+        },
+        {
+          "say": "小满说：我找到了，十五夹在十四和十六中间！",
+          "by": "xiaoman"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "对呀。页码告诉我们去书的哪个位置找。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "换到桌上的纸片。猜猜看，这儿的十五说的是什么？"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "绿盘里一组十张，盘外五张，数起来有十五张。"
+        },
+        {
+          "say": "所以找第十五页，手指找的是位置。数十五张，问的是有多少。"
+        },
+        {
+          "say": "等会儿和家人翻书时，试着把这两个十五讲给他们听。"
+        }
+      ]
+    },
+    {
+      "key": "picture-check",
+      "type": "quiz",
+      "title": "换个地方再试试",
+      "intro": [
+        "听清我的问题，想好了就选一张图。"
+      ],
+      "questions": [
+        {
+          "id": "arcade-count-garden",
+          "question": "给花盆插号码片。盘里十片，外面六片，一共有多少片？",
+          "skill": "由一组十和散片读写总数",
+          "answer": [
+            "A"
+          ],
+          "analysis": "先记盘里十片，再往后数六下，数到十六。",
+          "options": {
+            "A": {
+              "label": "16",
+              "visual": {
+                "kind": "asset",
+                "image": "number-16",
+                "alt": "16"
+              }
+            },
+            "B": {
+              "label": "15",
+              "visual": {
+                "kind": "asset",
+                "image": "number-15",
+                "alt": "15"
+              }
+            },
+            "C": {
+              "label": "17",
+              "visual": {
+                "kind": "asset",
+                "image": "number-17",
+                "alt": "17"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "tiles-sixteen",
+            "alt": "盘里十片，盘外六片"
+          }
+        },
+        {
+          "id": "arcade-undo-box",
+          "question": "把盘里十片倒出来，盘外两片也留着。哪张图对？",
+          "skill": "十个一和一个十互换时总数不变",
+          "answer": [
+            "B"
+          ],
+          "analysis": "盘里的十片变成散片，外面两片也在，合起来是十二片散片。",
+          "options": {
+            "A": {
+              "label": "十片散片",
+              "visual": {
+                "kind": "asset",
+                "image": "tiles-10-loose",
+                "alt": "十片散片"
+              }
+            },
+            "B": {
+              "label": "十二片散片",
+              "visual": {
+                "kind": "asset",
+                "image": "tiles-12-loose",
+                "alt": "十二片散片"
+              }
+            },
+            "C": {
+              "label": "十一片散片",
+              "visual": {
+                "kind": "asset",
+                "image": "tiles-11-loose",
+                "alt": "十一片散片"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "tiles-twelve-boxed",
+            "alt": "盘里十片，盘外两片"
+          }
+        },
+        {
+          "id": "arcade-read-eighteen",
+          "question": "要记下储物柜的十八号。哪架计数器摆的是十八？",
+          "skill": "按十位和个位读数",
+          "answer": [
+            "C"
+          ],
+          "analysis": "十八是一个十和八个一，要把一颗珠放左杆，八颗珠放右杆。",
+          "options": {
+            "A": {
+              "label": "左杆一颗，右杆七颗",
+              "visual": {
+                "kind": "asset",
+                "image": "counter-seventeen",
+                "alt": "左杆一颗，右杆七颗"
+              }
+            },
+            "B": {
+              "label": "左杆一颗，右杆六颗",
+              "visual": {
+                "kind": "asset",
+                "image": "counter-sixteen",
+                "alt": "左杆一颗，右杆六颗"
+              }
+            },
+            "C": {
+              "label": "左杆一颗，右杆八颗",
+              "visual": {
+                "kind": "asset",
+                "image": "counter-eighteen",
+                "alt": "左杆一颗，右杆八颗"
+              }
+            }
+          }
+        },
+        {
+          "id": "arcade-fill-station",
+          "question": "十七号和十九号之间漏了一个站号，该补几号？",
+          "skill": "在等距数线上补相邻数",
+          "answer": [
+            "A"
+          ],
+          "analysis": "从十七往右走一格到十八，再走一格到十九。",
+          "options": {
+            "A": {
+              "label": "18",
+              "visual": {
+                "kind": "asset",
+                "image": "number-18",
+                "alt": "18"
+              }
+            },
+            "B": {
+              "label": "16",
+              "visual": {
+                "kind": "asset",
+                "image": "number-16",
+                "alt": "16"
+              }
+            },
+            "C": {
+              "label": "20",
+              "visual": {
+                "kind": "asset",
+                "image": "number-20",
+                "alt": "20"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "line-gap-eighteen",
+            "alt": "从十六到二十的等距刻度，十七和十九之间空一格"
+          }
+        },
+        {
+          "id": "arcade-nearer-stop",
+          "question": "小车在十六，要去十一号或二十号。哪一站更近？",
+          "skill": "数等长格数比较距离",
+          "answer": [
+            "B"
+          ],
+          "analysis": "从十六到十一走五格，到二十只走四格，所以二十号更近。",
+          "options": {
+            "A": {
+              "label": "11",
+              "visual": {
+                "kind": "asset",
+                "image": "number-11",
+                "alt": "11"
+              }
+            },
+            "B": {
+              "label": "20",
+              "visual": {
+                "kind": "asset",
+                "image": "number-20",
+                "alt": "20"
+              }
+            },
+            "C": {
+              "label": "16",
+              "visual": {
+                "kind": "asset",
+                "image": "number-16",
+                "alt": "16"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "line-start-sixteen",
+            "alt": "从十一到二十的等距数线，十六是起点"
+          }
+        },
+        {
+          "id": "arcade-page-span",
+          "question": "从第十七页看到第二十页。两头都算，一共看了几页？",
+          "skill": "区分页码和张数，并按顺序数范围",
+          "answer": [
+            "C"
+          ],
+          "analysis": "要数第十七、十八、十九和二十页，两头都算，一共四页。",
+          "options": {
+            "A": {
+              "label": "3",
+              "visual": {
+                "kind": "asset",
+                "image": "number-3",
+                "alt": "3"
+              }
+            },
+            "B": {
+              "label": "5",
+              "visual": {
+                "kind": "asset",
+                "image": "number-5",
+                "alt": "5"
+              }
+            },
+            "C": {
+              "label": "4",
+              "visual": {
+                "kind": "asset",
+                "image": "number-4",
+                "alt": "4"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "pages-seventeen-twenty",
+            "alt": "纸页上的起点是十七，终点是二十"
+          }
+        }
+      ]
+    },
+    {
+      "key": "bring-the-method-home",
+      "type": "slide",
+      "title": "小棒架的四个发现",
+      "template": "summary",
+      "data": {
+        "title": "小棒架的四个发现",
+        "items": [
+          "先数整捆，再接着数散棒",
+          "满十根散棒就能换一捆",
+          "左边十位记捆，右边个位记散棒",
+          "数线上向右变大，按等长小格数步"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "收工啦！再送来一把小棒和一张页码条，我们还记得办法吗？"
+        },
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "先把十根记成一组，从十接着数散棒，不用从头数。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "散棒又满十就扎一捆。捆法变了，总数没变。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "整捆记左边的十位，散棒记右边的个位。"
+        },
+        {
+          "say": "没有散棒，写零留住个位。这个零可不能随手擦掉。"
+        },
+        {
+          "spotlight": "item-4"
+        },
+        {
+          "say": "找书页可以想一想数线。向右每走一格，数大一。"
+        },
+        {
+          "say": "比哪边近，就从同一个地方出发，数哪边的小格少。"
+        },
+        {
+          "say": "回家找一组十一到二十个的小物件，摆给家人看看吧。"
+        }
+      ]
+    }
+  ]
+}

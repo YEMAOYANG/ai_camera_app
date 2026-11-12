@@ -1,0 +1,80 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "求比一个数多（或少）几的数是多少",
+  "binding": {
+    "editionId": "pep-math-g1-lower-2022-standard",
+    "revisionId": "directory-6205d2037284e91f10b25edd",
+    "unitId": "bd8045fb-fd3d-42d3-95ed-a1ca984c5126",
+    "nodeId": "d4e172c0-2755-4816-8684-2b1ccf656788"
+  },
+  "scenario": "社区木偶剧场开演前要准备座椅、手套和票签。孩子听到已知的一组和另一组多或少的数量，按图核出另一组需要准备多少。",
+  "goals": [
+    "听清已知的参照量、相差量与所求一组的数量，先定位谁与谁比较及单位。",
+    "用同起点的物品图或等单位长短条表示比参照量多的关系，把同样多的一段与多出的一段合成所求数量。",
+    "用短条及等长缺口表示比参照量少的关系，从参照全长去掉差量，求剩下的一段。",
+    "选择与方向及差值一致的图和运算，算出目标量后重新比较两量，检查方向与相差量。"
+  ],
+  "goalEvidence": [
+    {"skill": "reference-gap-target", "source": "印71至72、教案1至2、课件6至7及13、任务单1"},
+    {"skill": "join-equal-and-extra", "source": "印71、教案2、课件8至11"},
+    {"skill": "remove-known-gap", "source": "印72、教案3、课件16至19、任务单1"},
+    {"skill": "verify-direction-and-gap", "source": "印71至72、课件12及20至24、教案4、任务单2"}
+  ],
+  "pageSequence": [
+    {"key": "listen-for-the-target", "kind": "teaching", "title": "给哪一排准备座椅", "plan": "以一排已摆好的椅子为参照。老师逐个点亮已知组、听到的相差数和目标组空位，辨认问题问的是目标组整排。"},
+    {"key": "join-the-extra-row", "kind": "teaching", "title": "同样多，再接一段", "plan": "用8把椅子和多5把的条件，先对齐同样多的8把，再接5把，括住目标全排。按图解释8加5得13，并从13与8的图验证多5把。"},
+    {"key": "fold-away-the-gap", "kind": "teaching", "title": "短下去的是哪一段", "plan": "用16只手套及少6只的条件。把较长的一排标成待保留段和6只的差段，淡出差段，短排剩10只。缺口以虚线定位，验算16和10相差6。"},
+    {"key": "arrange-prop-tiles", "kind": "interactive", "title": "让道具卡落到配对处", "plan": "控制落牌的左右位置，只有参照量和差段确实推出底牌的数量，接触时才配对消除。"},
+    {"key": "keep-one-reference", "kind": "teaching", "title": "同一条参照，两种方向", "plan": "中央票台有38张票签。一个窗口多16，另一窗口少9。先分别亮起两条目标与同一起点，选择与题意一致的方向。分别算出54张和29张，每一问使用同一参照量。"},
+    {"key": "deliver-the-right-count", "kind": "interactive", "title": "把刚好的票签送过去", "plan": "听每单的参照量、差和目标，取正确数量袋，再开车避开移动障碍送到听到的窗口。"},
+    {"key": "picture-check-a", "kind": "quiz", "title": "看图找对的一段", "plan": "老师读下列1至3题，呈现可数或可比长度的三张新图。"},
+    {"key": "picture-check-b", "kind": "quiz", "title": "算完用原条件检查", "plan": "老师读下列4至6题，逐题查方向、差值和所求数量。"},
+    {"key": "recap-compare-with-one-group", "kind": "teaching", "title": "找参照，画一画，再检查", "plan": "用一张原创图依次点亮参照、差、所求，复盘拼接或折去差段，最后交接亲子任务。"}
+  ],
+  "games": [
+    {
+      "page": "arrange-prop-tiles",
+      "template": "fallingTiles",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.fallingTiles",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "pair_match",
+      "reason": "位置和下落时机决定能否相邻。每张落牌图里标参照与增减段，底牌是不同目标量，只有按图求出的目标量才会与该落牌相邻消除。",
+      "levels": [
+        "用6多2、9多3的物品图；下落慢，正确底牌邻近空格。",
+        "用11少2、15少7的同起点短条；孩子要辨清缺口与实际目标，再移动到空格。",
+        "混合24多7和26少8等单位条，底牌位置改变，缩短每步落牌间隔。"
+      ],
+      "demo": "依次指向参照图、差段与合法底牌，移动首张落牌到正确相邻位置，看到消除停住，清掉演示连击与分数后交接。"
+    },
+    {
+      "page": "deliver-the-right-count",
+      "template": "listenDelivery",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.listenDelivery",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "listen_pick_deliver",
+      "reason": "先听相差关系决定哪一个数量袋能装车，再过移动障碍送到对应窗口。只听到窗口或熟记路线无法替代求数量。",
+      "levels": [
+        "用5多4的一单，取9枚的票签袋，障碍慢且通道宽。",
+        "用10少3和18少8的两单，短条标出缺口，取货和交付分别读声。",
+        "混合23多9和27少11的两单，采用有整十标记的图，变换窗口和障碍节奏。"
+      ],
+      "demo": "老师点亮参照、关系和目标取货点，实际取对第一袋即停住，清零演示进度，再用预录的取货和交付分步语音交接。"
+    }
+  ],
+  "quizPlan": [
+    {"skill": "reference-gap-target", "task": "桌上参照有7张明信片，另一桌多4张。听题选括线正确标出所求的一图。", "pictureOptions": ["括住参照桌7张", "括住目标桌相接的7张和4张", "括住目标桌新加的4张"], "correctPosition": 2, "rationale": "问题问另一桌整组，目标由同样多的7张和多出的4张组成。"},
+    {"skill": "remove-known-gap", "task": "水池东边有13个标记，西边少5个。哪张图正确表现西边的数量？", "pictureOptions": ["两行都画13格", "目标行有13格又多5格", "目标行有8格，另有5格虚线缺口"], "correctPosition": 3, "rationale": "参照全长13去掉5个，西边有8个。"},
+    {"skill": "join-equal-and-extra", "task": "手作展的一张桌上有28本册子，另一张桌多7本。选另一桌的数量图。", "pictureOptions": ["3组十本和5本", "2组十本和1本", "7本"], "correctPosition": 1, "rationale": "目标量等于28加7，得35本。"},
+    {"skill": "remove-known-gap", "task": "第一辆车有21个座位，第二辆少8个。选出第二辆车的座位图。", "pictureOptions": ["2组十和9个", "1组十和3个", "8个"], "correctPosition": 2, "rationale": "21减8得13个，8个是缺少量。"},
+    {"skill": "verify-direction-and-gap", "task": "展厅中间柜有34个零件，一侧多12个，另一侧少6个。选方向和格数都对的对齐图。", "pictureOptions": ["参照34，另一侧两条都是28格", "参照34，一条28格，一条46格，柜子图标位置互换", "参照34，多的一侧46格，少的一侧28格，均与对应柜子图标一致"], "correctPosition": 3, "rationale": "同一参照量34分别加12和减6，得到46和28，两条须归到各自的柜子。"},
+    {"skill": "verify-direction-and-gap", "task": "舞台前排有25面布旗，后排少6面。小演员说后排有19面，选出能核对这个结果的图。", "pictureOptions": ["从25与19的同起点两条中标出6格差", "从25与20的两条中标出5格差", "让后排比前排长6格"], "correctPosition": 1, "rationale": "19比25小，且25减19等于6，两个条件都符合。"}
+  ],
+  "presentation": "图片优先，老师预录读题与解释。一屏聚焦一件事。参照条、目标条和差段使用统一单位刻度，长短按量绘制。角色或容器的形状识别组别，遮住非目标文字仍可凭图和声音完成。",
+  "afterClass": {
+    "familyTask": "找两组家中小物件，大人只给一组数量和另一组多或少几，孩子画出已知组和目标组，算完数实物复查。家庭表现和口头说明待观察。",
+    "weeklyQuestionSource": ["由问题定位参照量、差量和待求量", "合并同样多的部分和增加部分", "从参照量去掉差量求较少数", "核对运算结果的大小方向和差"],
+    "source": "课练1、教案4、课件26"
+  }
+}

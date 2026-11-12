@@ -1,0 +1,1145 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "整理和复习",
+  "description": "人教版一年级下册第一单元。用原创展馆任务整理平面图形的边、角和外轮廓。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小数老师",
+      "role": "teacher",
+      "gender": "male",
+      "voice": "Ethan",
+      "avatar": "/teachers/ashu-math-v1.png",
+      "color": "#437763",
+      "persona": "和孩子在图上找线索，用边、角、外轮廓解释理由，再换一种办法核对。"
+    }
+  },
+  "images": {
+    "cover-museum": {
+      "file": "assets/cover-museum.png"
+    },
+    "depot-backdrop": {
+      "file": "assets/depot-backdrop.png"
+    },
+    "hall-backdrop": {
+      "file": "assets/hall-backdrop.png"
+    },
+    "family-shape": {
+      "file": "assets/family-shape.png"
+    },
+    "sort-cart": {
+      "file": "assets/sort-cart.png"
+    },
+    "sort-cart-push": {
+      "file": "assets/sort-cart-push.png"
+    },
+    "museum-sticker": {
+      "file": "assets/museum-sticker.png"
+    },
+    "maze-rover": {
+      "file": "assets/maze-rover.png"
+    },
+    "maze-rover-pop": {
+      "file": "assets/maze-rover-pop.png"
+    },
+    "ribbon-sticker": {
+      "file": "assets/ribbon-sticker.png"
+    },
+    "token-square": {
+      "file": "assets/token-square.png"
+    },
+    "token-tilt-square": {
+      "file": "assets/token-tilt-square.png"
+    },
+    "token-rect": {
+      "file": "assets/token-rect.png"
+    },
+    "token-tall-rect": {
+      "file": "assets/token-tall-rect.png"
+    },
+    "token-tri": {
+      "file": "assets/token-tri.png"
+    },
+    "token-turn-tri": {
+      "file": "assets/token-turn-tri.png"
+    },
+    "token-slant": {
+      "file": "assets/token-slant.png"
+    },
+    "token-round": {
+      "file": "assets/token-round.png"
+    },
+    "token-curve": {
+      "file": "assets/token-curve.png"
+    },
+    "token-straight": {
+      "file": "assets/token-straight.png"
+    },
+    "token-blank": {
+      "file": "assets/token-blank.png"
+    },
+    "rule-edge": {
+      "file": "assets/rule-edge.png"
+    },
+    "rule-count": {
+      "file": "assets/rule-count.png"
+    },
+    "faces-overview": {
+      "file": "assets/faces-overview.png"
+    },
+    "sort-edges": {
+      "file": "assets/sort-edges.png"
+    },
+    "sort-count": {
+      "file": "assets/sort-count.png"
+    },
+    "dot-square": {
+      "file": "assets/dot-square.png"
+    },
+    "turn-square": {
+      "file": "assets/turn-square.png"
+    },
+    "repeat-lesson": {
+      "file": "assets/repeat-lesson.png"
+    },
+    "wall-opening": {
+      "file": "assets/wall-opening.png"
+    },
+    "wall-seams-drawn": {
+      "file": "assets/wall-seams-drawn.png"
+    },
+    "wall-full-reference": {
+      "file": "assets/wall-full-reference.png"
+    },
+    "whole-and-parts": {
+      "file": "assets/whole-and-parts.png"
+    },
+    "q1-a": {
+      "file": "assets/q1-a.png"
+    },
+    "q1-b": {
+      "file": "assets/q1-b.png"
+    },
+    "q1-c": {
+      "file": "assets/q1-c.png"
+    },
+    "q2-a": {
+      "file": "assets/q2-a.png"
+    },
+    "q2-b": {
+      "file": "assets/q2-b.png"
+    },
+    "q2-c": {
+      "file": "assets/q2-c.png"
+    },
+    "q3-a": {
+      "file": "assets/q3-a.png"
+    },
+    "q3-b": {
+      "file": "assets/q3-b.png"
+    },
+    "q3-c": {
+      "file": "assets/q3-c.png"
+    },
+    "q4-stimulus": {
+      "file": "assets/q4-stimulus.png"
+    },
+    "q4-a": {
+      "file": "assets/q4-a.png"
+    },
+    "q4-b": {
+      "file": "assets/q4-b.png"
+    },
+    "q4-c": {
+      "file": "assets/q4-c.png"
+    },
+    "q5-stimulus": {
+      "file": "assets/q5-stimulus.png"
+    },
+    "q5-a": {
+      "file": "assets/q5-a.png"
+    },
+    "q5-b": {
+      "file": "assets/q5-b.png"
+    },
+    "q5-c": {
+      "file": "assets/q5-c.png"
+    },
+    "q6-stimulus": {
+      "file": "assets/q6-stimulus.png"
+    },
+    "q6-a": {
+      "file": "assets/q6-a.png"
+    },
+    "q6-b": {
+      "file": "assets/q6-b.png"
+    },
+    "q6-c": {
+      "file": "assets/q6-c.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "entry",
+      "type": "slide",
+      "title": "整理和复习",
+      "template": "picture-points",
+      "data": {
+        "title": "整理和复习",
+        "picture": "cover-museum",
+        "points": [
+          "找一个面",
+          "看边和角",
+          "用图说明"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "你好，我是小数老师。展馆收到一箱图形。"
+        },
+        {
+          "say": "你发现了什么？找一样东西指给我看。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "箱子里有圆盒，也有木块。"
+        },
+        {
+          "say": "用手贴一贴，哪一处是平平的？"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "展馆还要把形卡整理好。"
+        },
+        {
+          "say": "怎么知道转了个方向的卡该放在哪？"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "墙上有几处空，饰带也没贴完。"
+        },
+        {
+          "say": "我们用边和角的线索，把缺的地方找出来。"
+        },
+        {
+          "say": "最后看看，你能用图讲清哪一个发现。"
+        }
+      ]
+    },
+    {
+      "key": "find-a-face",
+      "type": "slide",
+      "title": "从物体上找一个面",
+      "template": "picture-points",
+      "data": {
+        "title": "从物体上找一个面",
+        "picture": "faces-overview",
+        "points": [
+          "选准一个面",
+          "看留下的边",
+          "选圆柱的底"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "小满拿来积木。哪个面可以印在纸上？"
+        },
+        {
+          "say": "挑一个平平的面，轻轻贴在纸上。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "手里拿的是整块积木。"
+        },
+        {
+          "say": "贴着纸的，只是这块积木的一面。"
+        },
+        {
+          "say": "笔尖沿贴纸的面走一圈，纸上留下一个形。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "看左边木块，贴着纸的是长方形的一面。"
+        },
+        {
+          "say": "方木块的这个面，描一圈是正方形。"
+        },
+        {
+          "say": "三角形和斜着的平行四边形，也能这样找。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "把圆柱的平底贴住纸，可以描出圆。"
+        },
+        {
+          "say": "从侧面看，底边好像压扁了。"
+        },
+        {
+          "say": "把底面朝向自己，就看清它原来的圆形。"
+        }
+      ]
+    },
+    {
+      "key": "choose-a-rule",
+      "type": "slide",
+      "title": "同一套卡，两次整理",
+      "template": "two-columns",
+      "data": {
+        "title": "同一套卡，两次整理",
+        "left": {
+          "heading": "先看边直不直",
+          "body": "圆的边弯弯的。其余几张全是直边。"
+        },
+        "left_picture": "sort-edges",
+        "right": {
+          "heading": "再数直边条数",
+          "body": "三条直边一组。四条直边一组。"
+        },
+        "right_picture": "sort-count"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "柜子还没贴签，先说出我们要看哪一点。"
+        },
+        {
+          "say": "同一套卡能怎样分？先沿边摸一圈。"
+        },
+        {
+          "say": "圆的边一直弯弯的，单独进一组。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "另外四张的边都是直的，可以放在一起。"
+        },
+        {
+          "say": "这些形颜色一样，我们还是能按边来分。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "接下来，只在直边的这组里继续分。"
+        },
+        {
+          "say": "从一个角出发，沿着三角形数，一、二、三。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "长方形、正方形和平行四边形都有四条直边。"
+        },
+        {
+          "say": "四条直边的卡放在一起。"
+        },
+        {
+          "say": "把卡转一转，再数，边没有变多或变少。"
+        },
+        {
+          "say": "按边的直弯分，把每张形卡推到合适的托盘。"
+        },
+        {
+          "say": "按直边条数分，三条一组，四条一组。"
+        },
+        {
+          "say": "有的卡转了方向。仍按直边条数分。"
+        },
+        {
+          "say": "沿形卡的边走一圈，你发现了什么？"
+        },
+        {
+          "say": "对照形卡和托盘，用这一关的标准比一比。"
+        },
+        {
+          "say": "你先找清标准，再把形卡各放到一个托盘。"
+        }
+      ]
+    },
+    {
+      "key": "turn-and-check",
+      "type": "slide",
+      "title": "转一转，还是原来的形",
+      "template": "two-columns",
+      "data": {
+        "title": "转一转，还是原来的形",
+        "left": {
+          "heading": "把四个角连好",
+          "body": "从一个点出发，沿外边围一圈。"
+        },
+        "left_picture": "dot-square",
+        "right": {
+          "heading": "转动再看",
+          "body": "转动改变朝向。边长和角没有变。"
+        },
+        "right_picture": "turn-square"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "小满画的这张卡和纸上的线，能对上吗？"
+        },
+        {
+          "say": "你想在点子图上留下一个方形吗？"
+        },
+        {
+          "say": "先找四个合适的点，作为四个角。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "从这个点出发，依次连外圈的角。"
+        },
+        {
+          "say": "最后回到起点，四条直边围成一个圈。"
+        },
+        {
+          "say": "四条边同样长，四个角也和纸角一样。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "看，它转了个方向。还是正方形吗？"
+        },
+        {
+          "say": "可以拿一张方形纸，也跟着转一下。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "四条边还一样长，四个角还是一样。"
+        },
+        {
+          "say": "所以它是转过的正方形。"
+        },
+        {
+          "say": "把它放大些，也可以用边和角认出来。"
+        }
+      ]
+    },
+    {
+      "key": "sort-the-gallery",
+      "type": "interactive",
+      "title": "推车整理形卡",
+      "page": "sort-the-gallery",
+      "widgetType": "simulation",
+      "startImage": "cover-museum",
+      "script": [
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#sort-rule"
+        },
+        {
+          "say": "这关先看边的样子，听清再开小车。"
+        },
+        {
+          "highlight": "#first-straight-card"
+        },
+        {
+          "say": "沿着这张卡走一圈。它有几条直直的边？"
+        },
+        {
+          "say": "它四条边都直，和直线托盘是同一组。"
+        },
+        {
+          "highlight": "#first-straight-dock"
+        },
+        {
+          "say": "这个托盘的记号，由几段直线连成。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "看我让车来到形卡后面，沿着格子往前推。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "留意小车怎样沿格子把形卡推向托盘。"
+        },
+        {
+          "say": "现在你来。走错时，先想边，再换方向。"
+        },
+        {
+          "say": "回转键能撤一步，小喇叭能重听这关标准。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "depot-edge": "choose-a-rule-15",
+        "depot-count": "choose-a-rule-16",
+        "depot-turn": "choose-a-rule-17",
+        "depot-hint": "choose-a-rule-18",
+        "depot-help": "choose-a-rule-19",
+        "depot-praise": "choose-a-rule-20"
+      }
+    },
+    {
+      "key": "see-a-repeat",
+      "type": "slide",
+      "title": "找出反复出现的一小段",
+      "template": "picture-points",
+      "data": {
+        "title": "找出反复出现的一小段",
+        "picture": "repeat-lesson",
+        "points": [
+          "先找一小段",
+          "留心顺序",
+          "回到原来的小段"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "展馆的饰带少了一片。你能看出空在哪里吗？"
+        },
+        {
+          "say": "先只试左边一个圆。下一格不是圆，一个形接不下去。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "这小段先放圆，再放平行四边形。"
+        },
+        {
+          "say": "一个形不行，两个能反复对上，这段最短。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "两小段形一样，前后的次序也一样。"
+        },
+        {
+          "say": "第三小段已经有圆。现在轮到什么形？"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "回去看前面，圆后面接平行四边形。"
+        },
+        {
+          "say": "把这张放进去，第三小段也就齐了。"
+        },
+        {
+          "say": "可以用手沿饰带再走一次，看看有没有乱。"
+        },
+        {
+          "say": "先找饰带上重复的小段。把亮起的空位补上。"
+        },
+        {
+          "say": "这段有三个形。按原来的顺序，一个个补好。"
+        },
+        {
+          "say": "小段里可以有相同的形。先看空位在小段的哪里。"
+        },
+        {
+          "say": "沿饰带找一小段。现在亮起的空位在哪里？"
+        },
+        {
+          "say": "看看前面完整的小段，再把次序对一对。"
+        },
+        {
+          "say": "空位都补齐了，检查小段还能按同样次序重复。"
+        }
+      ]
+    },
+    {
+      "key": "pattern-corridor",
+      "type": "interactive",
+      "title": "开小车补饰带",
+      "page": "pattern-corridor",
+      "widgetType": "simulation",
+      "startImage": "hall-backdrop",
+      "script": [
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#pattern-strip"
+        },
+        {
+          "say": "看饰带。正方形、三角形，是一小段。"
+        },
+        {
+          "say": "接着又是正方形、三角形，次序一样。"
+        },
+        {
+          "highlight": "#first-pattern-blank"
+        },
+        {
+          "say": "亮着的是下一小段的开头。"
+        },
+        {
+          "say": "小段从正方形起，空位先补正方形。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "看我沿小路绕过去，开到正方形图站。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "看小车往哪一个图站开，再对照饰带的空位。"
+        },
+        {
+          "say": "换你开。补齐小段后，再开到小旗那里。"
+        },
+        {
+          "say": "路线遇到纸门，先朝那边，再按圆形泡泡键。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "maze-two": "see-a-repeat-14",
+        "maze-three": "see-a-repeat-15",
+        "maze-repeated-card": "see-a-repeat-16",
+        "maze-hint": "see-a-repeat-17",
+        "maze-help": "see-a-repeat-18",
+        "maze-praise": "see-a-repeat-19"
+      }
+    },
+    {
+      "key": "wall-seams",
+      "type": "slide",
+      "title": "沿砖缝补分界线",
+      "template": "two-columns",
+      "data": {
+        "title": "沿砖缝补分界线",
+        "left": {
+          "heading": "先看每一行",
+          "body": "空的地方要按那一排的砖缝来补。"
+        },
+        "left_picture": "wall-opening",
+        "right": {
+          "heading": "每排各自补",
+          "body": "第一排缺一块。第二排缺三块。第三排缺两块。"
+        },
+        "right_picture": "wall-seams-drawn"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "看空处像一大块。能直接把它数成一块吗？"
+        },
+        {
+          "say": "墙上缺几块？先找还有哪几排有空。"
+        },
+        {
+          "say": "看相邻两排，砖缝并不在一条直线上。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "要补第一排，先看第一排留下来的缝。"
+        },
+        {
+          "say": "用同样宽度往空处画，刚好分出一整块。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "换到第二排，缝的位置也跟着换。"
+        },
+        {
+          "say": "沿着那一排自己的砖边，补成三块。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "第三排也按自己的砖缝来画，缺两块。"
+        },
+        {
+          "say": "从上到下数，一块、三块、两块。"
+        },
+        {
+          "say": "每块都只数一次，再把三排合起来。"
+        }
+      ]
+    },
+    {
+      "key": "wall-check",
+      "type": "slide",
+      "title": "补线后，再算一次",
+      "template": "two-columns",
+      "data": {
+        "title": "补线后，再算一次",
+        "left": {
+          "heading": "完整的一排有多长",
+          "body": "从一端到另一端，长六整块砖。"
+        },
+        "left_picture": "wall-full-reference",
+        "right": {
+          "heading": "按行看差几块",
+          "body": "一、三、二，合起来六块。"
+        },
+        "right_picture": "wall-seams-drawn"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "朵朵想再检查一次。还有办法吗？"
+        },
+        {
+          "say": "把墙补齐以后，每一排都一样长。"
+        },
+        {
+          "say": "第一排整砖有六块。沿边比，第二排一样长。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "第二排两端各半块，两个半块合一整块。"
+        },
+        {
+          "say": "把留下的砖按整块算，就能知道差多少。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "先看第一排，有五整块，还差一块。"
+        },
+        {
+          "say": "第二排原来够六块，留下三块的长度，差三块。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "第三排留下四块，还差两块。"
+        },
+        {
+          "say": "一加三再加二，共需要六块。"
+        },
+        {
+          "say": "跟刚才补线数的相同，我们找齐了。"
+        }
+      ]
+    },
+    {
+      "key": "whole-and-parts",
+      "type": "slide",
+      "title": "从外边看整体",
+      "template": "picture-points",
+      "data": {
+        "title": "从外边看整体",
+        "picture": "whole-and-parts",
+        "points": [
+          "接合的边齐平",
+          "沿外圈看整体",
+          "沿接缝找回部分"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "展牌要拼回去。两块怎样靠在一起？"
+        },
+        {
+          "say": "先比较高度，这两块一样高。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "让一样长的两条边紧紧贴住。"
+        },
+        {
+          "say": "左、右两块边对齐，没有空，也没有叠。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "手指只走最外面一圈。"
+        },
+        {
+          "say": "它的外圈仍有四个角，围出一个大长方形。"
+        },
+        {
+          "say": "里面这条线是接缝，留在整体里面。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "再沿接缝分开，就找回两张小长方形。"
+        },
+        {
+          "say": "看外圈认整体，看接缝找部分。"
+        },
+        {
+          "say": "这跟前面拼组、七巧板用到的办法一样。"
+        }
+      ]
+    },
+    {
+      "key": "six-picture-check",
+      "type": "quiz",
+      "title": "听一听，再看图",
+      "intro": [
+        "仔细听题。沿着边看，再选能说明理由的图。",
+        "需要时，点小喇叭再听一遍。"
+      ],
+      "questions": [
+        {
+          "id": "trace-a-square-face",
+          "skill": "face-trace",
+          "question": "哪件物体标出的那一面，描一圈是正方形？",
+          "analysis": "方木块标出的面，四边同样长，四个角都像纸角。",
+          "answer": [
+            "B"
+          ],
+          "options": {
+            "A": {
+              "label": "长木块上标出的长方形面",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-a",
+                "alt": "长木块上标出的长方形面"
+              }
+            },
+            "B": {
+              "label": "方木块上标出的正方形面",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-b",
+                "alt": "方木块上标出的正方形面"
+              }
+            },
+            "C": {
+              "label": "圆柱上标出的圆面",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-c",
+                "alt": "圆柱上标出的圆面"
+              }
+            }
+          }
+        },
+        {
+          "id": "all-four-straight",
+          "skill": "classify-by-edges",
+          "question": "哪一组的每张图都有四条直边？",
+          "analysis": "转过的正方形、长方形和斜放的平行四边形都有四条直边。",
+          "answer": [
+            "C"
+          ],
+          "options": {
+            "A": {
+              "label": "正方形、平行四边形和三角形",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-a",
+                "alt": "正方形、平行四边形和三角形"
+              }
+            },
+            "B": {
+              "label": "长方形、圆和正方形",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-b",
+                "alt": "长方形、圆和正方形"
+              }
+            },
+            "C": {
+              "label": "转过的正方形、长方形和平行四边形",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-c",
+                "alt": "转过的正方形、长方形和平行四边形"
+              }
+            }
+          }
+        },
+        {
+          "id": "close-the-square",
+          "skill": "draw-on-dot-grid",
+          "question": "哪幅图顺着连好四个角，围成正方形？",
+          "analysis": "沿外圈依次连四个角，最后回到起点。缺边或把线交叉，围不成这个正方形。",
+          "answer": [
+            "A"
+          ],
+          "options": {
+            "A": {
+              "label": "四条外边完整相接",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-a",
+                "alt": "四条外边完整相接"
+              }
+            },
+            "B": {
+              "label": "少了左侧一条边",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-b",
+                "alt": "少了左侧一条边"
+              }
+            },
+            "C": {
+              "label": "中间两条线交叉",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-c",
+                "alt": "中间两条线交叉"
+              }
+            }
+          }
+        },
+        {
+          "id": "repeat-and-extend",
+          "skill": "extend-repeating-unit",
+          "question": "这排图形按小段重复。空位接哪个形？",
+          "analysis": "一小段是圆、三角形、平行四边形。最后一个圆后接三角形。",
+          "answer": [
+            "B"
+          ],
+          "options": {
+            "A": {
+              "label": "圆",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-a",
+                "alt": "圆"
+              }
+            },
+            "B": {
+              "label": "三角形",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-b",
+                "alt": "三角形"
+              }
+            },
+            "C": {
+              "label": "平行四边形",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-c",
+                "alt": "平行四边形"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "q4-stimulus",
+            "alt": "圆、三角形、平行四边形重复两次，最后有一个圆和一个空位。"
+          }
+        },
+        {
+          "id": "count-the-gaps",
+          "skill": "count-missing-by-row",
+          "question": "只补墙里的白色空处，要几块整砖？",
+          "analysis": "中排两端的半砖已经砌好，只补白色空处。沿各排砖缝补线，上排缺两块，中排缺三块，共要五块整砖。",
+          "answer": [
+            "C"
+          ],
+          "options": {
+            "A": {
+              "label": "四块砖",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-a",
+                "alt": "四块砖"
+              }
+            },
+            "B": {
+              "label": "六块砖",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-b",
+                "alt": "六块砖"
+              }
+            },
+            "C": {
+              "label": "五块砖",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-c",
+                "alt": "五块砖"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "q5-stimulus",
+            "alt": "三排错缝小墙。第一、二排各有一个空缺，第三排完整。"
+          }
+        },
+        {
+          "id": "fill-the-sign",
+          "skill": "whole-and-parts",
+          "question": "哪两块能正好填满这块长方形展牌？",
+          "analysis": "两张一样大的正方形正好贴齐，两半都填满。较窄的长方形或三角形都会留空。",
+          "answer": [
+            "A"
+          ],
+          "options": {
+            "A": {
+              "label": "两张同样大的正方形",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-a",
+                "alt": "两张同样大的正方形"
+              }
+            },
+            "B": {
+              "label": "一张正方形和一张较窄的长方形",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-b",
+                "alt": "一张正方形和一张较窄的长方形"
+              }
+            },
+            "C": {
+              "label": "一张正方形和一张直角三角形",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-c",
+                "alt": "一张正方形和一张直角三角形"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "q6-stimulus",
+            "alt": "一张长方形展牌，中间有一条竖虚线，两半一样大。"
+          }
+        }
+      ]
+    },
+    {
+      "key": "tell-it-at-home",
+      "type": "slide",
+      "title": "把发现讲给家人",
+      "template": "picture-points",
+      "data": {
+        "title": "把发现讲给家人",
+        "picture": "family-shape",
+        "points": [
+          "从一个平面开始",
+          "说清你用的办法",
+          "让图帮你检查"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "今天展馆整理好了。你最想带走哪一个办法？"
+        },
+        {
+          "say": "回到家，找一件能安全拿在手里的东西。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "沿一个平面的边描一圈。纸上就留下这个面的形。"
+        },
+        {
+          "say": "把纸转到和原来的面同方向。贴回去，比一比边和角。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "分类先说用什么标准。"
+        },
+        {
+          "say": "接饰带先找重复小段，再从原来次序接。"
+        },
+        {
+          "say": "数缺砖可以先画缝，再一排一排数。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "拼好后沿外圈认整体，再看接缝找部分。"
+        },
+        {
+          "say": "你还可以把同一个办法画给家人看。"
+        },
+        {
+          "say": "讲出为什么，我就知道你会用它了。"
+        }
+      ]
+    }
+  ]
+}

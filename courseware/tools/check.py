@@ -9,6 +9,8 @@ import re
 from pathlib import Path
 from urllib.parse import unquote
 
+from courseware.tools import game_audio
+
 
 MEDIA_URL = re.compile(r'/api/classroom-media/[^/\s"\'<>]+/media/[^\s"\'<>+]+')
 HASH = re.compile(r'([0-9a-fA-F]{64})(?:\.[^./]+)?$')
@@ -37,11 +39,17 @@ def body_hash(body):
     return hashlib.sha256(data.encode('utf-8')).hexdigest()
 
 
+def valid_objectives(objectives):
+    return isinstance(objectives, list) and bool(objectives) and all(
+        isinstance(goal, str) and bool(goal.strip()) for goal in objectives)
+
+
 def teaching_goal_count(notes):
     """The goals covered by verify.py: objectives plus the key and difficult points."""
     if not isinstance(notes, dict):
         return 0
-    count = sum(isinstance(goal, str) and bool(goal.strip()) for goal in notes.get('objectives') or [])
+    objectives = notes.get('objectives')
+    count = len(objectives) if valid_objectives(objectives) else 0
     return count + sum(isinstance(notes.get(key), str) and bool(notes[key].strip()) for key in ('keyPoint', 'difficultPoint'))
 
 
@@ -175,7 +183,14 @@ def check_classroom(body, media_dir=None, *, notes=None, roster=None, receipt=No
     def add(gate, code, scene, detail, severity='error'):
         issues.append(dict(gate=gate, code=code, scene=scene, detail=detail, severity=severity))
 
+    try:
+        game_audio.verify_recordings(body)
+    except ValueError as exc:
+        add('G3', 'game_audio_invalid', None, str(exc))
+
     if notes is not None:
+        if (teaching or 'objectives' in notes) and not valid_objectives(notes.get('objectives')):
+            add('G0', 'objectives_invalid', None, 'Official notes objectives must be a nonempty list of nonblank strings')
         resources = notes.get('resources', {})
         for name in ('teachingDesign', 'courseware', 'learningTaskSheet', 'afterClassExercise'):
             item = resources.get(name, {})
@@ -377,6 +392,16 @@ def check_classroom(body, media_dir=None, *, notes=None, roster=None, receipt=No
         actual = [page.get('scene') for page in play_receipt.get('pages', []) if isinstance(page, dict)]
         if actual != expected:
             add('G6', 'play_receipt_incomplete', None, 'played scenes %s; expected %s' % (actual, expected))
+        for item in play_receipt.get('pages', []):
+            if not isinstance(item, dict) or type(item.get('scene')) is not int:
+                continue
+            number = item['scene']
+            if not 1 <= number <= len(scenes):
+                continue
+            content = scenes[number - 1].get('content') or {}
+            if ('data-guided-media-activity' in str(content.get('html', ''))
+                    and (item.get('method') != 'guided-media' or item.get('finishedAgain') is not True)):
+                add('G6', 'guided_media_playback_unverified', number, 'Two complete real-media playbacks required')
         issues += play_issues(play_receipt)
     if verification is not None:
         if verification.get('bodySha256') != digest:

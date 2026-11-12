@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+     width="1440" height="480" viewBox="0 0 1440 480">
+  <defs>
+    <g id="table-and-towers">
+      <rect width="480" height="480" fill="#fff4dc"/>
+      <rect y="355" width="480" height="125" fill="#f6dfb5"/>
+      <image x="88" y="138" width="83" height="217"
+             xlink:href="q3-tower-tall.png"/>
+      <image x="308" y="248" width="83" height="107"
+             xlink:href="q3-tower-short.png"/>
+      <path d="M30 355H450" fill="none" stroke="#294437" stroke-width="5" stroke-linecap="round"/>
+    </g>
+    <g id="ruler">
+      <rect x="2" y="2" width="48" height="216" rx="6"
+            fill="#f4be75" stroke="#294437" stroke-width="4"/>
+      <path d="M32 20h17 M32 42h17 M32 64h17 M32 86h17 M32 108h17
+               M32 130h17 M32 152h17 M32 174h17 M32 196h17 M24 218h25"
+            fill="none" stroke="#294437" stroke-width="4" stroke-linecap="round"/>
+      <ellipse cx="15" cy="205" rx="5" ry="8" fill="none" stroke="#294437" stroke-width="3"/>
+    </g>
+  </defs>
+  <g id="q3-a">
+    <use xlink:href="#table-and-towers"/>
+    <use xlink:href="#ruler" transform="translate(214 29)"/>
+  </g>
+  <g id="q3-b" transform="translate(480 0)">
+    <use xlink:href="#table-and-towers"/>
+    <use xlink:href="#ruler" transform="translate(214 137)"/>
+  </g>
+  <g id="q3-c" transform="translate(960 0)">
+    <use xlink:href="#table-and-towers"/>
+    <use xlink:href="#ruler" transform="translate(349 388) rotate(90)"/>
+  </g>
+</svg>

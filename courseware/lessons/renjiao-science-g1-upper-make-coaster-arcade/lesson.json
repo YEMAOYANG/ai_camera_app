@@ -1,0 +1,980 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "制作杯垫｜小小工坊",
+  "description": "小科老师带孩子从需要出发，画圆、剪裁、试用和改进，再把办法用到另一个生活问题。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小科老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Serena",
+      "avatar": "/avatars/teacher-2.png",
+      "color": "#57B05A",
+      "persona": "温和细心的科学老师，让孩子边做边观察，再按看到的问题改进。"
+    }
+  },
+  "images": {
+    "circle-methods": {
+      "file": "assets/circle-methods.png"
+    },
+    "compass-equal": {
+      "file": "assets/compass-equal.png"
+    },
+    "compass-long": {
+      "file": "assets/compass-long.png"
+    },
+    "compass-reference": {
+      "file": "assets/compass-reference.png"
+    },
+    "compass-short": {
+      "file": "assets/compass-short.png"
+    },
+    "cut-corner": {
+      "file": "assets/cut-corner.png"
+    },
+    "cut-cross": {
+      "file": "assets/cut-cross.png"
+    },
+    "cut-edge": {
+      "file": "assets/cut-edge.png"
+    },
+    "cut-method": {
+      "file": "assets/cut-method.png"
+    },
+    "flat-comparison": {
+      "file": "assets/flat-comparison.png"
+    },
+    "lint-plan": {
+      "file": "assets/lint-plan.png"
+    },
+    "paper": {
+      "file": "assets/paper-display-736.png"
+    },
+    "pencil": {
+      "file": "assets/pencil-display-736.png"
+    },
+    "pillow-fibers": {
+      "file": "assets/pillow-fibers.png"
+    },
+    "pot-flat": {
+      "file": "assets/pot-flat.png"
+    },
+    "pot-large": {
+      "file": "assets/pot-large.png"
+    },
+    "pot-reference": {
+      "file": "assets/pot-reference.png"
+    },
+    "pot-small": {
+      "file": "assets/pot-small.png"
+    },
+    "roller-ends": {
+      "file": "assets/roller-ends.png"
+    },
+    "roller-in": {
+      "file": "assets/roller-in.png"
+    },
+    "roller-out": {
+      "file": "assets/roller-out.png"
+    },
+    "round-lid": {
+      "file": "assets/round-lid-display-400.png"
+    },
+    "scissors": {
+      "file": "assets/scissors-display-736.png"
+    },
+    "string": {
+      "file": "assets/string-display-704.png"
+    },
+    "wide-coaster": {
+      "file": "assets/wide-coaster-display-400.png"
+    },
+    "workshop": {
+      "file": "assets/workshop-display-1280.png"
+    },
+    "observe-narrow-top": {
+      "file": "assets/observe-narrow-top.png"
+    },
+    "observe-narrow-side": {
+      "file": "assets/observe-narrow-side.png"
+    },
+    "observe-curled-top": {
+      "file": "assets/observe-curled-top.png"
+    },
+    "observe-curled-side": {
+      "file": "assets/observe-curled-side.png"
+    },
+    "observe-mixed-top": {
+      "file": "assets/observe-mixed-top.png"
+    },
+    "observe-mixed-side": {
+      "file": "assets/observe-mixed-side.png"
+    },
+    "observe-ready-top": {
+      "file": "assets/observe-ready-top.png"
+    },
+    "observe-ready-side": {
+      "file": "assets/observe-ready-side.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "bench",
+      "type": "slide",
+      "title": "先想杯子需要什么",
+      "template": "picture-points",
+      "data": {
+        "title": "先想杯子需要什么",
+        "picture": "workshop",
+        "points": [
+          "杯底要放得下",
+          "选做杯垫的材料",
+          "选帮忙做的工具"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "咦，空杯想要一张垫子，该剪多大的呢？"
+        },
+        {
+          "say": "伸手比一比。你猜，垫子要跟杯底一样大吗？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "把杯底放在纸上比一比，四周都留出一点边。"
+        },
+        {
+          "say": "这样把杯子放在中间，杯底就不会伸出垫子。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "纸剪下来留在杯底下，所以纸是材料。"
+        },
+        {
+          "say": "纸板也能试，先看看大小和能不能放平。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "铅笔能画线，剪刀能沿线剪，它们是工具。"
+        },
+        {
+          "say": "工具帮我们把材料变成想要的样子。"
+        }
+      ]
+    },
+    {
+      "key": "circle-tools",
+      "type": "slide",
+      "title": "三种办法画圆",
+      "template": "picture-points",
+      "data": {
+        "title": "三种办法画圆",
+        "picture": "circle-methods",
+        "points": [
+          "按住圆盖，沿边描",
+          "两支笔，一支站稳",
+          "固定线头，拉紧再画"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "不用圆规，手边哪样东西能帮我们画个圆呢？"
+        },
+        {
+          "say": "图里有三种办法，都得让画笔围着一个地方转。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "左边用圆盖，先把它按稳，边就不会跑。"
+        },
+        {
+          "say": "笔贴着盖边走一圈。换个大盖，能描个大圆。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "中间绑住两支笔，让笔尖之间的距离不变。"
+        },
+        {
+          "say": "一支笔尖站住，另一支围着它走，才不会歪。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "右边先按住线的一头，把另一头系在笔上。"
+        },
+        {
+          "say": "拉紧线再绕一圈，笔离中间就一直一样远。"
+        },
+        {
+          "say": "固定的线留长一点，画出来的圆就大一点。"
+        },
+        {
+          "say": "绕回起点，一圈就接上啦！"
+        }
+      ]
+    },
+    {
+      "key": "circle",
+      "type": "interactive",
+      "title": "圆线追光",
+      "page": "circle",
+      "widgetType": "game",
+      "startImage": "string",
+      "script": [
+        {
+          "setState": {
+            "demo": true,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#game-pivot"
+        },
+        {
+          "say": "我按住中间这个点，它要待在原地。"
+        },
+        {
+          "say": "这头不动，画到哪儿，中间都在同一个地方。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "笔尖碰到圆边，按空格或点落笔键，就能画啦。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "每走一点，笔尖到中间的远近都要一样。"
+        },
+        {
+          "say": "小满：把笔往中间抄过去，也能画完吗？",
+          "by": "xiaoman"
+        },
+        {
+          "say": "笔往里抄近路，绳子会松，画的线会离开圆边。"
+        },
+        {
+          "highlight": "#coaster-circle-start"
+        },
+        {
+          "say": "慢慢绕完，笔回到起点，圆线就合上了。"
+        },
+        {
+          "say": "绳子不合适时，按上箭头加长，按下箭头缩短。"
+        },
+        {
+          "say": "按住左箭头或右箭头，让笔沿着这一圈走。"
+        },
+        {
+          "say": "看到前面的灯一亮，再走过去收下它。"
+        },
+        {
+          "say": "轮到你啦！让笔绕回起点，看看能点亮多少灯。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "roundGoal": "circle-tools-12",
+        "fixedLength": "recap-9",
+        "longerLine": "circle-tools-13",
+        "roundComplete": "circle-tools-14"
+      }
+    },
+    {
+      "key": "cut",
+      "type": "slide",
+      "title": "沿线剪出杯垫",
+      "template": "picture-points",
+      "data": {
+        "title": "沿线剪出杯垫",
+        "picture": "cut-method",
+        "points": [
+          "请大人陪着剪",
+          "跟着线一点点剪",
+          "剪好再装饰"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "画好了圆，接下来要把圆从纸上剪下来。"
+        },
+        {
+          "say": "把纸摊开，先看看哪条线要留下做边。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "请大人陪着用圆头剪刀，剪口要离手指远一点。"
+        },
+        {
+          "say": "转纸前先停一下，免得另一只手碰到剪口。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "从纸边剪到圆线，再沿着线慢慢转。"
+        },
+        {
+          "say": "每次只剪一小段，转弯才容易跟准圆线。"
+        },
+        {
+          "say": "用剪刀沿线剪，边更齐，也比用手撕方便。"
+        },
+        {
+          "say": "请大人用废纸试试剪刀的不同位置，再告诉你发现。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "剪好后，把圆放平，再在垫子上画个记号。"
+        },
+        {
+          "say": "先把边剪出来，再装饰，就能把图案留在垫上。"
+        }
+      ]
+    },
+    {
+      "key": "test",
+      "type": "slide",
+      "title": "试一试，再改",
+      "template": "picture-points",
+      "data": {
+        "title": "试一试，再改",
+        "picture": "flat-comparison",
+        "points": [
+          "空杯放中间",
+          "记下哪儿好、哪儿要改",
+          "只换一处再试"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "猜猜看，杯子站得住，垫子就一定合适吗？"
+        },
+        {
+          "say": "今天只用空杯，不拿热水来试。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "把空杯轻轻放在垫子中间，低下头看看。"
+        },
+        {
+          "say": "先从上面看杯底有没有伸出去，再从旁边看平不平。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "看，杯底全垫住了，可垫子这一边翘起来啦。"
+        },
+        {
+          "say": "我画个圈记大小刚好，再画翘起的边记不足。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "这回换一张同样大、能平铺的纸板。"
+        },
+        {
+          "say": "用同一只空杯再试，看看换过后垫子平不平。"
+        },
+        {
+          "say": "如果垫子太小，就改大一些，再用这只杯子比。"
+        },
+        {
+          "say": "哇，杯底垫住了，垫边也平了！"
+        }
+      ]
+    },
+    {
+      "key": "cup",
+      "type": "interactive",
+      "title": "空杯接力",
+      "page": "cup",
+      "widgetType": "game",
+      "startImage": "wide-coaster",
+      "script": [
+        {
+          "setState": {
+            "demo": true,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#coaster-cup-first-drop"
+        },
+        {
+          "say": "空杯来啦！按左右箭头，对准垫子中间。"
+        },
+        {
+          "say": "按空格或点轻放键，看看空杯落在哪里。"
+        },
+        {
+          "highlight": "#coaster-cup-first-result"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "你看，纸垫的边藏在杯底下面了。"
+        },
+        {
+          "say": "小满：杯子站住了，这个小垫就够了吧？",
+          "by": "xiaoman"
+        },
+        {
+          "say": "再看看杯底，伸出去的这一圈没有被垫住。"
+        },
+        {
+          "say": "换个大一点的垫子，才有机会垫住整个杯底。"
+        },
+        {
+          "highlight": "#game-samples"
+        },
+        {
+          "say": "看，试过的图留在卡里了。你想换哪张垫子？"
+        },
+        {
+          "say": "用同一只空杯，再试换好的垫子。"
+        },
+        {
+          "say": "换了垫子还得看平不平，卷边要换平整的材料。"
+        },
+        {
+          "say": "轮到你啦！先试有白边的，再用同一只空杯试。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "firstTest": "test-5",
+        "sameCup": "test-12",
+        "compare": "test-6",
+        "wellDone": "test-14"
+      },
+      "observationCard": {
+        "title": "同一只空杯，先试再试",
+        "familyTask": "和大人一起用同一只空杯试做好的垫子。从上面看杯底是否全垫住，从旁边看垫边是否平整；先画下发现，再改一处并用原来的空杯复试。实际剪裁请成人陪伴。",
+        "levels": [
+          {
+            "label": "第 1 关：看杯底有没有伸出",
+            "trials": [
+              {
+                "id": "before",
+                "label": "先试",
+                "top": {
+                  "extends": {
+                    "label": "俯看：杯底伸出了垫子的边。",
+                    "image": "observe-narrow-top"
+                  }
+                },
+                "side": {
+                  "flat": {
+                    "label": "侧看：垫子的边平贴着桌面。",
+                    "image": "observe-narrow-side"
+                  }
+                }
+              },
+              {
+                "id": "after",
+                "label": "换垫再试",
+                "top": {
+                  "covers": {
+                    "label": "俯看：整个杯底都在垫子范围内。",
+                    "image": "observe-ready-top"
+                  }
+                },
+                "side": {
+                  "flat": {
+                    "label": "侧看：垫子的边平贴着桌面。",
+                    "image": "observe-ready-side"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "label": "第 2 关：看垫边有没有翘起",
+            "trials": [
+              {
+                "id": "before",
+                "label": "先试",
+                "top": {
+                  "covers": {
+                    "label": "俯看：整个杯底都在垫子范围内。",
+                    "image": "observe-curled-top"
+                  }
+                },
+                "side": {
+                  "raised": {
+                    "label": "侧看：垫子的边翘了起来。",
+                    "image": "observe-curled-side"
+                  }
+                }
+              },
+              {
+                "id": "after",
+                "label": "换垫再试",
+                "top": {
+                  "covers": {
+                    "label": "俯看：整个杯底都在垫子范围内。",
+                    "image": "observe-ready-top"
+                  }
+                },
+                "side": {
+                  "flat": {
+                    "label": "侧看：垫子的边平贴着桌面。",
+                    "image": "observe-ready-side"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "label": "第 3 关：两处一起比较",
+            "trials": [
+              {
+                "id": "before",
+                "label": "先试",
+                "top": {
+                  "extends": {
+                    "label": "俯看：杯底伸出了垫子的边。",
+                    "image": "observe-mixed-top"
+                  }
+                },
+                "side": {
+                  "raised": {
+                    "label": "侧看：垫子的边翘了起来。",
+                    "image": "observe-mixed-side"
+                  }
+                }
+              },
+              {
+                "id": "after",
+                "label": "换垫再试",
+                "top": {
+                  "covers": {
+                    "label": "俯看：整个杯底都在垫子范围内。",
+                    "image": "observe-ready-top"
+                  }
+                },
+                "side": {
+                  "flat": {
+                    "label": "侧看：垫子的边平贴着桌面。",
+                    "image": "observe-ready-side"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "key": "transfer",
+      "type": "slide",
+      "title": "把办法用到别处",
+      "template": "picture-points",
+      "data": {
+        "title": "把办法用到别处",
+        "picture": "lint-plan",
+        "points": [
+          "先说要解决的问题",
+          "想办法并画出设计",
+          "试过再说好不好"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "衣服沾了小毛毛，我们想把它带走。"
+        },
+        {
+          "say": "先把要解决的事说清，才好挑能帮忙的东西。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "小毛毛散在布面，可以想想怎样让它粘在一处。"
+        },
+        {
+          "say": "毛只在角落，我会先画一块小小的粘板。"
+        },
+        {
+          "say": "纸板一头留着手拿，请大人把胶贴在另一头。"
+        },
+        {
+          "say": "让粘面朝下，在角落按一下，再拿起来看。"
+        },
+        {
+          "say": "毛要是散开了，我会画一个能滚着粘的工具。"
+        },
+        {
+          "say": "它能沿着布面滚，帮我们粘一长条。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "纸筒能滚，双面胶能粘，画图时让胶贴在筒外。"
+        },
+        {
+          "say": "请大人把胶贴在筒外，再揭开外面的纸。"
+        },
+        {
+          "say": "露在外面的粘面要碰到布，才有机会粘到毛。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "请大人在一小块旧布上滚一下，看看带走多少毛。"
+        },
+        {
+          "say": "中间干净了，可还有一撮毛留在边角。"
+        },
+        {
+          "say": "我记下边角没滚到，换短一点的纸筒再试。"
+        },
+        {
+          "say": "衣服沾毛时，人们想出工具，清理起来更方便。"
+        },
+        {
+          "say": "请你画个小图，把办法讲给家人听。"
+        },
+        {
+          "say": "我再问个新问题，夹子最多能夹住几张纸？"
+        },
+        {
+          "say": "请大人一张张加纸，和你一起找答案。"
+        }
+      ]
+    },
+    {
+      "key": "quiz",
+      "type": "quiz",
+      "title": "工坊小检查",
+      "intro": [
+        "听小科老师读题，再看图片找线索。",
+        "每道题选一张，说说你是怎么看出来的。"
+      ],
+      "questions": [
+        {
+          "id": "coaster-material",
+          "question": "给蜡笔盒做块垫子，哪样剪下来留在盒下？",
+          "skill": "区分材料和工具",
+          "options": {
+            "A": {
+              "label": "一张纸",
+              "visual": {
+                "kind": "asset",
+                "image": "paper",
+                "alt": "一张纸"
+              }
+            },
+            "B": {
+              "label": "一支画线用的铅笔",
+              "visual": {
+                "kind": "asset",
+                "image": "pencil",
+                "alt": "一支画线用的铅笔"
+              }
+            },
+            "C": {
+              "label": "一把圆头剪刀",
+              "visual": {
+                "kind": "asset",
+                "image": "scissors",
+                "alt": "一把圆头剪刀"
+              }
+            }
+          },
+          "answer": [
+            "A"
+          ],
+          "analysis": "纸剪下后留在盒底，是做垫子的材料。铅笔帮忙画线，剪刀帮忙剪纸，两样都是工具。"
+        },
+        {
+          "id": "coaster-circle",
+          "question": "想画一个更大的圆，两支笔该选哪种摆法？",
+          "skill": "画大小不同的圆",
+          "options": {
+            "A": {
+              "label": "两笔尖距离和原来一样",
+              "visual": {
+                "kind": "asset",
+                "image": "compass-equal",
+                "alt": "两笔尖距离和原来一样"
+              }
+            },
+            "B": {
+              "label": "两笔尖距离比原来远",
+              "visual": {
+                "kind": "asset",
+                "image": "compass-long",
+                "alt": "两笔尖距离比原来远"
+              }
+            },
+            "C": {
+              "label": "两笔尖距离比原来近",
+              "visual": {
+                "kind": "asset",
+                "image": "compass-short",
+                "alt": "两笔尖距离比原来近"
+              }
+            }
+          },
+          "answer": [
+            "B"
+          ],
+          "analysis": "一支笔尖固定时，另一支笔离它越远，绕出的圆越大。第二张的笔尖间距比原来的大。",
+          "visual": {
+            "kind": "asset",
+            "image": "compass-reference",
+            "alt": "同一套两支笔，原来两笔尖间距适中"
+          }
+        },
+        {
+          "id": "coaster-cut",
+          "question": "给水壶做圆垫，哪条剪线能把画好的圆完整剪下来？",
+          "skill": "沿画好的圆线裁剪",
+          "options": {
+            "A": {
+              "label": "从纸边剪来，直直穿过圆内",
+              "visual": {
+                "kind": "asset",
+                "image": "cut-cross",
+                "alt": "从纸边剪来，直直穿过圆内"
+              }
+            },
+            "B": {
+              "label": "碰到圆线的一点，接着直着剪",
+              "visual": {
+                "kind": "asset",
+                "image": "cut-corner",
+                "alt": "碰到圆线的一点，接着直着剪"
+              }
+            },
+            "C": {
+              "label": "从纸边剪到圆线上，再沿圆线绕一圈",
+              "visual": {
+                "kind": "asset",
+                "image": "cut-edge",
+                "alt": "从纸边剪到圆线上，再沿圆线绕一圈"
+              }
+            }
+          },
+          "answer": [
+            "C"
+          ],
+          "analysis": "从纸边剪到圆线上，再沿画好的线绕一圈，才能把圆垫完整剪下来。穿过圆内会剪坏圆垫；碰到圆线就直着剪，只会剪掉一条纸边，圆还连在纸上。"
+        },
+        {
+          "id": "coaster-retest",
+          "question": "花盆底没伸出去，可垫子翘了。怎么改好？",
+          "skill": "根据使用效果改进",
+          "options": {
+            "A": {
+              "label": "同样大小，换成一张平整的垫",
+              "visual": {
+                "kind": "asset",
+                "image": "pot-flat",
+                "alt": "同样大小，换成一张平整的垫"
+              }
+            },
+            "B": {
+              "label": "换更大的垫，边仍然翘着",
+              "visual": {
+                "kind": "asset",
+                "image": "pot-large",
+                "alt": "换更大的垫，边仍然翘着"
+              }
+            },
+            "C": {
+              "label": "换更小的平垫，花盆底伸出去",
+              "visual": {
+                "kind": "asset",
+                "image": "pot-small",
+                "alt": "换更小的平垫，花盆底伸出去"
+              }
+            }
+          },
+          "answer": [
+            "A"
+          ],
+          "analysis": "原来的大小足够，问题是垫子翘起。换同样大且平整的垫子，既能放下盆底，也解决翘边。换完还要用原来的盆再试。",
+          "visual": {
+            "kind": "asset",
+            "image": "pot-reference",
+            "alt": "盆底完全落在垫上，垫子的右边翘起"
+          }
+        },
+        {
+          "id": "coaster-transfer",
+          "question": "靠垫上有几根毛。哪个纸筒的粘面能滚到毛上？",
+          "skill": "按需要设计简单工具",
+          "options": {
+            "A": {
+              "label": "胶贴在纸筒内壁，外侧没有粘面",
+              "visual": {
+                "kind": "asset",
+                "image": "roller-in",
+                "alt": "胶贴在纸筒内壁，外侧没有粘面"
+              }
+            },
+            "B": {
+              "label": "粘面露在纸筒外圈，滚动会碰到毛",
+              "visual": {
+                "kind": "asset",
+                "image": "roller-out",
+                "alt": "粘面露在纸筒外圈，滚动会碰到毛"
+              }
+            },
+            "C": {
+              "label": "粘面只贴在纸筒端口，外圈没有粘面",
+              "visual": {
+                "kind": "asset",
+                "image": "roller-ends",
+                "alt": "粘面只贴在纸筒端口，外圈没有粘面"
+              }
+            }
+          },
+          "answer": [
+            "B"
+          ],
+          "analysis": "纸筒外圈会从靠垫上滚过。粘面露在外圈，滚过去才能碰到毛。贴在筒里或两个端口上的胶碰不到毛。",
+          "visual": {
+            "kind": "asset",
+            "image": "pillow-fibers",
+            "alt": "靠垫上有三根要清理的毛"
+          }
+        }
+      ]
+    },
+    {
+      "key": "recap",
+      "type": "slide",
+      "title": "带走工坊的办法",
+      "template": "picture-points",
+      "data": {
+        "title": "带走工坊的办法",
+        "picture": "workshop",
+        "points": [
+          "按需要选材和工具",
+          "画圆，沿线剪",
+          "试用，记下，再改",
+          "换个问题也能用"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "我们从一只杯子出发，做了一块圆垫。"
+        },
+        {
+          "say": "还记得开工前要先看什么吗？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先比杯底大小，挑放得平、能做成垫子的材料。"
+        },
+        {
+          "say": "铅笔和剪刀能帮忙，实物剪裁请大人陪着。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "圆盖按稳，沿边画。两支笔要留住同样的距离。"
+        },
+        {
+          "say": "用笔和线时，定住一头，把线拉直再绕。"
+        },
+        {
+          "say": "画好圆，沿着线分小段剪，最后才装饰。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "空杯放在中间，看垫子放不放得下、平不平。"
+        },
+        {
+          "say": "我来口头记一次，空杯放得下，纸垫却翘了。"
+        },
+        {
+          "say": "我换了同样大的平纸板，再用原来那只杯试。"
+        },
+        {
+          "say": "把做了什么、发现什么、怎么改，说给家人听。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "粘毛工具也先想要做什么，再画、做和试。"
+        },
+        {
+          "say": "和大人拿一只空杯，从上面和旁边看你做的杯垫。"
+        },
+        {
+          "say": "画下一个发现，改过再试，说说哪儿变好了。"
+        }
+      ]
+    }
+  ]
+}

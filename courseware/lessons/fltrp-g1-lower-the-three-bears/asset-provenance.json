@@ -1,0 +1,905 @@
+{
+  "schemaVersion": "mira.courseware.art-provenance.v1",
+  "atlases": {
+    "story": {
+      "path": "art-source/story-atlas.png",
+      "sha256": "0e682f8276877d8ef1b82c80d1a6f4925c92169d0d1da9057a87e30fa2dd94e2",
+      "bytes": 3096095,
+      "tool": "codex-builtin-imagegen",
+      "toolOutputName": "exec-f29c4d08-3cc3-4d66-a005-2354d2c60a0c.png",
+      "prompt": "Use case: illustration-story.\nCreate ONE high-quality original square 4 by 4 tile atlas, sixteen equally sized independent square pictures. The art will be cut into sixteen child-facing digital picture cards. Use an exact geometric grid with an unobtrusive thin warm-cream divider at 25%, 50% and 75% both axes. Keep each whole subject in the central 74 percent of its own square, no spill, no border near subjects. No text, numbers, symbols, labels, lettering, speech bubbles, watermarks or repeated panel art. A single book-illustration style: warm cut-paper gouache, crisp expressive shapes, sage, persimmon, straw and plum, gentle forest puppet-theatre mood. Keep high visual contrast and strong silhouettes at thumbnail sizes. Four recurring original characters: father bear is broad chocolate brown, square muzzle and forest-green vest; mother bear tawny brown, long rust-gold apron and a round leaf brooch; baby bear small honey brown in bright teal striped shirt and round ears; little Goldilocks has golden-yellow bob and a coral pinafore over a cream shirt. Props consistently have distinct contour, size and patterns so no choice depends only on color.\nTile content in exact reading order, top left to bottom right:\nRow 1. A standalone father bear portrait, facing front, green vest. A standalone mother bear portrait, facing front, round leaf brooch and rust-gold apron. A standalone baby bear portrait, front, teal striped shirt. A standalone little Goldilocks portrait, yellow bob and coral pinafore. These four portraits should have warm pale backgrounds and fill 65% of their squares, with poses and relative sizes distinctive.\nRow 2. A single wide fluted forest-green ceramic bowl full of long visible curled noodles. A single orange rounded oval bowl with two side handles full of visible noodles. A single small teal bowl with bold vertical cream stripes full of visible noodles. One wide low green wooden bed with a tall square headboard and plaid quilt. Isolate each entire prop on warm light paper, no hands or bears.\nRow 3. One orange-brown medium wooden bed with rounded headboard and leaf-pattern quilt. One clearly small teal bed with round spindles and striped quilt. Little Goldilocks opens the door of a quirky woodland cottage, poised on the threshold, no bears or food or bed. Little Goldilocks tasting noodles from the small teal striped bowl at a wooden kitchen table, visible noodles, no bears or beds.\nRow 4. Little Goldilocks seated on the small teal striped bed in a quiet room, absolutely no food or bears. The three recurring bears arriving back through their cottage door together, no Goldilocks, no food or beds. Little Goldilocks walking away from the same cottage and glancing back, gentle surprised expression, nobody chasing her. A cozy broad empty woodworking theatre room with a cream central table and simple stage curtain, no humans, bears, props or text.\nDo not use any existing book art, illustration layout, or other images as reference. Standalone scenes with simple foregrounds and clear subjects. Grid positions are essential.",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "grid": 4
+    },
+    "props": {
+      "path": "art-source/props-atlas.png",
+      "sha256": "381136e9ff86246feae3af738493207a642da2b55215df48cf2e25687ea31110",
+      "bytes": 2546010,
+      "tool": "codex-builtin-imagegen",
+      "toolOutputName": "exec-1d67b8c4-4cf5-4a1b-9cea-01b967bd60bc.png",
+      "prompt": "Use case: illustration-story.\nGenerate ONE original square 3x3 image atlas, nine distinct scenes or object cards in exactly equal squares with a thin unobtrusive cream grid at one third and two thirds. Simple hand-cut paper gouache illustrations, crisp silhouettes and subtle paper texture, warm forest puppet theatre. Kids need to recognize each item on a tiny picture card. Keep subjects inside each cell with wide margins, uniform pale paper behind objects. No writing or typography.\nTop row, left to right: a small warm red toy drum with pale drum head and two clearly visible drumsticks; a diamond-shaped sage and sky-blue paper kite with a long tail and three simple ribbon ties; a brass handbell with dark persimmon handle.\nMiddle row: one clearly recognizable folded blue scarf with three large cream star patterns, draped diagonally; a muted warm brown soft cap with an obvious brim; a simple small green wooden toy cart with two large dark round wheels, open shallow cargo tray and red handle, seen from the side. Make the entire cart compact, friendly, distinct from the hat and bell.\nBottom row: the same green toy cart from a slight diagonal and its red handle, no extra character or cargo; a broad empty stage background with muted pale moss floor and soft tree silhouettes along the outer edges, no obstacles, no props; an original woodland puppet theatre small stage with sage curtain, four puppets across the stage: a broad chocolate-brown bear in a forest-green vest, a tawny mother bear in a rust-orange apron with leaf brooch, a little honey-brown bear in a teal striped shirt, a girl with golden-yellow bob wearing a coral pinafore over cream shirt. No additional puppets or letters.\nNo book cover, reference images, letters, numbers, borders within cells, busy scenes or watermarks.",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "grid": 3
+    }
+  },
+  "assets": {
+    "father": {
+      "path": "assets/father.png",
+      "sha256": "d01b4e8afdaec606ddd0b49a88b21ea155c54f2c6395d3012273479c04fc938e",
+      "bytes": 170371,
+      "dimensions": [
+        304,
+        304
+      ],
+      "kind": "crop-of-codex-builtin-imagegen",
+      "atlas": "story",
+      "crop": [
+        5,
+        5,
+        309,
+        309
+      ]
+    },
+    "mother": {
+      "path": "assets/mother.png",
+      "sha256": "eb16cd935b09c2ab869d2c54465e30542da5b96e9bc9df4b84d0f3fcbf69bcab",
+      "bytes": 166381,
+      "dimensions": [
+        303,
+        304
+      ],
+      "kind": "crop-of-codex-builtin-imagegen",
+      "atlas": "story",
+      "crop": [
+        319,
+        5,
+        622,
+        309
+      ]
+    },
+    "baby": {
+      "path": "assets/baby.png",
+      "sha256": "789ea07510ab1d84c0056b27d3267c474cfc3c55903eb9754227b7ff2d33dee1",
+      "bytes": 159965,
+      "dimensions": [
+        303,
+        304
+      ],
+      "kind": "crop-of-codex-builtin-imagegen",
+      "atlas": "story",
+      "crop": [
+        632,
+        5,
+        935,
+        309
+      ]
+    },
+    "goldilocks": {
+      "path": "assets/goldilocks.png",
+      "sha256": "7b92f3909dca20784f70f8feee80808e3cdc9c397287a616578fd7387f3a3f3f",
+      "bytes": 161417,
+      "dimensions": [
+        304,
+        304
+      ],
+      "kind": "crop-of-codex-builtin-imagegen",
+      "atlas": "story",
+      "crop": [
+        945,
+        5,
+        1249,
+        309
+      ]
+    },
+    "father-noodles": {
+      "path": "assets/father-noodles.png",
+      "sha256": "3584eb5fdd5ca66e94d740594fda19700f80f60f7c8d38cdfef0f3faa70885de",
+      "bytes": 168084,
+      "dimensions": [
+        304,
+        303
+      ],
+      "kind": "crop-of-codex-builtin-imagegen",
+      "atlas": "story",
+      "crop": [
+        5,
+        319,
+        309,
+        622
+      ]
+    },
+    "mother-noodles": {
+      "path": "assets/mother-noodles.png",
+      "sha256": "012a6b7b5be746b011991f7ce30ba6e195c51c97f12017c5af79e7356bd67508",
+      "bytes": 157919,
+      "dimensions": [
+        303,
+        303
+      ],
+      "kind": "crop-of-codex-builtin-imagegen",
+      "atlas": "story",
+      "crop": [
+        319,
+        319,
+        622,
+        622
+      ]
+    },
+    "baby-noodles": {
+      "path": "assets/baby-noodles.png",
+      "sha256": "4ba72fe7974598f8ea5271b696b4e74f293189bdcaff8c5450ed5700c195b5f8",
+      "bytes": 149252,
+      "dimensions": [
+        303,
+        303
+      ],
+      "kind": "crop-of-codex-builtin-imagegen",
+      "atlas": "story",
+      "crop": [
+        632,
+        319,
+        935,
+        622
+      ]
+    },
+    "father-bed": {
+      "path": "assets/father-bed.png",
+      "sha256": "47d7a04c297d6961b9818a4ce393a11faad99f409098d8506deaa8604b776726",
+      "bytes": 161465,
+      "dimensions": [
+        304,
+        303
+      ],
+      "kind": "crop-of-codex-builtin-imagegen",
+      "atlas": "story",
+      "crop": [
+        945,
+        319,
+        1249,
+        622
+      ]
+    },
+    "mother-bed": {
+      "path": "assets/mother-bed.png",
+      "sha256": "4b8738ab18a7801b56901570a839b83ca7432accc52ee39e335c1bf8b89cd3c3",
+      "bytes": 165585,
+      "dimensions": [
+        304,
+        303
+      ],
+      "kind": "crop-of-codex-builtin-imagegen",
+      "atlas": "story",
+      "crop": [
+        5,
+        632,
+        309,
+        935
+      ]
+    },
+    "baby-bed": {
+      "path": "assets/baby-bed.png",
+      "sha256": "4cff87a8498b4ab29738a2716e5f991042d01f8fdcbd37478483ef459813beb3",
+      "bytes": 157004,
+      "dimensions": [
+        303,
+        303
+      ],
+      "kind": "crop-of-codex-builtin-imagegen",
+      "atlas": "story",
+      "crop": [
+        319,
+        632,
+        622,
+        935
+      ]
+    },
+    "enter-house": {
+      "path": "assets/enter-house.png",
+      "sha256": "5eaadb31171dce2267b0353dcf96ff4d691641465a8825631724b698ceaf039f",
+      "bytes": 184359,
+      "dimensions": [
+        303,
+        303
+      ],
+      "kind": "crop-of-codex-builtin-imagegen",
+      "atlas": "story",
+      "crop": [
+        632,
+        632,
+        935,
+        935
+      ]
+    },
+    "taste-noodles": {
+      "path": "assets/taste-noodles.png",
+      "sha256": "1e4b625b4f41133e93391c922c6c1a3579ebf131aae4043a17f5257dbe3b41e4",
+      "bytes": 178179,
+      "dimensions": [
+        304,
+        303
+      ],
+      "kind": "crop-of-codex-builtin-imagegen",
+      "atlas": "story",
+      "crop": [
+        945,
+        632,
+        1249,
+        935
+      ]
+    },
+    "try-bed": {
+      "path": "assets/try-bed.png",
+      "sha256": "fb6b3efb890aa5e8865ad2dcdc73a349955bdd641b521acf88d8a92ba1c3a123",
+      "bytes": 180247,
+      "dimensions": [
+        304,
+        304
+      ],
+      "kind": "crop-of-codex-builtin-imagegen",
+      "atlas": "story",
+      "crop": [
+        5,
+        945,
+        309,
+        1249
+      ]
+    },
+    "bears-return": {
+      "path": "assets/bears-return.png",
+      "sha256": "e2c3d226dcac1c3b5f8353bbaae90e8096685f71fc8265e6cf974856fbccf53f",
+      "bytes": 185487,
+      "dimensions": [
+        303,
+        304
+      ],
+      "kind": "crop-of-codex-builtin-imagegen",
+      "atlas": "story",
+      "crop": [
+        319,
+        945,
+        622,
+        1249
+      ]
+    },
+    "girl-leaves": {
+      "path": "assets/girl-leaves.png",
+      "sha256": "f1a528e50eb869cf0f2139648998862b50bb2c77849bcb7581a48e216a26aeaa",
+      "bytes": 187231,
+      "dimensions": [
+        303,
+        304
+      ],
+      "kind": "crop-of-codex-builtin-imagegen",
+      "atlas": "story",
+      "crop": [
+        632,
+        945,
+        935,
+        1249
+      ]
+    },
+    "empty-theatre": {
+      "path": "assets/empty-theatre.png",
+      "sha256": "b00e310b8543eefcc6aca2e2e798145783154f47e8c0ea7cd43d6b4dcaa0dd3b",
+      "bytes": 172661,
+      "dimensions": [
+        304,
+        304
+      ],
+      "kind": "crop-of-codex-builtin-imagegen",
+      "atlas": "story",
+      "crop": [
+        945,
+        945,
+        1249,
+        1249
+      ]
+    },
+    "drum": {
+      "path": "assets/drum.png",
+      "sha256": "e5162a5e97a3cb58764ada5893944cf4dfa3e473e12ff6b05a804d3759927fa1",
+      "bytes": 249597,
+      "dimensions": [
+        408,
+        408
+      ],
+      "kind": "crop-of-codex-builtin-imagegen",
+      "atlas": "props",
+      "crop": [
+        5,
+        5,
+        413,
+        413
+      ]
+    },
+    "kite": {
+      "path": "assets/kite.png",
+      "sha256": "5bac50e0352c57e6378f5210e44d4b8665e3c512f16289df70246faf2cad2607",
+      "bytes": 228000,
+      "dimensions": [
+        408,
+        408
+      ],
+      "kind": "crop-of-codex-builtin-imagegen",
+      "atlas": "props",
+      "crop": [
+        423,
+        5,
+        831,
+        413
+      ]
+    },
+    "bell": {
+      "path": "assets/bell.png",
+      "sha256": "7e2753b45fd32b360b9b8d45ddc0af8768142321683e766345a6359636a225dd",
+      "bytes": 230923,
+      "dimensions": [
+        408,
+        408
+      ],
+      "kind": "crop-of-codex-builtin-imagegen",
+      "atlas": "props",
+      "crop": [
+        841,
+        5,
+        1249,
+        413
+      ]
+    },
+    "scarf": {
+      "path": "assets/scarf.png",
+      "sha256": "2dce87c29dc828ba79a1b42dd562dbcf6d291a6e863323bf9432294cd2dcbcbb",
+      "bytes": 267804,
+      "dimensions": [
+        408,
+        408
+      ],
+      "kind": "crop-of-codex-builtin-imagegen",
+      "atlas": "props",
+      "crop": [
+        5,
+        423,
+        413,
+        831
+      ]
+    },
+    "cap": {
+      "path": "assets/cap.png",
+      "sha256": "9db99cc1d30d84985bba94b7ec106b7ae711c0c5a591250143de094489975ddd",
+      "bytes": 242039,
+      "dimensions": [
+        408,
+        408
+      ],
+      "kind": "crop-of-codex-builtin-imagegen",
+      "atlas": "props",
+      "crop": [
+        423,
+        423,
+        831,
+        831
+      ]
+    },
+    "cart": {
+      "path": "assets/cart.png",
+      "sha256": "b6f35a9bd7060de424a0a273fcbd76caece8f8ee3f6034e37584b480d95ceed9",
+      "bytes": 230008,
+      "dimensions": [
+        408,
+        408
+      ],
+      "kind": "crop-of-codex-builtin-imagegen",
+      "atlas": "props",
+      "crop": [
+        841,
+        423,
+        1249,
+        831
+      ]
+    },
+    "cart-angle": {
+      "path": "assets/cart-angle.png",
+      "sha256": "9243395351e2bd8064175ae934818c31c1b191c31eb09cc103b9478476586b44",
+      "bytes": 237607,
+      "dimensions": [
+        408,
+        408
+      ],
+      "kind": "crop-of-codex-builtin-imagegen",
+      "atlas": "props",
+      "crop": [
+        5,
+        841,
+        413,
+        1249
+      ]
+    },
+    "forest-stage": {
+      "path": "assets/forest-stage.png",
+      "sha256": "e71e2f1dc21555427ff68a6f2cdaae0798589f8410361909189719b0ee8901e5",
+      "bytes": 252854,
+      "dimensions": [
+        408,
+        408
+      ],
+      "kind": "crop-of-codex-builtin-imagegen",
+      "atlas": "props",
+      "crop": [
+        423,
+        841,
+        831,
+        1249
+      ]
+    },
+    "puppet-stage": {
+      "path": "assets/puppet-stage.png",
+      "sha256": "7b53f08f4ed2e098f1dddb45d112e8ce12c4b250a030f74fc9987119955ad7bf",
+      "bytes": 279229,
+      "dimensions": [
+        408,
+        408
+      ],
+      "kind": "crop-of-codex-builtin-imagegen",
+      "atlas": "props",
+      "crop": [
+        841,
+        841,
+        1249,
+        1249
+      ]
+    },
+    "four-roles": {
+      "path": "assets/four-roles.png",
+      "sha256": "9edd2fcad5dacc84ec25b10b41ef17b702470d3120484fdf2213ea31500fd9a7",
+      "bytes": 375270,
+      "dimensions": [
+        490,
+        490
+      ],
+      "kind": "deterministic-composition",
+      "layout": "tile grid",
+      "tiles": [
+        [
+          "father",
+          "mother"
+        ],
+        [
+          "baby",
+          "goldilocks"
+        ]
+      ],
+      "tile": 230,
+      "gap": 10,
+      "background": "#fff1d4"
+    },
+    "noodle-owners": {
+      "path": "assets/noodle-owners.png",
+      "sha256": "67ab340339909f4fb8d07adc4783363e8d70074dcc98a90200e7c2dd8be3c1ba",
+      "bytes": 344656,
+      "dimensions": [
+        580,
+        390
+      ],
+      "kind": "deterministic-composition",
+      "layout": "tile grid",
+      "tiles": [
+        [
+          "father",
+          "mother",
+          "baby"
+        ],
+        [
+          "father-noodles",
+          "mother-noodles",
+          "baby-noodles"
+        ]
+      ],
+      "tile": 180,
+      "gap": 10,
+      "background": "#fff1d4"
+    },
+    "bed-owners": {
+      "path": "assets/bed-owners.png",
+      "sha256": "a1f200397ce1022eba2e524a3edf73f4a2bb21c7ccbcd8252e2b617ba2ba784a",
+      "bytes": 343558,
+      "dimensions": [
+        580,
+        390
+      ],
+      "kind": "deterministic-composition",
+      "layout": "tile grid",
+      "tiles": [
+        [
+          "father",
+          "mother",
+          "baby"
+        ],
+        [
+          "father-bed",
+          "mother-bed",
+          "baby-bed"
+        ]
+      ],
+      "tile": 180,
+      "gap": 10,
+      "background": "#fff1d4"
+    },
+    "story-path": {
+      "path": "assets/story-path.png",
+      "sha256": "4b8612f6b873307c5ce00ebbc48aa9c86027099e9201f58aa627a03ada46f380",
+      "bytes": 300069,
+      "dimensions": [
+        920,
+        192
+      ],
+      "kind": "deterministic-composition",
+      "layout": "tile grid",
+      "tiles": [
+        [
+          "enter-house",
+          "taste-noodles",
+          "try-bed",
+          "bears-return",
+          "girl-leaves"
+        ]
+      ],
+      "tile": 172,
+      "gap": 10,
+      "background": "#fff1d4"
+    },
+    "game-props": {
+      "path": "assets/game-props.png",
+      "sha256": "18234e5bb68d31bfdc90079231aeadcc22d6437e9b40432d2602f5140136d481",
+      "bytes": 278729,
+      "dimensions": [
+        440,
+        440
+      ],
+      "kind": "deterministic-composition",
+      "layout": "tile grid",
+      "tiles": [
+        [
+          "mother-bed",
+          "baby-noodles"
+        ],
+        [
+          "goldilocks",
+          "cart"
+        ]
+      ],
+      "tile": 205,
+      "gap": 10,
+      "background": "#fff1d4"
+    },
+    "game-story": {
+      "path": "assets/game-story.png",
+      "sha256": "3b6cef43a097315bbdc62f5764b94c40072b28bc84bb93e47eb05f3368ca0f8b",
+      "bytes": 338918,
+      "dimensions": [
+        440,
+        440
+      ],
+      "kind": "deterministic-composition",
+      "layout": "tile grid",
+      "tiles": [
+        [
+          "enter-house",
+          "taste-noodles"
+        ],
+        [
+          "bears-return",
+          "girl-leaves"
+        ]
+      ],
+      "tile": 205,
+      "gap": 10,
+      "background": "#fff1d4"
+    },
+    "practice-props": {
+      "path": "assets/practice-props.png",
+      "sha256": "daf982ad0c69b1ced8bf22baaf785659d8683bb91a65f40b652e4408192333fc",
+      "bytes": 158483,
+      "dimensions": [
+        490,
+        250
+      ],
+      "kind": "deterministic-composition",
+      "layout": "tile grid",
+      "tiles": [
+        [
+          "cap",
+          "drum"
+        ]
+      ],
+      "tile": 230,
+      "gap": 10,
+      "background": "#fff1d4"
+    },
+    "quiz-role-father": {
+      "path": "assets/quiz-role-father.png",
+      "sha256": "7812982df56ed1cdb8ae474f2fa5977bed1a9e60f7533bee20615803c99b6d08",
+      "bytes": 46854,
+      "dimensions": [
+        240,
+        240
+      ],
+      "kind": "deterministic-composition",
+      "layout": "focused puppet-stage crop",
+      "inputs": [
+        "puppet-stage"
+      ],
+      "crop": [
+        46,
+        140,
+        129,
+        292
+      ],
+      "paddedSize": [
+        240,
+        240
+      ],
+      "background": "#fff1d4"
+    },
+    "quiz-role-baby": {
+      "path": "assets/quiz-role-baby.png",
+      "sha256": "63faa4aa4c941d6f4676548f44f3a65abb84c1c9ed5ec2437fc3b9d13e6f28b9",
+      "bytes": 52183,
+      "dimensions": [
+        240,
+        240
+      ],
+      "kind": "deterministic-composition",
+      "layout": "focused puppet-stage crop",
+      "inputs": [
+        "puppet-stage"
+      ],
+      "crop": [
+        213,
+        192,
+        281,
+        292
+      ],
+      "paddedSize": [
+        240,
+        240
+      ],
+      "background": "#fff1d4"
+    },
+    "quiz-role-girl": {
+      "path": "assets/quiz-role-girl.png",
+      "sha256": "be63b98125387fd9391eee174d3edf82dfab04bdfd23c8610ecaaa6d22c7f05b",
+      "bytes": 55395,
+      "dimensions": [
+        240,
+        240
+      ],
+      "kind": "deterministic-composition",
+      "layout": "focused puppet-stage crop",
+      "inputs": [
+        "puppet-stage"
+      ],
+      "crop": [
+        281,
+        168,
+        366,
+        293
+      ],
+      "paddedSize": [
+        240,
+        240
+      ],
+      "background": "#fff1d4"
+    },
+    "quiz-scarf-a": {
+      "path": "assets/quiz-scarf-a.png",
+      "sha256": "eb38f2deb2b59f13d0e0f1d3bc92084e6952a48c4041e592b3870050fe38bcf2",
+      "bytes": 122480,
+      "dimensions": [
+        360,
+        360
+      ],
+      "kind": "deterministic-composition",
+      "layout": "two rows: asker points to scarf above, listener and heart below",
+      "inputs": [
+        "father",
+        "scarf",
+        "goldilocks"
+      ],
+      "heart": true,
+      "background": "#fff1d4",
+      "placements": {
+        "father": [
+          12,
+          15,
+          150,
+          150
+        ],
+        "scarf": [
+          198,
+          15,
+          150,
+          150
+        ],
+        "goldilocks": [
+          67,
+          192,
+          150,
+          150
+        ]
+      }
+    },
+    "quiz-scarf-b": {
+      "path": "assets/quiz-scarf-b.png",
+      "sha256": "bd5fbca64cbac3ad46bdc2dddc214f5167959c42f0ad704060797ff70cdf3766",
+      "bytes": 122743,
+      "dimensions": [
+        360,
+        360
+      ],
+      "kind": "deterministic-composition",
+      "layout": "two rows: asker points to scarf above, listener and heart below",
+      "inputs": [
+        "mother",
+        "scarf",
+        "goldilocks"
+      ],
+      "heart": false,
+      "background": "#fff1d4",
+      "placements": {
+        "mother": [
+          12,
+          15,
+          150,
+          150
+        ],
+        "scarf": [
+          198,
+          15,
+          150,
+          150
+        ],
+        "goldilocks": [
+          67,
+          192,
+          150,
+          150
+        ]
+      }
+    },
+    "quiz-scarf-c": {
+      "path": "assets/quiz-scarf-c.png",
+      "sha256": "127c7ba34008e0db45f82d44d275a86856570cc042314d97e8b01191fe29136f",
+      "bytes": 122059,
+      "dimensions": [
+        360,
+        360
+      ],
+      "kind": "deterministic-composition",
+      "layout": "two rows: asker points to scarf above, listener and heart below",
+      "inputs": [
+        "mother",
+        "scarf",
+        "goldilocks"
+      ],
+      "heart": true,
+      "background": "#fff1d4",
+      "placements": {
+        "mother": [
+          12,
+          15,
+          150,
+          150
+        ],
+        "scarf": [
+          198,
+          15,
+          150,
+          150
+        ],
+        "goldilocks": [
+          67,
+          192,
+          150,
+          150
+        ]
+      }
+    },
+    "quiz-order-a": {
+      "path": "assets/quiz-order-a.png",
+      "sha256": "1f7e3d150094bdb727024fcaf02672240c7e0d86878f07d83338c7ca2eaaa60e",
+      "bytes": 222511,
+      "dimensions": [
+        570,
+        270
+      ],
+      "kind": "deterministic-composition",
+      "layout": "two images separated by left-to-right arrow",
+      "inputs": [
+        "girl-leaves",
+        "bears-return"
+      ],
+      "background": "#fff1d4"
+    },
+    "quiz-order-b": {
+      "path": "assets/quiz-order-b.png",
+      "sha256": "d15c3dce51e1cae7f8347c47eaf26e7028e38ede11ea46051f02aa67ed280fce",
+      "bytes": 222505,
+      "dimensions": [
+        570,
+        270
+      ],
+      "kind": "deterministic-composition",
+      "layout": "two images separated by left-to-right arrow",
+      "inputs": [
+        "bears-return",
+        "girl-leaves"
+      ],
+      "background": "#fff1d4"
+    },
+    "quiz-order-c": {
+      "path": "assets/quiz-order-c.png",
+      "sha256": "6a4052e1ce51c8385769bac40a0d90449174da3b4ca296e402844440c3fde3ee",
+      "bytes": 217295,
+      "dimensions": [
+        570,
+        270
+      ],
+      "kind": "deterministic-composition",
+      "layout": "two images separated by left-to-right arrow",
+      "inputs": [
+        "bears-return",
+        "try-bed"
+      ],
+      "background": "#fff1d4"
+    },
+    "story-and-roleplay": {
+      "path": "assets/story-and-roleplay.png",
+      "sha256": "1d888a7aa2de6428e5d6f0f503873a791f9880d52f642c73f0537555444c5bca",
+      "bytes": 381228,
+      "dimensions": [
+        920,
+        340
+      ],
+      "kind": "deterministic-composition",
+      "layout": "top story strip, three separate practice props beneath",
+      "inputs": [
+        "story-path",
+        "cap",
+        "drum",
+        "kite"
+      ],
+      "background": "#fff1d4",
+      "placements": {
+        "story-path": [
+          5,
+          4
+        ],
+        "cap": [
+          235,
+          199,
+          132,
+          132
+        ],
+        "drum": [
+          394,
+          199,
+          132,
+          132
+        ],
+        "kite": [
+          553,
+          199,
+          132,
+          132
+        ]
+      }
+    }
+  },
+  "scope": "两幅本轮内置 imagegen 原创拼板及裁切；连环、角色对照和选项用可核的固定布局重组。未发送或复用原书图像。"
+}

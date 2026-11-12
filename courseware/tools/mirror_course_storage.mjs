@@ -12,6 +12,7 @@ import {createRequire} from 'node:module';
 import {fileURLToPath} from 'node:url';
 
 import {ROOT,clientFor,readConfig,storageIdentity} from '../../openmaic-runtime/scripts/course-storage.mjs';
+import {archiveKey} from '../../openmaic-runtime/scripts/course-archive.mjs';
 import {validateReceipt as validateBackupReceipt} from './store_backup.mjs';
 
 const require=createRequire(path.join(ROOT,'openmaic-runtime/.runtime/OpenMAIC/package.json'));
@@ -44,7 +45,7 @@ function parse(argv){
     if(!option?.startsWith('--')||value===undefined)throw Error('Expected named mirror option and value');
     const name=option.slice(2);
     if(name==='concurrency'||name==='limit'||name==='max-bytes')options[name]=Number(value);
-    else if(name==='config'||name==='state')options[name]=value;
+    else if(name==='config'||name==='state'||name==='prefix'||name==='archive-receipt')options[name]=value;
     else if(name==='defer-backup-receipt')options.deferBackupReceipts.push(value);
     else throw Error('Unknown mirror option');
   }
@@ -118,14 +119,16 @@ async function verifiedJournal(filename){
   return records;
 }
 
-async function inventory(client,config,read=(label,operation)=>operation(),idleMs){
+async function inventory(client,config,read=(label,operation)=>operation(),idleMs,prefix){
   const objects=[];let token;
   do{
-    const command=new ListObjectsV2Command({Bucket:config.bucket,ContinuationToken:token,MaxKeys:1000});
+    const command=new ListObjectsV2Command({Bucket:config.bucket,ContinuationToken:token,MaxKeys:1000,
+      ...(prefix?{Prefix:prefix}:{})});
     const response=await read({operation:'inventory',bucket:config.bucket},()=>send(client,command,idleMs));
     for(const item of response.Contents||[]){
       if(typeof item.Key!=='string'||!item.Key||!Number.isSafeInteger(Number(item.Size))||Number(item.Size)<0
           ||typeof item.ETag!=='string'||!item.ETag)throw Error('Source inventory is incomplete');
+      if(prefix&&!item.Key.startsWith(prefix))throw Error('Object inventory is outside its declared scope');
       objects.push({key:item.Key,size:Number(item.Size),etag:item.ETag});
     }
     token=response.IsTruncated?response.NextContinuationToken:undefined;
@@ -137,6 +140,39 @@ async function inventory(client,config,read=(label,operation)=>operation(),idleM
 
 function identity(config){
   const value=storageIdentity(config);return {endpoint:value.endpoint,bucket:value.bucket,region:value.region};
+}
+
+async function archiveScope(filename,source){
+  const stat=await fsp.lstat(filename);
+  if(!stat.isFile()||stat.size>1024*1024)throw Error('Invalid course archive receipt file');
+  let receipt;
+  try{receipt=JSON.parse(await fsp.readFile(filename,'utf8'));}
+  catch{throw Error('Invalid course archive receipt JSON');}
+  if(receipt?.schemaVersion!=='mira.course-archive.verification.v1'||receipt.complete!==true
+      ||canonical(receipt.storage)!==canonical(identity(source))||typeof receipt.archiveId!=='string'
+      ||!/^[A-Za-z0-9_-]{8,128}$/.test(receipt.archiveId)
+      ||!Array.isArray(receipt.objects)||!receipt.objects.length)throw Error('A verified course archive in the source bucket is required');
+  const files=new Map();
+  for(const item of receipt.objects){
+    if(!archiveKey(item?.objectKey)||files.has(item.objectKey)||!Number.isSafeInteger(item.byteSize)||item.byteSize<1
+        ||!/^[a-f0-9]{64}$/.test(item.sha256||'')||typeof item.etag!=='string'||!item.etag)
+      throw Error('Invalid course archive receipt object');
+    files.set(item.objectKey,item);
+  }
+  const directories=new Set([...files.keys()].map(key=>path.posix.dirname(key)+'/'));
+  if(directories.size!==1)throw Error('A course archive receipt must identify one directory');
+  return {archiveId:receipt.archiveId,prefix:[...directories][0],files};
+}
+
+function scopedArchiveInventory(inventory,scope){
+  const selected=inventory.filter(item=>scope.files.has(item.key));
+  if(selected.length!==scope.files.size||new Set(selected.map(item=>item.key)).size!==scope.files.size)
+    throw Error('Course archive source inventory is incomplete');
+  return selected.map(item=>{
+    const expected=scope.files.get(item.key);
+    if(item.size!==expected.byteSize||item.etag!==expected.etag)throw Error('Course archive source identity changed');
+    return {...item,expectedSha256:expected.sha256};
+  });
 }
 
 async function deferredKeys(filenames,source,inventory){
@@ -228,6 +264,7 @@ async function putFromSource(sourceClient,targetClient,source,target,item,spool)
       await pipeline(Readable.from(parts(),{objectMode:false}),fs.createWriteStream(filename,{flags:'wx',mode:0o600}));
       body=fs.createReadStream(filename);
     }
+    if(item.expectedSha256&&completed?.sha256!==item.expectedSha256)throw Error('Course archive source SHA-256 changed');
     const uploaded=await targetClient.send(new PutObjectCommand({Bucket:target.bucket,Key:item.key,Body:body,
       ContentLength:item.size,IfNoneMatch:'*',ServerSideEncryption:'AES256',
       ...(sourceMd5?{ContentMD5:Buffer.from(sourceMd5,'hex').toString('base64')}:{}),
@@ -266,6 +303,7 @@ async function mirrorOne(context,item,{range=false,allowWrite=true,previous,targ
   let targetHead=targetListed?await head(targetClient,target,item.key,idleMs):null,sourceBytes,targetBytes,remote,
     integrityCheck='source-target-sha256';
   if(targetHead&&previous&&previous.byteSize===item.size&&previous.sourceEtag===item.etag
+      &&(!item.expectedSha256||previous.sha256===item.expectedSha256)
       &&previous.targetEtag===targetHead.ETag&&previous.targetVersionId===targetHead.VersionId
       &&targetHead.ContentLength===item.size&&targetHead.ServerSideEncryption==='AES256'){
     return {receipt:previous,resumed:true};
@@ -284,6 +322,7 @@ async function mirrorOne(context,item,{range=false,allowWrite=true,previous,targ
       targetBytes=sourceBytes;integrityCheck='cos-content-md5+source-sha256';
     }
   }
+  if(item.expectedSha256&&sourceBytes.sha256!==item.expectedSha256)throw Error('Course archive source SHA-256 changed');
   targetBytes=targetBytes||await fullRead(targetClient,target,item.key,item.size,{...remote,requireEncryption:true,idleMs});
   if(sourceBytes.sha256!==targetBytes.sha256||!sourceBytes.prefix.equals(targetBytes.prefix)
       ||!sourceBytes.tail.equals(targetBytes.tail))throw Error('Source and target bytes differ');
@@ -314,6 +353,13 @@ export async function runMirror(options,dependencies={}){
   if(options.resume&&options.command!=='verify')throw Error('Resume applies only to verify');
   const filename=options.config||path.join(ROOT,'backend/.env');
   const source=dependencies.source||readConfig(filename);
+  const scope=options['archive-receipt']?await archiveScope(options['archive-receipt'],source):null;
+  if(scope&&(options.deferBackupReceipts?.length||(options.prefix!==undefined&&options.prefix!==scope.prefix)))
+    throw Error('Course archive receipt cannot be combined with a different directory or deferred backup');
+  const prefix=scope?.prefix??options.prefix;
+  if(prefix!==undefined&&(typeof prefix!=='string'||!prefix.endsWith('/')||prefix.startsWith('/')
+      ||prefix.slice(0,-1).split('/').some(part=>!part.trim()||part==='.'||part==='..')
+      ||/[\\\x00-\x1f\x7f]/.test(prefix)))throw Error('Expected a nonempty object directory prefix ending with /');
   const target=dependencies.target||readConfig(filename,'COS_TARGET');
   const sourceClient=dependencies.sourceClient||clientFor(source),targetClient=dependencies.targetClient||clientFor(target,{maxAttempts:1});
   const spool={directory:null,reserved:0n};
@@ -331,7 +377,10 @@ export async function runMirror(options,dependencies={}){
     lock=await fsp.open(lockPath,'wx',0o600);
     await lock.writeFile(JSON.stringify({pid:process.pid,createdAt:new Date().toISOString()})+'\n');
     await lock.sync();
-    const all=await inventory(sourceClient,source,read,idleMs),targetObjects=await inventory(targetClient,target,read,idleMs);
+    const sourceObjects=await inventory(sourceClient,source,read,idleMs,prefix);
+    const all=scope?scopedArchiveInventory(sourceObjects,scope):sourceObjects;
+    const targetInventory=await inventory(targetClient,target,read,idleMs,prefix);
+    const targetObjects=scope?targetInventory.filter(item=>scope.files.has(item.key)):targetInventory;
     const deferred=options.deferBackupReceipts?.length?await deferredKeys(options.deferBackupReceipts,source,all):new Set();
     const targetByKey=new Map(targetObjects.map(item=>[item.key,item]));
     let selected=deferred.size?all.filter(item=>!deferred.has(item.key)):all;
@@ -359,6 +408,8 @@ export async function runMirror(options,dependencies={}){
       return verified;
     });
     const summary={schemaVersion:'mira.course-storage.bucket-mirror-summary.v1',mode:options.command,
+      ...(prefix?{prefix,complete:result.objects===all.length}:{}),
+      ...(scope?{archiveId:scope.archiveId}:{}),
       sourceObjects:all.length,targetObjects:targetObjects.length,selectedObjects:selected.length,verifiedObjects:result.objects,
       resumedObjects:result.resumedObjects,verifiedBytes:result.bytes,
       ...(verifying?{resumedBytes:result.resumedBytes,retriedReads:policy.retried}:{}),
@@ -376,9 +427,11 @@ export async function runMirror(options,dependencies={}){
 if(process.argv[1]&&path.resolve(process.argv[1])===fileURLToPath(import.meta.url)){
   runMirror(parse(process.argv.slice(2))).then(result=>process.stdout.write(JSON.stringify({
     mode:result.mode,sourceObjects:result.sourceObjects,verifiedObjects:result.verifiedObjects,
+    ...(result.prefix?{prefix:result.prefix}:{}),
+    ...(result.archiveId?{archiveId:result.archiveId}:{}),
     resumedObjects:result.resumedObjects,verifiedBytes:result.verifiedBytes,
     ...(result.resumedBytes!==undefined?{resumedBytes:result.resumedBytes,retriedReads:result.retriedReads}:{}),
-    ...(result.deferredObjects?{deferredObjects:result.deferredObjects}:{}),complete:!result.deferredObjects})+'\n')).catch(error=>{
+    ...(result.deferredObjects?{deferredObjects:result.deferredObjects}:{}),complete:result.complete??!result.deferredObjects})+'\n')).catch(error=>{
       process.stderr.write(JSON.stringify({error:String(error?.message||error).slice(0,200)})+'\n');process.exitCode=1;
     });
 }

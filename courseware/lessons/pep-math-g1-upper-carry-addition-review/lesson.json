@@ -1,0 +1,1099 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "整理和复习",
+  "description": "回顾二十以内的进位加法，按和与加数整理灯牌，再用图核对等和与生活问题。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小数老师",
+      "role": "teacher",
+      "gender": "male",
+      "voice": "Ethan",
+      "avatar": "/teachers/ashu-math-v1.png",
+      "color": "#437763",
+      "persona": "用算式卡和灯图陪孩子比较、整理并核对数量。"
+    }
+  },
+  "images": {
+    "lantern-stage": {
+      "file": "assets/lantern-stage.png"
+    },
+    "lantern-sticker": {
+      "file": "assets/lantern-sticker.png"
+    },
+    "lantern-rover": {
+      "file": "assets/lantern-rover.png"
+    },
+    "lantern-rover-pop": {
+      "file": "assets/lantern-rover-pop.png"
+    },
+    "lantern-marble": {
+      "file": "assets/lantern-marble.png"
+    },
+    "card-6-6": {
+      "file": "assets/card-6-6.png"
+    },
+    "card-6-5": {
+      "file": "assets/card-6-5.png"
+    },
+    "card-7-5": {
+      "file": "assets/card-7-5.png"
+    },
+    "card-9-4": {
+      "file": "assets/card-9-4.png"
+    },
+    "card-8-6": {
+      "file": "assets/card-8-6.png"
+    },
+    "card-8-5": {
+      "file": "assets/card-8-5.png"
+    },
+    "card-6-7": {
+      "file": "assets/card-6-7.png"
+    },
+    "card-9-5": {
+      "file": "assets/card-9-5.png"
+    },
+    "card-8-8": {
+      "file": "assets/card-8-8.png"
+    },
+    "card-6-8": {
+      "file": "assets/card-6-8.png"
+    },
+    "card-9-7": {
+      "file": "assets/card-9-7.png"
+    },
+    "card-8-3": {
+      "file": "assets/card-8-3.png"
+    },
+    "card-8-4": {
+      "file": "assets/card-8-4.png"
+    },
+    "card-5-7": {
+      "file": "assets/card-5-7.png"
+    },
+    "card-7-7": {
+      "file": "assets/card-7-7.png"
+    },
+    "card-7-9": {
+      "file": "assets/card-7-9.png"
+    },
+    "teach-make-ten": {
+      "file": "assets/teach-make-ten.png"
+    },
+    "teach-swap": {
+      "file": "assets/teach-swap.png"
+    },
+    "teach-two-ways": {
+      "file": "assets/teach-two-ways.png"
+    },
+    "teach-original": {
+      "file": "assets/teach-original.png"
+    },
+    "teach-fixed": {
+      "file": "assets/teach-fixed.png"
+    },
+    "teach-row": {
+      "file": "assets/teach-row.png"
+    },
+    "teach-table-row": {
+      "file": "assets/teach-table-row.png"
+    },
+    "teach-table-col": {
+      "file": "assets/teach-table-col.png"
+    },
+    "teach-equal-left": {
+      "file": "assets/teach-equal-left.png"
+    },
+    "teach-equal-try": {
+      "file": "assets/teach-equal-try.png"
+    },
+    "teach-neighbor": {
+      "file": "assets/teach-neighbor.png"
+    },
+    "teach-check-17": {
+      "file": "assets/teach-check-17.png"
+    },
+    "q-fill-nine-start": {
+      "file": "assets/q-fill-nine-start.png"
+    },
+    "q-fill-nine-a": {
+      "file": "assets/q-fill-nine-a.png"
+    },
+    "q-fill-nine-b": {
+      "file": "assets/q-fill-nine-b.png"
+    },
+    "q-fill-nine-c": {
+      "file": "assets/q-fill-nine-c.png"
+    },
+    "q-equal-row-start": {
+      "file": "assets/q-equal-row-start.png"
+    },
+    "q-equal-row-a": {
+      "file": "assets/q-equal-row-a.png"
+    },
+    "q-equal-row-b": {
+      "file": "assets/q-equal-row-b.png"
+    },
+    "q-equal-row-c": {
+      "file": "assets/q-equal-row-c.png"
+    },
+    "q-column-start": {
+      "file": "assets/q-column-start.png"
+    },
+    "q-column-a": {
+      "file": "assets/q-column-a.png"
+    },
+    "q-column-b": {
+      "file": "assets/q-column-b.png"
+    },
+    "q-column-c": {
+      "file": "assets/q-column-c.png"
+    },
+    "q-equation-start": {
+      "file": "assets/q-equation-start.png"
+    },
+    "q-equation-a": {
+      "file": "assets/q-equation-a.png"
+    },
+    "q-equation-b": {
+      "file": "assets/q-equation-b.png"
+    },
+    "q-equation-c": {
+      "file": "assets/q-equation-c.png"
+    },
+    "q-delivered-start": {
+      "file": "assets/q-delivered-start.png"
+    },
+    "q-delivered-a": {
+      "file": "assets/q-delivered-a.png"
+    },
+    "q-delivered-b": {
+      "file": "assets/q-delivered-b.png"
+    },
+    "q-delivered-c": {
+      "file": "assets/q-delivered-c.png"
+    },
+    "q-color-start": {
+      "file": "assets/q-color-start.png"
+    },
+    "q-color-a": {
+      "file": "assets/q-color-a.png"
+    },
+    "q-color-b": {
+      "file": "assets/q-color-b.png"
+    },
+    "q-color-c": {
+      "file": "assets/q-color-c.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "the-repair-index",
+      "type": "slide",
+      "title": "灯牌乱了，先找哪种算法",
+      "template": "two-columns",
+      "data": {
+        "title": "灯牌乱了，先找哪种算法",
+        "left": {
+          "heading": "借十格盒凑十",
+          "body": "八再补两盏满十。"
+        },
+        "right": {
+          "heading": "换先后也一样",
+          "body": "六加七和七加六相等。"
+        },
+        "left_picture": "teach-make-ten",
+        "right_picture": "teach-swap"
+      },
+      "script": [
+        {
+          "say": "灯展的算式牌散了一桌。你会先拿哪一张来试算？"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "先看八盏和五盏。想让大的一组先变成十。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "八还差两盏。把五盏拆成两盏和三盏，再移两盏。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "十格正好满了，盒外还剩三盏。所以一共十三盏。"
+        },
+        {
+          "say": "现在找总数十三的牌。把两份合起来再看。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "再看另一张牌。知道六加七，还用重新算七加六吗？"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "两个加数换了位置，原来的六和七都没有增减。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "所以这两个算式的和相等。我们可以借熟悉的一张。"
+        },
+        {
+          "say": "有的牌看空格很快，有的牌一看就想起老朋友。"
+        },
+        {
+          "say": "复习时，我们还要看图找数量，再把算式按规则放好。"
+        }
+      ]
+    },
+    {
+      "key": "which-problem",
+      "type": "slide",
+      "title": "先问清楚，要求哪一部分",
+      "template": "two-columns",
+      "data": {
+        "title": "先问清楚，要求哪一部分",
+        "left": {
+          "heading": "同一批灯，两种分法",
+          "body": "按两层数，或按两色数。"
+        },
+        "right": {
+          "heading": "问发出以前",
+          "body": "发出八盏，桌上剩四盏。"
+        },
+        "left_picture": "teach-two-ways",
+        "right_picture": "teach-original"
+      },
+      "script": [
+        {
+          "say": "两张任务单都要用加法。问的事情也都一样吗？"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "第一张问架上有几盏灯。你可以从上面一层开始数。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "上层七盏，下层五盏。两层都数到，一共十二盏。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "也能按颜色数。橙六盏，绿六盏，也是同一批十二盏。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "第二张问发出以前有多少。发出去的灯还要算进去吗？"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "图上划了斜线的是已发的八盏。没有斜线的四盏还在。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "把发出的八盏和剩下的四盏合起来，原来有十二盏。"
+        },
+        {
+          "say": "一个问题是眼前一共多少，一个问题是开始一共多少。"
+        },
+        {
+          "say": "先说清问题，再用图看看两部分有没有漏掉或数两次。"
+        },
+        {
+          "say": "先把图里的两组合起来，算出一共是多少。"
+        }
+      ]
+    },
+    {
+      "key": "make-sorted-cards",
+      "type": "slide",
+      "title": "给散乱的灯牌排个队",
+      "template": "two-columns",
+      "data": {
+        "title": "给散乱的灯牌排个队",
+        "left": {
+          "heading": "固定第一加数",
+          "body": "后一个数按顺序写。"
+        },
+        "right": {
+          "heading": "把同和的牌排一行",
+          "body": "左右互换的算式也在同一行。"
+        },
+        "left_picture": "teach-fixed",
+        "right_picture": "teach-row"
+      },
+      "script": [
+        {
+          "say": "想做一本算式小册。随手想一张写一张，会漏掉什么？"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "先选第一个加数八。第二个数从能凑满十的地方写。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "八加二刚好十。下一格写八加三，再写八加四。"
+        },
+        {
+          "say": "第二个数每次多一。这样一直写到八加九。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "再照这个顺序写，一直写到八加九。一列就排完整了。"
+        },
+        {
+          "say": "八留在前面，后面的数从三开始，每次多一。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "也可以按和整理。先看这些一共都是十四的灯牌。"
+        },
+        {
+          "say": "先找总数十四的牌。把两组灯合起来核对。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "从九加五往右看。前面的数少一，后面的数多一。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "少掉的一盏正好到了另一组，所以十四没有变。"
+        },
+        {
+          "say": "六加八与八加六，两个数换位了，和还在同一行。"
+        },
+        {
+          "say": "先说规则再找下一张。这样抄过的好查，也不容易漏。"
+        },
+        {
+          "say": "游戏里先看发亮的候选。算完和，再瞄准发射。"
+        }
+      ]
+    },
+    {
+      "key": "sort-the-rows",
+      "type": "interactive",
+      "title": "弹珠找同和",
+      "widgetType": "game",
+      "page": "sort-the-rows",
+      "startImage": "lantern-stage",
+      "script": [
+        {
+          "say": "灯展的卡片要分成几排。长得不一样，能排一起吗？"
+        },
+        {
+          "setState": {
+            "pause": true,
+            "demo": true,
+            "level": 1
+          }
+        },
+        {
+          "highlight": "#demo-voice"
+        },
+        {
+          "say": "先听这一轮要找的和。没听清，可以点小喇叭。"
+        },
+        {
+          "say": "这一轮找和是十二的牌。先把图上两份灯合起来算。"
+        },
+        {
+          "highlight": "#demo-sum-first"
+        },
+        {
+          "say": "先分开数两组灯。算出和，再决定瞄哪张。"
+        },
+        {
+          "say": "另一张也可能是十二。我们是按总数分，不按长相分。"
+        },
+        {
+          "highlight": "#demo-aim-pad"
+        },
+        {
+          "say": "用左右箭头挪炮口。影线对着卡片，再点发射。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "留意炮口对着哪张卡。算一算，那张卡的和是不是十二。"
+        },
+        {
+          "say": "有时只差一盏，和就不一样。先算清，再瞄准。"
+        },
+        {
+          "say": "现在换你。第一轮有两张同和的牌，要分两次打中。"
+        },
+        {
+          "setState": {
+            "pause": false,
+            "demo": false,
+            "level": 1
+          }
+        }
+      ],
+      "gameAudio": {
+        "sum-twelve": "map-the-grid-7",
+        "sum-thirteen": "the-repair-index-8",
+        "sum-fourteen": "make-sorted-cards-12",
+        "sum-sixteen": "choose-and-recheck-6",
+        "sum-hint": "which-problem-16",
+        "sum-help": "make-sorted-cards-19",
+        "sum-good": "wrap-up-9"
+      }
+    },
+    {
+      "key": "map-the-grid",
+      "type": "slide",
+      "title": "算式表可以朝三个方向看",
+      "template": "two-columns",
+      "data": {
+        "title": "算式表可以朝三个方向看",
+        "left": {
+          "heading": "横着找一样的和",
+          "body": "这一排一共十二盏。"
+        },
+        "right": {
+          "heading": "竖着看一组不动",
+          "body": "橙格看竖列，绿边看斜向。"
+        },
+        "left_picture": "teach-table-row",
+        "right_picture": "teach-table-col"
+      },
+      "script": [
+        {
+          "say": "把灯牌放上格子，怎样不用从头算也能找到下一张？"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "最上面是和十的边界。下一行是和十一，再往下看。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "横着看十二那行。九加三、八加四，和都是十二。"
+        },
+        {
+          "say": "想象八加四右边空着。该填哪张牌？"
+        },
+        {
+          "say": "先找总数十二的牌。两组不同也能合成十二。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "往右移一格，前数少一，后数多一。"
+        },
+        {
+          "say": "八少一、四多一，和还是十二，填七加五。"
+        },
+        {
+          "say": "想找和十六的一排，先九加七，前数再逐次少一。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "再看橙色那一列。先找到第一加数一直是八的位置。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "往下走，八加二、八加三、八加四。"
+        },
+        {
+          "say": "和从十到十一，再到十二。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "沿绿边斜着向右上看。先看九加四，再看八加四。"
+        },
+        {
+          "say": "接着是七加四。第二个加数始终是四。"
+        },
+        {
+          "say": "第二个不变，第一少一，所以这些斜邻格的和也少一。"
+        },
+        {
+          "say": "九加九是十八。两边都是一位数，和最多十八。"
+        },
+        {
+          "say": "十九和二十还能用别的加法算，不在这张表里。"
+        },
+        {
+          "say": "先想刚才的规则。确定下一张是哪一张，再走。"
+        },
+        {
+          "say": "在迷宫里看看发亮的卡。开到那张，再找下一张。"
+        }
+      ]
+    },
+    {
+      "key": "find-the-next-card",
+      "type": "interactive",
+      "title": "泡泡车按序找卡",
+      "widgetType": "game",
+      "page": "find-the-next-card",
+      "startImage": "lantern-stage",
+      "script": [
+        {
+          "say": "灯牌迷宫有几条路。碰到一张卡就收，顺序会不会乱？"
+        },
+        {
+          "setState": {
+            "pause": true,
+            "demo": true,
+            "level": 1
+          }
+        },
+        {
+          "highlight": "#demo-maze-voice"
+        },
+        {
+          "say": "先听规则，再找下一站。忘了规则，就点重听。"
+        },
+        {
+          "say": "这一关让八留在前面，后面的数从三开始，每次多一。"
+        },
+        {
+          "highlight": "#game-target"
+        },
+        {
+          "say": "第一张是八加三。看到相同的八，还要看后面的数。"
+        },
+        {
+          "say": "如果先碰到后面的卡，它不会被收走。换条路再试。"
+        },
+        {
+          "highlight": "#demo-maze-pad"
+        },
+        {
+          "say": "点方向键开车。遇到橙色矮墙，可以对着它喷泡泡。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "看车怎么找第一张卡。先认出八加三，再看哪条路能到。"
+        },
+        {
+          "say": "后面还有固定第二个数，或让一排的和不变的关卡。"
+        },
+        {
+          "say": "现在你来开。按规则找齐卡片，最后再到小旗旁。"
+        },
+        {
+          "setState": {
+            "pause": false,
+            "demo": false,
+            "level": 1
+          }
+        }
+      ],
+      "gameAudio": {
+        "maze-left-eight": "make-sorted-cards-9",
+        "maze-right-seven": "wrap-up-11",
+        "maze-row-sixteen": "map-the-grid-11",
+        "maze-hint": "map-the-grid-23",
+        "maze-help": "map-the-grid-24",
+        "maze-good": "choose-and-recheck-17"
+      }
+    },
+    {
+      "key": "both-sides-match",
+      "type": "slide",
+      "title": "等号两边，要一样多",
+      "template": "two-columns",
+      "data": {
+        "title": "等号两边，要一样多",
+        "left": {
+          "heading": "左边先算好",
+          "body": "八加四有十二盏。"
+        },
+        "right": {
+          "heading": "右边试一试",
+          "body": "九盏加几盏也是十二？"
+        },
+        "left_picture": "teach-equal-left",
+        "right_picture": "teach-equal-try"
+      },
+      "script": [
+        {
+          "say": "一张等号灯牌中间缺一块。空着的这一堆该有几盏？"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "等号左边是八和四。别急着随手猜，先算左边的和。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "从四里借两盏给八，凑成十。还剩两盏，就是十二。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "所以等号右边也要十二。两边样子不同，可以同样多。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "右边已经有九盏。先试加两盏，看看会到哪一个数。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "九加二只有十一，还少一盏。这个试法先放在旁边。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "把两盏换成三盏。九加三是十二，正好和左边一样。"
+        },
+        {
+          "say": "再用图核一遍，左右都是一个十和两个一。"
+        },
+        {
+          "say": "看到等号，要同时顾到它两边，不能只算左边就停。"
+        }
+      ]
+    },
+    {
+      "key": "choose-and-recheck",
+      "type": "slide",
+      "title": "新问题，算完再核一遍",
+      "template": "two-columns",
+      "data": {
+        "title": "新问题，算完再核一遍",
+        "left": {
+          "heading": "借上一格推下一格",
+          "body": "九加七到九加八。"
+        },
+        "right": {
+          "heading": "两种办法能核对",
+          "body": "一个十和七个一。"
+        },
+        "left_picture": "teach-neighbor",
+        "right_picture": "teach-check-17"
+      },
+      "script": [
+        {
+          "say": "灯展要给十七盏灯挂牌。架上两组灯，手里的牌够吗？"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "现在有九盏和八盏。先借算式表里的上一格来想。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "九加七是十六。第一组没动，第二组多了一盏。"
+        },
+        {
+          "say": "目标和如果是十六，就找合起来十六的两组。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "所以九加八是十七。这个邻项规律让我们少算一步。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "还有个核对办法。用图看九差一到十，先补一盏。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "从八盏拿走一盏给九盏，余下七盏，灯没有少。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "图上一个十和七个一，也是十七。所以牌正好够用。"
+        },
+        {
+          "say": "如果两种办法结果不同，就回去看看数的是否是同一批。"
+        },
+        {
+          "say": "你也可以先选自己熟悉的办法，再请图来帮你检查。"
+        },
+        {
+          "say": "顺序找对了，相邻的卡能帮我们算得更快。"
+        }
+      ]
+    },
+    {
+      "key": "picture-check",
+      "type": "quiz",
+      "title": "换一批灯牌来核对",
+      "intro": [
+        "灯展换了一批新卡。先听题，再看图选一张。",
+        "没听清，可以点小喇叭再听一次。"
+      ],
+      "questions": [
+        {
+          "id": "fill-nine",
+          "question": "左边九盏，右边六盏。给九盏凑十，先怎么移？",
+          "skill": "选择凑十第一步",
+          "answer": [
+            "A"
+          ],
+          "analysis": "九盏差一满十。从六盏移来一盏，右边还剩五盏。",
+          "visual": {
+            "kind": "asset",
+            "image": "q-fill-nine-start",
+            "alt": "左九盏橙灯，右六盏绿灯"
+          },
+          "options": {
+            "A": {
+              "label": "向左移一盏，左十右五",
+              "visual": {
+                "kind": "asset",
+                "image": "q-fill-nine-a",
+                "alt": "向左移一盏，左十右五"
+              }
+            },
+            "B": {
+              "label": "两组都没移，左九右六",
+              "visual": {
+                "kind": "asset",
+                "image": "q-fill-nine-b",
+                "alt": "两组都没移，左九右六"
+              }
+            },
+            "C": {
+              "label": "向右移四盏，左五右十",
+              "visual": {
+                "kind": "asset",
+                "image": "q-fill-nine-c",
+                "alt": "向右移四盏，左五右十"
+              }
+            }
+          }
+        },
+        {
+          "id": "next-equal-row",
+          "question": "和十五的一排，八加七右边该接哪一张？",
+          "skill": "横排一边少一边多",
+          "answer": [
+            "C"
+          ],
+          "analysis": "往右前一个加数少一成七，后一个多一成八，和仍是十五。",
+          "visual": {
+            "kind": "asset",
+            "image": "q-equal-row-start",
+            "alt": "横排九加六、八加七，右边空一格"
+          },
+          "options": {
+            "A": {
+              "label": "七盏橙灯与七盏绿灯",
+              "visual": {
+                "kind": "asset",
+                "image": "q-equal-row-a",
+                "alt": "七盏橙灯与七盏绿灯"
+              }
+            },
+            "B": {
+              "label": "九盏橙灯与六盏绿灯",
+              "visual": {
+                "kind": "asset",
+                "image": "q-equal-row-b",
+                "alt": "九盏橙灯与六盏绿灯"
+              }
+            },
+            "C": {
+              "label": "七盏橙灯与八盏绿灯",
+              "visual": {
+                "kind": "asset",
+                "image": "q-equal-row-c",
+                "alt": "七盏橙灯与八盏绿灯"
+              }
+            }
+          }
+        },
+        {
+          "id": "column-four",
+          "question": "前面都是四，后面从六变成七。新的一格共多少？",
+          "skill": "固定第一加数时用邻项",
+          "answer": [
+            "B"
+          ],
+          "analysis": "四加六是十。后一个加数多一，前一个没变，和从十到十一。",
+          "visual": {
+            "kind": "asset",
+            "image": "q-column-start",
+            "alt": "四加六等于十，下一格是四加七"
+          },
+          "options": {
+            "A": {
+              "label": "正好十盏",
+              "visual": {
+                "kind": "asset",
+                "image": "q-column-a",
+                "alt": "正好十盏"
+              }
+            },
+            "B": {
+              "label": "十盏和一盏",
+              "visual": {
+                "kind": "asset",
+                "image": "q-column-b",
+                "alt": "十盏和一盏"
+              }
+            },
+            "C": {
+              "label": "十盏和两盏",
+              "visual": {
+                "kind": "asset",
+                "image": "q-column-c",
+                "alt": "十盏和两盏"
+              }
+            }
+          }
+        },
+        {
+          "id": "equal-right",
+          "question": "左边七盏加八盏，右边已有九盏。再放几盏才一样多？",
+          "skill": "让等号两边同和",
+          "answer": [
+            "A"
+          ],
+          "analysis": "七加八是十五。九加六也是十五，所以右边还需六盏。",
+          "visual": {
+            "kind": "asset",
+            "image": "q-equation-start",
+            "alt": "等号左七加八，右九加空格"
+          },
+          "options": {
+            "A": {
+              "label": "六盏灯",
+              "visual": {
+                "kind": "asset",
+                "image": "q-equation-a",
+                "alt": "六盏灯"
+              }
+            },
+            "B": {
+              "label": "五盏灯",
+              "visual": {
+                "kind": "asset",
+                "image": "q-equation-b",
+                "alt": "五盏灯"
+              }
+            },
+            "C": {
+              "label": "七盏灯",
+              "visual": {
+                "kind": "asset",
+                "image": "q-equation-c",
+                "alt": "七盏灯"
+              }
+            }
+          }
+        },
+        {
+          "id": "before-sending",
+          "question": "送出去七盏灯，还剩九盏。哪幅图表示原来一共有多少？",
+          "skill": "合并发出和留下的部分",
+          "answer": [
+            "B"
+          ],
+          "analysis": "求送出以前，要把已送的七盏和剩下九盏一起数。七加九等于十六。",
+          "visual": {
+            "kind": "asset",
+            "image": "q-delivered-start",
+            "alt": "七盏打斜线表示已送，九盏表示剩下"
+          },
+          "options": {
+            "A": {
+              "label": "一盒十盏和五盏",
+              "visual": {
+                "kind": "asset",
+                "image": "q-delivered-a",
+                "alt": "一盒十盏和五盏"
+              }
+            },
+            "B": {
+              "label": "一盒十盏和六盏",
+              "visual": {
+                "kind": "asset",
+                "image": "q-delivered-b",
+                "alt": "一盒十盏和六盏"
+              }
+            },
+            "C": {
+              "label": "一盒十盏和七盏",
+              "visual": {
+                "kind": "asset",
+                "image": "q-delivered-c",
+                "alt": "一盒十盏和七盏"
+              }
+            }
+          }
+        },
+        {
+          "id": "check-by-color",
+          "question": "把图上同一批灯换成按颜色分。哪张没有漏掉或多放？",
+          "skill": "用另一种分法核对同一批",
+          "answer": [
+            "C"
+          ],
+          "analysis": "橙色五盏加一盏等于六盏，绿色三盏加四盏等于七盏。总数仍是十三。",
+          "visual": {
+            "kind": "asset",
+            "image": "q-color-start",
+            "alt": "上排五橙三绿，下排一橙四绿"
+          },
+          "options": {
+            "A": {
+              "label": "七盏橙灯、六盏绿灯",
+              "visual": {
+                "kind": "asset",
+                "image": "q-color-a",
+                "alt": "七盏橙灯、六盏绿灯"
+              }
+            },
+            "B": {
+              "label": "六盏橙灯、八盏绿灯",
+              "visual": {
+                "kind": "asset",
+                "image": "q-color-b",
+                "alt": "六盏橙灯、八盏绿灯"
+              }
+            },
+            "C": {
+              "label": "六盏橙灯、七盏绿灯",
+              "visual": {
+                "kind": "asset",
+                "image": "q-color-c",
+                "alt": "六盏橙灯、七盏绿灯"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "wrap-up",
+      "type": "slide",
+      "title": "灯牌归位了，你会讲哪一条",
+      "template": "picture-points",
+      "data": {
+        "title": "灯牌归位了，你会讲哪一条",
+        "picture": "lantern-sticker",
+        "points": [
+          "凑十或交换",
+          "按和与加数整理",
+          "用图或另一式核对"
+        ]
+      },
+      "script": [
+        {
+          "say": "灯牌都归位了。有人刚来，你想先教他哪一件事？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "想象桌上两组灯。先用眼睛找差几盏可以满十。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "移过去的和留下的都要数。知道交换式也能很快算。"
+        },
+        {
+          "say": "两组只换先后，数量没增加，合起来还是原来的和。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "横着看，一组少一，另一组多一，合起来的和不变。"
+        },
+        {
+          "say": "找齐了。不同的算式可以有相同的和。"
+        },
+        {
+          "say": "竖着看固定一个加数，另一数多一，和也多一。"
+        },
+        {
+          "say": "也能让七留在后面，前面的数从五开始，每次多一。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "先听清问题。问原来，就把发出和剩下的两部分合起来。"
+        },
+        {
+          "say": "算完可用图或另一个算式核一遍，别漏数，也别数两次。"
+        },
+        {
+          "say": "回家用纸卡摆一行一列。请家人听你讲一条发现。"
+        }
+      ]
+    }
+  ]
+}

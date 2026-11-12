@@ -1,0 +1,992 @@
+{
+  "schemaVersion": "mira.courseware.lesson-assets.v1",
+  "lesson": "renjiao-science-g1-lower-design-pencil-holder",
+  "generatedAt": "2026-11-11T03:13:34+08:00",
+  "atlas": {
+    "tool": "Codex built-in image_gen",
+    "path": "art-source/pencil-workbench-atlas.png",
+    "sha256": "73317ad0c7194e88ea1c8d79946ea6f1a111fb04602701b8e41de592d73f9c4e",
+    "originalBasename": "exec-6a8a19a6-a142-4d21-9e76-748d793bf367.png",
+    "bytes": 2729519,
+    "pixels": [
+      1536,
+      1024
+    ],
+    "promptFile": "art-source/pencil-workbench-atlas.prompt.txt",
+    "promptSha256": "9533733b2360d78cc01b1155df8aa7b2e920978fbfa94b848166cdd8b9c7f4f4"
+  },
+  "assets": {
+    "desk-scene": {
+      "path": "assets/desk-scene.png",
+      "sha256": "7b60d94a53aa6eff6ce085b7e9e17d11e54b795f39df2ee967f5c30cb2e08a0c",
+      "bytes": 573345,
+      "pixels": [
+        760,
+        503
+      ],
+      "sourceKind": "codex_builtin_imagegen_atlas_cell",
+      "source": "art-source/pencil-workbench-atlas.png",
+      "sourceSha256": "73317ad0c7194e88ea1c8d79946ea6f1a111fb04602701b8e41de592d73f9c4e",
+      "crop": [
+        0,
+        0,
+        760,
+        503
+      ],
+      "maxEdge": 760,
+      "promptSha256": "9533733b2360d78cc01b1155df8aa7b2e920978fbfa94b848166cdd8b9c7f4f4",
+      "usedBy": [
+        "find-a-need"
+      ],
+      "visualClaim": "收纳前先观察散落的文具及取用需要。图中的桌面、尺、短笔和橡皮为本课原创。",
+      "sourceRefs": [
+        "output/courseware-lessons/renjiao-science-g1-lower-organize-objects/official/textbook/ebook-63.jpg",
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/lesson_1/coursewares/02.jpg"
+      ],
+      "visualState": "source_sheet_inspected"
+    },
+    "material-bench": {
+      "path": "assets/material-bench.png",
+      "sha256": "ab259dbff7968e15c35296e772c15e363d15b245bcd3d678de4e78432d1c116e",
+      "bytes": 592440,
+      "pixels": [
+        759,
+        503
+      ],
+      "sourceKind": "codex_builtin_imagegen_atlas_cell",
+      "source": "art-source/pencil-workbench-atlas.png",
+      "sourceSha256": "73317ad0c7194e88ea1c8d79946ea6f1a111fb04602701b8e41de592d73f9c4e",
+      "crop": [
+        777,
+        0,
+        1536,
+        503
+      ],
+      "maxEdge": 760,
+      "promptSha256": "9533733b2360d78cc01b1155df8aa7b2e920978fbfa94b848166cdd8b9c7f4f4",
+      "usedBy": [
+        "choose-materials"
+      ],
+      "visualClaim": "结合高度、分隔和稳定需要选择清洁可利用纸材，图中部件是本课示例。",
+      "sourceRefs": [
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/textbook/ebook-064.jpg",
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/lesson_1/lesson_plandesign/03.jpg"
+      ],
+      "visualState": "source_sheet_inspected"
+    },
+    "sort-workbench": {
+      "path": "assets/sort-workbench.png",
+      "sha256": "96a11d17082ed6437d31c9395f62cda8ae5085f9909271c07c13aa122e1d0880",
+      "bytes": 555508,
+      "pixels": [
+        760,
+        504
+      ],
+      "sourceKind": "codex_builtin_imagegen_atlas_cell",
+      "source": "art-source/pencil-workbench-atlas.png",
+      "sourceSha256": "73317ad0c7194e88ea1c8d79946ea6f1a111fb04602701b8e41de592d73f9c4e",
+      "crop": [
+        0,
+        520,
+        760,
+        1024
+      ],
+      "maxEdge": 760,
+      "promptSha256": "9533733b2360d78cc01b1155df8aa7b2e920978fbfa94b848166cdd8b9c7f4f4",
+      "usedBy": [
+        "sort-parts"
+      ],
+      "visualClaim": "原创工作台、工具图标和徽记只作课堂视觉提示，不承担实测事实。",
+      "sourceRefs": [
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/textbook/ebook-065.jpg",
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/lesson_2/lesson_plandesign/01.jpg"
+      ],
+      "visualState": "source_sheet_inspected"
+    },
+    "photo-workbench": {
+      "path": "assets/photo-workbench.png",
+      "sha256": "ee7d7ac41976b03257e52af2c637f650724c495ef95e4d11df5d7ae1d952d54c",
+      "bytes": 580688,
+      "pixels": [
+        759,
+        504
+      ],
+      "sourceKind": "codex_builtin_imagegen_atlas_cell",
+      "source": "art-source/pencil-workbench-atlas.png",
+      "sourceSha256": "73317ad0c7194e88ea1c8d79946ea6f1a111fb04602701b8e41de592d73f9c4e",
+      "crop": [
+        777,
+        520,
+        1536,
+        1024
+      ],
+      "maxEdge": 760,
+      "promptSha256": "9533733b2360d78cc01b1155df8aa7b2e920978fbfa94b848166cdd8b9c7f4f4",
+      "usedBy": [
+        "take-two-views"
+      ],
+      "visualClaim": "原创工作台、工具图标和徽记只作课堂视觉提示，不承担实测事实。",
+      "sourceRefs": [
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/textbook/ebook-065.jpg",
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/lesson_2/lesson_plandesign/01.jpg"
+      ],
+      "visualState": "source_sheet_inspected"
+    },
+    "part-wall-study": {
+      "path": "assets/part-wall-study.png",
+      "sha256": "2d594f91d5c366b259e4843acff2259be8899b0001e723bb4b4cce8009fd5c4e",
+      "bytes": 2623,
+      "pixels": [
+        720,
+        460
+      ],
+      "sourceKind": "course_code_scientific_diagram",
+      "source": "diagrams/render.py",
+      "sourceSha256": "624f624a35530fa0f95f2255ceabbd8453bcc7177ded11a569d1e8df13bc5841",
+      "usedBy": [
+        "look-at-parts"
+      ],
+      "visualClaim": "开口、筒壁、底板和分隔的用途由本课原创结构示意表达；角色由结构和可见用途区分。",
+      "sourceRefs": [
+        "output/courseware-lessons/renjiao-science-g1-lower-organize-objects/official/textbook/ebook-63.jpg",
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/lesson_1/lesson_plandesign/02.jpg"
+      ],
+      "visualState": "deterministic_render_pending_composed_visual_check"
+    },
+    "holder-front-study": {
+      "path": "assets/holder-front-study.png",
+      "sha256": "21c5e3dc6edda605a7ceb54c59d1c369bf583332f73acf3a707d89e04b840bbb",
+      "bytes": 3615,
+      "pixels": [
+        720,
+        460
+      ],
+      "sourceKind": "course_code_scientific_diagram",
+      "source": "diagrams/render.py",
+      "sourceSha256": "624f624a35530fa0f95f2255ceabbd8453bcc7177ded11a569d1e8df13bc5841",
+      "usedBy": [
+        "look-at-parts"
+      ],
+      "visualClaim": "开口、筒壁、底板和分隔的用途由本课原创结构示意表达；角色由结构和可见用途区分。",
+      "sourceRefs": [
+        "output/courseware-lessons/renjiao-science-g1-lower-organize-objects/official/textbook/ebook-63.jpg",
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/lesson_1/lesson_plandesign/02.jpg"
+      ],
+      "visualState": "deterministic_render_pending_composed_visual_check"
+    },
+    "design-plan": {
+      "path": "assets/design-plan.png",
+      "sha256": "c0931460ab117b631b912c91446f8960e54bac823113d59f59b3624e86824408",
+      "bytes": 7394,
+      "pixels": [
+        720,
+        460
+      ],
+      "sourceKind": "course_code_scientific_diagram",
+      "source": "diagrams/render.py",
+      "sourceSha256": "624f624a35530fa0f95f2255ceabbd8453bcc7177ded11a569d1e8df13bc5841",
+      "usedBy": [
+        "draw-plan"
+      ],
+      "visualClaim": "原创草图在相同装载下选择托住三格的宽底并留第二支短笔位，箭头标纸板与卷纸。笔与胶带作为按图备工具示意；图不证明实物稳定。",
+      "sourceRefs": [
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/textbook/ebook-064.jpg",
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/textbook/ebook-065.jpg",
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/lesson_1/coursewares/05.jpg",
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/lesson_1/lesson_plandesign/03.jpg"
+      ],
+      "visualState": "deterministic_render_pending_composed_visual_check"
+    },
+    "materials-kit": {
+      "path": "assets/materials-kit.png",
+      "sha256": "4703ee31d8e3e3fdd8f7de992f0c3fdf490b9937ab8ebf4bef7ace292e7a3a3c",
+      "bytes": 4268,
+      "pixels": [
+        720,
+        460
+      ],
+      "sourceKind": "course_code_scientific_diagram",
+      "source": "diagrams/render.py",
+      "sourceSha256": "624f624a35530fa0f95f2255ceabbd8453bcc7177ded11a569d1e8df13bc5841",
+      "usedBy": [
+        "prepare-to-make"
+      ],
+      "visualClaim": "原创预裁材料与工具示意。笔画标记，纸胶带固定纸件，较硬材料请成人使用合适的工具。",
+      "sourceRefs": [
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/textbook/ebook-065.jpg",
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/lesson_2/lesson_plandesign/02.jpg",
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/lesson_2/coursewares/05.jpg"
+      ],
+      "visualState": "deterministic_render_pending_composed_visual_check"
+    },
+    "assembled-empty": {
+      "path": "assets/assembled-empty.png",
+      "sha256": "f63fbefce6223506c227c654579f064b149a03baaa3f5ed4a7771d7c754412c7",
+      "bytes": 3390,
+      "pixels": [
+        720,
+        460
+      ],
+      "sourceKind": "course_code_scientific_diagram",
+      "source": "diagrams/render.py",
+      "sourceSha256": "624f624a35530fa0f95f2255ceabbd8453bcc7177ded11a569d1e8df13bc5841",
+      "usedBy": [
+        "build-and-try"
+      ],
+      "visualClaim": "按设计准备和制作后放入文具初试。插图展示本课材料或同一模型的部件位置。",
+      "sourceRefs": [
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/textbook/ebook-066.jpg",
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/lesson_2/lesson_plandesign/02.jpg"
+      ],
+      "visualState": "deterministic_render_pending_composed_visual_check"
+    },
+    "family-check": {
+      "path": "assets/family-check.png",
+      "sha256": "505c5e754ef4a1c750a080e7cef754bf05e1a353087aeb34638e8ff2a4911995",
+      "bytes": 5881,
+      "pixels": [
+        720,
+        460
+      ],
+      "sourceKind": "course_code_scientific_diagram",
+      "source": "diagrams/render.py",
+      "sourceSha256": "624f624a35530fa0f95f2255ceabbd8453bcc7177ded11a569d1e8df13bc5841",
+      "usedBy": [
+        "family-observation"
+      ],
+      "visualClaim": "印61要求放入文具初试，第二课时课件要求对照实际效果。本图是同一虚拟装载的一种视角；图能显示开口/露头，不能测得真实稳定性。",
+      "sourceRefs": [
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/textbook/ebook-066.jpg",
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/lesson_2/coursewares/06.jpg",
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/lesson_2/coursewares/09.jpg"
+      ],
+      "visualState": "deterministic_render_pending_composed_visual_check"
+    },
+    "parts-cart": {
+      "path": "assets/parts-cart.png",
+      "sha256": "696cee807854506016c061ecc14f48c5feb083eedbd6a31cd903a9a7ed4830d9",
+      "bytes": 1106,
+      "pixels": [
+        180,
+        180
+      ],
+      "sourceKind": "course_code_scientific_diagram",
+      "source": "diagrams/render.py",
+      "sourceSha256": "624f624a35530fa0f95f2255ceabbd8453bcc7177ded11a569d1e8df13bc5841",
+      "usedBy": [
+        "sort-parts"
+      ],
+      "visualClaim": "原创工作台、工具图标和徽记只作课堂视觉提示，不承担实测事实。",
+      "sourceRefs": [
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/textbook/ebook-065.jpg",
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/lesson_2/lesson_plandesign/01.jpg"
+      ],
+      "visualState": "deterministic_render_pending_composed_visual_check"
+    },
+    "camera-badge": {
+      "path": "assets/camera-badge.png",
+      "sha256": "b0fc0d186cde4117d90805f5dcc068638181860d39b77eaa51b34a5fd025e055",
+      "bytes": 1325,
+      "pixels": [
+        180,
+        180
+      ],
+      "sourceKind": "course_code_scientific_diagram",
+      "source": "diagrams/render.py",
+      "sourceSha256": "624f624a35530fa0f95f2255ceabbd8453bcc7177ded11a569d1e8df13bc5841",
+      "usedBy": [
+        "take-two-views"
+      ],
+      "visualClaim": "原创工作台、工具图标和徽记只作课堂视觉提示，不承担实测事实。",
+      "sourceRefs": [
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/textbook/ebook-065.jpg",
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/lesson_2/lesson_plandesign/01.jpg"
+      ],
+      "visualState": "deterministic_render_pending_composed_visual_check"
+    },
+    "green-mark": {
+      "path": "assets/green-mark.png",
+      "sha256": "112c4aad8a6babe6b1d09d36a6392c565d57f6a952ffec8e75fdedbd1bf235a8",
+      "bytes": 1389,
+      "pixels": [
+        180,
+        180
+      ],
+      "sourceKind": "course_code_scientific_diagram",
+      "source": "diagrams/render.py",
+      "sourceSha256": "624f624a35530fa0f95f2255ceabbd8453bcc7177ded11a569d1e8df13bc5841",
+      "usedBy": [
+        "sort-parts"
+      ],
+      "visualClaim": "原创工作台、工具图标和徽记只作课堂视觉提示，不承担实测事实。",
+      "sourceRefs": [
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/textbook/ebook-065.jpg",
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/lesson_2/lesson_plandesign/01.jpg"
+      ],
+      "visualState": "deterministic_render_pending_composed_visual_check"
+    },
+    "part-tall": {
+      "path": "assets/part-tall.png",
+      "sha256": "3fc97aae180bc6c1f6f973a5b4adf9d2110c7567f378dac6c92b45255008070e",
+      "bytes": 1167,
+      "pixels": [
+        196,
+        196
+      ],
+      "sourceKind": "course_code_scientific_diagram",
+      "source": "diagrams/render.py",
+      "sourceSha256": "624f624a35530fa0f95f2255ceabbd8453bcc7177ded11a569d1e8df13bc5841",
+      "usedBy": [
+        "sort-parts"
+      ],
+      "visualClaim": "开口、筒壁、底板和分隔的用途由本课原创结构示意表达；角色由结构和可见用途区分。",
+      "sourceRefs": [
+        "output/courseware-lessons/renjiao-science-g1-lower-organize-objects/official/textbook/ebook-63.jpg",
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/lesson_1/lesson_plandesign/02.jpg"
+      ],
+      "visualState": "deterministic_render_pending_composed_visual_check"
+    },
+    "part-low": {
+      "path": "assets/part-low.png",
+      "sha256": "b6fa10e740f94009847a8724ac38815d2a5d3c1d99ad207223834cb9bd4e141d",
+      "bytes": 1160,
+      "pixels": [
+        196,
+        196
+      ],
+      "sourceKind": "course_code_scientific_diagram",
+      "source": "diagrams/render.py",
+      "sourceSha256": "624f624a35530fa0f95f2255ceabbd8453bcc7177ded11a569d1e8df13bc5841",
+      "usedBy": [
+        "sort-parts"
+      ],
+      "visualClaim": "开口、筒壁、底板和分隔的用途由本课原创结构示意表达；角色由结构和可见用途区分。",
+      "sourceRefs": [
+        "output/courseware-lessons/renjiao-science-g1-lower-organize-objects/official/textbook/ebook-63.jpg",
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/lesson_1/lesson_plandesign/02.jpg"
+      ],
+      "visualState": "deterministic_render_pending_composed_visual_check"
+    },
+    "part-base": {
+      "path": "assets/part-base.png",
+      "sha256": "80f94e9d2555bfcf54bb56b48d717186cc26f4036c8aaf173e9fe3866a5bbc3a",
+      "bytes": 867,
+      "pixels": [
+        196,
+        196
+      ],
+      "sourceKind": "course_code_scientific_diagram",
+      "source": "diagrams/render.py",
+      "sourceSha256": "624f624a35530fa0f95f2255ceabbd8453bcc7177ded11a569d1e8df13bc5841",
+      "usedBy": [
+        "sort-parts"
+      ],
+      "visualClaim": "开口、筒壁、底板和分隔的用途由本课原创结构示意表达；角色由结构和可见用途区分。",
+      "sourceRefs": [
+        "output/courseware-lessons/renjiao-science-g1-lower-organize-objects/official/textbook/ebook-63.jpg",
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/lesson_1/lesson_plandesign/02.jpg"
+      ],
+      "visualState": "deterministic_render_pending_composed_visual_check"
+    },
+    "part-divider": {
+      "path": "assets/part-divider.png",
+      "sha256": "402e0fd134c8294ae4741edc47b2ca7a1576ad623150c45d3d8760371187b370",
+      "bytes": 833,
+      "pixels": [
+        196,
+        196
+      ],
+      "sourceKind": "course_code_scientific_diagram",
+      "source": "diagrams/render.py",
+      "sourceSha256": "624f624a35530fa0f95f2255ceabbd8453bcc7177ded11a569d1e8df13bc5841",
+      "usedBy": [
+        "sort-parts"
+      ],
+      "visualClaim": "开口、筒壁、底板和分隔的用途由本课原创结构示意表达；角色由结构和可见用途区分。",
+      "sourceRefs": [
+        "output/courseware-lessons/renjiao-science-g1-lower-organize-objects/official/textbook/ebook-63.jpg",
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/lesson_1/lesson_plandesign/02.jpg"
+      ],
+      "visualState": "deterministic_render_pending_composed_visual_check"
+    },
+    "part-tray": {
+      "path": "assets/part-tray.png",
+      "sha256": "cf664aa0b5e91e3549ed58336c7ed651b264985cd51f9368ed1ceea5cb3179c3",
+      "bytes": 1161,
+      "pixels": [
+        196,
+        196
+      ],
+      "sourceKind": "course_code_scientific_diagram",
+      "source": "diagrams/render.py",
+      "sourceSha256": "624f624a35530fa0f95f2255ceabbd8453bcc7177ded11a569d1e8df13bc5841",
+      "usedBy": [
+        "sort-parts"
+      ],
+      "visualClaim": "开口、筒壁、底板和分隔的用途由本课原创结构示意表达；角色由结构和可见用途区分。",
+      "sourceRefs": [
+        "output/courseware-lessons/renjiao-science-g1-lower-organize-objects/official/textbook/ebook-63.jpg",
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/lesson_1/lesson_plandesign/02.jpg"
+      ],
+      "visualState": "deterministic_render_pending_composed_visual_check"
+    },
+    "use-tall": {
+      "path": "assets/use-tall.png",
+      "sha256": "9e6d6a587eeada53437db54de5d13a36810a79bbac710b9646a0bc22c741ec9a",
+      "bytes": 1233,
+      "pixels": [
+        196,
+        196
+      ],
+      "sourceKind": "course_code_scientific_diagram",
+      "source": "diagrams/render.py",
+      "sourceSha256": "624f624a35530fa0f95f2255ceabbd8453bcc7177ded11a569d1e8df13bc5841",
+      "usedBy": [
+        "sort-parts"
+      ],
+      "visualClaim": "开口、筒壁、底板和分隔的用途由本课原创结构示意表达；角色由结构和可见用途区分。",
+      "sourceRefs": [
+        "output/courseware-lessons/renjiao-science-g1-lower-organize-objects/official/textbook/ebook-63.jpg",
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/lesson_1/lesson_plandesign/02.jpg"
+      ],
+      "visualState": "deterministic_render_pending_composed_visual_check"
+    },
+    "use-low": {
+      "path": "assets/use-low.png",
+      "sha256": "619d79214b93f7f067dd130589457e06e1cbe471c2332c2d80f8428392ef9a11",
+      "bytes": 1225,
+      "pixels": [
+        196,
+        196
+      ],
+      "sourceKind": "course_code_scientific_diagram",
+      "source": "diagrams/render.py",
+      "sourceSha256": "624f624a35530fa0f95f2255ceabbd8453bcc7177ded11a569d1e8df13bc5841",
+      "usedBy": [
+        "sort-parts"
+      ],
+      "visualClaim": "开口、筒壁、底板和分隔的用途由本课原创结构示意表达；角色由结构和可见用途区分。",
+      "sourceRefs": [
+        "output/courseware-lessons/renjiao-science-g1-lower-organize-objects/official/textbook/ebook-63.jpg",
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/lesson_1/lesson_plandesign/02.jpg"
+      ],
+      "visualState": "deterministic_render_pending_composed_visual_check"
+    },
+    "use-base": {
+      "path": "assets/use-base.png",
+      "sha256": "1b6b286847960d611527e62416bd45534f82f05c35a22e7e70a2f997988260e4",
+      "bytes": 1018,
+      "pixels": [
+        196,
+        196
+      ],
+      "sourceKind": "course_code_scientific_diagram",
+      "source": "diagrams/render.py",
+      "sourceSha256": "624f624a35530fa0f95f2255ceabbd8453bcc7177ded11a569d1e8df13bc5841",
+      "usedBy": [
+        "sort-parts"
+      ],
+      "visualClaim": "开口、筒壁、底板和分隔的用途由本课原创结构示意表达；角色由结构和可见用途区分。",
+      "sourceRefs": [
+        "output/courseware-lessons/renjiao-science-g1-lower-organize-objects/official/textbook/ebook-63.jpg",
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/lesson_1/lesson_plandesign/02.jpg"
+      ],
+      "visualState": "deterministic_render_pending_composed_visual_check"
+    },
+    "use-divider": {
+      "path": "assets/use-divider.png",
+      "sha256": "adc7fb8e978c2acb9eb9ec1166214023d7ed5094c32ba0f2d4c1839bcb5021a8",
+      "bytes": 1204,
+      "pixels": [
+        196,
+        196
+      ],
+      "sourceKind": "course_code_scientific_diagram",
+      "source": "diagrams/render.py",
+      "sourceSha256": "624f624a35530fa0f95f2255ceabbd8453bcc7177ded11a569d1e8df13bc5841",
+      "usedBy": [
+        "sort-parts"
+      ],
+      "visualClaim": "开口、筒壁、底板和分隔的用途由本课原创结构示意表达；角色由结构和可见用途区分。",
+      "sourceRefs": [
+        "output/courseware-lessons/renjiao-science-g1-lower-organize-objects/official/textbook/ebook-63.jpg",
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/lesson_1/lesson_plandesign/02.jpg"
+      ],
+      "visualState": "deterministic_render_pending_composed_visual_check"
+    },
+    "use-tray": {
+      "path": "assets/use-tray.png",
+      "sha256": "2d5a606cdac3a9a65214d485c130a04195f6ae525851cd6dedd9501ed3ff6d60",
+      "bytes": 1236,
+      "pixels": [
+        196,
+        196
+      ],
+      "sourceKind": "course_code_scientific_diagram",
+      "source": "diagrams/render.py",
+      "sourceSha256": "624f624a35530fa0f95f2255ceabbd8453bcc7177ded11a569d1e8df13bc5841",
+      "usedBy": [
+        "sort-parts"
+      ],
+      "visualClaim": "开口、筒壁、底板和分隔的用途由本课原创结构示意表达；角色由结构和可见用途区分。",
+      "sourceRefs": [
+        "output/courseware-lessons/renjiao-science-g1-lower-organize-objects/official/textbook/ebook-63.jpg",
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/lesson_1/lesson_plandesign/02.jpg"
+      ],
+      "visualState": "deterministic_render_pending_composed_visual_check"
+    },
+    "trial-1-top": {
+      "path": "assets/trial-1-top.png",
+      "sha256": "505c5e754ef4a1c750a080e7cef754bf05e1a353087aeb34638e8ff2a4911995",
+      "bytes": 5881,
+      "pixels": [
+        720,
+        460
+      ],
+      "sourceKind": "course_code_scientific_diagram",
+      "source": "diagrams/render.py",
+      "sourceSha256": "624f624a35530fa0f95f2255ceabbd8453bcc7177ded11a569d1e8df13bc5841",
+      "usedBy": [
+        "take-two-views"
+      ],
+      "visualClaim": "印61要求放入文具初试，第二课时课件要求对照实际效果。本图是同一虚拟装载的一种视角；图能显示开口/露头，不能测得真实稳定性。",
+      "sourceRefs": [
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/textbook/ebook-066.jpg",
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/lesson_2/coursewares/06.jpg",
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/lesson_2/coursewares/09.jpg"
+      ],
+      "visualState": "deterministic_render_pending_composed_visual_check"
+    },
+    "trial-1-side": {
+      "path": "assets/trial-1-side.png",
+      "sha256": "21c5e3dc6edda605a7ceb54c59d1c369bf583332f73acf3a707d89e04b840bbb",
+      "bytes": 3615,
+      "pixels": [
+        720,
+        460
+      ],
+      "sourceKind": "course_code_scientific_diagram",
+      "source": "diagrams/render.py",
+      "sourceSha256": "624f624a35530fa0f95f2255ceabbd8453bcc7177ded11a569d1e8df13bc5841",
+      "usedBy": [
+        "build-and-try",
+        "take-two-views"
+      ],
+      "visualClaim": "印61要求放入文具初试，第二课时课件要求对照实际效果。本图是同一虚拟装载的一种视角；图能显示开口/露头，不能测得真实稳定性。",
+      "sourceRefs": [
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/textbook/ebook-066.jpg",
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/lesson_2/coursewares/06.jpg",
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/lesson_2/coursewares/09.jpg"
+      ],
+      "visualState": "deterministic_render_pending_composed_visual_check"
+    },
+    "trial-2-top": {
+      "path": "assets/trial-2-top.png",
+      "sha256": "6c9a64898299fa090ddb73e52a8a7ba5c7ec349141f02963e615ee3641620bbd",
+      "bytes": 5865,
+      "pixels": [
+        720,
+        460
+      ],
+      "sourceKind": "course_code_scientific_diagram",
+      "source": "diagrams/render.py",
+      "sourceSha256": "624f624a35530fa0f95f2255ceabbd8453bcc7177ded11a569d1e8df13bc5841",
+      "usedBy": [
+        "compare-photos",
+        "take-two-views"
+      ],
+      "visualClaim": "印61要求放入文具初试，第二课时课件要求对照实际效果。本图是同一虚拟装载的一种视角；图能显示开口/露头，不能测得真实稳定性。",
+      "sourceRefs": [
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/textbook/ebook-066.jpg",
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/lesson_2/coursewares/06.jpg",
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/lesson_2/coursewares/09.jpg"
+      ],
+      "visualState": "deterministic_render_pending_composed_visual_check"
+    },
+    "trial-2-side": {
+      "path": "assets/trial-2-side.png",
+      "sha256": "3d7f012e535f1bbc23daa942e2e8d2aa4bb525feaf48d93e827762f87c05f15d",
+      "bytes": 3529,
+      "pixels": [
+        720,
+        460
+      ],
+      "sourceKind": "course_code_scientific_diagram",
+      "source": "diagrams/render.py",
+      "sourceSha256": "624f624a35530fa0f95f2255ceabbd8453bcc7177ded11a569d1e8df13bc5841",
+      "usedBy": [
+        "compare-photos",
+        "take-two-views"
+      ],
+      "visualClaim": "印61要求放入文具初试，第二课时课件要求对照实际效果。本图是同一虚拟装载的一种视角；图能显示开口/露头，不能测得真实稳定性。",
+      "sourceRefs": [
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/textbook/ebook-066.jpg",
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/lesson_2/coursewares/06.jpg",
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/lesson_2/coursewares/09.jpg"
+      ],
+      "visualState": "deterministic_render_pending_composed_visual_check"
+    },
+    "trial-3-top": {
+      "path": "assets/trial-3-top.png",
+      "sha256": "4eff0114279f56c08cca7a7b1a719463eed77a2b79c540e5fc8293f257c6fba2",
+      "bytes": 6371,
+      "pixels": [
+        720,
+        460
+      ],
+      "sourceKind": "course_code_scientific_diagram",
+      "source": "diagrams/render.py",
+      "sourceSha256": "624f624a35530fa0f95f2255ceabbd8453bcc7177ded11a569d1e8df13bc5841",
+      "usedBy": [
+        "take-two-views"
+      ],
+      "visualClaim": "印61要求放入文具初试，第二课时课件要求对照实际效果。本图是同一虚拟装载的一种视角；图能显示开口/露头，不能测得真实稳定性。",
+      "sourceRefs": [
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/textbook/ebook-066.jpg",
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/lesson_2/coursewares/06.jpg",
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/lesson_2/coursewares/09.jpg"
+      ],
+      "visualState": "deterministic_render_pending_composed_visual_check"
+    },
+    "trial-3-side": {
+      "path": "assets/trial-3-side.png",
+      "sha256": "6f6dc0533564b01cd0ee74cc72e66703a347a46d016199d3a77d04ab43157b42",
+      "bytes": 3687,
+      "pixels": [
+        720,
+        460
+      ],
+      "sourceKind": "course_code_scientific_diagram",
+      "source": "diagrams/render.py",
+      "sourceSha256": "624f624a35530fa0f95f2255ceabbd8453bcc7177ded11a569d1e8df13bc5841",
+      "usedBy": [
+        "take-two-views"
+      ],
+      "visualClaim": "印61要求放入文具初试，第二课时课件要求对照实际效果。本图是同一虚拟装载的一种视角；图能显示开口/露头，不能测得真实稳定性。",
+      "sourceRefs": [
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/textbook/ebook-066.jpg",
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/lesson_2/coursewares/06.jpg",
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/lesson_2/coursewares/09.jpg"
+      ],
+      "visualState": "deterministic_render_pending_composed_visual_check"
+    },
+    "q1-single": {
+      "path": "assets/q1-single.png",
+      "sha256": "f12a579379e449833db0177b6356bbaed80fea7a906d73546c45572149038bc9",
+      "bytes": 2693,
+      "pixels": [
+        720,
+        460
+      ],
+      "sourceKind": "course_code_scientific_diagram",
+      "source": "diagrams/render.py",
+      "sourceSha256": "624f624a35530fa0f95f2255ceabbd8453bcc7177ded11a569d1e8df13bc5841",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualClaim": "开口、筒壁、底板和分隔的用途由本课原创结构示意表达；角色由结构和可见用途区分。",
+      "sourceRefs": [
+        "output/courseware-lessons/renjiao-science-g1-lower-organize-objects/official/textbook/ebook-63.jpg",
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/lesson_1/lesson_plandesign/02.jpg"
+      ],
+      "visualState": "deterministic_render_pending_composed_visual_check"
+    },
+    "q1-split": {
+      "path": "assets/q1-split.png",
+      "sha256": "a489d2c7d7da995b06965a15362d8079ea28b93ddd1f7a3c41eeb0dee4bf6ee9",
+      "bytes": 3148,
+      "pixels": [
+        720,
+        460
+      ],
+      "sourceKind": "course_code_scientific_diagram",
+      "source": "diagrams/render.py",
+      "sourceSha256": "624f624a35530fa0f95f2255ceabbd8453bcc7177ded11a569d1e8df13bc5841",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualClaim": "开口、筒壁、底板和分隔的用途由本课原创结构示意表达；角色由结构和可见用途区分。",
+      "sourceRefs": [
+        "output/courseware-lessons/renjiao-science-g1-lower-organize-objects/official/textbook/ebook-63.jpg",
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/lesson_1/lesson_plandesign/02.jpg"
+      ],
+      "visualState": "deterministic_render_pending_composed_visual_check"
+    },
+    "q1-tray": {
+      "path": "assets/q1-tray.png",
+      "sha256": "84417a1303625cde1ecfa566788b563c1d650b981ac641abb2d10e15d0a6db2d",
+      "bytes": 2506,
+      "pixels": [
+        720,
+        460
+      ],
+      "sourceKind": "course_code_scientific_diagram",
+      "source": "diagrams/render.py",
+      "sourceSha256": "624f624a35530fa0f95f2255ceabbd8453bcc7177ded11a569d1e8df13bc5841",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualClaim": "开口、筒壁、底板和分隔的用途由本课原创结构示意表达；角色由结构和可见用途区分。",
+      "sourceRefs": [
+        "output/courseware-lessons/renjiao-science-g1-lower-organize-objects/official/textbook/ebook-63.jpg",
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/lesson_1/lesson_plandesign/02.jpg"
+      ],
+      "visualState": "deterministic_render_pending_composed_visual_check"
+    },
+    "q2-low": {
+      "path": "assets/q2-low.png",
+      "sha256": "8ed2d3ca3d71bec6068dd0e99fecd31e184c015b60691d7bf08b5bcb7d6ce631",
+      "bytes": 13509,
+      "pixels": [
+        430,
+        450
+      ],
+      "sourceKind": "course_code_scientific_diagram",
+      "source": "diagrams/render.py",
+      "sourceSha256": "624f624a35530fa0f95f2255ceabbd8453bcc7177ded11a569d1e8df13bc5841",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualClaim": "开口、筒壁、底板和分隔的用途由本课原创结构示意表达；角色由结构和可见用途区分。",
+      "sourceRefs": [
+        "output/courseware-lessons/renjiao-science-g1-lower-organize-objects/official/textbook/ebook-63.jpg",
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/lesson_1/lesson_plandesign/02.jpg"
+      ],
+      "visualState": "deterministic_render_pending_composed_visual_check"
+    },
+    "q2-high": {
+      "path": "assets/q2-high.png",
+      "sha256": "c2ffcc40bafa9a1a06e784ce9ca8e9c89c376d7f6355a7af665dd0e89de490ba",
+      "bytes": 18708,
+      "pixels": [
+        430,
+        450
+      ],
+      "sourceKind": "course_code_scientific_diagram",
+      "source": "diagrams/render.py",
+      "sourceSha256": "624f624a35530fa0f95f2255ceabbd8453bcc7177ded11a569d1e8df13bc5841",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualClaim": "示意剖面露出蜡笔的位置。蜡笔仍低于高筒口，手不能从筒口捏住它。",
+      "sourceRefs": [
+        "output/courseware-lessons/renjiao-science-g1-lower-organize-objects/official/textbook/ebook-63.jpg",
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/lesson_1/lesson_plandesign/02.jpg"
+      ],
+      "visualState": "deterministic_render_pending_composed_visual_check"
+    },
+    "q2-flat": {
+      "path": "assets/q2-flat.png",
+      "sha256": "e25ca78a4f334478f3f8827d52b3a1a9e150b03a00cfae8bcb7f3eaef0ecb6e5",
+      "bytes": 1758,
+      "pixels": [
+        430,
+        450
+      ],
+      "sourceKind": "course_code_scientific_diagram",
+      "source": "diagrams/render.py",
+      "sourceSha256": "624f624a35530fa0f95f2255ceabbd8453bcc7177ded11a569d1e8df13bc5841",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualClaim": "开口、筒壁、底板和分隔的用途由本课原创结构示意表达；角色由结构和可见用途区分。",
+      "sourceRefs": [
+        "output/courseware-lessons/renjiao-science-g1-lower-organize-objects/official/textbook/ebook-63.jpg",
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/lesson_1/lesson_plandesign/02.jpg"
+      ],
+      "visualState": "deterministic_render_pending_composed_visual_check"
+    },
+    "q3-both-low": {
+      "path": "assets/q3-both-low.png",
+      "sha256": "633fc7470d80945c72c3be77ac6fdf550a13c3a3c1fe95bc3080052032620d4d",
+      "bytes": 2732,
+      "pixels": [
+        720,
+        460
+      ],
+      "sourceKind": "course_code_scientific_diagram",
+      "source": "diagrams/render.py",
+      "sourceSha256": "624f624a35530fa0f95f2255ceabbd8453bcc7177ded11a569d1e8df13bc5841",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualClaim": "结合高度、分隔和稳定需要选择清洁可利用纸材，图中部件是本课示例。",
+      "sourceRefs": [
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/textbook/ebook-064.jpg",
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/lesson_1/lesson_plandesign/03.jpg"
+      ],
+      "visualState": "deterministic_render_pending_composed_visual_check"
+    },
+    "q3-no-base": {
+      "path": "assets/q3-no-base.png",
+      "sha256": "fb3d6d43b144f0c39d2e0a1de2e86a8969b3f8f32f8a29190a850b30d5b34bf1",
+      "bytes": 2819,
+      "pixels": [
+        720,
+        460
+      ],
+      "sourceKind": "course_code_scientific_diagram",
+      "source": "diagrams/render.py",
+      "sourceSha256": "624f624a35530fa0f95f2255ceabbd8453bcc7177ded11a569d1e8df13bc5841",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualClaim": "结合高度、分隔和稳定需要选择清洁可利用纸材，图中部件是本课示例。",
+      "sourceRefs": [
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/textbook/ebook-064.jpg",
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/lesson_1/lesson_plandesign/03.jpg"
+      ],
+      "visualState": "deterministic_render_pending_composed_visual_check"
+    },
+    "q3-complete": {
+      "path": "assets/q3-complete.png",
+      "sha256": "bf5564795869164393b69801f9ca06cd92d7dedb8018c4b870bff9e50affee03",
+      "bytes": 2923,
+      "pixels": [
+        720,
+        460
+      ],
+      "sourceKind": "course_code_scientific_diagram",
+      "source": "diagrams/render.py",
+      "sourceSha256": "624f624a35530fa0f95f2255ceabbd8453bcc7177ded11a569d1e8df13bc5841",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualClaim": "结合高度、分隔和稳定需要选择清洁可利用纸材，图中部件是本课示例。",
+      "sourceRefs": [
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/textbook/ebook-064.jpg",
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/lesson_1/lesson_plandesign/03.jpg"
+      ],
+      "visualState": "deterministic_render_pending_composed_visual_check"
+    },
+    "q4-child-tool": {
+      "path": "assets/q4-child-tool.png",
+      "sha256": "7124aa68ef33aee70c972f5d83229e1ebc218a497c03c82413a561e9b9edac2e",
+      "bytes": 3348,
+      "pixels": [
+        720,
+        460
+      ],
+      "sourceKind": "course_code_scientific_diagram",
+      "source": "diagrams/render.py",
+      "sourceSha256": "624f624a35530fa0f95f2255ceabbd8453bcc7177ded11a569d1e8df13bc5841",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualClaim": "较硬材料由成人处理，改动先在图上说明；选项是原创示意。",
+      "sourceRefs": [
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/lesson_2/lesson_plandesign/02.jpg",
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/lesson_2/coursewares/05.jpg"
+      ],
+      "visualState": "deterministic_render_pending_composed_visual_check"
+    },
+    "q4-ask-adult": {
+      "path": "assets/q4-ask-adult.png",
+      "sha256": "49d7f458dc68f8d673d8c0be35ec6ad1d4d5e883cd587786e894ee6f092df2c0",
+      "bytes": 4182,
+      "pixels": [
+        720,
+        460
+      ],
+      "sourceKind": "course_code_scientific_diagram",
+      "source": "diagrams/render.py",
+      "sourceSha256": "624f624a35530fa0f95f2255ceabbd8453bcc7177ded11a569d1e8df13bc5841",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualClaim": "指出设计图上要改的地方，请成人处理较硬材料。",
+      "sourceRefs": [
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/lesson_2/lesson_plandesign/02.jpg",
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/lesson_2/coursewares/05.jpg"
+      ],
+      "visualState": "deterministic_render_pending_composed_visual_check"
+    },
+    "q4-guess": {
+      "path": "assets/q4-guess.png",
+      "sha256": "722e9ee206fedd6b49172350bc59772757c99817fe8920778550da12ce00ef05",
+      "bytes": 3558,
+      "pixels": [
+        720,
+        460
+      ],
+      "sourceKind": "course_code_scientific_diagram",
+      "source": "diagrams/render.py",
+      "sourceSha256": "624f624a35530fa0f95f2255ceabbd8453bcc7177ded11a569d1e8df13bc5841",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualClaim": "较硬材料由成人处理，改动先在图上说明；选项是原创示意。",
+      "sourceRefs": [
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/lesson_2/lesson_plandesign/02.jpg",
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/lesson_2/coursewares/05.jpg"
+      ],
+      "visualState": "deterministic_render_pending_composed_visual_check"
+    },
+    "q5-top": {
+      "path": "assets/q5-top.png",
+      "sha256": "14c368f56a13eda04b3cbeb6999b2572f6a104903107e3c998f8fe6cf76713c2",
+      "bytes": 5471,
+      "pixels": [
+        720,
+        460
+      ],
+      "sourceKind": "course_code_scientific_diagram",
+      "source": "diagrams/render.py",
+      "sourceSha256": "624f624a35530fa0f95f2255ceabbd8453bcc7177ded11a569d1e8df13bc5841",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualClaim": "印61要求放入文具初试，第二课时课件要求对照实际效果。本图是同一虚拟装载的一种视角；图能显示开口/露头，不能测得真实稳定性。",
+      "sourceRefs": [
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/textbook/ebook-066.jpg",
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/lesson_2/coursewares/06.jpg",
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/lesson_2/coursewares/09.jpg"
+      ],
+      "visualState": "deterministic_render_pending_composed_visual_check"
+    },
+    "q5-side": {
+      "path": "assets/q5-side.png",
+      "sha256": "2e5ea347c16d6331cb67242e4a78db587fd64b3db0ff9a90e579caef5116a355",
+      "bytes": 3359,
+      "pixels": [
+        720,
+        460
+      ],
+      "sourceKind": "course_code_scientific_diagram",
+      "source": "diagrams/render.py",
+      "sourceSha256": "624f624a35530fa0f95f2255ceabbd8453bcc7177ded11a569d1e8df13bc5841",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualClaim": "印61要求放入文具初试，第二课时课件要求对照实际效果。本图是同一虚拟装载的一种视角；图能显示开口/露头，不能测得真实稳定性。",
+      "sourceRefs": [
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/textbook/ebook-066.jpg",
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/lesson_2/coursewares/06.jpg",
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/lesson_2/coursewares/09.jpg"
+      ],
+      "visualState": "deterministic_render_pending_composed_visual_check"
+    },
+    "q5-empty": {
+      "path": "assets/q5-empty.png",
+      "sha256": "70d97443a44e8bb904299dbd8167a674366eaaaa04c564f5fcf1530fddb903f9",
+      "bytes": 4891,
+      "pixels": [
+        720,
+        460
+      ],
+      "sourceKind": "course_code_scientific_diagram",
+      "source": "diagrams/render.py",
+      "sourceSha256": "624f624a35530fa0f95f2255ceabbd8453bcc7177ded11a569d1e8df13bc5841",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualClaim": "印61要求放入文具初试，第二课时课件要求对照实际效果。本图是同一虚拟装载的一种视角；图能显示开口/露头，不能测得真实稳定性。",
+      "sourceRefs": [
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/textbook/ebook-066.jpg",
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/lesson_2/coursewares/06.jpg",
+        "output/courseware-lessons/renjiao-science-g1-lower-design-pencil-holder/official/lesson_2/coursewares/09.jpg"
+      ],
+      "visualState": "deterministic_render_pending_composed_visual_check"
+    }
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "template": "wordBubbles",
+  "draft": true,
+  "title": "听词泡泡艇",
+  "sub": "听英语单词，移动小艇，让泡泡碰到漂过来的那张图。",
+  "doneText": "每个单词都找到一张图，泡泡贴纸到手！",
+  "voiceLead": true,
+  "stepVoiceLead": true,
+  "art": {
+    "backdrop": "garden.webp",
+    "frames": ["rover.webp", "rover-pop.webp"],
+    "icons": {
+      "apple": "apple.webp",
+      "banana": "banana.webp",
+      "carrot": "carrot.webp",
+      "dog": "dog.webp",
+      "cat": "cat.webp",
+      "rabbit": "rabbit.webp"
+    },
+    "sticker": "sticker.webp"
+  },
+  "levels": [
+    {
+      "rounds": [
+        {"target": "apple", "cards": ["apple", "banana"]},
+        {"target": "banana", "cards": ["apple", "banana"]}
+      ],
+      "drift": 22,
+      "pace": 0.75,
+      "tolerance": 61,
+      "hints": ["点喇叭，再听一次。", "图漂慢了，对准亮图。"]
+    },
+    {
+      "rounds": [
+        {"target": "dog", "cards": ["cat", "dog", "rabbit"]},
+        {"target": "cat", "cards": ["rabbit", "dog", "cat"]}
+      ],
+      "drift": 42,
+      "pace": 1.2,
+      "tolerance": 52,
+      "hints": ["听动物的名字。", "图漂慢了，对准亮图。"]
+    },
+    {
+      "rounds": [
+        {"target": "carrot", "cards": ["banana", "rabbit", "carrot"]},
+        {"target": "rabbit", "cards": ["rabbit", "carrot", "banana"]},
+        {"target": "banana", "cards": ["carrot", "banana", "rabbit"]}
+      ],
+      "drift": 58,
+      "pace": 1.65,
+      "tolerance": 44,
+      "hints": ["图在漂，提前一点吹。", "图漂慢了，对准亮图。"]
+    }
+  ]
+}

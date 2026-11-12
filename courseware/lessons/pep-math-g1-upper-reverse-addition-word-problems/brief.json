@@ -1,0 +1,178 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "逆向用加法解决问题",
+  "binding": {
+    "editionId": "pep-math-g1-upper-2022-standard",
+    "revisionId": "directory-ede7a8c63c337cf95a03fe79",
+    "unitId": "e3561735-f831-494f-ba43-370dccc3ff2a",
+    "nodeId": "7f801c99-039e-42d2-adae-8bbb9558fd16"
+  },
+  "scenario": "苗圃送苗日。车已经送走一组盆苗，棚里还留了一组。孩子把两组摆回出发前的托盘，再照原来的动作演一次来核对。",
+  "goals": [
+    "看时间先后，确定原来是动作发生之前。",
+    "画出拿走和留下的两个部分，用加法还原原数。",
+    "比较求原来与求剩下，根据问题决定用哪种运算。",
+    "拿算出的总量演一遍，核对剩下并尝试编故事。"
+  ],
+  "pageSequence": [
+    {
+      "key": "nursery-before-and-after",
+      "kind": "teaching",
+      "plan": "同一个托盘先放着盆苗，后来一部分被小车送走。按动作前、移动中、动作后辨认哪个时点叫原来。"
+    },
+    {
+      "key": "find-both-parts",
+      "kind": "teaching",
+      "plan": "点数已经送去种植区的七盆和留在棚里的六盆，每盆画一个记号，并用同一个整体框合回去。"
+    },
+    {
+      "key": "bring-the-parts-back",
+      "kind": "interactive",
+      "plan": "听清已拿走的数量，驾驶小车领回对应那一组，并送到正确的剩余托盘，合并恢复原数。"
+    },
+    {
+      "key": "make-an-addition",
+      "kind": "teaching",
+      "plan": "画已领和剩下的两部分，演示合并并把算式数字与每部分配对。听起来像减的动作发生过，当前问题问的是它发生之前。"
+    },
+    {
+      "key": "different-questions",
+      "kind": "teaching",
+      "plan": "比较两张清楚的信息图，一张给已领和剩下求原来，另一张给原来和已领取求剩下。先圈问题位置，再说明运算理由。"
+    },
+    {
+      "key": "restore-pair",
+      "kind": "interactive",
+      "plan": "移动下落的取出和剩余模型牌，配到表示动作前整体的对应图或算式，只有正确才过。"
+    },
+    {
+      "key": "replay-to-check",
+      "kind": "teaching",
+      "plan": "从算出的原数画完整总量，再移走题目指定的数量，核对留下的个数。用可点数图核查，不要求学生口算超出课目。"
+    },
+    {
+      "key": "make-up-a-story",
+      "kind": "teaching",
+      "plan": "换新情境，给出一张总量图和两个部分，让孩子编清动作、两条信息和一个求原来问题，老师示范一次。"
+    },
+    {
+      "key": "picture-check",
+      "kind": "quiz",
+      "plan": "六道原创图题听音完成，题图让两部分和时间点可核，兼顾算式和核查。"
+    },
+    {
+      "key": "wrap-up",
+      "kind": "teaching",
+      "plan": "回看先问哪一刻，再画两部分、合并求原来、重新演一遍核查，安排家庭说故事。"
+    }
+  ],
+  "games": [
+    {
+      "page": "bring-the-parts-back",
+      "template": "listenDelivery",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.listenDelivery",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "listen_pick_deliver",
+      "selection": "取货必须对应口令里的已领部分和数量，终点必须对应口令的剩余量；两处都对且驾驶送达，才显示并算出原来的完整图。",
+      "levels": [
+        "一单，两个明显不同数量的货点和剩余托盘，慢速短路。",
+        "两单，互换左、右和原图摆法，不靠颜色暗示数量。",
+        "三单，加入相邻数量干扰，分辨时间词并正确停等。"
+      ],
+      "demo": "点亮已领、余下、原来位置和方向键，示范首单第一动作后清空交接，预录取与送的不同指令。"
+    },
+    {
+      "page": "restore-pair",
+      "template": "fallingTiles",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.fallingTiles",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "pair_match",
+      "selection": "下落牌画清两部分，底板显示同一关系的动作前整体。首关用两部分相加得到对应总量；后关加入同数量但问题为求剩下的图，需识别时间与整体。",
+      "levels": [
+        "两种易区分总数的模型，低速下落。",
+        "三种两部分图，算出原来总量并配到对应列。",
+        "三至四次尝试，加入问题时点错误和近邻数量干扰。"
+      ],
+      "demo": "先逐个点亮两部分、动作前整体、落点和控制；老师移动第一块并复位，语音先说明后交给孩子。"
+    }
+  ],
+  "quizPlan": [
+    {
+      "skill": "before-and-after",
+      "prompt": "拿走几张贴纸。问原来有多少，要看哪一格？",
+      "answer": "所有贴纸都还在桌上、没有拿走的画面",
+      "position": 2,
+      "rationale": "原来指拿出动作发生之前。"
+    },
+    {
+      "skill": "restore-the-whole",
+      "prompt": "棋子带走五枚，还剩八枚。原来是哪张图？",
+      "answer": "5枚与8枚合起来的一组13枚",
+      "position": 3,
+      "rationale": "原来包括带走的和余下的两部分，5加8等于13。"
+    },
+    {
+      "skill": "restore-the-whole",
+      "prompt": "用掉六张小卡，剩七张。哪张图画全了两组？",
+      "answer": "一边6张表示已用，另一边7张表示还剩",
+      "position": 1,
+      "rationale": "两部分合起来才是原来。"
+    },
+    {
+      "skill": "operation-from-question",
+      "prompt": "取走五支蜡笔，盒里还有九支。原来是哪幅图？",
+      "answer": "把5支放回余下9支，得到14支",
+      "position": 2,
+      "rationale": "拿走是发生过的动作，要求原来应当合并。"
+    },
+    {
+      "skill": "replay-and-check",
+      "prompt": "算出原有十四个木夹。拿走八个，哪幅图能核对？",
+      "answer": "从14个划去8个，剩下6个",
+      "position": 1,
+      "rationale": "重做取走动作并核对余下，能检查原数。"
+    },
+    {
+      "skill": "operation-from-question",
+      "prompt": "十片布取走四片。问剩下多少，选哪张图？",
+      "answer": "十片布中划去四片，留下六片",
+      "position": 3,
+      "rationale": "问的是动作以后剩下的。从原有的十片里拿走四片。"
+    }
+  ],
+  "afterClass": {
+    "familyTask": "用小卡片摆原来、移走和余下。孩子告诉家人拿了几张、余下几张，让家人猜开始数，再一起演动作核对。",
+    "weeklyQuestionSource": [
+      "原来和现在的时点",
+      "合并拿走和剩下的两部分",
+      "依据问题选择运算",
+      "拿走后重查及编故事"
+    ],
+    "evidence": "线上记录图题和游戏操作，家庭观察实际摆放、解释和自编题。"
+  },
+  "artAndLanguage": "原创苗圃、便道和苗圃小车。每次只生成一个可数物，再由代码摆放；数量、时点、圈画与选择图精确核对。",
+  "goalDetails": [
+    {
+      "skill": "before-and-after",
+      "target": "看时间先后，确定原来是动作发生之前。",
+      "source": "原书印97阅读理解、教案1～2"
+    },
+    {
+      "skill": "restore-the-whole",
+      "target": "画出拿走和留下的两个部分，用加法还原原数。",
+      "source": "原书印97分析解答、课件5～11"
+    },
+    {
+      "skill": "operation-from-question",
+      "target": "比较求原来与求剩下，根据问题决定用哪种运算。",
+      "source": "原书印97回顾、教案3"
+    },
+    {
+      "skill": "replay-and-check",
+      "target": "拿算出的总量演一遍，核对剩下并尝试编故事。",
+      "source": "原书印98～99相关练习、教案3～5"
+    }
+  ]
+}

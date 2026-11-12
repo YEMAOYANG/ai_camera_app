@@ -1,0 +1,78 @@
+{
+  "template": "runner",
+  "title": "收集跑道",
+  "levels": [
+    {
+      "name": "第 1 关",
+      "rounds": [
+        {
+          "hint": "再看看目标。",
+          "hint2": "慢一点再试。",
+          "goal": 3,
+          "collect": 3,
+          "track": [
+            {
+              "value": 3,
+              "airborne": true
+            },
+            {
+              "value": 2
+            },
+            {
+              "value": 4
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "第 2 关",
+      "rounds": [
+        {
+          "hint": "再看看目标。",
+          "hint2": "慢一点再试。",
+          "goal": 7,
+          "collect": 7,
+          "track": [
+            {
+              "value": 3
+            },
+            {
+              "value": 6
+            },
+            {
+              "value": 4,
+              "airborne": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "第 3 关",
+      "rounds": [
+        {
+          "hint": "再看看目标。",
+          "hint2": "慢一点再试。",
+          "goal": 8,
+          "collect": 8,
+          "track": [
+            {
+              "value": 3
+            },
+            {
+              "value": 6
+            },
+            {
+              "value": 5,
+              "airborne": true
+            },
+            {
+              "value": 4
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

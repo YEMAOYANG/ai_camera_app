@@ -1,0 +1,44 @@
+<div data-semantic-diagram="提和虫的笔画路线" aria-hidden="true"></div>
+<div id="game-goal" aria-hidden="true"></div>
+<div id="game-player" aria-hidden="true"></div>
+<div id="game-target" aria-hidden="true"></div>
+
+<template id="dui-opening">
+  <div class="dui-opening dui-opening-trace" role="img" aria-label="小车停在田字格左下，从起点沿提笔路线向右上开">
+    <img class="dui-opening-scene" src="__IMG:trace-scene__" alt="">
+    <svg class="dui-opening-stroke" viewBox="0 0 560 315" data-semantic-diagram="田字格与提笔方向" aria-hidden="true">
+      <rect x="160" y="39" width="240" height="240" fill="none" stroke="#518273" stroke-width="3"></rect>
+      <path d="M280 39v240M160 159h240" fill="none" stroke="#7ea89a" stroke-width="3" stroke-dasharray="9 8"></path>
+      <path d="M208 215L353 146" fill="none" stroke="#237f72" stroke-width="13" stroke-linecap="round"></path>
+      <path d="M325 143l28 3-15 23" fill="none" stroke="#237f72" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"></path>
+    </svg>
+    <img class="dui-opening-car" src="__IMG:trace-car__" data-fallback="__IMG:dui-backup-trace-car__" alt="">
+  </div>
+</template>
+
+<script id="mira-narration-cues" type="application/json">{"schemaVersion":"mira.interactive.narration-cues.v1","cues":[{"id":"dui-p09-level1-goal","text":"看小车停在哪里，从那个起点沿路走到底。"},{"id":"dui-p09-level2-goal","text":"这次接着写虫的下面几笔。一笔走完，再找下一笔的小车。"},{"id":"dui-p09-level3-goal","text":"这回把虫从头写完。每写完一笔，就抬手找下一个起点。"},{"id":"dui-p09-hint","text":"先回到小车所在的起点，再顺着当前的路走。"},{"id":"dui-p09-later-hint2","text":"看看亮着的这一段路，沿它走到尽头，再换下一笔。"},{"id":"dui-p09-praise","text":"走完啦！你照着每一笔的顺序把路线接上了。"},{"id":"dui-p09-level1-hint2","text":"写到提时，手从左下往右上走，末尾轻一点。"}]}</script>
+<script id="mira-pre-recorded-audio">(()=>{
+const clips={"dui-p09-level1-goal":"__AUDIO:dui-p09-level1-goal__","dui-p09-level2-goal":"__AUDIO:dui-p09-level2-goal__","dui-p09-level3-goal":"__AUDIO:dui-p09-level3-goal__","dui-p09-hint":"__AUDIO:dui-p09-hint__","dui-p09-later-hint2":"__AUDIO:dui-p09-later-hint2__","dui-p09-praise":"__AUDIO:dui-p09-praise__","dui-p09-level1-hint2":"__AUDIO:dui-p09-level1-hint2__"};let active=null;
+let activeCue=null,pending=null,waiting=null,waitingAt=0,generation=0,visible=false;
+const state=(cueId,status)=>{document.documentElement.dataset.miraAudioState=status;
+window.dispatchEvent(new CustomEvent('mira-narration-state',{detail:{cueId,status}}));};
+const stop=(status)=>{generation++;pending=null;const previous=active;active=null;activeCue=null;
+if(previous){previous.onended=null;previous.onerror=null;previous.pause();previous.currentTime=0;}
+state(null,status);};
+window.miraCancelNarration=()=>{waiting=null;waitingAt=0;stop('ready');};
+window.addEventListener('message',(event)=>{if(event.source!==parent||event.data?.type!=='MIRA_NARRATION_VISIBILITY')return;
+visible=event.data.visible===true;if(!visible){stop('hidden');return;}
+const cueId=waiting;waiting=null;if(cueId&&Date.now()-waitingAt<=4000)window.miraNarrate(cueId);});
+const next=()=>{const cueId=pending;pending=null;if(cueId)play(cueId);};
+const play=async(cueId)=>{const ticket=generation;
+const clip=new Audio(clips[cueId]);active=clip;activeCue=cueId;const current=()=>generation===ticket&&active===clip;
+clip.onended=()=>{if(current()){active=null;activeCue=null;state(cueId,'ready');next();}};
+clip.onerror=()=>{if(current()){active=null;activeCue=null;state(cueId,'error');next();}};
+try{await clip.play();if(!current()){clip.pause();return false;}state(cueId,'playing');return true;}
+catch(_){if(current()){active=null;activeCue=null;state(cueId,'error');next();}return false;}};
+window.miraNarrate=async(cueId)=>{
+if(!Object.prototype.hasOwnProperty.call(clips,cueId)){state(cueId,'missing');return false;}
+if(!visible){waiting=cueId;waitingAt=Date.now();state(cueId,'hidden');return false;}
+if(active&&activeCue!==cueId){pending=cueId;state(cueId,'queued');return true;}
+stop('ready');return play(cueId);};
+state(null,'ready');})();</script>

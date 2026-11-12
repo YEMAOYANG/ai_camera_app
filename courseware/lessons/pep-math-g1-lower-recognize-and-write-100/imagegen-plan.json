@@ -1,0 +1,91 @@
+{
+  "schemaVersion": "mira.courseware.imagegen-plan.v1",
+  "mode": "builtin_native_imagegen",
+  "state": "realized_single_native_plate",
+  "plates": [
+    {
+      "id": "sticker-workshop-atlas",
+      "transparent": false,
+      "prompt": "A 2-by-2 evenly divided landscape 3:2 contact sheet with four independent crop-ready pictures of a Chinese school sticker sorting workshop. Perfect half-way boundaries, no gutters, labels, text, numerals or symbols. Unified matte gouache, warm cream paper grain, cut-paper silhouettes, deep pine and warm apricot with persimmon accent. Top left: two smiling Chinese first-grade children in a small workshop standing at a low desk with a largely empty wooden tray for a mosaic, one girl with apricot sweater and black bob and a boy with dark short hair and moss-green top. Top right: warm empty display stand inside workshop, quiet pale wall center and floor, pine cabinets only far sides, no people or loose props, room for a falling-block game. Bottom left: front-view warehouse corner with open center and light quiet floor, shelves only edges, no people, for an educational push cart game. Bottom right: same girl showing a plain tray to her parent by a cream paper window at home, foreground warm and uncluttered. No count-critical objects embedded; exact sticker counts are separate geometry."
+    },
+    {
+      "id": "sticker-workshop-sprites",
+      "transparent": true,
+      "prompt": "A transparent PNG sprite atlas, exactly six clean independent cutout assets, strict 3 columns by 2 rows on a landscape 3:2 canvas, one asset centered in the middle 55% of each equal tile. Fine grain paper cutouts in warm cream, deep pine, persimmon and apricot, readable child-friendly game props. No floor, cast shadow, text, letters, numerals, brand marks, grids or cell boundaries. Top left: yellow wooden push cart with simple clear right-facing profile and two pine wheels. Top center: same cart tipped slightly in action, a tiny small dust puff beside its wheels. Top right: simple green and apricot award badge with a leaf shape, no lettering. Bottom left: open illustrated book seen from slightly above, cream pages with blank lower right corner, pine covers, empty pages, no letters or page numbering. Bottom center: simple warm orange-and-cream craft rosette sticker, isolated. Bottom right: small muted pine tray symbol, isolated. Keep clear transparent gutters."
+    }
+  ],
+  "plannedAssets": {
+    "cover-stickers": {
+      "file": "assets/cover-stickers.png",
+      "plate": "sticker-workshop-atlas",
+      "cell": "top-left"
+    },
+    "fall-backdrop": {
+      "file": "assets/fall-backdrop.png",
+      "plate": "sticker-workshop-atlas",
+      "cell": "top-right"
+    },
+    "depot-backdrop": {
+      "file": "assets/depot-backdrop.png",
+      "plate": "sticker-workshop-atlas",
+      "cell": "bottom-left"
+    },
+    "family-stickers": {
+      "file": "assets/family-stickers.png",
+      "plate": "sticker-workshop-atlas",
+      "cell": "bottom-right"
+    },
+    "cart-ready": {
+      "file": "assets/cart-ready.png",
+      "plate": "sticker-workshop-sprites",
+      "cell": "top-left"
+    },
+    "cart-push": {
+      "file": "assets/cart-push.png",
+      "plate": "sticker-workshop-sprites",
+      "cell": "top-center"
+    },
+    "leaf-award": {
+      "file": "assets/leaf-award.png",
+      "plate": "sticker-workshop-sprites",
+      "cell": "top-right"
+    },
+    "book-page-100": {
+      "file": "assets/book-page-100.png",
+      "plate": "sticker-workshop-sprites",
+      "cell": "bottom-left",
+      "diagramOverlay": "在打开书的右页下角代码加页码100。"
+    },
+    "rosette-award": {
+      "file": "assets/rosette-award.png",
+      "plate": "sticker-workshop-sprites",
+      "cell": "bottom-center"
+    }
+  },
+  "actualPlate": {
+    "file": "art-source/sticker-workshop-combined.png",
+    "sha256": "a6ea8cf3d7ba6703fba8ccd748c92377c53bc000b0187b8d41d5186cc009d7b6",
+    "generator": "Codex built-in image_gen",
+    "prompt": "Make one crop-ready transparent 3-by-3 asset atlas for an original first-grade sticker workshop classroom. Landscape 1536×1024 composition. Exactly three equal columns and three equal rows, one independent asset centered within each cell, at least 6% transparent margins on all four sides of each cell. Keep all cells separate and their art fully visible. Use genuine transparent alpha in all negative space, never a checkerboard. No labels, words, digits, letters, logos, frames around the atlas, or watermarks. \n\nUnify the artwork with subtle paper grain, matte gouache, crisp cut-paper silhouettes, deep pine greens, warm cream, light apricot, persimmon accents. Calm larger color shapes, legible on a small screen. Any narrative panel is a separate, straight-edged 16:9 art rectangle on the transparent atlas. Educational counting objects and grids will be drawn separately.\n\nRow 1 col 1: One wide 16:9 narrative art rectangle. Two first-grade children at a low Chinese school sticker workshop desk, a girl with a black bob and apricot sweater, and a boy with short dark hair and pine-green top. They look with interest at a largely empty plain wood tray on the table. Warm paper light, quiet friendly faces, visible at small scale. No scattered counting objects.\nRow 1 col 2: One wide 16:9 backdrop art rectangle. An empty indoor sticker workshop at standing eye level, with gentle pale apricot wall and very quiet pale wood central floor; pine cabinets at far outside edges and mostly negative space in the middle for falling-block game graphics. No people or loose props.\nRow 1 col 3: One wide 16:9 backdrop art rectangle. Front-view craft stockroom at a Chinese elementary school, a distinct green-and-warm-cream room with shelves only along the far edges and a quiet open cream floor; clear empty center and no people, equipment, carts, or loose props.\nRow 2 col 1: One wide 16:9 narrative art rectangle. The same bob-haired girl in apricot brings a plain tray to show her smiling parent at home near a softly lit paper-cream window. No contents on the tray, no words or digits.\nRow 2 col 2: One isolated simple yellow wooden push cart with exactly two pine-green wheels, clear right-facing side profile and low shallow empty tray. A tiny warm cream accent. Center it and keep the whole cart fully visible.\nRow 2 col 3: The same right-facing yellow wooden push cart in a second animation pose, very slightly tipped forward with the same two dark pine wheels and tray; tiny muted dust puff stays beside wheels, whole silhouette intact.\nRow 3 col 1: One small leaf-shaped craft achievement badge with warm cream trim, muted green and light apricot, clean silhouette, no lettering.\nRow 3 col 2: One single open picture book, seen nearly straight overhead, dark pine cover and pale cream blank pages, broad clean horizontal book, perfectly legible outside boundary. Keep the right page lower corner flat, empty, and pale so a page number can be overlaid later. Do not print a page number, text, or illustration.\nRow 3 col 3: One single orange-and-warm-cream paper rosette sticker achievement, little folded ribbons below, no lettering or number.",
+    "promptSha256": "5c61dd417dfb9f9c2f0b3c10b44431d28e23412ead7c4c8108f0d392a7664449",
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "requestedTransparent": true,
+    "assets": [
+      "cover-stickers",
+      "fall-backdrop",
+      "depot-backdrop",
+      "family-stickers",
+      "cart-ready",
+      "cart-push",
+      "leaf-award",
+      "book-page-100",
+      "rosette-award"
+    ],
+    "recordedAt": "2026-11-11T03:44:08.889542+08:00",
+    "officialReferencesAttached": false,
+    "receipts": "asset-sources.json"
+  }
+}

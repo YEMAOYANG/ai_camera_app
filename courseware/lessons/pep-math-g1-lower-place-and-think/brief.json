@@ -1,0 +1,205 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "摆一摆，想一想",
+  "binding": {
+    "editionId": "pep-math-g1-lower-2022-standard",
+    "revisionId": "directory-6205d2037284e91f10b25edd",
+    "unitId": "acfb0386-a55f-4542-9d5d-619a3e2d9023",
+    "nodeId": "a4be94a0-e10f-465f-bcd7-a2cbe1feeb5e"
+  },
+  "authoredBy": "Codex /root/how_old",
+  "officialNotesSha256": "6609732c0aeefc85f4a02baddfdc2386371a4c9ee2bdf980a8b16530dcb2d556",
+  "scenario": "修补灯牌的两槽工坊。相同纸圆片放进个位或十位的槽里，登记号码，挪动一片检查下一张，再按圆片实际用量把牌送回材料盒。",
+  "goals": [
+    "能把相同圆片放在个位或十位并说出意义，按两格的数量读出组成的数。",
+    "能固定使用全部圆片，从一端开始，每次只挪一片并记录，按顺序不漏不重复地摆出所有不同的数。",
+    "能用实际摆法解释1到9枚的数量规律，预测9枚能摆10个数，并用左下斜排或端点验证。",
+    "能用十位和个位的圆片数相加反推总片数，识别记录中缺少的合法摆法或用了错误片数的数。",
+    "能用每位最多九片解释10枚时的两个无效端点，找出合法范围和9种摆法，不把小范围规律套到10枚。"
+  ],
+  "goalSources": [
+    {
+      "skill": "place-mat",
+      "target": "能把相同圆片放在个位或十位并说出意义，按两格的数量读出组成的数。",
+      "source": "印38、课件2～8"
+    },
+    {
+      "skill": "enumerate-order",
+      "target": "能固定使用全部圆片，从一端开始，每次只挪一片并记录，按顺序不漏不重复地摆出所有不同的数。",
+      "source": "印38、教案2～4"
+    },
+    {
+      "skill": "infer-pattern",
+      "target": "能用实际摆法解释1到9枚的数量规律，预测9枚能摆10个数，并用左下斜排或端点验证。",
+      "source": "印38末段、课件21～25及31"
+    },
+    {
+      "skill": "reverse-count",
+      "target": "能用十位和个位的圆片数相加反推总片数，识别记录中缺少的合法摆法或用了错误片数的数。",
+      "source": "教案5～6、课件26～30"
+    },
+    {
+      "skill": "ten-disc-limit",
+      "target": "能用每位最多九片解释10枚时的两个无效端点，找出合法范围和9种摆法，不把小范围规律套到10枚。",
+      "source": "课件32～36、教案7～8"
+    }
+  ],
+  "pageSequence": [
+    {
+      "key": "same-disc-new-place",
+      "kind": "teaching",
+      "plan": "两槽放同一枚，个位是一，十位是十；左空只写个位，右空写零。"
+    },
+    {
+      "key": "move-one-record-once",
+      "kind": "teaching",
+      "plan": "演示2枚的完整三个摆法，指同一圆片右移或左移，片数保持。"
+    },
+    {
+      "key": "find-the-missing-placement",
+      "kind": "teaching",
+      "plan": "从3枚的缺记录找漏掉的分法，按十位从0到3核对。"
+    },
+    {
+      "key": "one-way-and-back",
+      "kind": "teaching",
+      "plan": "用4枚双向列举，验同一集合、不重不漏，5枚迁移。"
+    },
+    {
+      "key": "follow-the-disc-route",
+      "kind": "game",
+      "plan": "用移动顺序选择实际可达的数位图，一次只走一格对应转移，不采错序卡。"
+    },
+    {
+      "key": "same-count-along-a-diagonal",
+      "kind": "teaching",
+      "plan": "在十位/个位坐标表看六枚的同和斜排，核对5枚和9枚种数。"
+    },
+    {
+      "key": "count-discs-not-the-value",
+      "kind": "teaching",
+      "plan": "用六枚的数列推回总片数，检查错误片数和漏步。"
+    },
+    {
+      "key": "fix-the-six-disc-record",
+      "kind": "teaching",
+      "plan": "在下一页让两种错误和实际修好的七行并列，逐项验证片数与单步。"
+    },
+    {
+      "key": "sort-the-disc-budgets",
+      "kind": "game",
+      "plan": "从数位图数出实物片数，实际推入对应片数材料盒。"
+    },
+    {
+      "key": "ten-discs-have-limits",
+      "kind": "teaching",
+      "plan": "个位与十位都最多9，10枚必须分开，两端排除，九种排列另数。"
+    },
+    {
+      "key": "picture-check",
+      "kind": "quiz",
+      "plan": "全新盘图、顺序步骤、数量猜测、错牌与11枚合法边界图。"
+    },
+    {
+      "key": "make-your-own-disc-board",
+      "kind": "teaching",
+      "plan": "用家中安全纸圆片选择新片数，双向验证并交换猜盘，实际完成待观察。"
+    }
+  ],
+  "games": [
+    {
+      "page": "follow-the-disc-route",
+      "template": "bubbleMaze",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.bubbleMaze",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "ordered_route",
+      "selection": "棋盘实际有该关全部合法摆法图。把空十位、全个位作为已摆起点，只采接下来多一枚十位、少一枚个位的图；错序不消耗或前进。最后通过实际终点。滚动大图保留刚才盘面。",
+      "levels": [
+        "2枚，从2按顺序收11、20，固定片数不变。",
+        "4枚，从4按次序收13、22、31、40。",
+        "5枚反向，从50按次序收41、32、23、14、5。"
+      ],
+      "demo": "指起始圆片槽、下一张真实盘面和方向键，移动一次并成功采一张后复位。",
+      "teacherAnchors": [
+        "game-player",
+        "game-target"
+      ]
+    },
+    {
+      "page": "sort-the-disc-budgets",
+      "template": "sortingDepot",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.sortingDepot",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "classification",
+      "selection": "每箱是实际圆片数位图。以左右片数之和匹配材料盒，数字大小不是匹配依据；落到错误圆片预算拒绝。",
+      "levels": [
+        "不同数牌用3或4枚，比较图和盒。",
+        "用4、5、6枚的三种图，改变站位。",
+        "加入同片数的两种摆法，用相同预算的两箱各接一个。"
+      ],
+      "demo": "指两边圆片图和对应材料盒，真推一个箱到正确盒再复位。",
+      "teacherAnchors": [
+        "game-player",
+        "game-target"
+      ]
+    }
+  ],
+  "quiz": [
+    {
+      "id": "read-a-new-board",
+      "skill": "数位与读数",
+      "prompt": "看两格，摆出的数是哪一个？",
+      "answer": "43",
+      "position": 2
+    },
+    {
+      "id": "move-one-to-the-tens",
+      "skill": "固定总片数挪一片",
+      "prompt": "把个位一枚移到十位。选挪完的图。",
+      "answer": "从35到44",
+      "position": 1
+    },
+    {
+      "id": "predict-seven",
+      "skill": "1～9枚的种数",
+      "prompt": "七枚都用上，一共能摆出几个数？",
+      "answer": "8种",
+      "position": 3
+    },
+    {
+      "id": "remove-a-wrong-card",
+      "skill": "反查片数",
+      "prompt": "只用八枚。哪张记录需要换掉？",
+      "answer": "36",
+      "position": 2
+    },
+    {
+      "id": "pick-a-valid-over-nine-split",
+      "skill": "每个数位至多九枚",
+      "prompt": "十一枚都要用。哪张两格都能摆？",
+      "answer": "9枚十位、2枚个位",
+      "position": 1
+    },
+    {
+      "id": "reverse-count-matching-pair",
+      "skill": "由数字反推两格总片数",
+      "prompt": "五十四和七十二，各用了几枚？",
+      "answer": "两张都9枚",
+      "position": 3
+    }
+  ],
+  "afterClass": {
+    "familyTask": "用安全纸圆片和家人选一个没操作过的固定片数，从两端各摆一遍，交换猜图并核查记录；有余力再试十一枚的上限。",
+    "weeklyQuestionSource": [
+      "数位读数",
+      "定额有序转移",
+      "1～9枚与种数",
+      "反推和排错",
+      "每位最多9"
+    ],
+    "evidence": "课内记录实际选择和分拣，家庭纸笔摆片与口述等待观察。"
+  },
+  "artAndLanguage": "精确画十位、个位、所有圆片位置和数码；使用位置、圆片、动作和口令，遮去非目标文字可玩。正式角色和场景待磁盘恢复。"
+}

@@ -1,0 +1,46 @@
+<div id="game-goal" aria-hidden="true"></div>
+<div id="game-player" aria-hidden="true"></div>
+<div id="game-target" aria-hidden="true"></div>
+
+<template id="dui-opening">
+  <div class="dui-opening dui-opening-catch" role="img" aria-label="看上方的目标图，移动下方的篮子接往下落的图卡">
+    <img class="dui-opening-scene" src="__IMG:catch-scene__" alt="">
+    <div class="dui-opening-goal">
+      <img src="__IMG:tree__" data-fallback="__IMG:dui-backup-tree__" alt="">
+    </div>
+    <div class="dui-opening-fall dui-opening-left">
+      <img src="__IMG:flower__" data-fallback="__IMG:dui-backup-flower__" alt="">
+    </div>
+    <div class="dui-opening-fall dui-opening-right">
+      <img src="__IMG:wind__" data-fallback="__IMG:dui-backup-wind__" alt="">
+    </div>
+    <img class="dui-opening-basket" src="__IMG:catch-basket__" data-fallback="__IMG:dui-backup-catch-basket__" alt="">
+  </div>
+</template>
+
+<script id="mira-narration-cues" type="application/json">{"schemaVersion":"mira.interactive.narration-cues.v1","cues":[{"id":"dui-p06-level1-goal","text":"先看看上面的图。左右挪篮子，接住同一类的图。"},{"id":"dui-p06-level2-goal","text":"这一回有三张图。先找同类，再把篮子移过去。"},{"id":"dui-p06-level3-goal","text":"四张图一起落下啦。认清是哪一类，再去接。"},{"id":"dui-p06-hint2","text":"先说出上面是什么，再想图卡里谁和它同类。"},{"id":"dui-p06-praise","text":"接住啦！你先分了类，才找到它的搭档。"},{"id":"dui-p06-hint","text":"先看它们是哪一类，再配对子。光看颜色容易找错。"}]}</script>
+<script id="mira-pre-recorded-audio">(()=>{
+const clips={"dui-p06-level1-goal":"__AUDIO:dui-p06-level1-goal__","dui-p06-level2-goal":"__AUDIO:dui-p06-level2-goal__","dui-p06-level3-goal":"__AUDIO:dui-p06-level3-goal__","dui-p06-hint2":"__AUDIO:dui-p06-hint2__","dui-p06-praise":"__AUDIO:dui-p06-praise__","dui-p06-hint":"__AUDIO:dui-p06-hint__"};let active=null;
+let activeCue=null,pending=null,waiting=null,waitingAt=0,generation=0,visible=false;
+const state=(cueId,status)=>{document.documentElement.dataset.miraAudioState=status;
+window.dispatchEvent(new CustomEvent('mira-narration-state',{detail:{cueId,status}}));};
+const stop=(status)=>{generation++;pending=null;const previous=active;active=null;activeCue=null;
+if(previous){previous.onended=null;previous.onerror=null;previous.pause();previous.currentTime=0;}
+state(null,status);};
+window.miraCancelNarration=()=>{waiting=null;waitingAt=0;stop('ready');};
+window.addEventListener('message',(event)=>{if(event.source!==parent||event.data?.type!=='MIRA_NARRATION_VISIBILITY')return;
+visible=event.data.visible===true;if(!visible){stop('hidden');return;}
+const cueId=waiting;waiting=null;if(cueId&&Date.now()-waitingAt<=4000)window.miraNarrate(cueId);});
+const next=()=>{const cueId=pending;pending=null;if(cueId)play(cueId);};
+const play=async(cueId)=>{const ticket=generation;
+const clip=new Audio(clips[cueId]);active=clip;activeCue=cueId;const current=()=>generation===ticket&&active===clip;
+clip.onended=()=>{if(current()){active=null;activeCue=null;state(cueId,'ready');next();}};
+clip.onerror=()=>{if(current()){active=null;activeCue=null;state(cueId,'error');next();}};
+try{await clip.play();if(!current()){clip.pause();return false;}state(cueId,'playing');return true;}
+catch(_){if(current()){active=null;activeCue=null;state(cueId,'error');next();}return false;}};
+window.miraNarrate=async(cueId)=>{
+if(!Object.prototype.hasOwnProperty.call(clips,cueId)){state(cueId,'missing');return false;}
+if(!visible){waiting=cueId;waitingAt=Date.now();state(cueId,'hidden');return false;}
+if(active&&activeCue!==cueId){pending=cueId;state(cueId,'queued');return true;}
+stop('ready');return play(cueId);};
+state(null,'ready');})();</script>

@@ -1,0 +1,32 @@
+<div id="game-goal" class="g-anchor"></div>
+<div id="game-player" class="g-anchor"></div>
+<div id="game-target" class="g-anchor"></div>
+
+<script id="mira-narration-cues" type="application/json">{"schemaVersion":"mira.interactive.narration-cues.v1","cues":[{"id":"prep-g02-goal","text":"等上课铃响，再沿着走道走进有课桌的门。可以按住走道，也可以按箭头。"},{"id":"prep-g02-challenge","text":"挑战关。铃声会晚一点来。听到铃，再走向有课桌的门。"},{"id":"prep-g02-hint","text":"先看看上面的铃，还没响就等一等。"},{"id":"prep-g02-hint2","text":"松开手，听到上课铃，再按住走向有课桌的门。"},{"id":"prep-g02-praise","text":"到教室啦！坐好，准备上课。"},{"id":"prep-g02-door-hint","text":"铃已经响了。看看两边，哪扇门里有课桌？"},{"id":"prep-g02-door-hint2","text":"找到有课桌的那扇门，按住那边的走道，走进教室。"}]}</script>
+<script id="mira-pre-recorded-audio">(()=>{
+const clips={"prep-g02-goal":"__AUDIO:prep-g02-goal__","prep-g02-challenge":"__AUDIO:prep-g02-challenge__","prep-g02-hint":"__AUDIO:prep-g02-hint__","prep-g02-hint2":"__AUDIO:prep-g02-hint2__","prep-g02-praise":"__AUDIO:prep-g02-praise__","prep-g02-door-hint":"__AUDIO:prep-g02-door-hint__","prep-g02-door-hint2":"__AUDIO:prep-g02-door-hint2__"};let active=null;
+let activeCue=null,pending=null,waiting=null,waitingAt=0,generation=0,visible=false;
+const state=(cueId,status)=>{document.documentElement.dataset.miraAudioState=status;
+window.dispatchEvent(new CustomEvent('mira-narration-state',{detail:{cueId,status}}));};
+const stop=(status)=>{generation++;pending=null;const previous=active;active=null;activeCue=null;
+if(previous){previous.onended=null;previous.onerror=null;previous.pause();previous.currentTime=0;}
+state(null,status);};
+window.miraCancelNarration=()=>{waiting=null;waitingAt=0;stop('ready');};
+window.addEventListener('message',(event)=>{if(event.source!==parent||event.data?.type!=='MIRA_NARRATION_VISIBILITY')return;
+visible=event.data.visible===true;if(!visible){stop('hidden');return;}
+const cueId=waiting;waiting=null;if(cueId&&Date.now()-waitingAt<=4000)window.miraNarrate(cueId);});
+const next=()=>{const cueId=pending;pending=null;if(cueId)play(cueId);};
+const play=async(cueId)=>{const ticket=generation;
+const clip=new Audio(clips[cueId]);active=clip;activeCue=cueId;const current=()=>generation===ticket&&active===clip;
+clip.onended=()=>{if(current()){active=null;activeCue=null;state(cueId,'ready');next();}};
+clip.onerror=()=>{if(current()){active=null;activeCue=null;state(cueId,'error');next();}};
+try{await clip.play();if(!current()){clip.pause();return false;}state(cueId,'playing');return true;}
+catch(_){if(current()){active=null;activeCue=null;state(cueId,'error');next();}return false;}};
+window.miraNarrate=async(cueId)=>{
+if(!Object.prototype.hasOwnProperty.call(clips,cueId)){state(cueId,'missing');return false;}
+if(!visible){waiting=cueId;waitingAt=Date.now();state(cueId,'hidden');return false;}
+if(active&&activeCue!==cueId){pending=cueId;state(cueId,'queued');return true;}
+stop('ready');return play(cueId);};
+state(null,'ready');})();</script>
+
+<script id="prep-picture-fallbacks" type="application/json">{"walk-class":{"width":1448,"height":1086,"src":"__IMG:prep-backup-walk-class__"},"keep-play":{"width":1448,"height":1086,"src":"__IMG:prep-backup-keep-play__"},"class-ready":{"width":1672,"height":941,"src":"__IMG:prep-backup-class-ready__"},"school-bell":{"width":1254,"height":1254,"src":"__IMG:prep-backup-school-bell__"}}</script>

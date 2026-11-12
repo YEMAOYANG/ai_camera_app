@@ -1,0 +1,1174 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "比大小",
+  "grade": 1,
+  "description": "用整排木章、计数器和数线解释大小，从左到右比较并验证分类、排序和缺位。",
+  "roster": {
+    "teacher": {
+      "name": "小数老师",
+      "role": "teacher",
+      "gender": "male",
+      "voice": "Ethan",
+      "avatar": "/avatars/teacher-1.png",
+      "color": "#286956",
+      "persona": "先请孩子指出整十和散枚，再从左到右说明关系。"
+    }
+  },
+  "images": {
+    "abacus-51-47": {
+      "file": "assets/abacus-51-47.png"
+    },
+    "abacus-59-60": {
+      "file": "assets/abacus-59-60.png"
+    },
+    "abacus-71-75": {
+      "file": "assets/abacus-71-75.png"
+    },
+    "between-10-and-14": {
+      "file": "assets/between-10-and-14.png"
+    },
+    "boundary-97-100": {
+      "file": "assets/boundary-97-100.png"
+    },
+    "crate-21-12": {
+      "file": "assets/crate-21-12.png"
+    },
+    "crate-32-45": {
+      "file": "assets/crate-32-45.png"
+    },
+    "crate-38-43": {
+      "file": "assets/crate-38-43.png"
+    },
+    "crate-55-56": {
+      "file": "assets/crate-55-56.png"
+    },
+    "crate-66-66": {
+      "file": "assets/crate-66-66.png"
+    },
+    "crate-70-68": {
+      "file": "assets/crate-70-68.png"
+    },
+    "crate-84-84": {
+      "file": "assets/crate-84-84.png"
+    },
+    "crate-89-93": {
+      "file": "assets/crate-89-93.png"
+    },
+    "crate-98-92": {
+      "file": "assets/crate-98-92.png"
+    },
+    "depot-proof-21-12": {
+      "file": "assets/depot-proof-21-12.png"
+    },
+    "depot-proof-32-45": {
+      "file": "assets/depot-proof-32-45.png"
+    },
+    "depot-proof-38-43": {
+      "file": "assets/depot-proof-38-43.png"
+    },
+    "depot-proof-55-56": {
+      "file": "assets/depot-proof-55-56.png"
+    },
+    "depot-proof-66-66": {
+      "file": "assets/depot-proof-66-66.png"
+    },
+    "depot-proof-70-68": {
+      "file": "assets/depot-proof-70-68.png"
+    },
+    "depot-proof-84-84": {
+      "file": "assets/depot-proof-84-84.png"
+    },
+    "depot-proof-89-93": {
+      "file": "assets/depot-proof-89-93.png"
+    },
+    "depot-proof-98-92": {
+      "file": "assets/depot-proof-98-92.png"
+    },
+    "depot-ready": {
+      "file": "assets/depot-ready.png"
+    },
+    "depot-view-21-12": {
+      "file": "assets/depot-view-21-12.png"
+    },
+    "depot-view-32-45": {
+      "file": "assets/depot-view-32-45.png"
+    },
+    "depot-view-38-43": {
+      "file": "assets/depot-view-38-43.png"
+    },
+    "depot-view-55-56": {
+      "file": "assets/depot-view-55-56.png"
+    },
+    "depot-view-66-66": {
+      "file": "assets/depot-view-66-66.png"
+    },
+    "depot-view-70-68": {
+      "file": "assets/depot-view-70-68.png"
+    },
+    "depot-view-84-84": {
+      "file": "assets/depot-view-84-84.png"
+    },
+    "depot-view-89-93": {
+      "file": "assets/depot-view-89-93.png"
+    },
+    "depot-view-98-92": {
+      "file": "assets/depot-view-98-92.png"
+    },
+    "empty-token": {
+      "file": "assets/empty-token.png"
+    },
+    "equal-64-64": {
+      "file": "assets/equal-64-64.png"
+    },
+    "family-card-gap": {
+      "file": "assets/family-card-gap.png"
+    },
+    "grouped-51-47": {
+      "file": "assets/grouped-51-47.png"
+    },
+    "grouped-71-75": {
+      "file": "assets/grouped-71-75.png"
+    },
+    "number-line-59-60": {
+      "file": "assets/number-line-59-60.png"
+    },
+    "one-vs-two-8-15": {
+      "file": "assets/one-vs-two-8-15.png"
+    },
+    "open-tens-choice": {
+      "file": "assets/open-tens-choice.png"
+    },
+    "opening-26-12": {
+      "file": "assets/opening-26-12.png"
+    },
+    "opening-51-47": {
+      "file": "assets/opening-51-47.png"
+    },
+    "ordered-69-65-27": {
+      "file": "assets/ordered-69-65-27.png"
+    },
+    "q-digit-1": {
+      "file": "assets/q-digit-1.png"
+    },
+    "q-digit-3": {
+      "file": "assets/q-digit-3.png"
+    },
+    "q-digit-9": {
+      "file": "assets/q-digit-9.png"
+    },
+    "q-direction-stem": {
+      "file": "assets/q-direction-stem.png"
+    },
+    "q-equal-stem": {
+      "file": "assets/q-equal-stem.png"
+    },
+    "q-magnet-stem": {
+      "file": "assets/q-magnet-stem.png"
+    },
+    "q-magnets-a": {
+      "file": "assets/q-magnets-a.png"
+    },
+    "q-magnets-b": {
+      "file": "assets/q-magnets-b.png"
+    },
+    "q-ones-stem": {
+      "file": "assets/q-ones-stem.png"
+    },
+    "q-order-a": {
+      "file": "assets/q-order-a.png"
+    },
+    "q-order-b": {
+      "file": "assets/q-order-b.png"
+    },
+    "q-order-c": {
+      "file": "assets/q-order-c.png"
+    },
+    "q-order-stem": {
+      "file": "assets/q-order-stem.png"
+    },
+    "q-stamp-stem": {
+      "file": "assets/q-stamp-stem.png"
+    },
+    "q-stamps-a": {
+      "file": "assets/q-stamps-a.png"
+    },
+    "q-stamps-b": {
+      "file": "assets/q-stamps-b.png"
+    },
+    "range-10-14": {
+      "file": "assets/range-10-14.png"
+    },
+    "reverse-75-71": {
+      "file": "assets/reverse-75-71.png"
+    },
+    "sign-eq": {
+      "file": "assets/sign-eq.png"
+    },
+    "sign-gt": {
+      "file": "assets/sign-gt.png"
+    },
+    "sign-lt": {
+      "file": "assets/sign-lt.png"
+    },
+    "snake-39": {
+      "file": "assets/snake-39.png"
+    },
+    "snake-46": {
+      "file": "assets/snake-46.png"
+    },
+    "snake-54": {
+      "file": "assets/snake-54.png"
+    },
+    "snake-56": {
+      "file": "assets/snake-56.png"
+    },
+    "snake-58": {
+      "file": "assets/snake-58.png"
+    },
+    "snake-62": {
+      "file": "assets/snake-62.png"
+    },
+    "snake-69": {
+      "file": "assets/snake-69.png"
+    },
+    "snake-70": {
+      "file": "assets/snake-70.png"
+    },
+    "snake-73": {
+      "file": "assets/snake-73.png"
+    },
+    "snake-74": {
+      "file": "assets/snake-74.png"
+    },
+    "snake-76": {
+      "file": "assets/snake-76.png"
+    },
+    "snake-79": {
+      "file": "assets/snake-79.png"
+    },
+    "snake-81": {
+      "file": "assets/snake-81.png"
+    },
+    "snake-proof-1-1": {
+      "file": "assets/snake-proof-1-1.png"
+    },
+    "snake-proof-2-1": {
+      "file": "assets/snake-proof-2-1.png"
+    },
+    "snake-proof-2-2": {
+      "file": "assets/snake-proof-2-2.png"
+    },
+    "snake-proof-3-1": {
+      "file": "assets/snake-proof-3-1.png"
+    },
+    "snake-proof-3-2": {
+      "file": "assets/snake-proof-3-2.png"
+    },
+    "snake-proof-3-3": {
+      "file": "assets/snake-proof-3-3.png"
+    },
+    "snake-ready": {
+      "file": "assets/snake-ready.png"
+    },
+    "swap-82-28": {
+      "file": "assets/swap-82-28.png"
+    },
+    "try-tens-digits": {
+      "file": "assets/try-tens-digits.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "open-the-stamp-workshop",
+      "type": "slide",
+      "title": "工坊的两盘木章，哪盘多",
+      "template": "two-columns",
+      "data": {
+        "title": "工坊的两盘木章，哪盘多",
+        "left": {
+          "heading": "先看一眼",
+          "body": "左盘和右盘，一排都是十枚。"
+        },
+        "left_picture": "opening-26-12",
+        "right": {
+          "heading": "两盘很接近",
+          "body": "按十个一排放齐，再找剩下的。"
+        },
+        "right_picture": "opening-51-47"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "展览工坊要把小木章装盘。哪盘更多呢？"
+        },
+        {
+          "say": "十枚放成一排。先看左盘的两排和右盘的一排。"
+        },
+        {
+          "say": "再瞧散着的。左边也多，一眼就能看出来。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "现在换两盘。左边整排多，右边散着的多。"
+        },
+        {
+          "say": "你觉得哪盘木章更多？先找一条能说清的理由。"
+        },
+        {
+          "say": "我们把两边相同的整排对齐，再比较。"
+        }
+      ]
+    },
+    {
+      "key": "compare-the-full-rows",
+      "type": "slide",
+      "title": "先比十位上的整排",
+      "template": "two-columns",
+      "data": {
+        "title": "先比十位上的整排",
+        "left": {
+          "heading": "对齐相同的四排",
+          "body": "左边还多一整排。"
+        },
+        "left_picture": "grouped-51-47",
+        "right": {
+          "heading": "用计数器再看一次",
+          "body": "五个十大于四个十。"
+        },
+        "right_picture": "abacus-51-47"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "左盘五排加一枚，是五十一。右盘是四十七。"
+        },
+        {
+          "say": "两边先配齐四排。左盘还多一整排。"
+        },
+        {
+          "say": "右盘散着七枚，还凑不满一排十枚。"
+        },
+        {
+          "say": "只看散枚会猜错。左边多的整排已经超过七枚。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "在计数器上，十位一颗珠代表十枚。"
+        },
+        {
+          "say": "左边十位五珠，右边四珠，先比较这两根杆。"
+        },
+        {
+          "say": "五个十比四个十多。五十一大于四十七。"
+        }
+      ]
+    },
+    {
+      "key": "compare-the-spare-stamps",
+      "type": "slide",
+      "title": "十位一样，再比个位",
+      "template": "two-columns",
+      "data": {
+        "title": "十位一样，再比个位",
+        "left": {
+          "heading": "两边都七排",
+          "body": "七十一和七十五都有七个十。"
+        },
+        "left_picture": "grouped-71-75",
+        "right": {
+          "heading": "看个位的珠",
+          "body": "一颗和五颗，右边多。"
+        },
+        "right_picture": "abacus-71-75"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "来看七十一和七十五。两盘都摆了七整排。"
+        },
+        {
+          "say": "十位相同。把七整排一排一排对好。"
+        },
+        {
+          "say": "左盘剩一枚，右盘剩五枚。只要比这些散枚。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "个位一颗珠只表示一枚。"
+        },
+        {
+          "say": "左盘个位一，右盘个位五。七十一小于七十五。"
+        },
+        {
+          "say": "十位相同才继续比个位。请你指给我看。"
+        }
+      ]
+    },
+    {
+      "key": "turn-the-open-mouth",
+      "type": "slide",
+      "title": "换一边，开口也跟着转",
+      "template": "two-columns",
+      "data": {
+        "title": "换一边，开口也跟着转",
+        "left": {
+          "heading": "让两个数交换位置",
+          "body": "75大于71，开口向左。"
+        },
+        "left_picture": "reverse-75-71",
+        "right": {
+          "heading": "两边一样多",
+          "body": "64等于64。"
+        },
+        "right_picture": "equal-64-64"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "刚才七十一在左，所以读七十一小于七十五。"
+        },
+        {
+          "say": "把这两个数换一边。现在从左读，七十五大于七十一。"
+        },
+        {
+          "say": "两个符号的开口都朝较大的数。尖端朝较小的数。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "这两盘都六整排、四枚散章。各处都相同。"
+        },
+        {
+          "say": "左边六十四，右边也是六十四。中间放等号。"
+        },
+        {
+          "say": "等号是两条一样长的横线。读六十四等于六十四。"
+        }
+      ]
+    },
+    {
+      "key": "one-digit-and-one-hundred",
+      "type": "slide",
+      "title": "一位数和一百，怎样比",
+      "template": "two-columns",
+      "data": {
+        "title": "一位数和一百，怎样比",
+        "left": {
+          "heading": "一排十已经超过八",
+          "body": "8小于15。"
+        },
+        "left_picture": "one-vs-two-8-15",
+        "right": {
+          "heading": "一百有一个百",
+          "body": "97小于100。"
+        },
+        "right_picture": "boundary-97-100"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "左边只有八枚。右边有一整排，再加五枚。"
+        },
+        {
+          "say": "一整排就有十枚，已经比八枚多。八小于十五。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "九十七的百位没有珠，一百的百位有一珠。"
+        },
+        {
+          "say": "百位的一颗珠，代表一个百。比九十七多。"
+        },
+        {
+          "say": "所以九十七小于一百。这次先看的位置更高。"
+        },
+        {
+          "say": "现在去开小蛇。先听规则，再选合适的数。"
+        },
+        {
+          "say": "找一个大于四十六的数。"
+        },
+        {
+          "say": "找一个小于六十二的数。"
+        },
+        {
+          "say": "基准变成五十八。找一个等于它的数。"
+        },
+        {
+          "say": "找一个大于七十六的数。"
+        },
+        {
+          "say": "基准变成七十九。找一个小于它的数。"
+        },
+        {
+          "say": "基准变成七十三。找一个等于它的数。"
+        },
+        {
+          "say": "先看空格和右边的基准号。"
+        },
+        {
+          "say": "十位相同才比个位。再读一读中间的符号。"
+        },
+        {
+          "say": "数牌和比较规则对上了。"
+        }
+      ]
+    },
+    {
+      "key": "drive-the-compare-snake",
+      "type": "interactive",
+      "title": "数牌小蛇",
+      "widgetType": "courseware_game",
+      "page": "drive-the-compare-snake",
+      "startImage": "snake-ready",
+      "script": [
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#snake-rule-strip"
+        },
+        {
+          "say": "空格在左，右边的基准是四十六。要找更大的数。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "小蛇停在下面，按箭头才开始走。"
+        },
+        {
+          "highlight": "#game-target"
+        },
+        {
+          "say": "五十四大于四十六。老师先向右，再向上。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "highlight": "#snake-match-proof"
+        },
+        {
+          "say": "真的吃到了五十四。右边留下比较式和新基准。"
+        },
+        {
+          "say": "交给你。先听读法，再开小蛇去找自己的数牌。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "snake-46-gt": "one-digit-and-one-hundred-8",
+        "snake-62-lt": "one-digit-and-one-hundred-9",
+        "snake-58-eq": "one-digit-and-one-hundred-10",
+        "snake-76-gt": "one-digit-and-one-hundred-11",
+        "snake-79-lt": "one-digit-and-one-hundred-12",
+        "snake-73-eq": "one-digit-and-one-hundred-13",
+        "snake-hint": "one-digit-and-one-hundred-14",
+        "snake-help": "one-digit-and-one-hundred-15",
+        "snake-praise": "one-digit-and-one-hundred-16"
+      }
+    },
+    {
+      "key": "check-on-the-number-line",
+      "type": "slide",
+      "title": "还能在数线上验证",
+      "template": "two-columns",
+      "data": {
+        "title": "还能在数线上验证",
+        "left": {
+          "heading": "相邻的两张号码",
+          "body": "59在60左边，60更大。"
+        },
+        "left_picture": "number-line-59-60",
+        "right": {
+          "heading": "回到计数器",
+          "body": "59的个位多，60的十位多。"
+        },
+        "right_picture": "abacus-59-60"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "数线从左往右越来越大。指着五十九。"
+        },
+        {
+          "say": "数到它后面紧挨着的六十，六十在右边。"
+        },
+        {
+          "say": "从左到右读，五十九小于六十。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "看两根十位杆。五十九有五个十，六十有六个十。"
+        },
+        {
+          "say": "五十九虽然有九个散枚，还是凑不满一个十。"
+        },
+        {
+          "say": "数线和计数器都说明，五十九小于六十。"
+        }
+      ]
+    },
+    {
+      "key": "keep-symbol-order",
+      "type": "slide",
+      "title": "数字换位置，也要重新比",
+      "template": "two-columns",
+      "data": {
+        "title": "数字换位置，也要重新比",
+        "left": {
+          "heading": "同样的八和二",
+          "body": "82的十位是8，28的十位是2。"
+        },
+        "left_picture": "swap-82-28",
+        "right": {
+          "heading": "三张数牌从大到小",
+          "body": "69、65、27。"
+        },
+        "right_picture": "ordered-69-65-27"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "八十二和二十八都用了八和二。看它们在哪一位。"
+        },
+        {
+          "say": "八十二有八个十，二十八只有两个十。"
+        },
+        {
+          "say": "所以八十二大于二十八。相同的数字换位置会改数量。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "有三张牌。两个六十几都比二十七大。"
+        },
+        {
+          "say": "六十九和六十五的十位一样。九大于五。"
+        },
+        {
+          "say": "从大到小摆，是六十九、六十五、二十七。"
+        },
+        {
+          "say": "下一站，固定读左边和右边，再选符号。"
+        },
+        {
+          "say": "先读左边和右边，再选符号柜。"
+        },
+        {
+          "say": "两盘一样多时，中间放等号。"
+        },
+        {
+          "say": "看清每一对的左右顺序，再推到对应的柜。"
+        },
+        {
+          "say": "把左边和右边的数重新读一遍。"
+        },
+        {
+          "say": "先比十位，十位相同再看看个位。"
+        },
+        {
+          "say": "每一对都到了正确的符号柜。"
+        }
+      ]
+    },
+    {
+      "key": "push-pairs-to-sign-docks",
+      "type": "interactive",
+      "title": "把双数牌推到符号柜",
+      "widgetType": "courseware_game",
+      "page": "push-pairs-to-sign-docks",
+      "startImage": "depot-ready",
+      "script": [
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#depot-current-pair"
+        },
+        {
+          "say": "左盘三十二，右盘四十五。两边的顺序要留住。"
+        },
+        {
+          "highlight": "#game-target"
+        },
+        {
+          "say": "牌上三十二在左，比右边的四十五小。"
+        },
+        {
+          "highlight": "#depot-first-less"
+        },
+        {
+          "say": "小于号开口朝右边较大的数。找到小于号柜。"
+        },
+        {
+          "highlight": "#push-toward-dock"
+        },
+        {
+          "say": "绕到牌的另一侧，朝小于号柜推，只送这一件。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "highlight": "#depot-result-sign"
+        },
+        {
+          "say": "牌进了柜，右边显示三十二小于四十五。"
+        },
+        {
+          "say": "轮到你。遇到相等的一对，就去等号柜。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "depot-two": "keep-symbol-order-9",
+        "depot-three": "keep-symbol-order-10",
+        "depot-four": "keep-symbol-order-11",
+        "depot-hint": "keep-symbol-order-12",
+        "depot-help": "keep-symbol-order-13",
+        "depot-praise": "keep-symbol-order-14"
+      }
+    },
+    {
+      "key": "choose-a-digit-that-works",
+      "type": "slide",
+      "title": "空着的一位可以填什么",
+      "template": "two-columns",
+      "data": {
+        "title": "空着的一位可以填什么",
+        "left": {
+          "heading": "左边十位空着",
+          "body": "□4要大于34。"
+        },
+        "left_picture": "open-tens-choice",
+        "right": {
+          "heading": "试几张再决定",
+          "body": "看24、34、44能不能通过。"
+        },
+        "right_picture": "try-tens-digits"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "左边是几十几，个位已经写了四。十位空着。"
+        },
+        {
+          "say": "要让左边大于三十四。我们先试两张牌。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "填二，得二十四，比三十四小。填三就相等。"
+        },
+        {
+          "say": "填四，得四十四。左边大，关系成立。"
+        },
+        {
+          "say": "填五到九也成立，因为这些十位都比三大。"
+        },
+        {
+          "say": "如果只问最小能填几，选四。要先听清题目。"
+        }
+      ]
+    },
+    {
+      "key": "choose-between-two-numbers",
+      "type": "slide",
+      "title": "两个条件要同时满足",
+      "template": "two-columns",
+      "data": {
+        "title": "两个条件要同时满足",
+        "left": {
+          "heading": "空格在10和14之间",
+          "body": "要比10大，也要比14小。"
+        },
+        "left_picture": "range-10-14",
+        "right": {
+          "heading": "到数线上找",
+          "body": "11、12、13都符合。"
+        },
+        "right_picture": "between-10-and-14"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "展柜只收两条条件都符合的号码。"
+        },
+        {
+          "say": "要比十大，还要比十四小。先读左边的条件。"
+        },
+        {
+          "say": "再读右边。选的数要比十四小。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "沿数线找十一、十二、十三，都在十和十四之间。"
+        },
+        {
+          "say": "十跟十相等，十四跟十四相等。两头不能选。"
+        },
+        {
+          "say": "从中选一张，再分别说它怎样符合两条条件。"
+        }
+      ]
+    },
+    {
+      "key": "picture-quiz",
+      "type": "quiz",
+      "title": "看图比较大小",
+      "intro": [
+        "先听清楚要比较哪两份。",
+        "从左往右读，再选一张图。"
+      ],
+      "questions": [
+        {
+          "id": "count-the-stamp-trays",
+          "question": "每排十枚木章。哪盘总数更多？",
+          "skill": "十位优先",
+          "visual": {
+            "kind": "asset",
+            "image": "q-stamp-stem",
+            "alt": "左边五排加七枚，右边六排加一枚"
+          },
+          "answer": [
+            "b"
+          ],
+          "analysis": "六排比五排多一整排。十枚已经超过七枚。六十一大于五十七，右盘多。",
+          "options": {
+            "a": {
+              "label": "左盘五排加七枚",
+              "visual": {
+                "kind": "asset",
+                "image": "q-stamps-a",
+                "alt": "左盘五排加七枚"
+              }
+            },
+            "b": {
+              "label": "右盘六排加一枚",
+              "visual": {
+                "kind": "asset",
+                "image": "q-stamps-b",
+                "alt": "右盘六排加一枚"
+              }
+            },
+            "c": {
+              "label": "两盘一样多",
+              "visual": {
+                "kind": "asset",
+                "image": "sign-eq",
+                "alt": "两盘一样多"
+              }
+            }
+          }
+        },
+        {
+          "id": "check-two-trays",
+          "question": "两盘都有三整排。哪盘磁扣多？",
+          "skill": "同十位看个位",
+          "visual": {
+            "kind": "asset",
+            "image": "q-magnet-stem",
+            "alt": "左三排另七枚，右三排没有散枚"
+          },
+          "answer": [
+            "a"
+          ],
+          "analysis": "两个三十相同，再比散扣。左盘多七枚，所以三十七大于三十。",
+          "options": {
+            "a": {
+              "label": "左盘有七枚散扣",
+              "visual": {
+                "kind": "asset",
+                "image": "q-magnets-a",
+                "alt": "左盘有七枚散扣"
+              }
+            },
+            "b": {
+              "label": "右盘没有散扣",
+              "visual": {
+                "kind": "asset",
+                "image": "q-magnets-b",
+                "alt": "右盘没有散扣"
+              }
+            },
+            "c": {
+              "label": "两盘一样多",
+              "visual": {
+                "kind": "asset",
+                "image": "sign-eq",
+                "alt": "两盘一样多"
+              }
+            }
+          }
+        },
+        {
+          "id": "balance-ticket-sign",
+          "question": "两盘圆片，选中间的符号。",
+          "skill": "数量相等",
+          "visual": {
+            "kind": "asset",
+            "image": "q-equal-stem",
+            "alt": "左右各两排十枚和六枚散片"
+          },
+          "answer": [
+            "c"
+          ],
+          "analysis": "两边各有两整排和六枚散片，都是二十六。两边相等，选等号。",
+          "options": {
+            "a": {
+              "label": "大于号",
+              "visual": {
+                "kind": "asset",
+                "image": "sign-gt",
+                "alt": "大于号"
+              }
+            },
+            "b": {
+              "label": "小于号",
+              "visual": {
+                "kind": "asset",
+                "image": "sign-lt",
+                "alt": "小于号"
+              }
+            },
+            "c": {
+              "label": "等号",
+              "visual": {
+                "kind": "asset",
+                "image": "sign-eq",
+                "alt": "等号"
+              }
+            }
+          }
+        },
+        {
+          "id": "direction-on-the-platform",
+          "question": "左边十七，右边二十二。选哪个符号？",
+          "skill": "从左到右读符号",
+          "visual": {
+            "kind": "asset",
+            "image": "q-direction-stem",
+            "alt": "左边十七，右边二十二，中间空着"
+          },
+          "answer": [
+            "b"
+          ],
+          "analysis": "十七小于二十二。小于号的尖端朝左边较小的十七，开口朝右。",
+          "options": {
+            "a": {
+              "label": "大于号",
+              "visual": {
+                "kind": "asset",
+                "image": "sign-gt",
+                "alt": "大于号"
+              }
+            },
+            "b": {
+              "label": "小于号",
+              "visual": {
+                "kind": "asset",
+                "image": "sign-lt",
+                "alt": "小于号"
+              }
+            },
+            "c": {
+              "label": "等号",
+              "visual": {
+                "kind": "asset",
+                "image": "sign-eq",
+                "alt": "等号"
+              }
+            }
+          }
+        },
+        {
+          "id": "order-three-shelf-tags",
+          "question": "三张货号从大到小，哪张图摆对？",
+          "skill": "三数排序",
+          "visual": {
+            "kind": "asset",
+            "image": "q-order-stem",
+            "alt": "十九、三十六、三十三三张牌"
+          },
+          "answer": [
+            "a"
+          ],
+          "analysis": "三十六和三十三都比十九大。先比这两个三十几的个位，六比三大。",
+          "options": {
+            "a": {
+              "label": "三十六、三十三、十九",
+              "visual": {
+                "kind": "asset",
+                "image": "q-order-a",
+                "alt": "三十六、三十三、十九"
+              }
+            },
+            "b": {
+              "label": "十九、三十三、三十六",
+              "visual": {
+                "kind": "asset",
+                "image": "q-order-b",
+                "alt": "十九、三十三、三十六"
+              }
+            },
+            "c": {
+              "label": "三十三、三十六、十九",
+              "visual": {
+                "kind": "asset",
+                "image": "q-order-c",
+                "alt": "三十三、三十六、十九"
+              }
+            }
+          }
+        },
+        {
+          "id": "test-a-missing-ones-place",
+          "question": "八十六小于八十几，个位选哪张？",
+          "skill": "验证填位条件",
+          "visual": {
+            "kind": "asset",
+            "image": "q-ones-stem",
+            "alt": "左八十六，右边十位八，个位空着，中间小于号"
+          },
+          "answer": [
+            "c"
+          ],
+          "analysis": "两边都是八个十。右边个位要大于六，选九。一和三都比六小。",
+          "options": {
+            "a": {
+              "label": "数字一",
+              "visual": {
+                "kind": "asset",
+                "image": "q-digit-1",
+                "alt": "数字一"
+              }
+            },
+            "b": {
+              "label": "数字三",
+              "visual": {
+                "kind": "asset",
+                "image": "q-digit-3",
+                "alt": "数字三"
+              }
+            },
+            "c": {
+              "label": "数字九",
+              "visual": {
+                "kind": "asset",
+                "image": "q-digit-9",
+                "alt": "数字九"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "say-how-you-know",
+      "type": "slide",
+      "title": "把你的比较办法说给家人",
+      "template": "two-columns",
+      "data": {
+        "title": "把你的比较办法说给家人",
+        "left": {
+          "heading": "回到两盘木章",
+          "body": "先看整排，整排相同再看散枚。"
+        },
+        "left_picture": "opening-51-47",
+        "right": {
+          "heading": "自己做一张数牌",
+          "body": "换一换两张数牌，再说关系。"
+        },
+        "right_picture": "family-card-gap"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "回到工坊。你会先看整排，还是先看散着的？"
+        },
+        {
+          "say": "先比十位。十位一样，再比个位。两位都相同就相等。"
+        },
+        {
+          "say": "用整排、计数器或数线，你选一种说理由。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "回家用纸写几张数字卡。你和家人各取两张。"
+        },
+        {
+          "say": "各摆一个两位数。先从左到右读，再选中间符号。"
+        },
+        {
+          "say": "把两边交换，再读一次。看看开口转不转。"
+        },
+        {
+          "say": "家人还可以改一张数字卡。你再说明谁大。"
+        }
+      ]
+    }
+  ]
+}

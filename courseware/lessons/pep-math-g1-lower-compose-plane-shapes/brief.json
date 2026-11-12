@@ -1,0 +1,199 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "图形的拼组",
+  "binding": {
+    "editionId": "pep-math-g1-lower-2022-standard",
+    "revisionId": "directory-6205d2037284e91f10b25edd",
+    "unitId": "00dd71f6-4bed-412c-951d-dc049bd461b4",
+    "nodeId": "43c58aab-3f26-4ee6-b49d-29086a5ff85f"
+  },
+  "scenario": "纸花房的马赛克缺了几块。孩子用同一盒纸片试不同拼法，修好带直角的空位，再给斜边拼图找刚好能补齐的纸片。",
+  "goals": [
+    "从两块相同的正方形、长方形或三角形开始，先观察边，按相同边的长度试着对齐，辨认拼出的外轮廓。",
+    "能改变同一组图形的摆法，从两块过渡到四块或更多，说清哪些边相接、外轮廓怎样变化。",
+    "能预测正方形纸沿相对边的中点连线或沿对角线分开后的图形，并通过重合、复原核对。",
+    "能按目标轮廓反找合适的部分，用简单图样表达原创拼图的拼接办法。"
+  ],
+  "pageSequence": [
+    {
+      "key": "workbench",
+      "kind": "teaching",
+      "plan": "两块相同纸片先找同样长的边。对照碰一个角、重叠和边完全贴合，沿外沿验证两块小方片拼成一个长方形。"
+    },
+    {
+      "key": "rectangle-pairs",
+      "kind": "teaching",
+      "plan": "两组尺寸不同的长方形分别沿长边、短边试拼。用等宽方格说明为什么其中一组能成正方形。"
+    },
+    {
+      "key": "replace-the-tile",
+      "kind": "interactive",
+      "plan": "拼桥中左右移和旋转下落块，补齐由方格组成的桥面空位。计分须完整覆盖，不让孩子凭颜色猜。"
+    },
+    {
+      "key": "triangle-seams",
+      "kind": "teaching",
+      "plan": "给出同样的两个直角等腰三角形，换对齐边，比较拼成的正方形与大三角形。另用选定的两个三角形旋转对齐成斜平行四边形。逐一指明接缝与外轮廓。"
+    },
+    {
+      "key": "four-pieces",
+      "kind": "teaching",
+      "plan": "把四枚同样方片摆成一排或两排两列，比较块数不变、轮廓改变。再用更多同样纸片设计原创图样。"
+    },
+    {
+      "key": "many-paper-pieces",
+      "kind": "teaching",
+      "plan": "四个同样的三角形拼成大三角形，六张同样方片换成两种排列。"
+    },
+    {
+      "key": "fold-and-check",
+      "kind": "teaching",
+      "plan": "画出横向折线、竖向折线和斜对角线，先猜剪出的部分，再用叠合和拼回去核对。"
+    },
+    {
+      "key": "matching-missing-piece",
+      "kind": "interactive",
+      "plan": "弹珠装入几何零件图，瞄准动态候选缺口。填入无空隙、无重叠的缺口才计分。逐轮显示已补图样作为操作反馈。"
+    },
+    {
+      "key": "picture-check",
+      "kind": "quiz",
+      "plan": "六道新图配音读题，覆盖沿边拼、尺寸、三角形、同片多拼法、剪纸和逆向补形。"
+    },
+    {
+      "key": "make-your-mosaic",
+      "kind": "teaching",
+      "plan": "回顾先看边、再试摆、最后验轮廓。留实体拼贴给家人观察，至少保留一种重新摆法的记录。"
+    }
+  ],
+  "games": [
+    {
+      "page": "replace-the-tile",
+      "template": "shapeBridge",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.shapeBridge",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "shape_compose",
+      "selection": "按模板用方格零件完成桥面。可用横竖条形与方片，复杂关允许拐角空位；此模板不画斜边，三角拼组由另一页讲练。",
+      "levels": [
+        "慢降，横向两格条与两行两列方片。",
+        "把竖条旋转后补横条空位，另做一次保持朝向。",
+        "接连比三个无重叠空位的边长和方向，其中包含拐角。"
+      ],
+      "demo": "教师依次亮横条、横向缺口、转动和落下键，实际只放入一次，然后从初始状态交接。",
+      "teacherAnchors": [
+        "game-player",
+        "bridge-demo-slot",
+        "bridge-spin",
+        "bridge-drop"
+      ]
+    },
+    {
+      "page": "matching-missing-piece",
+      "template": "magnetMarbles",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.magnetMarbles",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "pair_match",
+      "selection": "用 pairs 把几何零件映射到可无缝填满的唯一动态缺口。听口令并看清零件，漂移和瞄准时机真实改变结果。零件轮廓应在小屏也可辨，代码图不要借颜色固定正确答案。",
+      "levels": [
+        "大靶低漂移，区分不同宽度的两个缺口。",
+        "要补方形的一半，区分能填满的对角缺口与另一斜边布局。",
+        "混合三种轮廓和干扰，依次用多个零件补齐独立图样。"
+      ],
+      "demo": "教师亮待发零件、对应缺口、瞄准和发射键，只发射命中一次并展示实拼结果，随后从初始状态交接。",
+      "teacherAnchors": [
+        "marble-piece-view",
+        "marble-demo-gap",
+        "game-player",
+        "marble-launch",
+        "marble-finished-view"
+      ]
+    }
+  ],
+  "quiz": [
+    {
+      "id": "two-squares",
+      "skill": "同边对齐的整图",
+      "prompt": "两块方片一样大。哪幅摆法边贴边，可以拼成一个长方形？",
+      "answer": "两块方片平齐接在一起",
+      "position": 2,
+      "rationale": "两条同样长的整边重合，外边线是长方形；两块只碰角或彼此压住的图不合题意。"
+    },
+    {
+      "id": "which-rectangles",
+      "skill": "长方形拼成方形的条件",
+      "prompt": "哪一对长方形沿着长边贴合会变成正方形？",
+      "answer": "两块两格长、一格宽的长方形",
+      "position": 1,
+      "rationale": "两片贴起来短边长度合到两格，正好与长边两格相等；另两组接后两边长度不同。"
+    },
+    {
+      "id": "two-triangles",
+      "skill": "匹配三角形接缝",
+      "prompt": "左半块有一条斜边。要补成图框里的正方形，拿哪片正好补上？",
+      "answer": "与已有片全等、能转到缺口的直角等腰三角片",
+      "position": 3,
+      "rationale": "按图框比例把斜边重合，外面的四个角都要填满，不能用更小的相似形。"
+    },
+    {
+      "id": "rearrange-four",
+      "skill": "相同四块拼两种外形",
+      "prompt": "刚才四块方片排成一条。要用完同样的四块，哪幅能拼成正方形？",
+      "answer": "两行两列，每行两片",
+      "position": 2,
+      "rationale": "横竖都正好两片长，四块全用，没有叠或漏。"
+    },
+    {
+      "id": "cut-square",
+      "skill": "从整形预测两半",
+      "prompt": "这张正方形纸沿着连接两个相对角的线剪开，得到什么？",
+      "answer": "两块同样的三角形",
+      "position": 3,
+      "rationale": "对角线从一个角连到相对的角，剪下的两片可重合，也能拼回正方形。"
+    },
+    {
+      "id": "complement-curve",
+      "skill": "从完整轮廓反找部件",
+      "prompt": "纸灯罩的轮廓是圆。现在已经有一块半圆，哪块刚好补全？",
+      "answer": "与原有半圆同样大的半圆",
+      "position": 1,
+      "rationale": "将两段同样长的直边对齐，外侧两道弧围成一个圆；较小半圆会留下缺口。"
+    }
+  ],
+  "afterClass": {
+    "familyTask": "请家人预先备好安全纸片，用两块或四块同样纸片先拼两种不同轮廓，再和其他纸片创作一幅图。画下来或说出两段是怎样相接的。",
+    "weeklyQuestionSource": [
+      "同边贴合和整体轮廓",
+      "相同零件换摆法与两块到多块",
+      "正方形分割与复原",
+      "看完整轮廓补部件"
+    ],
+    "evidence": "线上记录图题和拼桥、补形操作，实体剪贴及口头说明由成人观察。"
+  },
+  "artAndLanguage": "几何组件与小题由代码按准确比例绘制，用边界、缝、摆法传意。背景和角色用登记正式素材，口令配音；遮住非目标文字仍能理解玩法。",
+  "goalSources": [
+    {
+      "skill": "align-edges",
+      "target": "从两块相同的正方形、长方形或三角形开始，先观察边，按相同边的长度试着对齐，辨认拼出的外轮廓。",
+      "source": "印3例2、课件5～22"
+    },
+    {
+      "skill": "rearrange-pieces",
+      "target": "能改变同一组图形的摆法，从两块过渡到四块或更多，说清哪些边相接、外轮廓怎样变化。",
+      "source": "印3试一试、课件23～30"
+    },
+    {
+      "skill": "split-and-rebuild",
+      "target": "能预测正方形纸沿相对边的中点连线或沿对角线分开后的图形，并通过重合、复原核对。",
+      "source": "印3做一做1、教案4～5"
+    },
+    {
+      "skill": "choose-components",
+      "target": "能按目标轮廓反找合适的部分，用简单图样表达原创拼图的拼接办法。",
+      "source": "印3做一做2、印7第5题和课后练习"
+    }
+  ],
+  "officialNotesSha256": "35324053307aed486503f553e0ca13307b728b75746293a45cecdb50f5ca6619",
+  "authoredBy": "Codex courseware"
+}

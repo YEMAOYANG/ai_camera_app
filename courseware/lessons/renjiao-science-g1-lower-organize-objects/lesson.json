@@ -1,0 +1,966 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "收纳物品",
+  "grade": 1,
+  "description": "比较袋和格，按物件与使用需要收纳，再用俯侧照片和实际取用验证。",
+  "roster": {
+    "teacher": {
+      "name": "小科老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Serena",
+      "avatar": "/avatars/teacher-2.png",
+      "color": "#287B94",
+      "persona": "像陪孩子看实物，问一个问题，指一个线索，等孩子试。"
+    }
+  },
+  "images": {
+    "box-layout-fit": {
+      "file": "assets/box-layout-fit.png"
+    },
+    "box-layout-outside": {
+      "file": "assets/box-layout-outside.png"
+    },
+    "box-layout-overlap": {
+      "file": "assets/box-layout-overlap.png"
+    },
+    "delivery-album": {
+      "file": "assets/delivery-album.png"
+    },
+    "delivery-bottle": {
+      "file": "assets/delivery-bottle.png"
+    },
+    "delivery-eraser": {
+      "file": "assets/delivery-eraser.png"
+    },
+    "delivery-map": {
+      "file": "assets/delivery-map.png"
+    },
+    "delivery-tape": {
+      "file": "assets/delivery-tape.png"
+    },
+    "desk-sorted": {
+      "file": "assets/desk-sorted.png"
+    },
+    "desk-unfiled": {
+      "file": "assets/desk-unfiled.png"
+    },
+    "home-organize-plan": {
+      "file": "assets/home-organize-plan.png"
+    },
+    "lane-paper-cart": {
+      "file": "assets/lane-paper-cart.png"
+    },
+    "large-open-tote": {
+      "file": "assets/large-open-tote.png"
+    },
+    "lid-fits-both": {
+      "file": "assets/lid-fits-both.png"
+    },
+    "lid-lifted-left": {
+      "file": "assets/lid-lifted-left.png"
+    },
+    "lid-lifted-right": {
+      "file": "assets/lid-lifted-right.png"
+    },
+    "life-storage-choices": {
+      "file": "assets/life-storage-choices.png"
+    },
+    "pocket-delivery-cover": {
+      "file": "assets/pocket-delivery-cover.png"
+    },
+    "pocket-guide": {
+      "file": "assets/pocket-guide.png"
+    },
+    "pocket-main": {
+      "file": "assets/pocket-main.png"
+    },
+    "pocket-road-background": {
+      "file": "assets/pocket-road-background.png"
+    },
+    "pocket-side": {
+      "file": "assets/pocket-side.png"
+    },
+    "pocket-zip": {
+      "file": "assets/pocket-zip.png"
+    },
+    "quiz-big-mesh": {
+      "file": "assets/quiz-big-mesh.png"
+    },
+    "quiz-big-pocket": {
+      "file": "assets/quiz-big-pocket.png"
+    },
+    "quiz-big-zip": {
+      "file": "assets/quiz-big-zip.png"
+    },
+    "quiz-close-only": {
+      "file": "assets/quiz-close-only.png"
+    },
+    "quiz-count-only": {
+      "file": "assets/quiz-count-only.png"
+    },
+    "quiz-retrieve-item": {
+      "file": "assets/quiz-retrieve-item.png"
+    },
+    "quiz-sort-ruler-hidden": {
+      "file": "assets/quiz-sort-ruler-hidden.png"
+    },
+    "quiz-sort-ruler-mixed": {
+      "file": "assets/quiz-sort-ruler-mixed.png"
+    },
+    "quiz-sort-ruler-sorted": {
+      "file": "assets/quiz-sort-ruler-sorted.png"
+    },
+    "quiz-stamp-accessible": {
+      "file": "assets/quiz-stamp-accessible.png"
+    },
+    "quiz-stamp-buried": {
+      "file": "assets/quiz-stamp-buried.png"
+    },
+    "quiz-stamp-under-stack": {
+      "file": "assets/quiz-stamp-under-stack.png"
+    },
+    "split-schoolbag": {
+      "file": "assets/split-schoolbag.png"
+    },
+    "storage-badge": {
+      "file": "assets/storage-badge.png"
+    },
+    "storage-camera-table": {
+      "file": "assets/storage-camera-table.png"
+    },
+    "storage-cart-idle": {
+      "file": "assets/storage-cart-idle.png"
+    },
+    "storage-cart-loaded": {
+      "file": "assets/storage-cart-loaded.png"
+    },
+    "storage-observer-camera": {
+      "file": "assets/storage-observer-camera.png"
+    },
+    "storage-photo-cover": {
+      "file": "assets/storage-photo-cover.png"
+    },
+    "storage-record-example": {
+      "file": "assets/storage-record-example.png"
+    },
+    "storage-side-bag": {
+      "file": "assets/storage-side-bag.png"
+    },
+    "storage-side-toybox": {
+      "file": "assets/storage-side-toybox.png"
+    },
+    "storage-side-tray": {
+      "file": "assets/storage-side-tray.png"
+    },
+    "storage-top-bag": {
+      "file": "assets/storage-top-bag.png"
+    },
+    "storage-top-toybox": {
+      "file": "assets/storage-top-toybox.png"
+    },
+    "storage-top-tray": {
+      "file": "assets/storage-top-tray.png"
+    },
+    "test-the-lid-model": {
+      "file": "assets/test-the-lid-model.png"
+    },
+    "turn-to-fit-model": {
+      "file": "assets/turn-to-fit-model.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "find-the-item",
+      "title": "彩带卷去哪儿了",
+      "type": "slide",
+      "template": "two-columns",
+      "data": {
+        "title": "彩带卷去哪儿了",
+        "left": {
+          "heading": "刚用过的手作桌",
+          "body": "找彩带卷"
+        },
+        "right": {
+          "heading": "整理过的手作桌",
+          "body": "再找彩带卷"
+        },
+        "left_picture": "desk-unfiled",
+        "right_picture": "desk-sorted"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "松风校园的手作桌上，大家要找那一卷橘色彩带。"
+        },
+        {
+          "say": "桌上还有画册、蓝尺和积木。你能指出彩带卷吗？"
+        },
+        {
+          "say": "有些东西遮住了另一些，伸手之前还得搬开它们。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "现在还是这些东西。画册放平，积木装进小盒。"
+        },
+        {
+          "say": "彩带和蓝尺都能看见。试着用手指找回彩带卷。"
+        },
+        {
+          "say": "我们整理时，要看它摆得齐不齐，也要试能不能取出来。"
+        }
+      ]
+    },
+    {
+      "key": "bag-or-tote",
+      "title": "两个袋子各有什么用",
+      "type": "slide",
+      "template": "two-columns",
+      "data": {
+        "title": "两个袋子各有什么用",
+        "left": {
+          "heading": "大开口布袋",
+          "body": "一起装进袋"
+        },
+        "right": {
+          "heading": "有分袋的书包",
+          "body": "用品有位置"
+        },
+        "left_picture": "large-open-tote",
+        "right_picture": "split-schoolbag"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "同学要把几件轻道具送到阅读角。布袋开口很大。"
+        },
+        {
+          "say": "从这一个口放进去，软的道具可以一起装。"
+        },
+        {
+          "say": "如果很多小东西混在袋底，找其中一件得翻一翻。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "再看这只书包。大袋、前袋和侧网袋各有自己的位置。"
+        },
+        {
+          "say": "同学每天带书和水瓶，可以把物品分到合用的袋里。"
+        },
+        {
+          "say": "看看物品是什么、想怎么拿，再决定用哪个袋子。"
+        }
+      ]
+    },
+    {
+      "key": "pick-a-pocket",
+      "title": "看看这只包的三个袋位",
+      "type": "slide",
+      "template": "picture-points",
+      "data": {
+        "title": "看看这只包的三个袋位",
+        "picture": "pocket-guide",
+        "points": [
+          "大袋能平放",
+          "前袋能拉好",
+          "侧袋可竖放"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "读书会要带四样东西。我们给它们选好位置。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "大画册和折好的地图要放平，可以放进大袋。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "彩带卷小，又要常拿，可以放到前面的拉链袋。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "把水瓶盖拧好，看看侧网袋能不能让它竖着站稳。"
+        },
+        {
+          "say": "不同书包的袋位会变。先观察自己的包，再选位置。"
+        },
+        {
+          "say": "等会儿先听要取哪件。小车取到它，再听要去哪里。"
+        },
+        {
+          "say": "先取画册。找摊开来宽宽的那一本。"
+        },
+        {
+          "say": "先取盖紧的小水瓶。"
+        },
+        {
+          "say": "取圆圆的彩带卷。"
+        },
+        {
+          "say": "先取折好的地图。"
+        },
+        {
+          "say": "把它送进能平放的大袋。"
+        },
+        {
+          "say": "把它送进前面的拉链袋。"
+        },
+        {
+          "say": "把它送到能竖放的侧网袋。"
+        },
+        {
+          "say": "停一下。听要取的东西，或者要去的袋位。"
+        },
+        {
+          "say": "看小车有没有带东西，再对照袋位的样子。"
+        },
+        {
+          "say": "送到了。它放在这只包合用的袋位里。"
+        }
+      ]
+    },
+    {
+      "key": "carry-to-the-pocket",
+      "title": "用品送进合适的袋位",
+      "type": "interactive",
+      "page": "carry-to-the-pocket",
+      "widgetType": "game",
+      "startImage": "pocket-delivery-cover",
+      "script": [
+        {
+          "say": "先看老师取画册。小车这会儿还空着。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "小车就在宽画册上。要是离得远，可以按方向键过去。"
+        },
+        {
+          "highlight": "#storage-action"
+        },
+        {
+          "say": "在物品格按右下有方块的按钮，小车才会取画册。"
+        },
+        {
+          "highlight": "#storage-main-pocket"
+        },
+        {
+          "say": "取完再听要去哪。要让画册平放，找上面的宽袋位。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "右边车筐里留下画册。下一步要把它送到宽袋位。"
+        },
+        {
+          "say": "轮到你。先取、再送。每次听清这趟小车要做什么。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "pick-album": "pick-a-pocket-11",
+        "pick-bottle": "pick-a-pocket-12",
+        "pick-tape": "pick-a-pocket-13",
+        "pick-foldmap": "pick-a-pocket-14",
+        "deliver-main-pocket": "pick-a-pocket-15",
+        "deliver-zip-pocket": "pick-a-pocket-16",
+        "deliver-side-pocket": "pick-a-pocket-17",
+        "delivery-hint": "pick-a-pocket-18",
+        "delivery-help": "pick-a-pocket-19",
+        "delivery-praise": "pick-a-pocket-20"
+      }
+    },
+    {
+      "key": "storage-in-daily-life",
+      "title": "看看手作教室怎么收",
+      "type": "slide",
+      "template": "picture-points",
+      "data": {
+        "title": "看看手作教室怎么收",
+        "picture": "life-storage-choices",
+        "points": [
+          "围裙挂起来",
+          "托盘分好格",
+          "积木先装小盒"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "阅读角外还有一张手作桌。哪几样东西总在换位置？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "围裙上有挂带。把它挂在低钩上，伸手就能取。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "长尺和方积木形状不同。放进不同格，一眼就能分清。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "散着的积木可以先归到小盒，再把盒子放进大箱。"
+        },
+        {
+          "say": "积木分格方便单独拿，装小盒方便一起搬。"
+        },
+        {
+          "say": "收好以后，从每个地方取一件试试看。"
+        }
+      ]
+    },
+    {
+      "key": "turn-and-fit",
+      "title": "转个方向，再试合盖",
+      "type": "slide",
+      "template": "two-columns",
+      "data": {
+        "title": "转个方向，再试合盖",
+        "left": {
+          "heading": "从上面看",
+          "body": "两件都进框"
+        },
+        "right": {
+          "heading": "从侧面看",
+          "body": "盖子放平吗"
+        },
+        "left_picture": "turn-to-fit-model",
+        "right_picture": "test-the-lid-model"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "同一只箱子还是这两件积木。长积木直放，伸到了箱外。"
+        },
+        {
+          "say": "让长积木转个方向。两件都进了框，也没有叠在一起。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "从侧面看。另一只箱里有一块立得高，把盖子顶起了。"
+        },
+        {
+          "say": "把这块积木放低，试着把盖子放平。这里画的是两种摆法。"
+        },
+        {
+          "say": "和大人轻碰积木，看看会不会倒或滑，再试合盖。"
+        },
+        {
+          "say": "如果家里的盒盖卡住，先打开重新摆，别用力压。"
+        }
+      ]
+    },
+    {
+      "key": "photograph-neat-storage",
+      "title": "给同一处收纳拍两面",
+      "type": "interactive",
+      "page": "photograph-neat-storage",
+      "widgetType": "game",
+      "startImage": "storage-photo-cover",
+      "script": [
+        {
+          "say": "我们先拍这只书包，取景里要留下整个包。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#storage-photo-preview"
+        },
+        {
+          "say": "看上方的小图。先从上面拍，能看见包里分隔。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "用箭头挪虚线框，让书包整个进框。"
+        },
+        {
+          "highlight": "#storage-shutter"
+        },
+        {
+          "say": "角度和小图一样了，再按右边有圆点的快门。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "下面留下刚拍的书包俯视照。接下来还要从侧面拍。"
+        },
+        {
+          "say": "轮到你啦。给每件收纳用品各拍两个角度。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "storage-photo-goal": "check-the-plan-11",
+        "storage-photo-top": "check-the-plan-12",
+        "storage-photo-side": "check-the-plan-13",
+        "storage-photo-hint": "check-the-plan-14",
+        "storage-photo-help": "check-the-plan-15",
+        "storage-photo-praise": "check-the-plan-16"
+      },
+      "observationCard": {
+        "title": "三处收纳的俯视和侧视",
+        "familyTask": "和大人找一处小桌角或一个自己的书包。先画原样，把安全小件分组归位，再试着找回一件常用物品。记录实际发现，别拍姓名或住址，不整理尖利物和重箱。",
+        "levels": [
+          {
+            "label": "分袋书包",
+            "trials": [
+              {
+                "id": "same-storage-two-views",
+                "label": "分袋书包的两张实际取景",
+                "top": {
+                  "storage-top-bag": {
+                    "label": "俯看大袋中的平放画册和有分隔的小件",
+                    "image": "storage-top-bag"
+                  }
+                },
+                "side": {
+                  "storage-side-bag": {
+                    "label": "侧看同一书包网袋里竖放的带盖水瓶",
+                    "image": "storage-side-bag"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "label": "透明盖收纳箱",
+            "trials": [
+              {
+                "id": "same-storage-two-views",
+                "label": "透明盖收纳箱的两张实际取景",
+                "top": {
+                  "storage-top-toybox": {
+                    "label": "透过透明盖俯看同一箱内小盒的分区",
+                    "image": "storage-top-toybox"
+                  }
+                },
+                "side": {
+                  "storage-side-toybox": {
+                    "label": "从侧面看到同一个箱盖平贴在箱口",
+                    "image": "storage-side-toybox"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "label": "分格托盘",
+            "trials": [
+              {
+                "id": "same-storage-two-views",
+                "label": "分格托盘的两张实际取景",
+                "top": {
+                  "storage-top-tray": {
+                    "label": "从上方看到同一托盘内尺子与积木分开",
+                    "image": "storage-top-tray"
+                  }
+                },
+                "side": {
+                  "storage-side-tray": {
+                    "label": "从侧面看到同一托盘内物件位于边沿以下",
+                    "image": "storage-side-tray"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "key": "check-the-plan",
+      "title": "照片告诉我们什么",
+      "type": "slide",
+      "template": "picture-points",
+      "data": {
+        "title": "照片告诉我们什么",
+        "picture": "storage-record-example",
+        "points": [
+          "俯看分隔",
+          "侧看摆放",
+          "回家试取"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "一张照片是一个角度。把同一处的两张放在一起看。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "俯看托盘，能找分隔板，也能看见每格放了什么。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "侧看书包，能看到水瓶是不是竖着。侧看盒子能看盒盖。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "想知道取起来方不方便，得亲手找一件常用物品。"
+        },
+        {
+          "say": "从游戏里拍到的，只记模型里的位置和盖合样子。"
+        },
+        {
+          "say": "自己桌上的实物先不填结果，等你动手后再记。"
+        },
+        {
+          "say": "看小图。这次要从哪个角度拍？"
+        },
+        {
+          "say": "找能从上面看清分隔的角度。"
+        },
+        {
+          "say": "找能从侧面看清高低的角度。"
+        },
+        {
+          "say": "用方向键挪取景框，把整个样品框进去。"
+        },
+        {
+          "say": "等角度和小图一样，再按快门。"
+        },
+        {
+          "say": "拍到了。两张要留在同一件样品的记录里。"
+        }
+      ]
+    },
+    {
+      "key": "picture-quiz",
+      "title": "收纳小能手图题",
+      "type": "quiz",
+      "intro": [
+        "先听题，再选图。选完用手指出你的线索。"
+      ],
+      "questions": [
+        {
+          "id": "place-art-book",
+          "skill": "select-fit-by-structure",
+          "question": "美术课的硬纸板不能折。能平放到这只包的哪个袋位？",
+          "answer": [
+            "B"
+          ],
+          "analysis": "敞开的大袋够宽，硬纸板可以平放。",
+          "options": {
+            "A": {
+              "label": "窄窄的前拉链袋",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-big-zip",
+                "alt": "窄窄的前拉链袋"
+              }
+            },
+            "B": {
+              "label": "可以平放硬纸板的宽大袋",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-big-pocket",
+                "alt": "可以平放硬纸板的宽大袋"
+              }
+            },
+            "C": {
+              "label": "外面的侧网袋",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-big-mesh",
+                "alt": "外面的侧网袋"
+              }
+            }
+          }
+        },
+        {
+          "id": "get-stamp-ready",
+          "skill": "select-for-frequent-retrieval",
+          "question": "方印章每次都要拿。放在哪里能一伸手就取到？",
+          "answer": [
+            "A"
+          ],
+          "analysis": "浅口袋里的印章露出来，直接就能拿到。",
+          "options": {
+            "A": {
+              "label": "露在浅口袋里的印章",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-stamp-accessible",
+                "alt": "露在浅口袋里的印章"
+              }
+            },
+            "B": {
+              "label": "被布挡住一部分的印章",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-stamp-buried",
+                "alt": "被布挡住一部分的印章"
+              }
+            },
+            "C": {
+              "label": "压在一叠本子下的印章",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-stamp-under-stack",
+                "alt": "压在一叠本子下的印章"
+              }
+            }
+          }
+        },
+        {
+          "id": "sort-ruler-and-blocks",
+          "skill": "group-by-shape-and-use",
+          "question": "长刷子和短蜡笔想各放一格，选哪张？",
+          "answer": [
+            "C"
+          ],
+          "analysis": "长刷子在长格里，短蜡笔在方格里。",
+          "options": {
+            "A": {
+              "label": "长刷子和短蜡笔挤在一格",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-sort-ruler-mixed",
+                "alt": "长刷子和短蜡笔挤在一格"
+              }
+            },
+            "B": {
+              "label": "长刷子被短蜡笔压住",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-sort-ruler-hidden",
+                "alt": "长刷子被短蜡笔压住"
+              }
+            },
+            "C": {
+              "label": "长刷子和短蜡笔各在一格",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-sort-ruler-sorted",
+                "alt": "长刷子和短蜡笔各在一格"
+              }
+            }
+          }
+        },
+        {
+          "id": "fit-both-pieces",
+          "skill": "change-orientation-for-fit",
+          "question": "要把两块新拼片装进扁盒。哪张都进了盒，也没重叠？",
+          "answer": [
+            "B"
+          ],
+          "analysis": "这两块拼片都在盒框以内，平放开了。",
+          "options": {
+            "A": {
+              "label": "两块拼片压在一起",
+              "visual": {
+                "kind": "asset",
+                "image": "box-layout-overlap",
+                "alt": "两块拼片压在一起"
+              }
+            },
+            "B": {
+              "label": "两块拼片平放在盒里且分开",
+              "visual": {
+                "kind": "asset",
+                "image": "box-layout-fit",
+                "alt": "两块拼片平放在盒里且分开"
+              }
+            },
+            "C": {
+              "label": "长拼片伸到盒外",
+              "visual": {
+                "kind": "asset",
+                "image": "box-layout-outside",
+                "alt": "长拼片伸到盒外"
+              }
+            }
+          }
+        },
+        {
+          "id": "find-the-flat-lid",
+          "skill": "observe-lid-clearance",
+          "question": "手作架上的三个新盒子，哪只盖子的两头都贴平？",
+          "answer": [
+            "C"
+          ],
+          "analysis": "这两件都低于盒口，盖子两端都贴平。",
+          "options": {
+            "A": {
+              "label": "盖子的左端被积木顶起",
+              "visual": {
+                "kind": "asset",
+                "image": "lid-lifted-left",
+                "alt": "盖子的左端被积木顶起"
+              }
+            },
+            "B": {
+              "label": "盖子的右端被积木顶起",
+              "visual": {
+                "kind": "asset",
+                "image": "lid-lifted-right",
+                "alt": "盖子的右端被积木顶起"
+              }
+            },
+            "C": {
+              "label": "盖子两端都放平",
+              "visual": {
+                "kind": "asset",
+                "image": "lid-fits-both",
+                "alt": "盖子两端都放平"
+              }
+            }
+          }
+        },
+        {
+          "id": "try-to-retrieve",
+          "skill": "test-a-storage-plan",
+          "question": "想知道蓝蜡笔好不好找，接下来该怎么做？",
+          "answer": [
+            "A"
+          ],
+          "analysis": "动手找到蓝蜡笔并取出来，才有实际发现。",
+          "options": {
+            "A": {
+              "label": "拿出蓝色蜡笔",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-retrieve-item",
+                "alt": "拿出蓝色蜡笔"
+              }
+            },
+            "B": {
+              "label": "把装蜡笔的盒子盖上",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-close-only",
+                "alt": "把装蜡笔的盒子盖上"
+              }
+            },
+            "C": {
+              "label": "用手指指着一个合上的盒子",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-count-only",
+                "alt": "用手指指着一个合上的盒子"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "home-organize-observation",
+      "title": "给一小处做收纳记录",
+      "type": "slide",
+      "template": "picture-points",
+      "data": {
+        "title": "给一小处做收纳记录",
+        "picture": "home-organize-plan",
+        "points": [
+          "先画原样",
+          "分组放好",
+          "找回一件"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "和大人选一个小桌角，也可以选你自己的书包。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先画原样。只画物品和放的位置，名字和住址不用写。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "用积木盒来比。先看挤不挤，试取蓝积木，再试合盖。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "分开摆好后，再看挤不挤、试取蓝积木、轻轻合盖。"
+        },
+        {
+          "say": "哪次好取、盖得平？尖利物和重箱交给大人。"
+        },
+        {
+          "say": "把两次看到的样子画下来，和家人说你改了哪里。"
+        }
+      ]
+    }
+  ]
+}

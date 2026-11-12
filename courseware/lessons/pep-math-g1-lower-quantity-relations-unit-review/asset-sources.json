@@ -1,0 +1,963 @@
+{
+  "schemaVersion": "mira.courseware.asset-sources.v1",
+  "originals": {
+    "community-garden": {
+      "path": "art-source/community-garden.png",
+      "sha256": "ee46ddbdd2422d049295fd348678943b551b1abbef3d38d8b9fb200f3377a0bf",
+      "source": "Codex built-in image_gen",
+      "prompt": "Produce a single landscape 16:9 wide background illustration for an original Chinese grade-one arithmetic lesson set at a welcoming community seedling nursery on open day. Hand-painted matte gouache on visible fine warm paper grain, clean layered cut-paper silhouettes, deep pine green, warm cream, apricot and persimmon, simple understated editorial picture-book style. Left edge shows rustic low greenhouse glazing and neatly arranged out-of-focus pots; right edge shows a small pale wooden potting bench and a low wall with leaves. Bright warm late-morning light, lots of calm open level warm-cream floor and empty visual space across center, especially the middle 72 percent and bottom 25 percent for a game board and controls. Flat side-on wide establishing frame, timeless neighborhood greenhouse, no people, no typography, no letters, no numbers, no signage, no marked countable rows, no frame or borders."
+    },
+    "seedling-shed": {
+      "path": "art-source/seedling-shed.png",
+      "sha256": "97e7382cc81973b2f6b1bf9c45095ac3af3eafacd01f0db4dfbfd99bba0c1564",
+      "source": "Codex built-in image_gen",
+      "prompt": "Single landscape 16:9 full-bleed original game background for a Grade 1 Chinese math lesson. A quiet greenhouse potting shed opening toward a community garden, viewed side-on at warm afternoon. Hand-painted matte gouache on fine paper with a clean children's picture-book cut-paper style, deep pine green edges and rafters, warm cream central floor, sparing apricot and persimmon details. A bench edge with isolated uncounted potted vines and garden canopy only at far left and right, soft peach light through frosted greenhouse panes in the far upper quarter. Keep central 75 percent and lower 28 percent visually quiet and flat so a large launcher and floating quantity diagrams can sit on top. No text, letters, digits, badges, borders, people or repeating objects that imply a quantity question."
+    },
+    "garden-objects-atlas": {
+      "path": "art-source/garden-objects-atlas.png",
+      "sha256": "44176061a855de283992045cd5faa3bdf5afa83432a65c1466b70353be9ad512",
+      "source": "Codex built-in image_gen",
+      "prompt": "One square transparent PNG sprite atlas for a first-grade community greenhouse picture book. EXACT 3 equal columns and 2 equal rows, SIX single isolated sprites, centers at x about 17%, 50%, 83%, y about 25%, 75%, with broad truly transparent gutters at least 8% of width and each wholly within its own cell. Top row left to right: a tiny sprout growing from one terracotta flowerpot, one sealed mint-green seed paper packet with a small plain leaf emblem, one vertical ochre garden plant marker with no inscription. Bottom row left to right: one squat green plastic starter tray with a blank top, one friendly low terracotta-and-pine wooden garden trolley in perfectly horizontal side profile at rest, the same trolley in a gently tilted moving three-quarter pose. Make sprites generously scaled but fully separated. Matte gouache, tiny subtle paper grain, layered cut-paper silhouettes, cream/apricot/pine green. No letters, digits, outlines of cells, pictorial background, gradient, floating decorations, or cast shadows beyond each object's own silhouette."
+    },
+    "garden-quiz-atlas-first": {
+      "path": "art-source/garden-quiz-atlas-first.png",
+      "sha256": "a1d1ab6aa6e3b34c6eb3dc883aa6189e75bc62e7770ce38934fef7995b1216e1",
+      "source": "Codex built-in image_gen",
+      "prompt": "One square transparent PNG sprite atlas for a first-grade community greenhouse picture book. EXACT 3 equal columns and 2 equal rows, SIX single isolated sprites, centers x 17%,50%,83% and y 25%,75%, broad truly transparent gutters at least 8% and each silhouette fully within its own cell. Top row left to right: one rich persimmon orange five-petal daisy blossom front-on with green center; one small warm brown pinecone with readable overlapping scales; one golden-orange garden spring clip seen side-on with obvious hinge and grip. Bottom row left to right: one amber-green swirled glass marble as one round cutout with clean edge; one cream paper merit sticker with pine-green sprout seal and warm apricot border, one green seedling viewed alone with three broad leaves and visible short stem. Matte gouache, subtle fine paper grain, bold cut-paper silhouettes, deep pine green, cream, ochre, persimmon. A single instance per cell, transparent outer background, no letters, numbers, words, textures outside the cutouts, visible grid or borders.",
+      "usedInFinishedSpritesVia": "garden-quiz-atlas"
+    },
+    "garden-quiz-atlas": {
+      "path": "art-source/garden-quiz-atlas.png",
+      "sha256": "996b2261a284d03007f57aa1a58a40bd7272df92a87b1d170d46bac4e8d7a0e5",
+      "source": "Codex built-in image_gen",
+      "prompt": "Edit the provided six-sprite atlas as precise transparent cutouts. Preserve the exact existing six silhouettes, positions, proportions, surface texture and palette in the 3 column by 2 row grid (daisy, pinecone, garden clip; glass marble, sprout seal, isolated seedling). Erase all atmospheric haze, shadow, feathered halo and paper color surrounding each object. Leave truly zero-opacity clear alpha around every silhouette including all corners and gutters. Crisp hand-cut edges; only the physical objects remain. Preserve object placement and leave generous empty alpha margins. No added elements, words or lines.",
+      "reference": "garden-quiz-atlas-first"
+    }
+  },
+  "assets": {
+    "community-garden": {
+      "path": "assets/community-garden.png",
+      "sha256": "6879172f9218d7a341c84a47617ef7215404e92154166b836184f0eb6d9e735a",
+      "source": "Codex built-in image_gen",
+      "prompt": "Produce a single landscape 16:9 wide background illustration for an original Chinese grade-one arithmetic lesson set at a welcoming community seedling nursery on open day. Hand-painted matte gouache on visible fine warm paper grain, clean layered cut-paper silhouettes, deep pine green, warm cream, apricot and persimmon, simple understated editorial picture-book style. Left edge shows rustic low greenhouse glazing and neatly arranged out-of-focus pots; right edge shows a small pale wooden potting bench and a low wall with leaves. Bright warm late-morning light, lots of calm open level warm-cream floor and empty visual space across center, especially the middle 72 percent and bottom 25 percent for a game board and controls. Flat side-on wide establishing frame, timeless neighborhood greenhouse, no people, no typography, no letters, no numbers, no signage, no marked countable rows, no frame or borders.",
+      "generatedSource": "art-source/community-garden.png",
+      "generatedSourceSha256": "ee46ddbdd2422d049295fd348678943b551b1abbef3d38d8b9fb200f3377a0bf",
+      "usedBy": [
+        "whole-and-parts",
+        "sort-by-what-is-missing"
+      ],
+      "visualReview": "pending"
+    },
+    "seedling-shed": {
+      "path": "assets/seedling-shed.png",
+      "sha256": "14233929a34d99412e99c111ce7a65b91810dd0bbf80a88416abb0a8971efca2",
+      "source": "Codex built-in image_gen",
+      "prompt": "Single landscape 16:9 full-bleed original game background for a Grade 1 Chinese math lesson. A quiet greenhouse potting shed opening toward a community garden, viewed side-on at warm afternoon. Hand-painted matte gouache on fine paper with a clean children's picture-book cut-paper style, deep pine green edges and rafters, warm cream central floor, sparing apricot and persimmon details. A bench edge with isolated uncounted potted vines and garden canopy only at far left and right, soft peach light through frosted greenhouse panes in the far upper quarter. Keep central 75 percent and lower 28 percent visually quiet and flat so a large launcher and floating quantity diagrams can sit on top. No text, letters, digits, badges, borders, people or repeating objects that imply a quantity question.",
+      "generatedSource": "art-source/seedling-shed.png",
+      "generatedSourceSha256": "97e7382cc81973b2f6b1bf9c45095ac3af3eafacd01f0db4dfbfd99bba0c1564",
+      "usedBy": [
+        "aim-at-the-matching-count"
+      ],
+      "visualReview": "pending"
+    },
+    "garden-pot": {
+      "assetKey": "garden-pot",
+      "path": "assets/garden-pot.png",
+      "sha256": "32221369967a79d927ddabdd62e4c398b97e6fdcd54e0d84ff229c1da58817d6",
+      "width": 222,
+      "height": 304,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/garden-objects-atlas.png",
+      "generatedSourceSha256": "44176061a855de283992045cd5faa3bdf5afa83432a65c1466b70353be9ad512",
+      "prompt": "One square transparent PNG sprite atlas for a first-grade community greenhouse picture book. EXACT 3 equal columns and 2 equal rows, SIX single isolated sprites, centers at x about 17%, 50%, 83%, y about 25%, 75%, with broad truly transparent gutters at least 8% of width and each wholly within its own cell. Top row left to right: a tiny sprout growing from one terracotta flowerpot, one sealed mint-green seed paper packet with a small plain leaf emblem, one vertical ochre garden plant marker with no inscription. Bottom row left to right: one squat green plastic starter tray with a blank top, one friendly low terracotta-and-pine wooden garden trolley in perfectly horizontal side profile at rest, the same trolley in a gently tilted moving three-quarter pose. Make sprites generously scaled but fully separated. Matte gouache, tiny subtle paper grain, layered cut-paper silhouettes, cream/apricot/pine green. No letters, digits, outlines of cells, pictorial background, gradient, floating decorations, or cast shadows beyond each object's own silhouette.",
+      "promptSha256": "82ec98465cb20f838bf1327954063c7fb6bd633f80a4e1129d477123105ea270",
+      "sourceCrop": [
+        126,
+        92,
+        417,
+        490
+      ],
+      "usedBy": [
+        "whole-and-parts",
+        "one-gap-several-questions",
+        "quiz-dependence"
+      ],
+      "visualReview": "pending"
+    },
+    "garden-seed-packet": {
+      "assetKey": "garden-seed-packet",
+      "path": "assets/garden-seed-packet.png",
+      "sha256": "40b70a4ccb5b09e513552a4c96c20c0fd4a2cf94127f44d8729dc369106ddef9",
+      "width": 250,
+      "height": 304,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/garden-objects-atlas.png",
+      "generatedSourceSha256": "44176061a855de283992045cd5faa3bdf5afa83432a65c1466b70353be9ad512",
+      "prompt": "One square transparent PNG sprite atlas for a first-grade community greenhouse picture book. EXACT 3 equal columns and 2 equal rows, SIX single isolated sprites, centers at x about 17%, 50%, 83%, y about 25%, 75%, with broad truly transparent gutters at least 8% of width and each wholly within its own cell. Top row left to right: a tiny sprout growing from one terracotta flowerpot, one sealed mint-green seed paper packet with a small plain leaf emblem, one vertical ochre garden plant marker with no inscription. Bottom row left to right: one squat green plastic starter tray with a blank top, one friendly low terracotta-and-pine wooden garden trolley in perfectly horizontal side profile at rest, the same trolley in a gently tilted moving three-quarter pose. Make sprites generously scaled but fully separated. Matte gouache, tiny subtle paper grain, layered cut-paper silhouettes, cream/apricot/pine green. No letters, digits, outlines of cells, pictorial background, gradient, floating decorations, or cast shadows beyond each object's own silhouette.",
+      "promptSha256": "82ec98465cb20f838bf1327954063c7fb6bd633f80a4e1129d477123105ea270",
+      "sourceCrop": [
+        599,
+        74,
+        934,
+        482
+      ],
+      "usedBy": [
+        "sort-by-what-is-missing"
+      ],
+      "visualReview": "pending"
+    },
+    "garden-marker": {
+      "assetKey": "garden-marker",
+      "path": "assets/garden-marker.png",
+      "sha256": "c8ac57c35b50cc2de02926a248f87d0f1886354577e50d14ddaff115f4cbd063",
+      "width": 131,
+      "height": 304,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/garden-objects-atlas.png",
+      "generatedSourceSha256": "44176061a855de283992045cd5faa3bdf5afa83432a65c1466b70353be9ad512",
+      "prompt": "One square transparent PNG sprite atlas for a first-grade community greenhouse picture book. EXACT 3 equal columns and 2 equal rows, SIX single isolated sprites, centers at x about 17%, 50%, 83%, y about 25%, 75%, with broad truly transparent gutters at least 8% of width and each wholly within its own cell. Top row left to right: a tiny sprout growing from one terracotta flowerpot, one sealed mint-green seed paper packet with a small plain leaf emblem, one vertical ochre garden plant marker with no inscription. Bottom row left to right: one squat green plastic starter tray with a blank top, one friendly low terracotta-and-pine wooden garden trolley in perfectly horizontal side profile at rest, the same trolley in a gently tilted moving three-quarter pose. Make sprites generously scaled but fully separated. Matte gouache, tiny subtle paper grain, layered cut-paper silhouettes, cream/apricot/pine green. No letters, digits, outlines of cells, pictorial background, gradient, floating decorations, or cast shadows beyond each object's own silhouette.",
+      "promptSha256": "82ec98465cb20f838bf1327954063c7fb6bd633f80a4e1129d477123105ea270",
+      "sourceCrop": [
+        1167,
+        60,
+        1350,
+        486
+      ],
+      "usedBy": [
+        "known-shorter-or-longer",
+        "two-questions-one-picture",
+        "sort-by-what-is-missing"
+      ],
+      "visualReview": "pending"
+    },
+    "garden-tray": {
+      "assetKey": "garden-tray",
+      "path": "assets/garden-tray.png",
+      "sha256": "591682465e24cbb631b86f110ec0afb01d29aebf752eedd529ad8490177f50d2",
+      "width": 304,
+      "height": 183,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/garden-objects-atlas.png",
+      "generatedSourceSha256": "44176061a855de283992045cd5faa3bdf5afa83432a65c1466b70353be9ad512",
+      "prompt": "One square transparent PNG sprite atlas for a first-grade community greenhouse picture book. EXACT 3 equal columns and 2 equal rows, SIX single isolated sprites, centers at x about 17%, 50%, 83%, y about 25%, 75%, with broad truly transparent gutters at least 8% of width and each wholly within its own cell. Top row left to right: a tiny sprout growing from one terracotta flowerpot, one sealed mint-green seed paper packet with a small plain leaf emblem, one vertical ochre garden plant marker with no inscription. Bottom row left to right: one squat green plastic starter tray with a blank top, one friendly low terracotta-and-pine wooden garden trolley in perfectly horizontal side profile at rest, the same trolley in a gently tilted moving three-quarter pose. Make sprites generously scaled but fully separated. Matte gouache, tiny subtle paper grain, layered cut-paper silhouettes, cream/apricot/pine green. No letters, digits, outlines of cells, pictorial background, gradient, floating decorations, or cast shadows beyond each object's own silhouette.",
+      "promptSha256": "82ec98465cb20f838bf1327954063c7fb6bd633f80a4e1129d477123105ea270",
+      "sourceCrop": [
+        20,
+        647,
+        494,
+        933
+      ],
+      "usedBy": [
+        "carry-the-first-answer"
+      ],
+      "visualReview": "pending"
+    },
+    "garden-cart": {
+      "assetKey": "garden-cart",
+      "path": "assets/garden-cart.png",
+      "sha256": "35ce399cd1ce47dad883801491c8a6d08f81da73c615d0eafea0f19a64e5ab01",
+      "width": 304,
+      "height": 246,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/garden-objects-atlas.png",
+      "generatedSourceSha256": "44176061a855de283992045cd5faa3bdf5afa83432a65c1466b70353be9ad512",
+      "prompt": "One square transparent PNG sprite atlas for a first-grade community greenhouse picture book. EXACT 3 equal columns and 2 equal rows, SIX single isolated sprites, centers at x about 17%, 50%, 83%, y about 25%, 75%, with broad truly transparent gutters at least 8% of width and each wholly within its own cell. Top row left to right: a tiny sprout growing from one terracotta flowerpot, one sealed mint-green seed paper packet with a small plain leaf emblem, one vertical ochre garden plant marker with no inscription. Bottom row left to right: one squat green plastic starter tray with a blank top, one friendly low terracotta-and-pine wooden garden trolley in perfectly horizontal side profile at rest, the same trolley in a gently tilted moving three-quarter pose. Make sprites generously scaled but fully separated. Matte gouache, tiny subtle paper grain, layered cut-paper silhouettes, cream/apricot/pine green. No letters, digits, outlines of cells, pictorial background, gradient, floating decorations, or cast shadows beyond each object's own silhouette.",
+      "promptSha256": "82ec98465cb20f838bf1327954063c7fb6bd633f80a4e1129d477123105ea270",
+      "sourceCrop": [
+        527,
+        590,
+        995,
+        968
+      ],
+      "usedBy": [
+        "sort-by-what-is-missing"
+      ],
+      "visualReview": "pending"
+    },
+    "garden-cart-moving": {
+      "assetKey": "garden-cart-moving",
+      "path": "assets/garden-cart-moving.png",
+      "sha256": "19d8db930cd5d3a41a3ba41796722c69e9c3ef093fd15d15bb787036cce925a0",
+      "width": 304,
+      "height": 268,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/garden-objects-atlas.png",
+      "generatedSourceSha256": "44176061a855de283992045cd5faa3bdf5afa83432a65c1466b70353be9ad512",
+      "prompt": "One square transparent PNG sprite atlas for a first-grade community greenhouse picture book. EXACT 3 equal columns and 2 equal rows, SIX single isolated sprites, centers at x about 17%, 50%, 83%, y about 25%, 75%, with broad truly transparent gutters at least 8% of width and each wholly within its own cell. Top row left to right: a tiny sprout growing from one terracotta flowerpot, one sealed mint-green seed paper packet with a small plain leaf emblem, one vertical ochre garden plant marker with no inscription. Bottom row left to right: one squat green plastic starter tray with a blank top, one friendly low terracotta-and-pine wooden garden trolley in perfectly horizontal side profile at rest, the same trolley in a gently tilted moving three-quarter pose. Make sprites generously scaled but fully separated. Matte gouache, tiny subtle paper grain, layered cut-paper silhouettes, cream/apricot/pine green. No letters, digits, outlines of cells, pictorial background, gradient, floating decorations, or cast shadows beyond each object's own silhouette.",
+      "promptSha256": "82ec98465cb20f838bf1327954063c7fb6bd633f80a4e1129d477123105ea270",
+      "sourceCrop": [
+        1028,
+        568,
+        1509,
+        992
+      ],
+      "usedBy": [
+        "sort-by-what-is-missing"
+      ],
+      "visualReview": "pending"
+    },
+    "garden-flower": {
+      "assetKey": "garden-flower",
+      "path": "assets/garden-flower.png",
+      "sha256": "02ff782370ba0714646c93b979921fc4d43e9e98b68a9a10107de73ba59505f4",
+      "width": 304,
+      "height": 293,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/garden-quiz-atlas.png",
+      "generatedSourceSha256": "996b2261a284d03007f57aa1a58a40bd7272df92a87b1d170d46bac4e8d7a0e5",
+      "prompt": "Edit the provided six-sprite atlas as precise transparent cutouts. Preserve the exact existing six silhouettes, positions, proportions, surface texture and palette in the 3 column by 2 row grid (daisy, pinecone, garden clip; glass marble, sprout seal, isolated seedling). Erase all atmospheric haze, shadow, feathered halo and paper color surrounding each object. Leave truly zero-opacity clear alpha around every silhouette including all corners and gutters. Crisp hand-cut edges; only the physical objects remain. Preserve object placement and leave generous empty alpha margins. No added elements, words or lines.",
+      "promptSha256": "473b6bb74a62080a58d95e2864ded235896392466eab7eb90e06d64bb486ac1f",
+      "sourceCrop": [
+        27,
+        38,
+        481,
+        476
+      ],
+      "usedBy": [
+        "quiz-difference"
+      ],
+      "visualReview": "pending"
+    },
+    "garden-pinecone": {
+      "assetKey": "garden-pinecone",
+      "path": "assets/garden-pinecone.png",
+      "sha256": "6e363ee2e8c71486bd7c78a67bbfef1775eaeab1d2c56192e482461ce1f300db",
+      "width": 256,
+      "height": 304,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/garden-quiz-atlas.png",
+      "generatedSourceSha256": "996b2261a284d03007f57aa1a58a40bd7272df92a87b1d170d46bac4e8d7a0e5",
+      "prompt": "Edit the provided six-sprite atlas as precise transparent cutouts. Preserve the exact existing six silhouettes, positions, proportions, surface texture and palette in the 3 column by 2 row grid (daisy, pinecone, garden clip; glass marble, sprout seal, isolated seedling). Erase all atmospheric haze, shadow, feathered halo and paper color surrounding each object. Leave truly zero-opacity clear alpha around every silhouette including all corners and gutters. Crisp hand-cut edges; only the physical objects remain. Preserve object placement and leave generous empty alpha margins. No added elements, words or lines.",
+      "promptSha256": "473b6bb74a62080a58d95e2864ded235896392466eab7eb90e06d64bb486ac1f",
+      "sourceCrop": [
+        567,
+        35,
+        945,
+        483
+      ],
+      "usedBy": [
+        "quiz-unknown-group"
+      ],
+      "visualReview": "pending"
+    },
+    "garden-clip": {
+      "assetKey": "garden-clip",
+      "path": "assets/garden-clip.png",
+      "sha256": "46f675531aa208e41b4689f43ca11c47dbc6f0478b2be70ca74479561924825c",
+      "width": 304,
+      "height": 217,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/garden-quiz-atlas.png",
+      "generatedSourceSha256": "996b2261a284d03007f57aa1a58a40bd7272df92a87b1d170d46bac4e8d7a0e5",
+      "prompt": "Edit the provided six-sprite atlas as precise transparent cutouts. Preserve the exact existing six silhouettes, positions, proportions, surface texture and palette in the 3 column by 2 row grid (daisy, pinecone, garden clip; glass marble, sprout seal, isolated seedling). Erase all atmospheric haze, shadow, feathered halo and paper color surrounding each object. Leave truly zero-opacity clear alpha around every silhouette including all corners and gutters. Crisp hand-cut edges; only the physical objects remain. Preserve object placement and leave generous empty alpha margins. No added elements, words or lines.",
+      "promptSha256": "473b6bb74a62080a58d95e2864ded235896392466eab7eb90e06d64bb486ac1f",
+      "sourceCrop": [
+        1034,
+        77,
+        1515,
+        420
+      ],
+      "usedBy": [
+        "quiz-same-gap",
+        "draw-your-own-comparison"
+      ],
+      "visualReview": "pending"
+    },
+    "garden-marble": {
+      "assetKey": "garden-marble",
+      "path": "assets/garden-marble.png",
+      "sha256": "21580e9e4682dd7ced6c082626a28fd2182952d731293f911f0f01634313f8da",
+      "width": 304,
+      "height": 304,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/garden-quiz-atlas.png",
+      "generatedSourceSha256": "996b2261a284d03007f57aa1a58a40bd7272df92a87b1d170d46bac4e8d7a0e5",
+      "prompt": "Edit the provided six-sprite atlas as precise transparent cutouts. Preserve the exact existing six silhouettes, positions, proportions, surface texture and palette in the 3 column by 2 row grid (daisy, pinecone, garden clip; glass marble, sprout seal, isolated seedling). Erase all atmospheric haze, shadow, feathered halo and paper color surrounding each object. Leave truly zero-opacity clear alpha around every silhouette including all corners and gutters. Crisp hand-cut edges; only the physical objects remain. Preserve object placement and leave generous empty alpha margins. No added elements, words or lines.",
+      "promptSha256": "473b6bb74a62080a58d95e2864ded235896392466eab7eb90e06d64bb486ac1f",
+      "sourceCrop": [
+        48,
+        564,
+        457,
+        973
+      ],
+      "usedBy": [
+        "aim-at-the-matching-count"
+      ],
+      "visualReview": "pending"
+    },
+    "garden-reward": {
+      "assetKey": "garden-reward",
+      "path": "assets/garden-reward.png",
+      "sha256": "a69eb82ef3e0d11eebdb5780ee2b12893ea47b89db41c883f33cd5218f13fb6b",
+      "width": 304,
+      "height": 294,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/garden-quiz-atlas.png",
+      "generatedSourceSha256": "996b2261a284d03007f57aa1a58a40bd7272df92a87b1d170d46bac4e8d7a0e5",
+      "prompt": "Edit the provided six-sprite atlas as precise transparent cutouts. Preserve the exact existing six silhouettes, positions, proportions, surface texture and palette in the 3 column by 2 row grid (daisy, pinecone, garden clip; glass marble, sprout seal, isolated seedling). Erase all atmospheric haze, shadow, feathered halo and paper color surrounding each object. Leave truly zero-opacity clear alpha around every silhouette including all corners and gutters. Crisp hand-cut edges; only the physical objects remain. Preserve object placement and leave generous empty alpha margins. No added elements, words or lines.",
+      "promptSha256": "473b6bb74a62080a58d95e2864ded235896392466eab7eb90e06d64bb486ac1f",
+      "sourceCrop": [
+        526,
+        541,
+        995,
+        994
+      ],
+      "usedBy": [
+        "sort-by-what-is-missing",
+        "aim-at-the-matching-count"
+      ],
+      "visualReview": "pending"
+    },
+    "garden-sprout": {
+      "assetKey": "garden-sprout",
+      "path": "assets/garden-sprout.png",
+      "sha256": "df9f8717a4661ef9a66a8b313ba1928eb564b2af6d340046425a1bb4f506eebd",
+      "width": 304,
+      "height": 282,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/garden-quiz-atlas.png",
+      "generatedSourceSha256": "996b2261a284d03007f57aa1a58a40bd7272df92a87b1d170d46bac4e8d7a0e5",
+      "prompt": "Edit the provided six-sprite atlas as precise transparent cutouts. Preserve the exact existing six silhouettes, positions, proportions, surface texture and palette in the 3 column by 2 row grid (daisy, pinecone, garden clip; glass marble, sprout seal, isolated seedling). Erase all atmospheric haze, shadow, feathered halo and paper color surrounding each object. Leave truly zero-opacity clear alpha around every silhouette including all corners and gutters. Crisp hand-cut edges; only the physical objects remain. Preserve object placement and leave generous empty alpha margins. No added elements, words or lines.",
+      "promptSha256": "473b6bb74a62080a58d95e2864ded235896392466eab7eb90e06d64bb486ac1f",
+      "sourceCrop": [
+        1030,
+        538,
+        1507,
+        980
+      ],
+      "usedBy": [
+        "quiz-total",
+        "quiz-changed-reference",
+        "aim-at-the-matching-count"
+      ],
+      "visualReview": "pending"
+    },
+    "whole-pots": {
+      "path": "assets/whole-pots.png",
+      "sha256": "b8e0d888c082a29f9b34ab28ceb0c85c809fc8f9bb90fe8434996b0098427271",
+      "source": "exact_quantity_diagram",
+      "diagramSource": "diagrams.py",
+      "diagramSourceSha256": "fb881ea9f015c63d6f8fb46fdbb389ad7985b810bc6f95c439e146d5d21d2df5",
+      "usedBy": [
+        "whole-and-parts"
+      ],
+      "visualReview": "pending"
+    },
+    "part-pots": {
+      "path": "assets/part-pots.png",
+      "sha256": "6c957c90794fa0692cc65fa9615c0893a34008a78d425cc9c22e1c242525ee82",
+      "source": "exact_quantity_diagram",
+      "diagramSource": "diagrams.py",
+      "diagramSourceSha256": "fb881ea9f015c63d6f8fb46fdbb389ad7985b810bc6f95c439e146d5d21d2df5",
+      "usedBy": [
+        "whole-and-parts"
+      ],
+      "visualReview": "pending"
+    },
+    "gap-pots": {
+      "path": "assets/gap-pots.png",
+      "sha256": "5a0131cf1cdcde5400664c1c06a7ceadd1ed7c65c0e037f3a185b1b34bc445c7",
+      "source": "exact_quantity_diagram",
+      "diagramSource": "diagrams.py",
+      "diagramSourceSha256": "fb881ea9f015c63d6f8fb46fdbb389ad7985b810bc6f95c439e146d5d21d2df5",
+      "usedBy": [
+        "one-gap-several-questions"
+      ],
+      "visualReview": "pending"
+    },
+    "shorter-markers": {
+      "path": "assets/shorter-markers.png",
+      "sha256": "e041f6e56a46f46c4ed367ac7677608c4e5164716c5de3c68e62fe7e19daaace",
+      "source": "exact_quantity_diagram",
+      "diagramSource": "diagrams.py",
+      "diagramSourceSha256": "fb881ea9f015c63d6f8fb46fdbb389ad7985b810bc6f95c439e146d5d21d2df5",
+      "usedBy": [
+        "known-shorter-or-longer"
+      ],
+      "visualReview": "pending"
+    },
+    "longer-seedlings": {
+      "path": "assets/longer-seedlings.png",
+      "sha256": "0faa5ed61963ebe9fe36a16a27b56d8b5ae55f6023360bc4361311edd36c545c",
+      "source": "exact_quantity_diagram",
+      "diagramSource": "diagrams.py",
+      "diagramSourceSha256": "fb881ea9f015c63d6f8fb46fdbb389ad7985b810bc6f95c439e146d5d21d2df5",
+      "usedBy": [
+        "known-shorter-or-longer"
+      ],
+      "visualReview": "pending"
+    },
+    "dependent-reference": {
+      "path": "assets/dependent-reference.png",
+      "sha256": "bfe54229463ad4f188f871d6b1e58b93882b159b13b5116a9fcceb7d57e1771f",
+      "source": "exact_quantity_diagram",
+      "diagramSource": "diagrams.py",
+      "diagramSourceSha256": "fb881ea9f015c63d6f8fb46fdbb389ad7985b810bc6f95c439e146d5d21d2df5",
+      "usedBy": [
+        "carry-the-first-answer"
+      ],
+      "visualReview": "pending"
+    },
+    "dependent-combine": {
+      "path": "assets/dependent-combine.png",
+      "sha256": "f5303c36fedca6976fb84e064775654c694486daaeb38c46215a1ce9280b2d89",
+      "source": "exact_quantity_diagram",
+      "diagramSource": "diagrams.py",
+      "diagramSourceSha256": "fb881ea9f015c63d6f8fb46fdbb389ad7985b810bc6f95c439e146d5d21d2df5",
+      "usedBy": [
+        "carry-the-first-answer"
+      ],
+      "visualReview": "pending"
+    },
+    "home-clips": {
+      "path": "assets/home-clips.png",
+      "sha256": "c09a09bbb8ac14e111a034755435b41f95aefce6a74e26d64cf975f66c24d77e",
+      "source": "exact_quantity_diagram",
+      "diagramSource": "diagrams.py",
+      "diagramSourceSha256": "fb881ea9f015c63d6f8fb46fdbb389ad7985b810bc6f95c439e146d5d21d2df5",
+      "usedBy": [
+        "draw-your-own-comparison"
+      ],
+      "visualReview": "pending"
+    },
+    "tray-whole": {
+      "path": "assets/tray-whole.png",
+      "sha256": "16c7b8166d7056429fb59c3f04d3fc318f5693e98544f9cd7dea2072024f9f42",
+      "source": "exact_quantity_diagram",
+      "diagramSource": "diagrams.py",
+      "diagramSourceSha256": "fb881ea9f015c63d6f8fb46fdbb389ad7985b810bc6f95c439e146d5d21d2df5",
+      "usedBy": [
+        "sort-by-what-is-missing"
+      ],
+      "visualReview": "pending"
+    },
+    "tray-part": {
+      "path": "assets/tray-part.png",
+      "sha256": "a1c687d90221010d508910a3fe8393034475c67b69a4b6a68738676c3a29d871",
+      "source": "exact_quantity_diagram",
+      "diagramSource": "diagrams.py",
+      "diagramSourceSha256": "fb881ea9f015c63d6f8fb46fdbb389ad7985b810bc6f95c439e146d5d21d2df5",
+      "usedBy": [
+        "sort-by-what-is-missing"
+      ],
+      "visualReview": "pending"
+    },
+    "tray-gap": {
+      "path": "assets/tray-gap.png",
+      "sha256": "86b33933f847534b83ea745131671e9a819134a832301a1fd54b357da3efbc3d",
+      "source": "exact_quantity_diagram",
+      "diagramSource": "diagrams.py",
+      "diagramSourceSha256": "fb881ea9f015c63d6f8fb46fdbb389ad7985b810bc6f95c439e146d5d21d2df5",
+      "usedBy": [
+        "sort-by-what-is-missing"
+      ],
+      "visualReview": "pending"
+    },
+    "card-seeds-total": {
+      "path": "assets/card-seeds-total.png",
+      "sha256": "0c81085312942ec1185039e810c89e7bcc25c721c635cf5a614291832c4cd13d",
+      "source": "exact_quantity_diagram",
+      "diagramSource": "diagrams.py",
+      "diagramSourceSha256": "fb881ea9f015c63d6f8fb46fdbb389ad7985b810bc6f95c439e146d5d21d2df5",
+      "usedBy": [
+        "sort-by-what-is-missing"
+      ],
+      "visualReview": "pending"
+    },
+    "card-seeds-gap": {
+      "path": "assets/card-seeds-gap.png",
+      "sha256": "cb267b6094291beb5ef150396ded5afe7b5296cbc995606a0d42457803c22c78",
+      "source": "exact_quantity_diagram",
+      "diagramSource": "diagrams.py",
+      "diagramSourceSha256": "fb881ea9f015c63d6f8fb46fdbb389ad7985b810bc6f95c439e146d5d21d2df5",
+      "usedBy": [
+        "sort-by-what-is-missing"
+      ],
+      "visualReview": "pending"
+    },
+    "card-seeds-part": {
+      "path": "assets/card-seeds-part.png",
+      "sha256": "535da6ecee5c7a03c9c2df91184b8881d76a5d27a38aa14b715c6faaaa7367ee",
+      "source": "exact_quantity_diagram",
+      "diagramSource": "diagrams.py",
+      "diagramSourceSha256": "fb881ea9f015c63d6f8fb46fdbb389ad7985b810bc6f95c439e146d5d21d2df5",
+      "usedBy": [
+        "sort-by-what-is-missing"
+      ],
+      "visualReview": "pending"
+    },
+    "card-pots-gap": {
+      "path": "assets/card-pots-gap.png",
+      "sha256": "4c0031d41cd705a55d79d4c3f2f8bce3ab4fe7790b7624b3f16ba6c5b7fb650c",
+      "source": "exact_quantity_diagram",
+      "diagramSource": "diagrams.py",
+      "diagramSourceSha256": "fb881ea9f015c63d6f8fb46fdbb389ad7985b810bc6f95c439e146d5d21d2df5",
+      "usedBy": [
+        "sort-by-what-is-missing"
+      ],
+      "visualReview": "pending"
+    },
+    "card-markers-total": {
+      "path": "assets/card-markers-total.png",
+      "sha256": "f874508ba66e66aada84fbb22f66896d1e41160bd7501e57620a4f64126f4b78",
+      "source": "exact_quantity_diagram",
+      "diagramSource": "diagrams.py",
+      "diagramSourceSha256": "fb881ea9f015c63d6f8fb46fdbb389ad7985b810bc6f95c439e146d5d21d2df5",
+      "usedBy": [
+        "sort-by-what-is-missing"
+      ],
+      "visualReview": "pending"
+    },
+    "card-twenty-part": {
+      "path": "assets/card-twenty-part.png",
+      "sha256": "491ccdd8cfda3fe04112fe1286cf475f8e5a7d6db4f533580909778d46454e48",
+      "source": "exact_quantity_diagram",
+      "diagramSource": "diagrams.py",
+      "diagramSourceSha256": "fb881ea9f015c63d6f8fb46fdbb389ad7985b810bc6f95c439e146d5d21d2df5",
+      "usedBy": [
+        "sort-by-what-is-missing"
+      ],
+      "visualReview": "pending"
+    },
+    "card-twenty-three-gap": {
+      "path": "assets/card-twenty-three-gap.png",
+      "sha256": "75e001cc52f2acebbd4e070cce834bd95d861bbd5a3cb81e98ae0f052b80edc0",
+      "source": "exact_quantity_diagram",
+      "diagramSource": "diagrams.py",
+      "diagramSourceSha256": "fb881ea9f015c63d6f8fb46fdbb389ad7985b810bc6f95c439e146d5d21d2df5",
+      "usedBy": [
+        "sort-by-what-is-missing"
+      ],
+      "visualReview": "pending"
+    },
+    "card-nineteen-total": {
+      "path": "assets/card-nineteen-total.png",
+      "sha256": "dead349dd6768b59a7da631dccd0aa7244af3267ee69defc2f03b3adbbbd0dbb",
+      "source": "exact_quantity_diagram",
+      "diagramSource": "diagrams.py",
+      "diagramSourceSha256": "fb881ea9f015c63d6f8fb46fdbb389ad7985b810bc6f95c439e146d5d21d2df5",
+      "usedBy": [
+        "sort-by-what-is-missing"
+      ],
+      "visualReview": "pending"
+    },
+    "card-twenty-four-part": {
+      "path": "assets/card-twenty-four-part.png",
+      "sha256": "e30d781153f61650d4b5865ad53214a4cebf292c717714b8aba35659884277f2",
+      "source": "exact_quantity_diagram",
+      "diagramSource": "diagrams.py",
+      "diagramSourceSha256": "fb881ea9f015c63d6f8fb46fdbb389ad7985b810bc6f95c439e146d5d21d2df5",
+      "usedBy": [
+        "sort-by-what-is-missing"
+      ],
+      "visualReview": "pending"
+    },
+    "order-find-13": {
+      "path": "assets/order-find-13.png",
+      "sha256": "90a9e7f573151e8157071c14fc03b2a18745652ace4264b03feb9729cddbe6c0",
+      "source": "exact_quantity_diagram",
+      "diagramSource": "diagrams.py",
+      "diagramSourceSha256": "fb881ea9f015c63d6f8fb46fdbb389ad7985b810bc6f95c439e146d5d21d2df5",
+      "usedBy": [
+        "aim-at-the-matching-count"
+      ],
+      "visualReview": "pending"
+    },
+    "order-find-gap": {
+      "path": "assets/order-find-gap.png",
+      "sha256": "454d2f76b9442e29db8d6a1ccc20f398048a63363263bd2f1789169ccf8c6564",
+      "source": "exact_quantity_diagram",
+      "diagramSource": "diagrams.py",
+      "diagramSourceSha256": "fb881ea9f015c63d6f8fb46fdbb389ad7985b810bc6f95c439e146d5d21d2df5",
+      "usedBy": [
+        "aim-at-the-matching-count"
+      ],
+      "visualReview": "pending"
+    },
+    "order-find-27": {
+      "path": "assets/order-find-27.png",
+      "sha256": "9b45ffffd1dc58e94d23f1898286017f5ef3cba963109573b242fa3cf5acfb2e",
+      "source": "exact_quantity_diagram",
+      "diagramSource": "diagrams.py",
+      "diagramSourceSha256": "fb881ea9f015c63d6f8fb46fdbb389ad7985b810bc6f95c439e146d5d21d2df5",
+      "usedBy": [
+        "aim-at-the-matching-count"
+      ],
+      "visualReview": "pending"
+    },
+    "order-find-63": {
+      "path": "assets/order-find-63.png",
+      "sha256": "40dd4554d6db3157055d10e3baab65513bf786f62e72d176a14bac9e9d6fb58b",
+      "source": "exact_quantity_diagram",
+      "diagramSource": "diagrams.py",
+      "diagramSourceSha256": "fb881ea9f015c63d6f8fb46fdbb389ad7985b810bc6f95c439e146d5d21d2df5",
+      "usedBy": [
+        "aim-at-the-matching-count"
+      ],
+      "visualReview": "pending"
+    },
+    "order-west-27": {
+      "path": "assets/order-west-27.png",
+      "sha256": "3cc0f161d7d40c31e9d823aef01e302d81f23b759e47ea7329eb1d0c4aad6b08",
+      "source": "exact_quantity_diagram",
+      "diagramSource": "diagrams.py",
+      "diagramSourceSha256": "fb881ea9f015c63d6f8fb46fdbb389ad7985b810bc6f95c439e146d5d21d2df5",
+      "usedBy": [
+        "aim-at-the-matching-count"
+      ],
+      "visualReview": "pending"
+    },
+    "order-south-35": {
+      "path": "assets/order-south-35.png",
+      "sha256": "809d63a669f64b76a09e629afde055854e9d640cfa3e0225df50952c541b929e",
+      "source": "exact_quantity_diagram",
+      "diagramSource": "diagrams.py",
+      "diagramSourceSha256": "fb881ea9f015c63d6f8fb46fdbb389ad7985b810bc6f95c439e146d5d21d2df5",
+      "usedBy": [
+        "aim-at-the-matching-count"
+      ],
+      "visualReview": "pending"
+    },
+    "target-4": {
+      "path": "assets/target-4.png",
+      "sha256": "ee26053868a97055cc2f9583631caa2ca655b0abd4289c62df95c85a7db3f35f",
+      "source": "exact_quantity_diagram",
+      "diagramSource": "diagrams.py",
+      "diagramSourceSha256": "fb881ea9f015c63d6f8fb46fdbb389ad7985b810bc6f95c439e146d5d21d2df5",
+      "usedBy": [
+        "aim-at-the-matching-count"
+      ],
+      "visualReview": "pending"
+    },
+    "target-9": {
+      "path": "assets/target-9.png",
+      "sha256": "93a798477ac665a2fc2823d6424dab0f91f275b9973f9f3b5746c858354714b6",
+      "source": "exact_quantity_diagram",
+      "diagramSource": "diagrams.py",
+      "diagramSourceSha256": "fb881ea9f015c63d6f8fb46fdbb389ad7985b810bc6f95c439e146d5d21d2df5",
+      "usedBy": [
+        "aim-at-the-matching-count"
+      ],
+      "visualReview": "pending"
+    },
+    "target-13": {
+      "path": "assets/target-13.png",
+      "sha256": "3c6ab4d853d0c7e13e9a340fc2a939a0a940f83d65afcec3b7c0c0516e77a37e",
+      "source": "exact_quantity_diagram",
+      "diagramSource": "diagrams.py",
+      "diagramSourceSha256": "fb881ea9f015c63d6f8fb46fdbb389ad7985b810bc6f95c439e146d5d21d2df5",
+      "usedBy": [
+        "aim-at-the-matching-count"
+      ],
+      "visualReview": "pending"
+    },
+    "target-27": {
+      "path": "assets/target-27.png",
+      "sha256": "9fa7c9632dc713e6038abadb696706dc18d27e45d78ba4f58c0a9bfd0ea62268",
+      "source": "exact_quantity_diagram",
+      "diagramSource": "diagrams.py",
+      "diagramSourceSha256": "fb881ea9f015c63d6f8fb46fdbb389ad7985b810bc6f95c439e146d5d21d2df5",
+      "usedBy": [
+        "aim-at-the-matching-count"
+      ],
+      "visualReview": "pending"
+    },
+    "target-35": {
+      "path": "assets/target-35.png",
+      "sha256": "c826e8f286d3a80d1723f28bc2a5a067b62764dc3fc8c50f349e257083cfbbf4",
+      "source": "exact_quantity_diagram",
+      "diagramSource": "diagrams.py",
+      "diagramSourceSha256": "fb881ea9f015c63d6f8fb46fdbb389ad7985b810bc6f95c439e146d5d21d2df5",
+      "usedBy": [
+        "aim-at-the-matching-count"
+      ],
+      "visualReview": "pending"
+    },
+    "target-39": {
+      "path": "assets/target-39.png",
+      "sha256": "2a66745df7c5293f31bbcebbbd3eb59b0a4ea0e377ed5d0070cdb6c4036f94df",
+      "source": "exact_quantity_diagram",
+      "diagramSource": "diagrams.py",
+      "diagramSourceSha256": "fb881ea9f015c63d6f8fb46fdbb389ad7985b810bc6f95c439e146d5d21d2df5",
+      "usedBy": [
+        "aim-at-the-matching-count"
+      ],
+      "visualReview": "pending"
+    },
+    "target-41": {
+      "path": "assets/target-41.png",
+      "sha256": "506cfeb1230d907570961e0bdc351aff150bdad139f4ab436c9a0fb04bf7e361",
+      "source": "exact_quantity_diagram",
+      "diagramSource": "diagrams.py",
+      "diagramSourceSha256": "fb881ea9f015c63d6f8fb46fdbb389ad7985b810bc6f95c439e146d5d21d2df5",
+      "usedBy": [
+        "aim-at-the-matching-count"
+      ],
+      "visualReview": "pending"
+    },
+    "target-45": {
+      "path": "assets/target-45.png",
+      "sha256": "96f402e03e50d2a8ea3addc749d8c4658edf2644a2d8d1ce25ca397ce2ce94cc",
+      "source": "exact_quantity_diagram",
+      "diagramSource": "diagrams.py",
+      "diagramSourceSha256": "fb881ea9f015c63d6f8fb46fdbb389ad7985b810bc6f95c439e146d5d21d2df5",
+      "usedBy": [
+        "aim-at-the-matching-count"
+      ],
+      "visualReview": "pending"
+    },
+    "target-63": {
+      "path": "assets/target-63.png",
+      "sha256": "1cc8019081a8dbc69afdda635d629a763e3f7291064eccfddbd08584caa6f7b1",
+      "source": "exact_quantity_diagram",
+      "diagramSource": "diagrams.py",
+      "diagramSourceSha256": "fb881ea9f015c63d6f8fb46fdbb389ad7985b810bc6f95c439e146d5d21d2df5",
+      "usedBy": [
+        "aim-at-the-matching-count"
+      ],
+      "visualReview": "pending"
+    },
+    "quiz-total-prompt": {
+      "path": "assets/quiz-total-prompt.png",
+      "sha256": "9e46d3395dd70a8135214f3b4322a1f01bd0553d3b578361f6fc21eee7d04b11",
+      "source": "exact_quantity_diagram",
+      "diagramSource": "diagrams.py",
+      "diagramSourceSha256": "fb881ea9f015c63d6f8fb46fdbb389ad7985b810bc6f95c439e146d5d21d2df5",
+      "usedBy": [
+        "quiz-total"
+      ],
+      "visualReview": "pending"
+    },
+    "quiz-total-a": {
+      "path": "assets/quiz-total-a.png",
+      "sha256": "93a798477ac665a2fc2823d6424dab0f91f275b9973f9f3b5746c858354714b6",
+      "source": "exact_quantity_diagram",
+      "diagramSource": "diagrams.py",
+      "diagramSourceSha256": "fb881ea9f015c63d6f8fb46fdbb389ad7985b810bc6f95c439e146d5d21d2df5",
+      "usedBy": [
+        "quiz-total"
+      ],
+      "visualReview": "pending"
+    },
+    "quiz-total-b": {
+      "path": "assets/quiz-total-b.png",
+      "sha256": "de830a0fb30b6e55b80f07e585f6ad5107f108523a4db8822bbb6a052a68b565",
+      "source": "exact_quantity_diagram",
+      "diagramSource": "diagrams.py",
+      "diagramSourceSha256": "fb881ea9f015c63d6f8fb46fdbb389ad7985b810bc6f95c439e146d5d21d2df5",
+      "usedBy": [
+        "quiz-total"
+      ],
+      "visualReview": "pending"
+    },
+    "quiz-total-c": {
+      "path": "assets/quiz-total-c.png",
+      "sha256": "a6b30be3314d2a24dfb91327332ac2f9f1817e176b375715b8373d8c596d889d",
+      "source": "exact_quantity_diagram",
+      "diagramSource": "diagrams.py",
+      "diagramSourceSha256": "fb881ea9f015c63d6f8fb46fdbb389ad7985b810bc6f95c439e146d5d21d2df5",
+      "usedBy": [
+        "quiz-total"
+      ],
+      "visualReview": "pending"
+    },
+    "quiz-difference-a": {
+      "path": "assets/quiz-difference-a.png",
+      "sha256": "439aabb7e70f727f796544389074da854ca5a8476bd0b405564487732b783b49",
+      "source": "exact_quantity_diagram",
+      "diagramSource": "diagrams.py",
+      "diagramSourceSha256": "fb881ea9f015c63d6f8fb46fdbb389ad7985b810bc6f95c439e146d5d21d2df5",
+      "usedBy": [
+        "quiz-difference"
+      ],
+      "visualReview": "pending"
+    },
+    "quiz-difference-b": {
+      "path": "assets/quiz-difference-b.png",
+      "sha256": "39aedf5d6eff166aaee64ee6ac8e5bf7765c0debe2dcfd9f21eb3f229bf0ce84",
+      "source": "exact_quantity_diagram",
+      "diagramSource": "diagrams.py",
+      "diagramSourceSha256": "fb881ea9f015c63d6f8fb46fdbb389ad7985b810bc6f95c439e146d5d21d2df5",
+      "usedBy": [
+        "quiz-difference"
+      ],
+      "visualReview": "pending"
+    },
+    "quiz-difference-c": {
+      "path": "assets/quiz-difference-c.png",
+      "sha256": "73f5952d236852721cc1df3ab0f61c55c1659b28b18d8935644dc8de6a1b4490",
+      "source": "exact_quantity_diagram",
+      "diagramSource": "diagrams.py",
+      "diagramSourceSha256": "fb881ea9f015c63d6f8fb46fdbb389ad7985b810bc6f95c439e146d5d21d2df5",
+      "usedBy": [
+        "quiz-difference"
+      ],
+      "visualReview": "pending"
+    },
+    "quiz-unknown-group-prompt": {
+      "path": "assets/quiz-unknown-group-prompt.png",
+      "sha256": "96069e6bbcd291ef60dbcefdbcf23cb5566fa5eb9d07b503563e60f2a28c18b0",
+      "source": "exact_quantity_diagram",
+      "diagramSource": "diagrams.py",
+      "diagramSourceSha256": "fb881ea9f015c63d6f8fb46fdbb389ad7985b810bc6f95c439e146d5d21d2df5",
+      "usedBy": [
+        "quiz-unknown-group"
+      ],
+      "visualReview": "pending"
+    },
+    "quiz-unknown-group-a": {
+      "path": "assets/quiz-unknown-group-a.png",
+      "sha256": "8ae212635b92ebedaa0e385e3800b66ad0e4ffbfdf3e61543101d23b637e9d39",
+      "source": "exact_quantity_diagram",
+      "diagramSource": "diagrams.py",
+      "diagramSourceSha256": "fb881ea9f015c63d6f8fb46fdbb389ad7985b810bc6f95c439e146d5d21d2df5",
+      "usedBy": [
+        "quiz-unknown-group"
+      ],
+      "visualReview": "pending"
+    },
+    "quiz-unknown-group-b": {
+      "path": "assets/quiz-unknown-group-b.png",
+      "sha256": "cc40b72de04a1b7d9929e5840ad30ec74d0984e9c0f72a7421e6719ab23bcd75",
+      "source": "exact_quantity_diagram",
+      "diagramSource": "diagrams.py",
+      "diagramSourceSha256": "fb881ea9f015c63d6f8fb46fdbb389ad7985b810bc6f95c439e146d5d21d2df5",
+      "usedBy": [
+        "quiz-unknown-group"
+      ],
+      "visualReview": "pending"
+    },
+    "quiz-unknown-group-c": {
+      "path": "assets/quiz-unknown-group-c.png",
+      "sha256": "e6476df278eadb346d97210fdfed26f0478f3fe2ba3b9d7923256cc6de968323",
+      "source": "exact_quantity_diagram",
+      "diagramSource": "diagrams.py",
+      "diagramSourceSha256": "fb881ea9f015c63d6f8fb46fdbb389ad7985b810bc6f95c439e146d5d21d2df5",
+      "usedBy": [
+        "quiz-unknown-group"
+      ],
+      "visualReview": "pending"
+    },
+    "quiz-dependence-a": {
+      "path": "assets/quiz-dependence-a.png",
+      "sha256": "02ca804204c22b1271a35a86a0d5ac8d5600137e49a3903054e256c5d960ad43",
+      "source": "exact_quantity_diagram",
+      "diagramSource": "diagrams.py",
+      "diagramSourceSha256": "fb881ea9f015c63d6f8fb46fdbb389ad7985b810bc6f95c439e146d5d21d2df5",
+      "usedBy": [
+        "quiz-dependence"
+      ],
+      "visualReview": "pending"
+    },
+    "quiz-dependence-b": {
+      "path": "assets/quiz-dependence-b.png",
+      "sha256": "33d811462fa53d3ef66877b69d5af75fcd313aeeb1982467d07d4a53b68420d4",
+      "source": "exact_quantity_diagram",
+      "diagramSource": "diagrams.py",
+      "diagramSourceSha256": "fb881ea9f015c63d6f8fb46fdbb389ad7985b810bc6f95c439e146d5d21d2df5",
+      "usedBy": [
+        "quiz-dependence"
+      ],
+      "visualReview": "pending"
+    },
+    "quiz-dependence-c": {
+      "path": "assets/quiz-dependence-c.png",
+      "sha256": "e509305bef0e1d8c21e2bf0a082407baa668959979ceef7f5bc67a238fb3fc5f",
+      "source": "exact_quantity_diagram",
+      "diagramSource": "diagrams.py",
+      "diagramSourceSha256": "fb881ea9f015c63d6f8fb46fdbb389ad7985b810bc6f95c439e146d5d21d2df5",
+      "usedBy": [
+        "quiz-dependence"
+      ],
+      "visualReview": "pending"
+    },
+    "quiz-changed-reference-a": {
+      "path": "assets/quiz-changed-reference-a.png",
+      "sha256": "6c6b647a910b23568a6936705c10d1ab38063efca6f6371604971df1e0a258ce",
+      "source": "exact_quantity_diagram",
+      "diagramSource": "diagrams.py",
+      "diagramSourceSha256": "fb881ea9f015c63d6f8fb46fdbb389ad7985b810bc6f95c439e146d5d21d2df5",
+      "usedBy": [
+        "quiz-changed-reference"
+      ],
+      "visualReview": "pending"
+    },
+    "quiz-changed-reference-b": {
+      "path": "assets/quiz-changed-reference-b.png",
+      "sha256": "2bde48c980a20eeb4602b034bc21a57b6e4907d89866bd836f0aa35e116bbf6d",
+      "source": "exact_quantity_diagram",
+      "diagramSource": "diagrams.py",
+      "diagramSourceSha256": "fb881ea9f015c63d6f8fb46fdbb389ad7985b810bc6f95c439e146d5d21d2df5",
+      "usedBy": [
+        "quiz-changed-reference"
+      ],
+      "visualReview": "pending"
+    },
+    "quiz-changed-reference-c": {
+      "path": "assets/quiz-changed-reference-c.png",
+      "sha256": "f6b61c2a591707c8785e398e408b65b41765258e6aaf5f726191b0790da606a4",
+      "source": "exact_quantity_diagram",
+      "diagramSource": "diagrams.py",
+      "diagramSourceSha256": "fb881ea9f015c63d6f8fb46fdbb389ad7985b810bc6f95c439e146d5d21d2df5",
+      "usedBy": [
+        "quiz-changed-reference"
+      ],
+      "visualReview": "pending"
+    },
+    "quiz-same-gap-a": {
+      "path": "assets/quiz-same-gap-a.png",
+      "sha256": "762a6744903f3762362f0f0164ea0699fa86e365ff90f5cff55227ebecc1721b",
+      "source": "exact_quantity_diagram",
+      "diagramSource": "diagrams.py",
+      "diagramSourceSha256": "fb881ea9f015c63d6f8fb46fdbb389ad7985b810bc6f95c439e146d5d21d2df5",
+      "usedBy": [
+        "quiz-same-gap"
+      ],
+      "visualReview": "pending"
+    },
+    "quiz-same-gap-b": {
+      "path": "assets/quiz-same-gap-b.png",
+      "sha256": "7a968ed2766ab4dc061d5a129614282f692d171afd4e300893093c0a15f73a96",
+      "source": "exact_quantity_diagram",
+      "diagramSource": "diagrams.py",
+      "diagramSourceSha256": "fb881ea9f015c63d6f8fb46fdbb389ad7985b810bc6f95c439e146d5d21d2df5",
+      "usedBy": [
+        "quiz-same-gap"
+      ],
+      "visualReview": "pending"
+    },
+    "quiz-same-gap-c": {
+      "path": "assets/quiz-same-gap-c.png",
+      "sha256": "7af8d6aaf08c8b4723f71c39e3f09ee74b8e3f00161828771197d82b9a71b04b",
+      "source": "exact_quantity_diagram",
+      "diagramSource": "diagrams.py",
+      "diagramSourceSha256": "fb881ea9f015c63d6f8fb46fdbb389ad7985b810bc6f95c439e146d5d21d2df5",
+      "usedBy": [
+        "quiz-same-gap"
+      ],
+      "visualReview": "pending"
+    },
+    "independent-total": {
+      "path": "assets/independent-total.png",
+      "sha256": "7703ce6bc35530d218f312c4a427cf7bcba717271dc2575c3787eb536d7fd2dc",
+      "source": "exact_quantity_diagram",
+      "diagramSource": "diagrams.py",
+      "diagramSourceSha256": "fb881ea9f015c63d6f8fb46fdbb389ad7985b810bc6f95c439e146d5d21d2df5",
+      "usedBy": [
+        "two-questions-one-picture"
+      ],
+      "visualReview": "pending"
+    },
+    "independent-gap": {
+      "path": "assets/independent-gap.png",
+      "sha256": "297a4eb4f9b331d5cdf2dd449f735ff07de6ff7c0ac92fd62fcb474f7492afdb",
+      "source": "exact_quantity_diagram",
+      "diagramSource": "diagrams.py",
+      "diagramSourceSha256": "fb881ea9f015c63d6f8fb46fdbb389ad7985b810bc6f95c439e146d5d21d2df5",
+      "usedBy": [
+        "two-questions-one-picture"
+      ],
+      "visualReview": "pending"
+    }
+  }
+}

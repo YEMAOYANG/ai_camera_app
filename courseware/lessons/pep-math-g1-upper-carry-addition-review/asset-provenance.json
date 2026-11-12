@@ -1,0 +1,791 @@
+{
+  "schemaVersion": "mira.courseware.asset-provenance.v1",
+  "lesson": "pep-math-g1-upper-carry-addition-review",
+  "reviewedAt": "2026-11-10T17:01:11.529420+08:00",
+  "status": "prevoice_contact_and_exact_count_passed",
+  "interactivePageBudget": {
+    "sort-the-rows": 1981430,
+    "find-the-next-card": 2306785
+  },
+  "missing": [],
+  "assets": [
+    {
+      "assetKey": "lantern-stage",
+      "path": "assets/lantern-stage.png",
+      "sha256": "e6f5777b4ee1f8381ed2c007415d3b999482b142e59ed2e5dd6b05e655a92805",
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/lantern-stage.png",
+      "generatedSourceSha256": "7b1f55f8696add41767e84e733e59cf408c81abfbfbd81f3296e3056672d86b0",
+      "prompt": "A wide 16:9 full-bleed background for a first-grade educational game called Little Lantern Dispatch. Original children's book illustration, matte gouache and fine uncoated paper texture, confident simple cut-paper silhouettes. View straight on into a quiet community lantern festival preparation booth at blue-green dusk. A dark muted pine and slate work surface fills the central 70 percent and all the bottom, calm and almost empty to support crisp overlaid game boards and controls. At the outer margins only, hang one apricot paper lantern high on the left, one small cream paper lantern high on the right; thin wood frames on the left and right edges and a sliver of painted tiled roofs seen through an open upper strip. Delicate warm light lives near the margins, not across the center. Warm cream, orange persimmon and antique teal accents on a peaceful deep green field. No numbers, text, labels, logos, human figures, counting arrays, game objects, buttons, UI or frames around the image. Very clean visual reading.",
+      "promptSha256": "0b1993ab11f4eed7d15e0005c0da5fbf13e1b341efc26f8f0ef42d6175c28270",
+      "derivedBy": "sips -Z 1280, original 16:9 preserved",
+      "usedBy": [
+        "sort-the-rows",
+        "find-the-next-card"
+      ],
+      "visualReview": "contact_sheet_subject_color_edges_passed_in_page_pending"
+    },
+    {
+      "assetKey": "lantern-orange",
+      "path": "assets/lantern-orange.png",
+      "sha256": "9ade12b25984a2f8f86a6c9c433581389583f0713db20eb1260769a455fee03e",
+      "width": 512,
+      "height": 512,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/lantern-cutouts.png",
+      "generatedSourceSha256": "600def1a3f9a95cd0d29aea088539cbe2132495e2f55b548efd9f365a9f72793",
+      "prompt": "Create one atlas containing separate original picture assets for a first-grade lesson.\nUse 2 equal rows and 3 equal columns, with one fully visible object centered in each occupied cell. Keep wide empty margins around every object and between cells. No crossing cell boundaries, touching subjects, dividers, frames, text, letters, numbers, labels, logos or watermarks. Leave unused cells empty. Use true transparent alpha for the background, including the margins. Do not draw a checkerboard.\n\nKeep a consistent matte gouache and fine paper grain, with clean cut-paper contours. Use deep pine green, warm cream, apricot and persimmon as accents when appropriate. Keep the objects immediately recognizable and retain the real or lesson-specific colors and details in the descriptions. An object used for counting appears exactly once in its own cell.\n\nCell positions, in reading order:\nRow 1, column 1: Exactly one simple persimmon-orange round paper lantern with a neat cap and a short single hanging tassel, viewed straight on. Very compact and recognizable silhouette, no string beyond the silhouette.\nRow 1, column 2: Exactly one simple mint turquoise-green round paper lantern with a neat cap and a short single hanging tassel, same scale and outline as the orange one, viewed straight on. Compact and recognizable.\nRow 1, column 3: One child-friendly miniature bubble car seen from straight overhead. Oriented to the right, pale apricot body with warm cream circular roof and two chunky slate-green wheels visible; near-square silhouette.\nRow 2, column 1: One copy of the little overhead apricot bubble car facing right, now with a small pale mint circular nozzle visibly open at the front. Same scale and silhouette, no external bubble or motion trail.\nRow 2, column 2: One glossy amber toy glass marble, round and legible at small scale, with one simple pine green inner leaf swirl and a cream highlight, no ground shadow.\nRow 2, column 3: One compact apricot lotus-shaped festival lantern with folded cream and mint paper petals and a thick warm cream sticker edge. Original cut-paper souvenir; no other subject.\n",
+      "promptSha256": "1b6852c466b11ef46c51cc6d1fd2019c4f8801f4ee83722fdd7999ca339631a8",
+      "sourceCrop": [
+        0,
+        0,
+        512,
+        512
+      ],
+      "usedBy": [
+        "art-source/lantern-math.json"
+      ],
+      "visualReview": "contact_sheet_subject_color_edges_passed_in_page_pending"
+    },
+    {
+      "assetKey": "lantern-green",
+      "path": "assets/lantern-green.png",
+      "sha256": "9504051f555f3ca2699667b563af2ad965638961fa45a49b82e8454db125fb76",
+      "width": 512,
+      "height": 512,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/lantern-cutouts.png",
+      "generatedSourceSha256": "600def1a3f9a95cd0d29aea088539cbe2132495e2f55b548efd9f365a9f72793",
+      "prompt": "Create one atlas containing separate original picture assets for a first-grade lesson.\nUse 2 equal rows and 3 equal columns, with one fully visible object centered in each occupied cell. Keep wide empty margins around every object and between cells. No crossing cell boundaries, touching subjects, dividers, frames, text, letters, numbers, labels, logos or watermarks. Leave unused cells empty. Use true transparent alpha for the background, including the margins. Do not draw a checkerboard.\n\nKeep a consistent matte gouache and fine paper grain, with clean cut-paper contours. Use deep pine green, warm cream, apricot and persimmon as accents when appropriate. Keep the objects immediately recognizable and retain the real or lesson-specific colors and details in the descriptions. An object used for counting appears exactly once in its own cell.\n\nCell positions, in reading order:\nRow 1, column 1: Exactly one simple persimmon-orange round paper lantern with a neat cap and a short single hanging tassel, viewed straight on. Very compact and recognizable silhouette, no string beyond the silhouette.\nRow 1, column 2: Exactly one simple mint turquoise-green round paper lantern with a neat cap and a short single hanging tassel, same scale and outline as the orange one, viewed straight on. Compact and recognizable.\nRow 1, column 3: One child-friendly miniature bubble car seen from straight overhead. Oriented to the right, pale apricot body with warm cream circular roof and two chunky slate-green wheels visible; near-square silhouette.\nRow 2, column 1: One copy of the little overhead apricot bubble car facing right, now with a small pale mint circular nozzle visibly open at the front. Same scale and silhouette, no external bubble or motion trail.\nRow 2, column 2: One glossy amber toy glass marble, round and legible at small scale, with one simple pine green inner leaf swirl and a cream highlight, no ground shadow.\nRow 2, column 3: One compact apricot lotus-shaped festival lantern with folded cream and mint paper petals and a thick warm cream sticker edge. Original cut-paper souvenir; no other subject.\n",
+      "promptSha256": "1b6852c466b11ef46c51cc6d1fd2019c4f8801f4ee83722fdd7999ca339631a8",
+      "sourceCrop": [
+        512,
+        0,
+        1024,
+        512
+      ],
+      "usedBy": [
+        "art-source/lantern-math.json"
+      ],
+      "visualReview": "contact_sheet_subject_color_edges_passed_in_page_pending"
+    },
+    {
+      "assetKey": "lantern-rover",
+      "path": "assets/lantern-rover.png",
+      "sha256": "84e63f8dbcfbc4bbc5c1c8ceed59887d26972ef08185809e29f86f941fd3ce6c",
+      "width": 512,
+      "height": 512,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/lantern-cutouts.png",
+      "generatedSourceSha256": "600def1a3f9a95cd0d29aea088539cbe2132495e2f55b548efd9f365a9f72793",
+      "prompt": "Create one atlas containing separate original picture assets for a first-grade lesson.\nUse 2 equal rows and 3 equal columns, with one fully visible object centered in each occupied cell. Keep wide empty margins around every object and between cells. No crossing cell boundaries, touching subjects, dividers, frames, text, letters, numbers, labels, logos or watermarks. Leave unused cells empty. Use true transparent alpha for the background, including the margins. Do not draw a checkerboard.\n\nKeep a consistent matte gouache and fine paper grain, with clean cut-paper contours. Use deep pine green, warm cream, apricot and persimmon as accents when appropriate. Keep the objects immediately recognizable and retain the real or lesson-specific colors and details in the descriptions. An object used for counting appears exactly once in its own cell.\n\nCell positions, in reading order:\nRow 1, column 1: Exactly one simple persimmon-orange round paper lantern with a neat cap and a short single hanging tassel, viewed straight on. Very compact and recognizable silhouette, no string beyond the silhouette.\nRow 1, column 2: Exactly one simple mint turquoise-green round paper lantern with a neat cap and a short single hanging tassel, same scale and outline as the orange one, viewed straight on. Compact and recognizable.\nRow 1, column 3: One child-friendly miniature bubble car seen from straight overhead. Oriented to the right, pale apricot body with warm cream circular roof and two chunky slate-green wheels visible; near-square silhouette.\nRow 2, column 1: One copy of the little overhead apricot bubble car facing right, now with a small pale mint circular nozzle visibly open at the front. Same scale and silhouette, no external bubble or motion trail.\nRow 2, column 2: One glossy amber toy glass marble, round and legible at small scale, with one simple pine green inner leaf swirl and a cream highlight, no ground shadow.\nRow 2, column 3: One compact apricot lotus-shaped festival lantern with folded cream and mint paper petals and a thick warm cream sticker edge. Original cut-paper souvenir; no other subject.\n",
+      "promptSha256": "1b6852c466b11ef46c51cc6d1fd2019c4f8801f4ee83722fdd7999ca339631a8",
+      "sourceCrop": [
+        1024,
+        0,
+        1536,
+        512
+      ],
+      "usedBy": [
+        "find-the-next-card"
+      ],
+      "visualReview": "contact_sheet_subject_color_edges_passed_in_page_pending"
+    },
+    {
+      "assetKey": "lantern-rover-pop",
+      "path": "assets/lantern-rover-pop.png",
+      "sha256": "ce043618c48bb33e24cc785cdada9985ae8ccac2d37e1870498f7c3e865f0da2",
+      "width": 512,
+      "height": 512,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/lantern-cutouts.png",
+      "generatedSourceSha256": "600def1a3f9a95cd0d29aea088539cbe2132495e2f55b548efd9f365a9f72793",
+      "prompt": "Create one atlas containing separate original picture assets for a first-grade lesson.\nUse 2 equal rows and 3 equal columns, with one fully visible object centered in each occupied cell. Keep wide empty margins around every object and between cells. No crossing cell boundaries, touching subjects, dividers, frames, text, letters, numbers, labels, logos or watermarks. Leave unused cells empty. Use true transparent alpha for the background, including the margins. Do not draw a checkerboard.\n\nKeep a consistent matte gouache and fine paper grain, with clean cut-paper contours. Use deep pine green, warm cream, apricot and persimmon as accents when appropriate. Keep the objects immediately recognizable and retain the real or lesson-specific colors and details in the descriptions. An object used for counting appears exactly once in its own cell.\n\nCell positions, in reading order:\nRow 1, column 1: Exactly one simple persimmon-orange round paper lantern with a neat cap and a short single hanging tassel, viewed straight on. Very compact and recognizable silhouette, no string beyond the silhouette.\nRow 1, column 2: Exactly one simple mint turquoise-green round paper lantern with a neat cap and a short single hanging tassel, same scale and outline as the orange one, viewed straight on. Compact and recognizable.\nRow 1, column 3: One child-friendly miniature bubble car seen from straight overhead. Oriented to the right, pale apricot body with warm cream circular roof and two chunky slate-green wheels visible; near-square silhouette.\nRow 2, column 1: One copy of the little overhead apricot bubble car facing right, now with a small pale mint circular nozzle visibly open at the front. Same scale and silhouette, no external bubble or motion trail.\nRow 2, column 2: One glossy amber toy glass marble, round and legible at small scale, with one simple pine green inner leaf swirl and a cream highlight, no ground shadow.\nRow 2, column 3: One compact apricot lotus-shaped festival lantern with folded cream and mint paper petals and a thick warm cream sticker edge. Original cut-paper souvenir; no other subject.\n",
+      "promptSha256": "1b6852c466b11ef46c51cc6d1fd2019c4f8801f4ee83722fdd7999ca339631a8",
+      "sourceCrop": [
+        0,
+        512,
+        512,
+        1024
+      ],
+      "usedBy": [
+        "find-the-next-card"
+      ],
+      "visualReview": "contact_sheet_subject_color_edges_passed_in_page_pending"
+    },
+    {
+      "assetKey": "lantern-marble",
+      "path": "assets/lantern-marble.png",
+      "sha256": "eb18b7b12e47bd724171fd4bd2d6c49c96c8c31f9966e41baeadda165e391999",
+      "width": 512,
+      "height": 512,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/lantern-cutouts.png",
+      "generatedSourceSha256": "600def1a3f9a95cd0d29aea088539cbe2132495e2f55b548efd9f365a9f72793",
+      "prompt": "Create one atlas containing separate original picture assets for a first-grade lesson.\nUse 2 equal rows and 3 equal columns, with one fully visible object centered in each occupied cell. Keep wide empty margins around every object and between cells. No crossing cell boundaries, touching subjects, dividers, frames, text, letters, numbers, labels, logos or watermarks. Leave unused cells empty. Use true transparent alpha for the background, including the margins. Do not draw a checkerboard.\n\nKeep a consistent matte gouache and fine paper grain, with clean cut-paper contours. Use deep pine green, warm cream, apricot and persimmon as accents when appropriate. Keep the objects immediately recognizable and retain the real or lesson-specific colors and details in the descriptions. An object used for counting appears exactly once in its own cell.\n\nCell positions, in reading order:\nRow 1, column 1: Exactly one simple persimmon-orange round paper lantern with a neat cap and a short single hanging tassel, viewed straight on. Very compact and recognizable silhouette, no string beyond the silhouette.\nRow 1, column 2: Exactly one simple mint turquoise-green round paper lantern with a neat cap and a short single hanging tassel, same scale and outline as the orange one, viewed straight on. Compact and recognizable.\nRow 1, column 3: One child-friendly miniature bubble car seen from straight overhead. Oriented to the right, pale apricot body with warm cream circular roof and two chunky slate-green wheels visible; near-square silhouette.\nRow 2, column 1: One copy of the little overhead apricot bubble car facing right, now with a small pale mint circular nozzle visibly open at the front. Same scale and silhouette, no external bubble or motion trail.\nRow 2, column 2: One glossy amber toy glass marble, round and legible at small scale, with one simple pine green inner leaf swirl and a cream highlight, no ground shadow.\nRow 2, column 3: One compact apricot lotus-shaped festival lantern with folded cream and mint paper petals and a thick warm cream sticker edge. Original cut-paper souvenir; no other subject.\n",
+      "promptSha256": "1b6852c466b11ef46c51cc6d1fd2019c4f8801f4ee83722fdd7999ca339631a8",
+      "sourceCrop": [
+        512,
+        512,
+        1024,
+        1024
+      ],
+      "usedBy": [
+        "sort-the-rows"
+      ],
+      "visualReview": "contact_sheet_subject_color_edges_passed_in_page_pending"
+    },
+    {
+      "assetKey": "lantern-sticker",
+      "path": "assets/lantern-sticker.png",
+      "sha256": "07f8717d6af8ad7243ba820124cf421f4d43bf59c2ba1788bf4aad7641e3a7cd",
+      "width": 512,
+      "height": 512,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/lantern-cutouts.png",
+      "generatedSourceSha256": "600def1a3f9a95cd0d29aea088539cbe2132495e2f55b548efd9f365a9f72793",
+      "prompt": "Create one atlas containing separate original picture assets for a first-grade lesson.\nUse 2 equal rows and 3 equal columns, with one fully visible object centered in each occupied cell. Keep wide empty margins around every object and between cells. No crossing cell boundaries, touching subjects, dividers, frames, text, letters, numbers, labels, logos or watermarks. Leave unused cells empty. Use true transparent alpha for the background, including the margins. Do not draw a checkerboard.\n\nKeep a consistent matte gouache and fine paper grain, with clean cut-paper contours. Use deep pine green, warm cream, apricot and persimmon as accents when appropriate. Keep the objects immediately recognizable and retain the real or lesson-specific colors and details in the descriptions. An object used for counting appears exactly once in its own cell.\n\nCell positions, in reading order:\nRow 1, column 1: Exactly one simple persimmon-orange round paper lantern with a neat cap and a short single hanging tassel, viewed straight on. Very compact and recognizable silhouette, no string beyond the silhouette.\nRow 1, column 2: Exactly one simple mint turquoise-green round paper lantern with a neat cap and a short single hanging tassel, same scale and outline as the orange one, viewed straight on. Compact and recognizable.\nRow 1, column 3: One child-friendly miniature bubble car seen from straight overhead. Oriented to the right, pale apricot body with warm cream circular roof and two chunky slate-green wheels visible; near-square silhouette.\nRow 2, column 1: One copy of the little overhead apricot bubble car facing right, now with a small pale mint circular nozzle visibly open at the front. Same scale and silhouette, no external bubble or motion trail.\nRow 2, column 2: One glossy amber toy glass marble, round and legible at small scale, with one simple pine green inner leaf swirl and a cream highlight, no ground shadow.\nRow 2, column 3: One compact apricot lotus-shaped festival lantern with folded cream and mint paper petals and a thick warm cream sticker edge. Original cut-paper souvenir; no other subject.\n",
+      "promptSha256": "1b6852c466b11ef46c51cc6d1fd2019c4f8801f4ee83722fdd7999ca339631a8",
+      "sourceCrop": [
+        1024,
+        512,
+        1536,
+        1024
+      ],
+      "usedBy": [
+        "sort-the-rows",
+        "find-the-next-card",
+        "wrap-up"
+      ],
+      "visualReview": "contact_sheet_subject_color_edges_passed_in_page_pending"
+    },
+    {
+      "assetKey": "card-6-6",
+      "path": "assets/card-6-6.png",
+      "sha256": "1223a9b1de63f12bfc7175cf8c6212c904758b8dbf05eddccb2abafc9b6c479d",
+      "source": "Deterministic lantern and ten-frame placement; count tokens are original ImageGen sprites",
+      "codeSource": "art-source/draw_lanterns.py",
+      "diagramSpec": "art-source/lantern-math.json",
+      "usedBy": [
+        "sort-the-rows"
+      ],
+      "visualReview": "sample_contact_sheet_and_analytic_count_passed_in_page_pending"
+    },
+    {
+      "assetKey": "card-6-5",
+      "path": "assets/card-6-5.png",
+      "sha256": "cf55da5b012ddf6922c21330ce48546be5f4d334d9c7a5a2ac6394236d6b9099",
+      "source": "Deterministic lantern and ten-frame placement; count tokens are original ImageGen sprites",
+      "codeSource": "art-source/draw_lanterns.py",
+      "diagramSpec": "art-source/lantern-math.json",
+      "usedBy": [
+        "sort-the-rows"
+      ],
+      "visualReview": "sample_contact_sheet_and_analytic_count_passed_in_page_pending"
+    },
+    {
+      "assetKey": "card-7-5",
+      "path": "assets/card-7-5.png",
+      "sha256": "bcc5a9fa620783e6fa490f6835f535bb4a8dde0fc17f25f135c499d47db8650e",
+      "source": "Deterministic lantern and ten-frame placement; count tokens are original ImageGen sprites",
+      "codeSource": "art-source/draw_lanterns.py",
+      "diagramSpec": "art-source/lantern-math.json",
+      "usedBy": [
+        "sort-the-rows"
+      ],
+      "visualReview": "sample_contact_sheet_and_analytic_count_passed_in_page_pending"
+    },
+    {
+      "assetKey": "card-9-4",
+      "path": "assets/card-9-4.png",
+      "sha256": "c3828e565eb1d2000d7984852e5143eb4068b627a0fb8b3242ebde98eef63ed9",
+      "source": "Deterministic lantern and ten-frame placement; count tokens are original ImageGen sprites",
+      "codeSource": "art-source/draw_lanterns.py",
+      "diagramSpec": "art-source/lantern-math.json",
+      "usedBy": [
+        "sort-the-rows"
+      ],
+      "visualReview": "sample_contact_sheet_and_analytic_count_passed_in_page_pending"
+    },
+    {
+      "assetKey": "card-8-6",
+      "path": "assets/card-8-6.png",
+      "sha256": "30ab9fec2ca452680a57973d16880ba5c9aba74a91b465d308e533b01e5f09f4",
+      "source": "Deterministic lantern and ten-frame placement; count tokens are original ImageGen sprites",
+      "codeSource": "art-source/draw_lanterns.py",
+      "diagramSpec": "art-source/lantern-math.json",
+      "usedBy": [
+        "sort-the-rows"
+      ],
+      "visualReview": "sample_contact_sheet_and_analytic_count_passed_in_page_pending"
+    },
+    {
+      "assetKey": "card-8-5",
+      "path": "assets/card-8-5.png",
+      "sha256": "8da5ac4844f039ce6bdc3ed01f5cc4ea7b86e65b2264de0bb5070566b374d991",
+      "source": "Deterministic lantern and ten-frame placement; count tokens are original ImageGen sprites",
+      "codeSource": "art-source/draw_lanterns.py",
+      "diagramSpec": "art-source/lantern-math.json",
+      "usedBy": [
+        "sort-the-rows",
+        "find-the-next-card"
+      ],
+      "visualReview": "sample_contact_sheet_and_analytic_count_passed_in_page_pending"
+    },
+    {
+      "assetKey": "card-6-7",
+      "path": "assets/card-6-7.png",
+      "sha256": "492918e64fb86d3c701b070f5faddb177649c87ffde3bc6fdcf08956b5bcecd8",
+      "source": "Deterministic lantern and ten-frame placement; count tokens are original ImageGen sprites",
+      "codeSource": "art-source/draw_lanterns.py",
+      "diagramSpec": "art-source/lantern-math.json",
+      "usedBy": [
+        "sort-the-rows",
+        "find-the-next-card"
+      ],
+      "visualReview": "sample_contact_sheet_and_analytic_count_passed_in_page_pending"
+    },
+    {
+      "assetKey": "card-9-5",
+      "path": "assets/card-9-5.png",
+      "sha256": "68cc7c49df4c224875736fa4bc478d311032dae4b0e427d8d1e694c5176910d9",
+      "source": "Deterministic lantern and ten-frame placement; count tokens are original ImageGen sprites",
+      "codeSource": "art-source/draw_lanterns.py",
+      "diagramSpec": "art-source/lantern-math.json",
+      "usedBy": [
+        "sort-the-rows"
+      ],
+      "visualReview": "sample_contact_sheet_and_analytic_count_passed_in_page_pending"
+    },
+    {
+      "assetKey": "card-8-8",
+      "path": "assets/card-8-8.png",
+      "sha256": "09bacea5bea32fcc1a3a52a34552ab92461ee2cc26038646a26482febb30acdd",
+      "source": "Deterministic lantern and ten-frame placement; count tokens are original ImageGen sprites",
+      "codeSource": "art-source/draw_lanterns.py",
+      "diagramSpec": "art-source/lantern-math.json",
+      "usedBy": [
+        "sort-the-rows",
+        "find-the-next-card"
+      ],
+      "visualReview": "sample_contact_sheet_and_analytic_count_passed_in_page_pending"
+    },
+    {
+      "assetKey": "card-6-8",
+      "path": "assets/card-6-8.png",
+      "sha256": "bfb16e20b0cb3f7718a75d461f164ecefc24ee07bb7fdb8ce5ba2bb32fffa4de",
+      "source": "Deterministic lantern and ten-frame placement; count tokens are original ImageGen sprites",
+      "codeSource": "art-source/draw_lanterns.py",
+      "diagramSpec": "art-source/lantern-math.json",
+      "usedBy": [
+        "sort-the-rows"
+      ],
+      "visualReview": "sample_contact_sheet_and_analytic_count_passed_in_page_pending"
+    },
+    {
+      "assetKey": "card-9-7",
+      "path": "assets/card-9-7.png",
+      "sha256": "228ab2b94429df962784bf0699e42b6f07bb52e2c4c4d3e6441900d00312931c",
+      "source": "Deterministic lantern and ten-frame placement; count tokens are original ImageGen sprites",
+      "codeSource": "art-source/draw_lanterns.py",
+      "diagramSpec": "art-source/lantern-math.json",
+      "usedBy": [
+        "sort-the-rows",
+        "find-the-next-card"
+      ],
+      "visualReview": "sample_contact_sheet_and_analytic_count_passed_in_page_pending"
+    },
+    {
+      "assetKey": "card-8-3",
+      "path": "assets/card-8-3.png",
+      "sha256": "4c94f502bd30ca28bddb5353b263ef2983f33cda286a7eb5ae4d2ba9d11e1758",
+      "source": "Deterministic lantern and ten-frame placement; count tokens are original ImageGen sprites",
+      "codeSource": "art-source/draw_lanterns.py",
+      "diagramSpec": "art-source/lantern-math.json",
+      "usedBy": [
+        "find-the-next-card"
+      ],
+      "visualReview": "sample_contact_sheet_and_analytic_count_passed_in_page_pending"
+    },
+    {
+      "assetKey": "card-8-4",
+      "path": "assets/card-8-4.png",
+      "sha256": "00b6cd865e7030d26ab7ccd2779d2ec66a346fe0b45121a3df3614fb5158152c",
+      "source": "Deterministic lantern and ten-frame placement; count tokens are original ImageGen sprites",
+      "codeSource": "art-source/draw_lanterns.py",
+      "diagramSpec": "art-source/lantern-math.json",
+      "usedBy": [
+        "find-the-next-card"
+      ],
+      "visualReview": "sample_contact_sheet_and_analytic_count_passed_in_page_pending"
+    },
+    {
+      "assetKey": "card-5-7",
+      "path": "assets/card-5-7.png",
+      "sha256": "9ad15c76492eedf06d7fd7b2f9eea7544ccc726c349b25ebd47071e5c57a6984",
+      "source": "Deterministic lantern and ten-frame placement; count tokens are original ImageGen sprites",
+      "codeSource": "art-source/draw_lanterns.py",
+      "diagramSpec": "art-source/lantern-math.json",
+      "usedBy": [
+        "find-the-next-card"
+      ],
+      "visualReview": "sample_contact_sheet_and_analytic_count_passed_in_page_pending"
+    },
+    {
+      "assetKey": "card-7-7",
+      "path": "assets/card-7-7.png",
+      "sha256": "3b874dfdd3b8b95e57a99739cf4aeebf937a532c73e11b12c5c3d714a1c196c9",
+      "source": "Deterministic lantern and ten-frame placement; count tokens are original ImageGen sprites",
+      "codeSource": "art-source/draw_lanterns.py",
+      "diagramSpec": "art-source/lantern-math.json",
+      "usedBy": [
+        "find-the-next-card"
+      ],
+      "visualReview": "sample_contact_sheet_and_analytic_count_passed_in_page_pending"
+    },
+    {
+      "assetKey": "card-7-9",
+      "path": "assets/card-7-9.png",
+      "sha256": "28f00ccf7488c2fc928105f0591ff113bbd811408fd4572a6bf9c1fcd5ff45be",
+      "source": "Deterministic lantern and ten-frame placement; count tokens are original ImageGen sprites",
+      "codeSource": "art-source/draw_lanterns.py",
+      "diagramSpec": "art-source/lantern-math.json",
+      "usedBy": [
+        "find-the-next-card"
+      ],
+      "visualReview": "sample_contact_sheet_and_analytic_count_passed_in_page_pending"
+    },
+    {
+      "assetKey": "teach-make-ten",
+      "path": "assets/teach-make-ten.png",
+      "sha256": "cfa2f3b95a5692cd29fe60313f93aff333d0e3295c9defa473b769dfc7a1d571",
+      "source": "Deterministic lantern and ten-frame placement; count tokens are original ImageGen sprites",
+      "codeSource": "art-source/draw_lanterns.py",
+      "diagramSpec": "art-source/lantern-math.json",
+      "usedBy": [
+        "the-repair-index"
+      ],
+      "visualReview": "sample_contact_sheet_and_analytic_count_passed_in_page_pending"
+    },
+    {
+      "assetKey": "teach-swap",
+      "path": "assets/teach-swap.png",
+      "sha256": "1738aacf0588bef28c73bd958805d99d7292932f0114d5f3d73c05e36c69dd6b",
+      "source": "Deterministic lantern and ten-frame placement; count tokens are original ImageGen sprites",
+      "codeSource": "art-source/draw_lanterns.py",
+      "diagramSpec": "art-source/lantern-math.json",
+      "usedBy": [
+        "the-repair-index"
+      ],
+      "visualReview": "sample_contact_sheet_and_analytic_count_passed_in_page_pending"
+    },
+    {
+      "assetKey": "teach-two-ways",
+      "path": "assets/teach-two-ways.png",
+      "sha256": "ecc92714edd5dd574c32399c66987e073ddefc6e8865879de332bcdd6ee3d9a2",
+      "source": "Deterministic lantern and ten-frame placement; count tokens are original ImageGen sprites",
+      "codeSource": "art-source/draw_lanterns.py",
+      "diagramSpec": "art-source/lantern-math.json",
+      "usedBy": [
+        "which-problem"
+      ],
+      "visualReview": "sample_contact_sheet_and_analytic_count_passed_in_page_pending"
+    },
+    {
+      "assetKey": "teach-original",
+      "path": "assets/teach-original.png",
+      "sha256": "30a9332b1510c0e762a5bbcd1a044cfeb30517c0b42e78f1b4c0b0054b39df5a",
+      "source": "Deterministic lantern and ten-frame placement; count tokens are original ImageGen sprites",
+      "codeSource": "art-source/draw_lanterns.py",
+      "diagramSpec": "art-source/lantern-math.json",
+      "usedBy": [
+        "which-problem"
+      ],
+      "visualReview": "sample_contact_sheet_and_analytic_count_passed_in_page_pending"
+    },
+    {
+      "assetKey": "teach-fixed",
+      "path": "assets/teach-fixed.png",
+      "sha256": "8892d07f2c741bc0fdc2dd9a110af3c4611ddd420d97e0ae7917a0586bf10c01",
+      "source": "Deterministic lantern and ten-frame placement; count tokens are original ImageGen sprites",
+      "codeSource": "art-source/draw_lanterns.py",
+      "diagramSpec": "art-source/lantern-math.json",
+      "usedBy": [
+        "make-sorted-cards"
+      ],
+      "visualReview": "sample_contact_sheet_and_analytic_count_passed_in_page_pending"
+    },
+    {
+      "assetKey": "teach-row",
+      "path": "assets/teach-row.png",
+      "sha256": "69ae506852eb4fd47974b2bc9a5ece8e65dd03159b72ce83b3e35c61e6b0e0d7",
+      "source": "Deterministic lantern and ten-frame placement; count tokens are original ImageGen sprites",
+      "codeSource": "art-source/draw_lanterns.py",
+      "diagramSpec": "art-source/lantern-math.json",
+      "usedBy": [
+        "make-sorted-cards"
+      ],
+      "visualReview": "horizontal_layout_generated_verified_against_spoken_direction"
+    },
+    {
+      "assetKey": "teach-table-row",
+      "path": "assets/teach-table-row.png",
+      "sha256": "b6ace4cfe2da8835a5b479df281fd0db58ac861c07081226ca8d672f45b49522",
+      "source": "Deterministic lantern and ten-frame placement; count tokens are original ImageGen sprites",
+      "codeSource": "art-source/draw_lanterns.py",
+      "diagramSpec": "art-source/lantern-math.json",
+      "usedBy": [
+        "map-the-grid"
+      ],
+      "visualReview": "sample_contact_sheet_and_analytic_count_passed_in_page_pending"
+    },
+    {
+      "assetKey": "teach-table-col",
+      "path": "assets/teach-table-col.png",
+      "sha256": "f80fff2d1743f957607d95723723e6aefb8dbafdb431c23927a6e36555a68418",
+      "source": "Deterministic lantern and ten-frame placement; count tokens are original ImageGen sprites",
+      "codeSource": "art-source/draw_lanterns.py",
+      "diagramSpec": "art-source/lantern-math.json",
+      "usedBy": [
+        "map-the-grid"
+      ],
+      "visualReview": "sample_contact_sheet_and_analytic_count_passed_in_page_pending"
+    },
+    {
+      "assetKey": "teach-equal-left",
+      "path": "assets/teach-equal-left.png",
+      "sha256": "2028c0d9a50da474a43ffc48decb912e83208555bb378ca817d4240d54258e6f",
+      "source": "Deterministic lantern and ten-frame placement; count tokens are original ImageGen sprites",
+      "codeSource": "art-source/draw_lanterns.py",
+      "diagramSpec": "art-source/lantern-math.json",
+      "usedBy": [
+        "both-sides-match"
+      ],
+      "visualReview": "sample_contact_sheet_and_analytic_count_passed_in_page_pending"
+    },
+    {
+      "assetKey": "teach-equal-try",
+      "path": "assets/teach-equal-try.png",
+      "sha256": "3a07dbb3808f7ea43023b544286afcf89604ad94328ae1b00f2b38214bd626b9",
+      "source": "Deterministic lantern and ten-frame placement; count tokens are original ImageGen sprites",
+      "codeSource": "art-source/draw_lanterns.py",
+      "diagramSpec": "art-source/lantern-math.json",
+      "usedBy": [
+        "both-sides-match"
+      ],
+      "visualReview": "sample_contact_sheet_and_analytic_count_passed_in_page_pending"
+    },
+    {
+      "assetKey": "teach-neighbor",
+      "path": "assets/teach-neighbor.png",
+      "sha256": "cfee0e2b4f4f72577d43efaa9d9f39f232feeed2471892b860e78bff1dffeb96",
+      "source": "Deterministic lantern and ten-frame placement; count tokens are original ImageGen sprites",
+      "codeSource": "art-source/draw_lanterns.py",
+      "diagramSpec": "art-source/lantern-math.json",
+      "usedBy": [
+        "choose-and-recheck"
+      ],
+      "visualReview": "sample_contact_sheet_and_analytic_count_passed_in_page_pending"
+    },
+    {
+      "assetKey": "teach-check-17",
+      "path": "assets/teach-check-17.png",
+      "sha256": "e2400d7102f099b7c0eab235f4f3ad2e73248a68277cd462ec9ac1162243d043",
+      "source": "Deterministic lantern and ten-frame placement; count tokens are original ImageGen sprites",
+      "codeSource": "art-source/draw_lanterns.py",
+      "diagramSpec": "art-source/lantern-math.json",
+      "usedBy": [
+        "choose-and-recheck"
+      ],
+      "visualReview": "sample_contact_sheet_and_analytic_count_passed_in_page_pending"
+    },
+    {
+      "assetKey": "q-fill-nine-start",
+      "path": "assets/q-fill-nine-start.png",
+      "sha256": "d16c4f2e70d3bdda938d66a3ae294bcfef9eac423aa80a86dfd6630caf2863ee",
+      "source": "Deterministic lantern and ten-frame placement; count tokens are original ImageGen sprites",
+      "codeSource": "art-source/draw_lanterns.py",
+      "diagramSpec": "art-source/lantern-math.json",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "sample_contact_sheet_and_analytic_count_passed_in_page_pending"
+    },
+    {
+      "assetKey": "q-fill-nine-a",
+      "path": "assets/q-fill-nine-a.png",
+      "sha256": "5d644aa1598fd5992a6b82d24f91562836188a2793e3490c941e0ca954e02827",
+      "source": "Deterministic lantern and ten-frame placement; count tokens are original ImageGen sprites",
+      "codeSource": "art-source/draw_lanterns.py",
+      "diagramSpec": "art-source/lantern-math.json",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "sample_contact_sheet_and_analytic_count_passed_in_page_pending"
+    },
+    {
+      "assetKey": "q-fill-nine-b",
+      "path": "assets/q-fill-nine-b.png",
+      "sha256": "d16c4f2e70d3bdda938d66a3ae294bcfef9eac423aa80a86dfd6630caf2863ee",
+      "source": "Deterministic lantern and ten-frame placement; count tokens are original ImageGen sprites",
+      "codeSource": "art-source/draw_lanterns.py",
+      "diagramSpec": "art-source/lantern-math.json",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "sample_contact_sheet_and_analytic_count_passed_in_page_pending"
+    },
+    {
+      "assetKey": "q-fill-nine-c",
+      "path": "assets/q-fill-nine-c.png",
+      "sha256": "53000aa99b68349ecd1c6d82771dc1d6e07ddb8cc35ec629e1c929abc77aa00a",
+      "source": "Deterministic lantern and ten-frame placement; count tokens are original ImageGen sprites",
+      "codeSource": "art-source/draw_lanterns.py",
+      "diagramSpec": "art-source/lantern-math.json",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "sample_contact_sheet_and_analytic_count_passed_in_page_pending"
+    },
+    {
+      "assetKey": "q-equal-row-start",
+      "path": "assets/q-equal-row-start.png",
+      "sha256": "45b021fb98db2baf152b61b1c47fc18c1d3f9c82f08aeba3d9108ca7a259cb69",
+      "source": "Deterministic lantern and ten-frame placement; count tokens are original ImageGen sprites",
+      "codeSource": "art-source/draw_lanterns.py",
+      "diagramSpec": "art-source/lantern-math.json",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "horizontal_layout_generated_verified_against_spoken_direction"
+    },
+    {
+      "assetKey": "q-equal-row-a",
+      "path": "assets/q-equal-row-a.png",
+      "sha256": "4ed2b3d57038d9546e46e76a862dda15bc2dcb29d5a77885d781370722e35b48",
+      "source": "Deterministic lantern and ten-frame placement; count tokens are original ImageGen sprites",
+      "codeSource": "art-source/draw_lanterns.py",
+      "diagramSpec": "art-source/lantern-math.json",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "sample_contact_sheet_and_analytic_count_passed_in_page_pending"
+    },
+    {
+      "assetKey": "q-equal-row-b",
+      "path": "assets/q-equal-row-b.png",
+      "sha256": "d16c4f2e70d3bdda938d66a3ae294bcfef9eac423aa80a86dfd6630caf2863ee",
+      "source": "Deterministic lantern and ten-frame placement; count tokens are original ImageGen sprites",
+      "codeSource": "art-source/draw_lanterns.py",
+      "diagramSpec": "art-source/lantern-math.json",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "sample_contact_sheet_and_analytic_count_passed_in_page_pending"
+    },
+    {
+      "assetKey": "q-equal-row-c",
+      "path": "assets/q-equal-row-c.png",
+      "sha256": "8150806ccfca2c8900cc887841a3c6b2ea584f32ff9757a6f61a38618f7e304b",
+      "source": "Deterministic lantern and ten-frame placement; count tokens are original ImageGen sprites",
+      "codeSource": "art-source/draw_lanterns.py",
+      "diagramSpec": "art-source/lantern-math.json",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "sample_contact_sheet_and_analytic_count_passed_in_page_pending"
+    },
+    {
+      "assetKey": "q-column-start",
+      "path": "assets/q-column-start.png",
+      "sha256": "8a099a32fe7a525a1da59abe63ba080a8b3bd64caa764bcf225d0eb29a4992ac",
+      "source": "Deterministic lantern and ten-frame placement; count tokens are original ImageGen sprites",
+      "codeSource": "art-source/draw_lanterns.py",
+      "diagramSpec": "art-source/lantern-math.json",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "sample_contact_sheet_and_analytic_count_passed_in_page_pending"
+    },
+    {
+      "assetKey": "q-column-a",
+      "path": "assets/q-column-a.png",
+      "sha256": "3fda4e161da7ec248d7f58c5891a123a0f685c3c528b472209193db1a53a5d25",
+      "source": "Deterministic lantern and ten-frame placement; count tokens are original ImageGen sprites",
+      "codeSource": "art-source/draw_lanterns.py",
+      "diagramSpec": "art-source/lantern-math.json",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "sample_contact_sheet_and_analytic_count_passed_in_page_pending"
+    },
+    {
+      "assetKey": "q-column-b",
+      "path": "assets/q-column-b.png",
+      "sha256": "921dc400bd72a9a36a177d3424463a672d3ec18311aa875b28071622a4fdbc7f",
+      "source": "Deterministic lantern and ten-frame placement; count tokens are original ImageGen sprites",
+      "codeSource": "art-source/draw_lanterns.py",
+      "diagramSpec": "art-source/lantern-math.json",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "sample_contact_sheet_and_analytic_count_passed_in_page_pending"
+    },
+    {
+      "assetKey": "q-column-c",
+      "path": "assets/q-column-c.png",
+      "sha256": "defc3e705e3928000fb13d2829b24b383331da9bf30f0de81f646555140ca1a0",
+      "source": "Deterministic lantern and ten-frame placement; count tokens are original ImageGen sprites",
+      "codeSource": "art-source/draw_lanterns.py",
+      "diagramSpec": "art-source/lantern-math.json",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "sample_contact_sheet_and_analytic_count_passed_in_page_pending"
+    },
+    {
+      "assetKey": "q-equation-start",
+      "path": "assets/q-equation-start.png",
+      "sha256": "b7af8c16c90ba693c0662c445e715a9fbde00344e6fc5b8cd3398694608ee4a1",
+      "source": "Deterministic lantern and ten-frame placement; count tokens are original ImageGen sprites",
+      "codeSource": "art-source/draw_lanterns.py",
+      "diagramSpec": "art-source/lantern-math.json",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "sample_contact_sheet_and_analytic_count_passed_in_page_pending"
+    },
+    {
+      "assetKey": "q-equation-a",
+      "path": "assets/q-equation-a.png",
+      "sha256": "7c37345d99a716aadda9fbda84cb0d52ff37c18a9c17838838999d5a5051f93d",
+      "source": "Deterministic lantern and ten-frame placement; count tokens are original ImageGen sprites",
+      "codeSource": "art-source/draw_lanterns.py",
+      "diagramSpec": "art-source/lantern-math.json",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "sample_contact_sheet_and_analytic_count_passed_in_page_pending"
+    },
+    {
+      "assetKey": "q-equation-b",
+      "path": "assets/q-equation-b.png",
+      "sha256": "8651f723d44f35600077b84745d2db8bdedd9781d1335075335da11fad3ae044",
+      "source": "Deterministic lantern and ten-frame placement; count tokens are original ImageGen sprites",
+      "codeSource": "art-source/draw_lanterns.py",
+      "diagramSpec": "art-source/lantern-math.json",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "sample_contact_sheet_and_analytic_count_passed_in_page_pending"
+    },
+    {
+      "assetKey": "q-equation-c",
+      "path": "assets/q-equation-c.png",
+      "sha256": "f342e363f65f29e2aa8619ee7192c08614b058a845d869c79aa752d6c037296f",
+      "source": "Deterministic lantern and ten-frame placement; count tokens are original ImageGen sprites",
+      "codeSource": "art-source/draw_lanterns.py",
+      "diagramSpec": "art-source/lantern-math.json",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "sample_contact_sheet_and_analytic_count_passed_in_page_pending"
+    },
+    {
+      "assetKey": "q-delivered-start",
+      "path": "assets/q-delivered-start.png",
+      "sha256": "6e1b2de43e935142514ebac73e6ba3ecdf13293a18d27eb8bee959f6897f32b3",
+      "source": "Deterministic lantern and ten-frame placement; count tokens are original ImageGen sprites",
+      "codeSource": "art-source/draw_lanterns.py",
+      "diagramSpec": "art-source/lantern-math.json",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "sample_contact_sheet_and_analytic_count_passed_in_page_pending"
+    },
+    {
+      "assetKey": "q-delivered-a",
+      "path": "assets/q-delivered-a.png",
+      "sha256": "16920d58da374b0ea8d21cdc7ddc55a953078fb2392e3c6a905b42d4d8868f5a",
+      "source": "Deterministic lantern and ten-frame placement; count tokens are original ImageGen sprites",
+      "codeSource": "art-source/draw_lanterns.py",
+      "diagramSpec": "art-source/lantern-math.json",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "sample_contact_sheet_and_analytic_count_passed_in_page_pending"
+    },
+    {
+      "assetKey": "q-delivered-b",
+      "path": "assets/q-delivered-b.png",
+      "sha256": "d91036fec8051773f44b4395e4690930f0614b0fb650ea8a0eeca585a2c6c6c3",
+      "source": "Deterministic lantern and ten-frame placement; count tokens are original ImageGen sprites",
+      "codeSource": "art-source/draw_lanterns.py",
+      "diagramSpec": "art-source/lantern-math.json",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "sample_contact_sheet_and_analytic_count_passed_in_page_pending"
+    },
+    {
+      "assetKey": "q-delivered-c",
+      "path": "assets/q-delivered-c.png",
+      "sha256": "e2400d7102f099b7c0eab235f4f3ad2e73248a68277cd462ec9ac1162243d043",
+      "source": "Deterministic lantern and ten-frame placement; count tokens are original ImageGen sprites",
+      "codeSource": "art-source/draw_lanterns.py",
+      "diagramSpec": "art-source/lantern-math.json",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "sample_contact_sheet_and_analytic_count_passed_in_page_pending"
+    },
+    {
+      "assetKey": "q-color-start",
+      "path": "assets/q-color-start.png",
+      "sha256": "465ac40ecec01adc0d57ed6e02693636e0152098f4efb3dc36421d0f2b68633d",
+      "source": "Deterministic lantern and ten-frame placement; count tokens are original ImageGen sprites",
+      "codeSource": "art-source/draw_lanterns.py",
+      "diagramSpec": "art-source/lantern-math.json",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "sample_contact_sheet_and_analytic_count_passed_in_page_pending"
+    },
+    {
+      "assetKey": "q-color-a",
+      "path": "assets/q-color-a.png",
+      "sha256": "bfd5e29ebe3c7fc66c3c4c353972137b88858444a2ae5d2abf51a2420f7f90c4",
+      "source": "Deterministic lantern and ten-frame placement; count tokens are original ImageGen sprites",
+      "codeSource": "art-source/draw_lanterns.py",
+      "diagramSpec": "art-source/lantern-math.json",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "sample_contact_sheet_and_analytic_count_passed_in_page_pending"
+    },
+    {
+      "assetKey": "q-color-b",
+      "path": "assets/q-color-b.png",
+      "sha256": "8b340b59645fb4a1e30516347c70694e58f061d580be86354e813fea2969b8b2",
+      "source": "Deterministic lantern and ten-frame placement; count tokens are original ImageGen sprites",
+      "codeSource": "art-source/draw_lanterns.py",
+      "diagramSpec": "art-source/lantern-math.json",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "sample_contact_sheet_and_analytic_count_passed_in_page_pending"
+    },
+    {
+      "assetKey": "q-color-c",
+      "path": "assets/q-color-c.png",
+      "sha256": "8822f1bee1aea6845466cdd7204c43b5796b85ecf3af59da0c2604e38181dc45",
+      "source": "Deterministic lantern and ten-frame placement; count tokens are original ImageGen sprites",
+      "codeSource": "art-source/draw_lanterns.py",
+      "diagramSpec": "art-source/lantern-math.json",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "sample_contact_sheet_and_analytic_count_passed_in_page_pending"
+    }
+  ]
+}

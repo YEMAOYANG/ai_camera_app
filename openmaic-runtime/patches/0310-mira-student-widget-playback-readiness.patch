@@ -1,0 +1,806 @@
+diff --git a/components/edit/PlaybackChromeRoot.tsx b/components/edit/PlaybackChromeRoot.tsx
+--- a/components/edit/PlaybackChromeRoot.tsx
++++ b/components/edit/PlaybackChromeRoot.tsx
+@@ -44,7 +44,7 @@
+ import { ActionEngine } from '@/lib/action/engine';
+ import { createAudioPlayer } from '@/lib/utils/audio-player';
+ import { useDiscussionTTS } from '@/lib/hooks/use-discussion-tts';
+-import { useWidgetIframeStore } from '@/lib/store/widget-iframe';
++import { createWidgetIframePlayback, supportsRecordedWidgetReadiness, useWidgetIframeStore } from '@/lib/store/widget-iframe';
+ import type { AudioIndicatorState } from '@/components/roundtable/audio-indicator';
+ import type { Action, DiscussionAction, SpeechAction } from '@/lib/types/action';
+ import { cn } from '@/lib/utils';
+@@ -364,6 +364,21 @@
+     const pageNarration = useSyncExternalStore(subscribePageNarration, getPageNarration, getPageNarration);
+     const parentOrigins = useMiraStudentParentOrigins();
+     const engineRef = useRef<PlaybackEngine | null>(null);
++    const widgetPlaybackRef = useRef<{
++      engine: PlaybackEngine;
++      gate: ReturnType<typeof createWidgetIframePlayback>;
++    } | null>(null);
++    const [waitingWidgetScene, setWaitingWidgetScene] = useState<string | null>(null);
++    const runScenePlayback = useCallback((engine: PlaybackEngine, start: () => void) => {
++      if (engineRef.current !== engine) return;
++      const playback = widgetPlaybackRef.current;
++      if (playback?.engine === engine) {
++        const request = sceneSwitchRequestRef.current;
++        playback.gate.run(start, () => sceneSwitchRequestRef.current === request);
++      } else {
++        start();
++      }
++    }, []);
+     useLayoutEffect(() => {
+       const fixed = usesTextbookPageNarration(stage);
+       releasePageNarrationPause();
+@@ -375,6 +390,7 @@
+       // Pause narration on an explicit listen gesture; discussion remains available.
+       const pauseForActivity = () => {
+         releasePageNarrationPause();
++        widgetPlaybackRef.current?.gate.cancel();
+         engineRef.current?.pause();
+         setLectureSpeech(previous => {
+           const state = useStageStore.getState();
+@@ -672,21 +688,23 @@
+         const sceneId = engine.getCurrentSceneId();
+         if (!sceneId || !chatAreaRef.current) return;
+ 
+-        const sessionId = chatAreaRef.current.startLecture(sceneId);
+-        if (engineRef.current !== engine) {
+-          await chatAreaRef.current.endSession(sessionId);
+-          return;
+-        }
+-        if (engine.getMode() !== 'idle') {
+-          // A competing live session already owns the engine. Tear down the
+-          // lecture session we just created/reactivated so it cannot linger.
+-          await chatAreaRef.current.endSession(sessionId);
+-          return;
+-        }
+-        lectureSessionIdRef.current = sessionId;
+-        engine.continuePlayback();
++        let discardedSession: Promise<void> | undefined;
++        runScenePlayback(engine, () => {
++          const chat = chatAreaRef.current;
++          if (!chat) return;
++          const sessionId = chat.startLecture(sceneId);
++          if (engineRef.current !== engine || engine.getMode() !== 'idle') {
++            // A competing live session already owns the engine.
++            discardedSession = chat.endSession(sessionId);
++            void discardedSession.catch(error => console.error('[Mira Runtime] Failed to discard stale lecture', error));
++            return;
++          }
++          lectureSessionIdRef.current = sessionId;
++          engine.continuePlayback();
++        });
++        await discardedSession;
+       },
+-      [doSessionCleanup, playbackCompleted, studentMode],
++      [doSessionCleanup, playbackCompleted, runScenePlayback, studentMode],
+     );
+ 
+     // Imperative teardown so the parent can `await` SSE / engine / TTS
+@@ -697,6 +715,7 @@
+       ref,
+       () => ({
+         teardown: async () => {
++          widgetPlaybackRef.current?.gate.dispose();
+           await chatAreaRef.current?.endActiveSession();
+           if (discussionAbortRef.current) {
+             discussionAbortRef.current.abort();
+@@ -812,6 +831,7 @@
+     // progress restoration begins, including pages without timeline actions.
+     useLayoutEffect(() => {
+       let cancelled = false;
++      let widgetGate: ReturnType<typeof createWidgetIframePlayback> | undefined;
+       const initializeScene = async () => {
+         const managedPageSpeech = currentScene ? fixedPageManagedSpeechIds(
+           currentScene, usesTextbookPageNarration(stage),
+@@ -822,6 +842,7 @@
+         }
+         engineRef.current?.stop();
+         engineRef.current = null;
++        widgetPlaybackRef.current = null;
+         setEngineMode('idle');
+         setLectureSpeaking(false);
+ 
+@@ -913,15 +934,13 @@
+           return;
+         }
+ 
+-        // Widget iframe messaging callback for interactive scenes, resolved lazily
+-        // at send time (keyed by sceneId). The interactive iframe now lives in the
+-        // keep-alive host (#619), which registers its postMessage callback a commit
+-        // after this engine is built — so resolving eagerly here would capture null
+-        // on a scene's first visit and silently drop every widget action. Looking it
+-        // up per-send always sees the live registration.
++        // Recorded student widgets use the document that this engine started on.
++        // Other widgets keep the existing lazy per-scene callback lookup.
+         const sceneIdForWidget = currentScene.id;
+-        const widgetSendMessage = (type: string, payload: Record<string, unknown>) =>
+-          useWidgetIframeStore.getState().getSendMessage(sceneIdForWidget)?.(type, payload);
++        const widgetSendMessage = (type: string, payload: Record<string, unknown>) => {
++          if (widgetGate) widgetGate.send(type, payload);
++          else useWidgetIframeStore.getState().getSendMessage(sceneIdForWidget)?.(type, payload);
++        };
+ 
+         // Create ActionEngine for playback (with audioPlayer for TTS and widget messaging)
+         const actionEngine = new ActionEngine(
+@@ -1131,7 +1150,7 @@
+                 }
+                 toast.error('本页学习进度还没有确认', {
+                   description: error instanceof Error ? error.message : '请稍后重试保存本页进度。',
+-                  action: { label: '重试保存', onClick: () => engine.continuePlayback() },
++                  action: { label: '重试保存', onClick: () => runScenePlayback(engine, () => engine.continuePlayback()) },
+                 });
+                 return; // Never advance on a rejected or unconfirmed completion.
+               }
+@@ -1225,15 +1244,43 @@
+ 
+         engineRef.current = engine;
+         activeSceneIdRef.current = currentScene.id;
++        if (studentMode && currentScene.type === 'interactive' && currentScene.content.type === 'interactive'
++          && !currentScene.miraActivityPersistence && !currentScene.miraActivity
++          && supportsRecordedWidgetReadiness(currentScene.content.html)
++          && currentScene.actions?.some(action => action.type.startsWith('widget_'))) {
++          const classroomId = currentScene.stageId;
++          widgetGate = createWidgetIframePlayback({
++            classroomId,
++            sceneId: currentScene.id,
++            isCurrent: () => {
++              const state = useStageStore.getState();
++              return !cancelled && engineRef.current === engine && state.stage?.id === classroomId
++                && state.getCurrentScene() === currentScene;
++            },
++            onWaiting: waiting => {
++              if (widgetPlaybackRef.current?.engine === engine) setWaitingWidgetScene(waiting ? currentScene.id : null);
++            },
++            onUnavailable: reason => {
++              if (reason === 'replaced' && engine.getMode() !== 'idle') {
++                engine.stop();
++                void chatAreaRef.current?.endActiveSession({ source: 'scene_switch' });
++              }
++              toast.error(reason === 'timeout' ? '互动页加载超时，请点播放重试。' : '互动页已更新，请点播放重试。');
++            },
++          });
++          widgetPlaybackRef.current = { engine, gate: widgetGate };
++        }
+ 
+         // Auto-start if triggered by auto-play scene advance
+         if (autoStartRef.current) {
+           autoStartRef.current = false;
+-          if (currentScene && chatAreaRef.current) {
+-            lectureSessionIdRef.current = chatAreaRef.current.startLecture(currentScene.id);
+-            lectureActionCounterRef.current = 0;
+-          }
+-          engine.start();
++          runScenePlayback(engine, () => {
++            if (currentScene && chatAreaRef.current) {
++              lectureSessionIdRef.current = chatAreaRef.current.startLecture(currentScene.id);
++              lectureActionCounterRef.current = 0;
++            }
++            engine.start();
++          });
+         } else {
+           // Load saved playback state and restore position (but never auto-play).
+           if (
+@@ -1267,6 +1314,7 @@
+       void initializeScene();
+       return () => {
+         cancelled = true;
++        widgetGate?.dispose();
+       };
+       // eslint-disable-next-line react-hooks/exhaustive-deps -- Only re-run when scene changes, functions are stable refs
+     }, [currentScene]);
+@@ -1478,13 +1526,15 @@
+      */
+     const gatedSceneSwitch = useCallback(
+       async (targetSceneId: string): Promise<boolean> => {
+-        const requestId = ++sceneSwitchRequestRef.current;
+-        const continueOperatorPlayback = engineRef.current?.getMode() === 'playing'
+-          || getPageNarration().phase === 'playing';
++        // Selecting the current page leaves its pending lecture start intact.
+         if (targetSceneId === currentSceneId) {
+           setPendingSceneId(null);
+           return false;
+         }
++        const requestId = ++sceneSwitchRequestRef.current;
++        widgetPlaybackRef.current?.gate.cancel();
++        const continueOperatorPlayback = engineRef.current?.getMode() === 'playing'
++          || getPageNarration().phase === 'playing';
+         if (studentMode && runtimeEvents) {
+           try {
+             await runtimeEvents.readProgress();
+@@ -1543,6 +1593,7 @@
+       if (!pendingSceneId) return;
+       const targetSceneId = pendingSceneId;
+       const requestId = ++sceneSwitchRequestRef.current;
++      widgetPlaybackRef.current?.gate.cancel();
+       sceneSwitchConfirmingRef.current = true;
+       setPendingSceneId(null);
+       try {
+@@ -1571,6 +1622,7 @@
+     /** User cancelled scene switch via AlertDialog */
+     const cancelSceneSwitch = useCallback(() => {
+       sceneSwitchRequestRef.current += 1;
++      widgetPlaybackRef.current?.gate.cancel();
+       setPendingSceneId(null);
+     }, []);
+ 
+@@ -1601,37 +1653,33 @@
+           studentAutoPlayRuntime?.acceptAudioStart();
+           setAutoPlayLecture(true);
+         }
+-        engine.resume();
+-        // Resume lecture buffer
+-        if (lectureSessionIdRef.current) {
+-          chatAreaRef.current?.resumeBuffer(lectureSessionIdRef.current);
+-        }
++        runScenePlayback(engine, () => {
++          engine.resume();
++          if (lectureSessionIdRef.current) chatAreaRef.current?.resumeBuffer(lectureSessionIdRef.current);
++        });
+       } else {
+         if (studentMode) {
+           audioPlayerRef.current.prepareStudentPlayback();
+           studentAutoPlayRuntime?.acceptAudioStart();
+           setAutoPlayLecture(true);
+         }
+-        const wasCompleted = playbackCompleted;
+-        setPlaybackCompleted(false);
+-        // startLecture is synchronous, so the first speech bubble exists before
+-        // playback while HTMLAudioElement.play() still receives this click's
+-        // browser user-activation grant.
+-        if (currentScene && chatAreaRef.current) {
+-          lectureSessionIdRef.current = chatAreaRef.current.startLecture(currentScene.id);
+-        }
+-        if (wasCompleted) {
+-          // Restart from beginning (user clicked restart after completion)
+-          lectureActionCounterRef.current = 0;
+-          engine.start();
+-        } else {
+-          // Continue from current position (e.g. after discussion end)
+-          engine.continuePlayback();
+-        }
++        runScenePlayback(engine, () => {
++          setPlaybackCompleted(false);
++          if (currentScene && chatAreaRef.current) {
++            lectureSessionIdRef.current = chatAreaRef.current.startLecture(currentScene.id);
++          }
++          if (playbackCompleted) {
++            lectureActionCounterRef.current = 0;
++            engine.start();
++          } else {
++            engine.continuePlayback();
++          }
++        });
+       }
+     }, [
+       playbackCompleted,
+       currentScene,
++      runScenePlayback,
+       saveSceneResumePosition,
+       setAutoPlayLecture,
+       studentAutoPlayRuntime,
+@@ -1922,6 +1970,20 @@
+ 
+         {/* Main Content Area */}
+         <div className="flex-1 flex flex-col overflow-hidden min-w-0 relative">
++          {waitingWidgetScene !== null && waitingWidgetScene === currentSceneId && (
++            <div className="absolute inset-x-0 top-2 z-20 mx-auto flex w-fit items-center gap-3 rounded bg-white px-3 py-2 text-sm text-gray-900 shadow">
++              <span role="status">正在载入互动页…</span>
++              <button
++                type="button"
++                data-mira-control="secondary"
++                className="inline-flex"
++                onKeyDown={event => event.stopPropagation()}
++                onClick={() => widgetPlaybackRef.current?.gate.cancel()}
++              >
++                取消
++              </button>
++            </div>
++          )}
+           {showStudentStartGate && (
+             <div
+               data-mira-chrome="start-gate"
+diff --git a/components/scene-renderers/InteractiveIframeHost.tsx b/components/scene-renderers/InteractiveIframeHost.tsx
+--- a/components/scene-renderers/InteractiveIframeHost.tsx
++++ b/components/scene-renderers/InteractiveIframeHost.tsx
+@@ -3,7 +3,7 @@
+ import { useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore, type CSSProperties } from 'react';
+ import { createPortal } from 'react-dom';
+ import { toast } from 'sonner';
+-import { useWidgetIframeStore } from '@/lib/store/widget-iframe';
++import { supportsRecordedWidgetReadiness, useWidgetIframeStore, type ReadyWidgetIframe } from '@/lib/store/widget-iframe';
+ import {
+   useInteractiveIframePool,
+   type IframePoolEntry,
+@@ -106,6 +106,7 @@
+   const classroomGeneration = useInteractiveIframePool((s) => s.classroomGeneration);
+   const reset = useInteractiveIframePool((s) => s.reset);
+   const configureClassroom = useInteractiveIframePool((s) => s.configureClassroom);
++  const studentMode = useMiraStudentRuntime();
+   const classroomId = useStageStore((s) => s.stage?.id);
+   const classroomScenes = useStageStore((s) => s.scenes);
+   const retainedSceneIds = useMemo(
+@@ -150,7 +151,7 @@
+     <>
+       {Object.entries(entries).map(([sceneId, entry]) => (
+         <PooledIframe
+-          key={`${classroomGeneration}:${sceneId}`}
++          key={`${classroomGeneration}:${sceneId}:${studentMode && supportsRecordedWidgetReadiness(entry.srcDoc) ? entry.documentGeneration : 0}`}
+           sceneId={sceneId}
+           entry={entry}
+           visible={entry.owner !== null && sceneId === activeSceneId}
+@@ -197,6 +198,7 @@
+   const visibleRef = useRef(visible);
+   visibleRef.current = visible;
+   const iframeRef = useRef<HTMLIFrameElement>(null);
++  const widgetLeaseRef = useRef<ReadyWidgetIframe | null>(null);
+   const source = entry.srcDoc ?? entry.src;
+   const [loadedSource, setLoadedSource] = useState<string>();
+   const checkpointIntroRef = useRef<((requested: boolean) => void) | null>(null);
+@@ -407,6 +409,26 @@
+     visibleViewport.height > 0 &&
+     rect.width > 0 &&
+     rect.height > 0;
++  const shownRef = useRef(shown);
++  shownRef.current = shown;
++  const documentReady = !!source && loadedSource === source
++    && (!needsCheckpoint || readyCheckpoint === checkpointKey) && mathOperationReady;
++  const recordedWidget = supportsRecordedWidgetReadiness(entry.srcDoc);
++  useLayoutEffect(() => {
++    const frame = iframeRef.current;
++    const target = frame?.contentWindow;
++    if (!studentMode || !recordedWidget || !documentReady || !classroomId || !frame?.isConnected || !target) return;
++    const lease = { classroomId, sceneId, documentGeneration: entry.documentGeneration, frame, target };
++    widgetLeaseRef.current = lease;
++    useWidgetIframeStore.getState().registerReadyIframe(lease, shownRef.current);
++    return () => {
++      widgetLeaseRef.current = null;
++      useWidgetIframeStore.getState().unregisterReadyIframe(lease);
++    };
++  }, [studentMode, recordedWidget, documentReady, classroomId, sceneId, entry.documentGeneration]);
++  useLayoutEffect(() => {
++    if (widgetLeaseRef.current) useWidgetIframeStore.getState().setReadyIframeVisible(widgetLeaseRef.current, shown);
++  }, [shown]);
+   // The page's own teacher lines wait while the lecture or a discussion speaks.
+   const [lectureSpeaking, setLectureSpeaking] = useState(isLectureSpeaking);
+   useEffect(() => {
+@@ -529,8 +551,7 @@
+         ref={iframeRef}
+         srcDoc={entry.srcDoc}
+         src={entry.srcDoc ? undefined : entry.src}
+-        data-mira-student-page-ready={studentMode && shown && source && loadedSource === source
+-          && (!needsCheckpoint || readyCheckpoint === checkpointKey) && mathOperationReady ? sceneId : undefined}
++        data-mira-student-page-ready={studentMode && shown && documentReady ? sceneId : undefined}
+         onLoad={() => {
+           setLoadedSource(source);
+           if (needsCheckpoint) { checkpointReadyRef.current = null; setReadyCheckpoint(null); }
+diff --git a/lib/store/interactive-iframe-pool.ts b/lib/store/interactive-iframe-pool.ts
+--- a/lib/store/interactive-iframe-pool.ts
++++ b/lib/store/interactive-iframe-pool.ts
+@@ -49,6 +49,8 @@
+   readonly owner: string | null;
+   /** Monotonic recency marker for LRU eviction. */
+   readonly tick: number;
++  /** Changes only when the source document changes or the entry is recreated. */
++  readonly documentGeneration: number;
+ }
+ 
+ interface MountInput {
+@@ -67,6 +69,8 @@
+   configureClassroom: (classroomId: string, retainedSceneIds: readonly string[]) => void;
+   /** Monotonic counter; each mount/touch takes the next value. */
+   tick: number;
++  /** Unlike LRU ticks, document identities are not reused after a pool reset. */
++  latestDocumentGeneration: number;
+   mount: (sceneId: string, input: MountInput) => void;
+   setRect: (sceneId: string, rect: IframeRect, clip?: IframeRect) => void;
+   /** A placeholder claims visibility for its scene, recording its owner id. */
+@@ -111,6 +115,7 @@
+   classroomGeneration: 0,
+   retainedSceneIds: [],
+   tick: 0,
++  latestDocumentGeneration: 0,
+ 
+   configureClassroom: (classroomId, sceneIds) =>
+     set((state) => {
+@@ -147,9 +152,11 @@
+       }
+       // New scene, or content changed: (re)build the entry. A content change here
+       // is the one intended reload path.
++      const documentGeneration = state.latestDocumentGeneration + 1;
+       const entry: IframePoolEntry = {
+         srcDoc: input.srcDoc,
+         src: input.src,
++        documentGeneration,
+         rect: existing?.rect ?? null,
+         clip: existing?.clip ?? null,
+         owner: existing?.owner ?? null,
+@@ -158,7 +165,7 @@
+       const entries = evictLru(
+         { ...state.entries, [sceneId]: entry }, state.activeSceneId, state.retainedSceneIds,
+       );
+-      return { entries, tick };
++      return { entries, tick, latestDocumentGeneration: documentGeneration };
+     }),
+ 
+   setRect: (sceneId, rect, clip = rect) =>
+diff --git a/lib/store/widget-iframe.ts b/lib/store/widget-iframe.ts
+--- a/lib/store/widget-iframe.ts
++++ b/lib/store/widget-iframe.ts
+@@ -5,6 +5,20 @@
+  */
+ 
+ import { create } from 'zustand';
++import { useInteractiveIframePool } from './interactive-iframe-pool';
++
++export interface ReadyWidgetIframe {
++  readonly classroomId: string;
++  readonly sceneId: string;
++  readonly documentGeneration: number;
++  readonly frame: HTMLIFrameElement;
++  readonly target: Window;
++}
++
++interface ReadyWidgetEntry {
++  readonly lease: ReadyWidgetIframe;
++  readonly visible: boolean;
++}
+ 
+ interface WidgetIframeState {
+   /** Callbacks keyed by sceneId for targeted postMessage communication */
+@@ -22,10 +36,15 @@
+   getSendMessage: (
+     sceneId?: string,
+   ) => ((type: string, payload: Record<string, unknown>) => void) | null;
++  readyByScene: Record<string, ReadyWidgetEntry>;
++  registerReadyIframe: (lease: ReadyWidgetIframe, visible: boolean) => void;
++  setReadyIframeVisible: (lease: ReadyWidgetIframe, visible: boolean) => void;
++  unregisterReadyIframe: (lease: ReadyWidgetIframe) => void;
+ }
+ 
+ export const useWidgetIframeStore = create<WidgetIframeState>((set, get) => ({
+   sendMessageByScene: {},
++  readyByScene: {},
+   activeSceneId: null,
+   registerIframe: (sceneId, callback) =>
+     set((state) => {
+@@ -47,4 +66,126 @@
+     if (!targetId) return null;
+     return state.sendMessageByScene[targetId] ?? null;
+   },
++  registerReadyIframe: (lease, visible) => {
++    const pool = useInteractiveIframePool.getState();
++    if (pool.classroomId !== lease.classroomId
++        || pool.entries[lease.sceneId]?.documentGeneration !== lease.documentGeneration) return;
++    set((state) => ({ readyByScene: { ...state.readyByScene, [lease.sceneId]: { lease, visible } } }));
++  },
++  setReadyIframeVisible: (lease, visible) =>
++    set((state) => {
++      const current = state.readyByScene[lease.sceneId];
++      if (current?.lease !== lease || current.visible === visible) return state;
++      return { readyByScene: { ...state.readyByScene, [lease.sceneId]: { lease, visible } } };
++    }),
++  unregisterReadyIframe: (lease) =>
++    set((state) => {
++      if (state.readyByScene[lease.sceneId]?.lease !== lease) return state;
++      const readyByScene = { ...state.readyByScene };
++      delete readyByScene[lease.sceneId];
++      return { readyByScene };
++    }),
+ }));
++
++const WIDGET_READY_TIMEOUT_MS = 10_000;
++
++export function supportsRecordedWidgetReadiness(html: string | undefined): boolean {
++  return !!html?.includes('data-courseware-reused-audio')
++    && !html.includes('<meta name="mira-activity-checkpoint" content="v1">');
++}
++
++/** Playback waits for the active document before it can emit any timeline actions. */
++export function createWidgetIframePlayback(options: {
++  classroomId: string;
++  sceneId: string;
++  isCurrent: () => boolean;
++  onWaiting: (waiting: boolean) => void;
++  onUnavailable: (reason: 'timeout' | 'replaced') => void;
++}) {
++  let disposed = false;
++  let endWait: (() => void) | undefined;
++  let releaseLease: (() => void) | undefined;
++  let held: ReadyWidgetIframe | undefined;
++
++  const currentEntry = () => {
++    const entry = useWidgetIframeStore.getState().readyByScene[options.sceneId];
++    const pool = useInteractiveIframePool.getState();
++    return entry?.lease.classroomId === options.classroomId && pool.classroomId === options.classroomId
++      && pool.entries[options.sceneId]?.documentGeneration === entry.lease.documentGeneration
++      && entry.lease.frame.isConnected
++      && entry.lease.frame.contentWindow === entry.lease.target ? entry : undefined;
++  };
++  const cancel = () => {
++    if (!endWait) return false;
++    const cleanup = endWait;
++    endWait = undefined;
++    cleanup();
++    options.onWaiting(false);
++    return true;
++  };
++  const detach = () => {
++    releaseLease?.();
++    releaseLease = undefined;
++    held = undefined;
++  };
++  const attach = (lease: ReadyWidgetIframe) => {
++    if (held === lease) return;
++    detach();
++    held = lease;
++    const check = () => {
++      if (currentEntry()?.lease === lease) return;
++      detach();
++      if (!disposed && options.isCurrent()) options.onUnavailable('replaced');
++    };
++    const unsubscribeFrame = useWidgetIframeStore.subscribe(check);
++    const unsubscribePool = useInteractiveIframePool.subscribe(check);
++    releaseLease = () => { unsubscribeFrame(); unsubscribePool(); };
++  };
++
++  return {
++    run(start: () => void, isRequested: () => boolean) {
++      if (disposed || endWait) return;
++      const getDocument = () => useInteractiveIframePool.getState().entries[options.sceneId]?.documentGeneration;
++      let requestedDocument = getDocument();
++      const tryStart = () => {
++        if (!options.isCurrent() || !isRequested()) {
++          cancel();
++          return true;
++        }
++        const document = getDocument();
++        if (requestedDocument !== undefined && document !== requestedDocument) {
++          cancel();
++          options.onUnavailable('replaced');
++          return true;
++        }
++        requestedDocument ??= document;
++        const entry = currentEntry();
++        if (!entry?.visible) return false;
++        cancel();
++        attach(entry.lease);
++        start();
++        return true;
++      };
++      if (tryStart()) return;
++      const unsubscribeFrame = useWidgetIframeStore.subscribe(tryStart);
++      const unsubscribePool = useInteractiveIframePool.subscribe(tryStart);
++      const timer = setTimeout(() => {
++        cancel();
++        if (!disposed && options.isCurrent() && isRequested()) options.onUnavailable('timeout');
++      }, WIDGET_READY_TIMEOUT_MS);
++      endWait = () => { unsubscribeFrame(); unsubscribePool(); clearTimeout(timer); };
++      options.onWaiting(true);
++    },
++    send(type: string, payload: Record<string, unknown>) {
++      if (held && currentEntry()?.lease === held && options.isCurrent()) {
++        held.target.postMessage({ type, ...payload }, '*');
++      }
++    },
++    cancel,
++    dispose() {
++      disposed = true;
++      cancel();
++      detach();
++    },
++  };
++}
+diff --git a/tests/store/interactive-iframe-pool.test.ts b/tests/store/interactive-iframe-pool.test.ts
+--- a/tests/store/interactive-iframe-pool.test.ts
++++ b/tests/store/interactive-iframe-pool.test.ts
+@@ -31,6 +31,23 @@
+     pool().mount('s1', { srcDoc: '<p>1</p>' });
+     pool().mount('s1', { srcDoc: '<p>2</p>' });
+     expect(pool().entries['s1'].srcDoc).toBe('<p>2</p>');
++  });
++
++  test('a retained document keeps its identity and a replacement never reuses it', () => {
++    pool().configureClassroom('room', []);
++    pool().mount('s1', { srcDoc: '<p>1</p>' });
++    const first = pool().entries.s1.documentGeneration;
++    pool().mount('s1', { srcDoc: '<p>1</p>' });
++    pool().claim('s1', 'owner');
++    pool().release('s1', 'owner');
++    expect(pool().entries.s1.documentGeneration).toBe(first);
++    pool().mount('s1', { srcDoc: '<p>2</p>' });
++    const replacement = pool().entries.s1.documentGeneration;
++    expect(replacement).toBeGreaterThan(first);
++    pool().reset();
++    pool().configureClassroom('room', []);
++    pool().mount('s1', { srcDoc: '<p>2</p>' });
++    expect(pool().entries.s1.documentGeneration).toBeGreaterThan(replacement);
+   });
+ 
+   test('supports url-backed (src) entries', () => {
+diff --git a/tests/store/widget-iframe-readiness.test.ts b/tests/store/widget-iframe-readiness.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/store/widget-iframe-readiness.test.ts
+@@ -0,0 +1,180 @@
++import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
++import { useInteractiveIframePool } from '@/lib/store/interactive-iframe-pool';
++import {
++  createWidgetIframePlayback, supportsRecordedWidgetReadiness, useWidgetIframeStore, type ReadyWidgetIframe,
++} from '@/lib/store/widget-iframe';
++
++const room = 'classroom';
++const scene = 'scene-game';
++const otherScene = 'scene-other';
++const firstWidget = { state: { demo: true, level: 1, pause: true } };
++const pool = () => useInteractiveIframePool.getState();
++const store = () => useWidgetIframeStore.getState();
++
++function mount(classroomId = room, sceneId = scene, srcDoc = '<script>/* game */</script>') {
++  pool().configureClassroom(classroomId, []);
++  pool().mount(sceneId, { srcDoc });
++  const postMessage = vi.fn();
++  const target = { postMessage } as unknown as Window;
++  const frame = { isConnected: true, contentWindow: target } as HTMLIFrameElement;
++  const lease: ReadyWidgetIframe = {
++    classroomId, sceneId, documentGeneration: pool().entries[sceneId].documentGeneration, frame, target,
++  };
++  return { lease, postMessage };
++}
++
++const gates: ReturnType<typeof createWidgetIframePlayback>[] = [];
++function playback(isCurrent = () => true) {
++  const onWaiting = vi.fn();
++  const onUnavailable = vi.fn();
++  const gate = createWidgetIframePlayback({ classroomId: room, sceneId: scene, isCurrent, onWaiting, onUnavailable });
++  gates.push(gate);
++  const start = vi.fn(() => gate.send('SET_WIDGET_STATE', firstWidget));
++  return { gate, start, onWaiting, onUnavailable };
++}
++
++beforeEach(() => {
++  vi.useFakeTimers();
++  pool().reset();
++  useWidgetIframeStore.setState({ readyByScene: {}, sendMessageByScene: {}, activeSceneId: null });
++});
++
++afterEach(() => {
++  for (const gate of gates.splice(0)) gate.dispose();
++  vi.useRealTimers();
++});
++
++describe('student widget playback readiness', () => {
++  test('cold start waits for the selected loaded visible iframe before the first action', () => {
++    const { gate, start, onWaiting } = playback();
++    gate.run(start, () => true);
++    const wrong = mount(room, otherScene);
++    store().registerReadyIframe(wrong.lease, true);
++    const actual = mount();
++    store().registerIframe(scene, vi.fn());
++    vi.advanceTimersByTime(640);
++    store().registerReadyIframe(actual.lease, false);
++    expect(start).not.toHaveBeenCalled();
++    store().setReadyIframeVisible(actual.lease, true);
++    expect(start).toHaveBeenCalledTimes(1);
++    expect(actual.postMessage).toHaveBeenCalledWith({ type: 'SET_WIDGET_STATE', ...firstWidget }, '*');
++    expect(wrong.postMessage).not.toHaveBeenCalled();
++    expect(onWaiting.mock.calls).toEqual([[true], [false]]);
++    expect(vi.getTimerCount()).toBe(0);
++  });
++
++  test('a warm iframe starts in the initiating event and a layout change does not replace it', () => {
++    const { lease, postMessage } = mount();
++    store().registerReadyIframe(lease, true);
++    const { gate, start, onWaiting, onUnavailable } = playback();
++    gate.run(start, () => true);
++    expect(start).toHaveBeenCalledTimes(1);
++    expect(onWaiting).not.toHaveBeenCalled();
++    store().setReadyIframeVisible(lease, false);
++    pool().setRect(scene, { left: 0, top: 0, width: 640, height: 360 });
++    store().setReadyIframeVisible(lease, true);
++    gate.send('SET_WIDGET_STATE', { state: { demo: false } });
++    expect(postMessage).toHaveBeenCalledTimes(2);
++    expect(onUnavailable).not.toHaveBeenCalled();
++  });
++
++  test('cancelling or superseding a wait discards late readiness', () => {
++    const { lease, postMessage } = mount();
++    let requested = true;
++    const { gate, start, onUnavailable } = playback();
++    gate.run(start, () => requested);
++    expect(gate.cancel()).toBe(true);
++    gate.run(start, () => requested);
++    requested = false;
++    store().registerReadyIframe(lease, true);
++    vi.advanceTimersByTime(10_001);
++    expect(start).not.toHaveBeenCalled();
++    expect(postMessage).not.toHaveBeenCalled();
++    expect(onUnavailable).not.toHaveBeenCalled();
++  });
++
++  test('repeated play while the same page is loading keeps the original pending start', () => {
++    const { lease, postMessage } = mount();
++    const { gate, start, onWaiting } = playback();
++    const duplicate = vi.fn();
++    gate.run(start, () => true);
++    gate.run(duplicate, () => true);
++    store().registerReadyIframe(lease, true);
++    expect(start).toHaveBeenCalledTimes(1);
++    expect(duplicate).not.toHaveBeenCalled();
++    expect(postMessage).toHaveBeenCalledTimes(1);
++    expect(onWaiting.mock.calls).toEqual([[true], [false]]);
++  });
++
++  test('an already selected loading document cannot start its replacement', () => {
++    const old = mount();
++    const { gate, start, onUnavailable } = playback();
++    gate.run(start, () => true);
++    const replacement = mount(room, scene, '<script>/* new game */</script>');
++    store().registerReadyIframe(replacement.lease, true);
++    store().registerReadyIframe(old.lease, true);
++    store().unregisterReadyIframe(old.lease);
++    expect(onUnavailable).toHaveBeenCalledWith('replaced');
++    expect(start).not.toHaveBeenCalled();
++    gate.run(start, () => true);
++    expect(replacement.postMessage).toHaveBeenCalledTimes(1);
++    expect(old.postMessage).not.toHaveBeenCalled();
++  });
++
++  test('an active lecture loses its target as soon as its document is replaced', () => {
++    const old = mount();
++    store().registerReadyIframe(old.lease, true);
++    const { gate, start, onUnavailable } = playback();
++    gate.run(start, () => true);
++    const replacement = mount(room, scene, '<script>/* new game */</script>');
++    store().registerReadyIframe(replacement.lease, true);
++    gate.send('SET_WIDGET_STATE', { state: { demo: false } });
++    expect(onUnavailable).toHaveBeenCalledExactlyOnceWith('replaced');
++    expect(old.postMessage).toHaveBeenCalledTimes(1);
++    expect(replacement.postMessage).not.toHaveBeenCalled();
++  });
++
++  test('a matching scene and generation cannot send through a disconnected iframe', () => {
++    const { lease, postMessage } = mount();
++    store().registerReadyIframe(lease, true);
++    const { gate, start } = playback();
++    gate.run(start, () => true);
++    Object.defineProperty(lease.frame, 'isConnected', { value: false });
++    gate.send('SET_WIDGET_STATE', { state: { demo: false } });
++    expect(postMessage).toHaveBeenCalledTimes(1);
++  });
++
++  test('switching classrooms with the same scene id cannot resume the old engine', () => {
++    let current = true;
++    const old = mount();
++    const { gate, start, onUnavailable } = playback(() => current);
++    gate.run(start, () => true);
++    current = false;
++    const other = mount('another-classroom');
++    store().registerReadyIframe(other.lease, true);
++    store().registerReadyIframe(old.lease, true);
++    expect(start).not.toHaveBeenCalled();
++    expect(onUnavailable).not.toHaveBeenCalled();
++    expect(other.postMessage).not.toHaveBeenCalled();
++  });
++
++  test('timeout releases the wait and a later explicit retry can start', () => {
++    const { lease } = mount();
++    const { gate, start, onWaiting, onUnavailable } = playback();
++    gate.run(start, () => true);
++    vi.advanceTimersByTime(10_000);
++    expect(onUnavailable).toHaveBeenCalledExactlyOnceWith('timeout');
++    expect(onWaiting.mock.calls).toEqual([[true], [false]]);
++    store().registerReadyIframe(lease, true);
++    expect(start).not.toHaveBeenCalled();
++    gate.run(start, () => true);
++    expect(start).toHaveBeenCalledTimes(1);
++  });
++
++  test('legacy and checkpoint widgets keep their existing playback paths', () => {
++    expect(supportsRecordedWidgetReadiness(undefined)).toBe(false);
++    expect(supportsRecordedWidgetReadiness('<script>/* legacy */</script>')).toBe(false);
++    expect(supportsRecordedWidgetReadiness('<script data-courseware-reused-audio></script>')).toBe(true);
++    expect(supportsRecordedWidgetReadiness('<meta name="mira-activity-checkpoint" content="v1"><script data-courseware-reused-audio></script>')).toBe(false);
++  });
++});

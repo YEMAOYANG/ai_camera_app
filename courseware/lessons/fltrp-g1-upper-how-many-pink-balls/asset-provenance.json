@@ -1,0 +1,2214 @@
+{
+  "schemaVersion": "mira.courseware.asset-provenance.v1",
+  "lesson": "fltrp-g1-upper-how-many-pink-balls",
+  "status": "all_playback_picture_sources_registered",
+  "reviewedAt": "2026-11-09T21:25:25+08:00",
+  "sourceAtlases": {
+    "counting-balls": {
+      "path": "art-source/ball-atlas.png",
+      "sourceKind": "codex_builtin_imagegen",
+      "originalToolOutput": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-f903ae18-9956-4a56-86a9-73406b4856db.png",
+      "sha256": "b164780317d630d7cfcfe392ccc810617a73680149a1ab1e5d9ffe398a3214d8",
+      "bytes": 2047495,
+      "pixels": [
+        1536,
+        1024
+      ],
+      "mode": "RGBA",
+      "grid": {
+        "columns": 3,
+        "rows": 2,
+        "cellPixels": 512,
+        "rowMajorOrder": [
+          "pink-ball",
+          "brown-ball",
+          "blue-ball",
+          "green-ball",
+          "red-ball",
+          "yellow-ball"
+        ]
+      },
+      "generationPrompt": "Scientific-educational sprite source for a first-grade English lesson on counting balls by color. Create exactly one transparent 3-column by 2-row sprite atlas, 3:2 landscape. Six equally sized square cells on an invisible grid. Every cell contains ONE isolated plain solid-color toy play ball, identical round silhouette, size, view, lighting and sparse brush texture, centered with at least 16% transparent padding on every side. Exact left-to-right order. Top row: bright strawberry-milk PINK (distinctly cool pink, not peach, orange or red); medium chocolate BROWN (distinctly brown, not orange, near-neutral warm chocolate); clear medium BLUE. Bottom row: fresh medium leaf GREEN; saturated TOMATO RED (clearly red, not pink); vivid LEMON YELLOW. The colors must remain readily distinguishable at 12 px for young children. Solid colors dominate, one very small gentle ivory highlight near top left and subtle darker shading at bottom right. The balls have no stripes, faces, seams, logos, numbers or markings. Fine paper grain, matte gouache, clean paper-cut edges, minimal storybook style in the established Mira art direction. No letters, text, numbers, labels, cell boxes, grid lines, borders, scenery, watermark, surface or floor shadow. True transparent RGBA between and around the six isolated objects. This is one reusable source ball per color, later repeated in code to create exact counted groups."
+    },
+    "teaching-props": {
+      "path": "art-source/teaching-props-atlas.png",
+      "sourceKind": "codex_builtin_imagegen",
+      "originalToolOutput": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-7dfadd69-ef59-4fe7-aaed-4aeeb33b61e9.png",
+      "sha256": "fc855f2ebe2971999ec24af5a98c928dc2b3955188a82b78667e2c3c265c639e",
+      "bytes": 873175,
+      "mode": "RGBA",
+      "pixels": [
+        1448,
+        1086
+      ],
+      "generationPrompt": "Create a single high-resolution transparent teaching sprite atlas for the Mira first grade English lesson 'How many pink balls?' (do not render any text). Strictly FOUR equal invisible columns by THREE equal invisible rows, each cell a square, canvas landscape 4:3 if available. Exactly one isolated item per occupied cell, centered and completely inside it with generous 15% transparent clear margins. The very last cell is entirely transparent and empty. Fine paper grain, matte gouache, clean paper-cut edges, warm children's picture-book style, strong small-size recognition. Exact row-major order: Row 1 left to right: (1) one bright grass GREEN sharpened wooden pencil with dark graphite tip and unmarked green body, lying diagonally; (2) one LEMON-YELLOW sharpened wooden pencil of identical shape, size, angle and graphite tip; (3) one clearly different bright green CAPPED PEN, with a visible pocket clip and blunt round cap, matching the green pencil color but no pointed wood or nib; (4) one solid rich PURPLE diamond paper kite, complete crossed sticks subtly visible under the paper and a narrow long curved purple ribbon tail, no bows that could be mistaken for extra objects. Row 2: (1) one closed deep PURPLE hardcover book, whole cover blank, cream page edge, no lettering; (2) one straight medium BLUE classroom ruler with a few small unnumbered measurement ticks, no numerals or letters; (3) front palm-side view of an open LEFT hand with exactly five distinct fully visible fingers: four naturally upright spread fingers and a single slanted thumb on the RIGHT side of the picture, warm neutral skin tone; (4) front palm-side view of an open RIGHT hand with exactly five distinct fully visible fingers: four naturally upright spread fingers and a single slanted thumb on the LEFT side of the picture, matching the left hand. Keep every fingertip inside its cell. Row 3: (1) one small STANDING PINK triangular pennant on a short neutral wooden post; (2) one identical pennant and post in medium CHOCOLATE BROWN; (3) one identical pennant and post in medium bright BLUE; (4) leave this cell completely empty. No floor shadows, background tint, scene, extra items, texture outside objects, visible cell lines, text, numbers, logo, labels or watermark. Use true transparent RGBA across all empty areas. Shape and named colors must remain clear even as small sprites.",
+      "rowMajorOrder": [
+        "green-pencil",
+        "yellow-pencil",
+        "green-pen",
+        "purple-kite",
+        "purple-book",
+        "blue-ruler",
+        "left-hand",
+        "right-hand",
+        "pink-flag",
+        "brown-flag",
+        "blue-flag",
+        null
+      ]
+    },
+    "festival-scenes": {
+      "path": "art-source/festival-scenes-atlas.png",
+      "sourceKind": "codex_builtin_imagegen",
+      "originalToolOutput": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-f13aa3a5-22b3-48c0-a785-05fdf77efd74.png",
+      "sha256": "2da0db7d125f33b635e8a4fa011a88d79752fe288f232689bfaeaa5dfbe73322",
+      "bytes": 2523512,
+      "mode": "RGB",
+      "pixels": [
+        1024,
+        1536
+      ],
+      "generationPrompt": "One portrait production atlas containing EXACTLY THREE distinct widescreen 16:9 storybook background paintings stacked vertically, one full-width painting per equal-height horizontal band, no gaps, no frames, no margins or divider lines. The horizontal scene transitions must land precisely at one-third and two-thirds of the full canvas height so three equal strips can be sliced out. All three paintings must be original backgrounds for the same warm primary-school color-ball festival. Fine paper grain, matte gouache, simple clean paper-cut contours, warm cream, deep pine greens, touches of muted apricot and terracotta, quiet negative space, no text. TOP THIRD: a honey-cream covered festival booth, small dark pine-green cloth-trimmed wooden storage crate on the far RIGHT on a light natural wood tabletop, its lid already propped open and its interior visibly EMPTY. One shallow EMPTY natural-wood sorting tray next to the crate on the right. The LEFT half of the tabletop is open and empty, good for overlaying an educational layer of separate ball sprites. Keep crate, lid and tray entirely within this strip, modest in size, no spilling over the seams. MIDDLE THIRD: a calm pond and low wooden jetty at a garden fair. Soft dark teal water, small reeds and a hint of trees restricted to outer edges, broad quiet low-contrast open water in the center and bottom for overlaying an interactive bubble boat and picture cards. BOTTOM THIRD: a garden delivery area with only calm grass, a soft muted cream path across the lower edge, low shrubs and flower beds at the far left and right. The entire central 65 percent should be quiet pale sage ground for overlaying a code-rendered road and vehicles, no pre-drawn road markings. Give all three distinct scenes similar lighting and tactile paper grain. Do not draw any balls, people, hands, characters, boats, vehicles, flags, numbered objects, signs, lettering, digits, logos, marks, answer clues or watermarks. Opaque original background paintings."
+    },
+    "game-actors": {
+      "path": "art-source/game-actors-atlas.png",
+      "sourceKind": "codex_builtin_imagegen_edit",
+      "originalToolOutput": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-da055b0e-9bef-420d-bc7d-2b23686c3d2d.png",
+      "sha256": "ea763b24391d77ab2759d9f7245661ee9d7dcc7f1c5fd4254f5004aed1d42adb",
+      "bytes": 1786827,
+      "mode": "RGBA",
+      "pixels": [
+        1536,
+        1024
+      ],
+      "grid": {
+        "columns": 3,
+        "rows": 2,
+        "cellPixels": 512,
+        "rowMajorOrder": [
+          "boat",
+          "boat-pop",
+          "ball-sticker",
+          "delivery-cart",
+          "delivery-cart-pop",
+          "traffic-cart"
+        ]
+      },
+      "generationPrompt": "An original transparent six-cell game sprite atlas for a first-grade English activity at a small outdoor color-ball fair. Exactly THREE equal invisible columns by TWO equal invisible rows on a 3:2 landscape canvas, square cells. Each cell holds exactly one clearly isolated item, complete and centered, at least 16% transparent padding on all sides and generous spacing between neighboring cells. True transparent RGBA outside the objects. Cohesive matte gouache, fine paper grain, clean paper-cut contour, warm cream, deep pine green and apricot accents. Readable at a tiny size. Strict row-major order. Top row left to right: (1) one small friendly BUBBLE BOAT seen DIRECTLY FROM ABOVE, pointing RIGHT, with a simple cream oval hull tapering to the right, deep teal rim, pine-green deck, tiny coral nozzle at the rightmost bow, NO wheels or road details; (2) the EXACT SAME right-facing boat at the exact same position, size, angle, design and orientation, with a tiny pale-aqua bubble puff just in front of its coral nozzle, no separate floating bubbles or droplets elsewhere; (3) one large isolated five-point warm honey-colored paper sticker star with a pine-green outline and a single cream edge highlight, no text or symbols inside it. Bottom row left to right: (1) one short distinctive apricot-orange and deep-pine toy DELIVERY VAN, DIRECT TOP-DOWN view, front pointing RIGHT, short broad body, cream windshield and clear rear parcel compartment, with small dark tires; (2) the EXACT SAME right-facing van in the exact same position and size with a tiny brighter cream parcel visible in the rear compartment and small amber lamp lit, same outline and view; (3) one small ochre-yellow toy TRAFFIC CAR, top-down view pointing RIGHT, solid simpler longer rounded body, navy windshield, distinct silhouette and color from the delivery van. Nothing else. No background color, shadows, text, numbers, labels, license plates, faces, outlines around the cells, backdrop, ground, water or watermark.",
+      "correctionPrompt": "Edit the supplied exact six-cell sprite atlas to do a crisp hard-background removal only. Keep all SIX object designs, exact positions, row-major layout, geometry, right-facing top-down orientations, colors, scale, surface texture and action-frame differences identical. The image contains a boat, the same boat with a small aqua puff, a star sticker, a delivery van, its loaded variant, and an ochre traffic car. The current semitransparent gray, cream or colored glow surrounding the objects is a defect. Completely REMOVE it. All pixels outside the actual silhouettes (including the gaps between cells and the corners of every cell) must be alpha 0, actually transparent, not gray, cream, checkerboard or faint haze. Keep only a narrow antialiased boundary of one or two pixels at the cut-paper edges, with solid opacity inside each actual object. Do not add shadows, a new background, scene, decorations, lines, lettering, text or numbers. This is a clean sprite cutout, not a redesign. Preserve the overall 3:2 landscape atlas and 3-column by 2-row evenly spaced placement.",
+      "rejectedToolOutput": {
+        "path": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-924f90f9-df70-40be-b84e-4e905569cf34.png",
+        "sha256": "01d14c390b50a2ee2b669cae19dab0920e84e0c3ba5e3c73d48d9bd2e97e3b20",
+        "finding": "Rejected semitransparent halo."
+      }
+    }
+  },
+  "derivation": {
+    "coordinates": "x0,y0 inclusive and x1,y1 exclusive in raw atlas pixels",
+    "visibleAlphaThreshold": 8,
+    "sourcePaddingPixels": 4,
+    "targetLongestVisibleAxisPixels": 224,
+    "resampling": "Pillow RGBA Lanczos, resize to nearest integral dimensions",
+    "placement": "Paste the full RGBA tile at floor((256 - resized length) / 2) on each axis. The resulting output alpha bounds give the visible ball, which defines later compositing diameter.",
+    "compression": "PNG lossless optimized, level 9",
+    "pillowVersion": "11.2.1"
+  },
+  "assets": {
+    "ball-sticker": {
+      "file": "assets/ball-sticker.png",
+      "sourceKind": "codex_builtin_imagegen_atlas_crop",
+      "sourceAtlas": "game-actors",
+      "sha256": "b2c20c1a45dc2b32f5789ee18a86a14685a2b6801ac3fc0aaca00861acfaecff",
+      "bytes": 65014,
+      "mode": "RGBA",
+      "pixels": [
+        256,
+        256
+      ],
+      "sourceCropXYXY": [
+        1103,
+        81,
+        1471,
+        432
+      ],
+      "pasteXY": [
+        10,
+        15
+      ],
+      "resizedPixels": [
+        236,
+        225
+      ],
+      "pairAlignment": {
+        "containedWithin": [
+          236,
+          236
+        ]
+      },
+      "use": [
+        "float-and-find",
+        "follow-the-flags"
+      ]
+    },
+    "blue-ball": {
+      "file": "assets/blue-ball.png",
+      "sourceKind": "codex_builtin_imagegen_derived",
+      "sourceAtlas": "counting-balls",
+      "sha256": "62dd9a653bc254a0958a9775cb84671d70d4067b5b973b6d672ee9224407dc50",
+      "bytes": 71413,
+      "pixels": [
+        256,
+        256
+      ],
+      "mode": "RGBA",
+      "cellXYXY": [
+        1024,
+        0,
+        1536,
+        512
+      ],
+      "sourceAlphaBoundsXYXY": [
+        1076,
+        97,
+        1455,
+        479
+      ],
+      "sourceCropXYXY": [
+        1072,
+        93,
+        1459,
+        483
+      ],
+      "resizedPixels": [
+        227,
+        229
+      ],
+      "pasteXY": [
+        14,
+        13,
+        241,
+        242
+      ],
+      "outputAlphaBoundsXYXY": [
+        16,
+        15,
+        239,
+        240
+      ],
+      "use": {
+        "scenes": [
+          "crate-rattle",
+          "colour-clues",
+          "pick-then-count",
+          "float-and-find",
+          "count-the-kind",
+          "follow-the-flags",
+          "crate-closed"
+        ],
+        "quiz": []
+      }
+    },
+    "blue-ball-and-book": {
+      "file": "assets/blue-ball-and-book.png",
+      "sourceKind": "deterministic_counted_layout",
+      "sourceAssets": [
+        "blue-ball",
+        "blue-book",
+        "pink-ball"
+      ],
+      "sha256": "2b021d2057300074e2385360ed06081ba18147e90ee07e41c83c9ebc273d20e4",
+      "bytes": 63698,
+      "pixels": [
+        810,
+        400
+      ],
+      "mode": "RGB",
+      "use": [
+        "count-the-kind"
+      ],
+      "layoutKey": "blue-ball-and-book",
+      "visualReview": "复核上排第二格和最右一格各一本蓝书。下排三框只有最右一框两本蓝书。已检查缩至约260×128的静态样张。"
+    },
+    "blue-bird": {
+      "file": "assets/blue-bird.png",
+      "sourceKind": "codex_builtin_imagegen_reuse",
+      "sha256": "dfc2eebac925fdfe50867b524ec52f7b1f34e9172267a410399ed4c2494a3bb3",
+      "bytes": 48145,
+      "pixels": [
+        224,
+        190
+      ],
+      "mode": "RGBA",
+      "sourcePath": "courseware/lessons/fltrp-g1-upper-its-an-orange-cat/assets/blue-bird.png",
+      "sourceSha256": "dfc2eebac925fdfe50867b524ec52f7b1f34e9172267a410399ed4c2494a3bb3",
+      "sourceAtlasSha256": "ae7cc4d50fbf6c20509775378532baaa8a70c21e018bde6655c6600d8666f7d4",
+      "sourceManifest": "courseware/lessons/fltrp-g1-upper-its-an-orange-cat/asset-provenance.json",
+      "sourceManifestSha256": "c9161b3833202795221be49aa157f150c1ab70cf46eafa520069b71bd2cce652",
+      "use": [
+        "words-we-can-say",
+        "picture-check/eight-blue-birds"
+      ]
+    },
+    "blue-book": {
+      "file": "assets/blue-book.png",
+      "sourceKind": "codex_builtin_imagegen_reuse",
+      "sha256": "6ec0105af8dc864168626eb2948b29b5b07f235552affb801cc177801c1a548b",
+      "bytes": 64206,
+      "pixels": [
+        224,
+        216
+      ],
+      "mode": "RGBA",
+      "sourcePath": "courseware/lessons/fltrp-g1-upper-its-an-orange-cat/assets/blue-book.png",
+      "sourceSha256": "6ec0105af8dc864168626eb2948b29b5b07f235552affb801cc177801c1a548b",
+      "sourceAtlasSha256": "ae7cc4d50fbf6c20509775378532baaa8a70c21e018bde6655c6600d8666f7d4",
+      "sourceManifest": "courseware/lessons/fltrp-g1-upper-its-an-orange-cat/asset-provenance.json",
+      "sourceManifestSha256": "c9161b3833202795221be49aa157f150c1ab70cf46eafa520069b71bd2cce652",
+      "use": [
+        "count-the-kind",
+        "words-we-can-say",
+        "picture-check/nine-library-books"
+      ]
+    },
+    "blue-flag": {
+      "file": "assets/blue-flag.png",
+      "sourceKind": "codex_builtin_imagegen_atlas_crop",
+      "sha256": "bad858b69faa74cbbcb89f00bea2e9a72c22626acbce3373a793f90d12305177",
+      "bytes": 53590,
+      "pixels": [
+        232,
+        272
+      ],
+      "mode": "RGBA",
+      "use": [
+        "follow-the-flags"
+      ],
+      "sourceAtlas": "teaching-props",
+      "cellXYXY": [
+        724,
+        724,
+        1086,
+        1086
+      ],
+      "sourceCropXYXY": [
+        796,
+        758,
+        1042,
+        1047
+      ],
+      "cropMethod": "RGBA alpha >=8 bounds plus 4 px, Lanczos contain 272 px"
+    },
+    "blue-ruler": {
+      "file": "assets/blue-ruler.png",
+      "sourceKind": "codex_builtin_imagegen_atlas_crop",
+      "sha256": "c20f4a1f8d98bf03f8509cfc32d4b467185aaa0391e09af370c5730c2aa5aeb3",
+      "bytes": 55167,
+      "pixels": [
+        272,
+        265
+      ],
+      "mode": "RGBA",
+      "use": [
+        "words-we-can-say"
+      ],
+      "sourceAtlas": "teaching-props",
+      "cellXYXY": [
+        362,
+        362,
+        724,
+        724
+      ],
+      "sourceCropXYXY": [
+        408,
+        409,
+        699,
+        692
+      ],
+      "cropMethod": "RGBA alpha >=8 bounds plus 4 px, Lanczos contain 272 px"
+    },
+    "boat": {
+      "file": "assets/boat.png",
+      "sourceKind": "codex_builtin_imagegen_atlas_crop",
+      "sourceAtlas": "game-actors",
+      "sha256": "0a328bef5d9dea4c491fc961f5e2a5c4b5885520e200fb7bb2edf56699690622",
+      "bytes": 37238,
+      "mode": "RGBA",
+      "pixels": [
+        256,
+        256
+      ],
+      "sourceCropXYXY": [
+        64,
+        161,
+        441,
+        384
+      ],
+      "pasteXY": [
+        17,
+        71
+      ],
+      "resizedPixels": [
+        188,
+        112
+      ],
+      "pairAlignment": {
+        "sharedScale": 0.5,
+        "visibleLeftX": 19,
+        "visibleBottomY": 181
+      },
+      "use": [
+        "float-and-find"
+      ]
+    },
+    "boat-pop": {
+      "file": "assets/boat-pop.png",
+      "sourceKind": "codex_builtin_imagegen_atlas_crop",
+      "sourceAtlas": "game-actors",
+      "sha256": "e9c33b702af22ab74d977c0e351a1462f6f0025338ec87f9a7cdc9f690abfc2f",
+      "bytes": 39818,
+      "mode": "RGBA",
+      "pixels": [
+        256,
+        256
+      ],
+      "sourceCropXYXY": [
+        551,
+        162,
+        993,
+        384
+      ],
+      "pasteXY": [
+        17,
+        72
+      ],
+      "resizedPixels": [
+        221,
+        111
+      ],
+      "pairAlignment": {
+        "sharedScale": 0.5,
+        "visibleLeftX": 19,
+        "visibleBottomY": 181
+      },
+      "use": [
+        "float-and-find"
+      ]
+    },
+    "brown-ball": {
+      "file": "assets/brown-ball.png",
+      "sourceKind": "codex_builtin_imagegen_derived",
+      "sourceAtlas": "counting-balls",
+      "sha256": "156e6aacc73a0b0e1a63c261578b99b47a3cb814b1c30024a4267f154bf487c5",
+      "bytes": 68384,
+      "pixels": [
+        256,
+        256
+      ],
+      "mode": "RGBA",
+      "cellXYXY": [
+        512,
+        0,
+        1024,
+        512
+      ],
+      "sourceAlphaBoundsXYXY": [
+        577,
+        98,
+        953,
+        479
+      ],
+      "sourceCropXYXY": [
+        573,
+        94,
+        957,
+        483
+      ],
+      "resizedPixels": [
+        226,
+        229
+      ],
+      "pasteXY": [
+        15,
+        13,
+        241,
+        242
+      ],
+      "outputAlphaBoundsXYXY": [
+        17,
+        15,
+        239,
+        240
+      ],
+      "use": {
+        "scenes": [
+          "crate-rattle",
+          "colour-clues",
+          "pick-then-count",
+          "float-and-find",
+          "follow-the-flags",
+          "crate-closed"
+        ],
+        "quiz": [
+          "pink-sports-balls"
+        ]
+      }
+    },
+    "brown-flag": {
+      "file": "assets/brown-flag.png",
+      "sourceKind": "codex_builtin_imagegen_atlas_crop",
+      "sha256": "e65c9755432705aef0aa54b93ef29e8ebe0e2bf86e07f133f8c9ceb16583c7e2",
+      "bytes": 54027,
+      "pixels": [
+        231,
+        272
+      ],
+      "mode": "RGBA",
+      "use": [
+        "follow-the-flags"
+      ],
+      "sourceAtlas": "teaching-props",
+      "cellXYXY": [
+        362,
+        724,
+        724,
+        1086
+      ],
+      "sourceCropXYXY": [
+        435,
+        758,
+        680,
+        1047
+      ],
+      "cropMethod": "RGBA alpha >=8 bounds plus 4 px, Lanczos contain 272 px"
+    },
+    "colour-samples": {
+      "file": "assets/colour-samples.png",
+      "sourceKind": "deterministic_counted_layout",
+      "sourceAssets": [
+        "blue-ball",
+        "brown-ball",
+        "green-ball",
+        "pink-ball",
+        "red-ball",
+        "yellow-ball"
+      ],
+      "sha256": "7e05ce7027d459e25e285eef6a372d78a6b0308b3b98f83a1b5bc5e1b5418740",
+      "bytes": 130000,
+      "pixels": [
+        640,
+        440
+      ],
+      "mode": "RGB",
+      "use": [
+        "colour-clues"
+      ],
+      "layoutKey": "colour-samples"
+    },
+    "delivery-background": {
+      "file": "assets/delivery-background.png",
+      "sourceKind": "codex_builtin_imagegen_atlas_crop",
+      "sha256": "3ce0adc45d0535ddd79fd58a9b5dd0ddd293d4a7392e70e87aac91efb7c180b1",
+      "bytes": 499463,
+      "pixels": [
+        800,
+        450
+      ],
+      "mode": "RGB",
+      "use": [
+        "follow-the-flags"
+      ],
+      "sourceAtlas": "festival-scenes",
+      "sourceCropXYXY": [
+        57,
+        1029,
+        953,
+        1533
+      ],
+      "cropMethod": "Seam-safe exact 16:9 crop, RGB Lanczos to 800×450"
+    },
+    "delivery-cart": {
+      "file": "assets/delivery-cart.png",
+      "sourceKind": "codex_builtin_imagegen_atlas_crop",
+      "sourceAtlas": "game-actors",
+      "sha256": "5a6cbaebbb46b515ef31c18fc8c83ea9a6e5ba7e5d6ad45c3b50cdbde4fe8a71",
+      "bytes": 52083,
+      "mode": "RGBA",
+      "pixels": [
+        256,
+        256
+      ],
+      "sourceCropXYXY": [
+        70,
+        633,
+        445,
+        902
+      ],
+      "pasteXY": [
+        26,
+        51
+      ],
+      "resizedPixels": [
+        206,
+        148
+      ],
+      "pairAlignment": {
+        "sharedScale": 0.55,
+        "visibleLeftX": 28,
+        "visibleBottomY": 197
+      },
+      "use": [
+        "follow-the-flags"
+      ]
+    },
+    "delivery-cart-pop": {
+      "file": "assets/delivery-cart-pop.png",
+      "sourceKind": "codex_builtin_imagegen_atlas_crop",
+      "sourceAtlas": "game-actors",
+      "sha256": "78f85cda03df3cf36a903111ae904dbda129b8647c0b83eac22ccbf080b26d22",
+      "bytes": 53476,
+      "mode": "RGBA",
+      "pixels": [
+        256,
+        256
+      ],
+      "sourceCropXYXY": [
+        567,
+        627,
+        944,
+        902
+      ],
+      "pasteXY": [
+        26,
+        48
+      ],
+      "resizedPixels": [
+        207,
+        151
+      ],
+      "pairAlignment": {
+        "sharedScale": 0.55,
+        "visibleLeftX": 28,
+        "visibleBottomY": 197
+      },
+      "use": [
+        "follow-the-flags"
+      ]
+    },
+    "delivery-cover": {
+      "file": "assets/delivery-cover.png",
+      "sourceKind": "deterministic_counted_layout",
+      "sourceAssets": [
+        "blue-flag",
+        "brown-flag",
+        "delivery-background",
+        "delivery-cart",
+        "group-p1b2",
+        "group-p2b1",
+        "pink-flag"
+      ],
+      "sha256": "509b1dc22af7aa8473fe6c33facc102e1d107c84cd653e3d6b2a60ff4be35811",
+      "bytes": 522090,
+      "pixels": [
+        800,
+        450
+      ],
+      "mode": "RGB",
+      "use": [
+        "follow-the-flags"
+      ],
+      "layoutKey": "delivery-cover"
+    },
+    "festival-background": {
+      "file": "assets/festival-background.png",
+      "sourceKind": "codex_builtin_imagegen_atlas_crop",
+      "sha256": "260f107c1f6d3aff09be7cee6a320eaa1d37ca8e5c4167c2aa2d05335b8e128d",
+      "bytes": 512728,
+      "pixels": [
+        800,
+        450
+      ],
+      "mode": "RGB",
+      "use": [
+        "crate-rattle"
+      ],
+      "sourceAtlas": "festival-scenes",
+      "sourceCropXYXY": [
+        127,
+        1,
+        1023,
+        505
+      ],
+      "cropMethod": "Seam-safe exact 16:9 crop, RGB Lanczos to 800×450"
+    },
+    "festival-cover": {
+      "file": "assets/festival-cover.png",
+      "sourceKind": "deterministic_counted_layout",
+      "sourceAssets": [
+        "blue-ball",
+        "brown-ball",
+        "festival-background",
+        "green-ball",
+        "pink-ball",
+        "red-ball",
+        "yellow-ball"
+      ],
+      "sha256": "f534e93f15f95b789febd33c1293961f79e34d0ff377d779fb5d28d0c98cff17",
+      "bytes": 517343,
+      "pixels": [
+        800,
+        450
+      ],
+      "mode": "RGB",
+      "use": [
+        "crate-rattle"
+      ],
+      "layoutKey": "festival-cover"
+    },
+    "green-ball": {
+      "file": "assets/green-ball.png",
+      "sourceKind": "codex_builtin_imagegen_derived",
+      "sourceAtlas": "counting-balls",
+      "sha256": "3fca502e2c9e955e5e54cde779f578e0c2882ca72347901d6a60517c1cc3be58",
+      "bytes": 67727,
+      "pixels": [
+        256,
+        256
+      ],
+      "mode": "RGBA",
+      "cellXYXY": [
+        0,
+        512,
+        512,
+        1024
+      ],
+      "sourceAlphaBoundsXYXY": [
+        72,
+        570,
+        452,
+        955
+      ],
+      "sourceCropXYXY": [
+        68,
+        566,
+        456,
+        959
+      ],
+      "resizedPixels": [
+        226,
+        229
+      ],
+      "pasteXY": [
+        15,
+        13,
+        241,
+        242
+      ],
+      "outputAlphaBoundsXYXY": [
+        17,
+        15,
+        239,
+        240
+      ],
+      "use": {
+        "scenes": [
+          "crate-rattle",
+          "colour-clues"
+        ],
+        "quiz": []
+      }
+    },
+    "green-pen": {
+      "file": "assets/green-pen.png",
+      "sourceKind": "codex_builtin_imagegen_atlas_crop",
+      "sha256": "8f5492dda799d41667ba04f5a92b4c1f671c5655f8199464940ccdc2d9e7f43c",
+      "bytes": 46872,
+      "pixels": [
+        229,
+        272
+      ],
+      "mode": "RGBA",
+      "use": [
+        "picture-check/ten-green-pencils"
+      ],
+      "sourceAtlas": "teaching-props",
+      "cellXYXY": [
+        724,
+        0,
+        1086,
+        362
+      ],
+      "sourceCropXYXY": [
+        784,
+        46,
+        1039,
+        349
+      ],
+      "cropMethod": "RGBA alpha >=8 bounds plus 4 px, Lanczos contain 272 px"
+    },
+    "green-pencil": {
+      "file": "assets/green-pencil.png",
+      "sourceKind": "codex_builtin_imagegen_atlas_crop",
+      "sha256": "f502d496b228b503e152963fb8e000a8924a92809232dffc780b0096ab0b59ef",
+      "bytes": 44844,
+      "pixels": [
+        249,
+        272
+      ],
+      "mode": "RGBA",
+      "use": [
+        "picture-check/ten-green-pencils"
+      ],
+      "sourceAtlas": "teaching-props",
+      "cellXYXY": [
+        0,
+        0,
+        362,
+        362
+      ],
+      "sourceCropXYXY": [
+        58,
+        46,
+        333,
+        346
+      ],
+      "cropMethod": "RGBA alpha >=8 bounds plus 4 px, Lanczos contain 272 px"
+    },
+    "group-b2p2": {
+      "file": "assets/group-b2p2.png",
+      "sourceKind": "deterministic_counted_layout",
+      "sourceAssets": [
+        "brown-ball",
+        "pink-ball"
+      ],
+      "sha256": "4900383667d0aab5db8a16c15986d65b32e947d33b5d8dad6c736d6e28b6e274",
+      "bytes": 43589,
+      "pixels": [
+        256,
+        256
+      ],
+      "mode": "RGBA",
+      "use": [
+        "float-and-find"
+      ],
+      "paintOrder": "bppb",
+      "gridTotal": 4
+    },
+    "group-b3u3": {
+      "file": "assets/group-b3u3.png",
+      "sourceKind": "deterministic_counted_layout",
+      "sourceAssets": [
+        "blue-ball",
+        "brown-ball"
+      ],
+      "sha256": "b67e7d145cd243e3ff3090f40c7b99050db1cd9996260227845454d8b5c6bcba",
+      "bytes": 32571,
+      "pixels": [
+        256,
+        256
+      ],
+      "mode": "RGBA",
+      "use": [
+        "float-and-find"
+      ],
+      "paintOrder": "ububub",
+      "gridTotal": 6
+    },
+    "group-b4u2": {
+      "file": "assets/group-b4u2.png",
+      "sourceKind": "deterministic_counted_layout",
+      "sourceAssets": [
+        "blue-ball",
+        "brown-ball"
+      ],
+      "sha256": "5303e408eb6892cc0f67eeab5be113a21b2e6664a000f027bcdf0261a832040b",
+      "bytes": 32625,
+      "pixels": [
+        256,
+        256
+      ],
+      "mode": "RGBA",
+      "use": [
+        "float-and-find"
+      ],
+      "paintOrder": "bubbub",
+      "gridTotal": 6
+    },
+    "group-b5p2": {
+      "file": "assets/group-b5p2.png",
+      "sourceKind": "deterministic_counted_layout",
+      "sourceAssets": [
+        "brown-ball",
+        "pink-ball"
+      ],
+      "sha256": "5dbb7715aa33175a04e5bffb6d1fb8626dd7b29f14e6341970d10066c3783db5",
+      "bytes": 35457,
+      "pixels": [
+        256,
+        256
+      ],
+      "mode": "RGBA",
+      "use": [
+        "float-and-find"
+      ],
+      "paintOrder": "bbpbbpb",
+      "gridTotal": 7
+    },
+    "group-p1b2": {
+      "file": "assets/group-p1b2.png",
+      "sourceKind": "deterministic_counted_layout",
+      "sourceAssets": [
+        "brown-ball",
+        "pink-ball"
+      ],
+      "sha256": "2a735ba5d329064be4908e50433c2205d36cd459fa6c2a4d6a8952bcb04115db",
+      "bytes": 33430,
+      "pixels": [
+        256,
+        256
+      ],
+      "mode": "RGBA",
+      "use": [
+        "float-and-find",
+        "follow-the-flags"
+      ],
+      "paintOrder": "bpb",
+      "gridTotal": 3
+    },
+    "group-p2b1": {
+      "file": "assets/group-p2b1.png",
+      "sourceKind": "deterministic_counted_layout",
+      "sourceAssets": [
+        "brown-ball",
+        "pink-ball"
+      ],
+      "sha256": "e94bd1ddebb9062f3ed59aa31303eac211ea271957c174dadc3f8a7dfdcd4016",
+      "bytes": 33135,
+      "pixels": [
+        256,
+        256
+      ],
+      "mode": "RGBA",
+      "use": [
+        "float-and-find",
+        "follow-the-flags"
+      ],
+      "paintOrder": "pbp",
+      "gridTotal": 3
+    },
+    "group-p2b2": {
+      "file": "assets/group-p2b2.png",
+      "sourceKind": "deterministic_counted_layout",
+      "sourceAssets": [
+        "brown-ball",
+        "pink-ball"
+      ],
+      "sha256": "c0c6aa4869f38eb92bb0bd79b73941cfad9cafcd6883ebf28192caf5ac2e6513",
+      "bytes": 43607,
+      "pixels": [
+        256,
+        256
+      ],
+      "mode": "RGBA",
+      "use": [
+        "float-and-find",
+        "follow-the-flags"
+      ],
+      "paintOrder": "pbpb",
+      "gridTotal": 4
+    },
+    "group-p3b1": {
+      "file": "assets/group-p3b1.png",
+      "sourceKind": "deterministic_counted_layout",
+      "sourceAssets": [
+        "brown-ball",
+        "pink-ball"
+      ],
+      "sha256": "9087c99e0fba5d76a9eebb3cf717b8da37dcd4e88f8a0a5bd2f61ae3f90462db",
+      "bytes": 33467,
+      "pixels": [
+        256,
+        256
+      ],
+      "mode": "RGBA",
+      "use": [
+        "float-and-find",
+        "follow-the-flags"
+      ],
+      "paintOrder": "ppbp",
+      "gridTotal": 4
+    },
+    "group-p4b1": {
+      "file": "assets/group-p4b1.png",
+      "sourceKind": "deterministic_counted_layout",
+      "sourceAssets": [
+        "brown-ball",
+        "pink-ball"
+      ],
+      "sha256": "a8e98aacfb86e00c1ab534d8596e367945ebd68a1bb82df003819fcbfe7e77a5",
+      "bytes": 24756,
+      "pixels": [
+        256,
+        256
+      ],
+      "mode": "RGBA",
+      "use": [
+        "float-and-find",
+        "follow-the-flags"
+      ],
+      "paintOrder": "ppbpp",
+      "gridTotal": 5
+    },
+    "group-p4b2": {
+      "file": "assets/group-p4b2.png",
+      "sourceKind": "deterministic_counted_layout",
+      "sourceAssets": [
+        "brown-ball",
+        "pink-ball"
+      ],
+      "sha256": "7671f352183ffa7feeebc42b84835bc8445ec5ff6d7a100846f4828e1a5e114f",
+      "bytes": 32387,
+      "pixels": [
+        256,
+        256
+      ],
+      "mode": "RGBA",
+      "use": [
+        "float-and-find"
+      ],
+      "paintOrder": "pbppbp",
+      "gridTotal": 6
+    },
+    "group-p4u2": {
+      "file": "assets/group-p4u2.png",
+      "sourceKind": "deterministic_counted_layout",
+      "sourceAssets": [
+        "blue-ball",
+        "pink-ball"
+      ],
+      "sha256": "8356df5be573b1e3a37881cfd850857bcfc65381c760f04b89315c9949316597",
+      "bytes": 32488,
+      "pixels": [
+        256,
+        256
+      ],
+      "mode": "RGBA",
+      "use": [
+        "float-and-find"
+      ],
+      "paintOrder": "puppup",
+      "gridTotal": 6
+    },
+    "group-p5b1": {
+      "file": "assets/group-p5b1.png",
+      "sourceKind": "deterministic_counted_layout",
+      "sourceAssets": [
+        "brown-ball",
+        "pink-ball"
+      ],
+      "sha256": "662a5d7ad990d96e8e34d77f5c5aebed185de5860632a331668010cf6b0d4a8c",
+      "bytes": 24911,
+      "pixels": [
+        256,
+        256
+      ],
+      "mode": "RGBA",
+      "use": [
+        "float-and-find"
+      ],
+      "paintOrder": "ppbppp",
+      "gridTotal": 6
+    },
+    "group-p5b2": {
+      "file": "assets/group-p5b2.png",
+      "sourceKind": "deterministic_counted_layout",
+      "sourceAssets": [
+        "brown-ball",
+        "pink-ball"
+      ],
+      "sha256": "98d6b00196eb4a440ef731cbca2c6b9ec1f350c181109e30087f01fed546870b",
+      "bytes": 35356,
+      "pixels": [
+        256,
+        256
+      ],
+      "mode": "RGBA",
+      "use": [
+        "float-and-find"
+      ],
+      "paintOrder": "ppbppbp",
+      "gridTotal": 7
+    },
+    "group-p6b1": {
+      "file": "assets/group-p6b1.png",
+      "sourceKind": "deterministic_counted_layout",
+      "sourceAssets": [
+        "brown-ball",
+        "pink-ball"
+      ],
+      "sha256": "ce162a06613e58bed21dead4240479b89cfff310c024f4a04ccf773d98be5791",
+      "bytes": 28892,
+      "pixels": [
+        256,
+        256
+      ],
+      "mode": "RGBA",
+      "use": [
+        "float-and-find"
+      ],
+      "paintOrder": "pppbppp",
+      "gridTotal": 7
+    },
+    "group-u2p2": {
+      "file": "assets/group-u2p2.png",
+      "sourceKind": "deterministic_counted_layout",
+      "sourceAssets": [
+        "blue-ball",
+        "pink-ball"
+      ],
+      "sha256": "abd35a86830aeb9cfece9f58f4f9198c846e8d3d094240a5487bd86ae2a8f5f9",
+      "bytes": 43897,
+      "pixels": [
+        256,
+        256
+      ],
+      "mode": "RGBA",
+      "use": [
+        "float-and-find"
+      ],
+      "paintOrder": "uppu",
+      "gridTotal": 4
+    },
+    "group-u2p3": {
+      "file": "assets/group-u2p3.png",
+      "sourceKind": "deterministic_counted_layout",
+      "sourceAssets": [
+        "blue-ball",
+        "pink-ball"
+      ],
+      "sha256": "8ba82acd58bfc65be57e35ad60b4cb874309acc355cd3757a18342886a27cb15",
+      "bytes": 32194,
+      "pixels": [
+        256,
+        256
+      ],
+      "mode": "RGBA",
+      "use": [
+        "follow-the-flags"
+      ],
+      "paintOrder": "pupup",
+      "gridTotal": 5
+    },
+    "group-u3b1": {
+      "file": "assets/group-u3b1.png",
+      "sourceKind": "deterministic_counted_layout",
+      "sourceAssets": [
+        "blue-ball",
+        "brown-ball"
+      ],
+      "sha256": "b8c534cc444178e3336aebd944e8c497408a69fc55a1447a397b4b448c7d4ee5",
+      "bytes": 34221,
+      "pixels": [
+        256,
+        256
+      ],
+      "mode": "RGBA",
+      "use": [
+        "float-and-find",
+        "follow-the-flags"
+      ],
+      "paintOrder": "ubuu",
+      "gridTotal": 4
+    },
+    "group-u3p2": {
+      "file": "assets/group-u3p2.png",
+      "sourceKind": "deterministic_counted_layout",
+      "sourceAssets": [
+        "blue-ball",
+        "pink-ball"
+      ],
+      "sha256": "55588a21278a695bd5543b7e29b123af7867845ae9638bffd5aba75c21ac0e5c",
+      "bytes": 32163,
+      "pixels": [
+        256,
+        256
+      ],
+      "mode": "RGBA",
+      "use": [
+        "float-and-find",
+        "follow-the-flags"
+      ],
+      "paintOrder": "upupu",
+      "gridTotal": 5
+    },
+    "group-u4p1": {
+      "file": "assets/group-u4p1.png",
+      "sourceKind": "deterministic_counted_layout",
+      "sourceAssets": [
+        "blue-ball",
+        "pink-ball"
+      ],
+      "sha256": "2e375a14ffe6cc4a962b1c6d4001a4b699416288e1d4a32603cd84d6d25827cc",
+      "bytes": 24952,
+      "pixels": [
+        256,
+        256
+      ],
+      "mode": "RGBA",
+      "use": [
+        "float-and-find",
+        "follow-the-flags"
+      ],
+      "paintOrder": "uupuu",
+      "gridTotal": 5
+    },
+    "group-u4p3": {
+      "file": "assets/group-u4p3.png",
+      "sourceKind": "deterministic_counted_layout",
+      "sourceAssets": [
+        "blue-ball",
+        "pink-ball"
+      ],
+      "sha256": "ae5eb43edaf0da91f54f8e5ea305d7b728e1a98684d873a6f2662f5192189965",
+      "bytes": 41997,
+      "pixels": [
+        256,
+        256
+      ],
+      "mode": "RGBA",
+      "use": [
+        "float-and-find"
+      ],
+      "paintOrder": "upupupu",
+      "gridTotal": 7
+    },
+    "group-u5b1": {
+      "file": "assets/group-u5b1.png",
+      "sourceKind": "deterministic_counted_layout",
+      "sourceAssets": [
+        "blue-ball",
+        "brown-ball"
+      ],
+      "sha256": "738c363d306acc87d5e3372e6712f3f08acf0f375c36e94e575f7d969732a36d",
+      "bytes": 25176,
+      "pixels": [
+        256,
+        256
+      ],
+      "mode": "RGBA",
+      "use": [
+        "float-and-find"
+      ],
+      "paintOrder": "uubuuu",
+      "gridTotal": 6
+    },
+    "group-u5p2": {
+      "file": "assets/group-u5p2.png",
+      "sourceKind": "deterministic_counted_layout",
+      "sourceAssets": [
+        "blue-ball",
+        "pink-ball"
+      ],
+      "sha256": "0bcba01885af8aed3ac51bf16dc466bf58813377cd4d0de3520d9813d70cc5ad",
+      "bytes": 35716,
+      "pixels": [
+        256,
+        256
+      ],
+      "mode": "RGBA",
+      "use": [
+        "float-and-find"
+      ],
+      "paintOrder": "uupuupu",
+      "gridTotal": 7
+    },
+    "group-u6b1": {
+      "file": "assets/group-u6b1.png",
+      "sourceKind": "deterministic_counted_layout",
+      "sourceAssets": [
+        "blue-ball",
+        "brown-ball"
+      ],
+      "sha256": "5b006b7eb06cd97176ee77b8936f3799b5eb89bb75318518e1ee9200ecc847d4",
+      "bytes": 29455,
+      "pixels": [
+        256,
+        256
+      ],
+      "mode": "RGBA",
+      "use": [
+        "float-and-find"
+      ],
+      "paintOrder": "uuubuuu",
+      "gridTotal": 7
+    },
+    "left-hand": {
+      "file": "assets/left-hand.png",
+      "sourceKind": "codex_builtin_imagegen_atlas_crop",
+      "sha256": "e71b68a9bd7ebf9f9fb6180671ef41887fa7e4f6c8897f0ff77f9646114e0a1b",
+      "bytes": 76601,
+      "pixels": [
+        237,
+        272
+      ],
+      "mode": "RGBA",
+      "use": [
+        "fingers-to-ten"
+      ],
+      "sourceAtlas": "teaching-props",
+      "cellXYXY": [
+        724,
+        362,
+        1086,
+        724
+      ],
+      "sourceCropXYXY": [
+        762,
+        387,
+        1042,
+        709
+      ],
+      "cropMethod": "RGBA alpha >=8 bounds plus 4 px, Lanczos contain 272 px"
+    },
+    "natural-rainbow": {
+      "file": "assets/natural-rainbow.png",
+      "sourceKind": "deterministic_counted_layout",
+      "sourceAssets": [],
+      "sha256": "6df385b808c4c88ead6197c235bb1f0c0ba711acf14028c01d7366cd4fe8b921",
+      "bytes": 5357,
+      "pixels": [
+        640,
+        440
+      ],
+      "mode": "RGB",
+      "use": [
+        "rainbow-cards"
+      ],
+      "layoutKey": "natural-rainbow"
+    },
+    "orange-kite": {
+      "file": "assets/orange-kite.png",
+      "sourceKind": "codex_builtin_imagegen_reuse",
+      "sha256": "9cada950ee1cdb4e48e5238e612fab413eb82349d7a4ad1358c19acfea9a77a6",
+      "bytes": 34545,
+      "pixels": [
+        171,
+        224
+      ],
+      "mode": "RGBA",
+      "sourcePath": "courseware/lessons/fltrp-g1-upper-its-an-orange-cat/assets/quiz-orange-kite.png",
+      "sourceSha256": "9cada950ee1cdb4e48e5238e612fab413eb82349d7a4ad1358c19acfea9a77a6",
+      "sourceAtlasSha256": "9b0c4f555c4ba38497b25ccac9c452a859d8b27a0f61bf555449642cd146d5fb",
+      "sourceManifest": "courseware/lessons/fltrp-g1-upper-its-an-orange-cat/asset-provenance.json",
+      "sourceManifestSha256": "c9161b3833202795221be49aa157f150c1ab70cf46eafa520069b71bd2cce652",
+      "use": [
+        "picture-check/one-yellow-kite"
+      ]
+    },
+    "order-board": {
+      "file": "assets/order-board.png",
+      "sourceKind": "deterministic_counted_layout",
+      "sourceAssets": [
+        "group-b4u2",
+        "group-p1b2",
+        "group-p2b1",
+        "group-p3b1",
+        "group-p4b1",
+        "group-p5b1",
+        "group-p6b1",
+        "group-u4p1",
+        "group-u5p2"
+      ],
+      "sha256": "2052665e838a35032c60b1a58689d038adb8dd8c8ea601ab43120d3a3e9bd412",
+      "bytes": 121114,
+      "pixels": [
+        640,
+        440
+      ],
+      "mode": "RGB",
+      "use": [
+        "count-the-kind"
+      ],
+      "layoutKey": "order-board"
+    },
+    "pink-ball": {
+      "file": "assets/pink-ball.png",
+      "sourceKind": "codex_builtin_imagegen_derived",
+      "sourceAtlas": "counting-balls",
+      "sha256": "bba592154a5c6410cef153740d56166e82f467808ac51740374ce6518d8cb202",
+      "bytes": 69099,
+      "pixels": [
+        256,
+        256
+      ],
+      "mode": "RGBA",
+      "cellXYXY": [
+        0,
+        0,
+        512,
+        512
+      ],
+      "sourceAlphaBoundsXYXY": [
+        76,
+        98,
+        451,
+        478
+      ],
+      "sourceCropXYXY": [
+        72,
+        94,
+        455,
+        482
+      ],
+      "resizedPixels": [
+        226,
+        229
+      ],
+      "pasteXY": [
+        15,
+        13,
+        241,
+        242
+      ],
+      "outputAlphaBoundsXYXY": [
+        17,
+        15,
+        239,
+        240
+      ],
+      "use": {
+        "scenes": [
+          "crate-rattle",
+          "colour-clues",
+          "pick-then-count",
+          "float-and-find",
+          "count-the-kind",
+          "follow-the-flags",
+          "crate-closed",
+          "words-we-can-say"
+        ],
+        "quiz": [
+          "pink-sports-balls"
+        ]
+      }
+    },
+    "pink-flag": {
+      "file": "assets/pink-flag.png",
+      "sourceKind": "codex_builtin_imagegen_atlas_crop",
+      "sha256": "6f35e03d2028519d0a73fcb123030f4d9f68a3c105cdbd6f0c2f64f1486f0866",
+      "bytes": 53704,
+      "pixels": [
+        231,
+        272
+      ],
+      "mode": "RGBA",
+      "use": [
+        "follow-the-flags"
+      ],
+      "sourceAtlas": "teaching-props",
+      "cellXYXY": [
+        0,
+        724,
+        362,
+        1086
+      ],
+      "sourceCropXYXY": [
+        76,
+        758,
+        321,
+        1047
+      ],
+      "cropMethod": "RGBA alpha >=8 bounds plus 4 px, Lanczos contain 272 px"
+    },
+    "pond-background": {
+      "file": "assets/pond-background.png",
+      "sourceKind": "codex_builtin_imagegen_atlas_crop",
+      "sha256": "015594990e138cb89b845f42d11fa6954843ddcf2c36e0360ffd965c1be10b5c",
+      "bytes": 495759,
+      "pixels": [
+        800,
+        450
+      ],
+      "mode": "RGB",
+      "use": [
+        "float-and-find"
+      ],
+      "sourceAtlas": "festival-scenes",
+      "sourceCropXYXY": [
+        57,
+        512,
+        953,
+        1016
+      ],
+      "cropMethod": "Seam-safe exact 16:9 crop, RGB Lanczos to 800×450"
+    },
+    "pond-cover": {
+      "file": "assets/pond-cover.png",
+      "sourceKind": "deterministic_counted_layout",
+      "sourceAssets": [
+        "blue-ball",
+        "boat",
+        "brown-ball",
+        "green-ball",
+        "pink-ball",
+        "pond-background"
+      ],
+      "sha256": "42fd68b721f60f2fd7adbe9215fb254cfe97be960cdee395be4dc7a694fa4d22",
+      "bytes": 509804,
+      "pixels": [
+        800,
+        450
+      ],
+      "mode": "RGB",
+      "use": [
+        "float-and-find"
+      ],
+      "layoutKey": "pond-cover"
+    },
+    "purple-book": {
+      "file": "assets/purple-book.png",
+      "sourceKind": "codex_builtin_imagegen_atlas_crop",
+      "sha256": "1df0316267e276295ff175feb1d6b3229918ef1c7cbe1fd09dcfe85f5ce9eb7e",
+      "bytes": 100419,
+      "pixels": [
+        262,
+        272
+      ],
+      "mode": "RGBA",
+      "use": [
+        "picture-check/six-purple-kites"
+      ],
+      "sourceAtlas": "teaching-props",
+      "cellXYXY": [
+        0,
+        362,
+        362,
+        724
+      ],
+      "sourceCropXYXY": [
+        44,
+        397,
+        342,
+        706
+      ],
+      "cropMethod": "RGBA alpha >=8 bounds plus 4 px, Lanczos contain 272 px"
+    },
+    "purple-kite": {
+      "file": "assets/purple-kite.png",
+      "sourceKind": "codex_builtin_imagegen_atlas_crop",
+      "sha256": "746177c4d38432b1d438d2d4054147e10366b484b8d647639a37508ba8ebd6f9",
+      "bytes": 44953,
+      "pixels": [
+        178,
+        272
+      ],
+      "mode": "RGBA",
+      "use": [
+        "picture-check/six-purple-kites"
+      ],
+      "sourceAtlas": "teaching-props",
+      "cellXYXY": [
+        1086,
+        0,
+        1448,
+        379
+      ],
+      "sourceCropXYXY": [
+        1158,
+        21,
+        1382,
+        364
+      ],
+      "cropMethod": "RGBA alpha >=8 bounds plus 4 px, Lanczos contain 272 px"
+    },
+    "q-blue-bird-6": {
+      "file": "assets/q-blue-bird-6.png",
+      "sourceKind": "deterministic_counted_layout",
+      "sourceAssets": [
+        "blue-bird"
+      ],
+      "sha256": "71a83b02fc12bdbf49d10490eb5faea51090617ea7c374c7a4971aa7a595a65c",
+      "bytes": 38318,
+      "pixels": [
+        600,
+        390
+      ],
+      "mode": "RGB",
+      "use": [
+        "picture-check/eight-blue-birds"
+      ],
+      "layoutKey": "q-blue-bird-6"
+    },
+    "q-blue-bird-8": {
+      "file": "assets/q-blue-bird-8.png",
+      "sourceKind": "deterministic_counted_layout",
+      "sourceAssets": [
+        "blue-bird"
+      ],
+      "sha256": "87303c45bcd64898279e59191c490666787ded6e969523028aa6376527e4932e",
+      "bytes": 38698,
+      "pixels": [
+        600,
+        390
+      ],
+      "mode": "RGB",
+      "use": [
+        "picture-check/eight-blue-birds"
+      ],
+      "layoutKey": "q-blue-bird-8"
+    },
+    "q-book-10": {
+      "file": "assets/q-book-10.png",
+      "sourceKind": "deterministic_counted_layout",
+      "sourceAssets": [
+        "blue-book"
+      ],
+      "sha256": "9a9982ae72675fa81b96074ccd6ace1e88abbffcde4d523bc6511488fc7d4773",
+      "bytes": 50198,
+      "pixels": [
+        600,
+        390
+      ],
+      "mode": "RGB",
+      "use": [
+        "picture-check/nine-library-books"
+      ],
+      "layoutKey": "q-book-10"
+    },
+    "q-book-8": {
+      "file": "assets/q-book-8.png",
+      "sourceKind": "deterministic_counted_layout",
+      "sourceAssets": [
+        "blue-book"
+      ],
+      "sha256": "a3cb3ccf5463ad228638afe74c32f300a969fe97cedb571590cb965c4a05a67d",
+      "bytes": 34752,
+      "pixels": [
+        600,
+        390
+      ],
+      "mode": "RGB",
+      "use": [
+        "picture-check/nine-library-books"
+      ],
+      "layoutKey": "q-book-8"
+    },
+    "q-book-9": {
+      "file": "assets/q-book-9.png",
+      "sourceKind": "deterministic_counted_layout",
+      "sourceAssets": [
+        "blue-book"
+      ],
+      "sha256": "df18ab02c03779f88948dbd4a9cf080a6a8071dba71148d646f2b956cde843bf",
+      "bytes": 49782,
+      "pixels": [
+        600,
+        390
+      ],
+      "mode": "RGB",
+      "use": [
+        "picture-check/nine-library-books"
+      ],
+      "layoutKey": "q-book-9"
+    },
+    "q-green-pencil-10": {
+      "file": "assets/q-green-pencil-10.png",
+      "sourceKind": "deterministic_counted_layout",
+      "sourceAssets": [
+        "green-pencil"
+      ],
+      "sha256": "16e969c0ea5a2a60899f1e2756d408ddaf8822ac2eafb002af32f39a7b1fa466",
+      "bytes": 24675,
+      "pixels": [
+        600,
+        390
+      ],
+      "mode": "RGB",
+      "use": [
+        "picture-check/ten-green-pencils"
+      ],
+      "layoutKey": "q-green-pencil-10"
+    },
+    "q-green-pencil-8": {
+      "file": "assets/q-green-pencil-8.png",
+      "sourceKind": "deterministic_counted_layout",
+      "sourceAssets": [
+        "green-pencil"
+      ],
+      "sha256": "05ebd06de904130c95e8fdad7d5c3fa108134abebd7c13c34c22d332e9bfcddb",
+      "bytes": 17609,
+      "pixels": [
+        600,
+        390
+      ],
+      "mode": "RGB",
+      "use": [
+        "picture-check/ten-green-pencils"
+      ],
+      "layoutKey": "q-green-pencil-8"
+    },
+    "q-green-pencil-9": {
+      "file": "assets/q-green-pencil-9.png",
+      "sourceKind": "deterministic_counted_layout",
+      "sourceAssets": [
+        "green-pencil"
+      ],
+      "sha256": "8792ff41d3135998d6d11ced9f0d3b7afc9da01e4710371efa04f3d2b4df1836",
+      "bytes": 24440,
+      "pixels": [
+        600,
+        390
+      ],
+      "mode": "RGB",
+      "use": [
+        "picture-check/ten-green-pencils"
+      ],
+      "layoutKey": "q-green-pencil-9"
+    },
+    "q-kite-stem": {
+      "file": "assets/q-kite-stem.png",
+      "sourceKind": "deterministic_counted_layout",
+      "sourceAssets": [
+        "purple-book",
+        "purple-kite",
+        "yellow-kite"
+      ],
+      "sha256": "60e6a576974adccbd27b375d37b47af2c8bbc69e59dfd5e0e21b9fafab5815d7",
+      "bytes": 59767,
+      "pixels": [
+        720,
+        440
+      ],
+      "mode": "RGB",
+      "use": [
+        "picture-check/six-purple-kites"
+      ],
+      "layoutKey": "q-kite-stem"
+    },
+    "q-pencil-stem": {
+      "file": "assets/q-pencil-stem.png",
+      "sourceKind": "deterministic_counted_layout",
+      "sourceAssets": [
+        "green-pen",
+        "green-pencil",
+        "yellow-pencil"
+      ],
+      "sha256": "bc96f27b8fdbe05ba5a0f0fb4f1206c12e4399e13b665399365dc96ea505b0d0",
+      "bytes": 36602,
+      "pixels": [
+        720,
+        440
+      ],
+      "mode": "RGB",
+      "use": [
+        "picture-check/ten-green-pencils"
+      ],
+      "layoutKey": "q-pencil-stem"
+    },
+    "q-pink-6": {
+      "file": "assets/q-pink-6.png",
+      "sourceKind": "deterministic_counted_layout",
+      "sourceAssets": [
+        "pink-ball"
+      ],
+      "sha256": "11cc22462723d84f80a64dea4c593ee059f7935626ff946d09f0c52e00466494",
+      "bytes": 33456,
+      "pixels": [
+        600,
+        390
+      ],
+      "mode": "RGB",
+      "use": [
+        "picture-check/pink-sports-balls"
+      ],
+      "layoutKey": "q-pink-6"
+    },
+    "q-pink-7": {
+      "file": "assets/q-pink-7.png",
+      "sourceKind": "deterministic_counted_layout",
+      "sourceAssets": [
+        "pink-ball"
+      ],
+      "sha256": "7c4cd95a8ab294ab040ff04143afd8abd58a937c1ca77704c7b4217f880ddbb8",
+      "bytes": 33586,
+      "pixels": [
+        600,
+        390
+      ],
+      "mode": "RGB",
+      "use": [
+        "picture-check/pink-sports-balls"
+      ],
+      "layoutKey": "q-pink-7"
+    },
+    "q-pink-9": {
+      "file": "assets/q-pink-9.png",
+      "sourceKind": "deterministic_counted_layout",
+      "sourceAssets": [
+        "pink-ball"
+      ],
+      "sha256": "cf13971544028ba2053768c7d97881b25cf8309dfc6fcd59a85991e32a4553eb",
+      "bytes": 33931,
+      "pixels": [
+        600,
+        390
+      ],
+      "mode": "RGB",
+      "use": [
+        "picture-check/pink-sports-balls"
+      ],
+      "layoutKey": "q-pink-9"
+    },
+    "q-pink-stem": {
+      "file": "assets/q-pink-stem.png",
+      "sourceKind": "deterministic_counted_layout",
+      "sourceAssets": [
+        "brown-ball",
+        "pink-ball"
+      ],
+      "sha256": "1cdc47f9d0d4391e50d0d566db78b3bd446215bed1414c8b83d8eacd08420933",
+      "bytes": 59102,
+      "pixels": [
+        720,
+        440
+      ],
+      "mode": "RGB",
+      "use": [
+        "picture-check/pink-sports-balls"
+      ],
+      "layoutKey": "q-pink-stem"
+    },
+    "q-purple-kite-5": {
+      "file": "assets/q-purple-kite-5.png",
+      "sourceKind": "deterministic_counted_layout",
+      "sourceAssets": [
+        "purple-kite"
+      ],
+      "sha256": "9655d3680c5ee457199e016e424b1e1c196674861c74d355017dd2f68b68ada9",
+      "bytes": 22907,
+      "pixels": [
+        600,
+        390
+      ],
+      "mode": "RGB",
+      "use": [
+        "picture-check/six-purple-kites"
+      ],
+      "layoutKey": "q-purple-kite-5"
+    },
+    "q-purple-kite-6": {
+      "file": "assets/q-purple-kite-6.png",
+      "sourceKind": "deterministic_counted_layout",
+      "sourceAssets": [
+        "purple-kite"
+      ],
+      "sha256": "1621108ba68f2c263cbb000b9afce7c8494e341dbe1cea997b3f73cbaf9d3815",
+      "bytes": 23100,
+      "pixels": [
+        600,
+        390
+      ],
+      "mode": "RGB",
+      "use": [
+        "picture-check/six-purple-kites"
+      ],
+      "layoutKey": "q-purple-kite-6"
+    },
+    "q-purple-kite-7": {
+      "file": "assets/q-purple-kite-7.png",
+      "sourceKind": "deterministic_counted_layout",
+      "sourceAssets": [
+        "purple-kite"
+      ],
+      "sha256": "290aada4d2bd29c0a8bdfe634ef1155bb61678ad8b7f20d85895190604dd60ff",
+      "bytes": 23273,
+      "pixels": [
+        600,
+        390
+      ],
+      "mode": "RGB",
+      "use": [
+        "picture-check/six-purple-kites"
+      ],
+      "layoutKey": "q-purple-kite-7"
+    },
+    "q-red-bird-8": {
+      "file": "assets/q-red-bird-8.png",
+      "sourceKind": "deterministic_counted_layout",
+      "sourceAssets": [
+        "red-bird"
+      ],
+      "sha256": "f8633bf1769f0599bd0d36f11e8c6e230a4e696f3add59881f872b8a0177d87a",
+      "bytes": 37652,
+      "pixels": [
+        600,
+        390
+      ],
+      "mode": "RGB",
+      "use": [
+        "picture-check/eight-blue-birds"
+      ],
+      "layoutKey": "q-red-bird-8"
+    },
+    "q-yellow-kite-2": {
+      "file": "assets/q-yellow-kite-2.png",
+      "sourceKind": "deterministic_counted_layout",
+      "sourceAssets": [
+        "yellow-kite"
+      ],
+      "sha256": "21649c6b82aee4aad3c9e5ba216ee4275fef52b6eefb0fb19e810b9e16bb55a4",
+      "bytes": 26353,
+      "pixels": [
+        600,
+        390
+      ],
+      "mode": "RGB",
+      "use": [
+        "picture-check/one-yellow-kite"
+      ],
+      "layoutKey": "q-yellow-kite-2"
+    },
+    "red-ball": {
+      "file": "assets/red-ball.png",
+      "sourceKind": "codex_builtin_imagegen_derived",
+      "sourceAtlas": "counting-balls",
+      "sha256": "f5d00475f941ec65a1415f039419a857f613f4b161e2281d3691f0fe23f5927f",
+      "bytes": 68446,
+      "pixels": [
+        256,
+        256
+      ],
+      "mode": "RGBA",
+      "cellXYXY": [
+        512,
+        512,
+        1024,
+        1024
+      ],
+      "sourceAlphaBoundsXYXY": [
+        571,
+        571,
+        955,
+        957
+      ],
+      "sourceCropXYXY": [
+        567,
+        567,
+        959,
+        961
+      ],
+      "resizedPixels": [
+        227,
+        229
+      ],
+      "pasteXY": [
+        14,
+        13,
+        241,
+        242
+      ],
+      "outputAlphaBoundsXYXY": [
+        16,
+        15,
+        239,
+        240
+      ],
+      "use": {
+        "scenes": [
+          "crate-rattle",
+          "colour-clues"
+        ],
+        "quiz": []
+      }
+    },
+    "red-bird": {
+      "file": "assets/red-bird.png",
+      "sourceKind": "codex_builtin_imagegen_reuse",
+      "sha256": "56d12272fc581d3d1a64d328282dd97067e789351992957da04ccf756d4e8d8c",
+      "bytes": 44166,
+      "pixels": [
+        224,
+        192
+      ],
+      "mode": "RGBA",
+      "sourcePath": "courseware/lessons/fltrp-g1-upper-its-an-orange-cat/assets/quiz-red-bird.png",
+      "sourceSha256": "56d12272fc581d3d1a64d328282dd97067e789351992957da04ccf756d4e8d8c",
+      "sourceAtlasSha256": "9b0c4f555c4ba38497b25ccac9c452a859d8b27a0f61bf555449642cd146d5fb",
+      "sourceManifest": "courseware/lessons/fltrp-g1-upper-its-an-orange-cat/asset-provenance.json",
+      "sourceManifestSha256": "c9161b3833202795221be49aa157f150c1ab70cf46eafa520069b71bd2cce652",
+      "use": [
+        "picture-check/eight-blue-birds"
+      ]
+    },
+    "right-hand": {
+      "file": "assets/right-hand.png",
+      "sourceKind": "codex_builtin_imagegen_atlas_crop",
+      "sha256": "430d7f4ef6538a1fbb5cc7cdc60aabeb0bcf7e0c558099c3f6e3cbb98a087fe6",
+      "bytes": 76563,
+      "pixels": [
+        240,
+        272
+      ],
+      "mode": "RGBA",
+      "use": [
+        "fingers-to-ten"
+      ],
+      "sourceAtlas": "teaching-props",
+      "cellXYXY": [
+        1086,
+        379,
+        1448,
+        724
+      ],
+      "sourceCropXYXY": [
+        1122,
+        388,
+        1405,
+        709
+      ],
+      "cropMethod": "RGBA alpha >=8 bounds plus 4 px, Lanczos contain 272 px"
+    },
+    "seven-ball-tray": {
+      "file": "assets/seven-ball-tray.png",
+      "sourceKind": "deterministic_counted_layout",
+      "sourceAssets": [
+        "blue-ball",
+        "brown-ball",
+        "pink-ball"
+      ],
+      "sha256": "5b7b9603a1c172006f92db221964a8fde92fc1da36d18c07e2f4c652b0cbb5fd",
+      "bytes": 68273,
+      "pixels": [
+        640,
+        440
+      ],
+      "mode": "RGB",
+      "use": [
+        "pick-then-count"
+      ],
+      "layoutKey": "seven-ball-tray"
+    },
+    "seven-colour-cards": {
+      "file": "assets/seven-colour-cards.png",
+      "sourceKind": "deterministic_counted_layout",
+      "sourceAssets": [],
+      "sha256": "5e00974e81d1cec7c1a52d34afe87acae179d5257e9793da436cab4b6d1c0bd7",
+      "bytes": 2356,
+      "pixels": [
+        640,
+        440
+      ],
+      "mode": "RGB",
+      "use": [
+        "rainbow-cards"
+      ],
+      "layoutKey": "seven-colour-cards"
+    },
+    "traffic-cart": {
+      "file": "assets/traffic-cart.png",
+      "sourceKind": "codex_builtin_imagegen_atlas_crop",
+      "sourceAtlas": "game-actors",
+      "sha256": "0644177260edc7a30a984d57d4dffa2dd0b8cd1dd3e4eaea602e99d1076788a2",
+      "bytes": 57013,
+      "mode": "RGBA",
+      "pixels": [
+        256,
+        256
+      ],
+      "sourceCropXYXY": [
+        1064,
+        646,
+        1477,
+        898
+      ],
+      "pasteXY": [
+        10,
+        56
+      ],
+      "resizedPixels": [
+        236,
+        144
+      ],
+      "pairAlignment": {
+        "containedWithin": [
+          236,
+          236
+        ]
+      },
+      "use": [
+        "follow-the-flags"
+      ]
+    },
+    "white-dog": {
+      "file": "assets/white-dog.png",
+      "sourceKind": "codex_builtin_imagegen_reuse",
+      "sha256": "fdeeb9d19c7f68fe4f8c646ee953e3b5d8c301c425d4f417b6d1fb65615e3f52",
+      "bytes": 58752,
+      "pixels": [
+        196,
+        224
+      ],
+      "mode": "RGBA",
+      "sourcePath": "courseware/lessons/fltrp-g1-upper-its-an-orange-cat/assets/quiz-white-dog.png",
+      "sourceSha256": "fdeeb9d19c7f68fe4f8c646ee953e3b5d8c301c425d4f417b6d1fb65615e3f52",
+      "sourceAtlasSha256": "9b0c4f555c4ba38497b25ccac9c452a859d8b27a0f61bf555449642cd146d5fb",
+      "sourceManifest": "courseware/lessons/fltrp-g1-upper-its-an-orange-cat/asset-provenance.json",
+      "sourceManifestSha256": "c9161b3833202795221be49aa157f150c1ab70cf46eafa520069b71bd2cce652",
+      "use": [
+        "words-we-can-say"
+      ]
+    },
+    "word-drawer": {
+      "file": "assets/word-drawer.png",
+      "sourceKind": "deterministic_counted_layout",
+      "sourceAssets": [
+        "blue-bird",
+        "blue-book",
+        "blue-ruler",
+        "pink-ball",
+        "white-dog",
+        "yellow-kite"
+      ],
+      "sha256": "4957bbd84cdb66f7d55d58a08c77cf377583211b5b75a5d1c16385880be341d4",
+      "bytes": 106143,
+      "pixels": [
+        640,
+        440
+      ],
+      "mode": "RGB",
+      "use": [
+        "words-we-can-say"
+      ],
+      "layoutKey": "word-drawer"
+    },
+    "yellow-ball": {
+      "file": "assets/yellow-ball.png",
+      "sourceKind": "codex_builtin_imagegen_derived",
+      "sourceAtlas": "counting-balls",
+      "sha256": "67dc9ae886f0b087b8785580a23fae77c66f920d3061d44d917b5e557e4ef849",
+      "bytes": 64975,
+      "pixels": [
+        256,
+        256
+      ],
+      "mode": "RGBA",
+      "cellXYXY": [
+        1024,
+        512,
+        1536,
+        1024
+      ],
+      "sourceAlphaBoundsXYXY": [
+        1072,
+        571,
+        1455,
+        956
+      ],
+      "sourceCropXYXY": [
+        1068,
+        567,
+        1459,
+        960
+      ],
+      "resizedPixels": [
+        227,
+        229
+      ],
+      "pasteXY": [
+        14,
+        13,
+        241,
+        242
+      ],
+      "outputAlphaBoundsXYXY": [
+        16,
+        15,
+        239,
+        240
+      ],
+      "use": {
+        "scenes": [
+          "crate-rattle",
+          "colour-clues"
+        ],
+        "quiz": []
+      }
+    },
+    "yellow-kite": {
+      "file": "assets/yellow-kite.png",
+      "sourceKind": "codex_builtin_imagegen_reuse",
+      "sha256": "bae029cc4d2476c4c88a159e632c2ab140ed1c7e87c2e65bbcbced25414dbb2e",
+      "bytes": 33197,
+      "pixels": [
+        169,
+        224
+      ],
+      "mode": "RGBA",
+      "sourcePath": "courseware/lessons/fltrp-g1-upper-its-an-orange-cat/assets/quiz-yellow-kite.png",
+      "sourceSha256": "bae029cc4d2476c4c88a159e632c2ab140ed1c7e87c2e65bbcbced25414dbb2e",
+      "sourceAtlasSha256": "9b0c4f555c4ba38497b25ccac9c452a859d8b27a0f61bf555449642cd146d5fb",
+      "sourceManifest": "courseware/lessons/fltrp-g1-upper-its-an-orange-cat/asset-provenance.json",
+      "sourceManifestSha256": "c9161b3833202795221be49aa157f150c1ab70cf46eafa520069b71bd2cce652",
+      "use": [
+        "picture-check/one-yellow-kite"
+      ]
+    },
+    "yellow-pencil": {
+      "file": "assets/yellow-pencil.png",
+      "sourceKind": "codex_builtin_imagegen_atlas_crop",
+      "sha256": "074c12a4d46bd676c93d7d066580534e8a89a4fdb20f4f1ff6f9bcab4e01956f",
+      "bytes": 40506,
+      "pixels": [
+        249,
+        272
+      ],
+      "mode": "RGBA",
+      "use": [
+        "picture-check/ten-green-pencils"
+      ],
+      "sourceAtlas": "teaching-props",
+      "cellXYXY": [
+        362,
+        0,
+        724,
+        362
+      ],
+      "sourceCropXYXY": [
+        417,
+        47,
+        693,
+        348
+      ],
+      "cropMethod": "RGBA alpha >=8 bounds plus 4 px, Lanczos contain 272 px"
+    }
+  },
+  "visualCheck": {
+    "method": "离线浅奶油和深松绿底逐个看实色、轮廓、透明边缘和无字情况。另看近12像素的单球缩小样。",
+    "result": "粉红与朱红易区分，棕、蓝、绿、黄主色明确。六个球形完整，边缘无相邻物件。图标尺寸已归一。",
+    "lessonRendering": "待在正式分组图片、游戏界面和640×360视口内验证。"
+  },
+  "useStatus": "已绑定课件源码。实际学生画面、小屏与真实读题待验。",
+  "countedCompositions": {
+    "source": "art-source/compose.py",
+    "sourceSha256": "3ccf5bc0d9ea368d9287314b283b50cc93e26760174e666a719beeb1e45f35df",
+    "layout": "art-source/counted-layout.json",
+    "layoutSha256": "2f189183b3e943a0d9f3e735dbde907ef544ee2fa4c88455c12f0747996b2d37",
+    "gameGroupLayoutSha256": "75d699309e94f95dd6d6f3d067847d8d8a61644d1b5e1f456bcd00decc7e8a83",
+    "count": 52,
+    "gameGroups": 23,
+    "quizAndSceneComposites": 29,
+    "staticReview": "逐图检查封面、讲解、题干、选项、手掌与角色帧。小号组卡在暖奶油底预览核对。",
+    "g6": "pending"
+  },
+  "interactivePageBudget": {
+    "float-and-find": {
+      "uniquePictures": 27,
+      "bytes": 1881881,
+      "targetBytes": 3000000
+    },
+    "follow-the-flags": {
+      "uniquePictures": 18,
+      "bytes": 1702385,
+      "targetBytes": 3000000
+    }
+  }
+}

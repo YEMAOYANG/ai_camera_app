@@ -1,0 +1,275 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "整理和复习",
+  "binding": {
+    "editionId": "pep-math-g1-lower-2022-standard",
+    "revisionId": "directory-6205d2037284e91f10b25edd",
+    "nodeId": "7ea3da90-af66-4293-8fde-02c4e3f62fc6",
+    "unitId": "acfb0386-a55f-4542-9d5d-619a3e2d9023"
+  },
+  "scenario": "木扣展厅收到一篮不同色的同规格木扣。先按十估和数，给同一批木扣做一张能看出组成、位置和来去数量的展签。",
+  "goals": [
+    "用十件作估量参照，再成十数并核查散件；说明99添1得到100与十个十合成一个百。",
+    "用同一数量的成十和散件、计数器和数卡互相核对，能读写百以内的数并说清数位和零。",
+    "在百数表和同刻度数线上找相邻数、比较大小和靠近哪个整十；说清比较的参照与远近。",
+    "用整十和散件的组成验证本单元的简单加减；遇到实际问题，找全条件，算后复核并说出用法。"
+  ],
+  "goalSources": [
+    {
+      "skill": "estimate-count-and-make-100",
+      "target": "用十件作估量参照，再成十数并核查散件；说明99添1得到100与十个十合成一个百。",
+      "source": "印39～40；课件2～12、21～22、26；设计1～2；任务单1～2"
+    },
+    {
+      "skill": "place-value-and-read-write",
+      "target": "用同一数量的成十和散件、计数器和数卡互相核对，能读写百以内的数并说清数位和零。",
+      "source": "印39～40；课件13～16；设计2～3"
+    },
+    {
+      "skill": "order-compare-and-nearest-ten",
+      "target": "在百数表和同刻度数线上找相邻数、比较大小和靠近哪个整十；说清比较的参照与远近。",
+      "source": "印39～40；课件17～19、23；设计3～4"
+    },
+    {
+      "skill": "compose-calculate-and-check",
+      "target": "用整十和散件的组成验证本单元的简单加减；遇到实际问题，找全条件，算后复核并说出用法。",
+      "source": "印39、41；课件20、24～25；设计4～5；任务单2"
+    }
+  ],
+  "pageSequence": [
+    {
+      "key": "open-the-counting-exhibit",
+      "kind": "teaching",
+      "plan": "同规格的木扣要开小展。回顾用十作参照以及剩下的单个。"
+    },
+    {
+      "key": "estimate-and-count-the-same-lot",
+      "kind": "teaching",
+      "plan": "以十件作参照估同一篮约70，重新数确有74，给满组和4件散扣留出可核空间。"
+    },
+    {
+      "key": "fill-the-last-space-to-100",
+      "kind": "teaching",
+      "plan": "从99加1至100，保留十行每行十格；写1、0、0并说空数位。"
+    },
+    {
+      "key": "read-the-same-seventy-four",
+      "kind": "teaching",
+      "plan": "七条十格、四个散件和计数器的十位7个位4互相对应，读写74。"
+    },
+    {
+      "key": "send-equivalent-number-pictures",
+      "kind": "game",
+      "plan": "按成十、散件图推到同量计数器展位，关卡加倒序数字、整十和一百。"
+    },
+    {
+      "key": "find-the-number-and-its-neighbors",
+      "kind": "teaching",
+      "plan": "百数表里找到73、74、75；同轴比较74靠近70还是80。"
+    },
+    {
+      "key": "compare-two-ways",
+      "kind": "teaching",
+      "plan": "以74与47、71分别比较，先比十位或同十位比个位，箭头同时说明方向与远近。"
+    },
+    {
+      "key": "follow-the-new-reference",
+      "kind": "game",
+      "plan": "操控蛇吃满足当前大于、小于条件的数，吃到后更新参照，最后辨认90和100。"
+    },
+    {
+      "key": "put-four-facts-on-the-exhibit",
+      "kind": "teaching",
+      "plan": "用70、4、74写两加两减，分别取走部分，和原图复核。"
+    },
+    {
+      "key": "use-the-number-map-to-check",
+      "kind": "teaching",
+      "plan": "74先拿走70剩4，再收到30成34。把每步用到的数和方法画回原有知识图。"
+    },
+    {
+      "key": "picture-quiz",
+      "kind": "quiz",
+      "plan": "六道原创图题各测数数、百的表示、位值、近整十、数序和应用。"
+    },
+    {
+      "key": "tell-the-family-your-number-map",
+      "kind": "teaching",
+      "plan": "回顾读图、数序与加减关联，请家人帮摆十组、画知识图并听孩子复述。"
+    }
+  ],
+  "games": [
+    {
+      "page": "send-equivalent-number-pictures",
+      "template": "sortingDepot",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.sortingDepot",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "classification",
+      "selection": "货件用十格条和散扣图，展位用计数器图和数位。只有表示同一数量才入位。中后关错开展位，不能总向右推；数字倒序、空个位和百位逐关出现。",
+      "levels": [
+        [
+          27,
+          52
+        ],
+        [
+          46,
+          64,
+          80
+        ],
+        [
+          35,
+          53,
+          90,
+          100
+        ]
+      ],
+      "teacherAnchors": [
+        "equivalence-guide",
+        "first-load",
+        "first-dock",
+        "game-player"
+      ],
+      "demo": "指向27的实物和计数器，实际向右推，停在第一张入位后复位。"
+    },
+    {
+      "page": "follow-the-new-reference",
+      "template": "compareSnake",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.compareSnake",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "comparison",
+      "selection": "真实蛇身和食物碰撞以数字大小接受，关内每次成功更新参照。数字卡是目标字形，数量小图让孩子可复核。只用大小规则，最近整十由讲解和图题检验。",
+      "levels": [
+        [
+          {
+            "ref": 58,
+            "test": "gt",
+            "candidates": [
+              85,
+              55
+            ],
+            "accept": 85
+          }
+        ],
+        [
+          {
+            "ref": 37,
+            "test": "gt",
+            "candidates": [
+              73,
+              36,
+              27
+            ],
+            "accept": 73
+          },
+          {
+            "ref": 73,
+            "test": "lt",
+            "candidates": [
+              69,
+              74,
+              92
+            ],
+            "accept": 69
+          }
+        ],
+        [
+          {
+            "ref": 82,
+            "test": "lt",
+            "candidates": [
+              79,
+              86,
+              93
+            ],
+            "accept": 79
+          },
+          {
+            "ref": 79,
+            "test": "gt",
+            "candidates": [
+              90,
+              71,
+              78
+            ],
+            "accept": 90
+          },
+          {
+            "ref": 90,
+            "test": "gt",
+            "candidates": [
+              100,
+              89,
+              90
+            ],
+            "accept": 100
+          }
+        ]
+      ],
+      "teacherAnchors": [
+        "current-reference-guide",
+        "game-player",
+        "first-good-card",
+        "last-accepted-number"
+      ],
+      "demo": "看58作参照、比较卡85，按向上真实吃85，固定展示首成功和更新参照，再复位。"
+    }
+  ],
+  "quiz": [
+    {
+      "id": "count-the-marker-bags",
+      "skill": "count-tens-and-singles",
+      "position": 2,
+      "plan": "新场景六条十枚、八枚散件，总量68。"
+    },
+    {
+      "id": "send-ten-full-wagons",
+      "skill": "ten-tens-make-100",
+      "position": 3,
+      "plan": "十辆各装十件，选一个百的展示牌。"
+    },
+    {
+      "id": "read-the-museum-counter",
+      "skill": "read-place-value",
+      "position": 1,
+      "plan": "十位两颗、个位六颗，选26。"
+    },
+    {
+      "id": "closer-to-which-ten",
+      "skill": "nearest-ten",
+      "position": 3,
+      "plan": "57沿同一刻度更靠近60。"
+    },
+    {
+      "id": "sort-new-entry-numbers",
+      "skill": "order-and-compare",
+      "position": 2,
+      "plan": "比较42、46、84，选择从小到大且刻度对齐的图。"
+    },
+    {
+      "id": "what-is-left-after-transfer",
+      "skill": "check-contextual-calculation",
+      "position": 1,
+      "plan": "89先取走80，再送来20，最后29。"
+    }
+  ],
+  "afterClass": {
+    "familyTask": "请家人和孩子用大纸片做十格，选同一批先估，再按十数到100。一起选一个两位数，用实物、数字和数轴画一张知识图；口述如何用原图检查一次拿走。",
+    "weeklyQuestionSource": [
+      "估数和实数",
+      "99添一与百位",
+      "位值读写",
+      "数序与比较",
+      "简单加减和实际问题"
+    ],
+    "evidence": "课堂游戏和图题分别留下真实事件，亲子摆、口述和纸笔由成人观察。"
+  },
+  "artAndLanguage": "木扣数量、百格、相邻刻度、珠子、算式用代码精确绘。非目标文字遮住时，可从同量图、数轴、箭头和录音判断。正式情境图和角色由本课内置 imagegen 完成。",
+  "authoring": {
+    "mode": "direct",
+    "model": "gpt-6.1-sol",
+    "bookAndCompanionScope": "印39正文、印40～42练习，一课时全35页配套。"
+  },
+  "officialNotesSha256": "18f3f71f87d3a7c9c6506ca2c66858a6b74babae866bd1b795d874fd2e3c71ee"
+}

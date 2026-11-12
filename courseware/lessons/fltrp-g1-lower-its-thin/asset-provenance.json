@@ -1,0 +1,1539 @@
+{
+  "schemaVersion": "mira.courseware.asset-provenance.v1",
+  "lesson": "fltrp-g1-lower-its-thin",
+  "reviewedAt": "2026-11-10T18:10:22.428950+08:00",
+  "status": "all_current_media_contact_checked_game_prevoice_sample_passed",
+  "assets": [
+    {
+      "assetKey": "farm-camera-sticker",
+      "path": "assets/farm-camera-sticker.png",
+      "sha256": "1e4511cfb2a8a48727ac0df6dd4ddbe37f2dbff1ca7c871478ebf5b785ab9cae",
+      "width": 399,
+      "height": 343,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/farm-quiz.png",
+      "generatedSourceSha256": "5ab5bad2637f08aba1848562b42bf5937a565e2151349e2b5edb320565431013",
+      "promptSha256": "277fba0b35ba3573f706479978f0dda48786cd1d98c9bf1d16b210ef9dc4ea2e",
+      "sourceCrop": [
+        847,
+        852,
+        1246,
+        1195
+      ],
+      "promptFile": {
+        "path": "art-source/farm-quiz.prompt.txt",
+        "sha256": "277fba0b35ba3573f706479978f0dda48786cd1d98c9bf1d16b210ef9dc4ea2e"
+      },
+      "atlasReceipt": {
+        "path": "art-source/farm-quiz.receipt.json",
+        "sha256": "fb2762e2d032394ecfbbc20b97f1b5754aff042a24a10cdbd47a578fb3f07571"
+      },
+      "usedBy": [
+        "aim-at-the-photo",
+        "deliver-the-photo",
+        "picture-check"
+      ],
+      "visualReview": "contact_checked_game_visual_sample_and_three_size_layout_passed"
+    },
+    {
+      "assetKey": "farm-ear-rabbit",
+      "path": "assets/farm-ear-rabbit.png",
+      "sha256": "d853cdb3affc54cfdac6e833a6b8ea74ef3177727627df8c614dc7cc7513dbf8",
+      "width": 206,
+      "height": 346,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/farm-figures.png",
+      "generatedSourceSha256": "a7e3b9747467d4203b15a4fa7780c81653df9a69c34b6294ba5ccd4cfab93d40",
+      "promptSha256": "51c14ac6ecb9408e418c2ad9fe4864ae557b2434dc0604798ddad8a294e9841a",
+      "sourceCrop": [
+        155,
+        666,
+        361,
+        1012
+      ],
+      "promptFile": {
+        "path": "art-source/farm-figures.prompt.txt",
+        "sha256": "51c14ac6ecb9408e418c2ad9fe4864ae557b2434dc0604798ddad8a294e9841a"
+      },
+      "atlasReceipt": {
+        "path": "art-source/farm-figures.receipt.json",
+        "sha256": "355d382de70a1a550b9f9074b0afc912150baf67c74e1c30fca6477c771f32ec"
+      },
+      "usedBy": [
+        "point-to-the-ears"
+      ],
+      "visualReview": "contact_checked"
+    },
+    {
+      "source": "Code layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_farm_cards.py",
+        "sha256": "8d04942c3efe6714e7861313b4b86c8e9519148bd02f95f1abb6ef556ace0a34"
+      },
+      "data": {
+        "path": "art-source/farm-cards.json",
+        "sha256": "024f89eff18ac0e337fc5745d21f80e1288fe2ed6e8eee3de1bf02fdfbd71e53"
+      },
+      "upstreamAssetKeys": [
+        "farm-black-pig",
+        "farm-fat-pig"
+      ],
+      "figureWidths": [
+        [
+          "fat-pig",
+          131
+        ],
+        [
+          "black-pig",
+          78
+        ],
+        [
+          "fat-pig",
+          78
+        ],
+        [
+          "fat-pig",
+          131
+        ],
+        [
+          "fat-pig",
+          78
+        ]
+      ],
+      "assetKey": "farm-five-pigs",
+      "path": "assets/farm-five-pigs.png",
+      "sha256": "b6bf73c1ee3bb81993df50ace02f5b48ed7562afc1428e10d06296f5231a1833",
+      "usedBy": [
+        "two-clue-photos"
+      ],
+      "visualReview": "contact_checked"
+    },
+    {
+      "assetKey": "farm-lens-ball",
+      "path": "assets/farm-lens-ball.png",
+      "sha256": "d868dd352e1fce6ecb3fc4bd997b35ffa27e65c3ffad9acfbc2a3dbf87977c75",
+      "width": 348,
+      "height": 347,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/farm-quiz.png",
+      "generatedSourceSha256": "5ab5bad2637f08aba1848562b42bf5937a565e2151349e2b5edb320565431013",
+      "promptSha256": "277fba0b35ba3573f706479978f0dda48786cd1d98c9bf1d16b210ef9dc4ea2e",
+      "sourceCrop": [
+        447,
+        853,
+        795,
+        1200
+      ],
+      "promptFile": {
+        "path": "art-source/farm-quiz.prompt.txt",
+        "sha256": "277fba0b35ba3573f706479978f0dda48786cd1d98c9bf1d16b210ef9dc4ea2e"
+      },
+      "atlasReceipt": {
+        "path": "art-source/farm-quiz.receipt.json",
+        "sha256": "fb2762e2d032394ecfbbc20b97f1b5754aff042a24a10cdbd47a578fb3f07571"
+      },
+      "usedBy": [
+        "aim-at-the-photo",
+        "deliver-the-photo"
+      ],
+      "visualReview": "contact_checked_game_visual_sample_and_three_size_layout_passed"
+    },
+    {
+      "source": "Code layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_farm_cards.py",
+        "sha256": "8d04942c3efe6714e7861313b4b86c8e9519148bd02f95f1abb6ef556ace0a34"
+      },
+      "data": {
+        "path": "art-source/farm-cards.json",
+        "sha256": "024f89eff18ac0e337fc5745d21f80e1288fe2ed6e8eee3de1bf02fdfbd71e53"
+      },
+      "upstreamAssetKeys": [
+        "farm-fat-pig"
+      ],
+      "figureWidths": [
+        [
+          "fat-pig",
+          201
+        ]
+      ],
+      "assetKey": "farm-one-big",
+      "path": "assets/farm-one-big.png",
+      "sha256": "1bc948c643e6e396e6fb1fd7a2e550b7132614d7e0ebb98bbcfe1ac77f7041e2",
+      "usedBy": [
+        "same-shape-two-sizes",
+        "aim-at-the-photo"
+      ],
+      "visualReview": "contact_checked_game_visual_sample_and_three_size_layout_passed"
+    },
+    {
+      "source": "Code layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_farm_cards.py",
+        "sha256": "8d04942c3efe6714e7861313b4b86c8e9519148bd02f95f1abb6ef556ace0a34"
+      },
+      "data": {
+        "path": "art-source/farm-cards.json",
+        "sha256": "024f89eff18ac0e337fc5745d21f80e1288fe2ed6e8eee3de1bf02fdfbd71e53"
+      },
+      "upstreamAssetKeys": [
+        "farm-black-pig"
+      ],
+      "figureWidths": [
+        [
+          "black-pig",
+          106
+        ]
+      ],
+      "assetKey": "farm-one-black-little",
+      "path": "assets/farm-one-black-little.png",
+      "sha256": "bb4bc42d99c0b557743519f9f0fdb8f4dee6adc53c84806bc609559a467bf7db",
+      "usedBy": [
+        "deliver-the-photo"
+      ],
+      "visualReview": "contact_checked_game_visual_sample_and_three_size_layout_passed"
+    },
+    {
+      "source": "Code layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_farm_cards.py",
+        "sha256": "8d04942c3efe6714e7861313b4b86c8e9519148bd02f95f1abb6ef556ace0a34"
+      },
+      "data": {
+        "path": "art-source/farm-cards.json",
+        "sha256": "024f89eff18ac0e337fc5745d21f80e1288fe2ed6e8eee3de1bf02fdfbd71e53"
+      },
+      "upstreamAssetKeys": [
+        "farm-fat-pig"
+      ],
+      "figureWidths": [
+        [
+          "fat-pig",
+          110
+        ]
+      ],
+      "assetKey": "farm-one-little",
+      "path": "assets/farm-one-little.png",
+      "sha256": "5cf2fbc4cff8b42ef9532625c7538fe2ef4aecfa571930ac6fc9ba22a317490d",
+      "usedBy": [
+        "same-shape-two-sizes",
+        "one-or-many",
+        "aim-at-the-photo"
+      ],
+      "visualReview": "contact_checked_game_visual_sample_and_three_size_layout_passed"
+    },
+    {
+      "source": "Code layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_farm_cards.py",
+        "sha256": "8d04942c3efe6714e7861313b4b86c8e9519148bd02f95f1abb6ef556ace0a34"
+      },
+      "data": {
+        "path": "art-source/farm-cards.json",
+        "sha256": "024f89eff18ac0e337fc5745d21f80e1288fe2ed6e8eee3de1bf02fdfbd71e53"
+      },
+      "upstreamAssetKeys": [
+        "farm-black-pig"
+      ],
+      "figureWidths": [
+        [
+          "black-pig",
+          145
+        ],
+        [
+          "black-pig",
+          145
+        ]
+      ],
+      "assetKey": "farm-pair-black-big",
+      "path": "assets/farm-pair-black-big.png",
+      "sha256": "f276ac1320e8a1a2c2eb6f6c2c217960a8eecd9c2d66fd102166b2d12893f541",
+      "usedBy": [
+        "listen-to-two-clues",
+        "deliver-the-photo"
+      ],
+      "visualReview": "contact_checked_game_visual_sample_and_three_size_layout_passed"
+    },
+    {
+      "source": "Code layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_farm_cards.py",
+        "sha256": "8d04942c3efe6714e7861313b4b86c8e9519148bd02f95f1abb6ef556ace0a34"
+      },
+      "data": {
+        "path": "art-source/farm-cards.json",
+        "sha256": "024f89eff18ac0e337fc5745d21f80e1288fe2ed6e8eee3de1bf02fdfbd71e53"
+      },
+      "upstreamAssetKeys": [
+        "farm-black-pig"
+      ],
+      "figureWidths": [
+        [
+          "black-pig",
+          106
+        ],
+        [
+          "black-pig",
+          106
+        ]
+      ],
+      "assetKey": "farm-pair-black-little",
+      "path": "assets/farm-pair-black-little.png",
+      "sha256": "de442cd487c6d78bff96159aaa26a352c6b6c1e5e20fafa3e0710bcb1b359d5c",
+      "usedBy": [
+        "listen-to-two-clues",
+        "deliver-the-photo"
+      ],
+      "visualReview": "contact_checked_game_visual_sample_and_three_size_layout_passed"
+    },
+    {
+      "source": "Code layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_farm_cards.py",
+        "sha256": "8d04942c3efe6714e7861313b4b86c8e9519148bd02f95f1abb6ef556ace0a34"
+      },
+      "data": {
+        "path": "art-source/farm-cards.json",
+        "sha256": "024f89eff18ac0e337fc5745d21f80e1288fe2ed6e8eee3de1bf02fdfbd71e53"
+      },
+      "upstreamAssetKeys": [
+        "farm-fat-pig"
+      ],
+      "figureWidths": [
+        [
+          "fat-pig",
+          145
+        ],
+        [
+          "fat-pig",
+          145
+        ]
+      ],
+      "assetKey": "farm-pair-pink-big",
+      "path": "assets/farm-pair-pink-big.png",
+      "sha256": "75ae0f44acc737c3a8d0a05112e8870d9c564cd3cefcc964b05b6cc840e18eb4",
+      "usedBy": [
+        "deliver-the-photo"
+      ],
+      "visualReview": "contact_checked_game_visual_sample_and_three_size_layout_passed"
+    },
+    {
+      "source": "Code layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_farm_cards.py",
+        "sha256": "8d04942c3efe6714e7861313b4b86c8e9519148bd02f95f1abb6ef556ace0a34"
+      },
+      "data": {
+        "path": "art-source/farm-cards.json",
+        "sha256": "024f89eff18ac0e337fc5745d21f80e1288fe2ed6e8eee3de1bf02fdfbd71e53"
+      },
+      "upstreamAssetKeys": [
+        "farm-fat-pig"
+      ],
+      "figureWidths": [
+        [
+          "fat-pig",
+          106
+        ],
+        [
+          "fat-pig",
+          106
+        ]
+      ],
+      "assetKey": "farm-pair-pink-little",
+      "path": "assets/farm-pair-pink-little.png",
+      "sha256": "1bf52eeae8aa11e21cc19225e80b2e9c6b38f23d5a869ef9fb90deae14078849",
+      "usedBy": [
+        "deliver-the-photo"
+      ],
+      "visualReview": "contact_checked_game_visual_sample_and_three_size_layout_passed"
+    },
+    {
+      "source": "Codex built-in image_gen",
+      "generatedSource": {
+        "path": "art-source/farm-photo-stage.png",
+        "sha256": "4715d62085c9f800374363352d450074dc10e062da0c4bddb59858478cb7f1ae"
+      },
+      "promptFile": {
+        "path": "art-source/farm-photo-stage.prompt.txt",
+        "sha256": "1991f6f83fe3edcb2276a3f8cf4f08739bd8f672c9ed01a2a80775183229fd55"
+      },
+      "derivedBy": "sips -Z 1280, original aspect preserved",
+      "assetKey": "farm-photo-stage",
+      "path": "assets/farm-photo-stage.png",
+      "sha256": "b9c48d04e3f38b882301316b162e4c614e14c8a7e2ae3918be6a46ce5c32f6fb",
+      "usedBy": [
+        "aim-at-the-photo",
+        "deliver-the-photo"
+      ],
+      "visualReview": "contact_checked_game_visual_sample_and_three_size_layout_passed"
+    },
+    {
+      "source": "Code layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_farm_cards.py",
+        "sha256": "8d04942c3efe6714e7861313b4b86c8e9519148bd02f95f1abb6ef556ace0a34"
+      },
+      "data": {
+        "path": "art-source/farm-cards.json",
+        "sha256": "024f89eff18ac0e337fc5745d21f80e1288fe2ed6e8eee3de1bf02fdfbd71e53"
+      },
+      "upstreamAssetKeys": [
+        "farm-quiz-black-lamb"
+      ],
+      "figureWidths": [
+        [
+          "quiz-black-lamb",
+          217
+        ]
+      ],
+      "assetKey": "farm-q-black-big",
+      "path": "assets/farm-q-black-big.png",
+      "sha256": "0efd0c0a7060bdf8e0534077bec61c997b71fa4e14ac98dd1da9391492ad7b99",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "contact_checked"
+    },
+    {
+      "source": "Code layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_farm_cards.py",
+        "sha256": "8d04942c3efe6714e7861313b4b86c8e9519148bd02f95f1abb6ef556ace0a34"
+      },
+      "data": {
+        "path": "art-source/farm-cards.json",
+        "sha256": "024f89eff18ac0e337fc5745d21f80e1288fe2ed6e8eee3de1bf02fdfbd71e53"
+      },
+      "upstreamAssetKeys": [
+        "farm-quiz-big-ears"
+      ],
+      "figureWidths": [
+        [
+          "quiz-big-ears",
+          113
+        ]
+      ],
+      "assetKey": "farm-q-ears-big",
+      "path": "assets/farm-q-ears-big.png",
+      "sha256": "71417054730a069827f418e4635a991ec0d8fe41390b075473282c3af07aad65",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "contact_checked"
+    },
+    {
+      "source": "Code layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_farm_cards.py",
+        "sha256": "8d04942c3efe6714e7861313b4b86c8e9519148bd02f95f1abb6ef556ace0a34"
+      },
+      "data": {
+        "path": "art-source/farm-cards.json",
+        "sha256": "024f89eff18ac0e337fc5745d21f80e1288fe2ed6e8eee3de1bf02fdfbd71e53"
+      },
+      "upstreamAssetKeys": [
+        "farm-quiz-big-ears"
+      ],
+      "figureWidths": [
+        [
+          "quiz-big-ears",
+          113
+        ]
+      ],
+      "assetKey": "farm-q-ears-feet",
+      "path": "assets/farm-q-ears-feet.png",
+      "sha256": "fc40f722b2795cb0640bfae68ed112924219abe7cbf7d091df603d87329c7af6",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "contact_checked"
+    },
+    {
+      "source": "Code layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_farm_cards.py",
+        "sha256": "8d04942c3efe6714e7861313b4b86c8e9519148bd02f95f1abb6ef556ace0a34"
+      },
+      "data": {
+        "path": "art-source/farm-cards.json",
+        "sha256": "024f89eff18ac0e337fc5745d21f80e1288fe2ed6e8eee3de1bf02fdfbd71e53"
+      },
+      "upstreamAssetKeys": [
+        "farm-quiz-little-ears"
+      ],
+      "figureWidths": [
+        [
+          "quiz-little-ears",
+          113
+        ]
+      ],
+      "assetKey": "farm-q-ears-little",
+      "path": "assets/farm-q-ears-little.png",
+      "sha256": "636956fbef6976fbec078873057ad4a445a3cdfb9f818bc6ca5a5529c704ecdd",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "contact_checked"
+    },
+    {
+      "source": "Code layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_farm_cards.py",
+        "sha256": "8d04942c3efe6714e7861313b4b86c8e9519148bd02f95f1abb6ef556ace0a34"
+      },
+      "data": {
+        "path": "art-source/farm-cards.json",
+        "sha256": "024f89eff18ac0e337fc5745d21f80e1288fe2ed6e8eee3de1bf02fdfbd71e53"
+      },
+      "upstreamAssetKeys": [
+        "farm-quiz-black-lamb",
+        "farm-quiz-white-lamb"
+      ],
+      "figureWidths": [
+        [
+          "quiz-white-lamb",
+          102
+        ],
+        [
+          "quiz-black-lamb",
+          102
+        ]
+      ],
+      "assetKey": "farm-q-mixed-lamb",
+      "path": "assets/farm-q-mixed-lamb.png",
+      "sha256": "d3fa8423a0df57f43387699ae5cb05d1bd60f1b95bc4653b5535c2ce1af0456a",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "contact_checked"
+    },
+    {
+      "source": "Code layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_farm_cards.py",
+        "sha256": "8d04942c3efe6714e7861313b4b86c8e9519148bd02f95f1abb6ef556ace0a34"
+      },
+      "data": {
+        "path": "art-source/farm-cards.json",
+        "sha256": "024f89eff18ac0e337fc5745d21f80e1288fe2ed6e8eee3de1bf02fdfbd71e53"
+      },
+      "upstreamAssetKeys": [
+        "farm-quiz-duck"
+      ],
+      "figureWidths": [
+        [
+          "quiz-duck",
+          96
+        ]
+      ],
+      "assetKey": "farm-q-one-duck",
+      "path": "assets/farm-q-one-duck.png",
+      "sha256": "d5901d58972112127aae9f7d04b2cfb58cf325078e5267a97c547d55a51cb5c5",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "contact_checked"
+    },
+    {
+      "source": "Code layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_farm_cards.py",
+        "sha256": "8d04942c3efe6714e7861313b4b86c8e9519148bd02f95f1abb6ef556ace0a34"
+      },
+      "data": {
+        "path": "art-source/farm-cards.json",
+        "sha256": "024f89eff18ac0e337fc5745d21f80e1288fe2ed6e8eee3de1bf02fdfbd71e53"
+      },
+      "upstreamAssetKeys": [
+        "farm-quiz-fat-cat"
+      ],
+      "figureWidths": [
+        [
+          "quiz-fat-cat",
+          128
+        ]
+      ],
+      "assetKey": "farm-q-round-little",
+      "path": "assets/farm-q-round-little.png",
+      "sha256": "6cb12549a13b7482b31fd08bd60e2fdd8b7cbbddd68cfebaea5609e3d6349e71",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "contact_checked"
+    },
+    {
+      "source": "Code layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_farm_cards.py",
+        "sha256": "8d04942c3efe6714e7861313b4b86c8e9519148bd02f95f1abb6ef556ace0a34"
+      },
+      "data": {
+        "path": "art-source/farm-cards.json",
+        "sha256": "024f89eff18ac0e337fc5745d21f80e1288fe2ed6e8eee3de1bf02fdfbd71e53"
+      },
+      "upstreamAssetKeys": [
+        "farm-quiz-fat-cat"
+      ],
+      "figureWidths": [
+        [
+          "quiz-fat-cat",
+          201
+        ]
+      ],
+      "assetKey": "farm-q-round",
+      "path": "assets/farm-q-round.png",
+      "sha256": "1dab7a21baf2400a07e6c1063aa11cc6a390180a1f059ff55244a4d1437e5145",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "contact_checked"
+    },
+    {
+      "source": "Code layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_farm_cards.py",
+        "sha256": "8d04942c3efe6714e7861313b4b86c8e9519148bd02f95f1abb6ef556ace0a34"
+      },
+      "data": {
+        "path": "art-source/farm-cards.json",
+        "sha256": "024f89eff18ac0e337fc5745d21f80e1288fe2ed6e8eee3de1bf02fdfbd71e53"
+      },
+      "upstreamAssetKeys": [
+        "farm-quiz-thin-cat"
+      ],
+      "figureWidths": [
+        [
+          "quiz-thin-cat",
+          201
+        ]
+      ],
+      "assetKey": "farm-q-thin",
+      "path": "assets/farm-q-thin.png",
+      "sha256": "5c67e5760e0ba388aa1d883beeb054e9e2883c97e1fc1e5bf8bffd871649bfdb",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "contact_checked"
+    },
+    {
+      "source": "Code layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_farm_cards.py",
+        "sha256": "8d04942c3efe6714e7861313b4b86c8e9519148bd02f95f1abb6ef556ace0a34"
+      },
+      "data": {
+        "path": "art-source/farm-cards.json",
+        "sha256": "024f89eff18ac0e337fc5745d21f80e1288fe2ed6e8eee3de1bf02fdfbd71e53"
+      },
+      "upstreamAssetKeys": [
+        "farm-quiz-black-lamb"
+      ],
+      "figureWidths": [
+        [
+          "quiz-black-lamb",
+          169
+        ],
+        [
+          "quiz-black-lamb",
+          169
+        ]
+      ],
+      "assetKey": "farm-q-two-big-black",
+      "path": "assets/farm-q-two-big-black.png",
+      "sha256": "e613c90b5ef6dc15e701ea75a1a199fb64e02b72fdef276562271764a8468420",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "contact_checked"
+    },
+    {
+      "source": "Code layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_farm_cards.py",
+        "sha256": "8d04942c3efe6714e7861313b4b86c8e9519148bd02f95f1abb6ef556ace0a34"
+      },
+      "data": {
+        "path": "art-source/farm-cards.json",
+        "sha256": "024f89eff18ac0e337fc5745d21f80e1288fe2ed6e8eee3de1bf02fdfbd71e53"
+      },
+      "upstreamAssetKeys": [
+        "farm-quiz-duck"
+      ],
+      "figureWidths": [
+        [
+          "quiz-duck",
+          169
+        ],
+        [
+          "quiz-duck",
+          169
+        ]
+      ],
+      "assetKey": "farm-q-two-big-ducks",
+      "path": "assets/farm-q-two-big-ducks.png",
+      "sha256": "f939d6b927fda7b1136090945f9293a134e4ff4ee65fd8e82e94dbaccdef9234",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "contact_checked"
+    },
+    {
+      "source": "Code layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_farm_cards.py",
+        "sha256": "8d04942c3efe6714e7861313b4b86c8e9519148bd02f95f1abb6ef556ace0a34"
+      },
+      "data": {
+        "path": "art-source/farm-cards.json",
+        "sha256": "024f89eff18ac0e337fc5745d21f80e1288fe2ed6e8eee3de1bf02fdfbd71e53"
+      },
+      "upstreamAssetKeys": [
+        "farm-quiz-black-lamb"
+      ],
+      "figureWidths": [
+        [
+          "quiz-black-lamb",
+          102
+        ],
+        [
+          "quiz-black-lamb",
+          102
+        ]
+      ],
+      "assetKey": "farm-q-two-black",
+      "path": "assets/farm-q-two-black.png",
+      "sha256": "72ff31f59e99076c8de3d4a83bf5c37e337711c0546a67a62a1366a3b654b6d3",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "contact_checked"
+    },
+    {
+      "source": "Code layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_farm_cards.py",
+        "sha256": "8d04942c3efe6714e7861313b4b86c8e9519148bd02f95f1abb6ef556ace0a34"
+      },
+      "data": {
+        "path": "art-source/farm-cards.json",
+        "sha256": "024f89eff18ac0e337fc5745d21f80e1288fe2ed6e8eee3de1bf02fdfbd71e53"
+      },
+      "upstreamAssetKeys": [
+        "farm-quiz-duck"
+      ],
+      "figureWidths": [
+        [
+          "quiz-duck",
+          96
+        ],
+        [
+          "quiz-duck",
+          96
+        ]
+      ],
+      "assetKey": "farm-q-two-ducks",
+      "path": "assets/farm-q-two-ducks.png",
+      "sha256": "7f875cb79789e68e3ec8657c83c3ff206d35e56b1f8854192925fd32d50d34e9",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "contact_checked"
+    },
+    {
+      "source": "Code layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_farm_cards.py",
+        "sha256": "8d04942c3efe6714e7861313b4b86c8e9519148bd02f95f1abb6ef556ace0a34"
+      },
+      "data": {
+        "path": "art-source/farm-cards.json",
+        "sha256": "024f89eff18ac0e337fc5745d21f80e1288fe2ed6e8eee3de1bf02fdfbd71e53"
+      },
+      "upstreamAssetKeys": [
+        "farm-quiz-white-lamb"
+      ],
+      "figureWidths": [
+        [
+          "quiz-white-lamb",
+          102
+        ],
+        [
+          "quiz-white-lamb",
+          102
+        ]
+      ],
+      "assetKey": "farm-q-two-white",
+      "path": "assets/farm-q-two-white.png",
+      "sha256": "bec3c9481798e9baa2119db20ae9c2b2d2a0261d4242c5e41702fca2a7135e39",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "contact_checked"
+    },
+    {
+      "source": "Code layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_farm_cards.py",
+        "sha256": "8d04942c3efe6714e7861313b4b86c8e9519148bd02f95f1abb6ef556ace0a34"
+      },
+      "data": {
+        "path": "art-source/farm-cards.json",
+        "sha256": "024f89eff18ac0e337fc5745d21f80e1288fe2ed6e8eee3de1bf02fdfbd71e53"
+      },
+      "upstreamAssetKeys": [
+        "farm-quiz-white-lamb"
+      ],
+      "figureWidths": [
+        [
+          "quiz-white-lamb",
+          217
+        ]
+      ],
+      "assetKey": "farm-q-white-big",
+      "path": "assets/farm-q-white-big.png",
+      "sha256": "4e99a27ef309c9a687b331f7d78c01e76884ec2c3b0330e3251394b8e2a3b989",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "contact_checked"
+    },
+    {
+      "source": "Code layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_farm_cards.py",
+        "sha256": "8d04942c3efe6714e7861313b4b86c8e9519148bd02f95f1abb6ef556ace0a34"
+      },
+      "data": {
+        "path": "art-source/farm-cards.json",
+        "sha256": "024f89eff18ac0e337fc5745d21f80e1288fe2ed6e8eee3de1bf02fdfbd71e53"
+      },
+      "upstreamAssetKeys": [
+        "farm-quiz-white-lamb"
+      ],
+      "figureWidths": [
+        [
+          "quiz-white-lamb",
+          104
+        ]
+      ],
+      "assetKey": "farm-q-white-little",
+      "path": "assets/farm-q-white-little.png",
+      "sha256": "838a03e57dbca1a34c3792432425a5e12d087968b0fb999322517a749ef5acca",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "contact_checked"
+    },
+    {
+      "assetKey": "farm-rover-flash",
+      "path": "assets/farm-rover-flash.png",
+      "sha256": "52dc776ed30b6ddcd1ffcaccad53509754e1b03ecc86cbcc040db683ade7dfe7",
+      "width": 404,
+      "height": 334,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/farm-figures.png",
+      "generatedSourceSha256": "a7e3b9747467d4203b15a4fa7780c81653df9a69c34b6294ba5ccd4cfab93d40",
+      "promptSha256": "51c14ac6ecb9408e418c2ad9fe4864ae557b2434dc0604798ddad8a294e9841a",
+      "sourceCrop": [
+        1070,
+        674,
+        1474,
+        1008
+      ],
+      "promptFile": {
+        "path": "art-source/farm-figures.prompt.txt",
+        "sha256": "51c14ac6ecb9408e418c2ad9fe4864ae557b2434dc0604798ddad8a294e9841a"
+      },
+      "atlasReceipt": {
+        "path": "art-source/farm-figures.receipt.json",
+        "sha256": "355d382de70a1a550b9f9074b0afc912150baf67c74e1c30fca6477c771f32ec"
+      },
+      "usedBy": [
+        "deliver-the-photo"
+      ],
+      "visualReview": "contact_checked_game_visual_sample_and_three_size_layout_passed"
+    },
+    {
+      "assetKey": "farm-rover",
+      "path": "assets/farm-rover.png",
+      "sha256": "5063a83de0a9a7ea30c22d1dc37913ff98f5bd92cd26f5ee17115b60d4aa6850",
+      "width": 367,
+      "height": 276,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/farm-figures.png",
+      "generatedSourceSha256": "a7e3b9747467d4203b15a4fa7780c81653df9a69c34b6294ba5ccd4cfab93d40",
+      "promptSha256": "51c14ac6ecb9408e418c2ad9fe4864ae557b2434dc0604798ddad8a294e9841a",
+      "sourceCrop": [
+        564,
+        732,
+        931,
+        1008
+      ],
+      "promptFile": {
+        "path": "art-source/farm-figures.prompt.txt",
+        "sha256": "51c14ac6ecb9408e418c2ad9fe4864ae557b2434dc0604798ddad8a294e9841a"
+      },
+      "atlasReceipt": {
+        "path": "art-source/farm-figures.receipt.json",
+        "sha256": "355d382de70a1a550b9f9074b0afc912150baf67c74e1c30fca6477c771f32ec"
+      },
+      "usedBy": [
+        "deliver-the-photo"
+      ],
+      "visualReview": "contact_checked_game_visual_sample_and_three_size_layout_passed"
+    },
+    {
+      "source": "Code layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_farm_cards.py",
+        "sha256": "8d04942c3efe6714e7861313b4b86c8e9519148bd02f95f1abb6ef556ace0a34"
+      },
+      "data": {
+        "path": "art-source/farm-cards.json",
+        "sha256": "024f89eff18ac0e337fc5745d21f80e1288fe2ed6e8eee3de1bf02fdfbd71e53"
+      },
+      "upstreamAssetKeys": [
+        "farm-fat-pig"
+      ],
+      "figureWidths": [
+        [
+          "fat-pig",
+          300
+        ]
+      ],
+      "assetKey": "farm-shape-fat",
+      "path": "assets/farm-shape-fat.png",
+      "sha256": "40a5c78e8f1f8acfbcb96a03ae2cd9330cc4f523f1b3e4ab25cf8656169bf878",
+      "usedBy": [
+        "shape-not-size",
+        "aim-at-the-photo"
+      ],
+      "visualReview": "contact_checked_game_visual_sample_and_three_size_layout_passed"
+    },
+    {
+      "source": "Code layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_farm_cards.py",
+        "sha256": "8d04942c3efe6714e7861313b4b86c8e9519148bd02f95f1abb6ef556ace0a34"
+      },
+      "data": {
+        "path": "art-source/farm-cards.json",
+        "sha256": "024f89eff18ac0e337fc5745d21f80e1288fe2ed6e8eee3de1bf02fdfbd71e53"
+      },
+      "upstreamAssetKeys": [
+        "farm-thin-pig"
+      ],
+      "figureWidths": [
+        [
+          "thin-pig",
+          300
+        ]
+      ],
+      "assetKey": "farm-shape-thin",
+      "path": "assets/farm-shape-thin.png",
+      "sha256": "3d92a3282439ff4c7010ba3f7808e25c80bafdd340254ce0936375c1e8318036",
+      "usedBy": [
+        "shape-not-size",
+        "aim-at-the-photo"
+      ],
+      "visualReview": "contact_checked_game_visual_sample_and_three_size_layout_passed"
+    },
+    {
+      "source": "Code layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_farm_cards.py",
+        "sha256": "8d04942c3efe6714e7861313b4b86c8e9519148bd02f95f1abb6ef556ace0a34"
+      },
+      "data": {
+        "path": "art-source/farm-cards.json",
+        "sha256": "024f89eff18ac0e337fc5745d21f80e1288fe2ed6e8eee3de1bf02fdfbd71e53"
+      },
+      "upstreamAssetKeys": [
+        "farm-cow",
+        "farm-dog",
+        "farm-fat-pig",
+        "farm-hen"
+      ],
+      "figureWidths": [
+        [
+          "cow",
+          163
+        ],
+        [
+          "hen",
+          100
+        ],
+        [
+          "fat-pig",
+          146
+        ],
+        [
+          "dog",
+          101
+        ]
+      ],
+      "assetKey": "farm-sounds",
+      "path": "assets/farm-sounds.png",
+      "sha256": "10c1166730a7df02d4acce012e8014034b82d5661d06d8b5b64c4556a47b507b",
+      "usedBy": [
+        "morning-sounds"
+      ],
+      "visualReview": "contact_checked"
+    },
+    {
+      "source": "Code layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_farm_cards.py",
+        "sha256": "8d04942c3efe6714e7861313b4b86c8e9519148bd02f95f1abb6ef556ace0a34"
+      },
+      "data": {
+        "path": "art-source/farm-cards.json",
+        "sha256": "024f89eff18ac0e337fc5745d21f80e1288fe2ed6e8eee3de1bf02fdfbd71e53"
+      },
+      "upstreamAssetKeys": [
+        "farm-fat-pig"
+      ],
+      "figureWidths": [
+        [
+          "fat-pig",
+          182
+        ],
+        [
+          "fat-pig",
+          182
+        ]
+      ],
+      "assetKey": "farm-two-big",
+      "path": "assets/farm-two-big.png",
+      "sha256": "08ba4b400f1c347862ece2fb56b751c0195ebd2a6ad31a64ed52b11a04ec91b9",
+      "usedBy": [
+        "aim-at-the-photo"
+      ],
+      "visualReview": "contact_checked_game_visual_sample_and_three_size_layout_passed"
+    },
+    {
+      "source": "Code layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_farm_cards.py",
+        "sha256": "8d04942c3efe6714e7861313b4b86c8e9519148bd02f95f1abb6ef556ace0a34"
+      },
+      "data": {
+        "path": "art-source/farm-cards.json",
+        "sha256": "024f89eff18ac0e337fc5745d21f80e1288fe2ed6e8eee3de1bf02fdfbd71e53"
+      },
+      "upstreamAssetKeys": [
+        "farm-fat-pig"
+      ],
+      "figureWidths": [
+        [
+          "fat-pig",
+          110
+        ],
+        [
+          "fat-pig",
+          110
+        ]
+      ],
+      "assetKey": "farm-two-little",
+      "path": "assets/farm-two-little.png",
+      "sha256": "923141390e0014fd440c731270a08d136123a16e1dccbc67d22dc9fea7e4b37c",
+      "usedBy": [
+        "one-or-many",
+        "aim-at-the-photo"
+      ],
+      "visualReview": "contact_checked_game_visual_sample_and_three_size_layout_passed"
+    }
+  ],
+  "missing": [],
+  "interactivePageBudget": [
+    {
+      "scene": "aim-at-the-photo",
+      "imageBytes": 2130526,
+      "limitBytes": 3145728
+    },
+    {
+      "scene": "deliver-the-photo",
+      "imageBytes": 2336247,
+      "limitBytes": 3145728
+    }
+  ],
+  "atlasCutouts": [
+    {
+      "assetKey": "farm-fat-pig",
+      "path": "assets/farm-fat-pig.png",
+      "sha256": "48ba0731cc91de04fecd1426868f3e6a71a0bc19def7f9ea808a5d05fb12cc1a",
+      "width": 403,
+      "height": 285,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/farm-figures.png",
+      "generatedSourceSha256": "a7e3b9747467d4203b15a4fa7780c81653df9a69c34b6294ba5ccd4cfab93d40",
+      "promptSha256": "51c14ac6ecb9408e418c2ad9fe4864ae557b2434dc0604798ddad8a294e9841a",
+      "sourceCrop": [
+        68,
+        19,
+        471,
+        304
+      ],
+      "promptFile": {
+        "path": "art-source/farm-figures.prompt.txt",
+        "sha256": "51c14ac6ecb9408e418c2ad9fe4864ae557b2434dc0604798ddad8a294e9841a"
+      },
+      "atlasReceipt": {
+        "path": "art-source/farm-figures.receipt.json",
+        "sha256": "355d382de70a1a550b9f9074b0afc912150baf67c74e1c30fca6477c771f32ec"
+      }
+    },
+    {
+      "assetKey": "farm-thin-pig",
+      "path": "assets/farm-thin-pig.png",
+      "sha256": "7179ce0849222449fe776daf7c95255f0ee74ee920d2df91661c17bdb848a733",
+      "width": 410,
+      "height": 282,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/farm-figures.png",
+      "generatedSourceSha256": "a7e3b9747467d4203b15a4fa7780c81653df9a69c34b6294ba5ccd4cfab93d40",
+      "promptSha256": "51c14ac6ecb9408e418c2ad9fe4864ae557b2434dc0604798ddad8a294e9841a",
+      "sourceCrop": [
+        567,
+        22,
+        977,
+        304
+      ],
+      "promptFile": {
+        "path": "art-source/farm-figures.prompt.txt",
+        "sha256": "51c14ac6ecb9408e418c2ad9fe4864ae557b2434dc0604798ddad8a294e9841a"
+      },
+      "atlasReceipt": {
+        "path": "art-source/farm-figures.receipt.json",
+        "sha256": "355d382de70a1a550b9f9074b0afc912150baf67c74e1c30fca6477c771f32ec"
+      }
+    },
+    {
+      "assetKey": "farm-black-pig",
+      "path": "assets/farm-black-pig.png",
+      "sha256": "e4942df2e60234a1a30e24b3ce3e15c553300e6a6c9e7c523b3578ca5e2d9db9",
+      "width": 404,
+      "height": 273,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/farm-figures.png",
+      "generatedSourceSha256": "a7e3b9747467d4203b15a4fa7780c81653df9a69c34b6294ba5ccd4cfab93d40",
+      "promptSha256": "51c14ac6ecb9408e418c2ad9fe4864ae557b2434dc0604798ddad8a294e9841a",
+      "sourceCrop": [
+        1074,
+        30,
+        1478,
+        303
+      ],
+      "promptFile": {
+        "path": "art-source/farm-figures.prompt.txt",
+        "sha256": "51c14ac6ecb9408e418c2ad9fe4864ae557b2434dc0604798ddad8a294e9841a"
+      },
+      "atlasReceipt": {
+        "path": "art-source/farm-figures.receipt.json",
+        "sha256": "355d382de70a1a550b9f9074b0afc912150baf67c74e1c30fca6477c771f32ec"
+      }
+    },
+    {
+      "assetKey": "farm-cow",
+      "path": "assets/farm-cow.png",
+      "sha256": "f88a4967c9a727c35636c39667ebc2f6cd1cd50a4f0a376ada5741cde08e8e9d",
+      "width": 420,
+      "height": 301,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/farm-figures.png",
+      "generatedSourceSha256": "a7e3b9747467d4203b15a4fa7780c81653df9a69c34b6294ba5ccd4cfab93d40",
+      "promptSha256": "51c14ac6ecb9408e418c2ad9fe4864ae557b2434dc0604798ddad8a294e9841a",
+      "sourceCrop": [
+        51,
+        335,
+        483,
+        645
+      ],
+      "promptFile": {
+        "path": "art-source/farm-figures.prompt.txt",
+        "sha256": "51c14ac6ecb9408e418c2ad9fe4864ae557b2434dc0604798ddad8a294e9841a"
+      },
+      "atlasReceipt": {
+        "path": "art-source/farm-figures.receipt.json",
+        "sha256": "355d382de70a1a550b9f9074b0afc912150baf67c74e1c30fca6477c771f32ec"
+      }
+    },
+    {
+      "assetKey": "farm-hen",
+      "path": "assets/farm-hen.png",
+      "sha256": "f3108e9b7472c7e0b254315b724165868d2e8706db97b0e211b7ac8841f507a3",
+      "width": 307,
+      "height": 306,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/farm-figures.png",
+      "generatedSourceSha256": "a7e3b9747467d4203b15a4fa7780c81653df9a69c34b6294ba5ccd4cfab93d40",
+      "promptSha256": "51c14ac6ecb9408e418c2ad9fe4864ae557b2434dc0604798ddad8a294e9841a",
+      "sourceCrop": [
+        605,
+        340,
+        912,
+        646
+      ],
+      "promptFile": {
+        "path": "art-source/farm-figures.prompt.txt",
+        "sha256": "51c14ac6ecb9408e418c2ad9fe4864ae557b2434dc0604798ddad8a294e9841a"
+      },
+      "atlasReceipt": {
+        "path": "art-source/farm-figures.receipt.json",
+        "sha256": "355d382de70a1a550b9f9074b0afc912150baf67c74e1c30fca6477c771f32ec"
+      }
+    },
+    {
+      "assetKey": "farm-dog",
+      "path": "assets/farm-dog.png",
+      "sha256": "05484d5db49cb0edc74acd85d46328e96eec43ca75aa39ce879dcc1376b9c8ca",
+      "width": 301,
+      "height": 305,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/farm-figures.png",
+      "generatedSourceSha256": "a7e3b9747467d4203b15a4fa7780c81653df9a69c34b6294ba5ccd4cfab93d40",
+      "promptSha256": "51c14ac6ecb9408e418c2ad9fe4864ae557b2434dc0604798ddad8a294e9841a",
+      "sourceCrop": [
+        1110,
+        342,
+        1411,
+        647
+      ],
+      "promptFile": {
+        "path": "art-source/farm-figures.prompt.txt",
+        "sha256": "51c14ac6ecb9408e418c2ad9fe4864ae557b2434dc0604798ddad8a294e9841a"
+      },
+      "atlasReceipt": {
+        "path": "art-source/farm-figures.receipt.json",
+        "sha256": "355d382de70a1a550b9f9074b0afc912150baf67c74e1c30fca6477c771f32ec"
+      }
+    },
+    {
+      "assetKey": "farm-ear-rabbit",
+      "path": "assets/farm-ear-rabbit.png",
+      "sha256": "d853cdb3affc54cfdac6e833a6b8ea74ef3177727627df8c614dc7cc7513dbf8",
+      "width": 206,
+      "height": 346,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/farm-figures.png",
+      "generatedSourceSha256": "a7e3b9747467d4203b15a4fa7780c81653df9a69c34b6294ba5ccd4cfab93d40",
+      "promptSha256": "51c14ac6ecb9408e418c2ad9fe4864ae557b2434dc0604798ddad8a294e9841a",
+      "sourceCrop": [
+        155,
+        666,
+        361,
+        1012
+      ],
+      "promptFile": {
+        "path": "art-source/farm-figures.prompt.txt",
+        "sha256": "51c14ac6ecb9408e418c2ad9fe4864ae557b2434dc0604798ddad8a294e9841a"
+      },
+      "atlasReceipt": {
+        "path": "art-source/farm-figures.receipt.json",
+        "sha256": "355d382de70a1a550b9f9074b0afc912150baf67c74e1c30fca6477c771f32ec"
+      }
+    },
+    {
+      "assetKey": "farm-rover",
+      "path": "assets/farm-rover.png",
+      "sha256": "5063a83de0a9a7ea30c22d1dc37913ff98f5bd92cd26f5ee17115b60d4aa6850",
+      "width": 367,
+      "height": 276,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/farm-figures.png",
+      "generatedSourceSha256": "a7e3b9747467d4203b15a4fa7780c81653df9a69c34b6294ba5ccd4cfab93d40",
+      "promptSha256": "51c14ac6ecb9408e418c2ad9fe4864ae557b2434dc0604798ddad8a294e9841a",
+      "sourceCrop": [
+        564,
+        732,
+        931,
+        1008
+      ],
+      "promptFile": {
+        "path": "art-source/farm-figures.prompt.txt",
+        "sha256": "51c14ac6ecb9408e418c2ad9fe4864ae557b2434dc0604798ddad8a294e9841a"
+      },
+      "atlasReceipt": {
+        "path": "art-source/farm-figures.receipt.json",
+        "sha256": "355d382de70a1a550b9f9074b0afc912150baf67c74e1c30fca6477c771f32ec"
+      }
+    },
+    {
+      "assetKey": "farm-rover-flash",
+      "path": "assets/farm-rover-flash.png",
+      "sha256": "52dc776ed30b6ddcd1ffcaccad53509754e1b03ecc86cbcc040db683ade7dfe7",
+      "width": 404,
+      "height": 334,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/farm-figures.png",
+      "generatedSourceSha256": "a7e3b9747467d4203b15a4fa7780c81653df9a69c34b6294ba5ccd4cfab93d40",
+      "promptSha256": "51c14ac6ecb9408e418c2ad9fe4864ae557b2434dc0604798ddad8a294e9841a",
+      "sourceCrop": [
+        1070,
+        674,
+        1474,
+        1008
+      ],
+      "promptFile": {
+        "path": "art-source/farm-figures.prompt.txt",
+        "sha256": "51c14ac6ecb9408e418c2ad9fe4864ae557b2434dc0604798ddad8a294e9841a"
+      },
+      "atlasReceipt": {
+        "path": "art-source/farm-figures.receipt.json",
+        "sha256": "355d382de70a1a550b9f9074b0afc912150baf67c74e1c30fca6477c771f32ec"
+      }
+    },
+    {
+      "assetKey": "farm-quiz-thin-cat",
+      "path": "assets/farm-quiz-thin-cat.png",
+      "sha256": "09d50707b601de36674ca039418f0b85ceaabbb19c54f1f7e507ef00f70e7309",
+      "width": 374,
+      "height": 356,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/farm-quiz.png",
+      "generatedSourceSha256": "5ab5bad2637f08aba1848562b42bf5937a565e2151349e2b5edb320565431013",
+      "promptSha256": "277fba0b35ba3573f706479978f0dda48786cd1d98c9bf1d16b210ef9dc4ea2e",
+      "sourceCrop": [
+        39,
+        24,
+        413,
+        380
+      ],
+      "promptFile": {
+        "path": "art-source/farm-quiz.prompt.txt",
+        "sha256": "277fba0b35ba3573f706479978f0dda48786cd1d98c9bf1d16b210ef9dc4ea2e"
+      },
+      "atlasReceipt": {
+        "path": "art-source/farm-quiz.receipt.json",
+        "sha256": "fb2762e2d032394ecfbbc20b97f1b5754aff042a24a10cdbd47a578fb3f07571"
+      }
+    },
+    {
+      "assetKey": "farm-quiz-fat-cat",
+      "path": "assets/farm-quiz-fat-cat.png",
+      "sha256": "fc208f4b532698a4dee07f227ece9aa8a124298165e88a70050ca9a2c024a9e4",
+      "width": 371,
+      "height": 354,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/farm-quiz.png",
+      "generatedSourceSha256": "5ab5bad2637f08aba1848562b42bf5937a565e2151349e2b5edb320565431013",
+      "promptSha256": "277fba0b35ba3573f706479978f0dda48786cd1d98c9bf1d16b210ef9dc4ea2e",
+      "sourceCrop": [
+        459,
+        25,
+        830,
+        379
+      ],
+      "promptFile": {
+        "path": "art-source/farm-quiz.prompt.txt",
+        "sha256": "277fba0b35ba3573f706479978f0dda48786cd1d98c9bf1d16b210ef9dc4ea2e"
+      },
+      "atlasReceipt": {
+        "path": "art-source/farm-quiz.receipt.json",
+        "sha256": "fb2762e2d032394ecfbbc20b97f1b5754aff042a24a10cdbd47a578fb3f07571"
+      }
+    },
+    {
+      "assetKey": "farm-quiz-white-lamb",
+      "path": "assets/farm-quiz-white-lamb.png",
+      "sha256": "54a3c1275224e39b306cd9b8e3341dcd13c85fc59154ede0988e0c22e6e9f178",
+      "width": 384,
+      "height": 352,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/farm-quiz.png",
+      "generatedSourceSha256": "5ab5bad2637f08aba1848562b42bf5937a565e2151349e2b5edb320565431013",
+      "promptSha256": "277fba0b35ba3573f706479978f0dda48786cd1d98c9bf1d16b210ef9dc4ea2e",
+      "sourceCrop": [
+        862,
+        30,
+        1246,
+        382
+      ],
+      "promptFile": {
+        "path": "art-source/farm-quiz.prompt.txt",
+        "sha256": "277fba0b35ba3573f706479978f0dda48786cd1d98c9bf1d16b210ef9dc4ea2e"
+      },
+      "atlasReceipt": {
+        "path": "art-source/farm-quiz.receipt.json",
+        "sha256": "fb2762e2d032394ecfbbc20b97f1b5754aff042a24a10cdbd47a578fb3f07571"
+      }
+    },
+    {
+      "assetKey": "farm-quiz-black-lamb",
+      "path": "assets/farm-quiz-black-lamb.png",
+      "sha256": "cad85bdcbb94f599d3f35bbaf9b363d4661696101d4826d9f5b5ce23b4b665b6",
+      "width": 380,
+      "height": 352,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/farm-quiz.png",
+      "generatedSourceSha256": "5ab5bad2637f08aba1848562b42bf5937a565e2151349e2b5edb320565431013",
+      "promptSha256": "277fba0b35ba3573f706479978f0dda48786cd1d98c9bf1d16b210ef9dc4ea2e",
+      "sourceCrop": [
+        29,
+        427,
+        409,
+        779
+      ],
+      "promptFile": {
+        "path": "art-source/farm-quiz.prompt.txt",
+        "sha256": "277fba0b35ba3573f706479978f0dda48786cd1d98c9bf1d16b210ef9dc4ea2e"
+      },
+      "atlasReceipt": {
+        "path": "art-source/farm-quiz.receipt.json",
+        "sha256": "fb2762e2d032394ecfbbc20b97f1b5754aff042a24a10cdbd47a578fb3f07571"
+      }
+    },
+    {
+      "assetKey": "farm-quiz-duck",
+      "path": "assets/farm-quiz-duck.png",
+      "sha256": "8f49bde83e46d8bcb1870fece61950c42dcd6c3d528e453a31df2a3115852ecc",
+      "width": 344,
+      "height": 346,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/farm-quiz.png",
+      "generatedSourceSha256": "5ab5bad2637f08aba1848562b42bf5937a565e2151349e2b5edb320565431013",
+      "promptSha256": "277fba0b35ba3573f706479978f0dda48786cd1d98c9bf1d16b210ef9dc4ea2e",
+      "sourceCrop": [
+        465,
+        439,
+        809,
+        785
+      ],
+      "promptFile": {
+        "path": "art-source/farm-quiz.prompt.txt",
+        "sha256": "277fba0b35ba3573f706479978f0dda48786cd1d98c9bf1d16b210ef9dc4ea2e"
+      },
+      "atlasReceipt": {
+        "path": "art-source/farm-quiz.receipt.json",
+        "sha256": "fb2762e2d032394ecfbbc20b97f1b5754aff042a24a10cdbd47a578fb3f07571"
+      }
+    },
+    {
+      "assetKey": "farm-quiz-little-ears",
+      "path": "assets/farm-quiz-little-ears.png",
+      "sha256": "767302f1b561bd2e065cda33fa5930fc983c2ccc8ee2194f6a8a3ad09ef2692c",
+      "width": 250,
+      "height": 330,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/farm-quiz.png",
+      "generatedSourceSha256": "5ab5bad2637f08aba1848562b42bf5937a565e2151349e2b5edb320565431013",
+      "promptSha256": "277fba0b35ba3573f706479978f0dda48786cd1d98c9bf1d16b210ef9dc4ea2e",
+      "sourceCrop": [
+        928,
+        448,
+        1178,
+        778
+      ],
+      "promptFile": {
+        "path": "art-source/farm-quiz.prompt.txt",
+        "sha256": "277fba0b35ba3573f706479978f0dda48786cd1d98c9bf1d16b210ef9dc4ea2e"
+      },
+      "atlasReceipt": {
+        "path": "art-source/farm-quiz.receipt.json",
+        "sha256": "fb2762e2d032394ecfbbc20b97f1b5754aff042a24a10cdbd47a578fb3f07571"
+      }
+    },
+    {
+      "assetKey": "farm-quiz-big-ears",
+      "path": "assets/farm-quiz-big-ears.png",
+      "sha256": "0290649c44efe1b9e762448fc3ca962f56aebd25c9bec1b2857a99ae07dab492",
+      "width": 232,
+      "height": 404,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/farm-quiz.png",
+      "generatedSourceSha256": "5ab5bad2637f08aba1848562b42bf5937a565e2151349e2b5edb320565431013",
+      "promptSha256": "277fba0b35ba3573f706479978f0dda48786cd1d98c9bf1d16b210ef9dc4ea2e",
+      "sourceCrop": [
+        96,
+        816,
+        328,
+        1220
+      ],
+      "promptFile": {
+        "path": "art-source/farm-quiz.prompt.txt",
+        "sha256": "277fba0b35ba3573f706479978f0dda48786cd1d98c9bf1d16b210ef9dc4ea2e"
+      },
+      "atlasReceipt": {
+        "path": "art-source/farm-quiz.receipt.json",
+        "sha256": "fb2762e2d032394ecfbbc20b97f1b5754aff042a24a10cdbd47a578fb3f07571"
+      }
+    },
+    {
+      "assetKey": "farm-lens-ball",
+      "path": "assets/farm-lens-ball.png",
+      "sha256": "d868dd352e1fce6ecb3fc4bd997b35ffa27e65c3ffad9acfbc2a3dbf87977c75",
+      "width": 348,
+      "height": 347,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/farm-quiz.png",
+      "generatedSourceSha256": "5ab5bad2637f08aba1848562b42bf5937a565e2151349e2b5edb320565431013",
+      "promptSha256": "277fba0b35ba3573f706479978f0dda48786cd1d98c9bf1d16b210ef9dc4ea2e",
+      "sourceCrop": [
+        447,
+        853,
+        795,
+        1200
+      ],
+      "promptFile": {
+        "path": "art-source/farm-quiz.prompt.txt",
+        "sha256": "277fba0b35ba3573f706479978f0dda48786cd1d98c9bf1d16b210ef9dc4ea2e"
+      },
+      "atlasReceipt": {
+        "path": "art-source/farm-quiz.receipt.json",
+        "sha256": "fb2762e2d032394ecfbbc20b97f1b5754aff042a24a10cdbd47a578fb3f07571"
+      }
+    },
+    {
+      "assetKey": "farm-camera-sticker",
+      "path": "assets/farm-camera-sticker.png",
+      "sha256": "1e4511cfb2a8a48727ac0df6dd4ddbe37f2dbff1ca7c871478ebf5b785ab9cae",
+      "width": 399,
+      "height": 343,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/farm-quiz.png",
+      "generatedSourceSha256": "5ab5bad2637f08aba1848562b42bf5937a565e2151349e2b5edb320565431013",
+      "promptSha256": "277fba0b35ba3573f706479978f0dda48786cd1d98c9bf1d16b210ef9dc4ea2e",
+      "sourceCrop": [
+        847,
+        852,
+        1246,
+        1195
+      ],
+      "promptFile": {
+        "path": "art-source/farm-quiz.prompt.txt",
+        "sha256": "277fba0b35ba3573f706479978f0dda48786cd1d98c9bf1d16b210ef9dc4ea2e"
+      },
+      "atlasReceipt": {
+        "path": "art-source/farm-quiz.receipt.json",
+        "sha256": "fb2762e2d032394ecfbbc20b97f1b5754aff042a24a10cdbd47a578fb3f07571"
+      }
+    },
+    {
+      "source": "Codex built-in image_gen",
+      "generatedSource": {
+        "path": "art-source/farm-photo-stage.png",
+        "sha256": "4715d62085c9f800374363352d450074dc10e062da0c4bddb59858478cb7f1ae"
+      },
+      "promptFile": {
+        "path": "art-source/farm-photo-stage.prompt.txt",
+        "sha256": "1991f6f83fe3edcb2276a3f8cf4f08739bd8f672c9ed01a2a80775183229fd55"
+      },
+      "derivedBy": "sips -Z 1280, original aspect preserved"
+    }
+  ],
+  "contactSheets": [
+    {
+      "path": "output/courseware-lessons/fltrp-g1-lower-its-thin/work-grade1Handoff20261110-current-standard-v2/qa-prevoice/quiz.jpg",
+      "sha256": "94f925539365d246e0d6f488512910efa3abec1d3dacc0a6c290fdb10b6a9c8a"
+    },
+    {
+      "path": "output/courseware-lessons/fltrp-g1-lower-its-thin/work-grade1Handoff20261110-current-standard-v2/qa-prevoice/remaining.jpg",
+      "sha256": "eee1ed17cbb3002bad21488f398bd5aa69180e8d7854475cf9ce464272bd20a9"
+    },
+    {
+      "path": "output/courseware-lessons/fltrp-g1-lower-its-thin/work-grade1Handoff20261110-current-standard-v2/qa-prevoice/teach.jpg",
+      "sha256": "b9634d154fd80f78aa6f645fa756500b692f437f844c37dc7ae2e8078d32d503"
+    }
+  ]
+}

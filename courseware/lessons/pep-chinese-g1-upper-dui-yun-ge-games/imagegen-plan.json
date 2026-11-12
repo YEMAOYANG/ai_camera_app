@@ -1,0 +1,805 @@
+{
+  "schemaVersion": "mira.courseware.imagegen-plan.v1",
+  "status": "game_artwork_integrated_full_page_review_pending",
+  "mode": "codex_builtin_imagegen",
+  "lesson": "对韵歌",
+  "existingIllustrations": {
+    "inspected": 15,
+    "eligibleForReuse": 0,
+    "reason": "15 笔原响应均由 OpenMAIC 图像路由返回阿里云 DashScope 素材，原图及回执保留。"
+  },
+  "retainedCodeVisuals": [
+    "write-three",
+    "write-two",
+    "glyph-rain",
+    "glyph-wind",
+    "glyph-bug",
+    "glyph-green",
+    "glyph-clear",
+    "glyph-peach",
+    "glyph-red",
+    "dui-trace paths"
+  ],
+  "legacyUnknown": [
+    "q-peach",
+    "q-singer"
+  ],
+  "generatedCandidates": [
+    {
+      "key": "q-rain",
+      "method": "codex_builtin_imagegen",
+      "status": "thumbnail_review_passed_page_review_pending",
+      "workspaceFile": "assets/codex/q-rain.png",
+      "generatedFile": "/Users/sqcopenclaw/.codex/generated_images/01a1bef3-3364-7a81-ae5f-5bfcc94e8a3c/exec-00577ad2-d412-4b65-be19-7b31dc297c25.png",
+      "sha256": "481731aecc385c138c4f650561ebd52b16011df802aa93866cbcb0ba9ca57228",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "bytes": 2633645,
+      "mode": "RGB",
+      "pages": [
+        "p11"
+      ],
+      "transparent": false,
+      "prompt": "Use case: illustration-story.\nAsset type: picture question stem and answer choice for Chinese first grade.\nPrimary request: a close-up indoor view of one pale blue-framed glass window on a rainy day. Five distinct medium-dark blue drops with elongated trails run down the OUTSIDE glass. The unmistakable water droplets on the window occupy the central area and are the first thing visible. The horizontal window sill is thin and entirely in frame; outdoors is only an indistinct gray-blue rain sky behind the glass. Window and drops should read at a glance as rain on a pane, not as rain splashing in a ground puddle.\nConstraints: no plants, snow, people, sunshine, outdoor puddle, windblown cloth, animals or curtains. Avoid a strong opaque grid that obscures the raindrops.\nStyle: original Chinese children's picture-book gouache and subtle colored-pencil paper grain, warm soft spring daylight, strong simple silhouettes with a muted warm palette. Square composition, recognizably readable in a small answer tile, clean uncluttered backdrop, generous margins, no text, letters, logo, watermark, or frame.",
+      "thumbnailReview": "56 像素看得见窗框和沿玻璃下落的深蓝水滴，与游戏落入水洼的新图分开。 待实际课件整页验收。"
+    },
+    {
+      "key": "q-wind",
+      "method": "codex_builtin_imagegen",
+      "status": "thumbnail_review_passed_page_review_pending",
+      "workspaceFile": "assets/codex/q-wind.png",
+      "generatedFile": "/Users/sqcopenclaw/.codex/generated_images/01a1bef3-3364-7a81-ae5f-5bfcc94e8a3c/exec-75d47a9d-e3c9-4f2a-ac2e-b3506a4dd4e6.png",
+      "sha256": "dfc643a507fcc87bce6830b42f55e3618d8adea11ce4d2fa6ba9d7629ee9a859",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "bytes": 2678155,
+      "mode": "RGB",
+      "pages": [
+        "p11"
+      ],
+      "transparent": false,
+      "prompt": "Use case: illustration-story.\nAsset type: square image option for a Chinese first-grade quiz.\nPrimary request: one ordinary soft red wool scarf fastened at one point on a short outdoor clothesline in a flat dry back yard. Its long loose red length sweeps to the right in the wind. A couple of tan fallen leaves are blown rightward nearby, above the flat light ground. Clear red scarf silhouette fills a central part of the tile; visually distinct from a flag fixed to a vertical pole. A simple warm yard and sky support the scarf only.\nConstraints: no hill, mountains, water, mountains on the horizon, rain, snow, people, flags, painted marks or other hanging clothes.\nStyle: original Chinese children's picture-book gouache and subtle colored-pencil paper grain, warm soft spring daylight, strong simple silhouettes with a muted warm palette. Square composition, recognizably readable in a small answer tile, clean uncluttered backdrop, generous margins, no text, letters, logo, watermark, or frame.",
+      "thumbnailReview": "56 像素能辨认夹在横绳上的红围巾和横飞的叶片，画面未借季节作为线索。 待实际课件整页验收。"
+    },
+    {
+      "key": "q-park",
+      "method": "codex_builtin_imagegen",
+      "status": "thumbnail_review_passed_page_review_pending",
+      "workspaceFile": "assets/codex/q-park.png",
+      "generatedFile": "/Users/sqcopenclaw/.codex/generated_images/01a1bef3-3364-7a81-ae5f-5bfcc94e8a3c/exec-b182bfdc-37b5-4737-8765-f1228aa10fc0.png",
+      "sha256": "0dff10db4f05bf6fa9730dccd89a8cebb4fdafcd6505356a708f4a3778c71145",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "bytes": 2914299,
+      "mode": "RGB",
+      "pages": [
+        "p11"
+      ],
+      "transparent": false,
+      "prompt": "Use case: illustration-story.\nAsset type: square picture option for a Chinese first-grade quiz.\nPrimary request: a small flat neighborhood park in warm daylight, shown close enough to read its focal point. One Chinese primary-school child in a cream sweater sits on a simple warm-brown wooden bench and reads an open blank picture book. Show the complete bench, the child's sitting posture, and the book. The ground is entirely level, with a short beige footpath and pale green grass behind it. Keep the child's hands simple and plausible, the backdrop quiet, and the scene easy to read as a child on a park bench.\nConstraints: no mountain, river, pond, flower garden, peach blossom, street sign, dog, other child, or wet weather.\nStyle: original Chinese children's picture-book gouache and subtle colored-pencil paper grain, warm soft spring daylight, strong simple silhouettes with a muted warm palette. Square composition, recognizably readable in a small answer tile, clean uncluttered backdrop, generous margins, no text, letters, logo, watermark, or frame.",
+      "thumbnailReview": "56 像素可认出长椅上的孩子和手中打开的书，背景平地无山水。 待实际课件整页验收。"
+    },
+    {
+      "key": "q-flower",
+      "method": "codex_builtin_imagegen",
+      "status": "thumbnail_review_passed_page_review_pending",
+      "workspaceFile": "assets/codex/q-flower.png",
+      "generatedFile": "/Users/sqcopenclaw/.codex/generated_images/01a1bef3-3364-7a81-ae5f-5bfcc94e8a3c/exec-70e9cfe7-f888-494c-8e86-9226fdf9b243.png",
+      "sha256": "9edb09f7806870238dd12e0faba1cd094daa13825997f0a83ddefc9cd6119cee",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "bytes": 2356879,
+      "mode": "RGB",
+      "pages": [
+        "p11"
+      ],
+      "transparent": false,
+      "prompt": "Use case: illustration-story.\nAsset type: square first-grade picture option for a living-thing matching question.\nPrimary request: exactly one recognizable sunflower standing upright, complete from large golden-yellow blossom through thick green stem to the leaves. Show a very large, dark warm-brown seed disc surrounded by many bright yellow petals, distinct from a five-petaled pale yellow wildflower. The central sunflower fills most of the square, visually readable in a thumbnail. Plain pale cream backdrop, very small suggestion of ground.\nConstraints: no other flower, vase, insect, bird, person, busy plant background, or cropped petals.\nStyle: original Chinese children's picture-book gouache and subtle colored-pencil paper grain, warm soft spring daylight, strong simple silhouettes with a muted warm palette. Square composition, recognizably readable in a small answer tile, clean uncluttered backdrop, generous margins, no text, letters, logo, watermark, or frame.",
+      "thumbnailReview": "56 像素下深褐色大花盘、黄瓣和茎叶清楚，与游戏浅黄野花区别明显。 待实际课件整页验收。"
+    },
+    {
+      "key": "q-bug",
+      "method": "codex_builtin_imagegen",
+      "status": "thumbnail_review_passed_page_review_pending",
+      "workspaceFile": "assets/codex/q-bug.png",
+      "generatedFile": "/Users/sqcopenclaw/.codex/generated_images/01a1bef3-3364-7a81-ae5f-5bfcc94e8a3c/exec-8df180de-d196-4621-ba17-0c2d96ae14d0.png",
+      "sha256": "de4a5850c8f484ed3c00865d0db57d2a1d856b1ae26697f79802ca240f25fdc3",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "bytes": 2634091,
+      "mode": "RGB",
+      "pages": [
+        "p11"
+      ],
+      "transparent": false,
+      "prompt": "Use case: illustration-story.\nAsset type: square first-grade picture answer depicting a ladybug.\nPrimary request: exactly one small, rounded scarlet ladybug with clear black polka dots and black head, perched atop a small pale-gray stone. Slightly elevated three-quarter view. Show its compact dome and black jointed legs clearly where visible, anatomically one six-legged insect with a split pair of scarlet wing covers. The ladybug dominates the image, with every part inside the edges, and is strongly distinct from a golden long-winged cicada.\nConstraints: no flower, duck, bird, other bug, leaf as a backdrop, or other detailed objects. No fly-like transparent external wings.\nStyle: original Chinese children's picture-book gouache and subtle colored-pencil paper grain, warm soft spring daylight, strong simple silhouettes with a muted warm palette. Square composition, recognizably readable in a small answer tile, clean uncluttered backdrop, generous margins, no text, letters, logo, watermark, or frame.",
+      "thumbnailReview": "56 像素下红壳黑斑瓢虫很清楚，与游戏蝉不同。 待实际课件整页验收。"
+    },
+    {
+      "key": "q-bird",
+      "method": "codex_builtin_imagegen",
+      "status": "thumbnail_review_passed_page_review_pending",
+      "workspaceFile": "assets/codex/q-bird.png",
+      "generatedFile": "/Users/sqcopenclaw/.codex/generated_images/01a1bef3-3364-7a81-ae5f-5bfcc94e8a3c/exec-dbcfcb29-89d7-469b-bd28-feaf6962ab63.png",
+      "sha256": "5dadf3eaf4428e25c6041ebda29b65fb0ec7739225d51f298bda6d8f2bab4d0c",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "bytes": 2557736,
+      "mode": "RGB",
+      "pages": [
+        "p11"
+      ],
+      "transparent": false,
+      "prompt": "Use case: illustration-story.\nAsset type: square question stem depicting one duckling for first grade.\nPrimary request: exactly one little butter-yellow duckling standing on a flat, dry pale-tan shore. Show the whole duckling at an easy three-quarter angle facing slightly left. The broad flat orange bill, soft yellow body, tiny folded wing and TWO orange webbed feet are all plainly visible. The whole subject occupies most of the square with safe margins. Minimal pale sky-blue and sand backdrop, with no large water area. Soft friendly expression and readable silhouette, distinct from a pointed-beaked blue songbird.\nConstraints: no people, flowers, bugs, other birds, objects, water ripples or puddle.\nStyle: original Chinese children's picture-book gouache and subtle colored-pencil paper grain, warm soft spring daylight, strong simple silhouettes with a muted warm palette. Square composition, recognizably readable in a small answer tile, clean uncluttered backdrop, generous margins, no text, letters, logo, watermark, or frame.",
+      "thumbnailReview": "56 像素可认出橙色扁嘴、黄色绒毛、两只蹼脚，区别于课堂蓝鸟。 待实际课件整页验收。"
+    },
+    {
+      "key": "q-valley",
+      "method": "codex_builtin_imagegen",
+      "status": "thumbnail_review_passed_page_review_pending",
+      "workspaceFile": "assets/codex/q-valley.png",
+      "generatedFile": "/Users/sqcopenclaw/.codex/generated_images/01a1bef3-3364-7a81-ae5f-5bfcc94e8a3c/exec-7147d252-d6bc-4ad8-a496-b269aa4852c8.png",
+      "sha256": "472f1bfe0cbd8e86f54e2d65202a6a029bf595fc4be88276588fa1ba88aa56ae",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "bytes": 2873174,
+      "mode": "RGB",
+      "pages": [
+        "p11"
+      ],
+      "transparent": false,
+      "prompt": "Use case: illustration-story.\nAsset type: square first-grade quiz answer illustrating green mountains and clear water in a fresh setting.\nPrimary request: an elevated view into a quiet spring mountain valley. Two distinct rising bright green mountain slopes flank a small transparent pale-blue creek that bends from the bottom foreground toward the distant center. In the foreground, several smooth submerged pebbles are visibly seen through the crystalline shallow water, with gentle ripples and reflected daylight; clearly water and not a blue path. The valley and creek are the only main subjects. Use an elevated framing with hills and creek equally legible in a small answer tile. This is a narrow winding mountain creek rather than a wide river viewed between foreground trees.\nConstraints: no foreground willows, blossoms, beach, scarf, city park, bridge, bench, people, or animals.\nStyle: original Chinese children's picture-book gouache and subtle colored-pencil paper grain, warm soft spring daylight, strong simple silhouettes with a muted warm palette. Square composition, recognizably readable in a small answer tile, clean uncluttered backdrop, generous margins, no text, letters, logo, watermark, or frame.",
+      "thumbnailReview": "56 像素下两侧青山和弯曲浅蓝水道仍分别明显。 待实际课件整页验收。"
+    },
+    {
+      "key": "flower",
+      "method": "codex_builtin_imagegen",
+      "status": "thumbnail_review_passed_page_review_pending",
+      "workspaceFile": "assets/codex/flower.png",
+      "generatedFile": "/Users/sqcopenclaw/.codex/generated_images/01a1bef3-3364-7a81-ae5f-5bfcc94e8a3c/exec-b5481d9d-98ca-47c2-888c-11c941b88e0f.png",
+      "sha256": "78c5b0e2462c31df925dbd0691a2f33fff7b460a8f75835b857724018d74156e",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "bytes": 1510026,
+      "mode": "RGB",
+      "pages": [
+        "p03",
+        "p06"
+      ],
+      "transparent": false,
+      "prompt": "Use case: illustration-story.\nAsset type: square first-grade picture card for a flowering plant, read at 46 pixels across.\nPrimary request: exactly one low delicate pale yellow wildflower growing out of a very small brown soil patch. Draw the entire shape: five rounded pale petals, a tiny light golden center, a slender green stem and two broad green leaves. Arrange the whole silhouette to occupy about 76 percent of the square with margins. Background plain very pale cream-mint, with no horizon or decorative patterns. Make the small pale flower center clearly different from a large dark sunflower disc.\nConstraints: no trees, bugs, people, vase, extra flowers, other props, or crop.\nStyle: original Chinese children's picture-book gouache, subtle colored-pencil paper grain, fresh soft daylight, strong gentle outlines, bright natural colors on a soft warm background, no text, letters, logos, watermarks, or frame.",
+      "thumbnailReview": "46 像素能认出单朵浅金花的花瓣、绿茎和叶，主体完整。 待实际课件整页验收。"
+    },
+    {
+      "key": "tree",
+      "method": "codex_builtin_imagegen",
+      "status": "thumbnail_review_passed_page_review_pending",
+      "workspaceFile": "assets/codex/tree.png",
+      "generatedFile": "/Users/sqcopenclaw/.codex/generated_images/01a1bef3-3364-7a81-ae5f-5bfcc94e8a3c/exec-b6276b18-423e-4f92-a075-34280f42e8e4.png",
+      "sha256": "84f9d8a51ac58922680746828b829ff388966644bca98a876c7408ab5e409a29",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "bytes": 2435638,
+      "mode": "RGB",
+      "pages": [
+        "p03",
+        "p06"
+      ],
+      "transparent": false,
+      "prompt": "Use case: illustration-story.\nAsset type: square first-grade picture card for a tree, read at 46 pixels across.\nPrimary request: exactly one wide round-crowned spring tree, alone and seen from the front. Clearly show its substantial warm-brown trunk, two visible branches and one big rounded mass of overlapping fresh green leaves. The complete tree fills about 80 percent of the square with safe edge margins. The base touches only a tiny simple earthy patch. Clean nearly flat pale warm-cream background, separate leaf crown from trunk. Make the silhouette obvious even at thumbnail scale.\nConstraints: no flowers, fruit, birds, bugs, grass blades, additional trees, cloud shapes, fence, people, or crop.\nStyle: original Chinese children's picture-book gouache, subtle colored-pencil paper grain, fresh soft daylight, strong gentle outlines, bright natural colors on a soft warm background, no text, letters, logos, watermarks, or frame.",
+      "thumbnailReview": "46 像素可分辨绿色圆冠和粗壮棕色树干，与细茎野花明显不同。 待实际课件整页验收。"
+    },
+    {
+      "key": "bird",
+      "method": "codex_builtin_imagegen",
+      "status": "thumbnail_review_passed_page_review_pending",
+      "workspaceFile": "assets/codex/bird.png",
+      "generatedFile": "/Users/sqcopenclaw/.codex/generated_images/01a1bef3-3364-7a81-ae5f-5bfcc94e8a3c/exec-7ddf7cad-a209-49a0-90b1-7e19fab18748.png",
+      "sha256": "74bb431af8e2e163fc813d1a00c3f798c81ba0d83575abf8f92224ccb00dfe57",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "bytes": 2611289,
+      "mode": "RGB",
+      "pages": [
+        "p03",
+        "p06"
+      ],
+      "transparent": false,
+      "prompt": "Use case: illustration-story.\nAsset type: square first-grade picture card for a songbird, read at 46 pixels across.\nPrimary request: exactly one plump little gray-blue songbird in side profile facing right, perched on a short bare horizontal twig. Clearly show a compact rounded body, short pointed beak, black eye, separate dark blue folded wing, two little gripping feet, and a short feathered tail. Fill about 78 percent of the square with the entire bird and twig; generous safe margins. The warm pale oat background is quiet and solid. Feels curious and lively. Anatomically a bird, never a duck or winged insect.\nConstraints: no leaves, insects, other birds, flowers, water, extra wings, or cropping.\nStyle: original Chinese children's picture-book gouache, subtle colored-pencil paper grain, fresh soft daylight, strong gentle outlines, bright natural colors on a soft warm background, no text, letters, logos, watermarks, or frame.",
+      "thumbnailReview": "46 像素能认出灰蓝侧身鸟、鸟喙与站枝姿态，完整清楚。 待实际课件整页验收。"
+    },
+    {
+      "key": "insect",
+      "method": "codex_builtin_imagegen",
+      "status": "thumbnail_review_passed_page_review_pending",
+      "workspaceFile": "assets/codex/insect.png",
+      "generatedFile": "/Users/sqcopenclaw/.codex/generated_images/01a1bef3-3364-7a81-ae5f-5bfcc94e8a3c/exec-cd5dc8e9-3501-4b02-82d8-b93a8faeaf97.png",
+      "sha256": "f07962199114453aca9a4d2490e906ab86e039c3b3d4324723e553fd62b3443b",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "bytes": 3060102,
+      "mode": "RGB",
+      "pages": [
+        "p03",
+        "p06",
+        "p09"
+      ],
+      "transparent": false,
+      "prompt": "Use case: illustration-story.\nAsset type: square first-grade picture card for one insect, read at 46 pixels across.\nPrimary request: exactly one warm golden brown cicada resting lengthwise on one broad fresh-green leaf. Show it clearly in a softly angled overhead three-quarter view. Big dark eyes near the head, broad translucent folded wings with just a few veins, oval segmented insect body, and small jointed legs. Warm chestnut body and light golden wing edges stand out from the saturated leaf. Cicada occupies most of the frame and is fully visible with margins. Friendly picture-book visual, not scary. Use the single leaf as simple background support and not as the main subject.\nConstraints: no flowers, bird, butterfly, caterpillar, second insect, people, branch, or water.\nStyle: original Chinese children's picture-book gouache, subtle colored-pencil paper grain, fresh soft daylight, strong gentle outlines, bright natural colors on a soft warm background, no text, letters, logos, watermarks, or frame.",
+      "thumbnailReview": "46 像素可见叶片上的棕色蝉体与透明翅，主体为虫。 待实际课件整页验收。"
+    },
+    {
+      "key": "landscape",
+      "method": "codex_builtin_imagegen",
+      "status": "thumbnail_review_passed_page_review_pending",
+      "workspaceFile": "assets/codex/landscape.png",
+      "generatedFile": "/Users/sqcopenclaw/.codex/generated_images/01a1bef3-3364-7a81-ae5f-5bfcc94e8a3c/exec-d3a633dd-4bc6-4d34-9052-5c792e34b48b.png",
+      "sha256": "75420c8079813cc8e12154870e417e0e829d8a93f0e961626e98309ce44acdac",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "bytes": 3082369,
+      "mode": "RGB",
+      "pages": [
+        "p04",
+        "p06"
+      ],
+      "transparent": false,
+      "prompt": "Use case: illustration-story.\nAsset type: wide 16:9 textbook lesson illustration about four distinct spring sights, Chinese first grade.\nPrimary request: a cohesive landscape by a clear blue-green river. In the distance above left and center, show clean silhouettes of green mountain peaks and valleys. Across the center and lower middle, show broad tranquil clear turquoise river water with a few transparent shallow ripples. In the left foreground, a distinct green willow with long narrow fresh-leaf branches hanging down toward the water. In the right foreground, a visibly different peach tree with dense small warm pink peach blossoms. Keep all four elements in separate legible regions, with no accidental occlusion of river or mountains. Landscape wide and edge-safe. No close main character.\nConstraints: no people, boats, building, paved roads, bridges, birds, letters, flags, or snow. Make the mountains recognizably higher than the foreground trees.\nStyle: original Chinese children's picture-book gouache, subtle colored-pencil paper grain, fresh soft daylight, strong gentle outlines, bright natural colors on a soft warm background, no text, letters, logos, watermarks, or frame.",
+      "thumbnailReview": "350×197 缩小后左柳、上方青山、中下清水与右桃花分别明确。 待实际课件整页验收。"
+    },
+    {
+      "key": "catch-scene",
+      "method": "codex_builtin_imagegen",
+      "status": "thumbnail_review_passed_page_review_pending",
+      "workspaceFile": "assets/codex/catch-scene.png",
+      "generatedFile": "/Users/sqcopenclaw/.codex/generated_images/01a1bef3-3364-7a81-ae5f-5bfcc94e8a3c/exec-da7dba0c-0b84-44cb-8d3b-377d821bfcb3.png",
+      "sha256": "d970ba021fd02ac1635278bd4fd1ccccd95080aabdc0a792722f615cd2db77f7",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "bytes": 1841358,
+      "mode": "RGB",
+      "pages": [
+        "p06"
+      ],
+      "transparent": false,
+      "prompt": "Use case: stylized-concept.\nAsset type: a 16:9 wide live gameplay backdrop for a first-grade picture-card catching game.\nPrimary request: a quiet spring open-air clearing seen at child's-eye level. Keep the top and middle 83 percent a very pale, nearly uniform warm blue sky, spacious and mostly featureless, so small moving card illustrations stand out. The lowest 17 percent is a slim and mostly flat warm cream-green clearing, with extremely restrained grass texture only in both far bottom corners. Keep the entire center and all potential card routes unobstructed. No featured object. Clear calm composition with a short low horizon.\nStyle: original children's picture-book gouache, faint colored-pencil paper texture, fresh soft daylight. Muted desaturated palette, pale blue and creamy warm green. Landscape, edge-to-edge, no frame.\nConstraints: no visible rain, cloud shapes, flags, flying leaves, flowers, trees, insects, birds, people, baskets, carts, pathways, lettering, HUD, logo or watermark. The image is an intentionally quiet background, without any answers to the lesson.",
+      "thumbnailReview": "320×180 预览清楚，浅天空留出连续卡片下落空间，场景不含类别线索。 待实际课件整页验收。"
+    },
+    {
+      "key": "trace-scene",
+      "method": "codex_builtin_imagegen",
+      "status": "thumbnail_review_passed_page_review_pending",
+      "workspaceFile": "assets/codex/trace-scene.png",
+      "generatedFile": "/Users/sqcopenclaw/.codex/generated_images/01a1bef3-3364-7a81-ae5f-5bfcc94e8a3c/exec-f34e8a80-33fe-4612-8b4f-2d616f634a14.png",
+      "sha256": "a9d83f6c4504ccf8aa0d62607809e2877fddc4d2b9a251e0d037b790833fc3d2",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "bytes": 1944406,
+      "mode": "RGB",
+      "pages": [
+        "p09"
+      ],
+      "transparent": false,
+      "prompt": "Use case: stylized-concept.\nAsset type: a 16:9 wide live gameplay backdrop for a Chinese first-grade handwriting route game.\nPrimary request: an orthographic overhead view of a calm honey-colored wooden primary-school table. A single enormous blank pale warm-ivory sheet of drawing paper lies perfectly flat across the center, aligned parallel to the frame. The clean paper occupies about 88 percent of the width and 73 percent of the height; the narrow wood surround is warm and softly textured. The paper is entirely empty, light, and smooth enough to give great contrast to dark teal pen trajectories added later by code. Use a crisp but understated paper edge, comfortably inside the frame. Minimal desk composition.\nStyle: original children's picture-book gouache, gentle colored-pencil grain mostly on the wood, calm fresh spring light, softly luminous paper. Landscape.\nConstraints: no grid, writing, letters, characters, ruled line, pencil, game prop, hands, tools, book, decoration, interface, brand or watermark.",
+      "thumbnailReview": "320×180 预览清楚，完整浅纸面与木桌边缘可辨，中央足够干净便于叠程序笔画。 待实际课件整页验收。"
+    },
+    {
+      "key": "duet",
+      "method": "codex_builtin_imagegen",
+      "status": "thumbnail_review_passed_page_review_pending",
+      "workspaceFile": "assets/codex/duet.png",
+      "generatedFile": "/Users/sqcopenclaw/.codex/generated_images/01a1bef3-3364-7a81-ae5f-5bfcc94e8a3c/exec-11c452a1-34bd-4a67-a6fd-78e13cb4c3dc.png",
+      "sha256": "4c338bb90dd79bf627e8f51b94136a5437d0c0d3b661218e9a925b4c87da07ca",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "bytes": 3070904,
+      "mode": "RGB",
+      "pages": [
+        "p01",
+        "p05",
+        "p06",
+        "p07",
+        "p09"
+      ],
+      "transparent": false,
+      "prompt": "Use case: illustration-story.\nAsset type: wide 16:9 lesson cover and classroom illustration for young children learning to read a matching couplet aloud.\nPrimary request: at a gentle pale-green riverside clearing, a six-year-old Chinese girl in a golden yellow sweater with two short black braids and a six-year-old Chinese boy in a sea-green shirt face each other closely, taking turns speaking and playing a hand-clap rhythm together. In a single clear moment, they each raise their nearer hand so their two open palms naturally meet in the middle, with the other hand relaxed and separate. Their cheerful open expressions show they are reading aloud to each other. A simple open picture book with blank unlettered cream pages lies on a low wooden stool below their hands. Show both children waist-up, the joined palms, and the book entirely inside the central 78 percent of the image, with comfortable upper and lower crop margins. No extra people. A quiet low green bank and pale sky are background only.\nStyle: original Chinese children's picture-book gouache and subtle colored-pencil grain, warm spring daylight, soft mint and warm ivory with golden orange accents, clear natural hand anatomy and readable gestures.\nConstraints: no written characters, text, symbols, sign, logos, borders or watermarks. No extra arms, fingers, characters, or duplicated book.",
+      "thumbnailReview": "280×158 开始卡实际尺寸下，两个孩子、相碰手掌和展开的书都清楚。 待实际课件整页验收。"
+    },
+    {
+      "key": "wind",
+      "method": "codex_builtin_imagegen",
+      "status": "thumbnail_review_passed_page_review_pending",
+      "workspaceFile": "assets/codex/wind.png",
+      "generatedFile": "/Users/sqcopenclaw/.codex/generated_images/01a1bef3-3364-7a81-ae5f-5bfcc94e8a3c/exec-4a0fe9d2-083b-42bb-b07f-cdece438ace8.png",
+      "sha256": "f988caf3be5d08906474f56a3377670b5c10b1353898a8dba29f1571889f901d",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "bytes": 2630714,
+      "mode": "RGB",
+      "pages": [
+        "p02",
+        "p06"
+      ],
+      "transparent": false,
+      "prompt": "Use case: illustration-story.\nAsset type: square teaching illustration and moving picture card for a Chinese first-grade lesson about wind.\nPrimary request: a single warm orange cloth flag is fastened along one short dark teal vertical pole, with its long loose end clearly blowing horizontally to the right. Two small muted tan leaves fly in the same direction to the right, detached from the ground. The wind direction is unmistakable from the cloth and leaves. Fill the square with the flag's silhouette, while preserving small margins. Use crisp, recognizable shapes for a 46-pixel card.\nStyle: original children's picture-book gouache with very subtle colored-pencil paper grain. Pale sky-blue background, warm orange cloth, muted dark outlines and clean warm daylight. Match the tone of a simple spring storybook.\nConstraints: no text or flag markings, flags of any country, people, plants, grass, buildings, rain, water, snow, clouds, frames, logos or watermarks. One coherent square illustration.",
+      "thumbnailReview": "46 像素下，橙色布旗、固定旗杆和向右的两片飞叶均能分辨。 待实际课件整页验收。"
+    },
+    {
+      "key": "catch-basket",
+      "method": "codex_builtin_imagegen",
+      "status": "thumbnail_review_passed_page_review_pending",
+      "workspaceFile": "assets/codex/catch-basket.png",
+      "generatedFile": "/Users/sqcopenclaw/.codex/generated_images/01a1bef3-3364-7a81-ae5f-5bfcc94e8a3c/exec-64b6386c-bfa9-47fa-a7f3-348931b85a0b.png",
+      "sha256": "05365cac360a589235ae412ad640b850f829ec553b3e4b0a59c5666bc64cc909",
+      "dimensions": [
+        2172,
+        724
+      ],
+      "bytes": 2854647,
+      "mode": "RGBA",
+      "pages": [
+        "p06"
+      ],
+      "transparent": true,
+      "prompt": "Use case: stylized-concept.\nAsset type: transparent game sprite for a first-grade picture-card catching game.\nPrimary request: one short and wide open-topped tan wicker basket, clearly hollow inside with a flat oval opening wide enough to catch a falling picture card. No handle. Viewed straight from the front and a little above, with a clearly drawn rim and a strong silhouette that remains recognizable at 90 pixels wide and 28 pixels high. Put it alone at the center, filling most of the width, with a wide low silhouette and a little transparent padding along all edges.\nStyle: original children's picture-book gouache and very subtle colored-pencil texture, warm amber and chestnut wicker, few broad cross-weave bands, gently lit, clear contour. True transparent background and alpha; no painted background, no checkerboard, no floor, no visible shadow, no watermarks, no contents.",
+      "thumbnailReview": "92 像素宽下可看清藤篮的空口和边沿，alpha 正常。 待实际课件整页验收。"
+    },
+    {
+      "key": "trace-car",
+      "method": "codex_builtin_imagegen",
+      "status": "thumbnail_review_passed_page_review_pending",
+      "workspaceFile": "assets/codex/trace-car.png",
+      "generatedFile": "/Users/sqcopenclaw/.codex/generated_images/01a1bef3-3364-7a81-ae5f-5bfcc94e8a3c/exec-3f0520f7-c32b-4ff9-9f35-9f8c62bae2db.png",
+      "sha256": "db41083ea6c1f544f2074f387042206ffa06f8c7e746ec4d0595920fa3755271",
+      "dimensions": [
+        1774,
+        887
+      ],
+      "bytes": 1945205,
+      "mode": "RGBA",
+      "pages": [
+        "p09"
+      ],
+      "transparent": true,
+      "prompt": "Use case: stylized-concept.\nAsset type: transparent game sprite for a first-grade Chinese writing path game.\nPrimary request: one small friendly orange toy car with four clearly separated dark rubber wheels and two teal-blue windows, viewed exactly from directly overhead. Its long axis runs left-to-right, with the short rounded hood at right. No face or driver. Keep the entire car centered and fully visible, occupying about 85% of the width with minimal transparent padding. Broad simple color areas and a clear contour read at 45 pixels wide.\nStyle: original children's picture-book gouache and very subtle colored-pencil grain. Warm orange body, gentle blue-green windows, dark warm-gray wheels, ivory highlight. True transparent background and alpha; no painted background or checkerboard, no floor shadow, no text, logo, arrow, pen, track, or extra objects.",
+      "thumbnailReview": "46 像素宽下可看清橙色车身、车窗和轮子，alpha 正常。 待实际课件整页验收。"
+    },
+    {
+      "key": "rain",
+      "method": "codex_builtin_imagegen",
+      "status": "thumbnail_review_passed_page_review_pending",
+      "workspaceFile": "assets/codex/rain.png",
+      "generatedFile": "/Users/sqcopenclaw/.codex/generated_images/01a1bef3-3364-7a81-ae5f-5bfcc94e8a3c/exec-2c98f830-1614-4e30-a3f8-1e3995152f54.png",
+      "sha256": "1dcdb47dfa2e0f3a4bc3088b836afb296791d0d0e3c99fac710da250467ed3db",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "pages": [
+        "p02",
+        "p06"
+      ],
+      "transparent": false,
+      "prompt": "Use case: illustration-story.\nAsset type: square teaching illustration for a Chinese first-grade phonics classroom, and picture card in a parachute-catching game.\nPrimary request: show rain falling into a shallow puddle, readable at only 46 pixels wide. Draw five large separated medium-dark blue drops with long tapered upper tails, clearly falling vertically from the pale sky. Put three horizontally spread blue-green ripple rings where drops meet a single puddle in the lower third. Rain drops and puddle should occupy 75% of the square, visually unmistakable as falling rain in a tiny thumbnail. Use comfortable margins and keep every visible subject inside the square.\nStyle: original children's picture-book gouache and subtle colored-pencil paper texture. Strong simple silhouettes, dark teal details, pale blue-green paper, a thin warm ivory suggestion of ground at bottom. Soft warm light, calm and playful. No frame.\nConstraints: no fences, bridges, windows, umbrellas, clouds, buildings, people, leaves, plants, snow, labels, characters, letters, or watermark. No icon grid or diagrams. One coherent illustration, no border.",
+      "thumbnailReview": "46 像素小图里五道落雨和水洼的蓝色轮廓仍然清楚，待在实际第2页和接伞场景实看。"
+    }
+  ],
+  "sharedPrompt": "Use case: illustration-story. 原创中文一年级儿童绘本配图。春日水粉和轻微彩铅纸纹，主体轮廓清楚，暖米白配清透青绿，少量暖橙与天青。用一个明确的构图传意，小尺寸仍能分辨。无文字、拼音、标签、边框、标识或水印。",
+  "requests": [
+    {
+      "key": "duet",
+      "pages": [
+        "p01",
+        "p05",
+        "p06",
+        "p07",
+        "p09"
+      ],
+      "role": "课程封面、对读讲解和开始卡",
+      "framing": "16:9 横图",
+      "transparent": false,
+      "prompt": "浅绿色河岸，两名六七岁中国小朋友面对面拍手对读。暖黄衣短辫女孩和青绿衣男孩各抬一只手，手掌自然相触，嘴在说话；一本打开的无字书落在两人之间的矮木凳上。画清两个半身、手和书，四周留安全边缘，人物完整，不画其他人。"
+    },
+    {
+      "key": "rain",
+      "pages": [
+        "p02",
+        "p06"
+      ],
+      "role": "天气教学和接伞图卡",
+      "framing": "方图",
+      "transparent": false,
+      "prompt": "极近景降雨，四到六条蓝色长水滴清楚地从淡青天空往下落，落进画面底部一个水洼，涟漪明确。水滴和涟漪占画面约四分之三，深青轮廓，在 46 像素时仍清楚。不要栏杆、桥、人物、房屋、树、云纹和雪。"
+    },
+    {
+      "key": "wind",
+      "pages": [
+        "p02",
+        "p06"
+      ],
+      "role": "天气教学和接伞图卡",
+      "framing": "方图",
+      "transparent": false,
+      "prompt": "侧面近景，一条橙布旗固定在一根短竖旗杆上，明显朝右横向飘开，右侧一两片枯叶向同一方向飞动。风的动作比旗杆更抢眼；浅天青背景，主体占四分之三，完整边缘。无字无图案旗帜，无雨、雪、云和人物。"
+    },
+    {
+      "key": "flower",
+      "pages": [
+        "p03",
+        "p06"
+      ],
+      "role": "植物教学和接伞图卡",
+      "framing": "方图",
+      "transparent": false,
+      "prompt": "一朵低矮奶黄色野花从一小块土长出，五瓣花、细茎和两片绿叶连成清楚轮廓。主体居中占四分之三，浅奶绿底。花盘小而浅，和小检查里的向日葵差异明显；不画树、虫或其他植物。"
+    },
+    {
+      "key": "tree",
+      "pages": [
+        "p03",
+        "p06"
+      ],
+      "role": "植物教学和接伞图卡",
+      "framing": "方图",
+      "transparent": false,
+      "prompt": "一棵圆冠深浅绿叶大树，结实清晰的褐色树干和少量枝杈，根旁一小块土。整棵树居中占四分之三，浅奶油底，无花、动物或其他树。"
+    },
+    {
+      "key": "bird",
+      "pages": [
+        "p03",
+        "p06"
+      ],
+      "role": "动物教学和接伞图卡",
+      "framing": "方图",
+      "transparent": false,
+      "prompt": "一只圆润的灰蓝小鸟侧身立在短小细枝上，喙、翅、尾和足都清楚。整只小鸟占四分之三，浅暖底，枝条只作支撑。没有虫、鸭子或其他动物。"
+    },
+    {
+      "key": "insect",
+      "pages": [
+        "p03",
+        "p06",
+        "p09"
+      ],
+      "role": "动物教学、接伞图卡和描字备用图",
+      "framing": "方图",
+      "transparent": false,
+      "prompt": "一只金褐色蝉在一片绿色大叶子上，头、双眼、透明翅和昆虫身体明显，蝉的轮廓占四分之三。叶子作底，背景浅米绿，无其他动物。"
+    },
+    {
+      "key": "landscape",
+      "pages": [
+        "p04",
+        "p06"
+      ],
+      "role": "课文风景讲解和接伞备用图",
+      "framing": "16:9 横图",
+      "transparent": false,
+      "prompt": "春日青山清水绘本全景，远处青山峰谷明确，中下是一片亮蓝清澈河水和浅缓涟漪，前景左侧垂下嫩绿柳枝，前景右侧盛开粉红桃花的一整树。四种景物各自有清楚的视觉区域，河面平静，无人物、船、建筑和字。"
+    },
+    {
+      "key": "q-rain",
+      "pages": [
+        "p11"
+      ],
+      "role": "雨字题题干图和小鸭配对干扰项",
+      "framing": "方图",
+      "transparent": false,
+      "prompt": "室内向外看一扇淡蓝木框玻璃窗。四五颗放大的深蓝半透明水滴清楚沿窗外玻璃往下滑，窗外只见浅灰雨天。水滴占主体，窗框薄，不画人物、花、雪或太阳；必须与教学用的雨落水洼画面显著不同。"
+    },
+    {
+      "key": "q-wind",
+      "pages": [
+        "p11"
+      ],
+      "role": "山水图题干扰项",
+      "framing": "方图",
+      "transparent": false,
+      "prompt": "平坦小院一条红围巾夹在晾绳上，布巾斜向右飘动，同方向有一两片飞叶。干燥平地，主体居中清楚，没有高山、溪水、雨雪、人物或旗杆。"
+    },
+    {
+      "key": "q-park",
+      "pages": [
+        "p11"
+      ],
+      "role": "山水图题干扰项",
+      "framing": "方图",
+      "transparent": false,
+      "prompt": "平坦的邻里小公园，一名一年级孩子坐木长椅看打开的无字绘本，人物与长椅占主要面积。背景仅绿草和一条浅米色步道，没有高山、河水、桃花、池塘或风吹物。"
+    },
+    {
+      "key": "q-flower",
+      "pages": [
+        "p11"
+      ],
+      "role": "小鸭配对题干扰项",
+      "framing": "方图",
+      "transparent": false,
+      "prompt": "近景一朵向日葵，宽大鲜黄色花瓣围住醒目的深褐花盘，粗壮绿茎和叶清楚。主体居中完整，浅奶油底，无虫、鸭、花瓶或其他花。与教学用的小野花轮廓明显不同。"
+    },
+    {
+      "key": "q-bug",
+      "pages": [
+        "p11"
+      ],
+      "role": "小鸭配对题正确选项",
+      "framing": "方图",
+      "transparent": false,
+      "prompt": "一只圆形红壳黑点瓢虫在浅灰石边上，红壳、黑头和小脚清楚，主体占大半幅，远景浅色。无花、鸟、鸭和其他虫，不画成蝉。"
+    },
+    {
+      "key": "q-bird",
+      "pages": [
+        "p11"
+      ],
+      "role": "小鸭配对题题干图",
+      "framing": "方图",
+      "transparent": false,
+      "prompt": "一只淡黄小鸭站在干燥的浅棕岸边，宽扁橙嘴和橙色蹼脚都清楚。整只居中占大半幅，浅青干净底，不画虫、花、其他鸭或大面积水面。"
+    },
+    {
+      "key": "q-valley",
+      "pages": [
+        "p11"
+      ],
+      "role": "山水图题正确选项",
+      "framing": "方图",
+      "transparent": false,
+      "prompt": "另一处清亮的山谷，俯视一点，前景是能看见圆卵石的透明浅蓝溪流，溪水向两侧鲜绿山坡之间延伸。青山和清水轮廓分明，无柳树、桃花、人物、红围巾或长椅。和课内春景换成山谷弯溪的全新构图。"
+    },
+    {
+      "key": "catch-scene",
+      "pages": [
+        "p06"
+      ],
+      "role": "实时接伞游戏背景",
+      "framing": "16:9 全幅横图",
+      "transparent": false,
+      "prompt": "Use case: stylized-concept. 儿童绘本画风的开阔晴天河岸空地，从正面平视。上面和中间约七成是非常干净、浅青渐变的天空，卡片可从上到下清楚经过；下面一窄条暖米草地，左右下角才有低矮纹理。不要画雨、风旗、花、树、虫、鸟、河面道具或游戏界面。保证中心和横向移动区域几乎无细节，背景色较浅。"
+    },
+    {
+      "key": "catch-basket",
+      "pages": [
+        "p06"
+      ],
+      "role": "接伞游戏横移篮子",
+      "framing": "宽扁对象，约3:1轮廓",
+      "transparent": true,
+      "prompt": "Use case: stylized-concept. 一只正面略俯视的暖棕色敞口藤篮，开口宽，边缘清楚，中间凹下能接住一张小卡片。只画一个无提手的宽扁篮子，留少量透明安全边缘。浅深藤纹简单，在小尺寸时仍可辨。纯透明背景，无物件、阴影地板和装饰。"
+    },
+    {
+      "key": "trace-scene",
+      "pages": [
+        "p09"
+      ],
+      "role": "实时描笔画游戏背景",
+      "framing": "16:9 全幅横图",
+      "transparent": false,
+      "prompt": "Use case: stylized-concept. 从上方看浅暖木色儿童学习桌，中心大部分是一张干净的浅米白书写纸。极淡纸纹，仅画幅边缘少许木纹，中心完全空。不给纸画任何字、方格、道路、笔、箭头或卡片，描字笔画由程序准确绘制。"
+    },
+    {
+      "key": "trace-car",
+      "pages": [
+        "p09"
+      ],
+      "role": "描字游戏可拖动的小车",
+      "framing": "略宽的正俯视对象",
+      "transparent": true,
+      "prompt": "Use case: stylized-concept. 一辆橙色儿童绘本玩具小车，正上方俯视，黑色四轮和青蓝挡风玻璃，轮廓清楚略宽。车体完整、单独居中，车底无地面阴影，纯透明背景，四周少量安全边缘。无箭头、字、司机和道路。"
+    }
+  ],
+  "playbackIntegration": {
+    "requiredGenerationCount": 0,
+    "activeDerivatives": [
+      {
+        "key": "duet",
+        "file": "assets/playback/duet.png",
+        "sha256": "a342fce2257b1532fce048037c42206f6922bf84927d78727627d017fae9985e",
+        "sourceSha256": "4c338bb90dd79bf627e8f51b94136a5437d0c0d3b661218e9a925b4c87da07ca"
+      },
+      {
+        "key": "rain",
+        "file": "assets/playback/rain.png",
+        "sha256": "c0ce0e5ba1c72615afaf153aeb27519fe618155fc5541c5c1cd16ed6a63c1ea9",
+        "sourceSha256": "1dcdb47dfa2e0f3a4bc3088b836afb296791d0d0e3c99fac710da250467ed3db"
+      },
+      {
+        "key": "wind",
+        "file": "assets/playback/wind.png",
+        "sha256": "ecbae3c31b7dad9fd1eb8d2e9a1aa59339d4b2a30e054ac535976e2f3ef8e2cc",
+        "sourceSha256": "f988caf3be5d08906474f56a3377670b5c10b1353898a8dba29f1571889f901d"
+      },
+      {
+        "key": "flower",
+        "file": "assets/playback/flower.png",
+        "sha256": "9ae1a60ce66bbd5dd14ad32568a03257875f9d438ca29ad84241ac5c2e1f50da",
+        "sourceSha256": "78c5b0e2462c31df925dbd0691a2f33fff7b460a8f75835b857724018d74156e"
+      },
+      {
+        "key": "tree",
+        "file": "assets/playback/tree.png",
+        "sha256": "b791b29dbea452c48699b532b058ba276fa98ef0b4c66810b077f2cdc0e9d69b",
+        "sourceSha256": "84f9d8a51ac58922680746828b829ff388966644bca98a876c7408ab5e409a29"
+      },
+      {
+        "key": "bird",
+        "file": "assets/playback/bird.png",
+        "sha256": "7eb5496e591645d0f19ef9bbf4b02c08c729fd672fe34913a09d64b3638d46b7",
+        "sourceSha256": "74bb431af8e2e163fc813d1a00c3f798c81ba0d83575abf8f92224ccb00dfe57"
+      },
+      {
+        "key": "insect",
+        "file": "assets/playback/insect.png",
+        "sha256": "c0d6bd224ca72b78c5ab7485a5f45c4722e11b3bd42fe0e7b500a36ca24f61ae",
+        "sourceSha256": "f07962199114453aca9a4d2490e906ab86e039c3b3d4324723e553fd62b3443b"
+      },
+      {
+        "key": "landscape",
+        "file": "assets/playback/landscape.png",
+        "sha256": "71123f22590bdf19e5893cd2c4d98c55b69aa944b60c83b13accaf27c4549bdd",
+        "sourceSha256": "75420c8079813cc8e12154870e417e0e829d8a93f0e961626e98309ce44acdac"
+      },
+      {
+        "key": "q-rain",
+        "file": "assets/playback/q-rain.png",
+        "sha256": "98bfaaf738129dcc46828f509ef8d6eea53b2b5e66a678eaa6c4c59874725fec",
+        "sourceSha256": "481731aecc385c138c4f650561ebd52b16011df802aa93866cbcb0ba9ca57228"
+      },
+      {
+        "key": "q-wind",
+        "file": "assets/playback/q-wind.png",
+        "sha256": "6aff2f4232aceeaf60061be3b5c1bdd8c60998ea11fff80b083ab3b21cb29c22",
+        "sourceSha256": "dfc643a507fcc87bce6830b42f55e3618d8adea11ce4d2fa6ba9d7629ee9a859"
+      },
+      {
+        "key": "q-park",
+        "file": "assets/playback/q-park.png",
+        "sha256": "e721023fba7f904b4b4c4e0bf3af33e23a0463bcbd22474008895aefc7f3c71a",
+        "sourceSha256": "0dff10db4f05bf6fa9730dccd89a8cebb4fdafcd6505356a708f4a3778c71145"
+      },
+      {
+        "key": "q-flower",
+        "file": "assets/playback/q-flower.png",
+        "sha256": "ab29974f9553f6840bf80d5075c7679031f622225a37804e232e0830d01ff564",
+        "sourceSha256": "9edb09f7806870238dd12e0faba1cd094daa13825997f0a83ddefc9cd6119cee"
+      },
+      {
+        "key": "q-bug",
+        "file": "assets/playback/q-bug.png",
+        "sha256": "2665bf397bf80c9d96fdc0a86400ceac80e30f5b496f90d9d870d064bff4687b",
+        "sourceSha256": "de4a5850c8f484ed3c00865d0db57d2a1d856b1ae26697f79802ca240f25fdc3"
+      },
+      {
+        "key": "q-bird",
+        "file": "assets/playback/q-bird.png",
+        "sha256": "6a0b6e04ae0b4e73bec9a9583281d307fbc715bbf8b3768305f051c10fe0f4b6",
+        "sourceSha256": "5dadf3eaf4428e25c6041ebda29b65fb0ec7739225d51f298bda6d8f2bab4d0c"
+      },
+      {
+        "key": "q-valley",
+        "file": "assets/playback/q-valley.png",
+        "sha256": "e9c7ef2596f23dd8bc7a1362ef87c205a75f8934029f7332df1dbfb884e06421",
+        "sourceSha256": "472f1bfe0cbd8e86f54e2d65202a6a029bf595fc4be88276588fa1ba88aa56ae"
+      }
+    ],
+    "illustrationBytesByPage": {
+      "p01": 331136,
+      "p02": 375538,
+      "p03": 317999,
+      "p04": 311833,
+      "p05": 331136,
+      "p06": 1947411,
+      "p07": 311833,
+      "p09": 715789,
+      "p11": 1180330
+    },
+    "remainingReview": "正式课件仍需核对三个尺寸的画面和触控。检查初始、示范、提示、正确反馈和后段关卡，并确认原图加载失败时使用登记备用图。",
+    "gameArtwork": [
+      {
+        "key": "catch-scene",
+        "file": "assets/game-candidate/catch-scene.png",
+        "sha256": "a6e357ef9299d313759d73395c89f24ab9183cf924c5507034870d1a1a0a11f6",
+        "sourceSha256": "d970ba021fd02ac1635278bd4fd1ccccd95080aabdc0a792722f615cd2db77f7"
+      },
+      {
+        "key": "catch-basket",
+        "file": "assets/game-candidate/catch-basket.png",
+        "sha256": "b893ac14173542ebcab64e03e51488fc36d2d58202bb47df8fff1f0b88a25c3d",
+        "sourceSha256": "05365cac360a589235ae412ad640b850f829ec553b3e4b0a59c5666bc64cc909"
+      },
+      {
+        "key": "trace-scene",
+        "file": "assets/game-candidate/trace-scene.png",
+        "sha256": "a8847caa489161d2d8b6c293353c3212c693c117b77158c2672311c7ffd277e1",
+        "sourceSha256": "a9d83f6c4504ccf8aa0d62607809e2877fddc4d2b9a251e0d037b790833fc3d2"
+      },
+      {
+        "key": "trace-car",
+        "file": "assets/game-candidate/trace-car.png",
+        "sha256": "68dde8fef8dea396ce6ee640161e08fd0a3dc9de8f6b1a942142c85775c1fd57",
+        "sourceSha256": "db41083ea6c1f544f2074f387042206ffa06f8c7e746ec4d0595920fa3755271"
+      },
+      {
+        "key": "dui-backup-rain",
+        "file": "assets/game-candidate/dui-backup-rain.png",
+        "sha256": "71341dc9e949e5b31ed72d6a034c16abd7f645d0c9ace98025387aa20a1a1e35",
+        "sourceSha256": "c0ce0e5ba1c72615afaf153aeb27519fe618155fc5541c5c1cd16ed6a63c1ea9"
+      },
+      {
+        "key": "dui-backup-wind",
+        "file": "assets/game-candidate/dui-backup-wind.png",
+        "sha256": "3928822cfd4192cd2f631ce390f92d3b2936f1a31f4bbd0c76339f5a6fdc732b",
+        "sourceSha256": "ecbae3c31b7dad9fd1eb8d2e9a1aa59339d4b2a30e054ac535976e2f3ef8e2cc"
+      },
+      {
+        "key": "dui-backup-flower",
+        "file": "assets/game-candidate/dui-backup-flower.png",
+        "sha256": "ea561c54fcbe23119d8786d7360a656db8a68833003f9000328dbb566dcc6e15",
+        "sourceSha256": "9ae1a60ce66bbd5dd14ad32568a03257875f9d438ca29ad84241ac5c2e1f50da"
+      },
+      {
+        "key": "dui-backup-tree",
+        "file": "assets/game-candidate/dui-backup-tree.png",
+        "sha256": "a2eff003cf402f660fed6756b5ce63ef2e0add80b64af84b07f338926cb0882a",
+        "sourceSha256": "b791b29dbea452c48699b532b058ba276fa98ef0b4c66810b077f2cdc0e9d69b"
+      },
+      {
+        "key": "dui-backup-bird",
+        "file": "assets/game-candidate/dui-backup-bird.png",
+        "sha256": "f8f3b6972e978498435b0a378c8e7c9aa3308c2b2aa876521e16dfeb4b06c3c6",
+        "sourceSha256": "7eb5496e591645d0f19ef9bbf4b02c08c729fd672fe34913a09d64b3638d46b7"
+      },
+      {
+        "key": "dui-backup-insect",
+        "file": "assets/game-candidate/dui-backup-insect.png",
+        "sha256": "1d9b983471c55ae707a4806887fbd32bb84c18be419d5599f7256a6aee076aab",
+        "sourceSha256": "c0d6bd224ca72b78c5ab7485a5f45c4722e11b3bd42fe0e7b500a36ca24f61ae"
+      },
+      {
+        "key": "dui-backup-catch-basket",
+        "file": "assets/game-candidate/dui-backup-catch-basket.png",
+        "sha256": "6e0896e38b1f05523b4754d07702a04525f2ad0a0238d5c883488f3dfb74e115",
+        "sourceSha256": "05365cac360a589235ae412ad640b850f829ec553b3e4b0a59c5666bc64cc909"
+      },
+      {
+        "key": "dui-backup-trace-car",
+        "file": "assets/game-candidate/dui-backup-trace-car.png",
+        "sha256": "0142df031bb8e7c58f0b41003868a2cb55a704fc55add029b19e811df6dab1da",
+        "sourceSha256": "db41083ea6c1f544f2074f387042206ffa06f8c7e746ec4d0595920fa3755271"
+      }
+    ]
+  }
+}

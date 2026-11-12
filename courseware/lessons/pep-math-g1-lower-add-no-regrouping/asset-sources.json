@@ -1,0 +1,2210 @@
+{
+  "schemaVersion": "mira.courseware.asset-sources.v1",
+  "imagegenPlan": "imagegen-plan.json",
+  "generatedBy": "Codex built-in image_gen and exact tens/ones diagrams",
+  "materializedRasterAssetCount": 76,
+  "assets": {
+    "sort-yard": {
+      "file": "assets/sort-yard.png",
+      "sha256": "883b83664177992e67efce3796e427ec0ce6898f2e6079e54192353b279b759c",
+      "bytes": 165519,
+      "pixels": [
+        480,
+        270
+      ],
+      "type": "imagegen_plate_crop",
+      "sourceAtlas": "art-source/craft-sticker-exhibition-atlas.png",
+      "sourceAtlasSha256": "cf7be28fda28dbd77bcb140fc39c6f298e65be7fbbbaf743b9c43b1720e8908b",
+      "sourceCropPx": [
+        532,
+        146,
+        999,
+        446
+      ],
+      "visualReview": "source image inspected; rendered use pending",
+      "cropRule": "center fitted RGB with warm cream matte",
+      "usedBy": [
+        "sort-the-counting-units"
+      ]
+    },
+    "tile-yard": {
+      "file": "assets/tile-yard.png",
+      "sha256": "d7f93e9cf015d4030a6a0b372e59891c8371a5c96f82b5821f735e8fcd86be5a",
+      "bytes": 180354,
+      "pixels": [
+        480,
+        270
+      ],
+      "type": "imagegen_plate_crop",
+      "sourceAtlas": "art-source/craft-sticker-exhibition-atlas.png",
+      "sourceAtlasSha256": "cf7be28fda28dbd77bcb140fc39c6f298e65be7fbbbaf743b9c43b1720e8908b",
+      "sourceCropPx": [
+        1042,
+        146,
+        1503,
+        446
+      ],
+      "visualReview": "source image inspected; rendered use pending",
+      "cropRule": "center fitted RGB with warm cream matte",
+      "usedBy": [
+        "match-the-order-total"
+      ]
+    },
+    "craft-cart": {
+      "file": "assets/craft-cart.png",
+      "sha256": "9ab4f489251928c0dd2f1fa4fb442df6781a22a34b763b7eb125248cf6a9452c",
+      "bytes": 217600,
+      "pixels": [
+        480,
+        345
+      ],
+      "type": "imagegen_plate_crop",
+      "sourceAtlas": "art-source/craft-sticker-exhibition-atlas.png",
+      "sourceAtlasSha256": "cf7be28fda28dbd77bcb140fc39c6f298e65be7fbbbaf743b9c43b1720e8908b",
+      "sourceCropPx": [
+        31,
+        586,
+        511,
+        931
+      ],
+      "visualReview": "source image inspected; rendered use pending",
+      "cropRule": "cropped without changing source alpha",
+      "usedBy": [
+        "sort-the-counting-units"
+      ]
+    },
+    "craft-cart-push": {
+      "file": "assets/craft-cart-push.png",
+      "sha256": "bf1b504fb52d81a568cba96f2a08aea57c36f7850b551c79a4caf6a3e0295d6f",
+      "bytes": 222584,
+      "pixels": [
+        482,
+        345
+      ],
+      "type": "imagegen_plate_crop",
+      "sourceAtlas": "art-source/craft-sticker-exhibition-atlas.png",
+      "sourceAtlasSha256": "cf7be28fda28dbd77bcb140fc39c6f298e65be7fbbbaf743b9c43b1720e8908b",
+      "sourceCropPx": [
+        512,
+        586,
+        994,
+        931
+      ],
+      "visualReview": "source image inspected; rendered use pending",
+      "cropRule": "cropped without changing source alpha",
+      "usedBy": [
+        "sort-the-counting-units"
+      ]
+    },
+    "craft-sticker-badge": {
+      "file": "assets/craft-sticker-badge.png",
+      "sha256": "a817cbcb5a42a85359b78b4fa29dca49f3a885b7de5c380ffba6cb46de899d12",
+      "bytes": 217901,
+      "pixels": [
+        342,
+        405
+      ],
+      "type": "imagegen_plate_crop",
+      "sourceAtlas": "art-source/craft-sticker-exhibition-atlas.png",
+      "sourceAtlasSha256": "cf7be28fda28dbd77bcb140fc39c6f298e65be7fbbbaf743b9c43b1720e8908b",
+      "sourceCropPx": [
+        1102,
+        534,
+        1444,
+        939
+      ],
+      "visualReview": "source image inspected; rendered use pending",
+      "cropRule": "cropped without changing source alpha",
+      "usedBy": [
+        "sort-the-counting-units",
+        "match-the-order-total"
+      ]
+    },
+    "craft-sticker-table": {
+      "file": "assets/craft-sticker-table.png",
+      "sha256": "33dc66fcbeaba2f569901c5afe34f8205b984746ee65edb08af502926184ed28",
+      "bytes": 437087,
+      "pixels": [
+        864,
+        486
+      ],
+      "type": "imagegen_with_precise_code_overlay",
+      "semantics": {
+        "originalScene": "原创手工展桌，孩子与收纳容器；前景叠两份数量教具",
+        "groups": [
+          {
+            "value": 34,
+            "tens": 3,
+            "ones": 4
+          },
+          {
+            "value": 3,
+            "tens": 0,
+            "ones": 3
+          }
+        ]
+      },
+      "usedBy": [
+        "craft-show-stickers"
+      ],
+      "generator": "art-source/diagrams.py",
+      "generatorSha256": "1a21fe101cc30345b0cae511b8b8a9bfdb4f55f2e76fd3877f3e46122698ac64",
+      "diagramSpecs": "art-source/diagram-specs.json",
+      "diagramSpecsSha256": "3b73ccf144471b4d8818888d287e4c9f1d8103fcddf5bddce3917e1e4d93bde3",
+      "background": {
+        "file": "art-source/craft-sticker-table-base.png",
+        "sha256": "8dce9d740265039c6f37bba0c376572c64ff4c568548ecf6e4603a6a5c7d3679",
+        "bytes": 523331,
+        "pixels": [
+          864,
+          486
+        ],
+        "type": "imagegen_plate_crop",
+        "sourceAtlas": "art-source/craft-sticker-exhibition-atlas.png",
+        "sourceAtlasSha256": "cf7be28fda28dbd77bcb140fc39c6f298e65be7fbbbaf743b9c43b1720e8908b",
+        "sourceCropPx": [
+          32,
+          147,
+          490,
+          445
+        ],
+        "visualReview": "source image inspected; rendered use pending",
+        "cropRule": "center fitted RGB with warm cream matte",
+        "usedBy": [
+          "craft-show-stickers"
+        ]
+      }
+    },
+    "ten-dot-strip": {
+      "file": "assets/ten-dot-strip.png",
+      "sha256": "4f275450a32beccfb0ba4c100f6804cb597077f6e315edabae543731cdde7bd0",
+      "bytes": 1653,
+      "pixels": [
+        540,
+        235
+      ],
+      "type": "precise_code_diagram",
+      "semantics": {
+        "value": 10,
+        "tens": 1,
+        "ones": 0
+      },
+      "usedBy": [
+        "a-strip-is-ten"
+      ],
+      "generator": "art-source/diagrams.py",
+      "generatorSha256": "1a21fe101cc30345b0cae511b8b8a9bfdb4f55f2e76fd3877f3e46122698ac64",
+      "diagramSpecs": "art-source/diagram-specs.json",
+      "diagramSpecsSha256": "3b73ccf144471b4d8818888d287e4c9f1d8103fcddf5bddce3917e1e4d93bde3"
+    },
+    "stickers-34": {
+      "file": "assets/stickers-34.png",
+      "sha256": "83edb06da2fd91a373a0d0ac6a7dbfcd96a7aa75cb6e96ed053b2f6369b70fb4",
+      "bytes": 3352,
+      "pixels": [
+        460,
+        270
+      ],
+      "type": "precise_code_diagram",
+      "semantics": {
+        "value": 34,
+        "tens": 3,
+        "ones": 4
+      },
+      "usedBy": [
+        "a-strip-is-ten",
+        "add-loose-three",
+        "add-three-strips",
+        "add-the-same-units"
+      ],
+      "generator": "art-source/diagrams.py",
+      "generatorSha256": "1a21fe101cc30345b0cae511b8b8a9bfdb4f55f2e76fd3877f3e46122698ac64",
+      "diagramSpecs": "art-source/diagram-specs.json",
+      "diagramSpecsSha256": "3b73ccf144471b4d8818888d287e4c9f1d8103fcddf5bddce3917e1e4d93bde3"
+    },
+    "add-three-ones": {
+      "file": "assets/add-three-ones.png",
+      "sha256": "e1bea6f66c7f11f8e1297d75764c2956c928a089b9faa534a0f005c122f01bb0",
+      "bytes": 7947,
+      "pixels": [
+        920,
+        310
+      ],
+      "type": "precise_code_diagram",
+      "semantics": {
+        "before": [
+          {
+            "value": 34,
+            "tens": 3,
+            "ones": 4
+          },
+          {
+            "value": 3,
+            "tens": 0,
+            "ones": 3
+          }
+        ],
+        "after": {
+          "value": 37,
+          "tens": 3,
+          "ones": 7
+        },
+        "transition": "two separate operands then an arrow to total"
+      },
+      "usedBy": [
+        "add-loose-three"
+      ],
+      "generator": "art-source/diagrams.py",
+      "generatorSha256": "1a21fe101cc30345b0cae511b8b8a9bfdb4f55f2e76fd3877f3e46122698ac64",
+      "diagramSpecs": "art-source/diagram-specs.json",
+      "diagramSpecsSha256": "3b73ccf144471b4d8818888d287e4c9f1d8103fcddf5bddce3917e1e4d93bde3"
+    },
+    "add-three-tens": {
+      "file": "assets/add-three-tens.png",
+      "sha256": "17bddb650371188ac1c940edcbbe1f6fff57a4f9a730c1a4f7e460cd24570e3f",
+      "bytes": 9431,
+      "pixels": [
+        920,
+        310
+      ],
+      "type": "precise_code_diagram",
+      "semantics": {
+        "before": [
+          {
+            "value": 34,
+            "tens": 3,
+            "ones": 4
+          },
+          {
+            "value": 30,
+            "tens": 3,
+            "ones": 0
+          }
+        ],
+        "after": {
+          "value": 64,
+          "tens": 6,
+          "ones": 4
+        },
+        "transition": "two separate operands then an arrow to total"
+      },
+      "usedBy": [
+        "add-three-strips"
+      ],
+      "generator": "art-source/diagrams.py",
+      "generatorSha256": "1a21fe101cc30345b0cae511b8b8a9bfdb4f55f2e76fd3877f3e46122698ac64",
+      "diagramSpecs": "art-source/diagram-specs.json",
+      "diagramSpecsSha256": "3b73ccf144471b4d8818888d287e4c9f1d8103fcddf5bddce3917e1e4d93bde3"
+    },
+    "one-unit-marker": {
+      "file": "assets/one-unit-marker.png",
+      "sha256": "9901505a47b3af2e91812c4503cef17002ce3ca1ab4fffc3063aae64a229aaae",
+      "bytes": 1129,
+      "pixels": [
+        460,
+        270
+      ],
+      "type": "precise_code_diagram",
+      "semantics": {
+        "value": 1,
+        "tens": 0,
+        "ones": 1
+      },
+      "usedBy": [
+        "sort-the-counting-units"
+      ],
+      "generator": "art-source/diagrams.py",
+      "generatorSha256": "1a21fe101cc30345b0cae511b8b8a9bfdb4f55f2e76fd3877f3e46122698ac64",
+      "diagramSpecs": "art-source/diagram-specs.json",
+      "diagramSpecsSha256": "3b73ccf144471b4d8818888d287e4c9f1d8103fcddf5bddce3917e1e4d93bde3"
+    },
+    "sort-loose-2": {
+      "file": "assets/sort-loose-2.png",
+      "sha256": "a0a41ccd7ecfa99a223d508334a98f843400450bbe766d68547346c476f8ac9a",
+      "bytes": 1172,
+      "pixels": [
+        460,
+        270
+      ],
+      "type": "precise_code_diagram",
+      "semantics": {
+        "value": 2,
+        "tens": 0,
+        "ones": 2
+      },
+      "usedBy": [
+        "sort-the-counting-units"
+      ],
+      "generator": "art-source/diagrams.py",
+      "generatorSha256": "1a21fe101cc30345b0cae511b8b8a9bfdb4f55f2e76fd3877f3e46122698ac64",
+      "diagramSpecs": "art-source/diagram-specs.json",
+      "diagramSpecsSha256": "3b73ccf144471b4d8818888d287e4c9f1d8103fcddf5bddce3917e1e4d93bde3"
+    },
+    "sort-loose-3": {
+      "file": "assets/sort-loose-3.png",
+      "sha256": "ccbda58793b09e32144a5b179a3b2944819e63c692263b3be99402d644205aea",
+      "bytes": 1191,
+      "pixels": [
+        460,
+        270
+      ],
+      "type": "precise_code_diagram",
+      "semantics": {
+        "value": 3,
+        "tens": 0,
+        "ones": 3
+      },
+      "usedBy": [
+        "sort-the-counting-units"
+      ],
+      "generator": "art-source/diagrams.py",
+      "generatorSha256": "1a21fe101cc30345b0cae511b8b8a9bfdb4f55f2e76fd3877f3e46122698ac64",
+      "diagramSpecs": "art-source/diagram-specs.json",
+      "diagramSpecsSha256": "3b73ccf144471b4d8818888d287e4c9f1d8103fcddf5bddce3917e1e4d93bde3"
+    },
+    "sort-loose-4": {
+      "file": "assets/sort-loose-4.png",
+      "sha256": "87049146268a9d2bd0da702be9414ca4187801d561ed30dfcd9ae0ae51528c8b",
+      "bytes": 1229,
+      "pixels": [
+        460,
+        270
+      ],
+      "type": "precise_code_diagram",
+      "semantics": {
+        "value": 4,
+        "tens": 0,
+        "ones": 4
+      },
+      "usedBy": [
+        "sort-the-counting-units"
+      ],
+      "generator": "art-source/diagrams.py",
+      "generatorSha256": "1a21fe101cc30345b0cae511b8b8a9bfdb4f55f2e76fd3877f3e46122698ac64",
+      "diagramSpecs": "art-source/diagram-specs.json",
+      "diagramSpecsSha256": "3b73ccf144471b4d8818888d287e4c9f1d8103fcddf5bddce3917e1e4d93bde3"
+    },
+    "sort-loose-6": {
+      "file": "assets/sort-loose-6.png",
+      "sha256": "3ff9083b3ac879473949ba351e34f7f19954ccf68b2a375ca45ada20fae1e8af",
+      "bytes": 1230,
+      "pixels": [
+        460,
+        270
+      ],
+      "type": "precise_code_diagram",
+      "semantics": {
+        "value": 6,
+        "tens": 0,
+        "ones": 6
+      },
+      "usedBy": [
+        "sort-the-counting-units"
+      ],
+      "generator": "art-source/diagrams.py",
+      "generatorSha256": "1a21fe101cc30345b0cae511b8b8a9bfdb4f55f2e76fd3877f3e46122698ac64",
+      "diagramSpecs": "art-source/diagram-specs.json",
+      "diagramSpecsSha256": "3b73ccf144471b4d8818888d287e4c9f1d8103fcddf5bddce3917e1e4d93bde3"
+    },
+    "sort-loose-7": {
+      "file": "assets/sort-loose-7.png",
+      "sha256": "24765b50c17ededab2db1b051e336f0e5bf846fa626d09e5af7f201fa651243b",
+      "bytes": 1226,
+      "pixels": [
+        460,
+        270
+      ],
+      "type": "precise_code_diagram",
+      "semantics": {
+        "value": 7,
+        "tens": 0,
+        "ones": 7
+      },
+      "usedBy": [
+        "sort-the-counting-units"
+      ],
+      "generator": "art-source/diagrams.py",
+      "generatorSha256": "1a21fe101cc30345b0cae511b8b8a9bfdb4f55f2e76fd3877f3e46122698ac64",
+      "diagramSpecs": "art-source/diagram-specs.json",
+      "diagramSpecsSha256": "3b73ccf144471b4d8818888d287e4c9f1d8103fcddf5bddce3917e1e4d93bde3"
+    },
+    "sort-strip-1": {
+      "file": "assets/sort-strip-1.png",
+      "sha256": "ed1ade5ddc2260abff0259785b9613d2ce549793d745a51eb460aa2a29a93d2d",
+      "bytes": 1252,
+      "pixels": [
+        460,
+        270
+      ],
+      "type": "precise_code_diagram",
+      "semantics": {
+        "value": 10,
+        "tens": 1,
+        "ones": 0
+      },
+      "usedBy": [
+        "sort-the-counting-units"
+      ],
+      "generator": "art-source/diagrams.py",
+      "generatorSha256": "1a21fe101cc30345b0cae511b8b8a9bfdb4f55f2e76fd3877f3e46122698ac64",
+      "diagramSpecs": "art-source/diagram-specs.json",
+      "diagramSpecsSha256": "3b73ccf144471b4d8818888d287e4c9f1d8103fcddf5bddce3917e1e4d93bde3"
+    },
+    "sort-strip-2": {
+      "file": "assets/sort-strip-2.png",
+      "sha256": "cf4ba91ce047be50a30827ec4d1f25a13abbea3b7a83cdd0e30c9a2b063ef4dc",
+      "bytes": 1356,
+      "pixels": [
+        460,
+        270
+      ],
+      "type": "precise_code_diagram",
+      "semantics": {
+        "value": 20,
+        "tens": 2,
+        "ones": 0
+      },
+      "usedBy": [
+        "sort-the-counting-units"
+      ],
+      "generator": "art-source/diagrams.py",
+      "generatorSha256": "1a21fe101cc30345b0cae511b8b8a9bfdb4f55f2e76fd3877f3e46122698ac64",
+      "diagramSpecs": "art-source/diagram-specs.json",
+      "diagramSpecsSha256": "3b73ccf144471b4d8818888d287e4c9f1d8103fcddf5bddce3917e1e4d93bde3"
+    },
+    "sort-strip-3": {
+      "file": "assets/sort-strip-3.png",
+      "sha256": "9457f8c73bfc60de0a55cceb8ee7bdedcc42312cc896e24ef7f9965f9a323419",
+      "bytes": 1450,
+      "pixels": [
+        460,
+        270
+      ],
+      "type": "precise_code_diagram",
+      "semantics": {
+        "value": 30,
+        "tens": 3,
+        "ones": 0
+      },
+      "usedBy": [
+        "sort-the-counting-units"
+      ],
+      "generator": "art-source/diagrams.py",
+      "generatorSha256": "1a21fe101cc30345b0cae511b8b8a9bfdb4f55f2e76fd3877f3e46122698ac64",
+      "diagramSpecs": "art-source/diagram-specs.json",
+      "diagramSpecsSha256": "3b73ccf144471b4d8818888d287e4c9f1d8103fcddf5bddce3917e1e4d93bde3"
+    },
+    "sort-strip-4": {
+      "file": "assets/sort-strip-4.png",
+      "sha256": "40b34d4c3670a043bca90c7dacf2b7d0e058871a9ea4d123fa912d4bd375e9ec",
+      "bytes": 1635,
+      "pixels": [
+        460,
+        270
+      ],
+      "type": "precise_code_diagram",
+      "semantics": {
+        "value": 40,
+        "tens": 4,
+        "ones": 0
+      },
+      "usedBy": [
+        "sort-the-counting-units"
+      ],
+      "generator": "art-source/diagrams.py",
+      "generatorSha256": "1a21fe101cc30345b0cae511b8b8a9bfdb4f55f2e76fd3877f3e46122698ac64",
+      "diagramSpecs": "art-source/diagram-specs.json",
+      "diagramSpecsSha256": "3b73ccf144471b4d8818888d287e4c9f1d8103fcddf5bddce3917e1e4d93bde3"
+    },
+    "ten-unit-marker": {
+      "file": "assets/ten-unit-marker.png",
+      "sha256": "ed1ade5ddc2260abff0259785b9613d2ce549793d745a51eb460aa2a29a93d2d",
+      "bytes": 1252,
+      "pixels": [
+        460,
+        270
+      ],
+      "type": "precise_code_diagram",
+      "semantics": {
+        "value": 10,
+        "tens": 1,
+        "ones": 0
+      },
+      "usedBy": [
+        "sort-the-counting-units"
+      ],
+      "generator": "art-source/diagrams.py",
+      "generatorSha256": "1a21fe101cc30345b0cae511b8b8a9bfdb4f55f2e76fd3877f3e46122698ac64",
+      "diagramSpecs": "art-source/diagram-specs.json",
+      "diagramSpecsSha256": "3b73ccf144471b4d8818888d287e4c9f1d8103fcddf5bddce3917e1e4d93bde3"
+    },
+    "add-twenty-three": {
+      "file": "assets/add-twenty-three.png",
+      "sha256": "451c2fefe76f7406ca6a050fb987b07933d397018eb5e56c054d18f096bae2e1",
+      "bytes": 9156,
+      "pixels": [
+        920,
+        310
+      ],
+      "type": "precise_code_diagram",
+      "semantics": {
+        "before": [
+          {
+            "value": 34,
+            "tens": 3,
+            "ones": 4
+          },
+          {
+            "value": 23,
+            "tens": 2,
+            "ones": 3
+          }
+        ],
+        "after": {
+          "value": 57,
+          "tens": 5,
+          "ones": 7
+        },
+        "transition": "two separate operands then an arrow to total"
+      },
+      "usedBy": [
+        "add-the-same-units"
+      ],
+      "generator": "art-source/diagrams.py",
+      "generatorSha256": "1a21fe101cc30345b0cae511b8b8a9bfdb4f55f2e76fd3877f3e46122698ac64",
+      "diagramSpecs": "art-source/diagram-specs.json",
+      "diagramSpecsSha256": "3b73ccf144471b4d8818888d287e4c9f1d8103fcddf5bddce3917e1e4d93bde3"
+    },
+    "example-four-plus-forty-two": {
+      "file": "assets/example-four-plus-forty-two.png",
+      "sha256": "79eb2e78d3eef0f7c94da67968bcbf175ef5f675e4bc2b529dc85b66f166b95d",
+      "bytes": 7264,
+      "pixels": [
+        920,
+        310
+      ],
+      "type": "precise_code_diagram",
+      "semantics": {
+        "before": [
+          {
+            "value": 4,
+            "tens": 0,
+            "ones": 4
+          },
+          {
+            "value": 42,
+            "tens": 4,
+            "ones": 2
+          }
+        ],
+        "after": {
+          "value": 46,
+          "tens": 4,
+          "ones": 6
+        },
+        "transition": "two separate operands then an arrow to total"
+      },
+      "usedBy": [
+        "swap-the-positions"
+      ],
+      "generator": "art-source/diagrams.py",
+      "generatorSha256": "1a21fe101cc30345b0cae511b8b8a9bfdb4f55f2e76fd3877f3e46122698ac64",
+      "diagramSpecs": "art-source/diagram-specs.json",
+      "diagramSpecsSha256": "3b73ccf144471b4d8818888d287e4c9f1d8103fcddf5bddce3917e1e4d93bde3"
+    },
+    "example-forty-plus-forty-two": {
+      "file": "assets/example-forty-plus-forty-two.png",
+      "sha256": "71a6461405f37f0d977d70eef4b72825e5d0d72dc32610693c50d2f16853459a",
+      "bytes": 9391,
+      "pixels": [
+        920,
+        310
+      ],
+      "type": "precise_code_diagram",
+      "semantics": {
+        "before": [
+          {
+            "value": 40,
+            "tens": 4,
+            "ones": 0
+          },
+          {
+            "value": 42,
+            "tens": 4,
+            "ones": 2
+          }
+        ],
+        "after": {
+          "value": 82,
+          "tens": 8,
+          "ones": 2
+        },
+        "transition": "two separate operands then an arrow to total"
+      },
+      "usedBy": [
+        "swap-the-positions"
+      ],
+      "generator": "art-source/diagrams.py",
+      "generatorSha256": "1a21fe101cc30345b0cae511b8b8a9bfdb4f55f2e76fd3877f3e46122698ac64",
+      "diagramSpecs": "art-source/diagram-specs.json",
+      "diagramSpecsSha256": "3b73ccf144471b4d8818888d287e4c9f1d8103fcddf5bddce3917e1e4d93bde3"
+    },
+    "order-15-4": {
+      "file": "assets/order-15-4.png",
+      "sha256": "69f59b6f7108e931e7d98b3b8223865260d016bb8a69e7c4e89ddf92338ec180",
+      "bytes": 5433,
+      "pixels": [
+        680,
+        308
+      ],
+      "type": "precise_code_diagram",
+      "semantics": {
+        "operands": [
+          {
+            "value": 15,
+            "tens": 1,
+            "ones": 5
+          },
+          {
+            "value": 4,
+            "tens": 0,
+            "ones": 4
+          }
+        ],
+        "formula": "15 + 4",
+        "resultVisible": false,
+        "format": "order"
+      },
+      "usedBy": [
+        "match-the-order-total"
+      ],
+      "generator": "art-source/diagrams.py",
+      "generatorSha256": "1a21fe101cc30345b0cae511b8b8a9bfdb4f55f2e76fd3877f3e46122698ac64",
+      "diagramSpecs": "art-source/diagram-specs.json",
+      "diagramSpecsSha256": "3b73ccf144471b4d8818888d287e4c9f1d8103fcddf5bddce3917e1e4d93bde3"
+    },
+    "order-23-4": {
+      "file": "assets/order-23-4.png",
+      "sha256": "16a55a35331034c89f00993ef34bcce65c6b87e75e2ff47867eca36e9d605be9",
+      "bytes": 6905,
+      "pixels": [
+        680,
+        308
+      ],
+      "type": "precise_code_diagram",
+      "semantics": {
+        "operands": [
+          {
+            "value": 23,
+            "tens": 2,
+            "ones": 3
+          },
+          {
+            "value": 4,
+            "tens": 0,
+            "ones": 4
+          }
+        ],
+        "formula": "23 + 4",
+        "resultVisible": false,
+        "format": "order"
+      },
+      "usedBy": [
+        "match-the-order-total"
+      ],
+      "generator": "art-source/diagrams.py",
+      "generatorSha256": "1a21fe101cc30345b0cae511b8b8a9bfdb4f55f2e76fd3877f3e46122698ac64",
+      "diagramSpecs": "art-source/diagram-specs.json",
+      "diagramSpecsSha256": "3b73ccf144471b4d8818888d287e4c9f1d8103fcddf5bddce3917e1e4d93bde3"
+    },
+    "order-31-20": {
+      "file": "assets/order-31-20.png",
+      "sha256": "994f48d34951d278b7bc549710f862fb1d7a35e4c7b8bfed8cbb3d089019b14f",
+      "bytes": 8255,
+      "pixels": [
+        680,
+        308
+      ],
+      "type": "precise_code_diagram",
+      "semantics": {
+        "operands": [
+          {
+            "value": 31,
+            "tens": 3,
+            "ones": 1
+          },
+          {
+            "value": 20,
+            "tens": 2,
+            "ones": 0
+          }
+        ],
+        "formula": "31 + 20",
+        "resultVisible": false,
+        "format": "order"
+      },
+      "usedBy": [
+        "match-the-order-total"
+      ],
+      "generator": "art-source/diagrams.py",
+      "generatorSha256": "1a21fe101cc30345b0cae511b8b8a9bfdb4f55f2e76fd3877f3e46122698ac64",
+      "diagramSpecs": "art-source/diagram-specs.json",
+      "diagramSpecsSha256": "3b73ccf144471b4d8818888d287e4c9f1d8103fcddf5bddce3917e1e4d93bde3"
+    },
+    "order-31-24": {
+      "file": "assets/order-31-24.png",
+      "sha256": "9d7897785e26964eadb4dce06827d1ababafd93290fdb64d9cfdafc529e407e6",
+      "bytes": 7600,
+      "pixels": [
+        680,
+        308
+      ],
+      "type": "precise_code_diagram",
+      "semantics": {
+        "operands": [
+          {
+            "value": 31,
+            "tens": 3,
+            "ones": 1
+          },
+          {
+            "value": 24,
+            "tens": 2,
+            "ones": 4
+          }
+        ],
+        "formula": "31 + 24",
+        "resultVisible": false,
+        "format": "order"
+      },
+      "usedBy": [
+        "match-the-order-total"
+      ],
+      "generator": "art-source/diagrams.py",
+      "generatorSha256": "1a21fe101cc30345b0cae511b8b8a9bfdb4f55f2e76fd3877f3e46122698ac64",
+      "diagramSpecs": "art-source/diagram-specs.json",
+      "diagramSpecsSha256": "3b73ccf144471b4d8818888d287e4c9f1d8103fcddf5bddce3917e1e4d93bde3"
+    },
+    "order-40-53": {
+      "file": "assets/order-40-53.png",
+      "sha256": "78b07afb5e934dbaf2a99f4b18fdd555b9c26ee5234fbc7a30c6870b9662ad7e",
+      "bytes": 9176,
+      "pixels": [
+        680,
+        308
+      ],
+      "type": "precise_code_diagram",
+      "semantics": {
+        "operands": [
+          {
+            "value": 40,
+            "tens": 4,
+            "ones": 0
+          },
+          {
+            "value": 53,
+            "tens": 5,
+            "ones": 3
+          }
+        ],
+        "formula": "40 + 53",
+        "resultVisible": false,
+        "format": "order"
+      },
+      "usedBy": [
+        "match-the-order-total"
+      ],
+      "generator": "art-source/diagrams.py",
+      "generatorSha256": "1a21fe101cc30345b0cae511b8b8a9bfdb4f55f2e76fd3877f3e46122698ac64",
+      "diagramSpecs": "art-source/diagram-specs.json",
+      "diagramSpecsSha256": "3b73ccf144471b4d8818888d287e4c9f1d8103fcddf5bddce3917e1e4d93bde3"
+    },
+    "order-42-30": {
+      "file": "assets/order-42-30.png",
+      "sha256": "0f6ac29a1770c6ad75224058f672465673f995644d7a367d6fada1ea944191c5",
+      "bytes": 8857,
+      "pixels": [
+        680,
+        308
+      ],
+      "type": "precise_code_diagram",
+      "semantics": {
+        "operands": [
+          {
+            "value": 42,
+            "tens": 4,
+            "ones": 2
+          },
+          {
+            "value": 30,
+            "tens": 3,
+            "ones": 0
+          }
+        ],
+        "formula": "42 + 30",
+        "resultVisible": false,
+        "format": "order"
+      },
+      "usedBy": [
+        "match-the-order-total"
+      ],
+      "generator": "art-source/diagrams.py",
+      "generatorSha256": "1a21fe101cc30345b0cae511b8b8a9bfdb4f55f2e76fd3877f3e46122698ac64",
+      "diagramSpecs": "art-source/diagram-specs.json",
+      "diagramSpecsSha256": "3b73ccf144471b4d8818888d287e4c9f1d8103fcddf5bddce3917e1e4d93bde3"
+    },
+    "order-42-5": {
+      "file": "assets/order-42-5.png",
+      "sha256": "4649befa19c7ca140774dcd803f6fe948129be0dea37fa30efea540515064485",
+      "bytes": 6884,
+      "pixels": [
+        680,
+        308
+      ],
+      "type": "precise_code_diagram",
+      "semantics": {
+        "operands": [
+          {
+            "value": 42,
+            "tens": 4,
+            "ones": 2
+          },
+          {
+            "value": 5,
+            "tens": 0,
+            "ones": 5
+          }
+        ],
+        "formula": "42 + 5",
+        "resultVisible": false,
+        "format": "order"
+      },
+      "usedBy": [
+        "match-the-order-total"
+      ],
+      "generator": "art-source/diagrams.py",
+      "generatorSha256": "1a21fe101cc30345b0cae511b8b8a9bfdb4f55f2e76fd3877f3e46122698ac64",
+      "diagramSpecs": "art-source/diagram-specs.json",
+      "diagramSpecsSha256": "3b73ccf144471b4d8818888d287e4c9f1d8103fcddf5bddce3917e1e4d93bde3"
+    },
+    "order-52-27": {
+      "file": "assets/order-52-27.png",
+      "sha256": "0545ccadb5a5a9f1d40c0c97fe158e648ff917f2a8599325cc675682d28bbd4b",
+      "bytes": 8059,
+      "pixels": [
+        680,
+        308
+      ],
+      "type": "precise_code_diagram",
+      "semantics": {
+        "operands": [
+          {
+            "value": 52,
+            "tens": 5,
+            "ones": 2
+          },
+          {
+            "value": 27,
+            "tens": 2,
+            "ones": 7
+          }
+        ],
+        "formula": "52 + 27",
+        "resultVisible": false,
+        "format": "order"
+      },
+      "usedBy": [
+        "match-the-order-total"
+      ],
+      "generator": "art-source/diagrams.py",
+      "generatorSha256": "1a21fe101cc30345b0cae511b8b8a9bfdb4f55f2e76fd3877f3e46122698ac64",
+      "diagramSpecs": "art-source/diagram-specs.json",
+      "diagramSpecsSha256": "3b73ccf144471b4d8818888d287e4c9f1d8103fcddf5bddce3917e1e4d93bde3"
+    },
+    "order-6-53": {
+      "file": "assets/order-6-53.png",
+      "sha256": "b0726c1d36d06080bce995e8428f83ea01644fee1bf109f3964a20a59751a8fc",
+      "bytes": 8645,
+      "pixels": [
+        680,
+        308
+      ],
+      "type": "precise_code_diagram",
+      "semantics": {
+        "operands": [
+          {
+            "value": 6,
+            "tens": 0,
+            "ones": 6
+          },
+          {
+            "value": 53,
+            "tens": 5,
+            "ones": 3
+          }
+        ],
+        "formula": "6 + 53",
+        "resultVisible": false,
+        "format": "order"
+      },
+      "usedBy": [
+        "match-the-order-total"
+      ],
+      "generator": "art-source/diagrams.py",
+      "generatorSha256": "1a21fe101cc30345b0cae511b8b8a9bfdb4f55f2e76fd3877f3e46122698ac64",
+      "diagramSpecs": "art-source/diagram-specs.json",
+      "diagramSpecsSha256": "3b73ccf144471b4d8818888d287e4c9f1d8103fcddf5bddce3917e1e4d93bde3"
+    },
+    "tile-15-4": {
+      "file": "assets/tile-15-4.png",
+      "sha256": "13f0c0b4be6a70890e4ac2fc83e699a30eb4eaaa9aadfd1a8606d8b0da46cbbe",
+      "bytes": 4459,
+      "pixels": [
+        440,
+        268
+      ],
+      "type": "precise_code_diagram",
+      "semantics": {
+        "operands": [
+          {
+            "value": 15,
+            "tens": 1,
+            "ones": 5
+          },
+          {
+            "value": 4,
+            "tens": 0,
+            "ones": 4
+          }
+        ],
+        "formula": "15 + 4",
+        "resultVisible": false,
+        "format": "tile"
+      },
+      "usedBy": [
+        "match-the-order-total"
+      ],
+      "generator": "art-source/diagrams.py",
+      "generatorSha256": "1a21fe101cc30345b0cae511b8b8a9bfdb4f55f2e76fd3877f3e46122698ac64",
+      "diagramSpecs": "art-source/diagram-specs.json",
+      "diagramSpecsSha256": "3b73ccf144471b4d8818888d287e4c9f1d8103fcddf5bddce3917e1e4d93bde3"
+    },
+    "tile-23-4": {
+      "file": "assets/tile-23-4.png",
+      "sha256": "f500cadc2d8a028b97a0aebc04ec7f95a663c2eb5a9f724d1d6aa60e7624db73",
+      "bytes": 5768,
+      "pixels": [
+        440,
+        268
+      ],
+      "type": "precise_code_diagram",
+      "semantics": {
+        "operands": [
+          {
+            "value": 23,
+            "tens": 2,
+            "ones": 3
+          },
+          {
+            "value": 4,
+            "tens": 0,
+            "ones": 4
+          }
+        ],
+        "formula": "23 + 4",
+        "resultVisible": false,
+        "format": "tile"
+      },
+      "usedBy": [
+        "match-the-order-total"
+      ],
+      "generator": "art-source/diagrams.py",
+      "generatorSha256": "1a21fe101cc30345b0cae511b8b8a9bfdb4f55f2e76fd3877f3e46122698ac64",
+      "diagramSpecs": "art-source/diagram-specs.json",
+      "diagramSpecsSha256": "3b73ccf144471b4d8818888d287e4c9f1d8103fcddf5bddce3917e1e4d93bde3"
+    },
+    "tile-31-20": {
+      "file": "assets/tile-31-20.png",
+      "sha256": "ec8b3ce6229018352a29c4364267cbb933eb4806d2def6145738e05892483ba5",
+      "bytes": 7012,
+      "pixels": [
+        440,
+        268
+      ],
+      "type": "precise_code_diagram",
+      "semantics": {
+        "operands": [
+          {
+            "value": 31,
+            "tens": 3,
+            "ones": 1
+          },
+          {
+            "value": 20,
+            "tens": 2,
+            "ones": 0
+          }
+        ],
+        "formula": "31 + 20",
+        "resultVisible": false,
+        "format": "tile"
+      },
+      "usedBy": [
+        "match-the-order-total"
+      ],
+      "generator": "art-source/diagrams.py",
+      "generatorSha256": "1a21fe101cc30345b0cae511b8b8a9bfdb4f55f2e76fd3877f3e46122698ac64",
+      "diagramSpecs": "art-source/diagram-specs.json",
+      "diagramSpecsSha256": "3b73ccf144471b4d8818888d287e4c9f1d8103fcddf5bddce3917e1e4d93bde3"
+    },
+    "tile-31-24": {
+      "file": "assets/tile-31-24.png",
+      "sha256": "3cea1ea8d6e07d6cc4e9b9d37bb5e3b0cea669d063dbfe126414568ac856f299",
+      "bytes": 6284,
+      "pixels": [
+        440,
+        268
+      ],
+      "type": "precise_code_diagram",
+      "semantics": {
+        "operands": [
+          {
+            "value": 31,
+            "tens": 3,
+            "ones": 1
+          },
+          {
+            "value": 24,
+            "tens": 2,
+            "ones": 4
+          }
+        ],
+        "formula": "31 + 24",
+        "resultVisible": false,
+        "format": "tile"
+      },
+      "usedBy": [
+        "match-the-order-total"
+      ],
+      "generator": "art-source/diagrams.py",
+      "generatorSha256": "1a21fe101cc30345b0cae511b8b8a9bfdb4f55f2e76fd3877f3e46122698ac64",
+      "diagramSpecs": "art-source/diagram-specs.json",
+      "diagramSpecsSha256": "3b73ccf144471b4d8818888d287e4c9f1d8103fcddf5bddce3917e1e4d93bde3"
+    },
+    "tile-40-53": {
+      "file": "assets/tile-40-53.png",
+      "sha256": "115b2a40b114a4ed039a6424ca48abd1ca8abbb1ee2e9a499e2e795cbb93b89f",
+      "bytes": 7790,
+      "pixels": [
+        440,
+        268
+      ],
+      "type": "precise_code_diagram",
+      "semantics": {
+        "operands": [
+          {
+            "value": 40,
+            "tens": 4,
+            "ones": 0
+          },
+          {
+            "value": 53,
+            "tens": 5,
+            "ones": 3
+          }
+        ],
+        "formula": "40 + 53",
+        "resultVisible": false,
+        "format": "tile"
+      },
+      "usedBy": [
+        "match-the-order-total"
+      ],
+      "generator": "art-source/diagrams.py",
+      "generatorSha256": "1a21fe101cc30345b0cae511b8b8a9bfdb4f55f2e76fd3877f3e46122698ac64",
+      "diagramSpecs": "art-source/diagram-specs.json",
+      "diagramSpecsSha256": "3b73ccf144471b4d8818888d287e4c9f1d8103fcddf5bddce3917e1e4d93bde3"
+    },
+    "tile-42-30": {
+      "file": "assets/tile-42-30.png",
+      "sha256": "b54356ca4f344142a3871c1f7daf67bb008cd36798b65326b32c8eed1b8ac370",
+      "bytes": 7576,
+      "pixels": [
+        440,
+        268
+      ],
+      "type": "precise_code_diagram",
+      "semantics": {
+        "operands": [
+          {
+            "value": 42,
+            "tens": 4,
+            "ones": 2
+          },
+          {
+            "value": 30,
+            "tens": 3,
+            "ones": 0
+          }
+        ],
+        "formula": "42 + 30",
+        "resultVisible": false,
+        "format": "tile"
+      },
+      "usedBy": [
+        "match-the-order-total"
+      ],
+      "generator": "art-source/diagrams.py",
+      "generatorSha256": "1a21fe101cc30345b0cae511b8b8a9bfdb4f55f2e76fd3877f3e46122698ac64",
+      "diagramSpecs": "art-source/diagram-specs.json",
+      "diagramSpecsSha256": "3b73ccf144471b4d8818888d287e4c9f1d8103fcddf5bddce3917e1e4d93bde3"
+    },
+    "tile-42-5": {
+      "file": "assets/tile-42-5.png",
+      "sha256": "5a7ef61620f45e671e95d3f960ba3bb75b90df3b3f8e73ce729b3b50f7091453",
+      "bytes": 5701,
+      "pixels": [
+        440,
+        268
+      ],
+      "type": "precise_code_diagram",
+      "semantics": {
+        "operands": [
+          {
+            "value": 42,
+            "tens": 4,
+            "ones": 2
+          },
+          {
+            "value": 5,
+            "tens": 0,
+            "ones": 5
+          }
+        ],
+        "formula": "42 + 5",
+        "resultVisible": false,
+        "format": "tile"
+      },
+      "usedBy": [
+        "match-the-order-total"
+      ],
+      "generator": "art-source/diagrams.py",
+      "generatorSha256": "1a21fe101cc30345b0cae511b8b8a9bfdb4f55f2e76fd3877f3e46122698ac64",
+      "diagramSpecs": "art-source/diagram-specs.json",
+      "diagramSpecsSha256": "3b73ccf144471b4d8818888d287e4c9f1d8103fcddf5bddce3917e1e4d93bde3"
+    },
+    "tile-52-27": {
+      "file": "assets/tile-52-27.png",
+      "sha256": "47050f6bcc3305e411d372d9f3cf1fd6a967148d9aa48dbfcafe0d417d698431",
+      "bytes": 6721,
+      "pixels": [
+        440,
+        268
+      ],
+      "type": "precise_code_diagram",
+      "semantics": {
+        "operands": [
+          {
+            "value": 52,
+            "tens": 5,
+            "ones": 2
+          },
+          {
+            "value": 27,
+            "tens": 2,
+            "ones": 7
+          }
+        ],
+        "formula": "52 + 27",
+        "resultVisible": false,
+        "format": "tile"
+      },
+      "usedBy": [
+        "match-the-order-total"
+      ],
+      "generator": "art-source/diagrams.py",
+      "generatorSha256": "1a21fe101cc30345b0cae511b8b8a9bfdb4f55f2e76fd3877f3e46122698ac64",
+      "diagramSpecs": "art-source/diagram-specs.json",
+      "diagramSpecsSha256": "3b73ccf144471b4d8818888d287e4c9f1d8103fcddf5bddce3917e1e4d93bde3"
+    },
+    "tile-6-53": {
+      "file": "assets/tile-6-53.png",
+      "sha256": "fe84d989df43db8f7f22e21fd695986d456949a5a7f2b4b976d18acd7af6e5d0",
+      "bytes": 7094,
+      "pixels": [
+        440,
+        268
+      ],
+      "type": "precise_code_diagram",
+      "semantics": {
+        "operands": [
+          {
+            "value": 6,
+            "tens": 0,
+            "ones": 6
+          },
+          {
+            "value": 53,
+            "tens": 5,
+            "ones": 3
+          }
+        ],
+        "formula": "6 + 53",
+        "resultVisible": false,
+        "format": "tile"
+      },
+      "usedBy": [
+        "match-the-order-total"
+      ],
+      "generator": "art-source/diagrams.py",
+      "generatorSha256": "1a21fe101cc30345b0cae511b8b8a9bfdb4f55f2e76fd3877f3e46122698ac64",
+      "diagramSpecs": "art-source/diagram-specs.json",
+      "diagramSpecsSha256": "3b73ccf144471b4d8818888d287e4c9f1d8103fcddf5bddce3917e1e4d93bde3"
+    },
+    "total-19": {
+      "file": "assets/total-19.png",
+      "sha256": "bfb35c46e9e1475cd3ae6bd29cade87bdc8565b527162d2ccdc9c3c225472a5d",
+      "bytes": 3011,
+      "pixels": [
+        460,
+        270
+      ],
+      "type": "precise_code_diagram",
+      "semantics": {
+        "value": 19,
+        "tens": 1,
+        "ones": 9,
+        "numericTarget": true
+      },
+      "usedBy": [
+        "match-the-order-total"
+      ],
+      "generator": "art-source/diagrams.py",
+      "generatorSha256": "1a21fe101cc30345b0cae511b8b8a9bfdb4f55f2e76fd3877f3e46122698ac64",
+      "diagramSpecs": "art-source/diagram-specs.json",
+      "diagramSpecsSha256": "3b73ccf144471b4d8818888d287e4c9f1d8103fcddf5bddce3917e1e4d93bde3"
+    },
+    "total-27": {
+      "file": "assets/total-27.png",
+      "sha256": "2c0ddc32df4ec359fb8b5b4fc968f37b1b99822da5d2de363ebeae18c531e5b6",
+      "bytes": 3083,
+      "pixels": [
+        460,
+        270
+      ],
+      "type": "precise_code_diagram",
+      "semantics": {
+        "value": 27,
+        "tens": 2,
+        "ones": 7,
+        "numericTarget": true
+      },
+      "usedBy": [
+        "match-the-order-total"
+      ],
+      "generator": "art-source/diagrams.py",
+      "generatorSha256": "1a21fe101cc30345b0cae511b8b8a9bfdb4f55f2e76fd3877f3e46122698ac64",
+      "diagramSpecs": "art-source/diagram-specs.json",
+      "diagramSpecsSha256": "3b73ccf144471b4d8818888d287e4c9f1d8103fcddf5bddce3917e1e4d93bde3"
+    },
+    "total-47": {
+      "file": "assets/total-47.png",
+      "sha256": "a9dd6f735481626bf2a75885760d3508700140fb56742744a3e6ba033479c78a",
+      "bytes": 2886,
+      "pixels": [
+        460,
+        270
+      ],
+      "type": "precise_code_diagram",
+      "semantics": {
+        "value": 47,
+        "tens": 4,
+        "ones": 7,
+        "numericTarget": true
+      },
+      "usedBy": [
+        "match-the-order-total"
+      ],
+      "generator": "art-source/diagrams.py",
+      "generatorSha256": "1a21fe101cc30345b0cae511b8b8a9bfdb4f55f2e76fd3877f3e46122698ac64",
+      "diagramSpecs": "art-source/diagram-specs.json",
+      "diagramSpecsSha256": "3b73ccf144471b4d8818888d287e4c9f1d8103fcddf5bddce3917e1e4d93bde3"
+    },
+    "total-51": {
+      "file": "assets/total-51.png",
+      "sha256": "a18162c535fd7c2e913a1118fbe2788ba02d880ee527e11fbade045c2b714115",
+      "bytes": 3156,
+      "pixels": [
+        460,
+        270
+      ],
+      "type": "precise_code_diagram",
+      "semantics": {
+        "value": 51,
+        "tens": 5,
+        "ones": 1,
+        "numericTarget": true
+      },
+      "usedBy": [
+        "match-the-order-total"
+      ],
+      "generator": "art-source/diagrams.py",
+      "generatorSha256": "1a21fe101cc30345b0cae511b8b8a9bfdb4f55f2e76fd3877f3e46122698ac64",
+      "diagramSpecs": "art-source/diagram-specs.json",
+      "diagramSpecsSha256": "3b73ccf144471b4d8818888d287e4c9f1d8103fcddf5bddce3917e1e4d93bde3"
+    },
+    "total-55": {
+      "file": "assets/total-55.png",
+      "sha256": "fe8d64da72119d7a9415528a504fea8ce0adebbaca0ec615af819062c1141295",
+      "bytes": 3072,
+      "pixels": [
+        460,
+        270
+      ],
+      "type": "precise_code_diagram",
+      "semantics": {
+        "value": 55,
+        "tens": 5,
+        "ones": 5,
+        "numericTarget": true
+      },
+      "usedBy": [
+        "match-the-order-total"
+      ],
+      "generator": "art-source/diagrams.py",
+      "generatorSha256": "1a21fe101cc30345b0cae511b8b8a9bfdb4f55f2e76fd3877f3e46122698ac64",
+      "diagramSpecs": "art-source/diagram-specs.json",
+      "diagramSpecsSha256": "3b73ccf144471b4d8818888d287e4c9f1d8103fcddf5bddce3917e1e4d93bde3"
+    },
+    "total-59": {
+      "file": "assets/total-59.png",
+      "sha256": "1c2a61c1f9214d5210eacbc52d3b2f2ab85de78d415f83a5c9e083589a4deb43",
+      "bytes": 4237,
+      "pixels": [
+        460,
+        270
+      ],
+      "type": "precise_code_diagram",
+      "semantics": {
+        "value": 59,
+        "tens": 5,
+        "ones": 9,
+        "numericTarget": true
+      },
+      "usedBy": [
+        "match-the-order-total"
+      ],
+      "generator": "art-source/diagrams.py",
+      "generatorSha256": "1a21fe101cc30345b0cae511b8b8a9bfdb4f55f2e76fd3877f3e46122698ac64",
+      "diagramSpecs": "art-source/diagram-specs.json",
+      "diagramSpecsSha256": "3b73ccf144471b4d8818888d287e4c9f1d8103fcddf5bddce3917e1e4d93bde3"
+    },
+    "total-72": {
+      "file": "assets/total-72.png",
+      "sha256": "6b58624f6c1f89022ce0e7cccc871c06392eeea34e921c4a0699b69ee195781e",
+      "bytes": 3686,
+      "pixels": [
+        460,
+        270
+      ],
+      "type": "precise_code_diagram",
+      "semantics": {
+        "value": 72,
+        "tens": 7,
+        "ones": 2,
+        "numericTarget": true
+      },
+      "usedBy": [
+        "match-the-order-total"
+      ],
+      "generator": "art-source/diagrams.py",
+      "generatorSha256": "1a21fe101cc30345b0cae511b8b8a9bfdb4f55f2e76fd3877f3e46122698ac64",
+      "diagramSpecs": "art-source/diagram-specs.json",
+      "diagramSpecsSha256": "3b73ccf144471b4d8818888d287e4c9f1d8103fcddf5bddce3917e1e4d93bde3"
+    },
+    "total-79": {
+      "file": "assets/total-79.png",
+      "sha256": "1d9739cec76e11f3294d0eebeb465cba219a4e402448f440addbbd709aa2d0e5",
+      "bytes": 4061,
+      "pixels": [
+        460,
+        270
+      ],
+      "type": "precise_code_diagram",
+      "semantics": {
+        "value": 79,
+        "tens": 7,
+        "ones": 9,
+        "numericTarget": true
+      },
+      "usedBy": [
+        "match-the-order-total"
+      ],
+      "generator": "art-source/diagrams.py",
+      "generatorSha256": "1a21fe101cc30345b0cae511b8b8a9bfdb4f55f2e76fd3877f3e46122698ac64",
+      "diagramSpecs": "art-source/diagram-specs.json",
+      "diagramSpecsSha256": "3b73ccf144471b4d8818888d287e4c9f1d8103fcddf5bddce3917e1e4d93bde3"
+    },
+    "total-93": {
+      "file": "assets/total-93.png",
+      "sha256": "048afad65b43733c60a3bf687494f980ee96a0fd5a2245a7daf4f4f9d4e0ec98",
+      "bytes": 4768,
+      "pixels": [
+        460,
+        270
+      ],
+      "type": "precise_code_diagram",
+      "semantics": {
+        "value": 93,
+        "tens": 9,
+        "ones": 3,
+        "numericTarget": true
+      },
+      "usedBy": [
+        "match-the-order-total"
+      ],
+      "generator": "art-source/diagrams.py",
+      "generatorSha256": "1a21fe101cc30345b0cae511b8b8a9bfdb4f55f2e76fd3877f3e46122698ac64",
+      "diagramSpecs": "art-source/diagram-specs.json",
+      "diagramSpecsSha256": "3b73ccf144471b4d8818888d287e4c9f1d8103fcddf5bddce3917e1e4d93bde3"
+    },
+    "check-1-order": {
+      "file": "assets/check-1-order.png",
+      "sha256": "a7d33bc6da360314682f7df014b4ee876a83e1c4f49ccee4d111c647089c8c2b",
+      "bytes": 4153,
+      "pixels": [
+        720,
+        246
+      ],
+      "type": "precise_code_diagram",
+      "semantics": {
+        "kind": "quiz operands",
+        "groups": [
+          {
+            "value": 22,
+            "tens": 2,
+            "ones": 2
+          },
+          {
+            "value": 6,
+            "tens": 0,
+            "ones": 6
+          }
+        ],
+        "resultVisible": false
+      },
+      "usedBy": [
+        "nrg-q1"
+      ],
+      "generator": "art-source/diagrams.py",
+      "generatorSha256": "1a21fe101cc30345b0cae511b8b8a9bfdb4f55f2e76fd3877f3e46122698ac64",
+      "diagramSpecs": "art-source/diagram-specs.json",
+      "diagramSpecsSha256": "3b73ccf144471b4d8818888d287e4c9f1d8103fcddf5bddce3917e1e4d93bde3"
+    },
+    "check-1-card-1": {
+      "file": "assets/check-1-card-1.png",
+      "sha256": "5628f8e6f79bc0362c39e64d8bb5675f5b03e9b34701f3891ede53d0c7fd5e9f",
+      "bytes": 2937,
+      "pixels": [
+        460,
+        270
+      ],
+      "type": "precise_code_diagram",
+      "semantics": {
+        "kind": "quiz answer model",
+        "distinctArt": true,
+        "option": {
+          "value": 24,
+          "tens": 2,
+          "ones": 4
+        }
+      },
+      "usedBy": [
+        "nrg-q1"
+      ],
+      "generator": "art-source/diagrams.py",
+      "generatorSha256": "1a21fe101cc30345b0cae511b8b8a9bfdb4f55f2e76fd3877f3e46122698ac64",
+      "diagramSpecs": "art-source/diagram-specs.json",
+      "diagramSpecsSha256": "3b73ccf144471b4d8818888d287e4c9f1d8103fcddf5bddce3917e1e4d93bde3"
+    },
+    "check-1-card-2": {
+      "file": "assets/check-1-card-2.png",
+      "sha256": "3b8da0e10a96c04686229039af1fe53438bf5c82b89b345cab4ffddcf5f35ccb",
+      "bytes": 3845,
+      "pixels": [
+        460,
+        270
+      ],
+      "type": "precise_code_diagram",
+      "semantics": {
+        "kind": "quiz answer model",
+        "distinctArt": true,
+        "option": {
+          "value": 28,
+          "tens": 2,
+          "ones": 8
+        }
+      },
+      "usedBy": [
+        "nrg-q1"
+      ],
+      "generator": "art-source/diagrams.py",
+      "generatorSha256": "1a21fe101cc30345b0cae511b8b8a9bfdb4f55f2e76fd3877f3e46122698ac64",
+      "diagramSpecs": "art-source/diagram-specs.json",
+      "diagramSpecsSha256": "3b73ccf144471b4d8818888d287e4c9f1d8103fcddf5bddce3917e1e4d93bde3"
+    },
+    "check-1-card-3": {
+      "file": "assets/check-1-card-3.png",
+      "sha256": "b386e5a1c9e293cc51b3f3755e6fdf99f6ddbcc6328ea3be355e71d201e2483d",
+      "bytes": 4497,
+      "pixels": [
+        460,
+        270
+      ],
+      "type": "precise_code_diagram",
+      "semantics": {
+        "kind": "quiz answer model",
+        "distinctArt": true,
+        "option": {
+          "value": 82,
+          "tens": 8,
+          "ones": 2
+        }
+      },
+      "usedBy": [
+        "nrg-q1"
+      ],
+      "generator": "art-source/diagrams.py",
+      "generatorSha256": "1a21fe101cc30345b0cae511b8b8a9bfdb4f55f2e76fd3877f3e46122698ac64",
+      "diagramSpecs": "art-source/diagram-specs.json",
+      "diagramSpecsSha256": "3b73ccf144471b4d8818888d287e4c9f1d8103fcddf5bddce3917e1e4d93bde3"
+    },
+    "check-2-order": {
+      "file": "assets/check-2-order.png",
+      "sha256": "d9a303270dfe01acbb0770fb73732e02d11c46401f1d16ff6cd697992c4b394c",
+      "bytes": 5367,
+      "pixels": [
+        720,
+        246
+      ],
+      "type": "precise_code_diagram",
+      "semantics": {
+        "kind": "quiz operands",
+        "groups": [
+          {
+            "value": 54,
+            "tens": 5,
+            "ones": 4
+          },
+          {
+            "value": 20,
+            "tens": 2,
+            "ones": 0
+          }
+        ],
+        "resultVisible": false
+      },
+      "usedBy": [
+        "nrg-q2"
+      ],
+      "generator": "art-source/diagrams.py",
+      "generatorSha256": "1a21fe101cc30345b0cae511b8b8a9bfdb4f55f2e76fd3877f3e46122698ac64",
+      "diagramSpecs": "art-source/diagram-specs.json",
+      "diagramSpecsSha256": "3b73ccf144471b4d8818888d287e4c9f1d8103fcddf5bddce3917e1e4d93bde3"
+    },
+    "check-2-card-1": {
+      "file": "assets/check-2-card-1.png",
+      "sha256": "2991fcbbf89587489e48b8b93a418f4b224fdd7324fb1782589a52001d896684",
+      "bytes": 3252,
+      "pixels": [
+        460,
+        270
+      ],
+      "type": "precise_code_diagram",
+      "semantics": {
+        "kind": "quiz answer model",
+        "distinctArt": true,
+        "option": {
+          "value": 74,
+          "tens": 7,
+          "ones": 4
+        }
+      },
+      "usedBy": [
+        "nrg-q2"
+      ],
+      "generator": "art-source/diagrams.py",
+      "generatorSha256": "1a21fe101cc30345b0cae511b8b8a9bfdb4f55f2e76fd3877f3e46122698ac64",
+      "diagramSpecs": "art-source/diagram-specs.json",
+      "diagramSpecsSha256": "3b73ccf144471b4d8818888d287e4c9f1d8103fcddf5bddce3917e1e4d93bde3"
+    },
+    "check-2-card-2": {
+      "file": "assets/check-2-card-2.png",
+      "sha256": "f4198f14ea608d2d2986276d1dd6c369e20683af8a70adfaa587c7a3538303c8",
+      "bytes": 4178,
+      "pixels": [
+        460,
+        270
+      ],
+      "type": "precise_code_diagram",
+      "semantics": {
+        "kind": "quiz answer model",
+        "distinctArt": true,
+        "option": {
+          "value": 56,
+          "tens": 5,
+          "ones": 6
+        }
+      },
+      "usedBy": [
+        "nrg-q2"
+      ],
+      "generator": "art-source/diagrams.py",
+      "generatorSha256": "1a21fe101cc30345b0cae511b8b8a9bfdb4f55f2e76fd3877f3e46122698ac64",
+      "diagramSpecs": "art-source/diagram-specs.json",
+      "diagramSpecsSha256": "3b73ccf144471b4d8818888d287e4c9f1d8103fcddf5bddce3917e1e4d93bde3"
+    },
+    "check-2-card-3": {
+      "file": "assets/check-2-card-3.png",
+      "sha256": "0b207d5abb6f8d7fdb0fee1cf9ce8b6858aba5c5d5cf448be34882878efd2697",
+      "bytes": 4057,
+      "pixels": [
+        460,
+        270
+      ],
+      "type": "precise_code_diagram",
+      "semantics": {
+        "kind": "quiz answer model",
+        "distinctArt": true,
+        "option": {
+          "value": 76,
+          "tens": 7,
+          "ones": 6
+        }
+      },
+      "usedBy": [
+        "nrg-q2"
+      ],
+      "generator": "art-source/diagrams.py",
+      "generatorSha256": "1a21fe101cc30345b0cae511b8b8a9bfdb4f55f2e76fd3877f3e46122698ac64",
+      "diagramSpecs": "art-source/diagram-specs.json",
+      "diagramSpecsSha256": "3b73ccf144471b4d8818888d287e4c9f1d8103fcddf5bddce3917e1e4d93bde3"
+    },
+    "check-3-order": {
+      "file": "assets/check-3-order.png",
+      "sha256": "7980053ddbdd2ec2229aa832c299498a2301a2114048723d01b786c8a1b7097a",
+      "bytes": 5051,
+      "pixels": [
+        720,
+        246
+      ],
+      "type": "precise_code_diagram",
+      "semantics": {
+        "kind": "quiz operands",
+        "groups": [
+          {
+            "value": 42,
+            "tens": 4,
+            "ones": 2
+          },
+          {
+            "value": 16,
+            "tens": 1,
+            "ones": 6
+          }
+        ],
+        "resultVisible": false
+      },
+      "usedBy": [
+        "nrg-q3"
+      ],
+      "generator": "art-source/diagrams.py",
+      "generatorSha256": "1a21fe101cc30345b0cae511b8b8a9bfdb4f55f2e76fd3877f3e46122698ac64",
+      "diagramSpecs": "art-source/diagram-specs.json",
+      "diagramSpecsSha256": "3b73ccf144471b4d8818888d287e4c9f1d8103fcddf5bddce3917e1e4d93bde3"
+    },
+    "check-3-card-1": {
+      "file": "assets/check-3-card-1.png",
+      "sha256": "ab5bbf2b6b71cf36016bee42b7053e5386dca5e38922d35a017f493fc6bbf6b9",
+      "bytes": 3706,
+      "pixels": [
+        460,
+        270
+      ],
+      "type": "precise_code_diagram",
+      "semantics": {
+        "kind": "quiz answer model",
+        "distinctArt": true,
+        "option": {
+          "value": 48,
+          "tens": 4,
+          "ones": 8
+        }
+      },
+      "usedBy": [
+        "nrg-q3"
+      ],
+      "generator": "art-source/diagrams.py",
+      "generatorSha256": "1a21fe101cc30345b0cae511b8b8a9bfdb4f55f2e76fd3877f3e46122698ac64",
+      "diagramSpecs": "art-source/diagram-specs.json",
+      "diagramSpecsSha256": "3b73ccf144471b4d8818888d287e4c9f1d8103fcddf5bddce3917e1e4d93bde3"
+    },
+    "check-3-card-2": {
+      "file": "assets/check-3-card-2.png",
+      "sha256": "f4198f14ea608d2d2986276d1dd6c369e20683af8a70adfaa587c7a3538303c8",
+      "bytes": 4178,
+      "pixels": [
+        460,
+        270
+      ],
+      "type": "precise_code_diagram",
+      "semantics": {
+        "kind": "quiz answer model",
+        "distinctArt": true,
+        "option": {
+          "value": 56,
+          "tens": 5,
+          "ones": 6
+        }
+      },
+      "usedBy": [
+        "nrg-q3"
+      ],
+      "generator": "art-source/diagrams.py",
+      "generatorSha256": "1a21fe101cc30345b0cae511b8b8a9bfdb4f55f2e76fd3877f3e46122698ac64",
+      "diagramSpecs": "art-source/diagram-specs.json",
+      "diagramSpecsSha256": "3b73ccf144471b4d8818888d287e4c9f1d8103fcddf5bddce3917e1e4d93bde3"
+    },
+    "check-3-card-3": {
+      "file": "assets/check-3-card-3.png",
+      "sha256": "87ed574cb1231d2f8368c60a84041d2e72ed485061dc089f756bcd76444c3eac",
+      "bytes": 4290,
+      "pixels": [
+        460,
+        270
+      ],
+      "type": "precise_code_diagram",
+      "semantics": {
+        "kind": "quiz answer model",
+        "distinctArt": true,
+        "option": {
+          "value": 58,
+          "tens": 5,
+          "ones": 8
+        }
+      },
+      "usedBy": [
+        "nrg-q3"
+      ],
+      "generator": "art-source/diagrams.py",
+      "generatorSha256": "1a21fe101cc30345b0cae511b8b8a9bfdb4f55f2e76fd3877f3e46122698ac64",
+      "diagramSpecs": "art-source/diagram-specs.json",
+      "diagramSpecsSha256": "3b73ccf144471b4d8818888d287e4c9f1d8103fcddf5bddce3917e1e4d93bde3"
+    },
+    "check-4-order": {
+      "file": "assets/check-4-order.png",
+      "sha256": "e1568e794b7f58dbb8e558844b4a3c7a9d3c1a23a84574e964a1616924b63da6",
+      "bytes": 4780,
+      "pixels": [
+        720,
+        246
+      ],
+      "type": "precise_code_diagram",
+      "semantics": {
+        "kind": "quiz operands",
+        "groups": [
+          {
+            "value": 6,
+            "tens": 0,
+            "ones": 6
+          },
+          {
+            "value": 61,
+            "tens": 6,
+            "ones": 1
+          }
+        ],
+        "resultVisible": false
+      },
+      "usedBy": [
+        "nrg-q4"
+      ],
+      "generator": "art-source/diagrams.py",
+      "generatorSha256": "1a21fe101cc30345b0cae511b8b8a9bfdb4f55f2e76fd3877f3e46122698ac64",
+      "diagramSpecs": "art-source/diagram-specs.json",
+      "diagramSpecsSha256": "3b73ccf144471b4d8818888d287e4c9f1d8103fcddf5bddce3917e1e4d93bde3"
+    },
+    "check-4-card-1": {
+      "file": "assets/check-4-card-1.png",
+      "sha256": "262ee1271b82a36711bbf6308737ad2fc1c9684c51c81bc4df8f75e08ab1ab4b",
+      "bytes": 3487,
+      "pixels": [
+        460,
+        270
+      ],
+      "type": "precise_code_diagram",
+      "semantics": {
+        "kind": "quiz answer model",
+        "distinctArt": true,
+        "option": {
+          "value": 61,
+          "tens": 6,
+          "ones": 1
+        }
+      },
+      "usedBy": [
+        "nrg-q4"
+      ],
+      "generator": "art-source/diagrams.py",
+      "generatorSha256": "1a21fe101cc30345b0cae511b8b8a9bfdb4f55f2e76fd3877f3e46122698ac64",
+      "diagramSpecs": "art-source/diagram-specs.json",
+      "diagramSpecsSha256": "3b73ccf144471b4d8818888d287e4c9f1d8103fcddf5bddce3917e1e4d93bde3"
+    },
+    "check-4-card-2": {
+      "file": "assets/check-4-card-2.png",
+      "sha256": "b2889a406d7ea5b4dba53b28e35f275ae2e58e9e13d740038a4ba9a22d6bed83",
+      "bytes": 3872,
+      "pixels": [
+        460,
+        270
+      ],
+      "type": "precise_code_diagram",
+      "semantics": {
+        "kind": "quiz answer model",
+        "distinctArt": true,
+        "option": {
+          "value": 67,
+          "tens": 6,
+          "ones": 7
+        }
+      },
+      "usedBy": [
+        "nrg-q4"
+      ],
+      "generator": "art-source/diagrams.py",
+      "generatorSha256": "1a21fe101cc30345b0cae511b8b8a9bfdb4f55f2e76fd3877f3e46122698ac64",
+      "diagramSpecs": "art-source/diagram-specs.json",
+      "diagramSpecsSha256": "3b73ccf144471b4d8818888d287e4c9f1d8103fcddf5bddce3917e1e4d93bde3"
+    },
+    "check-4-card-3": {
+      "file": "assets/check-4-card-3.png",
+      "sha256": "0b207d5abb6f8d7fdb0fee1cf9ce8b6858aba5c5d5cf448be34882878efd2697",
+      "bytes": 4057,
+      "pixels": [
+        460,
+        270
+      ],
+      "type": "precise_code_diagram",
+      "semantics": {
+        "kind": "quiz answer model",
+        "distinctArt": true,
+        "option": {
+          "value": 76,
+          "tens": 7,
+          "ones": 6
+        }
+      },
+      "usedBy": [
+        "nrg-q4"
+      ],
+      "generator": "art-source/diagrams.py",
+      "generatorSha256": "1a21fe101cc30345b0cae511b8b8a9bfdb4f55f2e76fd3877f3e46122698ac64",
+      "diagramSpecs": "art-source/diagram-specs.json",
+      "diagramSpecsSha256": "3b73ccf144471b4d8818888d287e4c9f1d8103fcddf5bddce3917e1e4d93bde3"
+    },
+    "check-5-order": {
+      "file": "assets/check-5-order.png",
+      "sha256": "5879d813750c1f1bb97d639d0335c50cff2853cc65f441f80e892f9a3574c132",
+      "bytes": 8732,
+      "pixels": [
+        720,
+        360
+      ],
+      "type": "precise_code_diagram",
+      "semantics": {
+        "kind": "quiz operands",
+        "groups": [
+          [
+            {
+              "value": 36,
+              "tens": 3,
+              "ones": 6
+            },
+            {
+              "value": 3,
+              "tens": 0,
+              "ones": 3
+            }
+          ],
+          [
+            {
+              "value": 36,
+              "tens": 3,
+              "ones": 6
+            },
+            {
+              "value": 30,
+              "tens": 3,
+              "ones": 0
+            }
+          ]
+        ],
+        "resultVisible": false
+      },
+      "usedBy": [
+        "nrg-q5"
+      ],
+      "generator": "art-source/diagrams.py",
+      "generatorSha256": "1a21fe101cc30345b0cae511b8b8a9bfdb4f55f2e76fd3877f3e46122698ac64",
+      "diagramSpecs": "art-source/diagram-specs.json",
+      "diagramSpecsSha256": "3b73ccf144471b4d8818888d287e4c9f1d8103fcddf5bddce3917e1e4d93bde3"
+    },
+    "check-5-card-1": {
+      "file": "assets/check-5-card-1.png",
+      "sha256": "6e5f56fedf1c03371256033c26ceedbc2820ead92e6545d5fbe2d7eb9296ec7e",
+      "bytes": 5937,
+      "pixels": [
+        470,
+        430
+      ],
+      "type": "precise_code_diagram",
+      "semantics": {
+        "kind": "quiz answer model",
+        "distinctArt": true,
+        "option": [
+          {
+            "value": 66,
+            "tens": 6,
+            "ones": 6
+          },
+          {
+            "value": 39,
+            "tens": 3,
+            "ones": 9
+          }
+        ]
+      },
+      "usedBy": [
+        "nrg-q5"
+      ],
+      "generator": "art-source/diagrams.py",
+      "generatorSha256": "1a21fe101cc30345b0cae511b8b8a9bfdb4f55f2e76fd3877f3e46122698ac64",
+      "diagramSpecs": "art-source/diagram-specs.json",
+      "diagramSpecsSha256": "3b73ccf144471b4d8818888d287e4c9f1d8103fcddf5bddce3917e1e4d93bde3"
+    },
+    "check-5-card-2": {
+      "file": "assets/check-5-card-2.png",
+      "sha256": "293743e67dc9df2339540e197349e75288ded70858d5044c3b997649176830ad",
+      "bytes": 6483,
+      "pixels": [
+        470,
+        430
+      ],
+      "type": "precise_code_diagram",
+      "semantics": {
+        "kind": "quiz answer model",
+        "distinctArt": true,
+        "option": [
+          {
+            "value": 39,
+            "tens": 3,
+            "ones": 9
+          },
+          {
+            "value": 39,
+            "tens": 3,
+            "ones": 9
+          }
+        ]
+      },
+      "usedBy": [
+        "nrg-q5"
+      ],
+      "generator": "art-source/diagrams.py",
+      "generatorSha256": "1a21fe101cc30345b0cae511b8b8a9bfdb4f55f2e76fd3877f3e46122698ac64",
+      "diagramSpecs": "art-source/diagram-specs.json",
+      "diagramSpecsSha256": "3b73ccf144471b4d8818888d287e4c9f1d8103fcddf5bddce3917e1e4d93bde3"
+    },
+    "check-5-card-3": {
+      "file": "assets/check-5-card-3.png",
+      "sha256": "790f17c1473875168a5ab30cf8e13ce2042f8feb8a4a9be4d4d59482383873ee",
+      "bytes": 5937,
+      "pixels": [
+        470,
+        430
+      ],
+      "type": "precise_code_diagram",
+      "semantics": {
+        "kind": "quiz answer model",
+        "distinctArt": true,
+        "option": [
+          {
+            "value": 39,
+            "tens": 3,
+            "ones": 9
+          },
+          {
+            "value": 66,
+            "tens": 6,
+            "ones": 6
+          }
+        ]
+      },
+      "usedBy": [
+        "nrg-q5"
+      ],
+      "generator": "art-source/diagrams.py",
+      "generatorSha256": "1a21fe101cc30345b0cae511b8b8a9bfdb4f55f2e76fd3877f3e46122698ac64",
+      "diagramSpecs": "art-source/diagram-specs.json",
+      "diagramSpecsSha256": "3b73ccf144471b4d8818888d287e4c9f1d8103fcddf5bddce3917e1e4d93bde3"
+    },
+    "check-6-order": {
+      "file": "assets/check-6-order.png",
+      "sha256": "afb0e1a45d7f6f67ecc9eb2c7369a358c55fdb36d2158cfbd3c24cef2b24f68e",
+      "bytes": 4631,
+      "pixels": [
+        720,
+        246
+      ],
+      "type": "precise_code_diagram",
+      "semantics": {
+        "kind": "quiz operands",
+        "groups": [
+          {
+            "value": 44,
+            "tens": 4,
+            "ones": 4
+          },
+          {
+            "value": 25,
+            "tens": 2,
+            "ones": 5
+          }
+        ],
+        "resultVisible": false
+      },
+      "usedBy": [
+        "nrg-q6"
+      ],
+      "generator": "art-source/diagrams.py",
+      "generatorSha256": "1a21fe101cc30345b0cae511b8b8a9bfdb4f55f2e76fd3877f3e46122698ac64",
+      "diagramSpecs": "art-source/diagram-specs.json",
+      "diagramSpecsSha256": "3b73ccf144471b4d8818888d287e4c9f1d8103fcddf5bddce3917e1e4d93bde3"
+    },
+    "check-6-card-1": {
+      "file": "assets/check-6-card-1.png",
+      "sha256": "66e14c2ee230e6a73018963a4048f07d5dcfa87323f3a917ead15a2f0bc43b17",
+      "bytes": 4527,
+      "pixels": [
+        460,
+        270
+      ],
+      "type": "precise_code_diagram",
+      "semantics": {
+        "kind": "quiz answer model",
+        "distinctArt": true,
+        "option": {
+          "value": 69,
+          "tens": 6,
+          "ones": 9
+        }
+      },
+      "usedBy": [
+        "nrg-q6"
+      ],
+      "generator": "art-source/diagrams.py",
+      "generatorSha256": "1a21fe101cc30345b0cae511b8b8a9bfdb4f55f2e76fd3877f3e46122698ac64",
+      "diagramSpecs": "art-source/diagram-specs.json",
+      "diagramSpecsSha256": "3b73ccf144471b4d8818888d287e4c9f1d8103fcddf5bddce3917e1e4d93bde3"
+    },
+    "check-6-card-2": {
+      "file": "assets/check-6-card-2.png",
+      "sha256": "9f40cc82ff0c01dea1872ff44c1bcea948cde2a58f253087d7c1fcff6d20bd9d",
+      "bytes": 3761,
+      "pixels": [
+        460,
+        270
+      ],
+      "type": "precise_code_diagram",
+      "semantics": {
+        "kind": "quiz answer model",
+        "distinctArt": true,
+        "option": {
+          "value": 64,
+          "tens": 6,
+          "ones": 4
+        }
+      },
+      "usedBy": [
+        "nrg-q6"
+      ],
+      "generator": "art-source/diagrams.py",
+      "generatorSha256": "1a21fe101cc30345b0cae511b8b8a9bfdb4f55f2e76fd3877f3e46122698ac64",
+      "diagramSpecs": "art-source/diagram-specs.json",
+      "diagramSpecsSha256": "3b73ccf144471b4d8818888d287e4c9f1d8103fcddf5bddce3917e1e4d93bde3"
+    },
+    "check-6-card-3": {
+      "file": "assets/check-6-card-3.png",
+      "sha256": "2d96f91ccd1d4afe428321c5138a9a194d45eb5bf025be0971778136b68d1e25",
+      "bytes": 3582,
+      "pixels": [
+        460,
+        270
+      ],
+      "type": "precise_code_diagram",
+      "semantics": {
+        "kind": "quiz answer model",
+        "distinctArt": true,
+        "option": {
+          "value": 49,
+          "tens": 4,
+          "ones": 9
+        }
+      },
+      "usedBy": [
+        "nrg-q6"
+      ],
+      "generator": "art-source/diagrams.py",
+      "generatorSha256": "1a21fe101cc30345b0cae511b8b8a9bfdb4f55f2e76fd3877f3e46122698ac64",
+      "diagramSpecs": "art-source/diagram-specs.json",
+      "diagramSpecsSha256": "3b73ccf144471b4d8818888d287e4c9f1d8103fcddf5bddce3917e1e4d93bde3"
+    },
+    "craft-review-display": {
+      "file": "assets/craft-review-display.png",
+      "sha256": "c813dc07ee07e125c60e6d912afe8d6f197d3a649005737cbade1610abc072de",
+      "bytes": 6849,
+      "pixels": [
+        780,
+        296
+      ],
+      "type": "precise_code_diagram",
+      "semantics": {
+        "models": [
+          {
+            "value": 32,
+            "tens": 3,
+            "ones": 2
+          },
+          {
+            "value": 5,
+            "tens": 0,
+            "ones": 5
+          },
+          {
+            "value": 20,
+            "tens": 2,
+            "ones": 0
+          }
+        ],
+        "kind": "three separate demonstration cards, no arithmetic result implied"
+      },
+      "usedBy": [
+        "tell-how-you-added"
+      ],
+      "generator": "art-source/diagrams.py",
+      "generatorSha256": "1a21fe101cc30345b0cae511b8b8a9bfdb4f55f2e76fd3877f3e46122698ac64",
+      "diagramSpecs": "art-source/diagram-specs.json",
+      "diagramSpecsSha256": "3b73ccf144471b4d8818888d287e4c9f1d8103fcddf5bddce3917e1e4d93bde3"
+    }
+  }
+}

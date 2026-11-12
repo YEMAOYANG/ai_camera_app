@@ -1,0 +1,1069 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "I like football.",
+  "description": "在运动日学会听清谁在说、喜欢哪项运动。",
+  "grade": 1,
+  "roster": {
+    "mia": {
+      "name": "Mia 老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Jennifer",
+      "avatar": "/teachers/coco-english-v1.png",
+      "color": "#557B76",
+      "persona": "先指清谁开口，再听短句中的运动和喜好。"
+    }
+  },
+  "images": {
+    "sport-animal-group": {
+      "file": "assets/sport-animal-group.png"
+    },
+    "sport-cart": {
+      "file": "assets/sport-cart.png"
+    },
+    "sport-cart-action": {
+      "file": "assets/sport-cart-action.png"
+    },
+    "sport-depot-basket-a": {
+      "file": "assets/sport-depot-basket-a.png"
+    },
+    "sport-depot-basket-b": {
+      "file": "assets/sport-depot-basket-b.png"
+    },
+    "sport-depot-foot-a": {
+      "file": "assets/sport-depot-foot-a.png"
+    },
+    "sport-depot-foot-b": {
+      "file": "assets/sport-depot-foot-b.png"
+    },
+    "sport-depot-ping": {
+      "file": "assets/sport-depot-ping.png"
+    },
+    "sport-goal": {
+      "file": "assets/sport-goal.png"
+    },
+    "sport-hoop": {
+      "file": "assets/sport-hoop.png"
+    },
+    "sport-i-foot-basket": {
+      "file": "assets/sport-i-foot-basket.png"
+    },
+    "sport-i-football": {
+      "file": "assets/sport-i-football.png"
+    },
+    "sport-i-ping": {
+      "file": "assets/sport-i-ping.png"
+    },
+    "sport-lions": {
+      "file": "assets/sport-lions.png"
+    },
+    "sport-ping-table": {
+      "file": "assets/sport-ping-table.png"
+    },
+    "sport-play-ping": {
+      "file": "assets/sport-play-ping.png"
+    },
+    "sport-quiz-i-basket": {
+      "file": "assets/sport-quiz-i-basket.png"
+    },
+    "sport-quiz-i-both": {
+      "file": "assets/sport-quiz-i-both.png"
+    },
+    "sport-quiz-i-foot": {
+      "file": "assets/sport-quiz-i-foot.png"
+    },
+    "sport-quiz-i-foot-ping": {
+      "file": "assets/sport-quiz-i-foot-ping.png"
+    },
+    "sport-quiz-play-alone": {
+      "file": "assets/sport-quiz-play-alone.png"
+    },
+    "sport-quiz-play-basket": {
+      "file": "assets/sport-quiz-play-basket.png"
+    },
+    "sport-quiz-play-ping": {
+      "file": "assets/sport-quiz-play-ping.png"
+    },
+    "sport-quiz-they-basket": {
+      "file": "assets/sport-quiz-they-basket.png"
+    },
+    "sport-quiz-they-foot": {
+      "file": "assets/sport-quiz-they-foot.png"
+    },
+    "sport-quiz-they-ping": {
+      "file": "assets/sport-quiz-they-ping.png"
+    },
+    "sport-quiz-we-basket": {
+      "file": "assets/sport-quiz-we-basket.png"
+    },
+    "sport-quiz-we-foot": {
+      "file": "assets/sport-quiz-we-foot.png"
+    },
+    "sport-quiz-we-ping": {
+      "file": "assets/sport-quiz-we-ping.png"
+    },
+    "sport-reporter": {
+      "file": "assets/sport-reporter.png"
+    },
+    "sport-shared-foot": {
+      "file": "assets/sport-shared-foot.png"
+    },
+    "sport-stage": {
+      "file": "assets/sport-stage.png"
+    },
+    "sport-sticker": {
+      "file": "assets/sport-sticker.png"
+    },
+    "sport-they-football": {
+      "file": "assets/sport-they-football.png"
+    },
+    "sport-three-equipment": {
+      "file": "assets/sport-three-equipment.png"
+    },
+    "sport-we-football": {
+      "file": "assets/sport-we-football.png"
+    },
+    "sport-we-ping": {
+      "file": "assets/sport-we-ping.png"
+    },
+    "sport-they-ping": {
+      "file": "assets/sport-they-ping.png"
+    },
+    "sport-they-basketball": {
+      "file": "assets/sport-they-basketball.png"
+    },
+    "sport-i-basketball": {
+      "file": "assets/sport-i-basketball.png"
+    },
+    "sport-bubble": {
+      "file": "assets/sport-bubble.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "club-welcome",
+      "type": "slide",
+      "title": "运动社团，等你来报名",
+      "template": "title-picture",
+      "data": {
+        "title": "运动社团，等你来报名",
+        "picture": "sport-stage",
+        "caption": "听清谁说的，再听喜欢什么。"
+      },
+      "script": [
+        {
+          "say": "学校的运动日要开始了。朋友们来报名选社团。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "看这三个活动区。孩子们可以选自己喜欢的项目。"
+        },
+        {
+          "say": "有人喜欢一种，也有人喜欢两种，都可以。"
+        },
+        {
+          "say": "老师听到一个词，就知道他们在说喜好。Like."
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "先听是谁开口，再听他喜欢什么。"
+        },
+        {
+          "say": "有人替别人介绍时，听的人也得找对那一组。"
+        },
+        {
+          "say": "报名之前，先用几张动物图练一练耳朵。"
+        }
+      ]
+    },
+    {
+      "key": "animal-warmup",
+      "type": "slide",
+      "title": "从动物画板听见 like",
+      "template": "two-columns",
+      "data": {
+        "title": "从动物画板听见 like",
+        "left": {
+          "heading": "lions",
+          "body": "狮子。"
+        },
+        "left_picture": "sport-lions",
+        "right": {
+          "heading": "them all",
+          "body": "这一组，全都。"
+        },
+        "right_picture": "sport-animal-group"
+      },
+      "script": [
+        {
+          "say": "这里有个动物画板。请听我说我喜欢谁。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "看到这两只棕鬃毛的动物了吗？指给我看。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "Lions. I like lions."
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "先听到 like，就知道我在说喜欢。这里说喜欢狮子。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "这一整张还有小猫和大象。我指着整组来说。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "I like them all."
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "Them 指刚看过的这些。All 把这一组全算上。"
+        },
+        {
+          "say": "把手指绕着图走一圈。一整组都在我说的范围里。"
+        }
+      ]
+    },
+    {
+      "key": "sports-clues",
+      "type": "slide",
+      "title": "用球和动作认出三种运动",
+      "template": "picture-points",
+      "data": {
+        "title": "用球和动作认出三种运动",
+        "picture": "sport-three-equipment",
+        "points": [
+          "football　足球",
+          "basketball　篮球",
+          "ping-pong　乒乓球"
+        ]
+      },
+      "script": [
+        {
+          "say": "报名板上有三张照片。只看球的颜色，容易猜错。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "看看球旁边的东西，能帮你找对运动。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "Football. 脚踢球，往球门送。"
+        },
+        {
+          "say": "看带网的球门和下面的球。喜欢踢足球，就说这一句。"
+        },
+        {
+          "say": "I like football."
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "Basketball. 手把球往篮筐投。"
+        },
+        {
+          "say": "篮球是有弧线的球，这张旁边还有篮筐。"
+        },
+        {
+          "say": "I like basketball."
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "Ping-pong. 小球、球拍和中间有网的球桌。"
+        },
+        {
+          "say": "I like ping-pong."
+        },
+        {
+          "say": "再听到运动名，就找对应的球或器材。"
+        }
+      ]
+    },
+    {
+      "key": "i-can-like-two",
+      "type": "slide",
+      "title": "我开口，说我的喜好",
+      "template": "two-columns",
+      "data": {
+        "title": "我开口，说我的喜好",
+        "left": {
+          "heading": "I like football.",
+          "body": "拿话筒的人介绍自己。"
+        },
+        "left_picture": "sport-i-football",
+        "right": {
+          "heading": "and",
+          "body": "同一个人可以喜欢两项。"
+        },
+        "right_picture": "sport-i-foot-basket"
+      },
+      "script": [
+        {
+          "say": "照片里有别人也在听。要知道谁说话，先找小话筒。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "话筒在小雨的头像上方。她是在介绍自己。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "I like football."
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "句子开头的 I 指小雨自己。旁边听的人不算进去。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "小雨接着放上篮球图。她还喜欢篮球。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "I like football and basketball."
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "And 把两项连起来。足球和篮球都是她喜欢的。"
+        },
+        {
+          "say": "说喜好要听本人怎么说。手里没拿球，也可以喜欢。"
+        }
+      ]
+    },
+    {
+      "key": "speaker-and-group",
+      "type": "slide",
+      "title": "两组都有人，谁在说话",
+      "template": "two-columns",
+      "data": {
+        "title": "两组都有人，谁在说话",
+        "left": {
+          "heading": "We like football.",
+          "body": "说话的人也在这组。"
+        },
+        "left_picture": "sport-we-football",
+        "right": {
+          "heading": "They like football.",
+          "body": "说话的人在这组外。"
+        },
+        "right_picture": "sport-they-football"
+      },
+      "script": [
+        {
+          "say": "两张照片里的队员一样。要听出 we 和 they，光数人数行吗？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "话筒在小雨上方。她和小林一起站在队里。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "We like football."
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "We 里有小雨自己，也有她身边的队友。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "话筒移到组外同学的头像上方。她在介绍同一组。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "They like football."
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "They 指她说到的那两个人，发话的同学没算在里面。"
+        },
+        {
+          "say": "同一组，换个人来说，句子开头就可能换。"
+        },
+        {
+          "say": "等会儿来听运动台的语音。先留心话筒在哪里。"
+        },
+        {
+          "say": "I like basketball."
+        },
+        {
+          "say": "We like ping-pong."
+        },
+        {
+          "say": "They like ping-pong."
+        },
+        {
+          "say": "They like basketball."
+        },
+        {
+          "say": "等照片慢下来，看看话筒，再瞄准。"
+        },
+        {
+          "say": "看谁拿话筒，重听是哪组和哪项运动。"
+        },
+        {
+          "say": "说话的人和运动都找对啦。"
+        }
+      ]
+    },
+    {
+      "key": "aim-the-club",
+      "type": "interactive",
+      "title": "听谁在说，瞄准报名图",
+      "page": "aim-the-club",
+      "widgetType": "game",
+      "startImage": "sport-stage",
+      "script": [
+        {
+          "say": "运动台发来大照片。先听要选哪张，再让弹珠去找。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "pause": true,
+            "level": 1
+          }
+        },
+        {
+          "highlight": "#game-target"
+        },
+        {
+          "say": "先找拿话筒的人。她也在足球队里，所以听的是 we。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "看炮口的虚线。先让虚线朝这张照片。"
+        },
+        {
+          "highlight": "#demo-sport-controls"
+        },
+        {
+          "say": "点左右箭头调方向。对正以后，再点发射。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "我打中这一张。两个人都在，说话的人也在队里。"
+        },
+        {
+          "say": "轮到你了。别光数两个头，看看话筒是谁拿的。"
+        },
+        {
+          "say": "听见篮球或乒乓球，再找相应器材。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "pause": false,
+            "level": 1
+          }
+        }
+      ],
+      "gameAudio": {
+        "we-foot": "speaker-and-group-5",
+        "they-foot": "speaker-and-group-11",
+        "i-basket": "speaker-and-group-16",
+        "we-ping": "speaker-and-group-17",
+        "they-ping": "speaker-and-group-18",
+        "they-basket": "speaker-and-group-19",
+        "b-help": "speaker-and-group-20",
+        "b-hint": "speaker-and-group-21",
+        "b-good": "speaker-and-group-22"
+      }
+    },
+    {
+      "key": "same-preference",
+      "type": "slide",
+      "title": "也喜欢，就能一起玩",
+      "template": "two-columns",
+      "data": {
+        "title": "也喜欢，就能一起玩",
+        "left": {
+          "heading": "We like football, too.",
+          "body": "你喜欢，我们也喜欢。"
+        },
+        "left_picture": "sport-shared-foot",
+        "right": {
+          "heading": "Let's play together.",
+          "body": "邀请伙伴一起玩。"
+        },
+        "right_picture": "sport-play-ping"
+      },
+      "script": [
+        {
+          "say": "小雨选了足球。旁边两位同学听了，也选了足球图。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "一边是小雨。另一边两位朋友的图里也是足球。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "We like football, too."
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "Too 是也。小雨说喜欢足球，这一组也喜欢同一项。"
+        },
+        {
+          "say": "如果他们选的是篮球，就不能说也喜欢足球。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "两位朋友也喜欢乒乓球，约好到球桌两边一起打。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "Let's play together."
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "Together 是一起。邀请朋友，就把这句话说给他听。"
+        },
+        {
+          "say": "Let's play with the ball."
+        },
+        {
+          "say": "Play with the ball，是用这只球玩。等朋友点头再一起玩。"
+        }
+      ]
+    },
+    {
+      "key": "plan-the-clubs",
+      "type": "slide",
+      "title": "按说过的喜好，排运动区",
+      "template": "two-columns",
+      "data": {
+        "title": "按说过的喜好，排运动区",
+        "left": {
+          "heading": "What do you like?",
+          "body": "先听他自己说。"
+        },
+        "left_picture": "sport-i-ping",
+        "right": {
+          "heading": "I like ping-pong.",
+          "body": "他选乒乓球区。"
+        },
+        "right_picture": "sport-ping-table"
+      },
+      "script": [
+        {
+          "say": "报名前先听本人。老师拿到报名卡，就给他找合适的运动区。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "小雨说喜欢乒乓球，卡上画的是她选的项目。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "What do you like?"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "问他喜欢什么，让他说自己的喜好。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "I like ping-pong."
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "再认右边的场地。球桌中间有网，正是乒乓球区。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "卡上是球拍，场地画的是球桌，两幅图指同一项。"
+        },
+        {
+          "say": "先让两张报名卡去合适的运动区。"
+        },
+        {
+          "say": "这回有三种运动。看清每张卡上的动作。"
+        },
+        {
+          "say": "两个孩子都喜欢篮球。各给他们留一个位置。"
+        },
+        {
+          "say": "看卡上喜欢哪项，场地上有什么器材。"
+        },
+        {
+          "say": "先绕到卡后面。需要改路线就按撤回。"
+        },
+        {
+          "say": "这组的报名卡已经到自己的运动区。"
+        }
+      ]
+    },
+    {
+      "key": "sort-the-clubs",
+      "type": "interactive",
+      "title": "推报名卡，送到同一运动区",
+      "page": "sort-the-clubs",
+      "widgetType": "game",
+      "startImage": "sport-stage",
+      "script": [
+        {
+          "say": "三种运动各有活动区。我们推报名卡过去。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "pause": true,
+            "level": 1
+          }
+        },
+        {
+          "highlight": "#game-target"
+        },
+        {
+          "say": "先看眼前的卡。这位朋友说喜欢足球。"
+        },
+        {
+          "highlight": "#demo-football-dock"
+        },
+        {
+          "say": "看到带网的球门吗？这里踢足球，送这边才对。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "小推车要走到卡后面，朝空着的运动区推。"
+        },
+        {
+          "highlight": "#demo-depot-controls"
+        },
+        {
+          "say": "箭头推卡。想换路线，可以点回转箭头。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "我把这张送到球门区。它停好了，不能再乱推。"
+        },
+        {
+          "say": "现在你来。先认他喜欢什么，再绕到卡后。"
+        },
+        {
+          "say": "如果卡不肯进去，看看这里是不是另一项运动。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "pause": false,
+            "level": 1
+          }
+        }
+      ],
+      "gameAudio": {
+        "d-first": "plan-the-clubs-14",
+        "d-second": "plan-the-clubs-15",
+        "d-third": "plan-the-clubs-16",
+        "d-hint": "plan-the-clubs-17",
+        "d-help": "plan-the-clubs-18",
+        "d-good": "plan-the-clubs-19"
+      }
+    },
+    {
+      "key": "picture-check",
+      "type": "quiz",
+      "title": "新一轮广播，听图选照片",
+      "intro": [
+        "听口令，先找拿话筒的人。",
+        "照片很像时，再听一遍运动的名称。"
+      ],
+      "questions": [
+        {
+          "id": "one-speaker",
+          "question": "I like basketball.",
+          "skill": "同项运动听辨 I 与 we",
+          "answer": [
+            "B"
+          ],
+          "analysis": "话筒在中间，B图只圈了这个人和篮球。A图框住中间和右边两人；C图选的是足球。",
+          "visual": {
+            "kind": "asset",
+            "image": "sport-reporter",
+            "alt": "小小运动广播员"
+          },
+          "options": {
+            "A": {
+              "label": "同队两人喜欢篮球",
+              "visual": {
+                "kind": "asset",
+                "image": "sport-quiz-we-basket",
+                "alt": "同队两人喜欢篮球"
+              }
+            },
+            "B": {
+              "label": "拿话筒的人自己喜欢篮球",
+              "visual": {
+                "kind": "asset",
+                "image": "sport-quiz-i-basket",
+                "alt": "拿话筒的人自己喜欢篮球"
+              }
+            },
+            "C": {
+              "label": "拿话筒的人自己喜欢足球",
+              "visual": {
+                "kind": "asset",
+                "image": "sport-quiz-i-foot",
+                "alt": "拿话筒的人自己喜欢足球"
+              }
+            }
+          }
+        },
+        {
+          "id": "our-football",
+          "question": "We like football.",
+          "skill": "两人组时判断发话者是不是组员",
+          "answer": [
+            "C"
+          ],
+          "analysis": "右图说话的人是足球组的一员。左图从组外介绍他们；中间是在讲自己。",
+          "visual": {
+            "kind": "asset",
+            "image": "sport-reporter",
+            "alt": "小小运动广播员"
+          },
+          "options": {
+            "A": {
+              "label": "组外主持人介绍足球组",
+              "visual": {
+                "kind": "asset",
+                "image": "sport-quiz-they-foot",
+                "alt": "组外主持人介绍足球组"
+              }
+            },
+            "B": {
+              "label": "一个孩子说自己喜欢足球",
+              "visual": {
+                "kind": "asset",
+                "image": "sport-quiz-i-foot",
+                "alt": "一个孩子说自己喜欢足球"
+              }
+            },
+            "C": {
+              "label": "拿话筒的人在足球组里",
+              "visual": {
+                "kind": "asset",
+                "image": "sport-quiz-we-foot",
+                "alt": "拿话筒的人在足球组里"
+              }
+            }
+          }
+        },
+        {
+          "id": "other-pair",
+          "question": "They like ping-pong.",
+          "skill": "听辨 they 和运动双条件",
+          "answer": [
+            "A"
+          ],
+          "analysis": "左图发话者指向另外一组，图上是乒乓球。中间是我们，右图是篮球。",
+          "visual": {
+            "kind": "asset",
+            "image": "sport-reporter",
+            "alt": "小小运动广播员"
+          },
+          "options": {
+            "A": {
+              "label": "发话者说另一组喜欢乒乓球",
+              "visual": {
+                "kind": "asset",
+                "image": "sport-quiz-they-ping",
+                "alt": "发话者说另一组喜欢乒乓球"
+              }
+            },
+            "B": {
+              "label": "发话者在乒乓球组里",
+              "visual": {
+                "kind": "asset",
+                "image": "sport-quiz-we-ping",
+                "alt": "发话者在乒乓球组里"
+              }
+            },
+            "C": {
+              "label": "发话者说另一组喜欢篮球",
+              "visual": {
+                "kind": "asset",
+                "image": "sport-quiz-they-basket",
+                "alt": "发话者说另一组喜欢篮球"
+              }
+            }
+          }
+        },
+        {
+          "id": "same-team",
+          "question": "We like football, too.",
+          "skill": "听 too 找到共同喜好",
+          "answer": [
+            "B"
+          ],
+          "analysis": "题图已经选了足球。中间这组也喜欢足球，才可以说 too。",
+          "visual": {
+            "kind": "asset",
+            "image": "sport-quiz-i-foot",
+            "alt": "一位孩子说自己喜欢足球"
+          },
+          "options": {
+            "A": {
+              "label": "一组喜欢篮球",
+              "visual": {
+                "kind": "asset",
+                "image": "sport-quiz-we-basket",
+                "alt": "一组喜欢篮球"
+              }
+            },
+            "B": {
+              "label": "一组也喜欢足球",
+              "visual": {
+                "kind": "asset",
+                "image": "sport-quiz-we-foot",
+                "alt": "一组也喜欢足球"
+              }
+            },
+            "C": {
+              "label": "一组喜欢乒乓球",
+              "visual": {
+                "kind": "asset",
+                "image": "sport-quiz-we-ping",
+                "alt": "一组喜欢乒乓球"
+              }
+            }
+          }
+        },
+        {
+          "id": "two-sports",
+          "question": "I like football and basketball.",
+          "skill": "听出 and 连起来的两种喜好",
+          "answer": [
+            "B"
+          ],
+          "analysis": "中间同时有足球和篮球。左边只有足球，右边第二项是乒乓球。",
+          "visual": {
+            "kind": "asset",
+            "image": "sport-reporter",
+            "alt": "小小运动广播员"
+          },
+          "options": {
+            "A": {
+              "label": "一个孩子只选足球",
+              "visual": {
+                "kind": "asset",
+                "image": "sport-quiz-i-foot",
+                "alt": "一个孩子只选足球"
+              }
+            },
+            "B": {
+              "label": "一个孩子选足球和篮球",
+              "visual": {
+                "kind": "asset",
+                "image": "sport-quiz-i-both",
+                "alt": "一个孩子选足球和篮球"
+              }
+            },
+            "C": {
+              "label": "一个孩子选足球和乒乓球",
+              "visual": {
+                "kind": "asset",
+                "image": "sport-quiz-i-foot-ping",
+                "alt": "一个孩子选足球和乒乓球"
+              }
+            }
+          }
+        },
+        {
+          "id": "invite-partner",
+          "question": "Let's play ping-pong together.",
+          "skill": "听懂一起玩并找对运动",
+          "answer": [
+            "C"
+          ],
+          "analysis": "右图两个人在同一张球桌两边一起打。左图一人，另一幅是篮球。",
+          "visual": {
+            "kind": "asset",
+            "image": "sport-reporter",
+            "alt": "小小运动广播员"
+          },
+          "options": {
+            "A": {
+              "label": "一个人在球桌边",
+              "visual": {
+                "kind": "asset",
+                "image": "sport-quiz-play-alone",
+                "alt": "一个人在球桌边"
+              }
+            },
+            "B": {
+              "label": "两个人一起打篮球",
+              "visual": {
+                "kind": "asset",
+                "image": "sport-quiz-play-basket",
+                "alt": "两个人一起打篮球"
+              }
+            },
+            "C": {
+              "label": "两个人在一张球桌两边打乒乓球",
+              "visual": {
+                "kind": "asset",
+                "image": "sport-quiz-play-ping",
+                "alt": "两个人在一张球桌两边打乒乓球"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "closing",
+      "type": "slide",
+      "title": "把你的喜好说给家人听",
+      "template": "summary",
+      "data": {
+        "title": "把你的喜好说给家人听",
+        "items": [
+          "I　只介绍自己。",
+          "We　说话人也在这组。",
+          "They　说另外那一组。",
+          "Too　也喜欢同一项。",
+          "和家人做一张喜好卡。"
+        ]
+      },
+      "script": [
+        {
+          "say": "社团报名结束了。现在，把今天的诀窍说一遍。"
+        },
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "说我喜欢，开头用 I。后面接 like，再说喜好。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "说我们喜欢，把自己和伙伴一起算进去。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "介绍另外一组，发话的人不在那组里，用 they。"
+        },
+        {
+          "spotlight": "item-4"
+        },
+        {
+          "say": "听见 too，就找双方都喜欢的那一项。"
+        },
+        {
+          "spotlight": "item-5"
+        },
+        {
+          "say": "回家各画一种运动。先轮流说自己喜欢什么。"
+        },
+        {
+          "say": "你们都喜欢足球时，说 We like football."
+        },
+        {
+          "say": "如果不一样，听清后把各自的卡摆好。"
+        },
+        {
+          "say": "请家人亲耳听你开口说，轮到你再问他。"
+        },
+        {
+          "say": "另外两位家人都喜欢篮球，你来介绍他们。"
+        },
+        {
+          "say": "They like basketball."
+        },
+        {
+          "say": "请大人看画，听听你说的是不是画里的喜好。"
+        }
+      ]
+    }
+  ]
+}

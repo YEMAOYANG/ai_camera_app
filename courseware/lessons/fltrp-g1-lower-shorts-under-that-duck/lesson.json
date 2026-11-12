@@ -1,0 +1,1025 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "There's a pair of shorts under that duck.",
+  "description": "到海边失物台，听清衣物、位置与归属。",
+  "grade": 1,
+  "roster": {
+    "mia": {
+      "name": "Mia 老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Jennifer",
+      "avatar": "/teachers/coco-english-v1.png",
+      "color": "#557B76",
+      "persona": "先指图再用简短句子教孩子听清衣物、位置和归属。"
+    }
+  },
+  "images": {
+    "shore-cart": {
+      "file": "assets/shore-cart.png"
+    },
+    "shore-leo-short": {
+      "file": "assets/shore-leo-short.png"
+    },
+    "shore-leo": {
+      "file": "assets/shore-leo.png"
+    },
+    "shore-look-far": {
+      "file": "assets/shore-look-far.png"
+    },
+    "shore-navy-pair": {
+      "file": "assets/shore-navy-pair.png"
+    },
+    "shore-nina-short": {
+      "file": "assets/shore-nina-short.png"
+    },
+    "shore-nina": {
+      "file": "assets/shore-nina.png"
+    },
+    "shore-pick-beside": {
+      "file": "assets/shore-pick-beside.png"
+    },
+    "shore-pick-under": {
+      "file": "assets/shore-pick-under.png"
+    },
+    "shore-quiz-far-shoes": {
+      "file": "assets/shore-quiz-far-shoes.png"
+    },
+    "shore-quiz-far-socks": {
+      "file": "assets/shore-quiz-far-socks.png"
+    },
+    "shore-quiz-her-shoes": {
+      "file": "assets/shore-quiz-her-shoes.png"
+    },
+    "shore-quiz-her-socks": {
+      "file": "assets/shore-quiz-her-socks.png"
+    },
+    "shore-quiz-his-shoes": {
+      "file": "assets/shore-quiz-his-shoes.png"
+    },
+    "shore-quiz-mixed-shoes": {
+      "file": "assets/shore-quiz-mixed-shoes.png"
+    },
+    "shore-quiz-near-socks": {
+      "file": "assets/shore-quiz-near-socks.png"
+    },
+    "shore-quiz-one-shoe": {
+      "file": "assets/shore-quiz-one-shoe.png"
+    },
+    "shore-quiz-one-sock": {
+      "file": "assets/shore-quiz-one-sock.png"
+    },
+    "shore-quiz-pair-shoes": {
+      "file": "assets/shore-quiz-pair-shoes.png"
+    },
+    "shore-quiz-pair-socks": {
+      "file": "assets/shore-quiz-pair-socks.png"
+    },
+    "shore-quiz-shorts-above": {
+      "file": "assets/shore-quiz-shorts-above.png"
+    },
+    "shore-quiz-shorts-beside": {
+      "file": "assets/shore-quiz-shorts-beside.png"
+    },
+    "shore-quiz-shorts-under": {
+      "file": "assets/shore-quiz-shorts-under.png"
+    },
+    "shore-quiz-three-socks": {
+      "file": "assets/shore-quiz-three-socks.png"
+    },
+    "shore-quiz-two-shorts": {
+      "file": "assets/shore-quiz-two-shorts.png"
+    },
+    "shore-shirt": {
+      "file": "assets/shore-shirt.png"
+    },
+    "shore-shoe": {
+      "file": "assets/shore-shoe.png"
+    },
+    "shore-shoes": {
+      "file": "assets/shore-shoes.png"
+    },
+    "shore-shorts-beside": {
+      "file": "assets/shore-shorts-beside.png"
+    },
+    "shore-shorts-under": {
+      "file": "assets/shore-shorts-under.png"
+    },
+    "shore-socks": {
+      "file": "assets/shore-socks.png"
+    },
+    "shore-stage": {
+      "file": "assets/shore-stage.png"
+    },
+    "shore-sticker": {
+      "file": "assets/shore-sticker.png"
+    },
+    "shore-teal-shorts": {
+      "file": "assets/shore-teal-shorts.png"
+    },
+    "shore-traffic": {
+      "file": "assets/shore-traffic.png"
+    },
+    "shore-van-run": {
+      "file": "assets/shore-van-run.png"
+    },
+    "shore-van": {
+      "file": "assets/shore-van.png"
+    },
+    "shore-quiz-one-shorts": {
+      "file": "assets/shore-quiz-one-shorts.png"
+    },
+    "shore-quiz-one-shirt": {
+      "file": "assets/shore-quiz-one-shirt.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "at-the-booth",
+      "type": "slide",
+      "title": "海边失物台，今天你值班",
+      "template": "title-picture",
+      "data": {
+        "title": "海边失物台，今天你值班",
+        "picture": "shore-stage",
+        "caption": "找衣物，再找主人。"
+      },
+      "script": [
+        {
+          "say": "今天我们在海边帮忙。有人来失物台找衣服。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "看看这个棚子。捡到的东西可以拿到这里。"
+        },
+        {
+          "say": "在海边要和大人待在一起。我们在木栏这边帮忙。"
+        },
+        {
+          "say": "Clothes. 这些都是衣物。我们会看到好几种。"
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "先说在哪里找到的，再听是谁的。"
+        },
+        {
+          "say": "只说有衣服，来领的人还不知道去哪里找。"
+        },
+        {
+          "say": "接下来我们看一件和一组，学会说得更清楚。"
+        }
+      ]
+    },
+    {
+      "key": "meet-the-clothes",
+      "type": "slide",
+      "title": "一件衬衫，一条短裤",
+      "template": "two-columns",
+      "data": {
+        "title": "一件衬衫，一条短裤",
+        "left": {
+          "heading": "a shirt",
+          "body": "一件衬衫"
+        },
+        "left_picture": "shore-shirt",
+        "right": {
+          "heading": "a pair of shorts",
+          "body": "一条短裤"
+        },
+        "right_picture": "shore-teal-shorts"
+      },
+      "script": [
+        {
+          "say": "桌面上有两种衣服，先看看领口和裤腿。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "左边有领子，还有两只袖子。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "A shirt. It is a shirt."
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "整件可以拿起来，我们说一件衬衫。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "再看右边。两条裤腿连在同一个裤腰上。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "A pair of shorts."
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "从裤腰提起来，是完整的一条短裤。"
+        },
+        {
+          "say": "Shorts 听起来像复数。我们用这一组词说一条。"
+        },
+        {
+          "say": "要说那里有一条，听这一句。"
+        },
+        {
+          "say": "There's a pair of shorts."
+        }
+      ]
+    },
+    {
+      "key": "shoe-pairs",
+      "type": "slide",
+      "title": "两只配起来，才是一双",
+      "template": "two-columns",
+      "data": {
+        "title": "两只配起来，才是一双",
+        "left": {
+          "heading": "a pair of shoes",
+          "body": "同款两只，配一双。"
+        },
+        "left_picture": "shore-shoes",
+        "right": {
+          "heading": "a pair of socks",
+          "body": "也要有配对的两只。"
+        },
+        "right_picture": "shore-socks"
+      },
+      "script": [
+        {
+          "say": "鞋和袜要凑在一起穿。找出两只，才算一双。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "看左图。一只、另一只，式样相同，可以配在一起。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "A pair of shoes."
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "左脚一只，右脚一只，两只能配着穿。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "袜子也一样。把同一款的两只放到一起。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "A pair of socks."
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "一只袜子还少了伙伴。两只配起来，才是一双。"
+        },
+        {
+          "say": "听三轮要用的口令。小车可以先等到落点下方。"
+        },
+        {
+          "say": "接一双鞋，剩的一只放到另一篮。"
+        },
+        {
+          "say": "两篮都配成双。先接一只，再给它找伙伴。"
+        },
+        {
+          "say": "这一轮落得更快。每篮仍装成一双。"
+        },
+        {
+          "say": "先数空格，再把整组鞋接进篮。"
+        },
+        {
+          "say": "只掉下一只，就找还差一只的篮。"
+        },
+        {
+          "say": "配成双了。篮里有能一起穿的两只。"
+        }
+      ]
+    },
+    {
+      "key": "catch-the-shoes",
+      "type": "interactive",
+      "title": "接鞋配成双",
+      "page": "catch-the-shoes",
+      "widgetType": "game",
+      "startImage": "shore-stage",
+      "script": [
+        {
+          "say": "失物台旁来了落鞋车。我们要把两只鞋配起来。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "pause": true,
+            "level": 1
+          }
+        },
+        {
+          "highlight": "#game-target"
+        },
+        {
+          "say": "看这次一起落下几只。它们会落到左边亮线。"
+        },
+        {
+          "highlight": "#game-goal"
+        },
+        {
+          "say": "这个篮有两个空格，刚好能放下这一双。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "推车先开到亮线下，再等鞋落进篮。"
+        },
+        {
+          "highlight": "#demo-catch-pad"
+        },
+        {
+          "say": "点左右箭头挪车，双箭头可以换另一只篮。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "我先接一起落下的两只。这两只是一双。"
+        },
+        {
+          "say": "换你来。两只一起来，就找有两个空格的篮。"
+        },
+        {
+          "say": "要是已经有一只，另接一只就能配成双。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "pause": false,
+            "level": 1
+          }
+        }
+      ],
+      "gameAudio": {
+        "round-one": "shoe-pairs-15",
+        "round-two": "shoe-pairs-16",
+        "round-three": "shoe-pairs-17",
+        "pair-hint": "shoe-pairs-18",
+        "pair-help": "shoe-pairs-19",
+        "pair-good": "shoe-pairs-20"
+      }
+    },
+    {
+      "key": "find-a-location",
+      "type": "slide",
+      "title": "先找到鸭子，再看短裤在哪",
+      "template": "two-columns",
+      "data": {
+        "title": "先找到鸭子，再看短裤在哪",
+        "left": {
+          "heading": "under that duck",
+          "body": "在那只鸭子下面。"
+        },
+        "left_picture": "shore-shorts-under",
+        "right": {
+          "heading": "over there",
+          "body": "在那边。"
+        },
+        "right_picture": "shore-look-far"
+      },
+      "script": [
+        {
+          "say": "有人问短裤在哪儿。我们能用鸭子帮他找到。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "先指玩具鸭。往它正下面看，有一条青短裤。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "Under that duck."
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "Under 指在下面。先找那只鸭，才知道往哪儿看。"
+        },
+        {
+          "say": "There's a pair of shorts."
+        },
+        {
+          "say": "Under that duck. 现在把两段连起来试试。"
+        },
+        {
+          "say": "There's a pair of shorts under it."
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "小朋友在画面近处。深蓝鞋离他更远。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "Over there. 在那边。一起向他前面的远处指。"
+        },
+        {
+          "say": "There's a pair of shoes over there."
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "那里有配成双的两只鞋。手指的是它们的位置。"
+        },
+        {
+          "say": "说的时候先说发现了什么，再把位置说清。"
+        }
+      ]
+    },
+    {
+      "key": "same-clothes-new-place",
+      "type": "slide",
+      "title": "同一条短裤，摆放不同",
+      "template": "two-columns",
+      "data": {
+        "title": "同一条短裤，摆放不同",
+        "left": {
+          "heading": "under",
+          "body": "在鸭子下面。"
+        },
+        "left_picture": "shore-shorts-under",
+        "right": {
+          "heading": "by the duck",
+          "body": "在鸭子旁边。"
+        },
+        "right_picture": "shore-shorts-beside"
+      },
+      "script": [
+        {
+          "say": "两张图都是这条青短裤。听到 under 要选哪张？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "从鸭子往下看。左图的短裤就在正下方。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "Under the duck. 这张符合。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "用手指从鸭子向下划，正好能指到短裤。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "右图的短裤也很近。用手从鸭子向下划试试。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "要向右划才找到，所以它在旁边。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "贴得近，和在下面，不是同一个位置。"
+        },
+        {
+          "say": "两张都有青短裤。要选对，还得把位置听清。"
+        }
+      ]
+    },
+    {
+      "key": "owners",
+      "type": "slide",
+      "title": "认清是谁的，再把衣物送回",
+      "template": "two-columns",
+      "data": {
+        "title": "认清是谁的，再把衣物送回",
+        "left": {
+          "heading": "his shorts",
+          "body": "Leo 的短裤。"
+        },
+        "left_picture": "shore-leo-short",
+        "right": {
+          "heading": "her shorts",
+          "body": "Nina 的短裤。"
+        },
+        "right_picture": "shore-nina-short"
+      },
+      "script": [
+        {
+          "say": "东西在哪儿和东西是谁的，要分成两步。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "这是男孩 Leo。相片下面，是他原来带的黄短裤。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "They're his shorts."
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "His 指他的。听到 his，先认出 Leo 的相片。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "这是女孩 Nina。她的照片下面有青短裤。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "They're her shorts."
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "Her 指她的。听到 her，先找 Nina 的相片。"
+        },
+        {
+          "say": "两个人都穿绿上衣。不能拿颜色来猜是谁的。"
+        },
+        {
+          "say": "给别人找东西，第一句说在哪里，第二句说是谁的。"
+        },
+        {
+          "say": "下面几句是邮车口令，耳朵听，手先等一等。"
+        },
+        {
+          "say": "Find the shorts under the duck."
+        },
+        {
+          "say": "Pick the pair of navy shoes."
+        },
+        {
+          "say": "Pick the pair of purple socks."
+        },
+        {
+          "say": "They're her shoes. Deliver them."
+        },
+        {
+          "say": "They're his socks. Deliver them."
+        },
+        {
+          "say": "They're her shorts. Deliver them."
+        },
+        {
+          "say": "先听清衣物。如果说了鸭子，再核对位置。"
+        },
+        {
+          "say": "图太像了就重听。再看衣服和人物相片。"
+        },
+        {
+          "say": "位置和主人都对，衣物送到了。"
+        }
+      ]
+    },
+    {
+      "key": "deliver-to-owners",
+      "type": "interactive",
+      "title": "听两句，帮衣服找主人",
+      "page": "deliver-to-owners",
+      "widgetType": "game",
+      "startImage": "shore-stage",
+      "script": [
+        {
+          "say": "邮车准备好了。先找那件衣物，再听该送给谁。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "pause": true,
+            "level": 1
+          }
+        },
+        {
+          "highlight": "#game-target"
+        },
+        {
+          "say": "口令说在鸭子下面。这条短裤摆在鸭子正下方。"
+        },
+        {
+          "highlight": "#demo-nina"
+        },
+        {
+          "say": "听到她的短裤，送到 Nina 的照片。先记住她。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "绿车停在这里。用箭头挪到短裤的取货格。"
+        },
+        {
+          "highlight": "#demo-deliver-pad"
+        },
+        {
+          "say": "车停稳再点包裹。路上有车，等空了再过。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "我只示范取货。右边小框有短裤，就取成功了。"
+        },
+        {
+          "say": "现在你来。要先选对位置，再送到对应的照片。"
+        },
+        {
+          "say": "如果取错，同色衣物先别选。重听位置那句话。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "pause": false,
+            "level": 1
+          }
+        }
+      ],
+      "gameAudio": {
+        "under": "owners-17",
+        "navy": "owners-18",
+        "socks": "owners-19",
+        "her-shoes": "owners-20",
+        "his-socks": "owners-21",
+        "her-shorts": "owners-22",
+        "route-hint": "owners-23",
+        "route-help": "owners-24",
+        "route-good": "owners-25"
+      }
+    },
+    {
+      "key": "picture-check",
+      "type": "quiz",
+      "title": "听口令，认新的失物照片",
+      "intro": [
+        "新照片来了。每题先听衣物，再听位置或是谁的。",
+        "两个画面很像时，可以再听一遍。"
+      ],
+      "questions": [
+        {
+          "id": "one-garment",
+          "question": "A pair of shorts. Find it.",
+          "skill": "区别一条短裤、两条短裤和一件衬衫",
+          "answer": [
+            "B"
+          ],
+          "analysis": "中间只有一条，裤腰和两条裤腿连在一起。左边两条，右边有领子，是衬衫。",
+          "visual": {
+            "kind": "asset",
+            "image": "shore-sticker",
+            "alt": "失物台的太阳贴纸"
+          },
+          "options": {
+            "A": {
+              "label": "两条红短裤",
+              "visual": {
+                "kind": "asset",
+                "image": "shore-quiz-two-shorts",
+                "alt": "两条红短裤"
+              }
+            },
+            "B": {
+              "label": "一条红短裤",
+              "visual": {
+                "kind": "asset",
+                "image": "shore-quiz-one-shorts",
+                "alt": "一条红短裤"
+              }
+            },
+            "C": {
+              "label": "一件条纹衬衫",
+              "visual": {
+                "kind": "asset",
+                "image": "shore-quiz-one-shirt",
+                "alt": "一件条纹衬衫"
+              }
+            }
+          }
+        },
+        {
+          "id": "two-shoes",
+          "question": "There's a pair of shoes. Find it.",
+          "skill": "选能一起穿的一双鞋",
+          "answer": [
+            "C"
+          ],
+          "analysis": "右图两只都是同款雨鞋。左图只有一只，中间是两只不同款，不能在这里配成一双。",
+          "visual": {
+            "kind": "asset",
+            "image": "shore-sticker",
+            "alt": "失物台的太阳贴纸"
+          },
+          "options": {
+            "A": {
+              "label": "一只红雨鞋",
+              "visual": {
+                "kind": "asset",
+                "image": "shore-quiz-one-shoe",
+                "alt": "一只红雨鞋"
+              }
+            },
+            "B": {
+              "label": "一只雨鞋和一只运动鞋",
+              "visual": {
+                "kind": "asset",
+                "image": "shore-quiz-mixed-shoes",
+                "alt": "一只雨鞋和一只运动鞋"
+              }
+            },
+            "C": {
+              "label": "两只同款红雨鞋",
+              "visual": {
+                "kind": "asset",
+                "image": "shore-quiz-pair-shoes",
+                "alt": "两只同款红雨鞋"
+              }
+            }
+          }
+        },
+        {
+          "id": "two-socks",
+          "question": "Find a pair of socks.",
+          "skill": "把一双迁移到袜子并区别单只和三只",
+          "answer": [
+            "A"
+          ],
+          "analysis": "左边正好是两只同款袜子。中间有三只，右边只有一只。",
+          "visual": {
+            "kind": "asset",
+            "image": "shore-sticker",
+            "alt": "失物台的太阳贴纸"
+          },
+          "options": {
+            "A": {
+              "label": "两只条纹袜",
+              "visual": {
+                "kind": "asset",
+                "image": "shore-quiz-pair-socks",
+                "alt": "两只条纹袜"
+              }
+            },
+            "B": {
+              "label": "三只条纹袜",
+              "visual": {
+                "kind": "asset",
+                "image": "shore-quiz-three-socks",
+                "alt": "三只条纹袜"
+              }
+            },
+            "C": {
+              "label": "一只条纹袜",
+              "visual": {
+                "kind": "asset",
+                "image": "shore-quiz-one-sock",
+                "alt": "一只条纹袜"
+              }
+            }
+          }
+        },
+        {
+          "id": "under-duck",
+          "question": "Find the shorts under the duck.",
+          "skill": "听 under 后以指定鸭子为参照",
+          "answer": [
+            "B"
+          ],
+          "analysis": "三张的衣物都一样。中间短裤在鸭子正下方，其余在旁边或上面。",
+          "visual": {
+            "kind": "asset",
+            "image": "shore-sticker",
+            "alt": "失物台的太阳贴纸"
+          },
+          "options": {
+            "A": {
+              "label": "短裤在鸭旁边",
+              "visual": {
+                "kind": "asset",
+                "image": "shore-quiz-shorts-beside",
+                "alt": "短裤在鸭旁边"
+              }
+            },
+            "B": {
+              "label": "短裤在鸭下面",
+              "visual": {
+                "kind": "asset",
+                "image": "shore-quiz-shorts-under",
+                "alt": "短裤在鸭下面"
+              }
+            },
+            "C": {
+              "label": "短裤在鸭上方",
+              "visual": {
+                "kind": "asset",
+                "image": "shore-quiz-shorts-above",
+                "alt": "短裤在鸭上方"
+              }
+            }
+          }
+        },
+        {
+          "id": "her-shoes",
+          "question": "They're her shoes. Who has them?",
+          "skill": "同款衣物中听懂 her 并核对鞋的类别",
+          "answer": [
+            "C"
+          ],
+          "analysis": "右图是 Nina 和她的雨鞋。左图是男孩，另一幅 Nina 的图放的是袜子。",
+          "visual": {
+            "kind": "asset",
+            "image": "shore-sticker",
+            "alt": "失物台的太阳贴纸"
+          },
+          "options": {
+            "A": {
+              "label": "Leo 和一双红雨鞋",
+              "visual": {
+                "kind": "asset",
+                "image": "shore-quiz-his-shoes",
+                "alt": "Leo 和一双红雨鞋"
+              }
+            },
+            "B": {
+              "label": "Nina 和一双条纹袜",
+              "visual": {
+                "kind": "asset",
+                "image": "shore-quiz-her-socks",
+                "alt": "Nina 和一双条纹袜"
+              }
+            },
+            "C": {
+              "label": "Nina 和一双红雨鞋",
+              "visual": {
+                "kind": "asset",
+                "image": "shore-quiz-her-shoes",
+                "alt": "Nina 和一双红雨鞋"
+              }
+            }
+          }
+        },
+        {
+          "id": "over-there",
+          "question": "A pair of socks over there. Point.",
+          "skill": "同时确认物件和远处位置",
+          "answer": [
+            "A"
+          ],
+          "analysis": "左边是离 Nina 远的两只袜子。中间也是袜子，可是就在她旁边。右边放的是雨鞋。",
+          "visual": {
+            "kind": "asset",
+            "image": "shore-sticker",
+            "alt": "失物台的太阳贴纸"
+          },
+          "options": {
+            "A": {
+              "label": "离 Nina 远的一双袜",
+              "visual": {
+                "kind": "asset",
+                "image": "shore-quiz-far-socks",
+                "alt": "离 Nina 远的一双袜"
+              }
+            },
+            "B": {
+              "label": "在 Nina 旁边的一双袜",
+              "visual": {
+                "kind": "asset",
+                "image": "shore-quiz-near-socks",
+                "alt": "在 Nina 旁边的一双袜"
+              }
+            },
+            "C": {
+              "label": "离 Nina 远的一双雨鞋",
+              "visual": {
+                "kind": "asset",
+                "image": "shore-quiz-far-shoes",
+                "alt": "离 Nina 远的一双雨鞋"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "closing",
+      "type": "slide",
+      "title": "在家也可以开失物台",
+      "template": "summary",
+      "data": {
+        "title": "在家也可以开失物台",
+        "items": [
+          "一条短裤，裤腿连在一起。",
+          "一双鞋袜，能配着穿的两只。",
+          "先听位置，指给别人看。",
+          "再听归属，找对照片。",
+          "和家人轮流玩找衣物。"
+        ]
+      },
+      "script": [
+        {
+          "say": "失物都送回来了。我们一起说说今天怎样找。"
+        },
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "两条裤腿共用一个裤腰。整件是一条短裤。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "一只鞋或一只袜还不够。两只配着穿，就是一双。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "听到 under，先找说到的物，再看正下方。"
+        },
+        {
+          "say": "听到 over there，可以指向远处的那一组。"
+        },
+        {
+          "spotlight": "item-4"
+        },
+        {
+          "say": "取好以后听 his 或 her，再认照片里的主人。"
+        },
+        {
+          "spotlight": "item-5"
+        },
+        {
+          "say": "回家用玩具和一双鞋。把鞋摆在玩具下边。"
+        },
+        {
+          "say": "There's a pair of shoes under it."
+        },
+        {
+          "say": "请家人指给你看。再换他们摆，你来猜位置。"
+        },
+        {
+          "say": "你说的句子和动作，请家人听一听、看一看。"
+        }
+      ]
+    }
+  ]
+}

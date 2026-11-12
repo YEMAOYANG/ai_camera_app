@@ -1,0 +1,375 @@
+{
+  "schemaVersion": "mira.courseware.lesson-art-plan.v1",
+  "status": "registered_and_reviewed_offline",
+  "houseStyle": "细纸纹、哑光水粉、剪纸轮廓、深松绿和暖奶油底，橘杏点缀。无文字、数字、品牌。可见条件用代码控制。",
+  "pairReview": "保持三组同张纸角的位置、材色和既有折痕。俯视可找褶线走向，侧视清楚看同一处的隆起；不将模拟图当触感或耐拉。碎片、纸浆、湿网、干纸小图一眼可辨。",
+  "atlases": [
+    {
+      "atlasId": "paper-rebuild-states",
+      "rows": 2,
+      "columns": 3,
+      "background": "cream",
+      "assets": [
+        {
+          "assetKey": "paper-scraps",
+          "description": "A shallow cream tray holding clean ivory waste paper torn into many irregular dry scraps; silhouette stands apart from a bowl and a screen. No letters.",
+          "usedBy": [
+            "rebuild-paper-route",
+            "paper-from-paper"
+          ],
+          "crop": [
+            20,
+            20,
+            503,
+            502
+          ]
+        },
+        {
+          "assetKey": "paper-pulp",
+          "description": "One warm ochre bowl containing wet pale paper pulp, wood stirrer raised over soft wet gray mixture. Shallow clear rim, distinguish from flat screen.",
+          "usedBy": [
+            "rebuild-paper-route",
+            "paper-from-paper"
+          ],
+          "crop": [
+            525,
+            20,
+            1010,
+            502
+          ]
+        },
+        {
+          "assetKey": "paper-on-mesh",
+          "description": "One square wooden mould and visibly fine mesh with a thin, wet uneven fibrous sheet, several drops below mesh. No writing or paper packet.",
+          "usedBy": [
+            "rebuild-paper-route",
+            "paper-from-paper"
+          ],
+          "crop": [
+            1033,
+            20,
+            1516,
+            502
+          ]
+        },
+        {
+          "assetKey": "paper-dry",
+          "description": "One dry, lifted ivory handmade sheet with deckled edges held above a plain pine slatted drying rack. No droplets. Clear separation from wet mesh.",
+          "usedBy": [
+            "rebuild-paper-route",
+            "paper-from-paper"
+          ],
+          "crop": [
+            20,
+            523,
+            503,
+            1003
+          ]
+        },
+        {
+          "assetKey": "paper-scout-idle",
+          "description": "Tiny apricot delivery cart with one recognizable folded-paper emblem and two round pine wheels, facing right. Simple silhouette.",
+          "usedBy": [
+            "rebuild-paper-route"
+          ],
+          "crop": [
+            551,
+            603,
+            986,
+            962
+          ]
+        },
+        {
+          "assetKey": "paper-scout-bubble",
+          "description": "Same apricot cart as adjacent cell, same two wheels and direction, active pose with a single pale mint bubble clear of wheels. No text.",
+          "usedBy": [
+            "rebuild-paper-route"
+          ],
+          "crop": [
+            1063,
+            562,
+            1498,
+            962
+          ]
+        }
+      ]
+    },
+    {
+      "atlasId": "paper-workshop-scenes",
+      "rows": 3,
+      "columns": 3,
+      "background": "cream",
+      "assets": [
+        {
+          "assetKey": "paper-workshop-maze",
+          "description": "Flat quiet paper studio board texture, warm ivory and pine, no items, walls, arrows or labels.",
+          "usedBy": [
+            "rebuild-paper-route"
+          ],
+          "crop": [
+            16,
+            19,
+            408,
+            407
+          ]
+        },
+        {
+          "assetKey": "paper-workshop-cover",
+          "description": "Original school paper craft table with one simple folded paper parcel, a sheet with abstract nontext print blocks, and a few folded thin white tissues. Warm illustration, no logos.",
+          "usedBy": [
+            "paper-around-us"
+          ],
+          "crop": [
+            430,
+            19,
+            823,
+            407
+          ]
+        },
+        {
+          "assetKey": "four-paper-samples",
+          "description": "Four separate flat samples in left-to-right order kraft tan, pale gray abstract print blocks newsprint, bright ivory unprinted copy paper, thin slightly folded ivory tissue. Different edge thickness and surface texture. No words.",
+          "usedBy": [
+            "paper-around-us"
+          ],
+          "crop": [
+            845,
+            19,
+            1237,
+            407
+          ]
+        },
+        {
+          "assetKey": "paper-job-choices",
+          "description": "Two quiet original scenes in one card: tissue wiping a small drop at a school exhibition table, and tan kraft gift pouch carrying a tiny wood block. No letters or fragile weight.",
+          "usedBy": [
+            "choose-paper-for-use"
+          ],
+          "crop": [
+            430,
+            429,
+            823,
+            823
+          ]
+        },
+        {
+          "assetKey": "paper-tug-setup",
+          "description": "Two adult hands hold opposite sides of two visibly equal-width looped paper strips, tan kraft and pale ivory copy, interlinked like two chain links; hands not pinching the shared contact point. Safe tidy close crop.",
+          "usedBy": [
+            "paper-tug"
+          ],
+          "crop": [
+            845,
+            429,
+            1237,
+            823
+          ]
+        },
+        {
+          "assetKey": "paper-observer-camera",
+          "description": "Isolated original pine green paper workshop camera with a circular ochre lens, simple silhouette, no letters.",
+          "usedBy": [
+            "photograph-paper-shapes"
+          ],
+          "crop": [
+            16,
+            845,
+            408,
+            1235
+          ]
+        },
+        {
+          "assetKey": "paper-camera-table",
+          "description": "Quiet clean matte paper atelier worktop texture in muted warm brown, no objects or bright pattern.",
+          "usedBy": [
+            "photograph-paper-shapes"
+          ],
+          "crop": [
+            430,
+            845,
+            823,
+            1235
+          ]
+        },
+        {
+          "assetKey": "paper-fiber-methods",
+          "description": "Three original quiet mini-illustrations with obvious separation: a rectangle kraft sheet and its lightly crumpled spread sheet; an adult gently tears a small clean scrap; a magnifier reveals fibrous torn edge. No copying the textbook setup or lettering.",
+          "usedBy": [
+            "see-fibers"
+          ],
+          "crop": [
+            845,
+            845,
+            1237,
+            1235
+          ]
+        }
+      ]
+    },
+    {
+      "atlasId": "paper-new-picture-questions",
+      "rows": 2,
+      "columns": 3,
+      "background": "cream",
+      "assets": [
+        {
+          "assetKey": "quiz-paper-smooth-edge",
+          "description": "High-magnification macro of one smooth machine-cut ivory paper edge, clean straight line, no visible fuzzy fringe; dark pine background.",
+          "usedBy": [
+            "picture-quiz"
+          ],
+          "crop": [
+            11,
+            10,
+            503,
+            503
+          ]
+        },
+        {
+          "assetKey": "quiz-paper-frayed-edge",
+          "description": "High-magnification macro of one new ivory torn paper edge, very small fine wispy exposed fibers projecting irregularly from ragged edge; dark pine background, no actual print.",
+          "usedBy": [
+            "picture-quiz"
+          ],
+          "crop": [
+            522,
+            10,
+            1014,
+            503
+          ]
+        },
+        {
+          "assetKey": "quiz-paper-printed-center",
+          "description": "Macro of only the middle of a paper sheet with simple muted ink shapes, edges out of frame and no exposed torn fibers; pine green mat border.",
+          "usedBy": [
+            "picture-quiz"
+          ],
+          "crop": [
+            1034,
+            10,
+            1526,
+            503
+          ]
+        },
+        {
+          "assetKey": "quiz-dry-window",
+          "description": "New scene, an intact thin wet paper layer lies safely on a plain cloth by a bright indoor window to dry, a small wooden clothes rack in background, no person or sunbeam hazards.",
+          "usedBy": [
+            "picture-quiz"
+          ],
+          "crop": [
+            11,
+            520,
+            503,
+            1013
+          ]
+        },
+        {
+          "assetKey": "quiz-tear-leftovers",
+          "description": "New scene, adult hands tear a clean left-over pastel sheet into scraps over a shallow basket, no water or mesh.",
+          "usedBy": [
+            "picture-quiz"
+          ],
+          "crop": [
+            522,
+            520,
+            1014,
+            1013
+          ]
+        },
+        {
+          "assetKey": "quiz-stir-new-pulp",
+          "description": "New scene, an adult gently stirs very small paper scraps in a muted green bowl with a wooden utensil, no screen or dry sheet.",
+          "usedBy": [
+            "picture-quiz"
+          ],
+          "crop": [
+            1034,
+            520,
+            1526,
+            1013
+          ]
+        }
+      ]
+    }
+  ],
+  "compositions": {
+    "paper-made-badge": {
+      "layout": "small cropped isolated dry handmade sheet to distinguish the completion sticker",
+      "sources": [
+        "paper-dry"
+      ],
+      "uses": [
+        "rebuild-paper-route"
+      ]
+    },
+    "paper-making-sequence": {
+      "layout": "four wide equal cells left to right with spatial separator, no text",
+      "sources": [
+        "paper-scraps",
+        "paper-pulp",
+        "paper-on-mesh",
+        "paper-dry"
+      ],
+      "uses": [
+        "paper-from-paper"
+      ]
+    },
+    "paper-photo-cover": {
+      "layout": "two views of exactly the same crumpled kraft sheet; small camera icon above",
+      "sources": [
+        "paper-top-kraft",
+        "paper-side-kraft",
+        "paper-observer-camera"
+      ],
+      "uses": [
+        "photograph-paper-shapes"
+      ]
+    },
+    "paper-route-cover": {
+      "layout": "open path from dry scraps to a bowl of wet pulp, small paper cart at start",
+      "sources": [
+        "paper-scraps",
+        "paper-pulp",
+        "paper-scout-idle"
+      ],
+      "uses": [
+        "rebuild-paper-route"
+      ]
+    }
+  },
+  "finishedSemanticDiagrams": [
+    "water-comparison-model",
+    "water-setup-fair",
+    "water-setup-width",
+    "water-setup-depth",
+    "tug-result-guide",
+    "tug-both-torn",
+    "tug-kraft-holds",
+    "tug-other-holds",
+    "water-height-low",
+    "water-height-middle",
+    "water-height-high",
+    "paper-top-kraft",
+    "paper-top-news",
+    "paper-top-print",
+    "paper-side-kraft",
+    "paper-side-news",
+    "paper-side-print",
+    "paper-family-record",
+    "quiz-bag-tissue",
+    "quiz-bag-news",
+    "quiz-bag-kraft"
+  ],
+  "rejectedAtlasCells": {
+    "paper-workshop-scenes": {
+      "crop": [
+        16,
+        429,
+        408,
+        823
+      ],
+      "reason": "图上纸条似乎平放在槽底，未明确体现并排同深浸入与同一水线。正式图使用由课堂模型生成的精确示意。"
+    }
+  }
+}

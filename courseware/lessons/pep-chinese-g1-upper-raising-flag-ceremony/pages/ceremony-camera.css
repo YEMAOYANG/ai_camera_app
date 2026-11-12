@@ -1,0 +1,15 @@
+#camera-shutter {
+  position:absolute; z-index:5; left:970px; top:325px; width:132px; height:132px;
+  display:grid; place-items:center; border:5px solid #F4D49B; border-radius:50%;
+  background:#156D65; color:#FFFDF3; box-shadow:0 7px 0 #084A45; touch-action:manipulation;
+  cursor:pointer;
+}
+#camera-restart {
+  position:absolute; z-index:5; left:1156px; top:18px; width:96px; height:96px;
+  display:grid; place-items:center; border:3px solid #D4E7DC; border-radius:50%;
+  background:#FCF9F0; color:#156D65; touch-action:manipulation; cursor:pointer;
+}
+#camera-shutter[hidden], #camera-restart[hidden] { display:none; }
+#camera-shutter:active { transform:translateY(4px); box-shadow:0 3px 0 #084A45; }
+#camera-shutter:focus-visible, #camera-restart:focus-visible { outline:6px solid #F19B4D; outline-offset:5px; }
+#ready button, #g-next, #btn-again { min-height:96px; }

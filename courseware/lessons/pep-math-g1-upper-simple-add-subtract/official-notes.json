@@ -1,0 +1,93 @@
+{
+  "schemaVersion": "mira.courseware.official-notes.v1",
+  "binding": {
+    "editionId": "pep-math-g1-upper-2022-standard",
+    "revisionId": "directory-ede7a8c63c337cf95a03fe79",
+    "nodeId": "4868b198-14ac-4f85-8e55-ccaaef49f888",
+    "unitId": "ae4d78e6-9ed7-4bec-a5a4-26ed49147600",
+    "classHours": ["lesson_1"]
+  },
+  "reviewedBy": "Codex production_support",
+  "reviewedAt": "2026-11-10T15:27:15+08:00",
+  "officialTextbook": {
+    "title": "义务教育教科书 数学一年级上册",
+    "publisher": "人民教育出版社",
+    "publication": "2024年7月，见教学设计第1页",
+    "resourceId": "c3e06fe4-c6b3-49cb-8727-4f8ff69bbfbc",
+    "bookHeading": "简单的加、减法",
+    "directoryHeading": "简单加、减法",
+    "printedPages": [81],
+    "pdfPages": [86],
+    "findings": [
+      "印刷80页仍练习11～20各数的组成与顺序。印刷81页是本课完整范围，含例4、例5和三组应用；印刷82页起进入排队问题。",
+      "例4先用一捆和若干散棒建立十和几个一的整体关系，再把这个整体分别减去两个已知部分。",
+      "例5把添几个一和去几个一画在计数器的个位上，保留原来的一颗十位珠；分别标出加式、减式各部分的名称。",
+      "本页练习把同一组成写成一加两减，判断图中未知的是总量还是部分，再独立口算。"
+    ]
+  },
+  "sourceEvidence": {
+    "officialIndex": "output/courseware-lessons/pep-math-g1-upper-6to10-review-arcade/official/resource-part-01.json",
+    "officialIndexSha256": "62e7e927c0e1372ef1ca1420a019239572de7a94aaa6c29a8b2448ce5f6091a3",
+    "officialIndexEntryCount": 53,
+    "officialActivityId": "f79b6ffa-a492-c96a-5cfa-e75d5021989e",
+    "officialDetailsUrl": "https://s-file-1.ykt.cbern.com.cn/zxx/ndrv2/national_lesson/resources/details/f79b6ffa-a492-c96a-5cfa-e75d5021989e.json",
+    "officialDetailsSha256": "69f5e4dbb680f91fc1b6c27ae81420fccc24a27d46c1e00a7b600bc84593fb26",
+    "materialsManifest": "output/courseware-lessons/pep-math-g1-upper-simple-add-subtract/official/manifest.json",
+    "materialsManifestSha256": "d09ad9bc3800da8f60870eaf7a686fc3f0c4395ecc05e8bcd8e04ce85b804be8",
+    "textbookPageManifest": "output/courseware-lessons/pep-math-g1-upper-recognize11to20/official/textbook-pages.json",
+    "textbookPageManifestSha256": "891995bd8e578eff030f1d7aacac183032bde7ea1aad7293ea997f6a10d6862d",
+    "scopePages": [
+      {"printedPage": 80, "pdfPage": 85, "scope": "前页", "path": "output/courseware-lessons/pep-math-g1-upper-recognize11to20/official/textbook/ebook-085.jpg", "sha256": "c7f2ed81de7047910cfe2702acdd4fed53d948843ffa162e56011ce79be9838e"},
+      {"printedPage": 81, "pdfPage": 86, "scope": "完整正文", "path": "output/courseware-lessons/pep-math-g1-upper-recognize11to20/official/textbook/ebook-086.jpg", "sha256": "75a5d611732a1fe890876f36c3ebb574b0ea09d54208bc3cb7bbb539dab997e2"},
+      {"printedPage": 82, "pdfPage": 87, "scope": "后页", "path": "output/courseware-lessons/pep-math-g1-upper-recognize11to20/official/textbook/ebook-087.jpg", "sha256": "10daba8701ff33fd67f8cc63966cfd0c8c3aa3cd56e9954666888bc100c43bad"}
+    ]
+  },
+  "classHourCoverage": "唯一官方课时。逐页审读教案4页、课件28页、学习任务单2页、课后练习1页，共35页，均按清单回读SHA-256。视频按既有授权豁免。",
+  "objectives": [
+    "用一捆十和若干散件说清十加几的结果；给出同一整体和其中一份，能用组成关系或对应加法求另一份。",
+    "用实物或计数器解释十几加几和十几减几怎样在个位添去；在不进位、不退位的前提下说清为什么原来的整十不变。",
+    "从全体和部分的图片判断求总数还是求剩余部分，列出有实际意义的算式。",
+    "在具体算式和图示中指认两个加数及和，也能分清被减数、减数和差。"
+  ],
+  "keyPoint": "把一个十和几个一的组成连到十加几及相应的减法，再用个位的增减解释十几加减几。",
+  "difficultPoint": "同一幅图因未知量不同可用加法或减法；减散件时保留整十，减整十时留下散件，分别说明变的是哪一部分。",
+  "contentBoundary": "本课不教进位、退位、列竖式、减数可交换或排队间隔。十几减去它个位上的那几个一才正好余十，不将配对关系泛化为任意十几减几。操作、口头解释和纸笔表现未真实看到时写待观察。",
+  "resources": {
+    "teachingDesign": {
+      "status": "reviewed",
+      "resourceId": "69724b35-01db-2ce5-691c-0a1f7ee4ad6b",
+      "pageRefs": [1, 2, 3, 4],
+      "findings": [
+        "第1页把教材第81页两例及应用列为范围，重点是两类运算，难点是说明过程和结果。",
+        "第2页从接着数和组成得到总量，再改变未知的位置，用拆分或想加算减解释两个减法。",
+        "第3页对照数线、实物和计数器，辨认个位增减与整十保留，说明运算各部分的名称。",
+        "第4页回到生活图辨别总数与部分，课后口算并说明方法。"
+      ]
+    },
+    "courseware": {
+      "status": "reviewed",
+      "resourceId": "a4bbe196-58cb-915c-a98b-99e9928a0a88",
+      "pageRefs": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28],
+      "findings": [
+        "第1～2页核对学段课名并复习十以内口算。第3～8页从两部分合并，比较接着数和按十与个组成。",
+        "第9～14页依次未知两部分，展示一加两减之间可用同一个整体关系解释。",
+        "第15～22页通过前后数、摆散棒和拨珠三种表示比较，概括本组十几加减几个一的个位变化。",
+        "第23页区分加式和减式的量名。第24～28页含组式、看图列式、课末回顾和变式口算提示。"
+      ]
+    },
+    "learningTaskSheet": {
+      "status": "reviewed",
+      "resourceId": "d1cba904-e20e-0884-d3d1-00c54aafd917",
+      "pageRefs": [1, 2],
+      "findings": ["第1页先用同一组十和几个一说明加法和两个减法，再让孩子自行选一种表示完成十几加几。第2页用相应减法检查能否迁移刚才的办法。"]
+    },
+    "afterClassExercise": {
+      "status": "reviewed",
+      "resourceId": "d9d77b8f-de1c-688a-6139-429bcb60077f",
+      "pageRefs": [1],
+      "findings": ["六项口算覆盖十加几、十几加几个一、去一个十和去几个一，并请孩子说算法。转为原创周测变式与亲子摆物口述。"]
+    },
+    "video": {"status": "waived", "resourceId": "edae5e4d-e629-b982-1ccb-681f2504922b"}
+  },
+  "factChecks": []
+}

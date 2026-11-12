@@ -1,0 +1,67 @@
+{
+  "schemaVersion": "mira.courseware.asset-composition.v1",
+  "key": "word-moon-boat",
+  "canvas": [
+    840,
+    450
+  ],
+  "background": "#fff2d7",
+  "inputs": {
+    "crescent-window": {
+      "file": "assets/illustrations/crescent-window.png",
+      "sha256": "ed384b2d33312bbf6e84f0c22952942ad6b9d6d479c60f55e698103989516216"
+    },
+    "curved-boat": {
+      "file": "assets/illustrations/curved-boat.png",
+      "sha256": "40c62bdfe60dd5bcde5d125f8d9c490fc0f7eca2d8ea43cd7cafc522359cb7a0"
+    }
+  },
+  "layers": [
+    {
+      "op": "roundrect",
+      "box": [
+        14,
+        100,
+        414,
+        350
+      ],
+      "radius": 22,
+      "fill": "#f9e8bc"
+    },
+    {
+      "op": "roundrect",
+      "box": [
+        426,
+        100,
+        826,
+        350
+      ],
+      "radius": 22,
+      "fill": "#f9e8bc"
+    },
+    {
+      "op": "asset",
+      "asset": "crescent-window",
+      "center": [
+        214,
+        225
+      ],
+      "size": [
+        382,
+        220
+      ]
+    },
+    {
+      "op": "asset",
+      "asset": "curved-boat",
+      "center": [
+        626,
+        225
+      ],
+      "size": [
+        382,
+        220
+      ]
+    }
+  ]
+}

@@ -1,0 +1,1024 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "图形的认识",
+  "description": "到风筝工坊辨认四种立体，观察滚动和站稳，再按平面、外形与缺口拼搭。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小数老师",
+      "role": "teacher",
+      "gender": "male",
+      "voice": "Ethan",
+      "avatar": "/avatars/teacher-1.png",
+      "color": "#286956",
+      "persona": "引导孩子看实际的面、比摆放，再解释自己怎样把积木拼好。"
+    }
+  },
+  "images": {
+    "ball-directions": {
+      "file": "assets/ball-directions.png"
+    },
+    "base-beam": {
+      "file": "assets/base-beam.png"
+    },
+    "base-four": {
+      "file": "assets/base-four.png"
+    },
+    "base-pair": {
+      "file": "assets/base-pair.png"
+    },
+    "base-row": {
+      "file": "assets/base-row.png"
+    },
+    "base-thin": {
+      "file": "assets/base-thin.png"
+    },
+    "base-wall": {
+      "file": "assets/base-wall.png"
+    },
+    "base-wide": {
+      "file": "assets/base-wide.png"
+    },
+    "built-beam": {
+      "file": "assets/built-beam.png"
+    },
+    "built-four": {
+      "file": "assets/built-four.png"
+    },
+    "built-pair": {
+      "file": "assets/built-pair.png"
+    },
+    "built-row": {
+      "file": "assets/built-row.png"
+    },
+    "built-thin": {
+      "file": "assets/built-thin.png"
+    },
+    "built-wall": {
+      "file": "assets/built-wall.png"
+    },
+    "built-wide": {
+      "file": "assets/built-wide.png"
+    },
+    "cart-push": {
+      "file": "assets/cart-push.png"
+    },
+    "cart-rest": {
+      "file": "assets/cart-rest.png"
+    },
+    "cube-layers": {
+      "file": "assets/cube-layers.png"
+    },
+    "cylinder-positions": {
+      "file": "assets/cylinder-positions.png"
+    },
+    "cylinder-stack-compare": {
+      "file": "assets/cylinder-stack-compare.png"
+    },
+    "flat-box-positions": {
+      "file": "assets/flat-box-positions.png"
+    },
+    "flat-cube-faces": {
+      "file": "assets/flat-cube-faces.png"
+    },
+    "home-example": {
+      "file": "assets/home-example.png"
+    },
+    "kite-sticker": {
+      "file": "assets/kite-sticker.png"
+    },
+    "lab-background": {
+      "file": "assets/lab-background.png"
+    },
+    "lab-invitation": {
+      "file": "assets/lab-invitation.png"
+    },
+    "lab-problem": {
+      "file": "assets/lab-problem.png"
+    },
+    "life-shapes": {
+      "file": "assets/life-shapes.png"
+    },
+    "piece-beam": {
+      "file": "assets/piece-beam.png"
+    },
+    "piece-four": {
+      "file": "assets/piece-four.png"
+    },
+    "piece-pair": {
+      "file": "assets/piece-pair.png"
+    },
+    "piece-row": {
+      "file": "assets/piece-row.png"
+    },
+    "piece-thin": {
+      "file": "assets/piece-thin.png"
+    },
+    "piece-wall": {
+      "file": "assets/piece-wall.png"
+    },
+    "piece-wide": {
+      "file": "assets/piece-wide.png"
+    },
+    "q-ball": {
+      "file": "assets/q-ball.png"
+    },
+    "q-cube": {
+      "file": "assets/q-cube.png"
+    },
+    "q-cube-eight": {
+      "file": "assets/q-cube-eight.png"
+    },
+    "q-cube-flat": {
+      "file": "assets/q-cube-flat.png"
+    },
+    "q-cylinder": {
+      "file": "assets/q-cylinder.png"
+    },
+    "q-cylinder-side": {
+      "file": "assets/q-cylinder-side.png"
+    },
+    "q-cylinder-tilt": {
+      "file": "assets/q-cylinder-tilt.png"
+    },
+    "q-cylinder-upright": {
+      "file": "assets/q-cylinder-upright.png"
+    },
+    "q-eight-slab": {
+      "file": "assets/q-eight-slab.png"
+    },
+    "q-fit-flat": {
+      "file": "assets/q-fit-flat.png"
+    },
+    "q-fit-piece": {
+      "file": "assets/q-fit-piece.png"
+    },
+    "q-fit-row": {
+      "file": "assets/q-fit-row.png"
+    },
+    "q-gap-plan": {
+      "file": "assets/q-gap-plan.png"
+    },
+    "q-long": {
+      "file": "assets/q-long.png"
+    },
+    "q-stack-aligned": {
+      "file": "assets/q-stack-aligned.png"
+    },
+    "q-stack-mismatch": {
+      "file": "assets/q-stack-mismatch.png"
+    },
+    "q-stack-offset": {
+      "file": "assets/q-stack-offset.png"
+    },
+    "rectangles-join": {
+      "file": "assets/rectangles-join.png"
+    },
+    "sample-ball": {
+      "file": "assets/sample-ball.png"
+    },
+    "sample-build": {
+      "file": "assets/sample-build.png"
+    },
+    "sample-cube": {
+      "file": "assets/sample-cube.png"
+    },
+    "sample-cylinder": {
+      "file": "assets/sample-cylinder.png"
+    },
+    "sample-long": {
+      "file": "assets/sample-long.png"
+    },
+    "sort-opening": {
+      "file": "assets/sort-opening.png"
+    },
+    "stack-opening": {
+      "file": "assets/stack-opening.png"
+    },
+    "token-ball": {
+      "file": "assets/token-ball.png"
+    },
+    "token-cube": {
+      "file": "assets/token-cube.png"
+    },
+    "token-cylinder": {
+      "file": "assets/token-cylinder.png"
+    },
+    "token-long": {
+      "file": "assets/token-long.png"
+    },
+    "two-cubes-long": {
+      "file": "assets/two-cubes-long.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "open-lab",
+      "type": "slide",
+      "title": "给风筝展搭一个台座",
+      "template": "picture-points",
+      "data": {
+        "title": "给风筝展搭一个台座",
+        "picture": "lab-invitation",
+        "points": [
+          "先认积木",
+          "再看怎么放",
+          "最后选补块"
+        ]
+      },
+      "script": [
+        {
+          "say": "小禾和小辰要布置风筝展。他们先搭了一个台座。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "看看右边这个台座。你能指出一块底板吗？"
+        },
+        {
+          "say": "下面是长盒一样的底板。上面有一根柱，也有方块。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "一会儿我们先拿起几样东西，想想它们叫什么。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "再看用哪一面挨着桌子，哪种摆法会滚。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "这边还留了一个位置。我们来找能正好补进去的积木。"
+        },
+        {
+          "say": "先用眼睛看，再用手比一比。最后讲讲你的理由。"
+        }
+      ]
+    },
+    {
+      "key": "objects-around-us",
+      "type": "slide",
+      "title": "从生活里找立体",
+      "template": "title-picture",
+      "data": {
+        "title": "从生活里找立体",
+        "picture": "life-shapes",
+        "caption": "长方体　正方体　圆柱　球"
+      },
+      "script": [
+        {
+          "say": "小禾拿来四样东西。你在家见过哪样？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "看第一样。这个橙色长盒像长方体，每个面都是平的。"
+        },
+        {
+          "say": "第二样是蓝色方盒。它每个面都一样大，像正方体。"
+        },
+        {
+          "say": "第三样木头有两头圆平面，弯弯的一圈在中间。它像圆柱。"
+        },
+        {
+          "say": "最后这颗小球，转到哪边摸，表面都弯弯的。"
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "盒子可以换颜色，木柱也能换方向。看看它们整个外形。"
+        },
+        {
+          "say": "你可以在手边找一件，再用手摸出一个特点。"
+        }
+      ]
+    },
+    {
+      "key": "flat-faces",
+      "type": "slide",
+      "title": "长盒和方块都能放稳",
+      "template": "two-columns",
+      "data": {
+        "title": "长盒和方块都能放稳",
+        "left": {
+          "heading": "长盒换一面",
+          "body": "平面贴着桌面。"
+        },
+        "right": {
+          "heading": "方块换个颜色",
+          "body": "每个面一样方。"
+        },
+        "left_picture": "flat-box-positions",
+        "right_picture": "flat-cube-faces"
+      },
+      "script": [
+        {
+          "say": "长盒平着放，再把它立起来。两次底下有什么一样？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "它用不同的平面挨着桌子。宽的一面适合做底板。"
+        },
+        {
+          "say": "这个长盒有长有短，我们在图里叫它长方体。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "方块也是平面。换个颜色，面还是同样大小的正方形。"
+        },
+        {
+          "say": "长、宽、高一样长时，我们叫它正方体。"
+        },
+        {
+          "say": "搭的时候可以让两个平面相接。用手比一比哪两面贴合。"
+        }
+      ]
+    },
+    {
+      "key": "round-solids",
+      "type": "slide",
+      "title": "圆柱和球怎么滚",
+      "template": "two-columns",
+      "data": {
+        "title": "圆柱和球怎么滚",
+        "left": {
+          "heading": "同一根圆柱",
+          "body": "立起来，圆平面挨着桌。"
+        },
+        "right": {
+          "heading": "同一颗球",
+          "body": "弯曲的表面可以滚。"
+        },
+        "left_picture": "cylinder-positions",
+        "right_picture": "ball-directions"
+      },
+      "script": [
+        {
+          "say": "如果桌上有一根圆柱和一个球，怎样让它们动起来？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "圆柱两头是同样大的圆平面。把一头放平，它站得稳。"
+        },
+        {
+          "say": "还是这根圆柱。把它侧放，弯面贴着桌子，轻推能滚。"
+        },
+        {
+          "say": "看它沿着圆边转。换个方向摆，再轻轻推一次。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "球表面整个弯弯的。轻轻往不同方向推，它都能滚。"
+        },
+        {
+          "say": "长盒的图盘和方块的图盘分开放。轮到你推积木啦。"
+        },
+        {
+          "say": "看整块形状，推到同类图盘。"
+        },
+        {
+          "say": "先停一下，看看整块的形状。"
+        },
+        {
+          "say": "再对照托盘图，找相同的面。也能退一步。"
+        },
+        {
+          "say": "形状和图盘对上了！"
+        }
+      ]
+    },
+    {
+      "key": "sort-solid-blocks",
+      "type": "interactive",
+      "title": "推车找同类立体",
+      "widgetType": "courseware_game",
+      "page": "sort-solid-blocks",
+      "startImage": "sort-opening",
+      "script": [
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "say": "小车要把积木送到同类托盘。你先看第一块。"
+        },
+        {
+          "highlight": "#demo-long-solid"
+        },
+        {
+          "say": "这块长盒现在立着。它有平面，边长有长有短。"
+        },
+        {
+          "highlight": "#demo-long-tray"
+        },
+        {
+          "say": "图盘里那块长盒是平放的。摆法变了，还是同一类。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "从积木后面推。我们用右箭头，先朝那只盘走。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "对着图盘比一比。先找平平的面，再看边的长短。"
+        },
+        {
+          "say": "交给你。从整块形状找同类，再选能推过去的路。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "sort-goal": "round-solids-9",
+        "sort-hint": "round-solids-10",
+        "sort-help": "round-solids-11",
+        "sort-praise": "round-solids-12"
+      }
+    },
+    {
+      "key": "stack-a-cylinder",
+      "type": "slide",
+      "title": "怎样把短柱拼高",
+      "template": "picture-points",
+      "data": {
+        "title": "怎样把短柱拼高",
+        "picture": "cylinder-stack-compare",
+        "points": [
+          "看粗细",
+          "对准圆面",
+          "沿一圈查接缝"
+        ]
+      },
+      "script": [
+        {
+          "say": "两根短圆柱能拼成一根高圆柱吗？先看看上面三种摆法。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "它们都叠了两件。你觉得哪一组外形接得最顺？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "比两个接触的圆面。一样大才有可能接成一整圈。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "再让两个圆面的中心对着。左边那组的边对齐了。"
+        },
+        {
+          "say": "中间那组两个圆面一样大，可上面那根偏到旁边了。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "右边一根粗，一根细。接缝旁会露出一圈台阶。"
+        },
+        {
+          "say": "能拼成整齐高柱时，手沿接缝摸过去，边是齐的。"
+        }
+      ]
+    },
+    {
+      "key": "build-a-long-block",
+      "type": "slide",
+      "title": "用平面拼一块长盒",
+      "template": "two-columns",
+      "data": {
+        "title": "用平面拼一块长盒",
+        "left": {
+          "heading": "小方块并排",
+          "body": "相同的方平面贴在一起。"
+        },
+        "right": {
+          "heading": "两块长盒合拢",
+          "body": "相接的平面贴满，外边对齐。"
+        },
+        "left_picture": "two-cubes-long",
+        "right_picture": "rectangles-join"
+      },
+      "script": [
+        {
+          "say": "能用两块积木变出一个新的长方体吗？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "两块小正方体并排。把相同大小的两个方平面贴上。"
+        },
+        {
+          "say": "看整个外形变长了。接口藏在中间，外面还是平的。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "再看两块一样的长盒。把长的平面靠在一起。"
+        },
+        {
+          "say": "这次拼出一块更宽的长方体。换个接法，长宽高也会变。"
+        },
+        {
+          "say": "也能用大小不同的块。要看外面有没有突出来或空一块。"
+        },
+        {
+          "say": "想象手贴着新长盒滑一圈。你会先检查哪条边？"
+        }
+      ]
+    },
+    {
+      "key": "fill-two-layers",
+      "type": "slide",
+      "title": "两层怎样合成大方块",
+      "template": "picture-points",
+      "data": {
+        "title": "两层怎样合成大方块",
+        "picture": "cube-layers",
+        "points": [
+          "先摆下面一层",
+          "对齐上面一层",
+          "看看前后和上下"
+        ]
+      },
+      "script": [
+        {
+          "say": "把同样的小正方体拼成一个更大的正方体，要摆几层？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先看下面。前面摆两块，后面也摆两块，共四块。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "上面还要一层一样的。四块各站在下面的一块上。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "把两层合拢。正面看见四块，后面的那一排也算进去。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "前后各两块，左右各两块，上下两层，外面才同样方正。"
+        },
+        {
+          "say": "每层四块，两层共八块。要比单块更大，每个方向都至少摆两块。"
+        },
+        {
+          "say": "现在换你来看看哪些缺口补得上。"
+        },
+        {
+          "say": "看缺口的形状。把落块移到能补齐的图旁，再落下。"
+        },
+        {
+          "say": "先看下面图卡的虚线缺口。"
+        },
+        {
+          "say": "比一比接上的面。轮廓对齐，再落下。"
+        },
+        {
+          "say": "缺口补齐了，拼成了新的立体。"
+        }
+      ]
+    },
+    {
+      "key": "complete-the-solid",
+      "type": "interactive",
+      "title": "接积木补完整",
+      "widgetType": "courseware_game",
+      "page": "complete-the-solid",
+      "startImage": "stack-opening",
+      "script": [
+        {
+          "say": "缺口画成虚线。今天让落下来的积木去补它。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "看落下来这块，它是细一些的短圆柱。"
+        },
+        {
+          "highlight": "#game-goal"
+        },
+        {
+          "say": "底下两个缺口有粗有细。先比接触的圆面。"
+        },
+        {
+          "highlight": "#demo-thin-gap"
+        },
+        {
+          "say": "这张图的缺口和落块一样粗。我只示范这一次。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "先往右移一格，对准旁边的空格，再点落下。"
+        },
+        {
+          "highlight": "#demo-built-solid"
+        },
+        {
+          "say": "右边是刚刚拼好的圆柱，接缝的边齐齐的。"
+        },
+        {
+          "say": "换你。照图里的方向比宽和高，再移动落下。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "build-goal": "fill-two-layers-12",
+        "build-hint": "fill-two-layers-13",
+        "build-help": "fill-two-layers-14",
+        "build-praise": "fill-two-layers-15"
+      }
+    },
+    {
+      "key": "check-a-new-build",
+      "type": "slide",
+      "title": "先想缺哪一块",
+      "template": "picture-points",
+      "data": {
+        "title": "先想缺哪一块",
+        "picture": "lab-problem",
+        "points": [
+          "看整个轮廓",
+          "看缺口占几格",
+          "试拼再检查"
+        ]
+      },
+      "script": [
+        {
+          "say": "小辰想搭右边这样的长盒。桌上的一堆还缺哪块？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "右边的小图左边先画了虚线。里面缺的是上面的一截。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先看看外面想要多长、多高，再看看已经有几层。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "上面从中间到右边空着。缺的是横着排的两块。"
+        },
+        {
+          "say": "如果两块上下摞起来，能放平，也会高出那条虚线。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "把两块并排补进上层。再检查上面和前面的边齐不齐。"
+        },
+        {
+          "say": "遇到新图也可以先指缺口，再说为什么那块能补。"
+        }
+      ]
+    },
+    {
+      "key": "picture-check",
+      "type": "quiz",
+      "title": "听一听，挑图形",
+      "intro": [
+        "听老师说完，再选一张图。想重听就点喇叭。",
+        "看到虚线，想想哪块能把缺口补完整。"
+      ],
+      "questions": [
+        {
+          "id": "all-square-faces",
+          "question": "哪一块每个面都一样大，都是正方形？",
+          "skill": "辨认正方体的相同方平面",
+          "answer": [
+            "b"
+          ],
+          "analysis": "正方体各面一样大，都是正方形。长盒的长边和短边不同，圆柱有曲面。",
+          "options": {
+            "a": {
+              "label": "边长不同的高长方体",
+              "visual": {
+                "kind": "asset",
+                "image": "q-long",
+                "alt": "边长不同的高长方体"
+              }
+            },
+            "b": {
+              "label": "三个方向边长相同的方块",
+              "visual": {
+                "kind": "asset",
+                "image": "q-cube",
+                "alt": "三个方向边长相同的方块"
+              }
+            },
+            "c": {
+              "label": "侧放的圆柱",
+              "visual": {
+                "kind": "asset",
+                "image": "q-cylinder",
+                "alt": "侧放的圆柱"
+              }
+            }
+          }
+        },
+        {
+          "id": "two-circular-faces",
+          "question": "哪块侧面弯，两头是一样的圆平面？",
+          "skill": "分清圆柱、球和长方体",
+          "answer": [
+            "c"
+          ],
+          "analysis": "圆柱两头是同样大的圆平面。球整个表面弯，长盒各面是平的。",
+          "options": {
+            "a": {
+              "label": "圆球",
+              "visual": {
+                "kind": "asset",
+                "image": "q-ball",
+                "alt": "圆球"
+              }
+            },
+            "b": {
+              "label": "有平面的长盒",
+              "visual": {
+                "kind": "asset",
+                "image": "q-long",
+                "alt": "有平面的长盒"
+              }
+            },
+            "c": {
+              "label": "横放，侧面弯且两端平圆的圆柱",
+              "visual": {
+                "kind": "asset",
+                "image": "q-cylinder",
+                "alt": "横放，侧面弯且两端平圆的圆柱"
+              }
+            }
+          }
+        },
+        {
+          "id": "stable-cylinder",
+          "question": "同一根圆柱，哪种摆法让圆平面贴桌？",
+          "skill": "比较同一圆柱的接触面",
+          "answer": [
+            "a"
+          ],
+          "analysis": "立着时底端圆平面贴桌。侧放以曲面接触，斜着只在底边一处接触。",
+          "options": {
+            "a": {
+              "label": "圆柱直立，一端平贴桌",
+              "visual": {
+                "kind": "asset",
+                "image": "q-cylinder-upright",
+                "alt": "圆柱直立，一端平贴桌"
+              }
+            },
+            "b": {
+              "label": "圆柱侧躺",
+              "visual": {
+                "kind": "asset",
+                "image": "q-cylinder-side",
+                "alt": "圆柱侧躺"
+              }
+            },
+            "c": {
+              "label": "圆柱斜靠自己的底边",
+              "visual": {
+                "kind": "asset",
+                "image": "q-cylinder-tilt",
+                "alt": "圆柱斜靠自己的底边"
+              }
+            }
+          }
+        },
+        {
+          "id": "stack-round-caps",
+          "question": "哪一组短柱接起来，成了边齐的高圆柱？",
+          "skill": "对齐同样大的圆平面",
+          "answer": [
+            "c"
+          ],
+          "analysis": "两个圆面要一样大，中心也要对齐。错开或一粗一细都会在接缝处露出台阶。",
+          "options": {
+            "a": {
+              "label": "等粗的两根短柱左右错开",
+              "visual": {
+                "kind": "asset",
+                "image": "q-stack-offset",
+                "alt": "等粗的两根短柱左右错开"
+              }
+            },
+            "b": {
+              "label": "两根短柱一细一粗",
+              "visual": {
+                "kind": "asset",
+                "image": "q-stack-mismatch",
+                "alt": "两根短柱一细一粗"
+              }
+            },
+            "c": {
+              "label": "同粗同轴的两根短柱",
+              "visual": {
+                "kind": "asset",
+                "image": "q-stack-aligned",
+                "alt": "同粗同轴的两根短柱"
+              }
+            }
+          }
+        },
+        {
+          "id": "two-layer-cube",
+          "question": "哪一组小方块拼成了更大的正方体？",
+          "skill": "看前后与上下两层",
+          "answer": [
+            "b"
+          ],
+          "analysis": "两层都要前后、左右各有两块。只摆一层就扁，八块摆成长条也不会得到正方体。",
+          "options": {
+            "a": {
+              "label": "前后左右各两块，只摆一层",
+              "visual": {
+                "kind": "asset",
+                "image": "q-cube-flat",
+                "alt": "前后左右各两块，只摆一层"
+              }
+            },
+            "b": {
+              "label": "两层，每层前后左右各两块",
+              "visual": {
+                "kind": "asset",
+                "image": "q-cube-eight",
+                "alt": "两层，每层前后左右各两块"
+              }
+            },
+            "c": {
+              "label": "八块排成两排的一层长盒",
+              "visual": {
+                "kind": "asset",
+                "image": "q-eight-slab",
+                "alt": "八块排成两排的一层长盒"
+              }
+            }
+          }
+        },
+        {
+          "id": "fill-the-corner",
+          "question": "图里的虚线缺口，哪组方块正好补满？",
+          "skill": "按缺口位置拼搭",
+          "answer": [
+            "a"
+          ],
+          "analysis": "后面整排要三块，前面右边还差一块。只有第一组的排法与这四个位置相合。",
+          "options": {
+            "a": {
+              "label": "后排三块，前排右侧一块",
+              "visual": {
+                "kind": "asset",
+                "image": "q-fit-piece",
+                "alt": "后排三块，前排右侧一块"
+              }
+            },
+            "b": {
+              "label": "前后各两块的方片",
+              "visual": {
+                "kind": "asset",
+                "image": "q-fit-flat",
+                "alt": "前后各两块的方片"
+              }
+            },
+            "c": {
+              "label": "四块横排成一条",
+              "visual": {
+                "kind": "asset",
+                "image": "q-fit-row",
+                "alt": "四块横排成一条"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "q-gap-plan",
+            "alt": "虚线长方体中，前排左边已有两块，后排和前排右边空着"
+          }
+        }
+      ]
+    },
+    {
+      "key": "review-and-build",
+      "type": "slide",
+      "title": "画一张自己的图形图",
+      "template": "picture-points",
+      "data": {
+        "title": "画一张自己的图形图",
+        "picture": "home-example",
+        "points": [
+          "指图形",
+          "比接触面",
+          "搭完说理由"
+        ]
+      },
+      "script": [
+        {
+          "say": "展台准备好了。回家想把哪种形状画在知识图上？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "可以画一件实物，再在旁边画它像的立体。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "长盒、方块、圆柱和球，先看整个样子，再给它叫名。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "圆柱立起来用圆平面，侧过来就能沿着弯面滚。"
+        },
+        {
+          "say": "有平面的积木也可以叠。拼接时比大小，看边齐不齐。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "用安全的积木搭一次。请大人听你说缺口为什么能补上。"
+        },
+        {
+          "say": "把新发现添在知识图上。口头说明和家里真的搭了什么，请家人帮你观察。"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,1864 @@
+{
+  "schemaVersion": "mira.courseware.asset-provenance.v1",
+  "atlasReceipts": {
+    "clip-workshop-scenes": {
+      "path": "art-source/clip-workshop-scenes.receipt.json",
+      "sha256": "2d15c6c9b6c5a6fa880533fe92c62c29807d37f0fc894ba63c8894b8172be1c0"
+    },
+    "clip-workshop-sprites": {
+      "path": "art-source/clip-workshop-sprites.receipt.json",
+      "sha256": "d537337d1b6a16ce67f83a9c4f182578c0820eed07adea249a290af34c08134a"
+    }
+  },
+  "numberPlan": {
+    "worked": [
+      12,
+      5
+    ],
+    "marble": [
+      [
+        11,
+        [
+          2,
+          3,
+          4
+        ]
+      ],
+      [
+        12,
+        [
+          3,
+          4,
+          5
+        ]
+      ],
+      [
+        13,
+        [
+          4,
+          5
+        ]
+      ]
+    ],
+    "tiles": [
+      [
+        11,
+        2
+      ],
+      [
+        11,
+        3
+      ],
+      [
+        11,
+        4
+      ],
+      [
+        12,
+        3
+      ],
+      [
+        12,
+        4
+      ],
+      [
+        12,
+        5
+      ],
+      [
+        13,
+        4
+      ],
+      [
+        13,
+        5
+      ]
+    ]
+  },
+  "assets": {
+    "aim-ready": {
+      "path": "assets/aim-ready.png",
+      "sha256": "b5aad37d267cf81a834ec99b26fd47c4f0dc998b36eb8446da3162a32f43e223",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/clip-diagrams.mjs",
+      "renderSourceSha256": "0c1b21ba63f23730f6c6a6f57a56e2d88135aebd42fb2866d42285218fc5da5c",
+      "usedBy": [
+        "choose-the-missing-part"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "marble-total-11": "9104db24c11e2f405aa49b6d22ace23c1fae291a095114fdbfce634caa6dc888",
+        "clip-amount-2": "fda20b54a789d96f30c4d2b2adc190990bc415c85659dbbed8c7b0d565c9ce6f",
+        "clip-amount-9": "e0175f0745a6285f3884429458eadb6964e927f0d371f2bd890616f0f65fc811"
+      }
+    },
+    "all-nine": {
+      "path": "assets/all-nine.png",
+      "sha256": "7a151cf9b3dd2d7bbd3b3756aec452143bc7d4cfaa8265ae2e5948301e954d2d",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/clip-diagrams.mjs",
+      "renderSourceSha256": "0c1b21ba63f23730f6c6a6f57a56e2d88135aebd42fb2866d42285218fc5da5c",
+      "usedBy": [
+        "explain-to-family",
+        "find-equal-remainders"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-clip": "4cf76d6111219fac6c18b5fe98b87f09261a946f591dcd994bf0637987c421e6"
+      },
+      "quantity": {
+        "examples": [
+          {
+            "total": 11,
+            "taken": 2,
+            "left": 9
+          },
+          {
+            "total": 12,
+            "taken": 3,
+            "left": 9
+          },
+          {
+            "total": 13,
+            "taken": 4,
+            "left": 9
+          }
+        ]
+      }
+    },
+    "break-for-two": {
+      "path": "assets/break-for-two.png",
+      "sha256": "2692ae0d0cf9977521b3c46d6a8a1ec11e0449773b8fd6a36bc7207f00332d64",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/clip-diagrams.mjs",
+      "renderSourceSha256": "0c1b21ba63f23730f6c6a6f57a56e2d88135aebd42fb2866d42285218fc5da5c",
+      "usedBy": [
+        "take-two"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-clip": "4cf76d6111219fac6c18b5fe98b87f09261a946f591dcd994bf0637987c421e6"
+      },
+      "quantity": {
+        "total": 11,
+        "tray": 10,
+        "loose": 1,
+        "takenTray": 2,
+        "takenLoose": 0,
+        "taken": 2,
+        "left": 9
+      }
+    },
+    "chain-for-two": {
+      "path": "assets/chain-for-two.png",
+      "sha256": "3f5ba2dc5b70c1c03a5ddcbe41013ee53ead3899320e8aa13956d27ce2ee1df3",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/clip-diagrams.mjs",
+      "renderSourceSha256": "0c1b21ba63f23730f6c6a6f57a56e2d88135aebd42fb2866d42285218fc5da5c",
+      "usedBy": [
+        "take-two"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-clip": "4cf76d6111219fac6c18b5fe98b87f09261a946f591dcd994bf0637987c421e6"
+      },
+      "quantity": {
+        "total": 11,
+        "tray": 10,
+        "loose": 1,
+        "takenTray": 1,
+        "takenLoose": 1,
+        "taken": 2,
+        "left": 9
+      }
+    },
+    "clip-amount-10": {
+      "path": "assets/clip-amount-10.png",
+      "sha256": "beeece493c5d3ac3431bc7a11e16d2300e8c9dbdd60d16ccdea52b041e78a076",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/clip-diagrams.mjs",
+      "renderSourceSha256": "0c1b21ba63f23730f6c6a6f57a56e2d88135aebd42fb2866d42285218fc5da5c",
+      "usedBy": [
+        "choose-the-missing-part"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-clip": "4cf76d6111219fac6c18b5fe98b87f09261a946f591dcd994bf0637987c421e6"
+      },
+      "quantity": {
+        "count": 10
+      }
+    },
+    "clip-amount-2": {
+      "path": "assets/clip-amount-2.png",
+      "sha256": "fda20b54a789d96f30c4d2b2adc190990bc415c85659dbbed8c7b0d565c9ce6f",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/clip-diagrams.mjs",
+      "renderSourceSha256": "0c1b21ba63f23730f6c6a6f57a56e2d88135aebd42fb2866d42285218fc5da5c",
+      "usedBy": [
+        "choose-the-missing-part"
+      ],
+      "derivativeConsumers": [
+        "aim-ready"
+      ],
+      "inputs": {
+        "single-clip": "4cf76d6111219fac6c18b5fe98b87f09261a946f591dcd994bf0637987c421e6"
+      },
+      "quantity": {
+        "count": 2
+      }
+    },
+    "clip-amount-3": {
+      "path": "assets/clip-amount-3.png",
+      "sha256": "f406c6fd82737bf8786fcd4f43691b1e62de75a25263951705e227cb1cb4cb21",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/clip-diagrams.mjs",
+      "renderSourceSha256": "0c1b21ba63f23730f6c6a6f57a56e2d88135aebd42fb2866d42285218fc5da5c",
+      "usedBy": [
+        "choose-the-missing-part"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-clip": "4cf76d6111219fac6c18b5fe98b87f09261a946f591dcd994bf0637987c421e6"
+      },
+      "quantity": {
+        "count": 3
+      }
+    },
+    "clip-amount-4": {
+      "path": "assets/clip-amount-4.png",
+      "sha256": "0a8da94242cdbb4e19cb7e04377f812be7cc3be696e109fe949efafd36a0e669",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/clip-diagrams.mjs",
+      "renderSourceSha256": "0c1b21ba63f23730f6c6a6f57a56e2d88135aebd42fb2866d42285218fc5da5c",
+      "usedBy": [
+        "choose-the-missing-part"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-clip": "4cf76d6111219fac6c18b5fe98b87f09261a946f591dcd994bf0637987c421e6"
+      },
+      "quantity": {
+        "count": 4
+      }
+    },
+    "clip-amount-5": {
+      "path": "assets/clip-amount-5.png",
+      "sha256": "aad1a4a4a3ff4dc507e096a1372e7889e5b169b76bf7f564a03d574cc8a9dc33",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/clip-diagrams.mjs",
+      "renderSourceSha256": "0c1b21ba63f23730f6c6a6f57a56e2d88135aebd42fb2866d42285218fc5da5c",
+      "usedBy": [
+        "choose-the-missing-part"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-clip": "4cf76d6111219fac6c18b5fe98b87f09261a946f591dcd994bf0637987c421e6"
+      },
+      "quantity": {
+        "count": 5
+      }
+    },
+    "clip-amount-7": {
+      "path": "assets/clip-amount-7.png",
+      "sha256": "5b15b310a3ec3c095e34e89efeaab6608a1c4185d53110dc7d344714249139b9",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/clip-diagrams.mjs",
+      "renderSourceSha256": "0c1b21ba63f23730f6c6a6f57a56e2d88135aebd42fb2866d42285218fc5da5c",
+      "usedBy": [
+        "choose-the-missing-part",
+        "pair-the-trays"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-clip": "4cf76d6111219fac6c18b5fe98b87f09261a946f591dcd994bf0637987c421e6"
+      },
+      "quantity": {
+        "count": 7
+      }
+    },
+    "clip-amount-8": {
+      "path": "assets/clip-amount-8.png",
+      "sha256": "e1f65e901b269857f9483b598afaa5ada6b380cca970b4fd971e57824c462e70",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/clip-diagrams.mjs",
+      "renderSourceSha256": "0c1b21ba63f23730f6c6a6f57a56e2d88135aebd42fb2866d42285218fc5da5c",
+      "usedBy": [
+        "choose-the-missing-part",
+        "pair-the-trays"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-clip": "4cf76d6111219fac6c18b5fe98b87f09261a946f591dcd994bf0637987c421e6"
+      },
+      "quantity": {
+        "count": 8
+      }
+    },
+    "clip-amount-9": {
+      "path": "assets/clip-amount-9.png",
+      "sha256": "e0175f0745a6285f3884429458eadb6964e927f0d371f2bd890616f0f65fc811",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/clip-diagrams.mjs",
+      "renderSourceSha256": "0c1b21ba63f23730f6c6a6f57a56e2d88135aebd42fb2866d42285218fc5da5c",
+      "usedBy": [
+        "choose-the-missing-part",
+        "pair-the-trays"
+      ],
+      "derivativeConsumers": [
+        "aim-ready",
+        "pair-ready"
+      ],
+      "inputs": {
+        "single-clip": "4cf76d6111219fac6c18b5fe98b87f09261a946f591dcd994bf0637987c421e6"
+      },
+      "quantity": {
+        "count": 9
+      }
+    },
+    "clip-card-11-2": {
+      "path": "assets/clip-card-11-2.png",
+      "sha256": "46558a7041fb41d1e08e5cac0292743fcb6318969fc4b9024fb44cd0d5dc6b00",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/clip-diagrams.mjs",
+      "renderSourceSha256": "0c1b21ba63f23730f6c6a6f57a56e2d88135aebd42fb2866d42285218fc5da5c",
+      "usedBy": [
+        "pair-the-trays"
+      ],
+      "derivativeConsumers": [
+        "pair-ready"
+      ],
+      "inputs": {
+        "single-clip": "4cf76d6111219fac6c18b5fe98b87f09261a946f591dcd994bf0637987c421e6"
+      },
+      "quantity": {
+        "total": 11,
+        "tray": 10,
+        "loose": 1,
+        "takenTray": 1,
+        "takenLoose": 1,
+        "taken": 2,
+        "left": 9
+      }
+    },
+    "clip-card-11-3": {
+      "path": "assets/clip-card-11-3.png",
+      "sha256": "069b9a6443cf38779c8acb9309a49d7696ff5527e147a8acb80dc919d665d701",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/clip-diagrams.mjs",
+      "renderSourceSha256": "0c1b21ba63f23730f6c6a6f57a56e2d88135aebd42fb2866d42285218fc5da5c",
+      "usedBy": [
+        "pair-the-trays"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-clip": "4cf76d6111219fac6c18b5fe98b87f09261a946f591dcd994bf0637987c421e6"
+      },
+      "quantity": {
+        "total": 11,
+        "tray": 10,
+        "loose": 1,
+        "takenTray": 2,
+        "takenLoose": 1,
+        "taken": 3,
+        "left": 8
+      }
+    },
+    "clip-card-11-4": {
+      "path": "assets/clip-card-11-4.png",
+      "sha256": "72ee646f71f6ea94f92bb5b822c03a049f87c151e60665aac256bc13c18728ab",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/clip-diagrams.mjs",
+      "renderSourceSha256": "0c1b21ba63f23730f6c6a6f57a56e2d88135aebd42fb2866d42285218fc5da5c",
+      "usedBy": [
+        "pair-the-trays"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-clip": "4cf76d6111219fac6c18b5fe98b87f09261a946f591dcd994bf0637987c421e6"
+      },
+      "quantity": {
+        "total": 11,
+        "tray": 10,
+        "loose": 1,
+        "takenTray": 3,
+        "takenLoose": 1,
+        "taken": 4,
+        "left": 7
+      }
+    },
+    "clip-card-12-3": {
+      "path": "assets/clip-card-12-3.png",
+      "sha256": "a7a3dd8c1d51a3b9710aaddb9e98477020ea0fe6ddabf7bc20669f5f60c14ed4",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/clip-diagrams.mjs",
+      "renderSourceSha256": "0c1b21ba63f23730f6c6a6f57a56e2d88135aebd42fb2866d42285218fc5da5c",
+      "usedBy": [
+        "pair-the-trays"
+      ],
+      "derivativeConsumers": [
+        "pair-ready"
+      ],
+      "inputs": {
+        "single-clip": "4cf76d6111219fac6c18b5fe98b87f09261a946f591dcd994bf0637987c421e6"
+      },
+      "quantity": {
+        "total": 12,
+        "tray": 10,
+        "loose": 2,
+        "takenTray": 1,
+        "takenLoose": 2,
+        "taken": 3,
+        "left": 9
+      }
+    },
+    "clip-card-12-4": {
+      "path": "assets/clip-card-12-4.png",
+      "sha256": "5868233f7022791f40df748de3d85bd29c2f0c531737182c4ba4a1456ffdc491",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/clip-diagrams.mjs",
+      "renderSourceSha256": "0c1b21ba63f23730f6c6a6f57a56e2d88135aebd42fb2866d42285218fc5da5c",
+      "usedBy": [
+        "pair-the-trays"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-clip": "4cf76d6111219fac6c18b5fe98b87f09261a946f591dcd994bf0637987c421e6"
+      },
+      "quantity": {
+        "total": 12,
+        "tray": 10,
+        "loose": 2,
+        "takenTray": 2,
+        "takenLoose": 2,
+        "taken": 4,
+        "left": 8
+      }
+    },
+    "clip-card-12-5": {
+      "path": "assets/clip-card-12-5.png",
+      "sha256": "de2535e31a7e5c98f5a5a8c2df4f239d86f4f0b011ade4828e79c8d231ca55a7",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/clip-diagrams.mjs",
+      "renderSourceSha256": "0c1b21ba63f23730f6c6a6f57a56e2d88135aebd42fb2866d42285218fc5da5c",
+      "usedBy": [
+        "pair-the-trays"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-clip": "4cf76d6111219fac6c18b5fe98b87f09261a946f591dcd994bf0637987c421e6"
+      },
+      "quantity": {
+        "total": 12,
+        "tray": 10,
+        "loose": 2,
+        "takenTray": 3,
+        "takenLoose": 2,
+        "taken": 5,
+        "left": 7
+      }
+    },
+    "clip-card-13-4": {
+      "path": "assets/clip-card-13-4.png",
+      "sha256": "4f2f8eec74f9592400059bd5240f0663ed89a3509aee418e6b0b8d1d8e80c02f",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/clip-diagrams.mjs",
+      "renderSourceSha256": "0c1b21ba63f23730f6c6a6f57a56e2d88135aebd42fb2866d42285218fc5da5c",
+      "usedBy": [
+        "pair-the-trays"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-clip": "4cf76d6111219fac6c18b5fe98b87f09261a946f591dcd994bf0637987c421e6"
+      },
+      "quantity": {
+        "total": 13,
+        "tray": 10,
+        "loose": 3,
+        "takenTray": 1,
+        "takenLoose": 3,
+        "taken": 4,
+        "left": 9
+      }
+    },
+    "clip-card-13-5": {
+      "path": "assets/clip-card-13-5.png",
+      "sha256": "0b3369678ccf129a9fd4aded7e28c95b89916f51f0858e363d2bf01a3bed46a5",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/clip-diagrams.mjs",
+      "renderSourceSha256": "0c1b21ba63f23730f6c6a6f57a56e2d88135aebd42fb2866d42285218fc5da5c",
+      "usedBy": [
+        "pair-the-trays"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-clip": "4cf76d6111219fac6c18b5fe98b87f09261a946f591dcd994bf0637987c421e6"
+      },
+      "quantity": {
+        "total": 13,
+        "tray": 10,
+        "loose": 3,
+        "takenTray": 2,
+        "takenLoose": 3,
+        "taken": 5,
+        "left": 8
+      }
+    },
+    "clip-kids": {
+      "path": "assets/clip-kids.png",
+      "sha256": "043585d9902936c25df38e8672c106fb96601efb3660a5971fe03fb09b59a424",
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/clip-workshop-scenes.png",
+      "generatedSourceSha256": "168b4dd0eb6de48bdef90007aaac5ed903a6055ded871431d891c000e4227110",
+      "sourceCrop": [
+        11,
+        518,
+        507,
+        1012
+      ],
+      "promptSha256": "91aa5089569241528e4ac56a3d5f511974947b260ac950ec964724b6867481ac",
+      "usedBy": [],
+      "derivativeConsumers": [
+        "craft-opening"
+      ]
+    },
+    "craft-at-home": {
+      "path": "assets/craft-at-home.png",
+      "sha256": "8eba03cfd57ec3d6a1e06cf3b702cf2f8a575c6a14914411da51aa5edee3ec18",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/clip-diagrams.mjs",
+      "renderSourceSha256": "0c1b21ba63f23730f6c6a6f57a56e2d88135aebd42fb2866d42285218fc5da5c",
+      "usedBy": [
+        "explain-to-family"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "family-craft": "7cad51011808a593d862260f463eca2c31d4e97f957432f4a5c3ea7fa57e12a2",
+        "paper-textiles": "6609c51bcda2dc04e610a1f2e01b09a5a95838d4f466c6aea08c3c5e099d1666"
+      }
+    },
+    "craft-entrance": {
+      "path": "assets/craft-entrance.png",
+      "sha256": "a64c4199c69cfc0070b11a83da84b720a2d1077061928eef1da144f4a4047283",
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/clip-workshop-scenes.png",
+      "generatedSourceSha256": "168b4dd0eb6de48bdef90007aaac5ed903a6055ded871431d891c000e4227110",
+      "sourceCrop": [
+        11,
+        11,
+        507,
+        505
+      ],
+      "promptSha256": "91aa5089569241528e4ac56a3d5f511974947b260ac950ec964724b6867481ac",
+      "usedBy": [],
+      "derivativeConsumers": [
+        "craft-opening"
+      ]
+    },
+    "craft-opening": {
+      "path": "assets/craft-opening.png",
+      "sha256": "f5cd2f3dc8d6475e016054388678f6d99a4dee8f798523f00106b7e6ef969bc1",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/clip-diagrams.mjs",
+      "renderSourceSha256": "0c1b21ba63f23730f6c6a6f57a56e2d88135aebd42fb2866d42285218fc5da5c",
+      "usedBy": [
+        "clip-trays"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "craft-entrance": "a64c4199c69cfc0070b11a83da84b720a2d1077061928eef1da144f4a4047283",
+        "clip-kids": "043585d9902936c25df38e8672c106fb96601efb3660a5971fe03fb09b59a424"
+      }
+    },
+    "craft-rosette": {
+      "path": "assets/craft-rosette.png",
+      "sha256": "75acf3d7f7c0caba044e71115345fae9fefcdcdf3fe6efe4e6a003d55c5698df",
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/clip-workshop-sprites.png",
+      "generatedSourceSha256": "3daac7fbaa4e1c93c1b0abc6e23a770142fb4929260edb86cfa0146b1ff7350a",
+      "sourceCrop": [
+        482,
+        780,
+        812,
+        1193
+      ],
+      "promptSha256": "50541a7615e646a67d18e6dd8f12578391c18ae28447fbfb614604c87aa5e29d",
+      "usedBy": [
+        "choose-the-missing-part"
+      ],
+      "derivativeConsumers": []
+    },
+    "equal-symbols": {
+      "path": "assets/equal-symbols.png",
+      "sha256": "e959919d7ce1fd42259f869f3057efc787ba8e39d08bb45cfc2a12c428094563",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/clip-diagrams.mjs",
+      "renderSourceSha256": "0c1b21ba63f23730f6c6a6f57a56e2d88135aebd42fb2866d42285218fc5da5c",
+      "usedBy": [
+        "find-equal-remainders"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-clip": "4cf76d6111219fac6c18b5fe98b87f09261a946f591dcd994bf0637987c421e6"
+      },
+      "quantity": {
+        "equalLeft": 9
+      }
+    },
+    "family-craft": {
+      "path": "assets/family-craft.png",
+      "sha256": "7cad51011808a593d862260f463eca2c31d4e97f957432f4a5c3ea7fa57e12a2",
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/clip-workshop-scenes.png",
+      "generatedSourceSha256": "168b4dd0eb6de48bdef90007aaac5ed903a6055ded871431d891c000e4227110",
+      "sourceCrop": [
+        520,
+        518,
+        1017,
+        1012
+      ],
+      "promptSha256": "91aa5089569241528e4ac56a3d5f511974947b260ac950ec964724b6867481ac",
+      "usedBy": [],
+      "derivativeConsumers": [
+        "craft-at-home"
+      ]
+    },
+    "first-take-two": {
+      "path": "assets/first-take-two.png",
+      "sha256": "f35350af68ca524a83d4fe2caa176ef47a827e747b202e51af3e67c33811fb89",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/clip-diagrams.mjs",
+      "renderSourceSha256": "0c1b21ba63f23730f6c6a6f57a56e2d88135aebd42fb2866d42285218fc5da5c",
+      "usedBy": [
+        "count-down-to-ten"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-clip": "4cf76d6111219fac6c18b5fe98b87f09261a946f591dcd994bf0637987c421e6"
+      },
+      "quantity": {
+        "total": 12,
+        "tray": 10,
+        "loose": 2,
+        "takenTray": 0,
+        "takenLoose": 2,
+        "taken": 2,
+        "left": 10
+      }
+    },
+    "five-from-ten": {
+      "path": "assets/five-from-ten.png",
+      "sha256": "dd8248204044c99ba1ce84b595a8138ac39fdbe251992edbbe5ffbd2bbe3dbee",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/clip-diagrams.mjs",
+      "renderSourceSha256": "0c1b21ba63f23730f6c6a6f57a56e2d88135aebd42fb2866d42285218fc5da5c",
+      "usedBy": [
+        "break-ten"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-clip": "4cf76d6111219fac6c18b5fe98b87f09261a946f591dcd994bf0637987c421e6"
+      },
+      "quantity": {
+        "total": 12,
+        "tray": 10,
+        "loose": 2,
+        "takenTray": 5,
+        "takenLoose": 0,
+        "taken": 5,
+        "left": 7
+      }
+    },
+    "four-seven-family": {
+      "path": "assets/four-seven-family.png",
+      "sha256": "10efadcccb75d038b03628913b8467170787301a72b351fc38792e5037874695",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/clip-diagrams.mjs",
+      "renderSourceSha256": "0c1b21ba63f23730f6c6a6f57a56e2d88135aebd42fb2866d42285218fc5da5c",
+      "usedBy": [
+        "add-the-part-back"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-clip": "4cf76d6111219fac6c18b5fe98b87f09261a946f591dcd994bf0637987c421e6"
+      },
+      "quantity": {
+        "total": 11,
+        "taken": 4,
+        "left": 7,
+        "converseTaken": 7,
+        "converseLeft": 4
+      }
+    },
+    "joined-11-2": {
+      "path": "assets/joined-11-2.png",
+      "sha256": "e111b6de30771c56762ef30ca19374b919c936e1e65962f94bde9bfcb04cb478",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/clip-diagrams.mjs",
+      "renderSourceSha256": "0c1b21ba63f23730f6c6a6f57a56e2d88135aebd42fb2866d42285218fc5da5c",
+      "usedBy": [
+        "choose-the-missing-part"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-clip": "4cf76d6111219fac6c18b5fe98b87f09261a946f591dcd994bf0637987c421e6"
+      },
+      "quantity": {
+        "total": 11,
+        "taken": 2,
+        "left": 9
+      }
+    },
+    "joined-11-3": {
+      "path": "assets/joined-11-3.png",
+      "sha256": "2aa2a9eb46350b00140501236b22f4d981415e05cd76d2406b0abb8cb2b34ed3",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/clip-diagrams.mjs",
+      "renderSourceSha256": "0c1b21ba63f23730f6c6a6f57a56e2d88135aebd42fb2866d42285218fc5da5c",
+      "usedBy": [
+        "choose-the-missing-part"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-clip": "4cf76d6111219fac6c18b5fe98b87f09261a946f591dcd994bf0637987c421e6"
+      },
+      "quantity": {
+        "total": 11,
+        "taken": 3,
+        "left": 8
+      }
+    },
+    "joined-11-4": {
+      "path": "assets/joined-11-4.png",
+      "sha256": "a309d1b06b4d14b7f880a054c6a806c13776cd11487e4e3e996f70927cb2a219",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/clip-diagrams.mjs",
+      "renderSourceSha256": "0c1b21ba63f23730f6c6a6f57a56e2d88135aebd42fb2866d42285218fc5da5c",
+      "usedBy": [
+        "choose-the-missing-part"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-clip": "4cf76d6111219fac6c18b5fe98b87f09261a946f591dcd994bf0637987c421e6"
+      },
+      "quantity": {
+        "total": 11,
+        "taken": 4,
+        "left": 7
+      }
+    },
+    "joined-12-3": {
+      "path": "assets/joined-12-3.png",
+      "sha256": "22170f8bd389796fa57fc71708beec32d0ad6ef66d555c97f6e8f49f3c84b4e1",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/clip-diagrams.mjs",
+      "renderSourceSha256": "0c1b21ba63f23730f6c6a6f57a56e2d88135aebd42fb2866d42285218fc5da5c",
+      "usedBy": [
+        "choose-the-missing-part"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-clip": "4cf76d6111219fac6c18b5fe98b87f09261a946f591dcd994bf0637987c421e6"
+      },
+      "quantity": {
+        "total": 12,
+        "taken": 3,
+        "left": 9
+      }
+    },
+    "joined-12-4": {
+      "path": "assets/joined-12-4.png",
+      "sha256": "0d255fc19ac1975d76705d5baa879bd0706f54fea5bb79592ddec809dcabbf39",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/clip-diagrams.mjs",
+      "renderSourceSha256": "0c1b21ba63f23730f6c6a6f57a56e2d88135aebd42fb2866d42285218fc5da5c",
+      "usedBy": [
+        "choose-the-missing-part"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-clip": "4cf76d6111219fac6c18b5fe98b87f09261a946f591dcd994bf0637987c421e6"
+      },
+      "quantity": {
+        "total": 12,
+        "taken": 4,
+        "left": 8
+      }
+    },
+    "joined-12-5": {
+      "path": "assets/joined-12-5.png",
+      "sha256": "c9ad445b7096ca777d2065062f65a1481dbcf86fe2b39d44019f76750238b511",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/clip-diagrams.mjs",
+      "renderSourceSha256": "0c1b21ba63f23730f6c6a6f57a56e2d88135aebd42fb2866d42285218fc5da5c",
+      "usedBy": [
+        "choose-the-missing-part"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-clip": "4cf76d6111219fac6c18b5fe98b87f09261a946f591dcd994bf0637987c421e6"
+      },
+      "quantity": {
+        "total": 12,
+        "taken": 5,
+        "left": 7
+      }
+    },
+    "joined-13-4": {
+      "path": "assets/joined-13-4.png",
+      "sha256": "0894c861eb4bcb421477177da982cfc1ee49dfe5638727e8b5312aa44bdadea8",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/clip-diagrams.mjs",
+      "renderSourceSha256": "0c1b21ba63f23730f6c6a6f57a56e2d88135aebd42fb2866d42285218fc5da5c",
+      "usedBy": [
+        "choose-the-missing-part"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-clip": "4cf76d6111219fac6c18b5fe98b87f09261a946f591dcd994bf0637987c421e6"
+      },
+      "quantity": {
+        "total": 13,
+        "taken": 4,
+        "left": 9
+      }
+    },
+    "joined-13-5": {
+      "path": "assets/joined-13-5.png",
+      "sha256": "0b273b64830465b18caf1f0155c000ed4ea5fb6412db80c6ef45e3ca2f0f2583",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/clip-diagrams.mjs",
+      "renderSourceSha256": "0c1b21ba63f23730f6c6a6f57a56e2d88135aebd42fb2866d42285218fc5da5c",
+      "usedBy": [
+        "choose-the-missing-part"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-clip": "4cf76d6111219fac6c18b5fe98b87f09261a946f591dcd994bf0637987c421e6"
+      },
+      "quantity": {
+        "total": 13,
+        "taken": 5,
+        "left": 8
+      }
+    },
+    "keep-seven": {
+      "path": "assets/keep-seven.png",
+      "sha256": "c9f3b52c946aa061ddd98115ebca9fe7c3cf2f0aaf62e1edc4296e20fc3c70af",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/clip-diagrams.mjs",
+      "renderSourceSha256": "0c1b21ba63f23730f6c6a6f57a56e2d88135aebd42fb2866d42285218fc5da5c",
+      "usedBy": [
+        "break-ten"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-clip": "4cf76d6111219fac6c18b5fe98b87f09261a946f591dcd994bf0637987c421e6"
+      },
+      "quantity": {
+        "total": 12,
+        "tray": 10,
+        "loose": 2,
+        "takenTray": 5,
+        "takenLoose": 0,
+        "taken": 5,
+        "left": 7
+      }
+    },
+    "kraft-tag": {
+      "path": "assets/kraft-tag.png",
+      "sha256": "6b3154510d583d75f50f073fcd849de3bdd8f2ece4bffb17dfaf6c6c36c84008",
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/clip-workshop-sprites.png",
+      "generatedSourceSha256": "3daac7fbaa4e1c93c1b0abc6e23a770142fb4929260edb86cfa0146b1ff7350a",
+      "sourceCrop": [
+        55,
+        445,
+        434,
+        747
+      ],
+      "promptSha256": "50541a7615e646a67d18e6dd8f12578391c18ae28447fbfb614604c87aa5e29d",
+      "usedBy": [],
+      "derivativeConsumers": [
+        "q-tag-a",
+        "q-tag-b",
+        "q-tag-c",
+        "q-tag-prompt"
+      ]
+    },
+    "marble-felt": {
+      "path": "assets/marble-felt.png",
+      "sha256": "430973260f0ddd1e994d9d7da1be8821d3f486bd7c68f336a1472a65b5b0c899",
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/clip-workshop-scenes.png",
+      "generatedSourceSha256": "168b4dd0eb6de48bdef90007aaac5ed903a6055ded871431d891c000e4227110",
+      "sourceCrop": [
+        1030,
+        11,
+        1527,
+        505
+      ],
+      "promptSha256": "91aa5089569241528e4ac56a3d5f511974947b260ac950ec964724b6867481ac",
+      "usedBy": [
+        "choose-the-missing-part"
+      ],
+      "derivativeConsumers": []
+    },
+    "marble-total-11": {
+      "path": "assets/marble-total-11.png",
+      "sha256": "9104db24c11e2f405aa49b6d22ace23c1fae291a095114fdbfce634caa6dc888",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/clip-diagrams.mjs",
+      "renderSourceSha256": "0c1b21ba63f23730f6c6a6f57a56e2d88135aebd42fb2866d42285218fc5da5c",
+      "usedBy": [
+        "choose-the-missing-part"
+      ],
+      "derivativeConsumers": [
+        "aim-ready"
+      ],
+      "inputs": {
+        "single-clip": "4cf76d6111219fac6c18b5fe98b87f09261a946f591dcd994bf0637987c421e6"
+      },
+      "quantity": {
+        "total": 11,
+        "tray": 10,
+        "loose": 1,
+        "takenTray": 0,
+        "takenLoose": 0,
+        "taken": 0,
+        "left": 11
+      }
+    },
+    "marble-total-12": {
+      "path": "assets/marble-total-12.png",
+      "sha256": "024dd0809f7e3b8856ab1123f2e4e18095e931f3af6e76689373044569af778c",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/clip-diagrams.mjs",
+      "renderSourceSha256": "0c1b21ba63f23730f6c6a6f57a56e2d88135aebd42fb2866d42285218fc5da5c",
+      "usedBy": [
+        "choose-the-missing-part"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-clip": "4cf76d6111219fac6c18b5fe98b87f09261a946f591dcd994bf0637987c421e6"
+      },
+      "quantity": {
+        "total": 12,
+        "tray": 10,
+        "loose": 2,
+        "takenTray": 0,
+        "takenLoose": 0,
+        "taken": 0,
+        "left": 12
+      }
+    },
+    "marble-total-13": {
+      "path": "assets/marble-total-13.png",
+      "sha256": "828f56e07a399cc830d9675a025e17595299b1434b466e1cc519f883ef488c7e",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/clip-diagrams.mjs",
+      "renderSourceSha256": "0c1b21ba63f23730f6c6a6f57a56e2d88135aebd42fb2866d42285218fc5da5c",
+      "usedBy": [
+        "choose-the-missing-part"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-clip": "4cf76d6111219fac6c18b5fe98b87f09261a946f591dcd994bf0637987c421e6"
+      },
+      "quantity": {
+        "total": 13,
+        "tray": 10,
+        "loose": 3,
+        "takenTray": 0,
+        "takenLoose": 0,
+        "taken": 0,
+        "left": 13
+      }
+    },
+    "pair-ready": {
+      "path": "assets/pair-ready.png",
+      "sha256": "6a18b99ed5159233a5102b53c435dd70ba540d2e29f71c74718abcd8108c42d5",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/clip-diagrams.mjs",
+      "renderSourceSha256": "0c1b21ba63f23730f6c6a6f57a56e2d88135aebd42fb2866d42285218fc5da5c",
+      "usedBy": [
+        "pair-the-trays"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "clip-card-12-3": "a7a3dd8c1d51a3b9710aaddb9e98477020ea0fe6ddabf7bc20669f5f60c14ed4",
+        "clip-card-11-2": "46558a7041fb41d1e08e5cac0292743fcb6318969fc4b9024fb44cd0d5dc6b00",
+        "clip-amount-9": "e0175f0745a6285f3884429458eadb6964e927f0d371f2bd890616f0f65fc811"
+      }
+    },
+    "paper-boat": {
+      "path": "assets/paper-boat.png",
+      "sha256": "49ba11e1a480739c4bb1d2761237537ce1ed94375cba0207f203fdb8c55e9f60",
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/clip-workshop-sprites.png",
+      "generatedSourceSha256": "3daac7fbaa4e1c93c1b0abc6e23a770142fb4929260edb86cfa0146b1ff7350a",
+      "sourceCrop": [
+        853,
+        72,
+        1280,
+        318
+      ],
+      "promptSha256": "50541a7615e646a67d18e6dd8f12578391c18ae28447fbfb614604c87aa5e29d",
+      "usedBy": [],
+      "derivativeConsumers": [
+        "q-boat-a",
+        "q-boat-b",
+        "q-boat-c",
+        "q-boat-prompt"
+      ]
+    },
+    "paper-flower": {
+      "path": "assets/paper-flower.png",
+      "sha256": "da8e3a95a1f506b37d0ad165a5dd91fed35c7388f68f9eae46efa176285eea1c",
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/clip-workshop-sprites.png",
+      "generatedSourceSha256": "3daac7fbaa4e1c93c1b0abc6e23a770142fb4929260edb86cfa0146b1ff7350a",
+      "sourceCrop": [
+        449,
+        16,
+        852,
+        387
+      ],
+      "promptSha256": "50541a7615e646a67d18e6dd8f12578391c18ae28447fbfb614604c87aa5e29d",
+      "usedBy": [],
+      "derivativeConsumers": [
+        "q-flower-a",
+        "q-flower-b",
+        "q-flower-c",
+        "q-flower-prompt"
+      ]
+    },
+    "paper-star": {
+      "path": "assets/paper-star.png",
+      "sha256": "6bd626dbb1c926712f2da660aed02422931a7874001fc68f9334d5cdb7016cc8",
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/clip-workshop-sprites.png",
+      "generatedSourceSha256": "3daac7fbaa4e1c93c1b0abc6e23a770142fb4929260edb86cfa0146b1ff7350a",
+      "sourceCrop": [
+        887,
+        808,
+        1244,
+        1167
+      ],
+      "promptSha256": "50541a7615e646a67d18e6dd8f12578391c18ae28447fbfb614604c87aa5e29d",
+      "usedBy": [
+        "pair-the-trays"
+      ],
+      "derivativeConsumers": []
+    },
+    "paper-textiles": {
+      "path": "assets/paper-textiles.png",
+      "sha256": "6609c51bcda2dc04e610a1f2e01b09a5a95838d4f466c6aea08c3c5e099d1666",
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/clip-workshop-scenes.png",
+      "generatedSourceSha256": "168b4dd0eb6de48bdef90007aaac5ed903a6055ded871431d891c000e4227110",
+      "sourceCrop": [
+        1030,
+        518,
+        1527,
+        1012
+      ],
+      "promptSha256": "91aa5089569241528e4ac56a3d5f511974947b260ac950ec964724b6867481ac",
+      "usedBy": [],
+      "derivativeConsumers": [
+        "craft-at-home"
+      ]
+    },
+    "put-five-back": {
+      "path": "assets/put-five-back.png",
+      "sha256": "8f871f515a62fac2332e4a8f04ab12dd2b675f1144701c82029256a1a22736c9",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/clip-diagrams.mjs",
+      "renderSourceSha256": "0c1b21ba63f23730f6c6a6f57a56e2d88135aebd42fb2866d42285218fc5da5c",
+      "usedBy": [
+        "add-the-part-back"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-clip": "4cf76d6111219fac6c18b5fe98b87f09261a946f591dcd994bf0637987c421e6"
+      },
+      "quantity": {
+        "total": 12,
+        "taken": 5,
+        "left": 7
+      }
+    },
+    "q-biscuit-a": {
+      "path": "assets/q-biscuit-a.png",
+      "sha256": "ba093c177f394d42970390122272cca0a192de9aa5be414b5795b549f8af5b3a",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/clip-diagrams.mjs",
+      "renderSourceSha256": "0c1b21ba63f23730f6c6a6f57a56e2d88135aebd42fb2866d42285218fc5da5c",
+      "usedBy": [
+        "picture-quiz"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "round-biscuit": "b7c2b54aff357255fd40f4335c6cb0faa54e10e5e7247ad2ae478025a8ff7688"
+      },
+      "quantity": {
+        "count": 6
+      }
+    },
+    "q-biscuit-b": {
+      "path": "assets/q-biscuit-b.png",
+      "sha256": "3b9d0f0957d39d591da0b56da27b751973bec43f9d60155df8fa913b42cbe1cb",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/clip-diagrams.mjs",
+      "renderSourceSha256": "0c1b21ba63f23730f6c6a6f57a56e2d88135aebd42fb2866d42285218fc5da5c",
+      "usedBy": [
+        "picture-quiz"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "round-biscuit": "b7c2b54aff357255fd40f4335c6cb0faa54e10e5e7247ad2ae478025a8ff7688"
+      },
+      "quantity": {
+        "count": 7
+      }
+    },
+    "q-biscuit-c": {
+      "path": "assets/q-biscuit-c.png",
+      "sha256": "25fb0ad54e95f0c22c8e399c9157020280bced3687bfd96a995cb1daf645e6ff",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/clip-diagrams.mjs",
+      "renderSourceSha256": "0c1b21ba63f23730f6c6a6f57a56e2d88135aebd42fb2866d42285218fc5da5c",
+      "usedBy": [
+        "picture-quiz"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "round-biscuit": "b7c2b54aff357255fd40f4335c6cb0faa54e10e5e7247ad2ae478025a8ff7688"
+      },
+      "quantity": {
+        "count": 8
+      }
+    },
+    "q-biscuit-prompt": {
+      "path": "assets/q-biscuit-prompt.png",
+      "sha256": "46833f4fca4a60f53a334fc06e6ebbfb6185265d8b01a0ba5012a7cad14cf3a1",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/clip-diagrams.mjs",
+      "renderSourceSha256": "0c1b21ba63f23730f6c6a6f57a56e2d88135aebd42fb2866d42285218fc5da5c",
+      "usedBy": [
+        "picture-quiz"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "round-biscuit": "b7c2b54aff357255fd40f4335c6cb0faa54e10e5e7247ad2ae478025a8ff7688"
+      },
+      "quantity": {
+        "knownLeft": 6,
+        "extraBefore": 1,
+        "sameRemoved": true
+      }
+    },
+    "q-boat-a": {
+      "path": "assets/q-boat-a.png",
+      "sha256": "ca319ea6d89bfd25253bd84005e1b95b49e47ee1f3d11ad1a6ca81c93d35fded",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/clip-diagrams.mjs",
+      "renderSourceSha256": "0c1b21ba63f23730f6c6a6f57a56e2d88135aebd42fb2866d42285218fc5da5c",
+      "usedBy": [
+        "picture-quiz"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "paper-boat": "49ba11e1a480739c4bb1d2761237537ce1ed94375cba0207f203fdb8c55e9f60"
+      },
+      "quantity": {
+        "left": 10,
+        "right": 10
+      }
+    },
+    "q-boat-b": {
+      "path": "assets/q-boat-b.png",
+      "sha256": "712357b02feb891291d3ef00a4d0592e1a960f19ed58de85d85e349f96ae9433",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/clip-diagrams.mjs",
+      "renderSourceSha256": "0c1b21ba63f23730f6c6a6f57a56e2d88135aebd42fb2866d42285218fc5da5c",
+      "usedBy": [
+        "picture-quiz"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "paper-boat": "49ba11e1a480739c4bb1d2761237537ce1ed94375cba0207f203fdb8c55e9f60"
+      },
+      "quantity": {
+        "left": 11,
+        "right": 10
+      }
+    },
+    "q-boat-c": {
+      "path": "assets/q-boat-c.png",
+      "sha256": "7a2657a85d5283d55bc2d734aba2db9a56e075d80554d7868b839e8e716bc5cf",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/clip-diagrams.mjs",
+      "renderSourceSha256": "0c1b21ba63f23730f6c6a6f57a56e2d88135aebd42fb2866d42285218fc5da5c",
+      "usedBy": [
+        "picture-quiz"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "paper-boat": "49ba11e1a480739c4bb1d2761237537ce1ed94375cba0207f203fdb8c55e9f60"
+      },
+      "quantity": {
+        "left": 10,
+        "right": 11
+      }
+    },
+    "q-boat-prompt": {
+      "path": "assets/q-boat-prompt.png",
+      "sha256": "7c41ac1f787e883160802ddaef536352f11dd193d69b5f1cd6c5f7fc6c1ea9c6",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/clip-diagrams.mjs",
+      "renderSourceSha256": "0c1b21ba63f23730f6c6a6f57a56e2d88135aebd42fb2866d42285218fc5da5c",
+      "usedBy": [
+        "picture-quiz"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "paper-boat": "49ba11e1a480739c4bb1d2761237537ce1ed94375cba0207f203fdb8c55e9f60"
+      },
+      "quantity": {
+        "tasks": [
+          [
+            14,
+            4
+          ],
+          [
+            15,
+            4
+          ]
+        ]
+      }
+    },
+    "q-crayon-a": {
+      "path": "assets/q-crayon-a.png",
+      "sha256": "f11ddcad492f73e1b042187cdb874d7d3304d9715719037adee29a83e70a0508",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/clip-diagrams.mjs",
+      "renderSourceSha256": "0c1b21ba63f23730f6c6a6f57a56e2d88135aebd42fb2866d42285218fc5da5c",
+      "usedBy": [
+        "picture-quiz"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "wax-crayon": "1eecf6fd40350e36bff0aceb771230d5250c971bed32a0d37aa28742825550cd"
+      },
+      "quantity": {
+        "left": 12,
+        "right": 13
+      }
+    },
+    "q-crayon-b": {
+      "path": "assets/q-crayon-b.png",
+      "sha256": "d98d149c40446e8d4eebf4a477ddcd153c9fdc80e249556240aa1fde9c548338",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/clip-diagrams.mjs",
+      "renderSourceSha256": "0c1b21ba63f23730f6c6a6f57a56e2d88135aebd42fb2866d42285218fc5da5c",
+      "usedBy": [
+        "picture-quiz"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "wax-crayon": "1eecf6fd40350e36bff0aceb771230d5250c971bed32a0d37aa28742825550cd"
+      },
+      "quantity": {
+        "left": 13,
+        "right": 13
+      }
+    },
+    "q-crayon-c": {
+      "path": "assets/q-crayon-c.png",
+      "sha256": "b2c9c185689210a052924f5d882ae4f478bb36f208ff5034eea740ed0d58ceaa",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/clip-diagrams.mjs",
+      "renderSourceSha256": "0c1b21ba63f23730f6c6a6f57a56e2d88135aebd42fb2866d42285218fc5da5c",
+      "usedBy": [
+        "picture-quiz"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "wax-crayon": "1eecf6fd40350e36bff0aceb771230d5250c971bed32a0d37aa28742825550cd"
+      },
+      "quantity": {
+        "left": 13,
+        "right": 12
+      }
+    },
+    "q-crayon-prompt": {
+      "path": "assets/q-crayon-prompt.png",
+      "sha256": "a2f1c902069647d80ce1c01b472942fb0fb8d992e8589af83902c3948584430e",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/clip-diagrams.mjs",
+      "renderSourceSha256": "0c1b21ba63f23730f6c6a6f57a56e2d88135aebd42fb2866d42285218fc5da5c",
+      "usedBy": [
+        "picture-quiz"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "wax-crayon": "1eecf6fd40350e36bff0aceb771230d5250c971bed32a0d37aa28742825550cd"
+      },
+      "quantity": {
+        "tasks": [
+          [
+            16,
+            3
+          ],
+          [
+            16,
+            4
+          ]
+        ]
+      }
+    },
+    "q-flower-a": {
+      "path": "assets/q-flower-a.png",
+      "sha256": "92d25c0984247e9daca1465d0eb9c8a0f5504b5caa3c8ae463afececdd1454b9",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/clip-diagrams.mjs",
+      "renderSourceSha256": "0c1b21ba63f23730f6c6a6f57a56e2d88135aebd42fb2866d42285218fc5da5c",
+      "usedBy": [
+        "picture-quiz"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "paper-flower": "da8e3a95a1f506b37d0ad165a5dd91fed35c7388f68f9eae46efa176285eea1c"
+      },
+      "quantity": {
+        "count": 8
+      }
+    },
+    "q-flower-b": {
+      "path": "assets/q-flower-b.png",
+      "sha256": "f82ed8cdbca17338ad464b306650a3cafe5285ebc1e754f76e35f4833854074f",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/clip-diagrams.mjs",
+      "renderSourceSha256": "0c1b21ba63f23730f6c6a6f57a56e2d88135aebd42fb2866d42285218fc5da5c",
+      "usedBy": [
+        "picture-quiz"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "paper-flower": "da8e3a95a1f506b37d0ad165a5dd91fed35c7388f68f9eae46efa176285eea1c"
+      },
+      "quantity": {
+        "count": 9
+      }
+    },
+    "q-flower-c": {
+      "path": "assets/q-flower-c.png",
+      "sha256": "5dd1f2ceb6ba562b29d1b06912af6dcc3d2be83215dc3cffc97fb59b6f1102cd",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/clip-diagrams.mjs",
+      "renderSourceSha256": "0c1b21ba63f23730f6c6a6f57a56e2d88135aebd42fb2866d42285218fc5da5c",
+      "usedBy": [
+        "picture-quiz"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "paper-flower": "da8e3a95a1f506b37d0ad165a5dd91fed35c7388f68f9eae46efa176285eea1c"
+      },
+      "quantity": {
+        "count": 10
+      }
+    },
+    "q-flower-prompt": {
+      "path": "assets/q-flower-prompt.png",
+      "sha256": "079de60341e5262c7c45fe42cc254fe02f3b33377d80e005c42abf231a504ff3",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/clip-diagrams.mjs",
+      "renderSourceSha256": "0c1b21ba63f23730f6c6a6f57a56e2d88135aebd42fb2866d42285218fc5da5c",
+      "usedBy": [
+        "picture-quiz"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "paper-flower": "da8e3a95a1f506b37d0ad165a5dd91fed35c7388f68f9eae46efa176285eea1c"
+      },
+      "quantity": {
+        "total": 14,
+        "taken": 5,
+        "left": 9
+      }
+    },
+    "q-seed-a": {
+      "path": "assets/q-seed-a.png",
+      "sha256": "b8c0265424bc9599338edb30ef37fa9837f677358d68b14c057fd707c4f35519",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/clip-diagrams.mjs",
+      "renderSourceSha256": "0c1b21ba63f23730f6c6a6f57a56e2d88135aebd42fb2866d42285218fc5da5c",
+      "usedBy": [
+        "picture-quiz"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "seedling": "bf09c638e3e8f53a6f9c1d4bbc97ce25e1127fa2dee2f288f054fb3ac2bdd524"
+      },
+      "quantity": {
+        "total": 15,
+        "tray": 10,
+        "loose": 5,
+        "takenTray": 0,
+        "takenLoose": 4,
+        "taken": 4,
+        "left": 11
+      }
+    },
+    "q-seed-b": {
+      "path": "assets/q-seed-b.png",
+      "sha256": "ad4d148557e5967fbaf5c1f959f076ee4e68633ecdd0524e0a45fac3be2b1223",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/clip-diagrams.mjs",
+      "renderSourceSha256": "0c1b21ba63f23730f6c6a6f57a56e2d88135aebd42fb2866d42285218fc5da5c",
+      "usedBy": [
+        "picture-quiz"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "seedling": "bf09c638e3e8f53a6f9c1d4bbc97ce25e1127fa2dee2f288f054fb3ac2bdd524"
+      },
+      "quantity": {
+        "total": 15,
+        "tray": 10,
+        "loose": 5,
+        "takenTray": 0,
+        "takenLoose": 5,
+        "taken": 5,
+        "left": 10
+      }
+    },
+    "q-seed-c": {
+      "path": "assets/q-seed-c.png",
+      "sha256": "36753e297a384a5e8a01e7b9b8d88edd4e14930d59318dafb5467bf53a122062",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/clip-diagrams.mjs",
+      "renderSourceSha256": "0c1b21ba63f23730f6c6a6f57a56e2d88135aebd42fb2866d42285218fc5da5c",
+      "usedBy": [
+        "picture-quiz"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "seedling": "bf09c638e3e8f53a6f9c1d4bbc97ce25e1127fa2dee2f288f054fb3ac2bdd524"
+      },
+      "quantity": {
+        "total": 16,
+        "tray": 10,
+        "loose": 6,
+        "takenTray": 0,
+        "takenLoose": 4,
+        "taken": 4,
+        "left": 12
+      }
+    },
+    "q-seed-prompt": {
+      "path": "assets/q-seed-prompt.png",
+      "sha256": "d7b6bad3962c6514d1cfc59fe1f6b6e3b13b7cad939cf8c38d0184bc921f43bb",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/clip-diagrams.mjs",
+      "renderSourceSha256": "0c1b21ba63f23730f6c6a6f57a56e2d88135aebd42fb2866d42285218fc5da5c",
+      "usedBy": [
+        "picture-quiz"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "seedling": "bf09c638e3e8f53a6f9c1d4bbc97ce25e1127fa2dee2f288f054fb3ac2bdd524"
+      },
+      "quantity": {
+        "total": 16,
+        "tray": 10,
+        "loose": 6,
+        "takenTray": 0,
+        "takenLoose": 5,
+        "taken": 5,
+        "left": 11
+      }
+    },
+    "q-tag-a": {
+      "path": "assets/q-tag-a.png",
+      "sha256": "655571737d0e63093646417204902fc4822e8b5db7eaa1ac3dbb22db48182b88",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/clip-diagrams.mjs",
+      "renderSourceSha256": "0c1b21ba63f23730f6c6a6f57a56e2d88135aebd42fb2866d42285218fc5da5c",
+      "usedBy": [
+        "picture-quiz"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "kraft-tag": "6b3154510d583d75f50f073fcd849de3bdd8f2ece4bffb17dfaf6c6c36c84008"
+      },
+      "quantity": {
+        "count": 6
+      }
+    },
+    "q-tag-b": {
+      "path": "assets/q-tag-b.png",
+      "sha256": "08247c166f553945aa993632b217d39c684275747f58c0fa66d61a344e0d6ed8",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/clip-diagrams.mjs",
+      "renderSourceSha256": "0c1b21ba63f23730f6c6a6f57a56e2d88135aebd42fb2866d42285218fc5da5c",
+      "usedBy": [
+        "picture-quiz"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "kraft-tag": "6b3154510d583d75f50f073fcd849de3bdd8f2ece4bffb17dfaf6c6c36c84008"
+      },
+      "quantity": {
+        "count": 5
+      }
+    },
+    "q-tag-c": {
+      "path": "assets/q-tag-c.png",
+      "sha256": "aeb1c377ac8868cab60357616e9233e5e025be9c4a65d5fa7e13b6b6f3110108",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/clip-diagrams.mjs",
+      "renderSourceSha256": "0c1b21ba63f23730f6c6a6f57a56e2d88135aebd42fb2866d42285218fc5da5c",
+      "usedBy": [
+        "picture-quiz"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "kraft-tag": "6b3154510d583d75f50f073fcd849de3bdd8f2ece4bffb17dfaf6c6c36c84008"
+      },
+      "quantity": {
+        "count": 7
+      }
+    },
+    "q-tag-prompt": {
+      "path": "assets/q-tag-prompt.png",
+      "sha256": "494485fd7bb9b9d0100f1976bc1c2bfba39c47c1d7969431a944b03483e3cfae",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/clip-diagrams.mjs",
+      "renderSourceSha256": "0c1b21ba63f23730f6c6a6f57a56e2d88135aebd42fb2866d42285218fc5da5c",
+      "usedBy": [
+        "picture-quiz"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "kraft-tag": "6b3154510d583d75f50f073fcd849de3bdd8f2ece4bffb17dfaf6c6c36c84008"
+      },
+      "quantity": {
+        "total": 11,
+        "taken": 5,
+        "left": 6
+      }
+    },
+    "round-biscuit": {
+      "path": "assets/round-biscuit.png",
+      "sha256": "b7c2b54aff357255fd40f4335c6cb0faa54e10e5e7247ad2ae478025a8ff7688",
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/clip-workshop-sprites.png",
+      "generatedSourceSha256": "3daac7fbaa4e1c93c1b0abc6e23a770142fb4929260edb86cfa0146b1ff7350a",
+      "sourceCrop": [
+        480,
+        422,
+        827,
+        778
+      ],
+      "promptSha256": "50541a7615e646a67d18e6dd8f12578391c18ae28447fbfb614604c87aa5e29d",
+      "usedBy": [],
+      "derivativeConsumers": [
+        "q-biscuit-a",
+        "q-biscuit-b",
+        "q-biscuit-c",
+        "q-biscuit-prompt"
+      ]
+    },
+    "same-eleven": {
+      "path": "assets/same-eleven.png",
+      "sha256": "a5d1c42f9392c5d94969231f1d38b5f526ff435aaa4ffd7b4bc9b79d03a9c9e0",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/clip-diagrams.mjs",
+      "renderSourceSha256": "0c1b21ba63f23730f6c6a6f57a56e2d88135aebd42fb2866d42285218fc5da5c",
+      "usedBy": [
+        "compare-fixed-total"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-clip": "4cf76d6111219fac6c18b5fe98b87f09261a946f591dcd994bf0637987c421e6"
+      },
+      "quantity": {
+        "examples": [
+          {
+            "total": 11,
+            "taken": 2,
+            "left": 9
+          },
+          {
+            "total": 11,
+            "taken": 3,
+            "left": 8
+          },
+          {
+            "total": 11,
+            "taken": 4,
+            "left": 7
+          }
+        ]
+      }
+    },
+    "same-three": {
+      "path": "assets/same-three.png",
+      "sha256": "ed2c3a557df5c3176e4a56ffc41ef4390f3437f1eb7ed46140fe34c3755d93e0",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/clip-diagrams.mjs",
+      "renderSourceSha256": "0c1b21ba63f23730f6c6a6f57a56e2d88135aebd42fb2866d42285218fc5da5c",
+      "usedBy": [
+        "compare-one-change"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-clip": "4cf76d6111219fac6c18b5fe98b87f09261a946f591dcd994bf0637987c421e6"
+      },
+      "quantity": {
+        "examples": [
+          {
+            "total": 11,
+            "taken": 3,
+            "left": 8
+          },
+          {
+            "total": 12,
+            "taken": 3,
+            "left": 9
+          },
+          {
+            "total": 13,
+            "taken": 3,
+            "left": 10
+          }
+        ]
+      }
+    },
+    "same-twelve": {
+      "path": "assets/same-twelve.png",
+      "sha256": "b274111ab99efc3a0f2d66bc909bef9db47f82094954a01a42a5110d0bea0c88",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/clip-diagrams.mjs",
+      "renderSourceSha256": "0c1b21ba63f23730f6c6a6f57a56e2d88135aebd42fb2866d42285218fc5da5c",
+      "usedBy": [
+        "compare-fixed-total"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-clip": "4cf76d6111219fac6c18b5fe98b87f09261a946f591dcd994bf0637987c421e6"
+      },
+      "quantity": {
+        "examples": [
+          {
+            "total": 12,
+            "taken": 3,
+            "left": 9
+          },
+          {
+            "total": 12,
+            "taken": 4,
+            "left": 8
+          },
+          {
+            "total": 12,
+            "taken": 5,
+            "left": 7
+          }
+        ]
+      }
+    },
+    "seedling": {
+      "path": "assets/seedling.png",
+      "sha256": "bf09c638e3e8f53a6f9c1d4bbc97ce25e1127fa2dee2f288f054fb3ac2bdd524",
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/clip-workshop-sprites.png",
+      "generatedSourceSha256": "3daac7fbaa4e1c93c1b0abc6e23a770142fb4929260edb86cfa0146b1ff7350a",
+      "sourceCrop": [
+        54,
+        842,
+        435,
+        1150
+      ],
+      "promptSha256": "50541a7615e646a67d18e6dd8f12578391c18ae28447fbfb614604c87aa5e29d",
+      "usedBy": [],
+      "derivativeConsumers": [
+        "q-seed-a",
+        "q-seed-b",
+        "q-seed-c",
+        "q-seed-prompt"
+      ]
+    },
+    "single-clip": {
+      "path": "assets/single-clip.png",
+      "sha256": "4cf76d6111219fac6c18b5fe98b87f09261a946f591dcd994bf0637987c421e6",
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/clip-workshop-sprites.png",
+      "generatedSourceSha256": "3daac7fbaa4e1c93c1b0abc6e23a770142fb4929260edb86cfa0146b1ff7350a",
+      "sourceCrop": [
+        176,
+        33,
+        333,
+        383
+      ],
+      "promptSha256": "50541a7615e646a67d18e6dd8f12578391c18ae28447fbfb614604c87aa5e29d",
+      "usedBy": [],
+      "derivativeConsumers": [
+        "all-nine",
+        "break-for-two",
+        "chain-for-two",
+        "clip-amount-10",
+        "clip-amount-2",
+        "clip-amount-3",
+        "clip-amount-4",
+        "clip-amount-5",
+        "clip-amount-7",
+        "clip-amount-8",
+        "clip-amount-9",
+        "clip-card-11-2",
+        "clip-card-11-3",
+        "clip-card-11-4",
+        "clip-card-12-3",
+        "clip-card-12-4",
+        "clip-card-12-5",
+        "clip-card-13-4",
+        "clip-card-13-5",
+        "equal-symbols",
+        "first-take-two",
+        "five-from-ten",
+        "four-seven-family",
+        "joined-11-2",
+        "joined-11-3",
+        "joined-11-4",
+        "joined-12-3",
+        "joined-12-4",
+        "joined-12-5",
+        "joined-13-4",
+        "joined-13-5",
+        "keep-seven",
+        "marble-total-11",
+        "marble-total-12",
+        "marble-total-13",
+        "put-five-back",
+        "same-eleven",
+        "same-three",
+        "same-twelve",
+        "then-take-three",
+        "three-from-units",
+        "twelve-before"
+      ]
+    },
+    "sort-desk": {
+      "path": "assets/sort-desk.png",
+      "sha256": "e278e1b0939d217d7290bf3d606b4262643f2d9d63a17961811ba2ce4a413365",
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/clip-workshop-scenes.png",
+      "generatedSourceSha256": "168b4dd0eb6de48bdef90007aaac5ed903a6055ded871431d891c000e4227110",
+      "sourceCrop": [
+        520,
+        11,
+        1017,
+        505
+      ],
+      "promptSha256": "91aa5089569241528e4ac56a3d5f511974947b260ac950ec964724b6867481ac",
+      "usedBy": [
+        "pair-the-trays"
+      ],
+      "derivativeConsumers": []
+    },
+    "then-take-three": {
+      "path": "assets/then-take-three.png",
+      "sha256": "7255407a34f001d44ebbfd4dc30a5b92b8aa63d91548f91a12518ba8a2d58768",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/clip-diagrams.mjs",
+      "renderSourceSha256": "0c1b21ba63f23730f6c6a6f57a56e2d88135aebd42fb2866d42285218fc5da5c",
+      "usedBy": [
+        "count-down-to-ten"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-clip": "4cf76d6111219fac6c18b5fe98b87f09261a946f591dcd994bf0637987c421e6"
+      },
+      "quantity": {
+        "total": 12,
+        "tray": 10,
+        "loose": 2,
+        "takenTray": 3,
+        "takenLoose": 2,
+        "taken": 5,
+        "left": 7
+      }
+    },
+    "three-from-units": {
+      "path": "assets/three-from-units.png",
+      "sha256": "76b25797f1eb2c9f4a5181c9a803c8f74b85d50b599696be001396fee9b064af",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/clip-diagrams.mjs",
+      "renderSourceSha256": "0c1b21ba63f23730f6c6a6f57a56e2d88135aebd42fb2866d42285218fc5da5c",
+      "usedBy": [
+        "compare-one-change"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-clip": "4cf76d6111219fac6c18b5fe98b87f09261a946f591dcd994bf0637987c421e6"
+      },
+      "quantity": {
+        "total": 13,
+        "tray": 10,
+        "loose": 3,
+        "takenTray": 0,
+        "takenLoose": 3,
+        "taken": 3,
+        "left": 10
+      }
+    },
+    "twelve-before": {
+      "path": "assets/twelve-before.png",
+      "sha256": "c44796f30be016873a055cdfcd8261bc489456569dd877fe787b5e183353d1a9",
+      "source": "exact_lesson_quantity_render",
+      "renderSource": "art-source/clip-diagrams.mjs",
+      "renderSourceSha256": "0c1b21ba63f23730f6c6a6f57a56e2d88135aebd42fb2866d42285218fc5da5c",
+      "usedBy": [
+        "choose-the-missing-part",
+        "clip-trays",
+        "pair-the-trays"
+      ],
+      "derivativeConsumers": [],
+      "inputs": {
+        "single-clip": "4cf76d6111219fac6c18b5fe98b87f09261a946f591dcd994bf0637987c421e6"
+      },
+      "quantity": {
+        "total": 12,
+        "tray": 10,
+        "loose": 2,
+        "takenTray": 0,
+        "takenLoose": 0,
+        "taken": 0,
+        "left": 12
+      }
+    },
+    "wax-crayon": {
+      "path": "assets/wax-crayon.png",
+      "sha256": "1eecf6fd40350e36bff0aceb771230d5250c971bed32a0d37aa28742825550cd",
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/clip-workshop-sprites.png",
+      "generatedSourceSha256": "3daac7fbaa4e1c93c1b0abc6e23a770142fb4929260edb86cfa0146b1ff7350a",
+      "sourceCrop": [
+        1004,
+        398,
+        1120,
+        790
+      ],
+      "promptSha256": "50541a7615e646a67d18e6dd8f12578391c18ae28447fbfb614604c87aa5e29d",
+      "usedBy": [],
+      "derivativeConsumers": [
+        "q-crayon-a",
+        "q-crayon-b",
+        "q-crayon-c",
+        "q-crayon-prompt"
+      ]
+    }
+  }
+}

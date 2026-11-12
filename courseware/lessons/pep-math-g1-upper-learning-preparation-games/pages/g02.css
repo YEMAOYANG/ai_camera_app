@@ -1,0 +1,15 @@
+#ready button, #finish button, #gcard button { min-width: 96px; min-height: 96px; }
+#ready .pic { object-fit: contain; background: #fff9ec; }
+#ready .card { padding-top: 24px; padding-bottom: 28px; }
+#finish .big { color: #bd7c20; font-size: 84px; }
+
+#ready .btn.xl, #gcard .btn.xl, #finish .btn.xl { min-height: 94px; }
+#finish .prep-reward {
+  display: block;
+  width: 178px;
+  height: 136px;
+  margin: 0 auto 14px;
+  border: 6px solid #e9bd62;
+  border-radius: 32px;
+  object-fit: cover;
+}

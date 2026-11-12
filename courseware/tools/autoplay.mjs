@@ -154,6 +154,7 @@ const playGame = async (page, file, errors) => {
   const result = { file, finishes: [], errors, stuck: null, method: 'game-autopilot', seconds: [] };
   const status = () => page.evaluate(() => window.K.game.status());
   const finished = async () => (await page.evaluate(snapshot)).finished;
+  const engineErrors = () => page.evaluate(() => (window.K.errs || []).map(String));
   let inputs = 0;
   for (; inputs < GAME_RANDOM_INPUTS && !(await finished()); inputs += 1) {
     const x = 20 + rand() * 1240;
@@ -166,31 +167,103 @@ const playGame = async (page, file, errors) => {
     await page.waitForTimeout(120);
   }
   const { levels } = await status();
+  const expected = Array.from({ length: levels }, (_, i) => i + 1);
+  if (await finished()) await page.locator('#btn-again').click();
+  let logStart = await page.evaluate(() => window.K.log.length);
   for (let round = 1; round <= 2 && !result.stuck; round += 1) {
-    const logStart = await page.evaluate(() => window.K.log.length);
     const started = Date.now();
     if (round === 1) await page.evaluate(() => { window.K.game.autoplay(true); window.K.onState({ level: 1 }); });
-    while (Date.now() - started < levels * GAME_SECONDS_PER_LEVEL * 1000 && !(await finished())) await page.waitForTimeout(250);
+    while (Date.now() - started < levels * GAME_SECONDS_PER_LEVEL * 1000 && !(await finished())) {
+      if (errors.length || (await engineErrors()).length) break;
+      await page.waitForTimeout(250);
+    }
     if (!(await finished())) { result.stuck = `game autopilot did not finish round ${round}`; break; }
     const won = await page.evaluate((from) => window.K.log.slice(from).filter((x) => x.startsWith('win:'))
       .map((x) => Number(x.split(':')[1])), logStart);
-    const missing = Array.from({ length: levels }, (_, i) => i + 1).filter((level) => !won.includes(level));
-    if (missing.length) { result.stuck = `game autopilot finished without winning level ${missing.join(', ')}`; break; }
+    const final = await status();
+    if (final.state !== 'done' || final.stars.length !== levels || expected.some(i => ![1, 2, 3].includes(final.stars[i - 1])) ||
+        won.length !== levels || expected.some((level, index) => won[index] !== level)) {
+      result.stuck = `game autopilot round ${round} needs one win per level in order (${won.join(', ')}; expected ${expected.join(', ')})`;
+      break;
+    }
     result.finishes.push(inputs + round);
     result.seconds.push(Math.round((Date.now() - started) / 1000));
     if (round === 2) break;
     const again = await page.$('#btn-again');
     if (!again) { result.stuck = 'no play-again button'; break; }
-    await again.click(); await page.waitForTimeout(400);
+    logStart = await page.evaluate(() => window.K.log.length);
+    await again.click();
     const restart = await page.$('#ready button');
-    if (restart && await restart.isVisible()) { await restart.click(); await page.waitForTimeout(300); }
+    if (restart && await restart.isVisible()) await restart.click();
     if (await finished()) { result.stuck = 'finish still showing after play again'; break; }
     const now = await status();
-    if (now.level !== 1 || now.state !== 'play') result.stuck = `play again did not restart level 1 (${now.state} ${now.level})`;
+    const replayStarted = await page.evaluate(from => window.K.log.slice(from).includes('level:1'), logStart);
+    if (!replayStarted || !now.auto) result.stuck = `play again did not restart level 1 (${now.state} ${now.level})`;
   }
-  for (const message of await page.evaluate(() => (window.K.errs || []).map(String))) errors.push(message);
+  errors.push(...await engineErrors());
   return result;
 };
+
+// Guided media activities have their own completion contract. Exercise the
+// child's controls and observe real playback from start through the media end.
+const guidedSelector = '[data-guided-media-activity]';
+async function playGuidedMedia(page, file, errors) {
+  const result = { file, finishes: [], errors, stuck: null, method: 'guided-media', seconds: [] };
+  const root = page.locator(guidedSelector);
+  const media = root.locator('audio[data-guided-media]');
+  const trigger = root.locator('[data-media-trigger]');
+  for (let round = 1; round <= 2; round += 1) {
+    const started = Date.now();
+    try {
+      if (round === 2) await page.reload();
+      await media.evaluate(element => {
+        if (!element.paused || element.currentTime !== 0) throw new Error('media started before the child acted');
+        const events = { played: false, ended: false, altered: false };
+        element.__miraGuidedEvents = events;
+        element.addEventListener('playing', () => { events.played = true; });
+        element.addEventListener('ended', () => { events.ended = true; });
+        for (const type of ['seeking', 'ratechange']) {
+          element.addEventListener(type, () => { events.altered = true; });
+        }
+      }, undefined, { timeout: 5000 });
+      await page.evaluate(() => window.postMessage({type:'SET_WIDGET_STATE', state:{activityReady:true}}, '*'));
+      await page.waitForFunction(selector => document.querySelector(selector)?.dataset.phase === 'ready', guidedSelector,
+                                 { timeout: 5000 });
+      const gesture = root.locator('[data-media-gesture]');
+      if (round === 1 && await gesture.count()) {
+        const bounds = await gesture.boundingBox({ timeout: 5000 });
+        if (!bounds) throw new Error('guided gesture is hidden');
+        const x = bounds.x + bounds.width / 2;
+        const y = bounds.y + bounds.height / 2;
+        await page.mouse.move(x, y);
+        await page.mouse.down();
+        await page.mouse.move(x, Math.min(700, y + 156), { steps: 12 });
+        await page.mouse.up();
+      } else {
+        await trigger.click({ timeout: 5000 });
+      }
+      await page.waitForFunction(selector => {
+        const phase = document.querySelector(selector)?.dataset.phase;
+        return phase === 'done' || phase === 'error';
+      }, guidedSelector, { timeout: 95000 });
+      const played = await media.evaluate(element => {
+        const events = element.__miraGuidedEvents;
+        return events.played && events.ended && !events.altered && element.ended
+          && !element.muted && element.volume > 0 && element.playbackRate === 1;
+      });
+      if (!played || await root.getAttribute('data-phase') !== 'done') {
+        throw new Error('activity did not finish with complete, unaltered media playback');
+      }
+      result.finishes.push(round);
+      result.seconds.push(Math.round((Date.now() - started) / 1000));
+    } catch (error) {
+      result.stuck = 'guided media round ' + round + ': ' + String(error.message).split('\n')[0];
+      break;
+    }
+  }
+  for (const message of await page.evaluate(() => (window.K?.errs || []).map(String))) errors.push(message);
+  return result;
+}
 
 const browser = await chromium.launch({ executablePath: args.chrome, headless: true });
 const files = fs.readdirSync(args.dir).filter((file) => /^scene-\d+\.html$/.test(file)).sort();
@@ -213,6 +286,11 @@ for (const file of files) {
   });
   if (args.inspect === '1') {
     report.push({ file, snapshot: await page.evaluate(snapshot) });
+    await page.close();
+    continue;
+  }
+  if (await page.locator(guidedSelector).count()) {
+    report.push(await playGuidedMedia(page, file, errors));
     await page.close();
     continue;
   }

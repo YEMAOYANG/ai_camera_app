@@ -1,0 +1,1363 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "Review Module",
+  "grade": 1,
+  "description": "在社区玩具交换会听颜色、点数、猜物件、问年龄，练习送礼和感谢。",
+  "roster": {
+    "mia": {
+      "name": "Mia 老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Jennifer",
+      "avatar": "/teachers/coco-english-v1.png",
+      "color": "#557B76",
+      "persona": "用短英语口令和图片带一年级孩子听清、想一想、再说。"
+    }
+  },
+  "audio": {
+    "five-claps": {
+      "file": "assets/five-claps.wav",
+      "sha256": "d94689e099fc012e3de471569b3cc476cca5b453b4b5bab7cbe5244a8aefab50"
+    }
+  },
+  "images": {
+    "swap-booth": {
+      "file": "assets/swap-booth.png"
+    },
+    "bubble-pond": {
+      "file": "assets/bubble-pond.png"
+    },
+    "delivery-path": {
+      "file": "assets/delivery-path.png"
+    },
+    "closed-gift": {
+      "file": "assets/closed-gift.png"
+    },
+    "birthday-book": {
+      "file": "assets/birthday-book.png"
+    },
+    "clapping-hands": {
+      "file": "assets/clapping-hands.png"
+    },
+    "q-give-pencil": {
+      "file": "assets/q-give-pencil.png"
+    },
+    "q-give-book": {
+      "file": "assets/q-give-book.png"
+    },
+    "q-give-dog": {
+      "file": "assets/q-give-dog.png"
+    },
+    "q-after-gift": {
+      "file": "assets/q-after-gift.png"
+    },
+    "red-cat": {
+      "file": "assets/red-cat.png"
+    },
+    "green-cat": {
+      "file": "assets/green-cat.png"
+    },
+    "green-dog": {
+      "file": "assets/green-dog.png"
+    },
+    "blue-dog": {
+      "file": "assets/blue-dog.png"
+    },
+    "blue-bird": {
+      "file": "assets/blue-bird.png"
+    },
+    "yellow-bird": {
+      "file": "assets/yellow-bird.png"
+    },
+    "toy-boat": {
+      "file": "assets/toy-boat.png"
+    },
+    "toy-van": {
+      "file": "assets/toy-van.png"
+    },
+    "q-green-bird": {
+      "file": "assets/q-green-bird.png"
+    },
+    "q-yellow-bird": {
+      "file": "assets/q-yellow-bird.png"
+    },
+    "q-green-dog": {
+      "file": "assets/q-green-dog.png"
+    },
+    "q-orange-cat": {
+      "file": "assets/q-orange-cat.png"
+    },
+    "q-red-cat": {
+      "file": "assets/q-red-cat.png"
+    },
+    "q-orange-dog": {
+      "file": "assets/q-orange-dog.png"
+    },
+    "q-blue-bag": {
+      "file": "assets/q-blue-bag.png"
+    },
+    "q-red-bag": {
+      "file": "assets/q-red-bag.png"
+    },
+    "q-blue-pencil": {
+      "file": "assets/q-blue-pencil.png"
+    },
+    "q-receiver": {
+      "file": "assets/q-receiver.png"
+    },
+    "q-giver": {
+      "file": "assets/q-giver.png"
+    },
+    "q-gift-listener": {
+      "file": "assets/q-gift-listener.png"
+    },
+    "clap-icon": {
+      "file": "assets/clap-icon.png"
+    },
+    "ball-3": {
+      "file": "assets/ball-3.png"
+    },
+    "ball-5": {
+      "file": "assets/ball-5.png"
+    },
+    "book-4": {
+      "file": "assets/book-4.png"
+    },
+    "schoolbag-2": {
+      "file": "assets/schoolbag-2.png"
+    },
+    "schoolbag-4": {
+      "file": "assets/schoolbag-4.png"
+    },
+    "pencil-6": {
+      "file": "assets/pencil-6.png"
+    },
+    "pencil-7": {
+      "file": "assets/pencil-7.png"
+    },
+    "book-6": {
+      "file": "assets/book-6.png"
+    },
+    "q-pencil-count-1": {
+      "file": "assets/q-pencil-count-1.png"
+    },
+    "q-pencil-count-2": {
+      "file": "assets/q-pencil-count-2.png"
+    },
+    "q-pencil-count-3": {
+      "file": "assets/q-pencil-count-3.png"
+    },
+    "quiz-animals-one": {
+      "file": "assets/quiz-animals-one.png"
+    },
+    "quiz-animals-two": {
+      "file": "assets/quiz-animals-two.png"
+    },
+    "quiz-bag-colors": {
+      "file": "assets/quiz-bag-colors.png"
+    },
+    "counting-panel": {
+      "file": "assets/counting-panel.png"
+    },
+    "age-seven": {
+      "file": "assets/age-seven.png"
+    },
+    "age-six": {
+      "file": "assets/age-six.png"
+    },
+    "q-age-seven": {
+      "file": "assets/q-age-seven.png"
+    },
+    "q-age-eight": {
+      "file": "assets/q-age-eight.png"
+    },
+    "q-age-nine": {
+      "file": "assets/q-age-nine.png"
+    },
+    "q-dots-eight": {
+      "file": "assets/q-dots-eight.png"
+    },
+    "q-dots-nine": {
+      "file": "assets/q-dots-nine.png"
+    },
+    "q-dots-ten": {
+      "file": "assets/q-dots-ten.png"
+    },
+    "badge-star": {
+      "file": "assets/badge-star.png"
+    },
+    "quiz-badge-star": {
+      "file": "assets/quiz-badge-star.png"
+    },
+    "badge-sun": {
+      "file": "assets/badge-sun.png"
+    },
+    "quiz-badge-sun": {
+      "file": "assets/quiz-badge-sun.png"
+    },
+    "badge-leaf": {
+      "file": "assets/badge-leaf.png"
+    },
+    "quiz-badge-leaf": {
+      "file": "assets/quiz-badge-leaf.png"
+    },
+    "volunteer-badges": {
+      "file": "assets/volunteer-badges.png"
+    },
+    "shelf-open": {
+      "file": "assets/shelf-open.png"
+    },
+    "shelf-covered": {
+      "file": "assets/shelf-covered.png"
+    },
+    "teaching-toys-six": {
+      "file": "assets/teaching-toys-six.png"
+    },
+    "orders-middle": {
+      "file": "assets/orders-middle.png"
+    },
+    "orders-final": {
+      "file": "assets/orders-final.png"
+    },
+    "q-number-board": {
+      "file": "assets/q-number-board.png"
+    },
+    "q-role-board": {
+      "file": "assets/q-role-board.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "swap-meet",
+      "type": "slide",
+      "title": "玩具交换会开门啦",
+      "template": "title-picture",
+      "data": {
+        "title": "玩具交换会开门啦",
+        "picture": "swap-booth",
+        "caption": "Hello! Welcome!"
+      },
+      "script": [
+        {
+          "say": "Hello! Welcome!"
+        },
+        {
+          "say": "交换会到了。你想先去看玩具，还是先去当小邮差？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "这儿有玩具、书包和铅笔。"
+        },
+        {
+          "say": "听清名字，再去找它们。"
+        },
+        {
+          "say": "同一种动物还可能涂成不同颜色，耳朵要听两条线索。"
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "见到同伴，可以先用英语打个招呼。"
+        },
+        {
+          "say": "Hello! Nice to meet you!"
+        },
+        {
+          "say": "等你听清再指图。说错了，我们听一遍再试。"
+        }
+      ]
+    },
+    {
+      "key": "point-and-name",
+      "type": "slide",
+      "title": "听颜色，也听动物",
+      "template": "title-picture",
+      "data": {
+        "title": "听颜色，也听动物",
+        "picture": "teaching-toys-six",
+        "caption": "What's this? It's a dog."
+      },
+      "script": [
+        {
+          "say": "这儿有两只绿色玩具。要指哪一只，先听我的话。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "Point to the green dog."
+        },
+        {
+          "say": "green 说的是绿色，dog 是小狗。"
+        },
+        {
+          "say": "两条线索都要对。"
+        },
+        {
+          "say": "绿色小猫也绿，但耳朵尖尖，它是 cat。"
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "如果想知道手边的玩具叫什么，就这样问。"
+        },
+        {
+          "say": "What’s this?"
+        },
+        {
+          "say": "It’s a green dog."
+        },
+        {
+          "say": "先跟我读问句，再换你答。我们听一轮新口令。"
+        }
+      ]
+    },
+    {
+      "key": "ready-for-the-pond",
+      "type": "slide",
+      "title": "去池边前先听一轮",
+      "template": "title-picture",
+      "data": {
+        "title": "去池边前先听一轮",
+        "picture": "teaching-toys-six",
+        "caption": "Listen and point."
+      },
+      "script": [
+        {
+          "say": "要开小艇啦。我们试着只听声音，在图里找玩具。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "Point to the blue dog."
+        },
+        {
+          "say": "Point to the green cat."
+        },
+        {
+          "say": "Find the blue bird."
+        },
+        {
+          "say": "Find the yellow bird."
+        },
+        {
+          "say": "Find the green dog."
+        },
+        {
+          "say": "Find the red cat."
+        },
+        {
+          "say": "Look for the blue dog."
+        },
+        {
+          "say": "Look for the green cat."
+        },
+        {
+          "say": "Look for the yellow bird."
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "再听颜色和动物，少听一个就会找错。"
+        },
+        {
+          "say": "如果图卡亮起，就把小船移到它下面。"
+        },
+        {
+          "say": "颜色和动物都听清，就能找到对应的图。"
+        }
+      ]
+    },
+    {
+      "key": "listen-and-aim",
+      "type": "interactive",
+      "title": "听颜色和动物",
+      "page": "listen-and-aim",
+      "startImage": "bubble-pond",
+      "widgetType": "learning-arcade",
+      "gameAudio": {
+        "point-blue-dog": "ready-for-the-pond-3",
+        "point-green-cat": "ready-for-the-pond-4",
+        "find-blue-bird": "ready-for-the-pond-5",
+        "find-yellow-bird": "ready-for-the-pond-6",
+        "find-green-dog": "ready-for-the-pond-7",
+        "find-red-cat": "ready-for-the-pond-8",
+        "look-blue-dog": "ready-for-the-pond-9",
+        "look-green-cat": "ready-for-the-pond-10",
+        "look-yellow-bird": "ready-for-the-pond-11",
+        "colour-hint": "ready-for-the-pond-13",
+        "colour-help": "ready-for-the-pond-14",
+        "colour-praise": "ready-for-the-pond-15"
+      },
+      "script": [
+        {
+          "say": "两张图都是蓝色。哪张还满足小狗这个线索？"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#game-goal"
+        },
+        {
+          "say": "先听老师给的两条线索。"
+        },
+        {
+          "say": "这一轮我听到了蓝色，还有小狗。"
+        },
+        {
+          "highlight": "#first-colour-card"
+        },
+        {
+          "say": "我找长耳朵和圆鼻子。它既是小狗，又是蓝色。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "用左右箭头移小船。到了图卡下面，点圆圈发泡泡。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "看泡泡从船头往上飘。我们只打一张，接到就停。"
+        },
+        {
+          "say": "颜色和动物都对才得分。现在轮到你听。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ]
+    },
+    {
+      "key": "count-by-ear",
+      "type": "slide",
+      "title": "听拍手，再说几个",
+      "template": "two-columns",
+      "data": {
+        "title": "听拍手，再说几个",
+        "left": {
+          "heading": "先用耳朵听",
+          "body": "How many?"
+        },
+        "left_picture": "clapping-hands",
+        "right": {
+          "heading": "再找要数的物件",
+          "body": "Three balls."
+        },
+        "right_picture": "counting-panel"
+      },
+      "script": [
+        {
+          "say": "谁会不用眼睛数？先看这双手，等会儿只用耳朵听。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "Count the claps."
+        },
+        {
+          "say": "假如拍了三下，我跟着数 one, two, three。拍完答 Three。"
+        },
+        {
+          "say": "How many?"
+        },
+        {
+          "say": "等会儿你可以点拍手图标听，也能再听一遍。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "也可以看图数。老师问 balls，就只数圆圆的球。"
+        },
+        {
+          "say": "How many balls?"
+        },
+        {
+          "say": "Three balls."
+        },
+        {
+          "say": "旁边有一本书，但书和球不是一种物件，不数进去。"
+        },
+        {
+          "say": "One, two, three, four."
+        },
+        {
+          "say": "Five, six, seven."
+        },
+        {
+          "say": "Eight, nine, ten."
+        },
+        {
+          "say": "请家人拍几下。先别看，听完再用英语说数。"
+        }
+      ]
+    },
+    {
+      "key": "guess-after-clues",
+      "type": "slide",
+      "title": "先猜，再听答复",
+      "template": "two-columns",
+      "data": {
+        "title": "先猜，再听答复",
+        "left": {
+          "heading": "盒子还盖着",
+          "body": "Is it a cat?"
+        },
+        "left_picture": "closed-gift",
+        "right": {
+          "heading": "答案亮相",
+          "body": "Yes, it is."
+        },
+        "right_picture": "blue-bird"
+      },
+      "script": [
+        {
+          "say": "给一条线索。盒里的动物有尾巴。我先猜小猫，再听回答。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "Is it a cat?"
+        },
+        {
+          "say": "No, it isn’t."
+        },
+        {
+          "say": "听见 No，刚才猜的猫就可以先放一边。"
+        },
+        {
+          "say": "换个猜法，问它是不是一只鸟。"
+        },
+        {
+          "say": "Is it a bird?"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "Yes, it is."
+        },
+        {
+          "say": "Yes 告诉我们，这一次猜对了。你看，盒里是小鸟。"
+        },
+        {
+          "say": "再猜一次，找家人藏一个熟悉的物件。"
+        }
+      ]
+    },
+    {
+      "key": "guess-the-volunteer",
+      "type": "slide",
+      "title": "谁在接收窗口",
+      "template": "title-picture",
+      "data": {
+        "title": "谁在接收窗口",
+        "picture": "volunteer-badges",
+        "caption": "Milo　Nia　Kai"
+      },
+      "script": [
+        {
+          "say": "三位志愿者等着接货。先认一认他们的标记。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "蓝星是 Milo，太阳是 Nia，红叶是 Kai。"
+        },
+        {
+          "say": "说 Hello 的人没有蓝星徽记。我们先猜红叶那位。"
+        },
+        {
+          "say": "Hello!"
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "Is it Kai?"
+        },
+        {
+          "say": "No, it isn’t."
+        },
+        {
+          "say": "听到 No，先排除红叶。再问太阳标记的 Nia。"
+        },
+        {
+          "say": "Is it Nia?"
+        },
+        {
+          "say": "Yes, it is."
+        },
+        {
+          "say": "如果听到 Yes，就用刚认过的标记找到这个人。"
+        },
+        {
+          "say": "Take it to Milo."
+        },
+        {
+          "say": "Take it to Nia."
+        },
+        {
+          "say": "Take it to Kai."
+        },
+        {
+          "say": "送货时只认已经介绍过的标记，听名字再去找。"
+        }
+      ]
+    },
+    {
+      "key": "name-and-age-badge",
+      "type": "slide",
+      "title": "用年龄牌来答",
+      "template": "two-columns",
+      "data": {
+        "title": "用年龄牌来答",
+        "left": {
+          "heading": "Milo 的年龄牌",
+          "body": "I’m seven."
+        },
+        "left_picture": "age-seven",
+        "right": {
+          "heading": "Nia 的年龄牌",
+          "body": "I’m six."
+        },
+        "right_picture": "age-six"
+      },
+      "script": [
+        {
+          "say": "数桌上几支铅笔，我问 How many pencils? 现在想问志愿者几岁。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "How old are you?"
+        },
+        {
+          "say": "这句话是在问年龄。蓝牌上面五点，下面两点。"
+        },
+        {
+          "say": "五和二一共七点。Milo 可以这样答。"
+        },
+        {
+          "say": "I’m seven."
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "How old are you?"
+        },
+        {
+          "say": "看看 Nia 的牌，下面只多一点，总共六点。"
+        },
+        {
+          "say": "I’m six."
+        },
+        {
+          "say": "拿张纸画一张牌，用你给角色编的年龄。"
+        },
+        {
+          "say": "你可以和家人交换角色。一人问，一人看牌说。"
+        }
+      ]
+    },
+    {
+      "key": "orders-from-the-desk",
+      "type": "slide",
+      "title": "听清是哪一种、有几个",
+      "template": "two-columns",
+      "data": {
+        "title": "听清是哪一种、有几个",
+        "left": {
+          "heading": "先认不同物件",
+          "body": "Listen and look."
+        },
+        "left_picture": "orders-middle",
+        "right": {
+          "heading": "同一物件也有不同数量",
+          "body": "Listen again."
+        },
+        "right_picture": "orders-final"
+      },
+      "script": [
+        {
+          "say": "同一张订单里，物件和数量少听一个，就可能拿错。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "看左边。有书，也有两张书包图。先听物件。"
+        },
+        {
+          "say": "Pick four books."
+        },
+        {
+          "say": "Pick two schoolbags."
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "再听有几个。同是铅笔，有六支，也有七支。"
+        },
+        {
+          "say": "Pick six pencils."
+        },
+        {
+          "say": "Pick seven pencils."
+        },
+        {
+          "say": "Pick six books."
+        },
+        {
+          "say": "没听清时再听，想想要拿哪种、有几个。"
+        },
+        {
+          "say": "提示亮起时，先等路上的车过去。"
+        },
+        {
+          "say": "先听清订单，再看收件标记，就能送对人。"
+        }
+      ]
+    },
+    {
+      "key": "count-and-deliver",
+      "type": "interactive",
+      "title": "听清数量再送货",
+      "page": "count-and-deliver",
+      "startImage": "delivery-path",
+      "widgetType": "learning-arcade",
+      "gameAudio": {
+        "clap-pickup": "count-by-ear-3",
+        "deliver-milo": "guess-the-volunteer-13",
+        "deliver-nia": "guess-the-volunteer-14",
+        "deliver-kai": "guess-the-volunteer-15",
+        "pickup-books-four": "orders-from-the-desk-4",
+        "pickup-bags-two": "orders-from-the-desk-5",
+        "pickup-pencils-six": "orders-from-the-desk-8",
+        "pickup-pencils-seven": "orders-from-the-desk-9",
+        "pickup-books-six": "orders-from-the-desk-10",
+        "order-hint": "orders-from-the-desk-11",
+        "order-help": "orders-from-the-desk-12",
+        "order-praise": "orders-from-the-desk-13"
+      },
+      "script": [
+        {
+          "say": "这张订单没念数字。怎么办？要先听拍手有几下。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#first-order"
+        },
+        {
+          "say": "听完拍手，再找跟拍手次数一样多的球。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "车就在取货点。到了图旁边，再点方形装卸键。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "右边的小窗出现刚拿到的球，说明这一次取对了。"
+        },
+        {
+          "highlight": "#receiving-windows"
+        },
+        {
+          "say": "上面的接收窗各有标记。听清是谁再过去。"
+        },
+        {
+          "say": "注意路上会来车。等空了，再用箭头开过去。"
+        },
+        {
+          "say": "轮到你。先点右边拍手图标，听完才开车。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ]
+    },
+    {
+      "key": "say-it-kindly",
+      "type": "slide",
+      "title": "一句祝福，一次送礼",
+      "template": "title-picture",
+      "data": {
+        "title": "一句祝福，一次送礼",
+        "picture": "birthday-book",
+        "caption": "Happy birthday!"
+      },
+      "script": [
+        {
+          "say": "今天是 Nia 的生日。Milo 该先说什么？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "Happy birthday!"
+        },
+        {
+          "say": "这是祝福。递出书的时候，再说这是给她的。"
+        },
+        {
+          "say": "A book for you."
+        },
+        {
+          "say": "Nia 收下书。轮到收礼的人说谢谢。"
+        },
+        {
+          "say": "Thank you!"
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "Milo 可以回一句不用谢。"
+        },
+        {
+          "say": "You’re welcome."
+        },
+        {
+          "say": "请找一本书练一遍。交换角色，再试一句送球的话。"
+        },
+        {
+          "say": "A ball for you."
+        }
+      ]
+    },
+    {
+      "key": "cover-and-remember",
+      "type": "slide",
+      "title": "看一看，再遮住",
+      "template": "title-picture",
+      "data": {
+        "title": "看一看，再遮住",
+        "picture": "shelf-open",
+        "caption": "Look. Remember."
+      },
+      "script": [
+        {
+          "say": "交换会要关柜门了。你能先记住柜里有几件东西吗？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "从上往下看。第一排是书包，第二排是书。"
+        },
+        {
+          "say": "下面摆着铅笔。你可以指着从左往右数，每件只数一次。"
+        },
+        {
+          "say": "Look. Remember."
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "我数第二排的书，one, two, three。记住 Three books。"
+        },
+        {
+          "say": "请按一下暂停，等你看够再继续。"
+        },
+        {
+          "say": "下一页会遮住柜子。不要回头，先试着说。"
+        }
+      ]
+    },
+    {
+      "key": "recall-from-memory",
+      "type": "slide",
+      "title": "柜子盖上了",
+      "template": "title-picture",
+      "data": {
+        "title": "柜子盖上了",
+        "picture": "shelf-covered",
+        "caption": "How many schoolbags?"
+      },
+      "script": [
+        {
+          "say": "柜子遮住了。我还记得 Three books。你记得第一排吗？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "How many schoolbags?"
+        },
+        {
+          "say": "先暂停。想清数量，再把物件词一起说给家人。"
+        },
+        {
+          "say": "等你说完，再继续听老师的答案。"
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "Four schoolbags."
+        },
+        {
+          "say": "再挑战一次，How many pencils?"
+        },
+        {
+          "say": "Five pencils."
+        },
+        {
+          "say": "可以回到上一页指着核对。忘了就重新看，再盖上重试。"
+        }
+      ]
+    },
+    {
+      "key": "picture-check",
+      "type": "quiz",
+      "title": "换一批图片听一听",
+      "intro": [
+        "听一遍老师说的话，再选符合的图。",
+        "没听清，点小喇叭再听一遍。"
+      ],
+      "questions": [
+        {
+          "id": "swap-q1",
+          "question": "Point to the green bird.",
+          "skill": "听颜色和动物指图",
+          "answer": [
+            "A"
+          ],
+          "analysis": "green 是绿色，bird 是小鸟。绿色小狗只有颜色对，黄鸟只有动物对。",
+          "visual": {
+            "kind": "asset",
+            "image": "quiz-animals-one",
+            "alt": "绿鸟、黄鸟、绿狗三张木玩具图"
+          },
+          "options": {
+            "A": {
+              "label": "图卡一",
+              "visual": {
+                "kind": "asset",
+                "image": "q-green-bird",
+                "alt": "绿色小鸟"
+              }
+            },
+            "B": {
+              "label": "图卡二",
+              "visual": {
+                "kind": "asset",
+                "image": "q-yellow-bird",
+                "alt": "黄色小鸟"
+              }
+            },
+            "C": {
+              "label": "图卡三",
+              "visual": {
+                "kind": "asset",
+                "image": "q-green-dog",
+                "alt": "绿色小狗"
+              }
+            }
+          }
+        },
+        {
+          "id": "swap-q2",
+          "question": "It’s an orange cat.",
+          "skill": "从物品回答中听出橙色和小猫",
+          "answer": [
+            "C"
+          ],
+          "analysis": "orange 是橙色，cat 是小猫。第三张同时符合两个线索。",
+          "visual": {
+            "kind": "asset",
+            "image": "quiz-animals-two",
+            "alt": "红猫、橙狗、橙猫三张木玩具图"
+          },
+          "options": {
+            "A": {
+              "label": "图卡一",
+              "visual": {
+                "kind": "asset",
+                "image": "q-red-cat",
+                "alt": "红色小猫"
+              }
+            },
+            "B": {
+              "label": "图卡二",
+              "visual": {
+                "kind": "asset",
+                "image": "q-orange-dog",
+                "alt": "橙色小狗"
+              }
+            },
+            "C": {
+              "label": "图卡三",
+              "visual": {
+                "kind": "asset",
+                "image": "q-orange-cat",
+                "alt": "橙色小猫"
+              }
+            }
+          }
+        },
+        {
+          "id": "swap-q3",
+          "question": "How many pencils? Seven.",
+          "skill": "听物件类别和七并按类计数",
+          "answer": [
+            "B"
+          ],
+          "analysis": "pencils 指铅笔，seven 是七。第二张有七支铅笔，书包不算。",
+          "visual": {
+            "kind": "asset",
+            "image": "q-blue-pencil",
+            "alt": "一支蓝色铅笔"
+          },
+          "options": {
+            "A": {
+              "label": "图卡一",
+              "visual": {
+                "kind": "asset",
+                "image": "q-pencil-count-1",
+                "alt": "六支铅笔和一个书包"
+              }
+            },
+            "B": {
+              "label": "图卡二",
+              "visual": {
+                "kind": "asset",
+                "image": "q-pencil-count-2",
+                "alt": "七支铅笔和一个书包"
+              }
+            },
+            "C": {
+              "label": "图卡三",
+              "visual": {
+                "kind": "asset",
+                "image": "q-pencil-count-3",
+                "alt": "八支铅笔和一个书包"
+              }
+            }
+          }
+        },
+        {
+          "id": "swap-q4",
+          "question": "How many? Ten.",
+          "skill": "听懂英语数字 ten 并选同样多的点",
+          "answer": [
+            "A"
+          ],
+          "analysis": "Ten 是十。第一张上面五点、下面五点，一共十点。",
+          "visual": {
+            "kind": "asset",
+            "image": "q-number-board",
+            "alt": "三张点数不同的卡片"
+          },
+          "options": {
+            "A": {
+              "label": "图卡一",
+              "visual": {
+                "kind": "asset",
+                "image": "q-dots-ten",
+                "alt": "十个点"
+              }
+            },
+            "B": {
+              "label": "图卡二",
+              "visual": {
+                "kind": "asset",
+                "image": "q-dots-eight",
+                "alt": "八个点"
+              }
+            },
+            "C": {
+              "label": "图卡三",
+              "visual": {
+                "kind": "asset",
+                "image": "q-dots-nine",
+                "alt": "九个点"
+              }
+            }
+          }
+        },
+        {
+          "id": "swap-q5",
+          "question": "Red? No. A blue bag.",
+          "skill": "听否定后选择真正的物件和颜色",
+          "answer": [
+            "C"
+          ],
+          "analysis": "No 排除了红色。blue 是蓝色，bag 是书包，蓝铅笔只有颜色对。",
+          "visual": {
+            "kind": "asset",
+            "image": "quiz-bag-colors",
+            "alt": "红书包、蓝铅笔和蓝书包"
+          },
+          "options": {
+            "A": {
+              "label": "图卡一",
+              "visual": {
+                "kind": "asset",
+                "image": "q-red-bag",
+                "alt": "红色书包"
+              }
+            },
+            "B": {
+              "label": "图卡二",
+              "visual": {
+                "kind": "asset",
+                "image": "q-blue-pencil",
+                "alt": "蓝色铅笔"
+              }
+            },
+            "C": {
+              "label": "图卡三",
+              "visual": {
+                "kind": "asset",
+                "image": "q-blue-bag",
+                "alt": "蓝色书包"
+              }
+            }
+          }
+        },
+        {
+          "id": "swap-q6",
+          "question": "Nia has the sun. Milo has the blue star. Kai has the red badge. Is it Milo? Yes, it is.",
+          "skill": "听肯定回答确认角色",
+          "answer": [
+            "B"
+          ],
+          "analysis": "听见 Yes, it is. 就确定是 Milo。对照题里三个角色的标记，Milo 的是蓝色星星。",
+          "visual": {
+            "kind": "asset",
+            "image": "q-role-board",
+            "alt": "太阳、蓝星和红叶三个接收标记"
+          },
+          "options": {
+            "A": {
+              "label": "图卡一",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-badge-sun",
+                "alt": "太阳标记"
+              }
+            },
+            "B": {
+              "label": "图卡二",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-badge-star",
+                "alt": "蓝星标记"
+              }
+            },
+            "C": {
+              "label": "图卡三",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-badge-leaf",
+                "alt": "红叶标记"
+              }
+            }
+          }
+        },
+        {
+          "id": "swap-q7",
+          "question": "How old are you? I’m 9.",
+          "skill": "听出英语年龄回答并认领年龄牌",
+          "answer": [
+            "C"
+          ],
+          "analysis": "How old 问几岁。nine 是九，第三张牌有九个点。",
+          "visual": {
+            "kind": "asset",
+            "image": "q-gift-listener",
+            "alt": "一位等着回答的小朋友"
+          },
+          "options": {
+            "A": {
+              "label": "图卡一",
+              "visual": {
+                "kind": "asset",
+                "image": "q-age-eight",
+                "alt": "八点的年龄牌"
+              }
+            },
+            "B": {
+              "label": "图卡二",
+              "visual": {
+                "kind": "asset",
+                "image": "q-age-seven",
+                "alt": "七点的年龄牌"
+              }
+            },
+            "C": {
+              "label": "图卡三",
+              "visual": {
+                "kind": "asset",
+                "image": "q-age-nine",
+                "alt": "九点的年龄牌"
+              }
+            }
+          }
+        },
+        {
+          "id": "swap-q8",
+          "question": "礼物已经交到收礼人手里。听，Thank you! 谁在说？",
+          "skill": "判断礼貌用语的说话角色",
+          "answer": [
+            "B"
+          ],
+          "analysis": "礼物已经送到收礼人手里。看图，礼物在戴围巾的孩子手里，所以是她说 Thank you。",
+          "visual": {
+            "kind": "asset",
+            "image": "q-after-gift",
+            "alt": "绿围巾孩子抱着礼物，橙衣孩子空着手"
+          },
+          "options": {
+            "A": {
+              "label": "图卡一",
+              "visual": {
+                "kind": "asset",
+                "image": "q-giver",
+                "alt": "橙衣送礼者"
+              }
+            },
+            "B": {
+              "label": "图卡二",
+              "visual": {
+                "kind": "asset",
+                "image": "q-receiver",
+                "alt": "绿围巾收礼者"
+              }
+            }
+          }
+        },
+        {
+          "id": "swap-q9",
+          "question": "A pencil for you.",
+          "skill": "听赠物句和物件词，选择对应动作",
+          "answer": [
+            "A"
+          ],
+          "analysis": "pencil 是铅笔。for you 是送给你。第一张把一支铅笔递给了同伴。",
+          "visual": {
+            "kind": "asset",
+            "image": "q-gift-listener",
+            "alt": "等着接礼物的孩子"
+          },
+          "options": {
+            "A": {
+              "label": "图卡一",
+              "visual": {
+                "kind": "asset",
+                "image": "q-give-pencil",
+                "alt": "把一支铅笔递给同伴"
+              }
+            },
+            "B": {
+              "label": "图卡二",
+              "visual": {
+                "kind": "asset",
+                "image": "q-give-book",
+                "alt": "把一本书递给同伴"
+              }
+            },
+            "C": {
+              "label": "图卡三",
+              "visual": {
+                "kind": "asset",
+                "image": "q-give-dog",
+                "alt": "把一只玩具狗递给同伴"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "wrap-up",
+      "type": "slide",
+      "title": "一起把交换会带回家",
+      "template": "title-picture",
+      "data": {
+        "title": "一起把交换会带回家",
+        "picture": "swap-booth",
+        "caption": "Listen. Think. Say."
+      },
+      "script": [
+        {
+          "say": "要关门啦。下次开交换会，你想请家人扮演谁？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "找物件，先听颜色和名字。问几个，就只数问的那种。"
+        },
+        {
+          "say": "猜东西听清 Yes 或 No。"
+        },
+        {
+          "say": "问年龄，就看自己编的年龄牌。"
+        },
+        {
+          "say": "祝福以后再送礼。收到的人说谢谢，送的人说不用谢。"
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "请家人藏一个物件，换你来问、来数、来送。"
+        },
+        {
+          "say": "也可以试试介绍自己的书包。"
+        },
+        {
+          "say": "This is my bag."
+        },
+        {
+          "say": "回到纸书第六十二到六十五页，找一项再练。"
+        }
+      ]
+    }
+  ]
+}

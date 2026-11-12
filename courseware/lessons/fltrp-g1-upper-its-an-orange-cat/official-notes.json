@@ -2,7 +2,7 @@
   "schemaVersion": "mira.courseware.official-notes.v1",
   "binding": {
     "editionId": "smartedu-english-six-year-g1-upper-sync-af05bc77",
-    "revisionId": "directory-0c147a23366906ebae132dca",
+    "revisionId": "20260928-metadata-1",
     "unitId": "aad710d5-42fb-342b-b657-c5ecffe6ad12",
     "nodeId": "c033cdb7-7a31-338e-9aef-fd498e3743cb",
     "unitTitle": "Module 7",
@@ -140,6 +140,10 @@
   },
   "directoryEvidence": {
     "registered": {
+      "path": "backend/content/textbooks/fltrp-reviewed-v1/smartedu-english-six-year-g1-upper-sync-af05bc77.20260928-metadata-1.json",
+      "sha256": "bbb6bc0d39193d1a111d1acff82d96508352dad7bec74622a8caac221969ac07"
+    },
+    "priorRegistered": {
       "path": "backend/content/textbooks/official-directories-v1/smartedu-english-six-year-g1-upper-sync-af05bc77.directory-0c147a23366906ebae132dca.json",
       "sha256": "034be84c6281ae39f1b6f73ad8e7bcfd044a431ad7ef34321ce1ba89c834cb8f",
       "bytes": 17046
@@ -151,6 +155,18 @@
     },
     "title": "Unit 2 It's an orange cat.",
     "hasPageAttachments": false
+  },
+  "selectedRevisionRecheck": {
+    "reviewedAt": "2026-11-09T20:01:47+08:00",
+    "priorNotesSha256": "30e7a316b8ba63ad22c33aeb60224cb6c179e561acf8045277ab2b4439168315",
+    "manifestDifferences": ["editionLabel", "revisionId"],
+    "sourceSame": true,
+    "moduleAndLessonSame": true,
+    "textbookPagesReRead": [40, 41, 42, 43, 44],
+    "publisherDesignPagesReRead": [7, 8, 9, 10, 11, 12, 13, 14],
+    "publisherSlidesReRead": 13,
+    "publisherExercisePagesReRead": 4,
+    "note": "两套完整目录只有版本标识和版本显示名不同，书目资源、官方原始树和第七模块节点逐项相同。再读封面、编者页、目录和原书正文，以印刷41至43页作为本课边界。旧教案与课件中的黄色猫只记录为版本差异。"
   },
   "versionReconciliation": {
     "earlierEvidence": {
@@ -274,7 +290,7 @@
     },
     "learningTaskSheet": {
       "status": "not_provided",
-      "evidence": "同册现代国家平台完整索引只有一份空part。旧资源26项中的三个M7条目均绑定U1，U2精确匹配为0。出版社M7完整7条为两套单元课件、模块教案、测试及三条视频，无独立任务单。"
+      "evidence": "同册现代国家平台完整索引只有一份空part，见nationalInventory.modernParts与modernPart。旧资源26项中的三个M7条目均绑定U1，精确课目节点c033cdb7-7a31-338e-9aef-fd498e3743cb匹配为0，见nationalInventory.legacyListing。出版社M7完整7条为两套单元课件、模块教案、测试及三条视频，无独立任务单，见publisherInventory。"
     },
     "afterClassExercise": {
       "status": "reviewed",
@@ -357,6 +373,22 @@
         ]
       }
     ]
+  },
+  "publisherInventory": {
+    "listingUrl": "https://resource.unischool.cn/unischool/resource/list?SiteID=47&catalogalias=jccpzl_bkpt_yyxbzxxynjqd_ynjsc&module=m7",
+    "listing": {
+      "path": "output/courseware-lessons/fltrp-g1-upper-is-it-a-dog/official/publisher-module7-listing.html",
+      "sha256": "bc73da1f6fb7afe1b041dc7893685c2dae6daa297602eba8681c1c679f09178f",
+      "bytes": 58864
+    },
+    "receipt": {
+      "path": "output/courseware-lessons/fltrp-g1-upper-is-it-a-dog/official/publisher-module7-listing-receipt.json",
+      "sha256": "ac4304cb418c0f292c3e4ec0c3270a57b1f8871c5b9f0f10070107776451dbc9"
+    },
+    "resourceIds": ["216248", "216249", "216250", "216251", "220731", "220732", "220733"],
+    "unit2TeachingDesign": "216248第二课时与第三课时U2部分",
+    "unit2Courseware": "216251",
+    "modulePractice": "216249"
   },
   "scopeExclusions": [
     "第38至40页M7U1情节和第一课时由相邻课程覆盖。保留U2原书复现的确认问答。",

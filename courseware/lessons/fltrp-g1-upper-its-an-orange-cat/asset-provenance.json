@@ -1,0 +1,2414 @@
+{
+  "schemaVersion": "mira.courseware.asset-provenance.v1",
+  "lesson": "fltrp-g1-upper-its-an-orange-cat",
+  "status": "all_local_playback_images_registered_pending_g6",
+  "catalog": {
+    "path": "courseware/kit/game_templates/catalog.json",
+    "sha256": "c20aa7d310bc5c58698fa447d09b472808bb00f2d1884f91dc71acd5d6a7bf16",
+    "versions": {
+      "bubbleMaze": {
+        "version": 1,
+        "entryPoint": "K.gameTemplates.bubbleMaze",
+        "ownerApprovedOn": "2026-11-09"
+      },
+      "magnetMarbles": {
+        "version": 1,
+        "entryPoint": "K.gameTemplates.magnetMarbles",
+        "ownerApprovedOn": "2026-11-09"
+      }
+    }
+  },
+  "derivation": {
+    "tool": "Pillow",
+    "version": "11.2.1",
+    "resample": "LANCZOS",
+    "colorChange": false,
+    "encoding": "PNG optimize"
+  },
+  "assets": {
+    "display-backdrop": {
+      "path": "assets/display-backdrop.png",
+      "sourceKind": "codex_builtin_imagegen_derivative",
+      "sha256": "e3a869a5a30e0e27cdfa9e9687f5e73cbd175e594946adaa543e6432b6148f4d",
+      "bytes": 93412,
+      "pixels": [
+        608,
+        342
+      ],
+      "mode": "RGB",
+      "source": {
+        "path": "output/courseware-production/classic-arcade-v3/assets/marble-workshop.webp",
+        "sha256": "e3ee307f5be3851a50018cffe29ac15e554595656588262e210d387bbd16d152",
+        "manifest": "output/courseware-production/classic-arcade-v3/asset-sources.json",
+        "manifestSha256": "01d4f3f836ac294d47bc31e1470dc15d11cf74ac120939f82d005e010aabdf40"
+      },
+      "originalImagegen": {
+        "path": "/Users/sqcopenclaw/.codex/generated_images/01a1bf78-0c06-7fe0-8877-bc245394cec3/exec-ace14c00-1d39-43c9-a576-9135341a3b16.png",
+        "sha256": "99c68b17bc56a7558523764901cbc46d65bc7a8997cbe1f3bf771482dfd71a08",
+        "prompt": "Use case: stylized-concept. A four-panel 2x2 concept atlas for a premium storybook arcade, wide overall format with four equal landscape crop panels and a very narrow cream cross gutter. Top left: amber copper and charcoal-teal marble workshop, dark deep spruce central playfield empty, edge brass wheels, brick kiln glows left edge only. Top right: nighttime blue-teal botanical garden, dark empty sky in center, luminous cream lanterns at bottom corners, moss and purple leaf silhouettes toward edge, understated firefly dots but no characters. Bottom left: warm sunbeam passing over fern beds and a little clearing at dusk, cool spruce and olive watercolor paper shadows, center unobstructed with no subjects or paths. Bottom right: landscape view of quiet clover and wildflowers with a small naturally grown blossom, a mood study for the photo safari. Same matte gouache with fine dry paper grain, crafted cut paper, clean silhouette edges and subtle offset shadow, deep spruce, cream and restrained warm persimmon accents. No text, letters, digits, UI, logos, symbols, watermark.",
+        "sourceCrop": [
+          8,
+          8,
+          827,
+          462
+        ]
+      },
+      "renderInput": {
+        "path": "output/courseware-production/classic-arcade-v3/assets/marble-workshop.webp",
+        "sha256": "e3ee307f5be3851a50018cffe29ac15e554595656588262e210d387bbd16d152",
+        "pixels": [
+          1280,
+          720
+        ]
+      },
+      "derivativeCrop": [
+        376,
+        150,
+        984,
+        492
+      ],
+      "maxSide": null,
+      "usedBy": [
+        "listen-and-aim"
+      ],
+      "templates": [
+        "magnetMarbles"
+      ],
+      "visualReview": {
+        "at": "2026-11-09T20:34:53+08:00",
+        "scope": "单图和游戏使用尺寸的静态核对",
+        "finding": "核对16:9裁区，保留原画纸纹，裁区内没有干扰目标物。",
+        "fullSceneG6": "pending"
+      }
+    },
+    "maze-backdrop": {
+      "path": "assets/maze-backdrop.png",
+      "sourceKind": "codex_builtin_imagegen_derivative",
+      "sha256": "1be60063b43087cd91c628f7f4c2db4cdcd643747edeebd442eb5a50258a144a",
+      "bytes": 84345,
+      "pixels": [
+        592,
+        333
+      ],
+      "mode": "RGB",
+      "source": {
+        "path": "output/courseware-production/classic-arcade-v3/assets/night-garden.webp",
+        "sha256": "49afe36d3a169f16bc191f73251fa5e1a046df1c4dfb4145dd6ce0551d4a48ab",
+        "manifest": "output/courseware-production/classic-arcade-v3/asset-sources.json",
+        "manifestSha256": "01d4f3f836ac294d47bc31e1470dc15d11cf74ac120939f82d005e010aabdf40"
+      },
+      "originalImagegen": {
+        "path": "/Users/sqcopenclaw/.codex/generated_images/01a1bf78-0c06-7fe0-8877-bc245394cec3/exec-ace14c00-1d39-43c9-a576-9135341a3b16.png",
+        "sha256": "99c68b17bc56a7558523764901cbc46d65bc7a8997cbe1f3bf771482dfd71a08",
+        "prompt": "Use case: stylized-concept. A four-panel 2x2 concept atlas for a premium storybook arcade, wide overall format with four equal landscape crop panels and a very narrow cream cross gutter. Top left: amber copper and charcoal-teal marble workshop, dark deep spruce central playfield empty, edge brass wheels, brick kiln glows left edge only. Top right: nighttime blue-teal botanical garden, dark empty sky in center, luminous cream lanterns at bottom corners, moss and purple leaf silhouettes toward edge, understated firefly dots but no characters. Bottom left: warm sunbeam passing over fern beds and a little clearing at dusk, cool spruce and olive watercolor paper shadows, center unobstructed with no subjects or paths. Bottom right: landscape view of quiet clover and wildflowers with a small naturally grown blossom, a mood study for the photo safari. Same matte gouache with fine dry paper grain, crafted cut paper, clean silhouette edges and subtle offset shadow, deep spruce, cream and restrained warm persimmon accents. No text, letters, digits, UI, logos, symbols, watermark.",
+        "sourceCrop": [
+          845,
+          8,
+          1665,
+          462
+        ]
+      },
+      "renderInput": {
+        "path": "output/courseware-production/classic-arcade-v3/assets/night-garden.webp",
+        "sha256": "49afe36d3a169f16bc191f73251fa5e1a046df1c4dfb4145dd6ce0551d4a48ab",
+        "pixels": [
+          1280,
+          720
+        ]
+      },
+      "derivativeCrop": [
+        360,
+        135,
+        952,
+        468
+      ],
+      "maxSide": null,
+      "usedBy": [
+        "guess-and-drive"
+      ],
+      "templates": [
+        "bubbleMaze"
+      ],
+      "visualReview": {
+        "at": "2026-11-09T20:34:53+08:00",
+        "scope": "单图和游戏使用尺寸的静态核对",
+        "finding": "核对16:9裁区，保留原画纸纹，裁区内没有干扰目标物。",
+        "fullSceneG6": "pending"
+      }
+    },
+    "gallery-sticker": {
+      "path": "assets/gallery-sticker.png",
+      "sourceKind": "codex_builtin_imagegen_derivative",
+      "sha256": "9389c34b9713f5605cf4b257553cb269c438b286117e321fd2131edb2af3c7b8",
+      "bytes": 33018,
+      "pixels": [
+        160,
+        145
+      ],
+      "mode": "RGBA",
+      "source": {
+        "path": "output/courseware-production/classic-arcade-v3/assets/sticker.webp",
+        "sha256": "1d31f346ac58e9cc148ab253b33de05978cd7585a7c7454ba089c8da810789cf",
+        "manifest": "output/courseware-production/classic-arcade-v3/asset-sources.json",
+        "manifestSha256": "01d4f3f836ac294d47bc31e1470dc15d11cf74ac120939f82d005e010aabdf40"
+      },
+      "originalImagegen": {
+        "path": "/Users/sqcopenclaw/.codex/generated_images/01a1bf78-0c06-7fe0-8877-bc245394cec3/exec-00dcd8f8-2185-492f-81ff-73754de5dc8b.png",
+        "sha256": "72badede9f926c6be6c58daa9f00645f8b2f85d244108fd4c1514851d4ba8c31",
+        "prompt": "Use case: stylized-concept. A real transparent RGBA sprite sheet, three equal columns and two equal rows, with six fully isolated sprites, every sprite centered in its own cell with generous transparent gaps and similar size; do not touch one another; no shadows outside silhouettes. Top row three animation frames of the exact same cinnamon rabbit with teal scarf facing right, first resting on all fours, second running with front paws out, third airborne with knees tucked. Bottom row exact positions: first a compact round vermilion bubble rover top-down seen from overhead, its bubble nozzle points RIGHT; second the SAME rover with two pearly bubbles immediately to its right (nozzle points RIGHT); third a single illustrated golden star-shaped collector sticker with embossed paper petals but no text. Premium storybook arcade: matte gouache, fine paper grain, clean cut paper edges, charcoal teal shadows, warm cream, deep spruce, apricot and persimmon highlights. No labels, marks, boxes, ground, background, logos or text. Every sprite entirely visible.",
+        "sourceCrop": [
+          1057,
+          544,
+          1510,
+          953
+        ]
+      },
+      "renderInput": {
+        "path": "output/courseware-production/classic-arcade-v3/assets/sticker.webp",
+        "sha256": "1d31f346ac58e9cc148ab253b33de05978cd7585a7c7454ba089c8da810789cf",
+        "pixels": [
+          300,
+          271
+        ]
+      },
+      "derivativeCrop": null,
+      "maxSide": 160,
+      "usedBy": [
+        "guess-and-drive",
+        "listen-and-aim"
+      ],
+      "templates": [
+        "bubbleMaze",
+        "magnetMarbles"
+      ],
+      "visualReview": {
+        "at": "2026-11-09T20:34:53+08:00",
+        "scope": "单图和游戏使用尺寸的静态核对",
+        "finding": "核对主物轮廓完整、透明边缘及和该课深色游戏底的对比。",
+        "fullSceneG6": "pending"
+      }
+    },
+    "amber-marble": {
+      "path": "assets/amber-marble.png",
+      "sourceKind": "codex_builtin_imagegen_derivative",
+      "sha256": "c91724b40eeaa5230b03a83b4ffee8ec9ecf28ddfe1912115fd4223ca865ed3f",
+      "bytes": 44500,
+      "pixels": [
+        157,
+        160
+      ],
+      "mode": "RGBA",
+      "source": {
+        "path": "output/courseware-production/classic-arcade-v3/assets/marble.webp",
+        "sha256": "d39b5df5a69c613fc8da8f2ba4287d00f098b362df1cb662dcb369f80baed489",
+        "manifest": "output/courseware-production/classic-arcade-v3/asset-sources.json",
+        "manifestSha256": "01d4f3f836ac294d47bc31e1470dc15d11cf74ac120939f82d005e010aabdf40"
+      },
+      "originalImagegen": {
+        "path": "/Users/sqcopenclaw/.codex/generated_images/01a1bf78-0c06-7fe0-8877-bc245394cec3/exec-50f2b3c5-385c-4136-9aaf-a7f67a680cd1.png",
+        "sha256": "72e74e61ba8c2f768c7f5b71e04a348ced3c20df04eba16cd8800b9ea30ad859",
+        "prompt": "Use case: stylized-concept. Actual transparent background RGBA game sprite sheet. Four equal cells on a 2 by 2 grid with wide transparent gutters, each centered, every silhouette isolated and fully visible. Top left: shining spherical amber and cream glass marble, miniature warm glint, circular silhouette. Top right: one delightful tiny firefly character in side view pointing right with cream glowing abdomen, black-teal head and two folded turquoise wings. Bottom left: same exact firefly with wings lifted in flight, pointing right, bright amber tail. Bottom right: one stylized symmetrical warm purple butterfly, front view spread wings, a quiet warm cream spot on each upper wing, accurately two pairs of wings and a slender body, no legs needed at this scale. Matte gouache fine paper texture and crisp cut-paper edges. Transparent everywhere outside assets, no ground, no margins colored, no text, logos, drop shadows or tiny scattered dots.",
+        "sourceCrop": [
+          207,
+          69,
+          578,
+          447
+        ]
+      },
+      "renderInput": {
+        "path": "output/courseware-production/classic-arcade-v3/assets/marble.webp",
+        "sha256": "d39b5df5a69c613fc8da8f2ba4287d00f098b362df1cb662dcb369f80baed489",
+        "pixels": [
+          371,
+          378
+        ]
+      },
+      "derivativeCrop": null,
+      "maxSide": 160,
+      "usedBy": [
+        "listen-and-aim"
+      ],
+      "templates": [
+        "magnetMarbles"
+      ],
+      "visualReview": {
+        "at": "2026-11-09T20:34:53+08:00",
+        "scope": "单图和游戏使用尺寸的静态核对",
+        "finding": "核对主物轮廓完整、透明边缘及和该课深色游戏底的对比。",
+        "fullSceneG6": "pending"
+      }
+    },
+    "paper-rover": {
+      "path": "assets/paper-rover.png",
+      "sourceKind": "codex_builtin_imagegen_derivative",
+      "sha256": "b122b4d56e3fba8d86dab30bcd2cb238e9ef40031fe43cdd514b544be42fcc81",
+      "bytes": 57790,
+      "pixels": [
+        192,
+        180
+      ],
+      "mode": "RGBA",
+      "source": {
+        "path": "output/courseware-production/classic-arcade-v3/assets/rover.webp",
+        "sha256": "a56d62690c8896d0d2b8180d7daeca8cb2a2a31279ef963609806bb8f16b9168",
+        "manifest": "output/courseware-production/classic-arcade-v3/asset-sources.json",
+        "manifestSha256": "01d4f3f836ac294d47bc31e1470dc15d11cf74ac120939f82d005e010aabdf40"
+      },
+      "originalImagegen": {
+        "path": "/Users/sqcopenclaw/.codex/generated_images/01a1bf78-0c06-7fe0-8877-bc245394cec3/exec-00dcd8f8-2185-492f-81ff-73754de5dc8b.png",
+        "sha256": "72badede9f926c6be6c58daa9f00645f8b2f85d244108fd4c1514851d4ba8c31",
+        "prompt": "Use case: stylized-concept. A real transparent RGBA sprite sheet, three equal columns and two equal rows, with six fully isolated sprites, every sprite centered in its own cell with generous transparent gaps and similar size; do not touch one another; no shadows outside silhouettes. Top row three animation frames of the exact same cinnamon rabbit with teal scarf facing right, first resting on all fours, second running with front paws out, third airborne with knees tucked. Bottom row exact positions: first a compact round vermilion bubble rover top-down seen from overhead, its bubble nozzle points RIGHT; second the SAME rover with two pearly bubbles immediately to its right (nozzle points RIGHT); third a single illustrated golden star-shaped collector sticker with embossed paper petals but no text. Premium storybook arcade: matte gouache, fine paper grain, clean cut paper edges, charcoal teal shadows, warm cream, deep spruce, apricot and persimmon highlights. No labels, marks, boxes, ground, background, logos or text. Every sprite entirely visible.",
+        "sourceCrop": [
+          35,
+          576,
+          427,
+          945
+        ]
+      },
+      "renderInput": {
+        "path": "output/courseware-production/classic-arcade-v3/assets/rover.webp",
+        "sha256": "a56d62690c8896d0d2b8180d7daeca8cb2a2a31279ef963609806bb8f16b9168",
+        "pixels": [
+          300,
+          282
+        ]
+      },
+      "derivativeCrop": null,
+      "maxSide": 192,
+      "usedBy": [
+        "guess-and-drive"
+      ],
+      "templates": [
+        "bubbleMaze"
+      ],
+      "visualReview": {
+        "at": "2026-11-09T20:34:53+08:00",
+        "scope": "单图和游戏使用尺寸的静态核对",
+        "finding": "核对主物轮廓完整、透明边缘及和该课深色游戏底的对比。",
+        "fullSceneG6": "pending"
+      }
+    },
+    "paper-rover-bubble": {
+      "path": "assets/paper-rover-bubble.png",
+      "sourceKind": "codex_builtin_imagegen_derivative",
+      "sha256": "3382b2494638858f87e7aa3914786e3dc7342a7ce024dec38cf431dc90c355e6",
+      "bytes": 50760,
+      "pixels": [
+        192,
+        160
+      ],
+      "mode": "RGBA",
+      "source": {
+        "path": "output/courseware-production/classic-arcade-v3/assets/rover-pop.webp",
+        "sha256": "2055b2cffbbb45f80af6ceadf7cc6771a5698f0018c340e01bdb2c18b41c257c",
+        "manifest": "output/courseware-production/classic-arcade-v3/asset-sources.json",
+        "manifestSha256": "01d4f3f836ac294d47bc31e1470dc15d11cf74ac120939f82d005e010aabdf40"
+      },
+      "originalImagegen": {
+        "path": "/Users/sqcopenclaw/.codex/generated_images/01a1bf78-0c06-7fe0-8877-bc245394cec3/exec-00dcd8f8-2185-492f-81ff-73754de5dc8b.png",
+        "sha256": "72badede9f926c6be6c58daa9f00645f8b2f85d244108fd4c1514851d4ba8c31",
+        "prompt": "Use case: stylized-concept. A real transparent RGBA sprite sheet, three equal columns and two equal rows, with six fully isolated sprites, every sprite centered in its own cell with generous transparent gaps and similar size; do not touch one another; no shadows outside silhouettes. Top row three animation frames of the exact same cinnamon rabbit with teal scarf facing right, first resting on all fours, second running with front paws out, third airborne with knees tucked. Bottom row exact positions: first a compact round vermilion bubble rover top-down seen from overhead, its bubble nozzle points RIGHT; second the SAME rover with two pearly bubbles immediately to its right (nozzle points RIGHT); third a single illustrated golden star-shaped collector sticker with embossed paper petals but no text. Premium storybook arcade: matte gouache, fine paper grain, clean cut paper edges, charcoal teal shadows, warm cream, deep spruce, apricot and persimmon highlights. No labels, marks, boxes, ground, background, logos or text. Every sprite entirely visible.",
+        "sourceCrop": [
+          506,
+          580,
+          868,
+          944
+        ]
+      },
+      "renderInput": {
+        "path": "/Users/sqcopenclaw/.codex/generated_images/01a1bf78-0c06-7fe0-8877-bc245394cec3/exec-00dcd8f8-2185-492f-81ff-73754de5dc8b.png",
+        "sha256": "72badede9f926c6be6c58daa9f00645f8b2f85d244108fd4c1514851d4ba8c31",
+        "pixels": [
+          1536,
+          1024
+        ]
+      },
+      "derivativeCrop": [
+        506,
+        580,
+        944,
+        944
+      ],
+      "maxSide": 192,
+      "usedBy": [
+        "guess-and-drive"
+      ],
+      "templates": [
+        "bubbleMaze"
+      ],
+      "visualReview": {
+        "at": "2026-11-09T20:34:53+08:00",
+        "scope": "单图和游戏使用尺寸的静态核对",
+        "finding": "从已认可精灵的同一张 ImageGen 原图重裁，保留完整第一颗泡泡。车辆轮廓与等待帧可辨。",
+        "fullSceneG6": "pending"
+      }
+    },
+    "black-bird": {
+      "path": "assets/black-bird.png",
+      "sourceKind": "codex_builtin_imagegen_derivative",
+      "sha256": "1b1484b1d86d02f4ede971a14fa1c2123e3787cc085bd2acc10be07c7f2ec50a",
+      "bytes": 30967,
+      "pixels": [
+        224,
+        175
+      ],
+      "mode": "RGBA",
+      "source": {
+        "path": "courseware/lessons/fltrp-g1-upper-that-is-a-yellow-bird-games/assets/black-bird.png",
+        "sha256": "550500417b06e4cc5287f67b4529e324a89e7da6529f4ecd8c7aea8e31048951",
+        "manifest": "courseware/lessons/fltrp-g1-upper-that-is-a-yellow-bird-games/asset-provenance.json",
+        "manifestSha256": "96a26032e0e4688c6d0a0fd43222ffd43e6549ded322a7d3615693e59b80a65e",
+        "priorVisualReview": {
+          "reviewedAt": "2026-11-09T08:36:13.799732+00:00",
+          "reviewedBy": "gpt-6.1-sol",
+          "result": "改版全身羽毛为黑，只有细灰纹表现结构。透明边缘、双脚和尾完整。在浅薄荷底132、72、54像素实看，黑色明确且无明显光圈。"
+        }
+      },
+      "originalImagegen": {
+        "path": "/Users/sqcopenclaw/.codex/generated_images/01a1bef3-8d96-70c1-9412-0d8e58ba9363/exec-f55bb270-9e05-4a87-b7a4-bf4915a43c84.png",
+        "sha256": "550500417b06e4cc5287f67b4529e324a89e7da6529f4ecd8c7aea8e31048951",
+        "prompt": "Use case: illustration-story. Isolated transparent cutout of exactly one entirely black-feathered storybook songbird in right-facing side profile. The head, neck, cheek, entire chest, entire belly, folded wing, back and tail must all have charcoal-black plumage. Only small cool-gray strokes may model feather detail. Absolutely no yellow, cream, tan, white, orange or warm plumage anywhere, especially on the cheek, breast and belly. The tiny beak and two feet can be muted neutral gray. One visible folded wing, complete toes and tail, 15 percent transparent padding, no scenery, branch, shadow or glow. Match warm matte gouache picture-book texture while the subject remains unambiguously black at small classroom size. No text, letters, numerals, logos or watermark.",
+        "sourceCrop": null
+      },
+      "renderInput": {
+        "path": "courseware/lessons/fltrp-g1-upper-that-is-a-yellow-bird-games/assets/black-bird.png",
+        "sha256": "550500417b06e4cc5287f67b4529e324a89e7da6529f4ecd8c7aea8e31048951",
+        "pixels": [
+          1536,
+          1024
+        ]
+      },
+      "derivativeCrop": [
+        152,
+        50,
+        1385,
+        1014
+      ],
+      "maxSide": 224,
+      "usedBy": [
+        "guess-and-drive",
+        "listen-and-aim"
+      ],
+      "templates": [
+        "bubbleMaze",
+        "magnetMarbles"
+      ],
+      "visualReview": {
+        "at": "2026-11-09T20:34:53+08:00",
+        "scope": "单图和游戏使用尺寸的静态核对",
+        "finding": "对照游戏底色，在150、76、26像素样图中核对单只鸟的颜色、喙、翼、尾和透明边缘。",
+        "fullSceneG6": "pending"
+      }
+    },
+    "yellow-bird": {
+      "path": "assets/yellow-bird.png",
+      "sourceKind": "codex_builtin_imagegen_derivative",
+      "sha256": "7d607949dc7ae807a08ab6fcfe3e5bf2db974b2cae69d5f2a0d56f8d06468fc0",
+      "bytes": 40656,
+      "pixels": [
+        224,
+        201
+      ],
+      "mode": "RGBA",
+      "source": {
+        "path": "courseware/lessons/fltrp-g1-upper-that-is-a-yellow-bird-games/assets/yellow-bird.png",
+        "sha256": "3443151b534811e7ce245ef16911deffcf9d916f6e46dd73b8043083d255debf",
+        "manifest": "courseware/lessons/fltrp-g1-upper-that-is-a-yellow-bird-games/asset-provenance.json",
+        "manifestSha256": "96a26032e0e4688c6d0a0fd43222ffd43e6549ded322a7d3615693e59b80a65e",
+        "priorVisualReview": {
+          "reviewedAt": "2026-11-09T08:27:19.398439+00:00",
+          "reviewedBy": "gpt-6.1-sol",
+          "result": "核对了真正的 PNG 透明通道，并放在浅薄荷底上看 96、64、44 像素试缩。完整单只黄鸟，喙、折翼、尾和双脚清楚，无可见边缘光圈。实际游戏以源像素取景框留边放大，原始 alpha 保留。"
+        }
+      },
+      "originalImagegen": {
+        "path": "/Users/sqcopenclaw/.codex/generated_images/01a1bef3-8d96-70c1-9412-0d8e58ba9363/exec-f7e485ab-1c3b-4c14-a50a-a2365009f516.png",
+        "sha256": "3443151b534811e7ce245ef16911deffcf9d916f6e46dd73b8043083d255debf",
+        "prompt": "Use case: illustration-story. One small generic storybook songbird in right-facing profile, ready to perch. Entire head and torso bright sunflower yellow, small neutral beak, two feet, one folded wing, clean short tail. Show the complete bird with 15 percent transparent padding. No twig, cage, scenery, shadow or extra bird. Original warm gouache picture-book illustration for Chinese first-grade English learners, calm mint and honey palette, clean silhouettes at 60 px, matte paint, soft daylight. No text, letters, numerals, logos, marks or copyrighted character design.",
+        "sourceCrop": null
+      },
+      "renderInput": {
+        "path": "courseware/lessons/fltrp-g1-upper-that-is-a-yellow-bird-games/assets/yellow-bird.png",
+        "sha256": "3443151b534811e7ce245ef16911deffcf9d916f6e46dd73b8043083d255debf",
+        "pixels": [
+          1536,
+          1024
+        ]
+      },
+      "derivativeCrop": [
+        247,
+        74,
+        1216,
+        944
+      ],
+      "maxSide": 224,
+      "usedBy": [
+        "listen-and-aim"
+      ],
+      "templates": [
+        "magnetMarbles"
+      ],
+      "visualReview": {
+        "at": "2026-11-09T20:34:53+08:00",
+        "scope": "单图和游戏使用尺寸的静态核对",
+        "finding": "对照游戏底色，在150、76、26像素样图中核对单只鸟的颜色、喙、翼、尾和透明边缘。",
+        "fullSceneG6": "pending"
+      }
+    },
+    "orange-cat": {
+      "path": "assets/orange-cat.png",
+      "bytes": 51583,
+      "sha256": "d13d9eabb9f39e6346eff839ac55983860fee56a35f37b52328d2aa429345ca2",
+      "pixels": [
+        185,
+        224
+      ],
+      "mode": "RGBA",
+      "sourceKind": "codex_builtin_imagegen_atlas_crop",
+      "master": "teaching-cutouts",
+      "sourceCell": {
+        "row": 1,
+        "column": 1,
+        "rect": [
+          0,
+          0,
+          280,
+          280
+        ],
+        "opaqueBounds": [
+          36,
+          34,
+          232,
+          276
+        ],
+        "maskedBounds": [
+          34,
+          32,
+          234,
+          278
+        ],
+        "retainedComponentAreas": [
+          31177
+        ]
+      },
+      "usedBy": [
+        "find-the-cat",
+        "guess-and-drive"
+      ],
+      "visualReview": {
+        "at": "2026-11-09T20:41:37+08:00",
+        "scope": "裁切或拼排后的静态核对",
+        "fullSceneG6": "pending",
+        "finding": "逐格核对预期的颜色、物件和完整轮廓，小尺寸查看透明边缘。"
+      },
+      "cropLayout": "art-source/teaching-layout.json"
+    },
+    "yellow-house": {
+      "path": "assets/yellow-house.png",
+      "bytes": 54166,
+      "sha256": "cc149aab7e7e400403d7d5155b6d3c9ea618ad7c3d35dc92babf7c70555b6f08",
+      "pixels": [
+        224,
+        204
+      ],
+      "mode": "RGBA",
+      "sourceKind": "codex_builtin_imagegen_atlas_crop",
+      "master": "teaching-cutouts",
+      "sourceCell": {
+        "row": 1,
+        "column": 2,
+        "rect": [
+          280,
+          0,
+          561,
+          280
+        ],
+        "opaqueBounds": [
+          18,
+          40,
+          267,
+          264
+        ],
+        "maskedBounds": [
+          16,
+          38,
+          269,
+          266
+        ],
+        "retainedComponentAreas": [
+          38436
+        ]
+      },
+      "usedBy": [
+        "house-or-box"
+      ],
+      "visualReview": {
+        "at": "2026-11-09T20:41:37+08:00",
+        "scope": "裁切或拼排后的静态核对",
+        "fullSceneG6": "pending",
+        "finding": "逐格核对预期的颜色、物件和完整轮廓，小尺寸查看透明边缘。"
+      },
+      "cropLayout": "art-source/teaching-layout.json"
+    },
+    "yellow-box": {
+      "path": "assets/yellow-box.png",
+      "bytes": 47623,
+      "sha256": "999b72b50d7370e5fa814bccc3f0eeaadb4342d37c3fd4319b7e2a24d3f4f54d",
+      "pixels": [
+        224,
+        169
+      ],
+      "mode": "RGBA",
+      "sourceKind": "codex_builtin_imagegen_atlas_crop",
+      "master": "teaching-cutouts",
+      "sourceCell": {
+        "row": 1,
+        "column": 3,
+        "rect": [
+          561,
+          0,
+          842,
+          280
+        ],
+        "opaqueBounds": [
+          17,
+          68,
+          273,
+          254
+        ],
+        "maskedBounds": [
+          15,
+          66,
+          275,
+          256
+        ],
+        "retainedComponentAreas": [
+          35408
+        ]
+      },
+      "usedBy": [
+        "guess-and-drive",
+        "house-or-box"
+      ],
+      "visualReview": {
+        "at": "2026-11-09T20:41:37+08:00",
+        "scope": "裁切或拼排后的静态核对",
+        "fullSceneG6": "pending",
+        "finding": "逐格核对预期的颜色、物件和完整轮廓，小尺寸查看透明边缘。"
+      },
+      "cropLayout": "art-source/teaching-layout.json"
+    },
+    "blue-pencil": {
+      "path": "assets/blue-pencil.png",
+      "bytes": 30767,
+      "sha256": "77b138039408fded954cf4c275c15bd1a944e601e0db6cafbeb9fad80261c7f8",
+      "pixels": [
+        192,
+        224
+      ],
+      "mode": "RGBA",
+      "sourceKind": "codex_builtin_imagegen_atlas_crop",
+      "master": "teaching-cutouts",
+      "sourceCell": {
+        "row": 1,
+        "column": 4,
+        "rect": [
+          842,
+          0,
+          1122,
+          280
+        ],
+        "opaqueBounds": [
+          45,
+          37,
+          242,
+          271
+        ],
+        "maskedBounds": [
+          43,
+          35,
+          244,
+          273
+        ],
+        "retainedComponentAreas": [
+          13513
+        ]
+      },
+      "usedBy": [
+        "listen-and-aim"
+      ],
+      "visualReview": {
+        "at": "2026-11-09T20:41:37+08:00",
+        "scope": "裁切或拼排后的静态核对",
+        "fullSceneG6": "pending",
+        "finding": "逐格核对预期的颜色、物件和完整轮廓，小尺寸查看透明边缘。"
+      },
+      "cropLayout": "art-source/teaching-layout.json"
+    },
+    "red-pencil": {
+      "path": "assets/red-pencil.png",
+      "bytes": 30472,
+      "sha256": "0b3e84ec0d74efeb922b968c3fd89322afa7bc9f0657cb341cf90d8415077985",
+      "pixels": [
+        189,
+        224
+      ],
+      "mode": "RGBA",
+      "sourceKind": "codex_builtin_imagegen_atlas_crop",
+      "master": "teaching-cutouts",
+      "sourceCell": {
+        "row": 2,
+        "column": 1,
+        "rect": [
+          0,
+          280,
+          280,
+          561
+        ],
+        "opaqueBounds": [
+          55,
+          35,
+          252,
+          273
+        ],
+        "maskedBounds": [
+          53,
+          33,
+          254,
+          275
+        ],
+        "retainedComponentAreas": [
+          13836
+        ]
+      },
+      "usedBy": [
+        "listen-and-aim"
+      ],
+      "visualReview": {
+        "at": "2026-11-09T20:41:37+08:00",
+        "scope": "裁切或拼排后的静态核对",
+        "fullSceneG6": "pending",
+        "finding": "逐格核对预期的颜色、物件和完整轮廓，小尺寸查看透明边缘。"
+      },
+      "cropLayout": "art-source/teaching-layout.json"
+    },
+    "blue-book": {
+      "path": "assets/blue-book.png",
+      "bytes": 64206,
+      "sha256": "6ec0105af8dc864168626eb2948b29b5b07f235552affb801cc177801c1a548b",
+      "pixels": [
+        224,
+        216
+      ],
+      "mode": "RGBA",
+      "sourceKind": "codex_builtin_imagegen_atlas_crop",
+      "master": "teaching-cutouts",
+      "sourceCell": {
+        "row": 2,
+        "column": 2,
+        "rect": [
+          280,
+          280,
+          561,
+          561
+        ],
+        "opaqueBounds": [
+          23,
+          39,
+          263,
+          269
+        ],
+        "maskedBounds": [
+          21,
+          37,
+          265,
+          271
+        ],
+        "retainedComponentAreas": [
+          37975
+        ]
+      },
+      "usedBy": [
+        "guess-and-drive",
+        "listen-and-aim"
+      ],
+      "visualReview": {
+        "at": "2026-11-09T20:41:37+08:00",
+        "scope": "裁切或拼排后的静态核对",
+        "fullSceneG6": "pending",
+        "finding": "逐格核对预期的颜色、物件和完整轮廓，小尺寸查看透明边缘。"
+      },
+      "cropLayout": "art-source/teaching-layout.json"
+    },
+    "yellow-cat": {
+      "path": "assets/yellow-cat.png",
+      "bytes": 50390,
+      "sha256": "1bd7a3731c0b411acd66228c48b1d76d6a9fb3cf8a036718d2a5326af9d6583a",
+      "pixels": [
+        184,
+        224
+      ],
+      "mode": "RGBA",
+      "sourceKind": "codex_builtin_imagegen_atlas_crop",
+      "master": "teaching-cutouts",
+      "sourceCell": {
+        "row": 2,
+        "column": 3,
+        "rect": [
+          561,
+          280,
+          842,
+          561
+        ],
+        "opaqueBounds": [
+          26,
+          32,
+          224,
+          278
+        ],
+        "maskedBounds": [
+          24,
+          30,
+          226,
+          280
+        ],
+        "retainedComponentAreas": [
+          32026
+        ]
+      },
+      "usedBy": [
+        "listen-and-aim"
+      ],
+      "visualReview": {
+        "at": "2026-11-09T20:41:37+08:00",
+        "scope": "裁切或拼排后的静态核对",
+        "fullSceneG6": "pending",
+        "finding": "逐格核对预期的颜色、物件和完整轮廓，小尺寸查看透明边缘。"
+      },
+      "cropLayout": "art-source/teaching-layout.json"
+    },
+    "black-cat": {
+      "path": "assets/black-cat.png",
+      "bytes": 53517,
+      "sha256": "ca98d86e9d996e9c7238e260a8239f293ce3c548508429731bb336c44f6762a6",
+      "pixels": [
+        186,
+        224
+      ],
+      "mode": "RGBA",
+      "sourceKind": "codex_builtin_imagegen_atlas_crop",
+      "master": "teaching-cutouts",
+      "sourceCell": {
+        "row": 2,
+        "column": 4,
+        "rect": [
+          842,
+          280,
+          1122,
+          561
+        ],
+        "opaqueBounds": [
+          22,
+          34,
+          220,
+          278
+        ],
+        "maskedBounds": [
+          20,
+          32,
+          222,
+          280
+        ],
+        "retainedComponentAreas": [
+          32199
+        ]
+      },
+      "usedBy": [
+        "listen-and-aim"
+      ],
+      "visualReview": {
+        "at": "2026-11-09T20:41:37+08:00",
+        "scope": "裁切或拼排后的静态核对",
+        "fullSceneG6": "pending",
+        "finding": "逐格核对预期的颜色、物件和完整轮廓，小尺寸查看透明边缘。"
+      },
+      "cropLayout": "art-source/teaching-layout.json"
+    },
+    "blue-bird": {
+      "path": "assets/blue-bird.png",
+      "bytes": 48145,
+      "sha256": "dfc2eebac925fdfe50867b524ec52f7b1f34e9172267a410399ed4c2494a3bb3",
+      "pixels": [
+        224,
+        190
+      ],
+      "mode": "RGBA",
+      "sourceKind": "codex_builtin_imagegen_atlas_crop",
+      "master": "teaching-cutouts",
+      "sourceCell": {
+        "row": 3,
+        "column": 1,
+        "rect": [
+          0,
+          561,
+          280,
+          841
+        ],
+        "opaqueBounds": [
+          24,
+          51,
+          271,
+          256
+        ],
+        "maskedBounds": [
+          22,
+          49,
+          273,
+          258
+        ],
+        "retainedComponentAreas": [
+          26788
+        ]
+      },
+      "usedBy": [
+        "guess-and-drive"
+      ],
+      "visualReview": {
+        "at": "2026-11-09T20:41:37+08:00",
+        "scope": "裁切或拼排后的静态核对",
+        "fullSceneG6": "pending",
+        "finding": "逐格核对预期的颜色、物件和完整轮廓，小尺寸查看透明边缘。"
+      },
+      "cropLayout": "art-source/teaching-layout.json"
+    },
+    "red-book": {
+      "path": "assets/red-book.png",
+      "bytes": 63617,
+      "sha256": "0074080a3b5937340b692638b08db21298403c7b36f175720506bdbaebd02158",
+      "pixels": [
+        224,
+        211
+      ],
+      "mode": "RGBA",
+      "sourceKind": "codex_builtin_imagegen_atlas_crop",
+      "master": "teaching-cutouts",
+      "sourceCell": {
+        "row": 3,
+        "column": 2,
+        "rect": [
+          280,
+          561,
+          561,
+          841
+        ],
+        "opaqueBounds": [
+          25,
+          31,
+          262,
+          253
+        ],
+        "maskedBounds": [
+          23,
+          29,
+          264,
+          255
+        ],
+        "retainedComponentAreas": [
+          36609
+        ]
+      },
+      "usedBy": [
+        "guess-and-drive",
+        "listen-and-aim"
+      ],
+      "visualReview": {
+        "at": "2026-11-09T20:41:37+08:00",
+        "scope": "裁切或拼排后的静态核对",
+        "fullSceneG6": "pending",
+        "finding": "逐格核对预期的颜色、物件和完整轮廓，小尺寸查看透明边缘。"
+      },
+      "cropLayout": "art-source/teaching-layout.json"
+    },
+    "red-ball": {
+      "path": "assets/red-ball.png",
+      "bytes": 70821,
+      "sha256": "2ed4751b74d90259bfe46f495911b68e47ef95d33056571bee6e2897996cfe9e",
+      "pixels": [
+        219,
+        224
+      ],
+      "mode": "RGBA",
+      "sourceKind": "codex_builtin_imagegen_atlas_crop",
+      "master": "teaching-cutouts",
+      "sourceCell": {
+        "row": 3,
+        "column": 3,
+        "rect": [
+          561,
+          561,
+          842,
+          841
+        ],
+        "opaqueBounds": [
+          29,
+          39,
+          237,
+          252
+        ],
+        "maskedBounds": [
+          27,
+          37,
+          239,
+          254
+        ],
+        "retainedComponentAreas": [
+          34528
+        ]
+      },
+      "usedBy": [
+        "guess-and-drive",
+        "listen-and-aim"
+      ],
+      "visualReview": {
+        "at": "2026-11-09T20:41:37+08:00",
+        "scope": "裁切或拼排后的静态核对",
+        "fullSceneG6": "pending",
+        "finding": "逐格核对预期的颜色、物件和完整轮廓，小尺寸查看透明边缘。"
+      },
+      "cropLayout": "art-source/teaching-layout.json"
+    },
+    "green-book": {
+      "path": "assets/green-book.png",
+      "bytes": 63690,
+      "sha256": "4c8813b082ddb64526b50d4f48793a874f50ff1e90a7825d110de1396d3a8e7e",
+      "pixels": [
+        224,
+        210
+      ],
+      "mode": "RGBA",
+      "sourceKind": "codex_builtin_imagegen_atlas_crop",
+      "master": "teaching-cutouts",
+      "sourceCell": {
+        "row": 3,
+        "column": 4,
+        "rect": [
+          842,
+          561,
+          1122,
+          841
+        ],
+        "opaqueBounds": [
+          12,
+          31,
+          252,
+          255
+        ],
+        "maskedBounds": [
+          10,
+          29,
+          254,
+          257
+        ],
+        "retainedComponentAreas": [
+          37613
+        ]
+      },
+      "usedBy": [
+        "guess-and-drive",
+        "listen-and-aim"
+      ],
+      "visualReview": {
+        "at": "2026-11-09T20:41:37+08:00",
+        "scope": "裁切或拼排后的静态核对",
+        "fullSceneG6": "pending",
+        "finding": "逐格核对预期的颜色、物件和完整轮廓，小尺寸查看透明边缘。"
+      },
+      "cropLayout": "art-source/teaching-layout.json"
+    },
+    "green-ball": {
+      "path": "assets/green-ball.png",
+      "bytes": 72935,
+      "sha256": "9c3a85a8911fb36b19312fd424e65fa1a6c4aef5ef9ab387990f7c51dbe892be",
+      "pixels": [
+        218,
+        224
+      ],
+      "mode": "RGBA",
+      "sourceKind": "codex_builtin_imagegen_atlas_crop",
+      "master": "teaching-cutouts",
+      "sourceCell": {
+        "row": 4,
+        "column": 1,
+        "rect": [
+          0,
+          841,
+          280,
+          1122
+        ],
+        "opaqueBounds": [
+          36,
+          27,
+          247,
+          245
+        ],
+        "maskedBounds": [
+          34,
+          25,
+          249,
+          247
+        ],
+        "retainedComponentAreas": [
+          36078
+        ]
+      },
+      "usedBy": [
+        "listen-and-aim"
+      ],
+      "visualReview": {
+        "at": "2026-11-09T20:41:37+08:00",
+        "scope": "裁切或拼排后的静态核对",
+        "fullSceneG6": "pending",
+        "finding": "逐格核对预期的颜色、物件和完整轮廓，小尺寸查看透明边缘。"
+      },
+      "cropLayout": "art-source/teaching-layout.json"
+    },
+    "workshop-cover": {
+      "path": "assets/workshop-cover.png",
+      "bytes": 239939,
+      "sha256": "b1c358c5678bfda2e3711bab9a86e063d02c05c18e35289f50363d62f3b65ff7",
+      "pixels": [
+        832,
+        468
+      ],
+      "mode": "P",
+      "sourceKind": "codex_imagegen_components_composited",
+      "baseAsset": "gallery-stage",
+      "compositionLayout": "art-source/teaching-layout.json",
+      "layers": [
+        "orange-cat",
+        "yellow-box"
+      ],
+      "usedBy": [
+        "guess-and-drive",
+        "listen-and-aim"
+      ],
+      "visualReview": {
+        "at": "2026-11-09T20:41:37+08:00",
+        "scope": "裁切或拼排后的静态核对",
+        "fullSceneG6": "pending",
+        "finding": "核对拼排的位置、颜色和教学线索。只在合帘遮挡场景给橙猫做背光，正式橙猫图保持原色。"
+      }
+    },
+    "paint-exhibit": {
+      "path": "assets/paint-exhibit.png",
+      "bytes": 243072,
+      "sha256": "4b863e78e7766f1c1e506e1f598478868a2f5a4ebd2ba1ee0f92206194106f45",
+      "pixels": [
+        832,
+        468
+      ],
+      "mode": "P",
+      "sourceKind": "codex_imagegen_components_composited",
+      "baseAsset": "gallery-stage",
+      "compositionLayout": "art-source/teaching-layout.json",
+      "layers": [
+        "paint-blue-cat",
+        "paint-black-monkey",
+        "paint-five-color-monkey"
+      ],
+      "usedBy": [
+        "paint-show"
+      ],
+      "visualReview": {
+        "at": "2026-11-09T20:41:37+08:00",
+        "scope": "裁切或拼排后的静态核对",
+        "fullSceneG6": "pending",
+        "finding": "核对拼排的位置、颜色和教学线索。只在合帘遮挡场景给橙猫做背光，正式橙猫图保持原色。"
+      }
+    },
+    "curtain-cat": {
+      "path": "assets/curtain-cat.png",
+      "bytes": 155960,
+      "sha256": "023c1b54e39caafa37f380c28411f64bcced1eb4a4b9f88c2fd6987a278c9076",
+      "pixels": [
+        480,
+        480
+      ],
+      "mode": "P",
+      "sourceKind": "codex_imagegen_components_composited",
+      "baseAsset": "gallery-stage",
+      "compositionLayout": "art-source/teaching-layout.json",
+      "layers": [
+        "orange-cat",
+        "curtain-panels"
+      ],
+      "usedBy": [
+        "find-the-cat"
+      ],
+      "visualReview": {
+        "at": "2026-11-09T20:41:37+08:00",
+        "scope": "裁切或拼排后的静态核对",
+        "fullSceneG6": "pending",
+        "finding": "核对拼排的位置、颜色和教学线索。只在合帘遮挡场景给橙猫做背光，正式橙猫图保持原色。"
+      }
+    },
+    "label-exhibit": {
+      "path": "assets/label-exhibit.png",
+      "bytes": 242038,
+      "sha256": "ad89a5293c8ff9f2b9e4db687a1322651d422b67c74bc77ee1be72b62677e746",
+      "pixels": [
+        832,
+        468
+      ],
+      "mode": "P",
+      "sourceKind": "codex_imagegen_components_composited",
+      "baseAsset": "gallery-stage",
+      "compositionLayout": "art-source/teaching-layout.json",
+      "layers": [
+        "orange-cat",
+        "yellow-box"
+      ],
+      "usedBy": [
+        "say-the-clues"
+      ],
+      "visualReview": {
+        "at": "2026-11-09T20:41:37+08:00",
+        "scope": "裁切或拼排后的静态核对",
+        "fullSceneG6": "pending",
+        "finding": "核对拼排的位置、颜色和教学线索。只在合帘遮挡场景给橙猫做背光，正式橙猫图保持原色。"
+      }
+    },
+    "beat-curtain": {
+      "path": "assets/beat-curtain.png",
+      "bytes": 248373,
+      "sha256": "961c5b037040c1f688896aa924c0981d9f28fd8be6bc6924149fabf29a6a5d61",
+      "pixels": [
+        832,
+        468
+      ],
+      "mode": "P",
+      "sourceKind": "codex_imagegen_components_composited",
+      "baseAsset": "gallery-stage",
+      "compositionLayout": "art-source/teaching-layout.json",
+      "layers": [
+        "blue-bird",
+        "apricot-lid"
+      ],
+      "usedBy": [
+        "tap-a-beat"
+      ],
+      "visualReview": {
+        "at": "2026-11-09T20:41:37+08:00",
+        "scope": "裁切或拼排后的静态核对",
+        "fullSceneG6": "pending",
+        "finding": "核对拼排的位置、颜色和教学线索。只在合帘遮挡场景给橙猫做背光，正式橙猫图保持原色。"
+      }
+    },
+    "guess-exhibit": {
+      "path": "assets/guess-exhibit.png",
+      "bytes": 240015,
+      "sha256": "9da10e3754e81c75c18c4e1739eecfc0837c9a17c0a0e116872ce56973515cb5",
+      "pixels": [
+        832,
+        468
+      ],
+      "mode": "P",
+      "sourceKind": "codex_imagegen_components_composited",
+      "baseAsset": "gallery-stage",
+      "compositionLayout": "art-source/teaching-layout.json",
+      "layers": [
+        "red-ball",
+        "red-book",
+        "green-book"
+      ],
+      "usedBy": [
+        "guess-two-ways"
+      ],
+      "visualReview": {
+        "at": "2026-11-09T20:41:37+08:00",
+        "scope": "裁切或拼排后的静态核对",
+        "fullSceneG6": "pending",
+        "finding": "核对拼排的位置、颜色和教学线索。只在合帘遮挡场景给橙猫做背光，正式橙猫图保持原色。"
+      }
+    },
+    "paper-workbench": {
+      "path": "assets/paper-workbench.png",
+      "bytes": 247438,
+      "sha256": "c3f180506b2cc07ae2f9078a6d3c0e38257eed29c941343f889903f951680944",
+      "pixels": [
+        832,
+        468
+      ],
+      "mode": "P",
+      "sourceKind": "codex_imagegen_components_composited",
+      "baseAsset": "gallery-stage",
+      "compositionLayout": "art-source/teaching-layout.json",
+      "layers": [
+        "blue-bird",
+        "cream-kite"
+      ],
+      "usedBy": [
+        "make-and-share"
+      ],
+      "visualReview": {
+        "at": "2026-11-09T20:41:37+08:00",
+        "scope": "裁切或拼排后的静态核对",
+        "fullSceneG6": "pending",
+        "finding": "核对拼排的位置、颜色和教学线索。只在合帘遮挡场景给橙猫做背光，正式橙猫图保持原色。"
+      }
+    },
+    "quiz-white-cat": {
+      "path": "assets/quiz-white-cat.png",
+      "bytes": 50314,
+      "sha256": "2f4b994a1c1d485ffb1a628f7419c2cf77c53d85746f1c54cfbc60a778040e55",
+      "pixels": [
+        176,
+        224
+      ],
+      "mode": "RGBA",
+      "sourceKind": "codex_builtin_imagegen_atlas_crop",
+      "master": "quiz-cutouts",
+      "sourceCell": {
+        "row": 1,
+        "column": 1,
+        "rect": [
+          0,
+          0,
+          282,
+          307
+        ],
+        "opaqueBounds": [
+          55,
+          39,
+          247,
+          291
+        ],
+        "maskedBounds": [
+          53,
+          37,
+          249,
+          293
+        ],
+        "retainedComponentAreas": [
+          30177
+        ]
+      },
+      "usedBy": [
+        "picture-check/white-bird",
+        "picture-check/white-dog"
+      ],
+      "visualReview": {
+        "at": "2026-11-09T20:41:37+08:00",
+        "scope": "裁切或拼排后的静态核对",
+        "fullSceneG6": "pending",
+        "finding": "在奶油浅底核对完整物件、可辨色块和轮廓，48像素样图未见邻格图或明显透明边缘杂点。"
+      },
+      "cropLayout": "art-source/quiz-layout.json"
+    },
+    "quiz-white-dog": {
+      "path": "assets/quiz-white-dog.png",
+      "bytes": 58752,
+      "sha256": "fdeeb9d19c7f68fe4f8c646ee953e3b5d8c301c425d4f417b6d1fb65615e3f52",
+      "pixels": [
+        196,
+        224
+      ],
+      "mode": "RGBA",
+      "sourceKind": "codex_builtin_imagegen_atlas_crop",
+      "master": "quiz-cutouts",
+      "sourceCell": {
+        "row": 1,
+        "column": 2,
+        "rect": [
+          282,
+          0,
+          560,
+          307
+        ],
+        "opaqueBounds": [
+          40,
+          49,
+          247,
+          289
+        ],
+        "maskedBounds": [
+          38,
+          47,
+          249,
+          291
+        ],
+        "retainedComponentAreas": [
+          34274
+        ]
+      },
+      "usedBy": [
+        "picture-check/white-dog"
+      ],
+      "visualReview": {
+        "at": "2026-11-09T20:41:37+08:00",
+        "scope": "裁切或拼排后的静态核对",
+        "fullSceneG6": "pending",
+        "finding": "在奶油浅底核对完整物件、可辨色块和轮廓，48像素样图未见邻格图或明显透明边缘杂点。"
+      },
+      "cropLayout": "art-source/quiz-layout.json"
+    },
+    "quiz-black-dog": {
+      "path": "assets/quiz-black-dog.png",
+      "bytes": 58133,
+      "sha256": "205d9b10bc26e3938adf43cd3fcc03b3a7425e23f363e561ae66a2e54e174314",
+      "pixels": [
+        195,
+        224
+      ],
+      "mode": "RGBA",
+      "sourceKind": "codex_builtin_imagegen_atlas_crop",
+      "master": "quiz-cutouts",
+      "sourceCell": {
+        "row": 1,
+        "column": 3,
+        "rect": [
+          560,
+          0,
+          840,
+          307
+        ],
+        "opaqueBounds": [
+          35,
+          47,
+          242,
+          288
+        ],
+        "maskedBounds": [
+          33,
+          45,
+          244,
+          290
+        ],
+        "retainedComponentAreas": [
+          34475
+        ]
+      },
+      "usedBy": [
+        "picture-check/white-dog"
+      ],
+      "visualReview": {
+        "at": "2026-11-09T20:41:37+08:00",
+        "scope": "裁切或拼排后的静态核对",
+        "fullSceneG6": "pending",
+        "finding": "在奶油浅底核对完整物件、可辨色块和轮廓，48像素样图未见邻格图或明显透明边缘杂点。"
+      },
+      "cropLayout": "art-source/quiz-layout.json"
+    },
+    "quiz-orange-kite": {
+      "path": "assets/quiz-orange-kite.png",
+      "bytes": 34545,
+      "sha256": "9cada950ee1cdb4e48e5238e612fab413eb82349d7a4ad1358c19acfea9a77a6",
+      "pixels": [
+        171,
+        224
+      ],
+      "mode": "RGBA",
+      "sourceKind": "codex_builtin_imagegen_atlas_crop",
+      "master": "quiz-cutouts",
+      "sourceCell": {
+        "row": 1,
+        "column": 4,
+        "rect": [
+          840,
+          0,
+          1122,
+          307
+        ],
+        "opaqueBounds": [
+          48,
+          34,
+          242,
+          296
+        ],
+        "maskedBounds": [
+          46,
+          32,
+          244,
+          298
+        ],
+        "retainedComponentAreas": [
+          19653
+        ]
+      },
+      "usedBy": [
+        "picture-check/orange-kite"
+      ],
+      "visualReview": {
+        "at": "2026-11-09T20:41:37+08:00",
+        "scope": "裁切或拼排后的静态核对",
+        "fullSceneG6": "pending",
+        "finding": "在奶油浅底核对完整物件、可辨色块和轮廓，48像素样图未见邻格图或明显透明边缘杂点。"
+      },
+      "cropLayout": "art-source/quiz-layout.json"
+    },
+    "quiz-orange-box": {
+      "path": "assets/quiz-orange-box.png",
+      "bytes": 55581,
+      "sha256": "76744f2347a8fa96a87afdcab5f1993f9c168550f70c50f0e48f7d5582976f33",
+      "pixels": [
+        224,
+        186
+      ],
+      "mode": "RGBA",
+      "sourceKind": "codex_builtin_imagegen_atlas_crop",
+      "master": "quiz-cutouts",
+      "sourceCell": {
+        "row": 2,
+        "column": 1,
+        "rect": [
+          0,
+          307,
+          282,
+          598
+        ],
+        "opaqueBounds": [
+          23,
+          52,
+          270,
+          253
+        ],
+        "maskedBounds": [
+          21,
+          50,
+          272,
+          255
+        ],
+        "retainedComponentAreas": [
+          35370
+        ]
+      },
+      "usedBy": [
+        "picture-check/orange-kite"
+      ],
+      "visualReview": {
+        "at": "2026-11-09T20:41:37+08:00",
+        "scope": "裁切或拼排后的静态核对",
+        "fullSceneG6": "pending",
+        "finding": "在奶油浅底核对完整物件、可辨色块和轮廓，48像素样图未见邻格图或明显透明边缘杂点。"
+      },
+      "cropLayout": "art-source/quiz-layout.json"
+    },
+    "quiz-yellow-kite": {
+      "path": "assets/quiz-yellow-kite.png",
+      "bytes": 33197,
+      "sha256": "bae029cc4d2476c4c88a159e632c2ab140ed1c7e87c2e65bbcbced25414dbb2e",
+      "pixels": [
+        169,
+        224
+      ],
+      "mode": "RGBA",
+      "sourceKind": "codex_builtin_imagegen_atlas_crop",
+      "master": "quiz-cutouts",
+      "sourceCell": {
+        "row": 2,
+        "column": 2,
+        "rect": [
+          282,
+          307,
+          560,
+          598
+        ],
+        "opaqueBounds": [
+          56,
+          16,
+          246,
+          277
+        ],
+        "maskedBounds": [
+          54,
+          14,
+          248,
+          279
+        ],
+        "retainedComponentAreas": [
+          19177
+        ]
+      },
+      "usedBy": [
+        "picture-check/orange-kite"
+      ],
+      "visualReview": {
+        "at": "2026-11-09T20:41:37+08:00",
+        "scope": "裁切或拼排后的静态核对",
+        "fullSceneG6": "pending",
+        "finding": "在奶油浅底核对完整物件、可辨色块和轮廓，48像素样图未见邻格图或明显透明边缘杂点。"
+      },
+      "cropLayout": "art-source/quiz-layout.json"
+    },
+    "quiz-green-box": {
+      "path": "assets/quiz-green-box.png",
+      "bytes": 56105,
+      "sha256": "7b31dcf69c178e79ea183bd38cff09ae5e8f7580cf71c7b28484ca9770ba5b45",
+      "pixels": [
+        224,
+        185
+      ],
+      "mode": "RGBA",
+      "sourceKind": "codex_builtin_imagegen_atlas_crop",
+      "master": "quiz-cutouts",
+      "sourceCell": {
+        "row": 2,
+        "column": 3,
+        "rect": [
+          560,
+          307,
+          840,
+          598
+        ],
+        "opaqueBounds": [
+          11,
+          55,
+          256,
+          253
+        ],
+        "maskedBounds": [
+          9,
+          53,
+          258,
+          255
+        ],
+        "retainedComponentAreas": [
+          34808
+        ]
+      },
+      "usedBy": [
+        "picture-check/green-house"
+      ],
+      "visualReview": {
+        "at": "2026-11-09T20:41:37+08:00",
+        "scope": "裁切或拼排后的静态核对",
+        "fullSceneG6": "pending",
+        "finding": "在奶油浅底核对完整物件、可辨色块和轮廓，48像素样图未见邻格图或明显透明边缘杂点。"
+      },
+      "cropLayout": "art-source/quiz-layout.json"
+    },
+    "quiz-blue-house": {
+      "path": "assets/quiz-blue-house.png",
+      "bytes": 60006,
+      "sha256": "74bac055a24e7ba8dfe34b1b1af906c0cdedcf2541d6a1f747f3d8dd5f055e82",
+      "pixels": [
+        224,
+        200
+      ],
+      "mode": "RGBA",
+      "sourceKind": "codex_builtin_imagegen_atlas_crop",
+      "master": "quiz-cutouts",
+      "sourceCell": {
+        "row": 2,
+        "column": 4,
+        "rect": [
+          840,
+          307,
+          1122,
+          598
+        ],
+        "opaqueBounds": [
+          10,
+          39,
+          250,
+          250
+        ],
+        "maskedBounds": [
+          8,
+          37,
+          252,
+          252
+        ],
+        "retainedComponentAreas": [
+          37449
+        ]
+      },
+      "usedBy": [
+        "picture-check/green-house"
+      ],
+      "visualReview": {
+        "at": "2026-11-09T20:41:37+08:00",
+        "scope": "裁切或拼排后的静态核对",
+        "fullSceneG6": "pending",
+        "finding": "在奶油浅底核对完整物件、可辨色块和轮廓，48像素样图未见邻格图或明显透明边缘杂点。"
+      },
+      "cropLayout": "art-source/quiz-layout.json"
+    },
+    "quiz-green-house": {
+      "path": "assets/quiz-green-house.png",
+      "bytes": 59097,
+      "sha256": "3aaf7b7e13a068005bd926fd6f2a8798be6fcf72fc2d14176969b11081e6227b",
+      "pixels": [
+        224,
+        200
+      ],
+      "mode": "RGBA",
+      "sourceKind": "codex_builtin_imagegen_atlas_crop",
+      "master": "quiz-cutouts",
+      "sourceCell": {
+        "row": 3,
+        "column": 1,
+        "rect": [
+          0,
+          598,
+          282,
+          850
+        ],
+        "opaqueBounds": [
+          33,
+          20,
+          269,
+          228
+        ],
+        "maskedBounds": [
+          31,
+          18,
+          271,
+          230
+        ],
+        "retainedComponentAreas": [
+          35918
+        ]
+      },
+      "usedBy": [
+        "picture-check/green-house"
+      ],
+      "visualReview": {
+        "at": "2026-11-09T20:41:37+08:00",
+        "scope": "裁切或拼排后的静态核对",
+        "fullSceneG6": "pending",
+        "finding": "在奶油浅底核对完整物件、可辨色块和轮廓，48像素样图未见邻格图或明显透明边缘杂点。"
+      },
+      "cropLayout": "art-source/quiz-layout.json"
+    },
+    "quiz-green-book": {
+      "path": "assets/quiz-green-book.png",
+      "bytes": 65862,
+      "sha256": "94c57c96fcd86689071bcdbe08835ec287c23937048a2bf67b13d450dfe5686f",
+      "pixels": [
+        220,
+        224
+      ],
+      "mode": "RGBA",
+      "sourceKind": "codex_builtin_imagegen_atlas_crop",
+      "master": "quiz-cutouts",
+      "sourceCell": {
+        "row": 3,
+        "column": 2,
+        "rect": [
+          282,
+          598,
+          560,
+          850
+        ],
+        "opaqueBounds": [
+          33,
+          14,
+          253,
+          238
+        ],
+        "maskedBounds": [
+          31,
+          12,
+          255,
+          240
+        ],
+        "retainedComponentAreas": [
+          35717
+        ]
+      },
+      "usedBy": [
+        "picture-check/yellow-book"
+      ],
+      "visualReview": {
+        "at": "2026-11-09T20:41:37+08:00",
+        "scope": "裁切或拼排后的静态核对",
+        "fullSceneG6": "pending",
+        "finding": "在奶油浅底核对完整物件、可辨色块和轮廓，48像素样图未见邻格图或明显透明边缘杂点。"
+      },
+      "cropLayout": "art-source/quiz-layout.json"
+    },
+    "quiz-yellow-book": {
+      "path": "assets/quiz-yellow-book.png",
+      "bytes": 61331,
+      "sha256": "7032ede1278ede0a88c6f84d024f63b6c40036fedc5d05168e236b3e8cdc5fb5",
+      "pixels": [
+        222,
+        224
+      ],
+      "mode": "RGBA",
+      "sourceKind": "codex_builtin_imagegen_atlas_crop",
+      "master": "quiz-cutouts",
+      "sourceCell": {
+        "row": 3,
+        "column": 3,
+        "rect": [
+          560,
+          598,
+          840,
+          850
+        ],
+        "opaqueBounds": [
+          30,
+          15,
+          248,
+          235
+        ],
+        "maskedBounds": [
+          28,
+          13,
+          250,
+          237
+        ],
+        "retainedComponentAreas": [
+          34751
+        ]
+      },
+      "usedBy": [
+        "picture-check/yellow-book"
+      ],
+      "visualReview": {
+        "at": "2026-11-09T20:41:37+08:00",
+        "scope": "裁切或拼排后的静态核对",
+        "fullSceneG6": "pending",
+        "finding": "在奶油浅底核对完整物件、可辨色块和轮廓，48像素样图未见邻格图或明显透明边缘杂点。"
+      },
+      "cropLayout": "art-source/quiz-layout.json"
+    },
+    "quiz-yellow-pencil": {
+      "path": "assets/quiz-yellow-pencil.png",
+      "bytes": 29471,
+      "sha256": "3a1926e57a09aed39bf8dd4656e57a81d41b8a042d4ebfeb14e7de95b8f05a8c",
+      "pixels": [
+        199,
+        224
+      ],
+      "mode": "RGBA",
+      "sourceKind": "codex_builtin_imagegen_atlas_crop",
+      "master": "quiz-cutouts",
+      "sourceCell": {
+        "row": 3,
+        "column": 4,
+        "rect": [
+          840,
+          598,
+          1122,
+          850
+        ],
+        "opaqueBounds": [
+          37,
+          15,
+          232,
+          238
+        ],
+        "maskedBounds": [
+          35,
+          13,
+          234,
+          240
+        ],
+        "retainedComponentAreas": [
+          12362
+        ]
+      },
+      "usedBy": [
+        "picture-check/yellow-book"
+      ],
+      "visualReview": {
+        "at": "2026-11-09T20:41:37+08:00",
+        "scope": "裁切或拼排后的静态核对",
+        "fullSceneG6": "pending",
+        "finding": "在奶油浅底核对完整物件、可辨色块和轮廓，48像素样图未见邻格图或明显透明边缘杂点。"
+      },
+      "cropLayout": "art-source/quiz-layout.json"
+    },
+    "quiz-red-bird": {
+      "path": "assets/quiz-red-bird.png",
+      "bytes": 44166,
+      "sha256": "56d12272fc581d3d1a64d328282dd97067e789351992957da04ccf756d4e8d8c",
+      "pixels": [
+        224,
+        192
+      ],
+      "mode": "RGBA",
+      "sourceKind": "codex_builtin_imagegen_atlas_crop",
+      "master": "quiz-cutouts",
+      "sourceCell": {
+        "row": 4,
+        "column": 1,
+        "rect": [
+          0,
+          850,
+          282,
+          1120
+        ],
+        "opaqueBounds": [
+          32,
+          43,
+          269,
+          242
+        ],
+        "maskedBounds": [
+          30,
+          41,
+          271,
+          244
+        ],
+        "retainedComponentAreas": [
+          22167
+        ]
+      },
+      "usedBy": [
+        "picture-check/white-bird"
+      ],
+      "visualReview": {
+        "at": "2026-11-09T20:41:37+08:00",
+        "scope": "裁切或拼排后的静态核对",
+        "fullSceneG6": "pending",
+        "finding": "在奶油浅底核对完整物件、可辨色块和轮廓，48像素样图未见邻格图或明显透明边缘杂点。"
+      },
+      "cropLayout": "art-source/quiz-layout.json"
+    },
+    "quiz-white-bird": {
+      "path": "assets/quiz-white-bird.png",
+      "bytes": 41522,
+      "sha256": "e8adf50d9538122154227b2c2e71cba36f5972a51f5ca8032b6d771dfc1eff1b",
+      "pixels": [
+        224,
+        194
+      ],
+      "mode": "RGBA",
+      "sourceKind": "codex_builtin_imagegen_atlas_crop",
+      "master": "quiz-cutouts",
+      "sourceCell": {
+        "row": 4,
+        "column": 2,
+        "rect": [
+          282,
+          850,
+          560,
+          1120
+        ],
+        "opaqueBounds": [
+          26,
+          42,
+          264,
+          245
+        ],
+        "maskedBounds": [
+          24,
+          40,
+          266,
+          247
+        ],
+        "retainedComponentAreas": [
+          22309
+        ]
+      },
+      "usedBy": [
+        "picture-check/white-bird"
+      ],
+      "visualReview": {
+        "at": "2026-11-09T20:41:37+08:00",
+        "scope": "裁切或拼排后的静态核对",
+        "fullSceneG6": "pending",
+        "finding": "在奶油浅底核对完整物件、可辨色块和轮廓，48像素样图未见邻格图或明显透明边缘杂点。"
+      },
+      "cropLayout": "art-source/quiz-layout.json"
+    },
+    "quiz-blue-kite": {
+      "path": "assets/quiz-blue-kite.png",
+      "bytes": 38017,
+      "sha256": "20dcf22e27d3ac1e9194a7c6dc2af56481958c299a6e72fa10dbab1f08c35ae3",
+      "pixels": [
+        179,
+        224
+      ],
+      "mode": "RGBA",
+      "sourceKind": "codex_builtin_imagegen_atlas_crop",
+      "master": "quiz-cutouts",
+      "sourceCell": {
+        "row": 4,
+        "column": 3,
+        "rect": [
+          560,
+          850,
+          840,
+          1120
+        ],
+        "opaqueBounds": [
+          53,
+          17,
+          244,
+          263
+        ],
+        "maskedBounds": [
+          51,
+          15,
+          246,
+          265
+        ],
+        "retainedComponentAreas": [
+          18012
+        ]
+      },
+      "usedBy": [
+        "picture-check/blue-kite"
+      ],
+      "visualReview": {
+        "at": "2026-11-09T20:41:37+08:00",
+        "scope": "裁切或拼排后的静态核对",
+        "fullSceneG6": "pending",
+        "finding": "在奶油浅底核对完整物件、可辨色块和轮廓，48像素样图未见邻格图或明显透明边缘杂点。"
+      },
+      "cropLayout": "art-source/quiz-layout.json"
+    },
+    "quiz-blue-ball": {
+      "path": "assets/quiz-blue-ball.png",
+      "bytes": 69929,
+      "sha256": "0589ee0a7217655b278bb1277d797d5c4c148547992524af59fe13d58d75757b",
+      "pixels": [
+        222,
+        224
+      ],
+      "mode": "RGBA",
+      "sourceKind": "codex_builtin_imagegen_atlas_crop",
+      "master": "quiz-cutouts",
+      "sourceCell": {
+        "row": 4,
+        "column": 4,
+        "rect": [
+          840,
+          850,
+          1122,
+          1120
+        ],
+        "opaqueBounds": [
+          25,
+          33,
+          234,
+          244
+        ],
+        "maskedBounds": [
+          23,
+          31,
+          236,
+          246
+        ],
+        "retainedComponentAreas": [
+          34589
+        ]
+      },
+      "usedBy": [
+        "picture-check/blue-kite"
+      ],
+      "visualReview": {
+        "at": "2026-11-09T20:41:37+08:00",
+        "scope": "裁切或拼排后的静态核对",
+        "fullSceneG6": "pending",
+        "finding": "在奶油浅底核对完整物件、可辨色块和轮廓，48像素样图未见邻格图或明显透明边缘杂点。"
+      },
+      "cropLayout": "art-source/quiz-layout.json"
+    },
+    "quiz-green-kite": {
+      "path": "assets/quiz-green-kite.png",
+      "bytes": 36600,
+      "sha256": "673dad3e67c74f23f366a08ccf872a6d2cc7ba919cfb7eb4dd720c00ab0df721",
+      "pixels": [
+        179,
+        224
+      ],
+      "mode": "RGBA",
+      "sourceKind": "codex_builtin_imagegen_atlas_crop",
+      "master": "quiz-cutouts",
+      "sourceCell": {
+        "row": 5,
+        "column": 1,
+        "rect": [
+          0,
+          1120,
+          282,
+          1402
+        ],
+        "opaqueBounds": [
+          63,
+          12,
+          259,
+          264
+        ],
+        "maskedBounds": [
+          61,
+          10,
+          261,
+          266
+        ],
+        "retainedComponentAreas": [
+          18633
+        ]
+      },
+      "usedBy": [
+        "picture-check/blue-kite"
+      ],
+      "visualReview": {
+        "at": "2026-11-09T20:41:37+08:00",
+        "scope": "裁切或拼排后的静态核对",
+        "fullSceneG6": "pending",
+        "finding": "在奶油浅底核对完整物件、可辨色块和轮廓，48像素样图未见邻格图或明显透明边缘杂点。"
+      },
+      "cropLayout": "art-source/quiz-layout.json"
+    }
+  },
+  "remainingMasters": [],
+  "sourceAtlases": {
+    "teaching-cutouts": {
+      "path": "art-source/teaching-cutouts.png",
+      "sourceKind": "codex_builtin_imagegen",
+      "bytes": 1571943,
+      "pixels": [
+        1122,
+        1402
+      ],
+      "mode": "RGBA",
+      "sha256": "ae7cc4d50fbf6c20509775378532baaa8a70c21e018bde6655c6600d8666f7d4",
+      "originalToolOutput": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-06920d94-8c43-4592-a237-3858521fc282.png",
+      "generationPrompt": "Use case: scientific-educational. Generate ONE source sprite atlas for grade-one English colour and object recognition. True transparent RGBA background, portrait aspect 4:5. Exactly four equal columns by five equal rows of square cells, a regular invisible grid. In every occupied cell center ONE completely isolated asset, at least 13% transparent padding on all sides, no overlap, no floor shadows, no labels, text, lettering, numbers, logo, watermark, colored cells or visible grid lines. The bottom-right cell is entirely transparent and empty. Render each row in this exact left-to-right order. Row 1: solid vivid orange cat with whiskers and tail; single golden-yellow simple miniature house with pitched roof, door and windows; vivid yellow open rectangular cardboard box clearly showing its opening and folds, no roof or windows; blue single sharpened pencil. Row 2: red single sharpened pencil; blue closed simple book; bright lemon-yellow cat, same silhouette and pose as orange cat; black cat, same silhouette and pose. Row 3: blue single bird facing right with beak and wings; red closed simple book; red round ball; green closed simple book. Row 4: green round ball; distinctly blue cat, same silhouette and pose as orange cat; one black monkey with long tail; ONE long-tailed monkey with distinct separate red, blue, white, yellow and black patches, identical pose to the black monkey, not five monkeys. Row 5: nearly closed deep pine green curtain pair with a narrow empty gap, no animal; isolated half-open apricot cardboard lid in three-quarter view, no box contents; plain cream diamond kite with long tail, only one kite; leave empty. Compare objects of the same kind at same scale, pose, linework and view. The stated colour covers most of each object, no secondary competing hue, especially keep true orange visually distinct from lemon yellow. Fine paper grain, matte gouache, clean paper-cut silhouettes, warm cream and deep pine-green ambience with restrained apricot accents, original picture-book assets, read clearly at 45 pixels. No written instructions in the picture. The cells will be cropped and verified individually.",
+      "occupiedCells": 19,
+      "layout": "art-source/teaching-layout.json",
+      "layoutSha256": "78ec44de17a856c7d0e4e0ffb8d2d85eb7dcd027ba00865b7100a15b87ff71f1"
+    },
+    "quiz-cutouts": {
+      "path": "art-source/quiz-cutouts.png",
+      "sourceKind": "codex_builtin_imagegen",
+      "bytes": 1298310,
+      "pixels": [
+        1122,
+        1402
+      ],
+      "mode": "RGBA",
+      "sha256": "9b0c4f555c4ba38497b25ccac9c452a859d8b27a0f61bf555449642cd146d5fb",
+      "originalToolOutput": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-af65ab7c-9c6d-4265-b877-0838d232e892.png",
+      "generationPrompt": "Use case: scientific-educational. Make ONE separate sprite atlas of original quiz options for six-year-olds. True transparent RGBA background, portrait 4:5, strictly four equal columns by five equal rows of square cells. In each occupied cell, center exactly one complete object, at least 13 percent transparent margin on all sides, isolated with no overlap or other scene. The last three cells of row five are entirely empty transparent. No cell boxes, background tint, visible grid, text, lettering, numbers, labels, logos or watermark. Exact left-to-right sequence. Row 1: a white cat with distinct triangular ears and long cat whiskers; a white small dog with floppy ears, broader muzzle and no cat whiskers; a black small dog of the same breed and pose as the white dog; an orange diamond paper kite with a long ribbon tail. Row 2: an orange open rectangular cardboard box with obvious opening and flaps; a lemon-yellow diamond paper kite, same shape and scale as orange kite; a green open rectangular box, same shape and scale as orange box; a blue miniature house with pitched roof, door and windows. Row 3: a green miniature house, same shape and scale as blue house; a green closed book with unmarked cover; a yellow closed book, same shape and scale; one yellow sharpened pencil. Row 4: one red bird facing right with visible beak and wing; one white bird of identical shape and pose; a blue diamond paper kite with tail; one blue round ball. Row 5: a green diamond paper kite with tail, then three wholly transparent empty cells. State colour covers most of each object. Distinguish orange, red and lemon yellow with clearly different hues; render white objects true white with sparse dark outlines. Use the same silhouette and viewpoint across each color variant, with generous crop margins and no clues to correctness. Fine paper grain, matte gouache, clean cut-paper edges, restrained warm cream and pine-green art direction. The objects must remain identifiable at small size. No decorative drawings or written instructions anywhere.",
+      "occupiedCells": 17,
+      "layout": "art-source/quiz-layout.json",
+      "layoutSha256": "243f69109bdf9658c0bb7587a3f16dcfb4a08650581f1a2bd4d8c789285547aa"
+    }
+  },
+  "compositionBases": {
+    "gallery-stage": {
+      "id": "gallery-stage",
+      "path": "art-source/theater.webp",
+      "sha256": "56f7ae6d839159b717400723dc64cff1dac31a0997c4e93e5638dfb503c35be8",
+      "bytes": 137612,
+      "sourceKind": "codex_builtin_imagegen_reused_public_backdrop",
+      "sourceFile": "output/courseware-production/classic-arcade-v3/assets/theater.webp",
+      "sourceManifest": "output/courseware-production/classic-arcade-v3/asset-sources.json",
+      "sourceManifestSha256": "01d4f3f836ac294d47bc31e1470dc15d11cf74ac120939f82d005e010aabdf40",
+      "originalImagegen": {
+        "path": "/Users/sqcopenclaw/.codex/generated_images/01a1bf78-0c06-7fe0-8877-bc245394cec3/exec-a6eff833-d457-4bc1-8a0c-f10c1143714e.png",
+        "sha256": "ad541553656a51da0a559efb0ee9f336a78eb0f0f2a052e263cda126e4b8603e",
+        "prompt": "Use case: stylized-concept. Art-direction matched landscape asset sheet for the Mira learning arcade. A perfectly regular 2x2 grid of four full-bleed wide rectangular illustrations with narrow straight warm-white cross gutter exactly at the midpoint; each will be cropped into a game asset. Top left: little midnight garden theater with dark spruce draped curtains and gold paper lanterns far to the edges, quiet flat pale warm parchment screen in the center, empty stage, no cast shadow or actors. Top right: top-down river irrigation garden with soft moss and turquoise at the edges, little canal stones and wetland flowers only at the margin, quiet teal open water in center, no characters or internal paths. Bottom left: an apricot sky and snowy blue-teal distant mountains, high alpine meadow and wispy clouds, empty central sky, no planes or landing pads. Bottom right: large single warm cream origami paper glider tilted pointing to the right, spruce green paper seam and persimmon accent, centered on a plain evenly flat contrasting warm plum ground, generous room around its entire silhouette. Matte gouache, fine dry paper grain, crisp cut-paper shapes, calm deep spruce shadows, warm cream, restrained apricot highlights, crafted storybook arcade art. No lettering, numbers, graphics, logo or watermark in any panel.",
+        "sourceCrop": [
+          0,
+          0,
+          881,
+          438
+        ]
+      }
+    }
+  },
+  "components": {
+    "paint-blue-cat": {
+      "path": "art-source/components/paint-blue-cat.png",
+      "bytes": 55103,
+      "sha256": "194eeb33cf63d87caaf5a3ca0d1fd4a8e7198b6fadcbfc2bc21cc9aa652a0101",
+      "pixels": [
+        188,
+        224
+      ],
+      "mode": "RGBA",
+      "sourceKind": "codex_builtin_imagegen_atlas_crop",
+      "master": "teaching-cutouts",
+      "sourceCell": {
+        "row": 4,
+        "column": 2,
+        "rect": [
+          280,
+          841,
+          561,
+          1122
+        ],
+        "opaqueBounds": [
+          26,
+          12,
+          223,
+          252
+        ],
+        "maskedBounds": [
+          24,
+          10,
+          225,
+          254
+        ],
+        "retainedComponentAreas": [
+          31618
+        ]
+      },
+      "usedBy": [
+        "paint-show"
+      ],
+      "visualReview": {
+        "at": "2026-11-09T20:41:37+08:00",
+        "scope": "裁切或拼排后的静态核对",
+        "fullSceneG6": "pending",
+        "finding": "逐格核对预期的颜色、物件和完整轮廓，小尺寸查看透明边缘。"
+      },
+      "cropLayout": "art-source/teaching-layout.json"
+    },
+    "paint-black-monkey": {
+      "path": "art-source/components/paint-black-monkey.png",
+      "bytes": 56690,
+      "sha256": "a6139937ac1fe852fab1b985670496cb03f565a0018a139c32c1452b429cb637",
+      "pixels": [
+        224,
+        202
+      ],
+      "mode": "RGBA",
+      "sourceKind": "codex_builtin_imagegen_atlas_crop",
+      "master": "teaching-cutouts",
+      "sourceCell": {
+        "row": 4,
+        "column": 3,
+        "rect": [
+          561,
+          841,
+          842,
+          1122
+        ],
+        "opaqueBounds": [
+          14,
+          22,
+          258,
+          239
+        ],
+        "maskedBounds": [
+          12,
+          20,
+          260,
+          241
+        ],
+        "retainedComponentAreas": [
+          30030
+        ]
+      },
+      "usedBy": [
+        "paint-show"
+      ],
+      "visualReview": {
+        "at": "2026-11-09T20:41:37+08:00",
+        "scope": "裁切或拼排后的静态核对",
+        "fullSceneG6": "pending",
+        "finding": "逐格核对预期的颜色、物件和完整轮廓，小尺寸查看透明边缘。"
+      },
+      "cropLayout": "art-source/teaching-layout.json"
+    },
+    "paint-five-color-monkey": {
+      "path": "art-source/components/paint-five-color-monkey.png",
+      "bytes": 61157,
+      "sha256": "c10721dd1f86239fc686951172374be637374058812f0f0a247468b5ab260992",
+      "pixels": [
+        224,
+        204
+      ],
+      "mode": "RGBA",
+      "sourceKind": "codex_builtin_imagegen_atlas_crop",
+      "master": "teaching-cutouts",
+      "sourceCell": {
+        "row": 4,
+        "column": 4,
+        "rect": [
+          842,
+          841,
+          1122,
+          1122
+        ],
+        "opaqueBounds": [
+          8,
+          21,
+          254,
+          243
+        ],
+        "maskedBounds": [
+          6,
+          19,
+          256,
+          245
+        ],
+        "retainedComponentAreas": [
+          31260
+        ]
+      },
+      "usedBy": [
+        "paint-show"
+      ],
+      "visualReview": {
+        "at": "2026-11-09T20:41:37+08:00",
+        "scope": "裁切或拼排后的静态核对",
+        "fullSceneG6": "pending",
+        "finding": "逐格核对预期的颜色、物件和完整轮廓，小尺寸查看透明边缘。"
+      },
+      "cropLayout": "art-source/teaching-layout.json"
+    },
+    "curtain-panels": {
+      "path": "art-source/components/curtain-panels.png",
+      "bytes": 75832,
+      "sha256": "847ebc2af7a4150fb566af7f1d0f86e5c014118fadd817e4b47f26917b129a40",
+      "pixels": [
+        220,
+        224
+      ],
+      "mode": "RGBA",
+      "sourceKind": "codex_builtin_imagegen_atlas_crop",
+      "master": "teaching-cutouts",
+      "sourceCell": {
+        "row": 5,
+        "column": 1,
+        "rect": [
+          0,
+          1122,
+          280,
+          1402
+        ],
+        "opaqueBounds": [
+          31,
+          16,
+          260,
+          250
+        ],
+        "maskedBounds": [
+          29,
+          14,
+          262,
+          252
+        ],
+        "retainedComponentAreas": [
+          22905,
+          22874
+        ]
+      },
+      "usedBy": [
+        "find-the-cat"
+      ],
+      "visualReview": {
+        "at": "2026-11-09T20:41:37+08:00",
+        "scope": "裁切或拼排后的静态核对",
+        "fullSceneG6": "pending",
+        "finding": "逐格核对预期的颜色、物件和完整轮廓，小尺寸查看透明边缘。"
+      },
+      "cropLayout": "art-source/teaching-layout.json"
+    },
+    "apricot-lid": {
+      "path": "art-source/components/apricot-lid.png",
+      "bytes": 45544,
+      "sha256": "5ee3f0684a950bcc3d26b3b7e622136fd619142d3fa2aa8c524bd9ddda8ba847",
+      "pixels": [
+        224,
+        159
+      ],
+      "mode": "RGBA",
+      "sourceKind": "codex_builtin_imagegen_atlas_crop",
+      "master": "teaching-cutouts",
+      "sourceCell": {
+        "row": 5,
+        "column": 2,
+        "rect": [
+          280,
+          1122,
+          561,
+          1402
+        ],
+        "opaqueBounds": [
+          13,
+          54,
+          258,
+          221
+        ],
+        "maskedBounds": [
+          11,
+          52,
+          260,
+          223
+        ],
+        "retainedComponentAreas": [
+          26454
+        ]
+      },
+      "usedBy": [
+        "tap-a-beat"
+      ],
+      "visualReview": {
+        "at": "2026-11-09T20:41:37+08:00",
+        "scope": "裁切或拼排后的静态核对",
+        "fullSceneG6": "pending",
+        "finding": "逐格核对预期的颜色、物件和完整轮廓，小尺寸查看透明边缘。"
+      },
+      "cropLayout": "art-source/teaching-layout.json"
+    },
+    "cream-kite": {
+      "path": "art-source/components/cream-kite.png",
+      "bytes": 34555,
+      "sha256": "10bf3d45c4e79f0dc72e84542a065deff3875b0a7d67b0f95f593dcd790ebdf3",
+      "pixels": [
+        180,
+        224
+      ],
+      "mode": "RGBA",
+      "sourceKind": "codex_builtin_imagegen_atlas_crop",
+      "master": "teaching-cutouts",
+      "sourceCell": {
+        "row": 5,
+        "column": 3,
+        "rect": [
+          561,
+          1122,
+          842,
+          1402
+        ],
+        "opaqueBounds": [
+          40,
+          1,
+          242,
+          260
+        ],
+        "maskedBounds": [
+          38,
+          0,
+          244,
+          262
+        ],
+        "retainedComponentAreas": [
+          17031
+        ]
+      },
+      "usedBy": [
+        "make-and-share"
+      ],
+      "visualReview": {
+        "at": "2026-11-09T20:41:37+08:00",
+        "scope": "裁切或拼排后的静态核对",
+        "fullSceneG6": "pending",
+        "finding": "逐格核对预期的颜色、物件和完整轮廓，小尺寸查看透明边缘。"
+      },
+      "cropLayout": "art-source/teaching-layout.json"
+    }
+  },
+  "interactivePageBudget": {
+    "listen-and-aim": {
+      "images": 15,
+      "bytes": 982907
+    },
+    "guess-and-drive": {
+      "images": 13,
+      "bytes": 906504
+    }
+  }
+}

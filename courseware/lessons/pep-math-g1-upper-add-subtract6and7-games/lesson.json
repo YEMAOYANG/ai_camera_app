@@ -1,0 +1,286 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "6和7的加、减法",
+  "description": "跑着收齐两包圆片，拉开弹弓移走一组灯，再把属于同一张分组图的算式钓出来。在计数工坊看懂6和7的分与合。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小数老师",
+      "role": "teacher",
+      "gender": "male",
+      "voice": "Ethan",
+      "avatar": "/teachers/ashu-math-v1.png",
+      "color": "#4A90D9",
+      "persona": "边操作圆片边说明每一步的数学老师。"
+    }
+  },
+  "images": {
+    "studio": {"file": "assets/studio.png"},
+    "join-forward": {"file": "assets/join-forward.png"},
+    "join-reverse": {"file": "assets/join-reverse.png"},
+    "take-three": {"file": "assets/take-three.png"},
+    "take-four": {"file": "assets/take-four.png"},
+    "groups-seven": {"file": "assets/groups-seven.png"},
+    "equal-six": {"file": "assets/equal-six.png"},
+    "fish-equal": {"file": "assets/fish-equal.png"},
+    "fish-seven": {"file": "assets/fish-seven.png"},
+    "fish-six": {"file": "assets/fish-six.png"},
+    "tickets": {"file": "assets/tickets.png"},
+    "socks": {"file": "assets/socks.png"},
+    "tags": {"file": "assets/tags.png"},
+    "num-1": {"glyph": {"groups": [{"cells": [{"glyph": "1"}]}]}},
+    "num-2": {"glyph": {"groups": [{"cells": [{"glyph": "2"}]}]}},
+    "num-5": {"glyph": {"groups": [{"cells": [{"glyph": "5"}]}]}},
+    "num-6": {"glyph": {"groups": [{"cells": [{"glyph": "6"}]}]}},
+    "num-7": {"glyph": {"groups": [{"cells": [{"glyph": "7"}]}]}}
+  },
+  "scenes": [
+    {
+      "key": "join",
+      "type": "slide",
+      "title": "两包圆片合起来",
+      "template": "two-columns",
+      "data": {
+        "title": "两包圆片合起来",
+        "left": {"heading": "先看橙色", "body": "2 + 4 = 6"},
+        "right": {"heading": "先看蓝色", "body": "4 + 2 = 6"},
+        "left_picture": "join-forward",
+        "right_picture": "join-reverse"
+      },
+      "script": [
+        {"spotlight": "title"},
+        {"say": "计数工坊要把两包圆片收进同一个托盘。"},
+        {"spotlight": "left-picture"},
+        {"say": "先看左边，橙色有两枚，蓝色有四枚。"},
+        {"say": "两种颜色都进盘，所以两部分都要数。"},
+        {"spotlight": "left-body"},
+        {"say": "从两枚接着数四枚，三、四、五、六。"},
+        {"say": "我们用加号把两部分连起来，二加四等于六。"},
+        {"spotlight": "right-picture"},
+        {"say": "也能先放四枚蓝片，再放两枚橙片。"},
+        {"spotlight": "right-body"},
+        {"say": "四加二也等于六，因为还是这两包，一枚都没变。"},
+        {"say": "两个加数可以交换位置，合起来的总数一样。"}
+      ]
+    },
+    {
+      "key": "collect",
+      "type": "interactive",
+      "title": "跑着装满计数筐",
+      "page": "collect",
+      "widgetType": "game",
+      "script": [
+        {"setState": {"demo": true, "level": 1}},
+        {"highlight": "#game-goal"},
+        {"say": "先看筐上要装六枚。路过的小包里，圆点就是圆片。"},
+        {"highlight": "#game-player"},
+        {"say": "下面的那包沿地面接住，高处那包要等靠近再跳。"},
+        {"highlight": "#game-target"},
+        {"say": "筐里先有两枚，想一想还差几枚，才刚好装满。"},
+        {"say": "小满说：我接一包三枚吧！", "by": "xiaoman"},
+        {"highlight": "#game-goal"},
+        {"say": "两枚再来三枚只有五枚，筐里还没有凑到六。"},
+        {"say": "跟我再数，已有两枚，要补四枚才到六。"},
+        {"say": "把两包合起来看总数。换个顺序接，总数也一样。"},
+        {"setState": {"demo": false, "level": 1}},
+        {"say": "轮到你，先看筐上要几枚，再决定什么时候跳。"}
+      ]
+    },
+    {
+      "key": "subtract",
+      "type": "slide",
+      "title": "从七枚里拿走一组",
+      "template": "two-columns",
+      "data": {
+        "title": "从七枚里拿走一组",
+        "left": {"heading": "拿走三枚", "body": "7 − 3 = 4"},
+        "right": {"heading": "拿走四枚", "body": "7 − 4 = 3"},
+        "left_picture": "take-three",
+        "right_picture": "take-four"
+      },
+      "script": [
+        {"spotlight": "title"},
+        {"say": "圆片原来都在上面的托盘，三枚橙片、四枚蓝片。"},
+        {"say": "两种颜色加起来是七枚，七就是原来的总数。"},
+        {"spotlight": "left-picture"},
+        {"say": "三个空印子是橙片原来的位置，它们挪到下面了。"},
+        {"spotlight": "left-body"},
+        {"say": "所以先写七，再减去三，盘里还剩四枚蓝片。"},
+        {"spotlight": "right-picture"},
+        {"say": "把七枚都放回去，这次改搬四枚蓝片。"},
+        {"spotlight": "right-body"},
+        {"say": "原来还是七枚，这回减四，留下三枚橙片。"},
+        {"say": "减法先写原来的总数，再写拿走的数。"},
+        {"say": "拿走的是哪一部分，就留下另一部分。"}
+      ]
+    },
+    {
+      "key": "aim",
+      "type": "interactive",
+      "title": "弹弓熄灯",
+      "page": "aim",
+      "widgetType": "game",
+      "script": [
+        {"setState": {"demo": true, "level": 1}},
+        {"highlight": "#game-goal"},
+        {"say": "看一看，工坊墙上七盏灯全亮着。七是原来的总数。"},
+        {"highlight": "#game-target"},
+        {"say": "这一轮打灭橙灯，灭掉的灯就是拿走的部分。"},
+        {"highlight": "#game-player"},
+        {"say": "把弹弓往后拉，虚线对好一盏橙灯，再松手。"},
+        {"say": "小满问：蓝灯也一起打灭吗？", "by": "xiaoman"},
+        {"highlight": "#game-target"},
+        {"say": "我们只减橙色的三盏。蓝灯该亮着，表示留下的。"},
+        {"say": "等三盏橙灯都灭了，就数没灭的蓝灯。"},
+        {"say": "七减三等于四，因为七盏里拿走三盏，剩四盏。"},
+        {"setState": {"demo": false, "level": 1}},
+        {"say": "轮到你，先看要灭哪一组，再拉弹弓慢慢瞄。"}
+      ]
+    },
+    {
+      "key": "four-ways",
+      "type": "slide",
+      "title": "一张图说四件事",
+      "template": "picture-points",
+      "data": {
+        "title": "一张图说四件事",
+        "picture": "groups-seven",
+        "points": ["3 + 4 = 7", "4 + 3 = 7", "7 − 3 = 4", "7 − 4 = 3"]
+      },
+      "script": [
+        {"spotlight": "picture"},
+        {"say": "一边三枚橙片，另一边四枚蓝片。我们换着看。"},
+        {"spotlight": "point-1"},
+        {"say": "先说橙片，再说蓝片。三和四合起来是七。"},
+        {"spotlight": "point-2"},
+        {"say": "先说蓝片，再说橙片。四加三还是七。"},
+        {"spotlight": "point-3"},
+        {"say": "现在从总数想。七里面有三和四，拿走三还剩四。"},
+        {"say": "想起三加四等于七，就能算出七减三等于四。"},
+        {"spotlight": "point-4"},
+        {"say": "若改拿四枚，留下的是三枚，七减四等于三。"},
+        {"say": "同一图的两个部分不同，能写出两加、两减。"},
+        {"say": "加法从部分找总数，减法从总数找另一部分。"}
+      ]
+    },
+    {
+      "key": "same-groups",
+      "type": "slide",
+      "title": "两包一样多呢",
+      "template": "picture-points",
+      "data": {
+        "title": "两包一样多呢",
+        "picture": "equal-six",
+        "points": ["两包各有 3 枚", "3 + 3 = 6", "6 − 3 = 3"]
+      },
+      "script": [
+        {"spotlight": "point-1"},
+        {"say": "换一张图。橙色三枚，蓝色也是三枚。"},
+        {"spotlight": "picture"},
+        {"say": "看，颜色不同，但两包的圆片数一样多。"},
+        {"spotlight": "point-2"},
+        {"say": "先放橙色再放蓝色，写成三加三等于六。"},
+        {"say": "先放蓝色也是三加三。两个加数都是三。"},
+        {"spotlight": "point-3"},
+        {"say": "从六枚里拿走橙色的三枚，剩蓝色的三枚。"},
+        {"say": "要是改拿蓝色，拿的还是三枚，剩的还是三枚。"},
+        {"say": "两次都写六减三等于三，不必把同一道式子写两遍。"},
+        {"say": "两边一样多，只得到一道不同的加法和一道减法。"}
+      ]
+    },
+    {
+      "key": "fish",
+      "type": "interactive",
+      "title": "钓出一图的算式",
+      "page": "fish",
+      "widgetType": "game",
+      "script": [
+        {"setState": {"demo": true, "level": 1}},
+        {"highlight": "#game-goal"},
+        {"say": "先看码头的数量图，两边都是三枚，合起来六枚。"},
+        {"highlight": "#game-target"},
+        {"say": "鱼背上有算式。在水里左右滑动，小船就会挪过去。"},
+        {"highlight": "#game-player"},
+        {"say": "船对准鱼，再点船放钩，先钓三加三等于六。"},
+        {"say": "小满说：看到六，我就钓六减二等于四！", "by": "xiaoman"},
+        {"highlight": "#game-goal"},
+        {"say": "两堆都是三枚，没有两枚这一组。先别钓那条鱼。"},
+        {"say": "该钓六减三等于三。拿走一边，剩下另一边。"},
+        {"say": "换成两边不一样多的图，就得钓齐两加和两减。"},
+        {"setState": {"demo": false, "level": 1}},
+        {"say": "轮到你。先看图里两部分和总数，再把鱼钓上来。"}
+      ]
+    },
+    {
+      "key": "quick-check",
+      "type": "quiz",
+      "title": "换个地方试一试",
+      "intro": ["听完问题，看图想一想，再选一张数字卡。"],
+      "questions": [
+        {
+          "id": "sum-delivery",
+          "question": "先收一张蓝票，再收五张橙票。调换先后，共几张？",
+          "skill": "两部分合并与加数换序",
+          "visual": {"kind": "asset", "image": "tickets", "alt": "一张蓝票和五张橙票"},
+          "options": {
+            "A": {"label": "6", "visual": {"kind": "asset", "image": "num-6", "alt": "数字6"}},
+            "B": {"label": "5", "visual": {"kind": "asset", "image": "num-5", "alt": "数字5"}},
+            "C": {"label": "7", "visual": {"kind": "asset", "image": "num-7", "alt": "数字7"}}
+          },
+          "answer": ["A"],
+          "analysis": "两种票都收进来。五加一等于六，反过来收也一样多。"
+        },
+        {
+          "id": "left-on-rack",
+          "question": "绳上原来有七只袜子，收走六只，绳上还剩几只？",
+          "skill": "整体减去一部分",
+          "visual": {"kind": "asset", "image": "socks", "alt": "七只袜子里有六只移到篮里，绳上还有一只"},
+          "options": {
+            "A": {"label": "2", "visual": {"kind": "asset", "image": "num-2", "alt": "数字2"}},
+            "B": {"label": "1", "visual": {"kind": "asset", "image": "num-1", "alt": "数字1"}},
+            "C": {"label": "6", "visual": {"kind": "asset", "image": "num-6", "alt": "数字6"}}
+          },
+          "answer": ["B"],
+          "analysis": "七是原来的总数。六只是拿走的，七减六剩一只。"
+        },
+        {
+          "id": "missing-tag",
+          "question": "七个行李牌，两个是蓝色的。其余是橙色，有几个？",
+          "skill": "用组成或已知加法找缺少的一部分",
+          "visual": {"kind": "asset", "image": "tags", "alt": "一组蓝色和一组橙色的行李牌，共七张"},
+          "options": {
+            "A": {"label": "7", "visual": {"kind": "asset", "image": "num-7", "alt": "数字7"}},
+            "B": {"label": "2", "visual": {"kind": "asset", "image": "num-2", "alt": "数字2"}},
+            "C": {"label": "5", "visual": {"kind": "asset", "image": "num-5", "alt": "数字5"}}
+          },
+          "answer": ["C"],
+          "analysis": "两个蓝牌和五个橙牌合成七个，所以七减二等于五。"
+        }
+      ]
+    },
+    {
+      "key": "recap",
+      "type": "slide",
+      "title": "工坊收工前想一想",
+      "template": "summary",
+      "data": {
+        "title": "工坊收工前想一想",
+        "items": ["两部分合起来，加数换位总数一样", "先写总数，再减去拿走的部分", "想起两部分合多少，就能找缺的一部分", "两部分相等，同样的式子只写一次"]
+      },
+      "script": [
+        {"spotlight": "item-1"},
+        {"say": "两包都放进去就用加法。换个先后，总数一样。"},
+        {"spotlight": "item-2"},
+        {"say": "拿走一包就用减法。先看原来的总数，再看拿走多少。"},
+        {"spotlight": "item-3"},
+        {"say": "知道三和四合成七，就知道七里拿走三还剩四。"},
+        {"say": "一张图里两部分不同，通常能说出两加两减。"},
+        {"spotlight": "item-4"},
+        {"say": "两边都是三时，写一次三加三，再写一次六减三。"},
+        {"say": "回家找两种颜色的扣子，摆一摆六或七。"},
+        {"say": "再和家人抽两张零到七的数卡，用大数减小数。"},
+        {"say": "指给家人看，哪一个是总数，你怎么知道还剩多少。"}
+      ]
+    }
+  ]
+}

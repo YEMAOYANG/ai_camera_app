@@ -1,0 +1,1257 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "动物王国开大会",
+  "description": "听四次通知、分辨日期钟点地点、分角色朗读并试发一条清楚的新通知。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小语老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Serena",
+      "avatar": "/avatars/teacher-2.png",
+      "color": "#D65A8C",
+      "persona": "用清楚的短句，带一年级孩子听懂通知和故事。"
+    }
+  },
+  "images": {
+    "start-story-board": {
+      "file": "assets/start-story-board.png"
+    },
+    "first-message-board": {
+      "file": "assets/first-message-board.png"
+    },
+    "second-message-board": {
+      "file": "assets/second-message-board.png"
+    },
+    "third-message-board": {
+      "file": "assets/third-message-board.png"
+    },
+    "last-message-board": {
+      "file": "assets/last-message-board.png"
+    },
+    "four-notice-board": {
+      "file": "assets/four-notice-board.png"
+    },
+    "hop-start": {
+      "file": "assets/hop-start.png"
+    },
+    "role-reading-board": {
+      "file": "assets/role-reading-board.png"
+    },
+    "write-guo-dou-board": {
+      "file": "assets/write-guo-dou-board.png"
+    },
+    "write-bai-dian-board": {
+      "file": "assets/write-bai-dian-board.png"
+    },
+    "write-ting-shi-board": {
+      "file": "assets/write-ting-shi-board.png"
+    },
+    "write-lin-board": {
+      "file": "assets/write-lin-board.png"
+    },
+    "notice-rehearsal-board": {
+      "file": "assets/notice-rehearsal-board.png"
+    },
+    "sorting-examples-board": {
+      "file": "assets/sorting-examples-board.png"
+    },
+    "sort-start": {
+      "file": "assets/sort-start.png"
+    },
+    "meeting-sticker": {
+      "file": "assets/meeting-sticker.png"
+    },
+    "hop-tiger-icon": {
+      "file": "assets/hop-tiger-icon.png"
+    },
+    "hop-first-icon": {
+      "file": "assets/hop-first-icon.png"
+    },
+    "hop-fox-icon": {
+      "file": "assets/hop-fox-icon.png"
+    },
+    "hop-day-icon": {
+      "file": "assets/hop-day-icon.png"
+    },
+    "hop-wolf-icon": {
+      "file": "assets/hop-wolf-icon.png"
+    },
+    "hop-eight-icon": {
+      "file": "assets/hop-eight-icon.png"
+    },
+    "hop-deer-icon": {
+      "file": "assets/hop-deer-icon.png"
+    },
+    "hop-plaza-icon": {
+      "file": "assets/hop-plaza-icon.png"
+    },
+    "hop-final-icon": {
+      "file": "assets/hop-final-icon.png"
+    },
+    "bear-ready": {
+      "file": "assets/bear-ready.png"
+    },
+    "bear-run": {
+      "file": "assets/bear-run.png"
+    },
+    "bear-jump": {
+      "file": "assets/bear-jump.png"
+    },
+    "story-scroll": {
+      "file": "assets/story-scroll.png"
+    },
+    "hop-backdrop": {
+      "file": "assets/hop-backdrop.png"
+    },
+    "sort-backdrop": {
+      "file": "assets/sort-backdrop.png"
+    },
+    "notice-cart": {
+      "file": "assets/notice-cart.png"
+    },
+    "notice-cart-up": {
+      "file": "assets/notice-cart-up.png"
+    },
+    "dock-date": {
+      "file": "assets/dock-date.png"
+    },
+    "dock-time": {
+      "file": "assets/dock-time.png"
+    },
+    "dock-place": {
+      "file": "assets/dock-place.png"
+    },
+    "dock-full": {
+      "file": "assets/dock-full.png"
+    },
+    "missing-day-card": {
+      "file": "assets/missing-day-card.png"
+    },
+    "missing-time-card": {
+      "file": "assets/missing-time-card.png"
+    },
+    "missing-place-card": {
+      "file": "assets/missing-place-card.png"
+    },
+    "complete-card": {
+      "file": "assets/complete-card.png"
+    },
+    "quiz-1-a": {
+      "file": "assets/quiz-1-a.png"
+    },
+    "quiz-1-b": {
+      "file": "assets/quiz-1-b.png"
+    },
+    "quiz-1-c": {
+      "file": "assets/quiz-1-c.png"
+    },
+    "quiz-2-a": {
+      "file": "assets/quiz-2-a.png"
+    },
+    "quiz-2-b": {
+      "file": "assets/quiz-2-b.png"
+    },
+    "quiz-3-a": {
+      "file": "assets/quiz-3-a.png"
+    },
+    "quiz-3-b": {
+      "file": "assets/quiz-3-b.png"
+    },
+    "quiz-3-c": {
+      "file": "assets/quiz-3-c.png"
+    },
+    "quiz-4-a": {
+      "file": "assets/quiz-4-a.png"
+    },
+    "quiz-4-b": {
+      "file": "assets/quiz-4-b.png"
+    },
+    "quiz-4-c": {
+      "file": "assets/quiz-4-c.png"
+    },
+    "quiz-5-a": {
+      "file": "assets/quiz-5-a.png"
+    },
+    "quiz-5-b": {
+      "file": "assets/quiz-5-b.png"
+    },
+    "quiz-5-c": {
+      "file": "assets/quiz-5-c.png"
+    },
+    "quiz-6-a": {
+      "file": "assets/quiz-6-a.png"
+    },
+    "quiz-6-b": {
+      "file": "assets/quiz-6-b.png"
+    },
+    "quiz-6-c": {
+      "file": "assets/quiz-6-c.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "the-broadcast-station",
+      "type": "slide",
+      "title": "森林广播站交来一件事",
+      "template": "picture-points",
+      "data": {
+        "title": "森林广播站交来一件事",
+        "picture": "start-story-board",
+        "points": [
+          "老虎 · 狗熊",
+          "通 · 通知",
+          "注意 · 注和意"
+        ]
+      },
+      "script": [
+        {
+          "say": "森林要开大会。谁去把这件事告诉大家？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先找老虎把任务交给狗熊的画面。"
+        },
+        {
+          "say": "指有条纹的老虎，读老虎的虎。指戴围巾的狗熊，读熊。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "通知就是先把要做的事告诉别人，好作准备。"
+        },
+        {
+          "say": "找带走之的通。狗熊拿起喇叭，把消息传给大家。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "听到注意，先停下手里的事。找左边有三点水的注。"
+        },
+        {
+          "say": "意字底下有个心。指着意，把心思放到这条消息上。"
+        }
+      ]
+    },
+    {
+      "key": "which-day",
+      "type": "slide",
+      "title": "第一次漏了哪一天",
+      "template": "picture-points",
+      "data": {
+        "title": "第一次漏了哪一天",
+        "picture": "first-message-board",
+        "points": [
+          "第一条 · 遍",
+          "狐狸问 · 一百遍",
+          "为什么 · 因为 · 舌",
+          "问回明天"
+        ]
+      },
+      "script": [
+        {
+          "say": "狗熊把要开会的事喊了出来。还缺什么呢？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "下一幅找狗熊刚拿起喇叭喊第一条。"
+        },
+        {
+          "say": "第一条只说要开会，请大家来参加。"
+        },
+        {
+          "say": "指带走之的遍。从头到尾喊一次，就是一遍。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "接着找狐狸来问哪一天的画面。"
+        },
+        {
+          "say": "指一百的百，第一横长。狐狸说喊一百遍也没用。"
+        },
+        {
+          "say": "狐狸在提醒还缺信息。狗熊这次喊了十遍。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "为什么听不明白？因为大家还不知道是哪天。"
+        },
+        {
+          "say": "指带方框的因。问为什么，说因为，两边都有这个为。"
+        },
+        {
+          "say": "故事里狗熊伸伸舌头。指舌字，再伸一下自己的舌头。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "找狗熊问过老虎、得到明天的那一幕。"
+        },
+        {
+          "say": "老虎说开会在明天。哪一天这一项补上了。"
+        }
+      ]
+    },
+    {
+      "key": "what-time",
+      "type": "slide",
+      "title": "第二次还漏了几点",
+      "template": "picture-points",
+      "data": {
+        "title": "第二次还漏了几点",
+        "picture": "second-message-board",
+        "points": [
+          "知道明天",
+          "大灰狼问 · 道理",
+          "补上上午八点"
+        ]
+      },
+      "script": [
+        {
+          "say": "现在知道是明天了。明天什么时候来呢？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "第二次的消息加上明天。它也喊了十遍。"
+        },
+        {
+          "say": "知道是哪天，还能再问上午还是下午。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "现在找大灰狼来追问几点的画面。"
+        },
+        {
+          "say": "大灰狼想知道具体钟点。狗熊觉得有道理。"
+        },
+        {
+          "say": "指道理的理。没说几点，大家没法准时到，狼说得对。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "接着找老虎补说上午八点的画面。"
+        },
+        {
+          "say": "明天上午八点，哪天和几点就都清楚了。"
+        }
+      ]
+    },
+    {
+      "key": "which-place",
+      "type": "slide",
+      "title": "第三次还要说清在哪里",
+      "template": "picture-points",
+      "data": {
+        "title": "第三次还要说清在哪里",
+        "picture": "third-message-board",
+        "points": [
+          "时间已经齐",
+          "梅花鹿问 · 呀",
+          "哎呀 · 忘了地点"
+        ]
+      },
+      "script": [
+        {
+          "say": "日期和钟点都知道了。听的人往哪儿走？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "第三次说了明天上午八点，还是喊了十遍。"
+        },
+        {
+          "say": "时间这两格够了，地点这一格还空着。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "找梅花鹿来问会场在哪里的画面。"
+        },
+        {
+          "say": "听老师换句话。我们的画放在哪儿呀？"
+        },
+        {
+          "say": "指问句最后的呀，轻轻读，像在等别人回答。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "接着找老虎想起森林广场的画面。"
+        },
+        {
+          "say": "指哎呀的呀。哎呀！我忘带画纸了。呀读第一声。"
+        },
+        {
+          "say": "找底下有心的忘。老虎没想起来说地点，这就叫忘了。"
+        },
+        {
+          "say": "图里老虎抬起爪子。感叹号让人听出他突然想起来。"
+        }
+      ]
+    },
+    {
+      "key": "they-all-arrive",
+      "type": "slide",
+      "title": "第四次大家为什么听明白",
+      "template": "picture-points",
+      "data": {
+        "title": "第四次大家为什么听明白",
+        "picture": "last-message-board",
+        "points": [
+          "第四条 · 第",
+          "日期 · 钟点 · 地点",
+          "准时到场"
+        ]
+      },
+      "script": [
+        {
+          "say": "这次的消息已经补齐。看看大家走到了哪儿。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "最后找时间地点齐全、大家到广场的图。"
+        },
+        {
+          "say": "指第四的第。第一条最早，第四条最后，用第来排先后。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "第四条说清明天、上午八点和森林广场。"
+        },
+        {
+          "say": "大家知道什么时候到、去哪里、要开大会。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "第二天上午，动物们到森林广场准时参加。"
+        },
+        {
+          "say": "这次也喊十遍。听众可以照着消息找场地。"
+        }
+      ]
+    },
+    {
+      "key": "four-calls-or-ten",
+      "type": "slide",
+      "title": "四次通知和十遍怎么数",
+      "template": "picture-points",
+      "data": {
+        "title": "四次通知和十遍怎么数",
+        "picture": "four-notice-board",
+        "points": [
+          "四张不同的消息",
+          "每张下面十个记号",
+          "按顺序接"
+        ]
+      },
+      "script": [
+        {
+          "say": "看左边四张通知牌。每张下面都有十个记号。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "第一条只说开会。第二条加上明天。"
+        },
+        {
+          "say": "第三条加到上午八点。第四条再补广场。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "每次喊十遍，是同一条消息说了十次。"
+        },
+        {
+          "say": "四张牌的意思不同，是故事前后四次通知。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "想一想前面是哪一幕，再听下一句。"
+        },
+        {
+          "say": "去亮起来的故事台，接到下一幅。"
+        },
+        {
+          "say": "你把故事画面按先后接起来了。"
+        }
+      ]
+    },
+    {
+      "key": "hop-through-the-story",
+      "type": "interactive",
+      "title": "跳上下一张故事牌",
+      "page": "hop-through-the-story",
+      "widgetType": "game",
+      "startImage": "hop-start",
+      "script": [
+        {
+          "say": "故事台需要按先后排好。来跑跳接图。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#meeting-hop-listen"
+        },
+        {
+          "say": "先听，谁先把通知的任务交了出去？"
+        },
+        {
+          "highlight": "#meeting-first-platform"
+        },
+        {
+          "say": "这里画老虎交任务。故事从这一步开始。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "按箭头和跳键，落在那张故事台上。"
+        },
+        {
+          "say": "接好一张，再听下一幕，想好顺序再跳。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "我只跳成第一下。你接手时从起点开始。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "hop-tiger": "the-broadcast-station-3",
+        "hop-first": "which-day-3",
+        "hop-fox": "which-day-7",
+        "hop-day": "which-day-15",
+        "hop-wolf": "what-time-6",
+        "hop-eight": "what-time-10",
+        "hop-deer": "which-place-6",
+        "hop-plaza": "which-place-10",
+        "hop-final": "they-all-arrive-3",
+        "hop-hint": "four-calls-or-ten-9",
+        "hop-help": "four-calls-or-ten-10",
+        "hop-praise": "four-calls-or-ten-11"
+      }
+    },
+    {
+      "key": "voices-in-the-forest",
+      "type": "slide",
+      "title": "给角色换一种口气",
+      "template": "picture-points",
+      "data": {
+        "title": "给角色换一种口气",
+        "picture": "role-reading-board",
+        "points": [
+          "带着疑问",
+          "着急和提醒",
+          "明白以后"
+        ]
+      },
+      "script": [
+        {
+          "say": "同一个故事里，有人在问，有人在提醒。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "狐狸抬爪问哪天。看到问号，句尾轻一些，等回答。"
+        },
+        {
+          "say": "我学狐狸问。哪天去画树叶呀？轻读呀，等一等。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "老虎想起漏地点，叹号读出惊讶。哎呀！场地还没说！"
+        },
+        {
+          "say": "狗熊举喇叭慢些说。明天下午两点，到树下，一起画画。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "第四次终于听懂了。噢，这回我知道去哪儿了！"
+        },
+        {
+          "say": "问句等人答。明白后的叹号，松口气读。回纸书试读。"
+        }
+      ]
+    },
+    {
+      "key": "write-country-all",
+      "type": "slide",
+      "title": "国怎样封口，都怎样写右边",
+      "template": "picture-points",
+      "data": {
+        "title": "国怎样封口，都怎样写右边",
+        "picture": "write-guo-dou-board",
+        "points": [
+          "国 · 八笔",
+          "都 · 十笔",
+          "纸上对照"
+        ]
+      },
+      "script": [
+        {
+          "say": "先看国和都。哪个有外框，哪个左右摆？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "外框先竖、横折。里边写横、横、竖、横、点。"
+        },
+        {
+          "say": "最后从左到右写底横，把外框封起来。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "左边先横、竖、横、撇，再竖、横折、横、横。"
+        },
+        {
+          "say": "都的右边先写横撇弯钩，一笔连着写，再写竖。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "国的底横最后写。都的右竖也在最后。"
+        },
+        {
+          "say": "写好请大人看看封口和右边两笔。"
+        }
+      ]
+    },
+    {
+      "key": "write-hundred-and-dot",
+      "type": "slide",
+      "title": "百的长横，点的四点",
+      "template": "picture-points",
+      "data": {
+        "title": "百的长横，点的四点",
+        "picture": "write-bai-dian-board",
+        "points": [
+          "百 · 六笔",
+          "点 · 九笔",
+          "纸上试写"
+        ]
+      },
+      "script": [
+        {
+          "say": "百和点都上下摆。先找它们的第一笔。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "百先写一横，再写撇。"
+        },
+        {
+          "say": "下面写竖、横折、横、横。第一横可以长些。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "上面先竖、横，再竖、横折、横。"
+        },
+        {
+          "say": "下面从左到右写四点。点和点留一点空。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "先看田字格里的样子，用手指比一遍。"
+        },
+        {
+          "say": "请家人看百的第一横和点的四个点。"
+        }
+      ]
+    },
+    {
+      "key": "write-listen-time",
+      "type": "slide",
+      "title": "听和时的左右怎么摆",
+      "template": "picture-points",
+      "data": {
+        "title": "听和时的左右怎么摆",
+        "picture": "write-ting-shi-board",
+        "points": [
+          "听 · 左口右斤",
+          "时 · 左日右寸",
+          "再比一比"
+        ]
+      },
+      "script": [
+        {
+          "say": "听通知，记时间。把听和时写给家人看。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "左边口按竖、横折、横来写，口收小一点。"
+        },
+        {
+          "say": "右边斤先撇、撇，再横、竖。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "左边日写竖、横折、横、横。"
+        },
+        {
+          "say": "右边寸写横、竖钩、点。末点留在横下。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "左边的口比日短一些，右边都要留出位置。"
+        },
+        {
+          "say": "在纸上各写一个，请大人看左右是否挤。"
+        }
+      ]
+    },
+    {
+      "key": "write-woods",
+      "type": "slide",
+      "title": "两个木怎样写成林",
+      "template": "picture-points",
+      "data": {
+        "title": "两个木怎样写成林",
+        "picture": "write-lin-board",
+        "points": [
+          "先写左边",
+          "再写右边",
+          "纸上试写"
+        ]
+      },
+      "script": [
+        {
+          "say": "森林广场有个林字。看它的两个木。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "左木先横、竖、撇，最后一点收住。"
+        },
+        {
+          "say": "左边留些空间，好让右木也能站进来。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "右木也是横、竖、撇，最后写向右下的捺。"
+        },
+        {
+          "say": "看看左边的点，和右边舒展开的捺。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "在田字格里先写左边，再写右边。"
+        },
+        {
+          "say": "请大人看看，两边最后一笔有没有分清。"
+        }
+      ]
+    },
+    {
+      "key": "make-a-clear-message",
+      "type": "slide",
+      "title": "发消息要说哪几件事",
+      "template": "picture-points",
+      "data": {
+        "title": "发消息要说哪几件事",
+        "picture": "notice-rehearsal-board",
+        "points": [
+          "日期 · 哪一天",
+          "钟点 · 几点",
+          "地点 · 在哪儿",
+          "内容 · 做什么"
+        ]
+      },
+      "script": [
+        {
+          "say": "想请伙伴一起做手工。先想他要知道什么。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "上午十点去木屋画花。你会问哪一天？"
+        },
+        {
+          "say": "日历告诉大家哪天去。把这一格补清楚。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "明天在果园捡树叶。明天哪个时候去？"
+        },
+        {
+          "say": "还要说时段和几点。听众才知道何时出发。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "后天上午九点讲故事。得先说明在哪儿。"
+        },
+        {
+          "say": "场地说具体，大家就能找到同一个地方。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "明天下午三点，在大树下交换画纸。"
+        },
+        {
+          "say": "这条说清哪天、几点、哪里，还说清做什么。"
+        }
+      ]
+    },
+    {
+      "key": "sort-the-gaps",
+      "type": "slide",
+      "title": "先听再看，哪一格空着",
+      "template": "picture-points",
+      "data": {
+        "title": "先听再看，哪一格空着",
+        "picture": "sorting-examples-board",
+        "points": [
+          "发现日期或钟点",
+          "再看地点",
+          "送到缺项托盘"
+        ]
+      },
+      "script": [
+        {
+          "say": "把刚才四条新消息放在一起，看看哪格空着。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "看日历和钟表，找哪一格还没说清。"
+        },
+        {
+          "say": "一条有钟点却缺哪天，另一条正好相反。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "再看看场地这格，有没有说去哪里。"
+        },
+        {
+          "say": "如果三格都有，听的人就能照着去。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "每张卡要推到它缺的那一类。齐的单放。"
+        },
+        {
+          "say": "先停一停，比一比卡上哪一格空着。"
+        },
+        {
+          "say": "看亮起来的托盘，绕到卡后面再推。"
+        },
+        {
+          "say": "你按空着的位置把通知分好了。"
+        }
+      ]
+    },
+    {
+      "key": "sort-announcements",
+      "type": "interactive",
+      "title": "把通知推到合适的托盘",
+      "page": "sort-announcements",
+      "widgetType": "game",
+      "startImage": "sort-start",
+      "script": [
+        {
+          "say": "广播站要检查新通知。来开小车推卡。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#meeting-first-card"
+        },
+        {
+          "say": "这张卡的日历空着。还要问是哪一天。"
+        },
+        {
+          "highlight": "#meeting-first-dock"
+        },
+        {
+          "say": "这儿的托盘画着日历。把缺日期的卡推去。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "用箭头把车开到卡后面，再慢慢推过去。"
+        },
+        {
+          "say": "看卡缺哪一格。三格全的，送到齐全托盘。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "我先推好一张。接着你从第一关开始。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "sort-goal-one": "sort-the-gaps-3",
+        "sort-goal-two": "sort-the-gaps-6",
+        "sort-goal-three": "sort-the-gaps-9",
+        "sort-hint": "sort-the-gaps-10",
+        "sort-help": "sort-the-gaps-11",
+        "sort-praise": "sort-the-gaps-12"
+      }
+    },
+    {
+      "key": "picture-quiz",
+      "type": "quiz",
+      "title": "听通知，找信息",
+      "intro": [
+        "听老师说完，再选一幅合适的图。"
+      ],
+      "questions": [
+        {
+          "id": "notice-rounds",
+          "question": "哪张图表示前三条漏信息，第四条齐全？",
+          "skill": "four-announcements",
+          "answer": [
+            "B"
+          ],
+          "analysis": "第一条就齐的图不合。最后还有空格的图也不合。前三条各有空格、第四条三格全有的图才符合。",
+          "options": {
+            "A": {
+              "label": "首尾都齐",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-1-a",
+                "alt": "第一张和第四张三格都有，第二张和第三张有空格"
+              }
+            },
+            "B": {
+              "label": "第四条才齐",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-1-b",
+                "alt": "四张通知卡依次少三项、少两项、少一项和三项齐全"
+              }
+            },
+            "C": {
+              "label": "最后还缺",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-1-c",
+                "alt": "前两张卡齐全，后两张仍有空格"
+              }
+            }
+          }
+        },
+        {
+          "id": "need-the-day",
+          "question": "上午十点在花坛种花。听的人还得问什么？",
+          "skill": "complete-message",
+          "answer": [
+            "A"
+          ],
+          "analysis": "日历说哪天，钟表说几点，木台代表地点。话里已有上午十点和花坛，只缺日期。",
+          "options": {
+            "A": {
+              "label": "问哪天",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-2-a",
+                "alt": "翻页日历图"
+              }
+            },
+            "B": {
+              "label": "问几点",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-2-b",
+                "alt": "带指针的时钟图"
+              }
+            },
+            "C": {
+              "label": "问地点",
+              "visual": {
+                "kind": "asset",
+                "image": "dock-place",
+                "alt": "一座林间木台，表示活动地点"
+              }
+            }
+          }
+        },
+        {
+          "id": "need-the-site",
+          "question": "明天下午三点来领戏票。还要问什么？",
+          "skill": "complete-message",
+          "answer": [
+            "C"
+          ],
+          "analysis": "哪天和几点都明确，听众还要知道去哪儿领戏票。",
+          "options": {
+            "A": {
+              "label": "问日期",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-3-a",
+                "alt": "日历页图"
+              }
+            },
+            "B": {
+              "label": "问时刻",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-3-b",
+                "alt": "钟表和午后太阳图"
+              }
+            },
+            "C": {
+              "label": "问地点",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-3-c",
+                "alt": "木桌和石亭分在道路两边，需要确认领票处"
+              }
+            }
+          }
+        },
+        {
+          "id": "deliver-clear-message",
+          "question": "哪张消息说清了何时、去哪儿做叶片拓印？",
+          "skill": "complete-message",
+          "answer": [
+            "B"
+          ],
+          "analysis": "图中日期、钟点和地点三格都有，后面的画表示去做叶片拓印。",
+          "options": {
+            "A": {
+              "label": "缺日期",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-4-a",
+                "alt": "日历格为空，钟点和木屋有图，活动为叶片拓印"
+              }
+            },
+            "B": {
+              "label": "三项都齐",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-4-b",
+                "alt": "日历、钟点和木屋都有图，活动为叶片拓印"
+              }
+            },
+            "C": {
+              "label": "缺地点",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-4-c",
+                "alt": "有日期和钟点，场地格空着，活动为叶片拓印"
+              }
+            }
+          }
+        },
+        {
+          "id": "read-with-surprise",
+          "question": "听，哎呀！哪张图像刚想起漏了一件事？",
+          "skill": "read-in-role",
+          "answer": [
+            "C"
+          ],
+          "analysis": "扶着脑门、眼睛睁大的那幅表现突然想到，适合用带惊讶的语气。",
+          "options": {
+            "A": {
+              "label": "追问",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-5-a",
+                "alt": "小朋友抬起手，等同伴回答"
+              }
+            },
+            "B": {
+              "label": "温和提醒",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-5-b",
+                "alt": "小朋友伸手给同伴指出展桌"
+              }
+            },
+            "C": {
+              "label": "刚想起来",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-5-c",
+                "alt": "小朋友手碰脑门、睁大眼睛，手里还拿着通知卡"
+              }
+            }
+          }
+        },
+        {
+          "id": "close-the-box",
+          "question": "国字的里面写好了。最后写哪一笔？",
+          "skill": "read-and-write",
+          "answer": [
+            "A"
+          ],
+          "analysis": "先写框和里面的玉，最后用底横从左到右封住外框。",
+          "options": {
+            "A": {
+              "label": "底横封口",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-6-a",
+                "alt": "橙色标出外框最后从左到右的底横"
+              }
+            },
+            "B": {
+              "label": "外框左竖",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-6-b",
+                "alt": "橙色标出左边竖线"
+              }
+            },
+            "C": {
+              "label": "内部一点",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-6-c",
+                "alt": "橙色标出玉中的点"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "tell-the-next-listener",
+      "type": "slide",
+      "title": "把清楚的消息说给家人",
+      "template": "picture-points",
+      "data": {
+        "title": "把清楚的消息说给家人",
+        "picture": "meeting-sticker",
+        "points": [
+          "回想四条",
+          "说一件新活动",
+          "回纸书朗读"
+        ]
+      },
+      "script": [
+        {
+          "say": "广播贴纸送给你。你也来当一回通知员。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "每条都喊十遍。前面分别要补哪天、几点、哪里。"
+        },
+        {
+          "say": "最后说清三项，大家才找到会场并准时到。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "选家里一件事，说哪天、几点、在哪儿做。"
+        },
+        {
+          "say": "把活动也说出来，请家人复述给你听。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "翻纸书分角色读，听问句、提醒和着急。"
+        },
+        {
+          "say": "选两个今天的字写给家人看，请他指指笔画。"
+        }
+      ]
+    }
+  ]
+}

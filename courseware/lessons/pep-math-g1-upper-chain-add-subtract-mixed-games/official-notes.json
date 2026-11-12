@@ -1,0 +1,270 @@
+{
+  "schemaVersion": "mira.courseware.official-notes.v1",
+  "binding": {
+    "editionId": "pep-math-g1-upper-2022-standard",
+    "revisionId": "directory-ede7a8c63c337cf95a03fe79",
+    "nodeId": "630133ba-c675-4e97-b6de-7d8d11289fc9",
+    "unitId": "3889582b-7958-49f7-ba4d-905b1dcc8761",
+    "lessonTitle": "连加、连减  加、减混合",
+    "gradeCode": "primary_1",
+    "subject": "math",
+    "volume": "upper",
+    "schoolSystem": "six_year",
+    "unitTitle": "二 6～10的认识和加、减法",
+    "classHour": "lesson_1",
+    "teachingRevision": "1"
+  },
+  "officialTextbook": {
+    "title": "新教材-小学数学人教版一年级上册",
+    "publisher": "人民教育出版社",
+    "publication": "2024年7月",
+    "editionLabel": "人教版 · 根据2022年版课程标准修订",
+    "textbookPages": [
+      59,
+      60,
+      61,
+      62
+    ],
+    "pageEvidence": "教学设计第1页对应印刷59页例2与60页例3。原书59–60页含例题和即时练习，61–62页为本课随后的练一练。印刷58为10的加减法结尾，63开始整理和复习。",
+    "teachingMaterialId": "ba9d9c0b-2c1c-4bba-84d7-369fb405bb13",
+    "activityId": "c947da10-5804-f38f-48f6-601310ed421d",
+    "officialLessonTitle": "连加、连减  加、减混合",
+    "activityDetailsUrl": "https://s-file-1.ykt.cbern.com.cn/zxx/ndrv2/national_lesson/resources/details/c947da10-5804-f38f-48f6-601310ed421d.json",
+    "activityDetailsSha256": "e505af65da87d02eff21e0fb9dd3b6de6cf3dc76b2d20c3a4079ee0b56be1516",
+    "classHours": [
+      "lesson_1"
+    ],
+    "classHourCoverage": "按精确节点匹配活动，未筛选课时，官方活动结构只列第一课时。此课时同时覆盖连加、连减和两种加减混合顺序，合为一门课。",
+    "textbookResourceId": "c3e06fe4-c6b3-49cb-8727-4f8ff69bbfbc",
+    "ebookLessonPages": [
+      64,
+      65,
+      66,
+      67
+    ],
+    "beforePrintedPage": 58,
+    "nextPrintedPage": 63
+  },
+  "sourceManifest": "output/courseware-lessons/pep-math-g1-upper-chain-add-subtract-mixed/official/manifest.json",
+  "sourceManifestSha256": "099644a9d3e53ce3d6b45bca56a59efbc704972baaab6b693ed16b0d20cd36e1",
+  "reviewedAt": "2026-11-06",
+  "reviewedBy": "Codex 逐页审读",
+  "reviewerKind": "ai",
+  "objectives": [
+    "从三部分合并或连续两次增加的具体情境理解连加，用前两个数的和接着加第三个数。",
+    "从同一对象集合分两次拿走的情境理解连减，用第一次拿走后的剩余数接着减。",
+    "看图辨认先增加后减少和先减少后增加两种过程，按实际先后顺序列出并计算10以内的加减混合算式。",
+    "把第一步的结果与当时的实物数量对应起来，把该数量作为第二步的起点，并能用图解释算式和情境的对应关系。"
+  ],
+  "keyPoint": "理解连加、连减和加减混合的意义，用两步运算解决10以内的具体问题。",
+  "difficultPoint": "辨认两个时间点所指的整体与部分。第一步的结果是当时的整体或剩余，也是第二步继续合并或拿走时的起点。",
+  "contentBoundary": {
+    "numberRange": "本课只用10以内的非负整数计算，起始量、中间量、最终量均在0至10之间。减去的数量不能超过当时已有的数量。",
+    "operationOrder": "对本课无括号、只含加和减的三数算式，从左往右计算。先算前两个数，再用所得的数和第三个数按第二个符号计算；加号在前先加，减号在前先减。",
+    "chainAddition": "两次加入的物体和原有物体都不重复。官方允许从同一静态图说出不同的合理合并故事，每个给定的算式仍按前两项先计算。若题意给定先后，算式顺序应与图和叙述一致。",
+    "chainSubtraction": "第一次拿走后，从仍在集合里的物体中拿走第二批。图上用位置或标记区分两批，已移出的物体不再被拿走。",
+    "mixedOperations": "加和减都能先做，取决于事件先后。比较两个都有合理起点的过程时，即使最终数量相同，也可能有不同的中间量；只核最后数量不足以判断是否分清了先后。",
+    "officialErrorExample": "教学设计第4至5页及课件第20至21页中的错误列式是供质疑的发言。把第一次移出后剩的量误作原有量会算错；须用发生变化之前的数量起算。",
+    "excluded": [
+      "括号与乘除优先级",
+      "负数计算",
+      "10以上的两步运算",
+      "把结果正确当作已经能口头解释"
+    ]
+  },
+  "factChecks": [],
+  "resources": {
+    "teachingDesign": {
+      "status": "reviewed",
+      "classHour": "lesson_1",
+      "resourceId": "cc70a4a0-5694-1628-e589-409604c85a14",
+      "pageCount": 5,
+      "pageRefs": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "findings": [
+        "第1页核定人教版2024年7月一年级上册，课目涉及教材59页例2、60页例3和练习。目标是理解10以内三类两步计算、借操作建模并用于生活。难点是整体与部分随观察步骤改变。",
+        "第2页从一个原有组和两批后来者的图中提取数量，可用点图和两条算式分别表示两个步骤，再引出写成一个连加算式。",
+        "第3页把前两个数的和带到第二步，另一个合理的合并叙述也要先算该算式的前两项。接着用两种去除标记区分同一群体的两次减少。",
+        "第4页承接连减的第一次剩余数量，在其上完成第二次减少；进入加减混合，按情境读出先增加还是先减少。末尾列出的错误发言需结合第5页纠正。",
+        "第5页用正确的起始数量重新推导先减后加，指出第二步用的是第一步结果。随后安排教材两页的图算练习、三类方法回顾及生活故事活动。"
+      ]
+    },
+    "courseware": {
+      "status": "reviewed",
+      "classHour": "lesson_1",
+      "resourceId": "971e76b4-3c36-54ac-4b55-cc6ae528c5e9",
+      "pageCount": 28,
+      "pageRefs": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28
+      ],
+      "findings": [
+        "第1至4页确认课目与单元，先从两幅图辨认对象及所在范围，再从第一幅图提取数量。",
+        "第5至8页分别圈出起始部分与后来的两个部分，比较分次到来和把后来两组合看这两种图意。",
+        "第9至12页由图形分组转到算式，展示两次增加合写成连加，并用连接线标出第一步的和如何参加第二步。",
+        "第13至17页观察两批对象依次离开，画点图用不同标记表示两次去除，列连减并解释第一次剩余数的来处。",
+        "第18至19页按前后图讲变化、列式和计算，先示范增加后减少。",
+        "第20至22页质疑把第一次变化后的数量误读成起始数量的做法，修正先减后加的算式，用中间结果接续。",
+        "第23页总结两种混合顺序。第24页用三组小棒和两批去除标记补算式，第25页从进出水面的两步图补符号和数量。",
+        "第26页比较三类算式的适用情境和计算顺序。第27页布置讲故事并列式。第28页确认制作单位为人民教育出版社。"
+      ]
+    },
+    "learningTaskSheet": {
+      "status": "reviewed",
+      "classHour": "lesson_1",
+      "resourceId": "4d559458-4bca-87cd-3368-6418ec60e278",
+      "pageCount": 2,
+      "pageRefs": [
+        1,
+        2
+      ],
+      "findings": [
+        "第1页列出10以内两步运算、操作建模和生活应用目标，并用两张图复习从画面提取对象与数量。",
+        "第2页要求选择一种办法表示连加数量关系。两组前后图让学生分别说出变化顺序，列出算式，算完再解释自己的故事。"
+      ]
+    },
+    "afterClassExercise": {
+      "status": "reviewed",
+      "classHour": "lesson_1",
+      "resourceId": "cd3fc6f7-6c9e-a922-0542-654a5d2b87ce",
+      "pageCount": 1,
+      "pageRefs": [
+        1
+      ],
+      "findings": [
+        "第1页让学生从家庭或学校挑一个符合两步加减的真实情境，自己画故事，与家人或同伴根据画面列式并算结果。"
+      ]
+    },
+    "video": {
+      "status": "waived",
+      "classHour": "lesson_1",
+      "resourceId": "f8d61639-a63a-5b68-5986-62f79eb5519a",
+      "ownerDecision": "课件制作标准第1条记录的2026-10-30视频豁免"
+    }
+  },
+  "originalityPlan": "用社区读书角和借还记录呈现每次数量变化。新作讲解、实时游戏和变式题沿用本课已登记的读书角及单本书原创图；数量和移动图另由代码准确绘制。",
+  "weeklyQuestionSources": [
+    {
+      "skill": "连加中的两次增加",
+      "source": "教学设计第2至3页；课件第9至12、24页"
+    },
+    {
+      "skill": "连减中的两次拿走",
+      "source": "教学设计第3至4页；课件第13至17、24页"
+    },
+    {
+      "skill": "先加后减",
+      "source": "教学设计第4页；课件第19、25页"
+    },
+    {
+      "skill": "先减后加",
+      "source": "教学设计第4至5页；课件第20至23页"
+    },
+    {
+      "skill": "根据中间量辨认事件顺序",
+      "source": "课件第11、16、20至23页；学习任务单第2页"
+    },
+    {
+      "skill": "把第一步结果接到第二步",
+      "source": "教学设计第3至5页；课件第16、21至22页"
+    }
+  ],
+  "sourceRecheck": {
+    "reviewedAt": "2026-11-09T14:53:52+08:00",
+    "reviewedBy": "Codex gpt-6.1-sol",
+    "textbookOriginals": [
+      {
+        "ebookPage": 1,
+        "sourcePath": "output/courseware-lessons/pep-math-g1-upper-add-subtract10/official/textbook/ebook-001.jpg",
+        "url": "https://r1-ndr.ykt.cbern.com.cn/edu_product/esp/assets/c3e06fe4-c6b3-49cb-8727-4f8ff69bbfbc.t/zh-CN/1787023025887/transcode/image/1.jpg",
+        "sha256": "ddcb16c4c64c58ad024f344cf629f994f962d7dd22202ee62d82179f6472326a"
+      },
+      {
+        "ebookPage": 2,
+        "sourcePath": "output/courseware-lessons/pep-math-g1-upper-add-subtract10/official/textbook/ebook-002.jpg",
+        "url": "https://r1-ndr.ykt.cbern.com.cn/edu_product/esp/assets/c3e06fe4-c6b3-49cb-8727-4f8ff69bbfbc.t/zh-CN/1787023025887/transcode/image/2.jpg",
+        "sha256": "73f6551affeafd097de587054a1396e863ca9eda7e6c52e5d135205a8ec101f1"
+      },
+      {
+        "ebookPage": 3,
+        "sourcePath": "output/courseware-lessons/pep-math-g1-upper-add-subtract10/official/textbook/ebook-003.jpg",
+        "url": "https://r1-ndr.ykt.cbern.com.cn/edu_product/esp/assets/c3e06fe4-c6b3-49cb-8727-4f8ff69bbfbc.t/zh-CN/1787023025887/transcode/image/3.jpg",
+        "sha256": "111242565f2d45cfd7099ab064ccd10998416c7b15b3718d80bafd195ee7cd8d"
+      },
+      {
+        "ebookPage": 63,
+        "sourcePath": "output/courseware-lessons/pep-math-g1-upper-add-subtract10/official/textbook/ebook-063.jpg",
+        "url": "https://r1-ndr.ykt.cbern.com.cn/edu_product/esp/assets/c3e06fe4-c6b3-49cb-8727-4f8ff69bbfbc.t/zh-CN/1787023025887/transcode/image/63.jpg",
+        "sha256": "e022a0576465aac3fa2edc4d80d3d3cfc83d62bd57e783f9bc6549457d62966b"
+      },
+      {
+        "ebookPage": 64,
+        "sourcePath": "output/courseware-lessons/pep-math-g1-upper-solid-shapes/official/textbook/ebook-064.jpg",
+        "url": "https://r1-ndr.ykt.cbern.com.cn/edu_product/esp/assets/c3e06fe4-c6b3-49cb-8727-4f8ff69bbfbc.t/zh-CN/1787023025887/transcode/image/64.jpg",
+        "sha256": "403d065c7e3573104809d4ec073a437040d65e63a36602ae968775f74f60feb2"
+      },
+      {
+        "ebookPage": 65,
+        "sourcePath": "output/courseware-lessons/pep-math-g1-upper-solid-shapes/official/textbook/ebook-065.jpg",
+        "url": "https://r1-ndr.ykt.cbern.com.cn/edu_product/esp/assets/c3e06fe4-c6b3-49cb-8727-4f8ff69bbfbc.t/zh-CN/1787023025887/transcode/image/65.jpg",
+        "sha256": "9760c1400c7877b78dda174dbd1b4f5d5795a7ebb7633f2460c08ab2ca7317fc"
+      },
+      {
+        "ebookPage": 66,
+        "sourcePath": "output/courseware-lessons/pep-math-g1-upper-solid-shapes/official/textbook/ebook-066.jpg",
+        "url": "https://r1-ndr.ykt.cbern.com.cn/edu_product/esp/assets/c3e06fe4-c6b3-49cb-8727-4f8ff69bbfbc.t/zh-CN/1787023025887/transcode/image/66.jpg",
+        "sha256": "7245b2ac6e4d4ccfd147ddc13ce0512c89b26fe8a433328cf77cebb0b717da60"
+      },
+      {
+        "ebookPage": 67,
+        "sourcePath": "output/courseware-lessons/pep-math-g1-upper-solid-shapes/official/textbook/ebook-067.jpg",
+        "url": "https://r1-ndr.ykt.cbern.com.cn/edu_product/esp/assets/c3e06fe4-c6b3-49cb-8727-4f8ff69bbfbc.t/zh-CN/1787023025887/transcode/image/67.jpg",
+        "sha256": "33022ff41afda088b787e85f190c09fc11338c7ba1b05abf784895af27f09904"
+      },
+      {
+        "ebookPage": 68,
+        "sourcePath": "output/courseware-lessons/pep-math-g1-upper-solid-shapes/official/textbook/ebook-068.jpg",
+        "url": "https://r1-ndr.ykt.cbern.com.cn/edu_product/esp/assets/c3e06fe4-c6b3-49cb-8727-4f8ff69bbfbc.t/zh-CN/1787023025887/transcode/image/68.jpg",
+        "sha256": "e0b2cba365a58f64d25f5c11f5c413888c17da23bddf7424734a8590d23d38f1"
+      }
+    ],
+    "findings": [
+      "第59页从两次增加、两次拿走的动作对应两步算式。连接标记把第一步的和或剩余数带到第二步。页末用三组实物及两批移出标记练习。",
+      "第60页把进与出按实际先后写成加减混合，先加后减和先减后加都从变化前的数量出发。做一做要求对照两幅图判断两次变化。",
+      "第61页练一练第1至4题用分步与两步式对应、图算、依次加减与接力过程巩固中间量。",
+      "第62页练一练第5至7题用对比口算、生活图及三数合成十进行迁移。数字表示历史角属于拓展，不作为本课考核目标。",
+      "封面、书名页和出版社页对照2022课标修订人教一上。四类配套资料共36张页面的哈希均与原清单一致。"
+    ]
+  }
+}

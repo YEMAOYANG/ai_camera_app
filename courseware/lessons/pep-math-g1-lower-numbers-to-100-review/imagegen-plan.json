@@ -1,0 +1,69 @@
+{
+  "schemaVersion": "mira.courseware.imagegen-plan.v1",
+  "mode": "builtin_native_imagegen",
+  "state": "planned_disk_hold",
+  "plates": [
+    {
+      "id": "button-exhibit-scenes",
+      "transparent": false,
+      "prompt": "Exactly four equally sized independent crop-ready panels in a strict 2 by 2 grid. Chinese elementary school maker room presenting a collection of wooden buttons. Paper grain, matte gouache, soft cut-paper shapes, warm cream, pine green, apricot and persimmon accents. No text or numerals, no count-critical objects. Top left two first-grade children and a teacher in the maker room setting up a display, distant windows, focused foreground. Top right quiet empty workshop wall and wooden floor for small delivery-cart game, open center. Bottom left an airy garden path beside exhibit windows with quiet center suitable for overlaid grid, no snake or distracting detail. Bottom right a child showing a hand-drawn sheet to a parent in warm light, no legible writing."
+    },
+    {
+      "id": "button-exhibit-sprites",
+      "transparent": true,
+      "prompt": "An equally divided 3 by 2 transparent sprite atlas, exactly one subject in each tile centered and comfortably inside the middle 55 percent. Cut-paper grain, matte gouache, cream and pine with apricot. Top-left: tiny side-view wooden cart pointing right. Top-center: same cart pushing in motion, same scale. Top-right: cheerful small round snake head looking right, green jade with an orange cheek, no tongue. Bottom-left: a small round matching snake-body segment. Bottom-center: a tapered matching tail segment pointing left. Bottom-right: a cute wood button shaped exhibit completion sticker. Transparent, no lettering, floor, text or cell lines."
+    }
+  ],
+  "plannedAssets": {
+    "cover-exhibit": {
+      "file": "assets/cover-exhibit.png",
+      "plate": "button-exhibit-scenes",
+      "cell": "top-left"
+    },
+    "depot-backdrop": {
+      "file": "assets/depot-backdrop.png",
+      "plate": "button-exhibit-scenes",
+      "cell": "top-right"
+    },
+    "snake-backdrop": {
+      "file": "assets/snake-backdrop.png",
+      "plate": "button-exhibit-scenes",
+      "cell": "bottom-left"
+    },
+    "family-exhibit": {
+      "file": "assets/family-exhibit.png",
+      "plate": "button-exhibit-scenes",
+      "cell": "bottom-right"
+    },
+    "cart-ready": {
+      "file": "assets/cart-ready.png",
+      "plate": "button-exhibit-sprites",
+      "cell": "top-left"
+    },
+    "cart-push": {
+      "file": "assets/cart-push.png",
+      "plate": "button-exhibit-sprites",
+      "cell": "top-center"
+    },
+    "snake-head": {
+      "file": "assets/snake-head.png",
+      "plate": "button-exhibit-sprites",
+      "cell": "top-right"
+    },
+    "snake-body": {
+      "file": "assets/snake-body.png",
+      "plate": "button-exhibit-sprites",
+      "cell": "bottom-left"
+    },
+    "snake-tail": {
+      "file": "assets/snake-tail.png",
+      "plate": "button-exhibit-sprites",
+      "cell": "bottom-center"
+    },
+    "exhibit-sticker": {
+      "file": "assets/exhibit-sticker.png",
+      "plate": "button-exhibit-sprites",
+      "cell": "bottom-right"
+    }
+  }
+}

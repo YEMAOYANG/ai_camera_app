@@ -1,0 +1,612 @@
+{
+  "schemaVersion": "mira.courseware.builtin-imagegen-plan.v1",
+  "status": "formal_art_and_six_quiz_questions_ready_historical_unknowns_unreferenced_voice_and_browser_pending",
+  "assetFamily": "warm field-guide gouache",
+  "generationMode": "codex_builtin_imagegen",
+  "renderPolicy": "One built-in call per source illustration. Transparency requested on isolated sprites. Classroom and quiz geometry is arranged from registered art at exact code-owned coordinates.",
+  "sourceAssets": [
+    {
+      "key": "bird-park-cover",
+      "transparentBackground": false,
+      "prompt": "Use case: illustration-story. Landscape 16:9 opening illustration. A young girl with dark brown hair and a pale sage raincoat holds a small camera at chest level, seen from slightly behind. A clear bright yellow bird perches on a single tree branch across the shallow pond and is visually distinct from the greenery. A low wooden rail and winding boardwalk establish an obvious foreground and farther space. No other animal or prominent item. Keep the whole girl and bird inside the central 80 percent. Original warm gouache picture-book illustration for Chinese first-grade English learners, calm mint and honey palette, clean silhouettes at 60 px, matte paint, soft daylight. No text, letters, numerals, logos, marks or copyrighted character design.",
+      "usedBy": [
+        "listen-three-clues",
+        "lookout-camera:start"
+      ]
+    },
+    {
+      "key": "lookout-background",
+      "transparentBackground": false,
+      "prompt": "Use case: illustration-story. Landscape 16:9 background for a full-screen real-time park photography game. Side-on three-quarter view of a bright quiet park, with a pale boardwalk along the bottom, mint pond beyond and distant foliage and slender trees. Low-contrast scenery with clear open central working area and no animals, people, equipment, signs or painted targets. All moving actors and distance markers will be placed separately by the game. Original warm gouache picture-book illustration for Chinese first-grade English learners, calm mint and honey palette, clean silhouettes at 60 px, matte paint, soft daylight. No text, letters, numerals, logos, marks or copyrighted character design.",
+      "usedBy": [
+        "lookout-camera"
+      ]
+    },
+    {
+      "key": "lookout-guide",
+      "transparentBackground": true,
+      "prompt": "Use case: illustration-story. One isolated full-body young girl field guide in pale sage hooded raincoat and mustard-yellow rain boots, shoulder-length chestnut hair gathered half up with a small pale yellow bow. She stands in side profile facing right and holds a compact camera naturally against her chest with two hands. A single distinct silhouette, face, elbows, boots and camera wholly visible. Center the complete figure in a square with 14 percent transparent padding and no floor shadow. Original warm gouache picture-book illustration for Chinese first-grade English learners, calm mint and honey palette, clean silhouettes at 60 px, matte paint, soft daylight. No text, letters, numerals, logos, marks or copyrighted character design.",
+      "usedBy": [
+        "lookout-camera",
+        "from-the-speaker",
+        "picture-check:distance-stimuli",
+        "bird-colour-practice"
+      ]
+    },
+    {
+      "key": "yellow-bird",
+      "transparentBackground": true,
+      "prompt": "Use case: illustration-story. One small generic storybook songbird in right-facing profile, ready to perch. Entire head and torso bright sunflower yellow, small neutral beak, two feet, one folded wing, clean short tail. Show the complete bird with 15 percent transparent padding. No twig, cage, scenery, shadow or extra bird. Original warm gouache picture-book illustration for Chinese first-grade English learners, calm mint and honey palette, clean silhouettes at 60 px, matte paint, soft daylight. No text, letters, numerals, logos, marks or copyrighted character design.",
+      "usedBy": [
+        "bag-and-bird",
+        "lookout-camera"
+      ]
+    },
+    {
+      "key": "blue-bird",
+      "transparentBackground": true,
+      "prompt": "Use case: illustration-story. One small generic storybook songbird in right-facing profile, ready to perch, with a bright blue head, wing and torso. Small neutral beak, two feet, one folded wing and short tail. Complete figure with transparent padding. No twig, scene, floor shadow or extra bird. Original warm gouache picture-book illustration for Chinese first-grade English learners, calm mint and honey palette, clean silhouettes at 60 px, matte paint, soft daylight. No text, letters, numerals, logos, marks or copyrighted character design.",
+      "usedBy": [
+        "picture-check:hear-far-blue-bird",
+        "picture-check:new-speaker-near-black-bird",
+        "bird-colour-practice"
+      ]
+    },
+    {
+      "key": "black-bird",
+      "transparentBackground": true,
+      "prompt": "Use case: illustration-story. Isolated transparent cutout of exactly one entirely black-feathered storybook songbird in right-facing side profile. The head, neck, cheek, entire chest, entire belly, folded wing, back and tail must all have charcoal-black plumage. Only small cool-gray strokes may model feather detail. Absolutely no yellow, cream, tan, white, orange or warm plumage anywhere, especially on the cheek, breast and belly. The tiny beak and two feet can be muted neutral gray. One visible folded wing, complete toes and tail, 15 percent transparent padding, no scenery, branch, shadow or glow. Match warm matte gouache picture-book texture while the subject remains unambiguously black at small classroom size. No text, letters, numerals, logos or watermark.",
+      "usedBy": [
+        "lookout-camera",
+        "picture-check:hear-far-blue-bird",
+        "picture-check:new-speaker-near-black-bird",
+        "bird-colour-practice"
+      ]
+    },
+    {
+      "key": "teaching-bag",
+      "transparentBackground": true,
+      "prompt": "Use case: illustration-story. One warm golden yellow child-sized crossbody school satchel, flap closed, prominent curved shoulder strap and a simple buckle, sitting in slight three-quarter view. Entire strap and bag visible. Square with transparent padding. No label, person, desk, shadow or other stationery. Original warm gouache picture-book illustration for Chinese first-grade English learners, calm mint and honey palette, clean silhouettes at 60 px, matte paint, soft daylight. No text, letters, numerals, logos, marks or copyrighted character design.",
+      "usedBy": [
+        "bag-and-bird",
+        "costume-rhythm-run"
+      ]
+    },
+    {
+      "key": "quiz-red-bag",
+      "transparentBackground": true,
+      "prompt": "Use case: illustration-story. One vivid coral red child-sized fabric tote in a natural three-quarter view, prominent pair of soft loop handles and a clearly closed or empty bag opening. Give the tote a different shape from a rectangular satchel. Complete single object against a transparent background with 15 percent padding. No label, surrounding setting or other objects. Original warm gouache picture-book illustration for Chinese first-grade English learners, calm mint and honey palette, clean silhouettes at 60 px, matte paint, soft daylight. No text, letters, numerals, logos, marks or copyrighted character design.",
+      "usedBy": [
+        "costume-rhythm-run",
+        "picture-check:hear-bag-at-fair",
+        "picture-check:hear-far-my-desk",
+        "picture-check:hear-near-red-bag"
+      ]
+    },
+    {
+      "key": "cat-prop",
+      "transparentBackground": true,
+      "prompt": "Use case: illustration-story. One upright small cream cat with orange ear patches, unmistakable pointed ears, face whiskers and a curled tail. Keep full body and all paws inside a transparent square, about 14 percent margin. It wears no collar, hat or accessories. No scenery, floor shadow or extra animal. Original warm gouache picture-book illustration for Chinese first-grade English learners, calm mint and honey palette, clean silhouettes at 60 px, matte paint, soft daylight. No text, letters, numerals, logos, marks or copyrighted character design.",
+      "usedBy": [
+        "cat-cap-hat-beat",
+        "costume-rhythm-run",
+        "picture-check:hear-cap-in-display",
+        "picture-check:hear-bag-at-fair",
+        "picture-check:hear-near-black-cat"
+      ]
+    },
+    {
+      "key": "cap-prop",
+      "transparentBackground": true,
+      "prompt": "Use case: illustration-story. One mustard baseball cap with a short, clearly forward-curving visor, no lettering. Slight three-quarter side view shows the single visor and domed crown. Complete single cap with generous transparent padding. No person, cat, surrounding scene or shadow. Original warm gouache picture-book illustration for Chinese first-grade English learners, calm mint and honey palette, clean silhouettes at 60 px, matte paint, soft daylight. No text, letters, numerals, logos, marks or copyrighted character design.",
+      "usedBy": [
+        "cat-cap-hat-beat",
+        "costume-rhythm-run",
+        "picture-check:hear-cap-in-display"
+      ]
+    },
+    {
+      "key": "hat-prop",
+      "transparentBackground": true,
+      "prompt": "Use case: illustration-story. One teal winter knitted hat, rounded dome with folded band and round pom-pom, no visor. Show softly painted weave with readable silhouette. Complete single hat with transparent padding. No person, cat, scenery or shadow. Original warm gouache picture-book illustration for Chinese first-grade English learners, calm mint and honey palette, clean silhouettes at 60 px, matte paint, soft daylight. No text, letters, numerals, logos, marks or copyrighted character design.",
+      "usedBy": [
+        "cat-cap-hat-beat",
+        "costume-rhythm-run",
+        "picture-check:hear-cap-in-display"
+      ]
+    },
+    {
+      "key": "rhythm-stage",
+      "transparentBackground": false,
+      "prompt": "Use case: illustration-story. Landscape 16:9 open-air park puppet stage background, wooden arch and cloth curtain in warm cream, coral and mint, drawn as simple wide shapes at the outer edges. Clear matte central work area and an open lower foreground, reserved for rolling costume props and a gameplay light line drawn in code. No props, letters, people, animals or decorative game controls. Original warm gouache picture-book illustration for Chinese first-grade English learners, calm mint and honey palette, clean silhouettes at 60 px, matte paint, soft daylight. No text, letters, numerals, logos, marks or copyrighted character design.",
+      "usedBy": [
+        "costume-rhythm-run",
+        "costume-rhythm-run:start"
+      ],
+      "resolution": {
+        "mode": "codex_builtin_imagegen",
+        "assetProvenanceKey": "rhythm-stage"
+      }
+    },
+    {
+      "key": "classroom-tour",
+      "transparentBackground": false,
+      "prompt": "Use case: illustration-story. Landscape 16:9 original school visitor scene, clear quiet perspective from an open classroom door. In the near foreground a sage-coated young girl and a friendly adult teacher stand next to each other, looking toward the room. A recognizable wooden pupil desk is fully visible far back near a broad bright window. Keep foreground figures and distant desk separated so their distance is obvious. No board writing, caption balloons or other people. Original warm gouache picture-book illustration for Chinese first-grade English learners, calm mint and honey palette, clean silhouettes at 60 px, matte paint, soft daylight. No text, letters, numerals, logos, marks or copyrighted character design.",
+      "usedBy": [
+        "visit-our-classroom",
+        "point-then-say"
+      ]
+    },
+    {
+      "key": "quiz-conservatory",
+      "transparentBackground": false,
+      "prompt": "Use case: illustration-story. Landscape 16:9 original children’s botanical fair conservatory, low-contrast mint and pale cream glass structure, a clear open foreground walkway and a farther strip beyond low plant beds. No people, animals, bags, chairs, desks or prominent colored objects. No lettering. The renderer will position actors and props using exact coordinates. Original warm gouache picture-book illustration for Chinese first-grade English learners, calm mint and honey palette, clean silhouettes at 60 px, matte paint, soft daylight. No text, letters, numerals, logos, marks or copyrighted character design.",
+      "usedBy": [
+        "picture-check:new-context-backdrop"
+      ]
+    },
+    {
+      "key": "desk-prop",
+      "transparentBackground": true,
+      "prompt": "Use case: illustration-story. One clearly recognizable primary school wooden desk with a single pale flat rectangular top and distinct legs, open space under the top, three-quarter view. Complete desk with 15 percent transparent padding. No attached chair, person, book, letters, scene or floor shadow. Original warm gouache picture-book illustration for Chinese first-grade English learners, calm mint and honey palette, clean silhouettes at 60 px, matte paint, soft daylight. No text, letters, numerals, logos, marks or copyrighted character design.",
+      "usedBy": [
+        "from-the-speaker",
+        "picture-check:hear-far-my-desk"
+      ]
+    },
+    {
+      "key": "game-scout-rover",
+      "transparentBackground": true,
+      "prompt": "One isolated toy bubble rover seen directly from above, pointing to the right. Small almond-shaped body, apricot cabin, deep pine-green wheel housings, cream highlights, two pairs of visible wheels, compact silhouette. Same warm paper texture and matte gouache as the sage-raincoat park field guide. Keep the rover centered, occupying most of the square and wholly visible. Transparent background. No person, scenery, text, letters, numerals, logo or watermark.",
+      "usedBy": [
+        "lookout-camera"
+      ],
+      "resolution": {
+        "mode": "reuse_approved_arcade_imagegen_art",
+        "assetProvenanceKey": "game-scout-rover"
+      }
+    },
+    {
+      "key": "game-scout-rover-pop",
+      "transparentBackground": true,
+      "referenceAsset": "game-scout-rover",
+      "prompt": "Use the supplied top-down right-facing bubble rover as exact design and scale reference. Keep its wheels, cabin colors, silhouette, orientation and placement unchanged. Add a single small pale aqua bubble puff just in front of its right-facing nose so it reads as one action frame. Warm paper texture and matte gouache. Transparent background. No text, letters, numerals, logo or watermark.",
+      "usedBy": [
+        "lookout-camera"
+      ],
+      "resolution": {
+        "mode": "reuse_approved_arcade_imagegen_art",
+        "assetProvenanceKey": "game-scout-rover-pop"
+      }
+    },
+    {
+      "key": "game-stage-marble",
+      "transparentBackground": true,
+      "prompt": "One isolated toy glass marble for a first-grade classroom stage game. Amber center with a small warm ivory reflection, smooth round readable silhouette and subtle matte gouache paper grain to fit the stage scenery. Transparent square background. Single sphere only, centered with enough padding to show the full shape. No lettering, numerals, faces, animals, shadows, text or watermark.",
+      "usedBy": [
+        "costume-rhythm-run"
+      ],
+      "resolution": {
+        "mode": "reuse_approved_arcade_imagegen_art",
+        "assetProvenanceKey": "game-stage-marble"
+      }
+    },
+    {
+      "key": "quiz-brick-courtyard",
+      "transparentBackground": false,
+      "prompt": "Create one ORIGINAL empty children's picture-book BACKGROUND for three first-grade listening quiz scenes, approximately landscape 32:19 (wide 1600 by 950 composition, use 16:9 if necessary). A distinct outdoor neighborhood market courtyard in a historic hillside town, seen straight ahead from a child's eye level. Open daylight sky at top, low terracotta brick arches and plaster walls at the upper outer edges, and spacious even gray-beige stone paving extending to the bottom edge. Keep the middle two thirds of the picture visually calm and low contrast, with broad flat warm cream-to-gray ground at exactly the same level across the width, subtly indicated joints, no major feature or shadow behind any possible answer position. Architectural arches recognizable near the upper edges after a center crop to 640×380 and a broad lightly translucent ivory panel across most of the center. Keep defining shapes inside an 8 percent safe area. Use calm original matte gouache on subtle warm paper with simple cut-paper silhouettes, soft sunlit apricot earth and brick colors, muted deep sage green accents, child-friendly but clean, limited detail. This image contains ARCHITECTURE, PAVING and OPEN SKY only. No people, animals, faces, birds, hand-held objects, bag, hats, furniture, cases, display stands, writing, glyphs, numbers, signs, greenhouse glazing, plant beds, school interior, desks, water, stage curtain, logos or watermark.",
+      "usedBy": [
+        "picture-check:hear-far-blue-bird",
+        "picture-check:hear-cap-in-display",
+        "picture-check:new-speaker-near-black-bird",
+        "picture-check:hear-bag-at-fair",
+        "picture-check:hear-far-my-desk",
+        "picture-check:hear-near-black-cat"
+      ],
+      "resolution": {
+        "mode": "codex_builtin_imagegen",
+        "assetProvenanceKey": "quiz-brick-courtyard"
+      }
+    },
+    {
+      "key": "reference-orange-schoolbag",
+      "prompt": "1:1 正方形画布，严格三列三行等面积隐形网格，顺序完全按原提示，每格主体留四边裁切空间。\n九格资产：红橘双肩书包（肩带可见）、封面浅蓝且见书脊纸页的合上硬皮书、露金属笔尖的蓝色钢笔；削出木头和石墨尖的黄铅笔、单独平直并带短刻线但没有数字的绿色尺、完整四边框玻璃窗；带把手的浅木门、坐姿橘猫有三角耳和一条长尾、坐姿熊猫有黑眼圈和圆耳。每格一个主体，在浅奶油背景上独立。两笔大小接近，裸露笔尖放大清楚，钢笔不用圆珠尖，铅笔不用自动铅笔。书与尺不画真实字。清晰温暖的原创图画书，暖奶油底、深线与少量橘红和青蓝，物体明暗分离，低细节，幼儿一眼可分辨；无文字、标签、数字、emoji、箭头、边框、现有教材角色与图样。多格图严格等面积，图像主体居中于各格并留足裁边，不画可见分隔线。",
+      "transparentBackground": false,
+      "usedBy": [
+        "picture-check:hear-bag-at-fair",
+        "picture-check:hear-far-my-desk"
+      ],
+      "resolution": {
+        "mode": "reuse_registered_codex_builtin_imagegen",
+        "assetProvenanceKey": "reference-orange-schoolbag"
+      }
+    },
+    {
+      "key": "reference-green-book-desk",
+      "prompt": "Use case: illustration-story. Generate a new original illustration for first-grade English picture recognition. Use the provided original classroom illustration as a style, character and setting reference as relevant. Match its warm soft gouache on cream paper, simple readable shapes, pale wood, muted teal, mustard and a touch of coral. Keep subjects centered with safe margins. No visible letters, digits, words, logos, arrows, watermark, graphics, or UI.\n\nLandscape 4:3. One isolated elementary student desk, centered and fully within frame. Clear broad horizontal pale-wood top, short rectangular teal or teal-accented metal legs and one closed plain teal exercise book resting flat on the surface. View from slightly above and front three-quarter angle, so the rectangular top and desk-leg shape are readable. Quiet warm cream background and soft contact shadow. Exactly one desk. No chair, stool, shelving, people, other furniture or clutter.",
+      "transparentBackground": false,
+      "usedBy": [
+        "from-the-speaker",
+        "picture-check:hear-far-my-desk"
+      ],
+      "resolution": {
+        "mode": "reuse_registered_codex_builtin_imagegen",
+        "assetProvenanceKey": "reference-green-book-desk"
+      }
+    },
+    {
+      "key": "classroom-door-visit",
+      "prompt": "Use case: illustration-story. Generate a new original illustration for first-grade English picture recognition. Use the provided original classroom illustration as a style, character and setting reference as relevant. Match its warm soft gouache on cream paper, simple readable shapes, pale wood, muted teal, mustard and a touch of coral. Keep subjects centered with safe margins. No visible letters, digits, words, logos, arrows, watermark, graphics, or UI.\n\nWide landscape 16:9. Friendly school open day. In the original classroom doorway, Ran with short black hair and mustard pullover is welcoming a visiting adult in a muted lake-blue jacket. The visitor has dark short hair and stands one step behind Ran at the open door. Inside the classroom a friendly dark-haired woman teacher in a coral cardigan turns from her unmarked teal chalkboard and smiles. Show only these three people. Their faces and body directions should be distinct and make the arrival legible. Ran can open one hand toward the teacher. Nobody is yet exchanging a greeting gesture.",
+      "transparentBackground": false,
+      "usedBy": [
+        "visit-our-classroom"
+      ],
+      "resolution": {
+        "mode": "reuse_registered_codex_builtin_imagegen",
+        "assetProvenanceKey": "classroom-door-visit"
+      }
+    },
+    {
+      "key": "classroom-desk-closeup",
+      "prompt": "Use case: illustration-story. Create a new landscape 16:9 image for a first-grade English course. The original art reference establishes soft warm gouache on cream paper, crisp simple contours and a calm low-detail picture-book style. Keep Ran's mustard top and short black hair consistent with the reference. Make the single instructional meaning obvious at a small thumbnail size. Put key subjects comfortably inside frame. No legible text, letters, numbers, labels, logos, arrows, UI or watermarks.\n\n原创小学开放日绘本。统一暖奶油底、浅木、青绿与珊瑚色，清晰柔和轮廓。姜黄上衣的小然独自站在自己的浅木课桌旁，课桌放合上的青色小册子。孩子一手轻指胸口，一手示意桌子。人物和物品居中。",
+      "transparentBackground": false,
+      "usedBy": [
+        "visit-our-classroom",
+        "point-then-say"
+      ],
+      "resolution": {
+        "mode": "reuse_registered_codex_builtin_imagegen",
+        "assetProvenanceKey": "classroom-desk-closeup"
+      }
+    },
+    {
+      "key": "quiz-black-cat",
+      "transparentBackground": true,
+      "prompt": "Create one BLACK CAT transparent game/quiz sprite by editing the supplied cream-and-orange cat. This is a matched choice for a first-grade listening exercise. Preserve the same square canvas, exact cat pose, original head tilt, proportions, silhouette, two triangular ears, visible whiskers, curved tail at right and all four feet. Retain the same overall framing and centered scale so a child can compare colors without other clues. Change the entire fur color (head, back, chest, legs, tail, ear backs) to warm BLACK with very subtle dark-charcoal highlights that still unmistakably read as black at 100 pixels. No orange or cream patches, stripes, collar or accessory. Inside the ears keep a tiny muted gray-rose; use small amber-brown irises and modest gray whiskers and nose highlights so the face is readable, in the same tactile matte gouache paper-cut technique. Keep all fur and limbs inside the original safe margins; do not rotate, enlarge, crop or add any other object. True alpha transparent background, including between legs and near the curled tail, no shadows, ground, words, letters, digits, icons, arrows, logo or watermark.",
+      "usedBy": [
+        "picture-check:hear-near-black-cat"
+      ],
+      "resolution": {
+        "mode": "codex_builtin_imagegen",
+        "assetProvenanceKey": "quiz-black-cat"
+      }
+    }
+  ],
+  "derivedAssets": {
+    "near-desk-example": [
+      "lookout-background",
+      "lookout-guide",
+      "reference-green-book-desk"
+    ],
+    "far-desk-example": [
+      "lookout-background",
+      "lookout-guide",
+      "reference-green-book-desk"
+    ],
+    "quizDistanceCards": [
+      "quiz-brick-courtyard",
+      "lookout-guide",
+      "blue-bird",
+      "black-bird",
+      "quiz-black-cat",
+      "cat-prop",
+      "reference-green-book-desk",
+      "reference-orange-schoolbag"
+    ],
+    "quizFairDisplayCards": [
+      "quiz-brick-courtyard",
+      "cat-prop",
+      "reference-orange-schoolbag",
+      "blue-bird"
+    ],
+    "three-stage-props": [
+      "cat-prop",
+      "cap-prop",
+      "hat-prop"
+    ],
+    "quizOptionMeaning": {
+      "hear-bag-at-fair": [
+        [
+          "quiz-fair-cat",
+          "展台上的奶油色小猫"
+        ],
+        [
+          "quiz-fair-schoolbag",
+          "展台上的橙红色双肩书包"
+        ],
+        [
+          "quiz-fair-blue-bird",
+          "展台上的蓝鸟"
+        ]
+      ],
+      "hear-far-blue-bird": [
+        [
+          "quiz-courtyard-near-blue",
+          "离小导游较近的蓝鸟"
+        ],
+        [
+          "quiz-courtyard-far-black",
+          "离小导游较远的黑鸟"
+        ],
+        [
+          "quiz-courtyard-far-blue",
+          "离小导游较远的蓝鸟"
+        ]
+      ],
+      "hear-cap-in-display": [
+        [
+          "quiz-courtyard-display-cat",
+          "展台上的奶油色小猫"
+        ],
+        [
+          "quiz-courtyard-display-knit-hat",
+          "展台上的青色针织帽"
+        ],
+        [
+          "quiz-courtyard-display-baseball-cap",
+          "展台上有帽舌的棒球帽"
+        ]
+      ],
+      "new-speaker-near-black-bird": [
+        [
+          "quiz-reporter-right-near-black",
+          "右边的小导游身边有一只黑鸟"
+        ],
+        [
+          "quiz-reporter-left-far-black",
+          "小导游还在左边，黑鸟离她较远"
+        ],
+        [
+          "quiz-reporter-right-near-blue",
+          "右边的小导游身边有一只蓝鸟"
+        ]
+      ],
+      "hear-far-my-desk": [
+        [
+          "quiz-school-near-desk",
+          "小导游身边的课桌"
+        ],
+        [
+          "quiz-school-far-desk",
+          "离小导游较远的课桌"
+        ],
+        [
+          "quiz-school-far-schoolbag",
+          "离小导游较远的橙红色双肩书包"
+        ]
+      ],
+      "hear-near-black-cat": [
+        [
+          "quiz-courtyard-near-black-cat",
+          "小导游身边的黑猫"
+        ],
+        [
+          "quiz-courtyard-far-black-cat",
+          "离小导游较远的黑猫"
+        ],
+        [
+          "quiz-courtyard-near-cream-cat",
+          "小导游身边的浅橘奶油色猫"
+        ]
+      ]
+    },
+    "near-blue-example": [
+      "lookout-guide",
+      "blue-bird"
+    ],
+    "far-black-example": [
+      "lookout-guide",
+      "black-bird"
+    ],
+    "quizCourtyardDisplayCards": [
+      "quiz-brick-courtyard",
+      "cat-prop",
+      "hat-prop",
+      "cap-prop"
+    ],
+    "classroom-door-distance": [
+      "classroom-door-visit"
+    ]
+  },
+  "historicImages": "19 original factory image receipts are retained in the legacy workspace. Their provider route is not the currently required built-in imagegen.",
+  "acceptance": [
+    "Check teaching meaning and intended color in every asset; verify complete and distinct shape, hands, and child-visible crop.",
+    "Verify transparent alpha on all isolated sprites, especially cap visor and bag handles, before registering.",
+    "Validate active artwork in the 640 by 360 game and quiz layouts; bind prompt, tool evidence, exact SHA and per-page usage."
+  ],
+  "renderer": {
+    "path": "illustrations.py",
+    "derivedCards": {
+      "near-desk-example": [
+        "lookout-background",
+        "lookout-guide",
+        "reference-green-book-desk"
+      ],
+      "far-desk-example": [
+        "lookout-background",
+        "lookout-guide",
+        "reference-green-book-desk"
+      ],
+      "classroom-door-distance": [
+        "classroom-door-visit"
+      ],
+      "near-blue-example": [
+        "lookout-background",
+        "lookout-guide",
+        "blue-bird"
+      ],
+      "far-black-example": [
+        "lookout-background",
+        "lookout-guide",
+        "black-bird"
+      ],
+      "three-stage-props": [
+        "lookout-background",
+        "cat-prop",
+        "cap-prop",
+        "hat-prop"
+      ],
+      "quiz-fair-cat": [
+        "quiz-brick-courtyard",
+        "cat-prop"
+      ],
+      "quiz-fair-schoolbag": [
+        "quiz-brick-courtyard",
+        "reference-orange-schoolbag"
+      ],
+      "quiz-fair-blue-bird": [
+        "quiz-brick-courtyard",
+        "blue-bird"
+      ],
+      "quiz-courtyard-display-cat": [
+        "quiz-brick-courtyard",
+        "cat-prop"
+      ],
+      "quiz-courtyard-display-knit-hat": [
+        "quiz-brick-courtyard",
+        "hat-prop"
+      ],
+      "quiz-courtyard-display-baseball-cap": [
+        "quiz-brick-courtyard",
+        "cap-prop"
+      ],
+      "quiz-courtyard-near-blue": [
+        "quiz-brick-courtyard",
+        "lookout-guide",
+        "blue-bird"
+      ],
+      "quiz-courtyard-far-black": [
+        "quiz-brick-courtyard",
+        "lookout-guide",
+        "black-bird"
+      ],
+      "quiz-courtyard-far-blue": [
+        "quiz-brick-courtyard",
+        "lookout-guide",
+        "blue-bird"
+      ],
+      "quiz-courtyard-near-black-cat": [
+        "quiz-brick-courtyard",
+        "lookout-guide",
+        "quiz-black-cat"
+      ],
+      "quiz-courtyard-far-black-cat": [
+        "quiz-brick-courtyard",
+        "lookout-guide",
+        "quiz-black-cat"
+      ],
+      "quiz-courtyard-near-cream-cat": [
+        "quiz-brick-courtyard",
+        "lookout-guide",
+        "cat-prop"
+      ],
+      "quiz-reporter-stimulus": [
+        "quiz-brick-courtyard",
+        "lookout-guide"
+      ],
+      "quiz-reporter-right-near-black": [
+        "quiz-brick-courtyard",
+        "lookout-guide",
+        "black-bird"
+      ],
+      "quiz-reporter-left-far-black": [
+        "quiz-brick-courtyard",
+        "lookout-guide",
+        "black-bird"
+      ],
+      "quiz-reporter-right-near-blue": [
+        "quiz-brick-courtyard",
+        "lookout-guide",
+        "blue-bird"
+      ],
+      "quiz-school-near-desk": [
+        "quiz-brick-courtyard",
+        "lookout-guide",
+        "reference-green-book-desk"
+      ],
+      "quiz-school-far-desk": [
+        "quiz-brick-courtyard",
+        "lookout-guide",
+        "reference-green-book-desk"
+      ],
+      "quiz-school-far-schoolbag": [
+        "quiz-brick-courtyard",
+        "lookout-guide",
+        "reference-orange-schoolbag"
+      ]
+    },
+    "playbackBounds": {
+      "bird-park-cover": [
+        1000,
+        562
+      ],
+      "lookout-background": [
+        1120,
+        630
+      ],
+      "lookout-guide": [
+        550,
+        550
+      ],
+      "yellow-bird": [
+        420,
+        420
+      ],
+      "blue-bird": [
+        420,
+        420
+      ],
+      "black-bird": [
+        420,
+        420
+      ],
+      "teaching-bag": [
+        470,
+        470
+      ],
+      "cat-prop": [
+        420,
+        420
+      ],
+      "cap-prop": [
+        420,
+        420
+      ],
+      "hat-prop": [
+        420,
+        420
+      ],
+      "rhythm-stage": [
+        1000,
+        562
+      ],
+      "classroom-desk-closeup": [
+        1000,
+        562
+      ],
+      "game-scout-rover": [
+        240,
+        240
+      ],
+      "game-scout-rover-pop": [
+        240,
+        240
+      ],
+      "game-stage-marble": [
+        200,
+        200
+      ]
+    },
+    "quizEncoding": {
+      "mode": "indexed_png",
+      "pixels": [
+        640,
+        380
+      ],
+      "colors": 192,
+      "method": "median_cut",
+      "dither": false,
+      "preserveOriginalMasters": true
+    }
+  }
+}

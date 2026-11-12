@@ -1,0 +1,1181 @@
+{
+  "schemaVersion": "mira.courseware.position-diagrams.v1",
+  "inputs": {
+    "theatre-lobby": {
+      "file": "assets/theatre-lobby.png",
+      "sha256": "e0be1f16c4030ceada1f060f707aede72b1f5a1aa307aabc2270b36e42414bf5"
+    },
+    "theatre-workroom": {
+      "file": "assets/theatre-workroom.png",
+      "sha256": "59a97d4139a813ef46d083a9ea8983dcffaab4cadb84db7adb625af25235cc90"
+    },
+    "usher-stand": {
+      "file": "assets/usher-stand.png",
+      "sha256": "c8f16e49bf50a73a9a6866eadf493a6d332b533eb504618317913d5c21bf4f4b"
+    },
+    "queue-child": {
+      "file": "assets/queue-child.png",
+      "sha256": "f35ab1c1dae1668c3227e7d2099ff820ee3d29fa091c9b3bd25f202ffb044dfa"
+    },
+    "flag-blue": {
+      "file": "assets/flag-blue.png",
+      "sha256": "67790422aa63ca792ee28dcae1f31a0c616f574094d7a981df2d80e188a5f4e8"
+    },
+    "flag-orange": {
+      "file": "assets/flag-orange.png",
+      "sha256": "fa383bb2b67418e067e28583141efb72fa19dc0c1246dce0d8a1b0a648c54f54"
+    },
+    "theatre-star": {
+      "file": "assets/theatre-star.png",
+      "sha256": "34ddf43880041f7e28f71c4174c107ecf49d8ebd3becde6ff1d7599ce04bc904"
+    }
+  },
+  "font": {
+    "family": "Arial",
+    "fontSha256": "525979822591a3447cfc49d943d6f7683508e25543407871c0ed8fed05fd2bd9"
+  },
+  "coordinatePolicy": "等距槽位只由序号和数组决定。每个位置至多一个人物，旗是同一位置的标记，不另算人物。",
+  "images": {
+    "theatre-queue-open": {
+      "kind": "rows",
+      "size": [
+        1000,
+        500
+      ],
+      "background": "theatre-lobby",
+      "rows": [
+        {
+          "positions": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "flags": [],
+          "selected": [
+            8
+          ],
+          "shape": "children",
+          "numbers": true
+        }
+      ]
+    },
+    "queue-8-13": {
+      "kind": "rows",
+      "size": [
+        1000,
+        400
+      ],
+      "rows": [
+        {
+          "positions": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15
+          ],
+          "flags": [
+            8,
+            13
+          ],
+          "selected": [],
+          "shape": "children",
+          "numbers": true
+        }
+      ]
+    },
+    "queue-to-dots": {
+      "kind": "rows",
+      "size": [
+        1000,
+        500
+      ],
+      "rows": [
+        {
+          "positions": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15
+          ],
+          "flags": [
+            8,
+            13
+          ],
+          "selected": [
+            9,
+            10,
+            11,
+            12
+          ],
+          "shape": "children",
+          "numbers": true
+        },
+        {
+          "positions": [
+            8,
+            9,
+            10,
+            11,
+            12,
+            13
+          ],
+          "flags": [
+            8,
+            13
+          ],
+          "selected": [
+            9,
+            10,
+            11,
+            12
+          ],
+          "shape": "dots",
+          "numbers": true
+        }
+      ]
+    },
+    "adjacent-and-reverse": {
+      "kind": "rows",
+      "size": [
+        1000,
+        500
+      ],
+      "rows": [
+        {
+          "positions": [
+            8,
+            9,
+            10,
+            11,
+            12,
+            13
+          ],
+          "flags": [
+            8,
+            13
+          ],
+          "selected": [
+            9,
+            10,
+            11,
+            12
+          ],
+          "shape": "dots",
+          "numbers": true
+        },
+        {
+          "positions": [
+            12,
+            13,
+            14,
+            15,
+            16,
+            17
+          ],
+          "flags": [
+            14,
+            15
+          ],
+          "selected": [],
+          "shape": "children",
+          "numbers": true
+        }
+      ]
+    },
+    "photos-include": {
+      "kind": "rows",
+      "size": [
+        1000,
+        420
+      ],
+      "rows": [
+        {
+          "positions": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "flags": [
+            2,
+            5
+          ],
+          "selected": [
+            2,
+            3,
+            4,
+            5
+          ],
+          "shape": "photos",
+          "numbers": true
+        }
+      ]
+    },
+    "floor-transfer": {
+      "kind": "floor",
+      "size": [
+        860,
+        600
+      ],
+      "positions": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "flags": [
+        3,
+        7
+      ],
+      "selected": [
+        4,
+        5,
+        6
+      ],
+      "showVerificationDots": true
+    },
+    "recap-dots": {
+      "kind": "rows",
+      "size": [
+        1000,
+        400
+      ],
+      "rows": [
+        {
+          "positions": [
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "flags": [
+            4,
+            9
+          ],
+          "selected": [
+            5,
+            6,
+            7,
+            8
+          ],
+          "shape": "dots",
+          "numbers": true
+        }
+      ]
+    },
+    "hop-start": {
+      "kind": "hop-start",
+      "size": [
+        1280,
+        720
+      ],
+      "background": "theatre-lobby",
+      "flags": [
+        5,
+        9
+      ],
+      "route": [
+        6,
+        7,
+        8
+      ]
+    },
+    "tiles-start": {
+      "kind": "tiles-start",
+      "size": [
+        1280,
+        720
+      ],
+      "background": "theatre-workroom",
+      "flags": [
+        2,
+        6
+      ],
+      "count": 3
+    },
+    "hop-flags-5-9": {
+      "kind": "flag-pair",
+      "size": [
+        560,
+        240
+      ],
+      "flags": [
+        5,
+        9
+      ],
+      "connector": "single neutral span without count marks"
+    },
+    "hop-flags-8-14": {
+      "kind": "flag-pair",
+      "size": [
+        560,
+        240
+      ],
+      "flags": [
+        8,
+        14
+      ],
+      "connector": "single neutral span without count marks"
+    },
+    "hop-flags-12-18": {
+      "kind": "flag-pair",
+      "size": [
+        560,
+        240
+      ],
+      "flags": [
+        12,
+        18
+      ],
+      "connector": "single neutral span without count marks"
+    },
+    "platform-flag-5": {
+      "kind": "flag-label",
+      "size": [
+        400,
+        150
+      ],
+      "position": 5,
+      "colour": "blue"
+    },
+    "platform-flag-9": {
+      "kind": "flag-label",
+      "size": [
+        400,
+        150
+      ],
+      "position": 9,
+      "colour": "orange"
+    },
+    "platform-flag-8": {
+      "kind": "flag-label",
+      "size": [
+        400,
+        150
+      ],
+      "position": 8,
+      "colour": "blue"
+    },
+    "platform-flag-14": {
+      "kind": "flag-label",
+      "size": [
+        400,
+        150
+      ],
+      "position": 14,
+      "colour": "orange"
+    },
+    "platform-flag-12": {
+      "kind": "flag-label",
+      "size": [
+        400,
+        150
+      ],
+      "position": 12,
+      "colour": "blue"
+    },
+    "platform-flag-18": {
+      "kind": "flag-label",
+      "size": [
+        400,
+        150
+      ],
+      "position": 18,
+      "colour": "orange"
+    },
+    "tiles-rule": {
+      "kind": "rule",
+      "size": [
+        480,
+        270
+      ]
+    },
+    "int-2-6": {
+      "kind": "mini-interval",
+      "size": [
+        288,
+        288
+      ],
+      "flags": [
+        2,
+        6
+      ],
+      "positions": [
+        3,
+        4,
+        5
+      ]
+    },
+    "int-7-12": {
+      "kind": "mini-interval",
+      "size": [
+        288,
+        288
+      ],
+      "flags": [
+        7,
+        12
+      ],
+      "positions": [
+        8,
+        9,
+        10,
+        11
+      ]
+    },
+    "int-14-17": {
+      "kind": "mini-interval",
+      "size": [
+        288,
+        288
+      ],
+      "flags": [
+        14,
+        17
+      ],
+      "positions": [
+        15,
+        16
+      ]
+    },
+    "int-3-7": {
+      "kind": "mini-interval",
+      "size": [
+        288,
+        288
+      ],
+      "flags": [
+        3,
+        7
+      ],
+      "positions": [
+        4,
+        5,
+        6
+      ]
+    },
+    "int-9-14": {
+      "kind": "mini-interval",
+      "size": [
+        288,
+        288
+      ],
+      "flags": [
+        9,
+        14
+      ],
+      "positions": [
+        10,
+        11,
+        12,
+        13
+      ]
+    },
+    "int-6-8": {
+      "kind": "mini-interval",
+      "size": [
+        288,
+        288
+      ],
+      "flags": [
+        6,
+        8
+      ],
+      "positions": [
+        7
+      ]
+    },
+    "int-9-13": {
+      "kind": "mini-interval",
+      "size": [
+        288,
+        288
+      ],
+      "flags": [
+        9,
+        13
+      ],
+      "positions": [
+        10,
+        11,
+        12
+      ]
+    },
+    "int-16-17": {
+      "kind": "mini-interval",
+      "size": [
+        288,
+        288
+      ],
+      "flags": [
+        16,
+        17
+      ],
+      "positions": []
+    },
+    "int-1-5": {
+      "kind": "mini-interval",
+      "size": [
+        288,
+        288
+      ],
+      "flags": [
+        1,
+        5
+      ],
+      "positions": [
+        2,
+        3,
+        4
+      ]
+    },
+    "count-0": {
+      "kind": "count",
+      "size": [
+        288,
+        288
+      ],
+      "count": 0
+    },
+    "count-1": {
+      "kind": "count",
+      "size": [
+        288,
+        288
+      ],
+      "count": 1
+    },
+    "count-2": {
+      "kind": "count",
+      "size": [
+        288,
+        288
+      ],
+      "count": 2
+    },
+    "count-3": {
+      "kind": "count",
+      "size": [
+        288,
+        288
+      ],
+      "count": 3
+    },
+    "count-4": {
+      "kind": "count",
+      "size": [
+        288,
+        288
+      ],
+      "count": 4
+    },
+    "q1-stem": {
+      "kind": "rows",
+      "size": [
+        640,
+        360
+      ],
+      "rows": [
+        {
+          "positions": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "flags": [
+            6
+          ],
+          "selected": [],
+          "shape": "children",
+          "numbers": true
+        }
+      ]
+    },
+    "q1-a": {
+      "kind": "rows",
+      "size": [
+        640,
+        360
+      ],
+      "rows": [
+        {
+          "positions": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "flags": [
+            6
+          ],
+          "selected": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "shape": "children",
+          "numbers": true
+        }
+      ]
+    },
+    "q1-b": {
+      "kind": "rows",
+      "size": [
+        640,
+        360
+      ],
+      "rows": [
+        {
+          "positions": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "flags": [
+            6
+          ],
+          "selected": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "shape": "children",
+          "numbers": true
+        }
+      ]
+    },
+    "q1-c": {
+      "kind": "rows",
+      "size": [
+        640,
+        360
+      ],
+      "rows": [
+        {
+          "positions": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "flags": [
+            6
+          ],
+          "selected": [
+            7,
+            8
+          ],
+          "shape": "children",
+          "numbers": true
+        }
+      ]
+    },
+    "q2-stem": {
+      "kind": "rows",
+      "size": [
+        640,
+        360
+      ],
+      "rows": [
+        {
+          "positions": [
+            8,
+            9,
+            10,
+            11,
+            12,
+            13
+          ],
+          "flags": [
+            9,
+            12
+          ],
+          "selected": [],
+          "shape": "square",
+          "numbers": true
+        }
+      ]
+    },
+    "q2-a": {
+      "kind": "rows",
+      "size": [
+        640,
+        360
+      ],
+      "rows": [
+        {
+          "positions": [
+            8,
+            9,
+            10,
+            11,
+            12,
+            13
+          ],
+          "flags": [
+            9,
+            12
+          ],
+          "selected": [
+            9,
+            10,
+            11
+          ],
+          "shape": "square",
+          "numbers": true
+        }
+      ]
+    },
+    "q2-b": {
+      "kind": "rows",
+      "size": [
+        640,
+        360
+      ],
+      "rows": [
+        {
+          "positions": [
+            8,
+            9,
+            10,
+            11,
+            12,
+            13
+          ],
+          "flags": [
+            9,
+            12
+          ],
+          "selected": [
+            11,
+            12
+          ],
+          "shape": "square",
+          "numbers": true
+        }
+      ]
+    },
+    "q2-c": {
+      "kind": "rows",
+      "size": [
+        640,
+        360
+      ],
+      "rows": [
+        {
+          "positions": [
+            8,
+            9,
+            10,
+            11,
+            12,
+            13
+          ],
+          "flags": [
+            9,
+            12
+          ],
+          "selected": [
+            10,
+            11
+          ],
+          "shape": "square",
+          "numbers": true
+        }
+      ]
+    },
+    "q3-stem": {
+      "kind": "rows",
+      "size": [
+        640,
+        360
+      ],
+      "rows": [
+        {
+          "positions": [
+            12,
+            13,
+            14,
+            15
+          ],
+          "flags": [
+            13,
+            14
+          ],
+          "selected": [],
+          "shape": "children",
+          "numbers": true
+        }
+      ]
+    },
+    "q3-a": {
+      "kind": "mini-interval",
+      "size": [
+        640,
+        360
+      ],
+      "flags": [
+        13,
+        14
+      ],
+      "positions": [
+        null
+      ]
+    },
+    "q3-b": {
+      "kind": "mini-interval",
+      "size": [
+        640,
+        360
+      ],
+      "flags": [
+        13,
+        14
+      ],
+      "positions": []
+    },
+    "q3-c": {
+      "kind": "mini-interval",
+      "size": [
+        640,
+        360
+      ],
+      "flags": [
+        13,
+        14
+      ],
+      "positions": [
+        null,
+        null
+      ]
+    },
+    "q4-stem": {
+      "kind": "floor",
+      "size": [
+        640,
+        420
+      ],
+      "positions": [
+        11,
+        12,
+        13,
+        14,
+        15,
+        16
+      ],
+      "flags": [
+        11,
+        16
+      ],
+      "selected": [],
+      "showVerificationDots": false
+    },
+    "q4-a": {
+      "kind": "floor",
+      "size": [
+        640,
+        420
+      ],
+      "positions": [
+        11,
+        12,
+        13,
+        14,
+        15,
+        16
+      ],
+      "flags": [
+        11,
+        16
+      ],
+      "selected": [
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "showVerificationDots": false
+    },
+    "q4-b": {
+      "kind": "floor",
+      "size": [
+        640,
+        420
+      ],
+      "positions": [
+        11,
+        12,
+        13,
+        14,
+        15,
+        16
+      ],
+      "flags": [
+        11,
+        16
+      ],
+      "selected": [
+        12,
+        13,
+        14,
+        15
+      ],
+      "showVerificationDots": false
+    },
+    "q4-c": {
+      "kind": "floor",
+      "size": [
+        640,
+        420
+      ],
+      "positions": [
+        11,
+        12,
+        13,
+        14,
+        15,
+        16
+      ],
+      "flags": [
+        11,
+        16
+      ],
+      "selected": [
+        12,
+        13,
+        14,
+        15,
+        16
+      ],
+      "showVerificationDots": false
+    },
+    "q5-stem": {
+      "kind": "rows",
+      "size": [
+        640,
+        360
+      ],
+      "rows": [
+        {
+          "positions": [
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "flags": [
+            3,
+            8
+          ],
+          "selected": [],
+          "shape": "square",
+          "numbers": true
+        }
+      ]
+    },
+    "q5-a": {
+      "kind": "count",
+      "size": [
+        640,
+        360
+      ],
+      "count": 4
+    },
+    "q5-b": {
+      "kind": "count",
+      "size": [
+        640,
+        360
+      ],
+      "count": 5
+    },
+    "q5-c": {
+      "kind": "count",
+      "size": [
+        640,
+        360
+      ],
+      "count": 6
+    },
+    "q6-stem": {
+      "kind": "rows",
+      "size": [
+        640,
+        360
+      ],
+      "rows": [
+        {
+          "positions": [
+            5,
+            6,
+            7,
+            8,
+            9,
+            10
+          ],
+          "flags": [
+            6,
+            9
+          ],
+          "selected": [],
+          "shape": "photos",
+          "numbers": true
+        }
+      ]
+    },
+    "q6-a": {
+      "kind": "rows",
+      "size": [
+        640,
+        360
+      ],
+      "rows": [
+        {
+          "positions": [
+            5,
+            6,
+            7,
+            8,
+            9,
+            10
+          ],
+          "flags": [
+            6,
+            9
+          ],
+          "selected": [
+            7,
+            8
+          ],
+          "shape": "photos",
+          "numbers": true
+        }
+      ]
+    },
+    "q6-b": {
+      "kind": "rows",
+      "size": [
+        640,
+        360
+      ],
+      "rows": [
+        {
+          "positions": [
+            5,
+            6,
+            7,
+            8,
+            9,
+            10
+          ],
+          "flags": [
+            6,
+            9
+          ],
+          "selected": [
+            6,
+            7,
+            8
+          ],
+          "shape": "photos",
+          "numbers": true
+        }
+      ]
+    },
+    "q6-c": {
+      "kind": "rows",
+      "size": [
+        640,
+        360
+      ],
+      "rows": [
+        {
+          "positions": [
+            5,
+            6,
+            7,
+            8,
+            9,
+            10
+          ],
+          "flags": [
+            6,
+            9
+          ],
+          "selected": [
+            6,
+            7,
+            8,
+            9
+          ],
+          "shape": "photos",
+          "numbers": true
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,979 @@
+{
+  "schemaVersion": "mira.courseware.imagegen-plan.v1",
+  "lesson": "走近科学｜单元回顾",
+  "style": "Matte gouache on subtle warm paper, clean simplified paper-cut silhouettes, deep pine green, cream and muted apricot, clear for a first-grade science class. No words, letters, digits, watermarks or logo.",
+  "sourcePolicy": "插画由内置 ImageGen 生成，或用有来源的母图按已批准的常规尺寸重采样。精确测量图由代码在插画底图上合成可验证的几何标记。观察图与模板实际结果逐图核对。验收后登记生成提示、合成源码、母图与成图 SHA-256；教材图仅审读。",
+  "releaseBudget": "1280×720 互动页，压缩后每页图片合计目标不超过 3 MB。",
+  "sequentialPriority": [
+    "science-workbench",
+    "paper-wing",
+    "ask-look",
+    "use-look",
+    "ask-measure",
+    "use-measure"
+  ],
+  "pendingFactChecks": [
+    "家庭实物观察、安全操作和孩子口述待观察。",
+    "正式孩子端的遮字试玩、观察卡结果与家长端独立回读待验。"
+  ],
+  "measurementComposition": {
+    "factCheck": "official-notes.json#measurement-common-origin",
+    "status": "geometry_registered_runtime_validation_pending",
+    "generatedInputs": "只生成单条纸带、积木塔或空桌面等插画组件。底图不生成刻度、数字、基准线或必须精确对齐的物件组合。",
+    "codeGeometry": "代码摆放纸带和塔底，绘制尺身、0 刻度、等距刻线及必要的共同基准线。纸带同端、塔底同线以及尺的起点与方向都用坐标验收。",
+    "sharedQuizInputs": "q3-a、q3-b、q3-c 共用同一套桌面、两座积木塔、尺身和刻线样式。代码只切换尺的起点与方向；三个选项用同尺度和画幅。",
+    "acceptance": [
+      "method-measure 两条纸带同端、长度不同，尺的 0 刻度与共同起点重合，尺与纸带平行。",
+      "ask-measure 用代码对齐双带，末端有可见差异；use-measure 的刻线由代码等距绘制。",
+      "q3-a 立尺的 0 刻度高于共同桌面线并留明显空隙；q3-b 立尺的 0 刻度和桌面线重合；q3-c 同一把尺横放。三图塔底和桌面线保持同一坐标。",
+      "出图后验证刻线间距和起点坐标，目视确认三个选项只凭摆法就能分清。"
+    ]
+  },
+  "assets": [
+    {
+      "key": "science-workbench",
+      "file": "assets/science-workbench.png",
+      "usedBy": [
+        "p04",
+        "p06"
+      ],
+      "priority": 1,
+      "status": "received_registered",
+      "target": {
+        "pixels": [
+          1280,
+          720
+        ],
+        "mode": "RGB",
+        "aspect": "landscape 16:9"
+      },
+      "prompt": "Use case: illustration-story. Asset type: 16:9 landscape opaque classroom science workbench backdrop for a first-grade educational lesson and game start card. Calm matte gouache on subtle warm paper, creamy oatmeal work surface from a gentle overhead angle, very light apricot along the lower edge, two understated deep pine green leaves and warm amber flecks only at the extreme left and right corners. Keep the entire central 75 percent and the lower middle a single quiet empty flat surface, pale warm cream, fully clear for drawn lesson objects and controls. No tools, props, people, paper wings, shadows that resemble objects, text, letters, numbers, symbols, logo, watermark or border. Warm paper grain, crisp simple shapes, calm high-contrast space for dark foreground. A true widescreen 16:9 composition, all important content very subtle and at the extreme corners.",
+      "verify": [
+        "中间和下部无遮挡",
+        "纯背景无物理含义",
+        "快门浅框在此浅底对比不足，局内使用模板原深底，实机小屏仍待验。"
+      ]
+    },
+    {
+      "key": "paper-wing",
+      "file": "assets/paper-wing.png",
+      "usedBy": [
+        "p05",
+        "p06"
+      ],
+      "priority": 1,
+      "status": "received_registered",
+      "target": {
+        "pixels": [
+          384,
+          384
+        ],
+        "mode": "RGBA",
+        "aspect": "square"
+      },
+      "prompt": "Use case: scientific-educational. Asset type: one original transparent game sprite for a first-grade science observation lesson. One inanimate handmade paper-wing model, a single broad symmetrical cut-paper object viewed directly from above, centered on a fully transparent background. Two wide rounded pale apricot paper wings join one slim straight dark pine-green paper spine, with a clear simple central fold and one warm cream paper accent on each side. Strong unmistakable wide silhouette at 60 px, even outline, subtle matte gouache paper texture, no cast shadow, no scenery, nothing else. This is a child's craft model, not a real animal: no eyes, antennae, body anatomy, feet, text, logo or watermark. Straight overhead face, horizontal span substantially wider than height, keep the whole object in frame, square canvas, about eight percent transparent padding. Clean paper-cut outline in the muted apricot, deep pine green and warm cream lesson palette.",
+      "verify": [
+        "保留 alpha",
+        "无真实昆虫特征",
+        "宽轮廓完整"
+      ]
+    },
+    {
+      "key": "paper-wing-side",
+      "file": "assets/paper-wing-side.png",
+      "usedBy": [
+        "p05",
+        "p06"
+      ],
+      "priority": 1,
+      "status": "received_registered",
+      "target": {
+        "pixels": [
+          384,
+          384
+        ],
+        "mode": "RGBA",
+        "aspect": "square"
+      },
+      "prompt": "Use case: identity-preserve, scientific-educational asset. Input image: exact identity, geometry, material and colors of the same handmade paper-wing object, currently shown directly from above. Create a matching SIDE ORTHOGRAPHIC VIEW of exactly that object, at the same scale, centered on a truly transparent square. Rotate the VIEW around the stationary object by exactly a quarter turn to look along its left-to-right horizontal wingspan. This is an educational pair: preserve the total vertical length and center position of the long dark pine-green raised folded paper spine, but the two broad flat orange wings should now be almost edge-on, overlapping in projection, so their broad apricot faces and cream patches are no longer displayed. Show a clear very slender, tall side silhouette of stacked green folded paper and a narrow apricot edge, with a tiny warm cream paper edge if visible. No silhouette of an insect, no new pieces, no top face in perspective, no cast shadow, no scenery, no text or numbers, no outlines of the original overhead view. Maintain the same matte gouache paper-cut texture and colors, one cutout object only, the same portrait-height extent as the original spine and wings.",
+      "verify": [
+        "从同一俯视母图保留纸色和纸脊，侧图只显示极窄纸沿",
+        "成对小屏目标读图仍待实际验收"
+      ]
+    },
+    {
+      "key": "label-problem",
+      "file": "assets/label-problem.png",
+      "usedBy": [
+        "p01",
+        "p11"
+      ],
+      "priority": 2,
+      "status": "received_registered",
+      "target": {
+        "pixels": [
+          960,
+          640
+        ],
+        "mode": "RGB",
+        "aspect": "landscape 3:2"
+      },
+      "prompt": "Use case: illustration-story. Asset type: a landscape 3:2 original scene for a first-grade science lesson. From a gentle overhead angle, show one plain apricot folding name card that has fallen and is now lying visibly flat on a low creamy oatmeal worktable, its simple center crease still visible. Beside it leave an empty spot reserved for a standing card, with no drawn marking or text. A child's two small relaxed hands rest well back from the paper, without covering it or touching it. Tight and immediately legible composition. The card is the only prop, entirely blank on both halves, with no upright card anywhere. Matte gouache on subtle warm paper, clean simplified paper-cut silhouettes, touches of deep pine green, warm cream and muted apricot. Calm clean first-grade science courseware art. No words, letters, digits, text-like marks, watermarks or logos.",
+      "verify": [
+        "目视通过：唯一纸名牌平躺，折痕可见，双手没接触，卡上无字。",
+        "用于开场和总结，非相同物件的生成编辑；工作台只共用配色。"
+      ],
+      "visualReference": "science-workbench，仅沿用现有底色和工作台外观，添加本课纸名牌与手。"
+    },
+    {
+      "key": "method-observe",
+      "file": "assets/method-observe.png",
+      "usedBy": [
+        "p02"
+      ],
+      "priority": 2,
+      "status": "received_registered",
+      "target": {
+        "pixels": [
+          760,
+          570
+        ],
+        "mode": "RGB",
+        "aspect": "landscape 4:3"
+      },
+      "prompt": "Use case: scientific-educational. An original landscape 4:3 illustration for a first-grade science lesson, viewed directly from above. A single long cream paper ribbon lies horizontally on a plain warm cream worktable, both ends of the strip entirely visible. In the right quarter of the ribbon, a child holds one dark pine-green magnifying glass above a tiny three-dash pine-green pattern. Through the clear circular lens, that same one little group of three parallel dashes is visibly magnified and easy to point at. The lens shows the cream paper through it and stays over the strip, not off to the side. No other patterns, no second strip, second tool or ruler. One visible anatomically natural small hand grips the handle without hiding the lens or strip. Simple warm matte gouache and clean paper-cut shapes, subtle paper grain, apricot accents. Quiet cropped overhead composition, no letters, digits, text, logo or watermark.",
+      "verify": [
+        "一整条纸带的两端都可见，一只手握放大镜，镜内三道等长平行纹样清晰，纸带外无第二组或其他工具。镜沿穿过纸带，可看出放大镜对着纸带。",
+        "保留原比例且目标元素完整。"
+      ]
+    },
+    {
+      "key": "method-measure",
+      "file": "assets/method-measure.png",
+      "usedBy": [
+        "p02"
+      ],
+      "priority": 2,
+      "status": "received_registered",
+      "target": {
+        "pixels": [
+          760,
+          570
+        ],
+        "mode": "RGB",
+        "aspect": "landscape 4:3"
+      },
+      "prompt": "Use case: scientific-educational. One original cutout of a single plain straight apricot paper ribbon viewed directly from overhead. Make it a clean horizontal rectangle about five times wider than it is tall with flat, clearly defined short ends. The entire ribbon is one uninterrupted muted apricot surface with subtle matte gouache paper grain. It fills most of the square width while leaving a small transparent margin. It will be duplicated and rescaled by code to show two lengths aligned precisely. Truly transparent background. No second ribbon, curl, taper, loose fragments, rulers, shadows, ticks, numbers, symbols, baseline, words or logo.",
+      "verify": [
+        "两条等宽不同长的纸带共用左端 x=114，尺 0 刻度也在 x=114；末端落在同一把尺的等距刻线。",
+        "生成素材与合成来源已核 SHA；整页实机验收待做。"
+      ],
+      "source": "diagrams/method-measure.svg",
+      "sharedComponent": "diagrams/paper-ribbon-surface.png"
+    },
+    {
+      "key": "method-trio",
+      "file": "assets/method-trio.png",
+      "usedBy": [
+        "p03",
+        "p04"
+      ],
+      "priority": 2,
+      "status": "received_registered",
+      "target": {
+        "pixels": [
+          960,
+          640
+        ],
+        "mode": "RGB",
+        "aspect": "landscape 3:2"
+      },
+      "prompt": "Use case: scientific-educational. An original landscape 3:2 first-grade science lesson illustration, arranged as three equal, clearly separated scenes across one warm cream page, with generous neutral gaps and no caption space. Left: test two ways of standing the same plain apricot paper name card on the same level tabletop, one example upright and the other low or tipped, no check marks. Middle: show a single child's hand carefully bending an orange paper strip into a triangular paper foot. Right: show a child's hand turning the page of an open illustrated cream guidebook, with one large diagram of a folded paper stand and no writing. Each scene must be unmistakable at small size, visually separate, centered, and have only the few objects needed. Consistent matte gouache paper-cut style, warm cream paper, muted apricot and dark pine green, clean silhouettes. No labels, words, letters, digits, arrows, logo, watermark, decoration, or extra tools. Full distinct scenes, no overlap between them.",
+      "verify": [
+        "从左到右是对照两种纸牌摆法、动手折纸脚、翻阅图册。三个场景留缝、无字；p03 讲解图，p04 开始卡用于唤起方法。",
+        "已在模拟游戏底色核对静态缩图；整页实机验收待做。"
+      ]
+    },
+    {
+      "key": "stand-test",
+      "file": "assets/stand-test.png",
+      "usedBy": [
+        "p07"
+      ],
+      "priority": 2,
+      "status": "received_registered",
+      "target": {
+        "pixels": [
+          760,
+          570
+        ],
+        "mode": "RGB",
+        "aspect": "landscape 4:3"
+      },
+      "prompt": "Use case: scientific-educational. Original landscape 4:3 first-grade lesson illustration of two trials on a single clearly level light cream worktable. Left trial: one plain flat apricot rectangular name card lies down, without a support. Right trial: an identical plain apricot rectangular name card stands upright, visibly held by one separate deep pine-green triangular folded paper foot behind it; use a slight three-quarter angle so the support is visible. Both apricot cards have exactly the same apparent unfolded size, color and paper texture. Below them is one open simple notebook on the same surface with two large unlabelled drawings side by side: a low line representing the left card lying down, and an upright outline with a triangular foot representing the right card. Avoid check marks and signs, the drawings record what happened. Matte gouache, warm cream paper and clean cut-paper edges. No hands, tools, other objects, words, letters, digits, watermarks or logos.",
+      "verify": [
+        "同一桌面左边纸牌平躺、右边由可见深绿三角纸脚托着站立；笔记左右的外形记录分别对应上方结果。只示意两次摆放结果，无尺寸读数。",
+        "保留原比例且目标元素完整。"
+      ]
+    },
+    {
+      "key": "record-and-listen",
+      "file": "assets/record-and-listen.png",
+      "usedBy": [
+        "p07"
+      ],
+      "priority": 2,
+      "status": "received_registered",
+      "target": {
+        "pixels": [
+          760,
+          570
+        ],
+        "mode": "RGB",
+        "aspect": "landscape 4:3"
+      },
+      "prompt": "Use case: illustration-story. Original landscape 4:3 first-grade classroom science illustration. Two six-year-old classmates sit side by side at a simple warm cream worktable. One points with a naturally shaped hand to a single bold sketch of an upright blank apricot paper name card in their shared open notebook; the other child listens and looks at that exact sketch. On the other notebook page, one simple low outline represents the same name card lying flat. Both faces warm and attentive, eyes and hands anatomically natural, no person looking at the viewer. Simple quiet matte gouache with warm paper-cut silhouettes, pine green accents and muted apricot. Clean composition, open notebook and the two diagrams clearly seen, no other props, words, handwriting, numerals, logo or watermark.",
+      "verify": [
+        "同伴一人指笔记上站立的纸牌图，另一人朝说话同伴倾听。另页有平躺外形；两图没有文字。此图按口述和共同看记录的情境使用。",
+        "保留原比例且目标元素完整。"
+      ]
+    },
+    {
+      "key": "family-paper-observation",
+      "file": "assets/family-paper-observation.png",
+      "usedBy": [
+        "p10"
+      ],
+      "priority": 2,
+      "status": "received_registered",
+      "target": {
+        "pixels": [
+          760,
+          570
+        ],
+        "mode": "RGB",
+        "aspect": "landscape 4:3"
+      },
+      "prompt": "Use case: precise-object-edit. Fix the child's disconnected arm in the supplied illustration while preserving the same two people, open blank notebook, table, color and wide framing. The child on the right holds one rectangular apricot sheet with two hands. At the viewer-left end of that sheet, the child's hand currently joins a small cream sleeve that ends as an isolated rounded oval in front of empty green wall. Change the child's pose just enough so the cream sleeve becomes ONE continuous anatomically connected arm. Its rounded elbow is bent and its upper sleeve clearly travels back under the orange paper to the child's near shoulder on the left side of the green vest. There must be no green background gap between that upper arm and the torso. You may lower the sheet slightly and bring the two hands closer together if helpful to show both arm connections. The child's other arm remains connected to the right shoulder. Only two child hands, both on the single sheet, no other limbs or paper, no markings or text. Maintain calm warm matte paper-cut art. Repair the arm anatomy and leave all other elements intact.",
+      "verify": [
+        "孩子两只手各持同一张纸的一端，画面左侧袖臂弯过纸下回到肩侧，另一臂也连续。成人陪同，笔记本两格留空，256×192 仍可辨，无剪刀或文字。",
+        "两版历史候选及本次二次定点修订均有原件 SHA。"
+      ],
+      "candidateReview": {
+        "status": "needs_revision",
+        "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-d1b00df2-215e-4ccf-9326-141e574a03ae.png",
+        "sourceSha256": "f4f33d5d5d5b20c84e95e1a18b2eb1a8f2b8bfa125910330495b9bb94eaf3bef",
+        "sourceDimensions": [
+          1448,
+          1086
+        ],
+        "editReference": {
+          "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-a7a3f08d-49f8-46f1-837d-3d09da38fd5e.png",
+          "sha256": "ab45aea639dc89ed0492fcb4e8b9bb929baaf7b61ffc5e6514861ec28bdc84c0",
+          "reason": "初稿重复画出纸和孩子的手。"
+        },
+        "prompt": "Use case: precise-object-edit. Correct the attached first-grade home-science illustration. Preserve the exact adult and child, faces, background, table, two blank notebook spaces, matte paper-cut texture, framing and color palette. The child should have exactly two arms and two hands. Keep only the upper broad rectangular apricot sheet, gripped by the child's two natural hands at its left and right short ends. Completely remove the lower edge-on orange strip, both extra hands below the upper sheet and both extra sleeve/arm fragments associated with them. Restore the corresponding green shirt and quiet background behind the removed shapes. Show a single moment and exactly one sheet of paper. No duplicates, no extra fingers, no motion echoes, no separate edge view or floating items, no words, numbers, logos, or watermarks. Do not add any new object.",
+        "finding": "单张纸和两手数量已正确。画面左边持纸的手与前臂袖子在桌面上方以圆头结束，和孩子肩部之间有一块可见绿色背景，前臂没有连回躯干。",
+        "supersededBy": {
+          "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-99c06852-c663-45b1-95b0-916d509f579d.png",
+          "sha256": "14a6471ecb064ac49eb81301d20cda008761fc1fb2ad31db36619a2c346029fe"
+        }
+      }
+    },
+    {
+      "key": "depot-rover",
+      "file": "assets/depot-rover.png",
+      "usedBy": [
+        "p04"
+      ],
+      "priority": 2,
+      "status": "received_registered",
+      "target": {
+        "pixels": [
+          256,
+          256
+        ],
+        "mode": "RGBA",
+        "aspect": "square"
+      },
+      "prompt": "Use case: illustration-story. One small friendly wheeled toy science cart for a first-grade warehouse game, isolated on a truly transparent square. Viewed slightly from above so its clear apricot rectangular cart body, pale wood top platform, two visible chunky pine-green wheels, and short flat front bumper are immediately readable even at 26 pixels. Mechanical object only, no eyes or face, no animal or human features, nothing on the flat platform. The bumper is a simple horizontal shape, all wheels and cart edges inside the image, modest even transparent padding. Clean matte gouache on subtly textured paper, with warm cream, deep pine green and muted orange. No shadow, background, scenery, text, numbers, badges, logo or watermark.",
+      "verify": [
+        "杏色搬运车，带两个深绿色轮子和深绿短保险杠。23px 静态可辨车辆轮廓，无人物五官或文字。",
+        "生成素材与合成来源已核 SHA；整页实机验收待做。"
+      ]
+    },
+    {
+      "key": "ask-look",
+      "file": "assets/ask-look.png",
+      "usedBy": [
+        "p04"
+      ],
+      "priority": 2,
+      "status": "received_registered",
+      "target": {
+        "pixels": [
+          256,
+          256
+        ],
+        "mode": "RGBA",
+        "aspect": "square"
+      },
+      "prompt": "Use case: scientific-educational. A single original transparent square game cutout for a first-grade lesson. Show one broad cream paper ribbon, nearly horizontal, with a single clearly visible group of three short dark pine-green parallel dashes stamped in its upper-right corner. The dashes are an abstract pattern, without any letters or numbers. The strip should fill most of the square horizontally; make the pattern large enough to still be noticed when the entire image is only 23 pixels wide, while remaining a small detail on the strip. Outline the warm cream paper with a thin muted apricot edge to keep the shape visible on light backgrounds. Clean matte gouache and a subtle paper-cut texture. No magnifier, ruler, other objects, background, border, writing, logo or shadow. Leave only modest transparent padding around the object.",
+      "verify": [
+        "材料搬运站的观察问题卡。仅一条纸带，右上角三道平行短纹。23 px 仍见位置明确的小花纹，三道不要求逐条数。",
+        "已在模拟托盘底色静态缩到 23 px 检查；整页实机验收待做。"
+      ]
+    },
+    {
+      "key": "use-look",
+      "file": "assets/use-look.png",
+      "usedBy": [
+        "p04"
+      ],
+      "priority": 2,
+      "status": "received_registered",
+      "target": {
+        "pixels": [
+          256,
+          256
+        ],
+        "mode": "RGBA",
+        "aspect": "square"
+      },
+      "prompt": "Use case: scientific-educational. One original simple magnifying glass cutout for a first-grade game, in a transparent square. A large clear round cream lens with one thick deep pine-green rim and a thick short dark green handle slanting down to the lower right. Show the whole magnifier, filling about 85 percent of the image, front-facing and instantly recognizable when reduced to 23 pixels. Only the circular lens and handle are present. A tiny muted apricot accent on the handle is allowed. Warm matte gouache and subtle clean paper-cut texture, bold uninterrupted silhouette. No other objects, scene, shadows, checkered background, text, symbols, labels, logos or numbers.",
+      "verify": [
+        "材料搬运站的观察方法托盘。粗边圆镜和斜柄在 23 px 仍可辨，背景透明，无字。",
+        "已在模拟托盘底色静态缩到 23 px 检查；整页实机验收待做。"
+      ]
+    },
+    {
+      "key": "ask-measure",
+      "file": "assets/ask-measure.png",
+      "usedBy": [
+        "p04"
+      ],
+      "priority": 2,
+      "status": "received_registered",
+      "target": {
+        "pixels": [
+          256,
+          256
+        ],
+        "mode": "RGBA",
+        "aspect": "square"
+      },
+      "prompt": "Reuse the single unmarked paper ribbon cutout planned for method-measure. Compose two visibly unequal lengths from the same starting coordinate in code, clear at 23 px; no ruler, words or background.",
+      "verify": [
+        "两条等宽不同长的纸带同起于 x=22，均复用单带纹理。透明背景，无文字，无尺。",
+        "生成素材与合成来源已核 SHA；整页实机验收待做。"
+      ],
+      "source": "diagrams/ask-measure.svg",
+      "sharedComponent": "diagrams/paper-ribbon-surface.png"
+    },
+    {
+      "key": "use-measure",
+      "file": "assets/use-measure.png",
+      "usedBy": [
+        "p04"
+      ],
+      "priority": 2,
+      "status": "received_registered",
+      "target": {
+        "pixels": [
+          256,
+          256
+        ],
+        "mode": "RGBA",
+        "aspect": "square"
+      },
+      "prompt": "Compose a single chunky apricot ruler icon in code on a transparent square. Use a clear origin mark and a few evenly spaced ticks, readable at 23 px. No generated tick marks or numerals.",
+      "verify": [
+        "静态按 23 px 复验七条独立刻线及起始长线，SVG 等距 30 单位。",
+        "透明无文字，深色短线与圆形放大镜的轮廓可区分。",
+        "整页实机验收待做。"
+      ],
+      "source": "diagrams/use-measure.svg"
+    },
+    {
+      "key": "ask-test",
+      "file": "assets/ask-test.png",
+      "usedBy": [
+        "p04"
+      ],
+      "priority": 2,
+      "status": "received_registered",
+      "target": {
+        "pixels": [
+          256,
+          256
+        ],
+        "mode": "RGBA",
+        "aspect": "square"
+      },
+      "prompt": "Use case: scientific-educational. A simple original transparent square cutout for a first-grade question card, immediately legible at 23 pixels. Show exactly two alternative folded apricot paper supports for the same small name card, side by side, seen in side profile: at left a simple shallow paper stand has tipped low; at right a simple taller triangular paper stand remains upright. One small cream name card with no printing stands apart between the two supports, suggesting the object to test rather than marking an answer. Emphasize the two contrasting large silhouettes, with a clean gap, modest transparent margins, flat matte gouache and warm paper-cut texture. Deep pine-green edges on soft apricot and cream, no written words, digits, arrows, ruler, magnifier, book, hands, check mark, background, border, shadow or logo.",
+      "verify": [
+        "两种折纸支座，一低一高，中间单张无字名牌。小屏静态可辨两种轮廓。",
+        "生成素材与合成来源已核 SHA；整页实机验收待做。"
+      ]
+    },
+    {
+      "key": "use-test",
+      "file": "assets/use-test.png",
+      "usedBy": [
+        "p04"
+      ],
+      "priority": 2,
+      "status": "received_registered",
+      "target": {
+        "pixels": [
+          256,
+          256
+        ],
+        "mode": "RGBA",
+        "aspect": "square"
+      },
+      "prompt": "Use case: scientific-educational. One compact square transparent icon for 'try both and compare' in a first-grade game. In its upper two-thirds are two equal simple cream picture panels with thick pine-green outlines. Each panel shows the same plain orange folded paper name card and the same short tabletop line, upright in one panel and tilted low in the other. Under both panels, centered and unmistakable, is one large simple eye icon with a dark green pupil, looking at both trials. Strong graphic silhouettes that are readable at 23 pixels, with minimal detail, and generous separation of the panels. Clean matte gouache, warm cream, muted apricot and pine green. Empty transparent margins. No labels, numbers, letters, arrows, checking symbols, ruler, magnifying glass, book, hands, or scenery.",
+      "verify": [
+        "双框对照两种纸牌姿态、下方单眼。23 px 可分高低和眼形，与带斜柄的放大镜图不同。",
+        "生成素材与合成来源已核 SHA；整页实机验收待做。"
+      ]
+    },
+    {
+      "key": "ask-make",
+      "file": "assets/ask-make.png",
+      "usedBy": [
+        "p04"
+      ],
+      "priority": 2,
+      "status": "received_registered",
+      "target": {
+        "pixels": [
+          256,
+          256
+        ],
+        "mode": "RGBA",
+        "aspect": "square"
+      },
+      "prompt": "Use case: scientific-educational. One original square transparent cutout to show a simple making problem to a first grader. Show only one small blank cream card fallen flat at a diagonal, and beside it one clearly separate long flat apricot paper strip with straight ends, still unfolded. The card should look like a wide rectangle resting low, not a stand. Give each object a bold and different silhouette, dark pine-green edge accents and a clear gap between them, readable when the icon is only 23 pixels wide. Warm subtle matte gouache paper texture. Modest transparent margins. No finished stand, hands, tools, ruler, book, line pattern, text, numbers, markings, logo, scene or shadow.",
+      "verify": [
+        "平放空白名牌与另放的未折杏色长纸条，23px 仍为两件可区分的形状，无已制好纸脚或文字。",
+        "已在模拟游戏底色核对静态缩图；整页实机验收待做。"
+      ]
+    },
+    {
+      "key": "use-make",
+      "file": "assets/use-make.png",
+      "usedBy": [
+        "p04"
+      ],
+      "priority": 2,
+      "status": "received_registered",
+      "target": {
+        "pixels": [
+          256,
+          256
+        ],
+        "mode": "RGBA",
+        "aspect": "square"
+      },
+      "prompt": "Use case: scientific-educational. One original cutout for a first-grade 'make it' game icon. Show exactly one small child's anatomically natural hand, with five fingers total and any hidden by the grip allowed, pinching a wide apricot paper strip as it is being bent into a simple triangular paper foot. The active pinch and the triangular fold must be easy to recognize at 23 pixels. Place both shapes centrally with bold simple pine-green outlines, warm muted orange paper, and matte gouache paper-cut texture. Transparent square background, no full person, no second hand, no tools, no extra object or panels, no cut-off fingers, no shadows, text, numerals, markings, symbols or logos.",
+      "verify": [
+        "一只手捏住折痕，把杏色纸条弯成三角支撑，23px 静态仍可辨手部动作和纸脚轮廓。",
+        "已在模拟游戏底色核对静态缩图；整页实机验收待做。"
+      ]
+    },
+    {
+      "key": "ask-lookup",
+      "file": "assets/ask-lookup.png",
+      "usedBy": [
+        "p04"
+      ],
+      "priority": 2,
+      "status": "received_registered",
+      "target": {
+        "pixels": [
+          256,
+          256
+        ],
+        "mode": "RGBA",
+        "aspect": "square"
+      },
+      "prompt": "Use case: scientific-educational. One original transparent square problem icon for a first-grade game. At left, one very simple partly folded dark pine-green paper model with a single bent flap. At right, one small upright cream instruction card divided into exactly two bold large windows. The upper window contains one simple apricot folded-paper picture; the lower window is visibly empty cream. The blank lower window conveys a missing folding step. Large uncomplicated forms with a wide clear gap, visible at 23 pixels, high contrast between each object. Matte gouache, subtle warm paper texture, clean paper-cut edges. Only these two objects with transparent padding, no open book, handwriting, letters, numerals, question marks, arrows, tools, hands, background, shadows or logo.",
+      "verify": [
+        "半折绿纸模型旁为两格图示卡，上格一张折纸图，下格空白。23px 合成实际题卡底色后仍可辨两物件和空格，卡片外底色可透出，无棋盘或文字。",
+        "已在模拟游戏底色核对静态缩图；整页实机验收待做。"
+      ]
+    },
+    {
+      "key": "use-lookup",
+      "file": "assets/use-lookup.png",
+      "usedBy": [
+        "p04"
+      ],
+      "priority": 2,
+      "status": "received_registered",
+      "target": {
+        "pixels": [
+          256,
+          256
+        ],
+        "mode": "RGBA",
+        "aspect": "square"
+      },
+      "prompt": "Use case: scientific-educational. One original open picture book icon for 'look up a folding method' in a first-grade game. Show the open book alone, straight on and slightly from above, broad dark pine-green cover outlines around two large warm cream pages. Each page contains just one bold and simple folded-paper diagram in muted apricot and pine green, with one visible triangular fold. Make the open book outline clear at 23 pixels with no tiny marks. Simple matte gouache and subtle paper-cut texture. Single object centered with transparent square padding. No text, letters, numerals, repeated writing lines, symbols, ruler, scissors, hand, additional papers, background, ground shadow, or logo.",
+      "verify": [
+        "带折纸图的展开图册，23px 可辨横向书页、书脊和两处图示，无印刷字。",
+        "已在模拟游戏底色核对静态缩图；整页实机验收待做。"
+      ]
+    },
+    {
+      "key": "q1-a",
+      "file": "assets/q1-a.png",
+      "usedBy": [
+        "p08"
+      ],
+      "priority": 3,
+      "status": "received_registered",
+      "target": {
+        "pixels": [
+          480,
+          480
+        ],
+        "mode": "RGB",
+        "aspect": "square"
+      },
+      "prompt": "Use case: precise-object-edit. Create a square option crop in the same room, keeping the exact dark green chair design, warm cream floor and paper-cut palette from the reference. Show the lower part of the chair and its feet on completely dry floor. A single natural child's hand holds one small muted apricot flashlight aimed at one chair foot, with a softly visible cream beam only around that dry foot. No cup, water, puddle, other furniture or person in this close view. Large simple shapes at thumbnail size, balanced central framing, matte gouache on warm paper. No labels, numerals, arrows, marks, or logo.",
+      "verify": [
+        "同款绿椅的局部。自然持手电照干燥椅脚，没有杯或蓝水迹。",
+        "图面无字，已核对第 1 题题意和 alt；实机仍待验。"
+      ]
+    },
+    {
+      "key": "q1-b",
+      "file": "assets/q1-b.png",
+      "usedBy": [
+        "p08"
+      ],
+      "priority": 3,
+      "status": "received_registered",
+      "target": {
+        "pixels": [
+          480,
+          480
+        ],
+        "mode": "RGB",
+        "aspect": "square"
+      },
+      "prompt": "Use case: precise-object-edit. Create a square option crop of the exact same tabletop, upright apricot cup, and separate shallow pale blue puddle from the reference. Keep the cup upright and a visible dry gap before the puddle, with no trail or evidence of where water came from. One child's attentive side profile and a naturally held dark pine green magnifying glass inspect the tabletop just at the edge of that puddle beside the cup. The lens does not hide the cup or the puddle. Same warm matte gouache and paper-cut scale as the other options. No splashes, tilted cup, symbols, text, numbers, arrows, logo or watermark.",
+      "verify": [
+        "同一矮桌、正立杏色杯和旁边水迹。孩子用放大镜看水迹边缘，杯和水保持可见间隔。只有本选项观察与问题直接相关的线索。",
+        "图面无字，已核对第 1 题题意和 alt；实机仍待验。"
+      ]
+    },
+    {
+      "key": "q1-c",
+      "file": "assets/q1-c.png",
+      "usedBy": [
+        "p08"
+      ],
+      "priority": 3,
+      "status": "received_registered",
+      "target": {
+        "pixels": [
+          480,
+          480
+        ],
+        "mode": "RGB",
+        "aspect": "square"
+      },
+      "prompt": "Use case: precise-object-edit. Create a square option crop of the exact same short wooden bookshelf in the reference, keeping the cream and muted apricot unmarked book spines. One child in a dark pine-green top stands at its side and is visibly choosing a book, one natural hand reaching toward a spine. Keep the bookcase and child legible, no other furniture, no cup or water in this crop. Same matte gouache, warm paper texture and neutral visual emphasis. No letters, titles, numbers, signs, marks, logos or watermarks.",
+      "verify": [
+        "同款两层短书架，孩子伸手取书，无杯或水。无字书脊沿用题干配色。",
+        "图面无字，已核对第 1 题题意和 alt；实机仍待验。"
+      ]
+    },
+    {
+      "key": "q1-scene",
+      "file": "assets/q1-scene.png",
+      "usedBy": [
+        "p08"
+      ],
+      "priority": 3,
+      "status": "received_registered",
+      "target": {
+        "pixels": [
+          640,
+          427
+        ],
+        "mode": "RGB",
+        "aspect": "landscape 3:2"
+      },
+      "prompt": "Use case: scientific-educational. Original wide 3:2 picture for a first-grade science quiz. A low warm cream wooden table fills the middle; on it a single upright apricot cup with its rim up stands close beside a separate shallow pale-blue puddle. There is a small visible dry gap between the cup and puddle. No pouring, splash, leaking, trail, arrows, tipped cups or liquid seen coming from anything. Also show one small dark pine-green wooden chair just to the left and a short shelf with a few unmarked cream and orange book spines on the right. Cup, puddle, chair and shelf all recognizable. Quiet uncluttered room, no people, neutral visual emphasis, matte gouache and subtle warm paper texture, clean simple cut-paper silhouettes. No words, numbers, signs, symbols or watermarks.",
+      "verify": [
+        "矮桌上立着杏色杯，旁边蓝水迹与杯身有干燥空隙，椅子和书架也可见。没有倾倒、水流或溅迹，水从何来仍未知。",
+        "图面无字，已核对第 1 题题意和 alt；实机仍待验。"
+      ]
+    },
+    {
+      "key": "q2-a",
+      "file": "assets/q2-a.png",
+      "usedBy": [
+        "p08"
+      ],
+      "priority": 3,
+      "status": "received_registered",
+      "target": {
+        "pixels": [
+          480,
+          480
+        ],
+        "mode": "RGB",
+        "aspect": "square"
+      },
+      "prompt": "Edit the provided square first-grade science quiz illustration as a matched alternate choice. Preserve its exact overhead view, warm cream paper, matte gouache flat shapes, and identical gray oval stone at the left with the same small green-gray speckles on its upper-right quadrant. Completely remove the blank book. The only tool now is one handheld magnifying glass, whose round clear lens sits over those same speckles on the stone, its muted forest-green handle angling diagonally down-right into the clear area where the book was. Show a few of the stone's original speckles obviously larger only through the lens, with clean optical continuity and no extra ornament, no hands. Keep the stone and complete silhouette of the magnifier large, distinct, and both fully within the edges, comparable in visual emphasis to the original. No other props, marks, lettering, digits, arrows, checks, borders, or watermarks. Match exact same matte paper-cut gouache and soft lighting.",
+      "verify": [
+        "同一块带细斑的石头，镜内可见同种纹样变大。只有这图的工具能让孩子看清细斑。",
+        "已核题意、答案 A 及图注；制作 96 px 对照，整页实机验收待做。"
+      ]
+    },
+    {
+      "key": "q2-b",
+      "file": "assets/q2-b.png",
+      "usedBy": [
+        "p08"
+      ],
+      "priority": 3,
+      "status": "received_registered",
+      "target": {
+        "pixels": [
+          480,
+          480
+        ],
+        "mode": "RGB",
+        "aspect": "square"
+      },
+      "prompt": "Edit the provided square first-grade science quiz illustration as a matched alternate choice. Retain its exact overhead camera, cream warm paper, soft light, matte paper-cut gouache look, and identical gray oval stone on the left with the same size, shape, placement and small dark sage speckles. Replace only the closed blank book on the right with one simple flat muted pine-green school ruler beside the stone, narrow straight rectangular shape, with a single row of uniformly spaced little cream engraved measurement tick lines along one edge and visibly no numbers. The ruler extends almost the height of the former book and is large enough to be recognizable at a small size. The ruler does not touch or hide the stone. No other tools, props, digits, lettering, arrows, check marks, border, or watermark. Match the original calm composition and the equivalent visual emphasis.",
+      "verify": [
+        "同一块带细斑的石头旁放无字直尺。尺用来量长度，此图没有放大镜。",
+        "已核题意、答案 A 及图注；制作 96 px 对照，整页实机验收待做。"
+      ]
+    },
+    {
+      "key": "q2-c",
+      "file": "assets/q2-c.png",
+      "usedBy": [
+        "p08"
+      ],
+      "priority": 3,
+      "status": "received_registered",
+      "target": {
+        "pixels": [
+          480,
+          480
+        ],
+        "mode": "RGB",
+        "aspect": "square"
+      },
+      "prompt": "Use case: scientific-educational. A square original first-grade science choice image. On a clean cream tabletop, one flat smooth oval light gray river stone lies just left of center. It has a small group of dark green-gray natural speckles near the upper-right of its top face, a very clear oval silhouette, and a soft bluish-gray edge. Beside it to the right lies one clearly closed blank cream notebook with a dark pine-green spine, page edges visible and cover entirely unmarked. Similar weight and scale for the two objects, no hands or other tools. Top-down, matte gouache and warm paper-cut texture, simple and readable at thumbnail size. No symbols, numbers, text, labels or logo.",
+      "verify": [
+        "同一块带细斑的石头旁放一本合起的空白本。没有放大镜。",
+        "已核题意、答案 A 及图注；制作 96 px 对照，整页实机验收待做。"
+      ]
+    },
+    {
+      "key": "q3-a",
+      "file": "assets/q3-a.png",
+      "usedBy": [
+        "p08"
+      ],
+      "priority": 3,
+      "status": "received_registered",
+      "target": {
+        "pixels": [
+          480,
+          480
+        ],
+        "mode": "RGB",
+        "aspect": "square"
+      },
+      "prompt": "Use case: scientific-educational. An original transparent asset sheet with exactly two isolated simple wooden block towers, separated by a very wide totally empty transparent gap. Direct front orthographic view, no perspective. The left tower is taller and muted apricot; the right tower is visibly shorter and deep pine green. Both towers have about the same width, clean rectangular stacked block silhouettes, flat level bottoms and flat level tops. Nothing touches or overlaps across the center. The exact same two cutouts will be reused at equal scale in three first-grade measurement-choice images. Warm matte gouache and subtle paper-cut texture, no side shadows or ground shadows, no ruler, table, tick marks, baseline, words, letters, numerals, symbols or watermark. The background between and around both objects must be true alpha transparency.",
+      "verify": [
+        "立尺的零刻线悬在左塔半腰，下方离桌面 108 图形单位。",
+        "三图除尺覆盖范围外的所有像素完全一致；96 px 预览仍可辨尺的位置和方向。"
+      ],
+      "source": "diagrams/q3-measure-options.svg",
+      "sharedComponents": [
+        "diagrams/q3-tower-tall.png",
+        "diagrams/q3-tower-short.png"
+      ]
+    },
+    {
+      "key": "q3-b",
+      "file": "assets/q3-b.png",
+      "usedBy": [
+        "p08"
+      ],
+      "priority": 3,
+      "status": "received_registered",
+      "target": {
+        "pixels": [
+          480,
+          480
+        ],
+        "mode": "RGB",
+        "aspect": "square"
+      },
+      "prompt": "Reuse the same two block-tower cutouts and tabletop as q3-a. Code keeps both bases at the same tabletop line and positions the upright ruler with the 0 tick on that line. Keep identical scale, colors and visual emphasis.",
+      "verify": [
+        "立尺的零刻线与两个塔底同在桌面基准 y=355。",
+        "三图除尺覆盖范围外的所有像素完全一致；96 px 预览仍可辨尺的位置和方向。"
+      ],
+      "source": "diagrams/q3-measure-options.svg",
+      "sharedComponents": [
+        "diagrams/q3-tower-tall.png",
+        "diagrams/q3-tower-short.png"
+      ]
+    },
+    {
+      "key": "q3-c",
+      "file": "assets/q3-c.png",
+      "usedBy": [
+        "p08"
+      ],
+      "priority": 3,
+      "status": "received_registered",
+      "target": {
+        "pixels": [
+          480,
+          480
+        ],
+        "mode": "RGB",
+        "aspect": "square"
+      },
+      "prompt": "Reuse the same two block-tower cutouts, tabletop and ruler design as q3-a. Code keeps both bases at the same tabletop line and shows the ruler horizontal on the table. Keep identical scale, colors and visual emphasis.",
+      "verify": [
+        "同一把尺转 90 度横放在同一桌面下部，保持刻线样式。",
+        "三图除尺覆盖范围外的所有像素完全一致；96 px 预览仍可辨尺的位置和方向。"
+      ],
+      "source": "diagrams/q3-measure-options.svg",
+      "sharedComponents": [
+        "diagrams/q3-tower-tall.png",
+        "diagrams/q3-tower-short.png"
+      ]
+    },
+    {
+      "key": "q4-a",
+      "file": "assets/q4-a.png",
+      "usedBy": [
+        "p09"
+      ],
+      "priority": 3,
+      "status": "received_registered",
+      "target": {
+        "pixels": [
+          480,
+          480
+        ],
+        "mode": "RGB",
+        "aspect": "square"
+      },
+      "prompt": "Create a different choice in the same first-grade science quiz using the provided image as the exact style and prop reference. Square illustration, ONE continuous cream-paper school table scene, no diptych. At left show just one of those same forest-green boards as a shallow ramp with an apricot support block under its raised left end. One hand with the same green cuff is carefully sliding a thin flat pale-brown sheet of cardboard horizontally between the apricot block and the elevated end of the green board to add a shim. Draw the hand pinching the card itself, and draw a clear section of the thin card jutting out on the left. Preserve the tactile paper silhouette and show all layers. At right, on flat ground and a clear visible gap away from the foot of the slope, the very same orange wood toy car is parked, with both wheels on the flat ground. No person is touching or releasing the car. Limit props, large clean shapes, sharp relationship among hand, card, and ramp; at thumbnail size the child can see the card being added. Same gentle matte gouache style, cream backdrop, apricot and deep forest green. No letters, digits, arrows, check marks, borders, or watermarks.",
+      "verify": [
+        "孩子在给单条斜坡加纸板，小车停在远处，仍是准备斜坡。",
+        "已核题意、答案 C 及图注；制作 96 px 对照，整页实机验收待做。"
+      ]
+    },
+    {
+      "key": "q4-b",
+      "file": "assets/q4-b.png",
+      "usedBy": [
+        "p09"
+      ],
+      "priority": 3,
+      "status": "received_registered",
+      "target": {
+        "pixels": [
+          480,
+          480
+        ],
+        "mode": "RGB",
+        "aspect": "square"
+      },
+      "prompt": "Make a square companion option for the same first-grade science quiz in the same exact matte cream-paper gouache look. Show both of the same pine-green straight ramps with tall and short apricot supports on one activity table. Put the ramps unobtrusively in the upper portion, left and right, clear enough to recognize. The foreground focal action is one hand with the same pine cuff visibly turning one page of a small open cream-colored picture booklet on the table, clearly pinching the corner of a lifted page. View from a mild three-quarter overhead angle so the opened booklet and the ramps are both readable. On the remaining visible page draw only a simple unlabeled illustration of a green plank and an apricot block. The same little orange toy car sits parked on flat ground to one side of the booklet, no hands near the car. No test underway. Large simple forms centered near one another, limited props, no diptych. No words, letters, digits, motion lines, arrows, checks, decorative border, or watermark. A clear quiet first-grade picture.",
+      "verify": [
+        "孩子翻看无字图册，两条斜坡都没有正在释放的小车。",
+        "已核题意、答案 C 及图注；制作 96 px 对照，整页实机验收待做。"
+      ]
+    },
+    {
+      "key": "q4-c",
+      "file": "assets/q4-c.png",
+      "usedBy": [
+        "p09"
+      ],
+      "priority": 3,
+      "status": "received_registered",
+      "target": {
+        "pixels": [
+          480,
+          480
+        ],
+        "mode": "RGB",
+        "aspect": "square"
+      },
+      "prompt": "A single square first-grade science quiz choice illustration, diptych of exactly TWO equal side-by-side square-ish panels separated only by a thin blank cream gutter. Exact matching side-view camera and school activity tabletop in both panels. In each panel one straight muted pine-green board makes a downhill ramp from upper left toward the same flat floor at right. Its high left end is supported by a simple apricot block. Left panel is unmistakably steeper, right panel is visibly shallower because the apricot block is half as tall. The ramp length and toy size stay the same. In both panels show exactly the same easily recognized small apricot wooden toy car in profile (simple rectangular body, rounded roof, two visibly dark wheels), sitting at the very upper left starting end of the board, both wheels in contact with its surface, pointing downhill to the right. Above/behind the car in each panel, one small hand just opened thumb and index finger to let it roll without a push. Draw both hands in exactly the same release pose, with a small visible gap behind the car. No motion lines or distances or results. Large immediately legible forms and clear separation, gentle matte gouache paper-cut forms with subtle warm ivory paper, muted apricot and deep pine green. Unmarked blank ground and background. Do not draw text, digits, symbols, arrows, checks, labels, photo frame embellishments, or another car.",
+      "verify": [
+        "并排两次比较，同一款小车分别在两条斜坡各自的上端，双轮接触坡面，手与车留缝，表现松手试滚。",
+        "已核题意、答案 C 及图注；制作 96 px 对照，整页实机验收待做。"
+      ]
+    },
+    {
+      "key": "q5-a",
+      "file": "assets/q5-a.png",
+      "usedBy": [
+        "p09"
+      ],
+      "priority": 3,
+      "status": "received_registered",
+      "target": {
+        "pixels": [
+          480,
+          480
+        ],
+        "mode": "RGB",
+        "aspect": "square"
+      },
+      "prompt": "Make another square choice for this same first-grade science quiz. Edit the attached picture so it contains ONLY ONE observation snapshot. Keep just the single window design from the LEFT reference panel, drawn once centered against the warm cream wall. Keep the identical simple two stacked panes, matching pine-green frame, soft pale sage light and one muted orange narrow paper ribbon taped near the upper-left corner, hanging straight vertically in this one record. Keep the window tall (about 77 percent of the square height and 48 percent of the width) with plenty of blank warm paper on both sides; keep the ribbon large and obvious at 96 pixels. Remove the entire right-hand window and the vertical split; do not add any second window, panel, photo, ribbon or object. Same quiet matte paper-cut gouache and lighting. No letters, digits, marks, arrows, icons, logo or watermark.",
+      "verify": [
+        "同一扇窗的一张图，只有一次橙色纸带记录。",
+        "已按图核对文字描述和选项绑定，制作 96 px 对照；整页实机验收待做。"
+      ]
+    },
+    {
+      "key": "q5-b",
+      "file": "assets/q5-b.png",
+      "usedBy": [
+        "p09"
+      ],
+      "priority": 3,
+      "status": "received_registered",
+      "target": {
+        "pixels": [
+          480,
+          480
+        ],
+        "mode": "RGB",
+        "aspect": "square"
+      },
+      "prompt": "Precisely edit this same square two-snapshot first-grade science illustration to create another quiz choice. Preserve both window scenes exactly: same crops, narrow gutter, framing, cream tape attachment spots and textured matte gouache; do not change anything outside the paper strips. Change the left hanging orange strip to a noticeably wider, long teal-blue paper strip, hanging perfectly straight down from the same tape, with strong contrast against the pale green window panes. Change the right orange strip to a distinctly much shorter narrow orange piece, about half its former length, continuing in its original downward-right direction and attached at the same point. The left strip is now a different, visibly wider, longer, teal-blue object; the right strip is visibly narrow, much shorter and orange. Exactly one strip per snapshot. Make the difference in color, width and length visible in a very small image. No arrows, letters, digits, labels, check marks, decorative elements or watermark.",
+      "verify": [
+        "同一扇窗的两张记录。左边是宽的青蓝纸带，右边是短的橙色纸带。",
+        "已按图核对文字描述和选项绑定，制作 96 px 对照；整页实机验收待做。"
+      ]
+    },
+    {
+      "key": "q5-c",
+      "file": "assets/q5-c.png",
+      "usedBy": [
+        "p09"
+      ],
+      "priority": 3,
+      "status": "received_registered",
+      "target": {
+        "pixels": [
+          480,
+          480
+        ],
+        "mode": "RGB",
+        "aspect": "square"
+      },
+      "prompt": "Make one square first-grade science illustrated quiz choice: two separate illustrated observation snapshots shown side by side, each using almost half the frame width and the same large height, with one narrow cream gutter. Both are exactly the same close front view of an identical simple small pine-green wooden window, same frame and two square panes, same pale cool sage daylight, same cream wall. In both snapshots one single vivid muted-apricot narrow rectangular paper ribbon is taped to the exact same spot under the top-left window frame with one short cream piece of tape. In LEFT snapshot ribbon hangs perfectly straight down from its fixed upper end. In RIGHT snapshot the very same ribbon angles about 50 degrees to the right from that same fixed end, leaning across the pane as it lifts in a gentle draft. Paper ribbon width, physical length and color are identical, only angle changes. Keep the two full ribbons large with crisp contrast and no overlapping props. The visual direction difference must read without any text at 96 pixels. No people, arrows, swirl marks, words, letters, digits, numbers, captions, check marks, logos, or watermarks. School science storybook, clean matte paper-cut gouache with faint warm paper texture, cream, pine green and apricot. Balanced calm composition, tightly crop around the two windows to keep ribbons big.",
+      "verify": [
+        "两张同窗图使用同尺寸橙色纸带和同一固定点，左侧下垂，右侧向一边倾斜。",
+        "已按图核对文字描述和选项绑定，制作 96 px 对照；整页实机验收待做。"
+      ]
+    },
+    {
+      "key": "q6-a",
+      "file": "assets/q6-a.png",
+      "usedBy": [
+        "p09"
+      ],
+      "priority": 3,
+      "status": "received_registered",
+      "target": {
+        "pixels": [
+          480,
+          480
+        ],
+        "mode": "RGB",
+        "aspect": "square"
+      },
+      "prompt": "Square illustrated answer choice for a first-grade science quiz about safely looking at unfamiliar tiny grains. Clear side-view at a school table. In the foreground center, one squat clear glass jar with broad rounded shoulders and a WIDE clear solid transparent screw lid firmly sealed across the entire opening, with a simple narrow muted pine-green rim. The lid looks visibly seated and shut. Inside the jar at its base only, a few small irregular dull brown and beige grains, visible through the transparent glass. An elementary-age child with short dark hair and a muted apricot sweater stands on the left, and an adult teacher with a pine-green cardigan stands to the right just behind the table. Both are quietly looking down at the sealed jar at comfortable arm's-length distance. Their mouths are closed, hands clearly well away from the jar, eyes open looking at the grains. No grains outside the jar, no other objects, no touching or open lid. Use large, legible, anatomically simple side-profile silhouettes, gentle matte paper-cut gouache with subtle warm paper, warm ivory, deep pine green and apricot. Keep a visible gap between faces and the jar; emphasize the transparent sealed container as a main focal subject. No words, letters, digits, arrows, symbols, check marks, frame, or watermark.",
+      "verify": [
+        "透明罐带盖密封，孩子和成人隔着一段距离看罐内颗粒。无接触、无取食动作。",
+        "已按图核对文字描述和选项绑定，制作 96 px 对照；整页实机验收待做。"
+      ]
+    },
+    {
+      "key": "q6-b",
+      "file": "assets/q6-b.png",
+      "usedBy": [
+        "p09"
+      ],
+      "priority": 3,
+      "status": "received_registered",
+      "target": {
+        "pixels": [
+          480,
+          480
+        ],
+        "mode": "RGB",
+        "aspect": "square"
+      },
+      "prompt": "Edit the reference square illustration into another first-grade quiz choice with the same child, exact apricot sweater and school table, cream paper and color palette, and the same glass jar of irregular brown and beige tiny grains. Remove the adult completely and leave cream negative space to the right. Show the same child in side profile on the left, still with a clearly CLOSED neutral mouth, holding exactly one tiny irregular beige grain between thumb and forefinger just short of the lips. Draw a clear small air gap so the grain is visibly outside the lips and the child has not eaten it; no open mouth, no swallowing, no pleased expression. Keep the pinching hand with correctly jointed fingers, exactly one hand raised, large enough to see in a thumbnail. The same jar now sits visibly OPEN on the table in lower center, with the detached transparent lid with pine-green rim sitting flat to its right and more of the same grains in its bottom. No extra objects, arrows, letters, digits, checkmarks, symbols or watermarks. Matte paper-cut gouache, simple large shapes.",
+      "verify": [
+        "透明罐开着，孩子捏着一粒小颗粒靠近闭着的嘴，颗粒与嘴之间有空隙。",
+        "已按图核对文字描述和选项绑定，制作 96 px 对照；整页实机验收待做。"
+      ]
+    },
+    {
+      "key": "q6-c",
+      "file": "assets/q6-c.png",
+      "usedBy": [
+        "p09"
+      ],
+      "priority": 3,
+      "status": "received_registered",
+      "target": {
+        "pixels": [
+          480,
+          480
+        ],
+        "mode": "RGB",
+        "aspect": "square"
+      },
+      "prompt": "Edit the reference square first-grade science quiz picture to a third option. Use the same child on the left in the same orange sweater, same warm table, same exact squat glass jar and small irregular brown and tan grains in the bottom. Remove the adult. The jar is visibly open: put the detached clear lid with its pine-green rim flat on the table to the right. Keep jar upright on the table. Show the child clearly leaning way down and forward over the jar from the left, head in profile nearly horizontal and nose pointed down very close to the open rim, with a narrow visible gap above it. Mouth CLOSED, hands out of sight, neutral face, not touching or tipping the jar, no grains outside jar, no smoke, smell lines or arrows. The position of the face just above the opening must be clear at small sizes and visually distinct from standing back with the lid shut. Use the exact same muted matte paper-cut gouache and warm ivory, apricot, dark pine palette. No writing, letters, digits, symbols, checkmarks, borders or watermarks.",
+      "verify": [
+        "同款透明罐已经开盖，孩子脸靠近罐口，脸没有接触罐。",
+        "已按图核对文字描述和选项绑定，制作 96 px 对照；整页实机验收待做。"
+      ]
+    }
+  ],
+  "observationOutcomes": [
+    {
+      "key": "paper-wing",
+      "status": "registered_linked",
+      "view": "top",
+      "expectedPose": 1,
+      "scope": "模拟观察，从上看宽。"
+    },
+    {
+      "key": "paper-wing-side",
+      "status": "registered_linked",
+      "view": "side",
+      "expectedPose": 0,
+      "scope": "模拟观察，从侧面看纸边。"
+    }
+  ]
+}

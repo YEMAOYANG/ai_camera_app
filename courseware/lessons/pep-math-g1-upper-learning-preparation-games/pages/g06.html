@@ -1,0 +1,32 @@
+<div id="game-goal" class="g-anchor"></div>
+<div id="game-player" class="g-anchor"></div>
+<div id="game-target" class="g-anchor"></div>
+
+<script id="mira-narration-cues" type="application/json">{"schemaVersion":"mira.interactive.narration-cues.v1","cues":[{"id":"prep-g06-goal","text":"等同学说完，从自己身上向上滑。老师递来话泡，再把它划给亮着的伙伴。"},{"id":"prep-g06-challenge","text":"挑战关。这次要听完三轮，再向上滑举手。拿到话泡后，划给亮着的伙伴。"},{"id":"prep-g06-hint","text":"看看话泡现在在谁头顶。"},{"id":"prep-g06-hint2","text":"先听完，再举手。等话泡到你这里，才可以传给亮着的伙伴。"},{"id":"prep-g06-praise","text":"伙伴听到了！一个讲完，另一个再接。"}]}</script>
+<script id="mira-pre-recorded-audio">(()=>{
+const clips={"prep-g06-goal":"__AUDIO:prep-g06-goal__","prep-g06-challenge":"__AUDIO:prep-g06-challenge__","prep-g06-hint":"__AUDIO:prep-g06-hint__","prep-g06-hint2":"__AUDIO:prep-g06-hint2__","prep-g06-praise":"__AUDIO:prep-g06-praise__"};let active=null;
+let activeCue=null,pending=null,waiting=null,waitingAt=0,generation=0,visible=false;
+const state=(cueId,status)=>{document.documentElement.dataset.miraAudioState=status;
+window.dispatchEvent(new CustomEvent('mira-narration-state',{detail:{cueId,status}}));};
+const stop=(status)=>{generation++;pending=null;const previous=active;active=null;activeCue=null;
+if(previous){previous.onended=null;previous.onerror=null;previous.pause();previous.currentTime=0;}
+state(null,status);};
+window.miraCancelNarration=()=>{waiting=null;waitingAt=0;stop('ready');};
+window.addEventListener('message',(event)=>{if(event.source!==parent||event.data?.type!=='MIRA_NARRATION_VISIBILITY')return;
+visible=event.data.visible===true;if(!visible){stop('hidden');return;}
+const cueId=waiting;waiting=null;if(cueId&&Date.now()-waitingAt<=4000)window.miraNarrate(cueId);});
+const next=()=>{const cueId=pending;pending=null;if(cueId)play(cueId);};
+const play=async(cueId)=>{const ticket=generation;
+const clip=new Audio(clips[cueId]);active=clip;activeCue=cueId;const current=()=>generation===ticket&&active===clip;
+clip.onended=()=>{if(current()){active=null;activeCue=null;state(cueId,'ready');next();}};
+clip.onerror=()=>{if(current()){active=null;activeCue=null;state(cueId,'error');next();}};
+try{await clip.play();if(!current()){clip.pause();return false;}state(cueId,'playing');return true;}
+catch(_){if(current()){active=null;activeCue=null;state(cueId,'error');next();}return false;}};
+window.miraNarrate=async(cueId)=>{
+if(!Object.prototype.hasOwnProperty.call(clips,cueId)){state(cueId,'missing');return false;}
+if(!visible){waiting=cueId;waitingAt=Date.now();state(cueId,'hidden');return false;}
+if(active&&activeCue!==cueId){pending=cueId;state(cueId,'queued');return true;}
+stop('ready');return play(cueId);};
+state(null,'ready');})();</script>
+
+<script id="prep-picture-fallbacks" type="application/json">{"listen":{"width":1448,"height":1086,"src":"__IMG:prep-backup-listen__"},"class-ready":{"width":1672,"height":941,"src":"__IMG:prep-backup-class-ready__"},"raise-hand":{"width":1448,"height":1086,"src":"__IMG:prep-backup-raise-hand__"},"speak-turn":{"width":1448,"height":1086,"src":"__IMG:prep-backup-speak-turn__"}}</script>

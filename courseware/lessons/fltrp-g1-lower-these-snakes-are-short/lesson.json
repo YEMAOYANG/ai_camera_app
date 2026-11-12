@@ -1,0 +1,1008 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "Unit 1 These snakes are short.",
+  "grade": 1,
+  "description": "听动物园导览，分开观察长短、高矮、整体大小，并试着介绍动物组。",
+  "roster": {
+    "mia": {
+      "name": "Mia 老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Jennifer",
+      "avatar": "/teachers/coco-english-v1.png",
+      "color": "#557B76",
+      "persona": "把一句话指向一幅图，用轻松短句请孩子听和观察。"
+    }
+  },
+  "images": {
+    "zoo-big-group": {
+      "file": "assets/zoo-big-group.png"
+    },
+    "zoo-boat-action": {
+      "file": "assets/zoo-boat-action.png"
+    },
+    "zoo-boat": {
+      "file": "assets/zoo-boat.png"
+    },
+    "zoo-bot-jump": {
+      "file": "assets/zoo-bot-jump.png"
+    },
+    "zoo-bot-walk": {
+      "file": "assets/zoo-bot-walk.png"
+    },
+    "zoo-bot": {
+      "file": "assets/zoo-bot.png"
+    },
+    "zoo-child-low": {
+      "file": "assets/zoo-child-low.png"
+    },
+    "zoo-child": {
+      "file": "assets/zoo-child.png"
+    },
+    "zoo-length-long": {
+      "file": "assets/zoo-length-long.png"
+    },
+    "zoo-length-short": {
+      "file": "assets/zoo-length-short.png"
+    },
+    "zoo-long-group": {
+      "file": "assets/zoo-long-group.png"
+    },
+    "zoo-low-group": {
+      "file": "assets/zoo-low-group.png"
+    },
+    "zoo-quiz-elephant-big": {
+      "file": "assets/zoo-quiz-elephant-big.png"
+    },
+    "zoo-quiz-elephant-one": {
+      "file": "assets/zoo-quiz-elephant-one.png"
+    },
+    "zoo-quiz-elephant-small": {
+      "file": "assets/zoo-quiz-elephant-small.png"
+    },
+    "zoo-quiz-elephant-trio": {
+      "file": "assets/zoo-quiz-elephant-trio.png"
+    },
+    "zoo-quiz-giraffe-low": {
+      "file": "assets/zoo-quiz-giraffe-low.png"
+    },
+    "zoo-quiz-giraffe-one": {
+      "file": "assets/zoo-quiz-giraffe-one.png"
+    },
+    "zoo-quiz-giraffe-pair": {
+      "file": "assets/zoo-quiz-giraffe-pair.png"
+    },
+    "zoo-quiz-giraffe-trio": {
+      "file": "assets/zoo-quiz-giraffe-trio.png"
+    },
+    "zoo-quiz-long-pair-alt": {
+      "file": "assets/zoo-quiz-long-pair-alt.png"
+    },
+    "zoo-quiz-long-pair": {
+      "file": "assets/zoo-quiz-long-pair.png"
+    },
+    "zoo-quiz-short-one": {
+      "file": "assets/zoo-quiz-short-one.png"
+    },
+    "zoo-quiz-short-pair-alt": {
+      "file": "assets/zoo-quiz-short-pair-alt.png"
+    },
+    "zoo-quiz-short-pair": {
+      "file": "assets/zoo-quiz-short-pair.png"
+    },
+    "zoo-quiz-tiger-trio": {
+      "file": "assets/zoo-quiz-tiger-trio.png"
+    },
+    "zoo-short-group": {
+      "file": "assets/zoo-short-group.png"
+    },
+    "zoo-size-three": {
+      "file": "assets/zoo-size-three.png"
+    },
+    "zoo-small-group": {
+      "file": "assets/zoo-small-group.png"
+    },
+    "zoo-stage": {
+      "file": "assets/zoo-stage.png"
+    },
+    "zoo-tall-group": {
+      "file": "assets/zoo-tall-group.png"
+    },
+    "zoo-tiger-group": {
+      "file": "assets/zoo-tiger-group.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "ready-to-guide",
+      "type": "slide",
+      "title": "跟着小导览员去动物园",
+      "template": "title-picture",
+      "data": {
+        "title": "跟着小导览员去动物园",
+        "picture": "zoo-child",
+        "caption": "先指清哪一组，再说什么样。"
+      },
+      "script": [
+        {
+          "say": "动物园的画板缺了几句介绍。你来当今天的小导览员吗？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "小导览员乐乐在等我们。他指着前面的路。"
+        },
+        {
+          "say": "Let's go to the zoo!"
+        },
+        {
+          "say": "Zoo 是动物园。我们一起去看看画板上有哪些动物。"
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "介绍前先指出你在说谁。再说你看见的一样特点。"
+        },
+        {
+          "say": "这条路上有三种看法。我们先比一比整只的大小。"
+        }
+      ]
+    },
+    {
+      "key": "compare-overall",
+      "type": "slide",
+      "title": "大小，要看整个身体",
+      "template": "picture-points",
+      "data": {
+        "title": "大小，要看整个身体",
+        "picture": "zoo-size-three",
+        "points": [
+          "big　整体大",
+          "small　整体小",
+          "very big　特别大"
+        ]
+      },
+      "script": [
+        {
+          "say": "同一条地面线上站着三个玩偶。哪个占的地方最多？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "从左往右看。狗、猫和大象都在同一条线上。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "The toy dog is big."
+        },
+        {
+          "say": "左边的狗比旁边的猫占得大。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "The toy cat is small."
+        },
+        {
+          "say": "中间的猫整只占的地方小。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "Look at the elephant. It's very big."
+        },
+        {
+          "say": "Very 表示程度更明显。图里的大象特别大。"
+        },
+        {
+          "say": "我们刚才比的是整只。下一张只看从头到尾有多长。"
+        }
+      ]
+    },
+    {
+      "key": "compare-length",
+      "type": "slide",
+      "title": "从头到尾，比较长短",
+      "template": "two-columns",
+      "data": {
+        "title": "从头到尾，比较长短",
+        "left": {
+          "heading": "long",
+          "body": "从共同起点看，伸得远。"
+        },
+        "left_picture": "zoo-length-long",
+        "right": {
+          "heading": "short",
+          "body": "从同一起点看，伸得近。"
+        },
+        "right_picture": "zoo-length-short"
+      },
+      "script": [
+        {
+          "say": "两条纸蛇颜色一样。只看颜色，能分出长和短吗？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "Snakes 是蛇。头对齐，左边尾巴伸到哪？"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "Long. This snake is long."
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "从头到尾更长，用 long。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "右边头也在同一起点，尾巴更近。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "Short. This snake is short."
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "在这个长短对照里，short 是短。"
+        },
+        {
+          "say": "比的时候，记住起点要一样。"
+        }
+      ]
+    },
+    {
+      "key": "compare-height",
+      "type": "slide",
+      "title": "从脚到头，比较高矮",
+      "template": "two-columns",
+      "data": {
+        "title": "从脚到头，比较高矮",
+        "left": {
+          "heading": "tall",
+          "body": "脚从同一条线开始。"
+        },
+        "left_picture": "zoo-tall-group",
+        "right": {
+          "heading": "short",
+          "body": "在这幅图里，乐乐相对矮。"
+        },
+        "right_picture": "zoo-child-low"
+      },
+      "script": [
+        {
+          "say": "乐乐抬头看。现在该沿着地面看，还是往上看？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "先看脚站在哪条线，再往上看头顶。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "The giraffes are tall."
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "Giraffes 是长颈鹿，tall 是高。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "乐乐和它们从同样的地面线比。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "I'm short."
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "这里 short 是矮。它和 tall 作对照。"
+        },
+        {
+          "say": "量蛇看头到尾，比高矮看脚到头。两处 short 意思跟着变。"
+        },
+        {
+          "say": "游戏里还有较矮的长颈鹿模型，听这句再找。"
+        },
+        {
+          "say": "Find the short giraffes."
+        }
+      ]
+    },
+    {
+      "key": "identify-the-group",
+      "type": "slide",
+      "title": "认出这一组，再说特点",
+      "template": "two-columns",
+      "data": {
+        "title": "认出这一组，再说特点",
+        "left": {
+          "heading": "What are they?",
+          "body": "两只都是老虎。"
+        },
+        "left_picture": "zoo-tiger-group",
+        "right": {
+          "heading": "These are elephants.",
+          "body": "这组大象在图里很大。"
+        },
+        "right_picture": "zoo-big-group"
+      },
+      "script": [
+        {
+          "say": "画板上来了两组。听 What are they，先找我指的那组。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "我指左边这两只。它们是什么？"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "What are they?"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "They're tigers."
+        },
+        {
+          "say": "Tigers 是老虎。先说出它们是谁，再说特点。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "Look at these elephants."
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "These are elephants."
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "They're very big."
+        },
+        {
+          "say": "Look at 是请看。These 指这组。Elephants 是大象。"
+        },
+        {
+          "say": "再听两句介绍。下一站可能会请你找其中一组。"
+        },
+        {
+          "say": "Look at the tigers. Jump there."
+        },
+        {
+          "say": "Find the big elephants."
+        },
+        {
+          "say": "Now find the small elephants."
+        },
+        {
+          "say": "Look at the small elephants."
+        }
+      ]
+    },
+    {
+      "key": "ask-about-the-group",
+      "type": "slide",
+      "title": "先指这组，再问长不长",
+      "template": "two-columns",
+      "data": {
+        "title": "先指这组，再问长不长",
+        "left": {
+          "heading": "Are they long?",
+          "body": "两条都是长的。"
+        },
+        "left_picture": "zoo-long-group",
+        "right": {
+          "heading": "These snakes are short.",
+          "body": "换到另一组，两条都短。"
+        },
+        "right_picture": "zoo-short-group"
+      },
+      "script": [
+        {
+          "say": "两张纸蛇画板都到了。问长不长，要先指哪张？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "Look at these snakes."
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "Are they long?"
+        },
+        {
+          "say": "先停一停，看看头到尾。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "Yes, they are."
+        },
+        {
+          "say": "这组两条都长。图里看见了，才可以肯定回答。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "我换一张画板。These 现在指右边这组。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "These snakes are short."
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "从头到尾都比较短。别把左边的长度用到右边。"
+        },
+        {
+          "say": "马上要听句子找图。试着先听是哪组，再听特征。"
+        },
+        {
+          "say": "Short snakes. Find the group."
+        },
+        {
+          "say": "Long snakes. Find the group."
+        },
+        {
+          "say": "Look at the short snakes."
+        },
+        {
+          "say": "Look at the long snakes."
+        },
+        {
+          "say": "先重听，再看这组的轮廓。"
+        },
+        {
+          "say": "看亮起的那组，慢一点对准。"
+        },
+        {
+          "say": "你听清了，也接到了对应的照片。"
+        }
+      ]
+    },
+    {
+      "key": "bubble-portraits",
+      "type": "interactive",
+      "title": "听句子，接住动物组",
+      "page": "bubble-portraits",
+      "widgetType": "game",
+      "startImage": "zoo-stage",
+      "script": [
+        {
+          "say": "相同颜色的蛇都在水面上。哪一张是刚听到的那组？"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#demo-zoo-speaker"
+        },
+        {
+          "say": "先听。漏听了可以点左下角的小喇叭，再听一次。"
+        },
+        {
+          "highlight": "#game-target"
+        },
+        {
+          "say": "老师先示范。把蛇头对齐，从头到尾比长短。"
+        },
+        {
+          "highlight": "#demo-zoo-bubble-pad"
+        },
+        {
+          "say": "左右箭头开船。把船对到那张图，再点吹泡泡。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "泡泡接住短蛇画板。这一组和刚才听到的相符。"
+        },
+        {
+          "say": "现在你来。听完整句，再移动小船对准。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "hear-short": "ask-about-the-group-17",
+        "hear-long": "ask-about-the-group-18",
+        "hear-tall": "compare-height-5",
+        "hear-low": "compare-height-16",
+        "hear-big": "identify-the-group-14",
+        "hear-tiger": "identify-the-group-7",
+        "hear-small": "identify-the-group-20",
+        "bubble-hint": "ask-about-the-group-21",
+        "bubble-help": "ask-about-the-group-22",
+        "bubble-good": "ask-about-the-group-23"
+      }
+    },
+    {
+      "key": "guide-one-stop",
+      "type": "slide",
+      "title": "让家人听懂你的介绍",
+      "template": "title-picture",
+      "data": {
+        "title": "让家人听懂你的介绍",
+        "picture": "zoo-tiger-group",
+        "caption": "指这一组，先说名称，再说一样特点。"
+      },
+      "script": [
+        {
+          "say": "如果轮到你讲解，光说大，家人知道你在说谁吗？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "我先指两只老虎，让家人看清这一组。"
+        },
+        {
+          "say": "These are tigers."
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "They're big."
+        },
+        {
+          "say": "先说名称，第二句加一个图里看得见的特征。"
+        },
+        {
+          "say": "你可以画一组喜欢的动物，再指给家人看。"
+        },
+        {
+          "say": "家人也可以问一句。听清他们问的是哪一组，再回答。"
+        },
+        {
+          "say": "还有一段跳跃路线。听完当前一句，再决定跳向哪张图。"
+        },
+        {
+          "say": "先重听。把这一句和脚下的图对上。"
+        },
+        {
+          "say": "先找动物，再看它在图里的特征。"
+        },
+        {
+          "say": "你跳到了这句介绍对应的一站。"
+        },
+        {
+          "say": "Look at the tall giraffes."
+        }
+      ]
+    },
+    {
+      "key": "jump-to-the-group",
+      "type": "interactive",
+      "title": "沿着动物园的口令跳",
+      "page": "jump-to-the-group",
+      "widgetType": "game",
+      "startImage": "zoo-stage",
+      "script": [
+        {
+          "say": "动物园有几个路牌。先去哪一站，要听谁在说什么？"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "小机器人站在起点。听完第一句才出发。"
+        },
+        {
+          "highlight": "#game-target"
+        },
+        {
+          "say": "这一句找短蛇。先看两张都是蛇，再认出更短的一组。"
+        },
+        {
+          "highlight": "#demo-zoo-hop-pad"
+        },
+        {
+          "say": "箭头跑。到边上按跳，落在那组的路牌上。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "小机器人只跳第一站。落在短蛇那组，路牌亮了。"
+        },
+        {
+          "say": "现在换你。每到一站，停一下听下一句再跳。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "visit-short": "ask-about-the-group-19",
+        "visit-long": "ask-about-the-group-20",
+        "visit-tall": "guide-one-stop-14",
+        "visit-big": "identify-the-group-18",
+        "visit-small": "identify-the-group-19",
+        "visit-tiger": "identify-the-group-17",
+        "hop-hint": "guide-one-stop-11",
+        "hop-help": "guide-one-stop-12",
+        "hop-good": "guide-one-stop-13"
+      }
+    },
+    {
+      "key": "picture-check",
+      "type": "quiz",
+      "title": "听介绍，选新的动物园照片",
+      "intro": [
+        "新画板来了。先听清说的是谁，再听它们什么样。",
+        "如果看见两组很像，可以重听。"
+      ],
+      "questions": [
+        {
+          "id": "short-snakes",
+          "question": "These snakes are short. Find them.",
+          "skill": "同起点听辨一组蛇的长短",
+          "answer": [
+            "B"
+          ],
+          "analysis": "三张都用相同参照。中间两条蛇都短，右边只有一条，左边两条更长。",
+          "visual": {
+            "kind": "asset",
+            "image": "zoo-bot",
+            "alt": "动物园的导览机器人"
+          },
+          "options": {
+            "A": {
+              "label": "两条长珊瑚蛇",
+              "visual": {
+                "kind": "asset",
+                "image": "zoo-quiz-long-pair",
+                "alt": "两条长珊瑚蛇"
+              }
+            },
+            "B": {
+              "label": "两条短珊瑚蛇",
+              "visual": {
+                "kind": "asset",
+                "image": "zoo-quiz-short-pair",
+                "alt": "两条短珊瑚蛇"
+              }
+            },
+            "C": {
+              "label": "一条短珊瑚蛇",
+              "visual": {
+                "kind": "asset",
+                "image": "zoo-quiz-short-one",
+                "alt": "一条短珊瑚蛇"
+              }
+            }
+          }
+        },
+        {
+          "id": "tall-giraffes",
+          "question": "The giraffes are tall. Find them.",
+          "skill": "同底线听辨一组动物的高度",
+          "answer": [
+            "C"
+          ],
+          "analysis": "右边两只长颈鹿站在同一条线上，脚到头都更高。左边只有一只，中间的两只更矮。",
+          "visual": {
+            "kind": "asset",
+            "image": "zoo-bot",
+            "alt": "动物园的导览机器人"
+          },
+          "options": {
+            "A": {
+              "label": "一只较高的长颈鹿",
+              "visual": {
+                "kind": "asset",
+                "image": "zoo-quiz-giraffe-one",
+                "alt": "一只较高的长颈鹿"
+              }
+            },
+            "B": {
+              "label": "两只相对矮的长颈鹿",
+              "visual": {
+                "kind": "asset",
+                "image": "zoo-quiz-giraffe-low",
+                "alt": "两只相对矮的长颈鹿"
+              }
+            },
+            "C": {
+              "label": "两只高长颈鹿",
+              "visual": {
+                "kind": "asset",
+                "image": "zoo-quiz-giraffe-pair",
+                "alt": "两只高长颈鹿"
+              }
+            }
+          }
+        },
+        {
+          "id": "very-big",
+          "question": "They're very big. Find the elephants.",
+          "skill": "听辨 very big 的整体大小",
+          "answer": [
+            "A"
+          ],
+          "analysis": "左边两只大象从整体上都占较大的地方。中间是两只小象，右边是较高的长颈鹿。",
+          "visual": {
+            "kind": "asset",
+            "image": "zoo-bot",
+            "alt": "动物园的导览机器人"
+          },
+          "options": {
+            "A": {
+              "label": "两只整体特别大的大象",
+              "visual": {
+                "kind": "asset",
+                "image": "zoo-quiz-elephant-big",
+                "alt": "两只整体特别大的大象"
+              }
+            },
+            "B": {
+              "label": "两只较小的大象",
+              "visual": {
+                "kind": "asset",
+                "image": "zoo-quiz-elephant-small",
+                "alt": "两只较小的大象"
+              }
+            },
+            "C": {
+              "label": "两只高但瘦长的长颈鹿",
+              "visual": {
+                "kind": "asset",
+                "image": "zoo-quiz-giraffe-pair",
+                "alt": "两只高但瘦长的长颈鹿"
+              }
+            }
+          }
+        },
+        {
+          "id": "what-are-they",
+          "question": "What are they? They're tigers.",
+          "skill": "听问答认出同类动物组",
+          "answer": [
+            "B"
+          ],
+          "analysis": "听到 tigers，要找一组老虎。中间三只都有橙色身体和深色条纹，另两组分别是大象和长颈鹿。",
+          "visual": {
+            "kind": "asset",
+            "image": "zoo-bot",
+            "alt": "动物园的导览机器人"
+          },
+          "options": {
+            "A": {
+              "label": "三只大象",
+              "visual": {
+                "kind": "asset",
+                "image": "zoo-quiz-elephant-trio",
+                "alt": "三只大象"
+              }
+            },
+            "B": {
+              "label": "三只老虎",
+              "visual": {
+                "kind": "asset",
+                "image": "zoo-quiz-tiger-trio",
+                "alt": "三只老虎"
+              }
+            },
+            "C": {
+              "label": "三只长颈鹿",
+              "visual": {
+                "kind": "asset",
+                "image": "zoo-quiz-giraffe-trio",
+                "alt": "三只长颈鹿"
+              }
+            }
+          }
+        },
+        {
+          "id": "yes-long",
+          "question": "Are they long? Yes, they are.",
+          "skill": "把肯定回答和长的图片对应",
+          "answer": [
+            "C"
+          ],
+          "analysis": "Yes 肯定问的是 long。右边两条从同一起点量都伸得远，中间两条较短。左边是站得高。",
+          "visual": {
+            "kind": "asset",
+            "image": "zoo-bot",
+            "alt": "动物园的导览机器人"
+          },
+          "options": {
+            "A": {
+              "label": "两只长颈鹿",
+              "visual": {
+                "kind": "asset",
+                "image": "zoo-quiz-giraffe-pair",
+                "alt": "两只长颈鹿"
+              }
+            },
+            "B": {
+              "label": "同起点的两条短蛇",
+              "visual": {
+                "kind": "asset",
+                "image": "zoo-quiz-short-pair-alt",
+                "alt": "同起点的两条短蛇"
+              }
+            },
+            "C": {
+              "label": "同起点的两条长蛇",
+              "visual": {
+                "kind": "asset",
+                "image": "zoo-quiz-long-pair-alt",
+                "alt": "同起点的两条长蛇"
+              }
+            }
+          }
+        },
+        {
+          "id": "these-elephants",
+          "question": "These are elephants. They're small.",
+          "skill": "听出一组名称与整体大小",
+          "answer": [
+            "A"
+          ],
+          "analysis": "听完两句要核对一组大象和整体小。左边两个都小，中间只有一个，右边两个都大。",
+          "visual": {
+            "kind": "asset",
+            "image": "zoo-bot",
+            "alt": "动物园的导览机器人"
+          },
+          "options": {
+            "A": {
+              "label": "两只小象",
+              "visual": {
+                "kind": "asset",
+                "image": "zoo-quiz-elephant-small",
+                "alt": "两只小象"
+              }
+            },
+            "B": {
+              "label": "一只小象",
+              "visual": {
+                "kind": "asset",
+                "image": "zoo-quiz-elephant-one",
+                "alt": "一只小象"
+              }
+            },
+            "C": {
+              "label": "两只大象",
+              "visual": {
+                "kind": "asset",
+                "image": "zoo-quiz-elephant-big",
+                "alt": "两只大象"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "closing",
+      "type": "slide",
+      "title": "把一站介绍给家人听",
+      "template": "summary",
+      "data": {
+        "title": "把一站介绍给家人听",
+        "items": [
+          "先找说的是哪一组。",
+          "long / short 看长短。",
+          "tall / short 看高矮。",
+          "big / small 看整体。",
+          "画一组，向家人介绍。"
+        ]
+      },
+      "script": [
+        {
+          "say": "如果家人想看看这座动物园，你想先介绍哪一站？"
+        },
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "先用 These 指向这组。说出名字，大家就知道你在说谁。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "两条蛇头对齐。沿头到尾比长短。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "脚在同一条地面线。往上比高和矮。"
+        },
+        {
+          "spotlight": "item-4"
+        },
+        {
+          "say": "大小看整个身体。Very 加上去，表示更明显。"
+        },
+        {
+          "spotlight": "item-5"
+        },
+        {
+          "say": "画一组喜欢的动物。先告诉家人它们是谁，再说一个特点。"
+        },
+        {
+          "say": "请家人听你说一说，也让家人介绍一组给你猜。"
+        }
+      ]
+    }
+  ]
+}

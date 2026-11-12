@@ -1,0 +1,227 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "观察校园里的植物",
+  "binding": {
+    "editionId": "smartedu-science-six-year-g1-lower-e231dd57",
+    "revisionId": "directory-359f40a6afba915101f297d3",
+    "unitId": "11983e8e-c931-46a7-97de-589b20d31258",
+    "nodeId": "50c290eb-cee8-44fe-a11c-d3d529b70c2a"
+  },
+  "goals": [
+    "能在成人陪同下观察校园植物，先看整株，再看叶、花或树皮等局部，用可见证据比较两株。",
+    "能用画、拓树皮或拍照片留下所见，并标明观察对象和特点，没观察的先留空。",
+    "能整理两三条观察所得，用名称或暂记编号、样子、特点向同伴介绍一株植物。",
+    "知道园艺师种植和养护植物，能设计一块有名称及一条查证特点的植物标识牌，爱护校园植物。"
+  ],
+  "goalSources": [
+    "印25–27、教案1.2",
+    "印27–28、教案1.3",
+    "印28、教案2.2",
+    "印29–30、教案2.3–4"
+  ],
+  "scenario": "原创松风校园观察簿。先看整株，拿一条局部证据对照，实操完成照片后整理成小展牌。",
+  "pageSequence": [
+    {
+      "key": "school-plant-walk",
+      "kind": "teaching",
+      "plan": "用不同校园植物引入，站在安全路径，不采摘。"
+    },
+    {
+      "key": "same-yellow-different",
+      "kind": "teaching",
+      "plan": "用枝形和一朵的花形区分两株黄花样本。"
+    },
+    {
+      "key": "whole-then-detail",
+      "kind": "teaching",
+      "plan": "柳树整株与下垂枝/窄叶，多角度看而不攀折。"
+    },
+    {
+      "key": "rub-the-bark",
+      "kind": "teaching",
+      "plan": "整株后选完整安全的树皮区，覆纸，横拿蜡笔轻拓、记名称。"
+    },
+    {
+      "key": "campus-plant-photos",
+      "kind": "game",
+      "plan": "同一枝迎春、连翘和柳的俯侧实拍，留每关图。"
+    },
+    {
+      "key": "match-plant-evidence",
+      "kind": "game",
+      "plan": "把局部证据弹珠送到同一株的整株照片上。"
+    },
+    {
+      "key": "report-what-you-saw",
+      "kind": "teaching",
+      "plan": "按名称、样子、可见特点记录，复看照片，没观察的留空。"
+    },
+    {
+      "key": "meet-the-gardener",
+      "kind": "teaching",
+      "plan": "看种植、浇水、按需修剪，尊重园艺师劳动。"
+    },
+    {
+      "key": "make-a-plant-sign",
+      "kind": "teaching",
+      "plan": "画原创新名牌，以查到的名称、图片和一条确证特点标记。"
+    },
+    {
+      "key": "picture-quiz",
+      "kind": "quiz",
+      "plan": "六道原创图题，覆盖证据、整体局部、记录、园艺和标识。"
+    },
+    {
+      "key": "home-plant-observation",
+      "kind": "teaching",
+      "plan": "成人带去安全公共区域观察，记录实际所见，不留住址或真实学校名。"
+    }
+  ],
+  "games": [
+    {
+      "page": "campus-plant-photos",
+      "template": "shutterScout",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.shutterScout",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "observe_state",
+      "selection": "同一枝的俯视与侧视各做正规抓拍，辅看叶/花或枝姿；不是把局部图冒作整株。",
+      "levels": [
+        {
+          "plant": "迎春",
+          "shotOrder": [
+            "top",
+            "side"
+          ]
+        },
+        {
+          "plant": "连翘",
+          "shotOrder": [
+            "side",
+            "top",
+            "side"
+          ]
+        },
+        {
+          "plant": "柳树",
+          "shotOrder": [
+            "top",
+            "side",
+            "top",
+            "side"
+          ]
+        }
+      ]
+    },
+    {
+      "page": "match-plant-evidence",
+      "template": "magnetMarbles",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.magnetMarbles",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "pair_match",
+      "selection": "同一植物的独特局部证据与整体图相配，迎春与连翘同色干扰，放错不计进度。",
+      "levels": [
+        [
+          "迎春六瓣对整株",
+          "连翘四瓣对整株"
+        ],
+        [
+          "柳叶对整株",
+          "迎春六瓣对整株",
+          "本次树皮对松树"
+        ],
+        [
+          "连翘四瓣对整株",
+          "本次树皮对松树",
+          "迎春六瓣对整株",
+          "柳叶对整株"
+        ]
+      ]
+    }
+  ],
+  "quiz": [
+    {
+      "id": "whole-willow",
+      "skill": "whole-vs-local",
+      "prompt": "哪一张把树顶到树脚的整株都画下来了？",
+      "answer": "B",
+      "optionImages": [
+        "q1-a",
+        "q1-b",
+        "q1-c"
+      ]
+    },
+    {
+      "id": "both-clues",
+      "skill": "compare-visible-features",
+      "prompt": "哪组同时把枝和一朵花画清楚了？",
+      "answer": "A",
+      "optionImages": [
+        "q2-a",
+        "q2-b",
+        "q2-c"
+      ]
+    },
+    {
+      "id": "bark-rubbing-order",
+      "skill": "bark-rubbing-steps",
+      "prompt": "从左到右，哪组是拓树皮的顺序？",
+      "answer": "C",
+      "optionImages": [
+        "q3-a",
+        "q3-b",
+        "q3-c"
+      ]
+    },
+    {
+      "id": "willow-branch-match",
+      "skill": "same-plant-whole-and-part",
+      "prompt": "这根枝上的叶又窄又长，它最可能是哪一株的枝？",
+      "answer": "B",
+      "optionImages": [
+        "q4-a",
+        "q4-b",
+        "q4-c"
+      ]
+    },
+    {
+      "id": "record-both-parts",
+      "skill": "complete-photo-evidence",
+      "prompt": "要介绍这株松树和它的树皮纹路，带哪组照片？",
+      "answer": "C",
+      "optionImages": [
+        "q5-a",
+        "q5-b",
+        "q5-c"
+      ]
+    },
+    {
+      "id": "sign-with-matching-clue",
+      "skill": "evidence-based-plant-sign",
+      "prompt": "哪块松树牌有整株图，还有实际看到的树皮线索？",
+      "answer": "A",
+      "optionImages": [
+        "q6-a",
+        "q6-b",
+        "q6-c"
+      ]
+    }
+  ],
+  "afterClass": {
+    "familyTask": "成人带看熟悉的公共植物，画整株再画一处，记录观察点和一条证据；不攀折、不剥皮、不尝。家庭实际待观察。",
+    "weeklyQuestionSource": [
+      "整体与局部",
+      "不同植物比较",
+      "真实记录",
+      "园艺和标识牌"
+    ]
+  },
+  "observationPlan": {
+    "scene": "campus-plant-photos",
+    "trialId": "same-branch-two-views",
+    "simulatedResult": "完成后由普通输入实际拍摄生成三组俯侧照片。演示、错误、未完成和自动代打不导出。",
+    "familyPractice": "和大人在安全的公共步道看一株熟悉植物。先画整株，再画一处叶、花或树皮，记下真实看到的一点。名称不确定就先记编号。不攀折，不剥皮，不入口，没看到的留空。",
+    "familyStatus": "pending_real_observation"
+  }
+}

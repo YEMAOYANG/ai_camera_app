@@ -1,0 +1,40 @@
+{
+  "template": "shapeBridge",
+  "draft": true,
+  "title": "拼桥工坊",
+  "sub": "移动、旋转木块，把桥面空位补完整。",
+  "doneText": "小兔过桥啦，拼桥贴纸到手！",
+  "voiceLead": true,
+  "art": {
+    "backdrop": "wetland.webp",
+    "frames": ["rabbit-ready.webp", "rabbit-jump.webp"],
+    "sticker": "sticker.webp"
+  },
+  "levels": [
+    {
+      "seconds": 6.5,
+      "slots": [
+        {"col": 1, "cells": [[0,0],[1,0]]},
+        {"col": 6, "cells": [[0,0],[1,0],[0,1],[1,1]]}
+      ],
+      "hints": ["木块该盖住哪几格？", "落慢了，找同形空位。"]
+    },
+    {
+      "seconds": 5.2,
+      "slots": [
+        {"col": 0, "cells": [[0,0],[0,1],[1,1]], "turns": 1},
+        {"col": 5, "cells": [[0,0],[1,0],[2,0]], "turns": 1}
+      ],
+      "hints": ["看看拐角朝哪边。", "转好后，移到亮处。"]
+    },
+    {
+      "seconds": 3.75,
+      "slots": [
+        {"col": 0, "cells": [[0,0],[1,0],[1,1],[2,1]], "turns": 1},
+        {"col": 3, "cells": [[0,0],[1,0],[2,0],[1,1]], "turns": 2},
+        {"col": 6, "cells": [[0,0],[0,1],[1,1]], "turns": 3}
+      ],
+      "hints": ["先看拐角，再放木块。", "落慢了，转好看亮处。"]
+    }
+  ]
+}

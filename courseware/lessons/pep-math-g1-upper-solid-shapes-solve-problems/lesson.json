@@ -1,0 +1,976 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "解决问题 · 十块积木搭展台",
+  "grade": 1,
+  "description": "一年级上册认识立体图形例二，用齐十件积木，试验承托与摆法，再检查作品怎样既稳又高。",
+  "roster": {
+    "teacher": {
+      "name": "小数老师",
+      "role": "teacher",
+      "gender": "male",
+      "voice": "Ethan",
+      "avatar": "/teachers/ashu-math-v1.png",
+      "color": "#4A90D9",
+      "persona": "用清楚简短的生活例子教一年级数学。"
+    }
+  },
+  "images": {
+    "ball-support": {
+      "file": "assets/ball-support.png"
+    },
+    "base-comparison": {
+      "file": "assets/base-comparison.png"
+    },
+    "bench-model": {
+      "file": "assets/bench-model.png"
+    },
+    "height-comparison": {
+      "file": "assets/height-comparison.png"
+    },
+    "material-tray": {
+      "file": "assets/material-tray.png"
+    },
+    "q1-a": {
+      "file": "assets/q1-a.png"
+    },
+    "q1-b": {
+      "file": "assets/q1-b.png"
+    },
+    "q1-c": {
+      "file": "assets/q1-c.png"
+    },
+    "q2-a": {
+      "file": "assets/q2-a.png"
+    },
+    "q2-b": {
+      "file": "assets/q2-b.png"
+    },
+    "q2-c": {
+      "file": "assets/q2-c.png"
+    },
+    "q3-a": {
+      "file": "assets/q3-a.png"
+    },
+    "q3-b": {
+      "file": "assets/q3-b.png"
+    },
+    "q3-c": {
+      "file": "assets/q3-c.png"
+    },
+    "q4-a": {
+      "file": "assets/q4-a.png"
+    },
+    "q4-b": {
+      "file": "assets/q4-b.png"
+    },
+    "q4-c": {
+      "file": "assets/q4-c.png"
+    },
+    "q4-stimulus": {
+      "file": "assets/q4-stimulus.png"
+    },
+    "q5-a": {
+      "file": "assets/q5-a.png"
+    },
+    "q5-b": {
+      "file": "assets/q5-b.png"
+    },
+    "q5-c": {
+      "file": "assets/q5-c.png"
+    },
+    "q5-compare": {
+      "file": "assets/q5-compare.png"
+    },
+    "q6-a": {
+      "file": "assets/q6-a.png"
+    },
+    "q6-b": {
+      "file": "assets/q6-b.png"
+    },
+    "q6-c": {
+      "file": "assets/q6-c.png"
+    },
+    "remaining-six": {
+      "file": "assets/remaining-six.png"
+    },
+    "roll-flat": {
+      "file": "assets/roll-flat.png"
+    },
+    "roll-side-rails": {
+      "file": "assets/roll-side-rails.png"
+    },
+    "hop-workbench": {
+      "file": "assets/hop-workbench.png"
+    },
+    "hop-sticker": {
+      "file": "assets/hop-sticker.png"
+    },
+    "hop-rabbit-ready": {
+      "file": "assets/hop-rabbit-ready.png"
+    },
+    "hop-rabbit-run": {
+      "file": "assets/hop-rabbit-run.png"
+    },
+    "hop-rabbit-jump": {
+      "file": "assets/hop-rabbit-jump.png"
+    },
+    "hop-edge-board": {
+      "file": "assets/hop-edge-board.png"
+    },
+    "hop-edge-brick": {
+      "file": "assets/hop-edge-brick.png"
+    },
+    "hop-end-board": {
+      "file": "assets/hop-end-board.png"
+    },
+    "hop-end-brick": {
+      "file": "assets/hop-end-brick.png"
+    },
+    "hop-end-case": {
+      "file": "assets/hop-end-case.png"
+    },
+    "hop-side-cylinder": {
+      "file": "assets/hop-side-cylinder.png"
+    },
+    "hop-upright-cylinder": {
+      "file": "assets/hop-upright-cylinder.png"
+    },
+    "hop-wide-board": {
+      "file": "assets/hop-wide-board.png"
+    },
+    "hop-wide-brick": {
+      "file": "assets/hop-wide-brick.png"
+    },
+    "hop-wide-case": {
+      "file": "assets/hop-wide-case.png"
+    },
+    "depot-flat": {
+      "file": "assets/depot-flat.png"
+    },
+    "depot-rails": {
+      "file": "assets/depot-rails.png"
+    },
+    "depot-row": {
+      "file": "assets/depot-row.png"
+    },
+    "depot-cradle": {
+      "file": "assets/depot-cradle.png"
+    },
+    "depot-cradle-turn": {
+      "file": "assets/depot-cradle-turn.png"
+    },
+    "depot-roll-mark": {
+      "file": "assets/depot-roll-mark.png"
+    },
+    "depot-hold-mark": {
+      "file": "assets/depot-hold-mark.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "p01",
+      "type": "slide",
+      "title": "展台上的搭建挑战",
+      "template": "picture-points",
+      "data": {
+        "title": "展台上的搭建挑战",
+        "picture": "bench-model",
+        "points": [
+          "每一块都用上",
+          "先搭得稳",
+          "站稳后再试着搭高"
+        ]
+      },
+      "script": [
+        {
+          "say": "积木展要开了，连球也得上台。你会把它放哪儿？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "找找球和台脚。用手指比一比，哪里有平平的面？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "球是最容易滚走的一件，可它也得用上。"
+        },
+        {
+          "say": "我们搭完还要数一遍，不能有一块留在托盘里。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "先让作品稳稳站住，这样球上去，底下才有东西托住它。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "架子站稳再试着变高。一碰就倒，挑战还没完成。"
+        },
+        {
+          "say": "好，先去数数我们手里到底有几件吧。"
+        }
+      ]
+    },
+    {
+      "key": "p02",
+      "type": "slide",
+      "title": "看清要用哪十件",
+      "template": "picture-points",
+      "data": {
+        "title": "看清要用哪十件",
+        "picture": "material-tray",
+        "points": [
+          "七块长方体",
+          "正方体、圆柱和球各一个",
+          "搭一件，查一件"
+        ]
+      },
+      "script": [
+        {
+          "say": "托盘里有几种积木？用手指挨个点一点。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "长方体有的细长，有的宽平。我们把它们一起数。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "三根细条、三块平板，再加那块厚的，一共七块。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "还有正方体、圆柱和球，各一个。一共十件。"
+        },
+        {
+          "say": "正方体的面一样大。圆柱有平圆面，球没有平面。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "每摆上一件，就找它在托盘里的位置。"
+        },
+        {
+          "say": "别把翻过来的一件数两次，它只是换了个面。"
+        }
+      ]
+    },
+    {
+      "key": "p03",
+      "type": "interactive",
+      "title": "积木跳跳台",
+      "page": "face-hop",
+      "widgetType": "learning-arcade",
+      "startImage": "hop-workbench",
+      "gameAudio": {
+        "hop-contact": "p06-12",
+        "hop-on-face": "p06-13",
+        "hop-hint": "p06-14",
+        "hop-help": "p06-15",
+        "hop-height": "p08-12",
+        "hop-praise": "p08-13"
+      },
+      "script": [
+        {
+          "say": "木台上是同一块积木。小兔要跳到哪一站？"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "用手比一比，积木翻个面，贴住台子的地方变了吗？"
+        },
+        {
+          "highlight": "#face-hop-demo-wide"
+        },
+        {
+          "say": "我们先求稳。宽面贴台，底下托住的地方就大。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "留意小兔跳向哪块积木，再看贴着台子的是哪一面。"
+        },
+        {
+          "say": "按方向键跑，再按空格跳。屏幕大按钮也能玩。"
+        },
+        {
+          "say": "轮到你啦。听清要比哪一项，再挑落脚的台子。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ]
+    },
+    {
+      "key": "p04",
+      "type": "slide",
+      "title": "小球往哪边滚",
+      "template": "two-columns",
+      "data": {
+        "title": "小球往哪边滚",
+        "left": {
+          "heading": "只用平板",
+          "body": "球遇不到侧面的积木"
+        },
+        "right": {
+          "heading": "加上两边挡块",
+          "body": "左右挡住，前后仍有空当"
+        },
+        "left_picture": "roll-flat",
+        "right_picture": "roll-side-rails"
+      },
+      "script": [
+        {
+          "say": "小满说：给球加两块挡板，它就能留下来吧？",
+          "by": "xiaoman"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "从上面看，用手指从球往前划。路上有挡块吗？"
+        },
+        {
+          "say": "平板在球下面，四周还空着，球能从边上滚出去。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "两根挡块夹在左右。再把手指往前或往后划。"
+        },
+        {
+          "say": "你看，那两边还开着呢，球还有路往外滚。"
+        },
+        {
+          "say": "要把球抬高，可以让合适的几根长条从下面托住它。"
+        },
+        {
+          "say": "左右再加高，前后仍有空。接下来试试从下面托。"
+        },
+        {
+          "say": "看球还有没有路滚。把两种摆法推到各自的托盘。"
+        },
+        {
+          "say": "先顺着球的前后和两边找，哪一边还空着？"
+        },
+        {
+          "say": "看长条能不能分开托住球。推不动就绕到背后。"
+        }
+      ]
+    },
+    {
+      "key": "p05",
+      "type": "interactive",
+      "title": "小球支架分拣",
+      "page": "support-depot",
+      "widgetType": "learning-arcade",
+      "startImage": "hop-workbench",
+      "gameAudio": {
+        "depot-goal": "p04-10",
+        "depot-hint": "p04-11",
+        "depot-help": "p04-12",
+        "depot-praise": "p07-10"
+      },
+      "script": [
+        {
+          "say": "小兔带来两张摆法图。它们该去同一个托盘吗？"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#game-target"
+        },
+        {
+          "say": "看这张图，左右各有长条。球的前后还留着空处。"
+        },
+        {
+          "highlight": "#depot-roll-reference"
+        },
+        {
+          "say": "有空路，球就可能滚出去。找圆球旁有箭头的托盘。"
+        },
+        {
+          "highlight": "#depot-hold-reference"
+        },
+        {
+          "say": "另一张有三根同高的长条，从下方分开托球。"
+        },
+        {
+          "say": "它去画着三根支架的托盘。先看图，再动手。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "用方向键走到卡片背后，再往前推。大按钮也能推。"
+        },
+        {
+          "highlight": "#depot-demo-dock"
+        },
+        {
+          "say": "我先推这张两边有挡块的图，送到箭头托盘。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "小兔推着图卡往前走。看，它停在箭头托盘里了。"
+        },
+        {
+          "say": "轮到你啦。先找空路，再看长条从哪里托住球。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ]
+    },
+    {
+      "key": "p06",
+      "type": "slide",
+      "title": "底座怎样稳又高",
+      "template": "picture-points",
+      "data": {
+        "title": "底座怎样稳又高",
+        "picture": "base-comparison",
+        "points": [
+          "宽面贴桌比较稳",
+          "同一块竖起来可以增高",
+          "两脚承托一块横板"
+        ]
+      },
+      "script": [
+        {
+          "say": "三组都用了相同的三块板。你猜，哪组既能站住又比平放高一些？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "把手平着放，再竖起来。你会摸到贴桌的地方变小了。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "左边宽面贴桌，接触的地方大，比较稳。顶还低。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "中间全用窄面站着，顶高了，却更容易歪。"
+        },
+        {
+          "say": "圆柱用平圆面着地不易滚，换成侧面接桌就能滚。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "右边让两只脚分开站，同样高，再用横板把它们连起来。"
+        },
+        {
+          "say": "图上两脚一起托住横板，搭得比平放高些。"
+        },
+        {
+          "say": "同一块积木，找用最大平面贴台的摆法。"
+        },
+        {
+          "say": "找用平平的圆面贴住台子的圆柱。"
+        },
+        {
+          "say": "先听清要比什么，再看积木下面和顶端。"
+        },
+        {
+          "say": "看一看贴着台子的面，或者用手比比高度。"
+        }
+      ]
+    },
+    {
+      "key": "p07",
+      "type": "slide",
+      "title": "十件怎样用全",
+      "template": "two-columns",
+      "data": {
+        "title": "十件怎样用全",
+        "left": {
+          "heading": "球和它的架子",
+          "body": "三根长条在同一高度托球"
+        },
+        "right": {
+          "heading": "托盘里剩六件",
+          "body": "用来搭底下和中间的部分"
+        },
+        "left_picture": "ball-support",
+        "right_picture": "remaining-six"
+      },
+      "script": [
+        {
+          "say": "球已经有了高座。能把整组放到作品上面吗？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "三根一样高的长条分开摆，中间留一点空。"
+        },
+        {
+          "say": "这副架子要让三处都托到球。空太大会掉，排成一线还会向旁边滚。"
+        },
+        {
+          "say": "球和三根长条一共用了四件。用手指先把这四件记下来。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "托盘还剩六件。板子托住上面的方块和圆柱。"
+        },
+        {
+          "say": "搭好底下六件，再把托球组移上去。它还是四件。"
+        },
+        {
+          "say": "从底到顶再找一遍，一件只算一次。十件全在才算用齐。"
+        },
+        {
+          "say": "分清两种摆法啦。搭高前，还要看看球有没有托稳。"
+        }
+      ]
+    },
+    {
+      "key": "p08",
+      "type": "slide",
+      "title": "先检查，再比高",
+      "template": "picture-points",
+      "data": {
+        "title": "先检查，再比高",
+        "picture": "height-comparison",
+        "points": [
+          "看托盘，找没用的积木",
+          "看底下怎么托，球有没有架子",
+          "从同一张桌面看谁的顶更高"
+        ]
+      },
+      "script": [
+        {
+          "say": "朵朵说：两座都用上了球，我想知道它们哪个更高。",
+          "by": "duoduo"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "把手指放到桌面线上。等一等，先查两件事。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "按托盘原来的顺序，在两座里找十件。少一件就先补上。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "下面有平面着地，球也有三处承托，才接着比高。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "两座从同一张桌面起。看顶，右边的球更高。"
+        },
+        {
+          "say": "下面的平板改成两脚加横板，材料还是原来那几件。"
+        },
+        {
+          "say": "实物要动手试。要是晃，就把它放低或把脚摆开。"
+        },
+        {
+          "say": "都固定好以后，从同一条底线看谁的顶更高。"
+        },
+        {
+          "say": "换个面，积木还是原来那块。你会比较啦！"
+        }
+      ]
+    },
+    {
+      "key": "p09",
+      "type": "quiz",
+      "title": "给积木选摆法",
+      "intro": [
+        "先听题，再看积木和桌面。",
+        "想好哪张合适，再点图。"
+      ],
+      "questions": [
+        {
+          "id": "sssp-q1",
+          "question": "同一个长木盒做底座。哪张图让最大的一面贴着桌面？",
+          "skill": "为同一长方体选择宽平接触面",
+          "analysis": "平放的木盒用最宽大的整面贴桌。侧放和竖放时，接触面都小些。",
+          "answer": [
+            "B"
+          ],
+          "options": {
+            "A": {
+              "label": "长盒侧放",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-a",
+                "alt": "长木盒侧立，长而窄的面接桌"
+              }
+            },
+            "B": {
+              "label": "长盒平放",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-b",
+                "alt": "长木盒平放，宽而长的面贴桌"
+              }
+            },
+            "C": {
+              "label": "长盒竖放",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-c",
+                "alt": "长木盒竖起，小端面贴桌"
+              }
+            }
+          }
+        },
+        {
+          "id": "sssp-q2",
+          "question": "圆柱下面贴桌，上面托住薄板。两处都用平圆面的是哪张？",
+          "skill": "认出圆柱用平圆面承托的摆法",
+          "analysis": "立起并贴紧时，下端圆面贴桌，上端圆面托住薄板。横放时接触的是曲面，有缝时上端没有贴住。",
+          "answer": [
+            "A"
+          ],
+          "options": {
+            "A": {
+              "label": "圆柱立放，薄板贴上端",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-a",
+                "alt": "圆柱立着，下端贴桌，上端顶住薄板"
+              }
+            },
+            "B": {
+              "label": "圆柱横放",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-b",
+                "alt": "圆柱侧躺，曲面贴桌并碰到薄板"
+              }
+            },
+            "C": {
+              "label": "上端留空",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-c",
+                "alt": "圆柱直立贴桌，但上方薄板与圆面之间有空隙"
+              }
+            }
+          }
+        },
+        {
+          "id": "sssp-q3",
+          "question": "从上往下看，小球沿哪张图的箭头滚，能滚出开口？",
+          "skill": "识别球仍可滚出的开放方向",
+          "analysis": "左、上、下三边都有挡板。右边开口比球宽，小球能从右边滚出去。",
+          "answer": [
+            "C"
+          ],
+          "options": {
+            "A": {
+              "label": "向左滚",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-a",
+                "alt": "三边围住的小球，箭头向左对着挡板"
+              }
+            },
+            "B": {
+              "label": "向上滚",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-b",
+                "alt": "三边围住的小球，箭头向上对着挡板"
+              }
+            },
+            "C": {
+              "label": "向右滚",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-c",
+                "alt": "三边围住的小球，箭头向右通往开口"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p10",
+      "type": "quiz",
+      "title": "检查小小展台",
+      "intro": [
+        "这里有几座新作品。",
+        "先查用了哪些，再看谁的顶高。"
+      ],
+      "questions": [
+        {
+          "id": "sssp-q4",
+          "question": "左边的积木都要用。右边搭好的作品还少用了哪一块？",
+          "skill": "对照托盘辨出遗漏的积木",
+          "analysis": "右边能找到正方体、圆柱和两块长方体。托盘里短短的那块长方体没有用上。",
+          "answer": [
+            "B"
+          ],
+          "options": {
+            "A": {
+              "label": "正方体",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-a",
+                "alt": "橙色的正方体"
+              }
+            },
+            "B": {
+              "label": "短长方体",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-b",
+                "alt": "青色的短长方体"
+              }
+            },
+            "C": {
+              "label": "圆柱",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-c",
+                "alt": "蓝色的矮圆柱"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "q4-stimulus",
+            "alt": "左边托盘里有薄长方体、正方体、高长方体、圆柱和短长方体。右边从下到上是薄长方体、正方体、高长方体和圆柱。"
+          }
+        },
+        {
+          "id": "sssp-q5",
+          "question": "三座塔都摆稳了。看同一张桌面，选顶端最高的一座。",
+          "skill": "从同一桌面起点比较塔高",
+          "analysis": "三座塔的底对齐桌面线。沿着同一条线往上看，右边那座的顶比另外两座高。",
+          "answer": [
+            "C"
+          ],
+          "options": {
+            "A": {
+              "label": "左边的塔",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-a",
+                "alt": "青色底座，蓝色长块竖起，橙色块平放在上"
+              }
+            },
+            "B": {
+              "label": "中间的塔",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-b",
+                "alt": "青色底座，上面蓝色和橙色长块都平放"
+              }
+            },
+            "C": {
+              "label": "右边的塔",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-c",
+                "alt": "青色底座，上面蓝色和橙色长块都竖放"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "q5-compare",
+            "alt": "同一条桌面线上从左到右有三座塔。三座的蓝块和橙块朝向不同。"
+          }
+        },
+        {
+          "id": "sssp-q6",
+          "question": "一共四块。三座都稳，先找用齐四块的，再选其中最高的。",
+          "skill": "同时检查用全、稳与高",
+          "analysis": "最高的那座只用三块，托盘里还剩一块。剩下两座都用齐四块，竖放橙色长块的那座更高。",
+          "answer": [
+            "A"
+          ],
+          "options": {
+            "A": {
+              "label": "橙色长块竖放",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-a",
+                "alt": "一座四件都用上的塔，其中一块竖起，托盘无剩件"
+              }
+            },
+            "B": {
+              "label": "橙色长块平放",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-b",
+                "alt": "一座四件都用上的塔，上面三块都平放，托盘无剩件"
+              }
+            },
+            "C": {
+              "label": "橙色和紫色长块都竖放",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-c",
+                "alt": "一座三件搭成的更高的塔，旁边托盘留一块薄积木"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p11",
+      "type": "slide",
+      "title": "换个搭法给家人看",
+      "template": "picture-points",
+      "data": {
+        "title": "换个搭法给家人看",
+        "picture": "height-comparison",
+        "points": [
+          "找同样的十件",
+          "试着改一个地方",
+          "点清材料，指着说原因"
+        ]
+      },
+      "script": [
+        {
+          "say": "展台收工前，我们还能用这十件搭出一个新样子吗？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "家里有合适材料，就请家人陪你在矮桌上搭。"
+        },
+        {
+          "say": "看一看材料，先把十件点清，免得搭着搭着少了一件。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "试着把宽面放平，再看看整个作品变成什么样。"
+        },
+        {
+          "say": "把球留在架上。架子晃，先把球拿下来再改。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "我给家人讲：用齐十块，先稳再高。我先把长方体竖放。"
+        },
+        {
+          "say": "我数齐十块，底座却晃。我把宽面放平，再看看稳不稳。"
+        }
+      ]
+    },
+    {
+      "key": "p12",
+      "type": "slide",
+      "title": "读懂、试摆、检查",
+      "template": "summary",
+      "data": {
+        "title": "读懂、试摆、检查",
+        "items": [
+          "看清要求：用全，稳稳站住，再比高",
+          "用平面承托，给球合适的架子",
+          "找剩件，从同一张桌面比高",
+          "试搭不合适，改了再查"
+        ]
+      },
+      "script": [
+        {
+          "say": "小球有地方站啦。你会怎样介绍自己的展台？"
+        },
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "十件都要用。作品先站稳，我们才接着试怎样搭高一点。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "宽平面托住底下，合适的三根长条一起托球。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "先找剩件，从底到顶数，再从同一桌面比高。"
+        },
+        {
+          "spotlight": "item-4"
+        },
+        {
+          "say": "发现球还能滚走，或底座太容易歪，就换一种摆法再试。"
+        },
+        {
+          "say": "下次搭新东西，也可以先想条件，边试边改。"
+        }
+      ]
+    }
+  ]
+}

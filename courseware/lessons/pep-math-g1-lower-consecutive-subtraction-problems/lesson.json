@@ -1,0 +1,914 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "用连减解决问题",
+  "description": "到校剧场按固定件数装满一份，用连减记录满份和余量，并加回来检查。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小数老师",
+      "role": "teacher",
+      "gender": "male",
+      "voice": "Ethan",
+      "avatar": "/teachers/ashu-math-v1.png",
+      "color": "#286956",
+      "persona": "用可数的物件、圈画和短句带孩子理解同量连减、停止与核对。"
+    }
+  },
+  "images": {
+    "packing-room": {
+      "file": "assets/packing-room.png"
+    },
+    "pack-cart": {
+      "file": "assets/pack-cart.png"
+    },
+    "finish-sticker": {
+      "file": "assets/finish-sticker.png"
+    },
+    "backstage-path": {
+      "file": "assets/backstage-path.png"
+    },
+    "token-badge": {
+      "file": "assets/token-badge.png"
+    },
+    "one-full-group": {
+      "file": "assets/one-full-group.png"
+    },
+    "circle-main": {
+      "file": "assets/circle-main.png"
+    },
+    "arrow-main": {
+      "file": "assets/arrow-main.png"
+    },
+    "stopping-main": {
+      "file": "assets/stopping-main.png"
+    },
+    "zero-example": {
+      "file": "assets/zero-example.png"
+    },
+    "addition-check": {
+      "file": "assets/addition-check.png"
+    },
+    "compare-example": {
+      "file": "assets/compare-example.png"
+    },
+    "catch-opening": {
+      "file": "assets/catch-opening.png"
+    },
+    "route-opening": {
+      "file": "assets/route-opening.png"
+    },
+    "station-0": {
+      "file": "assets/station-0.png"
+    },
+    "station-2": {
+      "file": "assets/station-2.png"
+    },
+    "station-3": {
+      "file": "assets/station-3.png"
+    },
+    "station-5": {
+      "file": "assets/station-5.png"
+    },
+    "station-7": {
+      "file": "assets/station-7.png"
+    },
+    "station-9": {
+      "file": "assets/station-9.png"
+    },
+    "station-10": {
+      "file": "assets/station-10.png"
+    },
+    "station-12": {
+      "file": "assets/station-12.png"
+    },
+    "station-15": {
+      "file": "assets/station-15.png"
+    },
+    "station-21": {
+      "file": "assets/station-21.png"
+    },
+    "quiz-fixed-prompt": {
+      "file": "assets/quiz-fixed-prompt.png"
+    },
+    "quiz-fixed-group-a": {
+      "file": "assets/quiz-fixed-group-a.png"
+    },
+    "quiz-fixed-group-b": {
+      "file": "assets/quiz-fixed-group-b.png"
+    },
+    "quiz-fixed-group-c": {
+      "file": "assets/quiz-fixed-group-c.png"
+    },
+    "quiz-second-remainder-a": {
+      "file": "assets/quiz-second-remainder-a.png"
+    },
+    "quiz-second-remainder-b": {
+      "file": "assets/quiz-second-remainder-b.png"
+    },
+    "quiz-second-remainder-c": {
+      "file": "assets/quiz-second-remainder-c.png"
+    },
+    "quiz-stop-short-a": {
+      "file": "assets/quiz-stop-short-a.png"
+    },
+    "quiz-stop-short-b": {
+      "file": "assets/quiz-stop-short-b.png"
+    },
+    "quiz-stop-short-c": {
+      "file": "assets/quiz-stop-short-c.png"
+    },
+    "quiz-stop-zero-a": {
+      "file": "assets/quiz-stop-zero-a.png"
+    },
+    "quiz-stop-zero-b": {
+      "file": "assets/quiz-stop-zero-b.png"
+    },
+    "quiz-stop-zero-c": {
+      "file": "assets/quiz-stop-zero-c.png"
+    },
+    "quiz-compare-packs-a": {
+      "file": "assets/quiz-compare-packs-a.png"
+    },
+    "quiz-compare-packs-b": {
+      "file": "assets/quiz-compare-packs-b.png"
+    },
+    "quiz-compare-packs-c": {
+      "file": "assets/quiz-compare-packs-c.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "pack-sign",
+      "type": "slide",
+      "title": "看清一袋固定装几个",
+      "template": "picture-points",
+      "data": {
+        "title": "看清一袋固定装几个",
+        "picture": "one-full-group",
+        "points": [
+          "一共二十二枚",
+          "每袋六枚",
+          "问满袋和零散"
+        ]
+      },
+      "script": [
+        {
+          "say": "学校剧场的徽章到了。二十二枚都堆在桌上。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "桌牌画了一个满袋的样子。你能数清要几枚吗？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "二十二是桌上全部的数。先记住起点是二十二。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "牌上有六枚。装满每一袋，都要刚好六枚。"
+        },
+        {
+          "say": "第一袋装六枚，下一袋还是六枚，袋子的规定一样。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "要回答满了几袋，还要回答有几枚没装成满袋。"
+        },
+        {
+          "say": "一袋和一枚是不同的数法。等会儿我们分开记。"
+        },
+        {
+          "say": "先从桌上找一份。够不够六枚，怎么看？"
+        }
+      ]
+    },
+    {
+      "key": "circle-batches",
+      "type": "slide",
+      "title": "每圈一份，下一次从剩下的数",
+      "template": "picture-points",
+      "data": {
+        "title": "每圈一份，下一次从剩下的数",
+        "picture": "circle-main",
+        "points": [
+          "圈第一组",
+          "从剩下的接着圈",
+          "一圈是一满袋"
+        ]
+      },
+      "script": [
+        {
+          "say": "桌上徽章很多。我们先把该进一袋的圈在一起。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "看左边框里。上排四枚，下排两枚，合起来六枚。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "圈好了第一份。二十二拿走六枚，剩十六枚。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "第二圈从那十六枚里拿，不再从二十二开始。"
+        },
+        {
+          "say": "十六减六剩十枚。再从十枚里圈出第三份六枚。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "三处有袋子的框各圈了六枚。三圈就是三满袋。"
+        },
+        {
+          "say": "最右边四枚还没成一份，暂时留在余量盘。"
+        },
+        {
+          "say": "按六枚一组圈，比一枚一枚记满袋更清楚。"
+        }
+      ]
+    },
+    {
+      "key": "track-arrow",
+      "type": "slide",
+      "title": "一支箭头就是拿走一满份",
+      "template": "title-picture",
+      "data": {
+        "title": "一支箭头就是拿走一满份",
+        "picture": "arrow-main",
+        "caption": "每次减六，下一步从前一步的差开始"
+      },
+      "script": [
+        {
+          "say": "圈画能看到一组一组。怎样把每一次记成一支箭头？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "第一格写二十二。第一支箭头上写减六。"
+        },
+        {
+          "say": "二十二减六等于十六。把十六写在下一格。"
+        },
+        {
+          "say": "再从十六减六，得到十。第三次从十减六，得四。"
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "每一支箭头表示装满一袋，所以三支是三袋。"
+        },
+        {
+          "say": "剩下的数在变，拿走的一份一直是六枚。"
+        },
+        {
+          "say": "最后一个数四是散着的徽章数。别把它数成袋。"
+        },
+        {
+          "say": "你能指着箭头，说一说第二次从哪个数开始吗？"
+        }
+      ]
+    },
+    {
+      "key": "pack-exact",
+      "type": "interactive",
+      "title": "完整道具串放进装箱车",
+      "page": "pack-exact",
+      "widgetType": "courseware_game",
+      "startImage": "catch-opening",
+      "script": [
+        {
+          "say": "换一块装箱牌。这次每份三枚，你会把小串放哪？"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#bag-size-card"
+        },
+        {
+          "say": "左边数出三枚。到三枚正好装满这一袋。"
+        },
+        {
+          "highlight": "#spare-bin"
+        },
+        {
+          "say": "右边是余量盘。不够一份的整串才留在这儿。"
+        },
+        {
+          "highlight": "#game-target"
+        },
+        {
+          "say": "现在落下的是一整串三枚。它够装一满袋。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "按箭头让车对准落点。双箭头可以换篮。"
+        },
+        {
+          "say": "先选装满袋的那边。等小车接住一整串再看。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "注意看三枚一起进左边。每凑好一份就多一袋。"
+        },
+        {
+          "say": "交给你以后会重来。数清每串，够一份才装袋。"
+        },
+        {
+          "say": "最后小串放余量盘，两个托盘都要放对。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "catch-goal": "recap-6",
+        "catch-hint": "recap-7",
+        "catch-help": "recap-8",
+        "catch-praise": "recap-9"
+      }
+    },
+    {
+      "key": "stop-before-next",
+      "type": "slide",
+      "title": "剩下不够一份就停",
+      "template": "picture-points",
+      "data": {
+        "title": "剩下不够一份就停",
+        "picture": "stopping-main",
+        "points": [
+          "比一份少",
+          "数满袋",
+          "记剩余"
+        ]
+      },
+      "script": [
+        {
+          "say": "我们回到徽章桌。三袋装好了，还要继续拿六枚吗？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "左边有三个满袋，右边单独摆着剩下的徽章。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "右边四枚。一袋要六枚，四比六少，装不满。"
+        },
+        {
+          "say": "这时停下来。下一次没有整份六枚可以拿走了。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "从箭头数三次，也能知道刚好装满了三袋。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "再看余量盘还有四枚。完整答案是三袋，余四枚。"
+        },
+        {
+          "say": "袋子里装好的徽章仍算原来的一部分。"
+        },
+        {
+          "say": "现在试着说，为什么不能把余下四枚叫第四袋？"
+        }
+      ]
+    },
+    {
+      "key": "zero-remainder",
+      "type": "slide",
+      "title": "最后恰好用完",
+      "template": "picture-points",
+      "data": {
+        "title": "最后恰好用完",
+        "picture": "zero-example",
+        "points": [
+          "十六枚",
+          "每袋四枚",
+          "余量是零"
+        ]
+      },
+      "script": [
+        {
+          "say": "道具换成十六枚，每袋四枚。余量盘会空吗？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "图里每一框四枚。每装一袋就从剩下的数减四。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先从十六减四得十二，再从十二减四得八。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "第三次八减四得四，最后四减四得零。"
+        },
+        {
+          "say": "第四次之前还剩四枚，正好能装一袋。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "四次后桌上没有散件，余量记零。这也要说清。"
+        },
+        {
+          "say": "装满的四袋还在。空的是余量盘。"
+        },
+        {
+          "say": "想想剩下一份正好那么多时，为什么还要再装一次？"
+        }
+      ]
+    },
+    {
+      "key": "back-to-total",
+      "type": "slide",
+      "title": "把满袋和余量加回去",
+      "template": "title-picture",
+      "data": {
+        "title": "把满袋和余量加回去",
+        "picture": "addition-check",
+        "caption": "把三袋里的件数和散件加起来"
+      },
+      "script": [
+        {
+          "say": "怎样知道我们的三袋和四枚，确实就是原来的二十二枚？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "看三个满袋。每袋六枚，把袋里的件数加起来。"
+        },
+        {
+          "say": "六加六是十二，再加六得十八。"
+        },
+        {
+          "say": "十八是袋里全部的数。还有四枚在余量盘。"
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "十八加四得二十二，和最初的总数一样。"
+        },
+        {
+          "say": "如果加回来少了一枚，就再查哪个圈或余量数漏了。"
+        },
+        {
+          "say": "还要查余下的有没有少于一整份。这样才算装到该停。"
+        },
+        {
+          "say": "用加法检查时，把散件也加进去。"
+        }
+      ]
+    },
+    {
+      "key": "count-steps",
+      "type": "interactive",
+      "title": "沿着同一步长走到停止点",
+      "page": "count-steps",
+      "widgetType": "courseware_game",
+      "startImage": "route-opening",
+      "script": [
+        {
+          "say": "这次有十七枚，每袋五枚。要让小车走到哪里？"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#route-group-count"
+        },
+        {
+          "say": "左边的五枚是一整份。每装满一袋就减五。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "看车旁的路。先算还剩多少，再去找那个站。"
+        },
+        {
+          "highlight": "#game-target"
+        },
+        {
+          "say": "十七减五得十二。第一站的画卡是十二枚。"
+        },
+        {
+          "say": "七枚和两枚要等后面的步骤。我们只示范第一站。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "等车在十二枚的站停住，再想下一次从哪个数减。"
+        },
+        {
+          "say": "之后你从十七开始。每减一次，多记一个满袋。"
+        },
+        {
+          "say": "余量比一份少就去旗子。恰好用完，余量是零。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "route-five": "recap-12",
+        "route-six": "recap-13",
+        "route-hint": "recap-14",
+        "route-help": "recap-15",
+        "route-praise": "recap-19",
+        "route-stop": "recap-18"
+      }
+    },
+    {
+      "key": "switch-the-size",
+      "type": "slide",
+      "title": "同样多道具，换一个每袋数",
+      "template": "picture-points",
+      "data": {
+        "title": "同样多道具，换一个每袋数",
+        "picture": "compare-example",
+        "points": [
+          "总数都二十",
+          "每袋四枚",
+          "每袋七枚"
+        ]
+      },
+      "script": [
+        {
+          "say": "还是二十枚。换一种袋子，满袋数会变吗？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "图的上排是每袋四枚，下排是每袋七枚。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "两种装法都从二十开始。先听清这次一袋几个。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "每袋四枚，依次剩十六、十二、八、四、零。"
+        },
+        {
+          "say": "减了五次，所以装满五袋，恰好用完。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "每袋七枚，二十减七得十三，再减七得六。"
+        },
+        {
+          "say": "六比七少就停。只装满两袋，剩六枚。"
+        },
+        {
+          "say": "装法变了，每次拿走的件数变，满袋数也会变。"
+        },
+        {
+          "say": "请你指两排袋子，解释为什么上排装满的袋数多。"
+        }
+      ]
+    },
+    {
+      "key": "picture-check",
+      "type": "quiz",
+      "title": "用新图找满份、剩余和停止点",
+      "intro": [
+        "先听一共多少、每份多少，再选一幅图。",
+        "选好以后点提交。我们看满份和剩余。"
+      ],
+      "questions": [
+        {
+          "id": "fixed-group",
+          "question": "二十三枚纪念章，每袋装五枚。哪个是满袋？",
+          "skill": "read-fixed-group",
+          "answer": [
+            "b"
+          ],
+          "analysis": "每袋固定装五枚。数出五枚才是一满袋，和桌上共有多少是两件事。",
+          "options": {
+            "a": {
+              "label": "四枚",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-fixed-group-a",
+                "alt": "四枚徽章"
+              }
+            },
+            "b": {
+              "label": "五枚",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-fixed-group-b",
+                "alt": "五枚徽章"
+              }
+            },
+            "c": {
+              "label": "六枚",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-fixed-group-c",
+                "alt": "六枚徽章"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "quiz-fixed-prompt",
+            "alt": "整齐摆放的二十三枚可数徽章"
+          }
+        },
+        {
+          "id": "second-remainder",
+          "question": "二十九枚徽章，每袋七枚。装满两袋后剩多少？",
+          "skill": "repeated-same-step",
+          "answer": [
+            "a"
+          ],
+          "analysis": "从二十九减七得二十二，再从二十二减七得十五。每次都拿走同样的七枚。",
+          "options": {
+            "a": {
+              "label": "十五枚",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-second-remainder-a",
+                "alt": "数字15和十五枚徽章"
+              }
+            },
+            "b": {
+              "label": "二十二枚",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-second-remainder-b",
+                "alt": "数字22和二十二枚徽章"
+              }
+            },
+            "c": {
+              "label": "十四枚",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-second-remainder-c",
+                "alt": "数字14和十四枚徽章"
+              }
+            }
+          }
+        },
+        {
+          "id": "stop-short",
+          "question": "三十一枚胸针，每包装六枚。选满包数和剩余。",
+          "skill": "stop-and-check",
+          "answer": [
+            "c"
+          ],
+          "analysis": "连续减六次序是二十五、十九、十三、七、一。共减五次，余一枚不足一包。",
+          "options": {
+            "a": {
+              "label": "四包余七",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-stop-short-a",
+                "alt": "四满包，各六枚，另有七枚"
+              }
+            },
+            "b": {
+              "label": "六包余零",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-stop-short-b",
+                "alt": "六满包，各六枚，余量盘空"
+              }
+            },
+            "c": {
+              "label": "五包余一",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-stop-short-c",
+                "alt": "五满包，各六枚，另有一枚"
+              }
+            }
+          }
+        },
+        {
+          "id": "stop-zero",
+          "question": "十八枚徽章，每袋六枚。选装完后的状态。",
+          "skill": "stop-and-check",
+          "answer": [
+            "b"
+          ],
+          "analysis": "十八减六三次，依次是十二、六、零。三袋恰好装完，余量盘空。",
+          "options": {
+            "a": {
+              "label": "两袋余六",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-stop-zero-a",
+                "alt": "两满袋，各六件，另有六件"
+              }
+            },
+            "b": {
+              "label": "三袋余零",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-stop-zero-b",
+                "alt": "三满袋，各六件，余量盘空"
+              }
+            },
+            "c": {
+              "label": "三袋余二",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-stop-zero-c",
+                "alt": "三满袋，各六件，另有两件"
+              }
+            }
+          }
+        },
+        {
+          "id": "compare-packs",
+          "question": "二十四件。每袋六件或每袋八件，各能装满几袋？",
+          "skill": "compare-fixed-groups",
+          "answer": [
+            "a"
+          ],
+          "analysis": "每袋六件装四袋；每袋八件装三袋。各把一份的件数加回来，都得到二十四。",
+          "options": {
+            "a": {
+              "label": "六件四袋，八件三袋",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-compare-packs-a",
+                "alt": "上排每袋六件四满袋；下排每袋八件三满袋"
+              }
+            },
+            "b": {
+              "label": "六件三袋，八件四袋",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-compare-packs-b",
+                "alt": "上排每袋六件三满袋；下排每袋八件四满袋"
+              }
+            },
+            "c": {
+              "label": "六件四袋，八件四袋",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-compare-packs-c",
+                "alt": "上排每袋六件四满袋；下排每袋八件四满袋"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "recap",
+      "type": "slide",
+      "title": "说出每一次拿走几件",
+      "template": "picture-points",
+      "data": {
+        "title": "说出每一次拿走几件",
+        "picture": "circle-main",
+        "points": [
+          "先看一份",
+          "每次减同样多",
+          "知道何时停",
+          "加回去检查"
+        ]
+      },
+      "script": [
+        {
+          "say": "打包结束了。换一桌道具，你会从哪两个数开始？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "先找一共有几件，再找每份要几件。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "一份必须装够规定的件数。圈出一份就记一袋。"
+        },
+        {
+          "say": "先数整串，够一份放满袋栏，不够放余量盘。"
+        },
+        {
+          "say": "先停一下。数一数这一串的件数。"
+        },
+        {
+          "say": "比一比一份图。小串留给余量盘。"
+        },
+        {
+          "say": "你把完整的份和零散件分开了。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "每次从剩下的数减一份，数清一共减了几次。"
+        },
+        {
+          "say": "每袋五枚。从现在剩的数，再减五。"
+        },
+        {
+          "say": "每袋六枚。从现在剩的数，再减六。"
+        },
+        {
+          "say": "先看还剩多少，再拿走一满份。"
+        },
+        {
+          "say": "看清左边每份几个，去找这次剩下的数。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "余下比一份少就停。恰好用完也要记零。"
+        },
+        {
+          "say": "没有下一满份了。把车开到旗子。"
+        },
+        {
+          "say": "你每次拿走同样多，走到了该停的地方。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "把各满份和散件加回去，应该等于最初的总数。"
+        },
+        {
+          "say": "回家请大人陪你分一分。用安全的小物试另一种份数。"
+        }
+      ]
+    }
+  ]
+}

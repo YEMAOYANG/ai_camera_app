@@ -1,0 +1,1019 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "解决问题｜七巧板",
+  "grade": 1,
+  "description": "用一套七巧板试拼三角形，再找边合缝的长方形和正方形。",
+  "roster": {
+    "teacher": {
+      "name": "小数老师",
+      "role": "teacher",
+      "gender": "male",
+      "voice": "Ethan",
+      "avatar": "/avatars/teacher-1.png",
+      "color": "#286956",
+      "persona": "陪孩子看边、转板、检查外轮廓，给时间想一想。"
+    }
+  },
+  "images": {
+    "family-exhibit": {
+      "file": "assets/family-exhibit.png"
+    },
+    "finished-added-large": {
+      "file": "assets/finished-added-large.png"
+    },
+    "finished-corner": {
+      "file": "assets/finished-corner.png"
+    },
+    "finished-large": {
+      "file": "assets/finished-large.png"
+    },
+    "finished-medium": {
+      "file": "assets/finished-medium.png"
+    },
+    "finished-slant": {
+      "file": "assets/finished-slant.png"
+    },
+    "finished-small": {
+      "file": "assets/finished-small.png"
+    },
+    "finished-square": {
+      "file": "assets/finished-square.png"
+    },
+    "four-big-outline": {
+      "file": "assets/four-big-outline.png"
+    },
+    "house-exhibit": {
+      "file": "assets/house-exhibit.png"
+    },
+    "loose-added-large": {
+      "file": "assets/loose-added-large.png"
+    },
+    "loose-corner": {
+      "file": "assets/loose-corner.png"
+    },
+    "loose-large": {
+      "file": "assets/loose-large.png"
+    },
+    "loose-medium": {
+      "file": "assets/loose-medium.png"
+    },
+    "loose-slant": {
+      "file": "assets/loose-slant.png"
+    },
+    "loose-small": {
+      "file": "assets/loose-small.png"
+    },
+    "loose-square": {
+      "file": "assets/loose-square.png"
+    },
+    "marble-intro": {
+      "file": "assets/marble-intro.png"
+    },
+    "one-complete-set": {
+      "file": "assets/one-complete-set.png"
+    },
+    "opening-scene": {
+      "file": "assets/opening-scene.png"
+    },
+    "q-four-fitted": {
+      "file": "assets/q-four-fitted.png"
+    },
+    "q-four-gapped": {
+      "file": "assets/q-four-gapped.png"
+    },
+    "q-four-overlap": {
+      "file": "assets/q-four-overlap.png"
+    },
+    "q-inventory-extra-board": {
+      "file": "assets/q-inventory-extra-board.png"
+    },
+    "q-inventory-five-triangles": {
+      "file": "assets/q-inventory-five-triangles.png"
+    },
+    "q-inventory-wrong-square": {
+      "file": "assets/q-inventory-wrong-square.png"
+    },
+    "q-make-slide": {
+      "file": "assets/q-make-slide.png"
+    },
+    "q-make-square": {
+      "file": "assets/q-make-square.png"
+    },
+    "q-make-triangle": {
+      "file": "assets/q-make-triangle.png"
+    },
+    "q-rect-complete": {
+      "file": "assets/q-rect-complete.png"
+    },
+    "q-rect-separated": {
+      "file": "assets/q-rect-separated.png"
+    },
+    "q-rect-shifted": {
+      "file": "assets/q-rect-shifted.png"
+    },
+    "q-three-medium": {
+      "file": "assets/q-three-medium.png"
+    },
+    "q-three-slanted": {
+      "file": "assets/q-three-slanted.png"
+    },
+    "q-three-square": {
+      "file": "assets/q-three-square.png"
+    },
+    "q-two-angled": {
+      "file": "assets/q-two-angled.png"
+    },
+    "q-two-goal": {
+      "file": "assets/q-two-goal.png"
+    },
+    "q-two-square": {
+      "file": "assets/q-two-square.png"
+    },
+    "q-two-triangle": {
+      "file": "assets/q-two-triangle.png"
+    },
+    "seven-loose-pieces": {
+      "file": "assets/seven-loose-pieces.png"
+    },
+    "show-booth": {
+      "file": "assets/show-booth.png"
+    },
+    "show-rosette": {
+      "file": "assets/show-rosette.png"
+    },
+    "snake-intro": {
+      "file": "assets/snake-intro.png"
+    },
+    "snake-off-angled": {
+      "file": "assets/snake-off-angled.png"
+    },
+    "snake-off-gap": {
+      "file": "assets/snake-off-gap.png"
+    },
+    "snake-off-shift": {
+      "file": "assets/snake-off-shift.png"
+    },
+    "snake-off-square": {
+      "file": "assets/snake-off-square.png"
+    },
+    "snake-r-rect": {
+      "file": "assets/snake-r-rect.png"
+    },
+    "snake-r-tri": {
+      "file": "assets/snake-r-tri.png"
+    },
+    "snake-rect-flat": {
+      "file": "assets/snake-rect-flat.png"
+    },
+    "snake-rect-high": {
+      "file": "assets/snake-rect-high.png"
+    },
+    "snake-t-big": {
+      "file": "assets/snake-t-big.png"
+    },
+    "snake-t-four": {
+      "file": "assets/snake-t-four.png"
+    },
+    "snake-t-small": {
+      "file": "assets/snake-t-small.png"
+    },
+    "snake-t-three-p": {
+      "file": "assets/snake-t-three-p.png"
+    },
+    "snake-t-three-q": {
+      "file": "assets/snake-t-three-q.png"
+    },
+    "square-to-rectangle": {
+      "file": "assets/square-to-rectangle.png"
+    },
+    "target-added-large": {
+      "file": "assets/target-added-large.png"
+    },
+    "target-corner": {
+      "file": "assets/target-corner.png"
+    },
+    "target-large": {
+      "file": "assets/target-large.png"
+    },
+    "target-medium": {
+      "file": "assets/target-medium.png"
+    },
+    "target-slant": {
+      "file": "assets/target-slant.png"
+    },
+    "target-small": {
+      "file": "assets/target-small.png"
+    },
+    "target-square": {
+      "file": "assets/target-square.png"
+    },
+    "three-or-four": {
+      "file": "assets/three-or-four.png"
+    },
+    "three-with-medium": {
+      "file": "assets/three-with-medium.png"
+    },
+    "three-with-slanted": {
+      "file": "assets/three-with-slanted.png"
+    },
+    "three-with-square": {
+      "file": "assets/three-with-square.png"
+    },
+    "two-try-again": {
+      "file": "assets/two-try-again.png"
+    },
+    "two-will-fit": {
+      "file": "assets/two-will-fit.png"
+    },
+    "worktable": {
+      "file": "assets/worktable.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "one-seven-piece-set",
+      "type": "slide",
+      "title": "给拼图展做一块门牌",
+      "template": "two-columns",
+      "data": {
+        "title": "给拼图展做一块门牌",
+        "left": {
+          "heading": "展台空着",
+          "body": "小禾和小满来做门牌。"
+        },
+        "left_picture": "opening-scene",
+        "right": {
+          "heading": "一套七巧板",
+          "body": "从一套里挑需要的板。"
+        },
+        "right_picture": "one-complete-set"
+      },
+      "script": [
+        {
+          "say": "拼图展要做一块三角形门牌。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "小禾和小满只有一套七巧板。"
+        },
+        {
+          "say": "想一想。要挑几块才能拼出门牌？"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "这些板贴在一起，外面是一个正方形。"
+        },
+        {
+          "say": "沿着接缝数一数。一套有七块。"
+        },
+        {
+          "say": "做三角门牌，可以从七块里先挑几块试试。"
+        },
+        {
+          "say": "拼好沿外边看一圈。门牌外边得是三角形。"
+        }
+      ]
+    },
+    {
+      "key": "sort-the-seven",
+      "type": "slide",
+      "title": "七块板里有哪些形状",
+      "template": "picture-points",
+      "data": {
+        "title": "七块板里有哪些形状",
+        "picture": "seven-loose-pieces",
+        "points": [
+          "五块三角板",
+          "一块正方形板",
+          "一块平行四边形板"
+        ]
+      },
+      "script": [
+        {
+          "say": "我们把七块摊开，看看每一块的外边。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先数三角板。左边两大块，接着一中块，再往右两小块。"
+        },
+        {
+          "say": "两大块一样大。两小块也一样大。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "下面左边是正方形。四条边一样长，四个角方方的。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "下面右边是平行四边形。"
+        },
+        {
+          "say": "每一对相对的边，像两条并排的线。"
+        },
+        {
+          "say": "五块三角板，再加下面两块，一共七块。"
+        },
+        {
+          "say": "现在可以挑板了。"
+        }
+      ]
+    },
+    {
+      "key": "two-piece-trial",
+      "type": "slide",
+      "title": "从两块一样大的板试起",
+      "template": "two-columns",
+      "data": {
+        "title": "从两块一样大的板试起",
+        "left": {
+          "heading": "转一转再贴",
+          "body": "两块大三角板沿整条边贴好。"
+        },
+        "left_picture": "two-will-fit",
+        "right": {
+          "heading": "换一组再看",
+          "body": "一三角一方有拐角。两小三角也能拼。"
+        },
+        "right_picture": "two-try-again"
+      },
+      "script": [
+        {
+          "say": "小禾先挑两块一样大的大三角板。"
+        },
+        {
+          "say": "哪两条边可以贴在一起？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "看左图。右边那块转四分之一圈。"
+        },
+        {
+          "say": "让两条同样长的直角边对齐。"
+        },
+        {
+          "say": "两条边贴紧，两块板各在接缝的一边。"
+        },
+        {
+          "say": "沿外边绕一圈，只剩三条直边。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "换成一块小三角和一块方板。"
+        },
+        {
+          "say": "图上外边多拐了一次，变成四条边。"
+        },
+        {
+          "say": "一块方板和一块三角板，边贴边拼不成三角形。"
+        },
+        {
+          "say": "再换两块小三角板。也能拼成三角形。"
+        },
+        {
+          "say": "和中块叠一叠，大小刚好一样。"
+        },
+        {
+          "say": "一套里选了两块就能试出一种拼法。接着加到三块。"
+        }
+      ]
+    },
+    {
+      "key": "try-three-and-four",
+      "type": "slide",
+      "title": "三块板，也能拼三角形",
+      "template": "two-columns",
+      "data": {
+        "title": "三块板，也能拼三角形",
+        "left": {
+          "heading": "两小块加方板",
+          "body": "两小板分别贴着方板的两条边。"
+        },
+        "left_picture": "three-with-square",
+        "right": {
+          "heading": "两小块加中板",
+          "body": "先拼两小板，再贴到中板。"
+        },
+        "right_picture": "three-with-medium"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "小满挑了两块小三角和一块方板。"
+        },
+        {
+          "say": "方板先放在角上。两小块各贴一条边，斜边接成一条线。"
+        },
+        {
+          "say": "你用手沿外面走一圈。外轮廓有三条直边。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "小禾把两小块先拼成一块和中三角板同大的形状。"
+        },
+        {
+          "say": "再和中板贴一条一样长的边。"
+        },
+        {
+          "say": "三块板也拼出同样大的三角形。"
+        },
+        {
+          "say": "两幅外轮廓一样。你能指给别人看接缝哪里变了吗？"
+        }
+      ]
+    },
+    {
+      "key": "keep-the-triangle",
+      "type": "slide",
+      "title": "留住三块拼法，再加一块",
+      "template": "two-columns",
+      "data": {
+        "title": "留住三块拼法，再加一块",
+        "left": {
+          "heading": "还可以换板",
+          "body": "两块小三角配一块平行四边形。"
+        },
+        "left_picture": "three-with-slanted",
+        "right": {
+          "heading": "三块接一块",
+          "body": "把三块拼好的三角形当作一整块。"
+        },
+        "right_picture": "three-or-four"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "还有一种。两小块贴在斜方板的两边。"
+        },
+        {
+          "say": "外边接成三条直线。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "看右图。左边是两小块加方板，已经拼好一个三角形。"
+        },
+        {
+          "say": "把这三块一起转四分之一圈。"
+        },
+        {
+          "say": "再添一块和它同样大的三角板。"
+        },
+        {
+          "say": "两条一样长的边贴合了。三块再添一块，数起来是四块。"
+        },
+        {
+          "say": "外面还是三条直边。"
+        },
+        {
+          "say": "板没有互相压住，接缝也没有露底。"
+        },
+        {
+          "say": "五块、六块或七块怎样拼三角形，可以在家自己挑战。"
+        },
+        {
+          "say": "接下来挑门牌缺的那一块。先看大小，再看边和角。"
+        },
+        {
+          "say": "两处虚线大小不同，先比长边和短边。"
+        },
+        {
+          "say": "如果大小相近，再比角和边的朝向。"
+        },
+        {
+          "say": "三个展板都有空位，选能严丝合缝的。"
+        },
+        {
+          "say": "停一下，比一比边长和角。"
+        },
+        {
+          "say": "想象把板移进虚线，看看会不会露出。"
+        },
+        {
+          "say": "边和角都对上了，看看成品的外边。"
+        }
+      ]
+    },
+    {
+      "key": "aim-to-complete",
+      "type": "interactive",
+      "title": "弹珠帮忙送板",
+      "widgetType": "courseware_game",
+      "page": "aim-to-complete",
+      "startImage": "marble-intro",
+      "gameAudio": {
+        "big-gap": "keep-the-triangle-13",
+        "corner-gap": "keep-the-triangle-14",
+        "medium-gap": "keep-the-triangle-15",
+        "marble-hint": "keep-the-triangle-16",
+        "marble-help": "keep-the-triangle-17",
+        "marble-praise": "keep-the-triangle-18"
+      },
+      "script": [
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "say": "展板上有两个没补好的地方。先看看这次要送哪一块。"
+        },
+        {
+          "highlight": "#piece-on-table"
+        },
+        {
+          "say": "左下角放大的就是手里的三角板。看看它的两条直角边。"
+        },
+        {
+          "highlight": "#game-target"
+        },
+        {
+          "say": "这条虚线的两条边和它一样长，角也能对齐。"
+        },
+        {
+          "highlight": "#aim-left"
+        },
+        {
+          "say": "点左箭头能改方向，弹珠会朝缺口转。"
+        },
+        {
+          "highlight": "#launch-piece"
+        },
+        {
+          "say": "对准了，再点发射。老师只送这一块。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "看纸片朝哪儿走。两条直角边都要贴住虚线。"
+        },
+        {
+          "highlight": "#exact-result"
+        },
+        {
+          "say": "右下角就是拼好的门牌。"
+        },
+        {
+          "say": "两块都在，外边接成三条线。"
+        },
+        {
+          "say": "到你了。比清边长、方向，再把弹珠送过去。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ]
+    },
+    {
+      "key": "turn-for-new-shapes",
+      "type": "slide",
+      "title": "同样的板，换一种贴法",
+      "template": "two-columns",
+      "data": {
+        "title": "同样的板，换一种贴法",
+        "left": {
+          "heading": "数一数四块",
+          "body": "大轮廓仍有三条直边。"
+        },
+        "left_picture": "four-big-outline",
+        "right": {
+          "heading": "换成方和长方",
+          "body": "沿斜边贴成方形，再接一块方板。"
+        },
+        "right_picture": "square-to-rectangle"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "刚才用四块拼成三角形。"
+        },
+        {
+          "say": "数完块数，再检查板边有没有贴紧。"
+        },
+        {
+          "say": "有的板比另一块小，也可以和别的板先拼成同样大小。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "现在拿两块小三角板。让最长的两条边对在一起。"
+        },
+        {
+          "say": "看箭头左边。外边四条一样长，四角方方的。"
+        },
+        {
+          "say": "这两块板拼成了正方形。"
+        },
+        {
+          "say": "把原来那块方板贴到右边。上下齐了，中间没有缝。"
+        },
+        {
+          "say": "箭头右边变成了长方形。两条边变长，另外两条边没变。"
+        },
+        {
+          "say": "接着去展台。看外面一圈，也要看板贴得紧不紧。"
+        },
+        {
+          "say": "绕右边外框看一圈，找板边贴紧的拼图。"
+        },
+        {
+          "say": "块数和摆法变了。看外边有几条直线。"
+        },
+        {
+          "say": "展台换了轮廓。再看边的长短和角。"
+        },
+        {
+          "say": "先绕外边看一圈。"
+        },
+        {
+          "say": "看看外边的方向，也看看板有没有贴紧。"
+        },
+        {
+          "say": "放进展台的是同一类外轮廓。"
+        }
+      ]
+    },
+    {
+      "key": "trace-outer-outline",
+      "type": "interactive",
+      "title": "带展品走到展台",
+      "widgetType": "courseware_game",
+      "page": "trace-outer-outline",
+      "startImage": "snake-intro",
+      "gameAudio": {
+        "snake-triangle": "turn-for-new-shapes-12",
+        "snake-variety": "turn-for-new-shapes-13",
+        "snake-rectangle": "turn-for-new-shapes-14",
+        "snake-hint": "turn-for-new-shapes-15",
+        "snake-help": "turn-for-new-shapes-16",
+        "snake-praise": "turn-for-new-shapes-17"
+      },
+      "script": [
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "say": "看右边的展台。这次要送同样外形、贴合好的拼图。"
+        },
+        {
+          "highlight": "#game-goal"
+        },
+        {
+          "say": "手指沿着外边走一圈。这个展台的轮廓是三角形。"
+        },
+        {
+          "highlight": "#game-target"
+        },
+        {
+          "say": "看地上的这一幅。两块板贴得紧，外边也是三角形。"
+        },
+        {
+          "highlight": "#snake-forward"
+        },
+        {
+          "say": "方向键会让小蛇走。老师先向上送这一幅。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "沿外边数三条直边，再看两块板中间有没有缝。"
+        },
+        {
+          "say": "轮到你。先看展台，再走到外形合适的拼图上。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ]
+    },
+    {
+      "key": "picture-quiz",
+      "type": "quiz",
+      "title": "帮拼图展选板",
+      "intro": [
+        "听完老师的话再选图。想重听，就点喇叭。",
+        "沿着外边看一圈，再看板和板有没有贴紧。"
+      ],
+      "questions": [
+        {
+          "id": "count-set",
+          "question": "哪张图只涂亮了一套里的五块三角板？",
+          "skill": "辨认一套七巧板的组成",
+          "answer": [
+            "b"
+          ],
+          "analysis": "一套中的五块三角板是两大、一中、两小。方板和斜方板各一块。",
+          "options": {
+            "a": {
+              "label": "涂亮四块三角和一块方板",
+              "visual": {
+                "kind": "asset",
+                "image": "q-inventory-wrong-square",
+                "alt": "涂亮四块三角和一块方板"
+              }
+            },
+            "b": {
+              "label": "涂亮两大、一中、两小三角板",
+              "visual": {
+                "kind": "asset",
+                "image": "q-inventory-five-triangles",
+                "alt": "涂亮两大、一中、两小三角板"
+              }
+            },
+            "c": {
+              "label": "涂亮五块三角板和斜方板",
+              "visual": {
+                "kind": "asset",
+                "image": "q-inventory-extra-board",
+                "alt": "涂亮五块三角板和斜方板"
+              }
+            }
+          }
+        },
+        {
+          "id": "two-pieces",
+          "question": "哪一组只用两块板，能拼出图中的轮廓？",
+          "skill": "用两块同样大的三角板贴合",
+          "answer": [
+            "c"
+          ],
+          "analysis": "两小三角板沿同样长的一条直角边贴紧，外边三条直线与目标相合。",
+          "options": {
+            "a": {
+              "label": "两块板拼成正方形",
+              "visual": {
+                "kind": "asset",
+                "image": "q-two-square",
+                "alt": "两块板拼成正方形"
+              }
+            },
+            "b": {
+              "label": "一三角和一方拼成拐边",
+              "visual": {
+                "kind": "asset",
+                "image": "q-two-angled",
+                "alt": "一三角和一方拼成拐边"
+              }
+            },
+            "c": {
+              "label": "两小三角拼成向左的三角形",
+              "visual": {
+                "kind": "asset",
+                "image": "q-two-triangle",
+                "alt": "两小三角拼成向左的三角形"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "q-two-goal",
+            "alt": "向左的三角虚线轮廓"
+          }
+        },
+        {
+          "id": "three-pieces",
+          "question": "哪一幅用两块小三角和一块方板拼好？",
+          "skill": "辨认三块板组成的三角形",
+          "answer": [
+            "a"
+          ],
+          "analysis": "三幅外面都是三角形。只有这幅里面的一块板四边同长、四角方正，是正方形。",
+          "options": {
+            "a": {
+              "label": "两小三角与一块正方形板",
+              "visual": {
+                "kind": "asset",
+                "image": "q-three-square",
+                "alt": "两小三角与一块正方形板"
+              }
+            },
+            "b": {
+              "label": "两小三角与一块中三角板",
+              "visual": {
+                "kind": "asset",
+                "image": "q-three-medium",
+                "alt": "两小三角与一块中三角板"
+              }
+            },
+            "c": {
+              "label": "两小三角与一块平行四边形板",
+              "visual": {
+                "kind": "asset",
+                "image": "q-three-slanted",
+                "alt": "两小三角与一块平行四边形板"
+              }
+            }
+          }
+        },
+        {
+          "id": "check-before-display",
+          "question": "这几幅都用四块板。哪幅贴紧，没有缝也没有重叠？",
+          "skill": "检查三角形拼图的接缝",
+          "answer": [
+            "b"
+          ],
+          "analysis": "四块板的接缝都贴齐，既没有盖住，也没露底。外轮廓还是三角形。",
+          "options": {
+            "a": {
+              "label": "四块三角拼图中间有缝",
+              "visual": {
+                "kind": "asset",
+                "image": "q-four-gapped",
+                "alt": "四块三角拼图中间有缝"
+              }
+            },
+            "b": {
+              "label": "四块板贴紧组成三角形",
+              "visual": {
+                "kind": "asset",
+                "image": "q-four-fitted",
+                "alt": "四块板贴紧组成三角形"
+              }
+            },
+            "c": {
+              "label": "四块三角拼图中间两块有重叠",
+              "visual": {
+                "kind": "asset",
+                "image": "q-four-overlap",
+                "alt": "四块三角拼图中间两块有重叠"
+              }
+            }
+          }
+        },
+        {
+          "id": "square-from-pair",
+          "question": "两块小三角板换个贴法。哪幅拼成了正方形？",
+          "skill": "迁移到正方形",
+          "answer": [
+            "a"
+          ],
+          "analysis": "两条最长边贴紧，外面留下四条一样长的边和四个直角。",
+          "options": {
+            "a": {
+              "label": "两块沿斜边贴紧，外形是正方形",
+              "visual": {
+                "kind": "asset",
+                "image": "q-make-square",
+                "alt": "两块沿斜边贴紧，外形是正方形"
+              }
+            },
+            "b": {
+              "label": "两块沿直角边拼成一个三角形",
+              "visual": {
+                "kind": "asset",
+                "image": "q-make-triangle",
+                "alt": "两块沿直角边拼成一个三角形"
+              }
+            },
+            "c": {
+              "label": "两块只碰到角",
+              "visual": {
+                "kind": "asset",
+                "image": "q-make-slide",
+                "alt": "两块只碰到角"
+              }
+            }
+          }
+        },
+        {
+          "id": "rectangle-plus-square",
+          "question": "两小板先拼成方形。再接一块方板，哪幅是长方形？",
+          "skill": "迁移到长方形",
+          "answer": [
+            "c"
+          ],
+          "analysis": "两组方形的整条边贴住。虽然竖着放，外边仍是两长两短，四角方正。",
+          "options": {
+            "a": {
+              "label": "两个方形错开一截",
+              "visual": {
+                "kind": "asset",
+                "image": "q-rect-shifted",
+                "alt": "两个方形错开一截"
+              }
+            },
+            "b": {
+              "label": "两个方形中间有缝",
+              "visual": {
+                "kind": "asset",
+                "image": "q-rect-separated",
+                "alt": "两个方形中间有缝"
+              }
+            },
+            "c": {
+              "label": "两个方形整边贴紧，组成竖长方形",
+              "visual": {
+                "kind": "asset",
+                "image": "q-rect-complete",
+                "alt": "两个方形整边贴紧，组成竖长方形"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "tangram-exhibition",
+      "type": "slide",
+      "title": "带着七块板做你的展品",
+      "template": "two-columns",
+      "data": {
+        "title": "带着七块板做你的展品",
+        "left": {
+          "heading": "试一件新作品",
+          "body": "这个小屋图样用了七块。"
+        },
+        "left_picture": "house-exhibit",
+        "right": {
+          "heading": "给家人讲讲",
+          "body": "先定目标，选板，再查外边和接缝。"
+        },
+        "right_picture": "family-exhibit"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "七巧板是我国的传统益智玩具。"
+        },
+        {
+          "say": "小满用七块板摆出自己的小屋。"
+        },
+        {
+          "say": "数一数用了几块。你能在屋子的外边找到接合的地方吗？"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "请家人准备一套实体七巧板。"
+        },
+        {
+          "say": "先用两块拼三角形，再试三块或四块。"
+        },
+        {
+          "say": "拼好先数块，再沿外边查。"
+        },
+        {
+          "say": "板有没有压住？中间有没有露底？"
+        },
+        {
+          "say": "给你的新图案起个名。说说先摆了哪块板。"
+        },
+        {
+          "say": "告诉家人哪两条边贴在一起。"
+        },
+        {
+          "say": "也可以画下板的接缝，下次换一种拼法再比一比。"
+        }
+      ]
+    }
+  ]
+}

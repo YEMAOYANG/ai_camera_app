@@ -9,6 +9,7 @@ from typing import Any, Callable
 from core.database import Database, DatabaseConnection
 from core.errors import ApiError
 from core.security import now_ms
+from content import courseware_observation
 from content.primary_skill_boundaries import (
     PRIMARY_CURRICULUM_VERSION,
     boundaries_for,
@@ -1118,6 +1119,16 @@ class LearningService:
         report_id: str,
         query: dict,
     ) -> dict:
+        child_id, report = self._report_detail_row(access_token, report_id, query)
+        payload = report_payload(report)
+        cards = self._report_observations(report)
+        if cards:
+            for image in courseware_observation.card_images(cards):
+                image['imageSha256'] = courseware_observation.MEDIA.fullmatch(image.pop('image'))['sha']
+            payload['observationCards'] = cards
+        return {"ok": True, "childId": child_id, "report": payload}
+
+    def _report_detail_row(self, access_token, report_id, query):
         context = self.auth_service.authenticate(access_token)
         child_id = self._required_text(query, "childId", "请选择孩子")
         normalized_report_id = str(report_id or "").strip()
@@ -1134,11 +1145,39 @@ class LearningService:
             )
         if report is None:
             raise ApiError("learning_report_not_found", "学习报告不存在", 404)
-        return {
-            "ok": True,
-            "childId": child_id,
-            "report": report_payload(report),
-        }
+        return child_id, report
+
+    def _report_observations(self, report):
+        if report['subject'] != 'science':
+            return []
+        course = self.repository.parse_json(report.get('observation_course_json'), {})
+        if not isinstance(course, dict) or not course.get('observationCards'):
+            return []
+        progress = self.repository.parse_json(report.get('observation_runtime_json'), {})
+        return courseware_observation.report_cards(course, progress, report['session_id'])
+
+    def report_observation_image(self, access_token, report_id, query, image_sha):
+        from services.course_file_store import CourseFileStore, CourseFileStorageError
+
+        _, report = self._report_detail_row(access_token, report_id, query)
+        if not courseware_observation.RELEASE_SHA.fullmatch(image_sha):
+            raise ApiError('learning_observation_image_not_found', '观察图片不存在', 404)
+        for item in courseware_observation.card_images(self._report_observations(report)):
+            image = courseware_observation.MEDIA.fullmatch(item['image'])
+            if image['sha'] == image_sha:
+                break
+        else:
+            raise ApiError('learning_observation_image_not_found', '观察图片不存在', 404)
+        store = CourseFileStore()
+        root = store.project_root / 'openmaic-runtime/.runtime/OpenMAIC/data/classrooms'
+        try:
+            data = store.read_bytes(root / image['classroom'] / 'media' / (image_sha + '.png'),
+                                    expected_sha256=image_sha, max_bytes=3 * 1024 * 1024)
+        except CourseFileStorageError:
+            data = None
+        if data is None:
+            raise ApiError('learning_observation_image_unavailable', '观察图片暂时无法加载', 503)
+        return data
 
     def _complete_and_report(
         self,

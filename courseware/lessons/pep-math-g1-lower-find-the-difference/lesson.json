@@ -1,0 +1,842 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "解决求两数相差几的实际问题",
+  "description": "到露营站找准两组，把两排对齐，用相差的一段解释减法。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小数老师",
+      "role": "teacher",
+      "gender": "male",
+      "voice": "Ethan",
+      "avatar": "/teachers/ashu-math-v1.png",
+      "color": "#286956",
+      "persona": "用实物和短句讲清楚同起点、配齐的一段和相差的一段。"
+    }
+  },
+  "images": {
+    "camp-clearing": {
+      "file": "assets/camp-clearing.png"
+    },
+    "camp-counts": {
+      "file": "assets/camp-counts.png"
+    },
+    "chair-pairs": {
+      "file": "assets/chair-pairs.png"
+    },
+    "chair-reverse": {
+      "file": "assets/chair-reverse.png"
+    },
+    "three-lamp-tags": {
+      "file": "assets/three-lamp-tags.png"
+    },
+    "home-example": {
+      "file": "assets/home-example.png"
+    },
+    "lantern-grove": {
+      "file": "assets/lantern-grove.png"
+    },
+    "camp-cart": {
+      "file": "assets/camp-cart.png"
+    },
+    "camp-cart-moving": {
+      "file": "assets/camp-cart-moving.png"
+    },
+    "camp-lantern": {
+      "file": "assets/camp-lantern.png"
+    },
+    "amber-marble": {
+      "file": "assets/amber-marble.png"
+    },
+    "camp-reward": {
+      "file": "assets/camp-reward.png"
+    },
+    "tray-paired": {
+      "file": "assets/tray-paired.png"
+    },
+    "tray-gap": {
+      "file": "assets/tray-gap.png"
+    },
+    "pair-card-1-equal": {
+      "file": "assets/pair-card-1-equal.png"
+    },
+    "pair-card-1-gap": {
+      "file": "assets/pair-card-1-gap.png"
+    },
+    "pair-card-2-equal": {
+      "file": "assets/pair-card-2-equal.png"
+    },
+    "pair-card-2-gap": {
+      "file": "assets/pair-card-2-gap.png"
+    },
+    "pair-card-3-equal": {
+      "file": "assets/pair-card-3-equal.png"
+    },
+    "pair-card-3-gap": {
+      "file": "assets/pair-card-3-gap.png"
+    },
+    "pair-card-3-short": {
+      "file": "assets/pair-card-3-short.png"
+    },
+    "order-9-5": {
+      "file": "assets/order-9-5.png"
+    },
+    "order-8-6": {
+      "file": "assets/order-8-6.png"
+    },
+    "order-14-8": {
+      "file": "assets/order-14-8.png"
+    },
+    "order-13-8": {
+      "file": "assets/order-13-8.png"
+    },
+    "order-31-23": {
+      "file": "assets/order-31-23.png"
+    },
+    "order-34-25": {
+      "file": "assets/order-34-25.png"
+    },
+    "order-27-20": {
+      "file": "assets/order-27-20.png"
+    },
+    "lamp-target-2": {
+      "file": "assets/lamp-target-2.png"
+    },
+    "lamp-target-4": {
+      "file": "assets/lamp-target-4.png"
+    },
+    "lamp-target-5": {
+      "file": "assets/lamp-target-5.png"
+    },
+    "lamp-target-6": {
+      "file": "assets/lamp-target-6.png"
+    },
+    "lamp-target-7": {
+      "file": "assets/lamp-target-7.png"
+    },
+    "lamp-target-8": {
+      "file": "assets/lamp-target-8.png"
+    },
+    "lamp-target-9": {
+      "file": "assets/lamp-target-9.png"
+    },
+    "quiz-kite-a": {
+      "file": "assets/quiz-kite-a.png"
+    },
+    "quiz-kite-b": {
+      "file": "assets/quiz-kite-b.png"
+    },
+    "quiz-kite-c": {
+      "file": "assets/quiz-kite-c.png"
+    },
+    "quiz-kite-prompt": {
+      "file": "assets/quiz-kite-prompt.png"
+    },
+    "quiz-patch-a": {
+      "file": "assets/quiz-patch-a.png"
+    },
+    "quiz-patch-b": {
+      "file": "assets/quiz-patch-b.png"
+    },
+    "quiz-patch-c": {
+      "file": "assets/quiz-patch-c.png"
+    },
+    "quiz-clip-a": {
+      "file": "assets/quiz-clip-a.png"
+    },
+    "quiz-clip-b": {
+      "file": "assets/quiz-clip-b.png"
+    },
+    "quiz-clip-c": {
+      "file": "assets/quiz-clip-c.png"
+    },
+    "quiz-clip-prompt": {
+      "file": "assets/quiz-clip-prompt.png"
+    },
+    "quiz-flag-a": {
+      "file": "assets/quiz-flag-a.png"
+    },
+    "quiz-flag-b": {
+      "file": "assets/quiz-flag-b.png"
+    },
+    "quiz-flag-c": {
+      "file": "assets/quiz-flag-c.png"
+    },
+    "quiz-book-a": {
+      "file": "assets/quiz-book-a.png"
+    },
+    "quiz-book-b": {
+      "file": "assets/quiz-book-b.png"
+    },
+    "quiz-book-c": {
+      "file": "assets/quiz-book-c.png"
+    },
+    "quiz-book-prompt": {
+      "file": "assets/quiz-book-prompt.png"
+    },
+    "quiz-rhythm-a": {
+      "file": "assets/quiz-rhythm-a.png"
+    },
+    "quiz-rhythm-b": {
+      "file": "assets/quiz-rhythm-b.png"
+    },
+    "quiz-rhythm-c": {
+      "file": "assets/quiz-rhythm-c.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "two-camps",
+      "title": "要比哪两排椅子",
+      "type": "slide",
+      "template": "two-columns",
+      "data": {
+        "title": "要比哪两排椅子",
+        "left": {
+          "heading": "两块营地",
+          "body": "圆牌营地和三角牌营地"
+        },
+        "right": {
+          "heading": "两排椅子",
+          "body": "圆牌营地多几把？"
+        },
+        "left_picture": "camp-clearing",
+        "right_picture": "camp-counts"
+      },
+      "script": [
+        {
+          "say": "露营站开门啦。值班员想知道两块营地的椅子差多少。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "你看，左边有圆牌，右边是三角牌。"
+        },
+        {
+          "say": "他问圆牌营地的椅子比三角牌营地多几把。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "看记录，圆牌有十一把，三角牌有七把。"
+        },
+        {
+          "say": "我们在比较同一种东西，都用把来数。"
+        },
+        {
+          "say": "要回答多几把，得找到圆牌那一排多出来的部分。"
+        },
+        {
+          "say": "两排放到同一个起点，猜猜哪些椅子会有伙伴。"
+        }
+      ]
+    },
+    {
+      "key": "match-the-chairs",
+      "title": "一把对一把",
+      "type": "slide",
+      "template": "picture-points",
+      "data": {
+        "title": "一把对一把",
+        "picture": "chair-pairs",
+        "points": [
+          "从同一头排",
+          "前 7 把配齐",
+          "11 − 7 = 4（把）"
+        ]
+      },
+      "script": [
+        {
+          "say": "站在两排椅子旁边，你能一眼看见相差几把吗？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "看图里的短线，每条线把上下一把椅子连成一对。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "两排从左边同一头开始，每个位置只配一把。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "短排七把全配齐。长排也正好拿出七把跟它们配。"
+        },
+        {
+          "say": "配齐段上下都有。相差段从短排尽头开始。"
+        },
+        {
+          "say": "过了第七对，长排还露出四把，短排已经排完。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "从十一把里减去配齐的七把，剩下四把。"
+        },
+        {
+          "say": "把配齐的七把和多出的四把接起来，正好是十一把。"
+        },
+        {
+          "say": "所以圆牌营地比三角牌营地多四把椅子。"
+        }
+      ]
+    },
+    {
+      "key": "reverse-the-question",
+      "title": "少几也是这一段",
+      "type": "slide",
+      "template": "picture-points",
+      "data": {
+        "title": "少几也是这一段",
+        "picture": "chair-reverse",
+        "points": [
+          "长排多 4 把",
+          "短排少 4 把",
+          "11 − 7 = 4（把）"
+        ]
+      },
+      "script": [
+        {
+          "say": "值班员换个问法。三角牌营地比圆牌营地少几把？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "先看上排多出的椅子，再把手指移到正下方的空圈。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "上排多出的四把，各对着下面一个空位。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "下排这四个空位，就说明它比上排少四把。"
+        },
+        {
+          "say": "看框线在两排的哪里。多出和空着的地方正好对齐。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "椅子和起点都没换，用十一减七，仍然是四把。"
+        },
+        {
+          "say": "问圆牌多几和问三角牌少几，都在找同一段。"
+        },
+        {
+          "say": "看准两排的尽头，再核对配齐和相差各有几把。"
+        }
+      ]
+    },
+    {
+      "key": "sort-the-pairing-cards",
+      "title": "把对齐卡送回托盘",
+      "type": "interactive",
+      "page": "sort-the-pairing-cards",
+      "widgetType": "courseware_game",
+      "startImage": "camp-clearing",
+      "script": [
+        {
+          "say": "把图卡送到对应的托盘。先看我开小车。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#pairing-legend"
+        },
+        {
+          "say": "左边大图放大了青色框里的卡。下面是两种托盘图。"
+        },
+        {
+          "highlight": "#first-paired-card"
+        },
+        {
+          "say": "这张卡框住上下都能对起来的格子，是配齐段。"
+        },
+        {
+          "highlight": "#first-paired-dock"
+        },
+        {
+          "say": "托盘里也画着上下相对的两排，这张卡送到这里。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "沿格子按箭头，从图卡后面把它推过去。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "看小车推过去，图卡进了同类托盘。"
+        },
+        {
+          "say": "框住长排多出的，或者短排空着的，都送到相差托盘。"
+        },
+        {
+          "say": "你来开车。先看括线框住的地方，再决定往哪边推。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "sort-goal": "match-the-chairs-8",
+        "sort-hint": "reverse-the-question-8",
+        "sort-help": "say-it-at-home-8",
+        "sort-praise": "say-it-at-home-12"
+      }
+    },
+    {
+      "key": "choose-two-counts",
+      "title": "三块牌里找两块",
+      "type": "slide",
+      "template": "picture-points",
+      "data": {
+        "title": "三块牌里找两块",
+        "picture": "three-lamp-tags",
+        "points": [
+          "圆牌 36 块，三角牌 28 块",
+          "36 − 28 = 8（块）",
+          "36 + 28 是合计"
+        ]
+      },
+      "script": [
+        {
+          "say": "露营站有三块记录牌。现在要比圆牌和三角牌。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "方牌有二十三块灯牌。它是另一个营地的数量。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "这道题用圆牌的三十六块和三角牌的二十八块。"
+        },
+        {
+          "say": "把这两条从同一起点排，先看它们各到哪里。"
+        },
+        {
+          "say": "找到两条的尽头，只数中间隔了几格。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "三十六减二十八，得到八块，和图里多出的八格一样。"
+        },
+        {
+          "say": "从较短一排的尽头往后看，就找到要数的那一段。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "三十六加二十八把两组合起来，问的是共有多少。"
+        },
+        {
+          "say": "三十六减二十三是和方牌比。问题提到谁，就取谁的数。"
+        }
+      ]
+    },
+    {
+      "key": "light-the-gap",
+      "title": "点亮相差的灯靶",
+      "type": "interactive",
+      "page": "light-the-gap",
+      "widgetType": "courseware_game",
+      "startImage": "lantern-grove",
+      "script": [
+        {
+          "say": "三块灯靶等着点亮。弹珠该飞到哪一块？"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#lamp-order"
+        },
+        {
+          "say": "看左边，两排从同一头排起。九盏和五盏先配成五对。"
+        },
+        {
+          "say": "长排在五对后还有四盏。要找跟余段一样多的灯靶。"
+        },
+        {
+          "highlight": "#center-lamp-dock"
+        },
+        {
+          "say": "中间的靶上数出四盏。箭头可以转向，飞着还能修。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "现在对准中间。我发一颗弹珠，看它飞向灯靶。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "留意弹珠到靶心的那一刻，数得一样才点亮。"
+        },
+        {
+          "say": "轮到你时先听口令。碰到三排时，先认准框中的两排。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "lamp-goal": "choose-two-counts-7",
+        "lamp-hint": "choose-two-counts-10",
+        "lamp-help": "say-it-at-home-10",
+        "lamp-praise": "say-it-at-home-13"
+      }
+    },
+    {
+      "key": "picture-check-a",
+      "title": "找出那一段",
+      "type": "quiz",
+      "intro": [
+        "听清要比的两组，再看看每幅图框住哪里。"
+      ],
+      "questions": [
+        {
+          "id": "choose-kite-groups",
+          "question": "风筝展只比圆牌和三角牌。哪两排该一起框？",
+          "skill": "select-compared-groups",
+          "answer": [
+            "b"
+          ],
+          "analysis": "问题只说圆牌和三角牌。选框住这两排的图，方牌的数量留在原处。",
+          "options": {
+            "a": {
+              "label": "圆牌和方牌",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-kite-a",
+                "alt": "框出圆牌的十只和方牌的九只风筝"
+              }
+            },
+            "b": {
+              "label": "圆牌和三角牌",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-kite-b",
+                "alt": "框出圆牌的十只和三角牌的六只风筝"
+              }
+            },
+            "c": {
+              "label": "三角牌和方牌",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-kite-c",
+                "alt": "框出三角牌的六只和方牌的九只风筝"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "quiz-kite-prompt",
+            "alt": "三排风筝，圆牌十只、三角牌六只、方牌九只"
+          }
+        },
+        {
+          "id": "patch-gap",
+          "question": "看十三枚和八枚袖标。哪条框线围着相差的一段？",
+          "skill": "align-and-find-gap",
+          "answer": [
+            "c"
+          ],
+          "analysis": "八对袖标先从同一头配齐。框住长排最后五枚的图，圈到的正是相差。",
+          "options": {
+            "a": {
+              "label": "配齐段",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-patch-a",
+                "alt": "框线围住上下都配齐的八对袖标"
+              }
+            },
+            "b": {
+              "label": "两组全部",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-patch-b",
+                "alt": "框线围住上下两排的全部袖标"
+              }
+            },
+            "c": {
+              "label": "长排露出的五枚",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-patch-c",
+                "alt": "框线只围住长排最后五枚袖标"
+              }
+            }
+          }
+        },
+        {
+          "id": "clip-difference",
+          "question": "大盒十八枚夹子，小盒十四枚。大盒多几枚？",
+          "skill": "subtract-equal-part",
+          "answer": [
+            "a"
+          ],
+          "analysis": "十八枚里与小盒同样多的是十四枚。十八减十四，余下四枚。",
+          "options": {
+            "a": {
+              "label": "四枚",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-clip-a",
+                "alt": "四枚文具夹"
+              }
+            },
+            "b": {
+              "label": "十四枚",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-clip-b",
+                "alt": "一个十和四枚文具夹"
+              }
+            },
+            "c": {
+              "label": "三十二枚",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-clip-c",
+                "alt": "三个十和两枚文具夹"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "quiz-clip-prompt",
+            "alt": "从同一头对齐的大盒十八枚和小盒十四枚文具夹"
+          }
+        }
+      ]
+    },
+    {
+      "key": "picture-check-b",
+      "title": "换个方向再比比",
+      "type": "quiz",
+      "intro": [
+        "先听比较哪两组。最后选一幅图，检查相差量。"
+      ],
+      "questions": [
+        {
+          "id": "reverse-flags",
+          "question": "两车有十九面和十二面旗。哪幅图里多和少指同一段？",
+          "skill": "reverse-same-gap",
+          "answer": [
+            "b"
+          ],
+          "analysis": "上排多出的七面在下排各对应一个空位。多七面和少七面都指同一段。",
+          "options": {
+            "a": {
+              "label": "框住配齐段",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-flag-a",
+                "alt": "框线只围住前十二对旗"
+              }
+            },
+            "b": {
+              "label": "余旗和空位对齐",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-flag-b",
+                "alt": "上排剩下的七面和下排七个空位对应，各有一条框线"
+              }
+            },
+            "c": {
+              "label": "框住整行",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-flag-c",
+                "alt": "框线从起点围住两排直到长排尽头"
+              }
+            }
+          }
+        },
+        {
+          "id": "book-shelves",
+          "question": "上中下层有三十、二十四、二十一本。上中层差几本？",
+          "skill": "select-compared-groups",
+          "answer": [
+            "c"
+          ],
+          "analysis": "只取上层三十本和中层二十四本。三十减二十四是六本。",
+          "options": {
+            "a": {
+              "label": "九本",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-book-a",
+                "alt": "九本书"
+              }
+            },
+            "b": {
+              "label": "五十四本",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-book-b",
+                "alt": "五个十和四本书"
+              }
+            },
+            "c": {
+              "label": "六本",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-book-c",
+                "alt": "六本书"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "quiz-book-prompt",
+            "alt": "上层三十本、中层二十四本、下层二十一本"
+          }
+        },
+        {
+          "id": "check-rhythm",
+          "question": "二十七块和十六块。哪两段能拼回二十七块？",
+          "skill": "subtract-equal-part",
+          "answer": [
+            "a"
+          ],
+          "analysis": "二十七减十六得十一。把配齐的十六格和多出的十一格接回去，和大组一样长。",
+          "options": {
+            "a": {
+              "label": "十六和十一",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-rhythm-a",
+                "alt": "十六格配齐段与十一格相差段接回二十七格"
+              }
+            },
+            "b": {
+              "label": "十六和十",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-rhythm-b",
+                "alt": "十六格和十格接成二十六格，终点差一格"
+              }
+            },
+            "c": {
+              "label": "二十七和十六",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-rhythm-c",
+                "alt": "两组整条相接成四十三格，超过大组终点"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "say-it-at-home",
+      "title": "把比较办法带回家",
+      "type": "slide",
+      "template": "picture-points",
+      "data": {
+        "title": "把比较办法带回家",
+        "picture": "home-example",
+        "points": [
+          "先认准两组",
+          "把两排对齐",
+          "找差，再换问法"
+        ]
+      },
+      "script": [
+        {
+          "say": "收营时还有两排灯。你能用刚才的办法查一查吗？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "圆牌十五盏，三角牌十盏。画线让它们从同一头开始。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "问题问这两组灯的相差，两个数都用盏。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "把灯一盏一盏对起来。前十盏上下成对。"
+        },
+        {
+          "say": "看看框线框住两排配齐的，还是一排多出或空着的。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "把相差的那几格，一格一格点清。"
+        },
+        {
+          "say": "十五减十得五。圆牌多五盏，三角牌少五盏。"
+        },
+        {
+          "say": "你把配齐和相差的两段分清了。"
+        },
+        {
+          "say": "你找到了相差的数量，做得好。"
+        },
+        {
+          "say": "回家摆两组同类小物件，画图并讲讲两种问法。"
+        }
+      ]
+    }
+  ]
+}

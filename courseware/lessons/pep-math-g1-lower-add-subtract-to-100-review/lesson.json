@@ -1,0 +1,1261 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "整理和复习｜100以内的口算加、减法",
+  "description": "用广播站的口算卡、十束与散件整理100以内的口算加、减法，再解决票数、搬运与容量问题。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小数老师",
+      "role": "teacher",
+      "gender": "male",
+      "voice": "Ethan",
+      "avatar": "/teachers/ashu-math-v1.png",
+      "color": "#437763",
+      "persona": "引导孩子按同一标准归类，再用整捆与散件解释口算和生活问题。"
+    }
+  },
+  "images": {
+    "cover": {
+      "file": "assets/cover.png"
+    },
+    "sort-backdrop": {
+      "file": "assets/sort-backdrop.png"
+    },
+    "match-backdrop": {
+      "file": "assets/match-backdrop.png"
+    },
+    "trolley": {
+      "file": "assets/trolley.png"
+    },
+    "microphone": {
+      "file": "assets/microphone.png"
+    },
+    "ticket": {
+      "file": "assets/ticket.png"
+    },
+    "sort-board": {
+      "file": "assets/sort-board.png"
+    },
+    "digits-board": {
+      "file": "assets/digits-board.png"
+    },
+    "place-board": {
+      "file": "assets/place-board.png"
+    },
+    "exchange-board": {
+      "file": "assets/exchange-board.png"
+    },
+    "ticket-teach": {
+      "file": "assets/ticket-teach.png"
+    },
+    "trips-teach": {
+      "file": "assets/trips-teach.png"
+    },
+    "capacity-teach": {
+      "file": "assets/capacity-teach.png"
+    },
+    "compare-board": {
+      "file": "assets/compare-board.png"
+    },
+    "sort-rule-ops": {
+      "file": "assets/sort-rule-ops.png"
+    },
+    "sort-rule-carry": {
+      "file": "assets/sort-rule-carry.png"
+    },
+    "sort-rule-borrow": {
+      "file": "assets/sort-rule-borrow.png"
+    },
+    "dock-plus": {
+      "file": "assets/dock-plus.png"
+    },
+    "dock-minus": {
+      "file": "assets/dock-minus.png"
+    },
+    "dock-carry": {
+      "file": "assets/dock-carry.png"
+    },
+    "dock-keep-add": {
+      "file": "assets/dock-keep-add.png"
+    },
+    "dock-borrow": {
+      "file": "assets/dock-borrow.png"
+    },
+    "dock-keep-sub": {
+      "file": "assets/dock-keep-sub.png"
+    },
+    "add-26-3": {
+      "file": "assets/add-26-3.png"
+    },
+    "sub-57-3": {
+      "file": "assets/sub-57-3.png"
+    },
+    "add-29-6": {
+      "file": "assets/add-29-6.png"
+    },
+    "add-43-4": {
+      "file": "assets/add-43-4.png"
+    },
+    "add-56-7": {
+      "file": "assets/add-56-7.png"
+    },
+    "sub-42-5": {
+      "file": "assets/sub-42-5.png"
+    },
+    "sub-65-4": {
+      "file": "assets/sub-65-4.png"
+    },
+    "sub-71-6": {
+      "file": "assets/sub-71-6.png"
+    },
+    "sub-49-8": {
+      "file": "assets/sub-49-8.png"
+    },
+    "more-tens": {
+      "file": "assets/more-tens.png"
+    },
+    "more-ones": {
+      "file": "assets/more-ones.png"
+    },
+    "carry-first": {
+      "file": "assets/carry-first.png"
+    },
+    "carry-next": {
+      "file": "assets/carry-next.png"
+    },
+    "borrow-first": {
+      "file": "assets/borrow-first.png"
+    },
+    "borrow-next": {
+      "file": "assets/borrow-next.png"
+    },
+    "value-48": {
+      "file": "assets/value-48.png"
+    },
+    "value-58": {
+      "file": "assets/value-58.png"
+    },
+    "value-39": {
+      "file": "assets/value-39.png"
+    },
+    "value-40": {
+      "file": "assets/value-40.png"
+    },
+    "value-36": {
+      "file": "assets/value-36.png"
+    },
+    "value-46": {
+      "file": "assets/value-46.png"
+    },
+    "value-54": {
+      "file": "assets/value-54.png"
+    },
+    "value-64": {
+      "file": "assets/value-64.png"
+    },
+    "value-43": {
+      "file": "assets/value-43.png"
+    },
+    "value-53": {
+      "file": "assets/value-53.png"
+    },
+    "value-63": {
+      "file": "assets/value-63.png"
+    },
+    "value-68": {
+      "file": "assets/value-68.png"
+    },
+    "value-78": {
+      "file": "assets/value-78.png"
+    },
+    "q1-a": {
+      "file": "assets/q1-a.png"
+    },
+    "q1-b": {
+      "file": "assets/q1-b.png"
+    },
+    "q1-c": {
+      "file": "assets/q1-c.png"
+    },
+    "q2-a": {
+      "file": "assets/q2-a.png"
+    },
+    "q2-b": {
+      "file": "assets/q2-b.png"
+    },
+    "q2-c": {
+      "file": "assets/q2-c.png"
+    },
+    "q3-a": {
+      "file": "assets/q3-a.png"
+    },
+    "q3-b": {
+      "file": "assets/q3-b.png"
+    },
+    "q3-c": {
+      "file": "assets/q3-c.png"
+    },
+    "q4-a": {
+      "file": "assets/q4-a.png"
+    },
+    "q4-b": {
+      "file": "assets/q4-b.png"
+    },
+    "q4-c": {
+      "file": "assets/q4-c.png"
+    },
+    "q5-a": {
+      "file": "assets/q5-a.png"
+    },
+    "q5-b": {
+      "file": "assets/q5-b.png"
+    },
+    "q5-c": {
+      "file": "assets/q5-c.png"
+    },
+    "q6-a": {
+      "file": "assets/q6-a.png"
+    },
+    "q6-b": {
+      "file": "assets/q6-b.png"
+    },
+    "q6-c": {
+      "file": "assets/q6-c.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "map-start",
+      "type": "slide",
+      "title": "给口算卡找位置",
+      "template": "picture-points",
+      "data": {
+        "title": "给口算卡找位置",
+        "picture": "cover",
+        "points": [
+          "先归类",
+          "再说为什么",
+          "最后用起来"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "社区广播站要开播了，桌上还有一摞口算卡。"
+        },
+        {
+          "say": "小满问：能把学过的口算画成一张图吗？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "加法和减法各占一边，卡片就好找了。"
+        },
+        {
+          "say": "加法看个位满不满十，减法看个位够不够减。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "十块小方块可以合成一捆。"
+        },
+        {
+          "say": "等会儿看看，哪一步需要换捆，哪一步不用。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "还差多少、搬几次，问法不同，算式也不同。"
+        },
+        {
+          "say": "来选几张卡，我们从运算符号开始整理。"
+        }
+      ]
+    },
+    {
+      "key": "sort-by-operation",
+      "type": "slide",
+      "title": "先分加法和减法",
+      "template": "picture-points",
+      "data": {
+        "title": "先分加法和减法",
+        "picture": "sort-board",
+        "points": [
+          "加号在一边",
+          "减号在另一边",
+          "给每边再分两组"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "这四张卡混在一起。你会先看什么？"
+        },
+        {
+          "say": "看看每张卡两个数中间的符号。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "三十七加五、四十三加六，都有加号。"
+        },
+        {
+          "say": "七加五是十二，要把十个一合成一个十。"
+        },
+        {
+          "say": "三加六只有九，不需要合成一个十。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "三十九减四、五十二减六，都有减号。"
+        },
+        {
+          "say": "九够减四，二不够减六，要向十位借一个十。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "加法分成进位和不进位，减法分成退位和不退位。"
+        },
+        {
+          "say": "先看加减，再看要不要换十，这是两层分法。"
+        }
+      ]
+    },
+    {
+      "key": "change-criteria",
+      "type": "slide",
+      "title": "换一条分卡规则",
+      "template": "picture-points",
+      "data": {
+        "title": "换一条分卡规则",
+        "picture": "digits-board",
+        "points": [
+          "后面是一位数",
+          "两位数是整十数",
+          "两位数不是整十数"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "这三张卡都是四十一开头，也都是加法。"
+        },
+        {
+          "say": "先分一位数和两位数。两位数还能再分。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "四十一加七。七是七个一，先算一加七，得八个一。"
+        },
+        {
+          "say": "四个十还在，所以结果是四十八。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "四十一加三十。三十是三个十，先算四个十加三个十。"
+        },
+        {
+          "say": "一个一还在，合起来是七十一。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "四十一加二十六。二十六有两个十，还有六个一。"
+        },
+        {
+          "say": "四个十加两个十，一个一加六个一，结果六十七。"
+        },
+        {
+          "say": "同一张卡换了标准，也能找到合适的新位置。"
+        }
+      ]
+    },
+    {
+      "key": "sorting-rules",
+      "type": "slide",
+      "title": "上车前先听规则",
+      "template": "picture-points",
+      "data": {
+        "title": "上车前先听规则",
+        "picture": "sort-rule-carry",
+        "points": [
+          "加法看满十",
+          "减法看够不够",
+          "从后面推"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "小车每次按当关的规则送卡。你听清再动。"
+        },
+        {
+          "say": "这关先看算式中间是加号还是减号。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "这一关全是加法。看个位相加满不满十。"
+        },
+        {
+          "say": "如果正好是十，也得把十个一换成一个十。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "这一关全是减法。看个位够不够减。"
+        },
+        {
+          "say": "够就直接减。不够就要把一个十拆开。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "看一眼这关的标记，再想卡上该看哪里。"
+        },
+        {
+          "say": "先口算个位，再从卡的后面推向合适的盘。"
+        },
+        {
+          "say": "用同一条规则，每张卡都只进一个托盘。"
+        }
+      ]
+    },
+    {
+      "key": "send-cards",
+      "type": "interactive",
+      "title": "推口算卡到对应托盘",
+      "page": "send-cards",
+      "widgetType": "simulation",
+      "startImage": "cover",
+      "script": [
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#sort-rule-picture"
+        },
+        {
+          "say": "现在按加减分，左边画着两种托盘的记号。"
+        },
+        {
+          "highlight": "#game-target"
+        },
+        {
+          "say": "这张卡是二十六加三。我们先找中间的加号。"
+        },
+        {
+          "highlight": "#first-operation-dock"
+        },
+        {
+          "say": "这里的托盘也有加号，可以接收这张卡。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "小车在卡的左边。按右键，从后面把卡推过去。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "看小车怎样把这张卡推向加号托盘。"
+        },
+        {
+          "say": "轮到你。下一张要先看符号，再选托盘。"
+        },
+        {
+          "say": "想再听一遍规则，点小喇叭。走错一步可以撤回。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "sort-operation": "sorting-rules-3",
+        "sort-carry": "sorting-rules-5",
+        "sort-borrow": "sorting-rules-8",
+        "sort-hint": "sorting-rules-11",
+        "sort-help": "sorting-rules-12",
+        "sort-praise": "sorting-rules-13"
+      }
+    },
+    {
+      "key": "same-place",
+      "type": "slide",
+      "title": "整捆和整捆算，散块和散块算",
+      "template": "picture-points",
+      "data": {
+        "title": "整捆和整捆算，散块和散块算",
+        "picture": "place-board",
+        "points": [
+          "加的是几个一",
+          "加的是几个十",
+          "两个数都有十和一"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "四十六加二，和四十六加三十，哪里会变？"
+        },
+        {
+          "say": "找一找图里的四捆和六块，想想先动哪边。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "加的二在个位，是两个一。六加二是八。"
+        },
+        {
+          "say": "四捆没动，四十和八合成四十八。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "四十六加三十，四捆再加三捆是七捆。"
+        },
+        {
+          "say": "六块没动，七十和六合成七十六。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "五十六减二十四。六个一拿走四个一，剩两个一。"
+        },
+        {
+          "say": "二十四的二在十位，是两个十。五个十减去两个十。"
+        },
+        {
+          "say": "三个十和两个一合成三十二。十跟十算，一跟一算。"
+        }
+      ]
+    },
+    {
+      "key": "carry-and-uncarry",
+      "type": "slide",
+      "title": "十个一和一个十互相换",
+      "template": "picture-points",
+      "data": {
+        "title": "十个一和一个十互相换",
+        "picture": "exchange-board",
+        "points": [
+          "满十就进一",
+          "不够减就退一",
+          "换单位以后再数"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "个位凑出十，或者个位不够减，先别急着写答案。"
+        },
+        {
+          "say": "一捆正好是十块。合上或拆开，数量没有变。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "四十七加六，先算七加六，得到十三个一。"
+        },
+        {
+          "say": "把圈出的十块换成一捆，还剩三块散的。"
+        },
+        {
+          "say": "原来四捆，现在五捆，加三块是五十三。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "六十四减七，四块不够取七块。"
+        },
+        {
+          "say": "把六捆中的一捆拆开，剩五捆，散块变成十四块。"
+        },
+        {
+          "say": "十四块去掉七块，还剩七块。合起来是五十七。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "这两次都动了十位。先数整捆，再数散块。"
+        },
+        {
+          "say": "还可以倒过来查，五十七加七能回到六十四。"
+        }
+      ]
+    },
+    {
+      "key": "match-rules",
+      "type": "slide",
+      "title": "结果图怎么核对",
+      "template": "picture-points",
+      "data": {
+        "title": "结果图怎么核对",
+        "picture": "more-tens",
+        "points": [
+          "先决定动哪边",
+          "再数结果图",
+          "算好再发射"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "桌上有一个算式和几张结果图，先看左边。"
+        },
+        {
+          "say": "先看加的是几捆还是几块，再找结果图。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "三十八加二十。二十是两捆，散块不用动。"
+        },
+        {
+          "say": "三捆再加两捆，有五捆。再加原来的八块。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "先看左边，再数结果图的整捆和散块。"
+        },
+        {
+          "say": "加和减都有换单位的时候。"
+        },
+        {
+          "say": "满了十个一，就把这十块换成一捆。"
+        },
+        {
+          "say": "个位不够减，先把一捆拆成十块。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "把十和一分别核对，算出来再发射。"
+        },
+        {
+          "say": "每次都要把算式配到算出的那个数。"
+        }
+      ]
+    },
+    {
+      "key": "match-picture-result",
+      "type": "interactive",
+      "title": "发射算式，配对结果图",
+      "page": "match-picture-result",
+      "widgetType": "simulation",
+      "startImage": "cover",
+      "script": [
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#operation-picture"
+        },
+        {
+          "say": "左边是三十八加二十。三捆再添两捆，散块不变。"
+        },
+        {
+          "highlight": "#result-pictures"
+        },
+        {
+          "say": "右边的十束和散件都能数。找五捆和八块。"
+        },
+        {
+          "highlight": "#game-target"
+        },
+        {
+          "say": "这张图是五捆八块，合起来正好是五十八。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "用左右键瞄准，再按发射键把弹珠送过去。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "留意弹珠会飞向哪一张结果图。"
+        },
+        {
+          "say": "接下来你自己算。先动对地方，再数整捆和散块。"
+        },
+        {
+          "say": "想再听这关的要求，就点小喇叭。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "match-same-place": "match-rules-3",
+        "match-carry": "match-rules-10",
+        "match-borrow": "match-rules-11",
+        "match-hint": "match-rules-8",
+        "match-help": "match-rules-13",
+        "match-praise": "match-rules-14"
+      }
+    },
+    {
+      "key": "real-situations",
+      "type": "slide",
+      "title": "还差多少张票",
+      "template": "picture-points",
+      "data": {
+        "title": "还差多少张票",
+        "picture": "ticket-teach",
+        "points": [
+          "找到要的总数",
+          "总数减去已有",
+          "用加法查一遍"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "广播站要发五十九张票。桌上已有二十三张。"
+        },
+        {
+          "say": "还差多少张？先指给我看，哪一个是总数。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "图上最左边是要发的五十九张。"
+        },
+        {
+          "say": "中间是已经有的二十三张，它是总数的一部分。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "要补的就是剩下的那一部分。"
+        },
+        {
+          "say": "列五十九减二十三，九减三是六。"
+        },
+        {
+          "say": "五个十减两个十，剩三个十。"
+        },
+        {
+          "say": "合起来是三十六张，还需要补三十六张。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "已有的二十三张，加上补的三十六张，正好五十九张。"
+        },
+        {
+          "say": "这样就知道没多拿，也没少拿。"
+        }
+      ]
+    },
+    {
+      "key": "one-or-several",
+      "type": "slide",
+      "title": "每次搬一样多",
+      "template": "picture-points",
+      "data": {
+        "title": "每次搬一样多",
+        "picture": "trips-teach",
+        "points": [
+          "搬走一车",
+          "继续减同一个数",
+          "加回去核对"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "库房还有十八盒道具，小车每次正好能运六盒。"
+        },
+        {
+          "say": "你可以先圈出一车的六盒，想想还要几车。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "十八减六得十二。第一车走了，架上还剩十二盒。"
+        },
+        {
+          "say": "图上每辆小车上方的一组，都有六盒。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "第二车再减六，十二减六得六。"
+        },
+        {
+          "say": "第三车又搬走六盒，六减六得零。"
+        },
+        {
+          "say": "一共减了三次，小车要跑三趟。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "每趟运六盒，六加六再加六，正好十八。"
+        },
+        {
+          "say": "问需要几次，就数一数减了几次。"
+        }
+      ]
+    },
+    {
+      "key": "capacity-limit",
+      "type": "slide",
+      "title": "两叠票能不能一起放",
+      "template": "picture-points",
+      "data": {
+        "title": "两叠票能不能一起放",
+        "picture": "capacity-teach",
+        "points": [
+          "加起来再比",
+          "换两叠再核",
+          "记住最多的意思"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "抽屉最多放四十七张票。两叠票能一起放进去吗？"
+        },
+        {
+          "say": "先别凭感觉，算一算两叠合起来有多少张。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "二十四张加二十三张，是四十七张。"
+        },
+        {
+          "say": "加起来刚好等于上限，所以能一起放。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "如果换成二十八张和二十四张，合起来是五十二张。"
+        },
+        {
+          "say": "五十二比四十七大，超过了，不能一起放。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "合起来比四十七小，能放。刚好四十七，也能放。"
+        },
+        {
+          "say": "超过才放不下。先相加，再和上限比。"
+        }
+      ]
+    },
+    {
+      "key": "check-with-compare",
+      "type": "slide",
+      "title": "先算清，再看符号",
+      "template": "picture-points",
+      "data": {
+        "title": "先算清，再看符号",
+        "picture": "compare-board",
+        "points": [
+          "先看等号",
+          "再看大于号",
+          "合适的数可以不止一个"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "这两张留言卡上，都留了一个方格。"
+        },
+        {
+          "say": "先看中间的符号。两张卡的方格一样填吗？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "二十七加多少等于三十七？看两个数的个位。"
+        },
+        {
+          "say": "两个数个位都是七，多的是一个十，所以空格填十。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "二十四加十五，四加五是九，两个十加一个十是三个十。"
+        },
+        {
+          "say": "左边是三十九。尖尖朝着小数，右边要比三十九小。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "三十八能填，三十也能填。把它们放进去比一比。"
+        },
+        {
+          "say": "三十九不能填，因为两边一样大，不符合大于号。"
+        }
+      ]
+    },
+    {
+      "key": "picture-check",
+      "type": "quiz",
+      "title": "听题，用新图查一查",
+      "intro": [
+        "我读题，你看图。想好后再选一幅。",
+        "先弄清是要分类、找结果，还是用条件解决问题。"
+      ],
+      "questions": [
+        {
+          "id": "identify-carry",
+          "skill": "organize-oral-calculation",
+          "question": "哪幅图的个位相加，要把十个一换成一个十？",
+          "answer": [
+            "B"
+          ],
+          "analysis": "三十四加八，四加八是十二，要换成一个十。另两图个位没满十。",
+          "options": {
+            "A": {
+              "label": "三十四加五，两组散块分别是四和五",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-a",
+                "alt": "三十四加五，两组散块分别是四和五"
+              }
+            },
+            "B": {
+              "label": "三十四加八，两组散块分别是四和八",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-b",
+                "alt": "三十四加八，两组散块分别是四和八"
+              }
+            },
+            "C": {
+              "label": "三十八加十，八个散块加一捆",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-c",
+                "alt": "三十八加十，八个散块加一捆"
+              }
+            }
+          }
+        },
+        {
+          "id": "add-two-tens",
+          "skill": "match-place-units",
+          "question": "四十七再添两捆，每捆是十。哪幅图是添完的总数？",
+          "answer": [
+            "A"
+          ],
+          "analysis": "四捆加两捆是六捆，原来七块还在，合起来是六十七。",
+          "options": {
+            "A": {
+              "label": "六捆七块",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-a",
+                "alt": "六捆七块"
+              }
+            },
+            "B": {
+              "label": "四捆九块",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-b",
+                "alt": "四捆九块"
+              }
+            },
+            "C": {
+              "label": "七捆七块",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-c",
+                "alt": "七捆七块"
+              }
+            }
+          }
+        },
+        {
+          "id": "borrow-and-remove",
+          "skill": "regroup-and-check",
+          "question": "五十三取走八。哪幅图是剩下的数量？",
+          "answer": [
+            "C"
+          ],
+          "analysis": "把一个十拆成十个一，十三去掉八还剩五。四捆五块是四十五。",
+          "options": {
+            "A": {
+              "label": "五捆五块",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-a",
+                "alt": "五捆五块"
+              }
+            },
+            "B": {
+              "label": "四捆三块",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-b",
+                "alt": "四捆三块"
+              }
+            },
+            "C": {
+              "label": "四捆五块",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-c",
+                "alt": "四捆五块"
+              }
+            }
+          }
+        },
+        {
+          "id": "find-missing-tickets",
+          "skill": "select-strategy-from-picture",
+          "question": "要准备四十六张票，已经有二十张。还要补多少张？",
+          "answer": [
+            "B"
+          ],
+          "analysis": "四十六减去已有的二十，还差二十六张。加回已有的二十正好。",
+          "options": {
+            "A": {
+              "label": "要四十六张，已有二十张，提议补四十四张",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-a",
+                "alt": "要四十六张，已有二十张，提议补四十四张"
+              }
+            },
+            "B": {
+              "label": "要四十六张，已有二十张，提议补二十六张",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-b",
+                "alt": "要四十六张，已有二十张，提议补二十六张"
+              }
+            },
+            "C": {
+              "label": "要四十六张，已有二十张，提议补六十六张",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-c",
+                "alt": "要四十六张，已有二十张，提议补六十六张"
+              }
+            }
+          }
+        },
+        {
+          "id": "move-all-boxes",
+          "skill": "select-strategy-from-picture",
+          "question": "二十八盒，每次正好运七盒。要几次才能运完？",
+          "answer": [
+            "A"
+          ],
+          "analysis": "每次减七，二十八依次变成二十一、十四、七和零，要四次。",
+          "options": {
+            "A": {
+              "label": "四辆小车，每车七盒",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-a",
+                "alt": "四辆小车，每车七盒"
+              }
+            },
+            "B": {
+              "label": "三辆小车，每车七盒",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-b",
+                "alt": "三辆小车，每车七盒"
+              }
+            },
+            "C": {
+              "label": "五辆小车，每车七盒",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-c",
+                "alt": "五辆小车，每车七盒"
+              }
+            }
+          }
+        },
+        {
+          "id": "compare-with-capacity",
+          "skill": "select-strategy-from-picture",
+          "question": "抽屉最多放五十张卡。图中哪两叠能一起放？",
+          "answer": [
+            "C"
+          ],
+          "analysis": "二十六加二十三是四十九，可以一起放。另外两组分别是五十五和五十二，都超过五十。",
+          "options": {
+            "A": {
+              "label": "二十九张和二十六张，最多五十张",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-a",
+                "alt": "二十九张和二十六张，最多五十张"
+              }
+            },
+            "B": {
+              "label": "二十九张和二十三张，最多五十张",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-b",
+                "alt": "二十九张和二十三张，最多五十张"
+              }
+            },
+            "C": {
+              "label": "二十六张和二十三张，最多五十张",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-c",
+                "alt": "二十六张和二十三张，最多五十张"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "recap-map",
+      "type": "slide",
+      "title": "把方法带回家",
+      "template": "picture-points",
+      "data": {
+        "title": "把方法带回家",
+        "picture": "cover",
+        "points": [
+          "会分",
+          "会算",
+          "会用"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "广播站的票和道具都整理好了。现在回到我们的知识图。"
+        },
+        {
+          "say": "想想你会把哪一种办法讲给家人听。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先认加号和减号，再看个位需不需要进位或退位。"
+        },
+        {
+          "say": "还可以按一位数、两位数分。再从两位数里找整十数。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "整捆跟整捆算，散块跟散块算。"
+        },
+        {
+          "say": "个位满十就合一捆。个位不够减就拆一捆。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "问还差多少，用总数减去已有；问能否放下，先加再比。"
+        },
+        {
+          "say": "每次搬同样多，可以一直减，数一数搬了几次。"
+        },
+        {
+          "say": "回家找个小问题。画出来，算一算，和家人一起查。"
+        }
+      ]
+    }
+  ]
+}

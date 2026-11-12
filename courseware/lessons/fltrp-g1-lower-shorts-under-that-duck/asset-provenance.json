@@ -1,0 +1,2170 @@
+{
+  "schemaVersion": "mira.courseware.asset-provenance.v1",
+  "lesson": "fltrp-g1-lower-shorts-under-that-duck",
+  "reviewedAt": "2026-11-10T19:14:08.887133+08:00",
+  "status": "all_current_media_contact_checked_interactive_prevoice_sample_passed",
+  "assets": [
+    {
+      "assetKey": "shore-cart",
+      "path": "assets/shore-cart.png",
+      "sha256": "2f4a0d38832ac591b18ac996d3373d54221ad9023c3c9de40a4851f146e1f548",
+      "width": 384,
+      "height": 364,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/shore-props.png",
+      "generatedSourceSha256": "6f6da81c81ffa7d60ddab35f8eadb902367faead05e47dadf391df63edcf53ee",
+      "promptSha256": "a220bfca7005d7b02daeaa8db75e24341612c9cbe5b89cb37d4011f0b4e2935d",
+      "sourceCrop": [
+        0,
+        0,
+        429,
+        407
+      ],
+      "promptFile": {
+        "path": "art-source/shore-props.prompt.txt",
+        "sha256": "a220bfca7005d7b02daeaa8db75e24341612c9cbe5b89cb37d4011f0b4e2935d"
+      },
+      "atlasReceipt": {
+        "path": "art-source/shore-props.receipt.json",
+        "sha256": "cf2ddb6dc6ab6318d7513c2b29c8d9fcdad69093f6f33f2cc488ee30b285212a"
+      },
+      "usedBy": [
+        "catch-the-shoes"
+      ],
+      "visualReview": "final_contact_checked_with_browser_interactive_samples"
+    },
+    {
+      "source": "Measured layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_shore_cards.py",
+        "sha256": "29e8ba3e130ad3683f6393b9ceef2f11f3cfbf7ef06fb9958617df2b9b2e9a53"
+      },
+      "data": {
+        "path": "art-source/shore-cards.json",
+        "sha256": "a7cc140b83f98b072a5d75eb30d743dd313a2bbf5796d6e422e1b21b597a30d1"
+      },
+      "upstreamAssetKeys": [
+        "shore-leo",
+        "shore-yellow-shorts"
+      ],
+      "layout": {
+        "canvas": [
+          360,
+          290
+        ],
+        "mat": false,
+        "pieces": [
+          [
+            "leo",
+            180,
+            86,
+            181,
+            168,
+            false
+          ],
+          [
+            "yellow-shorts",
+            180,
+            230,
+            147,
+            110,
+            false
+          ]
+        ]
+      },
+      "assetKey": "shore-leo-short",
+      "path": "assets/shore-leo-short.png",
+      "sha256": "c7fca737f49297ec6fcb383aa3ce6be2a17957dafa1cd58482d25ab7788e57eb",
+      "usedBy": [
+        "owners"
+      ],
+      "visualReview": "final_contact_checked_with_browser_interactive_samples"
+    },
+    {
+      "assetKey": "shore-leo",
+      "path": "assets/shore-leo.png",
+      "sha256": "de00b30f8a1f7ac6b796b82b9db43d4017582a21d4a110fd10d6b91bd38898bb",
+      "width": 384,
+      "height": 384,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/shore-core.png",
+      "generatedSourceSha256": "d6b53ae75ab653130c11303d92791863ba53fd388696d3825ee1a7a29c6c5b10",
+      "promptSha256": "dfaaf6086e64970620404f9b3e3118544c1b0122407a546e8790d4feb145dff7",
+      "sourceCrop": [
+        0,
+        836,
+        418,
+        1254
+      ],
+      "promptFile": {
+        "path": "art-source/shore-core.prompt.txt",
+        "sha256": "dfaaf6086e64970620404f9b3e3118544c1b0122407a546e8790d4feb145dff7"
+      },
+      "atlasReceipt": {
+        "path": "art-source/shore-core.receipt.json",
+        "sha256": "e4fed43766d31e7e066501e42868362f16357bf11eb550ed34af302166f7c080"
+      },
+      "usedBy": [
+        "deliver-to-owners"
+      ],
+      "visualReview": "final_contact_checked_with_browser_interactive_samples"
+    },
+    {
+      "source": "Measured layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_shore_cards.py",
+        "sha256": "29e8ba3e130ad3683f6393b9ceef2f11f3cfbf7ef06fb9958617df2b9b2e9a53"
+      },
+      "data": {
+        "path": "art-source/shore-cards.json",
+        "sha256": "a7cc140b83f98b072a5d75eb30d743dd313a2bbf5796d6e422e1b21b597a30d1"
+      },
+      "upstreamAssetKeys": [
+        "shore-duck",
+        "shore-leo",
+        "shore-navy-shoe"
+      ],
+      "layout": {
+        "canvas": [
+          360,
+          276
+        ],
+        "mat": false,
+        "pieces": [
+          [
+            "leo",
+            70,
+            190,
+            118,
+            143,
+            false
+          ],
+          [
+            "duck",
+            277,
+            94,
+            131,
+            99,
+            false
+          ],
+          [
+            "navy-shoe",
+            230,
+            205,
+            71,
+            90,
+            false
+          ],
+          [
+            "navy-shoe",
+            310,
+            205,
+            71,
+            90,
+            true
+          ]
+        ]
+      },
+      "assetKey": "shore-look-far",
+      "path": "assets/shore-look-far.png",
+      "sha256": "0dbbf89bc3ad160173d71ae36e434660bf76963c987af33936947e3172a82a42",
+      "usedBy": [
+        "find-a-location"
+      ],
+      "visualReview": "final_contact_checked_with_browser_interactive_samples"
+    },
+    {
+      "source": "Measured layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_shore_cards.py",
+        "sha256": "29e8ba3e130ad3683f6393b9ceef2f11f3cfbf7ef06fb9958617df2b9b2e9a53"
+      },
+      "data": {
+        "path": "art-source/shore-cards.json",
+        "sha256": "a7cc140b83f98b072a5d75eb30d743dd313a2bbf5796d6e422e1b21b597a30d1"
+      },
+      "upstreamAssetKeys": [
+        "shore-navy-shoe"
+      ],
+      "layout": {
+        "canvas": [
+          360,
+          270
+        ],
+        "mat": false,
+        "pieces": [
+          [
+            "navy-shoe",
+            94,
+            135,
+            163,
+            235,
+            false
+          ],
+          [
+            "navy-shoe",
+            266,
+            135,
+            163,
+            235,
+            true
+          ]
+        ]
+      },
+      "assetKey": "shore-navy-pair",
+      "path": "assets/shore-navy-pair.png",
+      "sha256": "8d7435e68be63034756b8996e7353bcfc9bf3b2b8d3c466d119bce08df284639",
+      "usedBy": [
+        "deliver-to-owners"
+      ],
+      "visualReview": "final_contact_checked_with_browser_interactive_samples"
+    },
+    {
+      "source": "Measured layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_shore_cards.py",
+        "sha256": "29e8ba3e130ad3683f6393b9ceef2f11f3cfbf7ef06fb9958617df2b9b2e9a53"
+      },
+      "data": {
+        "path": "art-source/shore-cards.json",
+        "sha256": "a7cc140b83f98b072a5d75eb30d743dd313a2bbf5796d6e422e1b21b597a30d1"
+      },
+      "upstreamAssetKeys": [
+        "shore-nina",
+        "shore-teal-shorts"
+      ],
+      "layout": {
+        "canvas": [
+          360,
+          290
+        ],
+        "mat": false,
+        "pieces": [
+          [
+            "nina",
+            180,
+            86,
+            181,
+            168,
+            false
+          ],
+          [
+            "teal-shorts",
+            180,
+            230,
+            147,
+            110,
+            false
+          ]
+        ]
+      },
+      "assetKey": "shore-nina-short",
+      "path": "assets/shore-nina-short.png",
+      "sha256": "bdb01fc1e7cbe20c3af591c539ea7f5b917ddbf5be638d1f374a3a20a1a13cf5",
+      "usedBy": [
+        "owners"
+      ],
+      "visualReview": "final_contact_checked_with_browser_interactive_samples"
+    },
+    {
+      "assetKey": "shore-nina",
+      "path": "assets/shore-nina.png",
+      "sha256": "3e616623ddf5525afda1066ff622d0b94664f7d5b1141e97ebb46803c80f1ad5",
+      "width": 384,
+      "height": 384,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/shore-core.png",
+      "generatedSourceSha256": "d6b53ae75ab653130c11303d92791863ba53fd388696d3825ee1a7a29c6c5b10",
+      "promptSha256": "dfaaf6086e64970620404f9b3e3118544c1b0122407a546e8790d4feb145dff7",
+      "sourceCrop": [
+        418,
+        836,
+        836,
+        1254
+      ],
+      "promptFile": {
+        "path": "art-source/shore-core.prompt.txt",
+        "sha256": "dfaaf6086e64970620404f9b3e3118544c1b0122407a546e8790d4feb145dff7"
+      },
+      "atlasReceipt": {
+        "path": "art-source/shore-core.receipt.json",
+        "sha256": "e4fed43766d31e7e066501e42868362f16357bf11eb550ed34af302166f7c080"
+      },
+      "usedBy": [
+        "deliver-to-owners"
+      ],
+      "visualReview": "final_contact_checked_with_browser_interactive_samples"
+    },
+    {
+      "source": "Measured layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_shore_cards.py",
+        "sha256": "29e8ba3e130ad3683f6393b9ceef2f11f3cfbf7ef06fb9958617df2b9b2e9a53"
+      },
+      "data": {
+        "path": "art-source/shore-cards.json",
+        "sha256": "a7cc140b83f98b072a5d75eb30d743dd313a2bbf5796d6e422e1b21b597a30d1"
+      },
+      "upstreamAssetKeys": [
+        "shore-duck",
+        "shore-teal-shorts"
+      ],
+      "layout": {
+        "canvas": [
+          248,
+          256
+        ],
+        "mat": false,
+        "pieces": [
+          [
+            "duck",
+            62,
+            128,
+            110,
+            242,
+            false
+          ],
+          [
+            "teal-shorts",
+            186,
+            128,
+            110,
+            242,
+            false
+          ]
+        ]
+      },
+      "assetKey": "shore-pick-beside",
+      "path": "assets/shore-pick-beside.png",
+      "sha256": "671979c7035e210a4a251a0c5c0460d316ca97d16b723356a93bd91a817c0db6",
+      "usedBy": [
+        "deliver-to-owners"
+      ],
+      "visualReview": "final_contact_checked_with_browser_interactive_samples"
+    },
+    {
+      "source": "Measured layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_shore_cards.py",
+        "sha256": "29e8ba3e130ad3683f6393b9ceef2f11f3cfbf7ef06fb9958617df2b9b2e9a53"
+      },
+      "data": {
+        "path": "art-source/shore-cards.json",
+        "sha256": "a7cc140b83f98b072a5d75eb30d743dd313a2bbf5796d6e422e1b21b597a30d1"
+      },
+      "upstreamAssetKeys": [
+        "shore-duck",
+        "shore-teal-shorts"
+      ],
+      "layout": {
+        "canvas": [
+          248,
+          256
+        ],
+        "mat": false,
+        "pieces": [
+          [
+            "duck",
+            124,
+            64,
+            234,
+            118,
+            false
+          ],
+          [
+            "teal-shorts",
+            124,
+            192,
+            234,
+            118,
+            false
+          ]
+        ]
+      },
+      "assetKey": "shore-pick-under",
+      "path": "assets/shore-pick-under.png",
+      "sha256": "1bafcd1286b08fba43a60289c4387c17676486917ba8982574418c6ce18099cd",
+      "usedBy": [
+        "deliver-to-owners"
+      ],
+      "visualReview": "final_contact_checked_with_browser_interactive_samples"
+    },
+    {
+      "source": "Measured layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_shore_cards.py",
+        "sha256": "29e8ba3e130ad3683f6393b9ceef2f11f3cfbf7ef06fb9958617df2b9b2e9a53"
+      },
+      "data": {
+        "path": "art-source/shore-cards.json",
+        "sha256": "a7cc140b83f98b072a5d75eb30d743dd313a2bbf5796d6e422e1b21b597a30d1"
+      },
+      "upstreamAssetKeys": [
+        "shore-nina",
+        "shore-rain-shoe"
+      ],
+      "layout": {
+        "canvas": [
+          360,
+          270
+        ],
+        "mat": true,
+        "pieces": [
+          [
+            "nina",
+            73,
+            191,
+            113,
+            130,
+            false
+          ],
+          [
+            "rain-shoe",
+            245,
+            102,
+            45,
+            112,
+            false
+          ],
+          [
+            "rain-shoe",
+            299,
+            102,
+            45,
+            112,
+            true
+          ]
+        ]
+      },
+      "assetKey": "shore-quiz-far-shoes",
+      "path": "assets/shore-quiz-far-shoes.png",
+      "sha256": "08c8aae8156dbcc7d27d9f9e4c0be6750ca33cab9f523e603e44c5fbeca333fb",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "final_contact_checked_with_browser_interactive_samples"
+    },
+    {
+      "source": "Measured layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_shore_cards.py",
+        "sha256": "29e8ba3e130ad3683f6393b9ceef2f11f3cfbf7ef06fb9958617df2b9b2e9a53"
+      },
+      "data": {
+        "path": "art-source/shore-cards.json",
+        "sha256": "a7cc140b83f98b072a5d75eb30d743dd313a2bbf5796d6e422e1b21b597a30d1"
+      },
+      "upstreamAssetKeys": [
+        "shore-nina",
+        "shore-quiz-sock"
+      ],
+      "layout": {
+        "canvas": [
+          360,
+          270
+        ],
+        "mat": true,
+        "pieces": [
+          [
+            "nina",
+            73,
+            191,
+            113,
+            130,
+            false
+          ],
+          [
+            "quiz-sock",
+            245,
+            102,
+            45,
+            112,
+            false
+          ],
+          [
+            "quiz-sock",
+            299,
+            102,
+            45,
+            112,
+            true
+          ]
+        ]
+      },
+      "assetKey": "shore-quiz-far-socks",
+      "path": "assets/shore-quiz-far-socks.png",
+      "sha256": "0524a163242f6c6d65e1a5d4699c6210410280c5ab131227efde489bb9a632d2",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "final_contact_checked_with_browser_interactive_samples"
+    },
+    {
+      "source": "Measured layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_shore_cards.py",
+        "sha256": "29e8ba3e130ad3683f6393b9ceef2f11f3cfbf7ef06fb9958617df2b9b2e9a53"
+      },
+      "data": {
+        "path": "art-source/shore-cards.json",
+        "sha256": "a7cc140b83f98b072a5d75eb30d743dd313a2bbf5796d6e422e1b21b597a30d1"
+      },
+      "upstreamAssetKeys": [
+        "shore-nina",
+        "shore-rain-shoe"
+      ],
+      "layout": {
+        "canvas": [
+          360,
+          270
+        ],
+        "mat": true,
+        "pieces": [
+          [
+            "nina",
+            180,
+            72,
+            132,
+            130,
+            false
+          ],
+          [
+            "rain-shoe",
+            114,
+            203,
+            122,
+            123,
+            false
+          ],
+          [
+            "rain-shoe",
+            246,
+            203,
+            122,
+            123,
+            true
+          ]
+        ]
+      },
+      "assetKey": "shore-quiz-her-shoes",
+      "path": "assets/shore-quiz-her-shoes.png",
+      "sha256": "5d9c0561c399c8c971bac63f42e722e4edb403b318533ff704570fe9d737cc94",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "final_contact_checked_with_browser_interactive_samples"
+    },
+    {
+      "source": "Measured layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_shore_cards.py",
+        "sha256": "29e8ba3e130ad3683f6393b9ceef2f11f3cfbf7ef06fb9958617df2b9b2e9a53"
+      },
+      "data": {
+        "path": "art-source/shore-cards.json",
+        "sha256": "a7cc140b83f98b072a5d75eb30d743dd313a2bbf5796d6e422e1b21b597a30d1"
+      },
+      "upstreamAssetKeys": [
+        "shore-nina",
+        "shore-quiz-sock"
+      ],
+      "layout": {
+        "canvas": [
+          360,
+          270
+        ],
+        "mat": true,
+        "pieces": [
+          [
+            "nina",
+            180,
+            72,
+            132,
+            130,
+            false
+          ],
+          [
+            "quiz-sock",
+            118,
+            203,
+            115,
+            123,
+            false
+          ],
+          [
+            "quiz-sock",
+            242,
+            203,
+            115,
+            123,
+            true
+          ]
+        ]
+      },
+      "assetKey": "shore-quiz-her-socks",
+      "path": "assets/shore-quiz-her-socks.png",
+      "sha256": "c01635f73992480919a03695bca0af027a9bf69c5e681967cd6ea7d73db6a608",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "final_contact_checked_with_browser_interactive_samples"
+    },
+    {
+      "source": "Measured layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_shore_cards.py",
+        "sha256": "29e8ba3e130ad3683f6393b9ceef2f11f3cfbf7ef06fb9958617df2b9b2e9a53"
+      },
+      "data": {
+        "path": "art-source/shore-cards.json",
+        "sha256": "a7cc140b83f98b072a5d75eb30d743dd313a2bbf5796d6e422e1b21b597a30d1"
+      },
+      "upstreamAssetKeys": [
+        "shore-leo",
+        "shore-rain-shoe"
+      ],
+      "layout": {
+        "canvas": [
+          360,
+          270
+        ],
+        "mat": true,
+        "pieces": [
+          [
+            "leo",
+            180,
+            72,
+            132,
+            130,
+            false
+          ],
+          [
+            "rain-shoe",
+            114,
+            203,
+            122,
+            123,
+            false
+          ],
+          [
+            "rain-shoe",
+            246,
+            203,
+            122,
+            123,
+            true
+          ]
+        ]
+      },
+      "assetKey": "shore-quiz-his-shoes",
+      "path": "assets/shore-quiz-his-shoes.png",
+      "sha256": "cba3e1b12a896ed0d951183c248fd0962514573bdc7b319f883e978e2c0e0b96",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "final_contact_checked_with_browser_interactive_samples"
+    },
+    {
+      "source": "Measured layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_shore_cards.py",
+        "sha256": "29e8ba3e130ad3683f6393b9ceef2f11f3cfbf7ef06fb9958617df2b9b2e9a53"
+      },
+      "data": {
+        "path": "art-source/shore-cards.json",
+        "sha256": "a7cc140b83f98b072a5d75eb30d743dd313a2bbf5796d6e422e1b21b597a30d1"
+      },
+      "upstreamAssetKeys": [
+        "shore-navy-shoe",
+        "shore-rain-shoe"
+      ],
+      "layout": {
+        "canvas": [
+          360,
+          270
+        ],
+        "mat": true,
+        "pieces": [
+          [
+            "rain-shoe",
+            88,
+            135,
+            156,
+            235,
+            false
+          ],
+          [
+            "navy-shoe",
+            270,
+            135,
+            156,
+            235,
+            false
+          ]
+        ]
+      },
+      "assetKey": "shore-quiz-mixed-shoes",
+      "path": "assets/shore-quiz-mixed-shoes.png",
+      "sha256": "5e652ee92c7bed4199ad53e98c17e8f5ad666b0351d6ccc8e1ec76afcb642e86",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "final_contact_checked_with_browser_interactive_samples"
+    },
+    {
+      "source": "Measured layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_shore_cards.py",
+        "sha256": "29e8ba3e130ad3683f6393b9ceef2f11f3cfbf7ef06fb9958617df2b9b2e9a53"
+      },
+      "data": {
+        "path": "art-source/shore-cards.json",
+        "sha256": "a7cc140b83f98b072a5d75eb30d743dd313a2bbf5796d6e422e1b21b597a30d1"
+      },
+      "upstreamAssetKeys": [
+        "shore-nina",
+        "shore-quiz-sock"
+      ],
+      "layout": {
+        "canvas": [
+          360,
+          270
+        ],
+        "mat": true,
+        "pieces": [
+          [
+            "nina",
+            73,
+            191,
+            113,
+            130,
+            false
+          ],
+          [
+            "quiz-sock",
+            159,
+            191,
+            45,
+            112,
+            false
+          ],
+          [
+            "quiz-sock",
+            213,
+            191,
+            45,
+            112,
+            true
+          ]
+        ]
+      },
+      "assetKey": "shore-quiz-near-socks",
+      "path": "assets/shore-quiz-near-socks.png",
+      "sha256": "fd8ce2d13f8d40bc081a3948530aeb57005f20226f895e85ed0544f8fc0b05e3",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "final_contact_checked_with_browser_interactive_samples"
+    },
+    {
+      "source": "Measured layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_shore_cards.py",
+        "sha256": "29e8ba3e130ad3683f6393b9ceef2f11f3cfbf7ef06fb9958617df2b9b2e9a53"
+      },
+      "data": {
+        "path": "art-source/shore-cards.json",
+        "sha256": "a7cc140b83f98b072a5d75eb30d743dd313a2bbf5796d6e422e1b21b597a30d1"
+      },
+      "upstreamAssetKeys": [
+        "shore-rain-shoe"
+      ],
+      "layout": {
+        "canvas": [
+          360,
+          270
+        ],
+        "mat": true,
+        "pieces": [
+          [
+            "rain-shoe",
+            180,
+            135,
+            166,
+            235,
+            false
+          ]
+        ]
+      },
+      "assetKey": "shore-quiz-one-shoe",
+      "path": "assets/shore-quiz-one-shoe.png",
+      "sha256": "5ec44f0c31bbdcdcf1ffa12e600f9f2b14a9a35f20d69d77638cf417e38e0908",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "final_contact_checked_with_browser_interactive_samples"
+    },
+    {
+      "source": "Measured layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_shore_cards.py",
+        "sha256": "29e8ba3e130ad3683f6393b9ceef2f11f3cfbf7ef06fb9958617df2b9b2e9a53"
+      },
+      "data": {
+        "path": "art-source/shore-cards.json",
+        "sha256": "a7cc140b83f98b072a5d75eb30d743dd313a2bbf5796d6e422e1b21b597a30d1"
+      },
+      "upstreamAssetKeys": [
+        "shore-quiz-sock"
+      ],
+      "layout": {
+        "canvas": [
+          360,
+          270
+        ],
+        "mat": true,
+        "pieces": [
+          [
+            "quiz-sock",
+            180,
+            135,
+            130,
+            235,
+            false
+          ]
+        ]
+      },
+      "assetKey": "shore-quiz-one-sock",
+      "path": "assets/shore-quiz-one-sock.png",
+      "sha256": "58b14989f0542e478a6957909b65fd28b2533bec001b0c34e11a042cb5de30b8",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "final_contact_checked_with_browser_interactive_samples"
+    },
+    {
+      "source": "Measured layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_shore_cards.py",
+        "sha256": "29e8ba3e130ad3683f6393b9ceef2f11f3cfbf7ef06fb9958617df2b9b2e9a53"
+      },
+      "data": {
+        "path": "art-source/shore-cards.json",
+        "sha256": "a7cc140b83f98b072a5d75eb30d743dd313a2bbf5796d6e422e1b21b597a30d1"
+      },
+      "upstreamAssetKeys": [
+        "shore-rain-shoe"
+      ],
+      "layout": {
+        "canvas": [
+          360,
+          270
+        ],
+        "mat": true,
+        "pieces": [
+          [
+            "rain-shoe",
+            94,
+            135,
+            163,
+            235,
+            false
+          ],
+          [
+            "rain-shoe",
+            266,
+            135,
+            163,
+            235,
+            true
+          ]
+        ]
+      },
+      "assetKey": "shore-quiz-pair-shoes",
+      "path": "assets/shore-quiz-pair-shoes.png",
+      "sha256": "eb1a085375623bbcbe603b81a7f1dda65cc09d9151cabc074587391e54d0405c",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "final_contact_checked_with_browser_interactive_samples"
+    },
+    {
+      "source": "Measured layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_shore_cards.py",
+        "sha256": "29e8ba3e130ad3683f6393b9ceef2f11f3cfbf7ef06fb9958617df2b9b2e9a53"
+      },
+      "data": {
+        "path": "art-source/shore-cards.json",
+        "sha256": "a7cc140b83f98b072a5d75eb30d743dd313a2bbf5796d6e422e1b21b597a30d1"
+      },
+      "upstreamAssetKeys": [
+        "shore-quiz-sock"
+      ],
+      "layout": {
+        "canvas": [
+          360,
+          270
+        ],
+        "mat": true,
+        "pieces": [
+          [
+            "quiz-sock",
+            94,
+            135,
+            163,
+            235,
+            false
+          ],
+          [
+            "quiz-sock",
+            266,
+            135,
+            163,
+            235,
+            true
+          ]
+        ]
+      },
+      "assetKey": "shore-quiz-pair-socks",
+      "path": "assets/shore-quiz-pair-socks.png",
+      "sha256": "569f3fbb008c9bb8feb9269c030834882585e1647bcee1af801e903d6c24ff3b",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "final_contact_checked_with_browser_interactive_samples"
+    },
+    {
+      "source": "Measured layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_shore_cards.py",
+        "sha256": "29e8ba3e130ad3683f6393b9ceef2f11f3cfbf7ef06fb9958617df2b9b2e9a53"
+      },
+      "data": {
+        "path": "art-source/shore-cards.json",
+        "sha256": "a7cc140b83f98b072a5d75eb30d743dd313a2bbf5796d6e422e1b21b597a30d1"
+      },
+      "upstreamAssetKeys": [
+        "shore-duck",
+        "shore-quiz-shorts"
+      ],
+      "layout": {
+        "canvas": [
+          360,
+          300
+        ],
+        "mat": true,
+        "pieces": [
+          [
+            "quiz-shorts",
+            180,
+            75,
+            346,
+            140,
+            false
+          ],
+          [
+            "duck",
+            180,
+            225,
+            346,
+            140,
+            false
+          ]
+        ]
+      },
+      "assetKey": "shore-quiz-shorts-above",
+      "path": "assets/shore-quiz-shorts-above.png",
+      "sha256": "45a53675678bf728204bccdde6be770e0d80bac5d55ae643660cb8889555018c",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "final_contact_checked_with_browser_interactive_samples"
+    },
+    {
+      "source": "Measured layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_shore_cards.py",
+        "sha256": "29e8ba3e130ad3683f6393b9ceef2f11f3cfbf7ef06fb9958617df2b9b2e9a53"
+      },
+      "data": {
+        "path": "art-source/shore-cards.json",
+        "sha256": "a7cc140b83f98b072a5d75eb30d743dd313a2bbf5796d6e422e1b21b597a30d1"
+      },
+      "upstreamAssetKeys": [
+        "shore-duck",
+        "shore-quiz-shorts"
+      ],
+      "layout": {
+        "canvas": [
+          360,
+          300
+        ],
+        "mat": true,
+        "pieces": [
+          [
+            "duck",
+            90,
+            150,
+            166,
+            286,
+            false
+          ],
+          [
+            "quiz-shorts",
+            270,
+            150,
+            166,
+            286,
+            false
+          ]
+        ]
+      },
+      "assetKey": "shore-quiz-shorts-beside",
+      "path": "assets/shore-quiz-shorts-beside.png",
+      "sha256": "a22724cda507bdbb62028591097c26a9484705de6878659269ecc15e25bb90c7",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "final_contact_checked_with_browser_interactive_samples"
+    },
+    {
+      "source": "Measured layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_shore_cards.py",
+        "sha256": "29e8ba3e130ad3683f6393b9ceef2f11f3cfbf7ef06fb9958617df2b9b2e9a53"
+      },
+      "data": {
+        "path": "art-source/shore-cards.json",
+        "sha256": "a7cc140b83f98b072a5d75eb30d743dd313a2bbf5796d6e422e1b21b597a30d1"
+      },
+      "upstreamAssetKeys": [
+        "shore-duck",
+        "shore-quiz-shorts"
+      ],
+      "layout": {
+        "canvas": [
+          360,
+          300
+        ],
+        "mat": true,
+        "pieces": [
+          [
+            "duck",
+            180,
+            75,
+            346,
+            140,
+            false
+          ],
+          [
+            "quiz-shorts",
+            180,
+            225,
+            346,
+            140,
+            false
+          ]
+        ]
+      },
+      "assetKey": "shore-quiz-shorts-under",
+      "path": "assets/shore-quiz-shorts-under.png",
+      "sha256": "d740ab3dad27651f558134b38b974f00d1773086f74ef76dbbb532606c2f1733",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "final_contact_checked_with_browser_interactive_samples"
+    },
+    {
+      "source": "Measured layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_shore_cards.py",
+        "sha256": "29e8ba3e130ad3683f6393b9ceef2f11f3cfbf7ef06fb9958617df2b9b2e9a53"
+      },
+      "data": {
+        "path": "art-source/shore-cards.json",
+        "sha256": "a7cc140b83f98b072a5d75eb30d743dd313a2bbf5796d6e422e1b21b597a30d1"
+      },
+      "upstreamAssetKeys": [
+        "shore-quiz-sock"
+      ],
+      "layout": {
+        "canvas": [
+          360,
+          270
+        ],
+        "mat": true,
+        "pieces": [
+          [
+            "quiz-sock",
+            62,
+            135,
+            100,
+            205,
+            false
+          ],
+          [
+            "quiz-sock",
+            180,
+            135,
+            100,
+            205,
+            true
+          ],
+          [
+            "quiz-sock",
+            298,
+            135,
+            100,
+            205,
+            false
+          ]
+        ]
+      },
+      "assetKey": "shore-quiz-three-socks",
+      "path": "assets/shore-quiz-three-socks.png",
+      "sha256": "b44fe090f88f4079739e1d96382e6096ea0556676f120e5d4d589e5385a5499e",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "final_contact_checked_with_browser_interactive_samples"
+    },
+    {
+      "source": "Measured layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_shore_cards.py",
+        "sha256": "29e8ba3e130ad3683f6393b9ceef2f11f3cfbf7ef06fb9958617df2b9b2e9a53"
+      },
+      "data": {
+        "path": "art-source/shore-cards.json",
+        "sha256": "a7cc140b83f98b072a5d75eb30d743dd313a2bbf5796d6e422e1b21b597a30d1"
+      },
+      "upstreamAssetKeys": [
+        "shore-quiz-shorts"
+      ],
+      "layout": {
+        "canvas": [
+          360,
+          270
+        ],
+        "mat": true,
+        "pieces": [
+          [
+            "quiz-shorts",
+            94,
+            135,
+            163,
+            235,
+            false
+          ],
+          [
+            "quiz-shorts",
+            266,
+            135,
+            163,
+            235,
+            true
+          ]
+        ]
+      },
+      "assetKey": "shore-quiz-two-shorts",
+      "path": "assets/shore-quiz-two-shorts.png",
+      "sha256": "6f9ba9f9aa5280ca65a548034512a502a8bdfaebc9ffb0512312732fd4c8345f",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "final_contact_checked_with_browser_interactive_samples"
+    },
+    {
+      "assetKey": "shore-shirt",
+      "path": "assets/shore-shirt.png",
+      "sha256": "91cbff53023bd0ce7e95615970da885673a51a0b070d9970554d765c807587b7",
+      "width": 384,
+      "height": 384,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/shore-core.png",
+      "generatedSourceSha256": "d6b53ae75ab653130c11303d92791863ba53fd388696d3825ee1a7a29c6c5b10",
+      "promptSha256": "dfaaf6086e64970620404f9b3e3118544c1b0122407a546e8790d4feb145dff7",
+      "sourceCrop": [
+        418,
+        418,
+        836,
+        836
+      ],
+      "promptFile": {
+        "path": "art-source/shore-core.prompt.txt",
+        "sha256": "dfaaf6086e64970620404f9b3e3118544c1b0122407a546e8790d4feb145dff7"
+      },
+      "atlasReceipt": {
+        "path": "art-source/shore-core.receipt.json",
+        "sha256": "e4fed43766d31e7e066501e42868362f16357bf11eb550ed34af302166f7c080"
+      },
+      "usedBy": [
+        "meet-the-clothes"
+      ],
+      "visualReview": "final_contact_checked_with_browser_interactive_samples"
+    },
+    {
+      "assetKey": "shore-shoe",
+      "path": "assets/shore-shoe.png",
+      "sha256": "b1fd97f679defa445121f7c609669b575bccc8d7a9b8a385e0327a167451b4dd",
+      "width": 384,
+      "height": 384,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/shore-core.png",
+      "generatedSourceSha256": "d6b53ae75ab653130c11303d92791863ba53fd388696d3825ee1a7a29c6c5b10",
+      "promptSha256": "dfaaf6086e64970620404f9b3e3118544c1b0122407a546e8790d4feb145dff7",
+      "sourceCrop": [
+        0,
+        0,
+        418,
+        418
+      ],
+      "promptFile": {
+        "path": "art-source/shore-core.prompt.txt",
+        "sha256": "dfaaf6086e64970620404f9b3e3118544c1b0122407a546e8790d4feb145dff7"
+      },
+      "atlasReceipt": {
+        "path": "art-source/shore-core.receipt.json",
+        "sha256": "e4fed43766d31e7e066501e42868362f16357bf11eb550ed34af302166f7c080"
+      },
+      "usedBy": [
+        "catch-the-shoes"
+      ],
+      "visualReview": "final_contact_checked_with_browser_interactive_samples"
+    },
+    {
+      "source": "Measured layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_shore_cards.py",
+        "sha256": "29e8ba3e130ad3683f6393b9ceef2f11f3cfbf7ef06fb9958617df2b9b2e9a53"
+      },
+      "data": {
+        "path": "art-source/shore-cards.json",
+        "sha256": "a7cc140b83f98b072a5d75eb30d743dd313a2bbf5796d6e422e1b21b597a30d1"
+      },
+      "upstreamAssetKeys": [
+        "shore-shoe"
+      ],
+      "layout": {
+        "canvas": [
+          360,
+          270
+        ],
+        "mat": false,
+        "pieces": [
+          [
+            "shoe",
+            94,
+            135,
+            163,
+            235,
+            false
+          ],
+          [
+            "shoe",
+            266,
+            135,
+            163,
+            235,
+            true
+          ]
+        ]
+      },
+      "assetKey": "shore-shoes",
+      "path": "assets/shore-shoes.png",
+      "sha256": "3678c4c93345f4c10d60f2776c46eed60f8e49a5e9bf98235a273a6a028a1870",
+      "usedBy": [
+        "shoe-pairs"
+      ],
+      "visualReview": "final_contact_checked_with_browser_interactive_samples"
+    },
+    {
+      "source": "Measured layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_shore_cards.py",
+        "sha256": "29e8ba3e130ad3683f6393b9ceef2f11f3cfbf7ef06fb9958617df2b9b2e9a53"
+      },
+      "data": {
+        "path": "art-source/shore-cards.json",
+        "sha256": "a7cc140b83f98b072a5d75eb30d743dd313a2bbf5796d6e422e1b21b597a30d1"
+      },
+      "upstreamAssetKeys": [
+        "shore-duck",
+        "shore-teal-shorts"
+      ],
+      "layout": {
+        "canvas": [
+          360,
+          300
+        ],
+        "mat": false,
+        "pieces": [
+          [
+            "duck",
+            90,
+            150,
+            166,
+            286,
+            false
+          ],
+          [
+            "teal-shorts",
+            270,
+            150,
+            166,
+            286,
+            false
+          ]
+        ]
+      },
+      "assetKey": "shore-shorts-beside",
+      "path": "assets/shore-shorts-beside.png",
+      "sha256": "62228187c2e929a7e02cedab6484f8fbcdd266d9b9dee1667721dc0d9948f880",
+      "usedBy": [
+        "same-clothes-new-place"
+      ],
+      "visualReview": "final_contact_checked_with_browser_interactive_samples"
+    },
+    {
+      "source": "Measured layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_shore_cards.py",
+        "sha256": "29e8ba3e130ad3683f6393b9ceef2f11f3cfbf7ef06fb9958617df2b9b2e9a53"
+      },
+      "data": {
+        "path": "art-source/shore-cards.json",
+        "sha256": "a7cc140b83f98b072a5d75eb30d743dd313a2bbf5796d6e422e1b21b597a30d1"
+      },
+      "upstreamAssetKeys": [
+        "shore-duck",
+        "shore-teal-shorts"
+      ],
+      "layout": {
+        "canvas": [
+          360,
+          300
+        ],
+        "mat": false,
+        "pieces": [
+          [
+            "duck",
+            180,
+            75,
+            346,
+            140,
+            false
+          ],
+          [
+            "teal-shorts",
+            180,
+            225,
+            346,
+            140,
+            false
+          ]
+        ]
+      },
+      "assetKey": "shore-shorts-under",
+      "path": "assets/shore-shorts-under.png",
+      "sha256": "fbcbb9ff8243f7c738b2833c92cb9ec6584ab0499b5086beafc4498af66a15a7",
+      "usedBy": [
+        "find-a-location",
+        "same-clothes-new-place"
+      ],
+      "visualReview": "final_contact_checked_with_browser_interactive_samples"
+    },
+    {
+      "source": "Measured layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_shore_cards.py",
+        "sha256": "29e8ba3e130ad3683f6393b9ceef2f11f3cfbf7ef06fb9958617df2b9b2e9a53"
+      },
+      "data": {
+        "path": "art-source/shore-cards.json",
+        "sha256": "a7cc140b83f98b072a5d75eb30d743dd313a2bbf5796d6e422e1b21b597a30d1"
+      },
+      "upstreamAssetKeys": [
+        "shore-sock"
+      ],
+      "layout": {
+        "canvas": [
+          360,
+          270
+        ],
+        "mat": false,
+        "pieces": [
+          [
+            "sock",
+            94,
+            135,
+            163,
+            235,
+            false
+          ],
+          [
+            "sock",
+            266,
+            135,
+            163,
+            235,
+            true
+          ]
+        ]
+      },
+      "assetKey": "shore-socks",
+      "path": "assets/shore-socks.png",
+      "sha256": "3a3f10523ac9e46513437b890f15fb90a2cdff97c46699f25170397feefe35f7",
+      "usedBy": [
+        "shoe-pairs",
+        "deliver-to-owners"
+      ],
+      "visualReview": "final_contact_checked_with_browser_interactive_samples"
+    },
+    {
+      "assetKey": "shore-stage",
+      "source": "Codex built-in image_gen",
+      "generatedSource": {
+        "path": "art-source/shore-stage.png",
+        "sha256": "39c838fa1670558f50cd33d8a36029f8a78d1364ce0baeba5d803933e772c5af"
+      },
+      "promptFile": {
+        "path": "art-source/shore-stage.prompt.txt",
+        "sha256": "ddcdd3ba919c60154cedcd23e9697d9c9e361e164a9f70afa786655b52b80459"
+      },
+      "derivedBy": "Image.Resampling.LANCZOS constrained to 1280x720 PNG",
+      "path": "assets/shore-stage.png",
+      "sha256": "bfd1703ce2da3627de86c90f029efa231b8fd5bc3c661e38356139320b601bce",
+      "usedBy": [
+        "at-the-booth",
+        "catch-the-shoes",
+        "deliver-to-owners"
+      ],
+      "visualReview": "final_contact_checked_with_browser_interactive_samples"
+    },
+    {
+      "assetKey": "shore-sticker",
+      "path": "assets/shore-sticker.png",
+      "sha256": "cdeb6296daa36b7fc6447f3a1aebd4b4272628aaeb863a45a47623d522d38076",
+      "width": 384,
+      "height": 364,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/shore-props.png",
+      "generatedSourceSha256": "6f6da81c81ffa7d60ddab35f8eadb902367faead05e47dadf391df63edcf53ee",
+      "promptSha256": "a220bfca7005d7b02daeaa8db75e24341612c9cbe5b89cb37d4011f0b4e2935d",
+      "sourceCrop": [
+        429,
+        407,
+        858,
+        814
+      ],
+      "promptFile": {
+        "path": "art-source/shore-props.prompt.txt",
+        "sha256": "a220bfca7005d7b02daeaa8db75e24341612c9cbe5b89cb37d4011f0b4e2935d"
+      },
+      "atlasReceipt": {
+        "path": "art-source/shore-props.receipt.json",
+        "sha256": "cf2ddb6dc6ab6318d7513c2b29c8d9fcdad69093f6f33f2cc488ee30b285212a"
+      },
+      "usedBy": [
+        "catch-the-shoes",
+        "deliver-to-owners",
+        "picture-check"
+      ],
+      "visualReview": "final_contact_checked_with_browser_interactive_samples"
+    },
+    {
+      "assetKey": "shore-teal-shorts",
+      "path": "assets/shore-teal-shorts.png",
+      "sha256": "7050cce906a412911599d51cf1e5bbfa6434cb9982b12532373bdda1c505d36d",
+      "width": 384,
+      "height": 384,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/shore-core.png",
+      "generatedSourceSha256": "d6b53ae75ab653130c11303d92791863ba53fd388696d3825ee1a7a29c6c5b10",
+      "promptSha256": "dfaaf6086e64970620404f9b3e3118544c1b0122407a546e8790d4feb145dff7",
+      "sourceCrop": [
+        836,
+        0,
+        1254,
+        418
+      ],
+      "promptFile": {
+        "path": "art-source/shore-core.prompt.txt",
+        "sha256": "dfaaf6086e64970620404f9b3e3118544c1b0122407a546e8790d4feb145dff7"
+      },
+      "atlasReceipt": {
+        "path": "art-source/shore-core.receipt.json",
+        "sha256": "e4fed43766d31e7e066501e42868362f16357bf11eb550ed34af302166f7c080"
+      },
+      "usedBy": [
+        "meet-the-clothes"
+      ],
+      "visualReview": "final_contact_checked_with_browser_interactive_samples"
+    },
+    {
+      "assetKey": "shore-traffic",
+      "path": "assets/shore-traffic.png",
+      "sha256": "534b143eec2f0324eff2672ffd0c0ba18e10088a85efd7b03743517c680a0ba2",
+      "width": 384,
+      "height": 364,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/shore-props.png",
+      "generatedSourceSha256": "6f6da81c81ffa7d60ddab35f8eadb902367faead05e47dadf391df63edcf53ee",
+      "promptSha256": "a220bfca7005d7b02daeaa8db75e24341612c9cbe5b89cb37d4011f0b4e2935d",
+      "sourceCrop": [
+        0,
+        407,
+        429,
+        814
+      ],
+      "promptFile": {
+        "path": "art-source/shore-props.prompt.txt",
+        "sha256": "a220bfca7005d7b02daeaa8db75e24341612c9cbe5b89cb37d4011f0b4e2935d"
+      },
+      "atlasReceipt": {
+        "path": "art-source/shore-props.receipt.json",
+        "sha256": "cf2ddb6dc6ab6318d7513c2b29c8d9fcdad69093f6f33f2cc488ee30b285212a"
+      },
+      "usedBy": [
+        "deliver-to-owners"
+      ],
+      "visualReview": "final_contact_checked_with_browser_interactive_samples"
+    },
+    {
+      "assetKey": "shore-van-run",
+      "path": "assets/shore-van-run.png",
+      "sha256": "c7dad03465d8049309e026ccf95f2e6d2567e4a3d5eb080d9cff348fc3816a39",
+      "width": 384,
+      "height": 363,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/shore-props.png",
+      "generatedSourceSha256": "6f6da81c81ffa7d60ddab35f8eadb902367faead05e47dadf391df63edcf53ee",
+      "promptSha256": "a220bfca7005d7b02daeaa8db75e24341612c9cbe5b89cb37d4011f0b4e2935d",
+      "sourceCrop": [
+        858,
+        0,
+        1288,
+        407
+      ],
+      "promptFile": {
+        "path": "art-source/shore-props.prompt.txt",
+        "sha256": "a220bfca7005d7b02daeaa8db75e24341612c9cbe5b89cb37d4011f0b4e2935d"
+      },
+      "atlasReceipt": {
+        "path": "art-source/shore-props.receipt.json",
+        "sha256": "cf2ddb6dc6ab6318d7513c2b29c8d9fcdad69093f6f33f2cc488ee30b285212a"
+      },
+      "usedBy": [
+        "deliver-to-owners"
+      ],
+      "visualReview": "final_contact_checked_with_browser_interactive_samples"
+    },
+    {
+      "assetKey": "shore-van",
+      "path": "assets/shore-van.png",
+      "sha256": "51d0214535f7595675dd6a65d66470a9cbcda77d7cd3406fad07b4a334ac2efa",
+      "width": 384,
+      "height": 364,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/shore-props.png",
+      "generatedSourceSha256": "6f6da81c81ffa7d60ddab35f8eadb902367faead05e47dadf391df63edcf53ee",
+      "promptSha256": "a220bfca7005d7b02daeaa8db75e24341612c9cbe5b89cb37d4011f0b4e2935d",
+      "sourceCrop": [
+        429,
+        0,
+        858,
+        407
+      ],
+      "promptFile": {
+        "path": "art-source/shore-props.prompt.txt",
+        "sha256": "a220bfca7005d7b02daeaa8db75e24341612c9cbe5b89cb37d4011f0b4e2935d"
+      },
+      "atlasReceipt": {
+        "path": "art-source/shore-props.receipt.json",
+        "sha256": "cf2ddb6dc6ab6318d7513c2b29c8d9fcdad69093f6f33f2cc488ee30b285212a"
+      },
+      "usedBy": [
+        "deliver-to-owners"
+      ],
+      "visualReview": "final_contact_checked_with_browser_interactive_samples"
+    },
+    {
+      "source": "Measured layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_shore_cards.py",
+        "sha256": "29e8ba3e130ad3683f6393b9ceef2f11f3cfbf7ef06fb9958617df2b9b2e9a53"
+      },
+      "data": {
+        "path": "art-source/shore-cards.json",
+        "sha256": "a7cc140b83f98b072a5d75eb30d743dd313a2bbf5796d6e422e1b21b597a30d1"
+      },
+      "upstreamAssetKeys": [
+        "shore-quiz-shorts"
+      ],
+      "layout": {
+        "canvas": [
+          360,
+          270
+        ],
+        "mat": true,
+        "pieces": [
+          [
+            "quiz-shorts",
+            180,
+            135,
+            154,
+            235,
+            false
+          ]
+        ]
+      },
+      "assetKey": "shore-quiz-one-shorts",
+      "path": "assets/shore-quiz-one-shorts.png",
+      "sha256": "53ed6dc47e73e6f20f2b452c45fa3daeb332d965043c87e1e710e0b45cca451c",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "final_contact_checked_with_browser_interactive_samples"
+    },
+    {
+      "source": "Measured layout of Codex built-in image_gen cutouts",
+      "drawingSource": {
+        "path": "art-source/draw_shore_cards.py",
+        "sha256": "29e8ba3e130ad3683f6393b9ceef2f11f3cfbf7ef06fb9958617df2b9b2e9a53"
+      },
+      "data": {
+        "path": "art-source/shore-cards.json",
+        "sha256": "a7cc140b83f98b072a5d75eb30d743dd313a2bbf5796d6e422e1b21b597a30d1"
+      },
+      "upstreamAssetKeys": [
+        "shore-quiz-shirt"
+      ],
+      "layout": {
+        "canvas": [
+          360,
+          270
+        ],
+        "mat": true,
+        "pieces": [
+          [
+            "quiz-shirt",
+            180,
+            135,
+            154,
+            235,
+            false
+          ]
+        ]
+      },
+      "assetKey": "shore-quiz-one-shirt",
+      "path": "assets/shore-quiz-one-shirt.png",
+      "sha256": "1ad41a0ea6637fab658d1b332deeb1635b25ac9bd2d450dd9f928719e3bbc8f0",
+      "usedBy": [
+        "picture-check"
+      ],
+      "visualReview": "final_contact_checked_with_browser_interactive_samples"
+    }
+  ],
+  "missing": [],
+  "interactivePageBudget": [
+    {
+      "scene": "catch-the-shoes",
+      "imageBytes": 1677438,
+      "limitBytes": 3145728
+    },
+    {
+      "scene": "deliver-to-owners",
+      "imageBytes": 2454476,
+      "limitBytes": 3145728
+    }
+  ],
+  "atlasCutouts": [
+    {
+      "assetKey": "shore-shoe",
+      "path": "assets/shore-shoe.png",
+      "sha256": "b1fd97f679defa445121f7c609669b575bccc8d7a9b8a385e0327a167451b4dd",
+      "width": 384,
+      "height": 384,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/shore-core.png",
+      "generatedSourceSha256": "d6b53ae75ab653130c11303d92791863ba53fd388696d3825ee1a7a29c6c5b10",
+      "promptSha256": "dfaaf6086e64970620404f9b3e3118544c1b0122407a546e8790d4feb145dff7",
+      "sourceCrop": [
+        0,
+        0,
+        418,
+        418
+      ],
+      "promptFile": {
+        "path": "art-source/shore-core.prompt.txt",
+        "sha256": "dfaaf6086e64970620404f9b3e3118544c1b0122407a546e8790d4feb145dff7"
+      },
+      "atlasReceipt": {
+        "path": "art-source/shore-core.receipt.json",
+        "sha256": "e4fed43766d31e7e066501e42868362f16357bf11eb550ed34af302166f7c080"
+      }
+    },
+    {
+      "assetKey": "shore-sock",
+      "path": "assets/shore-sock.png",
+      "sha256": "56a9ceed503b58f709332b074e6c4027d2dc2b23f0cb86059c5699d7e9c2d431",
+      "width": 384,
+      "height": 384,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/shore-core.png",
+      "generatedSourceSha256": "d6b53ae75ab653130c11303d92791863ba53fd388696d3825ee1a7a29c6c5b10",
+      "promptSha256": "dfaaf6086e64970620404f9b3e3118544c1b0122407a546e8790d4feb145dff7",
+      "sourceCrop": [
+        418,
+        0,
+        836,
+        418
+      ],
+      "promptFile": {
+        "path": "art-source/shore-core.prompt.txt",
+        "sha256": "dfaaf6086e64970620404f9b3e3118544c1b0122407a546e8790d4feb145dff7"
+      },
+      "atlasReceipt": {
+        "path": "art-source/shore-core.receipt.json",
+        "sha256": "e4fed43766d31e7e066501e42868362f16357bf11eb550ed34af302166f7c080"
+      }
+    },
+    {
+      "assetKey": "shore-teal-shorts",
+      "path": "assets/shore-teal-shorts.png",
+      "sha256": "7050cce906a412911599d51cf1e5bbfa6434cb9982b12532373bdda1c505d36d",
+      "width": 384,
+      "height": 384,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/shore-core.png",
+      "generatedSourceSha256": "d6b53ae75ab653130c11303d92791863ba53fd388696d3825ee1a7a29c6c5b10",
+      "promptSha256": "dfaaf6086e64970620404f9b3e3118544c1b0122407a546e8790d4feb145dff7",
+      "sourceCrop": [
+        836,
+        0,
+        1254,
+        418
+      ],
+      "promptFile": {
+        "path": "art-source/shore-core.prompt.txt",
+        "sha256": "dfaaf6086e64970620404f9b3e3118544c1b0122407a546e8790d4feb145dff7"
+      },
+      "atlasReceipt": {
+        "path": "art-source/shore-core.receipt.json",
+        "sha256": "e4fed43766d31e7e066501e42868362f16357bf11eb550ed34af302166f7c080"
+      }
+    },
+    {
+      "assetKey": "shore-yellow-shorts",
+      "path": "assets/shore-yellow-shorts.png",
+      "sha256": "711061af7d3de19fc3769ceec05c328eaf6017feea24458e33b1d70ac17d2cb3",
+      "width": 384,
+      "height": 384,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/shore-core.png",
+      "generatedSourceSha256": "d6b53ae75ab653130c11303d92791863ba53fd388696d3825ee1a7a29c6c5b10",
+      "promptSha256": "dfaaf6086e64970620404f9b3e3118544c1b0122407a546e8790d4feb145dff7",
+      "sourceCrop": [
+        0,
+        418,
+        418,
+        836
+      ],
+      "promptFile": {
+        "path": "art-source/shore-core.prompt.txt",
+        "sha256": "dfaaf6086e64970620404f9b3e3118544c1b0122407a546e8790d4feb145dff7"
+      },
+      "atlasReceipt": {
+        "path": "art-source/shore-core.receipt.json",
+        "sha256": "e4fed43766d31e7e066501e42868362f16357bf11eb550ed34af302166f7c080"
+      }
+    },
+    {
+      "assetKey": "shore-shirt",
+      "path": "assets/shore-shirt.png",
+      "sha256": "91cbff53023bd0ce7e95615970da885673a51a0b070d9970554d765c807587b7",
+      "width": 384,
+      "height": 384,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/shore-core.png",
+      "generatedSourceSha256": "d6b53ae75ab653130c11303d92791863ba53fd388696d3825ee1a7a29c6c5b10",
+      "promptSha256": "dfaaf6086e64970620404f9b3e3118544c1b0122407a546e8790d4feb145dff7",
+      "sourceCrop": [
+        418,
+        418,
+        836,
+        836
+      ],
+      "promptFile": {
+        "path": "art-source/shore-core.prompt.txt",
+        "sha256": "dfaaf6086e64970620404f9b3e3118544c1b0122407a546e8790d4feb145dff7"
+      },
+      "atlasReceipt": {
+        "path": "art-source/shore-core.receipt.json",
+        "sha256": "e4fed43766d31e7e066501e42868362f16357bf11eb550ed34af302166f7c080"
+      }
+    },
+    {
+      "assetKey": "shore-duck",
+      "path": "assets/shore-duck.png",
+      "sha256": "e8f3815f2c834f3d231b38094843ca8d25780b473c2a1a6f15609d3ac236ecc7",
+      "width": 384,
+      "height": 384,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/shore-core.png",
+      "generatedSourceSha256": "d6b53ae75ab653130c11303d92791863ba53fd388696d3825ee1a7a29c6c5b10",
+      "promptSha256": "dfaaf6086e64970620404f9b3e3118544c1b0122407a546e8790d4feb145dff7",
+      "sourceCrop": [
+        836,
+        418,
+        1254,
+        836
+      ],
+      "promptFile": {
+        "path": "art-source/shore-core.prompt.txt",
+        "sha256": "dfaaf6086e64970620404f9b3e3118544c1b0122407a546e8790d4feb145dff7"
+      },
+      "atlasReceipt": {
+        "path": "art-source/shore-core.receipt.json",
+        "sha256": "e4fed43766d31e7e066501e42868362f16357bf11eb550ed34af302166f7c080"
+      }
+    },
+    {
+      "assetKey": "shore-leo",
+      "path": "assets/shore-leo.png",
+      "sha256": "de00b30f8a1f7ac6b796b82b9db43d4017582a21d4a110fd10d6b91bd38898bb",
+      "width": 384,
+      "height": 384,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/shore-core.png",
+      "generatedSourceSha256": "d6b53ae75ab653130c11303d92791863ba53fd388696d3825ee1a7a29c6c5b10",
+      "promptSha256": "dfaaf6086e64970620404f9b3e3118544c1b0122407a546e8790d4feb145dff7",
+      "sourceCrop": [
+        0,
+        836,
+        418,
+        1254
+      ],
+      "promptFile": {
+        "path": "art-source/shore-core.prompt.txt",
+        "sha256": "dfaaf6086e64970620404f9b3e3118544c1b0122407a546e8790d4feb145dff7"
+      },
+      "atlasReceipt": {
+        "path": "art-source/shore-core.receipt.json",
+        "sha256": "e4fed43766d31e7e066501e42868362f16357bf11eb550ed34af302166f7c080"
+      }
+    },
+    {
+      "assetKey": "shore-nina",
+      "path": "assets/shore-nina.png",
+      "sha256": "3e616623ddf5525afda1066ff622d0b94664f7d5b1141e97ebb46803c80f1ad5",
+      "width": 384,
+      "height": 384,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/shore-core.png",
+      "generatedSourceSha256": "d6b53ae75ab653130c11303d92791863ba53fd388696d3825ee1a7a29c6c5b10",
+      "promptSha256": "dfaaf6086e64970620404f9b3e3118544c1b0122407a546e8790d4feb145dff7",
+      "sourceCrop": [
+        418,
+        836,
+        836,
+        1254
+      ],
+      "promptFile": {
+        "path": "art-source/shore-core.prompt.txt",
+        "sha256": "dfaaf6086e64970620404f9b3e3118544c1b0122407a546e8790d4feb145dff7"
+      },
+      "atlasReceipt": {
+        "path": "art-source/shore-core.receipt.json",
+        "sha256": "e4fed43766d31e7e066501e42868362f16357bf11eb550ed34af302166f7c080"
+      }
+    },
+    {
+      "assetKey": "shore-navy-shoe",
+      "path": "assets/shore-navy-shoe.png",
+      "sha256": "dc190e892ff019547ba757776014c994b4f59dceda7cdb2889423a77d1d424f7",
+      "width": 384,
+      "height": 384,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/shore-core.png",
+      "generatedSourceSha256": "d6b53ae75ab653130c11303d92791863ba53fd388696d3825ee1a7a29c6c5b10",
+      "promptSha256": "dfaaf6086e64970620404f9b3e3118544c1b0122407a546e8790d4feb145dff7",
+      "sourceCrop": [
+        836,
+        836,
+        1254,
+        1254
+      ],
+      "promptFile": {
+        "path": "art-source/shore-core.prompt.txt",
+        "sha256": "dfaaf6086e64970620404f9b3e3118544c1b0122407a546e8790d4feb145dff7"
+      },
+      "atlasReceipt": {
+        "path": "art-source/shore-core.receipt.json",
+        "sha256": "e4fed43766d31e7e066501e42868362f16357bf11eb550ed34af302166f7c080"
+      }
+    },
+    {
+      "assetKey": "shore-cart",
+      "path": "assets/shore-cart.png",
+      "sha256": "2f4a0d38832ac591b18ac996d3373d54221ad9023c3c9de40a4851f146e1f548",
+      "width": 384,
+      "height": 364,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/shore-props.png",
+      "generatedSourceSha256": "6f6da81c81ffa7d60ddab35f8eadb902367faead05e47dadf391df63edcf53ee",
+      "promptSha256": "a220bfca7005d7b02daeaa8db75e24341612c9cbe5b89cb37d4011f0b4e2935d",
+      "sourceCrop": [
+        0,
+        0,
+        429,
+        407
+      ],
+      "promptFile": {
+        "path": "art-source/shore-props.prompt.txt",
+        "sha256": "a220bfca7005d7b02daeaa8db75e24341612c9cbe5b89cb37d4011f0b4e2935d"
+      },
+      "atlasReceipt": {
+        "path": "art-source/shore-props.receipt.json",
+        "sha256": "cf2ddb6dc6ab6318d7513c2b29c8d9fcdad69093f6f33f2cc488ee30b285212a"
+      }
+    },
+    {
+      "assetKey": "shore-van",
+      "path": "assets/shore-van.png",
+      "sha256": "51d0214535f7595675dd6a65d66470a9cbcda77d7cd3406fad07b4a334ac2efa",
+      "width": 384,
+      "height": 364,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/shore-props.png",
+      "generatedSourceSha256": "6f6da81c81ffa7d60ddab35f8eadb902367faead05e47dadf391df63edcf53ee",
+      "promptSha256": "a220bfca7005d7b02daeaa8db75e24341612c9cbe5b89cb37d4011f0b4e2935d",
+      "sourceCrop": [
+        429,
+        0,
+        858,
+        407
+      ],
+      "promptFile": {
+        "path": "art-source/shore-props.prompt.txt",
+        "sha256": "a220bfca7005d7b02daeaa8db75e24341612c9cbe5b89cb37d4011f0b4e2935d"
+      },
+      "atlasReceipt": {
+        "path": "art-source/shore-props.receipt.json",
+        "sha256": "cf2ddb6dc6ab6318d7513c2b29c8d9fcdad69093f6f33f2cc488ee30b285212a"
+      }
+    },
+    {
+      "assetKey": "shore-van-run",
+      "path": "assets/shore-van-run.png",
+      "sha256": "c7dad03465d8049309e026ccf95f2e6d2567e4a3d5eb080d9cff348fc3816a39",
+      "width": 384,
+      "height": 363,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/shore-props.png",
+      "generatedSourceSha256": "6f6da81c81ffa7d60ddab35f8eadb902367faead05e47dadf391df63edcf53ee",
+      "promptSha256": "a220bfca7005d7b02daeaa8db75e24341612c9cbe5b89cb37d4011f0b4e2935d",
+      "sourceCrop": [
+        858,
+        0,
+        1288,
+        407
+      ],
+      "promptFile": {
+        "path": "art-source/shore-props.prompt.txt",
+        "sha256": "a220bfca7005d7b02daeaa8db75e24341612c9cbe5b89cb37d4011f0b4e2935d"
+      },
+      "atlasReceipt": {
+        "path": "art-source/shore-props.receipt.json",
+        "sha256": "cf2ddb6dc6ab6318d7513c2b29c8d9fcdad69093f6f33f2cc488ee30b285212a"
+      }
+    },
+    {
+      "assetKey": "shore-traffic",
+      "path": "assets/shore-traffic.png",
+      "sha256": "534b143eec2f0324eff2672ffd0c0ba18e10088a85efd7b03743517c680a0ba2",
+      "width": 384,
+      "height": 364,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/shore-props.png",
+      "generatedSourceSha256": "6f6da81c81ffa7d60ddab35f8eadb902367faead05e47dadf391df63edcf53ee",
+      "promptSha256": "a220bfca7005d7b02daeaa8db75e24341612c9cbe5b89cb37d4011f0b4e2935d",
+      "sourceCrop": [
+        0,
+        407,
+        429,
+        814
+      ],
+      "promptFile": {
+        "path": "art-source/shore-props.prompt.txt",
+        "sha256": "a220bfca7005d7b02daeaa8db75e24341612c9cbe5b89cb37d4011f0b4e2935d"
+      },
+      "atlasReceipt": {
+        "path": "art-source/shore-props.receipt.json",
+        "sha256": "cf2ddb6dc6ab6318d7513c2b29c8d9fcdad69093f6f33f2cc488ee30b285212a"
+      }
+    },
+    {
+      "assetKey": "shore-sticker",
+      "path": "assets/shore-sticker.png",
+      "sha256": "cdeb6296daa36b7fc6447f3a1aebd4b4272628aaeb863a45a47623d522d38076",
+      "width": 384,
+      "height": 364,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/shore-props.png",
+      "generatedSourceSha256": "6f6da81c81ffa7d60ddab35f8eadb902367faead05e47dadf391df63edcf53ee",
+      "promptSha256": "a220bfca7005d7b02daeaa8db75e24341612c9cbe5b89cb37d4011f0b4e2935d",
+      "sourceCrop": [
+        429,
+        407,
+        858,
+        814
+      ],
+      "promptFile": {
+        "path": "art-source/shore-props.prompt.txt",
+        "sha256": "a220bfca7005d7b02daeaa8db75e24341612c9cbe5b89cb37d4011f0b4e2935d"
+      },
+      "atlasReceipt": {
+        "path": "art-source/shore-props.receipt.json",
+        "sha256": "cf2ddb6dc6ab6318d7513c2b29c8d9fcdad69093f6f33f2cc488ee30b285212a"
+      }
+    },
+    {
+      "assetKey": "shore-rain-shoe",
+      "path": "assets/shore-rain-shoe.png",
+      "sha256": "b6725f8d5cfb7ce267bca46c527c8d3cab438ca2a338c302841ef23d1221be56",
+      "width": 384,
+      "height": 363,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/shore-props.png",
+      "generatedSourceSha256": "6f6da81c81ffa7d60ddab35f8eadb902367faead05e47dadf391df63edcf53ee",
+      "promptSha256": "a220bfca7005d7b02daeaa8db75e24341612c9cbe5b89cb37d4011f0b4e2935d",
+      "sourceCrop": [
+        858,
+        407,
+        1288,
+        814
+      ],
+      "promptFile": {
+        "path": "art-source/shore-props.prompt.txt",
+        "sha256": "a220bfca7005d7b02daeaa8db75e24341612c9cbe5b89cb37d4011f0b4e2935d"
+      },
+      "atlasReceipt": {
+        "path": "art-source/shore-props.receipt.json",
+        "sha256": "cf2ddb6dc6ab6318d7513c2b29c8d9fcdad69093f6f33f2cc488ee30b285212a"
+      }
+    },
+    {
+      "assetKey": "shore-quiz-sock",
+      "path": "assets/shore-quiz-sock.png",
+      "sha256": "303d5da694bcb2bee22e1cc37bb2d269ad883efbc96cbc7c7faca85c8f952be7",
+      "width": 342,
+      "height": 384,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/shore-props.png",
+      "generatedSourceSha256": "6f6da81c81ffa7d60ddab35f8eadb902367faead05e47dadf391df63edcf53ee",
+      "promptSha256": "a220bfca7005d7b02daeaa8db75e24341612c9cbe5b89cb37d4011f0b4e2935d",
+      "sourceCrop": [
+        0,
+        814,
+        362,
+        1221
+      ],
+      "promptFile": {
+        "path": "art-source/shore-props.prompt.txt",
+        "sha256": "a220bfca7005d7b02daeaa8db75e24341612c9cbe5b89cb37d4011f0b4e2935d"
+      },
+      "atlasReceipt": {
+        "path": "art-source/shore-props.receipt.json",
+        "sha256": "cf2ddb6dc6ab6318d7513c2b29c8d9fcdad69093f6f33f2cc488ee30b285212a"
+      }
+    },
+    {
+      "assetKey": "shore-quiz-shorts",
+      "path": "assets/shore-quiz-shorts.png",
+      "sha256": "46ccbba037990b2276b5905a82aae7c646376f98e347197ccdb5c52c7fcdc3ec",
+      "width": 384,
+      "height": 354,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/shore-props.png",
+      "generatedSourceSha256": "6f6da81c81ffa7d60ddab35f8eadb902367faead05e47dadf391df63edcf53ee",
+      "promptSha256": "a220bfca7005d7b02daeaa8db75e24341612c9cbe5b89cb37d4011f0b4e2935d",
+      "sourceCrop": [
+        417,
+        814,
+        858,
+        1221
+      ],
+      "promptFile": {
+        "path": "art-source/shore-props.prompt.txt",
+        "sha256": "a220bfca7005d7b02daeaa8db75e24341612c9cbe5b89cb37d4011f0b4e2935d"
+      },
+      "atlasReceipt": {
+        "path": "art-source/shore-props.receipt.json",
+        "sha256": "cf2ddb6dc6ab6318d7513c2b29c8d9fcdad69093f6f33f2cc488ee30b285212a"
+      }
+    },
+    {
+      "assetKey": "shore-quiz-shirt",
+      "path": "assets/shore-quiz-shirt.png",
+      "sha256": "1e00dbe2595a9e082a2e6bee4a191440b5fda42e2f98b465c84da3b713b9b14a",
+      "width": 384,
+      "height": 363,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/shore-props.png",
+      "generatedSourceSha256": "6f6da81c81ffa7d60ddab35f8eadb902367faead05e47dadf391df63edcf53ee",
+      "promptSha256": "a220bfca7005d7b02daeaa8db75e24341612c9cbe5b89cb37d4011f0b4e2935d",
+      "sourceCrop": [
+        858,
+        814,
+        1288,
+        1221
+      ],
+      "promptFile": {
+        "path": "art-source/shore-props.prompt.txt",
+        "sha256": "a220bfca7005d7b02daeaa8db75e24341612c9cbe5b89cb37d4011f0b4e2935d"
+      },
+      "atlasReceipt": {
+        "path": "art-source/shore-props.receipt.json",
+        "sha256": "cf2ddb6dc6ab6318d7513c2b29c8d9fcdad69093f6f33f2cc488ee30b285212a"
+      }
+    },
+    {
+      "assetKey": "shore-stage",
+      "source": "Codex built-in image_gen",
+      "generatedSource": {
+        "path": "art-source/shore-stage.png",
+        "sha256": "39c838fa1670558f50cd33d8a36029f8a78d1364ce0baeba5d803933e772c5af"
+      },
+      "promptFile": {
+        "path": "art-source/shore-stage.prompt.txt",
+        "sha256": "ddcdd3ba919c60154cedcd23e9697d9c9e361e164a9f70afa786655b52b80459"
+      },
+      "derivedBy": "Image.Resampling.LANCZOS constrained to 1280x720 PNG"
+    }
+  ],
+  "exactCountByCode": true,
+  "contactEvidence": [
+    {
+      "path": "output/courseware-lessons/fltrp-g1-lower-shorts-under-that-duck/work-grade1Handoff20261110-prevoice-v2/qa-prevoice/shore-game-contact.jpg",
+      "sha256": "1cf03758d15ce0d970d7463848c0a64c58e167688338058d26bad9221689019a"
+    },
+    {
+      "path": "output/courseware-lessons/fltrp-g1-lower-shorts-under-that-duck/work-grade1Handoff20261110-prevoice-v2/qa-prevoice/shore-lesson-contact.jpg",
+      "sha256": "89304de109ab09c9d31ef6662df70817f176856e2a7d2cab8749227644746b18"
+    },
+    {
+      "path": "output/courseware-lessons/fltrp-g1-lower-shorts-under-that-duck/work-grade1Handoff20261110-prevoice-v2/qa-prevoice/shore-quiz-contact-1.jpg",
+      "sha256": "ad1ef04d9d43defd33a1019558d1c719932bc4450972ef7a8766a59f896af74e"
+    },
+    {
+      "path": "output/courseware-lessons/fltrp-g1-lower-shorts-under-that-duck/work-grade1Handoff20261110-prevoice-v2/qa-prevoice/shore-quiz-contact-2.jpg",
+      "sha256": "d32c5c77da54ebe40bc3fb0b4b41a850235d6dcc395c425f4c3ccb2271c9b511"
+    },
+    {
+      "path": "output/courseware-lessons/fltrp-g1-lower-shorts-under-that-duck/work-grade1Handoff20261110-prevoice-v2/qa-prevoice/shore-quiz-v2-contact.jpg",
+      "sha256": "686c321d40ff7b7d73b8d43a57d1aa15142a93ae44332a805fd0925c7a99a974"
+    }
+  ]
+}

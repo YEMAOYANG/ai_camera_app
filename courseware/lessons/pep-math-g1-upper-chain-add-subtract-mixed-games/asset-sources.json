@@ -1,0 +1,120 @@
+{
+  "schemaVersion": "mira.courseware.asset-sources.v1",
+  "assets": {
+    "reading-corner": {
+      "file": "assets/reading-corner.png",
+      "sha256": "484ffd79803d2c4cc00d61fc606f223ffa161968c2dcd450c9a070f7a557d24b",
+      "width": 1672,
+      "height": 941,
+      "prompt": "Use case illustration-story. Create one original widescreen 16:9 storybook illustration for a six-year-old's math lesson set in a small neighborhood reading corner. The clear subject is one empty, child-height wooden bookcase beside a low empty returns counter, viewed almost straight on so children can immediately recognize where books will be put. Gentle daylight, warm ivory wall, softened oak, sage and muted lake-green accents, rounded hand-painted linework and calm clean colors. Leave the middle shelf faces clearly visible and completely empty. Simple composition, no people, no books, no repeated decorations, no text, no glyphs, no labels, no watermark. This image sets the place only. Leave all mathematical objects out so code can add exact counts separately.",
+      "source": "Codex built-in imagegen",
+      "generatorOutput": "exec-e6ef3083-a2ee-491d-8fa1-18300c494f0e.png",
+      "reusedFrom": "courseware/lessons/pep-math-g1-upper-chain-add-subtract-mixed/assets/reading-corner.png",
+      "usedBy": [
+        "s01",
+        "g02",
+        "g04",
+        "g06"
+      ]
+    },
+    "single-book": {
+      "file": "assets/single-book.png",
+      "sha256": "ae425e6ca6b0fb3bff3abc80b8763933ae90d8be64de1565b92d9e05a865a3b2",
+      "width": 1254,
+      "height": 1254,
+      "prompt": "Use case illustration-story. Create one isolated sprite of exactly one closed hardback book on a genuinely transparent background for a first-grade math lesson. Cover is muted warm terracotta with a plain soft outline, off-white pages and a clear spine, no lettering or motif. The closed book is shown in a gentle almost frontal three-quarter view with its front cover and a thin page edge clearly visible. Center the single object and fill roughly 80% of the square with a clean silhouette. Rounded hand-painted children's storybook aesthetic, warm soft colors. It must remain instantly recognizable as one book when drawn at 55px. No other objects, no background, no floor, no exterior shadow, no glyphs, no writing, no watermarks.",
+      "source": "Codex built-in imagegen",
+      "generatorOutput": "exec-acc1402f-4b3d-4a75-93f8-0a02139ca576.png",
+      "reusedFrom": "courseware/lessons/pep-math-g1-upper-chain-add-subtract-mixed/assets/single-book.png",
+      "usedBy": [
+        "s01",
+        "s03",
+        "s05",
+        "g02",
+        "g04",
+        "g06"
+      ]
+    },
+    "add-inventory": {
+      "file": "assets/add-inventory.png",
+      "sha256": "beaebc5a535f8ffda18c2edc791e13bb40f7dfe688a7e2b594d0110a3e29e6d4",
+      "source": "本课 diagrams.py 按确切数量绘制。",
+      "usedBy": [
+        "s01"
+      ]
+    },
+    "subtract-inventory": {
+      "file": "assets/subtract-inventory.png",
+      "sha256": "1e43ae1c943ec5052bf00d7101a33d89e69c1eea11173a0058c22bce92308526",
+      "source": "本课 diagrams.py 按确切数量绘制。",
+      "usedBy": [
+        "s03"
+      ]
+    },
+    "plus-then-minus": {
+      "file": "assets/plus-then-minus.png",
+      "sha256": "c7abeaa617b238275ea968f3c001c1992ffdcdb999fe9f7a2b9eb64cdcead18e",
+      "source": "本课 diagrams.py 按确切数量绘制。",
+      "usedBy": [
+        "s05"
+      ]
+    },
+    "minus-then-plus": {
+      "file": "assets/minus-then-plus.png",
+      "sha256": "e6773c44cb98d25f158158154d82f5987150d2d66b2ea06e7095d7e2c207982a",
+      "source": "本课 diagrams.py 按确切数量绘制。",
+      "usedBy": [
+        "s05"
+      ]
+    },
+    "chain-q1": {
+      "file": "assets/chain-q1.png",
+      "sha256": "2bdab196dfba4b4d828c4e71d1829f07e44586ba5a3caad8e764a16f879fe845",
+      "source": "本课 diagrams.py 按确切数量绘制。",
+      "usedBy": [
+        "q07"
+      ]
+    },
+    "chain-q2": {
+      "file": "assets/chain-q2.png",
+      "sha256": "ae3f72cd6f6524f18d12a8a0abc714592691dd770efe8ca510649d79dde5ba46",
+      "source": "本课 diagrams.py 按确切数量绘制。",
+      "usedBy": [
+        "q07"
+      ]
+    },
+    "chain-q3": {
+      "file": "assets/chain-q3.png",
+      "sha256": "9717a7b2e0e503efbc8ca2004ab18efaff2be1239d743b11ab53a83934b8e8d6",
+      "source": "本课 diagrams.py 按确切数量绘制。",
+      "usedBy": [
+        "q07"
+      ]
+    },
+    "chain-q4": {
+      "file": "assets/chain-q4.png",
+      "sha256": "1c274d0e5eeed0d9df8007a1f08af70f67f8eb41071c69bc7d99af4e1bf335b1",
+      "source": "本课 diagrams.py 按确切数量绘制。",
+      "usedBy": [
+        "q07"
+      ]
+    },
+    "chain-q5": {
+      "file": "assets/chain-q5.png",
+      "sha256": "8871491beae2e0f540ede065bb8fdb3ffb0bd3be280bec01cb73dbb633b8eb31",
+      "source": "本课 diagrams.py 按确切数量绘制。",
+      "usedBy": [
+        "q07"
+      ]
+    },
+    "chain-q6": {
+      "file": "assets/chain-q6.png",
+      "sha256": "73c44a49d4958f4dabe40c5889c00920360c0dd166e05edc5de3695875b9ef75",
+      "source": "本课 diagrams.py 按确切数量绘制。",
+      "usedBy": [
+        "q07"
+      ]
+    }
+  },
+  "glyphs": "num-* 的数字图由 courseware.tools.glyph_picture 根据 lesson.json 的 glyph 规格在构建时绘制。"
+}

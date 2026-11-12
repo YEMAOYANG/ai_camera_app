@@ -1,0 +1,1098 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "雨点儿",
+  "description": "听云间广播，认字、辨音、找两位雨点的落脚处，回到纸书分角色读。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小语老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Serena",
+      "avatar": "/avatars/teacher-2.png",
+      "color": "#D65A8A",
+      "persona": "用清楚自然的普通话引导一年级孩子看图、识字和朗读。"
+    }
+  },
+  "images": {
+    "cloud-radio": {
+      "file": "assets/cloud-radio.png"
+    },
+    "count-lanterns": {
+      "file": "assets/count-lanterns.png"
+    },
+    "grow-leaf": {
+      "file": "assets/grow-leaf.png"
+    },
+    "ask-scene": {
+      "file": "assets/ask-scene.png"
+    },
+    "answer-scene": {
+      "file": "assets/answer-scene.png"
+    },
+    "bubble-start": {
+      "file": "assets/bubble-start.png"
+    },
+    "count-beads": {
+      "file": "assets/count-beads.png"
+    },
+    "wash-pebbles": {
+      "file": "assets/wash-pebbles.png"
+    },
+    "long-ribbon": {
+      "file": "assets/long-ribbon.png"
+    },
+    "drop-big": {
+      "file": "assets/drop-big.png"
+    },
+    "drop-small": {
+      "file": "assets/drop-small.png"
+    },
+    "rain-boat": {
+      "file": "assets/rain-boat.png"
+    },
+    "rain-boat-pop": {
+      "file": "assets/rain-boat-pop.png"
+    },
+    "rain-truck": {
+      "file": "assets/rain-truck.png"
+    },
+    "rain-truck-glow": {
+      "file": "assets/rain-truck-glow.png"
+    },
+    "patrol-truck": {
+      "file": "assets/patrol-truck.png"
+    },
+    "rain-mic": {
+      "file": "assets/rain-mic.png"
+    },
+    "empty-station": {
+      "file": "assets/empty-station.png"
+    },
+    "green-station": {
+      "file": "assets/green-station.png"
+    },
+    "words-above": {
+      "file": "assets/words-above.png"
+    },
+    "words-in-talk": {
+      "file": "assets/words-in-talk.png"
+    },
+    "pause-example": {
+      "file": "assets/pause-example.png"
+    },
+    "writing-one": {
+      "file": "assets/writing-one.png"
+    },
+    "writing-two": {
+      "file": "assets/writing-two.png"
+    },
+    "rain-dialogue": {
+      "file": "assets/rain-dialogue.png"
+    },
+    "delivery-start": {
+      "file": "assets/delivery-start.png"
+    },
+    "two-endings": {
+      "file": "assets/two-endings.png"
+    },
+    "role-rehearsal": {
+      "file": "assets/role-rehearsal.png"
+    },
+    "grow-choice-a": {
+      "file": "assets/grow-choice-a.png"
+    },
+    "grow-choice-b": {
+      "file": "assets/grow-choice-b.png"
+    },
+    "grow-choice-c": {
+      "file": "assets/grow-choice-c.png"
+    },
+    "place-choice-a": {
+      "file": "assets/place-choice-a.png"
+    },
+    "place-choice-b": {
+      "file": "assets/place-choice-b.png"
+    },
+    "place-choice-c": {
+      "file": "assets/place-choice-c.png"
+    },
+    "change-choice-a": {
+      "file": "assets/change-choice-a.png"
+    },
+    "change-choice-b": {
+      "file": "assets/change-choice-b.png"
+    },
+    "change-choice-c": {
+      "file": "assets/change-choice-c.png"
+    },
+    "bright-choice-a": {
+      "file": "assets/bright-choice-a.png"
+    },
+    "bright-choice-b": {
+      "file": "assets/bright-choice-b.png"
+    },
+    "bright-choice-c": {
+      "file": "assets/bright-choice-c.png"
+    },
+    "talk-choice-a": {
+      "file": "assets/talk-choice-a.png"
+    },
+    "talk-choice-b": {
+      "file": "assets/talk-choice-b.png"
+    },
+    "talk-choice-c": {
+      "file": "assets/talk-choice-c.png"
+    },
+    "pause-choice-a": {
+      "file": "assets/pause-choice-a.png"
+    },
+    "pause-choice-b": {
+      "file": "assets/pause-choice-b.png"
+    },
+    "pause-choice-c": {
+      "file": "assets/pause-choice-c.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "cloud-radio",
+      "type": "slide",
+      "title": "云间来了两位客人",
+      "template": "picture-points",
+      "data": {
+        "title": "云间来了两位客人",
+        "picture": "cloud-radio",
+        "points": [
+          "雨点儿 · 儿化",
+          "两位客人",
+          "各找落脚处"
+        ]
+      },
+      "script": [
+        {
+          "say": "云间广播站刚开门，是谁轻轻敲了桌子？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "这节课叫雨点儿。把点和儿连起来读。"
+        },
+        {
+          "say": "先听我读，雨点儿。你也把点和儿连成一拍。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "披围巾的是大雨点，戴叶帽的是小雨点。"
+        },
+        {
+          "say": "一大一小从云下落，在天和地之间的半空聊了几句。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "它们看见了不同的地方，想落在哪里呢？"
+        },
+        {
+          "say": "先看清两位客人，再听它们的声音。"
+        }
+      ]
+    },
+    {
+      "key": "words-above",
+      "type": "slide",
+      "title": "跟着雨点认上半页字",
+      "template": "picture-points",
+      "data": {
+        "title": "跟着雨点认上半页字",
+        "picture": "words-above",
+        "points": [
+          "点 · 四点底",
+          "数 · 第三声或第四声",
+          "云彩 · 半空",
+          "地方 · 去哪里"
+        ]
+      },
+      "script": [
+        {
+          "say": "小雨点留下几张字卡，哪张藏着四个小点？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "雨点的点，下边有四点，叫四点底。"
+        },
+        {
+          "say": "下边四个小点排一排，我就找到了雨点的点。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "数的右边有撇、横、撇和捺。数灯笼时读第三声。"
+        },
+        {
+          "say": "报出灯笼的数目，数是第四声，表示有多少。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "云彩的彩右边有三撇。半空的半，一竖穿过两横。"
+        },
+        {
+          "say": "空上面是穴字头，屋顶下有两笔。半空的空读第一声。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "地方的方，上头一点，下有横折钩。地方就是哪儿。"
+        },
+        {
+          "say": "找正在一盏一盏数灯笼的孩子。"
+        }
+      ]
+    },
+    {
+      "key": "words-in-talk",
+      "type": "slide",
+      "title": "听一听问答里的字",
+      "template": "picture-points",
+      "data": {
+        "title": "听一听问答里的字",
+        "picture": "words-in-talk",
+        "points": [
+          "问 · 回 · 答",
+          "等了很久",
+          "更 · 比原先还……",
+          "长 · 两种读音"
+        ]
+      },
+      "script": [
+        {
+          "say": "广播响了两次。你能听出谁先开口吗？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "门里有个口，我找到问。开口请别人告诉自己。"
+        },
+        {
+          "say": "大框包小口的是回。把知道的说出来，叫回答。"
+        },
+        {
+          "say": "答上面是竹字头，下面是合。回答的答读第二声。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "久只有三笔，末笔是捺。等得久，就是等了很长时间。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "中间像日、长撇穿过的是更。比原先还亮，叫更亮。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "长字有竖提和捺。小叶长出来，这里读第三声。"
+        },
+        {
+          "say": "比两条丝带，一条长、一条短。长短的长读第二声。"
+        },
+        {
+          "say": "找土里刚长出一片小叶的图。"
+        },
+        {
+          "say": "找摊开手、正在提问的孩子。"
+        },
+        {
+          "say": "找指向灯笼、正在回答的孩子。"
+        },
+        {
+          "say": "慢一点，重听后再找画面里的动作。"
+        },
+        {
+          "say": "图卡慢下来了，等小艇对着亮图。"
+        }
+      ]
+    },
+    {
+      "key": "listen-to-pauses",
+      "type": "slide",
+      "title": "给声音留个小空隙",
+      "template": "picture-points",
+      "data": {
+        "title": "给声音留个小空隙",
+        "picture": "pause-example",
+        "points": [
+          "不少 · 第四声",
+          "不看 · 第二声",
+          "意思一组，读在一起"
+        ]
+      },
+      "script": [
+        {
+          "say": "小录音员读着读着，声音跑得比小车还快。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先听不少。不后面的少是第三声，不仍读第四声。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "再听不看。看是第四声，前面的不就读第二声。"
+        },
+        {
+          "say": "再对着听，不少，不看。把两个字连起来读。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "一口气说完小车过了石桥，这里轻轻停一下。"
+        },
+        {
+          "say": "听我读。小车过了石桥，慢慢开进树林。"
+        },
+        {
+          "say": "过桥和开进树林，各是一小组。停一下，画面更清楚。"
+        },
+        {
+          "say": "跟我读一遍。小车过了石桥，慢慢开进树林。"
+        }
+      ]
+    },
+    {
+      "key": "listen-for-a-scene",
+      "type": "interactive",
+      "title": "泡泡艇听词找图",
+      "page": "listen-for-a-scene",
+      "widgetType": "game",
+      "startImage": "bubble-start",
+      "script": [
+        {
+          "say": "录音要配一张图。怎样让泡泡找到说的那一张？"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#rain-listen-symbol"
+        },
+        {
+          "say": "先听口令。这次找正在数灯笼的孩子。"
+        },
+        {
+          "highlight": "#rain-first-count"
+        },
+        {
+          "say": "他用手指一盏一盏点灯笼，所以是数灯笼。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "按两边的箭头，把小艇开到那张卡下面。"
+        },
+        {
+          "say": "船头对准再按圆钮，泡泡就会往上飘。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "我只吹中一张就停。接下来从第一轮交给你。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "listen-count": "words-above-13",
+        "listen-grow": "words-in-talk-13",
+        "listen-ask": "words-in-talk-14",
+        "listen-answer": "words-in-talk-15",
+        "bubble-hint": "words-in-talk-16",
+        "bubble-hint-again": "words-in-talk-17",
+        "bubble-praise": "closing-3"
+      }
+    },
+    {
+      "key": "first-writing",
+      "type": "slide",
+      "title": "来和半怎样站稳",
+      "template": "picture-points",
+      "data": {
+        "title": "来和半怎样站稳",
+        "picture": "writing-one",
+        "points": [
+          "来 · 七笔",
+          "半 · 五笔",
+          "在纸上试一格"
+        ]
+      },
+      "script": [
+        {
+          "say": "要写一张落点卡，来和半的竖应该落在哪儿？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "来先写横、点、撇、横，两横间放点和撇。"
+        },
+        {
+          "say": "再写中间的竖，最后向两边写撇、捺。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "半先点、撇，再写短横、长横，最后一竖。"
+        },
+        {
+          "say": "半的两横有长短，竖从中间穿过，两边才稳。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "看格里每次添一笔，再在自己的纸上写。"
+        },
+        {
+          "say": "写完给大人看看，竖是不是站在格子中间。"
+        }
+      ]
+    },
+    {
+      "key": "two-rain-voices",
+      "type": "slide",
+      "title": "先听谁说，再看去哪里",
+      "template": "picture-points",
+      "data": {
+        "title": "先听谁说，再看去哪里",
+        "picture": "rain-dialogue",
+        "points": [
+          "大雨点先问",
+          "小雨点答，也问",
+          "大雨点说自己的去处",
+          "两处落脚图"
+        ]
+      },
+      "script": [
+        {
+          "say": "录音盒里有两种声音，谁先把问题递出来？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "大雨点先开口。小伙伴，你挑了哪处落脚？"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "小雨点先回答。我要去开花、长草的那片地。"
+        },
+        {
+          "say": "它又问，围巾朋友，你的落脚处选好了吗？"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "大雨点说，我挑那块空地，还没见到花草。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "一处本来有花草，小雨点去那里。"
+        },
+        {
+          "say": "另一处本来没有花草，大雨点要去那里。"
+        },
+        {
+          "say": "先接披围巾的大雨点儿。"
+        },
+        {
+          "say": "送到还没有花草的那处。"
+        },
+        {
+          "say": "先接戴叶帽的小雨点儿。"
+        },
+        {
+          "say": "送到已经有花有草的那处。"
+        },
+        {
+          "say": "先停一停，听清是接角色还是送到哪一站。"
+        },
+        {
+          "say": "看看发亮的位置，再等前面有空路。"
+        }
+      ]
+    },
+    {
+      "key": "deliver-a-role",
+      "type": "interactive",
+      "title": "给两位雨点送角色卡",
+      "page": "deliver-a-role",
+      "widgetType": "game",
+      "startImage": "delivery-start",
+      "script": [
+        {
+          "say": "两张角色卡要搭车。听见口令，你先去哪里？"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#rain-first-pickup"
+        },
+        {
+          "say": "这张戴橙围巾。老师先说接大雨点。"
+        },
+        {
+          "highlight": "#rain-empty-destination"
+        },
+        {
+          "say": "拿到卡之后，才去它选的那块没有花草的地。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "用箭头开车，到了对应的格子才按方钮。"
+        },
+        {
+          "say": "路上有橙车经过。停在草地上等路空了再走。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "我拿到一张就停。你从首关听接人的口令。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "pick-big": "two-rain-voices-12",
+        "send-empty": "two-rain-voices-13",
+        "pick-small": "two-rain-voices-14",
+        "send-plants": "two-rain-voices-15",
+        "delivery-hint": "two-rain-voices-16",
+        "delivery-hint-again": "two-rain-voices-17",
+        "delivery-praise": "closing-6"
+      }
+    },
+    {
+      "key": "two-endings",
+      "type": "slide",
+      "title": "两处地方，变化不一样",
+      "template": "picture-points",
+      "data": {
+        "title": "两处地方，变化不一样",
+        "picture": "two-endings",
+        "points": [
+          "先认两处",
+          "原先有花草",
+          "原先没有花草",
+          "用前后说一遍"
+        ]
+      },
+      "script": [
+        {
+          "say": "故事翻到后面，两处看着都有花草了。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "只看最后两张，还分得出是哪处先有吗？"
+        },
+        {
+          "say": "找一找圆石头和两粒小石头，再把前后对起来。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "小雨点去的地方，开始就有花有草。"
+        },
+        {
+          "say": "后来花比原先红，草比原先绿。花草本来就在。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "大雨点去的地，开始只见到土和石头。"
+        },
+        {
+          "say": "后来那里也有红花和绿草。这是从没有到有。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "用原先和后来，把同一处前后的两张图说清。"
+        },
+        {
+          "say": "这里讲的是故事里的变化，留着回书里找。"
+        }
+      ]
+    },
+    {
+      "key": "second-writing",
+      "type": "slide",
+      "title": "写你和有，留出地方",
+      "template": "picture-points",
+      "data": {
+        "title": "写你和有，留出地方",
+        "picture": "writing-two",
+        "points": [
+          "你 · 横钩",
+          "有 · 横在前",
+          "让大人看一看"
+        ]
+      },
+      "script": [
+        {
+          "say": "给两个朋友写字卡，哪一笔要在转角轻轻钩？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "你左边先撇、竖，是单人旁。右边从一撇开始。"
+        },
+        {
+          "say": "接着写横钩。先横着写，末端向左下轻轻钩。"
+        },
+        {
+          "say": "再写竖钩、撇和点，左右两边给对方留位置。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "有先写横，再写撇。下面写竖、横折钩和两横。"
+        },
+        {
+          "say": "两条短横放到里面，别从字的边上伸出来。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "看小格里一笔一笔添，再写给大人看。"
+        },
+        {
+          "say": "请大人看你钩的方向，还要看有的横撇顺序。"
+        }
+      ]
+    },
+    {
+      "key": "role-rehearsal",
+      "type": "slide",
+      "title": "问的人和答的人换一换",
+      "template": "picture-points",
+      "data": {
+        "title": "问的人和答的人换一换",
+        "picture": "role-rehearsal",
+        "points": [
+          "先问",
+          "听完再答",
+          "轮到另一位",
+          "回纸书读"
+        ]
+      },
+      "script": [
+        {
+          "say": "现在换成小雨点先问，会听起来不一样吗？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "小雨点问。下边那座小桥，你看见了吗？"
+        },
+        {
+          "say": "问的时候，像真的在等对方告诉你。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "大雨点答。看见啦，桥旁还有一块圆石头。"
+        },
+        {
+          "say": "先把对方问的事听完，再接上自己的回答。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "试着把角色换过来。问的人先说，答的人等一等。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "打开纸书，一人读大雨点，一人读小雨点。"
+        },
+        {
+          "say": "还可以请一个人读故事开头和最后两处变化。"
+        }
+      ]
+    },
+    {
+      "key": "picture-check",
+      "type": "quiz",
+      "title": "听老师读，选一张图",
+      "intro": [
+        "听完一题，再用画面找出答案。"
+      ],
+      "questions": [
+        {
+          "id": "rain-q1",
+          "question": "听到数一数珠子。哪张图里的孩子也在数？",
+          "skill": "words-and-sounds",
+          "answer": [
+            "B"
+          ],
+          "analysis": "孩子挨个点珠子，是在清点。课本里数不清的数也表示清点，读第三声。",
+          "options": {
+            "A": {
+              "label": "洗小石头",
+              "visual": {
+                "kind": "asset",
+                "image": "wash-pebbles",
+                "alt": "孩子双手在盆里洗几块小石头"
+              }
+            },
+            "B": {
+              "label": "数珠子",
+              "visual": {
+                "kind": "asset",
+                "image": "count-beads",
+                "alt": "孩子一根手指挨个点珠子，另一只手用手指计数"
+              }
+            },
+            "C": {
+              "label": "比丝带",
+              "visual": {
+                "kind": "asset",
+                "image": "long-ribbon",
+                "alt": "孩子伸手拉直较长的橙丝带，桌上还有较短的绿丝带"
+              }
+            }
+          }
+        },
+        {
+          "id": "rain-q2",
+          "question": "哪个花坛原先只见土，后来长出一丛草？",
+          "skill": "words-and-sounds",
+          "answer": [
+            "A"
+          ],
+          "analysis": "第一个花坛从一开始没有草，变成后来有草，这里的长读第三声。",
+          "options": {
+            "A": {
+              "label": "从土到草",
+              "visual": {
+                "kind": "asset",
+                "image": "grow-choice-a",
+                "alt": "同一花坛左图只见土，右图出现一丛绿草"
+              }
+            },
+            "B": {
+              "label": "一直有草",
+              "visual": {
+                "kind": "asset",
+                "image": "grow-choice-b",
+                "alt": "同一花坛两张图都已经有草，右图的草色更绿"
+              }
+            },
+            "C": {
+              "label": "还是空地",
+              "visual": {
+                "kind": "asset",
+                "image": "grow-choice-c",
+                "alt": "同一花坛前后两张图仍然没有花草"
+              }
+            }
+          }
+        },
+        {
+          "id": "rain-q3",
+          "question": "想想小雨点自己挑的落脚处。出发时它会指哪张图？",
+          "skill": "who-goes-where",
+          "answer": [
+            "C"
+          ],
+          "analysis": "小雨点要去已经有花草的一处。花和草两样都要在出发时看得见。",
+          "options": {
+            "A": {
+              "label": "土和石头",
+              "visual": {
+                "kind": "asset",
+                "image": "place-choice-a",
+                "alt": "空地上只有土和石头，没有花草"
+              }
+            },
+            "B": {
+              "label": "有草没花",
+              "visual": {
+                "kind": "asset",
+                "image": "place-choice-b",
+                "alt": "石边有绿草，没有花"
+              }
+            },
+            "C": {
+              "label": "有花有草",
+              "visual": {
+                "kind": "asset",
+                "image": "place-choice-c",
+                "alt": "砖边花坛中能同时看见一朵花和一丛草"
+              }
+            }
+          }
+        },
+        {
+          "id": "rain-q4",
+          "question": "大雨点去的那处，雨前雨后是哪组图？",
+          "skill": "before-and-after",
+          "answer": [
+            "A"
+          ],
+          "analysis": "先看左边有没有花草，再看右边。两样都是后来才有，符合大雨点去处的变化。",
+          "options": {
+            "A": {
+              "label": "后来才有花草",
+              "visual": {
+                "kind": "asset",
+                "image": "change-choice-a",
+                "alt": "砖边花坛左图没有花草，右图有花也有草"
+              }
+            },
+            "B": {
+              "label": "原本就有花草",
+              "visual": {
+                "kind": "asset",
+                "image": "change-choice-b",
+                "alt": "砖边花坛左右都有花草，右边颜色更鲜明"
+              }
+            },
+            "C": {
+            "label": "后来只有花",
+              "visual": {
+                "kind": "asset",
+                "image": "change-choice-c",
+              "alt": "砖边花坛左图没有花草，右图只有花"
+              }
+            }
+          }
+        },
+        {
+          "id": "rain-q5",
+          "question": "哪组图表示花和草原来就有，后来颜色更鲜明？",
+          "skill": "before-and-after",
+          "answer": [
+            "B"
+          ],
+          "analysis": "这一组的左图已经有花和草。右图的花草还在，花更红，草更绿。",
+          "options": {
+            "A": {
+              "label": "后来才有",
+              "visual": {
+                "kind": "asset",
+                "image": "bright-choice-a",
+                "alt": "同一条石头边原先没有花草，后来才出现红花和绿草"
+              }
+            },
+            "B": {
+              "label": "两样更鲜明",
+              "visual": {
+                "kind": "asset",
+                "image": "bright-choice-b",
+                "alt": "同一条石头边两幅图都有花草，右图花更红、草更绿"
+              }
+            },
+            "C": {
+              "label": "没有改变",
+              "visual": {
+                "kind": "asset",
+                "image": "bright-choice-c",
+                "alt": "同一条石头边两幅图花草的位置和颜色一致"
+              }
+            }
+          }
+        },
+        {
+          "id": "rain-q6",
+          "question": "围巾朋友，风车转了吗？转啦。话筒先给谁，再给谁？",
+          "skill": "read-in-roles",
+          "answer": [
+            "C"
+          ],
+          "analysis": "先开口的人喊围巾朋友。围巾雨点听完才回答，话筒先给叶帽，再给围巾。",
+          "options": {
+            "A": {
+              "label": "大先小后",
+              "visual": {
+                "kind": "asset",
+                "image": "talk-choice-a",
+                "alt": "麦克风先在围巾雨点面前，后来移到叶帽雨点面前"
+              }
+            },
+            "B": {
+              "label": "同一位连说",
+              "visual": {
+                "kind": "asset",
+                "image": "talk-choice-b",
+                "alt": "两格麦克风都在叶帽雨点面前，没有交给另一位"
+              }
+            },
+            "C": {
+              "label": "小先大后",
+              "visual": {
+                "kind": "asset",
+                "image": "talk-choice-c",
+                "alt": "麦克风先在叶帽雨点面前，随后移到围巾雨点面前"
+              }
+            }
+          }
+        },
+        {
+          "id": "rain-q7",
+          "question": "听老师读。雨棚下的灯笼，轻轻摇起来。哪组图顺序对？",
+          "skill": "pause-in-reading",
+          "answer": [
+            "A"
+          ],
+          "analysis": "前面先说雨棚下的灯笼，后面再说灯笼摇起来。中间可以轻轻停一下。",
+          "options": {
+            "A": {
+              "label": "先灯笼，后摇动",
+              "visual": {
+                "kind": "asset",
+                "image": "pause-choice-a",
+                "alt": "左图灯笼安静挂在雨棚下，右图灯笼斜着摇动，有弧线"
+              }
+            },
+            "B": {
+              "label": "先摇动，后停住",
+              "visual": {
+                "kind": "asset",
+                "image": "pause-choice-b",
+                "alt": "左图灯笼倾斜摇动，右图灯笼已经挂稳"
+              }
+            },
+            "C": {
+              "label": "先雨棚，后挂灯",
+              "visual": {
+                "kind": "asset",
+                "image": "pause-choice-c",
+                "alt": "左图雨棚下没有灯，右图灯笼安静挂起"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "closing",
+      "type": "slide",
+      "title": "带着声音回纸书",
+      "template": "summary",
+      "data": {
+        "title": "带着声音回纸书",
+        "items": [
+          "字放回词里读",
+          "听清角色的去处",
+          "同一处看前后",
+          "问答和停顿",
+          "请家人听看"
+        ]
+      },
+      "script": [
+        {
+          "say": "广播准备关灯了。哪几件事可以带回家试一试？"
+        },
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "你听清动作，再用画面找到了它。"
+        },
+        {
+          "say": "数字的数和数灯笼的数，意思不同，声音也不同。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "你认出了雨点儿，也找到了它选的地方。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "先用石头认出同一处，再说前后有了什么变化。"
+        },
+        {
+          "spotlight": "item-4"
+        },
+        {
+          "say": "问的人先说，回答的人等一句说完。长句分组读。"
+        },
+        {
+          "spotlight": "item-5"
+        },
+        {
+          "say": "和家人把角色换一换，再请家人看你写四个字。"
+        }
+      ]
+    }
+  ]
+}

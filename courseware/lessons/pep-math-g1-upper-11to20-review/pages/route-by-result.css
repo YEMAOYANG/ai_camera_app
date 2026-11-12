@@ -1,0 +1,21 @@
+#route-current {
+  position: absolute;
+  z-index: 2;
+  left: 34px;
+  top: 207px;
+  box-sizing: border-box;
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  width: 154px;
+  height: 148px;
+  border: 5px solid #286956;
+  border-radius: 25px;
+  color: #183a31;
+  background: #fff6e4;
+  pointer-events: none;
+  line-height: 1;
+}
+#route-current[hidden] { display: none; }
+#route-current span { font-size: 25px; font-weight: 700; }
+#route-current strong { padding-top: 13px; font-size: 76px; font-variant-numeric: tabular-nums; }

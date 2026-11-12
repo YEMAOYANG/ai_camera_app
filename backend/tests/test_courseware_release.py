@@ -224,6 +224,55 @@ class CoursewareReleaseTests(unittest.TestCase):
                 self.inputs['notes']['resources']['courseware']['findings'] = [source | update]
                 self.rejected('notes_invalid')
 
+    def test_source_flag_accepts_legacy_findings_bound_to_resource_pages(self):
+        notes = self.inputs['notes']
+        item = notes['resources']['courseware']
+        item['findings'] = [
+            {'classHour': 'lesson_1', 'finding': 'Compare two groups.'},
+            {'classHour': 'lesson_2', 'finding': 'Use the comparison to explain a choice.'},
+            {'classHour': 'lesson_3', 'finding': 'Apply the comparison.', 'pageRefs': [4]},
+        ]
+        item['pageRefs'] = ['lesson_1/courseware:3', 'lesson_2/courseware:12']
+        original_notes = deepcopy(notes)
+        refresh_receipts(self.inputs)
+
+        prepared = build_release(self.inputs)
+
+        self.assertEqual(notes, original_notes)
+        self.assertEqual(prepared['frozen']['coursewareLight']['evidence']['notesSha256'], digest(original_notes))
+        self.assertEqual(validate_light_release(prepared, self.inputs['manifest']), [])
+
+    def test_source_flag_refuses_unbound_legacy_findings(self):
+        finding = {'classHour': 'lesson_1', 'finding': 'Compare two groups.'}
+        cases = (
+            (finding, 'lesson_2/courseware:3'),
+            (finding, 'lesson_1/teachingDesign:3'),
+            (finding, 'lesson_1/courseware:0'),
+            (finding, 'lesson_1/courseware:3-4'),
+            ({'finding': finding['finding']}, 'lesson_1/courseware:3'),
+            (finding | {'extra': True}, 'lesson_1/courseware:3'),
+            (finding | {'classHour': 'lesson_01'}, 'lesson_01/courseware:3'),
+            (finding | {'classHour': ' lesson_1'}, ' lesson_1/courseware:3'),
+        )
+        for value, page_ref in cases:
+            with self.subTest(value=value, page_ref=page_ref):
+                item = self.inputs['notes']['resources']['courseware']
+                item['findings'] = [value]
+                item['pageRefs'] = [page_ref]
+                # A matching string under a different resource cannot supply this finding's reference.
+                self.inputs['notes']['resources']['teachingDesign']['pageRefs'] = ['lesson_1/courseware:3']
+                refresh_receipts(self.inputs)
+                self.rejected('notes_invalid')
+
+    def test_source_flag_does_not_replace_invalid_explicit_finding_references(self):
+        item = self.inputs['notes']['resources']['courseware']
+        item['pageRefs'] = ['lesson_1/courseware:3']
+        for refs in ([], None, 'lesson_1/courseware:3', [False], [{'package': 'slides', 'pages': [3]}]):
+            with self.subTest(refs=refs):
+                item['findings'] = [{'classHour': 'lesson_1', 'finding': 'Compare two groups.', 'pageRefs': refs}]
+                refresh_receipts(self.inputs)
+                self.rejected('notes_invalid')
+
     def test_a_resource_the_official_listing_lacks_needs_its_evidence(self):
         item = self.inputs['notes']['resources']['afterClassExercise']
         item.clear()

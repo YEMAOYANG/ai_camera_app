@@ -1,0 +1,993 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "数量间的加减关系｜整理和复习",
+  "description": "在社区种植角整理数量图，回顾合计、缺失部分、相差、求另一组和连续两问。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小数老师",
+      "role": "teacher",
+      "gender": "male",
+      "voice": "Ethan",
+      "avatar": "/teachers/ashu-math-v1.png",
+      "color": "#387362",
+      "persona": "用图带孩子理解数量关系，语气亲切清楚。"
+    }
+  },
+  "images": {
+    "community-garden": {
+      "file": "assets/community-garden.png"
+    },
+    "seedling-shed": {
+      "file": "assets/seedling-shed.png"
+    },
+    "garden-cart": {
+      "file": "assets/garden-cart.png"
+    },
+    "garden-cart-moving": {
+      "file": "assets/garden-cart-moving.png"
+    },
+    "garden-marble": {
+      "file": "assets/garden-marble.png"
+    },
+    "garden-reward": {
+      "file": "assets/garden-reward.png"
+    },
+    "garden-sprout": {
+      "file": "assets/garden-sprout.png"
+    },
+    "whole-pots": {
+      "file": "assets/whole-pots.png"
+    },
+    "part-pots": {
+      "file": "assets/part-pots.png"
+    },
+    "gap-pots": {
+      "file": "assets/gap-pots.png"
+    },
+    "shorter-markers": {
+      "file": "assets/shorter-markers.png"
+    },
+    "longer-seedlings": {
+      "file": "assets/longer-seedlings.png"
+    },
+    "dependent-reference": {
+      "file": "assets/dependent-reference.png"
+    },
+    "dependent-combine": {
+      "file": "assets/dependent-combine.png"
+    },
+    "home-clips": {
+      "file": "assets/home-clips.png"
+    },
+    "tray-whole": {
+      "file": "assets/tray-whole.png"
+    },
+    "tray-part": {
+      "file": "assets/tray-part.png"
+    },
+    "tray-gap": {
+      "file": "assets/tray-gap.png"
+    },
+    "card-seeds-total": {
+      "file": "assets/card-seeds-total.png"
+    },
+    "card-seeds-gap": {
+      "file": "assets/card-seeds-gap.png"
+    },
+    "card-seeds-part": {
+      "file": "assets/card-seeds-part.png"
+    },
+    "card-pots-gap": {
+      "file": "assets/card-pots-gap.png"
+    },
+    "card-markers-total": {
+      "file": "assets/card-markers-total.png"
+    },
+    "card-twenty-part": {
+      "file": "assets/card-twenty-part.png"
+    },
+    "card-twenty-three-gap": {
+      "file": "assets/card-twenty-three-gap.png"
+    },
+    "card-nineteen-total": {
+      "file": "assets/card-nineteen-total.png"
+    },
+    "card-twenty-four-part": {
+      "file": "assets/card-twenty-four-part.png"
+    },
+    "order-find-13": {
+      "file": "assets/order-find-13.png"
+    },
+    "order-find-gap": {
+      "file": "assets/order-find-gap.png"
+    },
+    "order-find-27": {
+      "file": "assets/order-find-27.png"
+    },
+    "order-find-63": {
+      "file": "assets/order-find-63.png"
+    },
+    "order-west-27": {
+      "file": "assets/order-west-27.png"
+    },
+    "order-south-35": {
+      "file": "assets/order-south-35.png"
+    },
+    "target-4": {
+      "file": "assets/target-4.png"
+    },
+    "target-9": {
+      "file": "assets/target-9.png"
+    },
+    "target-13": {
+      "file": "assets/target-13.png"
+    },
+    "target-27": {
+      "file": "assets/target-27.png"
+    },
+    "target-35": {
+      "file": "assets/target-35.png"
+    },
+    "target-39": {
+      "file": "assets/target-39.png"
+    },
+    "target-41": {
+      "file": "assets/target-41.png"
+    },
+    "target-45": {
+      "file": "assets/target-45.png"
+    },
+    "target-63": {
+      "file": "assets/target-63.png"
+    },
+    "quiz-total-prompt": {
+      "file": "assets/quiz-total-prompt.png"
+    },
+    "quiz-total-a": {
+      "file": "assets/quiz-total-a.png"
+    },
+    "quiz-total-b": {
+      "file": "assets/quiz-total-b.png"
+    },
+    "quiz-total-c": {
+      "file": "assets/quiz-total-c.png"
+    },
+    "quiz-difference-a": {
+      "file": "assets/quiz-difference-a.png"
+    },
+    "quiz-difference-b": {
+      "file": "assets/quiz-difference-b.png"
+    },
+    "quiz-difference-c": {
+      "file": "assets/quiz-difference-c.png"
+    },
+    "quiz-unknown-group-prompt": {
+      "file": "assets/quiz-unknown-group-prompt.png"
+    },
+    "quiz-unknown-group-a": {
+      "file": "assets/quiz-unknown-group-a.png"
+    },
+    "quiz-unknown-group-b": {
+      "file": "assets/quiz-unknown-group-b.png"
+    },
+    "quiz-unknown-group-c": {
+      "file": "assets/quiz-unknown-group-c.png"
+    },
+    "quiz-dependence-a": {
+      "file": "assets/quiz-dependence-a.png"
+    },
+    "quiz-dependence-b": {
+      "file": "assets/quiz-dependence-b.png"
+    },
+    "quiz-dependence-c": {
+      "file": "assets/quiz-dependence-c.png"
+    },
+    "quiz-changed-reference-a": {
+      "file": "assets/quiz-changed-reference-a.png"
+    },
+    "quiz-changed-reference-b": {
+      "file": "assets/quiz-changed-reference-b.png"
+    },
+    "quiz-changed-reference-c": {
+      "file": "assets/quiz-changed-reference-c.png"
+    },
+    "quiz-same-gap-a": {
+      "file": "assets/quiz-same-gap-a.png"
+    },
+    "quiz-same-gap-b": {
+      "file": "assets/quiz-same-gap-b.png"
+    },
+    "quiz-same-gap-c": {
+      "file": "assets/quiz-same-gap-c.png"
+    },
+    "independent-total": {
+      "file": "assets/independent-total.png"
+    },
+    "independent-gap": {
+      "file": "assets/independent-gap.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "whole-and-parts",
+      "type": "slide",
+      "title": "看看问号放在哪里",
+      "template": "two-columns",
+      "data": {
+        "title": "看看问号放在哪里",
+        "left": {
+          "heading": "求一共有几盆",
+          "body": "11 + 6 = 17（盆）"
+        },
+        "left_picture": "whole-pots",
+        "right": {
+          "heading": "求盖住的几盆",
+          "body": "17 − 11 = 6（盆）"
+        },
+        "right_picture": "part-pots"
+      },
+      "script": [
+        {
+          "say": "种植角要开放。小车送来了两组花盆。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "左边十一盆，右边六盆。两组都要登记。"
+        },
+        {
+          "say": "请用手沿着上面的括号，从头划到尾。"
+        },
+        {
+          "say": "括号把两组包在一起，问号在整条上。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "十一和六是两个部分。合起来用加法。"
+        },
+        {
+          "say": "十一加六等于十七。十七盆是总数。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "看右图。盖住一部分，现在已知总数十七。"
+        },
+        {
+          "say": "还看得见十一盆。问号挪到被盖住的部分。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "整体减掉已知的一部分，就能找回另一部分。"
+        },
+        {
+          "say": "十七减十一得六。把六盆放回去，还是十七盆。"
+        },
+        {
+          "say": "要问还剩几盆，也从总数里去掉拿走的。"
+        }
+      ]
+    },
+    {
+      "key": "one-gap-several-questions",
+      "type": "slide",
+      "title": "同一个缺口可以怎么问",
+      "template": "picture-points",
+      "data": {
+        "title": "同一个缺口可以怎么问",
+        "picture": "gap-pots",
+        "points": [
+          "一盆对一盆",
+          "长排多 5 盆，短排少 5 盆",
+          "短排添 5 盆就一样多"
+        ]
+      },
+      "script": [
+        {
+          "say": "把刚才的两组花盆排起来，你看见了什么？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "上排十一盆，下排六盆。都从左边起点排。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "一盆对一盆，短排六盆都配齐了。"
+        },
+        {
+          "say": "上排也有六盆配齐。露在外面的部分叫差。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "要问相差几，就找两排尽头之间的那段。"
+        },
+        {
+          "say": "十一减六得五。上排多五盆，下排少五盆。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "手指移到下排空着的地方，数一数空位。"
+        },
+        {
+          "say": "下排添上五盆，两排的尽头就能对齐。"
+        },
+        {
+          "say": "还可以问上排拿走几盆才一样多，仍是五盆。"
+        },
+        {
+          "say": "换个方向开口问，比较的还是同一个缺口。"
+        }
+      ]
+    },
+    {
+      "key": "sort-by-what-is-missing",
+      "type": "interactive",
+      "title": "把数量图送回托盘",
+      "page": "sort-by-what-is-missing",
+      "widgetType": "custom",
+      "startImage": "community-garden",
+      "script": [
+        {
+          "say": "种植角有几张数量卡，要请小车送回托盘。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#unknown-preview"
+        },
+        {
+          "say": "左边大图对应青色框里的卡。先找图上问号。"
+        },
+        {
+          "highlight": "#first-quantity-card"
+        },
+        {
+          "say": "这张卡有七包和五包，问号在整体括号上。"
+        },
+        {
+          "highlight": "#first-quantity-dock"
+        },
+        {
+          "say": "托盘也用大括号框住整体，所以送到这里。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "沿着格子按箭头，从数量卡后面把它推过去。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "看，卡进托盘了。我们配的是问号的位置。"
+        },
+        {
+          "say": "同样的两组种子也能问差，问号就在两排尽头之间。"
+        },
+        {
+          "say": "问号若在整条里空着的部分，就找缺失部分托盘。"
+        },
+        {
+          "say": "轮到你。看清问号框住谁，再开小车送卡。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "sort-unknown-goal": "draw-your-own-comparison-5",
+        "sort-unknown-hint": "draw-your-own-comparison-6",
+        "sort-unknown-help": "draw-your-own-comparison-9",
+        "sort-unknown-praise": "draw-your-own-comparison-14"
+      }
+    },
+    {
+      "key": "known-shorter-or-longer",
+      "type": "slide",
+      "title": "先看看要找的那排有多长",
+      "template": "two-columns",
+      "data": {
+        "title": "先看看要找的那排有多长",
+        "left": {
+          "heading": "靠窗比靠墙多 8 块",
+          "body": "找靠墙 27 − 8 = 19（块）"
+        },
+        "left_picture": "shorter-markers",
+        "right": {
+          "heading": "小苗床比大苗床少 7 棵",
+          "body": "找大苗床 18 + 7 = 25（棵）"
+        },
+        "right_picture": "longer-seedlings"
+      },
+      "script": [
+        {
+          "say": "靠窗有二十七块苗牌，比靠墙多八块。"
+        },
+        {
+          "say": "要找靠墙有多少。你猜那排该更长还是更短？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "靠窗是长排。靠墙的短排末尾在竖线这里。"
+        },
+        {
+          "say": "要求短排，就从长排减去多出的那一段。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "二十七减八是十九。十九添八能回到二十七。"
+        },
+        {
+          "say": "再换一件事。小苗床十八棵，比大苗床少七棵。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "这次要找的是大苗床。看，问号在长排。"
+        },
+        {
+          "say": "要找长排，就把短排和差量接在一起。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "十八加七是二十五。二十五减十八，正好差七。"
+        },
+        {
+          "say": "所以听到“少”也可能用加法，要看问的是谁。"
+        }
+      ]
+    },
+    {
+      "key": "two-questions-one-picture",
+      "type": "slide",
+      "title": "有时两问各用原来的数量",
+      "template": "two-columns",
+      "data": {
+        "title": "有时两问各用原来的数量",
+        "left": {
+          "heading": "问两组一共有几块",
+          "body": "12 + 8 = 20（块）"
+        },
+        "left_picture": "independent-total",
+        "right": {
+          "heading": "问两组相差几块",
+          "body": "12 − 8 = 4（块）"
+        },
+        "right_picture": "independent-gap"
+      },
+      "script": [
+        {
+          "say": "两组苗牌可以问两道题。第二问要用第一问吗？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "圆标托盘有十二块苗牌，三角标托盘有八块。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "请指一指这两个已知量。两问都在说这两组。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "求两处一共有多少，把两处实有量合起来。"
+        },
+        {
+          "say": "十二加八得二十。二十是第一问求出的总数。"
+        },
+        {
+          "say": "先把二十留在第一问的记录里。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "第二问要找两组相差几，回到原来的两排。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "十二减八得四。两个输入仍是十二和八。"
+        },
+        {
+          "say": "如果第一问还没写出，第二问也能单独算。"
+        },
+        {
+          "say": "我们按每道题问的量，各自选已知的数。"
+        }
+      ]
+    },
+    {
+      "key": "carry-the-first-answer",
+      "type": "slide",
+      "title": "有时要把第一问的答案带过去",
+      "template": "two-columns",
+      "data": {
+        "title": "有时要把第一问的答案带过去",
+        "left": {
+          "heading": "第二问换了参照",
+          "body": "37 − 8 = 29（个）\n29 + 5 = 34（个）"
+        },
+        "left_picture": "dependent-reference",
+        "right": {
+          "heading": "第二问要求合计",
+          "body": "17 + 6 = 23（个）\n17 + 23 = 40（个）"
+        },
+        "right_picture": "dependent-combine"
+      },
+      "script": [
+        {
+          "say": "一架有三十七个苗格，二架比它少八个。"
+        },
+        {
+          "say": "三架比二架多五个。先想一想，要先算哪一问？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "先找二架的短排。三十七减八得二十九。"
+        },
+        {
+          "say": "二十九加回八，就是三十七，第一问核对好了。"
+        },
+        {
+          "say": "看箭头从二架移到三架。五是三架比二架多的。"
+        },
+        {
+          "say": "第二问要用刚求出的那一排作参照。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "二十九加五得三十四。三十四和二十九相差五。"
+        },
+        {
+          "say": "换到分装台。左边有十七个盘，右边比它多六个。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "十七加六得二十三。二十三减十七，正好差六。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "再求两边总数，十七加二十三，等于四十个。"
+        },
+        {
+          "say": "六只表示相差。合计图里放的是右边的二十三。"
+        },
+        {
+          "say": "四十减去左边十七，剩二十三，合计对上了。"
+        }
+      ]
+    },
+    {
+      "key": "aim-at-the-matching-count",
+      "type": "interactive",
+      "title": "把弹珠送到正确数量",
+      "page": "aim-at-the-matching-count",
+      "widgetType": "custom",
+      "startImage": "seedling-shed",
+      "script": [
+        {
+          "say": "温室的数量靶等着你。问号这次指哪一排？"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#nursery-order"
+        },
+        {
+          "say": "左边图的小架有九盆，比大架少四盆。"
+        },
+        {
+          "say": "我们要找大架。问号在长排，把九和四合起来。"
+        },
+        {
+          "highlight": "#first-seed-target"
+        },
+        {
+          "say": "九加四是十三。中间的苗图是一组十和三株。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "左右箭头能调方向。飞起来时也能微调。"
+        },
+        {
+          "say": "我先对准中间，只发一次给你看。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "命中后留下了贴纸。第一问的数量已经找到了。"
+        },
+        {
+          "say": "后来换口令，要看问号和刚得到的数量再发射。"
+        },
+        {
+          "say": "现在轮到你。先听问什么，再把弹珠发出去。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "marble-find-longer": "known-shorter-or-longer-11",
+        "marble-find-gap": "one-gap-several-questions-8",
+        "marble-find-shorter": "known-shorter-or-longer-5",
+        "marble-find-total": "two-questions-one-picture-7",
+        "marble-use-previous": "carry-the-first-answer-7",
+        "marble-hint": "draw-your-own-comparison-10",
+        "marble-help": "draw-your-own-comparison-11",
+        "marble-praise": "draw-your-own-comparison-15"
+      }
+    },
+    {
+      "key": "picture-review-one",
+      "type": "quiz",
+      "title": "从图上认出所问的量",
+      "intro": [
+        "听老师读题，再选能回答这道题的图片。"
+      ],
+      "questions": [
+        {
+          "id": "quiz-total",
+          "question": "两盘有十四株和五株。一共有几株？",
+          "skill": "name-the-unknown",
+          "answer": [
+            "b"
+          ],
+          "analysis": "十四株和五株都是整体的一部分。两部分合起来，十四加五得十九。",
+          "options": {
+            "a": {
+              "label": "九株",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-total-a",
+                "alt": "排开的九株苗"
+              }
+            },
+            "b": {
+              "label": "十九株",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-total-b",
+                "alt": "十四株与五株在同一个合计括号下，共十九株"
+              }
+            },
+            "c": {
+              "label": "十四株",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-total-c",
+                "alt": "一组十株和散着的四株，共十四株"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "quiz-total-prompt",
+            "alt": "十四株与五株分成两段，整条的合计标问号"
+          }
+        },
+        {
+          "id": "quiz-difference",
+          "question": "长盆二十二朵，短盆十六朵。长盆多几朵？",
+          "skill": "name-the-unknown",
+          "answer": [
+            "c"
+          ],
+          "analysis": "十六朵配成十六对。二十二减十六得六，框线只围住长盆多出的六朵。",
+          "options": {
+            "a": {
+              "label": "两排已有的十六对",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-difference-a",
+                "alt": "框内上下各有十六朵，成十六对，长排末端六朵在框外"
+              }
+            },
+            "b": {
+              "label": "合计三十八朵",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-difference-b",
+                "alt": "两排花放进同一个整体，共三十八朵"
+              }
+            },
+            "c": {
+              "label": "多出六朵",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-difference-c",
+                "alt": "框线只围住长排多出的六朵花"
+              }
+            }
+          }
+        },
+        {
+          "id": "quiz-unknown-group",
+          "question": "左筐二十三个松果，比右筐少四个。右筐几个？",
+          "skill": "find-a-group-count",
+          "answer": [
+            "a"
+          ],
+          "analysis": "右筐是较长一排。用二十三加四，得到右筐的二十七个松果。",
+          "options": {
+            "a": {
+              "label": "二十七个",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-unknown-group-a",
+                "alt": "两组十个与七个散松果"
+              }
+            },
+            "b": {
+              "label": "十九个",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-unknown-group-b",
+                "alt": "一组十个与九个散松果"
+              }
+            },
+            "c": {
+              "label": "四个",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-unknown-group-c",
+                "alt": "四个松果"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "quiz-unknown-group-prompt",
+            "alt": "左筐二十三格放在上排，右筐放下排并标问号，末端多出四格"
+          }
+        }
+      ]
+    },
+    {
+      "key": "picture-review-two",
+      "type": "quiz",
+      "title": "第二问需要哪个量",
+      "intro": [
+        "听清每问要找什么，再看看图里用了哪些量。"
+      ],
+      "questions": [
+        {
+          "id": "quiz-dependence",
+          "question": "架上三十一盆，比院里多九盆。两处合计用哪两数？",
+          "skill": "check-question-dependence",
+          "answer": [
+            "b"
+          ],
+          "analysis": "先求院里，三十一减九得二十二。两处合计要用架上三十一和院里二十二。",
+          "options": {
+            "a": {
+              "label": "三十一与九",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-dependence-a",
+                "alt": "左边三十一盆、右边九盆"
+              }
+            },
+            "b": {
+              "label": "三十一与二十二",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-dependence-b",
+                "alt": "左边三十一盆、右边二十二盆"
+              }
+            },
+            "c": {
+              "label": "二十二与九",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-dependence-c",
+                "alt": "左边二十二盆、右边九盆"
+              }
+            }
+          }
+        },
+        {
+          "id": "quiz-changed-reference",
+          "question": "一号二十五株，二号比它少六。三号比二号多七，几株？",
+          "skill": "check-question-dependence",
+          "answer": [
+            "c"
+          ],
+          "analysis": "二号比一号少六株，先用二十五减六得十九。三号要用十九加七，得二十六。",
+          "options": {
+            "a": {
+              "label": "三十二株",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-changed-reference-a",
+                "alt": "三组十株和两株散苗"
+              }
+            },
+            "b": {
+              "label": "十八株",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-changed-reference-b",
+                "alt": "一组十株和八株散苗"
+              }
+            },
+            "c": {
+              "label": "二十六株",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-changed-reference-c",
+                "alt": "两组十株和六株散苗"
+              }
+            }
+          }
+        },
+        {
+          "id": "quiz-same-gap",
+          "question": "小盘比大盘少几个夹子？哪幅图也在找这个数？",
+          "skill": "ask-about-the-same-gap",
+          "answer": [
+            "a"
+          ],
+          "analysis": "十五和十一配齐后还差四个。问小盘少几个和问小盘添几个才一样多，都找同一个缺口。",
+          "options": {
+            "a": {
+              "label": "给小盘补齐",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-same-gap-a",
+                "alt": "小盘短排末端的四个空位"
+              }
+            },
+            "b": {
+              "label": "求两盘合计",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-same-gap-b",
+                "alt": "用同一个括号把两盘夹子合起来"
+              }
+            },
+            "c": {
+              "label": "数完大盘",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-same-gap-c",
+                "alt": "框住大盘从头到尾的十五个夹子"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "draw-your-own-comparison",
+      "type": "slide",
+      "title": "画一个家里的比较故事",
+      "template": "picture-points",
+      "data": {
+        "title": "画一个家里的比较故事",
+        "picture": "home-clips",
+        "points": [
+          "找出已知和问号",
+          "对齐两排，选合适的运算",
+          "核对结果，再换一种问法"
+        ]
+      },
+      "script": [
+        {
+          "say": "收工具时有十三个和八个夹子。能怎么问？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "请你指一指这两排。把它们从同一头对齐。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先找图上的问号，看看它在整组还是哪一段。"
+        },
+        {
+          "say": "先指一指问号框住了什么。"
+        },
+        {
+          "say": "合计问两排加起来。问差时只看露出的一段。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "看看图里的括号围住整条、缺的一段还是差。"
+        },
+        {
+          "say": "看图上问号在长排、短排，还是另一处。"
+        },
+        {
+          "say": "先找已知的那一段，再用框里的数来核对。"
+        },
+        {
+          "say": "十三减八得五。长排多五个，短排少五个。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "你看清了每个问号问的是谁。"
+        },
+        {
+          "say": "你找到了图上要问的量，还会回头检查。"
+        },
+        {
+          "say": "回家摆两组同样的小物件，自己画一幅图。"
+        },
+        {
+          "say": "先问哪排多几个，再从另一排开口问少几个。"
+        }
+      ]
+    }
+  ]
+}

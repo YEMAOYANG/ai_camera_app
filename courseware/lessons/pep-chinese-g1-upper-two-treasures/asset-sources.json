@@ -1,0 +1,1007 @@
+{
+  "schemaVersion": "mira.courseware.asset-sources.v1",
+  "generatedBy": "Codex built-in imagegen",
+  "imagegenPlan": "imagegen-plan.json",
+  "plates": {
+    "story-a": {
+      "path": "assets/illustrations/source/story-a.png",
+      "sha256": "e118a818d5cd249477f9b3e6538a398d983bdbca7093ef157a889fdc6c7e5f46",
+      "width": 1254,
+      "height": 1254,
+      "originalFilename": "exec-8760419d-bba3-4918-aff8-f5b9d103ee86.png"
+    },
+    "story-b": {
+      "path": "assets/illustrations/source/story-b.png",
+      "sha256": "47ca8ce297e1b40a3969b4cef7d8ac4a4ec8c0f59086dcedb44033fac84504c3",
+      "width": 1536,
+      "height": 1024,
+      "originalFilename": "exec-c59f9875-a875-4a62-882c-b7287d3f6e3d.png"
+    },
+    "environment": {
+      "path": "assets/illustrations/source/environment.png",
+      "sha256": "62ab21359aa79692dd9580c4f35a57695b0a1a15a0a8e5cc93c537daf1e22225",
+      "width": 1024,
+      "height": 1536,
+      "originalFilename": "exec-b941ab67-7c34-4b4f-a666-224469fc6662.png"
+    },
+    "props": {
+      "path": "assets/illustrations/source/props.png",
+      "sha256": "03aaef91ee58c8da891840588a6f71f5769495d3c120b5963b1b7c65f403dc49",
+      "width": 1254,
+      "height": 1254,
+      "originalFilename": "exec-f1ede99b-57a0-467d-8de0-8f769cef7dd1.png"
+    },
+    "sprites": {
+      "path": "assets/illustrations/source/sprites.png",
+      "sha256": "b145d70ac1645d070f84be05f4d27f5541ba3248d39c4425fd706b2b7cfa4605",
+      "width": 1536,
+      "height": 1024,
+      "originalFilename": "exec-0cda073b-aabb-42cb-95fa-d584eb531db4.png"
+    },
+    "quiz": {
+      "path": "assets/illustrations/source/quiz.png",
+      "sha256": "eef181655dedc336a47e89145f7e0b73a6e685e609e898728021deeec687e92e",
+      "width": 1254,
+      "height": 1254,
+      "originalFilename": "exec-8d788260-6627-448f-9b9b-71713d4407ca.png"
+    }
+  },
+  "assets": {
+    "cover-frame": {
+      "type": "codex_builtin_imagegen",
+      "plate": "story-a",
+      "source": "assets/illustrations/source/story-a.png",
+      "sourceSha256": "e118a818d5cd249477f9b3e6538a398d983bdbca7093ef157a889fdc6c7e5f46",
+      "sourceCell": {
+        "left": 0,
+        "top": 0,
+        "width": 627,
+        "height": 418
+      },
+      "crop": {
+        "left": 0,
+        "top": 0,
+        "width": 627,
+        "height": 418
+      },
+      "path": "assets/illustrations/cover-frame.png",
+      "sha256": "74ed57e0bf3e04cf64bf04d0ccb97a6ce35da26a027bb1530bf181afb6379504"
+    },
+    "hands-brain": {
+      "type": "codex_builtin_imagegen",
+      "plate": "story-a",
+      "source": "assets/illustrations/source/story-a.png",
+      "sourceSha256": "e118a818d5cd249477f9b3e6538a398d983bdbca7093ef157a889fdc6c7e5f46",
+      "sourceCell": {
+        "left": 627,
+        "top": 0,
+        "width": 627,
+        "height": 418
+      },
+      "crop": {
+        "left": 627,
+        "top": 0,
+        "width": 627,
+        "height": 418
+      },
+      "path": "assets/illustrations/hands-brain.png",
+      "sha256": "537cce30454823ed47e1e8f4eec7aeafa1783d286f1ef2c8c12c423e1d2efa0e"
+    },
+    "coat-and-tools": {
+      "type": "codex_builtin_imagegen",
+      "plate": "story-a",
+      "source": "assets/illustrations/source/story-a.png",
+      "sourceSha256": "e118a818d5cd249477f9b3e6538a398d983bdbca7093ef157a889fdc6c7e5f46",
+      "sourceCell": {
+        "left": 0,
+        "top": 418,
+        "width": 627,
+        "height": 418
+      },
+      "crop": {
+        "left": 0,
+        "top": 418,
+        "width": 627,
+        "height": 418
+      },
+      "path": "assets/illustrations/coat-and-tools.png",
+      "sha256": "38679be817bebe85bc1afffd344654751bee41e7427d5e745e437611ae726db7"
+    },
+    "story-action": {
+      "type": "codex_builtin_imagegen",
+      "plate": "story-a",
+      "source": "assets/illustrations/source/story-a.png",
+      "sourceSha256": "e118a818d5cd249477f9b3e6538a398d983bdbca7093ef157a889fdc6c7e5f46",
+      "sourceCell": {
+        "left": 627,
+        "top": 418,
+        "width": 627,
+        "height": 418
+      },
+      "crop": {
+        "left": 627,
+        "top": 418,
+        "width": 627,
+        "height": 418
+      },
+      "path": "assets/illustrations/story-action.png",
+      "sha256": "8658dfac9ff851b2d816ebabc50f1ed7c224c42e07a6666896a6c5957a8e86f3"
+    },
+    "cook-and-music": {
+      "type": "codex_builtin_imagegen",
+      "plate": "story-a",
+      "source": "assets/illustrations/source/story-a.png",
+      "sourceSha256": "e118a818d5cd249477f9b3e6538a398d983bdbca7093ef157a889fdc6c7e5f46",
+      "sourceCell": {
+        "left": 0,
+        "top": 836,
+        "width": 627,
+        "height": 418
+      },
+      "crop": {
+        "left": 0,
+        "top": 836,
+        "width": 627,
+        "height": 418
+      },
+      "path": "assets/illustrations/cook-and-music.png",
+      "sha256": "ad00c2ef872d55d879c7f777d43baddccab59d06adc2ed6970537cc5e85be9b3"
+    },
+    "friends-and-crayons": {
+      "type": "codex_builtin_imagegen",
+      "plate": "story-a",
+      "source": "assets/illustrations/source/story-a.png",
+      "sourceSha256": "e118a818d5cd249477f9b3e6538a398d983bdbca7093ef157a889fdc6c7e5f46",
+      "sourceCell": {
+        "left": 627,
+        "top": 836,
+        "width": 627,
+        "height": 418
+      },
+      "crop": {
+        "left": 627,
+        "top": 836,
+        "width": 627,
+        "height": 418
+      },
+      "path": "assets/illustrations/friends-and-crayons.png",
+      "sha256": "75c173d6faea4c64c7217e4a7453b67d4c413bda1f4b1c955d31fce8c0b38cd7"
+    },
+    "approaches-three": {
+      "type": "codex_builtin_imagegen",
+      "plate": "story-b",
+      "source": "assets/illustrations/source/story-b.png",
+      "sourceSha256": "47ca8ce297e1b40a3969b4cef7d8ac4a4ec8c0f59086dcedb44033fac84504c3",
+      "sourceCell": {
+        "left": 0,
+        "top": 0,
+        "width": 768,
+        "height": 512
+      },
+      "crop": {
+        "left": 0,
+        "top": 0,
+        "width": 768,
+        "height": 512
+      },
+      "path": "assets/illustrations/approaches-three.png",
+      "sha256": "1ee04a0f14678962177f33665525dcc2d542555b9d75e9398b9d04dedaee4995"
+    },
+    "tool-bench": {
+      "type": "codex_builtin_imagegen",
+      "plate": "story-b",
+      "source": "assets/illustrations/source/story-b.png",
+      "sourceSha256": "47ca8ce297e1b40a3969b4cef7d8ac4a4ec8c0f59086dcedb44033fac84504c3",
+      "sourceCell": {
+        "left": 768,
+        "top": 0,
+        "width": 768,
+        "height": 512
+      },
+      "crop": {
+        "left": 768,
+        "top": 0,
+        "width": 768,
+        "height": 512
+      },
+      "path": "assets/illustrations/tool-bench.png",
+      "sha256": "37d234411e61acdd554924060f115a492f615da11c8fada56bd7ef9b85bf31fd"
+    },
+    "reading-together": {
+      "type": "codex_builtin_imagegen",
+      "plate": "story-b",
+      "source": "assets/illustrations/source/story-b.png",
+      "sourceSha256": "47ca8ce297e1b40a3969b4cef7d8ac4a4ec8c0f59086dcedb44033fac84504c3",
+      "sourceCell": {
+        "left": 0,
+        "top": 512,
+        "width": 768,
+        "height": 512
+      },
+      "crop": {
+        "left": 0,
+        "top": 512,
+        "width": 768,
+        "height": 512
+      },
+      "path": "assets/illustrations/reading-together.png",
+      "sha256": "e98c16c32b3c0a99109188b29fd750beccd3802cc1aabfd7168da8be2dc69add"
+    },
+    "tool-start": {
+      "type": "codex_builtin_imagegen",
+      "plate": "story-b",
+      "source": "assets/illustrations/source/story-b.png",
+      "sourceSha256": "47ca8ce297e1b40a3969b4cef7d8ac4a4ec8c0f59086dcedb44033fac84504c3",
+      "sourceCell": {
+        "left": 768,
+        "top": 512,
+        "width": 768,
+        "height": 512
+      },
+      "crop": {
+        "left": 768,
+        "top": 512,
+        "width": 768,
+        "height": 512
+      },
+      "path": "assets/illustrations/tool-start.png",
+      "sha256": "0d9079eee42381d00def3bd3f859a0145aba04e6c04b1c09e708d81bcd9e1691"
+    },
+    "tool-backdrop": {
+      "type": "codex_builtin_imagegen",
+      "plate": "environment",
+      "source": "assets/illustrations/source/environment.png",
+      "sourceSha256": "62ab21359aa79692dd9580c4f35a57695b0a1a15a0a8e5cc93c537daf1e22225",
+      "sourceCell": {
+        "left": 0,
+        "top": 0,
+        "width": 1024,
+        "height": 512
+      },
+      "crop": {
+        "left": 0,
+        "top": 0,
+        "width": 1024,
+        "height": 512
+      },
+      "path": "assets/illustrations/tool-backdrop.png",
+      "sha256": "998c66204fce3d34a0288cac4219b4942b9660b832fbf241ceaa4f9190afd19d"
+    },
+    "bridge-backdrop": {
+      "type": "codex_builtin_imagegen",
+      "plate": "environment",
+      "source": "assets/illustrations/source/environment.png",
+      "sourceSha256": "62ab21359aa79692dd9580c4f35a57695b0a1a15a0a8e5cc93c537daf1e22225",
+      "sourceCell": {
+        "left": 0,
+        "top": 512,
+        "width": 1024,
+        "height": 512
+      },
+      "crop": {
+        "left": 0,
+        "top": 512,
+        "width": 1024,
+        "height": 512
+      },
+      "path": "assets/illustrations/bridge-backdrop.png",
+      "sha256": "c7c4da8d5a08db866a33d1f68f2acccb5b2334836f2f8b701ca1c32b31108ba1"
+    },
+    "bridge-start": {
+      "type": "codex_builtin_imagegen",
+      "plate": "environment",
+      "source": "assets/illustrations/source/environment.png",
+      "sourceSha256": "62ab21359aa79692dd9580c4f35a57695b0a1a15a0a8e5cc93c537daf1e22225",
+      "sourceCell": {
+        "left": 0,
+        "top": 1024,
+        "width": 1024,
+        "height": 512
+      },
+      "crop": {
+        "left": 0,
+        "top": 1024,
+        "width": 1024,
+        "height": 512
+      },
+      "path": "assets/illustrations/bridge-start.png",
+      "sha256": "d3e965e7eb7051d2522d4ef3d5ed5b98255f021fb9a1501d8ee6a49125d54260"
+    },
+    "prop-brace": {
+      "type": "codex_builtin_imagegen",
+      "plate": "props",
+      "source": "assets/illustrations/source/props.png",
+      "sourceSha256": "03aaef91ee58c8da891840588a6f71f5769495d3c120b5963b1b7c65f403dc49",
+      "sourceCell": {
+        "left": 0,
+        "top": 0,
+        "width": 418,
+        "height": 418
+      },
+      "crop": {
+        "left": 55,
+        "top": 104,
+        "width": 325,
+        "height": 264
+      },
+      "path": "assets/illustrations/prop-brace.png",
+      "sha256": "a5b48caed3aad6b32fb49529b394285b012b810eea8fd8b57a1082068bc3c2b6"
+    },
+    "prop-clip": {
+      "type": "codex_builtin_imagegen",
+      "plate": "props",
+      "source": "assets/illustrations/source/props.png",
+      "sourceSha256": "03aaef91ee58c8da891840588a6f71f5769495d3c120b5963b1b7c65f403dc49",
+      "sourceCell": {
+        "left": 418,
+        "top": 0,
+        "width": 418,
+        "height": 418
+      },
+      "crop": {
+        "left": 479,
+        "top": 70,
+        "width": 278,
+        "height": 307
+      },
+      "path": "assets/illustrations/prop-clip.png",
+      "sha256": "5dc41724ce4797643b09ed6ffaa97d1ff295c5430122dc95f2d31191f9cee073"
+    },
+    "prop-marker": {
+      "type": "codex_builtin_imagegen",
+      "plate": "props",
+      "source": "assets/illustrations/source/props.png",
+      "sourceSha256": "03aaef91ee58c8da891840588a6f71f5769495d3c120b5963b1b7c65f403dc49",
+      "sourceCell": {
+        "left": 836,
+        "top": 0,
+        "width": 418,
+        "height": 418
+      },
+      "crop": {
+        "left": 891,
+        "top": 68,
+        "width": 295,
+        "height": 314
+      },
+      "path": "assets/illustrations/prop-marker.png",
+      "sha256": "dea033a9c56295fd84c6f43dbe04421434f87ddc8eac2b3238d5928a29b6b630"
+    },
+    "station-frame": {
+      "type": "codex_builtin_imagegen",
+      "plate": "props",
+      "source": "assets/illustrations/source/props.png",
+      "sourceSha256": "03aaef91ee58c8da891840588a6f71f5769495d3c120b5963b1b7c65f403dc49",
+      "sourceCell": {
+        "left": 0,
+        "top": 418,
+        "width": 418,
+        "height": 418
+      },
+      "crop": {
+        "left": 68,
+        "top": 461,
+        "width": 308,
+        "height": 344
+      },
+      "path": "assets/illustrations/station-frame.png",
+      "sha256": "39f0fdcc9518062e48bdab8b940e273ddfda5c79ca19fe457d9c0dcca49f5763"
+    },
+    "station-papers": {
+      "type": "codex_builtin_imagegen",
+      "plate": "props",
+      "source": "assets/illustrations/source/props.png",
+      "sourceSha256": "03aaef91ee58c8da891840588a6f71f5769495d3c120b5963b1b7c65f403dc49",
+      "sourceCell": {
+        "left": 418,
+        "top": 418,
+        "width": 418,
+        "height": 418
+      },
+      "crop": {
+        "left": 449,
+        "top": 444,
+        "width": 348,
+        "height": 362
+      },
+      "path": "assets/illustrations/station-papers.png",
+      "sha256": "0fb51bcb55f04aaeee3fc39b38efb5ca1554962ac333edb292beaa354a8c714e"
+    },
+    "station-sign": {
+      "type": "codex_builtin_imagegen",
+      "plate": "props",
+      "source": "assets/illustrations/source/props.png",
+      "sourceSha256": "03aaef91ee58c8da891840588a6f71f5769495d3c120b5963b1b7c65f403dc49",
+      "sourceCell": {
+        "left": 836,
+        "top": 418,
+        "width": 418,
+        "height": 418
+      },
+      "crop": {
+        "left": 836,
+        "top": 518,
+        "width": 382,
+        "height": 256
+      },
+      "path": "assets/illustrations/station-sign.png",
+      "sha256": "004f34d015db9ae38e66af18b8b1a14322d191278f0b668f5a475d2b6fa77224"
+    },
+    "tool-cart": {
+      "type": "codex_builtin_imagegen",
+      "plate": "sprites",
+      "source": "assets/illustrations/source/sprites.png",
+      "sourceSha256": "b145d70ac1645d070f84be05f4d27f5541ba3248d39c4425fd706b2b7cfa4605",
+      "sourceCell": {
+        "left": 0,
+        "top": 0,
+        "width": 512,
+        "height": 512
+      },
+      "crop": {
+        "left": 58,
+        "top": 80,
+        "width": 414,
+        "height": 353
+      },
+      "path": "assets/illustrations/tool-cart.png",
+      "sha256": "c8678bfe68d8e5ad38da65da74266769639fe1e2c3506e9014cc11034ad2a210"
+    },
+    "tool-cart-lift": {
+      "type": "codex_builtin_imagegen",
+      "plate": "sprites",
+      "source": "assets/illustrations/source/sprites.png",
+      "sourceSha256": "b145d70ac1645d070f84be05f4d27f5541ba3248d39c4425fd706b2b7cfa4605",
+      "sourceCell": {
+        "left": 512,
+        "top": 0,
+        "width": 512,
+        "height": 512
+      },
+      "crop": {
+        "left": 562,
+        "top": 55,
+        "width": 404,
+        "height": 377
+      },
+      "path": "assets/illustrations/tool-cart-lift.png",
+      "sha256": "3aa2f6de7ff96a83597deb7c3fa3a1b532ffb0bc2fdc2433eab4abb6f6789dfd"
+    },
+    "lane-cart": {
+      "type": "codex_builtin_imagegen",
+      "plate": "sprites",
+      "source": "assets/illustrations/source/sprites.png",
+      "sourceSha256": "b145d70ac1645d070f84be05f4d27f5541ba3248d39c4425fd706b2b7cfa4605",
+      "sourceCell": {
+        "left": 1024,
+        "top": 0,
+        "width": 512,
+        "height": 512
+      },
+      "crop": {
+        "left": 1073,
+        "top": 134,
+        "width": 412,
+        "height": 284
+      },
+      "path": "assets/illustrations/lane-cart.png",
+      "sha256": "0ff6f524e6106a2f7c11fc5659c6b0a368ef85ccf5c45a2da14a860f48f859f6"
+    },
+    "rabbit-ready": {
+      "type": "codex_builtin_imagegen",
+      "plate": "sprites",
+      "source": "assets/illustrations/source/sprites.png",
+      "sourceSha256": "b145d70ac1645d070f84be05f4d27f5541ba3248d39c4425fd706b2b7cfa4605",
+      "sourceCell": {
+        "left": 0,
+        "top": 512,
+        "width": 512,
+        "height": 512
+      },
+      "crop": {
+        "left": 108,
+        "top": 512,
+        "width": 318,
+        "height": 465
+      },
+      "path": "assets/illustrations/rabbit-ready.png",
+      "sha256": "0383700d8f624ea0bd2363da271c5a9cb9aa24fb5bd98455c8b0c1b54a6ccd50"
+    },
+    "rabbit-hop": {
+      "type": "codex_builtin_imagegen",
+      "plate": "sprites",
+      "source": "assets/illustrations/source/sprites.png",
+      "sourceSha256": "b145d70ac1645d070f84be05f4d27f5541ba3248d39c4425fd706b2b7cfa4605",
+      "sourceCell": {
+        "left": 512,
+        "top": 512,
+        "width": 512,
+        "height": 512
+      },
+      "crop": {
+        "left": 574,
+        "top": 512,
+        "width": 382,
+        "height": 440
+      },
+      "path": "assets/illustrations/rabbit-hop.png",
+      "sha256": "5c9dc9535856d52509fcc4e23cbc3259f049ce7914dc307fc3b46e07cd322d64"
+    },
+    "reward-sticker": {
+      "type": "codex_builtin_imagegen",
+      "plate": "sprites",
+      "source": "assets/illustrations/source/sprites.png",
+      "sourceSha256": "b145d70ac1645d070f84be05f4d27f5541ba3248d39c4425fd706b2b7cfa4605",
+      "sourceCell": {
+        "left": 1024,
+        "top": 512,
+        "width": 512,
+        "height": 512
+      },
+      "crop": {
+        "left": 1043,
+        "top": 523,
+        "width": 446,
+        "height": 432
+      },
+      "path": "assets/illustrations/reward-sticker.png",
+      "sha256": "f5917c0a63177a486f7156c0054c59ea6431bff35479726f92abb1d9b47687a1"
+    },
+    "q1-tape": {
+      "type": "codex_builtin_imagegen",
+      "plate": "quiz",
+      "source": "assets/illustrations/source/quiz.png",
+      "sourceSha256": "eef181655dedc336a47e89145f7e0b73a6e685e609e898728021deeec687e92e",
+      "sourceCell": {
+        "left": 0,
+        "top": 0,
+        "width": 418,
+        "height": 418
+      },
+      "crop": {
+        "left": 0,
+        "top": 0,
+        "width": 418,
+        "height": 418
+      },
+      "path": "assets/illustrations/q1-tape.png",
+      "sha256": "9a0f37d7bb3f8206df06a0bc124b060c011373b3d68e19aed9469d86c390d7a3"
+    },
+    "q1-hang": {
+      "type": "codex_builtin_imagegen",
+      "plate": "quiz",
+      "source": "assets/illustrations/source/quiz.png",
+      "sourceSha256": "eef181655dedc336a47e89145f7e0b73a6e685e609e898728021deeec687e92e",
+      "sourceCell": {
+        "left": 418,
+        "top": 0,
+        "width": 418,
+        "height": 418
+      },
+      "crop": {
+        "left": 418,
+        "top": 0,
+        "width": 418,
+        "height": 418
+      },
+      "path": "assets/illustrations/q1-hang.png",
+      "sha256": "62148801d131d5e3397ecef82206cd0d2b9a830efc222dd437e4706f4b17ed87"
+    },
+    "q1-think": {
+      "type": "codex_builtin_imagegen",
+      "plate": "quiz",
+      "source": "assets/illustrations/source/quiz.png",
+      "sourceSha256": "eef181655dedc336a47e89145f7e0b73a6e685e609e898728021deeec687e92e",
+      "sourceCell": {
+        "left": 836,
+        "top": 0,
+        "width": 418,
+        "height": 418
+      },
+      "crop": {
+        "left": 836,
+        "top": 0,
+        "width": 418,
+        "height": 418
+      },
+      "path": "assets/illustrations/q1-think.png",
+      "sha256": "8b9c354bd7769cc9eb8938a30bf8b9283a2b3a88114cd831943cbc01fee13217"
+    },
+    "q2-point": {
+      "type": "codex_builtin_imagegen",
+      "plate": "quiz",
+      "source": "assets/illustrations/source/quiz.png",
+      "sourceSha256": "eef181655dedc336a47e89145f7e0b73a6e685e609e898728021deeec687e92e",
+      "sourceCell": {
+        "left": 0,
+        "top": 418,
+        "width": 418,
+        "height": 418
+      },
+      "crop": {
+        "left": 0,
+        "top": 418,
+        "width": 418,
+        "height": 418
+      },
+      "path": "assets/illustrations/q2-point.png",
+      "sha256": "8d7f755afb0482849f3afbc301fc6cca2a09d283e72b7d4db3388b570769507f"
+    },
+    "q2-walk": {
+      "type": "codex_builtin_imagegen",
+      "plate": "quiz",
+      "source": "assets/illustrations/source/quiz.png",
+      "sourceSha256": "eef181655dedc336a47e89145f7e0b73a6e685e609e898728021deeec687e92e",
+      "sourceCell": {
+        "left": 418,
+        "top": 418,
+        "width": 418,
+        "height": 418
+      },
+      "crop": {
+        "left": 418,
+        "top": 418,
+        "width": 418,
+        "height": 418
+      },
+      "path": "assets/illustrations/q2-walk.png",
+      "sha256": "afffdcb60f76ebefafdb9913ae73e898364cc519a5fb90a93d04de878ee2c6c7"
+    },
+    "q2-water": {
+      "type": "codex_builtin_imagegen",
+      "plate": "quiz",
+      "source": "assets/illustrations/source/quiz.png",
+      "sourceSha256": "eef181655dedc336a47e89145f7e0b73a6e685e609e898728021deeec687e92e",
+      "sourceCell": {
+        "left": 836,
+        "top": 418,
+        "width": 418,
+        "height": 418
+      },
+      "crop": {
+        "left": 836,
+        "top": 418,
+        "width": 418,
+        "height": 418
+      },
+      "path": "assets/illustrations/q2-water.png",
+      "sha256": "2380f43c073968ebf5131ff4776c06bfce13ed9ae4a4388bd5aaf6a7873d781d"
+    },
+    "q6-deep": {
+      "type": "codex_builtin_imagegen",
+      "plate": "quiz",
+      "source": "assets/illustrations/source/quiz.png",
+      "sourceSha256": "eef181655dedc336a47e89145f7e0b73a6e685e609e898728021deeec687e92e",
+      "sourceCell": {
+        "left": 0,
+        "top": 836,
+        "width": 418,
+        "height": 418
+      },
+      "crop": {
+        "left": 0,
+        "top": 836,
+        "width": 418,
+        "height": 418
+      },
+      "path": "assets/illustrations/q6-deep.png",
+      "sha256": "320195a716a5c6f7e80fc045f6087b7c8aa1adfd06e580dcb401c457642bae28"
+    },
+    "q6-press": {
+      "type": "codex_builtin_imagegen",
+      "plate": "quiz",
+      "source": "assets/illustrations/source/quiz.png",
+      "sourceSha256": "eef181655dedc336a47e89145f7e0b73a6e685e609e898728021deeec687e92e",
+      "sourceCell": {
+        "left": 418,
+        "top": 836,
+        "width": 418,
+        "height": 418
+      },
+      "crop": {
+        "left": 418,
+        "top": 836,
+        "width": 418,
+        "height": 418
+      },
+      "path": "assets/illustrations/q6-press.png",
+      "sha256": "801130dabefaef8244d67804866db94c4ee3ccbb7dc8a947ed82ffa57abe9cca"
+    },
+    "q6-wait": {
+      "type": "codex_builtin_imagegen",
+      "plate": "quiz",
+      "source": "assets/illustrations/source/quiz.png",
+      "sourceSha256": "eef181655dedc336a47e89145f7e0b73a6e685e609e898728021deeec687e92e",
+      "sourceCell": {
+        "left": 836,
+        "top": 836,
+        "width": 418,
+        "height": 418
+      },
+      "crop": {
+        "left": 836,
+        "top": 836,
+        "width": 418,
+        "height": 418
+      },
+      "path": "assets/illustrations/q6-wait.png",
+      "sha256": "4f28ea3303506245d6b22763f4fad3bf32692793269bfc2d1897fc476ebd12ae"
+    },
+    "q-raincoat": {
+      "type": "deterministic_imagegen_composition",
+      "source": {
+        "type": "codex_builtin_imagegen",
+        "plate": "props",
+        "source": "assets/illustrations/source/props.png",
+        "sourceSha256": "03aaef91ee58c8da891840588a6f71f5769495d3c120b5963b1b7c65f403dc49",
+        "sourceCell": {
+          "left": 0,
+          "top": 836,
+          "width": 418,
+          "height": 418
+        },
+        "crop": {
+          "left": 45,
+          "top": 846,
+          "width": 353,
+          "height": 386
+        },
+        "path": "assets/illustrations/source/q-raincoat-cutout.png",
+        "sha256": "b992150c7fa3805e96dd3e8ad6793fa094e052c6041666f9aa7bd197643f8b4c"
+      },
+      "canvas": {
+        "width": 390,
+        "height": 272,
+        "background": "#f9efd8"
+      },
+      "count": 1,
+      "centers": [
+        195
+      ],
+      "fit": {
+        "width": 218,
+        "height": 235
+      },
+      "path": "assets/illustrations/q-raincoat.png",
+      "sha256": "615c16a670fcde1861fb1f544104922aeee037b0a8a542334d8d2c130d6b539f"
+    },
+    "q-two-raincoats": {
+      "type": "deterministic_imagegen_composition",
+      "source": {
+        "type": "codex_builtin_imagegen",
+        "plate": "props",
+        "source": "assets/illustrations/source/props.png",
+        "sourceSha256": "03aaef91ee58c8da891840588a6f71f5769495d3c120b5963b1b7c65f403dc49",
+        "sourceCell": {
+          "left": 0,
+          "top": 836,
+          "width": 418,
+          "height": 418
+        },
+        "crop": {
+          "left": 45,
+          "top": 846,
+          "width": 353,
+          "height": 386
+        },
+        "path": "assets/illustrations/source/q-raincoat-cutout.png",
+        "sha256": "b992150c7fa3805e96dd3e8ad6793fa094e052c6041666f9aa7bd197643f8b4c"
+      },
+      "canvas": {
+        "width": 390,
+        "height": 272,
+        "background": "#f9efd8"
+      },
+      "count": 2,
+      "centers": [
+        105,
+        285
+      ],
+      "fit": {
+        "width": 146,
+        "height": 200
+      },
+      "path": "assets/illustrations/q-two-raincoats.png",
+      "sha256": "4cd36c501b081c0f77d762d58c42a7d600249cba3c26b661ef0c3c87cf228a3e"
+    },
+    "q-umbrella": {
+      "type": "deterministic_imagegen_composition",
+      "source": {
+        "type": "codex_builtin_imagegen",
+        "plate": "props",
+        "source": "assets/illustrations/source/props.png",
+        "sourceSha256": "03aaef91ee58c8da891840588a6f71f5769495d3c120b5963b1b7c65f403dc49",
+        "sourceCell": {
+          "left": 418,
+          "top": 836,
+          "width": 418,
+          "height": 418
+        },
+        "crop": {
+          "left": 437,
+          "top": 867,
+          "width": 374,
+          "height": 348
+        },
+        "path": "assets/illustrations/source/q-umbrella-cutout.png",
+        "sha256": "54fc670e9fca2d89189d39afcf6daafb8d67efa374e5f172ab50c8d9eb0d5c0a"
+      },
+      "canvas": {
+        "width": 390,
+        "height": 272,
+        "background": "#f9efd8"
+      },
+      "count": 1,
+      "centers": [
+        195
+      ],
+      "fit": {
+        "width": 218,
+        "height": 235
+      },
+      "path": "assets/illustrations/q-umbrella.png",
+      "sha256": "0dd07c3e98349b6c6334bba466e2ca635cf7158bbfa7219aa93c436d7954434c"
+    },
+    "stroke-he": {
+      "type": "deterministic_semantic_diagram",
+      "source": "assets/illustrations/source/stroke-he.svg",
+      "sourceSha256": "0e76d39242242224bf6afbaca63907a6d05b17161164e5e766482887188a6882",
+      "path": "assets/illustrations/stroke-he.png",
+      "sha256": "e164deb9613a76e4c7bdc3e5a6d31197abeb385ed1c8b289ab08320df67dda40"
+    },
+    "stroke-ye": {
+      "type": "deterministic_semantic_diagram",
+      "source": "assets/illustrations/source/stroke-ye.svg",
+      "sourceSha256": "7dc381916a6620c579d8d6602c3281f25a588a99715d278281dd10ed2dd776f9",
+      "path": "assets/illustrations/stroke-ye.png",
+      "sha256": "976b372497cc7403d6b4bb12436e54b9d24698b84078801fe090aa6b24cd2e2c"
+    },
+    "stroke-you": {
+      "type": "deterministic_semantic_diagram",
+      "source": "assets/illustrations/source/stroke-you.svg",
+      "sourceSha256": "9b193446e9dc039a2030b73ec070055beb98d6a206e081449f953c46e9ab9935",
+      "path": "assets/illustrations/stroke-you.png",
+      "sha256": "342f11b6df284157ded421373cb55f2181a9078c145b238d438df03c72533013"
+    },
+    "stroke-cai": {
+      "type": "deterministic_semantic_diagram",
+      "source": "assets/illustrations/source/stroke-cai.svg",
+      "sourceSha256": "98b01a7ec0a45da9f79fd43a65cebcc7820e264c8a9c5de004c3297c236f9fd9",
+      "path": "assets/illustrations/stroke-cai.png",
+      "sha256": "318fd89a6c71b47a3ec3f8faf15cf806e04e81cb223a90d64fc155afa411daf6"
+    },
+    "bridge-guide": {
+      "type": "deterministic_semantic_diagram",
+      "source": "assets/illustrations/source/bridge-guide.svg",
+      "sourceSha256": "efe92cd62d808b69ee8b6233a0736a4fd36f09b5e26bfade7fe7a9455da98bfa",
+      "path": "assets/illustrations/bridge-guide.png",
+      "sha256": "b0d22f362f965cd823306634debf608c81953645e5da19ede2e30f79ee60a63e"
+    },
+    "glyph-friend": {
+      "type": "deterministic_lesson_glyph",
+      "renderer": "courseware/tools/glyph_picture.py",
+      "configuration": {
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "友"
+              }
+            ]
+          }
+        ],
+        "size": [
+          360,
+          240
+        ]
+      },
+      "sha256": "6a701283480af2bb4843755de716d212dbcc5bee47e92ee151e8536d467faa5b",
+      "builtFilename": "pic-6a701283480af2bb4843755de716d212dbcc5bee47e92ee151e8536d467faa5b.png"
+    },
+    "glyph-have": {
+      "type": "deterministic_lesson_glyph",
+      "renderer": "courseware/tools/glyph_picture.py",
+      "configuration": {
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "有"
+              }
+            ]
+          }
+        ],
+        "size": [
+          360,
+          240
+        ]
+      },
+      "sha256": "8f918056bd766bd35a55ca0c0eadf0d7368065097ab96ab655c90fc57895ec2f",
+      "builtFilename": "pic-8f918056bd766bd35a55ca0c0eadf0d7368065097ab96ab655c90fc57895ec2f.png"
+    },
+    "glyph-again": {
+      "type": "deterministic_lesson_glyph",
+      "renderer": "courseware/tools/glyph_picture.py",
+      "configuration": {
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "又"
+              }
+            ]
+          }
+        ],
+        "size": [
+          360,
+          240
+        ]
+      },
+      "sha256": "d2013557540aa43d87b90af6fc15aa9a0dbda0336a16ed5ebc4b4d79934084b0",
+      "builtFilename": "pic-d2013557540aa43d87b90af6fc15aa9a0dbda0336a16ed5ebc4b4d79934084b0.png"
+    },
+    "glyph-compose": {
+      "type": "deterministic_lesson_glyph",
+      "renderer": "courseware/tools/glyph_picture.py",
+      "configuration": {
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "作"
+              }
+            ]
+          }
+        ],
+        "size": [
+          360,
+          240
+        ]
+      },
+      "sha256": "15fd6c5346770d8afb09bdd51cf5c5936952a7a1b89d3e3915485056aab6c33e",
+      "builtFilename": "pic-15fd6c5346770d8afb09bdd51cf5c5936952a7a1b89d3e3915485056aab6c33e.png"
+    },
+    "glyph-sit": {
+      "type": "deterministic_lesson_glyph",
+      "renderer": "courseware/tools/glyph_picture.py",
+      "configuration": {
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "坐"
+              }
+            ]
+          }
+        ],
+        "size": [
+          360,
+          240
+        ]
+      },
+      "sha256": "11d8cbd11263db64574ab2c80b46ed72dd6b69183c51361cd1ebb24aa93fb1a0",
+      "builtFilename": "pic-11d8cbd11263db64574ab2c80b46ed72dd6b69183c51361cd1ebb24aa93fb1a0.png"
+    },
+    "glyph-make": {
+      "type": "deterministic_lesson_glyph",
+      "renderer": "courseware/tools/glyph_picture.py",
+      "configuration": {
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "做"
+              }
+            ]
+          }
+        ],
+        "size": [
+          360,
+          240
+        ]
+      },
+      "sha256": "7d040dec195f3eb8b4382cc6791935eb04d77b9bdcd202f542d708de989c3547",
+      "builtFilename": "pic-7d040dec195f3eb8b4382cc6791935eb04d77b9bdcd202f542d708de989c3547.png"
+    }
+  }
+}

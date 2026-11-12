@@ -1,0 +1,177 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "笔算加法",
+  "binding": {
+    "editionId": "pep-math-g1-lower-2022-standard",
+    "revisionId": "directory-6205d2037284e91f10b25edd",
+    "nodeId": "e4b610b5-b310-48f5-829c-965ba6e83264",
+    "unitId": "f91c81c2-d62f-4a5d-b55e-dd42ef644a88"
+  },
+  "scenario": "社区巡展清点两箱徽章。桌面有装十枚的透明徽章条与可数的散枚，孩子把两箱合并并在双列记录板记账。",
+  "goals": [
+    "能用十束与散件说明相同数位为什么对齐，按个位与十位分别合并并写不进位的竖式。",
+    "能从个位加起，用十个一换一个十，解释进位小1的意义，并在十位只加它一次。",
+    "遇到个位和正好是十能在个位写0；一位数与个位对齐，即使先写一位数也遵守同一规则。",
+    "能根据图中两组数量求总数，辨认漏进位、漏写0和数位错齐，并用图核对改正。"
+  ],
+  "goalEvidence": [
+    {
+      "skill": "align-place-values",
+      "target": "能用十束与散件说明相同数位为什么对齐，按个位与十位分别合并并写不进位的竖式。",
+      "source": "印57、课件5至9、教案2至3"
+    },
+    {
+      "skill": "regroup-ten-ones",
+      "target": "能从个位加起，用十个一换一个十，解释进位小1的意义，并在十位只加它一次。",
+      "source": "印58、课件15至23、教案5至6"
+    },
+    {
+      "skill": "zero-and-single-digit",
+      "target": "遇到个位和正好是十能在个位写0；一位数与个位对齐，即使先写一位数也遵守同一规则。",
+      "source": "印59、课件25至26、任务单2"
+    },
+    {
+      "skill": "choose-sum-and-diagnose",
+      "target": "能根据图中两组数量求总数，辨认漏进位、漏写0和数位错齐，并用图核对改正。",
+      "source": "印60至61、课件3和28、作业练习1"
+    }
+  ],
+  "pageSequence": [
+    {
+      "key": "two-crates",
+      "kind": "teaching",
+      "title": "两箱巡展徽章合到一起"
+    },
+    {
+      "key": "same-column",
+      "kind": "teaching",
+      "title": "整条和散枚分两列"
+    },
+    {
+      "key": "no-carry",
+      "kind": "teaching",
+      "title": "从个位起把不进位的和记下来"
+    },
+    {
+      "key": "carry-workshop",
+      "kind": "teaching",
+      "title": "正好十枚装一条，十位多一条"
+    },
+    {
+      "key": "sort-by-ones",
+      "kind": "interactive",
+      "title": "把装满和没装满的卡送对位置"
+    },
+    {
+      "key": "zero-and-single",
+      "kind": "teaching",
+      "title": "个位清空时记0，一位数靠个位"
+    },
+    {
+      "key": "pair-check",
+      "kind": "interactive",
+      "title": "匹配图、竖式和正确总量"
+    },
+    {
+      "key": "diagnose",
+      "kind": "teaching",
+      "title": "看得见的三种记账失误"
+    },
+    {
+      "key": "picture-check",
+      "kind": "quiz",
+      "title": "用新徽章、表格和竖式图验收"
+    },
+    {
+      "key": "take-home",
+      "kind": "teaching",
+      "title": "给家人说明这一枚小1"
+    }
+  ],
+  "teachingPlan": [
+    "用原创21＋43看见2条和4条、1枚和3枚，依次对齐、从个位记4、十位记6，并用数量核对64。",
+    "用28＋54处理12个一，取十枚装一条放进十位，个位留下2，和为82。先写十位会需要重写，用同一表示说明起算顺序。",
+    "用37＋43看到个位清空时写0，正确80；用7＋65看到7与5排在个位，即使一位数在上方也靠右，得72。",
+    "展示自己重新画的错位、漏进位、漏写0图。先问是哪一步，再让孩子比对可数的实际总量。"
+  ],
+  "games": [
+    {
+      "page": "sort-by-ones",
+      "template": "sortingDepot",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.sortingDepot",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "classification",
+      "selection": "把两组个位徽章的可数卡推进能不能装满一条的仓位；仓位由十格未满图与整条转移图标识，不用颜色匹配。",
+      "levels": [
+        "个位合计低于十与恰好十。",
+        "合计超过十，对比只装一条与仍有散枚。",
+        "交换两仓方位，一位数仍只贡献个位。"
+      ],
+      "demo": "录音先圈十格和两仓，老师演示一张卡并等待命中事件，再复位交给孩子。"
+    },
+    {
+      "page": "pair-check",
+      "template": "magnetMarbles",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.magnetMarbles",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "pair_match",
+      "selection": "选择与两行徽章记录对应的唯一束散图；干扰可漏一条、遗漏个位0或把一个一误作一个十，不能靠颜色命中。",
+      "levels": [
+        "两位数不进位。",
+        "重组后仍剩散枚。",
+        "恰满十或加入一位数，变化正确靶位置。"
+      ],
+      "demo": "圈两行数位与候选图，按算理确认靶，真实发射后等命中事件，再复位交给孩子。"
+    }
+  ],
+  "quizPlan": [
+    {
+      "skill": "align-place-values",
+      "task": "图中25与31，选十位对十位的竖式和对应束散图。",
+      "correctPosition": 2,
+      "rationale": "2个十和3个十、5个一和1个一分别相加，结果56。"
+    },
+    {
+      "skill": "regroup-ten-ones",
+      "task": "图中38与27，选换一条后正确的总量。",
+      "correctPosition": 1,
+      "rationale": "8个一加7个一得15个一，换出一个十剩5个一，结果65。"
+    },
+    {
+      "skill": "zero-and-single-digit",
+      "task": "图中44与26，选择个位清空但记0的结果图。",
+      "correctPosition": 3,
+      "rationale": "4与6恰好满十，十位加进1得7个十，写70。"
+    },
+    {
+      "skill": "zero-and-single-digit",
+      "task": "图中6与57，选把6和7对齐的记法。",
+      "correctPosition": 2,
+      "rationale": "6表示6个一，应写在个位。个位13进1后结果63。"
+    },
+    {
+      "skill": "choose-sum-and-diagnose",
+      "task": "36枚入场徽章和18枚参观徽章合并，选修正十位漏进1的记录。",
+      "correctPosition": 1,
+      "rationale": "6＋8得14，十位加进1，正确总数54。"
+    }
+  ],
+  "afterClass": {
+    "familyTask": "找两个实际数量，摆或画成整十条与散件，向家人说为什么对齐、何时进1；家庭口述待观察。",
+    "weeklyQuestionSource": [
+      "同数位对齐",
+      "个位开始及满十进一",
+      "个位0与一位数的位置",
+      "图中求和及错误诊断"
+    ]
+  },
+  "artAndLanguage": "原创徽章图与双列记录板。颜色只辅助，条与散件可数，十格位置可辨。遮住非目标文字仍可凭图和真人教师录音完成。按标准走学科老师 registry，并为老师演示保留真实动作与交接。",
+  "authoring": {
+    "sourceMode": "direct",
+    "authorModels": [
+      "gpt-6.1-sol"
+    ]
+  }
+}

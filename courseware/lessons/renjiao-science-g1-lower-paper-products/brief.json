@@ -1,0 +1,226 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "纸制品",
+  "binding": {
+    "editionId": "smartedu-science-six-year-g1-lower-e231dd57",
+    "revisionId": "directory-359f40a6afba915101f297d3",
+    "nodeId": "1ee15c62-40aa-42d4-995c-e136eb249803",
+    "unitId": "634de0db-e962-4954-9be8-abfd7415579e"
+  },
+  "goals": [
+    "能指认几种常见的纸，按观察方法描述这几张样纸的薄厚、皱纹、边缘等，知道纸里有细小纤维。",
+    "能用同样大小、同一水线和同一时刻比较纸条湿痕，用等宽纸条在同样条件下比较是否容易拉断，按实际结果记录。",
+    "能根据纸在这次比较中表现出的特点解释用途，例如选可承受拉扯的包装纸或适合擦少量水的纸。",
+    "知道古代造纸术及蔡伦改进造纸，能按顺序说出废旧纸再做一张纸的四个步骤。"
+  ],
+  "goalSources": [
+    "印45–46、教案2",
+    "印47、教案2–3和任务单2",
+    "印47、课件14",
+    "印48–49、教案1及3"
+  ],
+  "scenario": "原创松风校园纸工坊。给手作展找合适的纸，先观察、按条件比较，再用干净旧纸做新的手工纸。",
+  "pageSequence": [
+    {
+      "key": "paper-around-us",
+      "kind": "teaching",
+      "plan": "用包装、书页和餐巾引出常见纸种。"
+    },
+    {
+      "key": "see-fibers",
+      "kind": "teaching",
+      "plan": "看、揉、撕，用放大镜从整张到断边观察纤维。"
+    },
+    {
+      "key": "photograph-paper-shapes",
+      "kind": "game",
+      "plan": "三组揉后摊开的同纸俯侧实际拍照，保留皱形证据。"
+    },
+    {
+      "key": "same-start-water",
+      "kind": "teaching",
+      "plan": "固定等长等宽与起始水线，同一时刻观察湿痕。"
+    },
+    {
+      "key": "paper-tug",
+      "kind": "teaching",
+      "plan": "同条件对比哪条先断，区分水爬和耐拉的证据。"
+    },
+    {
+      "key": "choose-paper-for-use",
+      "kind": "teaching",
+      "plan": "展台擦水和小包装各需不同本领。"
+    },
+    {
+      "key": "paper-from-paper",
+      "kind": "teaching",
+      "plan": "蔡伦改进造纸；演示撕碎、浸泡捣浆、抄起、晒干。"
+    },
+    {
+      "key": "rebuild-paper-route",
+      "kind": "game",
+      "plan": "按四状态路线到站，顺序错不推进。"
+    },
+    {
+      "key": "picture-quiz",
+      "kind": "quiz",
+      "plan": "六道新图，覆盖纤维、控制条件、两个比较、用途与流程。"
+    },
+    {
+      "key": "home-paper-observation",
+      "kind": "teaching",
+      "plan": "成人陪做两纸同水线观察，只记确实看到的。"
+    }
+  ],
+  "games": [
+    {
+      "page": "photograph-paper-shapes",
+      "template": "shutterScout",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.shutterScout",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "observe_state",
+      "selection": "同一片揉后摊开的纸，俯视找褶线走向，侧视看突起或折痕；拍错不保留，不从图片猜触感和韧性。",
+      "levels": [
+        {
+          "sample": "牛皮纸",
+          "shotOrder": [
+            "top",
+            "side"
+          ]
+        },
+        {
+          "sample": "新闻纸",
+          "shotOrder": [
+            "side",
+            "top",
+            "side"
+          ]
+        },
+        {
+          "sample": "打印纸",
+          "shotOrder": [
+            "top",
+            "side",
+            "top",
+            "side"
+          ]
+        }
+      ]
+    },
+    {
+      "page": "rebuild-paper-route",
+      "template": "bubbleMaze",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.bubbleMaze",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "ordered_route",
+      "selection": "孩子沿纸工坊到站按废纸碎片、湿纸浆、抄纸网、晾干纸的顺序，错站不进度。",
+      "levels": [
+        [
+          "碎纸",
+          "纸浆"
+        ],
+        [
+          "纸浆",
+          "抄纸",
+          "晒干"
+        ],
+        [
+          "碎纸",
+          "纸浆",
+          "抄纸",
+          "晒干"
+        ]
+      ]
+    }
+  ],
+  "quiz": [
+    {
+      "id": "look-at-torn-fibers",
+      "skill": "locate-paper-fibers",
+      "prompt": "哪张放大图看到撕开的纸边露出细丝？",
+      "answer": "B",
+      "optionImages": [
+        "quiz-paper-smooth-edge",
+        "quiz-paper-frayed-edge",
+        "quiz-paper-printed-center"
+      ]
+    },
+    {
+      "id": "control-samples",
+      "skill": "fair-paper-water-comparison",
+      "prompt": "哪组纸条同长同宽，入水深度也一样？",
+      "answer": "A",
+      "optionImages": [
+        "water-setup-fair",
+        "water-setup-width",
+        "water-setup-depth"
+      ]
+    },
+    {
+      "id": "higher-wet-front",
+      "skill": "compare-wet-front-from-line",
+      "prompt": "同一时刻，哪张记录的湿痕爬得最高？",
+      "answer": "C",
+      "optionImages": [
+        "water-height-low",
+        "water-height-middle",
+        "water-height-high"
+      ]
+    },
+    {
+      "id": "find-the-stronger-result",
+      "skill": "compare-tear-outcome",
+      "prompt": "哪张记录能看出浅棕纸这次较耐拉？",
+      "answer": "B",
+      "optionImages": [
+        "tug-both-torn",
+        "tug-kraft-holds",
+        "tug-other-holds"
+      ]
+    },
+    {
+      "id": "select-a-bag-paper",
+      "skill": "paper-property-for-use",
+      "prompt": "等宽纸条同样拉，哪种纸适合做小袋装积木？",
+      "answer": "C",
+      "optionImages": [
+        "quiz-bag-tissue",
+        "quiz-bag-news",
+        "quiz-bag-kraft"
+      ]
+    },
+    {
+      "id": "next-step-after-the-screen",
+      "skill": "ordered-papermaking",
+      "prompt": "湿纸浆已抄到网上，接下来做什么？",
+      "answer": "A",
+      "optionImages": [
+        "quiz-dry-window",
+        "quiz-tear-leftovers",
+        "quiz-stir-new-pulp"
+      ]
+    }
+  ],
+  "afterClass": {
+    "familyTask": "和大人选两种干净旧纸，取等宽等长小条，同一时间把末端放到同一水线，等到同一时刻再画湿痕。不把水或纸放进嘴里，避开插座。只记实际看到的。想再造一张纸，请大人帮助。",
+    "weeklyQuestionSource": [
+      "观察方法和纤维",
+      "同条件比较水爬与韧性",
+      "选纸",
+      "再造纸顺序"
+    ]
+  },
+  "observationPlan": {
+    "scene": "photograph-paper-shapes",
+    "trialId": "same-paper-two-views",
+    "simulatedResult": "孩子完成普通输入三组后才导出每件实际取得的两种视图；真实触感、水爬、耐拉和家庭结果另记待观察。"
+  },
+  "mediaStatus": {
+    "art": "pending_formal_imagegen_disk_hold",
+    "build": "pending_registered_art",
+    "browser": "pending_disk_hold",
+    "voice": "pending_independent_review_and_authorization"
+  }
+}

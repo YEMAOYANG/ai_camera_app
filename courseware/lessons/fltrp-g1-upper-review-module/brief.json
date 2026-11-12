@@ -1,0 +1,241 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "Review Module",
+  "binding": {
+    "editionId": "smartedu-english-six-year-g1-upper-sync-af05bc77",
+    "revisionId": "20260928-metadata-1",
+    "nodeId": "889dee65-cd97-39a8-8d43-c3587fdad537",
+    "unitId": "889dee65-cd97-39a8-8d43-c3587fdad537"
+  },
+  "scenario": "社区玩具交换会的邀请卡有四个图标，孩子用听颜色、数道具、猜角色和礼貌送物完成小任务。",
+  "goals": [
+    "按颜色与对象两种线索找图，并说出物件。",
+    "按英语听见的一到十、物件类别或拍手次数找数量，询问和回答。",
+    "听问答中的猜测、肯定和否定，根据明确线索缩小范围。",
+    "听年龄问题，观察虚构年龄牌并完整回应。",
+    "区别祝福、赠物、感谢和回应发生的角色与动作。"
+  ],
+  "pageSequence": [
+    {
+      "key": "swap-meet",
+      "kind": "teaching",
+      "plan": "先听老师欢迎，再观察交换会的不同图标。邀请孩子指出同色不同物或同物不同色，说明两个线索都要听。"
+    },
+    {
+      "key": "point-and-name",
+      "kind": "teaching",
+      "plan": "老师说颜色和对象，依次亮它们对应的部位，再用原创短问答从指图转到说物品名。"
+    },
+    {
+      "key": "ready-for-the-pond",
+      "kind": "teaching",
+      "plan": "用整套动物玩具图练听两条线索，熟悉动作、重听和反馈；游戏中再在新搭配和位置上操作。"
+    },
+    {
+      "key": "listen-and-aim",
+      "kind": "interactive",
+      "plan": "驾驶小艇移动，听颜色和对象后瞄准图卡。搭配用独立原创玩具图，词音响起后再行动。"
+    },
+    {
+      "key": "count-by-ear",
+      "kind": "teaching",
+      "plan": "用原创节奏听拍、复数并答。将同样问法用于一组图里的指定物件，画面由代码保证数量。"
+    },
+    {
+      "key": "guess-after-clues",
+      "kind": "teaching",
+      "plan": "分别示范对物件和角色的猜测与肯否定回答，角色线索由录音和已见图标提供。把Yes和No的结果各做一次。"
+    },
+    {
+      "key": "guess-the-volunteer",
+      "kind": "teaching",
+      "plan": "用已经介绍的三个角色标记猜谁说话，先听No排除再用Yes确认。"
+    },
+    {
+      "key": "name-and-age-badge",
+      "kind": "teaching",
+      "plan": "看一个虚构角色画年龄牌。先问年龄、后数牌上点、再听完整回答。用另一张原创牌让孩子跟答。"
+    },
+    {
+      "key": "orders-from-the-desk",
+      "kind": "teaching",
+      "plan": "对照数量相近的文具图，练习听英语数量和物件种类，再把同样的步骤用于邮车。"
+    },
+    {
+      "key": "count-and-deliver",
+      "kind": "interactive",
+      "plan": "首关实际听五次程序拍手声后判断球数。后两关听英语种类与数量，从取货点接货，再按名字送对应标记；遮图记忆放在独立讲解页。"
+    },
+    {
+      "key": "say-it-kindly",
+      "kind": "teaching",
+      "plan": "原创生日小场景按祝福、赠礼、感谢和回应练换角色，先听动作意图，再请孩子说给家人。"
+    },
+    {
+      "key": "cover-and-remember",
+      "kind": "teaching",
+      "plan": "看原创书包和文具展台，听老师说要数什么，看一会后盖住，尝试听问并回答；答后复看核对。"
+    },
+    {
+      "key": "recall-from-memory",
+      "kind": "teaching",
+      "plan": "独立遮图页只留整块遮布，暂停让孩子先回忆并答英语，继续后核对，再回看。"
+    },
+    {
+      "key": "picture-check",
+      "kind": "quiz",
+      "plan": "九道新图题读题配音，测颜色对象、英语数量、问答判断、年龄和礼貌动作。正式选项均为图，必要时用短音频提示。"
+    },
+    {
+      "key": "wrap-up",
+      "kind": "teaching",
+      "plan": "逐项回到四个图标，复习问物、数量、猜测、年龄和送礼答谢。请家人现场交换角色，教材练习可回纸书。"
+    }
+  ],
+  "games": [
+    {
+      "page": "listen-and-aim",
+      "template": "wordBubbles",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.wordBubbles",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "listen_match",
+      "selection": "口令同时包含已学颜色和对象，至少一项干扰有同色异物或同物异色。孩子实际移动瞄准，击中满足两条件的图卡才得分。",
+      "levels": [
+        "两轮，两张差异明显的玩具卡，移动幅度小。",
+        "三轮，加入同色异物和同物异色干扰。",
+        "三至四轮，使用未在讲解重复的词语组合，漂移稍快。"
+      ],
+      "demo": "依次亮声音、颜色位置、对象轮廓和泡泡键，示范第一轮一次后归零。启用voiceLead及stepVoiceLead，使用预录反馈。"
+    },
+    {
+      "page": "count-and-deliver",
+      "template": "listenDelivery",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.listenDelivery",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "listen_pick_deliver",
+      "selection": "取货点用不同类别和数量的图，收件站显示听到的指定数量或角色图。只有听对两个条件并驾驶到站才通过，逐个画出物品，不能借装饰猜。",
+      "levels": [
+        "一单。点击实际拍手音，听完先取对应数量的球，再送蓝星窗。",
+        "两单。区分书和书包，同时区分两个书包与四个书包。",
+        "三单。区分六、七支铅笔和六本书，再分别送不同角色。"
+      ],
+      "demo": "亮首单、邮车、接收窗，只示范取一次。重开后让孩子先点右侧拍手图标，声音可重放。"
+    }
+  ],
+  "quizPlan": [
+    {
+      "skill": "听颜色和动物指图",
+      "prompt": "Point to the green bird.",
+      "correctImage": "q-green-bird",
+      "position": 1,
+      "rationale": "green 是绿色，bird 是小鸟。绿色小狗只有颜色对，黄鸟只有动物对。"
+    },
+    {
+      "skill": "从物品回答中听出橙色和小猫",
+      "prompt": "It’s an orange cat.",
+      "correctImage": "q-orange-cat",
+      "position": 3,
+      "rationale": "orange 是橙色，cat 是小猫。第三张同时符合两个线索。"
+    },
+    {
+      "skill": "听物件类别和七并按类计数",
+      "prompt": "How many pencils? Seven.",
+      "correctImage": "q-pencil-count-2",
+      "position": 2,
+      "rationale": "pencils 指铅笔，seven 是七。第二张有七支铅笔，书包不算。"
+    },
+    {
+      "skill": "听懂英语数字 ten 并选同样多的点",
+      "prompt": "How many? Ten.",
+      "correctImage": "q-dots-ten",
+      "position": 1,
+      "rationale": "Ten 是十。第一张上面五点、下面五点，一共十点。"
+    },
+    {
+      "skill": "听否定后选择真正的物件和颜色",
+      "prompt": "Red? No. A blue bag.",
+      "correctImage": "q-blue-bag",
+      "position": 3,
+      "rationale": "No 排除了红色。blue 是蓝色，bag 是书包，蓝铅笔只有颜色对。"
+    },
+    {
+      "skill": "听肯定回答确认角色",
+      "prompt": "Is it Milo? Yes, it is.",
+      "correctImage": "quiz-badge-star",
+      "position": 2,
+      "rationale": "Yes, it is. 表示问对了。Milo 是蓝色星星的标记。"
+    },
+    {
+      "skill": "听出英语年龄回答并认领年龄牌",
+      "prompt": "How old are you? I’m 9.",
+      "correctImage": "q-age-nine",
+      "position": 3,
+      "rationale": "How old 问几岁。nine 是九，第三张牌有九个点。"
+    },
+    {
+      "skill": "判断礼貌用语的说话角色",
+      "prompt": "Thank you! 谁在说？",
+      "correctImage": "q-receiver",
+      "position": 2,
+      "rationale": "戴绿围巾的孩子已经收到礼物。收到礼物的人说 Thank you。"
+    },
+    {
+      "skill": "听赠物句和物件词，选择对应动作",
+      "prompt": "A pencil for you.",
+      "correctImage": "q-give-pencil",
+      "position": 1,
+      "rationale": "pencil 是铅笔。for you 是送给你。第一张把一支铅笔递给了同伴。"
+    }
+  ],
+  "afterClass": {
+    "familyTask": "用原创图、书包内物品或纸偶练问物、数数和生日对话，交换角色。可用虚构年龄和亲属关系，不需提供私人资料。",
+    "weeklyQuestionSource": [
+      "听颜色和对象",
+      "问并回答数量",
+      "听猜测与确认",
+      "问答年龄",
+      "祝福送物和礼貌回应"
+    ],
+    "evidence": "系统记录图题及游戏操作，实际听说、朗读和问答由家人观察。"
+  },
+  "artAndLanguage": "原创交换会、年龄牌和玩具道具。精确数量由代码摆放。中文说明与英语句型均用预录，图片保留判断所需线索。",
+  "goalBindings": [
+    {
+      "skill": "listen-and-identify",
+      "target": "按颜色与对象两种线索找图，并说出物件。",
+      "source": "原书印62活动1、外研216264第2页"
+    },
+    {
+      "skill": "ask-and-count",
+      "target": "按英语听见的一到十、物件类别或拍手次数找数量，询问和回答。",
+      "source": "原书印62活动2、印65活动6"
+    },
+    {
+      "skill": "guess-and-confirm",
+      "target": "听问答中的猜测、肯定和否定，根据明确线索缩小范围。",
+      "source": "原书印63活动3、外研216265第5页"
+    },
+    {
+      "skill": "age-and-greetings",
+      "target": "听年龄问题，观察虚构年龄牌并完整回应。",
+      "source": "原书印64活动4～5、外研216265第6～10页"
+    },
+    {
+      "skill": "gift-and-thanks",
+      "target": "区别祝福、赠物、感谢和回应发生的角色与动作。",
+      "source": "原书印64活动5、外研216265第11页"
+    }
+  ],
+  "authorship": {
+    "sourceMode": "direct",
+    "authorModels": [
+      "gpt-6.1-sol"
+    ]
+  },
+  "gameCatalog": {
+    "path": "courseware/kit/game_templates/catalog.json",
+    "sha256": "1f04d478644e68af67bc264bf46227ece3d94d9c4070e8a8dd219846a48f4753"
+  }
+}

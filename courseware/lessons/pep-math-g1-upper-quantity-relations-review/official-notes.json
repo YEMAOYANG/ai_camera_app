@@ -1,0 +1,132 @@
+{
+  "schemaVersion": "mira.courseware.official-notes.v1",
+  "binding": {
+    "editionId": "pep-math-g1-upper-2022-standard",
+    "revisionId": "directory-ede7a8c63c337cf95a03fe79",
+    "unitId": "198f382f-ded4-40ac-affe-a926f4577287",
+    "nodeId": "7a3e2077-4227-49aa-9f0f-6d07aa1313ff"
+  },
+  "reviewedBy": "/root/yellow_bird",
+  "reviewedAt": "2026-11-10",
+  "officialTextbook": {
+    "resourceId": "c3e06fe4-c6b3-49cb-8727-4f8ff69bbfbc",
+    "assetRevision": "1787023025887",
+    "printedPages": [
+      105,
+      107
+    ],
+    "pageRefs": [
+      105,
+      107
+    ],
+    "findings": [
+      "印105上半是数量关系小节，用两个部分合并和已知总数后求余量回顾加减法的意义。印105下半另属图形的认识。",
+      "印107第3题要求提取图和话的条件、反求原来的总数、解释与核对，还要求另提一个问题。印106和印107前两题不属于本节采用的练习。"
+    ]
+  },
+  "sourceEvidence": {
+    "catalogParts": "output/courseware-lessons/pep-math-g1-upper-number-and-operations-review/official/lesson-list-parts.json",
+    "catalogIndex": "output/courseware-lessons/pep-math-g1-upper-number-and-operations-review/official/lesson-list-part-1.json",
+    "manifest": "output/courseware-lessons/pep-math-g1-upper-quantity-relations-review/official/manifest.json",
+    "manifestSha256": "351871f2541a455533a4cf16312d8f8762768f67273d4d775cb0eb02baf0652f",
+    "textbookPages": "output/courseware-lessons/pep-math-g1-upper-quantity-relations-review/official/textbook-pages.json",
+    "textbookPagesSha256": "5dea0dfed36123ec1fc31d0c828e782eb019c179cbad9474c8df28bde5e68352",
+    "matchedActivityId": "138ff1c0-6ba0-a1c7-bb82-3f885e2f80ca",
+    "completeCatalogEntries": 53,
+    "matchingActivities": 1
+  },
+  "classHourCoverage": "完整册索引一个分片，精确章节唯一一项；课目详情仅 lesson_1。官方课件29页、教案5页、任务单2页、作业练习1页共37页已审读。视频按标准中的既有豁免。",
+  "objectives": [
+    "听清图和话提供的已知量与问题，按读题、解答、回查的次序解决。",
+    "把增加、两组合并、反求原来三种情境画成同一个合并关系，解释同一加法。",
+    "知道总数和一个部分时，用减法找另一部分；用同一组数说明加减的关系。",
+    "用相反动作或图核对方法和结果，再根据算式画图、说新故事。"
+  ],
+  "keyPoint": "从图和话分清两个部分与整体，决定加或减，并让同一关系在不同情境中可见。",
+  "difficultPoint": "动作本身与求哪个量要分开。已知离开的部分和留下的部分，求原来时用加法；知道整体及一部分，求另一部分时用减法，并能解释与检查。",
+  "contentBoundary": "正课印105上半；取教案明确指定的印107第3题作为练习参照。印104为数与运算、印105下半为独立图形节点、印106表和印107第2题非本节指定练习。课件用原创图、数字和故事。",
+  "resources": {
+    "courseware": {
+      "status": "reviewed",
+      "classHour": "lesson_1",
+      "pageRefs": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29
+      ],
+      "findings": [
+        "1～5先看知识图与解题次序。6～11用先有和又来的两部分讲加法，做完回到初始条件核对。",
+        "12～17用同一式讲增加、两个盘合并、已离开和剩下求原来，归纳整体模型。18～24改成已知整体和一部分求另一部分，把加减放在同一数量关系里。",
+        "25～29迁移教材题、复盘读题/解答/反思，并布置根据减法另画生活图。"
+      ]
+    },
+    "teachingDesign": {
+      "status": "reviewed",
+      "classHour": "lesson_1",
+      "pageRefs": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "findings": [
+        "第1页定位印105和数量关系，兼顾知识图、原创情境及运算意义。第2～3页从图和话找条件与问题，解答并用相反动作检查，继而比较同式异题。",
+        "第4页要求用刚才的故事改成减法，点名印105减法图和印107第3题。第5页强调方法也要核对，课后为减法另画新情境。"
+      ]
+    },
+    "learningTaskSheet": {
+      "status": "reviewed",
+      "classHour": "lesson_1",
+      "pageRefs": [
+        1,
+        2
+      ],
+      "findings": [
+        "第1页先画数量关系知识图，整理解决问题的步骤，再根据同一加法创编多个故事；第2页把刚才的加法故事改成减法。"
+      ]
+    },
+    "afterClassExercise": {
+      "status": "reviewed",
+      "classHour": "lesson_1",
+      "pageRefs": [
+        1
+      ],
+      "findings": [
+        "给一条减法，回到生活找能用这条算式的情境，写或画出来。"
+      ]
+    },
+    "video": {
+      "status": "waived",
+      "classHour": "lesson_1",
+      "evidence": "output/courseware-lessons/pep-math-g1-upper-quantity-relations-review/official/manifest.json"
+    }
+  },
+  "factChecks": []
+}

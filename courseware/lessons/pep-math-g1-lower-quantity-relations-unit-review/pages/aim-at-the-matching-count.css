@@ -1,0 +1,15 @@
+#cv #ready .pic { object-fit: contain; background: #fff5df; }
+#nursery-order {
+  position: absolute;
+  left: 18px;
+  top: 310px;
+  width: 201px;
+  display: grid;
+  gap: 7px;
+  border-radius: 13px;
+  z-index: 2;
+  pointer-events: none;
+}
+#nursery-order[hidden], #nursery-previous-answer[hidden] { display: none; }
+#nursery-order-picture { width: 100%; height: 142px; object-fit: contain; background: #fff5df; border-radius: 13px; }
+#nursery-previous-answer { width: 110px; height: 77px; object-fit: contain; background: #fff5df; border-radius: 9px; }

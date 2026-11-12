@@ -1,0 +1,353 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "走近科学｜单元回顾",
+  "identity": {
+    "schemaVersion": "mira.courseware.identity.v1",
+    "editionId": "smartedu-science-six-year-g1-upper-64e96b25",
+    "revisionId": "directory-0e2e092fb846ac493525aece",
+    "nodeId": "1d0a5e57-9cf8-4067-bc16-b3151dea76c9",
+    "unitId": "46cc11e4-1161-4776-b474-4087620227bc",
+    "subject": "science",
+    "gradeCode": "primary_1",
+    "volume": "upper",
+    "lessonTitle": "单元回顾",
+    "officialMaterialId": "a6dfbe2b-c9a8-4e6d-83fc-c47bf4c2d13e",
+    "officialChapterId": "1d0a5e57-9cf8-4067-bc16-b3151dea76c9"
+  },
+  "officialScope": {
+    "printedPages": [
+      13,
+      14,
+      15
+    ],
+    "pdfPages": [
+      18,
+      19,
+      20
+    ],
+    "exactActivityResources": 0,
+    "teacherObjectives": "按教材整理的原创目标",
+    "source": "official-notes.json"
+  },
+  "goals": [
+    "联系可见现象说出自己想知道的问题，区分看到的情况与尚需调查的问题。",
+    "理解科学活动会从提出问题走向寻找解决办法，借助行动和结果检查想法。",
+    "在图片和口述支持下，为简单问题选择观察、实验、制作、测量或查阅资料等合适方法，知道方法可以结合使用。",
+    "回顾认真观察、记录、倾听及安全等学习习惯，对已做活动提出新的问题。"
+  ],
+  "objectives": [
+    {
+      "id": "question",
+      "objective": "联系可见现象说出自己想知道的问题，区分看到的情况与尚需调查的问题。",
+      "evidence": [
+        "p01",
+        "p07",
+        "science-review-q1"
+      ]
+    },
+    {
+      "id": "process",
+      "objective": "理解科学活动会从提出问题走向寻找解决办法，借助行动和结果检查想法。",
+      "evidence": [
+        "p03",
+        "p05",
+        "p06",
+        "p07",
+        "science-review-q4",
+        "science-review-q5"
+      ]
+    },
+    {
+      "id": "methods",
+      "objective": "在图片和口述支持下，为简单问题选择观察、实验、制作、测量或查阅资料等合适方法，知道方法可以结合使用。",
+      "evidence": [
+        "p02",
+        "p03",
+        "p04",
+        "science-review-q2",
+        "science-review-q3"
+      ]
+    },
+    {
+      "id": "reflection",
+      "objective": "回顾认真观察、记录、倾听及安全等学习习惯，对已做活动提出新的问题。",
+      "evidence": [
+        "p07",
+        "p10",
+        "p11",
+        "science-review-q6"
+      ]
+    }
+  ],
+  "pageSequence": [
+    {
+      "key": "p01",
+      "title": "站不住的小名牌",
+      "type": "slide",
+      "teaching": "从名牌躺下这件事，说清已经看到什么、还想解决什么。",
+      "purpose": "现象与问题",
+      "printedPageRefs": "13–14"
+    },
+    {
+      "key": "p02",
+      "title": "细看和量一量",
+      "type": "slide",
+      "teaching": "逐处比对纸带，示范观察由整体到局部；用尺从同一起点找长度。",
+      "purpose": "观察和测量",
+      "printedPageRefs": "13"
+    },
+    {
+      "key": "p03",
+      "title": "还有三种办法",
+      "type": "slide",
+      "teaching": "同桌面对照试摆，做纸脚解决需要，查图册寻找已有方法，说明方法可以串起来。",
+      "purpose": "实验、制作、查资料",
+      "printedPageRefs": "13"
+    },
+    {
+      "key": "p04",
+      "title": "把问题送去找办法",
+      "type": "interactive",
+      "teaching": "按箭头推问题图，找到能收集证据的托盘，错组被拒绝；分关逐步增添方法。",
+      "purpose": "给问题选方法",
+      "printedPageRefs": "13",
+      "game": {
+        "template": "sortingDepot",
+        "version": 1,
+        "catalogStatus": "可用",
+        "approval": "2026-11-09",
+        "knowledgeRule": "只接受问题组和方法托盘的 group 匹配；图表和口令提供可辨方法线索，推动或颜色本身不能让错组成功。",
+        "levels": [
+          "两件：花纹观察、差多少测量，简单同排路径。",
+          "三件：制作、实验、查图册。分清想做一个、想试出比较结果、想找已有做法。",
+          "四件：观察、测量、实验、查阅混在一起，多一处遮挡并需选择推送顺序。"
+        ],
+        "input": "方向键/大箭头从后方推；回转键撤回；错组没有入盘得分。",
+        "teacher": "暂停高亮题卡、托盘、车位，再只示范一件入盘，清空后交接。",
+        "references": {
+          "example": "courseware/kit/examples/classic-arcade/sorting-depot.json",
+          "lessonConfig": "pages/method-depot.js",
+          "hints": "首次找想知道的事；再提示区分方法。"
+        }
+      }
+    },
+    {
+      "key": "p05",
+      "title": "同一个纸翼，两种看法",
+      "type": "slide",
+      "teaching": "先猜再对照同一纸翼的俯视和侧视，区分物件没换和相对观察方向变了。",
+      "purpose": "观察变化",
+      "printedPageRefs": "13、15"
+    },
+    {
+      "key": "p06",
+      "title": "拍下纸翼的变化",
+      "type": "interactive",
+      "teaching": "框住同一纸翼的模拟图，拍下与口令和小图对应的俯视/侧视，留存真人通关记录。",
+      "purpose": "模拟观察",
+      "printedPageRefs": "13、15",
+      "game": {
+        "template": "shutterScout",
+        "version": 1,
+        "catalogStatus": "可用",
+        "approval": "2026-11-09",
+        "knowledgeRule": "纸翼在取景框内且符合当前要观察的宽/窄状态才计分；随机拍摄或只追位置不能保证过关。",
+        "levels": [
+          "慢速、宽取景框，宽→窄两次。",
+          "移动范围增大，窄→宽→窄三次。",
+          "更快并缩小取景框，宽→窄→宽→窄四次。"
+        ],
+        "input": "方向键或大箭头移动虚线框，圆形按钮或空格拍摄。录音重听当前状态要求。",
+        "teacher": "暂停高亮固定目标小图和当前取景框，先等宽态拍一张即停，清空后交接。",
+        "references": {
+          "example": "courseware/kit/examples/classic-arcade/shutter-scout.json",
+          "lessonConfig": "pages/paper-wing-camera.js"
+        },
+        "observationCard": {
+          "status": "paired_views_bound_runtime_validation_pending",
+          "displayedDuringGame": "每张成功照片使用命中的真实视图图键。真人完整通关生成逐关俯侧配对快照，独立学生与家长回读待验。",
+          "ownerRequest": "walk-into-science-unit-review-shutter-observation-card",
+          "candidateImageKeys": [
+            "paper-wing",
+            "paper-wing-side"
+          ],
+          "evidenceBoundary": "仅屏幕上的模拟拍照结果，家中实物、口述、独立实际使用相机均待观察。",
+          "remaining": "模板当前完成浮层只显分数和文字；完成页两视图记录卡展示交接待确认。"
+        }
+      }
+    },
+    {
+      "key": "p07",
+      "title": "用记录回答，再提一问",
+      "type": "slide",
+      "teaching": "试两种纸牌摆法，各画结果，听同伴说明，再问换大小会怎样。",
+      "purpose": "验证、记录、反思",
+      "printedPageRefs": "13、15"
+    },
+    {
+      "key": "p08",
+      "title": "先问什么，再怎么找",
+      "type": "quiz",
+      "teaching": "在杯边水迹、石头细斑、积木塔的新情境里选观察焦点或工具。",
+      "purpose": "小检查",
+      "printedPageRefs": "13–14"
+    },
+    {
+      "key": "p09",
+      "title": "怎样试、记和看",
+      "type": "quiz",
+      "teaching": "在小车斜坡、纸带记录、陌生颗粒的新情境中选做法。",
+      "purpose": "小检查",
+      "printedPageRefs": "13、15"
+    },
+    {
+      "key": "p10",
+      "title": "和家人做一次小观察",
+      "type": "slide",
+      "teaching": "家人陪同转动同一张纸，画两个看到的样子，轮流说再追问。",
+      "purpose": "家庭实物与口述待观察",
+      "printedPageRefs": "15"
+    },
+    {
+      "key": "p11",
+      "title": "小科桌收工啦",
+      "type": "slide",
+      "teaching": "回到躺下的名牌，串起提问、选办法、记录、复查与再提问。",
+      "purpose": "全课回顾",
+      "printedPageRefs": "13–15"
+    }
+  ],
+  "quiz": [
+    {
+      "id": "science-review-q1",
+      "skill": "science-question-focus",
+      "prompt": "杯子旁边有水。要找水从哪儿来，先看哪里？",
+      "answerPosition": "B",
+      "reason": "先看杯口、杯边和旁边的水迹，找和水有关的线索。只看椅子或书架还帮不上忙。",
+      "pictureOptions": [
+        "q1-a",
+        "q1-b",
+        "q1-c"
+      ]
+    },
+    {
+      "id": "science-review-q2",
+      "skill": "science-observe-details",
+      "prompt": "想看清石头上的小斑纹，哪种做法合适？",
+      "answerPosition": "A",
+      "reason": "把石头的斑纹放到放大镜下面细看，就能比出哪一处有细斑。尺和空本子不帮我们看清细纹。",
+      "pictureOptions": [
+        "q2-a",
+        "q2-b",
+        "q2-c"
+      ]
+    },
+    {
+      "id": "science-review-q3",
+      "skill": "science-measure-consistently",
+      "prompt": "想比两座积木塔的高低，哪张图量得合适？",
+      "answerPosition": "B",
+      "reason": "两座塔都从桌面往上量。尺的起点和桌面对齐，量出来的高度才能比。",
+      "pictureOptions": [
+        "q3-a",
+        "q3-b",
+        "q3-c"
+      ]
+    },
+    {
+      "id": "science-review-q4",
+      "skill": "science-experiment-fair-compare",
+      "prompt": "想知道哪条斜坡让同一辆车滚得远，该怎么试？",
+      "answerPosition": "C",
+      "reason": "同一辆车分别从两条斜坡的起点松手，记下停的位置再比。只搭坡或只看图册，都还没有试。",
+      "pictureOptions": [
+        "q4-a",
+        "q4-b",
+        "q4-c"
+      ]
+    },
+    {
+      "id": "science-review-q5",
+      "skill": "science-compare-observation-records",
+      "prompt": "想知道窗边那条纸带有没有变方向，哪张记录能拿来比？",
+      "answerPosition": "C",
+      "reason": "记同一条纸带在两个时刻的样子，才看得出它有没有变方向。只画一次或换了纸带，比较就不清楚。",
+      "pictureOptions": [
+        "q5-a",
+        "q5-b",
+        "q5-c"
+      ]
+    },
+    {
+      "id": "science-review-q6",
+      "skill": "science-safety-habit",
+      "prompt": "桌上有不认识的小颗粒，想先看形状。哪种做法安全？",
+      "answerPosition": "A",
+      "reason": "先告诉大人，隔着透明盖看。来历不明的东西不拿到嘴边，也不打开凑近闻。",
+      "pictureOptions": [
+        "q6-a",
+        "q6-b",
+        "q6-c"
+      ]
+    }
+  ],
+  "familyTask": {
+    "prompt": "和家人用同一张干净废纸先猜、再轻轻转，画两次看到的边线，轮流说一条发现和一个新问题。实物与口述待观察。",
+    "status": "待观察",
+    "adultEvidence": "如有实做，可记录孩子的一句原话或其画的两次外形。"
+  },
+  "weeklyQuestionSource": {
+    "method": "按本课四目标供统一周测选题，每目标约两道原创图片变式。实物与口头问题待观察。",
+    "goals": [
+      {
+        "id": "question",
+        "practice": [
+          "从可见现象选一个相关的可追问问题",
+          "用图片分辨生活困难和已看见的情况"
+        ]
+      },
+      {
+        "id": "process",
+        "practice": [
+          "给一个制作结果选择合理的检查做法",
+          "用同一观察物的两份记录比较变化"
+        ]
+      },
+      {
+        "id": "methods",
+        "practice": [
+          "按想知道的证据区分细看和测量",
+          "区分动手做一个、动手比较试一试、从资料找已有信息"
+        ]
+      },
+      {
+        "id": "reflection",
+        "practice": [
+          "用图片辨认安全的观察行为",
+          "看记录，找出下一次还想知道什么"
+        ]
+      }
+    ],
+    "postclassPoints": [
+      "先问具体问题",
+      "选方法收集证据",
+      "记录、倾听、安全",
+      "做后再提一问"
+    ],
+    "quizSkillIds": [
+      "science-question-focus",
+      "science-observe-details",
+      "science-measure-consistently",
+      "science-experiment-fair-compare",
+      "science-compare-observation-records",
+      "science-safety-habit"
+    ]
+  },
+  "production": {
+    "status": "original_offline_source_imagegen_and_observation_handoff_pending",
+    "authoring": "根据教材原页直接创作，新写台词、题、互动配置；旧课 25 笔通义画图和旧课文件保留。",
+    "images": "imagegen-plan.json 列出准确待生成或已收到的目标，不用空图、别课图或旧付费图冒充。",
+    "voices": "小科老师 Serena。复用来自本课讲解页的游戏语音在编译时绑定；当前待统一配音。",
+    "gates": "仅做离线源码、素材声明和规则核对。待正式图、模板观察记录、录音、实机、独立核对、发布。"
+  }
+}

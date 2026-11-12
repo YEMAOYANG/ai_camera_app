@@ -1,0 +1,181 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "There's a pair of shorts under that duck.",
+  "sourceBinding": {
+    "schemaVersion": "mira.courseware.identity.v1",
+    "slug": "fltrp-g1-lower-shorts-under-that-duck",
+    "editionId": "smartedu-english-six-year-g1-lower-sync-c8ae9406",
+    "revisionId": "directory-057e330e9b4c19ff0e6ab21e",
+    "nodeId": "ad7b4251-6767-3ec5-b764-329f1ff317a2",
+    "unitId": "c4f01db5-7a93-3c42-a559-bff19502f64b",
+    "officialChapterId": "ad7b4251-6767-3ec5-b764-329f1ff317a2",
+    "officialActivityId": "8aee809d-6a56-4dc4-016a-58112ed5098f",
+    "officialMaterialId": "c8ae9406-6280-bd3e-0444-3227ae2dab7a",
+    "subject": "english",
+    "gradeCode": "primary_1",
+    "volume": "lower",
+    "schoolSystem": "six_year",
+    "publisher": "外语教学与研究出版社",
+    "title": "There's a pair of shorts under that duck.",
+    "unitTitle": "Module 8",
+    "lessonTitle": "Unit 1 There's a pair of shorts under that duck.",
+    "printedPages": [
+      44,
+      45,
+      46
+    ],
+    "digitalPageImages": [
+      49,
+      50,
+      51
+    ]
+  },
+  "authoring": {
+    "model": "gpt-6.1-sol",
+    "mode": "Codex direct authoring",
+    "originality": "以原创海边失物台重构教材语用，不借官图、人物、练习图或课文连续台词。原画由内置 ImageGen 生成，件数和位置由本课排图代码锁定。"
+  },
+  "goals": [
+    "听图识别 a shirt、a pair of shorts、a pair of shoes 和 a pair of socks；看出一条短裤裤腿相连，一双鞋或袜是配起来的两只。",
+    "听辨 There’s a pair of …，听出衣物和 under that duck / over there，指对参照物和位置。",
+    "听到 They're his/her …，把成对或一条短裤归到图中对应的孩子。两个人衣服的颜色都可相同。",
+    "和家人用实物或玩具听说练习，指给对方看位置，再交换角色；由家人观察。"
+  ],
+  "keyPoint": "先辨认衣物及一组的单位，再用 There’s a pair of … 报位置，用 They're his/her … 确认归属。",
+  "difficultPoint": "shorts 是连成一条的衣物，鞋袜是两只配一双；找衣物位置和认领是两件事。",
+  "games": [
+    {
+      "scene": "catch-the-shoes",
+      "template": "orchardCatch@1",
+      "knowledgeRule": "两只同款配成一双，落点移动并选择有足够空格的篮；错篮不能留分。",
+      "why": "让一双与一只体现在可见篮格，孩子每次要判断落下的组和空格。",
+      "progression": [
+        "左篮两格右篮一格，双只再单只。",
+        "两个两格篮，听规则后把两次单只配成一双。",
+        "两篮仍各两格，落点和风移变、先辨两只再找单只伙伴。"
+      ]
+    },
+    {
+      "scene": "deliver-to-owners",
+      "template": "listenDelivery@1",
+      "knowledgeRule": "听目标衣物或参照位置选取货点，再听 his/her 与对应人物完成送货。",
+      "why": "同一条短裤摆下面或旁边作为干扰，两个收件人同服色，衣物和归属各有实门槛。",
+      "progression": [
+        "三取货点，一条慢车道送一单。",
+        "两车道，先归鞋再归袜。",
+        "三车道三单，混合位置、鞋袜和两个主人。"
+      ]
+    }
+  ],
+  "pages": [
+    {
+      "page": 1,
+      "id": "at-the-booth",
+      "type": "slide",
+      "title": "海边失物台，今天你值班"
+    },
+    {
+      "page": 2,
+      "id": "meet-the-clothes",
+      "type": "slide",
+      "title": "一件衬衫，一条短裤"
+    },
+    {
+      "page": 3,
+      "id": "shoe-pairs",
+      "type": "slide",
+      "title": "两只配起来，才是一双"
+    },
+    {
+      "page": 4,
+      "id": "catch-the-shoes",
+      "type": "interactive",
+      "title": "接鞋配成双"
+    },
+    {
+      "page": 5,
+      "id": "find-a-location",
+      "type": "slide",
+      "title": "先找到鸭子，再看短裤在哪"
+    },
+    {
+      "page": 6,
+      "id": "same-clothes-new-place",
+      "type": "slide",
+      "title": "同一条短裤，摆放不同"
+    },
+    {
+      "page": 7,
+      "id": "owners",
+      "type": "slide",
+      "title": "认清是谁的，再把衣物送回"
+    },
+    {
+      "page": 8,
+      "id": "deliver-to-owners",
+      "type": "interactive",
+      "title": "听两句，帮衣服找主人"
+    },
+    {
+      "page": 9,
+      "id": "picture-check",
+      "type": "quiz",
+      "title": "听口令，认新的失物照片"
+    },
+    {
+      "page": 10,
+      "id": "closing",
+      "type": "slide",
+      "title": "在家也可以开失物台"
+    }
+  ],
+  "quiz": [
+    {
+      "id": "one-garment",
+      "skill": "区别一条短裤、两条短裤和一件衬衫",
+      "answer": [
+        "B"
+      ]
+    },
+    {
+      "id": "two-shoes",
+      "skill": "选能一起穿的一双鞋",
+      "answer": [
+        "C"
+      ]
+    },
+    {
+      "id": "two-socks",
+      "skill": "把一双迁移到袜子并区别单只和三只",
+      "answer": [
+        "A"
+      ]
+    },
+    {
+      "id": "under-duck",
+      "skill": "听 under 后以指定鸭子为参照",
+      "answer": [
+        "B"
+      ]
+    },
+    {
+      "id": "her-shoes",
+      "skill": "同款衣物中听懂 her 并核对鞋的类别",
+      "answer": [
+        "C"
+      ]
+    },
+    {
+      "id": "over-there",
+      "skill": "同时确认物件和远处位置",
+      "answer": [
+        "A"
+      ]
+    }
+  ],
+  "afterClass": {
+    "home": "把一双鞋摆到玩具下方，先听说位置，再轮换寻找和介绍。",
+    "weekly": "沿用本课六道原创图题能力做本周题源；一条与一双、衣物位置和归属，不纳入 U2。",
+    "evidence": "课内记录操作和客观图选；口语及在家摆放由家人观察。"
+  }
+}

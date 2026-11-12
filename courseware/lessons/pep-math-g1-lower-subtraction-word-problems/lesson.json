@@ -1,0 +1,1160 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "解决问题",
+  "description": "人教版一年级下册第二单元印17。用图书角的书签任务解释如何按问题挑线索、求另一部分并检查。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小数老师",
+      "role": "teacher",
+      "gender": "male",
+      "voice": "Ethan",
+      "avatar": "/teachers/ashu-math-v1.png",
+      "color": "#437763",
+      "persona": "先请孩子说清问什么，再画出总量和已知部分，并用加法回查。"
+    }
+  },
+  "images": {
+    "cover-library": {
+      "file": "assets/cover-library.png"
+    },
+    "sort-backdrop": {
+      "file": "assets/sort-backdrop.png"
+    },
+    "delivery-backdrop": {
+      "file": "assets/delivery-backdrop.png"
+    },
+    "family-library": {
+      "file": "assets/family-library.png"
+    },
+    "magnifier": {
+      "file": "assets/magnifier.png"
+    },
+    "aside-shelf": {
+      "file": "assets/aside-shelf.png"
+    },
+    "sort-cart": {
+      "file": "assets/sort-cart.png"
+    },
+    "sort-push": {
+      "file": "assets/sort-push.png"
+    },
+    "delivery-cart": {
+      "file": "assets/delivery-cart.png"
+    },
+    "delivery-action": {
+      "file": "assets/delivery-action.png"
+    },
+    "lane-trolley": {
+      "file": "assets/lane-trolley.png"
+    },
+    "leaf-sticker": {
+      "file": "assets/leaf-sticker.png"
+    },
+    "sort-whole-12": {
+      "file": "assets/sort-whole-12.png"
+    },
+    "sort-leaf-7": {
+      "file": "assets/sort-leaf-7.png"
+    },
+    "sort-people-3": {
+      "file": "assets/sort-people-3.png"
+    },
+    "sort-labels-15": {
+      "file": "assets/sort-labels-15.png"
+    },
+    "sort-remaining-8": {
+      "file": "assets/sort-remaining-8.png"
+    },
+    "sort-trays-2": {
+      "file": "assets/sort-trays-2.png"
+    },
+    "sort-whole-14": {
+      "file": "assets/sort-whole-14.png"
+    },
+    "sort-leaf-6": {
+      "file": "assets/sort-leaf-6.png"
+    },
+    "sort-other-5": {
+      "file": "assets/sort-other-5.png"
+    },
+    "drop-wave": {
+      "file": "assets/drop-wave.png"
+    },
+    "drop-leaf": {
+      "file": "assets/drop-leaf.png"
+    },
+    "drop-loan": {
+      "file": "assets/drop-loan.png"
+    },
+    "cargo-4": {
+      "file": "assets/cargo-4.png"
+    },
+    "cargo-5": {
+      "file": "assets/cargo-5.png"
+    },
+    "cargo-6": {
+      "file": "assets/cargo-6.png"
+    },
+    "cargo-7": {
+      "file": "assets/cargo-7.png"
+    },
+    "cargo-8": {
+      "file": "assets/cargo-8.png"
+    },
+    "cargo-9": {
+      "file": "assets/cargo-9.png"
+    },
+    "main-clue-board": {
+      "file": "assets/main-clue-board.png"
+    },
+    "loan-clue-board": {
+      "file": "assets/loan-clue-board.png"
+    },
+    "two-racks": {
+      "file": "assets/two-racks.png"
+    },
+    "main-model": {
+      "file": "assets/main-model.png"
+    },
+    "main-check": {
+      "file": "assets/main-check.png"
+    },
+    "loan-model": {
+      "file": "assets/loan-model.png"
+    },
+    "loan-check": {
+      "file": "assets/loan-check.png"
+    },
+    "rack-model": {
+      "file": "assets/rack-model.png"
+    },
+    "q5-stimulus": {
+      "file": "assets/q5-stimulus-independent-v5.png"
+    },
+    "main-restore": {
+      "file": "assets/main-restore.png"
+    },
+    "order-14-8-wave": {
+      "file": "assets/order-14-8-wave.png"
+    },
+    "order-14-6-leaf": {
+      "file": "assets/order-14-6-leaf.png"
+    },
+    "order-16-7-loan": {
+      "file": "assets/order-16-7-loan.png"
+    },
+    "order-13-5-wave": {
+      "file": "assets/order-13-5-wave.png"
+    },
+    "order-15-6-leaf": {
+      "file": "assets/order-15-6-leaf.png"
+    },
+    "order-12-8-loan": {
+      "file": "assets/order-12-8-loan.png"
+    },
+    "q1-stimulus": {
+      "file": "assets/q1-stimulus-independent-v5.png"
+    },
+    "q1-a": {
+      "file": "assets/q1-a-independent-v5.png"
+    },
+    "q1-b": {
+      "file": "assets/q1-b-independent-v5.png"
+    },
+    "q1-c": {
+      "file": "assets/q1-c-independent-v5.png"
+    },
+    "q2-stimulus": {
+      "file": "assets/q2-stimulus-independent-v5.png"
+    },
+    "q3-stimulus": {
+      "file": "assets/q3-stimulus-independent-v5.png"
+    },
+    "q4-stimulus": {
+      "file": "assets/q4-stimulus-independent-v5.png"
+    },
+    "q6-stimulus": {
+      "file": "assets/q6-stimulus-independent-v5.png"
+    },
+    "q2-a": {
+      "file": "assets/q2-a-independent-v5.png"
+    },
+    "q2-b": {
+      "file": "assets/q2-b-independent-v5.png"
+    },
+    "q2-c": {
+      "file": "assets/q2-c-independent-v5.png"
+    },
+    "q3-a": {
+      "file": "assets/q3-a-independent-v5.png"
+    },
+    "q3-b": {
+      "file": "assets/q3-b-independent-v5.png"
+    },
+    "q3-c": {
+      "file": "assets/q3-c-independent-v5.png"
+    },
+    "q4-a": {
+      "file": "assets/q4-a-independent-v5.png"
+    },
+    "q4-b": {
+      "file": "assets/q4-b-independent-v5.png"
+    },
+    "q4-c": {
+      "file": "assets/q4-c-independent-v5.png"
+    },
+    "q6-a": {
+      "file": "assets/q6-a-independent-v5.png"
+    },
+    "q6-b": {
+      "file": "assets/q6-b-independent-v5.png"
+    },
+    "q6-c": {
+      "file": "assets/q6-c-independent-v5.png"
+    },
+    "q5-a": {
+      "file": "assets/q5-a-independent-v5.png"
+    },
+    "q5-b": {
+      "file": "assets/q5-b-independent-v5.png"
+    },
+    "q5-c": {
+      "file": "assets/q5-c-independent-v5.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "entry",
+      "type": "slide",
+      "title": "解决问题",
+      "template": "picture-points",
+      "data": {
+        "title": "解决问题",
+        "picture": "cover-library",
+        "points": [
+          "有两种书签",
+          "知道叶纹有七张",
+          "先听清问什么"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "你好，我是小数老师。我们到了图书角。"
+        },
+        {
+          "say": "三位同学帮忙做书签。成品要放到这架上。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "成品有叶纹书签，也有波纹书签。"
+        },
+        {
+          "say": "两种合在一起，这架一共有十五张。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "这架十五张里，有七张是叶纹的。"
+        },
+        {
+          "say": "管理员只问，波纹书签有几张？"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "听见了三个数，哪个数该放进图里？"
+        },
+        {
+          "say": "先说出要找的是哪一种、哪一架。"
+        },
+        {
+          "say": "一会儿我们就能把有用的线索挑出来。"
+        }
+      ]
+    },
+    {
+      "key": "ask-first",
+      "type": "slide",
+      "title": "先问自己，题目问哪一组",
+      "template": "picture-points",
+      "data": {
+        "title": "先问自己，题目问哪一组",
+        "picture": "main-clue-board",
+        "points": [
+          "用得上两种的总数",
+          "用得上叶纹的张数",
+          "人数先放旁边"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "小满说，图上有十五、七、三。都要用吗？"
+        },
+        {
+          "say": "先把问题说一遍。我们找这架的波纹书签。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "总数十五张，包括这架所有成品。"
+        },
+        {
+          "say": "找波纹书签，就要知道它在哪个整体里。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "这架有七张叶纹，是整体里面的一部分。"
+        },
+        {
+          "say": "另一部分波纹有几张，还不知道。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "三人说的是来帮忙的同学。"
+        },
+        {
+          "say": "三人没有告诉我们做了几张波纹书签。"
+        },
+        {
+          "say": "求书签张数时，这张人数卡先放在旁边。"
+        },
+        {
+          "say": "这关问本架的波纹书签。挑跟这一问有关系的线索。"
+        },
+        {
+          "say": "先停一停。这个问题问的是哪一组？"
+        },
+        {
+          "say": "对一对整体和已知部分。其他线索先放旁边。"
+        },
+        {
+          "say": "和这一问有关的线索，已经挑出来了。"
+        }
+      ]
+    },
+    {
+      "key": "draw-the-whole",
+      "type": "slide",
+      "title": "把两部分画在同一个框里",
+      "template": "picture-points",
+      "data": {
+        "title": "把两部分画在同一个框里",
+        "picture": "main-model",
+        "points": [
+          "整框表示十五张",
+          "先画已知的七张",
+          "总数减去已知部分"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "没有看到波纹的张数，能把关系画出来吗？"
+        },
+        {
+          "say": "我画一个长框，框住这架所有的成品。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "下边的十五，指的是整个框。"
+        },
+        {
+          "say": "整框里只有两种书签，叶纹和波纹。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "左边画七张叶纹，占了整框的一部分。"
+        },
+        {
+          "say": "右边留给波纹书签，暂时空着。"
+        },
+        {
+          "say": "三个帮忙的人不用放进书签框。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "从十五张里去掉七张叶纹。"
+        },
+        {
+          "say": "整框里留下的，只能是波纹这一部分。"
+        },
+        {
+          "say": "所以用十五减七，求波纹有多少张。"
+        }
+      ]
+    },
+    {
+      "key": "check-the-answer",
+      "type": "slide",
+      "title": "算出来，再合回去",
+      "template": "two-columns",
+      "data": {
+        "title": "算出来，再合回去",
+        "left": {
+          "heading": "求到八张波纹",
+          "body": "15 − 7 = 8（张）。"
+        },
+        "left_picture": "main-check",
+        "right": {
+          "heading": "两部分合回十五",
+          "body": "7 + 8 = 15（张）。"
+        },
+        "right_picture": "main-restore"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "朵朵问，我怎么知道算出来的数答对了？"
+        },
+        {
+          "say": "刚刚画的空处，现在能补上多少张？"
+        },
+        {
+          "say": "十五减七等于八，补上八张波纹。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "八说的是波纹书签。单位是张。"
+        },
+        {
+          "say": "叶纹的七张也还在这幅图里。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "把已知七张和求出的八张合起来。"
+        },
+        {
+          "say": "合起来十五，正好回到原来整个框。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "有人想用十五减三，算出十二张。"
+        },
+        {
+          "say": "三是人数。错算的十二张加七张，比十五张多。"
+        },
+        {
+          "say": "合不回原来的数，说明选错了线索。"
+        },
+        {
+          "say": "答的是这架波纹有八张，和问题对得上。"
+        }
+      ]
+    },
+    {
+      "key": "sort-the-clues",
+      "type": "interactive",
+      "title": "推车挑出有用的线索",
+      "page": "sort-the-clues",
+      "widgetType": "simulation",
+      "startImage": "sort-backdrop",
+      "script": [
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#clue-gallery"
+        },
+        {
+          "say": "看左边。上面问这架的波纹书签。"
+        },
+        {
+          "say": "下面几张是给你的线索，先挑对范围。"
+        },
+        {
+          "highlight": "#first-total-card"
+        },
+        {
+          "say": "这张卡数的是本架所有书签，题目用得到。"
+        },
+        {
+          "highlight": "#first-needed-dock"
+        },
+        {
+          "say": "有用的线索送去放大镜盘。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "小车从线索卡后面往盘里推。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "留意小车把总数卡推向哪个盘。"
+        },
+        {
+          "say": "这一问用不上的卡，先推到小架图那里。"
+        },
+        {
+          "say": "轮到你了。换问题时，要重新挑线索。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "sort-bookmark": "ask-first-14",
+        "sort-loan": "what-was-borrowed-15",
+        "sort-rack": "same-unit-new-scope-16",
+        "sort-hint": "ask-first-15",
+        "sort-help": "ask-first-16",
+        "sort-praise": "ask-first-17"
+      }
+    },
+    {
+      "key": "what-was-borrowed",
+      "type": "slide",
+      "title": "问的是借出多少张",
+      "template": "two-columns",
+      "data": {
+        "title": "问的是借出多少张",
+        "left": {
+          "heading": "原来十四张",
+          "body": "十四张包括借出的，也包括现在留下的。"
+        },
+        "left_picture": "loan-clue-board",
+        "right": {
+          "heading": "从总数里分出剩下的",
+          "body": "14 − 6 = 8（张）。"
+        },
+        "right_picture": "loan-model"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "小满把标签分到两边。先听清要找哪边。"
+        },
+        {
+          "say": "标签借了两天。还剩六张。问借出几张？"
+        },
+        {
+          "say": "这回求的是已经借走的那一部分。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "我们要用原来十四张和还剩六张。"
+        },
+        {
+          "say": "两天说的是时间，没说借了几张。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "一整个框表示十四张。先标出还剩六张。"
+        },
+        {
+          "say": "框内另一边就是已经借出去的。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "十四减六等于八。借出去八张。"
+        },
+        {
+          "say": "借出的八张加留下的六张，合回十四。"
+        },
+        {
+          "say": "回头检查。我们答的是借走的张数。"
+        },
+        {
+          "say": "现在问借出去多少张。先找有关系的线索。"
+        },
+        {
+          "say": "问借出多少。看总数和还剩的，去拿算出的量。"
+        },
+        {
+          "say": "把拿好的标签送到有向外箭头的盘。"
+        }
+      ]
+    },
+    {
+      "key": "same-unit-new-scope",
+      "type": "slide",
+      "title": "都数书签，也要看是哪一架",
+      "template": "two-columns",
+      "data": {
+        "title": "都数书签，也要看是哪一架",
+        "left": {
+          "heading": "这一问只数拱顶架",
+          "body": "拱顶架14张，其中叶纹6张。"
+        },
+        "left_picture": "two-racks",
+        "right": {
+          "heading": "用同一个整体算",
+          "body": "本架波纹8张。另问尖顶架时用4张。"
+        },
+        "right_picture": "rack-model"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "两张卡上都画着波纹。该用哪一张？"
+        },
+        {
+          "say": "这回有拱顶架和尖顶架。先听问哪一架。"
+        },
+        {
+          "say": "这一问要找拱顶架上的波纹书签。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "拱顶架总共十四张，里面叶纹有六张。"
+        },
+        {
+          "say": "尖顶架上另有四张波纹，跟这问没有关系。"
+        },
+        {
+          "say": "两边都用张来数。还得看是不是同一架。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "把本架十四张画进框，去掉这架叶纹六张。"
+        },
+        {
+          "say": "十四减六等于八。拱顶架有八张波纹。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "如果改问尖顶架有多少张波纹呢？"
+        },
+        {
+          "say": "刚刚先放旁边的四张，现在就有用了。"
+        },
+        {
+          "say": "线索用不用，要跟着问题变。"
+        },
+        {
+          "say": "只问拱顶架的波纹书签。别把尖顶架混进来。"
+        },
+        {
+          "say": "问波纹一组。看这架总量和已知组，再去取货。"
+        },
+        {
+          "say": "把算出的那包送到波纹盘。"
+        },
+        {
+          "say": "问叶纹一组。用这架总量减去已知组，再取货。"
+        },
+        {
+          "say": "这一问找叶纹。送到画着叶纹的盘。"
+        },
+        {
+          "say": "先看题目要找的那一组。"
+        },
+        {
+          "say": "总量减去已知的部分，就找到另一部分。"
+        },
+        {
+          "say": "这一问的数量和目的盘都对上了。"
+        }
+      ]
+    },
+    {
+      "key": "deliver-the-missing",
+      "type": "interactive",
+      "title": "算对再开车送货",
+      "page": "deliver-the-missing",
+      "widgetType": "simulation",
+      "startImage": "delivery-backdrop",
+      "script": [
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#delivery-order"
+        },
+        {
+          "say": "看左边。总共十四张，叶纹有八张。"
+        },
+        {
+          "say": "下面问波纹。用十四减八，求到六张。"
+        },
+        {
+          "highlight": "#first-cargo"
+        },
+        {
+          "say": "这个包有六张，正是这一问要找的。"
+        },
+        {
+          "highlight": "#first-drop"
+        },
+        {
+          "say": "目的盘画着波纹，送过去时要认准。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "先开到六张的包旁边，再按拿取键。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "留意右边的小格，它会显示车拿到的包。"
+        },
+        {
+          "say": "现在你来。按方向走，看到小车经过就等等。"
+        },
+        {
+          "say": "把算出的那包送到对应的盘。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "ask-wave": "same-unit-new-scope-17",
+        "send-wave": "same-unit-new-scope-18",
+        "ask-leaf": "same-unit-new-scope-19",
+        "send-leaf": "same-unit-new-scope-20",
+        "ask-loan": "what-was-borrowed-16",
+        "send-loan": "what-was-borrowed-17",
+        "deliver-hint": "same-unit-new-scope-21",
+        "deliver-help": "same-unit-new-scope-22",
+        "deliver-praise": "same-unit-new-scope-23"
+      }
+    },
+    {
+      "key": "read-listen-check",
+      "type": "slide",
+      "title": "把解题过程说出来",
+      "template": "picture-points",
+      "data": {
+        "title": "把解题过程说出来",
+        "picture": "loan-check",
+        "points": [
+          "先问范围",
+          "画整体和已知部分",
+          "合回去，再回答"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "两个货盘都收好了。你是怎么找到另一组的？"
+        },
+        {
+          "say": "回到刚才的标签题，再用图说一遍。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先说要找的是哪种物品和哪一部分。"
+        },
+        {
+          "say": "知道问什么，才能挑和它有关的数。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "一个框画原来所有标签。"
+        },
+        {
+          "say": "已知留六张，从十四里减六。"
+        },
+        {
+          "say": "余下八张就是借走的那部分。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "六张和八张合回来，确实是十四张。"
+        },
+        {
+          "say": "原来问借出去几张，答借出去八张。"
+        },
+        {
+          "say": "如果改问经过几天，那个时间就用得上。"
+        }
+      ]
+    },
+    {
+      "key": "six-picture-check",
+      "type": "quiz",
+      "title": "听清问题，选一幅图",
+      "intro": [
+        "先听这道题问的是谁。再去找线索。",
+        "拿不准时，用图把两部分合起来看看。"
+      ],
+      "questions": [
+        {
+          "id": "which-two-clues",
+          "skill": "choose-relevant-conditions",
+          "question": "两种贴纸十一枚，月纹七枚，空盘三个。星纹用哪两条？",
+          "analysis": "总数十一枚和月纹七枚在同一个整体里，能求星纹。三个空盘说的是盘子，与有多少枚贴纸无关。",
+          "answer": [
+            "A"
+          ],
+          "visual": {
+            "kind": "asset",
+            "image": "q1-stimulus",
+            "alt": "两种印章贴共十一枚，其中七枚月纹，另外有三个空盘。"
+          },
+          "options": {
+            "A": {
+              "label": "共十一枚和七枚月纹",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-a",
+                "alt": "共十一枚和七枚月纹"
+              }
+            },
+            "B": {
+              "label": "共十一枚和三个空盘",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-b",
+                "alt": "共十一枚和三个空盘"
+              }
+            },
+            "C": {
+              "label": "七枚月纹和三个空盘",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-c",
+                "alt": "七枚月纹和三个空盘"
+              }
+            }
+          }
+        },
+        {
+          "id": "known-leaf-unknown-wave",
+          "skill": "subtract-known-from-whole",
+          "question": "两种风筝挂签十三张，七张叶纹，晾两天。波纹几张？",
+          "analysis": "晾了两天说的是时间。十三减七等于六，有六张波纹挂签。",
+          "answer": [
+            "B"
+          ],
+          "visual": {
+            "kind": "asset",
+            "image": "q2-stimulus",
+            "alt": "风筝挂签总共十三张，其中叶纹七张，晾了两天。"
+          },
+          "options": {
+            "A": {
+              "label": "七张波纹挂签",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-a",
+                "alt": "七张波纹挂签"
+              }
+            },
+            "B": {
+              "label": "六张波纹挂签",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-b",
+                "alt": "六张波纹挂签"
+              }
+            },
+            "C": {
+              "label": "五张波纹挂签",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-c",
+                "alt": "五张波纹挂签"
+              }
+            }
+          }
+        },
+        {
+          "id": "ignore-next-case",
+          "skill": "same-unit-outside-scope",
+          "question": "圆顶十二张，三张叶纹。尖顶波纹四张。圆顶波纹几张？",
+          "analysis": "尖顶的四张和圆顶的挂签不在同一处。圆顶一共有十二张，减去圆顶三张叶纹，剩下九张波纹。",
+          "answer": [
+            "C"
+          ],
+          "visual": {
+            "kind": "asset",
+            "image": "q3-stimulus",
+            "alt": "圆顶帐篷的挂签共十二张，其中三张叶纹。尖顶帐篷另有四张波纹。"
+          },
+          "options": {
+            "A": {
+              "label": "八张波纹挂签",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-a",
+                "alt": "八张波纹挂签"
+              }
+            },
+            "B": {
+              "label": "四张波纹挂签",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-b",
+                "alt": "四张波纹挂签"
+              }
+            },
+            "C": {
+              "label": "九张波纹挂签",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-c",
+                "alt": "九张波纹挂签"
+              }
+            }
+          }
+        },
+        {
+          "id": "find-what-was-loaned",
+          "skill": "original-minus-remaining",
+          "question": "原有十七张演出票，演了三天，剩九张。发出几张？",
+          "analysis": "十七减九得八，发出了八张票。三天是演出的时间，不能从票的张数中减掉。",
+          "answer": [
+            "B"
+          ],
+          "visual": {
+            "kind": "asset",
+            "image": "q4-stimulus",
+            "alt": "演出票原有十七张，还剩九张，演出进行了三天。"
+          },
+          "options": {
+            "A": {
+              "label": "九张演出票",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-a",
+                "alt": "九张演出票"
+              }
+            },
+            "B": {
+              "label": "八张演出票",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-b",
+                "alt": "八张演出票"
+              }
+            },
+            "C": {
+              "label": "十四张演出票",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-c",
+                "alt": "十四张演出票"
+              }
+            }
+          }
+        },
+        {
+          "id": "put-parts-back",
+          "skill": "addition-check-missing-part",
+          "question": "贺卡两种贴纸共十一枚，五枚月纹。哪两组合回？",
+          "analysis": "五枚月纹加六枚星纹正好十一枚。五枚星纹少一枚，七枚星纹多一枚。",
+          "answer": [
+            "A"
+          ],
+          "visual": {
+            "kind": "asset",
+            "image": "q5-stimulus",
+            "alt": "贺卡贴纸共十一枚，已知五枚月纹，星纹数量待找。"
+          },
+          "options": {
+            "A": {
+              "label": "五枚月纹与六枚星纹",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-a",
+                "alt": "五枚月纹与六枚星纹"
+              }
+            },
+            "B": {
+              "label": "五枚月纹与五枚星纹",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-b",
+                "alt": "五枚月纹与五枚星纹"
+              }
+            },
+            "C": {
+              "label": "五枚月纹与七枚星纹",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-c",
+                "alt": "五枚月纹与七枚星纹"
+              }
+            }
+          }
+        },
+        {
+          "id": "changed-scope",
+          "skill": "change-question-change-condition",
+          "question": "问尖顶入口的入场签，那里有几张波纹的？",
+          "analysis": "这一问找尖顶入口。尖顶的卡上直接画了七张波纹入场签。圆顶入口的总数和叶纹数与这问无关。",
+          "answer": [
+            "C"
+          ],
+          "visual": {
+            "kind": "asset",
+            "image": "q6-stimulus",
+            "alt": "圆顶入口有十八张入场签，其中九张叶纹。尖顶入口另有七张波纹入场签。"
+          },
+          "options": {
+            "A": {
+              "label": "九张波纹入场签",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-a",
+                "alt": "九张波纹入场签"
+              }
+            },
+            "B": {
+              "label": "八张波纹入场签",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-b",
+                "alt": "八张波纹入场签"
+              }
+            },
+            "C": {
+              "label": "七张波纹入场签",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-c",
+                "alt": "七张波纹入场签"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "tell-it-at-home",
+      "type": "slide",
+      "title": "给家人出一道生活题",
+      "template": "picture-points",
+      "data": {
+        "title": "给家人出一道生活题",
+        "picture": "family-library",
+        "points": [
+          "说清要找什么",
+          "画图找另一部分",
+          "换一个问题试试"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "今天你给图书角找到了缺的那一组。"
+        },
+        {
+          "say": "回家可以用纸片和家人一起编个问题。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "比如两个人收好十三张纸片。"
+        },
+        {
+          "say": "纸片只有红、蓝两种。红色五张，蓝色有几张？"
+        },
+        {
+          "say": "先听清问题找的是纸片，不是人数。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "画一个十三张的整框。"
+        },
+        {
+          "say": "去掉五张红色，框里剩的全是蓝色。数数有几张。"
+        },
+        {
+          "say": "再把答案和红色加回来检查。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "改问谁一起收，或者一共有几个人。"
+        },
+        {
+          "say": "你刚才放旁边的线索还用得上吗？"
+        },
+        {
+          "say": "把你选线索的理由说给家人听。"
+        }
+      ]
+    }
+  ]
+}

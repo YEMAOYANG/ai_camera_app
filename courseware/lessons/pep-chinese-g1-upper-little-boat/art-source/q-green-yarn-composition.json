@@ -1,0 +1,29 @@
+{
+  "schemaVersion": "mira.courseware.asset-composition.v1",
+  "key": "q-green-yarn",
+  "canvas": [
+    480,
+    480
+  ],
+  "background": "#fef2d8",
+  "inputs": {
+    "yarn-atlas-crop": {
+      "file": "assets/q-green-yarn.png",
+      "sha256": "901cc30c09ef77bcfe55cd743c6dc0dfe57e9d9ef17268199a42bfe357c2fa6c"
+    }
+  },
+  "layers": [
+    {
+      "op": "asset",
+      "asset": "yarn-atlas-crop",
+      "center": [
+        240,
+        240
+      ],
+      "size": [
+        332,
+        332
+      ]
+    }
+  ]
+}

@@ -1,0 +1,218 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "语文园地八",
+  "sourceBinding": {
+    "schemaVersion": "mira.courseware.lesson-identity.v1",
+    "slug": "pep-chinese-g1-lower-language-garden-eight",
+    "title": "语文园地八",
+    "lessonTitle": "语文园地八",
+    "unitTitle": "第八单元·阅读",
+    "editionId": "pep-chinese-g1-lower-2022-standard",
+    "revisionId": "directory-b30168cf88d5ee5709335698",
+    "nodeId": "77412f37-e267-413b-a9f3-a421ea36c1ca",
+    "unitId": "336f717a-5a30-4b70-87f1-0ac3b195ed88",
+    "gradeCode": "primary_1",
+    "subject": "chinese",
+    "volume": "lower",
+    "schoolSystem": "six_year",
+    "publisher": "人民教育出版社",
+    "teachingRevision": "1",
+    "classHours": [
+      "lesson_1"
+    ],
+    "officialActivityId": "7f42b55d-85a2-faa6-3eda-2e675f17776f",
+    "officialMaterialId": "2d22a5c9-80b8-46cb-8595-564f5c368f3e",
+    "officialChapterId": "77412f37-e267-413b-a9f3-a421ea36c1ca",
+    "textbookSource": {
+      "url": "https://basic.smartedu.cn/tchMaterial/detail?contentType=assets_document&contentId=b87e153f-a64c-451a-aa6c-6ed9ac7d6821&catalogType=tchMaterial&subCatalog=tchMaterial",
+      "resourceId": "b87e153f-a64c-451a-aa6c-6ed9ac7d6821",
+      "verifiedAt": "2026-11-10"
+    },
+    "sourceIdentityEvidence": [
+      "output/courseware-lessons/pep-chinese-g1-lower-language-garden-eight/official/textbook-reuse-receipt.json",
+      "output/courseware-lessons/pep-chinese-g1-lower-language-garden-eight/official/exact-activity-details.json",
+      "output/courseware-lessons/pep-chinese-g1-lower-little-monkey-down-the-mountain/official/activity-index-part_100.json"
+    ],
+    "printedPages": [
+      109,
+      110,
+      111,
+      112,
+      113
+    ],
+    "digitalPageImages": [
+      114,
+      115,
+      116,
+      117,
+      118
+    ]
+  },
+  "authoring": {
+    "model": "gpt-6.1-sol",
+    "mode": "Codex direct authoring",
+    "originality": "用字片和原创生活图讲本课。字形、部件关系和书写格由本课代码定位；诗和故事回到纸书，只作原创观察和提问。"
+  },
+  "goals": [
+    "看清部件所在的位置，用加一部分或去一部分认识八个字。观察页、交、户、父在田字格里的写法，纸上练写由大人看。",
+    "结合字形差别和词义，分清午/牛、刀/力、人/入、玉/主；用新例子说出选这个字的原因。",
+    "结合发生的事、动作和表情理解高兴、生气、害怕、难过；先说发生了什么和自己的感受，再写一两句。",
+    "读《画鸡》，把红冠、白羽和响亮叫声联系到画面，随教材积累；具体范读依另行授权。",
+    "和家人读《小熊住山洞》，按四季复述花、叶、果、鸟家，小熊劝留树及动物感谢；共读和表达请家人观察。"
+  ],
+  "keyPoint": "字的部件和细小笔形要看清，放进有意义的词语再核。说写心情要说清事情和感受。",
+  "difficultPoint": "字形相似也要结合词义，不只凭一笔猜。表情可以是线索，生活中的感受要联系实际发生的事。",
+  "games": [
+    {
+      "scene": "slide-word-parts",
+      "template": "slideMerge@1",
+      "knowledgeRule": "同向滑片，只有当前正确部件配对才合成目标汉字；正确成品锁定部件在字里的位置。",
+      "why": "孩子要先判断搭档，再找同轨路径；扣住的是配对知识，不把碰头方向冒充写字位置。",
+      "progression": [
+        "口少、王见两组，直线和换向。",
+        "丁页、月半、票风三组，绕挡板。",
+        "恢复房校爸飘四组，改变起点和挡板。"
+      ]
+    },
+    {
+      "scene": "aim-for-feelings",
+      "template": "magnetMarbles@1",
+      "knowledgeRule": "听懂新情境中的事情和动作，瞄中最相符的情绪图才得分。",
+      "why": "同角色脸图不带字，判断来自题设情境与动作。轨迹和发射时机另需操控。",
+      "progression": [
+        "高兴和难过，两靶。",
+        "生气、害怕、高兴，三靶。",
+        "四种情绪，各换新情境，漂动稍快。"
+      ]
+    }
+  ],
+  "pages": [
+    {
+      "page": 1,
+      "id": "join-parts",
+      "type": "slide",
+      "title": "把两块部件合成一个字"
+    },
+    {
+      "page": 2,
+      "id": "take-a-part-away",
+      "type": "slide",
+      "title": "拿掉一部分，再认留下的字"
+    },
+    {
+      "page": 3,
+      "id": "observe-the-grid",
+      "type": "slide",
+      "title": "在田字格里观察四个字"
+    },
+    {
+      "page": 4,
+      "id": "look-for-a-stroke",
+      "type": "slide",
+      "title": "午和牛、刀和力，只差一点形"
+    },
+    {
+      "page": 5,
+      "id": "check-position-and-meaning",
+      "type": "slide",
+      "title": "人和入、玉和主，看笔画在哪"
+    },
+    {
+      "page": 6,
+      "id": "slide-word-parts",
+      "type": "interactive",
+      "title": "滑字片，给部件找搭档"
+    },
+    {
+      "page": 7,
+      "id": "events-and-feelings",
+      "type": "slide",
+      "title": "先想发生了什么，再说心情"
+    },
+    {
+      "page": 8,
+      "id": "say-it-then-write",
+      "type": "slide",
+      "title": "先说事情和心情，再把它写下来"
+    },
+    {
+      "page": 9,
+      "id": "aim-for-feelings",
+      "type": "interactive",
+      "title": "听情境，瞄准可能的心情"
+    },
+    {
+      "page": 10,
+      "id": "read-the-rooster",
+      "type": "slide",
+      "title": "打开纸书读《画鸡》"
+    },
+    {
+      "page": 11,
+      "id": "read-the-bear",
+      "type": "slide",
+      "title": "跟家人读《小熊住山洞》"
+    },
+    {
+      "page": 12,
+      "id": "picture-check",
+      "type": "quiz",
+      "title": "看新图，听一句再选"
+    },
+    {
+      "page": 13,
+      "id": "closing",
+      "type": "slide",
+      "title": "把今天的发现说给家人听"
+    }
+  ],
+  "quiz": [
+    {
+      "id": "parts-for-xian",
+      "skill": "听词义匹配能组成目标字的两个部件",
+      "answer": [
+        "B"
+      ]
+    },
+    {
+      "id": "remove-from-school",
+      "skill": "看部件位置和减字后保留的形状",
+      "answer": [
+        "C"
+      ]
+    },
+    {
+      "id": "small-calf",
+      "skill": "午/牛的竖与词义双核",
+      "answer": [
+        "A"
+      ]
+    },
+    {
+      "id": "enter-the-room",
+      "skill": "在听到词和场景后分辨人/入",
+      "answer": [
+        "B"
+      ]
+    },
+    {
+      "id": "heard-thunder",
+      "skill": "用事件和动作辨害怕",
+      "answer": [
+        "C"
+      ]
+    },
+    {
+      "id": "winter-nest",
+      "skill": "从共读情节选出相符的冬天证据",
+      "answer": [
+        "A"
+      ]
+    }
+  ],
+  "afterClass": {
+    "home": "纸书练写页、交、户、父；说和写生活心情，跟家人读《画鸡》《小熊住山洞》并复述一个季节。",
+    "weekly": "形近字四组、部件加减、结合情境理解心情及课文图义。",
+    "evidence": "选图与操作是课内可见结果；练字、朗读、实际表达由大人观察。"
+  }
+}

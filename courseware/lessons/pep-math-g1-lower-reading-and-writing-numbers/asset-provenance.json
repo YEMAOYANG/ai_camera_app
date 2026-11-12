@@ -1,0 +1,1651 @@
+{
+  "schemaVersion": "mira.courseware.asset-provenance.v1",
+  "atlasReceipts": {
+    "postal-scenes": {
+      "path": "art-source/postal-scenes.receipt.json",
+      "sha256": "4059ab5becf66c5144b1790539da40f37e761c7a848a60ae324d3e8a8dbb23cd"
+    },
+    "postal-sprites": {
+      "path": "art-source/postal-sprites.receipt.json",
+      "sha256": "69f6c3f8451a290ce763736a00314b371b9b971a1c36e2ab85602d3ff645e2b6"
+    }
+  },
+  "numberPlan": {
+    "tensSide": "left",
+    "onesSide": "right",
+    "itemsPerGroup": 10,
+    "twoDigitScope": [
+      10,
+      99
+    ],
+    "oneDigitContrast": [
+      5,
+      6,
+      8
+    ]
+  },
+  "assets": {
+    "abacus-42": {
+      "path": "assets/abacus-42.png",
+      "sha256": "34e20db5babb79a09a082b184ead9fa4305866ee022ef350646b3514593754cd",
+      "source": "exact_place_value_diagram",
+      "renderSource": "art-source/place-value-diagrams.mjs",
+      "renderSourceSha256": "333aa0e6e64ffcea36d7ad741c87ab0af7986c92bad35be184cc8117ab8dc427",
+      "usedBy": [
+        "one-tray-one-bead"
+      ],
+      "inputs": {
+        "chart-counter": "ced55ce2f7c3d326e9e9f28c067f67bc80f84b95669d906d0e47173b67318714"
+      },
+      "derivativeConsumers": [],
+      "quantity": {
+        "n": 42,
+        "tens": 4,
+        "ones": 2,
+        "groupSize": 10
+      }
+    },
+    "board-10": {
+      "path": "assets/board-10.png",
+      "sha256": "608fbf498ae1864fc2531b20aaf48c2872750de6701dacfb33b9690bb3f99b63",
+      "source": "exact_place_value_diagram",
+      "renderSource": "art-source/place-value-diagrams.mjs",
+      "renderSourceSha256": "333aa0e6e64ffcea36d7ad741c87ab0af7986c92bad35be184cc8117ab8dc427",
+      "usedBy": [
+        "read-one-ten"
+      ],
+      "inputs": {
+        "chart-counter": "ced55ce2f7c3d326e9e9f28c067f67bc80f84b95669d906d0e47173b67318714"
+      },
+      "derivativeConsumers": [],
+      "quantity": {
+        "n": 10,
+        "tens": 1,
+        "ones": 0,
+        "groupSize": 10
+      }
+    },
+    "board-17": {
+      "path": "assets/board-17.png",
+      "sha256": "9b2e746238a0beaf3a54a619aa52a8b4b757d710aa68ff88aa8aa7b2c4ad6654",
+      "source": "exact_place_value_diagram",
+      "renderSource": "art-source/place-value-diagrams.mjs",
+      "renderSourceSha256": "333aa0e6e64ffcea36d7ad741c87ab0af7986c92bad35be184cc8117ab8dc427",
+      "usedBy": [
+        "read-one-ten"
+      ],
+      "inputs": {
+        "chart-counter": "ced55ce2f7c3d326e9e9f28c067f67bc80f84b95669d906d0e47173b67318714"
+      },
+      "derivativeConsumers": [],
+      "quantity": {
+        "n": 17,
+        "tens": 1,
+        "ones": 7,
+        "groupSize": 10
+      }
+    },
+    "board-24": {
+      "path": "assets/board-24.png",
+      "sha256": "a8bd89a461836c2f01db6303613221e84fe523ae91cc1d69abef22e5b260f400",
+      "source": "exact_place_value_diagram",
+      "renderSource": "art-source/place-value-diagrams.mjs",
+      "renderSourceSha256": "333aa0e6e64ffcea36d7ad741c87ab0af7986c92bad35be184cc8117ab8dc427",
+      "usedBy": [
+        "find-and-read-places"
+      ],
+      "inputs": {
+        "chart-counter": "ced55ce2f7c3d326e9e9f28c067f67bc80f84b95669d906d0e47173b67318714"
+      },
+      "derivativeConsumers": [],
+      "quantity": {
+        "n": 24,
+        "tens": 2,
+        "ones": 4,
+        "groupSize": 10
+      }
+    },
+    "board-42": {
+      "path": "assets/board-42.png",
+      "sha256": "ad9783aa1408db40a4b8148b9050c9445f868fc3309bc119fa653fc42e206f05",
+      "source": "exact_place_value_diagram",
+      "renderSource": "art-source/place-value-diagrams.mjs",
+      "renderSourceSha256": "333aa0e6e64ffcea36d7ad741c87ab0af7986c92bad35be184cc8117ab8dc427",
+      "usedBy": [
+        "find-and-read-places",
+        "take-the-number-cards"
+      ],
+      "inputs": {
+        "chart-counter": "ced55ce2f7c3d326e9e9f28c067f67bc80f84b95669d906d0e47173b67318714"
+      },
+      "derivativeConsumers": [],
+      "quantity": {
+        "n": 42,
+        "tens": 4,
+        "ones": 2,
+        "groupSize": 10
+      }
+    },
+    "board-50": {
+      "path": "assets/board-50.png",
+      "sha256": "ca2c5dfadeee5c984c745659fef7238818c3e73f384f3e97e7303a0051f44dad",
+      "source": "exact_place_value_diagram",
+      "renderSource": "art-source/place-value-diagrams.mjs",
+      "renderSourceSha256": "333aa0e6e64ffcea36d7ad741c87ab0af7986c92bad35be184cc8117ab8dc427",
+      "usedBy": [
+        "empty-ones-needs-zero"
+      ],
+      "inputs": {
+        "chart-counter": "ced55ce2f7c3d326e9e9f28c067f67bc80f84b95669d906d0e47173b67318714"
+      },
+      "derivativeConsumers": [],
+      "quantity": {
+        "n": 50,
+        "tens": 5,
+        "ones": 0,
+        "groupSize": 10
+      }
+    },
+    "board-63": {
+      "path": "assets/board-63.png",
+      "sha256": "6788a3ab473b2bc0f2bae4247041e305a4e1dda403073459f812b31a4be6e340",
+      "source": "exact_place_value_diagram",
+      "renderSource": "art-source/place-value-diagrams.mjs",
+      "renderSourceSha256": "333aa0e6e64ffcea36d7ad741c87ab0af7986c92bad35be184cc8117ab8dc427",
+      "usedBy": [
+        "deliver-by-number",
+        "hear-and-write"
+      ],
+      "inputs": {
+        "chart-counter": "ced55ce2f7c3d326e9e9f28c067f67bc80f84b95669d906d0e47173b67318714"
+      },
+      "derivativeConsumers": [],
+      "quantity": {
+        "n": 63,
+        "tens": 6,
+        "ones": 3,
+        "groupSize": 10
+      }
+    },
+    "box-13": {
+      "path": "assets/box-13.png",
+      "sha256": "374bebb4316101ac3480a0573397336bb262790ac13e028547d1f28f88909bf9",
+      "source": "exact_place_value_diagram",
+      "renderSource": "art-source/place-value-diagrams.mjs",
+      "renderSourceSha256": "333aa0e6e64ffcea36d7ad741c87ab0af7986c92bad35be184cc8117ab8dc427",
+      "usedBy": [
+        "deliver-by-number"
+      ],
+      "inputs": {
+        "postbox": "822d813900731d867f7a9c16dc3afdd7ac49eba5b2c207c13592a6cfc18ea1e2"
+      },
+      "derivativeConsumers": [],
+      "quantity": {
+        "n": 13,
+        "tens": 1,
+        "ones": 3,
+        "groupSize": 10
+      }
+    },
+    "box-31": {
+      "path": "assets/box-31.png",
+      "sha256": "9f23abe77b77825b537c53568484ce41d328e4be08b5a41ffe5e22a2105d3c98",
+      "source": "exact_place_value_diagram",
+      "renderSource": "art-source/place-value-diagrams.mjs",
+      "renderSourceSha256": "333aa0e6e64ffcea36d7ad741c87ab0af7986c92bad35be184cc8117ab8dc427",
+      "usedBy": [
+        "deliver-by-number"
+      ],
+      "inputs": {
+        "postbox": "822d813900731d867f7a9c16dc3afdd7ac49eba5b2c207c13592a6cfc18ea1e2"
+      },
+      "derivativeConsumers": [],
+      "quantity": {
+        "n": 31,
+        "tens": 3,
+        "ones": 1,
+        "groupSize": 10
+      }
+    },
+    "box-47": {
+      "path": "assets/box-47.png",
+      "sha256": "0ec4442f04df0dd3b977d1a83b403f69699d7a20397b24a97cced3206f58e43e",
+      "source": "exact_place_value_diagram",
+      "renderSource": "art-source/place-value-diagrams.mjs",
+      "renderSourceSha256": "333aa0e6e64ffcea36d7ad741c87ab0af7986c92bad35be184cc8117ab8dc427",
+      "usedBy": [
+        "deliver-by-number"
+      ],
+      "inputs": {
+        "postbox": "822d813900731d867f7a9c16dc3afdd7ac49eba5b2c207c13592a6cfc18ea1e2"
+      },
+      "derivativeConsumers": [],
+      "quantity": {
+        "n": 47,
+        "tens": 4,
+        "ones": 7,
+        "groupSize": 10
+      }
+    },
+    "box-61": {
+      "path": "assets/box-61.png",
+      "sha256": "b823e0c6c4ea71576f0e38bfeeb66bba0b8a67726a0b8338f2706da77e8899a9",
+      "source": "exact_place_value_diagram",
+      "renderSource": "art-source/place-value-diagrams.mjs",
+      "renderSourceSha256": "333aa0e6e64ffcea36d7ad741c87ab0af7986c92bad35be184cc8117ab8dc427",
+      "usedBy": [
+        "deliver-by-number"
+      ],
+      "inputs": {
+        "postbox": "822d813900731d867f7a9c16dc3afdd7ac49eba5b2c207c13592a6cfc18ea1e2"
+      },
+      "derivativeConsumers": [],
+      "quantity": {
+        "n": 61,
+        "tens": 6,
+        "ones": 1,
+        "groupSize": 10
+      }
+    },
+    "box-74": {
+      "path": "assets/box-74.png",
+      "sha256": "55d63394491e21f24c6e7138f28189b7b476230eb60651ce0a7408a8229207a4",
+      "source": "exact_place_value_diagram",
+      "renderSource": "art-source/place-value-diagrams.mjs",
+      "renderSourceSha256": "333aa0e6e64ffcea36d7ad741c87ab0af7986c92bad35be184cc8117ab8dc427",
+      "usedBy": [
+        "deliver-by-number"
+      ],
+      "inputs": {
+        "postbox": "822d813900731d867f7a9c16dc3afdd7ac49eba5b2c207c13592a6cfc18ea1e2"
+      },
+      "derivativeConsumers": [],
+      "quantity": {
+        "n": 74,
+        "tens": 7,
+        "ones": 4,
+        "groupSize": 10
+      }
+    },
+    "box-8": {
+      "path": "assets/box-8.png",
+      "sha256": "803f5722a1a9464437144d1f20238eb6aecb9d83f65ca456868f56c8892b2386",
+      "source": "exact_place_value_diagram",
+      "renderSource": "art-source/place-value-diagrams.mjs",
+      "renderSourceSha256": "333aa0e6e64ffcea36d7ad741c87ab0af7986c92bad35be184cc8117ab8dc427",
+      "usedBy": [
+        "deliver-by-number"
+      ],
+      "inputs": {
+        "postbox": "822d813900731d867f7a9c16dc3afdd7ac49eba5b2c207c13592a6cfc18ea1e2"
+      },
+      "derivativeConsumers": [],
+      "quantity": {
+        "n": 8,
+        "tens": 0,
+        "ones": 8,
+        "groupSize": 10
+      }
+    },
+    "box-80": {
+      "path": "assets/box-80.png",
+      "sha256": "0c1959b1cff029addd434359369ed40ddef374748790dfdba9f3fa6fdbf49912",
+      "source": "exact_place_value_diagram",
+      "renderSource": "art-source/place-value-diagrams.mjs",
+      "renderSourceSha256": "333aa0e6e64ffcea36d7ad741c87ab0af7986c92bad35be184cc8117ab8dc427",
+      "usedBy": [
+        "deliver-by-number"
+      ],
+      "inputs": {
+        "postbox": "822d813900731d867f7a9c16dc3afdd7ac49eba5b2c207c13592a6cfc18ea1e2"
+      },
+      "derivativeConsumers": [],
+      "quantity": {
+        "n": 80,
+        "tens": 8,
+        "ones": 0,
+        "groupSize": 10
+      }
+    },
+    "box-83": {
+      "path": "assets/box-83.png",
+      "sha256": "a8725ff8db4a9c122e2ccea69c70a2c0637458002904c402aad396e5a7d09822",
+      "source": "exact_place_value_diagram",
+      "renderSource": "art-source/place-value-diagrams.mjs",
+      "renderSourceSha256": "333aa0e6e64ffcea36d7ad741c87ab0af7986c92bad35be184cc8117ab8dc427",
+      "usedBy": [
+        "deliver-by-number"
+      ],
+      "inputs": {
+        "postbox": "822d813900731d867f7a9c16dc3afdd7ac49eba5b2c207c13592a6cfc18ea1e2"
+      },
+      "derivativeConsumers": [],
+      "quantity": {
+        "n": 83,
+        "tens": 8,
+        "ones": 3,
+        "groupSize": 10
+      }
+    },
+    "carrier-lift": {
+      "assetKey": "carrier-lift",
+      "path": "assets/carrier-lift.png",
+      "sha256": "f89796f10beb8deca2310d23054e2e8fe47583dae58f6d53c3877d41d712fff3",
+      "width": 238,
+      "height": 264,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/postal-sprites.png",
+      "generatedSourceSha256": "ef0870571b56403de591c8feb3695c2065c7b11b617d60c4f96f75accbe5b7e8",
+      "prompt": "Transparent background required. Create a strict 3 columns × 3 rows production game sprite atlas, nine distinct independent centered cutouts, equidistant at x=1/6,1/2,5/6 and y=1/6,1/2,5/6. Each isolated artwork fits entirely inside 70% of its cell with ample transparent whitespace between items, no shadows beyond their cell. Tactile paper-clay 3D illustrations, clean silhouettes, crisp, warm teal coral yellow pastel palette, no words, letters, digits or labels. Row 1 left to right: (1) cute small spherical yellow and teal postal delivery robot with smiling face, tiny wheels, facing right, no parcel; (2) the same cute spherical robot in an upbeat rolling animation pose, small body tilt, eyes smiling, same consistent size facing right; (3) cute same robot in teal from a top three-quarter view with cheerful face for garden maze. Row 2 left to right: (4) a flat uncluttered cream envelope with teal triangular flap, centered, no postage markings; (5) single coral orange and teal door-like garden archway, inside is mint, looks like a finish arch; (6) a compact 3D navy and teal postal cart with golden wheel, side view facing right, no printed words. Row 3 left to right: (7) one coral red community post box with a horizontal slot and teal base, front view; (8) single golden-orange round reward rosette with central white envelope icon; (9) a simple forest green rounded leafy pot for the maze scenery. No text, no numerals, no scattered details, no existing brands, no ground plane. Use true alpha for entire transparent background.",
+      "promptSha256": "641fca158a15a8ec7d2384fc8f1a1a3b422f45f4b694095a2c2ef9e0812b0883",
+      "sourceCrop": [
+        650,
+        43,
+        888,
+        307
+      ],
+      "usedBy": [
+        "deliver-by-number",
+        "take-the-number-cards"
+      ],
+      "visualReview": "offline_asset_content_reviewed_browser_pending",
+      "derivativeConsumers": []
+    },
+    "carrier-stand": {
+      "assetKey": "carrier-stand",
+      "path": "assets/carrier-stand.png",
+      "sha256": "67494958cfccde22806bab5b763fad406dd8968f449c4801cfa04aaf5e61cbbe",
+      "width": 235,
+      "height": 282,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/postal-sprites.png",
+      "generatedSourceSha256": "ef0870571b56403de591c8feb3695c2065c7b11b617d60c4f96f75accbe5b7e8",
+      "prompt": "Transparent background required. Create a strict 3 columns × 3 rows production game sprite atlas, nine distinct independent centered cutouts, equidistant at x=1/6,1/2,5/6 and y=1/6,1/2,5/6. Each isolated artwork fits entirely inside 70% of its cell with ample transparent whitespace between items, no shadows beyond their cell. Tactile paper-clay 3D illustrations, clean silhouettes, crisp, warm teal coral yellow pastel palette, no words, letters, digits or labels. Row 1 left to right: (1) cute small spherical yellow and teal postal delivery robot with smiling face, tiny wheels, facing right, no parcel; (2) the same cute spherical robot in an upbeat rolling animation pose, small body tilt, eyes smiling, same consistent size facing right; (3) cute same robot in teal from a top three-quarter view with cheerful face for garden maze. Row 2 left to right: (4) a flat uncluttered cream envelope with teal triangular flap, centered, no postage markings; (5) single coral orange and teal door-like garden archway, inside is mint, looks like a finish arch; (6) a compact 3D navy and teal postal cart with golden wheel, side view facing right, no printed words. Row 3 left to right: (7) one coral red community post box with a horizontal slot and teal base, front view; (8) single golden-orange round reward rosette with central white envelope icon; (9) a simple forest green rounded leafy pot for the maze scenery. No text, no numerals, no scattered details, no existing brands, no ground plane. Use true alpha for entire transparent background.",
+      "promptSha256": "641fca158a15a8ec7d2384fc8f1a1a3b422f45f4b694095a2c2ef9e0812b0883",
+      "sourceCrop": [
+        172,
+        32,
+        407,
+        314
+      ],
+      "usedBy": [
+        "deliver-by-number"
+      ],
+      "visualReview": "offline_asset_content_reviewed_browser_pending",
+      "derivativeConsumers": [
+        "delivery-ready"
+      ]
+    },
+    "chart-counter": {
+      "assetKey": "chart-counter",
+      "path": "assets/chart-counter.png",
+      "sha256": "ced55ce2f7c3d326e9e9f28c067f67bc80f84b95669d906d0e47173b67318714",
+      "width": 671,
+      "height": 375,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/postal-scenes.png",
+      "generatedSourceSha256": "64b9be8ed50a19415b2eb3c0bb7166d7ed74d0dd306c7e009319d1d6e4ded8d4",
+      "prompt": "Create one ultra-wide clean illustrated production contact sheet 3 columns × 2 rows of SIX evenly sized 16:9 classroom background images, edge-to-edge, all separated by thin flat bright hot pink #ff00ff two gutters vertically and one horizontally, no outer margin. Layout total ratio 8:3 ideally and aim high pixel resolution. These will be cropped to six separate scenes for a first-grade Chinese elementary math animated lesson at a tiny modern neighbourhood post room. Bright clear sky, natural honey wood, pine-teal green, clean ivory, some coral red and little golden accents. Use a cohesive elegant tactile 3-D stop-motion book illustration look, colorful but soft, use friendly warm skin and natural anatomy. Top left: exterior of a tiny teal-orange community post room with neutral envelope emblem only and two Chinese elementary school children from afar in a quiet residential courtyard, on right half, plain sunny light area on left for teacher overlay. Top middle: inside its wood post counter, clean large open empty countertop, empty center, friendly mint shelving in far background, no objects in front. Top right: overhead garden and teal mint floor with grass and pale apricot surrounding border, EMPTY in center as a low-contrast smooth stage for a drawn maze grid, no built-in maze, no characters. Bottom left: side-on low perspective exterior sidewalk, a wide flat empty path across center, only soft out of focus mint and amber houses in distance; no traffic, no people, no bins. Bottom middle: close-up of Chinese child and parent doing a paper and cards activity together, they occupy right half, a quiet empty beige desk on left; no numbers or lettering. Bottom right: blank distinct simplified post counter with cream cork backdrop and wide quiet empty light center for diagrams, unobtrusive teal wall edge. No words, no digits, no letters, no text or readable markings anywhere. Do not draw arrays of objects, beads or piles of quantities. No borders except solid hot pink internal gutters.",
+      "promptSha256": "b15a468f510ad31344975c2b1fb0eff6150ae89bb94514bf1ebaa68324e5f889",
+      "sourceCrop": [
+        1373,
+        389,
+        2044,
+        764
+      ],
+      "usedBy": [],
+      "visualReview": "offline_asset_content_reviewed_browser_pending",
+      "derivativeConsumers": [
+        "abacus-42",
+        "board-10",
+        "board-17",
+        "board-24",
+        "board-42",
+        "board-50",
+        "board-63",
+        "same-six"
+      ]
+    },
+    "compare-50-and-5": {
+      "path": "assets/compare-50-and-5.png",
+      "sha256": "e05def9b5990dcbf09a840aaee7c89198d7487c7ff27a22c87ff1077c71e16ae",
+      "source": "exact_place_value_diagram",
+      "renderSource": "art-source/place-value-diagrams.mjs",
+      "renderSourceSha256": "333aa0e6e64ffcea36d7ad741c87ab0af7986c92bad35be184cc8117ab8dc427",
+      "usedBy": [
+        "empty-ones-needs-zero"
+      ],
+      "inputs": {},
+      "derivativeConsumers": [],
+      "quantity": [
+        {
+          "n": 50,
+          "tens": 5,
+          "ones": 0,
+          "groupSize": 10
+        },
+        {
+          "n": 5,
+          "tens": 0,
+          "ones": 5,
+          "groupSize": 10
+        }
+      ]
+    },
+    "delivery-ready": {
+      "path": "assets/delivery-ready.png",
+      "sha256": "a6eb99d2496d83987eea898d0538b731b6688764a3069579a630077eeeecc768",
+      "source": "exact_place_value_diagram",
+      "renderSource": "art-source/place-value-diagrams.mjs",
+      "renderSourceSha256": "333aa0e6e64ffcea36d7ad741c87ab0af7986c92bad35be184cc8117ab8dc427",
+      "usedBy": [
+        "deliver-by-number"
+      ],
+      "inputs": {
+        "delivery-street": "ccbcf9282794e762bda47107ca2b5b4258756d792a9a6b86ff5c64d7c0e9e2c1",
+        "carrier-stand": "67494958cfccde22806bab5b763fad406dd8968f449c4801cfa04aaf5e61cbbe",
+        "postbox": "822d813900731d867f7a9c16dc3afdd7ac49eba5b2c207c13592a6cfc18ea1e2"
+      },
+      "derivativeConsumers": [],
+      "quantity": {
+        "n": 31,
+        "tens": 3,
+        "ones": 1,
+        "groupSize": 10
+      }
+    },
+    "delivery-street": {
+      "assetKey": "delivery-street",
+      "path": "assets/delivery-street.png",
+      "sha256": "ccbcf9282794e762bda47107ca2b5b4258756d792a9a6b86ff5c64d7c0e9e2c1",
+      "width": 673,
+      "height": 375,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/postal-scenes.png",
+      "generatedSourceSha256": "64b9be8ed50a19415b2eb3c0bb7166d7ed74d0dd306c7e009319d1d6e4ded8d4",
+      "prompt": "Create one ultra-wide clean illustrated production contact sheet 3 columns × 2 rows of SIX evenly sized 16:9 classroom background images, edge-to-edge, all separated by thin flat bright hot pink #ff00ff two gutters vertically and one horizontally, no outer margin. Layout total ratio 8:3 ideally and aim high pixel resolution. These will be cropped to six separate scenes for a first-grade Chinese elementary math animated lesson at a tiny modern neighbourhood post room. Bright clear sky, natural honey wood, pine-teal green, clean ivory, some coral red and little golden accents. Use a cohesive elegant tactile 3-D stop-motion book illustration look, colorful but soft, use friendly warm skin and natural anatomy. Top left: exterior of a tiny teal-orange community post room with neutral envelope emblem only and two Chinese elementary school children from afar in a quiet residential courtyard, on right half, plain sunny light area on left for teacher overlay. Top middle: inside its wood post counter, clean large open empty countertop, empty center, friendly mint shelving in far background, no objects in front. Top right: overhead garden and teal mint floor with grass and pale apricot surrounding border, EMPTY in center as a low-contrast smooth stage for a drawn maze grid, no built-in maze, no characters. Bottom left: side-on low perspective exterior sidewalk, a wide flat empty path across center, only soft out of focus mint and amber houses in distance; no traffic, no people, no bins. Bottom middle: close-up of Chinese child and parent doing a paper and cards activity together, they occupy right half, a quiet empty beige desk on left; no numbers or lettering. Bottom right: blank distinct simplified post counter with cream cork backdrop and wide quiet empty light center for diagrams, unobtrusive teal wall edge. No words, no digits, no letters, no text or readable markings anywhere. Do not draw arrays of objects, beads or piles of quantities. No borders except solid hot pink internal gutters.",
+      "promptSha256": "b15a468f510ad31344975c2b1fb0eff6150ae89bb94514bf1ebaa68324e5f889",
+      "sourceCrop": [
+        3,
+        389,
+        676,
+        764
+      ],
+      "usedBy": [
+        "deliver-by-number"
+      ],
+      "visualReview": "offline_asset_content_reviewed_browser_pending",
+      "derivativeConsumers": [
+        "delivery-ready"
+      ]
+    },
+    "digit-0": {
+      "path": "assets/digit-0.png",
+      "sha256": "229bd306b4493e56032376e208676c21ae60b84c03a196b2c84c602ba29e00ff",
+      "source": "exact_place_value_diagram",
+      "renderSource": "art-source/place-value-diagrams.mjs",
+      "renderSourceSha256": "333aa0e6e64ffcea36d7ad741c87ab0af7986c92bad35be184cc8117ab8dc427",
+      "usedBy": [
+        "take-the-number-cards"
+      ],
+      "inputs": {},
+      "derivativeConsumers": [],
+      "quantity": {
+        "digit": 0
+      }
+    },
+    "digit-2": {
+      "path": "assets/digit-2.png",
+      "sha256": "a238b44d3eb54f3053e28d1fc8f18aa2f79f05148ca8a5a761de7d1e6c7a3724",
+      "source": "exact_place_value_diagram",
+      "renderSource": "art-source/place-value-diagrams.mjs",
+      "renderSourceSha256": "333aa0e6e64ffcea36d7ad741c87ab0af7986c92bad35be184cc8117ab8dc427",
+      "usedBy": [
+        "take-the-number-cards"
+      ],
+      "inputs": {},
+      "derivativeConsumers": [],
+      "quantity": {
+        "digit": 2
+      }
+    },
+    "digit-3": {
+      "path": "assets/digit-3.png",
+      "sha256": "1758590f76d7743ebbeb0a692bcb5bd567cfc3e67559b4771068c661a1b13ed2",
+      "source": "exact_place_value_diagram",
+      "renderSource": "art-source/place-value-diagrams.mjs",
+      "renderSourceSha256": "333aa0e6e64ffcea36d7ad741c87ab0af7986c92bad35be184cc8117ab8dc427",
+      "usedBy": [
+        "take-the-number-cards"
+      ],
+      "inputs": {},
+      "derivativeConsumers": [],
+      "quantity": {
+        "digit": 3
+      }
+    },
+    "digit-4": {
+      "path": "assets/digit-4.png",
+      "sha256": "fcb1a879845d505b1e8e2bd85ece994ccfb932df1ad452cb0215fa89a8124da4",
+      "source": "exact_place_value_diagram",
+      "renderSource": "art-source/place-value-diagrams.mjs",
+      "renderSourceSha256": "333aa0e6e64ffcea36d7ad741c87ab0af7986c92bad35be184cc8117ab8dc427",
+      "usedBy": [
+        "take-the-number-cards"
+      ],
+      "inputs": {},
+      "derivativeConsumers": [],
+      "quantity": {
+        "digit": 4
+      }
+    },
+    "digit-6": {
+      "path": "assets/digit-6.png",
+      "sha256": "109c22a37f58f28b66ecd667a12bb72761091adfa4eee5f5041e062d7706e7ff",
+      "source": "exact_place_value_diagram",
+      "renderSource": "art-source/place-value-diagrams.mjs",
+      "renderSourceSha256": "333aa0e6e64ffcea36d7ad741c87ab0af7986c92bad35be184cc8117ab8dc427",
+      "usedBy": [
+        "take-the-number-cards"
+      ],
+      "inputs": {},
+      "derivativeConsumers": [],
+      "quantity": {
+        "digit": 6
+      }
+    },
+    "digit-7": {
+      "path": "assets/digit-7.png",
+      "sha256": "3eeabbe4a3f1a887c1790d5f497103282857fcd9887ff712732490b385495bea",
+      "source": "exact_place_value_diagram",
+      "renderSource": "art-source/place-value-diagrams.mjs",
+      "renderSourceSha256": "333aa0e6e64ffcea36d7ad741c87ab0af7986c92bad35be184cc8117ab8dc427",
+      "usedBy": [
+        "take-the-number-cards"
+      ],
+      "inputs": {},
+      "derivativeConsumers": [],
+      "quantity": {
+        "digit": 7
+      }
+    },
+    "family-post": {
+      "assetKey": "family-post",
+      "path": "assets/family-post.png",
+      "sha256": "e12db684062950df071fd3f55e233c2f0695944b2e6ec523daf26c8559f1b801",
+      "width": 672,
+      "height": 375,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/postal-scenes.png",
+      "generatedSourceSha256": "64b9be8ed50a19415b2eb3c0bb7166d7ed74d0dd306c7e009319d1d6e4ded8d4",
+      "prompt": "Create one ultra-wide clean illustrated production contact sheet 3 columns × 2 rows of SIX evenly sized 16:9 classroom background images, edge-to-edge, all separated by thin flat bright hot pink #ff00ff two gutters vertically and one horizontally, no outer margin. Layout total ratio 8:3 ideally and aim high pixel resolution. These will be cropped to six separate scenes for a first-grade Chinese elementary math animated lesson at a tiny modern neighbourhood post room. Bright clear sky, natural honey wood, pine-teal green, clean ivory, some coral red and little golden accents. Use a cohesive elegant tactile 3-D stop-motion book illustration look, colorful but soft, use friendly warm skin and natural anatomy. Top left: exterior of a tiny teal-orange community post room with neutral envelope emblem only and two Chinese elementary school children from afar in a quiet residential courtyard, on right half, plain sunny light area on left for teacher overlay. Top middle: inside its wood post counter, clean large open empty countertop, empty center, friendly mint shelving in far background, no objects in front. Top right: overhead garden and teal mint floor with grass and pale apricot surrounding border, EMPTY in center as a low-contrast smooth stage for a drawn maze grid, no built-in maze, no characters. Bottom left: side-on low perspective exterior sidewalk, a wide flat empty path across center, only soft out of focus mint and amber houses in distance; no traffic, no people, no bins. Bottom middle: close-up of Chinese child and parent doing a paper and cards activity together, they occupy right half, a quiet empty beige desk on left; no numbers or lettering. Bottom right: blank distinct simplified post counter with cream cork backdrop and wide quiet empty light center for diagrams, unobtrusive teal wall edge. No words, no digits, no letters, no text or readable markings anywhere. Do not draw arrays of objects, beads or piles of quantities. No borders except solid hot pink internal gutters.",
+      "promptSha256": "b15a468f510ad31344975c2b1fb0eff6150ae89bb94514bf1ebaa68324e5f889",
+      "sourceCrop": [
+        688,
+        389,
+        1360,
+        764
+      ],
+      "usedBy": [
+        "find-a-number-at-home"
+      ],
+      "visualReview": "offline_asset_content_reviewed_browser_pending",
+      "derivativeConsumers": []
+    },
+    "goods-13": {
+      "path": "assets/goods-13.png",
+      "sha256": "6fa06e7689a1fd70dfefc2bbe6b817f27d2c3b4513a1a7b8be9cbf1cafdc22b6",
+      "source": "exact_place_value_diagram",
+      "renderSource": "art-source/place-value-diagrams.mjs",
+      "renderSourceSha256": "333aa0e6e64ffcea36d7ad741c87ab0af7986c92bad35be184cc8117ab8dc427",
+      "usedBy": [
+        "deliver-by-number"
+      ],
+      "inputs": {},
+      "derivativeConsumers": [],
+      "quantity": {
+        "n": 13,
+        "tens": 1,
+        "ones": 3,
+        "groupSize": 10
+      }
+    },
+    "goods-31": {
+      "path": "assets/goods-31.png",
+      "sha256": "3c794d86c137e65346463de29630360f957ab1faffe25ceb1948b0d4d950d5a9",
+      "source": "exact_place_value_diagram",
+      "renderSource": "art-source/place-value-diagrams.mjs",
+      "renderSourceSha256": "333aa0e6e64ffcea36d7ad741c87ab0af7986c92bad35be184cc8117ab8dc427",
+      "usedBy": [
+        "deliver-by-number"
+      ],
+      "inputs": {},
+      "derivativeConsumers": [],
+      "quantity": {
+        "n": 31,
+        "tens": 3,
+        "ones": 1,
+        "groupSize": 10
+      }
+    },
+    "goods-47": {
+      "path": "assets/goods-47.png",
+      "sha256": "f279d3c1f41e416bfe18202f06d375094f01de4108d09a1eafe46992b455e544",
+      "source": "exact_place_value_diagram",
+      "renderSource": "art-source/place-value-diagrams.mjs",
+      "renderSourceSha256": "333aa0e6e64ffcea36d7ad741c87ab0af7986c92bad35be184cc8117ab8dc427",
+      "usedBy": [
+        "deliver-by-number"
+      ],
+      "inputs": {},
+      "derivativeConsumers": [],
+      "quantity": {
+        "n": 47,
+        "tens": 4,
+        "ones": 7,
+        "groupSize": 10
+      }
+    },
+    "goods-61": {
+      "path": "assets/goods-61.png",
+      "sha256": "c59827126813efa4281d0e619f16263e7965f601797682d9f55c360b73cdd3ee",
+      "source": "exact_place_value_diagram",
+      "renderSource": "art-source/place-value-diagrams.mjs",
+      "renderSourceSha256": "333aa0e6e64ffcea36d7ad741c87ab0af7986c92bad35be184cc8117ab8dc427",
+      "usedBy": [
+        "deliver-by-number"
+      ],
+      "inputs": {},
+      "derivativeConsumers": [],
+      "quantity": {
+        "n": 61,
+        "tens": 6,
+        "ones": 1,
+        "groupSize": 10
+      }
+    },
+    "goods-74": {
+      "path": "assets/goods-74.png",
+      "sha256": "22079fb9c42f531c53f82c1f3984c3ed687f466b55c34182585375faf13e47b7",
+      "source": "exact_place_value_diagram",
+      "renderSource": "art-source/place-value-diagrams.mjs",
+      "renderSourceSha256": "333aa0e6e64ffcea36d7ad741c87ab0af7986c92bad35be184cc8117ab8dc427",
+      "usedBy": [
+        "deliver-by-number"
+      ],
+      "inputs": {},
+      "derivativeConsumers": [],
+      "quantity": {
+        "n": 74,
+        "tens": 7,
+        "ones": 4,
+        "groupSize": 10
+      }
+    },
+    "goods-8": {
+      "path": "assets/goods-8.png",
+      "sha256": "bc52b61a51a0b6198047ce7a40d1e413fa74ce8103299f9aa20921c0ae2bc8d7",
+      "source": "exact_place_value_diagram",
+      "renderSource": "art-source/place-value-diagrams.mjs",
+      "renderSourceSha256": "333aa0e6e64ffcea36d7ad741c87ab0af7986c92bad35be184cc8117ab8dc427",
+      "usedBy": [
+        "deliver-by-number"
+      ],
+      "inputs": {},
+      "derivativeConsumers": [],
+      "quantity": {
+        "n": 8,
+        "tens": 0,
+        "ones": 8,
+        "groupSize": 10
+      }
+    },
+    "goods-80": {
+      "path": "assets/goods-80.png",
+      "sha256": "5da97cd9c7cd9e55fc0b7621386f9b131d3d2c3680db6a165e30c3d2ac4b5ce6",
+      "source": "exact_place_value_diagram",
+      "renderSource": "art-source/place-value-diagrams.mjs",
+      "renderSourceSha256": "333aa0e6e64ffcea36d7ad741c87ab0af7986c92bad35be184cc8117ab8dc427",
+      "usedBy": [
+        "deliver-by-number"
+      ],
+      "inputs": {},
+      "derivativeConsumers": [],
+      "quantity": {
+        "n": 80,
+        "tens": 8,
+        "ones": 0,
+        "groupSize": 10
+      }
+    },
+    "goods-83": {
+      "path": "assets/goods-83.png",
+      "sha256": "e544b04bb65d96387c1e18429f24a244f8a73be694c21e5a48c12f1abe17508b",
+      "source": "exact_place_value_diagram",
+      "renderSource": "art-source/place-value-diagrams.mjs",
+      "renderSourceSha256": "333aa0e6e64ffcea36d7ad741c87ab0af7986c92bad35be184cc8117ab8dc427",
+      "usedBy": [
+        "deliver-by-number"
+      ],
+      "inputs": {},
+      "derivativeConsumers": [],
+      "quantity": {
+        "n": 83,
+        "tens": 8,
+        "ones": 3,
+        "groupSize": 10
+      }
+    },
+    "groups-42": {
+      "path": "assets/groups-42.png",
+      "sha256": "a1a461220c44951b0c085a1dd3b1ea06914f3e1d7ffe3a97f41ece1d3713e69e",
+      "source": "exact_place_value_diagram",
+      "renderSource": "art-source/place-value-diagrams.mjs",
+      "renderSourceSha256": "333aa0e6e64ffcea36d7ad741c87ab0af7986c92bad35be184cc8117ab8dc427",
+      "usedBy": [
+        "one-tray-one-bead"
+      ],
+      "inputs": {
+        "single-envelope": "1d225d2de7810b17e3161494b41a9d159b2f309c382cc13365657c0cf6183d26",
+        "post-desk": "67feff5473e4fa5d96545843704e837f6c363164d422743e42d14c210416b28e"
+      },
+      "derivativeConsumers": [],
+      "quantity": {
+        "n": 42,
+        "tens": 4,
+        "ones": 2,
+        "groupSize": 10
+      }
+    },
+    "groups-66": {
+      "path": "assets/groups-66.png",
+      "sha256": "1ce64c66ed736eabe4c1326276ea33c06df91dd2210a17b27773f0361e9aea60",
+      "source": "exact_place_value_diagram",
+      "renderSource": "art-source/place-value-diagrams.mjs",
+      "renderSourceSha256": "333aa0e6e64ffcea36d7ad741c87ab0af7986c92bad35be184cc8117ab8dc427",
+      "usedBy": [
+        "two-sixes"
+      ],
+      "inputs": {
+        "single-envelope": "1d225d2de7810b17e3161494b41a9d159b2f309c382cc13365657c0cf6183d26",
+        "post-desk": "67feff5473e4fa5d96545843704e837f6c363164d422743e42d14c210416b28e"
+      },
+      "derivativeConsumers": [],
+      "quantity": {
+        "n": 66,
+        "tens": 6,
+        "ones": 6,
+        "groupSize": 10
+      }
+    },
+    "listen-symbol": {
+      "path": "assets/listen-symbol.png",
+      "sha256": "8ce7c1eea788a44033d1e875603e3ead0e9b012b4694aaa28ea477e0e92dfafa",
+      "source": "exact_place_value_diagram",
+      "renderSource": "art-source/place-value-diagrams.mjs",
+      "renderSourceSha256": "333aa0e6e64ffcea36d7ad741c87ab0af7986c92bad35be184cc8117ab8dc427",
+      "usedBy": [
+        "deliver-by-number",
+        "quiz:listen-to-number"
+      ],
+      "inputs": {},
+      "derivativeConsumers": [],
+      "quantity": null
+    },
+    "maze-34": {
+      "path": "assets/maze-34.png",
+      "sha256": "92f63d695e94f722793a15a4a92b21b2b260abff20cb9ffd6f5d636c9585964a",
+      "source": "exact_place_value_diagram",
+      "renderSource": "art-source/place-value-diagrams.mjs",
+      "renderSourceSha256": "333aa0e6e64ffcea36d7ad741c87ab0af7986c92bad35be184cc8117ab8dc427",
+      "usedBy": [
+        "take-the-number-cards"
+      ],
+      "inputs": {},
+      "derivativeConsumers": [],
+      "quantity": {
+        "n": 34,
+        "tens": 3,
+        "ones": 4,
+        "groupSize": 10
+      }
+    },
+    "maze-46": {
+      "path": "assets/maze-46.png",
+      "sha256": "c6a9efe16db2593fda2e23c2c3a587543e4657a7abaa259589edfaef791a0446",
+      "source": "exact_place_value_diagram",
+      "renderSource": "art-source/place-value-diagrams.mjs",
+      "renderSourceSha256": "333aa0e6e64ffcea36d7ad741c87ab0af7986c92bad35be184cc8117ab8dc427",
+      "usedBy": [
+        "take-the-number-cards"
+      ],
+      "inputs": {},
+      "derivativeConsumers": [],
+      "quantity": {
+        "n": 46,
+        "tens": 4,
+        "ones": 6,
+        "groupSize": 10
+      }
+    },
+    "maze-64": {
+      "path": "assets/maze-64.png",
+      "sha256": "07faeee9d3312c8ab1b80bc1a49373692adcd5ef5e2f567a721b4c9588b74d2f",
+      "source": "exact_place_value_diagram",
+      "renderSource": "art-source/place-value-diagrams.mjs",
+      "renderSourceSha256": "333aa0e6e64ffcea36d7ad741c87ab0af7986c92bad35be184cc8117ab8dc427",
+      "usedBy": [
+        "take-the-number-cards"
+      ],
+      "inputs": {},
+      "derivativeConsumers": [],
+      "quantity": {
+        "n": 64,
+        "tens": 6,
+        "ones": 4,
+        "groupSize": 10
+      }
+    },
+    "maze-70": {
+      "path": "assets/maze-70.png",
+      "sha256": "a0b7b59d534a511e35041256abc6e176dfd38e30cd43944915ed945546343dd5",
+      "source": "exact_place_value_diagram",
+      "renderSource": "art-source/place-value-diagrams.mjs",
+      "renderSourceSha256": "333aa0e6e64ffcea36d7ad741c87ab0af7986c92bad35be184cc8117ab8dc427",
+      "usedBy": [
+        "take-the-number-cards"
+      ],
+      "inputs": {},
+      "derivativeConsumers": [],
+      "quantity": {
+        "n": 70,
+        "tens": 7,
+        "ones": 0,
+        "groupSize": 10
+      }
+    },
+    "maze-72": {
+      "path": "assets/maze-72.png",
+      "sha256": "ac061985a6ba850a22fa6c2328fec824d8376bb06b5434ee48187b5e8a2529c0",
+      "source": "exact_place_value_diagram",
+      "renderSource": "art-source/place-value-diagrams.mjs",
+      "renderSourceSha256": "333aa0e6e64ffcea36d7ad741c87ab0af7986c92bad35be184cc8117ab8dc427",
+      "usedBy": [
+        "take-the-number-cards"
+      ],
+      "inputs": {},
+      "derivativeConsumers": [],
+      "quantity": {
+        "n": 72,
+        "tens": 7,
+        "ones": 2,
+        "groupSize": 10
+      }
+    },
+    "maze-car": {
+      "assetKey": "maze-car",
+      "path": "assets/maze-car.png",
+      "sha256": "248a1162ba95fe87e029667350ac50c7a12af199c54a8e302b3764135a78cd83",
+      "width": 225,
+      "height": 274,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/postal-sprites.png",
+      "generatedSourceSha256": "ef0870571b56403de591c8feb3695c2065c7b11b617d60c4f96f75accbe5b7e8",
+      "prompt": "Transparent background required. Create a strict 3 columns × 3 rows production game sprite atlas, nine distinct independent centered cutouts, equidistant at x=1/6,1/2,5/6 and y=1/6,1/2,5/6. Each isolated artwork fits entirely inside 70% of its cell with ample transparent whitespace between items, no shadows beyond their cell. Tactile paper-clay 3D illustrations, clean silhouettes, crisp, warm teal coral yellow pastel palette, no words, letters, digits or labels. Row 1 left to right: (1) cute small spherical yellow and teal postal delivery robot with smiling face, tiny wheels, facing right, no parcel; (2) the same cute spherical robot in an upbeat rolling animation pose, small body tilt, eyes smiling, same consistent size facing right; (3) cute same robot in teal from a top three-quarter view with cheerful face for garden maze. Row 2 left to right: (4) a flat uncluttered cream envelope with teal triangular flap, centered, no postage markings; (5) single coral orange and teal door-like garden archway, inside is mint, looks like a finish arch; (6) a compact 3D navy and teal postal cart with golden wheel, side view facing right, no printed words. Row 3 left to right: (7) one coral red community post box with a horizontal slot and teal base, front view; (8) single golden-orange round reward rosette with central white envelope icon; (9) a simple forest green rounded leafy pot for the maze scenery. No text, no numerals, no scattered details, no existing brands, no ground plane. Use true alpha for entire transparent background.",
+      "promptSha256": "641fca158a15a8ec7d2384fc8f1a1a3b422f45f4b694095a2c2ef9e0812b0883",
+      "sourceCrop": [
+        1145,
+        36,
+        1370,
+        310
+      ],
+      "usedBy": [
+        "take-the-number-cards"
+      ],
+      "visualReview": "offline_asset_content_reviewed_browser_pending",
+      "derivativeConsumers": [
+        "maze-ready"
+      ]
+    },
+    "maze-garden": {
+      "assetKey": "maze-garden",
+      "path": "assets/maze-garden.png",
+      "sha256": "7b439884defb2148b7e11f9d8568cde88918003b90e8808f9325c3b5f62cbe1a",
+      "width": 671,
+      "height": 376,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/postal-scenes.png",
+      "generatedSourceSha256": "64b9be8ed50a19415b2eb3c0bb7166d7ed74d0dd306c7e009319d1d6e4ded8d4",
+      "prompt": "Create one ultra-wide clean illustrated production contact sheet 3 columns × 2 rows of SIX evenly sized 16:9 classroom background images, edge-to-edge, all separated by thin flat bright hot pink #ff00ff two gutters vertically and one horizontally, no outer margin. Layout total ratio 8:3 ideally and aim high pixel resolution. These will be cropped to six separate scenes for a first-grade Chinese elementary math animated lesson at a tiny modern neighbourhood post room. Bright clear sky, natural honey wood, pine-teal green, clean ivory, some coral red and little golden accents. Use a cohesive elegant tactile 3-D stop-motion book illustration look, colorful but soft, use friendly warm skin and natural anatomy. Top left: exterior of a tiny teal-orange community post room with neutral envelope emblem only and two Chinese elementary school children from afar in a quiet residential courtyard, on right half, plain sunny light area on left for teacher overlay. Top middle: inside its wood post counter, clean large open empty countertop, empty center, friendly mint shelving in far background, no objects in front. Top right: overhead garden and teal mint floor with grass and pale apricot surrounding border, EMPTY in center as a low-contrast smooth stage for a drawn maze grid, no built-in maze, no characters. Bottom left: side-on low perspective exterior sidewalk, a wide flat empty path across center, only soft out of focus mint and amber houses in distance; no traffic, no people, no bins. Bottom middle: close-up of Chinese child and parent doing a paper and cards activity together, they occupy right half, a quiet empty beige desk on left; no numbers or lettering. Bottom right: blank distinct simplified post counter with cream cork backdrop and wide quiet empty light center for diagrams, unobtrusive teal wall edge. No words, no digits, no letters, no text or readable markings anywhere. Do not draw arrays of objects, beads or piles of quantities. No borders except solid hot pink internal gutters.",
+      "promptSha256": "b15a468f510ad31344975c2b1fb0eff6150ae89bb94514bf1ebaa68324e5f889",
+      "sourceCrop": [
+        1373,
+        3,
+        2044,
+        379
+      ],
+      "usedBy": [
+        "take-the-number-cards"
+      ],
+      "visualReview": "offline_asset_content_reviewed_browser_pending",
+      "derivativeConsumers": [
+        "maze-ready"
+      ]
+    },
+    "maze-plant": {
+      "assetKey": "maze-plant",
+      "path": "assets/maze-plant.png",
+      "sha256": "c4759a45b9ff4ef59f65521c2b86be8dd876eea8499a2896682af2c1f03c4427",
+      "width": 279,
+      "height": 286,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/postal-sprites.png",
+      "generatedSourceSha256": "ef0870571b56403de591c8feb3695c2065c7b11b617d60c4f96f75accbe5b7e8",
+      "prompt": "Transparent background required. Create a strict 3 columns × 3 rows production game sprite atlas, nine distinct independent centered cutouts, equidistant at x=1/6,1/2,5/6 and y=1/6,1/2,5/6. Each isolated artwork fits entirely inside 70% of its cell with ample transparent whitespace between items, no shadows beyond their cell. Tactile paper-clay 3D illustrations, clean silhouettes, crisp, warm teal coral yellow pastel palette, no words, letters, digits or labels. Row 1 left to right: (1) cute small spherical yellow and teal postal delivery robot with smiling face, tiny wheels, facing right, no parcel; (2) the same cute spherical robot in an upbeat rolling animation pose, small body tilt, eyes smiling, same consistent size facing right; (3) cute same robot in teal from a top three-quarter view with cheerful face for garden maze. Row 2 left to right: (4) a flat uncluttered cream envelope with teal triangular flap, centered, no postage markings; (5) single coral orange and teal door-like garden archway, inside is mint, looks like a finish arch; (6) a compact 3D navy and teal postal cart with golden wheel, side view facing right, no printed words. Row 3 left to right: (7) one coral red community post box with a horizontal slot and teal base, front view; (8) single golden-orange round reward rosette with central white envelope icon; (9) a simple forest green rounded leafy pot for the maze scenery. No text, no numerals, no scattered details, no existing brands, no ground plane. Use true alpha for entire transparent background.",
+      "promptSha256": "641fca158a15a8ec7d2384fc8f1a1a3b422f45f4b694095a2c2ef9e0812b0883",
+      "sourceCrop": [
+        1118,
+        705,
+        1397,
+        991
+      ],
+      "usedBy": [],
+      "visualReview": "offline_asset_content_reviewed_browser_pending",
+      "derivativeConsumers": [
+        "maze-ready"
+      ]
+    },
+    "maze-ready": {
+      "path": "assets/maze-ready.png",
+      "sha256": "ba3f4c0480aadc3ba97c529db30f6c9a2d8b10281ee2f8b391995145203b1e77",
+      "source": "exact_place_value_diagram",
+      "renderSource": "art-source/place-value-diagrams.mjs",
+      "renderSourceSha256": "333aa0e6e64ffcea36d7ad741c87ab0af7986c92bad35be184cc8117ab8dc427",
+      "usedBy": [
+        "take-the-number-cards"
+      ],
+      "inputs": {
+        "maze-garden": "7b439884defb2148b7e11f9d8568cde88918003b90e8808f9325c3b5f62cbe1a",
+        "maze-plant": "c4759a45b9ff4ef59f65521c2b86be8dd876eea8499a2896682af2c1f03c4427",
+        "maze-car": "248a1162ba95fe87e029667350ac50c7a12af199c54a8e302b3764135a78cd83",
+        "postal-arch": "aab33ff81c652d2f59c7bf80835ec0795835e318284c49c9f95162ec2831bf47"
+      },
+      "derivativeConsumers": [],
+      "quantity": null
+    },
+    "passing-cart": {
+      "assetKey": "passing-cart",
+      "path": "assets/passing-cart.png",
+      "sha256": "e372ce3d43ec451e0c55c099745c9ff73dd61ee7f89c4b5d9f54e16fc9ece8e1",
+      "width": 310,
+      "height": 214,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/postal-sprites.png",
+      "generatedSourceSha256": "ef0870571b56403de591c8feb3695c2065c7b11b617d60c4f96f75accbe5b7e8",
+      "prompt": "Transparent background required. Create a strict 3 columns × 3 rows production game sprite atlas, nine distinct independent centered cutouts, equidistant at x=1/6,1/2,5/6 and y=1/6,1/2,5/6. Each isolated artwork fits entirely inside 70% of its cell with ample transparent whitespace between items, no shadows beyond their cell. Tactile paper-clay 3D illustrations, clean silhouettes, crisp, warm teal coral yellow pastel palette, no words, letters, digits or labels. Row 1 left to right: (1) cute small spherical yellow and teal postal delivery robot with smiling face, tiny wheels, facing right, no parcel; (2) the same cute spherical robot in an upbeat rolling animation pose, small body tilt, eyes smiling, same consistent size facing right; (3) cute same robot in teal from a top three-quarter view with cheerful face for garden maze. Row 2 left to right: (4) a flat uncluttered cream envelope with teal triangular flap, centered, no postage markings; (5) single coral orange and teal door-like garden archway, inside is mint, looks like a finish arch; (6) a compact 3D navy and teal postal cart with golden wheel, side view facing right, no printed words. Row 3 left to right: (7) one coral red community post box with a horizontal slot and teal base, front view; (8) single golden-orange round reward rosette with central white envelope icon; (9) a simple forest green rounded leafy pot for the maze scenery. No text, no numerals, no scattered details, no existing brands, no ground plane. Use true alpha for entire transparent background.",
+      "promptSha256": "641fca158a15a8ec7d2384fc8f1a1a3b422f45f4b694095a2c2ef9e0812b0883",
+      "sourceCrop": [
+        1087,
+        405,
+        1433,
+        644
+      ],
+      "usedBy": [
+        "deliver-by-number"
+      ],
+      "visualReview": "offline_asset_content_reviewed_browser_pending",
+      "derivativeConsumers": []
+    },
+    "post-desk": {
+      "assetKey": "post-desk",
+      "path": "assets/post-desk.png",
+      "sha256": "67feff5473e4fa5d96545843704e837f6c363164d422743e42d14c210416b28e",
+      "width": 672,
+      "height": 376,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/postal-scenes.png",
+      "generatedSourceSha256": "64b9be8ed50a19415b2eb3c0bb7166d7ed74d0dd306c7e009319d1d6e4ded8d4",
+      "prompt": "Create one ultra-wide clean illustrated production contact sheet 3 columns × 2 rows of SIX evenly sized 16:9 classroom background images, edge-to-edge, all separated by thin flat bright hot pink #ff00ff two gutters vertically and one horizontally, no outer margin. Layout total ratio 8:3 ideally and aim high pixel resolution. These will be cropped to six separate scenes for a first-grade Chinese elementary math animated lesson at a tiny modern neighbourhood post room. Bright clear sky, natural honey wood, pine-teal green, clean ivory, some coral red and little golden accents. Use a cohesive elegant tactile 3-D stop-motion book illustration look, colorful but soft, use friendly warm skin and natural anatomy. Top left: exterior of a tiny teal-orange community post room with neutral envelope emblem only and two Chinese elementary school children from afar in a quiet residential courtyard, on right half, plain sunny light area on left for teacher overlay. Top middle: inside its wood post counter, clean large open empty countertop, empty center, friendly mint shelving in far background, no objects in front. Top right: overhead garden and teal mint floor with grass and pale apricot surrounding border, EMPTY in center as a low-contrast smooth stage for a drawn maze grid, no built-in maze, no characters. Bottom left: side-on low perspective exterior sidewalk, a wide flat empty path across center, only soft out of focus mint and amber houses in distance; no traffic, no people, no bins. Bottom middle: close-up of Chinese child and parent doing a paper and cards activity together, they occupy right half, a quiet empty beige desk on left; no numbers or lettering. Bottom right: blank distinct simplified post counter with cream cork backdrop and wide quiet empty light center for diagrams, unobtrusive teal wall edge. No words, no digits, no letters, no text or readable markings anywhere. Do not draw arrays of objects, beads or piles of quantities. No borders except solid hot pink internal gutters.",
+      "promptSha256": "b15a468f510ad31344975c2b1fb0eff6150ae89bb94514bf1ebaa68324e5f889",
+      "sourceCrop": [
+        688,
+        3,
+        1360,
+        379
+      ],
+      "usedBy": [],
+      "visualReview": "offline_asset_content_reviewed_browser_pending",
+      "derivativeConsumers": [
+        "groups-42",
+        "groups-66",
+        "tray-of-ten"
+      ]
+    },
+    "post-office-view": {
+      "assetKey": "post-office-view",
+      "path": "assets/post-office-view.png",
+      "sha256": "5415629e1764049738030a86db6840cb947cc9ba9ffc36bf3916af5cae74aff5",
+      "width": 673,
+      "height": 376,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/postal-scenes.png",
+      "generatedSourceSha256": "64b9be8ed50a19415b2eb3c0bb7166d7ed74d0dd306c7e009319d1d6e4ded8d4",
+      "prompt": "Create one ultra-wide clean illustrated production contact sheet 3 columns × 2 rows of SIX evenly sized 16:9 classroom background images, edge-to-edge, all separated by thin flat bright hot pink #ff00ff two gutters vertically and one horizontally, no outer margin. Layout total ratio 8:3 ideally and aim high pixel resolution. These will be cropped to six separate scenes for a first-grade Chinese elementary math animated lesson at a tiny modern neighbourhood post room. Bright clear sky, natural honey wood, pine-teal green, clean ivory, some coral red and little golden accents. Use a cohesive elegant tactile 3-D stop-motion book illustration look, colorful but soft, use friendly warm skin and natural anatomy. Top left: exterior of a tiny teal-orange community post room with neutral envelope emblem only and two Chinese elementary school children from afar in a quiet residential courtyard, on right half, plain sunny light area on left for teacher overlay. Top middle: inside its wood post counter, clean large open empty countertop, empty center, friendly mint shelving in far background, no objects in front. Top right: overhead garden and teal mint floor with grass and pale apricot surrounding border, EMPTY in center as a low-contrast smooth stage for a drawn maze grid, no built-in maze, no characters. Bottom left: side-on low perspective exterior sidewalk, a wide flat empty path across center, only soft out of focus mint and amber houses in distance; no traffic, no people, no bins. Bottom middle: close-up of Chinese child and parent doing a paper and cards activity together, they occupy right half, a quiet empty beige desk on left; no numbers or lettering. Bottom right: blank distinct simplified post counter with cream cork backdrop and wide quiet empty light center for diagrams, unobtrusive teal wall edge. No words, no digits, no letters, no text or readable markings anywhere. Do not draw arrays of objects, beads or piles of quantities. No borders except solid hot pink internal gutters.",
+      "promptSha256": "b15a468f510ad31344975c2b1fb0eff6150ae89bb94514bf1ebaa68324e5f889",
+      "sourceCrop": [
+        3,
+        3,
+        676,
+        379
+      ],
+      "usedBy": [
+        "post-office"
+      ],
+      "visualReview": "offline_asset_content_reviewed_browser_pending",
+      "derivativeConsumers": []
+    },
+    "postal-arch": {
+      "assetKey": "postal-arch",
+      "path": "assets/postal-arch.png",
+      "sha256": "aab33ff81c652d2f59c7bf80835ec0795835e318284c49c9f95162ec2831bf47",
+      "width": 310,
+      "height": 289,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/postal-sprites.png",
+      "generatedSourceSha256": "ef0870571b56403de591c8feb3695c2065c7b11b617d60c4f96f75accbe5b7e8",
+      "prompt": "Transparent background required. Create a strict 3 columns × 3 rows production game sprite atlas, nine distinct independent centered cutouts, equidistant at x=1/6,1/2,5/6 and y=1/6,1/2,5/6. Each isolated artwork fits entirely inside 70% of its cell with ample transparent whitespace between items, no shadows beyond their cell. Tactile paper-clay 3D illustrations, clean silhouettes, crisp, warm teal coral yellow pastel palette, no words, letters, digits or labels. Row 1 left to right: (1) cute small spherical yellow and teal postal delivery robot with smiling face, tiny wheels, facing right, no parcel; (2) the same cute spherical robot in an upbeat rolling animation pose, small body tilt, eyes smiling, same consistent size facing right; (3) cute same robot in teal from a top three-quarter view with cheerful face for garden maze. Row 2 left to right: (4) a flat uncluttered cream envelope with teal triangular flap, centered, no postage markings; (5) single coral orange and teal door-like garden archway, inside is mint, looks like a finish arch; (6) a compact 3D navy and teal postal cart with golden wheel, side view facing right, no printed words. Row 3 left to right: (7) one coral red community post box with a horizontal slot and teal base, front view; (8) single golden-orange round reward rosette with central white envelope icon; (9) a simple forest green rounded leafy pot for the maze scenery. No text, no numerals, no scattered details, no existing brands, no ground plane. Use true alpha for entire transparent background.",
+      "promptSha256": "641fca158a15a8ec7d2384fc8f1a1a3b422f45f4b694095a2c2ef9e0812b0883",
+      "sourceCrop": [
+        604,
+        351,
+        928,
+        653
+      ],
+      "usedBy": [
+        "take-the-number-cards"
+      ],
+      "visualReview": "offline_asset_content_reviewed_browser_pending",
+      "derivativeConsumers": [
+        "maze-ready"
+      ]
+    },
+    "postal-rosette": {
+      "assetKey": "postal-rosette",
+      "path": "assets/postal-rosette.png",
+      "sha256": "285ff61523c684058c6ef1601dd86d1afec8ffa00f740ec7f2a8666a1ba74cea",
+      "width": 256,
+      "height": 292,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/postal-sprites.png",
+      "generatedSourceSha256": "ef0870571b56403de591c8feb3695c2065c7b11b617d60c4f96f75accbe5b7e8",
+      "prompt": "Transparent background required. Create a strict 3 columns × 3 rows production game sprite atlas, nine distinct independent centered cutouts, equidistant at x=1/6,1/2,5/6 and y=1/6,1/2,5/6. Each isolated artwork fits entirely inside 70% of its cell with ample transparent whitespace between items, no shadows beyond their cell. Tactile paper-clay 3D illustrations, clean silhouettes, crisp, warm teal coral yellow pastel palette, no words, letters, digits or labels. Row 1 left to right: (1) cute small spherical yellow and teal postal delivery robot with smiling face, tiny wheels, facing right, no parcel; (2) the same cute spherical robot in an upbeat rolling animation pose, small body tilt, eyes smiling, same consistent size facing right; (3) cute same robot in teal from a top three-quarter view with cheerful face for garden maze. Row 2 left to right: (4) a flat uncluttered cream envelope with teal triangular flap, centered, no postage markings; (5) single coral orange and teal door-like garden archway, inside is mint, looks like a finish arch; (6) a compact 3D navy and teal postal cart with golden wheel, side view facing right, no printed words. Row 3 left to right: (7) one coral red community post box with a horizontal slot and teal base, front view; (8) single golden-orange round reward rosette with central white envelope icon; (9) a simple forest green rounded leafy pot for the maze scenery. No text, no numerals, no scattered details, no existing brands, no ground plane. Use true alpha for entire transparent background.",
+      "promptSha256": "641fca158a15a8ec7d2384fc8f1a1a3b422f45f4b694095a2c2ef9e0812b0883",
+      "sourceCrop": [
+        638,
+        705,
+        894,
+        997
+      ],
+      "usedBy": [
+        "deliver-by-number",
+        "take-the-number-cards"
+      ],
+      "visualReview": "offline_asset_content_reviewed_browser_pending",
+      "derivativeConsumers": []
+    },
+    "postbox": {
+      "assetKey": "postbox",
+      "path": "assets/postbox.png",
+      "sha256": "822d813900731d867f7a9c16dc3afdd7ac49eba5b2c207c13592a6cfc18ea1e2",
+      "width": 241,
+      "height": 309,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/postal-sprites.png",
+      "generatedSourceSha256": "ef0870571b56403de591c8feb3695c2065c7b11b617d60c4f96f75accbe5b7e8",
+      "prompt": "Transparent background required. Create a strict 3 columns × 3 rows production game sprite atlas, nine distinct independent centered cutouts, equidistant at x=1/6,1/2,5/6 and y=1/6,1/2,5/6. Each isolated artwork fits entirely inside 70% of its cell with ample transparent whitespace between items, no shadows beyond their cell. Tactile paper-clay 3D illustrations, clean silhouettes, crisp, warm teal coral yellow pastel palette, no words, letters, digits or labels. Row 1 left to right: (1) cute small spherical yellow and teal postal delivery robot with smiling face, tiny wheels, facing right, no parcel; (2) the same cute spherical robot in an upbeat rolling animation pose, small body tilt, eyes smiling, same consistent size facing right; (3) cute same robot in teal from a top three-quarter view with cheerful face for garden maze. Row 2 left to right: (4) a flat uncluttered cream envelope with teal triangular flap, centered, no postage markings; (5) single coral orange and teal door-like garden archway, inside is mint, looks like a finish arch; (6) a compact 3D navy and teal postal cart with golden wheel, side view facing right, no printed words. Row 3 left to right: (7) one coral red community post box with a horizontal slot and teal base, front view; (8) single golden-orange round reward rosette with central white envelope icon; (9) a simple forest green rounded leafy pot for the maze scenery. No text, no numerals, no scattered details, no existing brands, no ground plane. Use true alpha for entire transparent background.",
+      "promptSha256": "641fca158a15a8ec7d2384fc8f1a1a3b422f45f4b694095a2c2ef9e0812b0883",
+      "sourceCrop": [
+        168,
+        690,
+        409,
+        999
+      ],
+      "usedBy": [],
+      "visualReview": "offline_asset_content_reviewed_browser_pending",
+      "derivativeConsumers": [
+        "box-13",
+        "box-31",
+        "box-47",
+        "box-61",
+        "box-74",
+        "box-8",
+        "box-80",
+        "box-83",
+        "delivery-ready"
+      ]
+    },
+    "q-abacus-53": {
+      "path": "assets/q-abacus-53.png",
+      "sha256": "237b510c934f337d0e99ec64d8a7eb39fc6c8fac48ac4b34bb1d974945e70bee",
+      "source": "exact_place_value_diagram",
+      "renderSource": "art-source/place-value-diagrams.mjs",
+      "renderSourceSha256": "333aa0e6e64ffcea36d7ad741c87ab0af7986c92bad35be184cc8117ab8dc427",
+      "usedBy": [
+        "quiz:abacus-to-label"
+      ],
+      "inputs": {},
+      "derivativeConsumers": [],
+      "quantity": {
+        "n": 53,
+        "tens": 5,
+        "ones": 3,
+        "groupSize": 10
+      }
+    },
+    "q-amount-37": {
+      "path": "assets/q-amount-37.png",
+      "sha256": "0d33a3f06194b50a992ed8f54481843743359ed49ada03a7c34495e4cd742ae1",
+      "source": "exact_place_value_diagram",
+      "renderSource": "art-source/place-value-diagrams.mjs",
+      "renderSourceSha256": "333aa0e6e64ffcea36d7ad741c87ab0af7986c92bad35be184cc8117ab8dc427",
+      "usedBy": [
+        "quiz:written-number-to-packs"
+      ],
+      "inputs": {
+        "single-envelope": "1d225d2de7810b17e3161494b41a9d159b2f309c382cc13365657c0cf6183d26"
+      },
+      "derivativeConsumers": [],
+      "quantity": {
+        "n": 37,
+        "tens": 3,
+        "ones": 7,
+        "groupSize": 10
+      }
+    },
+    "q-amount-70": {
+      "path": "assets/q-amount-70.png",
+      "sha256": "710b7d280eb2edd666242842b8a94f5f095fb642456edb08751543699ac4a012",
+      "source": "exact_place_value_diagram",
+      "renderSource": "art-source/place-value-diagrams.mjs",
+      "renderSourceSha256": "333aa0e6e64ffcea36d7ad741c87ab0af7986c92bad35be184cc8117ab8dc427",
+      "usedBy": [
+        "quiz:written-number-to-packs"
+      ],
+      "inputs": {
+        "single-envelope": "1d225d2de7810b17e3161494b41a9d159b2f309c382cc13365657c0cf6183d26"
+      },
+      "derivativeConsumers": [],
+      "quantity": {
+        "n": 70,
+        "tens": 7,
+        "ones": 0,
+        "groupSize": 10
+      }
+    },
+    "q-amount-73": {
+      "path": "assets/q-amount-73.png",
+      "sha256": "6e10695b1c3e2167187988b81ae20450f349875d62d2f6cb3c2702ccfb2734d8",
+      "source": "exact_place_value_diagram",
+      "renderSource": "art-source/place-value-diagrams.mjs",
+      "renderSourceSha256": "333aa0e6e64ffcea36d7ad741c87ab0af7986c92bad35be184cc8117ab8dc427",
+      "usedBy": [
+        "quiz:written-number-to-packs"
+      ],
+      "inputs": {
+        "single-envelope": "1d225d2de7810b17e3161494b41a9d159b2f309c382cc13365657c0cf6183d26"
+      },
+      "derivativeConsumers": [],
+      "quantity": {
+        "n": 73,
+        "tens": 7,
+        "ones": 3,
+        "groupSize": 10
+      }
+    },
+    "q-both-88": {
+      "path": "assets/q-both-88.png",
+      "sha256": "c82219d9adceeca7f42ee1bc42971cbc992f141510a5a22e7ef61306daa434c7",
+      "source": "exact_place_value_diagram",
+      "renderSource": "art-source/place-value-diagrams.mjs",
+      "renderSourceSha256": "333aa0e6e64ffcea36d7ad741c87ab0af7986c92bad35be184cc8117ab8dc427",
+      "usedBy": [
+        "quiz:same-digit-different-value"
+      ],
+      "inputs": {},
+      "derivativeConsumers": [],
+      "quantity": {
+        "n": 88,
+        "tens": 8,
+        "ones": 8,
+        "groupSize": 10,
+        "selection": "both"
+      }
+    },
+    "q-groups-41": {
+      "path": "assets/q-groups-41.png",
+      "sha256": "f42972a3cad0b05caba318e71fc4c412a4d8bc8220df9eea659b209eaef51729",
+      "source": "exact_place_value_diagram",
+      "renderSource": "art-source/place-value-diagrams.mjs",
+      "renderSourceSha256": "333aa0e6e64ffcea36d7ad741c87ab0af7986c92bad35be184cc8117ab8dc427",
+      "usedBy": [
+        "quiz:packs-to-written-number"
+      ],
+      "inputs": {
+        "single-envelope": "1d225d2de7810b17e3161494b41a9d159b2f309c382cc13365657c0cf6183d26"
+      },
+      "derivativeConsumers": [],
+      "quantity": {
+        "n": 41,
+        "tens": 4,
+        "ones": 1,
+        "groupSize": 10
+      }
+    },
+    "q-hear-empty": {
+      "path": "assets/q-hear-empty.png",
+      "sha256": "598523f31d7883f597e7290c2f18a362dc61265e6555a2311d3d4dcf2c9f83e6",
+      "source": "exact_place_value_diagram",
+      "renderSource": "art-source/place-value-diagrams.mjs",
+      "renderSourceSha256": "333aa0e6e64ffcea36d7ad741c87ab0af7986c92bad35be184cc8117ab8dc427",
+      "usedBy": [
+        "quiz:empty-right-write-zero"
+      ],
+      "inputs": {},
+      "derivativeConsumers": [],
+      "quantity": {
+        "n": 60,
+        "tens": 6,
+        "ones": 0,
+        "groupSize": 10
+      }
+    },
+    "q-number-14": {
+      "path": "assets/q-number-14.png",
+      "sha256": "9095217bd36640491789a5a690e508f9c6d05dcc68c5378ee5361d15dc167127",
+      "source": "exact_place_value_diagram",
+      "renderSource": "art-source/place-value-diagrams.mjs",
+      "renderSourceSha256": "333aa0e6e64ffcea36d7ad741c87ab0af7986c92bad35be184cc8117ab8dc427",
+      "usedBy": [
+        "quiz:packs-to-written-number"
+      ],
+      "inputs": {},
+      "derivativeConsumers": [],
+      "quantity": {
+        "n": 14,
+        "tens": 1,
+        "ones": 4,
+        "groupSize": 10
+      }
+    },
+    "q-number-25": {
+      "path": "assets/q-number-25.png",
+      "sha256": "277a491bdf09ea19ed386e88b19f38d9fa691ce1f0e4344470421e932ed6f1c9",
+      "source": "exact_place_value_diagram",
+      "renderSource": "art-source/place-value-diagrams.mjs",
+      "renderSourceSha256": "333aa0e6e64ffcea36d7ad741c87ab0af7986c92bad35be184cc8117ab8dc427",
+      "usedBy": [
+        "quiz:listen-to-number"
+      ],
+      "inputs": {},
+      "derivativeConsumers": [],
+      "quantity": {
+        "n": 25,
+        "tens": 2,
+        "ones": 5,
+        "groupSize": 10
+      }
+    },
+    "q-number-35": {
+      "path": "assets/q-number-35.png",
+      "sha256": "c578b9c1894b08397318dddb3dce3f7a377614569a55687e9fa49577a1c3f148",
+      "source": "exact_place_value_diagram",
+      "renderSource": "art-source/place-value-diagrams.mjs",
+      "renderSourceSha256": "333aa0e6e64ffcea36d7ad741c87ab0af7986c92bad35be184cc8117ab8dc427",
+      "usedBy": [
+        "quiz:abacus-to-label"
+      ],
+      "inputs": {},
+      "derivativeConsumers": [],
+      "quantity": {
+        "n": 35,
+        "tens": 3,
+        "ones": 5,
+        "groupSize": 10
+      }
+    },
+    "q-number-40": {
+      "path": "assets/q-number-40.png",
+      "sha256": "697431a7b2cef48ba64dea5d68712f9d76a24766e9fe97556a193d1ff14422cb",
+      "source": "exact_place_value_diagram",
+      "renderSource": "art-source/place-value-diagrams.mjs",
+      "renderSourceSha256": "333aa0e6e64ffcea36d7ad741c87ab0af7986c92bad35be184cc8117ab8dc427",
+      "usedBy": [
+        "quiz:packs-to-written-number"
+      ],
+      "inputs": {},
+      "derivativeConsumers": [],
+      "quantity": {
+        "n": 40,
+        "tens": 4,
+        "ones": 0,
+        "groupSize": 10
+      }
+    },
+    "q-number-41": {
+      "path": "assets/q-number-41.png",
+      "sha256": "05eccdf6bd887f9bd51b368234f51a767745fc074e72be2d6e199061d9df7011",
+      "source": "exact_place_value_diagram",
+      "renderSource": "art-source/place-value-diagrams.mjs",
+      "renderSourceSha256": "333aa0e6e64ffcea36d7ad741c87ab0af7986c92bad35be184cc8117ab8dc427",
+      "usedBy": [
+        "quiz:packs-to-written-number"
+      ],
+      "inputs": {},
+      "derivativeConsumers": [],
+      "quantity": {
+        "n": 41,
+        "tens": 4,
+        "ones": 1,
+        "groupSize": 10
+      }
+    },
+    "q-number-52": {
+      "path": "assets/q-number-52.png",
+      "sha256": "b4784cbb9a3326cd172a12a8557badd167956cac52e5151e948558109a948b0b",
+      "source": "exact_place_value_diagram",
+      "renderSource": "art-source/place-value-diagrams.mjs",
+      "renderSourceSha256": "333aa0e6e64ffcea36d7ad741c87ab0af7986c92bad35be184cc8117ab8dc427",
+      "usedBy": [
+        "quiz:listen-to-number"
+      ],
+      "inputs": {},
+      "derivativeConsumers": [],
+      "quantity": {
+        "n": 52,
+        "tens": 5,
+        "ones": 2,
+        "groupSize": 10
+      }
+    },
+    "q-number-53": {
+      "path": "assets/q-number-53.png",
+      "sha256": "c59e2970db9388b7a2707f934ded8a88693a993622a0b7ce6a2fd780c135d804",
+      "source": "exact_place_value_diagram",
+      "renderSource": "art-source/place-value-diagrams.mjs",
+      "renderSourceSha256": "333aa0e6e64ffcea36d7ad741c87ab0af7986c92bad35be184cc8117ab8dc427",
+      "usedBy": [
+        "quiz:abacus-to-label"
+      ],
+      "inputs": {},
+      "derivativeConsumers": [],
+      "quantity": {
+        "n": 53,
+        "tens": 5,
+        "ones": 3,
+        "groupSize": 10
+      }
+    },
+    "q-number-56": {
+      "path": "assets/q-number-56.png",
+      "sha256": "a2c90d639ff4d2b84f4d075a231d999258b3b2472a1d072f643f8ac0b1309506",
+      "source": "exact_place_value_diagram",
+      "renderSource": "art-source/place-value-diagrams.mjs",
+      "renderSourceSha256": "333aa0e6e64ffcea36d7ad741c87ab0af7986c92bad35be184cc8117ab8dc427",
+      "usedBy": [
+        "quiz:listen-to-number"
+      ],
+      "inputs": {},
+      "derivativeConsumers": [],
+      "quantity": {
+        "n": 56,
+        "tens": 5,
+        "ones": 6,
+        "groupSize": 10
+      }
+    },
+    "q-number-58": {
+      "path": "assets/q-number-58.png",
+      "sha256": "ecf11b0465997b6c9ea586ddabea8f43fdccf48d929a8cfd671806e8771294ea",
+      "source": "exact_place_value_diagram",
+      "renderSource": "art-source/place-value-diagrams.mjs",
+      "renderSourceSha256": "333aa0e6e64ffcea36d7ad741c87ab0af7986c92bad35be184cc8117ab8dc427",
+      "usedBy": [
+        "quiz:abacus-to-label"
+      ],
+      "inputs": {},
+      "derivativeConsumers": [],
+      "quantity": {
+        "n": 58,
+        "tens": 5,
+        "ones": 8,
+        "groupSize": 10
+      }
+    },
+    "q-number-6": {
+      "path": "assets/q-number-6.png",
+      "sha256": "8dd3326273146febe89272ac1e4cf30287fdb845bdb88206eeb7414737089246",
+      "source": "exact_place_value_diagram",
+      "renderSource": "art-source/place-value-diagrams.mjs",
+      "renderSourceSha256": "333aa0e6e64ffcea36d7ad741c87ab0af7986c92bad35be184cc8117ab8dc427",
+      "usedBy": [
+        "quiz:empty-right-write-zero"
+      ],
+      "inputs": {},
+      "derivativeConsumers": [],
+      "quantity": {
+        "n": 6,
+        "tens": 0,
+        "ones": 6,
+        "groupSize": 10
+      }
+    },
+    "q-number-60": {
+      "path": "assets/q-number-60.png",
+      "sha256": "4848da9b50b72879ce84fb749449f99783152c5f8314d1344fa72d436f4ef41a",
+      "source": "exact_place_value_diagram",
+      "renderSource": "art-source/place-value-diagrams.mjs",
+      "renderSourceSha256": "333aa0e6e64ffcea36d7ad741c87ab0af7986c92bad35be184cc8117ab8dc427",
+      "usedBy": [
+        "quiz:empty-right-write-zero"
+      ],
+      "inputs": {},
+      "derivativeConsumers": [],
+      "quantity": {
+        "n": 60,
+        "tens": 6,
+        "ones": 0,
+        "groupSize": 10
+      }
+    },
+    "q-number-61": {
+      "path": "assets/q-number-61.png",
+      "sha256": "e986f8c9177b1a050a7e444fa9b8dcba81084a5434857b5f3181f63c5896e16e",
+      "source": "exact_place_value_diagram",
+      "renderSource": "art-source/place-value-diagrams.mjs",
+      "renderSourceSha256": "333aa0e6e64ffcea36d7ad741c87ab0af7986c92bad35be184cc8117ab8dc427",
+      "usedBy": [
+        "quiz:empty-right-write-zero"
+      ],
+      "inputs": {},
+      "derivativeConsumers": [],
+      "quantity": {
+        "n": 61,
+        "tens": 6,
+        "ones": 1,
+        "groupSize": 10
+      }
+    },
+    "q-number-73": {
+      "path": "assets/q-number-73.png",
+      "sha256": "025a2820e23b0344aabd36c65260f422dfb8ba51d99b223ebb5edf3b98604041",
+      "source": "exact_place_value_diagram",
+      "renderSource": "art-source/place-value-diagrams.mjs",
+      "renderSourceSha256": "333aa0e6e64ffcea36d7ad741c87ab0af7986c92bad35be184cc8117ab8dc427",
+      "usedBy": [
+        "quiz:written-number-to-packs"
+      ],
+      "inputs": {},
+      "derivativeConsumers": [],
+      "quantity": {
+        "n": 73,
+        "tens": 7,
+        "ones": 3,
+        "groupSize": 10
+      }
+    },
+    "q-ones-88": {
+      "path": "assets/q-ones-88.png",
+      "sha256": "f850b4d50c3742e9d36f283d4441e183c756e41eb583ca5d9aa118f3c9e2069b",
+      "source": "exact_place_value_diagram",
+      "renderSource": "art-source/place-value-diagrams.mjs",
+      "renderSourceSha256": "333aa0e6e64ffcea36d7ad741c87ab0af7986c92bad35be184cc8117ab8dc427",
+      "usedBy": [
+        "quiz:same-digit-different-value"
+      ],
+      "inputs": {},
+      "derivativeConsumers": [],
+      "quantity": {
+        "n": 88,
+        "tens": 8,
+        "ones": 8,
+        "groupSize": 10,
+        "selection": "ones"
+      }
+    },
+    "q-same-88": {
+      "path": "assets/q-same-88.png",
+      "sha256": "c1a41c6151940a1255f905f4236dd387d567564de8190fb9ebdf01c7130598bd",
+      "source": "exact_place_value_diagram",
+      "renderSource": "art-source/place-value-diagrams.mjs",
+      "renderSourceSha256": "333aa0e6e64ffcea36d7ad741c87ab0af7986c92bad35be184cc8117ab8dc427",
+      "usedBy": [
+        "quiz:same-digit-different-value"
+      ],
+      "inputs": {},
+      "derivativeConsumers": [],
+      "quantity": {
+        "n": 88,
+        "tens": 8,
+        "ones": 8,
+        "groupSize": 10,
+        "selection": "none"
+      }
+    },
+    "q-tens-88": {
+      "path": "assets/q-tens-88.png",
+      "sha256": "e704543856a69bfa6bd92c42e8871ac8b03176b8c719a13068c5619a42884b38",
+      "source": "exact_place_value_diagram",
+      "renderSource": "art-source/place-value-diagrams.mjs",
+      "renderSourceSha256": "333aa0e6e64ffcea36d7ad741c87ab0af7986c92bad35be184cc8117ab8dc427",
+      "usedBy": [
+        "quiz:same-digit-different-value"
+      ],
+      "inputs": {},
+      "derivativeConsumers": [],
+      "quantity": {
+        "n": 88,
+        "tens": 8,
+        "ones": 8,
+        "groupSize": 10,
+        "selection": "tens"
+      }
+    },
+    "same-six": {
+      "path": "assets/same-six.png",
+      "sha256": "95083d43eee4673f2a124f82b07a57ffa76734167f9848d26ef861ed83940857",
+      "source": "exact_place_value_diagram",
+      "renderSource": "art-source/place-value-diagrams.mjs",
+      "renderSourceSha256": "333aa0e6e64ffcea36d7ad741c87ab0af7986c92bad35be184cc8117ab8dc427",
+      "usedBy": [
+        "two-sixes"
+      ],
+      "inputs": {
+        "chart-counter": "ced55ce2f7c3d326e9e9f28c067f67bc80f84b95669d906d0e47173b67318714"
+      },
+      "derivativeConsumers": [],
+      "quantity": {
+        "n": 66,
+        "tens": 6,
+        "ones": 6,
+        "groupSize": 10
+      }
+    },
+    "single-envelope": {
+      "assetKey": "single-envelope",
+      "path": "assets/single-envelope.png",
+      "sha256": "1d225d2de7810b17e3161494b41a9d159b2f309c382cc13365657c0cf6183d26",
+      "width": 276,
+      "height": 196,
+      "source": "Codex built-in image_gen",
+      "generatedSource": "art-source/postal-sprites.png",
+      "generatedSourceSha256": "ef0870571b56403de591c8feb3695c2065c7b11b617d60c4f96f75accbe5b7e8",
+      "prompt": "Transparent background required. Create a strict 3 columns × 3 rows production game sprite atlas, nine distinct independent centered cutouts, equidistant at x=1/6,1/2,5/6 and y=1/6,1/2,5/6. Each isolated artwork fits entirely inside 70% of its cell with ample transparent whitespace between items, no shadows beyond their cell. Tactile paper-clay 3D illustrations, clean silhouettes, crisp, warm teal coral yellow pastel palette, no words, letters, digits or labels. Row 1 left to right: (1) cute small spherical yellow and teal postal delivery robot with smiling face, tiny wheels, facing right, no parcel; (2) the same cute spherical robot in an upbeat rolling animation pose, small body tilt, eyes smiling, same consistent size facing right; (3) cute same robot in teal from a top three-quarter view with cheerful face for garden maze. Row 2 left to right: (4) a flat uncluttered cream envelope with teal triangular flap, centered, no postage markings; (5) single coral orange and teal door-like garden archway, inside is mint, looks like a finish arch; (6) a compact 3D navy and teal postal cart with golden wheel, side view facing right, no printed words. Row 3 left to right: (7) one coral red community post box with a horizontal slot and teal base, front view; (8) single golden-orange round reward rosette with central white envelope icon; (9) a simple forest green rounded leafy pot for the maze scenery. No text, no numerals, no scattered details, no existing brands, no ground plane. Use true alpha for entire transparent background.",
+      "promptSha256": "641fca158a15a8ec7d2384fc8f1a1a3b422f45f4b694095a2c2ef9e0812b0883",
+      "sourceCrop": [
+        151,
+        415,
+        427,
+        611
+      ],
+      "usedBy": [],
+      "visualReview": "offline_asset_content_reviewed_browser_pending",
+      "derivativeConsumers": [
+        "groups-42",
+        "groups-66",
+        "q-amount-37",
+        "q-amount-70",
+        "q-amount-73",
+        "q-groups-41",
+        "tray-of-ten"
+      ]
+    },
+    "speech-63": {
+      "path": "assets/speech-63.png",
+      "sha256": "2bc76d8f24b1d6b8855ce43b90ebfc351e0400144c3fcc31e93caae51ab9c094",
+      "source": "exact_place_value_diagram",
+      "renderSource": "art-source/place-value-diagrams.mjs",
+      "renderSourceSha256": "333aa0e6e64ffcea36d7ad741c87ab0af7986c92bad35be184cc8117ab8dc427",
+      "usedBy": [
+        "hear-and-write"
+      ],
+      "inputs": {},
+      "derivativeConsumers": [],
+      "quantity": null
+    },
+    "tray-of-ten": {
+      "path": "assets/tray-of-ten.png",
+      "sha256": "f5f7d653a7f7ab7db75ffaa906eba9278923be6a56275d3f75ab093205dd3a58",
+      "source": "exact_place_value_diagram",
+      "renderSource": "art-source/place-value-diagrams.mjs",
+      "renderSourceSha256": "333aa0e6e64ffcea36d7ad741c87ab0af7986c92bad35be184cc8117ab8dc427",
+      "usedBy": [
+        "post-office"
+      ],
+      "inputs": {
+        "post-desk": "67feff5473e4fa5d96545843704e837f6c363164d422743e42d14c210416b28e",
+        "single-envelope": "1d225d2de7810b17e3161494b41a9d159b2f309c382cc13365657c0cf6183d26"
+      },
+      "derivativeConsumers": [],
+      "quantity": {
+        "n": 12,
+        "tens": 1,
+        "ones": 2,
+        "groupSize": 10
+      }
+    },
+    "two-empty-places": {
+      "path": "assets/two-empty-places.png",
+      "sha256": "5f153e0778321dd1c9d1a62bc45032a061e1b5c4e1cc75f3962b40b7fde15655",
+      "source": "exact_place_value_diagram",
+      "renderSource": "art-source/place-value-diagrams.mjs",
+      "renderSourceSha256": "333aa0e6e64ffcea36d7ad741c87ab0af7986c92bad35be184cc8117ab8dc427",
+      "usedBy": [
+        "find-a-number-at-home",
+        "take-the-number-cards"
+      ],
+      "inputs": {},
+      "derivativeConsumers": [],
+      "quantity": null
+    }
+  }
+}

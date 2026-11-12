@@ -1,0 +1,1172 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "7 小书包",
+  "description": "小语老师带孩子听辨文具、找字形部件、练轻声和笔顺，玩完再把真正的书包整理好。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小语老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Serena",
+      "avatar": "/avatars/teacher-2.png",
+      "color": "#D65A8A",
+      "persona": "用文具、听读和田字格帮一年级小朋友认字，讲清为什么，再让孩子动手。"
+    }
+  },
+  "images": {
+    "eraser": {
+      "file": "assets/eraser.png"
+    },
+    "glyph-components": {
+      "file": "assets/glyph-components.png"
+    },
+    "opening-desk": {
+      "file": "assets/opening-desk.png"
+    },
+    "paper-tool-strip": {
+      "file": "assets/paper-tool-strip.png"
+    },
+    "pen-tool-strip": {
+      "file": "assets/pen-tool-strip.png"
+    },
+    "pencilcase": {
+      "file": "assets/pencilcase.png"
+    },
+    "ruler": {
+      "file": "assets/ruler.png"
+    },
+    "task-erase": {
+      "file": "assets/task-erase.png"
+    },
+    "task-line": {
+      "file": "assets/task-line.png"
+    },
+    "task-pens": {
+      "file": "assets/task-pens.png"
+    },
+    "small-pair": {
+      "glyph": {
+        "layout": "rows",
+        "size": [
+          520,
+          320
+        ],
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "小"
+              },
+              {
+                "glyph": "少"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "early-card": {
+      "glyph": {
+        "layout": "rows",
+        "size": [
+          480,
+          480
+        ],
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "早"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "dao-card": {
+      "glyph": {
+        "layout": "rows",
+        "size": [
+          480,
+          480
+        ],
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "刀"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "chi-card": {
+      "glyph": {
+        "layout": "rows",
+        "size": [
+          480,
+          480
+        ],
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "尺"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "bi-card": {
+      "glyph": {
+        "layout": "rows",
+        "size": [
+          480,
+          480
+        ],
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "笔"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "bao-card": {
+      "glyph": {
+        "layout": "rows",
+        "size": [
+          480,
+          480
+        ],
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "包"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "zuo-card": {
+      "glyph": {
+        "layout": "rows",
+        "size": [
+          480,
+          480
+        ],
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "作"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "ke-card": {
+      "glyph": {
+        "layout": "rows",
+        "size": [
+          480,
+          480
+        ],
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "课"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "ben-card": {
+      "glyph": {
+        "layout": "rows",
+        "size": [
+          480,
+          480
+        ],
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "本"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "xiao-card": {
+      "glyph": {
+        "layout": "rows",
+        "size": [
+          480,
+          480
+        ],
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "小"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "shao-card": {
+      "glyph": {
+        "layout": "rows",
+        "size": [
+          480,
+          480
+        ],
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "少"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "bu-card": {
+      "glyph": {
+        "layout": "rows",
+        "size": [
+          480,
+          480
+        ],
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "不"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "dao-grid": {
+      "file": "assets/dao-grid.png"
+    },
+    "chi-grid": {
+      "file": "assets/chi-grid.png"
+    },
+    "writing-grid-set": {
+      "file": "assets/writing-grid-set.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "open-bag",
+      "type": "slide",
+      "title": "书包打开啦",
+      "template": "title-picture",
+      "data": {
+        "title": "书包打开啦",
+        "picture": "opening-desk",
+        "caption": "看样子，想用处"
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "桌上摆着一排学习用品，等着回书包。"
+        },
+        {
+          "say": "我想把笔收好，要找一个能装笔的袋子。"
+        },
+        {
+          "say": "看见袋口和拉链，我就知道笔能进去。"
+        },
+        {
+          "say": "再找一找，哪件东西有一条长长的直边？"
+        },
+        {
+          "say": "直边能帮铅笔走得直，所以它适合画直线。"
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "先看清它的样子，再想它能帮什么忙。"
+        },
+        {
+          "say": "等我们认齐文具，就能给它们安排好位置。"
+        }
+      ]
+    },
+    {
+      "key": "paper-tools",
+      "type": "slide",
+      "title": "给纸帮忙的文具",
+      "template": "picture-points",
+      "data": {
+        "title": "给纸帮忙的文具",
+        "picture": "paper-tool-strip",
+        "points": [
+          "橡皮",
+          "尺子",
+          "作业本"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "写错铅笔字时，拿橡皮轻轻擦。"
+        },
+        {
+          "say": "擦过以后，纸上腾出空地方，可以再写。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "尺子有一条直边，笔贴着它走就不容易歪。"
+        },
+        {
+          "say": "尺，第三声。读尺子时，子轻轻带过。"
+        },
+        {
+          "say": "老师读一遍。尺子。你也试着读轻一点。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "横线一行行排开，字就有地方站整齐。"
+        },
+        {
+          "say": "作业本能把每天写的作业留在一起。"
+        },
+        {
+          "say": "作、业都读第四声。业的底下有一横。"
+        }
+      ]
+    },
+    {
+      "key": "pencil-tools",
+      "type": "slide",
+      "title": "铅笔的三个伙伴",
+      "template": "picture-points",
+      "data": {
+        "title": "铅笔的三个伙伴",
+        "picture": "pen-tool-strip",
+        "points": [
+          "笔袋",
+          "铅笔",
+          "转笔刀"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "几支笔容易滚散，笔袋能把它们装在一起。"
+        },
+        {
+          "say": "合好拉链再装进书包，找笔时就不用翻。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "铅笔尖碰到纸面，就能留下细细的线。"
+        },
+        {
+          "say": "笔，第三声。写字用笔，画画也用笔。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "转笔刀能削尖铅笔，请大人帮忙操作。"
+        },
+        {
+          "say": "看到外壳和小孔，就能认出这件工具。"
+        },
+        {
+          "say": "转读第四声，刀读第一声。刀字有个朝里的钩。"
+        },
+        {
+          "say": "想选哪件工具，先想眼前遇到了什么问题。"
+        }
+      ]
+    },
+    {
+      "key": "tool-rescue",
+      "type": "interactive",
+      "title": "文具空投",
+      "page": "tool-rescue",
+      "widgetType": "game",
+      "startImage": "opening-desk",
+      "script": [
+        {
+          "say": "手指左右滑，篮子跟着你，去接合适的文具。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1
+          }
+        },
+        {
+          "highlight": "#game-goal"
+        },
+        {
+          "say": "图上两个点要连起来，老师先想怎样连得直。"
+        },
+        {
+          "say": "小满说，我想接橡皮，它也能碰到纸。",
+          "by": "xiaoman"
+        },
+        {
+          "highlight": "#game-target"
+        },
+        {
+          "say": "橡皮能擦笔迹。要连出直线，得借用长长的直边。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "这一轮是老师的示范。我用篮子接住尺子。"
+        },
+        {
+          "say": "先看图想用途，再移动篮子。慢一点也来得及。"
+        },
+        {
+          "say": "看到乱线想想怎么擦，看到散笔想想怎么装。"
+        },
+        {
+          "say": "没接准可以再来，留心下一次落下的位置。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1
+          }
+        },
+        {
+          "say": "轮到你做文具接运员啦！"
+        }
+      ]
+    },
+    {
+      "key": "character-parts",
+      "type": "slide",
+      "title": "字上有小标记",
+      "template": "picture-points",
+      "data": {
+        "title": "字上有小标记",
+        "picture": "glyph-components",
+        "points": [
+          "包 · 包字头",
+          "作 · 单人旁",
+          "笔 · 竹字头"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "包，第一声，书包的包。书包可以装书和文具。"
+        },
+        {
+          "say": "看橙色那一小块。它从右上弯下来，是包字头。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "作，第四声。我们做作业时，就用到这个字。"
+        },
+        {
+          "say": "它左边的一撇一竖合起来，是单人旁。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "笔，第三声。铅笔的笔，写字的笔，都是它。"
+        },
+        {
+          "say": "它头顶这两小组笔画，合起来叫竹字头。"
+        },
+        {
+          "say": "遇到这三个字，先找对部件，再读整个字。"
+        }
+      ]
+    },
+    {
+      "key": "treasure-words",
+      "type": "slide",
+      "title": "平常用品也是宝贝",
+      "template": "two-columns",
+      "data": {
+        "title": "平常用品也是宝贝",
+        "left": {
+          "heading": "宝贝",
+          "body": "常用，也珍惜"
+        },
+        "left_picture": "opening-desk",
+        "right": {
+          "heading": "小和少",
+          "body": "小有竖钩，少的末笔是撇"
+        },
+        "right_picture": "small-pair"
+      },
+      "script": [
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "宝，第三声。贝，第四声。合起来读宝贝。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "小朋友爱惜常用的东西，也会叫它宝贝。"
+        },
+        {
+          "say": "比方说，我天天用这支笔写字，写完就好好收起来。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "少，第三声。纸上写的字不多，就说写得少。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "看中间，小字是竖钩，少字的第一笔是竖。"
+        },
+        {
+          "say": "少还多一笔长撇，从右上撇向左下。"
+        },
+        {
+          "say": "遇见这两个字，先看中间，再找最后那一撇。"
+        }
+      ]
+    },
+    {
+      "key": "early-lesson",
+      "type": "slide",
+      "title": "课和早用在什么时候",
+      "template": "two-columns",
+      "data": {
+        "title": "课和早用在什么时候",
+        "left": {
+          "heading": "课",
+          "body": "课本 · 上课"
+        },
+        "left_picture": "opening-desk",
+        "right": {
+          "heading": "早",
+          "body": "早上 · 早起"
+        },
+        "right_picture": "early-card"
+      },
+      "script": [
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "课，第四声。语文课开始，就可以拿出课本。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "课本拿来学新内容，作业本用来写练习。"
+        },
+        {
+          "say": "跟我说，拿出语文课本，准备上课。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "早，第三声。天刚亮，我们就可以说早上。"
+        },
+        {
+          "say": "早字上面是日，下面是十，两部分叠着。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "今天还没到上课时间，书包已经准备好啦。"
+        },
+        {
+          "say": "比平时更早一点起床，就可以说起得早。"
+        },
+        {
+          "say": "想想在说哪段时间，还是在说学习的一节课。"
+        }
+      ]
+    },
+    {
+      "key": "reading-rhythm",
+      "type": "slide",
+      "title": "读短句要有轻有停",
+      "template": "picture-points",
+      "data": {
+        "title": "读短句要有轻有停",
+        "picture": "opening-desk",
+        "points": [
+          "我的尺子",
+          "我起得早",
+          "词里连着，句末停一停"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先听我说，我的尺子。的和子都轻轻带过去。"
+        },
+        {
+          "say": "前面的字清楚，轻的字短一点，词才连得起来。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "再听一句，我起得早。得读得轻，也读得短。"
+        },
+        {
+          "say": "说早时声音更清楚，因为我们想说的是早。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "听这两句。天刚亮，我把文具摆好了。"
+        },
+        {
+          "say": "短停一下。背起书包，笔袋陪我去教室。"
+        },
+        {
+          "say": "儿歌先说书包里装了哪些宝贝。"
+        },
+        {
+          "say": "后面说它们陪着小朋友上学，就像伙伴一样。"
+        },
+        {
+          "say": "回原书时，词里的字连着读，遇到句号多停一下。"
+        }
+      ]
+    },
+    {
+      "key": "write-first",
+      "type": "slide",
+      "title": "先学写刀和尺",
+      "template": "two-columns",
+      "data": {
+        "title": "先学写刀和尺",
+        "left": {
+          "heading": "刀",
+          "body": "横折钩、撇"
+        },
+        "left_picture": "dao-grid",
+        "right": {
+          "heading": "尺",
+          "body": "横折、横、撇、捺"
+        },
+        "right_picture": "chi-grid"
+      },
+      "script": [
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "手指先写刀。第一笔是横折钩，中间不断开。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "向右走，折下来，再在末端向里轻轻钩。"
+        },
+        {
+          "say": "第二笔向左下撇，两笔都从上半格起。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "再写尺。第一笔横折，第二笔补里面的横。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "接着向左下撇，最后一笔向右下捺。"
+        },
+        {
+          "say": "横折在上半格，末笔长捺伸到右下格。"
+        },
+        {
+          "say": "纸上书写时，让大人看一看你落笔的顺序。"
+        }
+      ]
+    },
+    {
+      "key": "write-next",
+      "type": "slide",
+      "title": "本、不、少的关键一笔",
+      "template": "picture-points",
+      "data": {
+        "title": "本、不、少的关键一笔",
+        "picture": "writing-grid-set",
+        "points": [
+          "本 · 最后添短横",
+          "不 · 竖撑在中间",
+          "少 · 首笔竖，末笔撇"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "本，先写横、竖、撇、捺，把木的样子写出来。"
+        },
+        {
+          "say": "竖沿中线，末笔短横添在下半格，才写成本。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "不，先写一横，再从横的下方向左下撇。"
+        },
+        {
+          "say": "再写靠着竖中线的竖，末笔往右下点。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "少先沿竖中线写竖，再写左撇和右点。"
+        },
+        {
+          "say": "末笔从右半格向左下撇长些，这就成了少。"
+        },
+        {
+          "say": "每个字都先看起笔，再看最容易写漏的一笔。"
+        }
+      ]
+    },
+    {
+      "key": "stroke-drive",
+      "type": "interactive",
+      "title": "笔画小车",
+      "page": "stroke-drive",
+      "widgetType": "game",
+      "startImage": "opening-desk",
+      "script": [
+        {
+          "say": "笔画小车要按笔顺走。每起一笔，就从新起点出发。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1
+          }
+        },
+        {
+          "highlight": "#game-goal"
+        },
+        {
+          "say": "老师先练刀。先找第一笔横折钩的起点。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "先横着向右，再折下来，末端轻轻往里钩。"
+        },
+        {
+          "say": "小满说，到了转弯口，我可以直接抄过去吧？",
+          "by": "xiaoman"
+        },
+        {
+          "highlight": "#game-target"
+        },
+        {
+          "say": "沿线转才是横折钩，斜着抄过去，转角就没了。"
+        },
+        {
+          "say": "第一笔走完再抬手，第二笔从上面向左下撇。"
+        },
+        {
+          "say": "车开偏了，回到小车停下的位置再走。"
+        },
+        {
+          "say": "这是屏幕上的路线，纸上的笔形还请大人看看。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1
+          }
+        },
+        {
+          "say": "现在你来开车。每一笔都先找起点再出发。"
+        }
+      ]
+    },
+    {
+      "key": "pack-practice",
+      "type": "slide",
+      "title": "让文具各回各位",
+      "template": "picture-points",
+      "data": {
+        "title": "让文具各回各位",
+        "picture": "pencilcase",
+        "points": [
+          "先看看，哪些还散着",
+          "笔归袋，书本放平",
+          "拉好拉链，再查一遍"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "收书包前先扫一眼桌面，看看什么还没归位。"
+        },
+        {
+          "say": "比如有几支笔散着，还有作业本摊在桌上。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "把笔放进袋里，走路时就不容易滚散。"
+        },
+        {
+          "say": "把作业本合好放平，书页就不容易折起来。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "把笔袋拉好，再查一遍桌角和书包的口袋。"
+        },
+        {
+          "say": "这样就能看出漏了哪一样，来得及补进去。"
+        },
+        {
+          "say": "试着和大人说说，你先收了什么，为什么。"
+        }
+      ]
+    },
+    {
+      "key": "picture-check",
+      "type": "quiz",
+      "title": "小检查",
+      "intro": [
+        "每道题都由老师念给你听。",
+        "听清问题，再把三张图都看一看。",
+        "想好再选，选完看看为什么。"
+      ],
+      "questions": [
+        {
+          "id": "draw-a-sign",
+          "question": "卡纸要画三角形的直边，还要借哪件文具？",
+          "skill": "根据用途辨认尺子",
+          "answer": [
+            "B"
+          ],
+          "analysis": "尺子的直边能引着铅笔画直线。橡皮用来擦，笔袋用来收笔。",
+          "options": {
+            "A": {
+              "label": "橡皮",
+              "visual": {
+                "kind": "asset",
+                "image": "eraser",
+                "alt": "橡皮"
+              }
+            },
+            "B": {
+              "label": "尺子",
+              "visual": {
+                "kind": "asset",
+                "image": "ruler",
+                "alt": "尺子"
+              }
+            },
+            "C": {
+              "label": "笔袋",
+              "visual": {
+                "kind": "asset",
+                "image": "pencilcase",
+                "alt": "笔袋"
+              }
+            }
+          }
+        },
+        {
+          "id": "homework-character",
+          "question": "给美术作业挂字牌。听，作业的作，哪一张是这个字？",
+          "skill": "识别作的单人旁和字形",
+          "answer": [
+            "C"
+          ],
+          "analysis": "作是第四声，左边是单人旁。笔有竹字头，包有包字头。",
+          "options": {
+            "A": {
+              "label": "笔",
+              "visual": {
+                "kind": "asset",
+                "image": "bi-card",
+                "alt": "笔"
+              }
+            },
+            "B": {
+              "label": "包",
+              "visual": {
+                "kind": "asset",
+                "image": "bao-card",
+                "alt": "包"
+              }
+            },
+            "C": {
+              "label": "作",
+              "visual": {
+                "kind": "asset",
+                "image": "zuo-card",
+                "alt": "作"
+              }
+            }
+          }
+        },
+        {
+          "id": "early-meeting",
+          "question": "校队约清早在操场集合。清早的早是哪一张字卡？",
+          "skill": "在生活情境认读早",
+          "answer": [
+            "A"
+          ],
+          "analysis": "清早的早上面是日，下面是十。课和本的写法、意思都不同。",
+          "options": {
+            "A": {
+              "label": "早",
+              "visual": {
+                "kind": "asset",
+                "image": "early-card",
+                "alt": "早"
+              }
+            },
+            "B": {
+              "label": "课",
+              "visual": {
+                "kind": "asset",
+                "image": "ke-card",
+                "alt": "课"
+              }
+            },
+            "C": {
+              "label": "本",
+              "visual": {
+                "kind": "asset",
+                "image": "ben-card",
+                "alt": "本"
+              }
+            }
+          }
+        },
+        {
+          "id": "missing-beanbag",
+          "question": "投豆袋时还少一只。听，少一只的少，是哪张字卡？",
+          "skill": "识别少与小的字形差别",
+          "answer": [
+            "B"
+          ],
+          "analysis": "少的第一笔是竖，末笔还有一长撇。小的中间是竖钩。",
+          "options": {
+            "A": {
+              "label": "小",
+              "visual": {
+                "kind": "asset",
+                "image": "xiao-card",
+                "alt": "小"
+              }
+            },
+            "B": {
+              "label": "少",
+              "visual": {
+                "kind": "asset",
+                "image": "shao-card",
+                "alt": "少"
+              }
+            },
+            "C": {
+              "label": "不",
+              "visual": {
+                "kind": "asset",
+                "image": "bu-card",
+                "alt": "不"
+              }
+            }
+          }
+        },
+        {
+          "id": "sharpener-label",
+          "question": "文具柜要补张字牌。转笔刀的刀，是哪个字？",
+          "skill": "辨认转笔刀的刀及其关键笔画",
+          "answer": [
+            "C"
+          ],
+          "analysis": "刀只有两笔，第一笔横折钩，第二笔是撇。本和尺的笔画更多。",
+          "options": {
+            "A": {
+              "label": "本",
+              "visual": {
+                "kind": "asset",
+                "image": "ben-card",
+                "alt": "本"
+              }
+            },
+            "B": {
+              "label": "尺",
+              "visual": {
+                "kind": "asset",
+                "image": "chi-card",
+                "alt": "尺"
+              }
+            },
+            "C": {
+              "label": "刀",
+              "visual": {
+                "kind": "asset",
+                "image": "dao-card",
+                "alt": "刀"
+              }
+            }
+          }
+        },
+        {
+          "id": "put-away-pens",
+          "question": "放学了，要把散开的几支笔一起带走，先放哪儿？",
+          "skill": "把收纳方法迁移到课后情境",
+          "answer": [
+            "A"
+          ],
+          "analysis": "笔袋有开口，能把几支笔放到一起。橡皮和尺子都没有收笔的地方。",
+          "options": {
+            "A": {
+              "label": "笔袋",
+              "visual": {
+                "kind": "asset",
+                "image": "pencilcase",
+                "alt": "笔袋"
+              }
+            },
+            "B": {
+              "label": "橡皮",
+              "visual": {
+                "kind": "asset",
+                "image": "eraser",
+                "alt": "橡皮"
+              }
+            },
+            "C": {
+              "label": "尺子",
+              "visual": {
+                "kind": "asset",
+                "image": "ruler",
+                "alt": "尺子"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "recap",
+      "type": "slide",
+      "title": "小书包里的五个本领",
+      "template": "summary",
+      "data": {
+        "title": "小书包里的五个本领",
+        "items": [
+          "看图想用处",
+          "认字找部件",
+          "词里连着，句末停一停",
+          "看准起笔，按顺序写",
+          "笔进袋，书本放平"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "橡皮能擦、尺边能画直线。先想要做什么，再选工具。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "包、作、笔都有好认的小部件，找准位置再读。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "回原书念儿歌，轻的音短一点，念到句末停一下。"
+        },
+        {
+          "spotlight": "item-4"
+        },
+        {
+          "say": "尺、刀、本、不、少，落笔前先想先写哪一笔。"
+        },
+        {
+          "spotlight": "item-5"
+        },
+        {
+          "say": "收笔进袋，书本合好放平，关上前再查一次。"
+        },
+        {
+          "say": "拿出两件自己的文具，跟大人说说名字和用处。"
+        },
+        {
+          "say": "再请大人听你念儿歌，看你写字和整理书包。"
+        }
+      ]
+    }
+  ]
+}

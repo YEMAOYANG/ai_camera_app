@@ -1,0 +1,1044 @@
+{
+  "schemaVersion": "mira.courseware.imagegen-plan.v1",
+  "lesson": "我们的感觉器官｜单元回顾",
+  "style": "Original first-grade science courseware art, warm cream paper, deep pine green, muted apricot and occasional fruit red, subtle matte gouache grain, clean paper-cut outlines, large shapes and uncluttered backgrounds. No words, letters, numbers, logo, watermark or decorative marks.",
+  "sourcePolicy": "使用 Codex 内置 ImageGen 创建正式插画。记录原件路径、逐字实际 prompt、参考原件与原/派生 SHA。几何或需固定位置的合成在本课保留可编辑文件。媒体未到不建立替代占位图。",
+  "releaseBudget": {
+    "gamePageBytesMaximum": 3000000,
+    "gameFrame": "1280×720",
+    "gamePreviewMinimum": "640×360",
+    "quizOptionVisualCheck": "96px"
+  },
+  "sequentialPriority": [
+    "orchard-workbench",
+    "apple-top",
+    "apple-side",
+    "snake-head",
+    "snake-body",
+    "snake-tail",
+    "orchard-sticker",
+    "senses-map"
+  ],
+  "pendingFactChecks": [
+    "正式学生端遮字试玩、真实完成观察卡及家长端独立回读待验。",
+    "真实亲子活动、孩子口述及孩子提出的问题待观察。"
+  ],
+  "sourceOnlyImagegen": [
+    {
+      "key": "clear-cup-master",
+      "sourceOnly": true,
+      "target": {
+        "width": 384,
+        "height": 384,
+        "alpha": true
+      },
+      "prompt": "Use case: scientific-educational. One identical classroom observation cup for use in a diagram, centered on a truly transparent square. Simple short clear glass, level flat bottom, straight vertical sides, clean subtle cool-gray contour. It contains perfectly colorless clear liquid filled to exactly half its height, with a clean horizontal waterline. Entire glass visible, camera straight-on, no plate, hand, pouring, steam, bubbles, straw, label, quantity markings, dark shadow or other object. Original first-grade science courseware art, warm cream paper, deep pine green, muted apricot and occasional fruit red, subtle matte gouache grain, clean paper-cut outlines, large shapes and uncluttered backgrounds. No words, letters, numbers, logo, watermark or decorative marks.",
+      "usedBy": [
+        "unknown-jars"
+      ],
+      "verify": "单杯透明、清液无色无提示，源图真 alpha，水面水平，同图复用恰好四次。",
+      "status": "ready_imagegen_source",
+      "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-448fe737-6abe-40fb-82d9-f9f9b4657bf0.png",
+      "sourceSha256": "10917a93bef75278269abf579dfbcef691a6fd1366da51980830a968b0d36869",
+      "localOriginal": "diagrams/clear-cup-master.original.png"
+    },
+    {
+      "key": "speaker-master",
+      "sourceOnly": true,
+      "target": {
+        "width": 640,
+        "height": 640,
+        "alpha": true
+      },
+      "prompt": "Use case: scientific-educational. Single small portable classroom speaker front orthographic view on a truly transparent square, softened pine-green case with simple dark grille on the upper two thirds and a broad completely blank warm cream lower panel for a later digital slider. No buttons, no controls, no writing, no logo or power symbols. Keep the whole speaker in frame and make the plain bottom panel big and clearly bounded. Straight-on, no perspective or shadow. Original first-grade science courseware art, warm cream paper, deep pine green, muted apricot and occasional fruit red, subtle matte gouache grain, clean paper-cut outlines, large shapes and uncluttered backgrounds. No words, letters, numbers, logo, watermark or decorative marks.",
+      "usedBy": [
+        "q3-a",
+        "q3-b",
+        "q3-c"
+      ],
+      "verify": "同一音箱身份底图，面板为合成预留空位。",
+      "status": "ready_imagegen_source",
+      "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-59e2a499-27f0-4ba6-ab10-61027132e4b8.png",
+      "sourceSha256": "9e1368c5ed4bd4bc7c6e5bf25df119f30fcdc0f525e12f6276f7367bf2ddde60",
+      "localOriginal": "diagrams/speaker-master.original.png"
+    }
+  ],
+  "assets": [
+    {
+      "key": "orchard-workbench",
+      "file": "assets/orchard-workbench.png",
+      "usedBy": [
+        "p04 canvas",
+        "p06 canvas"
+      ],
+      "priority": 1,
+      "status": "ready_imagegen",
+      "target": {
+        "width": 1280,
+        "height": 720,
+        "alpha": false
+      },
+      "prompt": "Use case: illustration-story. Asset type: original widescreen 16:9 opaque backdrop for a first-grade science observation game. An empty warm cream workbench with subtle matte gouache paper grain and only a few desaturated sage leaves and pale apricot wood textures at the extreme corners. Keep the central 80 percent quiet and level, with no raised objects or cast shadows, so game controls and dark green panels stay readable. No fruit, shapes, people, tools, words, logos, numbers, watermarks, borders or symbols.",
+      "verify": "中心单一平面，不能冒出道具和纹样。深绿玩法面板、深绿虚线边和焦点卡在640×360均可辨。",
+      "sha256": "be821c53057ba7fbbf0e2483a3c4f5b18c275efe363945892967f2bacd79dd87",
+      "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-d405675d-0716-455f-be3c-40541d762044.png",
+      "receivedPrompt": "Original wide 16:9 opaque backdrop for a first-grade science observation game. A completely EMPTY warm cream apple-observation workbench seen almost from above with a subtle sense of pale wood, flat and level, fine matte gouache paper grain. Center 84% of the frame is an unbroken very quiet light ivory surface, low contrast and no wood slat seams, ideal behind dark green game panels and small touch targets. At only the extreme upper left and lower right corners place tiny, desaturated sage leaf tips and faint apricot wood texture, all low contrast. No raised objects, no shadows across the active area, no fruit, shapes, tools, jars, human hands, people, tableware, labels, numbers, words, symbols, border, logo or watermark. Clean minimal soft matte cut-paper gouache matching quiet classroom illustrations. Composition must remain useful down to a 640×360 phone view."
+    },
+    {
+      "key": "apple-top",
+      "file": "assets/apple-top.png",
+      "usedBy": [
+        "p03 right-picture",
+        "p04 live,target,shot,finish,parent",
+        "orchard-start source",
+        "observation-record source"
+      ],
+      "priority": 2,
+      "status": "ready_imagegen",
+      "target": {
+        "width": 512,
+        "height": 512,
+        "alpha": true
+      },
+      "prompt": "Use case: scientific-educational. One original isolated transparent cutout of one small classroom apple, directly overhead looking straight down along its stem, in a square canvas. Saturated warm crimson-red skin, one broad soft golden-apricot blush on the viewer’s left, just one short brown stem centered in a shallow visible dark-red dimple, and three subtle pale speckles on the viewer’s lower left. Compact round apple silhouette slightly irregular, broadest about 80 percent of the square, with no leaf or additional object. Soft matte gouache, subtle paper grain, strong clear silhouette and clean true transparent margins. Make the center stem and indentation readable when the object is about 50 pixels across. No shadow, plate, scenery, cross-section, labels, text, symbols, logos or watermarks.",
+      "verify": "唯一果柄正中央且周边凹处可辨；暖杏斑在左，浅斑点细微；真透明；固定为后续同一苹果身份参考。",
+      "sha256": "4f0f9094e1c009f6473915dd6471fb24c05e114d6cf1fd51042620c20fdd5ab8",
+      "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-e67f1098-92f0-4960-83f9-4371f374d756.png",
+      "receivedPrompt": "One original isolated cutout of ONE small classroom apple seen DIRECTLY FROM ABOVE, looking down straight along its stem, for a first-grade science comparison of top and side views. True transparent square canvas. Apple has warm saturated crimson-red skin, one broad soft golden-apricot blush on the viewer's LEFT shoulder, and three subtle pale speckles grouped on the viewer's lower left. One short small BROWN stem stands in a distinctly visible shallow dark red dimple at the center of the fruit as seen from above. From this directly overhead view, the short stem is foreshortened, roughly a small stub or oval, not a long stick across the skin. Compact organic near-round apple outline, slightly lobed, wide part about 78% of square, centered, complete. No leaf. Soft matte hand-cut gouache, warm subtle paper texture, strong clean edge and truly transparent margin. Keep the center stem and round-ish indentation distinctive when the fruit appears as a 40-pixel game icon. No shadow, scenery, extra fruit, dish, cross-section, arrows, symbols, letters, digits, labels, logo or watermark."
+    },
+    {
+      "key": "apple-side",
+      "file": "assets/apple-side.png",
+      "usedBy": [
+        "p03 left-picture",
+        "p04 live,target,shot,finish,parent",
+        "orchard-start source",
+        "observation-record source"
+      ],
+      "priority": 3,
+      "status": "ready_imagegen",
+      "target": {
+        "width": 512,
+        "height": 512,
+        "alpha": true
+      },
+      "prompt": "Use case: identity-preserve, scientific-educational. The reference is the exact original cutout of this ONE apple, seen directly above along its short stem. Create an orthographic side view of the very same intact apple, with the viewpoint turned 90 degrees from overhead to level side view. Preserve its scale, warm crimson skin, warm apricot blush on the viewer's left, the same short brown stem and the same matte paper texture. The short stem now protrudes above the center of the top rim and is visibly attached; the shallow stem dimple is just a subtle notch at the top silhouette rather than a ring centered in the fruit. Show the whole plump, softly tapered side silhouette. Center it on a genuinely transparent square, no horizontal squeezing, no cut fruit, no extra leaves, no second fruit, no shadow, no props, no writing, symbols or marks.",
+      "verify": "检查同体色斑、同尺度及顶缘露柄。31px仍可用果柄中点／顶缘辨别两视图；不把同图压缩替代。",
+      "reference": "apple-top 的实际原件；原图及派生 SHA 都要记录。",
+      "sha256": "74b7b2eb60af1cdd99721c29fe9daf623ae50274432e32f54d857cff74431dd0",
+      "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-e925e078-c09c-4fcd-b6f1-ef8bff15d2bc.png",
+      "receivedPrompt": "Create the EXACT SAME individual apple as the provided directly overhead reference, but now seen from the SIDE at fruit-center eye level, a physical 90-degree camera move around the upright fruit, NOT a rotated flat top view. Isolated centered fruit with true transparent alpha, same 1:1 canvas and matching visual scale. Preserve warm saturated crimson-red skin, the same broad soft golden-apricot blush on the viewer's left, same recognizable group of three subtle pale skin speckles near the lower left, the same brown short stem and matte paper-cut gouache. From this side view, the apple's gently lobed red upper shoulder forms a visible TOP EDGE, with the short brown stem visibly protruding ABOVE that edge near the top center in profile; its base is inside a small notch between shoulders. The middle of the fruit is uninterrupted red skin, with NO round central indentation, dark center or stem in the middle. Give a natural side-profile apple silhouette slightly wider at shoulders, rounded lower sides and softly lobed base. Keep whole stem and whole apple within clear transparent margins, no leaf. Make stem on top edge distinguishable at 32px. No second object, cast shadow, table, scenery, cut section, sticker, arrows, words, numbers, labels or watermark."
+    },
+    {
+      "key": "senses-map",
+      "file": "assets/senses-map.png",
+      "usedBy": [
+        "p01 picture",
+        "p11 picture"
+      ],
+      "priority": 4,
+      "status": "ready_imagegen",
+      "target": {
+        "width": 1024,
+        "height": 768,
+        "alpha": false
+      },
+      "prompt": "Use case: illustration-story. A landscape 4:3 close-up educational illustration. Center one warm crimson whole apple with a golden-apricot blush at left on a simple table. Around it place exactly five large distinct cream round picture vignettes: an eye upper left, the outer ear upper right, a nose at center right, a healthy pink tongue protruding slightly from a mouth lower right, and the pad of a finger making light contact with the apple skin lower left. Keep each organ visually separate and make the finger-skin contact unmistakable; no clinical cutaway, no hands floating detached, no tasting action. Use an attached crop of the hand in the skin vignette. Separate vignettes by generous space, preserve space on every edge. Original first-grade science courseware art, warm cream paper, deep pine green, muted apricot and occasional fruit red, subtle matte gouache grain, clean paper-cut outlines, large shapes and uncluttered backgrounds. No words, letters, numbers, logo, watermark or decorative marks.",
+      "verify": "逐项核确实只有眼、耳、鼻、舌、指腹皮肤，位置清楚且不看字可指；苹果不出现切面。",
+      "reference": "apple-side 成图可作为苹果外观参考，五器官另审。",
+      "sha256": "4efb54476968fb37870d1796c554a6a941f2a9d58acee536462fff0ba379f861",
+      "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-09884c3b-659f-4fec-9362-b7afce5066c8.png",
+      "receivedPrompt": "Use case: scientific-educational. 4:3 landscape educational illustration for a 6-year-old, a picture map of five human sense organs. Center ONE whole red apple on a simple cream table, using the reference only for its warm red and left apricot blush, intact silhouette and short stem. Arrange exactly FIVE visually separate round cream medallion frames with subtle thin pine-green rims around the apple. Upper left medallion: one open HUMAN EYE with iris and upper lid. Upper right medallion: one HUMAN OUTER EAR in side view. Middle right medallion: one HUMAN NOSE shown as a natural closeup from below slightly in three-quarter. Lower right medallion: one small mouth with a healthy PINK TONGUE gently stuck out, no food near the mouth. Lower left medallion: side close-up of one index FINGERTIP pad touching the red curved peel, connected to a cropped natural hand, just a little patch of peel and no second whole fruit. Wide gaps between all five medallions and between medallions and central apple. Clean natural anatomy, nonclinical, no duplicate organs, no other objects, generous edge margins. Warm cream, deep pine, muted apricot, matte gouache paper grain, clean cut-paper outlines. No lettering, numbers, words, arrows, labels, decorative marks, logo or watermark.",
+      "artReview": "中心是一颗完整苹果；眼、耳、鼻、舌、触碰果皮的指腹在五个分开的圆框内，舌和苹果分开。136×102五框及其用途线索均可分辨；较写实水粉。"
+    },
+    {
+      "key": "unknown-jars",
+      "file": "assets/unknown-jars.png",
+      "usedBy": [
+        "p02 left-picture"
+      ],
+      "priority": 5,
+      "status": "ready_deterministic_composition",
+      "target": {
+        "width": 768,
+        "height": 576,
+        "alpha": false
+      },
+      "verify": "四杯清液从视觉上不能区分，不靠蒸汽/颜色泄露答案；只作已知线索模拟。",
+      "method": "用 `clear-cup-master` 一张有正式来源的透明单杯图，原比例复用四次置于统一奶油底。一行四杯，等大等液位等间距；不可加杯序或可猜身份的标记。",
+      "sha256": "03e977cdc7982615566cc02f7b475eb30793afcbf6a5b4cdf2f599ae4baa13ef",
+      "source": "diagrams/unknown-jars.svg"
+    },
+    {
+      "key": "safety-actions",
+      "file": "assets/safety-actions.png",
+      "usedBy": [
+        "p02 right-picture"
+      ],
+      "priority": 6,
+      "status": "ready_imagegen",
+      "target": {
+        "width": 768,
+        "height": 576,
+        "alpha": false
+      },
+      "prompt": "Use case: illustration-story. A 4:3 landscape triptych with three large, clearly separated pictures for first grade. Left: an unlabelled sealed bottle on the table and a child calmly stepping back with hands at their sides, turning toward a nearby adult. Middle: a child's dusty fingertips lowered away from the untouched eyes, with a clean basin visible in the background. Right: a child presses the low-volume side of a simple small speaker control, ears clearly far from the speaker. No danger, injury, fear, or mixed hands or props. Every action is visually legible without reading. Original first-grade science courseware art, warm cream paper, deep pine green, muted apricot and occasional fruit red, subtle matte gouache grain, clean paper-cut outlines, large shapes and uncluttered backgrounds. No words, letters, numbers, logo, watermark or decorative marks.",
+      "verify": "三格不串，眼睛无手触，设备与耳有距；成人明确在未知物旁协助。安全举动可单独指出。",
+      "sha256": "55e9426014d56f4f4698c43bfa97bcf63fe03bcf7424c9f37095dda6671faeb3",
+      "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-c0963bd0-1046-4ff1-b59e-804475e3c8b4.png",
+      "receivedPrompt": "Use case: scientific-educational. Three separate illustrated safety actions in a LANDSCAPE 4:3 triptych for first-grade science, with two clean cream vertical gutters, no mixing of figures across panels. Left panel: a closed plain small bottle with a cap stands upright on a desk, hands-off. A child is one step back, both hands down, face turned to a clearly visible seated adult nearby for help. Middle panel: child by a wash basin with one dusty hand held visibly down near waist, face clear, both eyes completely untouched and far from hands. Right panel: one child at arm's length from the small pine-green speaker from reference, touching the small round volume knob at the LEFT END of a clean horizontal slot on its lower cream front panel with an outstretched index finger. Child's exposed ear stays far from speaker; the slot and low-end knob are clearly visible, no sound waves. Keep relevant hands natural and separate. Children calm, no injury or alarm. Warm cream, pine green, muted apricot, matte gouache paper grain and clean cut-paper outlines. No symbols, text, numbers, lettering, arrows, logos or watermark. All three action subjects large and clear at classroom size.",
+      "artReview": "左格孩子看向成人求助，封盖瓶保持距离；中格手放低、洗手盆清楚，脏印细节需较大图；右格孩子按松绿音箱左端低音量位置。136×102可分出三格及主要动作，音量端点放大更清楚。"
+    },
+    {
+      "key": "apple-senses",
+      "file": "assets/apple-senses.png",
+      "usedBy": [
+        "p07 right-picture"
+      ],
+      "priority": 7,
+      "status": "ready_imagegen",
+      "target": {
+        "width": 768,
+        "height": 576,
+        "alpha": false
+      },
+      "prompt": "Use case: scientific-educational. A 4:3 landscape science illustration in two clearly separated halves showing the same intact red apple with a golden blush on its left in two methods. Left: a fingertip of one anatomically natural hand lightly touches the washed apple's skin while the whole apple rests on a level cream table. Right: one large clear magnifying-glass lens lies in the viewing line over a small area on the left half of the same apple; three pale speckles in the lens are visibly enlarged in place. The glass stays over the fruit and leaves the apple outline visible, with one simple hand holding the handle. Two clean teaching examples, no extra tools, cut fruit, confusing scratches or food tasting. Original first-grade science courseware art, warm cream paper, deep pine green, muted apricot and occasional fruit red, subtle matte gouache grain, clean paper-cut outlines, large shapes and uncluttered backgrounds. No words, letters, numbers, logo, watermark or decorative marks.",
+      "verify": "左右仍同一只苹果，左指腹接触、右真实透镜对上同处斑点，非脱离果皮、非果皮尺寸改变。",
+      "reference": "apple-side 的正式图或原件作为身份参考。",
+      "sha256": "77089fffa5043b9b847e3eeaf69738fb53506a6ca09e7b51f85b54e42276db84",
+      "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-1a373c9a-9df6-41a5-93cf-ac73ec4913e6.png",
+      "receivedPrompt": "Use case: scientific-educational. Original 4:3 landscape two-panel first-grade science lesson image. In both halves use the SAME intact apple from the reference with same shape, crimson peel, warm left apricot patch, three tiny pale speckles in a triangular cluster on the lower-left peel, and short top stem. Left panel: single natural adult-sized hand comes in from the left, with only the index fingertip gently touching the side of the apple; other fingers naturally curl back. Right panel: a single clear round magnifying glass with pine-green rim and short handle is held directly in front of the lower-left apple peel by a hand entering from the right. EXACTLY the same three speckles seen through the lens become visibly larger; keep the three small speckles aligned in the same triangular layout and only inside the lens, with red peel visible through the lens. Lens is visibly in front of the peel, not beside the apple. Keep the intact apple the same size, retain most of its side outline and its short top stem beyond the lens. Calm cream background, simple table, central vertical cream gutter, matte gouache grain, large clean cut-paper shapes, muted pine green and apricot. No eating, scratches, extra fruit, transparent peel, floating tools, words, numerals, logo or watermark.",
+      "artReview": "左右两格复用同只红苹果、左杏斑和近旁浅点；左指腹与果皮真实接触，右镜片盖在同一位置并让三浅点明显放大。136×102仍能分辨两种方法。"
+    },
+    {
+      "key": "snake-start",
+      "file": "assets/snake-start.png",
+      "usedBy": [
+        "p06 ready card"
+      ],
+      "priority": 8,
+      "status": "ready_imagegen",
+      "target": {
+        "width": 768,
+        "height": 576,
+        "alpha": false
+      },
+      "prompt": "Use case: illustration-story. A landscape 4:3 game start picture. One short friendly pine-green paper-cut snake with an apricot cheek marking and two simple small eyes follows a gently curving line toward two simple separate thick round paper tiles, one pale apricot and one sage teal. Show the entire snake, the two easily distinguished circles, and clean unoccupied surroundings, medium scale. Body lies on the cream workbench, no extra food or obstacles, no signs or arrows. This is a stylized cut-paper game character, anatomically simplified, not a realistic species. Original first-grade science courseware art, warm cream paper, deep pine green, muted apricot and occasional fruit red, subtle matte gouache grain, clean paper-cut outlines, large shapes and uncluttered backgrounds. No words, letters, numbers, logo, watermark or decorative marks.",
+      "verify": "无多余图卡，两个都是圆、颜色可分，小蛇和关内一致。",
+      "reference": "snake-head 成图后用作角色参考，圆片精确可分辨。",
+      "sha256": "50207ae1f1ebbbecc35e51dd35d59d42e0c7e52ba232516e04378c05bcaacd67",
+      "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-30c8a220-3872-4951-937e-efb4f5f6527d.png",
+      "receivedPrompt": "Use case: illustration-story. A landscape 4:3 game start illustration for a quiet first-grade science shape game. Use reference only for the identity of the friendly top-down paper-cut toy snake: deep pine-green, pale sage snout, two little eyes, a muted apricot cheek mark, head pointed right. Here show ONE complete short toy snake with the same head, simple sage and pine-green body following a smooth gentle curve, and a small tapering tail, entirely visible on a warm cream workbench. To its right, place exactly TWO separate round flat paper game tiles, both circular with no perspective distortion, one muted apricot and one sage teal. The tiles should read as two circles of the same shape and two distinct colors. Leave a clear space between the snake and tiles. Medium scale, broad breathing room, matte gouache grain and clean cut-paper edges. No text, lettering, numerals, logos, watermark, arrows, grid, other tiles, obstacles, food or extra animals.",
+      "artReview": "单条朝右小蛇和两个分离的同形异色圆片，无其他物或文字。起始卡按103×78实宽缩看仍可辨。"
+    },
+    {
+      "key": "snake-head",
+      "file": "assets/snake-head.png",
+      "usedBy": [
+        "p06 snake frames"
+      ],
+      "priority": 9,
+      "status": "ready_imagegen",
+      "target": {
+        "width": 320,
+        "height": 320,
+        "alpha": true
+      },
+      "prompt": "Use case: illustration-story. One isolated transparent sprite of a single friendly stylized paper-cut snake head, facing right, top-down view. Rounded deep pine-green head with a lighter sage snout, two tiny simple eyes and a muted apricot cheek accent, no open jaws and no tongue. Large recognizable silhouette, left neck cropped neatly for an overlapping body piece, little clear padding. Square canvas with real alpha. Original first-grade science courseware art, warm cream paper, deep pine green, muted apricot and occasional fruit red, subtle matte gouache grain, clean paper-cut outlines, large shapes and uncluttered backgrounds. No words, letters, numbers, logo, watermark or decorative marks.",
+      "verify": "方向朝右，转向用引擎旋转，脸及颈小屏可辨。",
+      "sha256": "899b1c96b5aaaa0aca614cd473f6506333e65cb0a98f80824c0ad144dec14c49",
+      "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-e1fa8836-baa3-4fb6-88a8-6bb9427b7ddf.png",
+      "receivedPrompt": "Use case: illustration-story. One isolated transparent game sprite of a single friendly stylized paper-cut snake head, facing directly RIGHT in a top-down view. This is only a head and a tiny short green attachment behind it, no body or tail. The short flat neck attachment is on the LEFT. The broad rounded sage snout and tiny nostrils are on the RIGHT. Rounded deep pine-green head with a lighter sage snout, two tiny simple dark eyes visible from above and one muted apricot cheek accent, no open jaws and no tongue. Horizontal right-facing silhouette in center of square, with modest clear padding, true alpha transparency. Original first-grade science courseware art, subtle matte gouache grain, clean paper-cut outlines, large shapes. No words, letters, numbers, logo, watermark, shadows or other decorative marks.",
+      "artReview": "俯视蛇头，左侧是接躯干的短颈，右侧浅绿色为鼻吻，配暗松绿和杏色小斑。局内以32px检查方向，浅鼻吻/杏色仍可从松绿棋盘辨别。"
+    },
+    {
+      "key": "snake-body",
+      "file": "assets/snake-body.png",
+      "usedBy": [
+        "p06 snake frames"
+      ],
+      "priority": 10,
+      "status": "ready_imagegen",
+      "target": {
+        "width": 320,
+        "height": 320,
+        "alpha": true
+      },
+      "prompt": "Use case: illustration-story. Single isolated round paper-cut body segment for the same top-down friendly pine-green toy snake in the reference. A compact near-circle with deep pine-green edging and sage center, subtle matting, no face or limbs, no directional marks. Almost fills square with real alpha. Original first-grade science courseware art, warm cream paper, deep pine green, muted apricot and occasional fruit red, subtle matte gouache grain, clean paper-cut outlines, large shapes and uncluttered backgrounds. No words, letters, numbers, logo, watermark or decorative marks.",
+      "verify": "同角色色且能连续接成躯干；无眼、无头。",
+      "reference": "snake-head 正式身份与色板。",
+      "sha256": "b3a3d33c3d35a8b74c8e755b09ac5c2f88dd0ce16f970ff2e62fdbb8cd5bb253",
+      "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-e87dc4f5-3d0c-4672-be96-a8d580bf2d33.png",
+      "receivedPrompt": "Use case: illustration-story. Use the input snake head image for pine-green palette, sage green and paper texture only. Create ONE separate round paper-cut body segment for that same friendly top-down toy snake. A centered almost circular soft disk, deep pine-green edging and a sage-green center, flat layered paper shapes, subtle matte gouache texture, large and readable. A compact near-circle with a gentle slightly organic edge. No face, eyes, nostrils, tail, stripes, markings, neck or limbs. Object almost fills square with modest even margin and genuinely transparent surrounding pixels, no shadow. No words, letters, numbers, logo, watermark or decorative marks.",
+      "artReview": "一块近圆浅青绿纸片、深松绿边；无眼、无方向。局内31px配同色头尾，明显不同于带杏色或青绿底的圆图卡。"
+    },
+    {
+      "key": "snake-tail",
+      "file": "assets/snake-tail.png",
+      "usedBy": [
+        "p06 snake frames"
+      ],
+      "priority": 11,
+      "status": "ready_imagegen",
+      "target": {
+        "width": 320,
+        "height": 320,
+        "alpha": true
+      },
+      "prompt": "Use case: illustration-story. Single isolated transparent stylized paper-cut snake tail sprite for the same top-down classroom toy snake. Short smooth tapered drop shape, broad rounded end on right joining the body, narrow rounded tip on left, deep pine-green edge and sage center. No face or extra segments. Square true alpha. Original first-grade science courseware art, warm cream paper, deep pine green, muted apricot and occasional fruit red, subtle matte gouache grain, clean paper-cut outlines, large shapes and uncluttered backgrounds. No words, letters, numbers, logo, watermark or decorative marks.",
+      "verify": "右宽左尖，跟引擎尾节转角方向吻合；同角色色。",
+      "reference": "snake-head 正式身份与色板。",
+      "sha256": "e50db231f407236c76cab67dc161aadf54953e8731b07569be89f66a87dd14c1",
+      "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-8af185a4-09f1-484c-91b4-3acf78b485c9.png",
+      "receivedPrompt": "Use case: illustration-story. Single isolated transparent stylized paper-cut SNAKE TAIL sprite for the top-down toy snake. Use the reference disk for its deep pine-green edge and sage-green center and matte paper grain only. Create a small horizontal tapered teardrop shape, BROAD rounded end at RIGHT (joins snake body) and distinctly NARROW rounded tip at LEFT (points away). One solid short smoothly tapered piece. No face, dots, extra body parts, directional marks or shadow. True transparent background around the centered cutout on a square. Large clean shape, original first-grade science cut-paper game style, no letters, numbers, logo, watermark or decorative marks.",
+      "artReview": "左尖右宽且为单个水滴形零件；引擎让右侧宽端向前一节，31px仍可辨方向。"
+    },
+    {
+      "key": "orchard-sticker",
+      "file": "assets/orchard-sticker.png",
+      "usedBy": [
+        "p04 finish",
+        "p06 finish"
+      ],
+      "priority": 12,
+      "status": "ready_imagegen",
+      "target": {
+        "width": 320,
+        "height": 320,
+        "alpha": true
+      },
+      "prompt": "Use case: illustration-story. One isolated large award sticker of a friendly fruit observer's badge. A warm crimson-red whole apple with one short stem and a small clear round lens overlapping its lower right, surrounded by a cream cut-paper rim and a very thin deep green outline. Transparent square, bold simple silhouette, no letters, numbering, checkmarks, text, scenery, shadows or extra fruit. Original first-grade science courseware art, warm cream paper, deep pine green, muted apricot and occasional fruit red, subtle matte gouache grain, clean paper-cut outlines, large shapes and uncluttered backgrounds. No words, letters, numbers, logo, watermark or decorative marks.",
+      "verify": "完成奖励是本课苹果观察主题，小图可辨，真实 alpha。",
+      "sha256": "4f1ace14c11096bf3cac6a0d553b99299738a0b80d3093ed5e11cca2cb93cb1e",
+      "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-20889f89-77bd-4a44-88fe-a355fa7c746f.png",
+      "receivedPrompt": "Use case: illustration-story. One isolated award sticker for a first-grade fruit observer. Use the reference for the whole red apple's identity and colors: plump crimson body, short visible brown stem, warm apricot blush on the left. Render that one whole apple and a small clear circular magnifying lens with its short pine-green handle, overlapping only the lower right of the apple. The lens does not cover the stem or center. One contiguous cream die-cut sticker rim and fine dark-pine outline around the combined silhouette. Transparent square with clear margins, bold simple forms, matte gouache and soft paper grain, visibly legible at a tiny game badge size. No extra fruit, letters, digits, icons, checkmarks, logo, scenery, shadow or watermark.",
+      "artReview": "整只红苹果与右下一个小放大镜重叠。保持同苹果短柄和左杏斑，74px完成贴纸中均可辨。仅作奖励标记。"
+    },
+    {
+      "key": "family-apple",
+      "file": "assets/family-apple.png",
+      "usedBy": [
+        "p10 picture"
+      ],
+      "priority": 13,
+      "status": "ready_imagegen",
+      "target": {
+        "width": 1024,
+        "height": 768,
+        "alpha": false
+      },
+      "prompt": "Use case: illustration-story. A quiet 4:3 landscape family observation at a cream kitchen table. One seated first-grade child touches the skin of one whole washed crimson-red apple with the pad of a single natural index finger, with the apple resting on the table. Child's other hand rests nearby away from the fruit; one adult sits on the child's other side, looks at the child's gesture and listens. An open notebook has two large unlabelled spaces: one with a simple whole-apple sketch and one blank. Show the short stem, warm apricot blush on left, exactly one apple, natural eyes, arms and hands. No eating, no knife, no unknown liquid, no other tools, no extra fingers, no other people. Original first-grade science courseware art, warm cream paper, deep pine green, muted apricot and occasional fruit red, subtle matte gouache grain, clean paper-cut outlines, large shapes and uncluttered backgrounds. No words, letters, numbers, logo, watermark or decorative marks.",
+      "verify": "一只苹果放稳，只有一个指腹接触果皮；家人能看到动作、听孩子说；笔记仅整果线图和空位。",
+      "reference": "apple-side 正式图或原件，场景仍为教材同类物体。",
+      "sha256": "ebc3f31e64b8df9f815bb03da96271cbd36b7cdc94082dcb287e77554b37346d",
+      "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-7a0471b4-3d67-430e-8e85-134ad0d1eae5.png",
+      "receivedPrompt": "Use case: illustration-story. 4:3 landscape children's science courseware illustration of an actual home observation. Use the reference only for the identity of the one apple: whole crimson fruit, warm apricot blush on left, three tiny pale speckles and one short brown stem. The apple rests on a warm cream kitchen table. One seated first-grade child on the left leans slightly forward and gently touches the apple's left side with the pad of ONE extended index finger, other fingers softly curled and the other hand away from the fruit. One seated adult on the right looks at that touch and listens, relaxed and at the child's level, with hands calmly resting far from the apple. In foreground a simple open notebook, a single outline sketch of a whole apple on the left page, the right page blank. Both faces and all relevant actions clear and separated, natural hands and anatomy, simple uncluttered kitchen. Warm cream, pine green and apricot, matte gouache paper grain, clean paper-cut silhouettes. No other real fruit, eating, knife, unknown liquid, extra tools, text, numerals, lettering, logo or watermark.",
+      "artReview": "一只苹果放稳，孩子只伸一指轻触果皮，成人注视；笔记左页是苹果轮廓，右页空白，支持记录触感的口述。136×102仍见互动关系；指腹接触在原图局部复核。"
+    },
+    {
+      "key": "orchard-start",
+      "file": "assets/orchard-start.png",
+      "usedBy": [
+        "p04 ready card"
+      ],
+      "priority": 14,
+      "status": "ready_deterministic_composition",
+      "target": {
+        "width": 960,
+        "height": 640,
+        "alpha": false
+      },
+      "method": "正式苹果两视角导入工作台，按比例并排；不做镜像、拉伸、姿态转换。",
+      "verify": "两个视角清楚且与游戏一致，无教学答案字样。",
+      "sha256": "7ecd536b83433784296e30fba72c9c53706d1a8a523ce56705deef70fa081a80",
+      "source": "diagrams/orchard-start.svg"
+    },
+    {
+      "key": "observation-record",
+      "file": "assets/observation-record.png",
+      "usedBy": [
+        "p07 left-picture"
+      ],
+      "priority": 15,
+      "status": "ready_deterministic_composition",
+      "target": {
+        "width": 960,
+        "height": 640,
+        "alpha": false
+      },
+      "method": "两格同样大的记录框：左为正式 apple-side，右为正式 apple-top；背景为奶油纸面，可用同一工作台。",
+      "verify": "图片次序与口述一致，底色对比，不能使用假观察快照。",
+      "sha256": "1b598ad358f5e8b5f1b5ee971994a2ab05399ea3baa4e8b1e8c44ce16473da7b",
+      "source": "diagrams/observation-record.svg"
+    },
+    {
+      "key": "round-apricot",
+      "file": "assets/round-apricot.png",
+      "usedBy": [
+        "p06 game token",
+        "p05 exact geometry reference"
+      ],
+      "priority": 16,
+      "status": "ready_deterministic_geometry",
+      "target": {
+        "width": 256,
+        "height": 256,
+        "alpha": true
+      },
+      "method": "同一透明正方画布；圆，杏色。几何坐标、颜色与编组来自可编辑 SVG。",
+      "verify": "不能凭质感区分；形状大小和朝向必须符合关卡，缩小到29px仍清楚。",
+      "source": "diagrams/round-apricot.svg",
+      "sha256": "05d5dd8a6848893b9a117144dc7e7104b2a41d7131a5c0c47b2219a4493897cf"
+    },
+    {
+      "key": "round-sage",
+      "file": "assets/round-sage.png",
+      "usedBy": [
+        "p06 game token",
+        "p05 exact geometry reference"
+      ],
+      "priority": 17,
+      "status": "ready_deterministic_geometry",
+      "target": {
+        "width": 256,
+        "height": 256,
+        "alpha": true
+      },
+      "method": "同一透明正方画布；圆，青绿色。几何坐标、颜色与编组来自可编辑 SVG。",
+      "verify": "不能凭质感区分；形状大小和朝向必须符合关卡，缩小到29px仍清楚。",
+      "source": "diagrams/round-sage.svg",
+      "sha256": "b84fffb5c4ed40170188182e058346dd5c77dad291ccd07bb2571316c012622c"
+    },
+    {
+      "key": "round-sage-small",
+      "file": "assets/round-sage-small.png",
+      "usedBy": [
+        "p06 game token",
+        "p05 exact geometry reference"
+      ],
+      "priority": 18,
+      "status": "ready_deterministic_geometry",
+      "target": {
+        "width": 256,
+        "height": 256,
+        "alpha": true
+      },
+      "method": "同一透明正方画布；小圆，青绿色。几何坐标、颜色与编组来自可编辑 SVG。",
+      "verify": "不能凭质感区分；形状大小和朝向必须符合关卡，缩小到29px仍清楚。",
+      "source": "diagrams/round-sage-small.svg",
+      "sha256": "6b9f1ae87c79c447b5b97d4d22475895d3141e58c2a114c81a22c0315b8650c0"
+    },
+    {
+      "key": "square-apricot",
+      "file": "assets/square-apricot.png",
+      "usedBy": [
+        "p06 game token",
+        "p05 exact geometry reference"
+      ],
+      "priority": 19,
+      "status": "ready_deterministic_geometry",
+      "target": {
+        "width": 256,
+        "height": 256,
+        "alpha": true
+      },
+      "method": "同一透明正方画布；正方形，杏色。几何坐标、颜色与编组来自可编辑 SVG。",
+      "verify": "不能凭质感区分；形状大小和朝向必须符合关卡，缩小到29px仍清楚。",
+      "source": "diagrams/square-apricot.svg",
+      "sha256": "641a6b4e35fc4032c4ac50ab195812b009ee7b307c600610e34cc98dcf075249"
+    },
+    {
+      "key": "square-sage",
+      "file": "assets/square-sage.png",
+      "usedBy": [
+        "p06 game token",
+        "p05 exact geometry reference"
+      ],
+      "priority": 20,
+      "status": "ready_deterministic_geometry",
+      "target": {
+        "width": 256,
+        "height": 256,
+        "alpha": true
+      },
+      "method": "同一透明正方画布；正方形，青绿色。几何坐标、颜色与编组来自可编辑 SVG。",
+      "verify": "不能凭质感区分；形状大小和朝向必须符合关卡，缩小到29px仍清楚。",
+      "source": "diagrams/square-sage.svg",
+      "sha256": "aee8adda893f57b7f6ab1e98dd2e3b97721b534ca04d749709eb99ab9f313201"
+    },
+    {
+      "key": "triangle-apricot",
+      "file": "assets/triangle-apricot.png",
+      "usedBy": [
+        "p06 game token"
+      ],
+      "priority": 21,
+      "status": "ready_deterministic_geometry",
+      "target": {
+        "width": 256,
+        "height": 256,
+        "alpha": true
+      },
+      "method": "同一透明正方画布；等边三角形，杏色。几何坐标、颜色与编组来自可编辑 SVG。",
+      "verify": "不能凭质感区分；形状大小和朝向必须符合关卡，缩小到29px仍清楚。",
+      "source": "diagrams/triangle-apricot.svg",
+      "sha256": "cdd2a390c03397d28a15ad763ffdf8cb5f534a4493576161a76beca04acffed3"
+    },
+    {
+      "key": "triangle-sage",
+      "file": "assets/triangle-sage.png",
+      "usedBy": [
+        "p06 game token"
+      ],
+      "priority": 22,
+      "status": "ready_deterministic_geometry",
+      "target": {
+        "width": 256,
+        "height": 256,
+        "alpha": true
+      },
+      "method": "同一透明正方画布；小等边三角形，青绿色。几何坐标、颜色与编组来自可编辑 SVG。",
+      "verify": "不能凭质感区分；形状大小和朝向必须符合关卡，缩小到29px仍清楚。",
+      "source": "diagrams/triangle-sage.svg",
+      "sha256": "a552db8713117f939b98464763d20a00312b1b07e3c46af5005e4f2f14dcc134"
+    },
+    {
+      "key": "triangle-apr-turn",
+      "file": "assets/triangle-apr-turn.png",
+      "usedBy": [
+        "p06 game token"
+      ],
+      "priority": 23,
+      "status": "ready_deterministic_geometry",
+      "target": {
+        "width": 256,
+        "height": 256,
+        "alpha": true
+      },
+      "method": "同一透明正方画布；同等边三角形转180度，杏色。几何坐标、颜色与编组来自可编辑 SVG。",
+      "verify": "不能凭质感区分；形状大小和朝向必须符合关卡，缩小到29px仍清楚。",
+      "source": "diagrams/triangle-apr-turn.svg",
+      "sha256": "df30c981326c6e264896b6fb04ba526dafc59466f644589da3f71ed361c8336c"
+    },
+    {
+      "key": "rectangle-apricot",
+      "file": "assets/rectangle-apricot.png",
+      "usedBy": [
+        "p06 game token"
+      ],
+      "priority": 24,
+      "status": "ready_deterministic_geometry",
+      "target": {
+        "width": 256,
+        "height": 256,
+        "alpha": true
+      },
+      "method": "同一透明正方画布；长方形，杏色。几何坐标、颜色与编组来自可编辑 SVG。",
+      "verify": "不能凭质感区分；形状大小和朝向必须符合关卡，缩小到29px仍清楚。",
+      "source": "diagrams/rectangle-apricot.svg",
+      "sha256": "8fdcf06ee83735dab2b9b9e6652984a2d56c3805db7da3e1c71816d1fecee5fe"
+    },
+    {
+      "key": "sort-by-shape",
+      "file": "assets/sort-by-shape.png",
+      "usedBy": [
+        "p05 left-picture"
+      ],
+      "priority": 25,
+      "status": "ready_deterministic_geometry",
+      "target": {
+        "width": 720,
+        "height": 480,
+        "alpha": false
+      },
+      "method": "两组同样的托盘。左：杏圆和青绿圆。右：杏正方和青绿正方。复用相同 SVG 几何。",
+      "verify": "只按形；每组颜色不同，二次分组使用同一批四卡。",
+      "source": "diagrams/sort-by-shape.svg",
+      "sha256": "38bdfcc73e02762e10f9c2a68313a45aeeb5bc6aab299fe102d3d98a3052ae8d"
+    },
+    {
+      "key": "sort-by-color",
+      "file": "assets/sort-by-color.png",
+      "usedBy": [
+        "p05 right-picture"
+      ],
+      "priority": 26,
+      "status": "ready_deterministic_geometry",
+      "target": {
+        "width": 720,
+        "height": 480,
+        "alpha": false
+      },
+      "method": "两组同样的托盘。左：杏圆和杏正方。右：青绿圆和青绿正方。复用相同 SVG 几何。",
+      "verify": "只按色；每组形状不同，四卡与前图同。",
+      "source": "diagrams/sort-by-color.svg",
+      "sha256": "50a2dc131a1bf1b944f3d44b77bfaabf8170a346ac0036a11951f2ac1507f865"
+    },
+    {
+      "key": "q1-scene",
+      "file": "assets/q1-scene.png",
+      "usedBy": [
+        "p08 q1 prompt"
+      ],
+      "priority": 27,
+      "status": "ready_imagegen",
+      "target": {
+        "width": 768,
+        "height": 576,
+        "alpha": false
+      },
+      "prompt": "Use case: scientific-educational. One little metal wind chime hanging by a thread just inside an open warm cream classroom window. A few slim metal pipes hang around the small central striker, all parts attached, the whole chime visible, with a pale sage curtain corner slightly lifted. Big uncluttered recognizable chime. No person, fruit, sound text, stray objects, directional signs or extra device. Original first-grade science courseware art, warm cream paper, deep pine green, muted apricot and occasional fruit red, subtle matte gouache grain, clean paper-cut outlines, large shapes and uncluttered backgrounds. No words, letters, numbers, logo, watermark or decorative marks.",
+      "verify": "可辨一个挂在窗边的风铃，声音由题目朗读提供。",
+      "sha256": "b09b2f4aaf793905e0f304767ba11b3b636886e518e3fb78629fb1a63db0b288",
+      "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-ca2361b5-ba77-4775-8544-5738709467b2.png",
+      "receivedPrompt": "Use case: scientific-educational. A single prominent wind chime for a first-grade listening question, 4:3 landscape. Near an open cream classroom window, one recognizable small silver-metal wind chime hangs from a visible cord. A single hanging wood top cap supports a short group of long slender metal pipes surrounding a small central wooden clapper and a hanging paddle below. Each hanging part is visibly attached, nothing floats. Full instrument visible and prominent, a muted sage curtain corner gently lifted behind, uncluttered warm cream window and no person. Matte gouache paper grain, clean cut-paper outlines, pine green and pale apricot accents, generous margins. No sound waves, sound text, numbers, words, marks, signs, logos, watermarks, extra devices or instruments.",
+      "artReview": "窗边悬着单只小金属风铃，竖管与下方吊片可见，96像素宽可认；仅作题干情境，是否响由老师朗读说明。"
+    },
+    {
+      "key": "q1-a",
+      "file": "assets/q1-a.png",
+      "usedBy": [
+        "p08 q1-a"
+      ],
+      "priority": 28,
+      "status": "ready_imagegen",
+      "target": {
+        "width": 480,
+        "height": 480,
+        "alpha": false
+      },
+      "prompt": "Use case: scientific-educational. A single large close-up of a healthy child's open eye, with upper and lower eyelids, dark brown iris and pupil, a simple eyebrow, and softly cropped face context. No second organ is prominent, no glasses, no hand, no icon frame. Original first-grade science courseware art, warm cream paper, deep pine green, muted apricot and occasional fruit red, subtle matte gouache grain, clean paper-cut outlines, large shapes and uncluttered backgrounds. No words, letters, numbers, logo, watermark or decorative marks.",
+      "verify": "96px读出眼，眼睑眼珠自然。",
+      "sha256": "2a00e93eb011afcc8c77961ca7d4ef53dc45344ca7959f27f8b7d1817ecbf8d2",
+      "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-d80f8a4a-1ba9-465a-9774-ddcd9f6d2583.png",
+      "receivedPrompt": "Use case: scientific-educational. One SQUARE unlabelled quiz option picture for a first-grade science lesson. Reference picture provides just the eye's matte-gouache cut-paper color and natural anatomy; redraw it as its own image. A SINGLE large healthy child's open human eye in a straight-on tight close-up, dark brown iris and black pupil, natural upper and lower lids, modest lashes, eyebrow. Eye horizontally centered and recognizable at 96×96 px. The surrounding cropped skin is warm cream and apricot, soft texture with no sharp distracting edge. Only eye and eyebrow visible, no nose, hand, hair, frame, medallion ring, apple, glasses, face makeup, wounds, writing, letters, numerals or watermark.",
+      "artReview": "清楚的单眼近景，有眼睑与棕色虹膜；96px与耳、鼻互不混淆。"
+    },
+    {
+      "key": "q1-b",
+      "file": "assets/q1-b.png",
+      "usedBy": [
+        "p08 q1-b"
+      ],
+      "priority": 29,
+      "status": "ready_imagegen",
+      "target": {
+        "width": 480,
+        "height": 480,
+        "alpha": false
+      },
+      "prompt": "Use case: scientific-educational. A single large close-up of a healthy child's external ear, neatly cropped, showing the clearly curved pinna, its natural inner contours and the side of the child's cheek. Similar scale and palette to the eye picture. No piercing, no hand, no hearing device, no visible separate eye or nose. Original first-grade science courseware art, warm cream paper, deep pine green, muted apricot and occasional fruit red, subtle matte gouache grain, clean paper-cut outlines, large shapes and uncluttered backgrounds. No words, letters, numbers, logo, watermark or decorative marks.",
+      "verify": "96px读出耳廓，无工具或饰物。",
+      "reference": "q1-a 的色调及轮廓风格。",
+      "sha256": "f6ac135e344d6d369f0c825a6e93b13d38b77e5222f5e0a21420ed8173390eab",
+      "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-72f30bb6-4a05-48fc-b51d-3f4c303f2f6d.png",
+      "receivedPrompt": "Use case: scientific-educational. One SQUARE unlabelled quiz option picture for first-grade science. Reference provides just its ear’s matte-gouache color and anatomy; redraw a stand-alone illustration. A SINGLE large natural HUMAN OUTER EAR (pinna) in close-up from the side, central in a tight square crop. Clear upper rim, inner fold, small tragus and lobe. A small edge of brown hair and cheek behind it, no eye, nose or mouth visible. Ear is clean, no piercing, earrings, aids, hand or objects. Distinct at 96×96 px, warm cream and apricot skin with subtle paper grain, natural but child-appropriate. No dark frame, rings, text, letters, numbers, apple, logo or watermark.",
+      "artReview": "无耳饰的单个外耳近景，耳廓与耳垂轮廓可见；96px可认，唯一匹配听声音。"
+    },
+    {
+      "key": "q1-c",
+      "file": "assets/q1-c.png",
+      "usedBy": [
+        "p08 q1-c"
+      ],
+      "priority": 30,
+      "status": "ready_imagegen",
+      "target": {
+        "width": 480,
+        "height": 480,
+        "alpha": false
+      },
+      "prompt": "Use case: scientific-educational. A single large close-up of a healthy child's nose, front three-quarter view with nose bridge and two natural nostrils visible, surrounded by just a small crop of cream-toned face. Similar scale and palette to the eye picture. No eye, mouth, hand, injury or marks. Original first-grade science courseware art, warm cream paper, deep pine green, muted apricot and occasional fruit red, subtle matte gouache grain, clean paper-cut outlines, large shapes and uncluttered backgrounds. No words, letters, numbers, logo, watermark or decorative marks.",
+      "verify": "96px读出鼻梁鼻孔，无突出的第二器官。",
+      "reference": "q1-a 的色调及轮廓风格。",
+      "sha256": "ca0a744648f2b2cd5bccd53dcde957d3daaeb619bc18b11eb61c7ae778d3bdeb",
+      "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-8c95e81c-a691-4546-ba79-83d5d8a9a9a2.png",
+      "receivedPrompt": "Use case: scientific-educational. One SQUARE unlabelled quiz option illustration for first-grade science, matching the organ images' warm apricot skin, matte gouache paper grain and natural clean shape. Use reference only for its human nose anatomy and color. Show one large child's HUMAN NOSE in a small three-quarter close-up, with the softly curved nose bridge starting above, rounded tip and TWO natural nostril openings visible below. The nose is recognizable at 96×96 px and surrounded only by softly cropped cream-apricot face skin. Omit the eyes, lips, ears and fingers entirely. No hands, apple, frame, circular border, piercing, injury, numbers, letters, writing, logo or watermark.",
+      "artReview": "单鼻近景，鼻梁和两个鼻孔可见；96px可辨，图片无文字或其他器官。"
+    },
+    {
+      "key": "q2-c",
+      "file": "assets/q2-c.png",
+      "usedBy": [
+        "p08 q2-c"
+      ],
+      "priority": 31,
+      "status": "ready_imagegen",
+      "target": {
+        "width": 480,
+        "height": 480,
+        "alpha": false
+      },
+      "prompt": "Use case: scientific-educational. Two equally sized sage-teal square towels, one coarser woven loop cloth and one smoother cloth of the same hue, laid flat beside each other on a plain cream table with a clear gap. An anatomically natural child's left and right index fingertip touch one towel each; small relaxed hands from the lower frame edge. Towel edges and both contact points are fully visible, no marks to label either texture. Direct close overhead framing. Original first-grade science courseware art, warm cream paper, deep pine green, muted apricot and occasional fruit red, subtle matte gouache grain, clean paper-cut outlines, large shapes and uncluttered backgrounds. No words, letters, numbers, logo, watermark or decorative marks.",
+      "verify": "同色两巾、两指各碰一巾，接触明显；物体大小位置作本题锁定。",
+      "sha256": "50058a72f7a536232099cf62bb1d33cb170aec15b89df67302b7818d504b940b",
+      "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-f7313f05-564e-4860-bbfb-357fcc2a8dd3.png",
+      "receivedPrompt": "Use case: scientific-educational. One square picture option for first-grade science. Slightly elevated overhead view of two equally sized small square sage-teal towels on a plain warm cream table, placed left and right with a clear gap. LEFT towel visibly has coarser woven loops. RIGHT towel is smoother cloth of the SAME sage-teal hue. No color clue; they are equal size, fully visible and laid flat. A child's two small natural hands come in from the lower edge, each gently touches the center of its respective towel with one extended index fingertip, with other fingers relaxed or loosely curled. Fingertip-to-fabric contact points unmistakable; no overlap between towels. Large crisp silhouettes, matte gouache paper grain, warm cream and subtle apricot skin, clean classroom cut-paper style. No other tools, no labels, words, letters, numbers, logos, watermark or decoration.",
+      "artReview": "同色等大毛巾左粗右细，孩子左右食指分别轻触一条。96px仍见两个触点，唯一直接用皮肤比较触感。"
+    },
+    {
+      "key": "q2-a",
+      "file": "assets/q2-a.png",
+      "usedBy": [
+        "p08 q2-a"
+      ],
+      "priority": 32,
+      "status": "ready_imagegen",
+      "target": {
+        "width": 480,
+        "height": 480,
+        "alpha": false
+      },
+      "prompt": "Use case: scientific-educational. Reuse the exact same pair of sage-teal towels, sizes, colors, coarse-left and smooth-right texture and cream table in the reference. Change the viewing angle to a slightly elevated view. One child looks with open eyes at the two towels from a comfortable distance; both hands rest behind the table edge, away from the towels. The child does not touch or smell them. Keep both towels visually the same size as each other and fully visible. Original first-grade science courseware art, warm cream paper, deep pine green, muted apricot and occasional fruit red, subtle matte gouache grain, clean paper-cut outlines, large shapes and uncluttered backgrounds. No words, letters, numbers, logo, watermark or decorative marks.",
+      "verify": "明确使用眼睛，两手离开，不添加工具，不改两巾身份。",
+      "reference": "q2-c 的两条毛巾与工作台。",
+      "sha256": "6124e2cd6418ef4e547b76ba0dc03d7316806229ebd789b730eaa1abb74aee71",
+      "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-4bf54237-1065-4b16-be99-e4427cd21ffc.png",
+      "receivedPrompt": "Use case: scientific-educational. Square first-grade science quiz illustration of looking WITHOUT touching. Preserve the reference's exact two equally-sized sage-teal towels, left coarse chunky loops, right smoother weave, same simple cream table, laid flat side by side with visible gap. Change the view to a slightly elevated three-quarter view: towels large and unobstructed in lower half. Beyond the far table edge, one child sits or stands upright, clearly looking down at both towels, both brown eyes open and their gaze aimed downward at the towels. Their hands are lowered in their lap, completely away from the towels. Nose remains far above the table with no sniffing lean. Emphasize eye gaze and distance, keep hands off and both towels fully visible. Warm cream, soft apricot skin and matte gouache paper texture, clean paper-cut teaching art. No words, numbers, logo, watermark, arrows, motion marks or extra tools.",
+      "artReview": "同一孩子睁眼看桌上两条同色等大的蓝绿毛巾，手低于桌沿，没有接触。96px看姿势仍可认。"
+    },
+    {
+      "key": "q2-b",
+      "file": "assets/q2-b.png",
+      "usedBy": [
+        "p08 q2-b"
+      ],
+      "priority": 33,
+      "status": "ready_imagegen",
+      "target": {
+        "width": 480,
+        "height": 480,
+        "alpha": false
+      },
+      "prompt": "Use case: scientific-educational. Reuse the exact same pair of sage-teal towels, sizes, colors and cream table from the reference. One child leans with their nose over the towels to smell, with both hands still well away from the cloth and no face-to-cloth contact. The nose and visible gap are large enough to recognize. The two towel identities and textures are preserved, with no extra object. Original first-grade science courseware art, warm cream paper, deep pine green, muted apricot and occasional fruit red, subtle matte gouache grain, clean paper-cut outlines, large shapes and uncluttered backgrounds. No words, letters, numbers, logo, watermark or decorative marks.",
+      "verify": "低头近闻但未碰毛巾，双手远离；同两巾。",
+      "reference": "q2-c 的两条毛巾与工作台。",
+      "sha256": "7c3dad1f1124f281693b5da489e1f612acb9b651ba2f993b5c7d1d47e1dc1011",
+      "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-d7d36229-0e91-45c5-8406-fb0c3eb5bbe2.png",
+      "receivedPrompt": "Use case: precise-object-edit for a first-grade scientific quiz option. Keep EXACTLY the same two sage-teal towels as the image, same coarse loop LEFT and smoother RIGHT, same equal sizes, position, color and cream tabletop; preserve the same little girl in mustard top and flower hair clip. Change ONLY the child's action from sitting upright and looking to clearly leaning down to SMELL the towels. Show a three-quarter near-side view of her face, gently closed eyes, closed lips, nose near the far edge of the towels, with a clear strip of background between nose and fabric so there is no contact. Her arms and hands remain low on the far side of the table, away from both towels; keep both towel textures readable and the frame square. No sniff lines or other symbols, no extra props, text, letters, numerals, logo or watermark. Same warm matte cut-paper gouache style.",
+      "artReview": "沿用同一孩子与两条毛巾。闭眼向前闻，双手在桌沿，鼻与毛巾有空隙，手没碰毛巾。96px俯身动作与A可辨。"
+    },
+    {
+      "key": "q3-a",
+      "file": "assets/q3-a.png",
+      "usedBy": [
+        "p08 q3-a"
+      ],
+      "priority": 34,
+      "status": "ready_deterministic_composition",
+      "target": {
+        "width": 480,
+        "height": 480,
+        "alpha": false
+      },
+      "method": "以同一 `speaker-master` 底图，在留空的前面板上用 SVG 合成清楚的横滑轨、两个扬声器图形和圆滑块。最低端，圆滑块在左小扬声器旁，其余元素完全相同。滑块自身与图形之间留明显间隙。",
+      "verify": "A/B唯一差异是滑块端点。96px 小扬声器与大扬声器、滑块位置不混，两个选项无文字符号。",
+      "sha256": "626e0aa8de3845f4635644f92ffda3c925779fed0ab1367ee53acde9f948dc6d",
+      "source": "diagrams/q3-a.svg"
+    },
+    {
+      "key": "q3-b",
+      "file": "assets/q3-b.png",
+      "usedBy": [
+        "p08 q3-b"
+      ],
+      "priority": 35,
+      "status": "ready_deterministic_composition",
+      "target": {
+        "width": 480,
+        "height": 480,
+        "alpha": false
+      },
+      "method": "以同一 `speaker-master` 底图，在留空的前面板上用 SVG 合成清楚的横滑轨、两个扬声器图形和圆滑块。最高端，圆滑块在右大扬声器旁，其余元素完全相同。滑块自身与图形之间留明显间隙。",
+      "verify": "A/B唯一差异是滑块端点。96px 小扬声器与大扬声器、滑块位置不混，两个选项无文字符号。",
+      "sha256": "4e6a81496899af8fe1394938bc2a840a0a3eb2e39930369994e685315ee9d31a",
+      "source": "diagrams/q3-b.svg"
+    },
+    {
+      "key": "q3-c",
+      "file": "assets/q3-c.png",
+      "usedBy": [
+        "p08 q3-c"
+      ],
+      "priority": 36,
+      "status": "ready_imagegen",
+      "target": {
+        "width": 480,
+        "height": 480,
+        "alpha": false
+      },
+      "prompt": "Use case: scientific-educational. Show the same small portable pine-green classroom speaker as the reference, with dark grille and clean light lower panel, resting on a cream desk. A child turns their head to bring an exposed ear close to the grille. Leave a visible cream gap between the ear and grille; no contact, injury or sound marks. Use side three-quarter view, large visible ear and speaker. No other objects or gesture. Original first-grade science courseware art, warm cream paper, deep pine green, muted apricot and occasional fruit red, subtle matte gouache grain, clean paper-cut outlines, large shapes and uncluttered backgrounds. No words, letters, numbers, logo, watermark or decorative marks.",
+      "verify": "只展示耳朵接近音箱，间隙清楚，不出现危险后果；保持音箱身份。",
+      "reference": "speaker-master 实图。",
+      "sha256": "ac3ae7e3d4ad0230259ebba39c00f83102bd80e35a79b028442a3f15f895b5db",
+      "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-7ee65e24-8e98-4946-8df1-0a68649876cd.png",
+      "receivedPrompt": "Use case: precise-object-edit for a first-grade scientific educational illustration. Edit this exact 4:3 speaker and child illustration. Keep the exact speaker with orange handle on the left, exact same child and visible near ear on the right, the matte cut-paper gouache style, colors, orientation and the single desk. Widen the gap between the child's ear and the speaker to a clear 8% of the full frame width at the point of closest approach. A clean uninterrupted vertical strip of warm cream backdrop must be clearly visible from above the near ear to below it, between the speaker and the child's near ear. At 96 pixels wide there must be at least 7 clearly empty pixels between the closest parts of ear and speaker. Keep the ear pointed toward and noticeably close to the speaker. Slightly reduce the two subjects' scale and shift them outward as needed to preserve wide outer margins, whole speaker and the entire visible ear. No touching or overlapping, no new objects, hands, writing, waves, marks, or symbols."
+    },
+    {
+      "key": "q4-c",
+      "file": "assets/q4-c.png",
+      "usedBy": [
+        "p09 q4-c"
+      ],
+      "priority": 37,
+      "status": "ready_imagegen",
+      "target": {
+        "width": 480,
+        "height": 480,
+        "alpha": false
+      },
+      "prompt": "Use case: scientific-educational. A plain transparent open bottle with a little clear liquid sits on a low cream courtyard ledge, straight body and softly colored blue-green neck ring. A child stands well back with hands away, pointing loosely toward the bottle to an adult arriving beside them. The bottle opening, the separation, and the adult are immediately visible. No one touches the bottle; no bottle label, visible cap in hands, or injury. Tight courtyard vignette with no extra bottle. Original first-grade science courseware art, warm cream paper, deep pine green, muted apricot and occasional fruit red, subtle matte gouache grain, clean paper-cut outlines, large shapes and uncluttered backgrounds. No words, letters, numbers, logo, watermark or decorative marks.",
+      "verify": "容器开着，孩子拉开距离叫成人，成人没有触瓶。该透明瓶形体固定给另外两图。",
+      "sha256": "4a97d934f42c07e4642034dd13b1a15f031379e5e3ce5db565c8123eebb14299",
+      "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-3864ce91-5c19-4102-b04f-a4e40b149c55.png",
+      "receivedPrompt": "Use case: scientific-educational. A square first-grade science quiz option in a simple warm cream school courtyard. One unlabelled transparent open bottle with straight cylindrical sides, short neck, soft blue-green ring below the lip, and a little clear colorless liquid stands upright near the center of a low cream ledge. Its open neck is visibly hollow and no cap is present. To the right, a primary-school child in a muted apricot top stands safely a good step back from the bottle, looking up at an adult who has come beside them. The child gestures loosely toward the bottle at waist level with arm kept in their space. The adult is attentive, with hands visibly away from the bottle. Clear cream gap between bottle and both people, plain courtyard wall, objects large enough to read at 96 px. Subtle matte gouache paper grain, warm cream, pine green and muted apricot, clean cut-paper outlines. No touching, no extra bottles, no label, no text, numbers, symbols, logos or watermark.",
+      "artReview": "同一透明开口瓶留在台上。孩子已和瓶子拉开距离并面向成人求助，手不接触瓶。96px可分辨成人、孩子和相隔的开口瓶。"
+    },
+    {
+      "key": "q4-a",
+      "file": "assets/q4-a.png",
+      "usedBy": [
+        "p09 q4-a"
+      ],
+      "priority": 38,
+      "status": "ready_imagegen",
+      "target": {
+        "width": 480,
+        "height": 480,
+        "alpha": false
+      },
+      "prompt": "Use case: scientific-educational. Keep the exact same unlabeled open transparent bottle with a little clear liquid and blue-green neck ring, on the same cream courtyard ledge. One child leans forward with their nose near the open bottle mouth, with a clearly visible gap. Both hands are away and no nose or mouth touches the container. Tight side view with nose, gap and bottle clearly separated, no adult or harm in this choice. Original first-grade science courseware art, warm cream paper, deep pine green, muted apricot and occasional fruit red, subtle matte gouache grain, clean paper-cut outlines, large shapes and uncluttered backgrounds. No words, letters, numbers, logo, watermark or decorative marks.",
+      "verify": "鼻部和开口间隙明显，确实同瓶，嘴未靠近。",
+      "reference": "q4-c 的确切透明瓶和环境。",
+      "sha256": "efa1f26ad0ff0a8ef05b353d26a0fb4d1a43f85c05587931a7e005211d32d8ed",
+      "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-5a5a5d5b-a237-4a46-ad6a-f6f03bbb425e.png",
+      "receivedPrompt": "Use case: scientific-educational. Square first-grade quiz illustration of a mistaken choice, using the same child in muted apricot and the same one unlabelled transparent open bottle from the reference: hollow short neck, blue-green ring below its lip, a little colorless liquid, no cap. Show a tight side view of the bottle standing upright on the cream courtyard ledge. The child bends forward from the right, brings their NOSE near and immediately above the bottle opening as if about to smell, with a clearly visible narrow background gap between nose and rim. The child's lips are closed and are farther from the neck than the nose is. Keep both hands behind the back and away from the bottle, no adult in this option. No contact, liquid movement, sniff marks, harm, text, numerals, labels, logos or watermark. Matte gouache cut-paper grain and clean warm cream forms. Make the nose, bottle's open neck and the gap obvious at 96 px.",
+      "artReview": "同一无字透明瓶，浅蓝绿色瓶口环，盖子打开，瓶立于台面。孩子低头向瓶口，鼻与开口仍有间隙，双手留在身后。96px可辨接近方向。"
+    },
+    {
+      "key": "q4-b",
+      "file": "assets/q4-b.png",
+      "usedBy": [
+        "p09 q4-b"
+      ],
+      "priority": 39,
+      "status": "ready_imagegen",
+      "target": {
+        "width": 480,
+        "height": 480,
+        "alpha": false
+      },
+      "prompt": "Use case: scientific-educational. Keep the same unlabeled open transparent bottle with clear liquid and blue-green neck ring from the reference. One child holds it in one natural hand, lifted toward their firmly closed lips. Show a clear gap between lips and open rim; keep the bottle upright, no pouring and no fluid out of the bottle. Tight side view with child, hand and container unmistakable, no adult or harm. Original first-grade science courseware art, warm cream paper, deep pine green, muted apricot and occasional fruit red, subtle matte gouache grain, clean paper-cut outlines, large shapes and uncluttered backgrounds. No words, letters, numbers, logo, watermark or decorative marks.",
+      "verify": "口部接近但闭着且与瓶口有间隙，瓶直立没有液体外流。",
+      "reference": "q4-c 的确切透明瓶。",
+      "sha256": "54cc6c8a4d95f8e1f3827ecac368591861e0f06e62e3aded7550fc8b902fbcef",
+      "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-dd127c38-b9d4-436f-9f9c-67533ec52698.png",
+      "receivedPrompt": "Use case: precise-object-edit for first-grade educational material. Edit the square source image, keeping the exact same child, nose, cheek silhouette, clothes, natural hand holding the same upright bottle, label-free blue-green neck ring, visible clear liquid, clean empty gap from the bottle to the face, and courtyard composition. Change ONLY the mouth: the lips are CLOSED TOGETHER, as a single calm short horizontal mouth line with the natural chin beneath it. Remove the dark open mouth shape entirely. This is the moment before any taste; there is no open mouth, teeth, tongue, contact or spilled liquid. Preserve the paper-cut matte gouache texture, colors and lighting. No text or symbols.",
+      "artReview": "同一透明开口瓶直立，浅蓝绿色瓶口环。孩子将它举到闭唇旁，保留可见间隙，液体不外流。96px可见持瓶靠嘴，原图复核闭唇与无接触；使用定点修订稿。"
+    },
+    {
+      "key": "q5-b",
+      "file": "assets/q5-b.png",
+      "usedBy": [
+        "p09 q5-b"
+      ],
+      "priority": 40,
+      "status": "ready_imagegen",
+      "target": {
+        "width": 480,
+        "height": 480,
+        "alpha": false
+      },
+      "prompt": "Use case: scientific-educational. Close overhead look at one folded sage-teal knitted scarf on a plain cream table. Near one end is a small repeated woven zigzag. One large clear magnifying-glass lens with deep pine-green rim is held over the same woven motif, whose in-lens weave is clearly enlarged, aligning with the tiny unaltered weave outside. No other props or measuring marks. The lens stays over the fabric and shows the fabric's same colors. Original first-grade science courseware art, warm cream paper, deep pine green, muted apricot and occasional fruit red, subtle matte gouache grain, clean paper-cut outlines, large shapes and uncluttered backgrounds. No words, letters, numbers, logo, watermark or decorative marks.",
+      "verify": "同一织纹镜内变大、保持相同纹理结构、镜片盖住围巾局部。",
+      "reference": "本图的围巾作为 q5-a/c 身份参考。",
+      "sha256": "47583b612f963760f6d412c0b6ce4744d1c5e6a56109d75d8a9f3b0dfc7f63e3",
+      "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-469d24c4-2665-4fa8-a231-0ac60a90a0e0.png",
+      "receivedPrompt": "Use case: scientific-educational. Square close overhead first-grade quiz illustration of ONE folded sage-teal knitted scarf resting flat on warm cream paper tabletop. Near its lower end, a band of simple small pale sage knitted zigzag stitches. A single large round clear handheld magnifying glass sits visually over PART of that same zigzag band, deep pine-green rim, short handle points lower right. Show several original tiny V-shaped knit stitches on the same scarf OUTSIDE the lens to the left and right, and exactly that same pale sage V stitch pattern enlarged clearly INSIDE the clear lens, centered on the same zigzag band with green scarf fabric visible behind it. The scarf outline, its straight edge and the unaltered original size remain visible around the glass. The reference teaches only how to illustrate a transparent magnifier and visibly enlarged details; do not include the apple, hand or two panels. Only the scarf and a single magnifier. High contrast between different sizes of stitch. Subtle matte gouache paper grain, pine green and warm cream, clean paper-cut outlines. No other tools, arbitrary symbols, numbers, letters, text, logos or watermark.",
+      "artReview": "同一蓝绿围巾，放大镜对准浅色V纹，镜内的同一处V纹变宽变大，镜外仍为细纹。96px仍能区分小纹及镜中变大的纹。"
+    },
+    {
+      "key": "q5-a",
+      "file": "assets/q5-a.png",
+      "usedBy": [
+        "p09 q5-a"
+      ],
+      "priority": 41,
+      "status": "ready_imagegen",
+      "target": {
+        "width": 480,
+        "height": 480,
+        "alpha": false
+      },
+      "prompt": "Use case: scientific-educational. The exact same folded sage-teal scarf and same knitted zigzag from the reference on the same cream table, viewed directly overhead. One short translucent straight ruler lies next to and along the scarf edge without covering the motif. No readable digits or writing, simple straight edge and a few small ruler marks only. The zigzag stays tiny at its original scale; no magnification and no other tool. Original first-grade science courseware art, warm cream paper, deep pine green, muted apricot and occasional fruit red, subtle matte gouache grain, clean paper-cut outlines, large shapes and uncluttered backgrounds. No words, letters, numbers, logo, watermark or decorative marks.",
+      "verify": "一把透明直尺，尺面无字且细纹仍小。",
+      "reference": "q5-b 的围巾。",
+      "sha256": "0c7cf9cab5e2f3cddb6caa2d8d02b7e134ebec82d1098219af5b4bda9d5df4ea",
+      "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-e54e552c-9413-48f8-971c-b0dee5b1eb2e.png",
+      "receivedPrompt": "Use case: precise-object-edit for a square first-grade science quiz illustration. Preserve the same single folded sage-teal scarf, left and right straight edges, top fold and thin horizontal pale-sage zigzag stitch band near the lower end, overhead angle, cream paper tabletop and matte gouache style. Remove the magnifying glass entirely and continue the original tiny zigzag uninterrupted through the whole scarf at exactly the same original size as the visible left and right portions, with no enlargement. Add a single straight translucent off-white classroom ruler with a clearly straight edge, short orderly tick marks of two lengths, and NO digits or writing. Put it on the cream tabletop immediately beside the RIGHT scarf edge, aligned along the edge, fully visible, without overlapping the zigzag. Slightly scale down scarf if needed so there is room for the ruler to read at 96 px. No lens, no second object, no hands, no other tools, no words, letters, numbers, logos or watermark.",
+      "artReview": "同一蓝绿围巾和浅色连续V纹，旁边透明直尺有刻线、没有可读文字数字。96px可区分直尺和小纹；未显示纹放大。"
+    },
+    {
+      "key": "q5-c",
+      "file": "assets/q5-c.png",
+      "usedBy": [
+        "p09 q5-c"
+      ],
+      "priority": 42,
+      "status": "ready_imagegen",
+      "target": {
+        "width": 480,
+        "height": 480,
+        "alpha": false
+      },
+      "prompt": "Use case: scientific-educational. The exact same folded sage-teal scarf with the same tiny knitted zigzag from the reference on a plain cream tabletop. A single compact pair of pine-green binoculars sits just beside it, recognizable by two connected barrels and round ends. The binoculars are not pointed at the cloth, and the zigzag is still tiny, original scale. Overhead three-quarter view, no other tool. Original first-grade science courseware art, warm cream paper, deep pine green, muted apricot and occasional fruit red, subtle matte gouache grain, clean paper-cut outlines, large shapes and uncluttered backgrounds. No words, letters, numbers, logo, watermark or decorative marks.",
+      "verify": "望远镜为连着的双筒，和围巾纹路不接触。",
+      "reference": "q5-b 的围巾。",
+      "sha256": "66df3d936ed0825d5e0720e92fd65e64bbffc8813d50d4af2fe8eb7edeec172c",
+      "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-6b2dbe16-afab-4390-b1b9-d91e92e005f1.png",
+      "receivedPrompt": "Use case: precise-object-edit for a first-grade science square quiz illustration. Keep exactly the same one folded sage-teal knitted scarf with top fold and tiny thin unbroken pale-sage horizontal zigzag stitches near its lower end, same original small stitch scale and cream tabletop. Remove the ruler completely. Compose the full scarf on the left, slightly smaller as needed, and place ONE compact pine-green pair of binoculars on the cream tabletop on the right. Binoculars are shown from an overhead three-quarter view, with two clearly connected parallel round barrels, two visible round objective rims, and a central bridge. They point away from the scarf. Their outline is visually clear and big enough to recognize at 96 pixels. Binoculars do not touch or cover the scarf and no magnified area appears. Same matte gouache paper grain, warm cream and pine green, clean cut-paper classroom style. No ruler, magnifying glass, hands, other props, text, numbers, logos or watermark.",
+      "artReview": "同一蓝绿围巾和浅色连续V纹，双筒望远镜放在一旁，和围巾未接触，未在使用。96px仍清楚辨双筒。"
+    },
+    {
+      "key": "q6-a",
+      "file": "assets/q6-a.png",
+      "usedBy": [
+        "p09 q6-a"
+      ],
+      "priority": 43,
+      "status": "ready_deterministic_geometry",
+      "target": {
+        "width": 480,
+        "height": 480,
+        "alpha": false
+      },
+      "method": "同一方图、同四徽章、同样两组托盘位置。左：杏三角+青绿三角。右：杏长方+青绿长方。 用课件内可编辑 SVG 绘制，所有尺寸和色号固定。",
+      "verify": "四个徽章都在且不重叠。形状规则只有 A 正确；B 看颜色，C 交叉混合。96px 两组仍明显。",
+      "source": "diagrams/q6-a.svg",
+      "sha256": "3577be773eaee8a3757077fed9e7dd7795eaea71be28b6c914f0893fc62cb85c"
+    },
+    {
+      "key": "q6-b",
+      "file": "assets/q6-b.png",
+      "usedBy": [
+        "p09 q6-b"
+      ],
+      "priority": 44,
+      "status": "ready_deterministic_geometry",
+      "target": {
+        "width": 480,
+        "height": 480,
+        "alpha": false
+      },
+      "method": "同一方图、同四徽章、同样两组托盘位置。左：杏三角+杏长方。右：青绿三角+青绿长方。 用课件内可编辑 SVG 绘制，所有尺寸和色号固定。",
+      "verify": "四个徽章都在且不重叠。形状规则只有 A 正确；B 看颜色，C 交叉混合。96px 两组仍明显。",
+      "source": "diagrams/q6-b.svg",
+      "sha256": "ea10335ac2e6a75d02f3bf51b72678b12739bba42865f10c99745c979ccc390b"
+    },
+    {
+      "key": "q6-c",
+      "file": "assets/q6-c.png",
+      "usedBy": [
+        "p09 q6-c"
+      ],
+      "priority": 45,
+      "status": "ready_deterministic_geometry",
+      "target": {
+        "width": 480,
+        "height": 480,
+        "alpha": false
+      },
+      "method": "同一方图、同四徽章、同样两组托盘位置。左：杏三角+青绿长方。右：青绿三角+杏长方。 用课件内可编辑 SVG 绘制，所有尺寸和色号固定。",
+      "verify": "四个徽章都在且不重叠。形状规则只有 A 正确；B 看颜色，C 交叉混合。96px 两组仍明显。",
+      "source": "diagrams/q6-c.svg",
+      "sha256": "571acd972afbb5ead571f9c9a125168bae674581c83cb4d154837021adae60be"
+    }
+  ],
+  "observationOutcomes": [
+    {
+      "key": "apple-top",
+      "view": "top",
+      "status": "ready_imagegen",
+      "expectedPose": "俯视，果柄位于苹果图中点附近且浅凹从上可辨。",
+      "scope": "同一颗画中苹果",
+      "sha256": "4f0f9094e1c009f6473915dd6471fb24c05e114d6cf1fd51042620c20fdd5ab8",
+      "artReview": "正上方的近圆轮廓，短棕色果柄在中央深红浅凹中，杏色斑和三个浅点在左。缩到31px仍见中央深色小点。保留真实alpha。"
+    },
+    {
+      "key": "apple-side",
+      "view": "side",
+      "status": "ready_imagegen",
+      "expectedPose": "侧视，果柄伸出顶缘，整颗苹果侧面轮廓可辨。",
+      "scope": "同一颗画中苹果",
+      "sha256": "74b7b2eb60af1cdd99721c29fe9daf623ae50274432e32f54d857cff74431dd0",
+      "artReview": "同一红果左侧杏斑和三个浅点，短棕柄从顶部轮廓露出，果实中央无柄窝。缩到31px仍能以顶缘短柄对照俯视的中央深点。保留真实alpha。"
+    }
+  ],
+  "gamePageAssetBudgets": {
+    "p04": {
+      "totalAssetBytes": 2173047,
+      "assetKeys": [
+        "apple-side",
+        "apple-top",
+        "orchard-start",
+        "orchard-sticker",
+        "orchard-workbench"
+      ],
+      "budgetBytes": 3000000
+    },
+    "p06": {
+      "totalAssetBytes": 1807225,
+      "assetKeys": [
+        "orchard-sticker",
+        "orchard-workbench",
+        "rectangle-apricot",
+        "round-apricot",
+        "round-sage",
+        "round-sage-small",
+        "snake-body",
+        "snake-head",
+        "snake-start",
+        "snake-tail",
+        "square-apricot",
+        "square-sage",
+        "triangle-apr-turn",
+        "triangle-apricot",
+        "triangle-sage"
+      ],
+      "budgetBytes": 3000000
+    }
+  },
+  "quizPageAssetBudgets": {
+    "p08": {
+      "totalAssetBytes": 2999319,
+      "assetKeys": [
+        "q1-a",
+        "q1-b",
+        "q1-c",
+        "q1-scene",
+        "q2-a",
+        "q2-b",
+        "q2-c",
+        "q3-a",
+        "q3-b",
+        "q3-c"
+      ],
+      "targetBytes": 3000000
+    },
+    "p09": {
+      "totalAssetBytes": 2321720,
+      "assetKeys": [
+        "q4-a",
+        "q4-b",
+        "q4-c",
+        "q5-a",
+        "q5-b",
+        "q5-c",
+        "q6-a",
+        "q6-b",
+        "q6-c"
+      ],
+      "targetBytes": 3000000
+    }
+  }
+}

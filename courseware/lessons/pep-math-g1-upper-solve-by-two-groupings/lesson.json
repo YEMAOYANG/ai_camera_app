@@ -1,0 +1,1122 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "解决问题",
+  "description": "植物展登记同一架盆栽，按架层和牌形完整分组，用两种加法核对总数。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小数老师",
+      "role": "teacher",
+      "gender": "male",
+      "voice": "Ethan",
+      "avatar": "/teachers/ashu-math-v1.png",
+      "color": "#437763",
+      "persona": "和孩子从图里找要数的东西，用分组图和加法解释，并回到原图检查。"
+    }
+  },
+  "images": {
+    "by-row": {
+      "file": "assets/illustrations/by-row.png"
+    },
+    "compare-sums": {
+      "file": "assets/illustrations/compare-sums.png"
+    },
+    "cross-wrong": {
+      "file": "assets/illustrations/cross-wrong.png"
+    },
+    "dock-bottom": {
+      "file": "assets/illustrations/dock-bottom.png"
+    },
+    "dock-top": {
+      "file": "assets/illustrations/dock-top.png"
+    },
+    "exhibit-sticker": {
+      "file": "assets/illustrations/exhibit-sticker.png"
+    },
+    "home-art": {
+      "file": "assets/illustrations/home-art.png"
+    },
+    "intro-match": {
+      "file": "assets/illustrations/intro-match.png"
+    },
+    "intro-sort": {
+      "file": "assets/illustrations/intro-sort.png"
+    },
+    "match-backdrop": {
+      "file": "assets/illustrations/match-backdrop.png"
+    },
+    "matching-guide": {
+      "file": "assets/illustrations/matching-guide.png"
+    },
+    "opening-rack": {
+      "file": "assets/illustrations/opening-rack.png"
+    },
+    "plant-cart": {
+      "file": "assets/illustrations/plant-cart.png"
+    },
+    "plant-cart-push": {
+      "file": "assets/illustrations/plant-cart-push.png"
+    },
+    "q1-flag-and-bird": {
+      "file": "assets/illustrations/q1-flag-and-bird.png"
+    },
+    "q1-miss-flag": {
+      "file": "assets/illustrations/q1-miss-flag.png"
+    },
+    "q1-only-flags": {
+      "file": "assets/illustrations/q1-only-flags.png"
+    },
+    "q2-five-seven": {
+      "file": "assets/illustrations/q2-five-seven.png"
+    },
+    "q2-six-seven": {
+      "file": "assets/illustrations/q2-six-seven.png"
+    },
+    "q2-six-six": {
+      "file": "assets/illustrations/q2-six-six.png"
+    },
+    "q3-mix-standards": {
+      "file": "assets/illustrations/q3-mix-standards.png"
+    },
+    "q3-repeat-shape": {
+      "file": "assets/illustrations/q3-repeat-shape.png"
+    },
+    "q3-shapes-once": {
+      "file": "assets/illustrations/q3-shapes-once.png"
+    },
+    "q4-complete-both": {
+      "file": "assets/illustrations/q4-complete-both.png"
+    },
+    "q4-omit-first": {
+      "file": "assets/illustrations/q4-omit-first.png"
+    },
+    "q4-omit-second": {
+      "file": "assets/illustrations/q4-omit-second.png"
+    },
+    "q5-marks-correct": {
+      "file": "assets/illustrations/q5-marks-correct.png"
+    },
+    "q5-marks-down-swapped": {
+      "file": "assets/illustrations/q5-marks-down-swapped.png"
+    },
+    "q5-marks-up-swapped": {
+      "file": "assets/illustrations/q5-marks-up-swapped.png"
+    },
+    "q6-mark-every": {
+      "file": "assets/illustrations/q6-mark-every.png"
+    },
+    "q6-mark-twice": {
+      "file": "assets/illustrations/q6-mark-twice.png"
+    },
+    "q6-skip-a-row": {
+      "file": "assets/illustrations/q6-skip-a-row.png"
+    },
+    "rack-a": {
+      "file": "assets/illustrations/rack-a.png"
+    },
+    "rack-b": {
+      "file": "assets/illustrations/rack-b.png"
+    },
+    "rack-c": {
+      "file": "assets/illustrations/rack-c.png"
+    },
+    "row-sum": {
+      "file": "assets/illustrations/row-sum.png"
+    },
+    "rule-rack": {
+      "file": "assets/illustrations/rule-rack.png"
+    },
+    "rule-tag": {
+      "file": "assets/illustrations/rule-tag.png"
+    },
+    "seed-marble": {
+      "file": "assets/illustrations/seed-marble.png"
+    },
+    "sort-backdrop": {
+      "file": "assets/illustrations/sort-backdrop.png"
+    },
+    "sorting-rule-guide": {
+      "file": "assets/illustrations/sorting-rule-guide.png"
+    },
+    "tag-drop": {
+      "file": "assets/illustrations/tag-drop.png"
+    },
+    "tag-leaf": {
+      "file": "assets/illustrations/tag-leaf.png"
+    },
+    "tag-sum": {
+      "file": "assets/illustrations/tag-sum.png"
+    },
+    "target-a-omit": {
+      "file": "assets/illustrations/target-a-omit.png"
+    },
+    "target-a-repeat": {
+      "file": "assets/illustrations/target-a-repeat.png"
+    },
+    "target-a-tag": {
+      "file": "assets/illustrations/target-a-tag.png"
+    },
+    "target-b-mix": {
+      "file": "assets/illustrations/target-b-mix.png"
+    },
+    "target-b-row": {
+      "file": "assets/illustrations/target-b-row.png"
+    },
+    "target-b-tag": {
+      "file": "assets/illustrations/target-b-tag.png"
+    },
+    "target-c-extra": {
+      "file": "assets/illustrations/target-c-extra.png"
+    },
+    "target-c-repeat": {
+      "file": "assets/illustrations/target-c-repeat.png"
+    },
+    "target-c-row": {
+      "file": "assets/illustrations/target-c-row.png"
+    },
+    "target-c-tag": {
+      "file": "assets/illustrations/target-c-tag.png"
+    },
+    "token-lf": {
+      "file": "assets/illustrations/token-lf.png"
+    },
+    "token-lg": {
+      "file": "assets/illustrations/token-lg.png"
+    },
+    "token-lr": {
+      "file": "assets/illustrations/token-lr.png"
+    },
+    "token-uf": {
+      "file": "assets/illustrations/token-uf.png"
+    },
+    "token-ug": {
+      "file": "assets/illustrations/token-ug.png"
+    },
+    "token-ur": {
+      "file": "assets/illustrations/token-ur.png"
+    },
+    "token-us": {
+      "file": "assets/illustrations/token-us.png"
+    },
+    "transfer-birds": {
+      "file": "assets/illustrations/transfer-birds.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "plant-exhibit",
+      "type": "slide",
+      "title": "植物展要数什么",
+      "template": "picture-points",
+      "data": {
+        "title": "植物展要数什么",
+        "picture": "opening-rack",
+        "points": [
+          "找到要数的东西",
+          "看一看原来摆在哪儿",
+          "再看看每盆的牌"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "欢迎来到小小植物展。"
+        },
+        {
+          "say": "展架上的盆栽要登记。"
+        },
+        {
+          "say": "请找找，盆栽都放在哪里？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "我们数的是架上所有盆栽。"
+        },
+        {
+          "say": "地上的洒水壶和小铲子留在外面。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "架子有两层。先看上层，再看下层。"
+        },
+        {
+          "say": "放在不同层的盆栽，可以各数一次。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "每盆还有一块小牌。"
+        },
+        {
+          "say": "有叶形牌，也有水滴形牌。"
+        },
+        {
+          "say": "你想按架层数，还是按小牌数？"
+        }
+      ]
+    },
+    {
+      "key": "one-rule-at-a-time",
+      "type": "slide",
+      "title": "按架层分两组",
+      "template": "picture-points",
+      "data": {
+        "title": "按架层分两组",
+        "picture": "by-row",
+        "points": [
+          "上层一组",
+          "下层一组",
+          "每盆只进一组"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "第一种办法，看盆栽原来放哪一层。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "指一指，上层这一排有几盆？"
+        },
+        {
+          "say": "一、二、三、四、五。上层有五盆。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "再数下层。"
+        },
+        {
+          "say": "一、二、三、四。接着五、六、七、八。"
+        },
+        {
+          "say": "下层有八盆。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "上层的都在第一组，下层的都在第二组。"
+        },
+        {
+          "say": "整架只有这两层，每盆都分进去一次。"
+        },
+        {
+          "say": "想一想，两组怎样合起来？"
+        }
+      ]
+    },
+    {
+      "key": "count-each-group",
+      "type": "slide",
+      "title": "把两组的数量合起来",
+      "template": "picture-points",
+      "data": {
+        "title": "把两组的数量合起来",
+        "picture": "row-sum",
+        "points": [
+          "上层 5 盆",
+          "下层 8 盆",
+          "5＋8＝13（盆）"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "这里每张盆栽小图对应架上的一盆。"
+        },
+        {
+          "say": "先点数，再把两个数记下来。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "上层五盆，指给我看这五个位置。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "下层八盆，沿着下面一排再数。"
+        },
+        {
+          "say": "上层和下层合在一起，就是整架。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "五加八等于十三。"
+        },
+        {
+          "say": "答，展架上一共有十三盆。"
+        },
+        {
+          "say": "等会儿换一种看法，看看还会不会数到十三盆。"
+        }
+      ]
+    },
+    {
+      "key": "sorting-rules",
+      "type": "slide",
+      "title": "一次听清一条标准",
+      "template": "picture-points",
+      "data": {
+        "title": "一次听清一条标准",
+        "picture": "sorting-rule-guide",
+        "points": [
+          "架层标记",
+          "叶形和水滴形",
+          "送进合适的托盘"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "推盆牌时，先听清这一关按什么分。"
+        },
+        {
+          "say": "每张牌保留盆栽的两个线索。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "按架层分。看小架子亮在哪一层。"
+        },
+        {
+          "say": "小架子亮在上面，表示盆栽原来在上层。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "按牌形分。找叶形和水滴形托盘。"
+        },
+        {
+          "say": "有两种牌形，各进一种托盘。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "这一关再按架层分。每张盆牌只送一次。"
+        },
+        {
+          "say": "听清这一关的标准，再看看对应托盘。"
+        },
+        {
+          "say": "绕到盆牌后面。需要时可以撤回一步。"
+        },
+        {
+          "say": "按这条标准，每张盆牌只进一个托盘。"
+        }
+      ]
+    },
+    {
+      "key": "send-by-the-rule",
+      "type": "interactive",
+      "title": "推盆牌到合适的托盘",
+      "page": "send-by-the-rule",
+      "widgetType": "simulation",
+      "startImage": "intro-sort",
+      "script": [
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#rule-picture"
+        },
+        {
+          "say": "先按架层分。看左边的小架子。"
+        },
+        {
+          "highlight": "#game-target"
+        },
+        {
+          "say": "这张盆牌上的小架子，亮在上面。"
+        },
+        {
+          "highlight": "#first-dock"
+        },
+        {
+          "say": "这个托盘也亮着上层，可以接收它。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "小车来到盆牌后面，往托盘方向推。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "看小车怎样把盆牌推向上层托盘。"
+        },
+        {
+          "say": "现在轮到你。想重听时，点小喇叭。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "sort-rack-one": "sorting-rules-5",
+        "sort-by-tag": "sorting-rules-8",
+        "sort-rack-again": "sorting-rules-11",
+        "sort-hint": "sorting-rules-12",
+        "sort-help": "sorting-rules-13",
+        "sort-praise": "sorting-rules-14"
+      }
+    },
+    {
+      "key": "show-both-totals",
+      "type": "slide",
+      "title": "换一条标准再算",
+      "template": "picture-points",
+      "data": {
+        "title": "换一条标准再算",
+        "picture": "tag-sum",
+        "points": [
+          "叶形牌 7 盆",
+          "水滴形牌 6 盆",
+          "7＋6＝13（盆）"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "原来那架盆栽没有换。"
+        },
+        {
+          "say": "这次先找小牌的形状。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "把叶形牌的都找出来。数到七盆。"
+        },
+        {
+          "say": "上层和下层都能找到叶形牌。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "再找所有水滴形牌，数到六盆。"
+        },
+        {
+          "say": "每盆只有一种形状的小牌。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "七加六等于十三。"
+        },
+        {
+          "say": "换了一条标准，每盆还是数一次。"
+        },
+        {
+          "say": "再对照一下刚才的五加八。"
+        }
+      ]
+    },
+    {
+      "key": "same-whole",
+      "type": "slide",
+      "title": "两道算式，同一整架",
+      "template": "picture-points",
+      "data": {
+        "title": "两道算式，同一整架",
+        "picture": "compare-sums",
+        "points": [
+          "按架层看",
+          "按牌形看",
+          "两次都数全"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "两幅图用的是同一架盆栽。"
+        },
+        {
+          "say": "先找找，你还认得出哪几盆？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "按架层，五盆加八盆，是十三盆。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "按牌形，七盆加六盆，也是十三盆。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "两个加法里，两部分的数量不同。"
+        },
+        {
+          "say": "整架的盆栽还是这些。每盆都数过一次。"
+        },
+        {
+          "say": "所以两个结果相同。"
+        },
+        {
+          "say": "你也可以一盆一盆指着图核对。"
+        }
+      ]
+    },
+    {
+      "key": "trace-the-double-count",
+      "type": "slide",
+      "title": "圈出数重和漏掉的盆",
+      "template": "picture-points",
+      "data": {
+        "title": "圈出数重和漏掉的盆",
+        "picture": "cross-wrong",
+        "points": [
+          "同时在两组里",
+          "两组里都找不到",
+          "回到同一条标准"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "有人把上层五盆和叶形牌七盆合起来。"
+        },
+        {
+          "say": "五加七是十二，跟十三不同。回到原架一盆盆查。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "这三盆上层叶形牌，在两组里都出现了。"
+        },
+        {
+          "say": "橙色双圈指出这些被数重的盆。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "这四盆下层水滴形牌，在两组里都没出现。"
+        },
+        {
+          "say": "蓝色虚线圈指出这些漏掉的盆。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "现在只按架层分。上层每盆点一次，下层也一样。"
+        },
+        {
+          "say": "五加八重新算出十三。整架的盆栽都点到了。"
+        },
+        {
+          "say": "就算两个结果碰巧相同，也要回图查。"
+        }
+      ]
+    },
+    {
+      "key": "matching-rules",
+      "type": "slide",
+      "title": "先对照每一盆",
+      "template": "picture-points",
+      "data": {
+        "title": "先对照每一盆",
+        "picture": "matching-guide",
+        "points": [
+          "看原来一架",
+          "检查有没有重或漏",
+          "留下完整的一组图"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "左边是原来一架，右边是几种分组图。"
+        },
+        {
+          "say": "两边的盆栽可以一个一个比。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "对照左边一架。找一张每盆只数一次的图。"
+        },
+        {
+          "say": "认得同一盆的样子，就能找出它在哪里。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "找两张分组完整的图。两种标准都可以。"
+        },
+        {
+          "say": "总数碰巧相同，也要一盆一盆核对。"
+        },
+        {
+          "say": "回到左边原图，把每一盆对照一次。"
+        },
+        {
+          "say": "找一找哪个样子出现两次，哪个没出现。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "每一盆都在，找到了完整分组。"
+        }
+      ]
+    },
+    {
+      "key": "recheck-by-matching",
+      "type": "interactive",
+      "title": "发射种子，对上完整分组",
+      "page": "recheck-by-matching",
+      "widgetType": "simulation",
+      "startImage": "intro-match",
+      "script": [
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#source-rack"
+        },
+        {
+          "say": "先看左边原来的盆栽。每一盆都要找到。"
+        },
+        {
+          "highlight": "#target-area"
+        },
+        {
+          "say": "右边的靶画了几种分法，先仔细比较。"
+        },
+        {
+          "highlight": "#game-target"
+        },
+        {
+          "say": "我找到了每盆只出现一次的那张图。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "用左右键瞄准。点发射键，把种子送过去。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "留意种子会飞向哪张分组图。"
+        },
+        {
+          "say": "交给你。先看一盆有没有数重，再看有没有漏。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "match-once": "matching-rules-5",
+        "match-two-views": "matching-rules-8",
+        "match-same-count": "matching-rules-9",
+        "match-hint": "matching-rules-10",
+        "match-help": "matching-rules-11",
+        "match-praise": "matching-rules-13"
+      }
+    },
+    {
+      "key": "one-more-exhibit",
+      "type": "slide",
+      "title": "给小鸟摆件也算一算",
+      "template": "picture-points",
+      "data": {
+        "title": "给小鸟摆件也算一算",
+        "picture": "transfer-birds",
+        "points": [
+          "说清要数的东西",
+          "按层 4＋7＝11",
+          "按朝向 6＋5＝11"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "小鸟摆件也要登记。先看两排摆件。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "要数的是架上的所有小鸟摆件。"
+        },
+        {
+          "say": "你能说出两个看图的办法吗？"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "按架层看，上层四件，下层七件。"
+        },
+        {
+          "say": "四加七等于十一件。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "再看鸟嘴朝向。朝左六件，朝右五件。"
+        },
+        {
+          "say": "六加五也等于十一件。"
+        },
+        {
+          "say": "两个结果一样。用手指回图核对每一只。"
+        }
+      ]
+    },
+    {
+      "key": "picture-check",
+      "type": "quiz",
+      "title": "听一听，选一幅新图",
+      "intro": [
+        "先听清题目，再数图里的物件。",
+        "想一想哪些都要数，哪些要留在外面。"
+      ],
+      "questions": [
+        {
+          "id": "count-only-flags",
+          "skill": "choose-a-standard",
+          "question": "只数架上的小旗。哪幅图圈对了？",
+          "answer": [
+            "A"
+          ],
+          "analysis": "五面小旗都被圈到。小鸟摆件要留在圈外。",
+          "options": {
+            "A": {
+              "label": "两层的五面小旗全部圈住，小鸟摆件没有圈",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-only-flags",
+                "alt": "两层的五面小旗全部圈住，小鸟摆件没有圈"
+              }
+            },
+            "B": {
+              "label": "只圈四面小旗，漏掉下层最右边的一面",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-miss-flag",
+                "alt": "只圈四面小旗，漏掉下层最右边的一面"
+              }
+            },
+            "C": {
+              "label": "圈了五面旗，还圈了一个小鸟摆件",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-flag-and-bird",
+                "alt": "圈了五面旗，还圈了一个小鸟摆件"
+              }
+            }
+          }
+        },
+        {
+          "id": "count-two-rows",
+          "skill": "partition-and-sum",
+          "question": "上层六件，下层七件。哪幅图两层都数全了？",
+          "answer": [
+            "C"
+          ],
+          "analysis": "上层的六件和下层的七件都在，六加七等于十三。",
+          "options": {
+            "A": {
+              "label": "上层有六件，下层有六件",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-six-six",
+                "alt": "上层有六件，下层有六件"
+              }
+            },
+            "B": {
+              "label": "上层有五件，下层有七件",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-five-seven",
+                "alt": "上层有五件，下层有七件"
+              }
+            },
+            "C": {
+              "label": "上层有六件，下层有七件",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-six-seven",
+                "alt": "上层有六件，下层有七件"
+              }
+            }
+          }
+        },
+        {
+          "id": "use-one-mark",
+          "skill": "partition-and-sum",
+          "question": "看左边原架。按圆牌和方牌分，哪幅图每件只进一组？",
+          "answer": [
+            "B"
+          ],
+          "analysis": "圆牌全在同一组，方牌全在另一组，每件只出现一次。",
+          "options": {
+            "A": {
+              "label": "两个盘都混着圆牌和方牌",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-mix-standards",
+                "alt": "两个盘都混着圆牌和方牌"
+              }
+            },
+            "B": {
+              "label": "两个圆牌在一组，两个方牌在一组，四件都出现一次",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-shapes-once",
+                "alt": "两个圆牌在一组，两个方牌在一组，四件都出现一次"
+              }
+            },
+            "C": {
+              "label": "圆牌和方牌分开，但多肉盆栽出现两次，漏掉红花",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-repeat-shape",
+                "alt": "圆牌和方牌分开，但多肉盆栽出现两次，漏掉红花"
+              }
+            }
+          }
+        },
+        {
+          "id": "check-two-ways",
+          "skill": "two-views-same-total",
+          "question": "哪幅图用两种分法都数全了同一批？",
+          "answer": [
+            "A"
+          ],
+          "analysis": "按层三件加四件，按牌两件加五件。两次都数了同一批七件。",
+          "options": {
+            "A": {
+              "label": "同七件展品先按架层分三件和四件，再按牌形分两件和五件",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-complete-both",
+                "alt": "同七件展品先按架层分三件和四件，再按牌形分两件和五件"
+              }
+            },
+            "B": {
+              "label": "左边架层分全了，右边牌形分组少了一件",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-omit-second",
+                "alt": "左边架层分全了，右边牌形分组少了一件"
+              }
+            },
+            "C": {
+              "label": "左边架层分组少了一件，右边牌形分全了",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-omit-first",
+                "alt": "左边架层分组少了一件，右边牌形分全了"
+              }
+            }
+          }
+        },
+        {
+          "id": "spot-double-and-missing",
+          "skill": "find-and-repair-a-count",
+          "question": "把上层和圆牌合起来。哪幅图圈对了重数和漏数？",
+          "answer": [
+            "B"
+          ],
+          "analysis": "上层圆牌会数两次，下层方牌一次也没选到。",
+          "options": {
+            "A": {
+              "label": "双圈标上层方牌，虚线圈标下层圆牌",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-marks-up-swapped",
+                "alt": "双圈标上层方牌，虚线圈标下层圆牌"
+              }
+            },
+            "B": {
+              "label": "双圈标上层圆牌，虚线圈标下层方牌",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-marks-correct",
+                "alt": "双圈标上层圆牌，虚线圈标下层方牌"
+              }
+            },
+            "C": {
+              "label": "双圈标下层圆牌，虚线圈标上层方牌",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-marks-down-swapped",
+                "alt": "双圈标下层圆牌，虚线圈标上层方牌"
+              }
+            }
+          }
+        },
+        {
+          "id": "recheck-unequal",
+          "skill": "find-and-repair-a-count",
+          "question": "两次数出来不一样。哪幅图能帮你重查？",
+          "answer": [
+            "C"
+          ],
+          "analysis": "在原图每件标一次，按同一标准重分两组，再核算总数。",
+          "options": {
+            "A": {
+              "label": "只在上层做标记，仍把下层留空",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-skip-a-row",
+                "alt": "只在上层做标记，仍把下层留空"
+              }
+            },
+            "B": {
+              "label": "在一个展品上做两次标记，另一个展品没标",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-mark-twice",
+                "alt": "在一个展品上做两次标记，另一个展品没标"
+              }
+            },
+            "C": {
+              "label": "原来每件都有一次标记，再沿着两层完整点数",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-mark-every",
+                "alt": "原来每件都有一次标记，再沿着两层完整点数"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "wrap-up",
+      "type": "slide",
+      "title": "在家试一组物件",
+      "template": "picture-points",
+      "data": {
+        "title": "在家试一组物件",
+        "picture": "home-art",
+        "points": [
+          "找同一批物件",
+          "用一条标准分组",
+          "换办法再核对"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "今天我们帮植物展登记了盆栽。"
+        },
+        {
+          "say": "回想一下，你用的是哪两条标准？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "在家选一组安全的小玩具或纸片。"
+        },
+        {
+          "say": "可以跟家人这样讲。我数桌上这六张纸片。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "按位置分，上三张下三张，三加三等于六。"
+        },
+        {
+          "say": "试试每件做一次标记。不要漏掉任何一件。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "按颜色分，红四张蓝两张，四加二也等于六。"
+        },
+        {
+          "say": "每种分法单独算。两次都是原来这六张。"
+        },
+        {
+          "say": "翻到纸书第九十六页，也可以指图说。"
+        },
+        {
+          "say": "第九十八页，试试天鹅图和舞台图。"
+        }
+      ]
+    }
+  ]
+}

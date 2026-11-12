@@ -1,0 +1,125 @@
+{
+  "atlasId": "corridor-atlas",
+  "rows": 3,
+  "columns": 3,
+  "background": "transparent",
+  "assets": [
+    {
+      "assetKey": "door-green",
+      "description": "松绿门",
+      "usedBy": [
+        "verify-the-door"
+      ],
+      "crop": [
+        101,
+        7,
+        411,
+        332
+      ]
+    },
+    {
+      "assetKey": "door-gold",
+      "description": "金色门",
+      "usedBy": [
+        "verify-the-door"
+      ],
+      "crop": [
+        613,
+        7,
+        923,
+        332
+      ]
+    },
+    {
+      "assetKey": "door-red",
+      "description": "红色门",
+      "usedBy": [
+        "verify-the-door"
+      ],
+      "crop": [
+        1125,
+        7,
+        1435,
+        332
+      ]
+    },
+    {
+      "assetKey": "green-child",
+      "description": "绿帽角色俯视",
+      "usedBy": [
+        "one-clue-two-possibilities"
+      ],
+      "crop": [
+        147,
+        359,
+        366,
+        670
+      ]
+    },
+    {
+      "assetKey": "gold-child",
+      "description": "黄帽角色俯视",
+      "usedBy": [
+        "one-clue-two-possibilities"
+      ],
+      "crop": [
+        659,
+        362,
+        878,
+        670
+      ]
+    },
+    {
+      "assetKey": "blank-clue",
+      "description": "空白寻宝卡",
+      "usedBy": [
+        "mark-the-route-first"
+      ],
+      "crop": [
+        1149,
+        347,
+        1411,
+        671
+      ]
+    },
+    {
+      "assetKey": "scout-idle",
+      "description": "寻宝车待机帧",
+      "usedBy": [
+        "draw-then-drive"
+      ],
+      "crop": [
+        31,
+        730,
+        466,
+        985
+      ]
+    },
+    {
+      "assetKey": "scout-move",
+      "description": "寻宝车运行帧",
+      "usedBy": [
+        "draw-then-drive"
+      ],
+      "crop": [
+        545,
+        726,
+        978,
+        987
+      ]
+    },
+    {
+      "assetKey": "folded-plan",
+      "description": "空白折纸地图",
+      "usedBy": [
+        "five-direction-clues"
+      ],
+      "crop": [
+        1062,
+        705,
+        1500,
+        996
+      ]
+    }
+  ]
+}

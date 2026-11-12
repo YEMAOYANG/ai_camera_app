@@ -1,0 +1,1454 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "小猴子下山",
+  "description": "跟着影偶故事复述五段和空手因果，练动作词、两个特点与规范书写。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小语老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Serena",
+      "avatar": "/avatars/teacher-2.png",
+      "color": "#D65A8C",
+      "persona": "用适合一年级的短句，带孩子说清故事先后和动作。"
+    }
+  },
+  "images": {
+    "act-ball-cup-icon": {
+      "file": "assets/act-ball-cup-icon.png"
+    },
+    "act-ball-hug-icon": {
+      "file": "assets/act-ball-hug-icon.png"
+    },
+    "act-ball-toss-icon": {
+      "file": "assets/act-ball-toss-icon.png"
+    },
+    "act-break-icon": {
+      "file": "assets/act-break-icon.png"
+    },
+    "act-cup-icon": {
+      "file": "assets/act-cup-icon.png"
+    },
+    "act-hug-icon": {
+      "file": "assets/act-hug-icon.png"
+    },
+    "act-pick-icon": {
+      "file": "assets/act-pick-icon.png"
+    },
+    "act-shoulder-icon": {
+      "file": "assets/act-shoulder-icon.png"
+    },
+    "action-backdrop": {
+      "file": "assets/action-backdrop.png"
+    },
+    "action-boat": {
+      "file": "assets/action-boat.png"
+    },
+    "action-boat-pop": {
+      "file": "assets/action-boat-pop.png"
+    },
+    "action-start": {
+      "file": "assets/action-start.png"
+    },
+    "break-carry-board": {
+      "file": "assets/break-carry-board.png"
+    },
+    "corn-stage": {
+      "file": "assets/corn-stage.png"
+    },
+    "empty-handed-board": {
+      "file": "assets/empty-handed-board.png"
+    },
+    "first-three-route": {
+      "file": "assets/first-three-route.png"
+    },
+    "home-retell-board": {
+      "file": "assets/home-retell-board.png"
+    },
+    "map-carry-icon": {
+      "file": "assets/map-carry-icon.png"
+    },
+    "map-chase-icon": {
+      "file": "assets/map-chase-icon.png"
+    },
+    "map-corn-icon": {
+      "file": "assets/map-corn-icon.png"
+    },
+    "map-home-icon": {
+      "file": "assets/map-home-icon.png"
+    },
+    "map-hug-icon": {
+      "file": "assets/map-hug-icon.png"
+    },
+    "map-melon-icon": {
+      "file": "assets/map-melon-icon.png"
+    },
+    "map-peach-icon": {
+      "file": "assets/map-peach-icon.png"
+    },
+    "map-pick-icon": {
+      "file": "assets/map-pick-icon.png"
+    },
+    "map-throw-icon": {
+      "file": "assets/map-throw-icon.png"
+    },
+    "map-woods-icon": {
+      "file": "assets/map-woods-icon.png"
+    },
+    "maze-backdrop": {
+      "file": "assets/maze-backdrop.png"
+    },
+    "maze-rover": {
+      "file": "assets/maze-rover.png"
+    },
+    "maze-rover-pop": {
+      "file": "assets/maze-rover-pop.png"
+    },
+    "maze-start": {
+      "file": "assets/maze-start.png"
+    },
+    "melon-stage": {
+      "file": "assets/melon-stage.png"
+    },
+    "monkey-sticker": {
+      "file": "assets/monkey-sticker.png"
+    },
+    "new-trip-practice": {
+      "file": "assets/new-trip-practice.png"
+    },
+    "next-story-cuts": {
+      "file": "assets/next-story-cuts.png"
+    },
+    "one-ball-action-board": {
+      "file": "assets/one-ball-action-board.png"
+    },
+    "peach-stage": {
+      "file": "assets/peach-stage.png"
+    },
+    "practice-actions-board": {
+      "file": "assets/practice-actions-board.png"
+    },
+    "quiz-1-a": {
+      "file": "assets/quiz-1-a.png"
+    },
+    "quiz-1-b": {
+      "file": "assets/quiz-1-b.png"
+    },
+    "quiz-1-c": {
+      "file": "assets/quiz-1-c.png"
+    },
+    "quiz-2-a": {
+      "file": "assets/quiz-2-a.png"
+    },
+    "quiz-2-b": {
+      "file": "assets/quiz-2-b.png"
+    },
+    "quiz-2-c": {
+      "file": "assets/quiz-2-c.png"
+    },
+    "quiz-3-a": {
+      "file": "assets/quiz-3-a.png"
+    },
+    "quiz-3-b": {
+      "file": "assets/quiz-3-b.png"
+    },
+    "quiz-3-c": {
+      "file": "assets/quiz-3-c.png"
+    },
+    "quiz-4-a": {
+      "file": "assets/quiz-4-a.png"
+    },
+    "quiz-4-b": {
+      "file": "assets/quiz-4-b.png"
+    },
+    "quiz-4-c": {
+      "file": "assets/quiz-4-c.png"
+    },
+    "quiz-5-a": {
+      "file": "assets/quiz-5-a.png"
+    },
+    "quiz-5-b": {
+      "file": "assets/quiz-5-b.png"
+    },
+    "quiz-5-c": {
+      "file": "assets/quiz-5-c.png"
+    },
+    "quiz-6-a": {
+      "file": "assets/quiz-6-a.png"
+    },
+    "quiz-6-b": {
+      "file": "assets/quiz-6-b.png"
+    },
+    "quiz-6-c": {
+      "file": "assets/quiz-6-c.png"
+    },
+    "rabbit-chase": {
+      "file": "assets/rabbit-chase.png"
+    },
+    "same-prop-two-traits": {
+      "file": "assets/same-prop-two-traits.png"
+    },
+    "write-gao-xing": {
+      "file": "assets/write-gao-xing.png"
+    },
+    "write-gua-tu": {
+      "file": "assets/write-gua-tu.png"
+    },
+    "write-jin": {
+      "file": "assets/write-jin.png"
+    },
+    "write-zhe-wang": {
+      "file": "assets/write-zhe-wang.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "corn-at-the-start",
+      "type": "slide",
+      "title": "空着手的小猴，先走到哪儿",
+      "template": "picture-points",
+      "data": {
+        "title": "空着手的小猴，先走到哪儿",
+        "picture": "corn-stage",
+        "points": [
+          "小猴 hóu",
+          "一块地 kuài",
+          "结出 jiē"
+        ]
+      },
+      "script": [
+        {
+          "say": "山脚的影偶戏，怎么从最后一幕开始了？"
+        },
+        {
+          "say": "小猴到家时两手空空。我们从第一幕找原因。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "猜一猜长尾巴的角色是谁。"
+        },
+        {
+          "say": "指猴左边的反犬旁，再看这只小猴。跟我读，猴。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "一块地是一片地方。指块左边的土字旁，跟读块。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "看玉米棒长出来了。指结出的结，左边是绞丝旁。"
+        },
+        {
+          "say": "这里的结读第一声，活动结束的结读第二声。"
+        },
+        {
+          "say": "复述时先说它到了哪儿，再说它看见了什么。"
+        },
+        {
+          "say": "看见不少大玉米棒，小猴接下来会做什么？"
+        }
+      ]
+    },
+    {
+      "key": "break-and-carry",
+      "type": "slide",
+      "title": "手掰下来，肩扛着走",
+      "template": "picture-points",
+      "data": {
+        "title": "手掰下来，肩扛着走",
+        "picture": "break-carry-board",
+        "points": [
+          "掰 bāi",
+          "扛 káng",
+          "往 wǎng",
+          "高兴 xìng"
+        ]
+      },
+      "script": [
+        {
+          "say": "玉米棒连着秆。用两只手怎么把它取下来？"
+        },
+        {
+          "say": "看图想一想，先动手还是先用肩？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "掰字中间是分，两边都是手。两手一分，来读掰。"
+        },
+        {
+          "say": "小猴掰下一根玉米棒。手动在先，玉米棒才离开秆。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "玉米棒放在肩上，由肩托住。指扛的提手旁，跟读扛。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "指往的双人旁。小猴肩扛玉米朝前走，这叫往前走。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "看见又大又多的玉米棒，小猴很高兴。"
+        },
+        {
+          "say": "指高兴的兴，读第四声。尾音是后鼻音，跟我读。"
+        },
+        {
+          "say": "这一幕可以说，小猴到玉米地，看见玉米，掰下一根扛走。"
+        },
+        {
+          "say": "我学小猴高兴的声音。哇，玉米真多！我来掰一个。"
+        }
+      ]
+    },
+    {
+      "key": "under-the-peach-tree",
+      "type": "slide",
+      "title": "桃树下，手里的玉米去哪儿",
+      "template": "picture-points",
+      "data": {
+        "title": "桃树下，手里的玉米去哪儿",
+        "picture": "peach-stage",
+        "points": [
+          "一棵 kē",
+          "满树 mǎn",
+          "扔 rēng",
+          "摘 zhāi"
+        ]
+      },
+      "script": [
+        {
+          "say": "下一幕到了桃树下。小猴肩上的玉米还会一直跟着它吗？"
+        },
+        {
+          "say": "看看地上和树上，找找动作发生在哪里。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "棵左边是木字旁。指一棵桃树，跟读，棵用来数树。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "好多枝头挂着桃。指满的三点水，读满树的满。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "它先把玉米扔掉。扔的时候，东西离开了手。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "再伸手把桃子从枝上取下来，这个动作叫摘。"
+        },
+        {
+          "say": "指扔和摘左边的提手旁。两件都用手，跟我读，扔，摘。"
+        },
+        {
+          "say": "这回有两件事要按先后说。先扔玉米，再摘桃。"
+        }
+      ]
+    },
+    {
+      "key": "at-the-watermelon-patch",
+      "type": "slide",
+      "title": "瓜地里，捧和抱怎么分",
+      "template": "picture-points",
+      "data": {
+        "title": "瓜地里，捧和抱怎么分",
+        "picture": "melon-stage",
+        "points": [
+          "捧 pěng",
+          "瓜地里",
+          "抱着瓜",
+          "掌托，臂围"
+        ]
+      },
+      "script": [
+        {
+          "say": "几个桃子放在哪里，小猴才拿得住？"
+        },
+        {
+          "say": "你看它的手，再看看后来那个大瓜。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "指捧的提手旁。看掌心向上托桃子，跟我读，捧。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "小猴到了瓜地，看见许多大而圆的瓜。"
+        },
+        {
+          "say": "桃子被它扔下了，它又摘了一个瓜。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "手臂围住大瓜，把它搂在身前。这样拿叫抱。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "捧主要看手掌有没有在下面托。抱主要看手臂有没有围住。"
+        },
+        {
+          "say": "你再说说瓜地里的先后。它捧着桃来，抱着瓜离开。"
+        }
+      ]
+    },
+    {
+      "key": "rabbit-on-the-way",
+      "type": "slide",
+      "title": "回家路上，谁跟在谁后面",
+      "template": "picture-points",
+      "data": {
+        "title": "回家路上，谁跟在谁后面",
+        "picture": "rabbit-chase",
+        "points": [
+          "往回走",
+          "扔下瓜",
+          "追 zhuī",
+          "跑进树林"
+        ]
+      },
+      "script": [
+        {
+          "say": "已经抱着瓜往家走了。路上又有什么吸引了小猴？"
+        },
+        {
+          "say": "先找画面前面的小动物，再找后面的脚步。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "它本来抱瓜往家走，路上看见一只蹦蹦跳跳的兔子。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "它先把瓜扔在路上，手里一下子没了瓜。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "追字有走之。看小猴在兔子后面跑，想赶上，读追。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "兔子跑进树林，小猴看不见它，也没有追上。"
+        },
+        {
+          "say": "这一幕和前面一样有扔。它扔下的是什么，去做什么？"
+        }
+      ]
+    },
+    {
+      "key": "why-empty",
+      "type": "slide",
+      "title": "最后一幕，空手是怎么来的",
+      "template": "picture-points",
+      "data": {
+        "title": "最后一幕，空手是怎么来的",
+        "picture": "empty-handed-board",
+        "points": [
+          "拿过三样",
+          "又都扔下",
+          "没追到兔",
+          "想想心情"
+        ]
+      },
+      "script": [
+        {
+          "say": "第一眼看到的空手画面，现在终于接到最后一幕了。"
+        },
+        {
+          "say": "想一想，它一路拿过什么？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "玉米、桃子和西瓜，它都曾经拿在手里。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "想摘桃就扔玉米，想摘瓜又扔桃。"
+        },
+        {
+          "say": "为了去追兔子，连后来抱着的西瓜也扔了。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "兔子进了树林，它没追到，手里也没有原先的东西。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "所以它空手到家。你猜它会对家人说什么？"
+        },
+        {
+          "say": "这只是我们的猜想，说说你从哪一幕想到的。"
+        },
+        {
+          "say": "听我慢一点说。玉米、桃子、瓜都没了，它空手走回家。"
+        },
+        {
+          "say": "翻开纸书，跟大人分段朗读。读到结尾，可以放慢一点。"
+        }
+      ]
+    },
+    {
+      "key": "two-traits",
+      "type": "slide",
+      "title": "两处特点说的是同一样东西",
+      "template": "picture-points",
+      "data": {
+        "title": "两处特点说的是同一样东西",
+        "picture": "same-prop-two-traits",
+        "points": [
+          "故事里的桃",
+          "故事里的瓜",
+          "道具里的围巾"
+        ]
+      },
+      "script": [
+        {
+          "say": "场记写道具介绍，要用两条线索描述同一个东西。"
+        },
+        {
+          "say": "第一眼看颜色，再看形状。这两处能合起来说吗？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "一只桃子个头大，颜色也红，就能说又大又红。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "一个瓜又大又圆。大和圆都是说这个瓜。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "看围巾软软地垂下来。摊开看，这条围巾还很长。"
+        },
+        {
+          "say": "这条围巾又长又软。两个特点都说同一条围巾。"
+        },
+        {
+          "say": "先说是什么，再说它的两个特点。你可以试试身边的东西。"
+        }
+      ]
+    },
+    {
+      "key": "order-first-places",
+      "type": "slide",
+      "title": "给场记留一张路线表",
+      "template": "picture-points",
+      "data": {
+        "title": "给场记留一张路线表",
+        "picture": "first-three-route",
+        "points": [
+          "第一站",
+          "下一站",
+          "再往前",
+          "小旗出口"
+        ]
+      },
+      "script": [
+        {
+          "say": "有三张地点图，看起来都对，哪张应该在最前面？"
+        },
+        {
+          "say": "别只选离得最近的。先想小猴在哪儿见到了第一样东西。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先录第一幕，找有成排玉米的地方。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "玉米地后是桃树，找桃子挂在枝头的那一幕。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "离开桃树后，再录满地有西瓜的地方。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "当前这些画面录齐了，最后开到小旗。"
+        },
+        {
+          "say": "把到哪儿、见什么、做什么连起来，就能把几幕接好。"
+        }
+      ]
+    },
+    {
+      "key": "order-then-actions",
+      "type": "slide",
+      "title": "同一地点，也要分清先后",
+      "template": "picture-points",
+      "data": {
+        "title": "同一地点，也要分清先后",
+        "picture": "next-story-cuts",
+        "points": [
+          "换成桃",
+          "回家路",
+          "树林和家",
+          "重听一下"
+        ]
+      },
+      "script": [
+        {
+          "say": "场记又捡到些近景。有些图在同一个地方，顺序会一样吗？"
+        },
+        {
+          "say": "先看手上原来有什么，再看后来拿到了什么。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "到桃树下，先录玉米离开手的那一幕。"
+        },
+        {
+          "say": "扔过玉米，再录从树枝取下桃子。"
+        },
+        {
+          "say": "手掌托着桃子到了瓜地，接上这一幕。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "先录手臂抱住西瓜、往回走的那一幕。"
+        },
+        {
+          "say": "西瓜丢在路上，接小猴跑在兔子后面的图。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "接兔子跑进树林的画面。"
+        },
+        {
+          "say": "最后一幕，是小猴两手空空走到家门。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "先听要找哪一幕，再开到那个格子。"
+        },
+        {
+          "say": "别急，重听一次，需要时可以看发亮的格子。"
+        },
+        {
+          "say": "顺序接好了。每张小画都能帮我们想起一个动作。"
+        }
+      ]
+    },
+    {
+      "key": "walk-the-stage-map",
+      "type": "interactive",
+      "title": "泡泡车给故事排顺序",
+      "page": "walk-the-stage-map",
+      "widgetType": "game",
+      "startImage": "maze-start",
+      "script": [
+        {
+          "say": "影偶戏的镜头散开了。能开车把它们按顺序带回来吗？"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#monkey-maze-listen"
+        },
+        {
+          "say": "听第一幕的口令，我们要从玉米地开始。"
+        },
+        {
+          "highlight": "#monkey-maze-first"
+        },
+        {
+          "say": "看这张，几根玉米秆站在一起，叶子间还有玉米棒。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "这辆场记车用箭头开。开到对的格，右侧就多一张镜头。"
+        },
+        {
+          "say": "软挡板可以用泡泡打开。镜头都齐，才去小旗。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "我只接第一张。接下来轮到你，车会回到起点。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "map-corn": "order-first-places-4",
+        "map-peach": "order-first-places-6",
+        "map-melon": "order-first-places-8",
+        "map-throw": "order-then-actions-4",
+        "map-pick": "order-then-actions-5",
+        "map-carry": "order-then-actions-6",
+        "map-hug": "order-then-actions-8",
+        "map-chase": "order-then-actions-9",
+        "map-woods": "order-then-actions-11",
+        "map-home": "order-then-actions-12",
+        "map-exit": "order-first-places-10",
+        "map-hint": "order-then-actions-14",
+        "map-hint2": "order-then-actions-15",
+        "map-praise": "order-then-actions-16"
+      }
+    },
+    {
+      "key": "which-action",
+      "type": "slide",
+      "title": "小演员怎么拿道具",
+      "template": "picture-points",
+      "data": {
+        "title": "小演员怎么拿道具",
+        "picture": "practice-actions-board",
+        "points": [
+          "掰和摘",
+          "扛与捧",
+          "抱与扔"
+        ]
+      },
+      "script": [
+        {
+          "say": "换到影偶后台。同样是用手，动作怎么会不一样？"
+        },
+        {
+          "say": "看小演员的手和肩，猜猜他在做哪一件事。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "找两手把软道具掰开的样子。"
+        },
+        {
+          "say": "看，摘布花是把它从道具枝上取下来。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "找把纸卷扛在肩上的小演员。"
+        },
+        {
+          "say": "找两手在下方捧着纸袋的小演员。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "找把靠垫抱在身前的小演员。"
+        },
+        {
+          "say": "找把软布球扔出去的小演员。"
+        },
+        {
+          "say": "还可以把同一个道具抱、捧或扔。看看哪里动了。"
+        }
+      ]
+    },
+    {
+      "key": "one-ball-three-actions",
+      "type": "slide",
+      "title": "同一个软布球，三种拿法",
+      "template": "picture-points",
+      "data": {
+        "title": "同一个软布球，三种拿法",
+        "picture": "one-ball-action-board",
+        "points": [
+          "抱布球",
+          "捧布球",
+          "扔布球",
+          "听清再动"
+        ]
+      },
+      "script": [
+        {
+          "say": "三张画里都是软布球。怎么只听动词也能找对图？"
+        },
+        {
+          "say": "我说捧，你的眼睛先找手掌在什么地方。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "把软布球抱在身前，手臂围着它。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "两手从下面捧起软布球。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "把软布球扔出去，它会离开手。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "没碰上也可以重听，先看看手在哪里。"
+        },
+        {
+          "say": "卡片慢下来了。看看哪张图亮起来。"
+        },
+        {
+          "say": "动作图接住啦。试着说出人做了什么，再说他用了什么。"
+        }
+      ]
+    },
+    {
+      "key": "catch-the-action",
+      "type": "interactive",
+      "title": "泡泡艇接动作",
+      "page": "catch-the-action",
+      "widgetType": "game",
+      "startImage": "action-start",
+      "script": [
+        {
+          "say": "道具场的动作卡在飘。愿意开小艇接老师念到的那一张吗？"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#monkey-action-listen"
+        },
+        {
+          "say": "先听口令。第一回，听见的是把软道具掰开。"
+        },
+        {
+          "highlight": "#monkey-action-first"
+        },
+        {
+          "say": "这张里两只手向两边用力，软道具在中间分开了。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "用箭头开到这张卡下面，再按圆圆的泡泡键。"
+        },
+        {
+          "say": "等泡泡向上飘到卡片。一下没接到，可以重听。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "这次只接第一张。我停下了，你从头听第一句。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "act-break": "which-action-4",
+        "act-pick": "which-action-5",
+        "act-shoulder": "which-action-7",
+        "act-cup": "which-action-8",
+        "act-hug": "which-action-10",
+        "act-ball-hug": "one-ball-three-actions-4",
+        "act-ball-cup": "one-ball-three-actions-6",
+        "act-ball-toss": "one-ball-three-actions-8",
+        "act-hint": "one-ball-three-actions-10",
+        "act-hint2": "one-ball-three-actions-11",
+        "act-praise": "one-ball-three-actions-12"
+      }
+    },
+    {
+      "key": "write-gao-and-xing",
+      "type": "slide",
+      "title": "高和兴怎么写得稳",
+      "template": "picture-points",
+      "data": {
+        "title": "高和兴怎么写得稳",
+        "picture": "write-gao-xing",
+        "points": [
+          "高 · 先上后下",
+          "兴 · 下部舒展"
+        ]
+      },
+      "script": [
+        {
+          "say": "高兴是两个字。它们各有哪一笔贴近横中线？"
+        },
+        {
+          "say": "田字格的小格能帮我们找位置。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "高先写点、横，再写上面的竖、横折、横。"
+        },
+        {
+          "say": "下面先竖，横折钩的横贴近横中线。"
+        },
+        {
+          "say": "里面再写竖、横折、横。两个口都写扁些。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "兴先写点、点、撇，再写一横，贴近横中线。"
+        },
+        {
+          "say": "最后是撇和点，分在下半格两边。"
+        },
+        {
+          "say": "听老师说顺序，用手在空中写，再请大人看田字格。"
+        }
+      ]
+    },
+    {
+      "key": "write-zhe-and-wang",
+      "type": "slide",
+      "title": "着和往，认清两边",
+      "template": "picture-points",
+      "data": {
+        "title": "着和往，认清两边",
+        "picture": "write-zhe-wang",
+        "points": [
+          "着 · 目有两短横",
+          "往 · 左窄右宽"
+        ]
+      },
+      "script": [
+        {
+          "say": "着和往都有几道横。哪里长，哪里短？"
+        },
+        {
+          "say": "我们看每一笔从哪儿起，又在哪儿停。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "着先点、撇，再写三横，第三横写得长。"
+        },
+        {
+          "say": "接着一撇，下面写目，从左竖和横折起。"
+        },
+        {
+          "say": "目里两横，最后一横把底封上。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "往先写撇、撇、竖，是左边的双人旁。"
+        },
+        {
+          "say": "右边点、横、横、竖、横，最下面一横伸开。"
+        },
+        {
+          "say": "和大人一起检查，着下面的目里有两横，往左右宽窄不同。"
+        }
+      ]
+    },
+    {
+      "key": "write-gua-and-tu",
+      "type": "slide",
+      "title": "瓜的提和兔的点",
+      "template": "picture-points",
+      "data": {
+        "title": "瓜的提和兔的点",
+        "picture": "write-gua-tu",
+        "points": [
+          "瓜 · 第三笔竖提",
+          "兔 · 右下最后一点"
+        ]
+      },
+      "script": [
+        {
+          "say": "画好的字只差一两笔，看起来也会不一样。"
+        },
+        {
+          "say": "先来找瓜的竖提，再来找兔的最后一点。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "瓜开头两撇，第一撇较平，第二撇较直。"
+        },
+        {
+          "say": "第三笔竖提，竖下去，笔尖向右上挑。"
+        },
+        {
+          "say": "接着写点，最后一捺向右下伸开。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "兔先撇、横撇，再写竖、横折、横。"
+        },
+        {
+          "say": "接着写撇、竖弯钩。最后一笔是右下的点。"
+        },
+        {
+          "say": "用手指点一点最后一笔的地方，再写给大人看。"
+        }
+      ]
+    },
+    {
+      "key": "write-jin",
+      "type": "slide",
+      "title": "进字先写井，再写走之",
+      "template": "picture-points",
+      "data": {
+        "title": "进字先写井，再写走之",
+        "picture": "write-jin",
+        "points": [
+          "先写井",
+          "再写走之",
+          "最后托住"
+        ]
+      },
+      "script": [
+        {
+          "say": "走进树林的进，哪部分先落笔？"
+        },
+        {
+          "say": "右边的小格里还没有走之。猜猜先写的是谁。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先写井，两横、一撇、一竖。井略靠右。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "走之有三笔。先一点，再横折折撇，最后平捺。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "最后的捺从左下舒展开，像把右上边的井托起来。"
+        },
+        {
+          "say": "自己写一遍时请大人看，你是不是先写完井才写走之。"
+        }
+      ]
+    },
+    {
+      "key": "pick-a-goal",
+      "type": "slide",
+      "title": "第二次下山，先选一个目标",
+      "template": "picture-points",
+      "data": {
+        "title": "第二次下山，先选一个目标",
+        "picture": "new-trip-practice",
+        "points": [
+          "先想目标",
+          "看一看再走",
+          "讲清理由"
+        ]
+      },
+      "script": [
+        {
+          "say": "故事外，小猴说要带一条红丝带给奶奶。路上有好看的松果。"
+        },
+        {
+          "say": "要完成它答应的事，这时可以怎样做？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "它答应送的是丝带。先想清自己要做哪件事。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "松果很好看。它可以先记住在哪里，手里仍拿着丝带。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "说小猴拿着丝带去奶奶家，因为它答应了要送丝带。"
+        },
+        {
+          "say": "现在把目标和遇见的东西换一换。你能续编一个新的结尾吗？"
+        }
+      ]
+    },
+    {
+      "key": "picture-quiz",
+      "type": "quiz",
+      "title": "听题，把画面找回来",
+      "intro": [
+        "听老师说完，再选一张合适的画。"
+      ],
+      "questions": [
+        {
+          "id": "finish-reason",
+          "question": "故事海报最后画小猴空着手，哪组小画能说清楚为什么？",
+          "skill": "story-cause",
+          "answer": [
+            "B"
+          ],
+          "analysis": "它把先前拿到的东西一次次扔下，最后没追到兔子，所以空着手回家。",
+          "options": {
+            "A": {
+              "label": "一直拿着瓜",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-1-a",
+                "alt": "小册三格画小猴抱瓜，抱瓜看兔，回家时仍抱瓜"
+              }
+            },
+            "B": {
+              "label": "扔下瓜没追到",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-1-b",
+                "alt": "小册三格画玉米桃子留在路边、瓜落在路上、兔钻进树林"
+              }
+            },
+            "C": {
+              "label": "兔子被它追到",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-1-c",
+                "alt": "小册三格画小猴抱瓜、跟着兔、最后牵着兔子回来"
+              }
+            }
+          }
+        },
+        {
+          "id": "carry-on-shoulder",
+          "question": "小演员要把软泡沫木条扛到布景边。哪幅动作图符合这句话？",
+          "skill": "shoulder-carry",
+          "answer": [
+            "A"
+          ],
+          "analysis": "扛时用肩托住物件。这幅图的长木条放在肩上。",
+          "options": {
+            "A": {
+              "label": "用肩托木条",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-2-a",
+                "alt": "小演员把长泡沫木条横放在一边肩上"
+              }
+            },
+            "B": {
+              "label": "双手捧木条",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-2-b",
+                "alt": "小演员两手掌向上把泡沫木条托在腰前"
+              }
+            },
+            "C": {
+              "label": "两臂抱木条",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-2-c",
+                "alt": "小演员双臂从两边围住泡沫木条，把它抱在胸前"
+              }
+            }
+          }
+        },
+        {
+          "id": "cup-the-pebbles",
+          "question": "两手捧着几枚纸做的小石头。哪幅图动作相符？",
+          "skill": "cup-and-hug",
+          "answer": [
+            "C"
+          ],
+          "analysis": "捧主要是双手从下面托住。掌心朝上，纸石头放在手心里。",
+          "options": {
+            "A": {
+              "label": "把纸石头扔出去",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-3-a",
+                "alt": "小演员刚放开双手，几枚纸石头沿弧线飞出"
+              }
+            },
+            "B": {
+              "label": "用臂抱纸石头",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-3-b",
+                "alt": "小演员弯曲手臂，把装纸石头的敞口袋贴在胸前"
+              }
+            },
+            "C": {
+              "label": "手掌托纸石头",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-3-c",
+                "alt": "两手掌心向上并拢，纸石头放在两只手掌上"
+              }
+            }
+          }
+        },
+        {
+          "id": "two-traits",
+          "question": "看左边的气球。哪张图里它比右边的小，而且是圆的？",
+          "skill": "two-traits-one-object",
+          "answer": [
+            "B"
+          ],
+          "analysis": "左边的气球比右边的小，外形也是圆的。又小又圆要同时符合。",
+          "options": {
+            "A": {
+              "label": "小而长",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-4-a",
+                "alt": "左边是长椭圆小气球，右边是同一只灰色参照气球"
+              }
+            },
+            "B": {
+              "label": "小而圆",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-4-b",
+                "alt": "左边是圆形小气球，右边是同一只灰色参照气球"
+              }
+            },
+            "C": {
+              "label": "大而圆",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-4-c",
+                "alt": "左边是较大的圆气球，右边是同一只灰色参照气球"
+              }
+            }
+          }
+        },
+        {
+          "id": "rabbit-final-dot",
+          "question": "田字格里的兔只差最后一笔。哪张图画对了这笔？",
+          "skill": "rabbit-last-stroke",
+          "answer": [
+            "A"
+          ],
+          "analysis": "兔的最后一笔是点，落在右下。",
+          "options": {
+            "A": {
+              "label": "右下一点",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-5-a",
+                "alt": "同样的七笔后，橙色的一点画在字的右下方"
+              }
+            },
+            "B": {
+              "label": "左下一点",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-5-b",
+                "alt": "同样的七笔后，橙色的一点画在字的左下方"
+              }
+            },
+            "C": {
+              "label": "右上一点",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-5-c",
+                "alt": "同样的七笔后，橙色的一点画在字的右上方"
+              }
+            }
+          }
+        },
+        {
+          "id": "next-trip-goal",
+          "question": "小猴答应把花带回家，半路看到好看的叶子。哪幅图能完成约定？",
+          "skill": "choose-a-goal",
+          "answer": [
+            "C"
+          ],
+          "analysis": "约好把花带回家。它可以看看叶子，仍带着原来的花回去。",
+          "options": {
+            "A": {
+              "label": "带叶子回家",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-6-a",
+                "alt": "小猴把花落在路边，拿着叶子走到家门口"
+              }
+            },
+            "B": {
+              "label": "两手空空回家",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-6-b",
+                "alt": "小猴把花和叶子都留在路边，空手站到家门口"
+              }
+            },
+            "C": {
+              "label": "带花回家",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-6-c",
+                "alt": "小猴还拿着原来的花，走到家门口"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "tell-a-new-trip",
+      "type": "slide",
+      "title": "带一条路线回去讲",
+      "template": "picture-points",
+      "data": {
+        "title": "带一条路线回去讲",
+        "picture": "home-retell-board",
+        "points": [
+          "按顺序复述",
+          "一个物件两特点",
+          "从一个目标开始",
+          "翻纸书、做动作"
+        ]
+      },
+      "script": [
+        {
+          "say": "影偶戏演完了。合上屏幕前，你能用三句话说一段吗？"
+        },
+        {
+          "say": "先想那一段的地点、所见和动作，再把它们连起来。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "从玉米地、桃树、瓜地，说到路上遇见兔子。"
+        },
+        {
+          "say": "再告诉大人，小猴为什么空手回到了家。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "拿身边同一样东西，看看它的两个特点，说一句又什么又什么。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "给第二次下山定个目标，遇到别的东西时想想怎么做。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "请大人和你在纸书上读一读这五段，挑两个动作各说一句。"
+        },
+        {
+          "say": "今天的动作句、字和续编，留给大人听和看。"
+        },
+        {
+          "say": "说完可以反问大人，它的选择怎样帮它完成了目标？"
+        }
+      ]
+    }
+  ]
+}

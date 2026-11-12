@@ -1,0 +1,271 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "解决问题｜两人之间",
+  "binding": {
+    "editionId": "pep-math-g1-upper-2022-standard",
+    "revisionId": "directory-ede7a8c63c337cf95a03fe79",
+    "nodeId": "a6b85a1c-cfda-4627-9115-2aa6ab16ca69",
+    "unitId": "ae4d78e6-9ed7-4bec-a5a4-26ed49147600"
+  },
+  "goals": [
+    "用第几位找位置，说出它与人数的区别。",
+    "把两个位置当作边界，找出严格在它们之间的位置。",
+    "用顺数或一人一点求人数，再用另一种方法复查。",
+    "在新情境根据问题判定两端是否计入。"
+  ],
+  "scenario": "社区光影剧场的入场队伍。两个工作人员拿着醒目的端点旗，中间每个人或座位都对应一个清楚的点。",
+  "pageSequence": [
+    {
+      "key": "open",
+      "kind": "teaching",
+      "plan": "光影剧场开始入场，先猜‘排第八’是否表示八个人，再逐步点亮人、位置牌和完整一队，建立位置与数量的区别。"
+    },
+    {
+      "key": "two-markers",
+      "kind": "teaching",
+      "plan": "有人问两位旗手之间有谁。先指同一个起数方向，再标出第八和第十三，一面旗一面旗点亮。顺着说出九到十二，轮到终点时停下。"
+    },
+    {
+      "key": "draw-and-check",
+      "kind": "teaching",
+      "plan": "把整队逐个变成点，再把只需看的局部拉近。点亮两个端点、四个中间点和复核结果，说明画图与顺数为什么得到同一人数。"
+    },
+    {
+      "key": "hop-between",
+      "kind": "interactive",
+      "plan": "控制小演员按顺序跳到两旗之间的真实位置。落到端点或范围外的数字无法领取检查点。"
+    },
+    {
+      "key": "edges-and-empty",
+      "kind": "teaching",
+      "plan": "在同一队列交换两个端点的说出顺序，再看第十四与第十五的相邻位置。两边只定位，里面没有位置时记为零。"
+    },
+    {
+      "key": "from-through",
+      "kind": "teaching",
+      "plan": "用剧场照片从第二张看到第五张，逐张从起点数到终点。与只数两端之间的情境比较。"
+    },
+    {
+      "key": "match-the-middle",
+      "kind": "interactive",
+      "plan": "底板是一段有两面旗的序号图，落块是点阵人数。横移后把点阵送到对应底板旁，只有人数正确且位置相邻才消除。"
+    },
+    {
+      "key": "new-places",
+      "kind": "teaching",
+      "plan": "把队列图转成竖着的楼层图或一段有编号的参观停靠点，分别复查边界、顺数方向和中间数量。"
+    },
+    {
+      "key": "picture-check",
+      "kind": "quiz",
+      "plan": "六道新图题。老师先读任务，按点图选范围、人数或验证方法；结果反馈说明为什么不能把定位的人算进去。"
+    },
+    {
+      "key": "recap",
+      "kind": "teaching",
+      "plan": "再用剧场队伍从头说一遍先找两个位置、只数里面、用另一种办法验算。邀请和家人排一排、用软物摆点图。"
+    }
+  ],
+  "games": [
+    {
+      "page": "hop-between",
+      "template": "platformHop",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.platformHop",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "ordered_route",
+      "selection": "路线只接受按次序落在端点内部的位置。端点与少量范围外的位置在图上可见，提示牌用固定两旗图示，隐藏默认的下一站数字提示。孩子依据两个数的位置和落脚顺序决定目标。",
+      "levels": [
+        "第五和第九是旗台，三处宽落脚台。旗与数字台各有不同图样，先给练习时间。",
+        "第八和第十四是旗台，五处内部平台，加入范围外的高台。",
+        "第十二和第十八是旗台，五处不同高度的窄台，控制落脚时机。"
+      ],
+      "demo": "先指两旗、第一处内部平台和起跳控制，说清为什么只跳里面；示范一次落脚，再清空进度并交还首关。"
+    },
+    {
+      "page": "match-the-middle",
+      "template": "fallingTiles",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.fallingTiles",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "pair_match",
+      "selection": "底板以连续序号和两面旗标出范围，落块图画出若干人数点。把两端之间实际的人数和对应底板相邻放下，才配对消除并计分。",
+      "levels": [
+        "三组间隔对应三、四、两点。三块慢落，一步看一处。",
+        "三组混合间隔，含只有一点的短间隔。顺序改变并加快落块。",
+        "两个不同位置的间隔同为三点，第三组两旗紧邻为零。零块只配中间没有点的底图。"
+      ],
+      "demo": "第一关只示范一次数图与移动落块，给出如何区分旗与人点的提示，然后复位。"
+    }
+  ],
+  "quizPlan": [
+    {
+      "skill": "ordinal-vs-count",
+      "prompt": "蓝旗孩子排第六。哪张只圈了他前面的人？",
+      "answer": "从第一到第五的五个人",
+      "position": 1,
+      "rationale": "蓝帽占第六个位置，前面有五个位置。",
+      "pictureStem": "q1-stem",
+      "pictureOptions": [
+        "q1-a",
+        "q1-b",
+        "q1-c"
+      ],
+      "answerKey": "A"
+    },
+    {
+      "skill": "between-endpoints",
+      "prompt": "第九格和第十二格有旗。哪张图只亮了中间？",
+      "answer": "只标第十和第十一格",
+      "position": 3,
+      "rationale": "从第九格后面开始，在第十二格前停。",
+      "pictureStem": "q2-stem",
+      "pictureOptions": [
+        "q2-a",
+        "q2-b",
+        "q2-c"
+      ],
+      "answerKey": "C"
+    },
+    {
+      "skill": "between-endpoints",
+      "prompt": "第十三和第十四两人之间有几人？选点图。",
+      "answer": "中间是空的",
+      "position": 2,
+      "rationale": "第十三后面紧接着第十四，没有空出其他位置。",
+      "pictureStem": "q3-stem",
+      "pictureOptions": [
+        "q3-a",
+        "q3-b",
+        "q3-c"
+      ],
+      "answerKey": "B"
+    },
+    {
+      "skill": "count-and-verify",
+      "prompt": "第十一层和第十六层之间，哪张图只亮了中间的楼层？",
+      "answer": "只亮出十二、十三、十四、十五四层",
+      "position": 2,
+      "rationale": "逐层数正好四层，两头只定位。",
+      "pictureStem": "q4-stem",
+      "pictureOptions": [
+        "q4-a",
+        "q4-b",
+        "q4-c"
+      ],
+      "answerKey": "B"
+    },
+    {
+      "skill": "count-and-verify",
+      "prompt": "展品第三位和第八位有旗。选两旗之间的点图。",
+      "answer": "四个未画旗的点，旗外的点不计",
+      "position": 1,
+      "rationale": "从第四位数到第七位，共四件。",
+      "pictureStem": "q5-stem",
+      "pictureOptions": [
+        "q5-a",
+        "q5-b",
+        "q5-c"
+      ],
+      "answerKey": "A"
+    },
+    {
+      "skill": "transfer-boundaries",
+      "prompt": "从第六张照片看到第九张，两头都看。圈哪几张？",
+      "answer": "圈第六到第九共四张",
+      "position": 3,
+      "rationale": "题目说明两头都看，起止两张都要计入。",
+      "pictureStem": "q6-stem",
+      "pictureOptions": [
+        "q6-a",
+        "q6-b",
+        "q6-c"
+      ],
+      "answerKey": "C"
+    }
+  ],
+  "afterClass": {
+    "familyTask": "用积木排一列，家人各用一枚颜色片标一个位置。孩子先指出两处，再数中间并画点核对；交换说法后看看结果有没有变。",
+    "weeklyQuestionSource": [
+      "辨别序数和数量",
+      "两端之间的内部范围",
+      "点图与顺数互证",
+      "楼层或展品迁移及两端计入的措辞"
+    ],
+    "evidence": "数字试玩只记录落脚、配对和图题。实物排位、画图和口头理由待观察。",
+    "variationRules": [
+      {
+        "skill": "ordinal-vs-count",
+        "examplesToDraw": [
+          "改变起数端，判断被标位置",
+          "在同一行分辨某位和总人数"
+        ]
+      },
+      {
+        "skill": "between-endpoints",
+        "examplesToDraw": [
+          "换一对端点并选内部连续位置",
+          "相邻端点，匹配零点图"
+        ]
+      },
+      {
+        "skill": "count-and-verify",
+        "examplesToDraw": [
+          "选正确的一物一点图",
+          "比较一张数对与漏数的核对图"
+        ]
+      },
+      {
+        "skill": "transfer-boundaries",
+        "examplesToDraw": [
+          "楼层或站点只算中间",
+          "明确读到或看到哪一张，包含起止"
+        ]
+      }
+    ],
+    "questionScope": "周末题包按当周所学合并生成。题目从二十以内新位置取样，避免本课例子和小检查的同一对端点。每题用图和老师读题，保留唯一答案和解析。"
+  },
+  "art": "内置 ImageGen 原创剧场、道具室、演员三帧、单人、蓝橙旗与奖励贴纸。每个位置的图、范围和点数依可编辑数据精确摆放，图片与文字不依赖彼此才能操作。",
+  "goalDetails": [
+    {
+      "skill": "ordinal-vs-count",
+      "target": "用第几位找位置，说出它与人数的区别。",
+      "source": "教材印82阅读理解、教案第2页"
+    },
+    {
+      "skill": "between-endpoints",
+      "target": "把两个位置当作边界，找出严格在它们之间的位置。",
+      "source": "教材印82分析解答、教案第2～3页"
+    },
+    {
+      "skill": "count-and-verify",
+      "target": "用顺数或一人一点求人数，再用另一种方法复查。",
+      "source": "教材印82回顾反思、教案第3～5页"
+    },
+    {
+      "skill": "transfer-boundaries",
+      "target": "在新情境根据问题判定两端是否计入。",
+      "source": "教材印83做一做、印84第4和8题，教案第5～6页"
+    }
+  ],
+  "authorship": {
+    "authorModels": [
+      "gpt-6.1-sol"
+    ],
+    "modelEvidence": {
+      "sessionId": "01a1c43e-779d-76c1-9193-2b50ab5e491a",
+      "metadataField": "turn_context.payload.model"
+    },
+    "method": "审读官方两端范围及核对方法后，由 Codex 直接创作全套台词、互动页配置和图题。",
+    "attestation": "本课作者为 Codex（gpt-6.1-sol）。讲解文字、题目、图片和页面版式为原创。图片用内置 ImageGen 与确定性示意图合成。未照搬官方整页原文、图片、题目或布局，未使用 DeepSeek 初稿。",
+    "sourceSha256": {
+      "official-notes.json": "c28ba2bacf578bd2198d677bcb142cad40bc4d320fec3f8810df4ef5d2970425",
+      "lesson.json": "8f1febf0fadb6fc12bc8f302a589e292b5f2e253db5f10ce1f3858491cb1ff22",
+      "pages/hop-between.js": "753532769fbc2e99f5d6c85e8667acbef0cb8d7de457463f644ab81ad10c2c24",
+      "pages/match-the-middle.js": "4d31c737251046d9926572a044f4836bf0b61aa5df9b4a5d3d0dcc64147e5485",
+      "art-source/position-diagrams.json": "200490b1e157c9767977d1991aa090cc7af9d9396e5e6719ae777e3b84468518",
+      "asset-sources.json": "71adaf0eaf2dcfb3e5b4ea1a203762514349c1e9852bd8b0c29524390746ef66",
+      "tests/test_position_diagrams.py": "1feef96e6bf774e4e3890a9708d1576f0c59b5fb26a799db2c80418b63f5a589"
+    }
+  }
+}

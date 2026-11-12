@@ -1,0 +1,81 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "含相差数量关系的连续两问的问题",
+  "binding": {
+    "editionId": "pep-math-g1-lower-2022-standard",
+    "revisionId": "directory-6205d2037284e91f10b25edd",
+    "unitId": "bd8045fb-fd3d-42d3-95ed-a1ca984c5126",
+    "nodeId": "38016e4f-ff5a-49b2-b3e7-b067846c7d6a"
+  },
+  "scenario": "溪边巡护站要登记各组收集的回收瓶和仓库物资。总账常缺一项，孩子先算出要填进中间格的数量，再把它带到下一项任务。",
+  "goals": [
+    "区分两问各自求的数量和单位，能从第二问找出还缺哪个条件。",
+    "借助对齐图先求一组比参照多或少若干时的实际数量，能说明为什么选择加法或减法。",
+    "把第一问的结果和第二问需要的另一已知量放入图中，按顺序解答并说明中间结果的用途。",
+    "能把两问的依赖关系迁移到先后两次求剩余的情境，或根据已知条件补出能支持第二问的第一问。"
+  ],
+  "goalEvidence": [
+    {"skill": "find-missing-condition", "source": "印73、教案2至3、课件3至4及7、任务单1"},
+    {"skill": "find-intermediate-amount", "source": "印73、教案2至3、课件5至6及16"},
+    {"skill": "use-intermediate-amount", "source": "印73、教案3至4、课件7至10及17至19"},
+    {"skill": "transfer-dependent-questions", "source": "印74第4至5题、教案4至5、任务单1至2、课件11至18"}
+  ],
+  "pageSequence": [
+    {"key": "what-is-missing", "kind": "teaching", "title": "总账缺了哪一组", "plan": "展示巡护两组的瓶子图标及两问。甲组18个，乙组少7个。让孩子从合计问题回看两方的数量格，认出乙组还没有实际数量。"},
+    {"key": "count-the-second-group", "kind": "teaching", "title": "先求乙组的数量", "plan": "从同一起点对齐，逐项点亮甲组18、7个缺口及乙组空格。说明18减7得11并把11标在乙组的数量格。"},
+    {"key": "move-the-first-result", "kind": "teaching", "title": "把第一问的答案放进总账", "plan": "用箭头把乙组11个的记录送到总账一个空格，再点亮甲组18个这一已知部分。按图解释合并18和11得29。回看第一问为何要先算。"},
+    {"key": "jump-to-the-linked-counts", "kind": "interactive", "title": "沿数量记录跳到总账台", "plan": "跑跳经过参照台、第一问结果台和第二问总账台。每次正确着陆才成为下一次跳跃的检查点。"},
+    {"key": "a-first-question-for-the-total", "kind": "teaching", "title": "给总账补一个先问的问题", "plan": "东亭有21张观察记录，西亭多8张。由合计问题倒查少了西亭的数量，先补问并求出29，再求两亭合计50。"},
+    {"key": "carry-the-new-remaining-count", "kind": "teaching", "title": "第二次从哪里开始减", "plan": "仓库57个夹子，先领18个，后领14个。按时间画三张记录卡，第一步剩39个，把39移到第二张卡当起点，第二步剩25个。"},
+    {"key": "deliver-the-intermediate-result", "kind": "interactive", "title": "把第一笔记录送到能用它的地方", "plan": "先取装有正确中间数量的记录袋，再开车穿过移动障碍，把记录送到按第二问求得的终点。"},
+    {"key": "picture-check-a", "kind": "quiz", "title": "先问什么，先算什么", "plan": "老师逐题读下列1至3题，呈现三张语义明确的新图。"},
+    {"key": "picture-check-b", "kind": "quiz", "title": "把第一问接到第二问", "plan": "老师逐题读下列4至6题，检查中间量、最后结果和作答顺序。"},
+    {"key": "tell-the-two-steps", "kind": "teaching", "title": "先找缺的量，再用刚算的数", "plan": "回到巡护总账图，逐个点亮问题、缺少的条件和使用中间结果的箭头，安排一个亲子活动。"}
+  ],
+  "games": [
+    {
+      "page": "jump-to-the-linked-counts",
+      "template": "platformHop",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.platformHop",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "ordered_route",
+      "reason": "跳跃要求控制距离和时机。台面有图示数量和干扰项，只有按参照、第一问的实有量、第二问合计的顺序着陆才获得检查点。顶部固定显示任务图，不显示下一正确数。",
+      "levels": [
+        "8与少3的物品图，先找参照8，再到5、13；台面宽、跳距短。",
+        "9与多4的情境，按9、13、22跳，放入只表示差量的干扰台。",
+        "20与多6的单位条，按20、26、46跳，增加高低落差及把差错当实有量的干扰台。"
+      ],
+      "demo": "依次点亮任务图中的参照、起跳角色与首个落脚台，实际完成一次正确着陆即停，清掉检查点进度后交接。"
+    },
+    {
+      "page": "deliver-the-intermediate-result",
+      "template": "listenDelivery",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.listenDelivery",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "listen_pick_deliver",
+      "reason": "取货是第一问，交付是第二问。正确记录袋在车上保持可见，送达条件由第二问结果确定。需要先求中间量，再用它算总量或剩余，越障路径不会替孩子选出数量。",
+      "levels": [
+        "已知12和少2，先取10，送到两组共22的终点，移动障碍慢。",
+        "已知16和多7，先取23，送到共39的终点，增加一个只把差与已知量相加的干扰站。",
+        "用34个物品先领9个再领6个，先取25，送到还剩19的终点，加入从34直接减6的干扰站。"
+      ],
+      "demo": "点亮第一问需要的已知图、车和正确中间量袋，实际取货一次就停，复位清空货袋。按取货与交付分别用预录语音交接。"
+    }
+  ],
+  "quizPlan": [
+    {"skill": "find-missing-condition", "task": "两组观鸟员记录了同一类观察点。第一组11处，第二组少4处。要知道两组一共记录多少处，先问哪一组有多少？", "pictureOptions": ["两组合计的大框", "只框第二组的整排空位", "只圈两组的4处差"], "correctPosition": 2, "rationale": "第一组数量已有，第二组的实有量是合计前需要补的条件。"},
+    {"skill": "find-intermediate-amount", "task": "两个托盘摆陶片，圆盘17片，方盘少6片。选第一问所求的方盘陶片图。", "pictureOptions": ["2组十和3片", "6片", "1组十和1片"], "correctPosition": 3, "rationale": "17减6得11片，6是差量。"},
+    {"skill": "use-intermediate-amount", "task": "一边有13盏纸灯，另一边多7盏，第一问已经求出另一边20盏。选第二问求总数所需的两组。", "pictureOptions": ["13盏与20盏两组", "13盏与7盏差量", "20盏与7盏差量"], "correctPosition": 1, "rationale": "合计要用两个实际数量13和20。"},
+    {"skill": "use-intermediate-amount", "task": "一组有22盒画笔，另一组少9盒。先找另一组，再选两组共有多少盒的图。", "pictureOptions": ["3组十和1盒", "3组十和5盒", "1组十和3盒"], "correctPosition": 2, "rationale": "先算22减9得13，再用22加13得35盒。"},
+    {"skill": "transfer-dependent-questions", "task": "河岸营地搭了19顶帐篷，树林营地比河岸多5顶。最后问两处共几顶。选能给最后一问补条件的第一问图。", "pictureOptions": ["只框河岸已有的19顶", "只框多出来的5顶", "框树林那排的整组帐篷"], "correctPosition": 3, "rationale": "先问树林有几顶，算出24顶，才有合计所需的两处数量。"},
+    {"skill": "transfer-dependent-questions", "task": "箱里有41枚纽扣，第一次用12枚，后来又用8枚。选正确的两张剩余图顺序。", "pictureOptions": ["第一次剩29，第二次剩21", "第一次剩29，第二次剩33", "第一次剩21，第二次剩29"], "correctPosition": 1, "rationale": "先用41减12得29，再从29减8得21。第二次开始时箱里已经只剩29。"}
+  ],
+  "presentation": "一屏一件事，图片区分已知、差量、中间量和结果。移动已有记录用箭头表示，算式只连接当前问题的两个输入。数量和条长用准确的点阵或整十图示。老师预录指令和反馈，遮住非目标文字仍能作答。",
+  "afterClass": {
+    "familyTask": "和家人用两组同类小物件编两个连续问题。先算出原来未给出的那一组，再用这个数解第二问，画箭头说明它去哪一步。口头说明和家庭完成情况待观察。",
+    "weeklyQuestionSource": ["判断第二问缺少的条件", "先由相差求实际数量", "把第一问结果用于合计", "连续求余及补出第一问"],
+    "source": "课练1、教案4至5、课件19至20"
+  }
+}

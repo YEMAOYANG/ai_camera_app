@@ -1,0 +1,1086 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "Unit 1 That is my father.",
+  "description": "灯影展来了家人和朋友。跟着两位主持听清关系、看谁在说和站在哪里，再做一次完整介绍。",
+  "grade": 1,
+  "roster": {
+    "mia": {
+      "name": "Mia 老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Jennifer",
+      "avatar": "/teachers/coco-english-v1.png",
+      "color": "#557B76",
+      "persona": "在原创小对话中带孩子先看、再听、最后开口介绍。"
+    }
+  },
+  "images": {
+    "delivery-opening": {
+      "file": "assets/delivery-opening.png"
+    },
+    "family-cards-opening": {
+      "file": "assets/family-cards-opening.png"
+    },
+    "family-tree-a": {
+      "file": "assets/family-tree-a.png"
+    },
+    "far-a": {
+      "file": "assets/far-a.png"
+    },
+    "far-b": {
+      "file": "assets/far-b.png"
+    },
+    "far-father-a": {
+      "file": "assets/far-father-a.png"
+    },
+    "far-mother": {
+      "file": "assets/far-mother.png"
+    },
+    "father-a": {
+      "file": "assets/father-a.png"
+    },
+    "father-b": {
+      "file": "assets/father-b.png"
+    },
+    "friend-a": {
+      "file": "assets/friend-a.png"
+    },
+    "grandma-a": {
+      "file": "assets/grandma-a.png"
+    },
+    "grandpa-a": {
+      "file": "assets/grandpa-a.png"
+    },
+    "greet-daddy": {
+      "file": "assets/greet-daddy.png"
+    },
+    "host-a": {
+      "file": "assets/host-a.png"
+    },
+    "host-b": {
+      "file": "assets/host-b.png"
+    },
+    "introduce-father": {
+      "file": "assets/introduce-father.png"
+    },
+    "lantern-hall": {
+      "file": "assets/lantern-hall.png"
+    },
+    "lantern-van": {
+      "file": "assets/lantern-van.png"
+    },
+    "look-at-paper": {
+      "file": "assets/look-at-paper.png"
+    },
+    "mother-a": {
+      "file": "assets/mother-a.png"
+    },
+    "near-a": {
+      "file": "assets/near-a.png"
+    },
+    "near-b": {
+      "file": "assets/near-b.png"
+    },
+    "near-father-a": {
+      "file": "assets/near-father-a.png"
+    },
+    "near-friend-a": {
+      "file": "assets/near-friend-a.png"
+    },
+    "near-mother": {
+      "file": "assets/near-mother.png"
+    },
+    "quiz-a-father-far": {
+      "file": "assets/quiz-a-father-far.png"
+    },
+    "quiz-b-father-far": {
+      "file": "assets/quiz-b-father-far.png"
+    },
+    "quiz-b-father-wrong": {
+      "file": "assets/quiz-b-father-wrong.png"
+    },
+    "quiz-father": {
+      "file": "assets/quiz-father.png"
+    },
+    "quiz-father-b": {
+      "file": "assets/quiz-father-b.png"
+    },
+    "quiz-grandma-far": {
+      "file": "assets/quiz-grandma-far.png"
+    },
+    "quiz-grandma-near": {
+      "file": "assets/quiz-grandma-near.png"
+    },
+    "quiz-grandma-relation": {
+      "file": "assets/quiz-grandma-relation.png"
+    },
+    "quiz-grandpa": {
+      "file": "assets/quiz-grandpa.png"
+    },
+    "quiz-grandpa-near": {
+      "file": "assets/quiz-grandpa-near.png"
+    },
+    "quiz-mother-relation": {
+      "file": "assets/quiz-mother-relation.png"
+    },
+    "quiz-other-father-relation": {
+      "file": "assets/quiz-other-father-relation.png"
+    },
+    "quiz-route-correct": {
+      "file": "assets/quiz-route-correct.png"
+    },
+    "quiz-route-near-first": {
+      "file": "assets/quiz-route-near-first.png"
+    },
+    "quiz-route-reverse": {
+      "file": "assets/quiz-route-reverse.png"
+    },
+    "quiz-welcome-chart": {
+      "file": "assets/quiz-welcome-chart.png"
+    },
+    "relation-father-mother": {
+      "file": "assets/relation-father-mother.png"
+    },
+    "relation-grandpa-a": {
+      "file": "assets/relation-grandpa-a.png"
+    },
+    "respond-friend": {
+      "file": "assets/respond-friend.png"
+    },
+    "respond-to-host": {
+      "file": "assets/respond-to-host.png"
+    },
+    "tile-father-a": {
+      "file": "assets/tile-father-a.png"
+    },
+    "tile-father-b": {
+      "file": "assets/tile-father-b.png"
+    },
+    "tile-father-mother": {
+      "file": "assets/tile-father-mother.png"
+    },
+    "tile-friend-a": {
+      "file": "assets/tile-friend-a.png"
+    },
+    "tile-grandma-a": {
+      "file": "assets/tile-grandma-a.png"
+    },
+    "tile-grandpa-a": {
+      "file": "assets/tile-grandpa-a.png"
+    },
+    "tile-mother-a": {
+      "file": "assets/tile-mother-a.png"
+    },
+    "welcome": {
+      "file": "assets/welcome.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "welcome",
+      "type": "slide",
+      "title": "灯影展开门啦",
+      "template": "picture-points",
+      "data": {
+        "title": "灯影展开门啦",
+        "picture": "welcome",
+        "points": [
+          "找说话的人",
+          "找听话的人",
+          "找被介绍的人"
+        ]
+      },
+      "script": [
+        {
+          "say": "灯影展开门啦。有人朝小宁和阿乐走过来。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "小宁戴圆眼镜。看看谁和她站在一起，谁从门口走进来？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "开口的是小宁。她想让身旁的阿乐认识新来的这位叔叔。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "身旁穿珊瑚红上衣的阿乐先听完。我们也和阿乐一起听。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "小宁说 That is my father."
+        },
+        {
+          "say": "她在向阿乐介绍自己的爸爸。"
+        },
+        {
+          "say": "换一个人拿话筒，句子会怎么变？"
+        }
+      ]
+    },
+    {
+      "key": "parents",
+      "type": "slide",
+      "title": "打招呼和作介绍",
+      "template": "two-columns",
+      "data": {
+        "title": "打招呼和作介绍",
+        "left": {
+          "heading": "Hello, Daddy!",
+          "body": "朝爸爸打招呼。"
+        },
+        "right": {
+          "heading": "That is my father.",
+          "body": "向同伴介绍爸爸。"
+        },
+        "left_picture": "greet-daddy",
+        "right_picture": "introduce-father"
+      },
+      "script": [
+        {
+          "say": "穿红棕毛衣的是同一个人。"
+        },
+        {
+          "say": "小宁这两次分别在跟谁说话？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "小宁朝爸爸挥手。"
+        },
+        {
+          "say": "对爸爸打招呼，她说 Hello, Daddy!"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "跟我朝爸爸打个招呼。Hello, Daddy!"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "小宁在向阿乐介绍。"
+        },
+        {
+          "say": "她指向隔了几块地砖的爸爸。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "介绍自己的爸爸，她说 That is my father."
+        },
+        {
+          "say": "现在你当阿乐，听完再看她指谁。"
+        }
+      ]
+    },
+    {
+      "key": "grandparents-friend",
+      "type": "slide",
+      "title": "沿着图上的关系找",
+      "template": "picture-points",
+      "data": {
+        "title": "沿着图上的关系找",
+        "picture": "family-tree-a",
+        "points": [
+          "father · mother",
+          "grandpa · grandma",
+          "friend"
+        ]
+      },
+      "script": [
+        {
+          "say": "关系图下面戴圆眼镜的是谁？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "实线从小宁连到穿红棕毛衣的爸爸和戴发箍的妈妈。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "小宁说，Father."
+        },
+        {
+          "say": "小宁说，Mother."
+        },
+        {
+          "say": "Father 是爸爸，mother 是妈妈。"
+        },
+        {
+          "say": "你沿着线各指一次。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "从小宁沿线到妈妈，再到上一排。"
+        },
+        {
+          "say": "这两位是 grandpa 和 grandma。"
+        },
+        {
+          "say": "小宁说，Grandpa."
+        },
+        {
+          "say": "小宁说，Grandma."
+        },
+        {
+          "say": "左上是外公，右上是外婆。"
+        },
+        {
+          "say": "顺着图上的线找，光看头发猜不出。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "小宁说，Friend."
+        },
+        {
+          "say": "小宁右边挥手的是阿乐。"
+        },
+        {
+          "say": "虚线把一起做主持的两位朋友连起来。"
+        },
+        {
+          "say": "听是谁在说，也听称呼。把落卡移到对应图的旁边。"
+        },
+        {
+          "say": "先重听。下落的图告诉你是谁在说。"
+        },
+        {
+          "say": "看看底下的关系图，再把卡移到旁边。"
+        },
+        {
+          "say": "说话的人和称呼都对上了！"
+        },
+        {
+          "say": "再来试一次。先指来访者。"
+        },
+        {
+          "say": "听第二遍时，用手比比两人隔多远。"
+        },
+        {
+          "say": "小宁说，That is my grandma. 先拿来访者的卡。"
+        },
+        {
+          "say": "小宁再说，That is my grandma. 看两张站图。"
+        },
+        {
+          "say": "小宁说，This is my friend. 先拿来访者的卡。"
+        },
+        {
+          "say": "小宁再说，This is my friend. 看两张站图。"
+        }
+      ]
+    },
+    {
+      "key": "family-cards",
+      "type": "interactive",
+      "title": "欢迎台接访客卡",
+      "widgetType": "courseware_game",
+      "page": "family-cards",
+      "startImage": "family-cards-opening",
+      "script": [
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "say": "来帮欢迎台接图卡。"
+        },
+        {
+          "say": "先看卡上是谁，再听他用什么称呼。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "圆眼镜的小宁是正在说的人。小宁说，Father."
+        },
+        {
+          "highlight": "#game-goal"
+        },
+        {
+          "say": "底下是关系图。卡要落在合适的图旁边。"
+        },
+        {
+          "highlight": "#demo-family-father"
+        },
+        {
+          "say": "看小宁和爸爸的关系图。我只示范接这一块。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "按右键挪一格。到爸爸图的旁边，按空格或点落下。"
+        },
+        {
+          "say": "这次交给你。听称呼，把卡落到对应的关系图旁边。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "a-father": "grandparents-friend-5",
+        "a-mother": "grandparents-friend-6",
+        "a-grandpa": "grandparents-friend-12",
+        "a-grandma": "grandparents-friend-13",
+        "a-friend": "grandparents-friend-17",
+        "family-goal": "grandparents-friend-20",
+        "family-hint": "grandparents-friend-21",
+        "family-help": "grandparents-friend-22",
+        "family-praise": "grandparents-friend-23",
+        "mother-father": "who-says-my-12",
+        "b-father": "who-says-my-15"
+      }
+    },
+    {
+      "key": "this-that",
+      "type": "slide",
+      "title": "从说话人看远近",
+      "template": "two-columns",
+      "data": {
+        "title": "从说话人看远近",
+        "left": {
+          "heading": "This is my father.",
+          "body": "爸爸在小宁身边。"
+        },
+        "right": {
+          "heading": "That is my father.",
+          "body": "爸爸隔着一段路。"
+        },
+        "left_picture": "near-father-a",
+        "right_picture": "far-father-a"
+      },
+      "script": [
+        {
+          "say": "爸爸换了位置，小宁的介绍会变吗？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "这张图的虚线短。爸爸就在小宁旁边。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "小宁可以说 This is my father."
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "现在爸爸走远了。看小宁面前的虚线，隔了更长一段。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "小宁说 That is my father."
+        },
+        {
+          "say": "两张图里的爸爸是同一个人。"
+        },
+        {
+          "say": "就在身边，用 this。隔得远，用 that。"
+        },
+        {
+          "say": "如果换了说话的人，就站到那个人的位置再看一遍。"
+        },
+        {
+          "say": "再来试一次。先指来访者。"
+        },
+        {
+          "say": "听第二遍时，用手比比两人隔多远。"
+        },
+        {
+          "say": "小宁说，This is my father. 先拿来访者的卡。"
+        },
+        {
+          "say": "小宁再说，This is my father. 看灯离小宁多远，送到合适的站。"
+        }
+      ]
+    },
+    {
+      "key": "who-says-my",
+      "type": "slide",
+      "title": "换个人说，my 指谁",
+      "template": "two-columns",
+      "data": {
+        "title": "换个人说，my 指谁",
+        "left": {
+          "heading": "小宁说",
+          "body": "That is my grandpa."
+        },
+        "right": {
+          "heading": "妈妈说",
+          "body": "That is my father."
+        },
+        "left_picture": "relation-grandpa-a",
+        "right_picture": "relation-father-mother"
+      },
+      "script": [
+        {
+          "say": "看这位穿绿色背心的来访者。"
+        },
+        {
+          "say": "小宁和妈妈会怎样介绍同一个人？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "绿色框的小宁在说。她沿着线先到妈妈，再到外公。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "小宁说 That is my grandpa."
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "绿色框圈住了妈妈。"
+        },
+        {
+          "say": "这位来访者是妈妈的爸爸。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "小宁的妈妈说 That is my father."
+        },
+        {
+          "say": "小宁的妈妈说，Father."
+        },
+        {
+          "say": "穿蓝背带裤的阿川也来了。"
+        },
+        {
+          "say": "他的爸爸戴蓝帽子。阿川会指谁？"
+        },
+        {
+          "say": "阿川说，Father."
+        },
+        {
+          "say": "先找谁正在说。这个人说 my，就是在说自己的关系。"
+        },
+        {
+          "say": "再来试一次。先指来访者。"
+        },
+        {
+          "say": "听第二遍时，用手比比两人隔多远。"
+        },
+        {
+          "say": "小宁的妈妈说，That is my father. 先拿来访者的卡。"
+        },
+        {
+          "say": "小宁的妈妈再说，That is my father. 先找妈妈的站图。"
+        },
+        {
+          "say": "阿川说，This is my father. 先拿来访者的卡。"
+        },
+        {
+          "say": "阿川再说，This is my father. 找阿川的站图。"
+        },
+        {
+          "say": "阿川说，That is my father. 先拿来访者的卡。"
+        },
+        {
+          "say": "阿川再说，That is my father. 找阿川的站图。"
+        }
+      ]
+    },
+    {
+      "key": "deliver-introductions",
+      "type": "interactive",
+      "title": "送访客卡到灯影展",
+      "widgetType": "courseware_game",
+      "page": "deliver-introductions",
+      "startImage": "delivery-opening",
+      "script": [
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "say": "路这边有访客卡，对面有图站。先把介绍听完，再拿卡。"
+        },
+        {
+          "highlight": "#demo-delivery-father"
+        },
+        {
+          "say": "小宁说 This is my father."
+        },
+        {
+          "say": "我只示范拿来访者这张卡。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "小车往右一格。到卡旁，按空格或点包裹按钮。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "等车停到卡边，再按一下。"
+        },
+        {
+          "highlight": "#demo-delivery-carry"
+        },
+        {
+          "say": "拿到的访客卡会出现在右边。等路空了，再开过去。"
+        },
+        {
+          "highlight": "#demo-delivery-near"
+        },
+        {
+          "say": "这张图里的灯挨着小宁。"
+        },
+        {
+          "highlight": "#demo-delivery-far"
+        },
+        {
+          "say": "这张图里的灯隔着长一点的路。要从图里的人看远近。"
+        },
+        {
+          "say": "交给你。先拿对访客，再选合适的站。"
+        },
+        {
+          "say": "到站还是用同一个按钮交卡。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "pick-father-a": "this-that-15",
+        "deliver-father-a": "this-that-16",
+        "pick-grandma-a": "grandparents-friend-26",
+        "deliver-grandma-a": "grandparents-friend-27",
+        "pick-friend-a": "grandparents-friend-28",
+        "deliver-friend-a": "grandparents-friend-29",
+        "pick-mother-father": "who-says-my-19",
+        "deliver-mother-father": "who-says-my-20",
+        "pick-near-b": "who-says-my-21",
+        "deliver-near-b": "who-says-my-22",
+        "pick-far-b": "who-says-my-23",
+        "deliver-far-b": "who-says-my-24",
+        "delivery-goal": "recap-19",
+        "delivery-hint": "recap-20",
+        "delivery-help": "recap-21",
+        "delivery-praise": "recap-23"
+      }
+    },
+    {
+      "key": "introduce-someone",
+      "type": "slide",
+      "title": "轮到新主持介绍",
+      "template": "title-picture",
+      "data": {
+        "title": "轮到新主持介绍",
+        "picture": "quiz-welcome-chart",
+        "caption": "先找谁说，再看向被介绍的人。"
+      },
+      "script": [
+        {
+          "say": "下一场换了两位新主持。"
+        },
+        {
+          "say": "左边戴黄发夹，右边穿红毛衣。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "沿女孩的实线找。"
+        },
+        {
+          "say": "黄条纹是妈妈，蓝绿色衣服是爸爸。"
+        },
+        {
+          "say": "沿妈妈向上，蓝开衫是外公。"
+        },
+        {
+          "say": "红围巾是外婆，白帽是女孩的朋友。"
+        },
+        {
+          "say": "右边男孩的图只有一根线。沿着它找到戴绿帽的爸爸。"
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "白帽朋友站到女孩身边。"
+        },
+        {
+          "say": "她说 This is my friend."
+        },
+        {
+          "say": "轮到你。朝白帽朋友说 Hello!"
+        },
+        {
+          "say": "绿帽爸爸站远了一点。"
+        },
+        {
+          "say": "男孩说 That is my father."
+        },
+        {
+          "say": "换你拿话筒，自己说一次。"
+        }
+      ]
+    },
+    {
+      "key": "picture-check",
+      "type": "quiz",
+      "title": "听介绍，选一张图",
+      "intro": [
+        "先听老师问什么，再看三张图。想重听，就点喇叭。",
+        "认出谁在说，再听清楚介绍了谁。",
+        "听到两句时，看看哪张图的先后对。"
+      ],
+      "questions": [
+        {
+          "id": "hear-mother",
+          "question": "黄发夹女孩说 Mother. 哪张关系图连到了她的妈妈？",
+          "skill": "听称谓找人物关系",
+          "answer": [
+            "a"
+          ],
+          "analysis": "女孩的妈妈穿黄条纹衣服，实线直接连到女孩。红围巾是外婆，蓝绿色衣服是爸爸。",
+          "options": {
+            "a": {
+              "label": "女孩直接连到黄条纹衣服的妈妈",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-mother-relation",
+                "alt": "女孩直接连到黄条纹衣服的妈妈"
+              }
+            },
+            "b": {
+              "label": "女孩经过妈妈连到红围巾外婆",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-grandma-relation",
+                "alt": "女孩经过妈妈连到红围巾外婆"
+              }
+            },
+            "c": {
+              "label": "女孩直接连到蓝绿色衣服的爸爸",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-other-father-relation",
+                "alt": "女孩直接连到蓝绿色衣服的爸爸"
+              }
+            }
+          }
+        },
+        {
+          "id": "greet-daddy",
+          "question": "红毛衣男孩说 Hello, Daddy! 他朝谁打招呼？",
+          "skill": "听懂 Daddy 是亲切招呼爸爸",
+          "answer": [
+            "c"
+          ],
+          "analysis": "说话的是红毛衣男孩。沿他的关系线找，绿帽访客是他的爸爸。蓝绿色衣服的人是另一位主持的爸爸。",
+          "options": {
+            "a": {
+              "label": "蓝绿色衣服的来访者",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-father",
+                "alt": "蓝绿色衣服的来访者"
+              }
+            },
+            "b": {
+              "label": "蓝开衫的来访者",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-grandpa",
+                "alt": "蓝开衫的来访者"
+              }
+            },
+            "c": {
+              "label": "绿帽子的来访者",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-father-b",
+                "alt": "绿帽子的来访者"
+              }
+            }
+          }
+        },
+        {
+          "id": "hear-this",
+          "question": "黄发夹女孩说 This is my grandma. 哪张图合得上？",
+          "skill": "从说话者看 this 所指的近处",
+          "answer": [
+            "b"
+          ],
+          "analysis": "找红围巾的外婆，再从女孩的位置看。外婆靠近女孩的这张符合 this。",
+          "options": {
+            "a": {
+              "label": "女孩和红围巾外婆隔着长一段路",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-grandma-far",
+                "alt": "女孩和红围巾外婆隔着长一段路"
+              }
+            },
+            "b": {
+              "label": "红围巾外婆就在女孩近旁",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-grandma-near",
+                "alt": "红围巾外婆就在女孩近旁"
+              }
+            },
+            "c": {
+              "label": "蓝开衫外公就在女孩近旁",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-grandpa-near",
+                "alt": "蓝开衫外公就在女孩近旁"
+              }
+            }
+          }
+        },
+        {
+          "id": "follow-my",
+          "question": "红毛衣男孩说 That is my father. 选图。",
+          "skill": "my 随现在说话者改变",
+          "answer": [
+            "a"
+          ],
+          "analysis": "男孩拿着话筒。他的爸爸戴绿帽，站在离他有一段路的地方。另一位主持人说 my，才会介绍蓝绿色衣服的爸爸。",
+          "options": {
+            "a": {
+              "label": "红毛衣男孩指向远处戴绿帽的爸爸",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-b-father-far",
+                "alt": "红毛衣男孩指向远处戴绿帽的爸爸"
+              }
+            },
+            "b": {
+              "label": "黄发夹女孩指向远处蓝绿色衣服的爸爸",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-a-father-far",
+                "alt": "黄发夹女孩指向远处蓝绿色衣服的爸爸"
+              }
+            },
+            "c": {
+              "label": "红毛衣男孩对着远处蓝绿色衣服的人",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-b-father-wrong",
+                "alt": "红毛衣男孩对着远处蓝绿色衣服的人"
+              }
+            }
+          }
+        },
+        {
+          "id": "follow-two-introductions",
+          "question": "That is my grandpa. This is my friend.",
+          "skill": "听完整介绍按人物和远近顺序匹配",
+          "answer": [
+            "c"
+          ],
+          "analysis": "先看到蓝开衫外公站在远处，再看到戴白帽的朋友站在女孩近处。",
+          "options": {
+            "a": {
+              "label": "先近处外公，后近处白帽朋友",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-route-near-first",
+                "alt": "先近处外公，后近处白帽朋友"
+              }
+            },
+            "b": {
+              "label": "先近处白帽朋友，后远处外公",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-route-reverse",
+                "alt": "先近处白帽朋友，后远处外公"
+              }
+            },
+            "c": {
+              "label": "先远处外公，后近处白帽朋友",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-route-correct",
+                "alt": "先远处外公，后近处白帽朋友"
+              }
+            }
+          }
+        },
+        {
+          "id": "reply-to-friend",
+          "question": "This is my friend. 朝白帽朋友怎么问好？",
+          "skill": "听完介绍后朝新朋友回应",
+          "answer": [
+            "b"
+          ],
+          "analysis": "看向被介绍的白帽朋友，挥手说 Hello。",
+          "options": {
+            "a": {
+              "label": "女孩朝介绍人挥手",
+              "visual": {
+                "kind": "asset",
+                "image": "respond-to-host",
+                "alt": "女孩朝介绍人挥手"
+              }
+            },
+            "b": {
+              "label": "黄发夹女孩转向白帽朋友挥手",
+              "visual": {
+                "kind": "asset",
+                "image": "respond-friend",
+                "alt": "黄发夹女孩转向白帽朋友挥手"
+              }
+            },
+            "c": {
+              "label": "黄发夹女孩低头看纸",
+              "visual": {
+                "kind": "asset",
+                "image": "look-at-paper",
+                "alt": "黄发夹女孩低头看纸"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "recap",
+      "type": "slide",
+      "title": "你也来当小主持",
+      "template": "picture-points",
+      "data": {
+        "title": "你也来当小主持",
+        "picture": "near-friend-a",
+        "points": [
+          "找说话的人",
+          "看关系和远近",
+          "说整句，再问好"
+        ]
+      },
+      "script": [
+        {
+          "say": "灯影展就要开始啦。"
+        },
+        {
+          "say": "小宁想把阿乐介绍给谁呢？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "戴圆眼镜的小宁正要开口。先在图里指到说话的人。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "小宁和阿乐是朋友。"
+        },
+        {
+          "say": "阿乐就在小宁旁边。她会怎么介绍？"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "小宁说 This is my friend."
+        },
+        {
+          "say": "阿乐走远了。That is my friend."
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "你来当小宁，指人，再说一整句。"
+        },
+        {
+          "say": "大人当听介绍的人，回一句 Hello!"
+        },
+        {
+          "say": "在家用纸偶也能玩。"
+        },
+        {
+          "say": "挪远一个纸偶，重新介绍一次。"
+        },
+        {
+          "say": "再换一个说话的人，你会怎么介绍？"
+        },
+        {
+          "say": "请大人听听你介绍的是谁、离你多远。"
+        },
+        {
+          "say": "再听一次欢迎台的玩法。"
+        },
+        {
+          "say": "听完一句再拿访客卡。听这句里用 this 还是 that，再送到合适的图站。"
+        },
+        {
+          "say": "先重听。这次是拿卡，还是送卡？"
+        },
+        {
+          "say": "从说话人看，this 去近站，that 去远站。"
+        },
+        {
+          "say": "两种线索都核对好了，就可以送到这一站。"
+        },
+        {
+          "say": "访客卡送到了，人物和远近都对上了。"
+        }
+      ]
+    }
+  ]
+}

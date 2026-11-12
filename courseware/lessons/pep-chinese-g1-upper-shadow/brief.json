@@ -1,0 +1,84 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "影子",
+  "goals": [
+    "认读影、前、常、黑、狗、左、右、它、好、朋、友，辨认三撇、反犬旁和月字旁，读准词语中的轻声。",
+    "以人或纸偶的朝向为参照辨别前、后、左、右，用方位词向别人说清相对位置。",
+    "借助两小节中的方位和动作线索读懂影子常伴随人的意思，理解小黑狗和好朋友表达的亲近感，练习读出儿歌的节奏。",
+    "按本册笔顺学习写左、右、在、我，分清左与右的下部、在与左的不同，认识斜钩并在我字中找准位置。"
+  ],
+  "scope": {
+    "editionId": "pep-chinese-g1-upper-2022-standard",
+    "revisionId": "20260924-directory-3",
+    "nodeId": "u7-l2",
+    "printedPages": [86, 87],
+    "pdfPages": [91, 92],
+    "officialPeriods": ["lesson_1", "lesson_2"],
+    "officialNotes": "official-notes.json"
+  },
+  "pageSequence": [
+    {"key": "p01", "type": "slide", "title": "谁跟到门口了", "intent": "原创故事从走到院门时发现地上的轮廓开始，引导先看角色和影子的位置，再打开自己的课本找两节写了什么。"},
+    {"key": "p02", "type": "slide", "title": "影子总在同一个地方吗", "intent": "用原创看图和字形提示教影、前、常、左、右，突出影的三撇。读清影子里的轻声和常常表达的频率，练在同一朝向下说前后左右。"},
+    {"key": "p03", "type": "slide", "title": "跟着和陪着", "intent": "用人物和小动物的原创动作图认读黑、狗、它、好、朋、友，依次指出狗的反犬旁、朋的月字旁，示范跟着、陪着和朋友里的轻声。"},
+    {"key": "p04", "type": "slide", "title": "先看清他朝哪儿", "intent": "固定俯视参照人的面朝方向，从脸朝的一边找前方，从背的一边找后方，再比左右。四张人物位置图按老师话逐个亮起，并示范完整方位句。"},
+    {
+      "key": "p05",
+      "type": "interactive",
+      "title": "听方位送道具",
+      "intent": "听老师说要取的道具和收件人相对参照角色的位置，开车避开巡车，按先取后送完成。",
+      "game": {
+        "template": "listenDelivery",
+        "version": 1,
+        "entryPoint": "K.gameTemplates.listenDelivery",
+        "ownerApprovedOn": "2026-11-09",
+        "example": "courseware/kit/examples/classic-arcade/listen-delivery.json",
+        "rule": "只有先取语音指定道具，再到示意图中正确方位的收件点才得分。收件图同一视角、同一朝向，图标标示的人位置各不相同。",
+        "levels": ["先练一单前或后，留宽路。", "再练两单左和右，换一条路。", "末关三单混合方位，增加巡车变化。"],
+        "handoff": "老师先亮道具、参照人和收件图，再实演首个取件动作，清空得分与进度后交给孩子。每一步预录口令可重听。"
+      }
+    },
+    {"key": "p06", "type": "slide", "title": "为什么像小黑狗", "intent": "按第一节的方位变化和第二节的陪伴线索讲清两处形象为什么贴切。用原创短句示范停顿和轻声，再请孩子看自己的课本分节练读。"},
+    {
+      "key": "p07",
+      "type": "interactive",
+      "title": "把影子照进框",
+      "intent": "用纸偶和灯的模拟情境回应影子位置的疑问。孩子移动灯，观察屏幕上的影子移到目标轮廓并定格。",
+      "game": {
+        "template": "shadowStage",
+        "version": 1,
+        "entryPoint": "K.gameTemplates.shadowStage",
+        "ownerApprovedOn": "2026-11-09",
+        "example": "courseware/kit/examples/classic-arcade/shadow-stage.json",
+        "rule": "孩子真实操控灯的位置，只有影子移到指定的另一侧并对齐才成功。所有目标保持同一照射距离，让孩子专心观察方向。",
+        "levels": ["单个左右目标，容差宽，短时间即可成功。", "左右两次交替。", "三次不同位置，收窄对齐范围。"],
+        "handoff": "先亮灯、纸偶和幕布目标，预测再示范定格一张；交接恢复第1关，孩子用大按钮或方向键移动并定格。"
+      }
+    },
+    {"key": "p08", "type": "slide", "title": "左和右下面有区别", "intent": "原创田字格用递进小格示范每一笔，老师依次点亮起笔、左、右三个要点，比较工和口，再留纸笔临写。"},
+    {"key": "p09", "type": "slide", "title": "我和在怎么写", "intent": "先比较在和左左侧的竖，再用递进小格按教材笔顺示范我，指出第五笔斜钩。落笔过程请家长观察。"},
+    {"key": "p10", "type": "quiz", "title": "听老师问，看图找", "intent": "六道读题图片小检查。用新人物、新道具或新字形示意，图片上只保留目标字和真正需要识别的方向信息。"},
+    {"key": "p11", "type": "slide", "title": "影子小演员", "intent": "回扣院门故事，复习参照人、方位词、跟随与陪伴以及四字书写的关键。给家庭留一个原创手影小故事和对照教材朗读的任务。"}
+  ],
+  "quizPlan": [
+    {"skill": "chinese-shadow-position", "focus": "参照面朝门的纸偶，用三张不同站位图辨认其前方。"},
+    {"skill": "chinese-shadow-position", "focus": "用新的同向人物和位置图区分左与右。"},
+    {"skill": "chinese-shadow-light-context", "focus": "同一个纸偶换照射侧，判断模拟图里的影子位置。"},
+    {"skill": "chinese-shadow-language", "focus": "从并行、离开、静物三幅原创图里找能表示常伴随的动作。"},
+    {"skill": "chinese-shadow-components", "focus": "听老师提示后，从教材目标字的原创字形图认出反犬旁。"},
+    {"skill": "chinese-shadow-writing", "focus": "在三张同一个我字的高亮示意图里指认斜钩。"}
+  ],
+  "afterClass": {
+    "reading": "看自己手上的课本，分节朗读并请家长听一听停顿和轻声。",
+    "spokenDirection": "和家人站到同一朝向，用一个新物件练习说前、后、左、右。",
+    "writing": "纸上写左、右、在、我，请家长观察起笔、顺序、斜钩和占位。",
+    "familyActivity": "和家人用纸偶或手影演一个原创小故事，轮流用方位词说影子在哪里。",
+    "evidence": "四项真实表现均为待观察。"
+  },
+  "weeklyQuestionSource": "目标、课后练习线索和小检查技能已记录，供孩子学过本课后的周测合并出题。",
+  "production": {
+    "status": "official_resources_reviewed_brief_ready",
+    "assets": "正式插图在出图获准后按本课原创登记。目标字形、笔画和定向位置示意由代码精确绘制，教材扫描页只用于审读。",
+    "rights": "台词、图、题和版式原创。朗读全文从孩子手上的教材完成。",
+    "catalogSha256": "1f04d478644e68af67bc264bf46227ece3d94d9c4070e8a8dd219846a48f4753"
+  }
+}

@@ -1,0 +1,2219 @@
+{
+  "schemaVersion": "mira.courseware.asset-sources.v1",
+  "generatedBy": "codex_builtin_imagegen",
+  "imagegenPlan": "imagegen-plan.json",
+  "plates": {
+    "storybook": {
+      "source": "assets/illustrations/source/storybook.png",
+      "originalFilename": "exec-b4ec2d50-b94b-491a-b5fa-204d41f04d83.png",
+      "sourceSha256": "67d5e04d7741455f094ead860fa8922bfdd2728bfffe542e915080c76728af19",
+      "width": 1254,
+      "height": 1254
+    },
+    "props": {
+      "source": "assets/illustrations/source/props.png",
+      "originalFilename": "exec-ecf53ec4-8132-4411-83d9-5c930f5220c2.png",
+      "sourceSha256": "db14cdfbbe28da27656b80a7097a919e803c1d68207cdc159f7ca9740e04bcac",
+      "width": 1254,
+      "height": 1254
+    },
+    "game-rooms": {
+      "source": "assets/illustrations/source/game-rooms.png",
+      "originalFilename": "exec-107aa257-3661-42cb-ba98-8658005b2dcc.png",
+      "sourceSha256": "8cfc1a670417903240e6707d93d73dda58b00f7296c24bdccb89912ab58f1650",
+      "width": 1254,
+      "height": 1254
+    },
+    "furniture": {
+      "source": "assets/illustrations/source/furniture.png",
+      "originalFilename": "exec-68392bbf-c92a-46a7-9e81-21d80ddead86.png",
+      "sourceSha256": "b6c60786f4103a770baafc0d90739112bda83ea9bec4bf3effd7aee0605462f2",
+      "width": 1270,
+      "height": 1239
+    },
+    "game-frames": {
+      "source": "assets/illustrations/source/game-frames.png",
+      "originalFilename": "exec-cb1ac239-742c-4c81-8d34-83ce143e9c6b.png",
+      "sourceSha256": "967bf5ced219141f35435a360f4121f203e8c103f7fd392966e6d163c156e6c9",
+      "width": 1254,
+      "height": 1254
+    }
+  },
+  "assets": {
+    "welcome-art": {
+      "type": "codex_builtin_imagegen",
+      "plate": "storybook",
+      "source": "assets/illustrations/source/storybook.png",
+      "sourceSha256": "67d5e04d7741455f094ead860fa8922bfdd2728bfffe542e915080c76728af19",
+      "sourceCell": {
+        "left": 0,
+        "top": 0,
+        "width": 627,
+        "height": 627
+      },
+      "crop": {
+        "left": 0,
+        "top": 0,
+        "width": 627,
+        "height": 627
+      },
+      "path": "assets/illustrations/welcome-art.png",
+      "sha256": "66933834057783a32c0df2e8e488d5fb2bc17234b09932d47edc75f68ad7bda0"
+    },
+    "under-story": {
+      "type": "codex_builtin_imagegen",
+      "plate": "storybook",
+      "source": "assets/illustrations/source/storybook.png",
+      "sourceSha256": "67d5e04d7741455f094ead860fa8922bfdd2728bfffe542e915080c76728af19",
+      "sourceCell": {
+        "left": 627,
+        "top": 0,
+        "width": 627,
+        "height": 627
+      },
+      "crop": {
+        "left": 627,
+        "top": 0,
+        "width": 627,
+        "height": 627
+      },
+      "path": "assets/illustrations/under-story.png",
+      "sha256": "925bb9e403ddced4d9487f7aaa15221958bd57f9b0a7e111809dfbe2c2ad9aca"
+    },
+    "puppet-tote-story": {
+      "type": "codex_builtin_imagegen",
+      "plate": "storybook",
+      "source": "assets/illustrations/source/storybook.png",
+      "sourceSha256": "67d5e04d7741455f094ead860fa8922bfdd2728bfffe542e915080c76728af19",
+      "sourceCell": {
+        "left": 0,
+        "top": 627,
+        "width": 627,
+        "height": 627
+      },
+      "crop": {
+        "left": 0,
+        "top": 627,
+        "width": 627,
+        "height": 627
+      },
+      "path": "assets/illustrations/puppet-tote-story.png",
+      "sha256": "cea20c29fa792054a0256292507bb46013ede9413191d17f4265e21a98d23136"
+    },
+    "home-story-art": {
+      "type": "codex_builtin_imagegen",
+      "plate": "storybook",
+      "source": "assets/illustrations/source/storybook.png",
+      "sourceSha256": "67d5e04d7741455f094ead860fa8922bfdd2728bfffe542e915080c76728af19",
+      "sourceCell": {
+        "left": 627,
+        "top": 627,
+        "width": 627,
+        "height": 627
+      },
+      "crop": {
+        "left": 627,
+        "top": 627,
+        "width": 627,
+        "height": 627
+      },
+      "path": "assets/illustrations/home-story-art.png",
+      "sha256": "8f5d602ccfa2766530c0ad75489e75e5a70798d2a2e0f22ec61284f50bb0828d"
+    },
+    "prop-clip": {
+      "type": "codex_builtin_imagegen",
+      "plate": "props",
+      "source": "assets/illustrations/source/props.png",
+      "sourceSha256": "db14cdfbbe28da27656b80a7097a919e803c1d68207cdc159f7ca9740e04bcac",
+      "sourceCell": {
+        "left": 0,
+        "top": 0,
+        "width": 418,
+        "height": 418
+      },
+      "crop": {
+        "left": 27,
+        "top": 142,
+        "width": 381,
+        "height": 167
+      },
+      "alphaBelow86Cleared": true,
+      "path": "assets/illustrations/prop-clip.png",
+      "sha256": "dd54add1d45d8fd60e0489a79f70177ccc1177ceaefa86a2e87d1f0f8ac9a92b"
+    },
+    "prop-pencil": {
+      "type": "codex_builtin_imagegen",
+      "plate": "props",
+      "source": "assets/illustrations/source/props.png",
+      "sourceSha256": "db14cdfbbe28da27656b80a7097a919e803c1d68207cdc159f7ca9740e04bcac",
+      "sourceCell": {
+        "left": 418,
+        "top": 0,
+        "width": 418,
+        "height": 418
+      },
+      "crop": {
+        "left": 469,
+        "top": 44,
+        "width": 339,
+        "height": 348
+      },
+      "alphaBelow86Cleared": true,
+      "path": "assets/illustrations/prop-pencil.png",
+      "sha256": "900940f4a6e2bee6563f009c1b52e41191634e08da55c006eecbec1f7cacbe61"
+    },
+    "prop-eraser": {
+      "type": "codex_builtin_imagegen",
+      "plate": "props",
+      "source": "assets/illustrations/source/props.png",
+      "sourceSha256": "db14cdfbbe28da27656b80a7097a919e803c1d68207cdc159f7ca9740e04bcac",
+      "sourceCell": {
+        "left": 836,
+        "top": 0,
+        "width": 418,
+        "height": 418
+      },
+      "crop": {
+        "left": 854,
+        "top": 110,
+        "width": 368,
+        "height": 242
+      },
+      "alphaBelow86Cleared": true,
+      "path": "assets/illustrations/prop-eraser.png",
+      "sha256": "f08b63ac91eb70b4e869790448998dbf4415bd1658b5e2679c992bbaf18df8f3"
+    },
+    "prop-car": {
+      "type": "codex_builtin_imagegen",
+      "plate": "props",
+      "source": "assets/illustrations/source/props.png",
+      "sourceSha256": "db14cdfbbe28da27656b80a7097a919e803c1d68207cdc159f7ca9740e04bcac",
+      "sourceCell": {
+        "left": 0,
+        "top": 418,
+        "width": 418,
+        "height": 418
+      },
+      "crop": {
+        "left": 19,
+        "top": 511,
+        "width": 379,
+        "height": 277
+      },
+      "alphaBelow86Cleared": true,
+      "path": "assets/illustrations/prop-car.png",
+      "sha256": "1368dda4a0e2d3e93e1d21ff18e2a4a40e019adba7ce9af32268bf7d0f36de61"
+    },
+    "prop-hazel": {
+      "type": "codex_builtin_imagegen",
+      "plate": "props",
+      "source": "assets/illustrations/source/props.png",
+      "sourceSha256": "db14cdfbbe28da27656b80a7097a919e803c1d68207cdc159f7ca9740e04bcac",
+      "sourceCell": {
+        "left": 418,
+        "top": 418,
+        "width": 418,
+        "height": 418
+      },
+      "crop": {
+        "left": 428,
+        "top": 428,
+        "width": 362,
+        "height": 398
+      },
+      "alphaBelow86Cleared": true,
+      "path": "assets/illustrations/prop-hazel.png",
+      "sha256": "37f1abfc6ec9ea3e39c0929ac44e5d69a36347b0b2fb3a82b77e4fbbca5b5c86"
+    },
+    "prop-nori": {
+      "type": "codex_builtin_imagegen",
+      "plate": "props",
+      "source": "assets/illustrations/source/props.png",
+      "sourceSha256": "db14cdfbbe28da27656b80a7097a919e803c1d68207cdc159f7ca9740e04bcac",
+      "sourceCell": {
+        "left": 836,
+        "top": 418,
+        "width": 418,
+        "height": 418
+      },
+      "crop": {
+        "left": 883,
+        "top": 428,
+        "width": 337,
+        "height": 398
+      },
+      "alphaBelow86Cleared": true,
+      "path": "assets/illustrations/prop-nori.png",
+      "sha256": "3b464c4f125fa6e88bc3912e02bff23a9f9597b16a25b949cade271fe0a7e6b9"
+    },
+    "prop-book": {
+      "type": "codex_builtin_imagegen",
+      "plate": "props",
+      "source": "assets/illustrations/source/props.png",
+      "sourceSha256": "db14cdfbbe28da27656b80a7097a919e803c1d68207cdc159f7ca9740e04bcac",
+      "sourceCell": {
+        "left": 0,
+        "top": 836,
+        "width": 418,
+        "height": 418
+      },
+      "crop": {
+        "left": 19,
+        "top": 944,
+        "width": 389,
+        "height": 234
+      },
+      "alphaBelow86Cleared": true,
+      "path": "assets/illustrations/prop-book.png",
+      "sha256": "6655c6298d389394c56e863d78d0830906c7a0793d494cc98f9744db1d74d903"
+    },
+    "sprout-sticker": {
+      "type": "codex_builtin_imagegen",
+      "plate": "props",
+      "source": "assets/illustrations/source/props.png",
+      "sourceSha256": "db14cdfbbe28da27656b80a7097a919e803c1d68207cdc159f7ca9740e04bcac",
+      "sourceCell": {
+        "left": 836,
+        "top": 836,
+        "width": 418,
+        "height": 418
+      },
+      "crop": {
+        "left": 876,
+        "top": 885,
+        "width": 317,
+        "height": 324
+      },
+      "alphaBelow86Cleared": true,
+      "path": "assets/illustrations/sprout-sticker.png",
+      "sha256": "929aba40f5958e4196dc635dd7b9bfc432b51011e3c6184e067815d42ad3f321"
+    },
+    "pond-backdrop": {
+      "type": "codex_builtin_imagegen",
+      "plate": "game-rooms",
+      "source": "assets/illustrations/source/game-rooms.png",
+      "sourceSha256": "8cfc1a670417903240e6707d93d73dda58b00f7296c24bdccb89912ab58f1650",
+      "sourceCell": {
+        "left": 0,
+        "top": 0,
+        "width": 627,
+        "height": 627
+      },
+      "crop": {
+        "left": 0,
+        "top": 0,
+        "width": 627,
+        "height": 627
+      },
+      "path": "assets/illustrations/pond-backdrop.png",
+      "sha256": "28df9eec8228e7f8f339abe7e7dcd847e02f478c18af908f2677363d028d4a01"
+    },
+    "library-backdrop": {
+      "type": "codex_builtin_imagegen",
+      "plate": "game-rooms",
+      "source": "assets/illustrations/source/game-rooms.png",
+      "sourceSha256": "8cfc1a670417903240e6707d93d73dda58b00f7296c24bdccb89912ab58f1650",
+      "sourceCell": {
+        "left": 627,
+        "top": 0,
+        "width": 627,
+        "height": 627
+      },
+      "crop": {
+        "left": 627,
+        "top": 0,
+        "width": 627,
+        "height": 627
+      },
+      "path": "assets/illustrations/library-backdrop.png",
+      "sha256": "b06185386a2aa381d9fc57d36468b0d40e8802df620ab7b6abf84effc443c371"
+    },
+    "boat-start": {
+      "type": "codex_builtin_imagegen",
+      "plate": "game-rooms",
+      "source": "assets/illustrations/source/game-rooms.png",
+      "sourceSha256": "8cfc1a670417903240e6707d93d73dda58b00f7296c24bdccb89912ab58f1650",
+      "sourceCell": {
+        "left": 0,
+        "top": 627,
+        "width": 627,
+        "height": 627
+      },
+      "crop": {
+        "left": 0,
+        "top": 627,
+        "width": 627,
+        "height": 627
+      },
+      "path": "assets/illustrations/boat-start.png",
+      "sha256": "0f08268214ed4ac666c81ba07b5ab4f3c63d00d91d2e79105de123ac38edae5e"
+    },
+    "maze-start": {
+      "type": "codex_builtin_imagegen",
+      "plate": "game-rooms",
+      "source": "assets/illustrations/source/game-rooms.png",
+      "sourceSha256": "8cfc1a670417903240e6707d93d73dda58b00f7296c24bdccb89912ab58f1650",
+      "sourceCell": {
+        "left": 627,
+        "top": 627,
+        "width": 627,
+        "height": 627
+      },
+      "crop": {
+        "left": 627,
+        "top": 627,
+        "width": 627,
+        "height": 627
+      },
+      "path": "assets/illustrations/maze-start.png",
+      "sha256": "65b1a62652a5519f2e1e79c15c87267048c61f00622c683b853a8d0dc65a89c3"
+    },
+    "desk": {
+      "type": "codex_builtin_imagegen",
+      "plate": "furniture",
+      "source": "assets/illustrations/source/furniture.png",
+      "sourceSha256": "b6c60786f4103a770baafc0d90739112bda83ea9bec4bf3effd7aee0605462f2",
+      "sourceCell": {
+        "left": 14,
+        "top": 104,
+        "width": 684,
+        "height": 490
+      },
+      "crop": {
+        "left": 26,
+        "top": 127,
+        "width": 648,
+        "height": 446
+      },
+      "alphaBelow86Cleared": true,
+      "path": "assets/illustrations/desk.png",
+      "sha256": "b75e7a4dca3f428a94c2432999b18adaab1fbaa8fe8b51ab909057e92439717e"
+    },
+    "chair": {
+      "type": "codex_builtin_imagegen",
+      "plate": "furniture",
+      "source": "assets/illustrations/source/furniture.png",
+      "sourceSha256": "b6c60786f4103a770baafc0d90739112bda83ea9bec4bf3effd7aee0605462f2",
+      "sourceCell": {
+        "left": 708,
+        "top": 20,
+        "width": 536,
+        "height": 595
+      },
+      "crop": {
+        "left": 739,
+        "top": 42,
+        "width": 455,
+        "height": 570
+      },
+      "alphaBelow86Cleared": true,
+      "path": "assets/illustrations/chair.png",
+      "sha256": "2fc1bb998674fe8e23c7ade97f703c06ef46e95e1c536b029b8edbd6b66911f2"
+    },
+    "box": {
+      "type": "codex_builtin_imagegen",
+      "plate": "furniture",
+      "source": "assets/illustrations/source/furniture.png",
+      "sourceSha256": "b6c60786f4103a770baafc0d90739112bda83ea9bec4bf3effd7aee0605462f2",
+      "sourceCell": {
+        "left": 11,
+        "top": 637,
+        "width": 623,
+        "height": 564
+      },
+      "crop": {
+        "left": 36,
+        "top": 667,
+        "width": 588,
+        "height": 511
+      },
+      "alphaBelow86Cleared": true,
+      "path": "assets/illustrations/box.png",
+      "sha256": "0d536fab6bdddcce60a4fe5809e4c6f76a5ea71fcfaf1e80e05e78d0dde77040"
+    },
+    "bag": {
+      "type": "codex_builtin_imagegen",
+      "plate": "furniture",
+      "source": "assets/illustrations/source/furniture.png",
+      "sourceSha256": "b6c60786f4103a770baafc0d90739112bda83ea9bec4bf3effd7aee0605462f2",
+      "sourceCell": {
+        "left": 643,
+        "top": 675,
+        "width": 622,
+        "height": 519
+      },
+      "crop": {
+        "left": 654,
+        "top": 701,
+        "width": 597,
+        "height": 463
+      },
+      "alphaBelow86Cleared": true,
+      "path": "assets/illustrations/bag.png",
+      "sha256": "95e08d6387aafc3f7fdda60240886c3f72187a5fd18f739dd5818161c2f1b09f"
+    },
+    "boat-idle": {
+      "type": "codex_builtin_imagegen",
+      "plate": "game-frames",
+      "source": "assets/illustrations/source/game-frames.png",
+      "sourceSha256": "967bf5ced219141f35435a360f4121f203e8c103f7fd392966e6d163c156e6c9",
+      "sourceCell": {
+        "left": 0,
+        "top": 0,
+        "width": 627,
+        "height": 627
+      },
+      "crop": {
+        "left": 69,
+        "top": 188,
+        "width": 501,
+        "height": 275
+      },
+      "alphaBelow86Cleared": true,
+      "rotationDegrees": 90,
+      "path": "assets/illustrations/boat-idle.png",
+      "sha256": "b9e3f346cdca12ea651d032c6e6ab5612ff3ba06f2ebd48ab350673e784ddc14"
+    },
+    "boat-pop": {
+      "type": "codex_builtin_imagegen",
+      "plate": "game-frames",
+      "source": "assets/illustrations/source/game-frames.png",
+      "sourceSha256": "967bf5ced219141f35435a360f4121f203e8c103f7fd392966e6d163c156e6c9",
+      "sourceCell": {
+        "left": 627,
+        "top": 0,
+        "width": 627,
+        "height": 627
+      },
+      "crop": {
+        "left": 654,
+        "top": 188,
+        "width": 554,
+        "height": 274
+      },
+      "alphaBelow86Cleared": true,
+      "rotationDegrees": 90,
+      "path": "assets/illustrations/boat-pop.png",
+      "sha256": "42f53fc6ba55f1f1540656eaef3f86402488f7df67053089d8997a4491e5a563"
+    },
+    "maze-cart-idle": {
+      "type": "codex_builtin_imagegen",
+      "plate": "game-frames",
+      "source": "assets/illustrations/source/game-frames.png",
+      "sourceSha256": "967bf5ced219141f35435a360f4121f203e8c103f7fd392966e6d163c156e6c9",
+      "sourceCell": {
+        "left": 0,
+        "top": 627,
+        "width": 627,
+        "height": 627
+      },
+      "crop": {
+        "left": 74,
+        "top": 729,
+        "width": 461,
+        "height": 395
+      },
+      "alphaBelow86Cleared": true,
+      "path": "assets/illustrations/maze-cart-idle.png",
+      "sha256": "e6ad361e5b4812bc6bcc0b2e9de012eee7f25fc025b9e26a82b521051953afe5"
+    },
+    "maze-cart-pop": {
+      "type": "codex_builtin_imagegen",
+      "plate": "game-frames",
+      "source": "assets/illustrations/source/game-frames.png",
+      "sourceSha256": "967bf5ced219141f35435a360f4121f203e8c103f7fd392966e6d163c156e6c9",
+      "sourceCell": {
+        "left": 627,
+        "top": 627,
+        "width": 627,
+        "height": 627
+      },
+      "crop": {
+        "left": 656,
+        "top": 729,
+        "width": 542,
+        "height": 396
+      },
+      "alphaBelow86Cleared": true,
+      "path": "assets/illustrations/maze-cart-pop.png",
+      "sha256": "48292dd74f8dc377658f97adbd9295f89900ec66ed3dae98cfa76cee16fd1383"
+    },
+    "clip-under-desk": {
+      "type": "semantic_composition",
+      "components": [
+        "desk",
+        "prop-clip"
+      ],
+      "description": "clip under desk. The actual furniture silhouette and occlusion show the relation.",
+      "composition": {
+        "width": 246,
+        "height": 214,
+        "markup": "<rect x=\"1\" y=\"1\" width=\"244\" height=\"212\" rx=\"26\" fill=\"#fff5df\" stroke=\"#8da993\" stroke-width=\"2\"/><rect x=\"6\" y=\"183\" width=\"234\" height=\"25\" rx=\"13\" fill=\"#eddbb8\" stroke=\"none\" stroke-width=\"1\"/><path d=\"M17,183 L229,183\" fill=\"none\" stroke=\"#ad8864\" stroke-width=\"2\" stroke-linecap=\"round\"/>",
+        "layers": [
+          {
+            "asset": "desk",
+            "x": 27,
+            "y": 53,
+            "width": 192,
+            "height": 132,
+            "fit": "contain",
+            "anchor": "center"
+          },
+          {
+            "asset": "prop-clip",
+            "x": 79,
+            "y": 144,
+            "width": 87,
+            "height": 38,
+            "fit": "contain",
+            "anchor": "center"
+          }
+        ]
+      },
+      "path": "assets/illustrations/clip-under-desk.png",
+      "sha256": "e776aef808376afd6a4991184a76270c04f2c4b51c92efefe2bfb8e3650cb240"
+    },
+    "clip-on-desk": {
+      "type": "semantic_composition",
+      "components": [
+        "desk",
+        "prop-clip"
+      ],
+      "description": "clip on desk. The actual furniture silhouette and occlusion show the relation.",
+      "composition": {
+        "width": 246,
+        "height": 214,
+        "markup": "<rect x=\"1\" y=\"1\" width=\"244\" height=\"212\" rx=\"26\" fill=\"#fff5df\" stroke=\"#8da993\" stroke-width=\"2\"/><rect x=\"6\" y=\"183\" width=\"234\" height=\"25\" rx=\"13\" fill=\"#eddbb8\" stroke=\"none\" stroke-width=\"1\"/><path d=\"M17,183 L229,183\" fill=\"none\" stroke=\"#ad8864\" stroke-width=\"2\" stroke-linecap=\"round\"/>",
+        "layers": [
+          {
+            "asset": "desk",
+            "x": 27,
+            "y": 53,
+            "width": 192,
+            "height": 132,
+            "fit": "contain",
+            "anchor": "center"
+          },
+          {
+            "asset": "prop-clip",
+            "x": 80,
+            "y": 55,
+            "width": 87,
+            "height": 38,
+            "fit": "contain",
+            "anchor": "center"
+          }
+        ]
+      },
+      "path": "assets/illustrations/clip-on-desk.png",
+      "sha256": "5b886ab5ec9909dcc0e84b054ce5656ef100cba1cac2dbb7ff728abe8fbee39b"
+    },
+    "clip-in-bag": {
+      "type": "semantic_composition",
+      "components": [
+        "bag",
+        "prop-clip"
+      ],
+      "description": "clip in bag. The actual furniture silhouette and occlusion show the relation.",
+      "composition": {
+        "width": 246,
+        "height": 214,
+        "markup": "<rect x=\"1\" y=\"1\" width=\"244\" height=\"212\" rx=\"26\" fill=\"#fff5df\" stroke=\"#8da993\" stroke-width=\"2\"/><rect x=\"6\" y=\"183\" width=\"234\" height=\"25\" rx=\"13\" fill=\"#eddbb8\" stroke=\"none\" stroke-width=\"1\"/><path d=\"M17,183 L229,183\" fill=\"none\" stroke=\"#ad8864\" stroke-width=\"2\" stroke-linecap=\"round\"/>",
+        "layers": [
+          {
+            "asset": "bag",
+            "x": 37,
+            "y": 52,
+            "width": 172,
+            "height": 133,
+            "fit": "contain",
+            "anchor": "center"
+          },
+          {
+            "asset": "prop-clip",
+            "x": 83,
+            "y": 70,
+            "width": 87,
+            "height": 38,
+            "fit": "contain",
+            "anchor": "center"
+          },
+          {
+            "asset": "bag",
+            "x": 37,
+            "y": 52,
+            "width": 172,
+            "height": 133,
+            "occlusionMaskSvg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"172\" height=\"133\" viewBox=\"0 0 1 1\" preserveAspectRatio=\"none\"><path d=\"M 0.106,0.167 C 0.163,0.261 0.324,0.326 0.535,0.325 C 0.685,0.323 0.831,0.240 0.925,0.163 L 1,0.38 L 1,1 L 0,1 L 0,0.38 Z\" fill=\"white\"/></svg>"
+          }
+        ]
+      },
+      "path": "assets/illustrations/clip-in-bag.png",
+      "sha256": "a9a8c31df50595ee0a91824ed18b8fe7db13f3afd6e56614556e78194c1ae2bd"
+    },
+    "clip-on-chair": {
+      "type": "semantic_composition",
+      "components": [
+        "chair",
+        "prop-clip"
+      ],
+      "description": "clip on chair. The actual furniture silhouette and occlusion show the relation.",
+      "composition": {
+        "width": 246,
+        "height": 214,
+        "markup": "<rect x=\"1\" y=\"1\" width=\"244\" height=\"212\" rx=\"26\" fill=\"#fff5df\" stroke=\"#8da993\" stroke-width=\"2\"/><rect x=\"6\" y=\"183\" width=\"234\" height=\"25\" rx=\"13\" fill=\"#eddbb8\" stroke=\"none\" stroke-width=\"1\"/><path d=\"M17,183 L229,183\" fill=\"none\" stroke=\"#ad8864\" stroke-width=\"2\" stroke-linecap=\"round\"/>",
+        "layers": [
+          {
+            "asset": "chair",
+            "x": 62,
+            "y": 31,
+            "width": 123,
+            "height": 154,
+            "fit": "contain",
+            "anchor": "center"
+          },
+          {
+            "asset": "prop-clip",
+            "x": 80,
+            "y": 78,
+            "width": 87,
+            "height": 38,
+            "fit": "contain",
+            "anchor": "center"
+          }
+        ]
+      },
+      "path": "assets/illustrations/clip-on-chair.png",
+      "sha256": "03fcdf4b9ec7a37206c3f51beac58c00501558273aa67ab0e5982c4829e11651"
+    },
+    "clip-beside-bag": {
+      "type": "semantic_composition",
+      "components": [
+        "bag",
+        "prop-clip"
+      ],
+      "description": "clip beside bag. The actual furniture silhouette and occlusion show the relation.",
+      "composition": {
+        "width": 246,
+        "height": 214,
+        "markup": "<rect x=\"1\" y=\"1\" width=\"244\" height=\"212\" rx=\"26\" fill=\"#fff5df\" stroke=\"#8da993\" stroke-width=\"2\"/><rect x=\"6\" y=\"183\" width=\"234\" height=\"25\" rx=\"13\" fill=\"#eddbb8\" stroke=\"none\" stroke-width=\"1\"/><path d=\"M17,183 L229,183\" fill=\"none\" stroke=\"#ad8864\" stroke-width=\"2\" stroke-linecap=\"round\"/>",
+        "layers": [
+          {
+            "asset": "bag",
+            "x": 14,
+            "y": 84,
+            "width": 130,
+            "height": 101,
+            "fit": "contain",
+            "anchor": "center"
+          },
+          {
+            "asset": "prop-clip",
+            "x": 163,
+            "y": 154,
+            "width": 67,
+            "height": 29,
+            "fit": "contain",
+            "anchor": "center"
+          }
+        ]
+      },
+      "path": "assets/illustrations/clip-beside-bag.png",
+      "sha256": "a67796e0e1a6865972d45443389c9d4d81c24e34827632e83f5b26515d5423cc"
+    },
+    "clip-under-chair": {
+      "type": "semantic_composition",
+      "components": [
+        "chair",
+        "prop-clip"
+      ],
+      "description": "clip under chair. The actual furniture silhouette and occlusion show the relation.",
+      "composition": {
+        "width": 246,
+        "height": 214,
+        "markup": "<rect x=\"1\" y=\"1\" width=\"244\" height=\"212\" rx=\"26\" fill=\"#fff5df\" stroke=\"#8da993\" stroke-width=\"2\"/><rect x=\"6\" y=\"183\" width=\"234\" height=\"25\" rx=\"13\" fill=\"#eddbb8\" stroke=\"none\" stroke-width=\"1\"/><path d=\"M17,183 L229,183\" fill=\"none\" stroke=\"#ad8864\" stroke-width=\"2\" stroke-linecap=\"round\"/>",
+        "layers": [
+          {
+            "asset": "chair",
+            "x": 62,
+            "y": 31,
+            "width": 123,
+            "height": 154,
+            "fit": "contain",
+            "anchor": "center"
+          },
+          {
+            "asset": "prop-clip",
+            "x": 89,
+            "y": 153,
+            "width": 66,
+            "height": 29,
+            "fit": "contain",
+            "anchor": "center"
+          }
+        ]
+      },
+      "path": "assets/illustrations/clip-under-chair.png",
+      "sha256": "be38a90417605bf6fb8c51262d6ec41643207251ed8ec5d5d47ac359370c86cf"
+    },
+    "book-on-desk": {
+      "type": "semantic_composition",
+      "components": [
+        "desk",
+        "prop-book"
+      ],
+      "description": "book on desk. The actual furniture silhouette and occlusion show the relation.",
+      "composition": {
+        "width": 246,
+        "height": 214,
+        "markup": "<rect x=\"1\" y=\"1\" width=\"244\" height=\"212\" rx=\"26\" fill=\"#fff5df\" stroke=\"#8da993\" stroke-width=\"2\"/><rect x=\"6\" y=\"183\" width=\"234\" height=\"25\" rx=\"13\" fill=\"#eddbb8\" stroke=\"none\" stroke-width=\"1\"/><path d=\"M17,183 L229,183\" fill=\"none\" stroke=\"#ad8864\" stroke-width=\"2\" stroke-linecap=\"round\"/>",
+        "layers": [
+          {
+            "asset": "desk",
+            "x": 27,
+            "y": 53,
+            "width": 192,
+            "height": 132,
+            "fit": "contain",
+            "anchor": "center"
+          },
+          {
+            "asset": "prop-book",
+            "x": 83,
+            "y": 44,
+            "width": 81,
+            "height": 49,
+            "fit": "contain",
+            "anchor": "center"
+          }
+        ]
+      },
+      "path": "assets/illustrations/book-on-desk.png",
+      "sha256": "ef5feb98d0232d49a041f90f1822be61df24ef73aef1f96eb34457a76617e7a1"
+    },
+    "book-under-desk": {
+      "type": "semantic_composition",
+      "components": [
+        "desk",
+        "prop-book"
+      ],
+      "description": "book under desk. The actual furniture silhouette and occlusion show the relation.",
+      "composition": {
+        "width": 246,
+        "height": 214,
+        "markup": "<rect x=\"1\" y=\"1\" width=\"244\" height=\"212\" rx=\"26\" fill=\"#fff5df\" stroke=\"#8da993\" stroke-width=\"2\"/><rect x=\"6\" y=\"183\" width=\"234\" height=\"25\" rx=\"13\" fill=\"#eddbb8\" stroke=\"none\" stroke-width=\"1\"/><path d=\"M17,183 L229,183\" fill=\"none\" stroke=\"#ad8864\" stroke-width=\"2\" stroke-linecap=\"round\"/>",
+        "layers": [
+          {
+            "asset": "desk",
+            "x": 27,
+            "y": 53,
+            "width": 192,
+            "height": 132,
+            "fit": "contain",
+            "anchor": "center"
+          },
+          {
+            "asset": "prop-book",
+            "x": 82,
+            "y": 133,
+            "width": 81,
+            "height": 49,
+            "fit": "contain",
+            "anchor": "center"
+          }
+        ]
+      },
+      "path": "assets/illustrations/book-under-desk.png",
+      "sha256": "460e2733a6a883803d8ce4cb9a1cf364af8781a650d6296c4b78e7564b83c457"
+    },
+    "pencil-under-desk": {
+      "type": "semantic_composition",
+      "components": [
+        "desk",
+        "prop-pencil"
+      ],
+      "description": "pencil under desk. The actual furniture silhouette and occlusion show the relation.",
+      "composition": {
+        "width": 246,
+        "height": 214,
+        "markup": "<rect x=\"1\" y=\"1\" width=\"244\" height=\"212\" rx=\"26\" fill=\"#fff5df\" stroke=\"#8da993\" stroke-width=\"2\"/><rect x=\"6\" y=\"183\" width=\"234\" height=\"25\" rx=\"13\" fill=\"#eddbb8\" stroke=\"none\" stroke-width=\"1\"/><path d=\"M17,183 L229,183\" fill=\"none\" stroke=\"#ad8864\" stroke-width=\"2\" stroke-linecap=\"round\"/>",
+        "layers": [
+          {
+            "asset": "desk",
+            "x": 27,
+            "y": 53,
+            "width": 192,
+            "height": 132,
+            "fit": "contain",
+            "anchor": "center"
+          },
+          {
+            "asset": "prop-pencil",
+            "x": 98,
+            "y": 132,
+            "width": 49,
+            "height": 50,
+            "fit": "contain",
+            "anchor": "center"
+          }
+        ]
+      },
+      "path": "assets/illustrations/pencil-under-desk.png",
+      "sha256": "ebc8423b12ccac5c447851626941a3ec8d78c39500de9ec7e45565b0545cfcd6"
+    },
+    "pencil-on-desk": {
+      "type": "semantic_composition",
+      "components": [
+        "desk",
+        "prop-pencil"
+      ],
+      "description": "pencil on desk. The actual furniture silhouette and occlusion show the relation.",
+      "composition": {
+        "width": 246,
+        "height": 214,
+        "markup": "<rect x=\"1\" y=\"1\" width=\"244\" height=\"212\" rx=\"26\" fill=\"#fff5df\" stroke=\"#8da993\" stroke-width=\"2\"/><rect x=\"6\" y=\"183\" width=\"234\" height=\"25\" rx=\"13\" fill=\"#eddbb8\" stroke=\"none\" stroke-width=\"1\"/><path d=\"M17,183 L229,183\" fill=\"none\" stroke=\"#ad8864\" stroke-width=\"2\" stroke-linecap=\"round\"/>",
+        "layers": [
+          {
+            "asset": "desk",
+            "x": 27,
+            "y": 53,
+            "width": 192,
+            "height": 132,
+            "fit": "contain",
+            "anchor": "center"
+          },
+          {
+            "asset": "prop-pencil",
+            "x": 99,
+            "y": 43,
+            "width": 49,
+            "height": 50,
+            "fit": "contain",
+            "anchor": "center"
+          }
+        ]
+      },
+      "path": "assets/illustrations/pencil-on-desk.png",
+      "sha256": "e82b3c8523e1939537c68aa021d461735141c03aa99f3fe3dc702e0019af1962"
+    },
+    "pencil-in-box": {
+      "type": "semantic_composition",
+      "components": [
+        "box",
+        "prop-pencil"
+      ],
+      "description": "pencil in box. The actual furniture silhouette and occlusion show the relation.",
+      "composition": {
+        "width": 246,
+        "height": 214,
+        "markup": "<rect x=\"1\" y=\"1\" width=\"244\" height=\"212\" rx=\"26\" fill=\"#fff5df\" stroke=\"#8da993\" stroke-width=\"2\"/><rect x=\"6\" y=\"183\" width=\"234\" height=\"25\" rx=\"13\" fill=\"#eddbb8\" stroke=\"none\" stroke-width=\"1\"/><path d=\"M17,183 L229,183\" fill=\"none\" stroke=\"#ad8864\" stroke-width=\"2\" stroke-linecap=\"round\"/>",
+        "layers": [
+          {
+            "asset": "box",
+            "x": 47,
+            "y": 52,
+            "width": 153,
+            "height": 133,
+            "fit": "contain",
+            "anchor": "center"
+          },
+          {
+            "asset": "prop-pencil",
+            "x": 106,
+            "y": 97,
+            "width": 49,
+            "height": 50,
+            "fit": "contain",
+            "anchor": "center"
+          },
+          {
+            "asset": "box",
+            "x": 47,
+            "y": 52,
+            "width": 153,
+            "height": 133,
+            "occlusionMaskSvg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"153\" height=\"133\" viewBox=\"0 0 1 1\" preserveAspectRatio=\"none\"><path d=\"M 0.222,0.681 L 0.965,0.566 L 1,0.68 L 1,1 L 0,1 L 0.10,0.72 Z\" fill=\"white\"/></svg>"
+          }
+        ]
+      },
+      "path": "assets/illustrations/pencil-in-box.png",
+      "sha256": "59672df5fb5d5eb7fa7db700b04f113c4d33213db9e1d1a58d2891f557ca6e37"
+    },
+    "book-in-box": {
+      "type": "semantic_composition",
+      "components": [
+        "box",
+        "prop-book"
+      ],
+      "description": "book in box. The actual furniture silhouette and occlusion show the relation.",
+      "composition": {
+        "width": 246,
+        "height": 214,
+        "markup": "<rect x=\"1\" y=\"1\" width=\"244\" height=\"212\" rx=\"26\" fill=\"#fff5df\" stroke=\"#8da993\" stroke-width=\"2\"/><rect x=\"6\" y=\"183\" width=\"234\" height=\"25\" rx=\"13\" fill=\"#eddbb8\" stroke=\"none\" stroke-width=\"1\"/><path d=\"M17,183 L229,183\" fill=\"none\" stroke=\"#ad8864\" stroke-width=\"2\" stroke-linecap=\"round\"/>",
+        "layers": [
+          {
+            "asset": "box",
+            "x": 47,
+            "y": 52,
+            "width": 153,
+            "height": 133,
+            "fit": "contain",
+            "anchor": "center"
+          },
+          {
+            "asset": "prop-book",
+            "x": 90,
+            "y": 98,
+            "width": 81,
+            "height": 49,
+            "fit": "contain",
+            "anchor": "center"
+          },
+          {
+            "asset": "box",
+            "x": 47,
+            "y": 52,
+            "width": 153,
+            "height": 133,
+            "occlusionMaskSvg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"153\" height=\"133\" viewBox=\"0 0 1 1\" preserveAspectRatio=\"none\"><path d=\"M 0.222,0.681 L 0.965,0.566 L 1,0.68 L 1,1 L 0,1 L 0.10,0.72 Z\" fill=\"white\"/></svg>"
+          }
+        ]
+      },
+      "path": "assets/illustrations/book-in-box.png",
+      "sha256": "9238c2fea11dbc84998fe2da63add2cfb070968c85f9d9cdcbba05e8a7c49714"
+    },
+    "hazel-on-chair": {
+      "type": "semantic_composition",
+      "components": [
+        "chair",
+        "prop-hazel"
+      ],
+      "description": "hazel on chair. The actual furniture silhouette and occlusion show the relation.",
+      "composition": {
+        "width": 246,
+        "height": 214,
+        "markup": "<rect x=\"1\" y=\"1\" width=\"244\" height=\"212\" rx=\"26\" fill=\"#fff5df\" stroke=\"#8da993\" stroke-width=\"2\"/><rect x=\"6\" y=\"183\" width=\"234\" height=\"25\" rx=\"13\" fill=\"#eddbb8\" stroke=\"none\" stroke-width=\"1\"/><path d=\"M17,183 L229,183\" fill=\"none\" stroke=\"#ad8864\" stroke-width=\"2\" stroke-linecap=\"round\"/>",
+        "layers": [
+          {
+            "asset": "chair",
+            "x": 62,
+            "y": 31,
+            "width": 123,
+            "height": 154,
+            "fit": "contain",
+            "anchor": "center"
+          },
+          {
+            "asset": "prop-hazel",
+            "x": 94,
+            "y": 51,
+            "width": 59,
+            "height": 65,
+            "fit": "contain",
+            "anchor": "center"
+          }
+        ]
+      },
+      "path": "assets/illustrations/hazel-on-chair.png",
+      "sha256": "427cfa9a8ab49d32f4f2417ab8972cfb7f06f2b47e68d6095696965f37063bde"
+    },
+    "hazel-under-desk": {
+      "type": "semantic_composition",
+      "components": [
+        "desk",
+        "prop-hazel"
+      ],
+      "description": "hazel under desk. The actual furniture silhouette and occlusion show the relation.",
+      "composition": {
+        "width": 246,
+        "height": 214,
+        "markup": "<rect x=\"1\" y=\"1\" width=\"244\" height=\"212\" rx=\"26\" fill=\"#fff5df\" stroke=\"#8da993\" stroke-width=\"2\"/><rect x=\"6\" y=\"183\" width=\"234\" height=\"25\" rx=\"13\" fill=\"#eddbb8\" stroke=\"none\" stroke-width=\"1\"/><path d=\"M17,183 L229,183\" fill=\"none\" stroke=\"#ad8864\" stroke-width=\"2\" stroke-linecap=\"round\"/>",
+        "layers": [
+          {
+            "asset": "desk",
+            "x": 27,
+            "y": 53,
+            "width": 192,
+            "height": 132,
+            "fit": "contain",
+            "anchor": "center"
+          },
+          {
+            "asset": "prop-hazel",
+            "x": 96,
+            "y": 124,
+            "width": 53,
+            "height": 58,
+            "fit": "contain",
+            "anchor": "center"
+          }
+        ]
+      },
+      "path": "assets/illustrations/hazel-under-desk.png",
+      "sha256": "ec037df681acf54216f0065a09a05ef58529a87605a646532b89e1f7abcf553b"
+    },
+    "hazel-on-desk": {
+      "type": "semantic_composition",
+      "components": [
+        "desk",
+        "prop-hazel"
+      ],
+      "description": "hazel on desk. The actual furniture silhouette and occlusion show the relation.",
+      "composition": {
+        "width": 246,
+        "height": 214,
+        "markup": "<rect x=\"1\" y=\"1\" width=\"244\" height=\"212\" rx=\"26\" fill=\"#fff5df\" stroke=\"#8da993\" stroke-width=\"2\"/><rect x=\"6\" y=\"183\" width=\"234\" height=\"25\" rx=\"13\" fill=\"#eddbb8\" stroke=\"none\" stroke-width=\"1\"/><path d=\"M17,183 L229,183\" fill=\"none\" stroke=\"#ad8864\" stroke-width=\"2\" stroke-linecap=\"round\"/>",
+        "layers": [
+          {
+            "asset": "desk",
+            "x": 27,
+            "y": 53,
+            "width": 192,
+            "height": 132,
+            "fit": "contain",
+            "anchor": "center"
+          },
+          {
+            "asset": "prop-hazel",
+            "x": 94,
+            "y": 28,
+            "width": 59,
+            "height": 65,
+            "fit": "contain",
+            "anchor": "center"
+          }
+        ]
+      },
+      "path": "assets/illustrations/hazel-on-desk.png",
+      "sha256": "2a0e24608723fbce5f04d72cbf04eaee8311a077c15ddb676c98ba2022462290"
+    },
+    "hazel-in-bag": {
+      "type": "semantic_composition",
+      "components": [
+        "bag",
+        "prop-hazel"
+      ],
+      "description": "hazel in bag. The actual furniture silhouette and occlusion show the relation.",
+      "composition": {
+        "width": 246,
+        "height": 214,
+        "markup": "<rect x=\"1\" y=\"1\" width=\"244\" height=\"212\" rx=\"26\" fill=\"#fff5df\" stroke=\"#8da993\" stroke-width=\"2\"/><rect x=\"6\" y=\"183\" width=\"234\" height=\"25\" rx=\"13\" fill=\"#eddbb8\" stroke=\"none\" stroke-width=\"1\"/><path d=\"M17,183 L229,183\" fill=\"none\" stroke=\"#ad8864\" stroke-width=\"2\" stroke-linecap=\"round\"/>",
+        "layers": [
+          {
+            "asset": "bag",
+            "x": 37,
+            "y": 52,
+            "width": 172,
+            "height": 133,
+            "fit": "contain",
+            "anchor": "center"
+          },
+          {
+            "asset": "prop-hazel",
+            "x": 98,
+            "y": 48,
+            "width": 57,
+            "height": 63,
+            "fit": "contain",
+            "anchor": "center"
+          },
+          {
+            "asset": "bag",
+            "x": 37,
+            "y": 52,
+            "width": 172,
+            "height": 133,
+            "occlusionMaskSvg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"172\" height=\"133\" viewBox=\"0 0 1 1\" preserveAspectRatio=\"none\"><path d=\"M 0.106,0.167 C 0.163,0.261 0.324,0.326 0.535,0.325 C 0.685,0.323 0.831,0.240 0.925,0.163 L 1,0.38 L 1,1 L 0,1 L 0,0.38 Z\" fill=\"white\"/></svg>"
+          }
+        ]
+      },
+      "path": "assets/illustrations/hazel-in-bag.png",
+      "sha256": "a1a856ce249ae8204637ecabdd8bc91a4154f328aedf7ddbc83aff1abc836f26"
+    },
+    "hazel-under-chair": {
+      "type": "semantic_composition",
+      "components": [
+        "chair",
+        "prop-hazel"
+      ],
+      "description": "hazel under chair. The actual furniture silhouette and occlusion show the relation.",
+      "composition": {
+        "width": 246,
+        "height": 214,
+        "markup": "<rect x=\"1\" y=\"1\" width=\"244\" height=\"212\" rx=\"26\" fill=\"#fff5df\" stroke=\"#8da993\" stroke-width=\"2\"/><rect x=\"6\" y=\"183\" width=\"234\" height=\"25\" rx=\"13\" fill=\"#eddbb8\" stroke=\"none\" stroke-width=\"1\"/><path d=\"M17,183 L229,183\" fill=\"none\" stroke=\"#ad8864\" stroke-width=\"2\" stroke-linecap=\"round\"/>",
+        "layers": [
+          {
+            "asset": "chair",
+            "x": 62,
+            "y": 31,
+            "width": 123,
+            "height": 154,
+            "fit": "contain",
+            "anchor": "center"
+          },
+          {
+            "asset": "prop-hazel",
+            "x": 100,
+            "y": 133,
+            "width": 45,
+            "height": 49,
+            "fit": "contain",
+            "anchor": "center"
+          }
+        ]
+      },
+      "path": "assets/illustrations/hazel-under-chair.png",
+      "sha256": "0f170c77833b6032cb721c7a3e953e9ba53c8171233fc26db1e558081273db86"
+    },
+    "hazel-in-box": {
+      "type": "semantic_composition",
+      "components": [
+        "box",
+        "prop-hazel"
+      ],
+      "description": "hazel in box. The actual furniture silhouette and occlusion show the relation.",
+      "composition": {
+        "width": 246,
+        "height": 214,
+        "markup": "<rect x=\"1\" y=\"1\" width=\"244\" height=\"212\" rx=\"26\" fill=\"#fff5df\" stroke=\"#8da993\" stroke-width=\"2\"/><rect x=\"6\" y=\"183\" width=\"234\" height=\"25\" rx=\"13\" fill=\"#eddbb8\" stroke=\"none\" stroke-width=\"1\"/><path d=\"M17,183 L229,183\" fill=\"none\" stroke=\"#ad8864\" stroke-width=\"2\" stroke-linecap=\"round\"/>",
+        "layers": [
+          {
+            "asset": "box",
+            "x": 47,
+            "y": 52,
+            "width": 153,
+            "height": 133,
+            "fit": "contain",
+            "anchor": "center"
+          },
+          {
+            "asset": "prop-hazel",
+            "x": 102,
+            "y": 87,
+            "width": 57,
+            "height": 63,
+            "fit": "contain",
+            "anchor": "center"
+          },
+          {
+            "asset": "box",
+            "x": 47,
+            "y": 52,
+            "width": 153,
+            "height": 133,
+            "occlusionMaskSvg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"153\" height=\"133\" viewBox=\"0 0 1 1\" preserveAspectRatio=\"none\"><path d=\"M 0.222,0.681 L 0.965,0.566 L 1,0.68 L 1,1 L 0,1 L 0.10,0.72 Z\" fill=\"white\"/></svg>"
+          }
+        ]
+      },
+      "path": "assets/illustrations/hazel-in-box.png",
+      "sha256": "19269e9cde2a7b66a3714bd75b717ab8484eda08d37d101137632d88b895b5dd"
+    },
+    "q2-under-chair": {
+      "type": "semantic_composition",
+      "components": [
+        "chair",
+        "prop-car"
+      ],
+      "description": "car under chair. The actual furniture silhouette and occlusion show the relation.",
+      "composition": {
+        "width": 246,
+        "height": 214,
+        "markup": "<rect x=\"1\" y=\"1\" width=\"244\" height=\"212\" rx=\"26\" fill=\"#fff5df\" stroke=\"#8da993\" stroke-width=\"2\"/><rect x=\"6\" y=\"183\" width=\"234\" height=\"25\" rx=\"13\" fill=\"#eddbb8\" stroke=\"none\" stroke-width=\"1\"/><path d=\"M17,183 L229,183\" fill=\"none\" stroke=\"#ad8864\" stroke-width=\"2\" stroke-linecap=\"round\"/>",
+        "layers": [
+          {
+            "asset": "chair",
+            "x": 62,
+            "y": 31,
+            "width": 123,
+            "height": 154,
+            "fit": "contain",
+            "anchor": "center"
+          },
+          {
+            "asset": "prop-car",
+            "x": 92,
+            "y": 137,
+            "width": 61,
+            "height": 45,
+            "fit": "contain",
+            "anchor": "center"
+          }
+        ]
+      },
+      "path": "assets/illustrations/q2-under-chair.png",
+      "sha256": "51596fda6e9bbaaca3d1510ac26dee08c9003ef13a7b3f48036c8049a19178eb"
+    },
+    "q2-on-chair": {
+      "type": "semantic_composition",
+      "components": [
+        "chair",
+        "prop-car"
+      ],
+      "description": "car on chair. The actual furniture silhouette and occlusion show the relation.",
+      "composition": {
+        "width": 246,
+        "height": 214,
+        "markup": "<rect x=\"1\" y=\"1\" width=\"244\" height=\"212\" rx=\"26\" fill=\"#fff5df\" stroke=\"#8da993\" stroke-width=\"2\"/><rect x=\"6\" y=\"183\" width=\"234\" height=\"25\" rx=\"13\" fill=\"#eddbb8\" stroke=\"none\" stroke-width=\"1\"/><path d=\"M17,183 L229,183\" fill=\"none\" stroke=\"#ad8864\" stroke-width=\"2\" stroke-linecap=\"round\"/>",
+        "layers": [
+          {
+            "asset": "chair",
+            "x": 62,
+            "y": 31,
+            "width": 123,
+            "height": 154,
+            "fit": "contain",
+            "anchor": "center"
+          },
+          {
+            "asset": "prop-car",
+            "x": 90,
+            "y": 67,
+            "width": 67,
+            "height": 49,
+            "fit": "contain",
+            "anchor": "center"
+          }
+        ]
+      },
+      "path": "assets/illustrations/q2-on-chair.png",
+      "sha256": "d78d709a156c07fbe10da77e89b95f299c1767fc45d6579b7d1f4162d5e0b017"
+    },
+    "q2-under-desk": {
+      "type": "semantic_composition",
+      "components": [
+        "desk",
+        "prop-car"
+      ],
+      "description": "car under desk. The actual furniture silhouette and occlusion show the relation.",
+      "composition": {
+        "width": 246,
+        "height": 214,
+        "markup": "<rect x=\"1\" y=\"1\" width=\"244\" height=\"212\" rx=\"26\" fill=\"#fff5df\" stroke=\"#8da993\" stroke-width=\"2\"/><rect x=\"6\" y=\"183\" width=\"234\" height=\"25\" rx=\"13\" fill=\"#eddbb8\" stroke=\"none\" stroke-width=\"1\"/><path d=\"M17,183 L229,183\" fill=\"none\" stroke=\"#ad8864\" stroke-width=\"2\" stroke-linecap=\"round\"/>",
+        "layers": [
+          {
+            "asset": "desk",
+            "x": 27,
+            "y": 53,
+            "width": 192,
+            "height": 132,
+            "fit": "contain",
+            "anchor": "center"
+          },
+          {
+            "asset": "prop-car",
+            "x": 89,
+            "y": 133,
+            "width": 67,
+            "height": 49,
+            "fit": "contain",
+            "anchor": "center"
+          }
+        ]
+      },
+      "path": "assets/illustrations/q2-under-desk.png",
+      "sha256": "7523329948d2792951b26f82f4170a58fb3826656110c520eba5ebf15e13e909"
+    },
+    "q3-pencil-beside-bag": {
+      "type": "semantic_composition",
+      "components": [
+        "bag",
+        "prop-pencil"
+      ],
+      "description": "pencil beside bag. The actual furniture silhouette and occlusion show the relation.",
+      "composition": {
+        "width": 246,
+        "height": 214,
+        "markup": "<rect x=\"1\" y=\"1\" width=\"244\" height=\"212\" rx=\"26\" fill=\"#fff5df\" stroke=\"#8da993\" stroke-width=\"2\"/><rect x=\"6\" y=\"183\" width=\"234\" height=\"25\" rx=\"13\" fill=\"#eddbb8\" stroke=\"none\" stroke-width=\"1\"/><path d=\"M17,183 L229,183\" fill=\"none\" stroke=\"#ad8864\" stroke-width=\"2\" stroke-linecap=\"round\"/>",
+        "layers": [
+          {
+            "asset": "bag",
+            "x": 14,
+            "y": 84,
+            "width": 130,
+            "height": 101,
+            "fit": "contain",
+            "anchor": "center"
+          },
+          {
+            "asset": "prop-pencil",
+            "x": 172,
+            "y": 133,
+            "width": 49,
+            "height": 50,
+            "fit": "contain",
+            "anchor": "center"
+          }
+        ]
+      },
+      "path": "assets/illustrations/q3-pencil-beside-bag.png",
+      "sha256": "6a590951cd7e596fafb25c26966f61ea8cc3a1df1eb3400b978236805e8b045d"
+    },
+    "q3-pencil-under-desk": {
+      "type": "semantic_composition",
+      "components": [
+        "desk",
+        "prop-pencil"
+      ],
+      "description": "pencil under desk. The actual furniture silhouette and occlusion show the relation.",
+      "composition": {
+        "width": 246,
+        "height": 214,
+        "markup": "<rect x=\"1\" y=\"1\" width=\"244\" height=\"212\" rx=\"26\" fill=\"#fff5df\" stroke=\"#8da993\" stroke-width=\"2\"/><rect x=\"6\" y=\"183\" width=\"234\" height=\"25\" rx=\"13\" fill=\"#eddbb8\" stroke=\"none\" stroke-width=\"1\"/><path d=\"M17,183 L229,183\" fill=\"none\" stroke=\"#ad8864\" stroke-width=\"2\" stroke-linecap=\"round\"/>",
+        "layers": [
+          {
+            "asset": "desk",
+            "x": 27,
+            "y": 53,
+            "width": 192,
+            "height": 132,
+            "fit": "contain",
+            "anchor": "center"
+          },
+          {
+            "asset": "prop-pencil",
+            "x": 98,
+            "y": 132,
+            "width": 49,
+            "height": 50,
+            "fit": "contain",
+            "anchor": "center"
+          }
+        ]
+      },
+      "path": "assets/illustrations/q3-pencil-under-desk.png",
+      "sha256": "ebc8423b12ccac5c447851626941a3ec8d78c39500de9ec7e45565b0545cfcd6"
+    },
+    "q3-pencil-in-bag": {
+      "type": "semantic_composition",
+      "components": [
+        "bag",
+        "prop-pencil"
+      ],
+      "description": "pencil in bag. The actual furniture silhouette and occlusion show the relation.",
+      "composition": {
+        "width": 246,
+        "height": 214,
+        "markup": "<rect x=\"1\" y=\"1\" width=\"244\" height=\"212\" rx=\"26\" fill=\"#fff5df\" stroke=\"#8da993\" stroke-width=\"2\"/><rect x=\"6\" y=\"183\" width=\"234\" height=\"25\" rx=\"13\" fill=\"#eddbb8\" stroke=\"none\" stroke-width=\"1\"/><path d=\"M17,183 L229,183\" fill=\"none\" stroke=\"#ad8864\" stroke-width=\"2\" stroke-linecap=\"round\"/>",
+        "layers": [
+          {
+            "asset": "bag",
+            "x": 37,
+            "y": 52,
+            "width": 172,
+            "height": 133,
+            "fit": "contain",
+            "anchor": "center"
+          },
+          {
+            "asset": "prop-pencil",
+            "x": 102,
+            "y": 58,
+            "width": 49,
+            "height": 50,
+            "fit": "contain",
+            "anchor": "center"
+          },
+          {
+            "asset": "bag",
+            "x": 37,
+            "y": 52,
+            "width": 172,
+            "height": 133,
+            "occlusionMaskSvg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"172\" height=\"133\" viewBox=\"0 0 1 1\" preserveAspectRatio=\"none\"><path d=\"M 0.106,0.167 C 0.163,0.261 0.324,0.326 0.535,0.325 C 0.685,0.323 0.831,0.240 0.925,0.163 L 1,0.38 L 1,1 L 0,1 L 0,0.38 Z\" fill=\"white\"/></svg>"
+          }
+        ]
+      },
+      "path": "assets/illustrations/q3-pencil-in-bag.png",
+      "sha256": "24d4bace669809c176c0daa33e1ec18f7a3dff2c03b5c822faa5187de943c1d7"
+    },
+    "eraser-on-chair": {
+      "type": "semantic_composition",
+      "components": [
+        "chair",
+        "prop-eraser"
+      ],
+      "description": "eraser on chair. The actual furniture silhouette and occlusion show the relation.",
+      "composition": {
+        "width": 246,
+        "height": 214,
+        "markup": "<rect x=\"1\" y=\"1\" width=\"244\" height=\"212\" rx=\"26\" fill=\"#fff5df\" stroke=\"#8da993\" stroke-width=\"2\"/><rect x=\"6\" y=\"183\" width=\"234\" height=\"25\" rx=\"13\" fill=\"#eddbb8\" stroke=\"none\" stroke-width=\"1\"/><path d=\"M17,183 L229,183\" fill=\"none\" stroke=\"#ad8864\" stroke-width=\"2\" stroke-linecap=\"round\"/>",
+        "layers": [
+          {
+            "asset": "chair",
+            "x": 62,
+            "y": 31,
+            "width": 123,
+            "height": 154,
+            "fit": "contain",
+            "anchor": "center"
+          },
+          {
+            "asset": "prop-eraser",
+            "x": 91,
+            "y": 74,
+            "width": 64,
+            "height": 42,
+            "fit": "contain",
+            "anchor": "center"
+          }
+        ]
+      },
+      "path": "assets/illustrations/eraser-on-chair.png",
+      "sha256": "5258f3182bb2ee36f42b80d929a29e887e604f45fc47ec8a0812cb579dc063e2"
+    },
+    "eraser-in-bag": {
+      "type": "semantic_composition",
+      "components": [
+        "bag",
+        "prop-eraser"
+      ],
+      "description": "eraser in bag. The actual furniture silhouette and occlusion show the relation.",
+      "composition": {
+        "width": 246,
+        "height": 214,
+        "markup": "<rect x=\"1\" y=\"1\" width=\"244\" height=\"212\" rx=\"26\" fill=\"#fff5df\" stroke=\"#8da993\" stroke-width=\"2\"/><rect x=\"6\" y=\"183\" width=\"234\" height=\"25\" rx=\"13\" fill=\"#eddbb8\" stroke=\"none\" stroke-width=\"1\"/><path d=\"M17,183 L229,183\" fill=\"none\" stroke=\"#ad8864\" stroke-width=\"2\" stroke-linecap=\"round\"/>",
+        "layers": [
+          {
+            "asset": "bag",
+            "x": 37,
+            "y": 52,
+            "width": 172,
+            "height": 133,
+            "fit": "contain",
+            "anchor": "center"
+          },
+          {
+            "asset": "prop-eraser",
+            "x": 94,
+            "y": 66,
+            "width": 64,
+            "height": 42,
+            "fit": "contain",
+            "anchor": "center"
+          },
+          {
+            "asset": "bag",
+            "x": 37,
+            "y": 52,
+            "width": 172,
+            "height": 133,
+            "occlusionMaskSvg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"172\" height=\"133\" viewBox=\"0 0 1 1\" preserveAspectRatio=\"none\"><path d=\"M 0.106,0.167 C 0.163,0.261 0.324,0.326 0.535,0.325 C 0.685,0.323 0.831,0.240 0.925,0.163 L 1,0.38 L 1,1 L 0,1 L 0,0.38 Z\" fill=\"white\"/></svg>"
+          }
+        ]
+      },
+      "path": "assets/illustrations/eraser-in-bag.png",
+      "sha256": "17192cdb7d79324f347680e1c1ab08732797c3b44fbf2e003633198c2a5f7e8e"
+    },
+    "eraser-under-chair": {
+      "type": "semantic_composition",
+      "components": [
+        "chair",
+        "prop-eraser"
+      ],
+      "description": "eraser under chair. The actual furniture silhouette and occlusion show the relation.",
+      "composition": {
+        "width": 246,
+        "height": 214,
+        "markup": "<rect x=\"1\" y=\"1\" width=\"244\" height=\"212\" rx=\"26\" fill=\"#fff5df\" stroke=\"#8da993\" stroke-width=\"2\"/><rect x=\"6\" y=\"183\" width=\"234\" height=\"25\" rx=\"13\" fill=\"#eddbb8\" stroke=\"none\" stroke-width=\"1\"/><path d=\"M17,183 L229,183\" fill=\"none\" stroke=\"#ad8864\" stroke-width=\"2\" stroke-linecap=\"round\"/>",
+        "layers": [
+          {
+            "asset": "chair",
+            "x": 62,
+            "y": 31,
+            "width": 123,
+            "height": 154,
+            "fit": "contain",
+            "anchor": "center"
+          },
+          {
+            "asset": "prop-eraser",
+            "x": 89,
+            "y": 138,
+            "width": 66,
+            "height": 44,
+            "fit": "contain",
+            "anchor": "center"
+          }
+        ]
+      },
+      "path": "assets/illustrations/eraser-under-chair.png",
+      "sha256": "fe50743641d57c76d869c5e621097e7a6d03188781b7289c25f98fc01adfe0cd"
+    },
+    "q5-clip-on-desk": {
+      "type": "semantic_composition",
+      "components": [
+        "desk",
+        "prop-clip"
+      ],
+      "description": "clip on desk. The actual furniture silhouette and occlusion show the relation.",
+      "composition": {
+        "width": 246,
+        "height": 214,
+        "markup": "<rect x=\"1\" y=\"1\" width=\"244\" height=\"212\" rx=\"26\" fill=\"#fff5df\" stroke=\"#8da993\" stroke-width=\"2\"/><rect x=\"6\" y=\"183\" width=\"234\" height=\"25\" rx=\"13\" fill=\"#eddbb8\" stroke=\"none\" stroke-width=\"1\"/><path d=\"M17,183 L229,183\" fill=\"none\" stroke=\"#ad8864\" stroke-width=\"2\" stroke-linecap=\"round\"/>",
+        "layers": [
+          {
+            "asset": "desk",
+            "x": 27,
+            "y": 53,
+            "width": 192,
+            "height": 132,
+            "fit": "contain",
+            "anchor": "center"
+          },
+          {
+            "asset": "prop-clip",
+            "x": 80,
+            "y": 55,
+            "width": 87,
+            "height": 38,
+            "fit": "contain",
+            "anchor": "center"
+          }
+        ]
+      },
+      "path": "assets/illustrations/q5-clip-on-desk.png",
+      "sha256": "5b886ab5ec9909dcc0e84b054ce5656ef100cba1cac2dbb7ff728abe8fbee39b"
+    },
+    "q5-car-under-desk": {
+      "type": "semantic_composition",
+      "components": [
+        "desk",
+        "prop-car"
+      ],
+      "description": "car under desk. The actual furniture silhouette and occlusion show the relation.",
+      "composition": {
+        "width": 246,
+        "height": 214,
+        "markup": "<rect x=\"1\" y=\"1\" width=\"244\" height=\"212\" rx=\"26\" fill=\"#fff5df\" stroke=\"#8da993\" stroke-width=\"2\"/><rect x=\"6\" y=\"183\" width=\"234\" height=\"25\" rx=\"13\" fill=\"#eddbb8\" stroke=\"none\" stroke-width=\"1\"/><path d=\"M17,183 L229,183\" fill=\"none\" stroke=\"#ad8864\" stroke-width=\"2\" stroke-linecap=\"round\"/>",
+        "layers": [
+          {
+            "asset": "desk",
+            "x": 27,
+            "y": 53,
+            "width": 192,
+            "height": 132,
+            "fit": "contain",
+            "anchor": "center"
+          },
+          {
+            "asset": "prop-car",
+            "x": 89,
+            "y": 133,
+            "width": 67,
+            "height": 49,
+            "fit": "contain",
+            "anchor": "center"
+          }
+        ]
+      },
+      "path": "assets/illustrations/q5-car-under-desk.png",
+      "sha256": "7523329948d2792951b26f82f4170a58fb3826656110c520eba5ebf15e13e909"
+    },
+    "q5-car-on-desk": {
+      "type": "semantic_composition",
+      "components": [
+        "desk",
+        "prop-car"
+      ],
+      "description": "car on desk. The actual furniture silhouette and occlusion show the relation.",
+      "composition": {
+        "width": 246,
+        "height": 214,
+        "markup": "<rect x=\"1\" y=\"1\" width=\"244\" height=\"212\" rx=\"26\" fill=\"#fff5df\" stroke=\"#8da993\" stroke-width=\"2\"/><rect x=\"6\" y=\"183\" width=\"234\" height=\"25\" rx=\"13\" fill=\"#eddbb8\" stroke=\"none\" stroke-width=\"1\"/><path d=\"M17,183 L229,183\" fill=\"none\" stroke=\"#ad8864\" stroke-width=\"2\" stroke-linecap=\"round\"/>",
+        "layers": [
+          {
+            "asset": "desk",
+            "x": 27,
+            "y": 53,
+            "width": 192,
+            "height": 132,
+            "fit": "contain",
+            "anchor": "center"
+          },
+          {
+            "asset": "prop-car",
+            "x": 90,
+            "y": 44,
+            "width": 67,
+            "height": 49,
+            "fit": "contain",
+            "anchor": "center"
+          }
+        ]
+      },
+      "path": "assets/illustrations/q5-car-on-desk.png",
+      "sha256": "25c2e540298cc538c2b277f5407b9acd01153883d063215ef6c9fdc6da0bac67"
+    },
+    "q6-car-in-box": {
+      "type": "semantic_composition",
+      "components": [
+        "box",
+        "prop-car"
+      ],
+      "description": "car in box. The actual furniture silhouette and occlusion show the relation.",
+      "composition": {
+        "width": 246,
+        "height": 214,
+        "markup": "<rect x=\"1\" y=\"1\" width=\"244\" height=\"212\" rx=\"26\" fill=\"#fff5df\" stroke=\"#8da993\" stroke-width=\"2\"/><rect x=\"6\" y=\"183\" width=\"234\" height=\"25\" rx=\"13\" fill=\"#eddbb8\" stroke=\"none\" stroke-width=\"1\"/><path d=\"M17,183 L229,183\" fill=\"none\" stroke=\"#ad8864\" stroke-width=\"2\" stroke-linecap=\"round\"/>",
+        "layers": [
+          {
+            "asset": "box",
+            "x": 47,
+            "y": 52,
+            "width": 153,
+            "height": 133,
+            "fit": "contain",
+            "anchor": "center"
+          },
+          {
+            "asset": "prop-car",
+            "x": 97,
+            "y": 98,
+            "width": 67,
+            "height": 49,
+            "fit": "contain",
+            "anchor": "center"
+          },
+          {
+            "asset": "box",
+            "x": 47,
+            "y": 52,
+            "width": 153,
+            "height": 133,
+            "occlusionMaskSvg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"153\" height=\"133\" viewBox=\"0 0 1 1\" preserveAspectRatio=\"none\"><path d=\"M 0.222,0.681 L 0.965,0.566 L 1,0.68 L 1,1 L 0,1 L 0.10,0.72 Z\" fill=\"white\"/></svg>"
+          }
+        ]
+      },
+      "path": "assets/illustrations/q6-car-in-box.png",
+      "sha256": "f36c03055b4e1dbd4f9fbe998ec14941347a0f8201e92a3a027525c393fde63b"
+    },
+    "q6-car-beside-box": {
+      "type": "semantic_composition",
+      "components": [
+        "box",
+        "prop-car"
+      ],
+      "description": "car beside box. The actual furniture silhouette and occlusion show the relation.",
+      "composition": {
+        "width": 246,
+        "height": 214,
+        "markup": "<rect x=\"1\" y=\"1\" width=\"244\" height=\"212\" rx=\"26\" fill=\"#fff5df\" stroke=\"#8da993\" stroke-width=\"2\"/><rect x=\"6\" y=\"183\" width=\"234\" height=\"25\" rx=\"13\" fill=\"#eddbb8\" stroke=\"none\" stroke-width=\"1\"/><path d=\"M17,183 L229,183\" fill=\"none\" stroke=\"#ad8864\" stroke-width=\"2\" stroke-linecap=\"round\"/>",
+        "layers": [
+          {
+            "asset": "box",
+            "x": 14,
+            "y": 72,
+            "width": 130,
+            "height": 113,
+            "fit": "contain",
+            "anchor": "center"
+          },
+          {
+            "asset": "prop-car",
+            "x": 163,
+            "y": 134,
+            "width": 67,
+            "height": 49,
+            "fit": "contain",
+            "anchor": "center"
+          }
+        ]
+      },
+      "path": "assets/illustrations/q6-car-beside-box.png",
+      "sha256": "d1b095f813d5fe1b534e3ae5bdd7e4f257c819679c1be75f5d7833b15c86c615"
+    },
+    "q6-eraser-in-box": {
+      "type": "semantic_composition",
+      "components": [
+        "box",
+        "prop-eraser"
+      ],
+      "description": "eraser in box. The actual furniture silhouette and occlusion show the relation.",
+      "composition": {
+        "width": 246,
+        "height": 214,
+        "markup": "<rect x=\"1\" y=\"1\" width=\"244\" height=\"212\" rx=\"26\" fill=\"#fff5df\" stroke=\"#8da993\" stroke-width=\"2\"/><rect x=\"6\" y=\"183\" width=\"234\" height=\"25\" rx=\"13\" fill=\"#eddbb8\" stroke=\"none\" stroke-width=\"1\"/><path d=\"M17,183 L229,183\" fill=\"none\" stroke=\"#ad8864\" stroke-width=\"2\" stroke-linecap=\"round\"/>",
+        "layers": [
+          {
+            "asset": "box",
+            "x": 47,
+            "y": 52,
+            "width": 153,
+            "height": 133,
+            "fit": "contain",
+            "anchor": "center"
+          },
+          {
+            "asset": "prop-eraser",
+            "x": 98,
+            "y": 105,
+            "width": 64,
+            "height": 42,
+            "fit": "contain",
+            "anchor": "center"
+          },
+          {
+            "asset": "box",
+            "x": 47,
+            "y": 52,
+            "width": 153,
+            "height": 133,
+            "occlusionMaskSvg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"153\" height=\"133\" viewBox=\"0 0 1 1\" preserveAspectRatio=\"none\"><path d=\"M 0.222,0.681 L 0.965,0.566 L 1,0.68 L 1,1 L 0,1 L 0.10,0.72 Z\" fill=\"white\"/></svg>"
+          }
+        ]
+      },
+      "path": "assets/illustrations/q6-eraser-in-box.png",
+      "sha256": "e8c3bf031b043b2cc7c3ce63bad192503ad1d9557836b0b8468936e3d2854645"
+    },
+    "three-places-art": {
+      "type": "semantic_composition",
+      "components": [
+        "clip-on-desk",
+        "clip-under-desk",
+        "clip-in-bag"
+      ],
+      "description": "Independent side-by-side position contrasts with clear furniture.",
+      "composition": {
+        "width": 924,
+        "height": 436,
+        "markup": "<rect x=\"0\" y=\"0\" width=\"924\" height=\"436\" rx=\"26\" fill=\"#f2e4ca\" stroke=\"none\" stroke-width=\"1\"/>",
+        "layers": [
+          {
+            "asset": "clip-on-desk",
+            "x": 18,
+            "y": 18,
+            "width": 284,
+            "height": 400,
+            "fit": "contain",
+            "anchor": "center"
+          },
+          {
+            "asset": "clip-under-desk",
+            "x": 320,
+            "y": 18,
+            "width": 284,
+            "height": 400,
+            "fit": "contain",
+            "anchor": "center"
+          },
+          {
+            "asset": "clip-in-bag",
+            "x": 622,
+            "y": 18,
+            "width": 284,
+            "height": 400,
+            "fit": "contain",
+            "anchor": "center"
+          }
+        ]
+      },
+      "path": "assets/illustrations/three-places-art.png",
+      "sha256": "0ec6be4a89fbd36bfd32fd5c4d6de4590ebc03cf90dd65c28a21a8406c400e8b"
+    },
+    "chair-clip-art": {
+      "type": "semantic_composition",
+      "components": [
+        "clip-on-chair",
+        "clip-under-chair"
+      ],
+      "description": "Independent side-by-side position contrasts with clear furniture.",
+      "composition": {
+        "width": 922,
+        "height": 444,
+        "markup": "<rect x=\"0\" y=\"0\" width=\"922\" height=\"444\" rx=\"26\" fill=\"#f2e4ca\" stroke=\"none\" stroke-width=\"1\"/>",
+        "layers": [
+          {
+            "asset": "clip-on-chair",
+            "x": 22,
+            "y": 22,
+            "width": 428,
+            "height": 400,
+            "fit": "contain",
+            "anchor": "center"
+          },
+          {
+            "asset": "clip-under-chair",
+            "x": 472,
+            "y": 22,
+            "width": 428,
+            "height": 400,
+            "fit": "contain",
+            "anchor": "center"
+          }
+        ]
+      },
+      "path": "assets/illustrations/chair-clip-art.png",
+      "sha256": "226b01702732c1394d2d208bef3ce2c74238515efd8fe4f9bcf85857568164c6"
+    },
+    "desk-and-box-art": {
+      "type": "semantic_composition",
+      "components": [
+        "book-under-desk",
+        "pencil-on-desk",
+        "pencil-in-box",
+        "book-in-box"
+      ],
+      "description": "Independent side-by-side position contrasts with clear furniture.",
+      "composition": {
+        "width": 922,
+        "height": 518,
+        "markup": "<rect x=\"0\" y=\"0\" width=\"922\" height=\"518\" rx=\"26\" fill=\"#f2e4ca\" stroke=\"none\" stroke-width=\"1\"/>",
+        "layers": [
+          {
+            "asset": "book-under-desk",
+            "x": 22,
+            "y": 22,
+            "width": 428,
+            "height": 226,
+            "fit": "contain",
+            "anchor": "center"
+          },
+          {
+            "asset": "pencil-on-desk",
+            "x": 472,
+            "y": 22,
+            "width": 428,
+            "height": 226,
+            "fit": "contain",
+            "anchor": "center"
+          },
+          {
+            "asset": "pencil-in-box",
+            "x": 22,
+            "y": 270,
+            "width": 428,
+            "height": 226,
+            "fit": "contain",
+            "anchor": "center"
+          },
+          {
+            "asset": "book-in-box",
+            "x": 472,
+            "y": 270,
+            "width": 428,
+            "height": 226,
+            "fit": "contain",
+            "anchor": "center"
+          }
+        ]
+      },
+      "path": "assets/illustrations/desk-and-box-art.png",
+      "sha256": "58a483b12e72b7e56a3c9d28c612b792252b8be2281adfd93f06d64d9d76416c"
+    },
+    "hazel-sequence-art": {
+      "type": "semantic_composition",
+      "components": [
+        "hazel-on-chair",
+        "hazel-under-desk",
+        "hazel-in-bag"
+      ],
+      "description": "Read the spatial story in order, from left to right.",
+      "composition": {
+        "width": 924,
+        "height": 436,
+        "markup": "<rect x=\"0\" y=\"0\" width=\"924\" height=\"436\" rx=\"26\" fill=\"#f2e4ca\" stroke=\"none\" stroke-width=\"1\"/><path d=\"M303,218 L319,218\" fill=\"none\" stroke=\"#705b49\" stroke-width=\"2\" stroke-linecap=\"round\"/><path d=\"M319,218 L314,214\" fill=\"none\" stroke=\"#705b49\" stroke-width=\"2\" stroke-linecap=\"round\"/><path d=\"M319,218 L314,222\" fill=\"none\" stroke=\"#705b49\" stroke-width=\"2\" stroke-linecap=\"round\"/><path d=\"M605,218 L621,218\" fill=\"none\" stroke=\"#705b49\" stroke-width=\"2\" stroke-linecap=\"round\"/><path d=\"M621,218 L616,214\" fill=\"none\" stroke=\"#705b49\" stroke-width=\"2\" stroke-linecap=\"round\"/><path d=\"M621,218 L616,222\" fill=\"none\" stroke=\"#705b49\" stroke-width=\"2\" stroke-linecap=\"round\"/>",
+        "layers": [
+          {
+            "asset": "hazel-on-chair",
+            "x": 18,
+            "y": 18,
+            "width": 284,
+            "height": 400,
+            "fit": "contain",
+            "anchor": "center"
+          },
+          {
+            "asset": "hazel-under-desk",
+            "x": 320,
+            "y": 18,
+            "width": 284,
+            "height": 400,
+            "fit": "contain",
+            "anchor": "center"
+          },
+          {
+            "asset": "hazel-in-bag",
+            "x": 622,
+            "y": 18,
+            "width": 284,
+            "height": 400,
+            "fit": "contain",
+            "anchor": "center"
+          }
+        ]
+      },
+      "path": "assets/illustrations/hazel-sequence-art.png",
+      "sha256": "0bfbe72fa5bc890d9e1b84ed03572777792f9f59686b143c2fc6e12a9f1493f2"
+    },
+    "other-hazel-art": {
+      "type": "semantic_composition",
+      "components": [
+        "hazel-on-desk",
+        "hazel-under-chair",
+        "hazel-in-box"
+      ],
+      "description": "Independent side-by-side position contrasts with clear furniture.",
+      "composition": {
+        "width": 924,
+        "height": 436,
+        "markup": "<rect x=\"0\" y=\"0\" width=\"924\" height=\"436\" rx=\"26\" fill=\"#f2e4ca\" stroke=\"none\" stroke-width=\"1\"/>",
+        "layers": [
+          {
+            "asset": "hazel-on-desk",
+            "x": 18,
+            "y": 18,
+            "width": 284,
+            "height": 400,
+            "fit": "contain",
+            "anchor": "center"
+          },
+          {
+            "asset": "hazel-under-chair",
+            "x": 320,
+            "y": 18,
+            "width": 284,
+            "height": 400,
+            "fit": "contain",
+            "anchor": "center"
+          },
+          {
+            "asset": "hazel-in-box",
+            "x": 622,
+            "y": 18,
+            "width": 284,
+            "height": 400,
+            "fit": "contain",
+            "anchor": "center"
+          }
+        ]
+      },
+      "path": "assets/illustrations/other-hazel-art.png",
+      "sha256": "c5757880071f8ee41c99c2307c1d411129a42433ef1e451de48b780edc12fc3b"
+    },
+    "recap-art": {
+      "type": "semantic_composition",
+      "components": [
+        "clip-on-desk",
+        "clip-under-chair",
+        "hazel-in-bag"
+      ],
+      "description": "Independent side-by-side position contrasts with clear furniture.",
+      "composition": {
+        "width": 924,
+        "height": 436,
+        "markup": "<rect x=\"0\" y=\"0\" width=\"924\" height=\"436\" rx=\"26\" fill=\"#f2e4ca\" stroke=\"none\" stroke-width=\"1\"/>",
+        "layers": [
+          {
+            "asset": "clip-on-desk",
+            "x": 18,
+            "y": 18,
+            "width": 284,
+            "height": 400,
+            "fit": "contain",
+            "anchor": "center"
+          },
+          {
+            "asset": "clip-under-chair",
+            "x": 320,
+            "y": 18,
+            "width": 284,
+            "height": 400,
+            "fit": "contain",
+            "anchor": "center"
+          },
+          {
+            "asset": "hazel-in-bag",
+            "x": 622,
+            "y": 18,
+            "width": 284,
+            "height": 400,
+            "fit": "contain",
+            "anchor": "center"
+          }
+        ]
+      },
+      "path": "assets/illustrations/recap-art.png",
+      "sha256": "6439cdfdc4d5c9e06debce8cba1ec62602c1e28c9d1f502b2465b28bcff8361f"
+    },
+    "q4-eraser-reversed": {
+      "type": "semantic_composition",
+      "components": [
+        "eraser-in-bag",
+        "eraser-on-chair"
+      ],
+      "description": "Read the spatial story in order, from left to right.",
+      "composition": {
+        "width": 922,
+        "height": 444,
+        "markup": "<rect x=\"0\" y=\"0\" width=\"922\" height=\"444\" rx=\"26\" fill=\"#f2e4ca\" stroke=\"none\" stroke-width=\"1\"/><path d=\"M453,222 L469,222\" fill=\"none\" stroke=\"#705b49\" stroke-width=\"2\" stroke-linecap=\"round\"/><path d=\"M469,222 L464,218\" fill=\"none\" stroke=\"#705b49\" stroke-width=\"2\" stroke-linecap=\"round\"/><path d=\"M469,222 L464,226\" fill=\"none\" stroke=\"#705b49\" stroke-width=\"2\" stroke-linecap=\"round\"/>",
+        "layers": [
+          {
+            "asset": "eraser-in-bag",
+            "x": 22,
+            "y": 22,
+            "width": 428,
+            "height": 400,
+            "fit": "contain",
+            "anchor": "center"
+          },
+          {
+            "asset": "eraser-on-chair",
+            "x": 472,
+            "y": 22,
+            "width": 428,
+            "height": 400,
+            "fit": "contain",
+            "anchor": "center"
+          }
+        ]
+      },
+      "path": "assets/illustrations/q4-eraser-reversed.png",
+      "sha256": "0f725fd1c3d2828a2b08b3aaff7e509c90ba42495f8339388c848276a339c9c7"
+    },
+    "q4-eraser-correct": {
+      "type": "semantic_composition",
+      "components": [
+        "eraser-on-chair",
+        "eraser-in-bag"
+      ],
+      "description": "Read the spatial story in order, from left to right.",
+      "composition": {
+        "width": 922,
+        "height": 444,
+        "markup": "<rect x=\"0\" y=\"0\" width=\"922\" height=\"444\" rx=\"26\" fill=\"#f2e4ca\" stroke=\"none\" stroke-width=\"1\"/><path d=\"M453,222 L469,222\" fill=\"none\" stroke=\"#705b49\" stroke-width=\"2\" stroke-linecap=\"round\"/><path d=\"M469,222 L464,218\" fill=\"none\" stroke=\"#705b49\" stroke-width=\"2\" stroke-linecap=\"round\"/><path d=\"M469,222 L464,226\" fill=\"none\" stroke=\"#705b49\" stroke-width=\"2\" stroke-linecap=\"round\"/>",
+        "layers": [
+          {
+            "asset": "eraser-on-chair",
+            "x": 22,
+            "y": 22,
+            "width": 428,
+            "height": 400,
+            "fit": "contain",
+            "anchor": "center"
+          },
+          {
+            "asset": "eraser-in-bag",
+            "x": 472,
+            "y": 22,
+            "width": 428,
+            "height": 400,
+            "fit": "contain",
+            "anchor": "center"
+          }
+        ]
+      },
+      "path": "assets/illustrations/q4-eraser-correct.png",
+      "sha256": "1f511eee4f61cd30a70024d8d2e7efb8c24935e65c00d6355d3a99a945d941a9"
+    },
+    "q4-eraser-wrong-first": {
+      "type": "semantic_composition",
+      "components": [
+        "eraser-under-chair",
+        "eraser-in-bag"
+      ],
+      "description": "Read the spatial story in order, from left to right.",
+      "composition": {
+        "width": 922,
+        "height": 444,
+        "markup": "<rect x=\"0\" y=\"0\" width=\"922\" height=\"444\" rx=\"26\" fill=\"#f2e4ca\" stroke=\"none\" stroke-width=\"1\"/><path d=\"M453,222 L469,222\" fill=\"none\" stroke=\"#705b49\" stroke-width=\"2\" stroke-linecap=\"round\"/><path d=\"M469,222 L464,218\" fill=\"none\" stroke=\"#705b49\" stroke-width=\"2\" stroke-linecap=\"round\"/><path d=\"M469,222 L464,226\" fill=\"none\" stroke=\"#705b49\" stroke-width=\"2\" stroke-linecap=\"round\"/>",
+        "layers": [
+          {
+            "asset": "eraser-under-chair",
+            "x": 22,
+            "y": 22,
+            "width": 428,
+            "height": 400,
+            "fit": "contain",
+            "anchor": "center"
+          },
+          {
+            "asset": "eraser-in-bag",
+            "x": 472,
+            "y": 22,
+            "width": 428,
+            "height": 400,
+            "fit": "contain",
+            "anchor": "center"
+          }
+        ]
+      },
+      "path": "assets/illustrations/q4-eraser-wrong-first.png",
+      "sha256": "663c74b7454ef079f23db2990dd52d20c8bd43c12917af5aaa87f5a104e7b39d"
+    },
+    "q1-pencil": {
+      "type": "semantic_composition",
+      "components": [
+        "prop-pencil"
+      ],
+      "description": "A single recognizable pencil with no reference object needed.",
+      "composition": {
+        "width": 470,
+        "height": 304,
+        "markup": "<rect x=\"0\" y=\"0\" width=\"470\" height=\"304\" rx=\"28\" fill=\"#fff6e3\" stroke=\"none\" stroke-width=\"1\"/><rect x=\"0\" y=\"239\" width=\"470\" height=\"65\" rx=\"28\" fill=\"#ead5b3\" stroke=\"none\" stroke-width=\"1\"/>",
+        "layers": [
+          {
+            "asset": "prop-pencil",
+            "x": 96,
+            "y": 47,
+            "width": 278,
+            "height": 180,
+            "fit": "contain",
+            "anchor": "center"
+          }
+        ]
+      },
+      "path": "assets/illustrations/q1-pencil.png",
+      "sha256": "42a2359a3aa0841e54379230967fe72564e4e3caae4d047eb406e3343a715884"
+    },
+    "q1-eraser": {
+      "type": "semantic_composition",
+      "components": [
+        "prop-eraser"
+      ],
+      "description": "A single recognizable eraser with no reference object needed.",
+      "composition": {
+        "width": 470,
+        "height": 304,
+        "markup": "<rect x=\"0\" y=\"0\" width=\"470\" height=\"304\" rx=\"28\" fill=\"#fff6e3\" stroke=\"none\" stroke-width=\"1\"/><rect x=\"0\" y=\"239\" width=\"470\" height=\"65\" rx=\"28\" fill=\"#ead5b3\" stroke=\"none\" stroke-width=\"1\"/>",
+        "layers": [
+          {
+            "asset": "prop-eraser",
+            "x": 96,
+            "y": 47,
+            "width": 278,
+            "height": 180,
+            "fit": "contain",
+            "anchor": "center"
+          }
+        ]
+      },
+      "path": "assets/illustrations/q1-eraser.png",
+      "sha256": "484eff25f6eb8b8c22bf91ca2e2d0423204e07d95f6acb8285602df012d2b90a"
+    },
+    "q1-book": {
+      "type": "semantic_composition",
+      "components": [
+        "prop-book"
+      ],
+      "description": "A single recognizable book with no reference object needed.",
+      "composition": {
+        "width": 470,
+        "height": 304,
+        "markup": "<rect x=\"0\" y=\"0\" width=\"470\" height=\"304\" rx=\"28\" fill=\"#fff6e3\" stroke=\"none\" stroke-width=\"1\"/><rect x=\"0\" y=\"239\" width=\"470\" height=\"65\" rx=\"28\" fill=\"#ead5b3\" stroke=\"none\" stroke-width=\"1\"/>",
+        "layers": [
+          {
+            "asset": "prop-book",
+            "x": 96,
+            "y": 47,
+            "width": 278,
+            "height": 180,
+            "fit": "contain",
+            "anchor": "center"
+          }
+        ]
+      },
+      "path": "assets/illustrations/q1-book.png",
+      "sha256": "4e341747fe18ac3fd0b429c3b0a9319abcaa969ab961ea0bcc8ac75e827e1b74"
+    }
+  }
+}

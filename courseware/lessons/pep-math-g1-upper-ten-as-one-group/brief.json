@@ -1,0 +1,229 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "lesson": {
+    "editionId": "pep-math-g1-upper-2022-standard",
+    "revisionId": "directory-ede7a8c63c337cf95a03fe79",
+    "nodeId": "7415785b-3fd8-495f-81e7-81bcdb327c0a",
+    "unitId": "ae4d78e6-9ed7-4bec-a5a4-26ed49147600",
+    "lessonTitle": "10的再认识",
+    "unitTitle": "四 11～20的认识",
+    "classHour": "lesson_1",
+    "classHours": [
+      "lesson_1"
+    ],
+    "gradeCode": "primary_1",
+    "subject": "math",
+    "volume": "upper",
+    "schoolSystem": "six_year",
+    "teachingRevision": "1"
+  },
+  "goals": [
+    "在图中逐个圈足十件，再数圈外的余量。能说明成组后较容易核数并找一个生活例子。",
+    "用十根散小棒和一捆小棒解释十个一是一个十。能用计数器示范右边个位满十，交换成左边十位一颗，数的大小不变。",
+    "辨别计数器从右起是个位、再左是十位。同一颗珠的位置不同，表示一个一或一个十；解释10中1和0以及0不可省略。",
+    "观察0～9各用一个数字表示。10由已有的1和0组成，把数字、计数器和实物表示互相对应。"
+  ],
+  "keyPoint": "先把十个一换成一个十，再读它所在的位置。",
+  "difficultPoint": "实物虽捆成一捆，仍是原来的十件；计数器珠数不等于它表示的数量。",
+  "scenario": "手作角打包桌从散片装十开始，到实物、计数器和标签对照，解释同样是一个为什么有时读十。",
+  "pageSequence": [
+    {
+      "key": "empty-tray",
+      "title": "为什么一捆也能表示十？",
+      "purpose": "包装桌旁先提出一捆和一根是不是一样，留待用实物和计数器解释。"
+    },
+    {
+      "key": "group-and-count",
+      "title": "先把十件圈出来",
+      "purpose": "把一排材料逐件圈足十，再数圈外四件，解释如何防重数。"
+    },
+    {
+      "key": "one-bundle",
+      "title": "十根松棒，换一捆",
+      "purpose": "图示同十根小棒的散开、捆起及解开；数量不变。"
+    },
+    {
+      "key": "marble-pack",
+      "title": "弹珠找同量图卡",
+      "purpose": "凭听到的成组数量和余量，瞄准漂移目标；只有等量正确表示才记分。"
+    },
+    {
+      "key": "counter-exchange",
+      "title": "一颗珠怎么能表示十？",
+      "purpose": "个位九颗加一变满十，换成十位一颗，个位清空。"
+    },
+    {
+      "key": "read-the-places",
+      "title": "把零留下来",
+      "purpose": "右个位左十位；对比同一珠在两位的不同意义，说明0占位、0～9单数字与10用两个旧数字。"
+    },
+    {
+      "key": "parcel-delivery",
+      "title": "小车送对数字站",
+      "purpose": "实时取货过车道，再按位交付，错误对象和站点都拒绝。"
+    },
+    {
+      "key": "picture-check",
+      "title": "换几张新图来验货",
+      "purpose": "六道不同量或情境的图题，两题各落在A、B、C，教师读题。"
+    },
+    {
+      "key": "close-tray",
+      "title": "一捆十，站对位",
+      "purpose": "用盒装例子回扣1根和1捆，复述位置与0，留一项家庭实物任务。"
+    }
+  ],
+  "games": [
+    {
+      "page": "marble-pack",
+      "id": "magnetMarbles",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.magnetMarbles",
+      "rule": "炮台即时横调角度，飞行时可改向。只在命中与当前口令等量且符合分组条件的漂移图靶时计分。",
+      "levels": [
+        "2次找满十/一捆，宽靶低漂移。",
+        "3次辨一捆和同张图圈外余量，增加干扰与速度。",
+        "4次口令在松散十、十位一珠、一捆加余量间变化，目标漂移更大。"
+      ],
+      "noReading": "图靶用小棒、捆、计数器等精确数量图，口令语音可重听，箭头调整。"
+    },
+    {
+      "page": "parcel-delivery",
+      "id": "listenDelivery",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.listenDelivery",
+      "rule": "按照口令选散件或成组货，闪避车辆，送到同量的计数器站；取错或送错不推进。",
+      "levels": [
+        "一单，认一捆和十位一颗个位空，慢车道。",
+        "两单，交叉区分个位二和十位一；多车道。",
+        "三单，辨个位三、个位五和一个十；增加车道及速度变化。"
+      ],
+      "noReading": "起终点由大轮廓简图传意，语音分段告诉取什么、送到哪，方向箭头和装卸键可见。"
+    }
+  ],
+  "quiz": [
+    {
+      "id": "stamp-packet",
+      "goal": "辨准刚好十个才成一组",
+      "answerPosition": "B",
+      "answer": "十个",
+      "visual": "用精确数量/计数器/数字图，口头读题。"
+    },
+    {
+      "id": "seven-loose",
+      "goal": "先圈十再数不同余量",
+      "answerPosition": "C",
+      "answer": "七个一",
+      "visual": "用精确数量/计数器/数字图，口头读题。"
+    },
+    {
+      "id": "ten-bead-trade",
+      "goal": "满十颗个位珠换一颗十位珠",
+      "answerPosition": "A",
+      "answer": "十位一珠、个位空",
+      "visual": "用精确数量/计数器/数字图，口头读题。"
+    },
+    {
+      "id": "one-on-the-right",
+      "goal": "识别右边一颗表示一个一",
+      "answerPosition": "B",
+      "answer": "一枚散片",
+      "visual": "用精确数量/计数器/数字图，口头读题。"
+    },
+    {
+      "id": "keep-the-place",
+      "goal": "十位有一、个位空时保留0",
+      "answerPosition": "C",
+      "answer": "个位补0",
+      "visual": "用精确数量/计数器/数字图，口头读题。"
+    },
+    {
+      "id": "two-known-digits",
+      "goal": "选择两边数量都对、八只用一个数字而十由两个学过的数字组成的标签。",
+      "answerPosition": "A",
+      "answer": "左8只用一个数字，右10用1和0；一盒有十枚。",
+      "visual": "用精确数量/计数器/数字图，口头读题。"
+    }
+  ],
+  "weeklyReviewSource": {
+    "source": "仅提交本课图题题源、目标与生活练习方向。",
+    "questionIds": [
+      "stamp-packet",
+      "seven-loose",
+      "ten-bead-trade",
+      "one-on-the-right",
+      "keep-the-place",
+      "two-known-digits"
+    ]
+  },
+  "afterClassPractice": {
+    "task": "和家人找一种按十成组的东西，逐件点数确认。画或拍下它，说清一组多少，若有散件再说余下几个。",
+    "status": "待观察",
+    "officialRef": "本课印刷75页和配套课后练习第1页。"
+  },
+  "artPlan": {
+    "imagegen": [
+      "独立新画打包桌封面。",
+      "优先复用正式登记的弹珠工坊和交通道具。"
+    ],
+    "semanticDiagrams": [
+      "实物用精确可数的计数片、松棒与十棒一捆图，计数器左右位、交换过程、0占位和数字卡均由代码绘制。",
+      "游戏和6道图题的计数/位值图均按已验数量生成。"
+    ]
+  },
+  "authorship": {
+    "authorModel": "gpt-6.1-sol",
+    "method": "审读原书与四类全部32页官方材料后直接创作本课。精确数学图用代码生成，使用获批准的两款游戏模板和本课配置。",
+    "catalogSha256": "1f04d478644e68af67bc264bf46227ece3d94d9c4070e8a8dd219846a48f4753",
+    "sourceSha256": {
+      "identity.json": "dd2c91f63ab3ebe7e8d1311a1509f5f353950c39ccc426c4a7695091d0c4e017",
+      "official-notes.json": "271292197ca0dfcd968ead5dc8fa9c93fa13f3b13eabaa07ba3735f3e2d2bb2b",
+      "lesson.json": "84726c37f8efcacb6aeedc5250cbe49647ece9bf5d628854092a3b08eadfdc10",
+      "asset-provenance.json": "7b966c18b10111df9709dbc2aaf4cd7288589d09c8991e2793a595357e7a9b4b",
+      "art-source/draw_place_value.py": "aaef7767572f2169eff060f7eb8020669bf712a599c7f02b3e1f8880a2177b87",
+      "tests/game_rules.test.cjs": "843c8d2fb52cab4a836911f4820a317c1e1ef1b0e383d4448cc6107b00a49bb3",
+      "tests/test_draw_place_value.py": "3c60a130fee0ba4d005f7665a5b0598acbe5216dcb6ac9718090b9f7a8ad6493",
+      "pages/marble-pack.html": "629142d32a4416157290e4203f6bd2ef1ebb0636877bc114884976bd68a60808",
+      "pages/marble-pack.js": "aee8f5e79c07d3f43d77d367843a7c1f82b1253e7f9cfdbbb1cc9e9c97af017c",
+      "pages/parcel-delivery.html": "ef615da2281429a94e4c16b408201227e0eca35bb3833bb53b3dfb3fd89e78ae",
+      "pages/parcel-delivery.js": "95537491c24dfb7d1baf5d6f62366aa9d24fcaa705f57aa4b2f01f19829dd297"
+    },
+    "attestation": "讲解、图题、示范和关卡配置均为本课原创。官方图文仅用于核对。游戏美术保留已登记内置 ImageGen 来源。未使用 DeepSeek。",
+    "preVoicePlan": {
+      "generator": "courseware.tools.build prepare",
+      "teacherVoice": "Ethan",
+      "gameCueBindings": 21,
+      "quizRecordings": 6,
+      "recordingStatus": "pending",
+      "fullSourceBuild": "prepared",
+      "validatedWithoutCover": {
+        "scenes": 8,
+        "speechCount": 87,
+        "gameCueBindings": 21,
+        "quizRecordings": 6
+      },
+      "artifact": "lines.json",
+      "work": "output/courseware-lessons/pep-math-g1-upper-ten-as-one-group/prevoice-v1-recheck",
+      "sha256": "f588f288491575b746cd0b43cf85324184e49178c06fbc5bf3be1d03017454e7",
+      "draftSha256": "ae9380cf060f4509639de1a9b457d2a5dc4cdfc673b85656f38d526ba32ed715",
+      "speechCount": 95,
+      "longestLine": 29
+    },
+    "preVoiceReviewRevision": {
+      "status": "same_candidate_question_ready_for_independent_recheck",
+      "revisedItems": [
+        "two-known-digits"
+      ],
+      "changedSpeechIds": [
+        "quiz_speech_8"
+      ],
+      "priorDraft": "output/courseware-lessons/pep-math-g1-upper-ten-as-one-group/prevoice-v1/draft.json",
+      "priorDraftSha256": "e4d4bae26ff6bf698fb5f09b1e156a24b7491b68a7d1a2bac568b5c7a23b99e4",
+      "priorVerificationReceipt": "output/courseware-lessons/pep-math-g1-upper-ten-as-one-group/prevoice-v1/verification-prevoice.json",
+      "priorVerificationReceiptSha256": "6dfa3c131c5a8338516511b8e11b2e7086306253ba3ffcca328357e971bb7dc0",
+      "priorEvidence": "output/courseware-lessons/pep-math-g1-upper-ten-as-one-group/prevoice-v1/verification-evidence-prevoice.json",
+      "priorEvidenceSha256": "43d873a98b726bff0d10c5f063226ddb60e447f3502327d27551b22864cb9650",
+      "priorVoicePlanSha256": "95fd8cc2235d55f4b59841c1536e34767d1f07d516f067093bbb78bfd21bfef7"
+    }
+  }
+}

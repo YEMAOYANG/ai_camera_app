@@ -1,0 +1,235 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "咕咚",
+  "binding": {
+    "editionId": "pep-chinese-g1-lower-2022-standard",
+    "revisionId": "directory-b30168cf88d5ee5709335698",
+    "nodeId": "d2614fb1-1b51-48ac-959a-728063396b78",
+    "unitId": "336f717a-5a30-4b70-87f1-0ac3b195ed88"
+  },
+  "scenario": "河湾图画广播站收来一声怪响。先整理四组故事画，再分清是耳朵直接听到、听伙伴说还是亲眼看见。",
+  "goals": [
+    "借助图画、偏旁、句子猜读并核实咕、咚、熟、掉、湖、吓、啦、鹿、象、野、拦、哪、那、领，认识领的页字旁。",
+    "按四组画面讲清七段起因、经过与结局，解释谁先听到、谁跟跑、野牛怎样问和木瓜落水如何验证。",
+    "用图和原创对话读出兔子的害怕、小猴与伙伴的急切和野牛的询问，回纸书分角色读。",
+    "分清亲耳听、听别人说和亲眼看，遇到不明情况先问清依据，再根据证据判断。",
+    "按田字格规范练写吓、怕、象、到、为、家、没，由成人实际看书写。"
+  ],
+  "goalSources": [
+    {
+      "goal": "借助图画、偏旁、句子猜读并核实咕、咚、熟、掉、湖、吓、啦、鹿、象、野、拦、哪、那、领，认识领的页字旁。",
+      "source": "印102至104、第一课时课件2至15"
+    },
+    {
+      "goal": "按四组画面讲清七段起因、经过与结局，解释谁先听到、谁跟跑、野牛怎样问和木瓜落水如何验证。",
+      "source": "印102至104、第二课时课件3至20"
+    },
+    {
+      "goal": "用图和原创对话读出兔子的害怕、小猴与伙伴的急切和野牛的询问，回纸书分角色读。",
+      "source": "两课时教案、课后作业"
+    },
+    {
+      "goal": "分清亲耳听、听别人说和亲眼看，遇到不明情况先问清依据，再根据证据判断。",
+      "source": "第二课时教案及任务单1"
+    },
+    {
+      "goal": "按田字格规范练写吓、怕、象、到、为、家、没，由成人实际看书写。",
+      "source": "印104及GF 0023—2020"
+    }
+  ],
+  "pageSequence": [
+    {
+      "key": "hear-a-sound",
+      "kind": "teaching",
+      "plan": "拟声词和落水，借图、句、偏旁猜读。"
+    },
+    {
+      "key": "rabbit-heard",
+      "kind": "teaching",
+      "plan": "兔只听声受惊；识吓啦，读出怕。"
+    },
+    {
+      "key": "everybody-runs",
+      "kind": "teaching",
+      "plan": "猴子及狐狸、山羊、小鹿、大象跟跑，区别看到跑与看到声源。"
+    },
+    {
+      "key": "buffalo-asks",
+      "kind": "teaching",
+      "plan": "野牛拦问、哪与那，分层追问。"
+    },
+    {
+      "key": "back-to-lake",
+      "kind": "teaching",
+      "plan": "领和页字旁，第二次木瓜落湖，大家看见才懂。"
+    },
+    {
+      "key": "film-steps",
+      "kind": "teaching",
+      "plan": "按事情发生的顺序收图"
+    },
+    {
+      "key": "order-the-frames",
+      "kind": "game",
+      "plan": "泡泡车按声音、跟跑、追问、回看收录图。"
+    },
+    {
+      "key": "what-we-know",
+      "kind": "teaching",
+      "plan": "三种线索，从哪里知道"
+    },
+    {
+      "key": "sort-the-clues",
+      "kind": "game",
+      "plan": "推入亲耳听、听别人说、亲眼看到的对应布景。"
+    },
+    {
+      "key": "read-the-voices",
+      "kind": "teaching",
+      "plan": "新对话分别读受惊、急切、冷静询问和轻松。"
+    },
+    {
+      "key": "write-xia-and-pa",
+      "kind": "teaching",
+      "plan": "吓和怕，左右怎么排"
+    },
+    {
+      "key": "write-mei-and-dao",
+      "kind": "teaching",
+      "plan": "没和到，先看哪部分在左"
+    },
+    {
+      "key": "write-wei-and-jia",
+      "kind": "teaching",
+      "plan": "为和家，起笔和收笔"
+    },
+    {
+      "key": "write-xiang",
+      "kind": "teaching",
+      "plan": "象的长笔怎样展开"
+    },
+    {
+      "key": "picture-quiz",
+      "kind": "quiz",
+      "plan": "用新情境看图判断声音、语气、顺序、来源和笔序。"
+    },
+    {
+      "key": "bring-the-story-home",
+      "kind": "teaching",
+      "plan": "回顾先问清依据再判断，和大人翻原书。"
+    }
+  ],
+  "games": [
+    {
+      "page": "order-the-frames",
+      "template": "bubbleMaze",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.bubbleMaze",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "listen_order",
+      "selection": "根据听到的事件线索沿迷宫开车，按前后接画并留下镜头。",
+      "levels": [
+        "落水、兔跑、猴跟。",
+        "猴跟、大伙跟、野牛拦问。",
+        "追问、带路、再见木瓜、大家笑。"
+      ],
+      "teacherAnchors": [
+        "gudong-film-listen",
+        "gudong-film-first",
+        "game-player"
+      ],
+      "demo": "暂停首关依次亮图、目标与车，示范一次实际成功操作，清零后交给孩子。"
+    },
+    {
+      "page": "sort-the-clues",
+      "template": "sortingDepot",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.sortingDepot",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "classification",
+      "selection": "图片推送由所知线索来源决定。用角色动作区分耳朵听实声、听伙伴转述、自己看见声源。",
+      "levels": [
+        "兔子听到和小猴听兔讲。",
+        "加入看见木瓜掉湖。",
+        "大象听大伙讲也归转述，和亲眼看声源区分。"
+      ],
+      "teacherAnchors": [
+        "gudong-clue-card",
+        "gudong-clue-dock",
+        "game-player"
+      ],
+      "demo": "暂停首关依次亮图、目标与车，示范一次实际成功操作，清零后交给孩子。"
+    }
+  ],
+  "quiz": [
+    {
+      "id": "sound-in-room",
+      "skill": "sound-source",
+      "prompt": "新故事里听到一声哗啦。哪张画能说明声音是水从壶里倒出来的？",
+      "answer": "壶向盆倒水",
+      "position": 2,
+      "rationale": "水柱从壶嘴落到盆里，可以用哗啦来学这段水声。"
+    },
+    {
+      "id": "saw-with-own-eyes",
+      "skill": "hear-or-see",
+      "prompt": "哪幅图是小宁亲眼看见窗边的木球掉到地上？",
+      "answer": "面对看到",
+      "position": 3,
+      "rationale": "她面对窗边，正看到木球往下掉。亲耳听或听转述都没有亲眼看到。"
+    },
+    {
+      "id": "ask-about-noise",
+      "skill": "ask-before-follow",
+      "prompt": "伙伴听说走廊有一声响就跑过来。哪张图是先问清消息怎么来的？",
+      "answer": "问来的人",
+      "position": 1,
+      "rationale": "先停下问对方怎么知道，分清是自己听到、听别人说，还是亲眼见到。"
+    },
+    {
+      "id": "next-after-question",
+      "skill": "ordered-story",
+      "prompt": "新画册画到野牛问清是兔子听到响声。后面哪张接得上？",
+      "answer": "兔领大伙回湖",
+      "position": 2,
+      "rationale": "问清后是兔子领大家回到湖边去看，再弄明白响声。"
+    },
+    {
+      "id": "new-voice",
+      "skill": "dialogue-tone",
+      "prompt": "新纸偶剧里，小船碰到木盒忽然响。哪一幅里的小演员最像是受惊时说话？",
+      "answer": "身体缩、眼睁大",
+      "position": 1,
+      "rationale": "忽然听到响，身体一缩、表情吃惊，是受到惊吓的反应。"
+    },
+    {
+      "id": "last-dot-wei",
+      "skill": "writing-strokes",
+      "prompt": "写字卡里的为前三笔已经写好。哪幅图把最后一点加对了？",
+      "answer": "补在字里面",
+      "position": 3,
+      "rationale": "为先点、撇、横折钩，最后在里面补一点。"
+    },
+    {
+      "id": "lead-the-kittens",
+      "skill": "guess-with-context",
+      "prompt": "听，猫姐姐领着小猫到屋里。哪幅画能帮助猜领是什么意思？",
+      "answer": "猫姐姐带路",
+      "position": 2,
+      "rationale": "领是走在前面带着别人。猫姐姐在前，小猫跟着进门。"
+    }
+  ],
+  "afterClass": {
+    "familyTask": "成人陪读课文，听孩子用四组画讲清谁听、谁说、谁问和最后看见什么。写字请成人看实际顺序。",
+    "weeklyQuestionSource": [
+      "拟声和字形",
+      "起因经过结果",
+      "线索来源",
+      "先问再核实",
+      "角色语气与笔顺"
+    ],
+    "evidence": "线上记选图与操作；实际朗读、复述、书写留待观察。"
+  },
+  "artAndLanguage": "画面、旁白和题原创，原文留纸书。最后才画大家看清第二个木瓜落水。几何、笔画路径精确画。",
+  "officialNotesSha256": "6a6c4e196277ee76a5bdf4582e473a66a99b073b8036c9d82a9e5042294f567a"
+}

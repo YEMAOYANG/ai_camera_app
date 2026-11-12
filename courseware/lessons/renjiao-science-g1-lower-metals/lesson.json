@@ -1,0 +1,1037 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "金属",
+  "grade": 1,
+  "description": "按相同条件比较铜铁铝样品，从不同观察证据说明材料特点、部件用途和合金例子。",
+  "roster": {
+    "teacher": {
+      "name": "小科老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Serena",
+      "avatar": "/avatars/teacher-2.png",
+      "color": "#287B94",
+      "persona": "语气自然清楚，和孩子一起找能验证的材料证据。"
+    }
+  },
+  "images": {
+    "adult-hammer-choices": {
+      "file": "assets/adult-hammer-choices.png"
+    },
+    "alloy-examples": {
+      "file": "assets/alloy-examples.png"
+    },
+    "fair-bend-conditions": {
+      "file": "assets/fair-bend-conditions.png"
+    },
+    "fair-setup-quiz": {
+      "file": "assets/fair-setup-quiz.png"
+    },
+    "flattened-end-comparison": {
+      "file": "assets/flattened-end-comparison.png"
+    },
+    "metal-camera-bench": {
+      "file": "assets/metal-camera-bench.png"
+    },
+    "metal-evidence-badge": {
+      "file": "assets/metal-evidence-badge.png"
+    },
+    "metal-family-observation": {
+      "file": "assets/metal-family-observation.png"
+    },
+    "metal-hinge-repair": {
+      "file": "assets/metal-hinge-repair.png"
+    },
+    "metal-observation-camera": {
+      "file": "assets/metal-observation-camera.png"
+    },
+    "metal-observation-notes": {
+      "file": "assets/metal-observation-notes.png"
+    },
+    "metal-photo-cover": {
+      "file": "assets/metal-photo-cover.png"
+    },
+    "metal-side-aluminum": {
+      "file": "assets/metal-side-aluminum.png"
+    },
+    "metal-side-copper": {
+      "file": "assets/metal-side-copper.png"
+    },
+    "metal-side-iron": {
+      "file": "assets/metal-side-iron.png"
+    },
+    "metal-sort-workbench": {
+      "file": "assets/metal-sort-workbench.png"
+    },
+    "metal-station-cover": {
+      "file": "assets/metal-station-cover.png"
+    },
+    "metal-top-aluminum": {
+      "file": "assets/metal-top-aluminum.png"
+    },
+    "metal-top-copper": {
+      "file": "assets/metal-top-copper.png"
+    },
+    "metal-top-iron": {
+      "file": "assets/metal-top-iron.png"
+    },
+    "metal-trolley-idle": {
+      "file": "assets/metal-trolley-idle.png"
+    },
+    "metal-trolley-roll": {
+      "file": "assets/metal-trolley-roll.png"
+    },
+    "polish-before-after": {
+      "file": "assets/polish-before-after.png"
+    },
+    "quiz-bend-short-strip": {
+      "file": "assets/quiz-bend-short-strip.png"
+    },
+    "quiz-known-copper-coil": {
+      "file": "assets/quiz-known-copper-coil.png"
+    },
+    "quiz-known-iron-rod": {
+      "file": "assets/quiz-known-iron-rod.png"
+    },
+    "quiz-paper-roll": {
+      "file": "assets/quiz-paper-roll.png"
+    },
+    "quiz-polish-tile": {
+      "file": "assets/quiz-polish-tile.png"
+    },
+    "quiz-soft-cord": {
+      "file": "assets/quiz-soft-cord.png"
+    },
+    "quiz-solid-metal-pin": {
+      "file": "assets/quiz-solid-metal-pin.png"
+    },
+    "quiz-stainless-spoon": {
+      "file": "assets/quiz-stainless-spoon.png"
+    },
+    "quiz-tap-hanging-tile": {
+      "file": "assets/quiz-tap-hanging-tile.png"
+    },
+    "quiz-tip-side": {
+      "file": "assets/quiz-tip-side.png"
+    },
+    "quiz-tip-straight": {
+      "file": "assets/quiz-tip-straight.png"
+    },
+    "quiz-tip-top": {
+      "file": "assets/quiz-tip-top.png"
+    },
+    "quiz-wind-wheel": {
+      "file": "assets/quiz-wind-wheel.png"
+    },
+    "quiz-wire-coating": {
+      "file": "assets/quiz-wire-coating.png"
+    },
+    "quiz-wire-core": {
+      "file": "assets/quiz-wire-core.png"
+    },
+    "quiz-wire-gap": {
+      "file": "assets/quiz-wire-gap.png"
+    },
+    "quiz-wire-stimulus": {
+      "file": "assets/quiz-wire-stimulus.png"
+    },
+    "result-bent-down": {
+      "file": "assets/result-bent-down.png"
+    },
+    "result-bent-up": {
+      "file": "assets/result-bent-up.png"
+    },
+    "result-dull-to-bright": {
+      "file": "assets/result-dull-to-bright.png"
+    },
+    "result-flat-tip": {
+      "file": "assets/result-flat-tip.png"
+    },
+    "result-polished": {
+      "file": "assets/result-polished.png"
+    },
+    "result-suspended-sound": {
+      "file": "assets/result-suspended-sound.png"
+    },
+    "school-metal-repair": {
+      "file": "assets/school-metal-repair.png"
+    },
+    "station-bend": {
+      "file": "assets/station-bend.png"
+    },
+    "station-hammer": {
+      "file": "assets/station-hammer.png"
+    },
+    "station-polish": {
+      "file": "assets/station-polish.png"
+    },
+    "station-tap": {
+      "file": "assets/station-tap.png"
+    },
+    "suspended-plates": {
+      "file": "assets/suspended-plates.png"
+    },
+    "three-known-metals": {
+      "file": "assets/three-known-metals.png"
+    },
+    "unequal-length-quiz": {
+      "file": "assets/unequal-length-quiz.png"
+    },
+    "unequal-pressure-quiz": {
+      "file": "assets/unequal-pressure-quiz.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "metal-at-school",
+      "title": "器材台上找金属",
+      "type": "slide",
+      "template": "two-columns",
+      "data": {
+        "title": "器材台上找金属",
+        "left": {
+          "heading": "校园修理台",
+          "body": "找金属部件"
+        },
+        "right": {
+          "heading": "铜、铁、铝",
+          "body": "三根已知样条"
+        },
+        "left_picture": "school-metal-repair",
+        "right_picture": "three-known-metals"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "校园器材台在整理旧部件。你能帮忙找出金属吗？"
+        },
+        {
+          "say": "这段线里面的铜芯有点红。外面还包了一层软皮。"
+        },
+        {
+          "say": "工具上还有已知的铁头。它的颜色和铜芯不一样。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "老师带来三根材料已知的样条。铜、铁和铝都是金属。"
+        },
+        {
+          "say": "刚打磨过的这块铜偏红，铁和铝的亮处颜色更浅。"
+        },
+        {
+          "say": "想知道新物品是哪种金属，先找标签，再看其他证据。"
+        },
+        {
+          "say": "看到亮亮的一处，可以先记线索。种类还要查证。"
+        }
+      ]
+    },
+    {
+      "key": "polish-a-patch",
+      "title": "为什么磨同一个地方",
+      "type": "slide",
+      "template": "picture-points",
+      "data": {
+        "title": "为什么磨同一个地方",
+        "picture": "polish-before-after",
+        "points": [
+          "先看原来的一端",
+          "成人示范磨一磨",
+          "只记露出来的样子"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "这根样条有一点暗。把同一处磨过，会露出什么？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先看铜样条的右端。我们记住这一小块原来的样子。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "成人固定样条，用砂纸磨这一端。我们站开看。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "再看原来的地方。这回露出偏红的亮处，有金属光泽。"
+        },
+        {
+          "say": "另一根磨过也有亮处。比较时要看相同位置和方法。"
+        },
+        {
+          "say": "磨只帮我们看表面。样条的种类仍要看已有标识。"
+        },
+        {
+          "say": "砂纸和工具由大人操作。家里的罐子不要自己磨。"
+        }
+      ]
+    },
+    {
+      "key": "bend-the-same-way",
+      "title": "怎样比较弯折",
+      "type": "slide",
+      "template": "picture-points",
+      "data": {
+        "title": "怎样比较弯折",
+        "picture": "fair-bend-conditions",
+        "points": [
+          "样条长短、粗细接近",
+          "夹住同处，从同处压",
+          "到同一弯度再比较"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "要比哪根更费力，能拿很粗和很细的样条直接比吗？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先找长短和粗细接近的三根，让它们更容易公平比较。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "大人都在同一端夹稳，从相同位置慢慢压。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "弯到同样的程度，再比较哪根更费力。"
+        },
+        {
+          "say": "配套课堂弯样条时用力不同。图上只看得到形状。"
+        },
+        {
+          "say": "换了粗细和用法，结果也可能变。我们只记这次。"
+        },
+        {
+          "say": "要留照片时，先看小图要哪一面，让整根进框。"
+        },
+        {
+          "say": "从上面看。找一找这根样条上哪一端磨亮了。"
+        },
+        {
+          "say": "从侧面看。看看样条的轮廓是直的，还是弯的。"
+        },
+        {
+          "say": "挪一挪虚线框，让整根样条进入框里。"
+        },
+        {
+          "say": "等样条转到和小图一样的角度再拍。"
+        },
+        {
+          "say": "拍到了。两张放在一起，能看见不同的地方。"
+        }
+      ]
+    },
+    {
+      "key": "listen-and-flatten",
+      "title": "敲和锤各留下什么",
+      "type": "slide",
+      "template": "two-columns",
+      "data": {
+        "title": "敲和锤各留下什么",
+        "left": {
+          "heading": "轻敲悬挂片",
+          "body": "听发出的声音"
+        },
+        "right": {
+          "heading": "锤过的样条",
+          "body": "看末端的形状"
+        },
+        "left_picture": "suspended-plates",
+        "right_picture": "flattened-end-comparison"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "小满问：敲和锤都要碰一下，它们看的地方一样吗？"
+        },
+        {
+          "say": "大人把金属片吊好，用木笔轻敲，耳朵听发出的声。"
+        },
+        {
+          "say": "配套课堂轻敲时听到了声音。照片只留下看见的样子。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "再看锤过的样条。成人在垫板上示范，我们只观察。"
+        },
+        {
+          "say": "左图末端原来较厚，右图锤过后变薄。形状变了。"
+        },
+        {
+          "say": "敲时主要听，锤后主要看。记录里要分开。"
+        },
+        {
+          "say": "看到磨过的亮处，送回磨的工位。听声去轻敲的工位。"
+        },
+        {
+          "say": "弯成弧和锤扁不是一回事。按画面里的形状分。"
+        },
+        {
+          "say": "四个工位都有卡。先看卡记录了什么，再选路。"
+        },
+        {
+          "say": "没送进去就先停，看卡上的是亮处、声音还是形变。"
+        },
+        {
+          "say": "小车要绕到卡片后面。先对照图，再推。"
+        },
+        {
+          "say": "送对啦。方法不同，记录下来的线索也不同。"
+        }
+      ]
+    },
+    {
+      "key": "sort-metal-evidence",
+      "title": "观察记录送回工位",
+      "type": "interactive",
+      "page": "sort-metal-evidence",
+      "widgetType": "game",
+      "startImage": "metal-station-cover",
+      "script": [
+        {
+          "say": "记录卡从工位拿乱了。你能按留下的线索送回去吗？"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#game-target"
+        },
+        {
+          "say": "这张卡的样条一端变亮，刚才是哪种方法看的？"
+        },
+        {
+          "highlight": "#polish-dock-first"
+        },
+        {
+          "say": "上面是砂纸磨的工位。它下面一个是听声的工位。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "我把小车开到卡后面，再把卡推到磨的工位。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "卡留在磨的工位里。说明这个方法和记录对上了。"
+        },
+        {
+          "say": "轮到你。看清卡里的证据，再用箭头开小车。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "station-first": "listen-and-flatten-9",
+        "station-shape": "listen-and-flatten-10",
+        "station-all": "listen-and-flatten-11",
+        "station-hint": "listen-and-flatten-12",
+        "station-help": "listen-and-flatten-13",
+        "station-praise": "listen-and-flatten-14"
+      }
+    },
+    {
+      "key": "photograph-metal-samples",
+      "title": "给同一根样条拍两面",
+      "type": "interactive",
+      "page": "photograph-metal-samples",
+      "widgetType": "game",
+      "startImage": "metal-photo-cover",
+      "script": [
+        {
+          "say": "同一根铜样条换个角度，亮处和弯弧都能看清吗？"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#metal-photo-preview"
+        },
+        {
+          "say": "第一张从上面拍。小图这一端的亮处看得清。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "用箭头挪虚线框，把整根样条放进去。"
+        },
+        {
+          "highlight": "#game-target"
+        },
+        {
+          "say": "角度对上后，再按右边带圆点的快门。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "下边留着刚拍的俯视照。换侧面才能看清弯弧。"
+        },
+        {
+          "say": "轮到你。三根都拍两面，记录照片能看见的证据。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "sample-photo-goal": "bend-the-same-way-11",
+        "sample-photo-top": "bend-the-same-way-12",
+        "sample-photo-side": "bend-the-same-way-13",
+        "sample-photo-hint": "bend-the-same-way-14",
+        "sample-photo-help": "bend-the-same-way-15",
+        "sample-photo-praise": "bend-the-same-way-16"
+      },
+      "observationCard": {
+        "title": "三根金属样条的两面观察",
+        "familyTask": "和大人挑一件熟悉、冷却、无尖边的物品，找出一处可能用金属的部件。画它并记下一条可见线索，再请大人查看标识或说明。没查明的种类留空。家庭只观察，不磨、不敲、不用锤子。",
+        "levels": [
+          {
+            "label": "铜样条",
+            "trials": [
+              {
+                "id": "same-metal-two-views",
+                "label": "铜样条的同一根样条",
+                "top": {
+                  "metal-top-copper": {
+                    "label": "从上面看偏红表面和一端较亮的磨痕",
+                    "image": "metal-top-copper"
+                  }
+                },
+                "side": {
+                  "metal-side-copper": {
+                    "label": "侧面看同一根样条的一段弯弧",
+                    "image": "metal-side-copper"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "label": "铁样条",
+            "trials": [
+              {
+                "id": "same-metal-two-views",
+                "label": "铁样条的同一根样条",
+                "top": {
+                  "metal-top-iron": {
+                    "label": "从上面看灰浅表面和一端较亮的磨痕",
+                    "image": "metal-top-iron"
+                  }
+                },
+                "side": {
+                  "metal-side-iron": {
+                    "label": "侧面看同一根样条末段的弯曲",
+                    "image": "metal-side-iron"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "label": "铝样条",
+            "trials": [
+              {
+                "id": "same-metal-two-views",
+                "label": "铝样条的同一根样条",
+                "top": {
+                  "metal-top-aluminum": {
+                    "label": "从上面看浅色表面和一端较亮的磨痕",
+                    "image": "metal-top-aluminum"
+                  }
+                },
+                "side": {
+                  "metal-side-aluminum": {
+                    "label": "侧面看同一根样条弯向一侧的轮廓",
+                    "image": "metal-side-aluminum"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "key": "compare-the-records",
+      "title": "看过、听过分开记",
+      "type": "slide",
+      "template": "picture-points",
+      "data": {
+        "title": "看过、听过分开记",
+        "picture": "metal-observation-notes",
+        "points": [
+          "同一方法找共同点",
+          "比样条的不同",
+          "未观察先留空"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "小满想在照片旁写声音很脆。你觉得他有这条证据吗？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "左起是铜、铁、铝。看俯视图，每根都有磨亮的地方。"
+        },
+        {
+          "say": "配套课堂记录了敲声。只凭声音，认不出是哪种金属。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "这三根都能弯，但弯到同样程度，需要的力不全相同。"
+        },
+        {
+          "say": "颜色也有不同。我们记样品的实见，不凭颜色猜品种。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "只拍照时，声音和费力程度没有实际试过，就先留空。"
+        },
+        {
+          "say": "把照片、听到的声和手的感受放在不同栏。"
+        }
+      ]
+    },
+    {
+      "key": "metal-fits-the-job",
+      "title": "按部件要做的事选材料",
+      "type": "slide",
+      "template": "two-columns",
+      "data": {
+        "title": "按部件要做的事选材料",
+        "left": {
+          "heading": "比较锤头",
+          "body": "想把钉子钉进木块"
+        },
+        "right": {
+          "heading": "修理台的连接轴",
+          "body": "想让小门能开合"
+        },
+        "left_picture": "adult-hammer-choices",
+        "right_picture": "metal-hinge-repair"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "修理台要钉紧一个木箱。两种锤头都能完成吗？"
+        },
+        {
+          "say": "老师拿选定的橡胶头和金属头作比较。工具由大人操作。"
+        },
+        {
+          "say": "这次用金属头更适合把钉子钉进木块。橡胶头较软。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "再看小门。这里的金属轴托住小门，也让它能转。"
+        },
+        {
+          "say": "如果换成薄纸条，眼前这一根会弯，托不稳小门。"
+        },
+        {
+          "say": "先想清部件要做的事，再看选的材料能不能做到。"
+        },
+        {
+          "say": "铝箔能折起来包东西，也说明同是金属，用处各有不同。"
+        }
+      ]
+    },
+    {
+      "key": "meet-an-alloy",
+      "title": "有些部件用合金",
+      "type": "slide",
+      "template": "picture-points",
+      "data": {
+        "title": "有些部件用合金",
+        "picture": "alloy-examples",
+        "points": [
+          "铜铁铝之外还有金属",
+          "合金用多种成分制成",
+          "按部件核对实际材料"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "这把锅和这个车架都亮亮的。它们用的是同种材料吗？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "除了铜、铁、铝，生活里还有金、银等金属。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "用一定办法把金属和其他成分制在一起，可以做成合金。"
+        },
+        {
+          "say": "古代有用青铜做的钟。青铜是以铜为主的一类合金。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "这口锅是不锈钢的。这辆车的车架用了铝合金。"
+        },
+        {
+          "say": "说到车架，要指具体部件。整辆车还有其他材料。"
+        },
+        {
+          "say": "光看外表不能肯定。要请大人一起看标签或说明。"
+        }
+      ]
+    },
+    {
+      "key": "picture-quiz",
+      "title": "金属证据小检查",
+      "type": "quiz",
+      "intro": [
+        "先听清要找什么，再选最合适的图。"
+      ],
+      "questions": [
+        {
+          "id": "where-is-the-copper",
+          "skill": "known-copper-component",
+          "question": "这段线已确认有铜芯。哪张图圈出铜芯？",
+          "answer": [
+            "B"
+          ],
+          "analysis": "圈住了线里面露出的铜丝。",
+          "options": {
+            "A": {
+              "label": "圈外面的塑料皮",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-wire-coating",
+                "alt": "圈外面的塑料皮"
+              }
+            },
+            "B": {
+              "label": "圈露出来的铜丝",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-wire-core",
+                "alt": "圈露出来的铜丝"
+              }
+            },
+            "C": {
+              "label": "圈铜丝旁的空处",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-wire-gap",
+                "alt": "圈铜丝旁的空处"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "quiz-wire-stimulus",
+            "alt": "一段绿色包皮的低压教学模型，末端露出红铜线芯"
+          }
+        },
+        {
+          "id": "same-bend-conditions",
+          "skill": "fair-bend-comparison",
+          "question": "哪组样条一样长、一样粗，也从同一处压？",
+          "answer": [
+            "A"
+          ],
+          "analysis": "左边这组粗细长短和箭头位置相同。",
+          "options": {
+            "A": {
+              "label": "同长、同粗、同位置",
+              "visual": {
+                "kind": "asset",
+                "image": "fair-setup-quiz",
+                "alt": "同长、同粗、同位置"
+              }
+            },
+            "B": {
+              "label": "一根短、一根长",
+              "visual": {
+                "kind": "asset",
+                "image": "unequal-length-quiz",
+                "alt": "一根短、一根长"
+              }
+            },
+            "C": {
+              "label": "一样长粗，箭头位置不同",
+              "visual": {
+                "kind": "asset",
+                "image": "unequal-pressure-quiz",
+                "alt": "一样长粗，箭头位置不同"
+              }
+            }
+          }
+        },
+        {
+          "id": "choose-to-listen",
+          "skill": "choose-method-for-evidence",
+          "question": "要听金属片发出的声音，哪种方法合适？",
+          "answer": [
+            "C"
+          ],
+          "analysis": "把金属片挂好，由大人轻敲来听。",
+          "options": {
+            "A": {
+              "label": "成人用砂纸磨方形金属小片",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-polish-tile",
+                "alt": "成人用砂纸磨方形金属小片"
+              }
+            },
+            "B": {
+              "label": "成人把样条缓慢弯成弧",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-bend-short-strip",
+                "alt": "成人把样条缓慢弯成弧"
+              }
+            },
+            "C": {
+              "label": "成人用木棒轻敲悬挂的方形金属片",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-tap-hanging-tile",
+                "alt": "成人用木棒轻敲悬挂的方形金属片"
+              }
+            }
+          }
+        },
+        {
+          "id": "see-the-thin-tip",
+          "skill": "side-view-shape-change",
+          "question": "哪张侧面图能看出样条的末端变薄了？",
+          "answer": [
+            "B"
+          ],
+          "analysis": "右端比左边窄，侧面能看清变薄。",
+          "options": {
+            "A": {
+              "label": "俯看整个宽面，末端宽度看着相同",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-tip-top",
+                "alt": "俯看整个宽面，末端宽度看着相同"
+              }
+            },
+            "B": {
+              "label": "侧面末端明显比主体薄",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-tip-side",
+                "alt": "侧面末端明显比主体薄"
+              }
+            },
+            "C": {
+              "label": "侧面从头到尾一样厚",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-tip-straight",
+                "alt": "侧面从头到尾一样厚"
+              }
+            }
+          }
+        },
+        {
+          "id": "choose-a-pin",
+          "skill": "material-for-a-function",
+          "question": "玩具风轮要用硬圆杆撑住。选哪一根？",
+          "answer": [
+            "C"
+          ],
+          "analysis": "这根金属圆杆又直又硬，适合做支轴。",
+          "options": {
+            "A": {
+              "label": "软布绳，垂落弯曲",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-soft-cord",
+                "alt": "软布绳，垂落弯曲"
+              }
+            },
+            "B": {
+              "label": "松软纸卷，端部被压皱",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-paper-roll",
+                "alt": "松软纸卷，端部被压皱"
+              }
+            },
+            "C": {
+              "label": "硬而直的银灰色金属圆杆",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-solid-metal-pin",
+                "alt": "硬而直的银灰色金属圆杆"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "quiz-wind-wheel",
+            "alt": "桌面玩具风轮，画中轴处空着等待放杆"
+          }
+        },
+        {
+          "id": "alloy-kitchen-tool",
+          "skill": "recognize-a-known-alloy",
+          "question": "不锈钢勺、铜线和铁棒，哪件用了合金？",
+          "answer": [
+            "A"
+          ],
+          "analysis": "不锈钢是合金，这把勺用不锈钢做。",
+          "options": {
+            "A": {
+              "label": "不锈钢勺",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-stainless-spoon",
+                "alt": "不锈钢勺"
+              }
+            },
+            "B": {
+              "label": "铜线卷",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-known-copper-coil",
+                "alt": "铜线卷"
+              }
+            },
+            "C": {
+              "label": "铁棒",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-known-iron-rod",
+                "alt": "铁棒"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "home-metal-observation",
+      "title": "把一条真线索带回来",
+      "type": "slide",
+      "template": "picture-points",
+      "data": {
+        "title": "把一条真线索带回来",
+        "picture": "metal-family-observation",
+        "points": [
+          "选安全的熟悉物品",
+          "画下部件和看到的",
+          "请大人查材料说明"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "家里的哪件物品有金属部件？我们先找安全的。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "和大人选一件冷却、没有尖边的东西。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "画一处部件，记下看见的线索，比如有一小块亮处。"
+        },
+        {
+          "say": "记清它做什么。轴托住小门，锅上的部件各有用处。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "和大人看看标签。还不知道是哪种，就留空。"
+        },
+        {
+          "say": "在家只观察。不要磨、不要敲，也不用锤子。"
+        },
+        {
+          "say": "今天我们按方法留下证据，再用证据解释材料的用处。"
+        }
+      ]
+    }
+  ]
+}

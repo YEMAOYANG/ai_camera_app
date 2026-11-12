@@ -1,0 +1,210 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "各种各样的叶",
+  "binding": {
+    "editionId": "smartedu-science-six-year-g1-lower-e231dd57",
+    "revisionId": "directory-359f40a6afba915101f297d3",
+    "nodeId": "c4b03dab-6eab-4ee2-999d-bd3ce28e9e56",
+    "unitId": "11983e8e-c931-46a7-97de-589b20d31258"
+  },
+  "scenario": "小小叶展需要三张观察卡。孩子给叶片拍视图、说形状、整理展架，最后给家里带一个安全观察任务。",
+  "goals": [
+    "能用语言和图描述熟悉的叶的颜色、轮廓和可见纹路，并用一个相似物做形状联想。",
+    "能选择安全观察方法，画下一个叶片的外形和叶脉，比较两片叶的不同和相同之处。",
+    "在两三种典型阔叶上找出叶片、叶柄和叶片上的叶脉，说明从比较到归纳的过程。",
+    "能辨认课本举的几种奇特叶的形态，并用图或持续观察记录一个新的发现。"
+  ],
+  "goalSources": [
+    {
+      "skill": "describe-and-associate",
+      "target": "能用语言和图描述熟悉的叶的颜色、轮廓和可见纹路，并用一个相似物做形状联想。",
+      "source": "印17～19、课件4～12"
+    },
+    {
+      "skill": "safe-observe-and-draw",
+      "target": "能选择安全观察方法，画下一个叶片的外形和叶脉，比较两片叶的不同和相同之处。",
+      "source": "印18、教案2、任务单2"
+    },
+    {
+      "skill": "compare-and-generalize",
+      "target": "在两三种典型阔叶上找出叶片、叶柄和叶片上的叶脉，说明从比较到归纳的过程。",
+      "source": "印19、教案3"
+    },
+    {
+      "skill": "unusual-and-continue",
+      "target": "能辨认课本举的几种奇特叶的形态，并用图或持续观察记录一个新的发现。",
+      "source": "印20、课件16～22"
+    }
+  ],
+  "pageSequence": [
+    {
+      "key": "which-leaf-came-to-the-table",
+      "kind": "teaching",
+      "plan": "从校园样本图里找不同，老师说颜色、大小、形状，再引导孩子描述。"
+    },
+    {
+      "key": "safe-observation-and-drawing",
+      "kind": "teaching",
+      "plan": "依次演示看、可在成人确认安全后摸与扇闻，并沿一片叶的边和可见叶脉画记录；不入口，带刺及未知的只看。"
+    },
+    {
+      "key": "draw-what-you-see",
+      "kind": "teaching",
+      "plan": "换另一片叶，用原样对照老师画外边、柄与可见纹路，没测的触感和气味先留空。"
+    },
+    {
+      "key": "paired-leaf-observations",
+      "kind": "game",
+      "plan": "真实拍同一片叶的两视角，通过三个样本关卡后对照观察卡。"
+    },
+    {
+      "key": "what-does-it-look-like",
+      "kind": "teaching",
+      "plan": "以银杏、松、槭、玉米、荷等清晰轮廓找生活相像物；孩子可口头说另一种联想并指共同外形。"
+    },
+    {
+      "key": "sort-by-visible-leaf-shape",
+      "kind": "game",
+      "plan": "根据外轮廓搬叶到样例托盘，不用颜色代替形状。"
+    },
+    {
+      "key": "compare-parts-and-find-a-rule",
+      "kind": "teaching",
+      "plan": "两三片典型阔叶并排，按位置点亮叶片、叶柄和叶片上的叶脉。老师示范找共同点，保留对不同叶结构的观察空间。"
+    },
+    {
+      "key": "veins-on-the-leaf",
+      "kind": "teaching",
+      "plan": "用原样图分别圈叶片、叶脉和叶柄，明确叶脉在叶片里。"
+    },
+    {
+      "key": "strange-leaf-gallery",
+      "kind": "teaching",
+      "plan": "看王莲、蒲葵、仙人球、葱、生石花五种真实形态示意，按纸书说明和核验图像比较。请孩子想一想它们生活的环境，避免把相似外形当确定物种。"
+    },
+    {
+      "key": "picture-quiz",
+      "kind": "quiz",
+      "plan": "六道语音图题，正确位置各两次。"
+    },
+    {
+      "key": "take-a-leaf-note-home",
+      "kind": "teaching",
+      "plan": "在安全观察的前提下留家庭活动，记录一片叶，或随季节观察同一棵熟悉植物，选落叶做作品。"
+    }
+  ],
+  "games": [
+    {
+      "page": "paired-leaf-observations",
+      "template": "shutterScout",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.shutterScout",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "observe_state",
+      "selection": "同一片叶的两个实际登记的图像为俯视和正交侧视。俯视用于看轮廓、可见叶脉与叶柄，侧视用于看弯曲或平整轮廓与柄的连接，侧视不冒作叶背。每关在移动视窗实际拍两种状态。",
+      "levels": [
+        "俯视与侧视同一扇形银杏叶，慢速宽框。",
+        "换成同一狭长的样本，借侧视找弯曲，收窄取景。",
+        "换成同一常见阔叶，在更快切换中捕捉两种状态。"
+      ],
+      "demo": "老师示范对准框，按一次真实快门，复位后开始正式关卡。",
+      "teacherAnchors": [
+        "leaf-preview",
+        "game-player",
+        "game-target"
+      ],
+      "observationPlan": {
+        "sceneId": "scene-paired-leaf-observations",
+        "trialId": "same-leaf-two-views",
+        "levels": [
+          "fan",
+          "long",
+          "broad"
+        ],
+        "photoViews": "同关登记同一叶的俯、侧图；shots 用1和0，两者每关各成功一次。observation.trials 在同一个试次内声明三关全部合法图片，观察卡据关对照图与试次。",
+        "complete": "只有真人正式三关齐拍才出结果；自动试玩或教师演示均不计真实拍照。卡片可看叶图，实体触感或气味由成人观察。"
+      }
+    },
+    {
+      "page": "sort-by-visible-leaf-shape",
+      "template": "sortingDepot",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.sortingDepot",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "classification",
+      "selection": "给物件和托盘分别登记可验证的实际叶片与轮廓图标，按本轮可见外轮廓分类，同色异形和同形异色并列。孩子走位、拿叶片、送入样例托盘，错误要说明在哪个部位不相似。",
+      "levels": [
+        "先送两件，对比扇形和明显长条形轮廓。",
+        "增加近圆一类，放三件，颜色和朝向不提示答案。",
+        "用四片叶、三至四类托盘，每盘一件，沿可通行路径，分清同类不同大小。"
+      ],
+      "demo": "老师亮扇形叶卡、扇形托盘和小车，用背后推的方式示范一次，复位后进入正式关。",
+      "teacherAnchors": [
+        "game-target",
+        "fan-sample-dock",
+        "game-player"
+      ]
+    }
+  ],
+  "quiz": [
+    {
+      "id": "find-the-fan-outline",
+      "skill": "形状联想",
+      "prompt": "哪一片的外边像打开的小扇子？",
+      "answer": "展开成小扇形的黄叶",
+      "position": 2,
+      "rationale": "这片黄叶从小柄那一边向外展开，外边像扇面。"
+    },
+    {
+      "id": "show-the-petiole",
+      "skill": "区分叶柄和叶脉",
+      "prompt": "看这片宽叶。哪张图圈住了连到茎的小柄？",
+      "answer": "圈住叶片外左端的小柄",
+      "position": 1,
+      "rationale": "叶柄在叶片外，细细地伸出来。中间的线和叶尖都在叶片上。"
+    },
+    {
+      "id": "same-color-different-shapes",
+      "skill": "按轮廓比较",
+      "prompt": "都选绿色叶。哪一组有一片近圆、一片细长？",
+      "answer": "一片近圆，一片细长",
+      "position": 3,
+      "rationale": "荷叶从上面看近圆。玉米叶像条长带。两片都是绿的，外边形状不同。"
+    },
+    {
+      "id": "safe-for-spines",
+      "skill": "安全观察",
+      "prompt": "看到带尖刺的仙人球。哪张图的观察做法合适？",
+      "answer": "孩子站开，用眼睛看",
+      "position": 2,
+      "rationale": "在合适的距离用眼睛看。带刺的植物不用手碰，鼻子也不用凑近。"
+    },
+    {
+      "id": "record-what-you-see",
+      "skill": "画图记录",
+      "prompt": "哪张记录画出了叶子的外边和里面的纹路？",
+      "answer": "轮廓和看见的纹路都画了",
+      "position": 3,
+      "rationale": "看得见的记录既有一圈叶的外边，也有叶片里的几条纹路。"
+    },
+    {
+      "id": "find-the-leaf-that-looks-like-a-tray",
+      "skill": "比较奇特叶",
+      "prompt": "哪张图的叶浮在水上，边缘还朝上翻？",
+      "answer": "一张翻边圆叶浮在水上",
+      "position": 1,
+      "rationale": "王莲的大圆叶在水面，外边翻起像盘子的边。另两片没有这样的边。"
+    }
+  ],
+  "afterClass": {
+    "familyTask": "成人在平坦熟悉的场所陪看已确认的落叶，孩子画边缘、叶柄和看到的纹路，口头比较两片；有兴趣可复看同一植物随季节的变化，或用安全落叶做书签。",
+    "weeklyQuestionSource": [
+      "认轮廓和形状联想",
+      "观察方法与安全",
+      "叶片叶柄叶脉",
+      "比较特殊叶"
+    ],
+    "evidence": "线上只记录游戏动作和选择。实地触摸、扇闻、画图、季节记录由成人观察，不收集位置。"
+  },
+  "artAndLanguage": "叶片有辨形任务，按已核实的轮廓、边缘、相对尺寸和同一物件的视角制作。生成美术通过实图参考核对结构，脉和柄的定位用几何叠层。保持音频和可见线索，遮掉非目标文字仍可操作。"
+}

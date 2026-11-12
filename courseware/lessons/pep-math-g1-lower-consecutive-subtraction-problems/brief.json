@@ -1,0 +1,177 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "用连减解决问题",
+  "binding": {
+    "editionId": "pep-math-g1-lower-2022-standard",
+    "revisionId": "directory-6205d2037284e91f10b25edd",
+    "nodeId": "c701e49c-7639-485b-836e-7b89b07524b2",
+    "unitId": "ac9164b9-5eba-4c7e-9436-214fc2df042b"
+  },
+  "scenario": "校剧场的道具打包站。按每袋规定件数把彩夹或徽章装满，空袋等候下一整份，放不满的件留在单独的余量托盘。",
+  "goals": [
+    "从图中识别总数、每份固定个数和问题，理解装满的每一份都要达到同样数量。",
+    "每次从剩下的物品减去一整份，用圈画、逐式或箭头记录；数出减了几次，还剩几个。",
+    "剩下的比一份少时停止，能处理恰好减到零的情形，并用把各满份和剩余加回来核对总数。",
+    "在总数相同、每份数量不同的新情境里分别画图或连减，解释得到的满份数可以不同。"
+  ],
+  "goalEvidence": [
+    {
+      "skill": "read-fixed-group",
+      "target": "从图中识别总数、每份固定个数和问题，理解装满的每一份都要达到同样数量。",
+      "source": "印50例3、教案2"
+    },
+    {
+      "skill": "repeated-same-step",
+      "target": "每次从剩下的物品减去一整份，用圈画、逐式或箭头记录；数出减了几次，还剩几个。",
+      "source": "印50例3、课件4至11"
+    },
+    {
+      "skill": "stop-and-check",
+      "target": "剩下的比一份少时停止，能处理恰好减到零的情形，并用把各满份和剩余加回来核对总数。",
+      "source": "印50回顾反思、课件11与17至19"
+    },
+    {
+      "skill": "compare-fixed-groups",
+      "target": "在总数相同、每份数量不同的新情境里分别画图或连减，解释得到的满份数可以不同。",
+      "source": "印52第7题、课件16至20"
+    }
+  ],
+  "pageSequence": [
+    {
+      "key": "pack-sign",
+      "kind": "teaching",
+      "title": "看清一袋固定装几个"
+    },
+    {
+      "key": "circle-batches",
+      "kind": "teaching",
+      "title": "每圈一份，下一次从剩下的数"
+    },
+    {
+      "key": "track-arrow",
+      "kind": "teaching",
+      "title": "一支箭头就是拿走一满份"
+    },
+    {
+      "key": "pack-exact",
+      "kind": "interactive",
+      "title": "完整道具串放进装箱车"
+    },
+    {
+      "key": "stop-before-next",
+      "kind": "teaching",
+      "title": "剩下不够一份就停"
+    },
+    {
+      "key": "zero-remainder",
+      "kind": "teaching",
+      "title": "最后恰好用完"
+    },
+    {
+      "key": "back-to-total",
+      "kind": "teaching",
+      "title": "把满袋和余量加回去"
+    },
+    {
+      "key": "count-steps",
+      "kind": "interactive",
+      "title": "沿着同一步长走到停止点"
+    },
+    {
+      "key": "switch-the-size",
+      "kind": "teaching",
+      "title": "同样多道具，换一个每袋数"
+    },
+    {
+      "key": "picture-check",
+      "kind": "quiz",
+      "title": "用新图找满份、剩余和停止点"
+    },
+    {
+      "key": "recap",
+      "kind": "teaching",
+      "title": "说出每一次拿走几件"
+    }
+  ],
+  "games": [
+    {
+      "page": "pack-exact",
+      "template": "orchardCatch",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.orchardCatch",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "exact_quantity",
+      "selection": "用成串物件识别一整份。满份车每个小格绘制具体物件并用清晰边线标出一份，另一托盘保留不足一份的余量。每关只发固定大小整串与一个更小余串，不能通过合错串凑容量。",
+      "levels": [
+        "两串各3与余串2，满份槽6、余量槽2。",
+        "两串各4与余串3，满份槽8、余量槽3。",
+        "三串各2与余串1，满份槽6、余量槽1。"
+      ],
+      "demo": "圈每份的数量标志和单独余量槽，示范接一整串、显示一满份减少，交接后复位。"
+    },
+    {
+      "page": "count-steps",
+      "template": "bubbleMaze",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.bubbleMaze",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "ordered_route",
+      "selection": "每站画对应剩余物件量；站点符号与实物对应，按每次取同样一份选择下一站，忽略分支中的临近干扰值。左侧每成功一次增加一枚满袋图，余量不足一份或为0才可到出口。",
+      "levels": [
+        "总量17、每份5，走到12、7、2；余2时退出。",
+        "总量20、每份5，走到15、10、5、0；零余量。",
+        "总量27、每份6，走到21、15、9、3；设置错误一步的分叉。"
+      ],
+      "demo": "圈站点余量、每份图和下一站，实际完成一站暂停；交给孩子前重置。"
+    }
+  ],
+  "quizPlan": [
+    {
+      "skill": "read-fixed-group",
+      "task": "图给23枚纪念章、每袋5枚，选正确整袋图标。",
+      "correctPosition": 2,
+      "rationale": "一整袋恰有5个；不按总数或空袋算。"
+    },
+    {
+      "skill": "repeated-same-step",
+      "task": "29枚徽章每袋7枚，连续装满两袋，选择余量图。",
+      "correctPosition": 1,
+      "rationale": "29减7得22，再减7得15；同印51已见的单步28减7区分。"
+    },
+    {
+      "skill": "stop-and-check",
+      "task": "31枚胸针每包6枚，选满包和余量图。",
+      "correctPosition": 3,
+      "rationale": "连续减5次每次6，余1不足一份。"
+    },
+    {
+      "skill": "stop-and-check",
+      "task": "18枚徽章每袋6枚，选剩余状态。",
+      "correctPosition": 2,
+      "rationale": "三袋后恰好用完，余0。"
+    },
+    {
+      "skill": "compare-fixed-groups",
+      "task": "同样24件道具，每袋6件或每袋8件，选择两种装法的对应满袋数图。",
+      "correctPosition": 1,
+      "rationale": "每袋6件为4袋，每袋8件为3袋；按题中两个每份量分别核。"
+    }
+  ],
+  "afterClass": {
+    "familyTask": "用家里安全的小物做一个连减同数问题。先确定一份多少，装一份记一次，停止后把满份与余量合回去核对。",
+    "weeklyQuestionSource": [
+      "识别总数与每份数",
+      "连减箭头与满份数",
+      "不足一份或恰好用完",
+      "同总量换每份量"
+    ],
+    "evidence": "屏幕只记录游戏和图题，实际分装和口头说明待观察。"
+  },
+  "artAndLanguage": "数量由完整可数的原创物件与满盒边线承担，老师说清选什么和何时停止，遮住非目标文字仍可操作。题图不能重复教材及配套组合。",
+  "authoring": {
+    "sourceMode": "direct",
+    "authorModels": [
+      "gpt-6.1-sol"
+    ]
+  }
+}

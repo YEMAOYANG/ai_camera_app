@@ -1,14 +1,20 @@
 """Independently verify lesson speech and questions against official notes."""
 import argparse
+from concurrent.futures import ThreadPoolExecutor
+from copy import deepcopy
 from datetime import datetime, timezone
+from functools import partial
+from hashlib import sha256
 import json
 import os
 import re
 from pathlib import Path
+import shutil
 import subprocess
 import tempfile
 
-from courseware.tools.check import body_hash
+from courseware.tools import game_audio
+from courseware.tools.check import body_hash, valid_objectives
 
 
 VERIFIER_MODEL = 'gpt-6.1-terra'
@@ -16,6 +22,7 @@ VERIFIER_EFFORT = 'low'
 PROMPT = Path(__file__).parent / 'prompts' / 'verify.v1.md'
 ANALYSIS_PROMPT = Path(__file__).parent / 'prompts' / 'verify_analysis.v1.md'
 TEACHING_PROMPT = Path(__file__).parent / 'prompts' / 'verify_teaching.v1.md'
+EVIDENCE_SCHEMA = 'mira.courseware.verification-evidence.v1'
 SPEECH_VERDICT_SCHEMA = {
     'type': 'object', 'additionalProperties': False,
     'properties': {'id': {'type': 'string'}, 'ok': {'type': 'boolean'},
@@ -80,13 +87,14 @@ def _items(body):
 
 def _teaching_items(notes):
     """The learning goals the narration must teach: the notes' objectives, key point and difficult point."""
+    objectives = notes.get('objectives') if isinstance(notes, dict) else None
+    if not valid_objectives(objectives):
+        raise ValueError('objectives_invalid (official notes must have a nonempty list of nonblank objectives)')
     items = [{'id': 'goal-%d' % number, 'goal': goal, 'kind': 'objective'}
-             for number, goal in enumerate(notes.get('objectives') or [], 1) if isinstance(goal, str) and goal.strip()]
+             for number, goal in enumerate(objectives, 1)]
     for key, kind in (('keyPoint', 'key point'), ('difficultPoint', 'difficult point')):
         if isinstance(notes.get(key), str) and notes[key].strip():
             items.append({'id': key, 'goal': notes[key], 'kind': kind})
-    if not items:
-        raise ValueError('The official notes list no objectives, key point or difficult point to check the teaching against')
     return items
 
 
@@ -96,7 +104,7 @@ def _narration(body):
             for number, scene in enumerate(body.get('scenes', []), 1)]
 
 
-def _picture_batch(items, media, *, check_files):
+def _picture_batch(items, media, *, check_files, strict_media=False):
     batch, images = [], []
     for item in items:
         pictures = []
@@ -108,7 +116,10 @@ def _picture_batch(items, media, *, check_files):
                     raise ValueError('Invalid picture source: ' + str(src))
                 if media is None:
                     raise ValueError('Media directory required for picture: ' + match.group(1))
-                path = (Path(media) / match.group(1)).resolve()
+                local = Path(media) / match.group(1)
+                if strict_media and (local.is_symlink() or local.suffix.lower() not in ('.png', '.jpg', '.jpeg', '.webp')):
+                    raise ValueError('Invalid local verifier picture: ' + local.name)
+                path = local.resolve()
                 if check_files and not path.is_file():
                     raise ValueError('Picture file missing: ' + str(path))
                 images.append(str(path))
@@ -121,27 +132,32 @@ def _picture_batch(items, media, *, check_files):
     return batch, images
 
 
-def build_requests(body, notes, *, batch_size=40, media=None, teaching=False):
+def _request(kind, batch, notes, *, images=(), narration=None):
+    template = {
+        'question_analysis': ANALYSIS_PROMPT, 'teaching': TEACHING_PROMPT,
+    }.get(kind, PROMPT).read_text(encoding='utf-8')
+    prompt = template.replace('$NOTES', json.dumps(notes, ensure_ascii=False, sort_keys=True))
+    if kind == 'teaching':
+        prompt = prompt.replace('$NARRATION', json.dumps(narration, ensure_ascii=False))
+    prompt = prompt.replace('$KIND', kind).replace('$ITEMS', json.dumps(batch, ensure_ascii=False, sort_keys=True))
+    return {'kind': kind, 'items': batch, 'prompt': prompt, 'images': list(images)}
+
+
+def build_requests(body, notes, *, batch_size=40, media=None, teaching=False, check_files=True, strict_media=False):
     if type(batch_size) is not int or batch_size < 1:
         raise ValueError('batch_size must be a positive integer')
+    teaching_items = _teaching_items(notes) if teaching else []
     requests = []
     for kind, items in zip(('speech', 'question_solve', 'question_analysis'), _items(body)):
-        template = (ANALYSIS_PROMPT if kind == 'question_analysis' else PROMPT).read_text(encoding='utf-8')
         size = min(batch_size, 4) if kind != 'speech' else batch_size
         for start in range(0, len(items), size):
             batch = items[start:start + size]
             images = []
             if kind != 'speech':
-                batch, images = _picture_batch(batch, media, check_files=True)
-            prompt = template.replace('$NOTES', json.dumps(notes, ensure_ascii=False, sort_keys=True))
-            prompt = prompt.replace('$KIND', kind).replace('$ITEMS', json.dumps(batch, ensure_ascii=False, sort_keys=True))
-            requests.append({'kind': kind, 'items': batch, 'prompt': prompt, 'images': images})
-    if teaching:
-        items = _teaching_items(notes)
-        prompt = TEACHING_PROMPT.read_text(encoding='utf-8').replace('$NOTES', json.dumps(notes, ensure_ascii=False, sort_keys=True))
-        prompt = prompt.replace('$NARRATION', json.dumps(_narration(body), ensure_ascii=False)).replace('$KIND', 'teaching')
-        prompt = prompt.replace('$ITEMS', json.dumps(items, ensure_ascii=False, sort_keys=True))
-        requests.append({'kind': 'teaching', 'items': items, 'prompt': prompt, 'images': []})
+                batch, images = _picture_batch(batch, media, check_files=check_files, strict_media=strict_media)
+            requests.append(_request(kind, batch, notes, images=images))
+    if teaching_items:
+        requests.append(_request('teaching', teaching_items, notes, narration=_narration(body)))
     return requests
 
 
@@ -189,9 +205,32 @@ def _validate(request, result):
     return result['verdicts']
 
 
-def default_runner(prompt, schema, model, effort, images=()):
+def _check_review_disk_space(directory=None):
+    setting = 'MIRA_COURSEWARE_MIN_FREE_BYTES'
+    configured = os.environ.get(setting)
+    if configured is None:
+        return
+    try:
+        floor = int(configured)
+    except ValueError:
+        floor = None
+    minimum = 2 * 1024**3
+    if floor is None or floor < minimum:
+        raise ValueError(f'{setting} must be an integer of at least {minimum} bytes')
+    for path in (Path.cwd(), directory if directory is not None else tempfile.gettempdir()):
+        available = shutil.disk_usage(path).free
+        if available < floor:
+            raise RuntimeError(f'Independent review disk space at {path} has {available} bytes available, '
+                               f'requires at least {floor} bytes')
+
+
+def default_runner(prompt, schema, model, effort, images=(), *, attempts=2):
+    if attempts not in (1, 2):
+        raise ValueError('Verification attempts must be 1 or 2')
     binary = os.environ.get('MIRA_CODEX_BIN', '/Applications/ChatGPT.app/Contents/Resources/codex-cli/bin/codex')
+    _check_review_disk_space()
     with tempfile.TemporaryDirectory() as directory:
+        _check_review_disk_space(directory)
         schema_path = Path(directory) / 'schema.json'
         output_path = Path(directory) / 'output.json'
         schema_path.write_text(json.dumps(schema), encoding='utf-8')
@@ -202,7 +241,8 @@ def default_runner(prompt, schema, model, effort, images=()):
                 raise ValueError('Picture file missing: ' + str(image))
             command.extend(['--image', str(Path(image).resolve())])
         command.extend(['--output-schema', str(schema_path), '-o', str(output_path), '-'])
-        for attempt in range(2):
+        for attempt in range(attempts):
+            _check_review_disk_space(directory)
             stderr = ''
             try:
                 output_path.unlink(missing_ok=True)
@@ -210,18 +250,25 @@ def default_runner(prompt, schema, model, effort, images=()):
                 stderr = result.stderr or ''
                 return json.loads(output_path.read_text(encoding='utf-8'))
             except (OSError, subprocess.SubprocessError, ValueError) as exc:
-                if attempt == 1:
+                if attempt == attempts - 1:
                     stderr = getattr(exc, 'stderr', None) or stderr
                     detail = ': ' + stderr[-300:] if stderr else ''
-                    raise RuntimeError('Codex verification failed after two attempts: ' + str(exc) + detail) from exc
+                    count = 'two attempts' if attempts == 2 else 'one attempt'
+                    raise RuntimeError(f'Codex verification failed after {count}: ' + str(exc) + detail) from exc
 
 
-def run_requests(requests, runner=default_runner, *, model=VERIFIER_MODEL, effort=VERIFIER_EFFORT):
-    verdicts = []
-    for request in requests:
+def run_requests(requests, runner=default_runner, *, model=VERIFIER_MODEL, effort=VERIFIER_EFFORT, jobs=1):
+    if type(jobs) is not int or jobs not in (1, 2):
+        raise ValueError('Verification jobs must be 1 or 2')
+
+    def verify_one(request):
         result = runner(request['prompt'], _schema(request['kind']), model, effort, request.get('images', ()))
-        verdicts.extend(_validate(request, result))
-    return verdicts
+        return _validate(request, result)
+
+    if jobs == 1:
+        return [verdict for request in requests for verdict in verify_one(request)]
+    with ThreadPoolExecutor(max_workers=jobs) as pool:
+        return [verdict for batch in pool.map(verify_one, requests) for verdict in batch]
 
 
 def build_receipt(body, notes, requests, verdicts, stored_answers, *, model, effort, ran_at):
@@ -288,6 +335,54 @@ def build_receipt(body, notes, requests, verdicts, stored_answers, *, model, eff
             'verifier': {'model': model, 'effort': effort, 'ranAt': ran_at}}
 
 
+def _evidence_body(body):
+    content = deepcopy(body)
+    game_audio.verify_recordings(content, before_voice=True)
+    for record in [content['stage'], *content['scenes']]:
+        for key in ('createdAt', 'updatedAt'):
+            record.pop(key, None)
+    for scene in content['scenes']:
+        for action in scene.get('actions', []):
+            if action.get('type') == 'speech':
+                action.pop('audioId', None)
+                action.pop('audioUrl', None)
+        if scene.get('type') == 'quiz':
+            for question in scene['content']['questions']:
+                question.pop('questionAudioUrl', None)
+    return content
+
+
+def _evidence_input_hash(body, requests, picture_hashes):
+    inputs = [{'kind': request['kind'], 'prompt': request['prompt'], 'schema': _schema(request['kind']),
+               'pictures': [picture_hashes[filename] for filename in request['images']]} for request in requests]
+    return body_hash({'content': _evidence_body(body), 'requests': inputs})
+
+
+def evidence_input_hash(body, requests):
+    """Identify the same built lesson before and after binding recorded audio."""
+    picture_hashes = {filename: sha256(Path(filename).read_bytes()).hexdigest()
+                      for filename in {image for request in requests for image in request['images']}}
+    return _evidence_input_hash(body, requests, picture_hashes)
+
+
+def verification_from_evidence(body, notes, requests, answers, evidence, *, model, effort):
+    if (not isinstance(evidence, dict) or evidence.get('schemaVersion') != EVIDENCE_SCHEMA
+            or evidence.get('notesSha256') != body_hash(notes)
+            or evidence.get('inputSha256') != evidence_input_hash(body, requests)):
+        raise ValueError('Lesson or verifier inputs differ from the recorded independent review')
+    if (evidence['model'], evidence['effort']) != (model, effort):
+        raise ValueError('Recorded review used a different model or reasoning effort')
+    if not re.fullmatch(r'[a-f0-9]{64}', str(evidence.get('reviewedBodySha256', ''))):
+        raise ValueError('Recorded review is missing the original body identity')
+    if not isinstance(evidence.get('ranAt'), str) or datetime.fromisoformat(evidence['ranAt']).tzinfo is None:
+        raise ValueError('Recorded review is missing the verifier timestamp')
+    receipt = build_receipt(body, notes, requests, evidence['verdicts'], answers,
+                            model=model, effort=effort, ran_at=evidence['ranAt'])
+    receipt['reusedEvidence'] = {'sha256': body_hash(evidence), 'inputSha256': evidence['inputSha256'],
+                                 'reviewedBodySha256': evidence['reviewedBodySha256']}
+    return receipt
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     for name in ('body', 'notes', 'out'):
@@ -295,16 +390,58 @@ def main():
     parser.add_argument('--media')
     parser.add_argument('--model', default=VERIFIER_MODEL)
     parser.add_argument('--effort', default=VERIFIER_EFFORT)
+    parser.add_argument('--jobs', type=int, choices=(1, 2), default=1,
+                        help='run independent verifier requests concurrently, returning verdicts in request order')
+    parser.add_argument('--no-retry', action='store_true',
+                        help='invoke the model once per request when running a new review')
+    evidence_options = parser.add_mutually_exclusive_group()
+    evidence_options.add_argument('--save-evidence', type=Path,
+                                  help='save authentic model verdicts for the identical lesson after audio binding')
+    evidence_options.add_argument('--reuse-evidence', type=Path,
+                                  help='validate and reuse recorded model verdicts without a second model call')
     args = parser.parse_args()
     try:
         body = json.loads(Path(args.body).read_text(encoding='utf-8'))
+        if 'stage' not in body and 'body' in body and 'lines' in body:
+            body = body['body']
         notes = json.loads(Path(args.notes).read_text(encoding='utf-8'))
         requests = build_requests(body, notes, media=args.media or Path(args.body).resolve().parent / 'media', teaching=True)
         answers = {q['id']: q['answer'] for scene in body.get('scenes', []) if scene.get('type') == 'quiz'
                    for q in scene.get('content', {}).get('questions', [])}
-        verdicts = run_requests(requests, model=args.model, effort=args.effort)
-        receipt = build_receipt(body, notes, requests, verdicts, answers, model=args.model,
-                                effort=args.effort, ran_at=datetime.now(timezone.utc).isoformat())
+        if args.reuse_evidence:
+            evidence = json.loads(args.reuse_evidence.read_text(encoding='utf-8'))
+            from courseware.tools import verify_delta, verify_presentation
+            replayers = {verify_delta.EVIDENCE_SCHEMA: verify_delta.replay,
+                         verify_presentation.EVIDENCE_SCHEMA: verify_presentation.replay}
+            schema = evidence.get('schemaVersion') if isinstance(evidence, dict) else None
+            replayer = replayers.get(schema) if isinstance(schema, str) else None
+            if replayer is not None:
+                receipt = replayer(body, notes, args.media or Path(args.body).resolve().parent / 'media',
+                                   evidence, model=args.model, effort=args.effort)
+            else:
+                receipt = verification_from_evidence(body, notes, requests, answers, evidence,
+                                                     model=args.model, effort=args.effort)
+        else:
+            if args.save_evidence and (args.save_evidence.exists() or args.save_evidence.resolve() == Path(args.out).resolve()):
+                raise ValueError('Verification evidence requires a new file distinct from the receipt')
+            input_hash = evidence_input_hash(body, requests) if args.save_evidence else None
+            runner_options = {'runner': partial(default_runner, attempts=1)} if args.no_retry else {}
+            verdicts = run_requests(requests, model=args.model, effort=args.effort, jobs=args.jobs,
+                                    **runner_options)
+            ran_at = datetime.now(timezone.utc).isoformat()
+            receipt = build_receipt(body, notes, requests, verdicts, answers, model=args.model,
+                                    effort=args.effort, ran_at=ran_at)
+            if args.save_evidence:
+                if input_hash != evidence_input_hash(body, requests):
+                    raise ValueError('Independent review input changed during verification')
+                evidence = {'schemaVersion': EVIDENCE_SCHEMA, 'inputSha256': input_hash,
+                            'reviewedBodySha256': receipt['bodySha256'], 'notesSha256': receipt['notesSha256'],
+                            'model': args.model, 'effort': args.effort, 'ranAt': ran_at, 'verdicts': verdicts}
+                with args.save_evidence.open('x', encoding='utf-8') as stream:
+                    json.dump(evidence, stream, ensure_ascii=False, indent=2)
+                    stream.write('\n')
+        if args.reuse_evidence and args.reuse_evidence.resolve() == Path(args.out).resolve():
+            raise ValueError('The verification receipt must not overwrite its evidence')
         Path(args.out).write_text(json.dumps(receipt, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
     except (OSError, ValueError, KeyError, RuntimeError) as exc:
         parser.exit(2, 'Verification failed: %s\n' % exc)

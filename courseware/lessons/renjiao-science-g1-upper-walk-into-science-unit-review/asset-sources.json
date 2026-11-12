@@ -1,0 +1,1292 @@
+{
+  "schemaVersion": "mira.courseware.asset-sources.v1",
+  "assets": {
+    "paper-wing": {
+      "file": "assets/paper-wing.png",
+      "sha256": "ab23814fed494c781194fda4d92f808dc08b836325758f6101d14d2a4953b072",
+      "usedBy": [
+        "p05",
+        "p06"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "description": "同一模拟纸翼的正交俯视宽轮廓。讲解页、快门目标与合法成功后观察卡使用同一登记图键。",
+      "generator": "Codex 内置 ImageGen",
+      "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-0aae0042-3960-4bbb-9a1c-210732a93a0d.png",
+      "sourceSha256": "c2c3ac47bb517723cf21d166a1811c6d90ed011b7b48305c32a38ab5ba0e7c56",
+      "sourceDimensions": [
+        1254,
+        1254
+      ],
+      "derivative": {
+        "method": "Pillow LANCZOS，整幅 1254×1254 至 384×384，保持透明通道，PNG optimize",
+        "dimensions": [
+          384,
+          384
+        ],
+        "mode": "RGBA"
+      },
+      "prompt": "Use case: scientific-educational. Asset type: one original transparent game sprite for a first-grade science observation lesson. One inanimate handmade paper-wing model, a single broad symmetrical cut-paper object viewed directly from above, centered on a fully transparent background. Two wide rounded pale apricot paper wings join one slim straight dark pine-green paper spine, with a clear simple central fold and one warm cream paper accent on each side. Strong unmistakable wide silhouette at 60 px, even outline, subtle matte gouache paper texture, no cast shadow, no scenery, nothing else. This is a child's craft model, not a real animal: no eyes, antennae, body anatomy, feet, text, logo or watermark. Straight overhead face, horizontal span substantially wider than height, keep the whole object in frame, square canvas, about eight percent transparent padding. Clean paper-cut outline in the muted apricot, deep pine green and warm cream lesson palette."
+    },
+    "science-workbench": {
+      "file": "assets/science-workbench.png",
+      "sha256": "b80c68a06c001b34c1b99e0f19da7c54a3f6e5ac927426129c35b6951d400b53",
+      "usedBy": [
+        "p04",
+        "p06"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "generator": "Codex 内置 ImageGen",
+      "description": "开始卡底层和材料搬运工作台的纯装饰背景；无物件、没有教学事实。快门局内用模板深绿底，保证浅色框对比。",
+      "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-20a0c19e-7622-4678-8e0f-314f573bc100.png",
+      "sourceSha256": "558665332af0c58c2a8384d99f34cebcfb0a24c64efc2e5c4c544a65650ca868",
+      "sourceDimensions": [
+        1672,
+        941
+      ],
+      "derivative": {
+        "method": "Pillow LANCZOS，1672×941 至 1280×720 RGB，PNG optimize",
+        "dimensions": [
+          1280,
+          720
+        ],
+        "mode": "RGB"
+      },
+      "prompt": "Use case: illustration-story. Asset type: 16:9 landscape opaque classroom science workbench backdrop for a first-grade educational lesson and game start card. Calm matte gouache on subtle warm paper, creamy oatmeal work surface from a gentle overhead angle, very light apricot along the lower edge, two understated deep pine green leaves and warm amber flecks only at the extreme left and right corners. Keep the entire central 75 percent and the lower middle a single quiet empty flat surface, pale warm cream, fully clear for drawn lesson objects and controls. No tools, props, people, paper wings, shadows that resemble objects, text, letters, numbers, symbols, logo, watermark or border. Warm paper grain, crisp simple shapes, calm high-contrast space for dark foreground. A true widescreen 16:9 composition, all important content very subtle and at the extreme corners."
+    },
+    "paper-wing-side": {
+      "file": "assets/paper-wing-side.png",
+      "sha256": "bf22a3155f25ae0751195a0680231348bf7646151765fae05164484e05caf538",
+      "usedBy": [
+        "p05",
+        "p06"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "generator": "Codex 内置 ImageGen",
+      "description": "由同一纸翼模型的俯视母图作参考的侧向窄轮廓。讲解页对照、快门目标和合法成功后观察卡共用同一图键。",
+      "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-c23077cf-fb87-41d0-9ab8-e0acf5ee7434.png",
+      "sourceSha256": "a5ab6bb0ff9645424b41572bf1954506ff842917230cb7665f06e955f0e8df47",
+      "sourceDimensions": [
+        1254,
+        1254
+      ],
+      "editReference": {
+        "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-0aae0042-3960-4bbb-9a1c-210732a93a0d.png",
+        "sha256": "c2c3ac47bb517723cf21d166a1811c6d90ed011b7b48305c32a38ab5ba0e7c56"
+      },
+      "derivative": {
+        "method": "Pillow LANCZOS，整幅 1254×1254 至 384×384，保持透明通道，PNG optimize",
+        "dimensions": [
+          384,
+          384
+        ],
+        "mode": "RGBA"
+      },
+      "prompt": "Use case: identity-preserve, scientific-educational asset. Input image: exact identity, geometry, material and colors of the same handmade paper-wing object, currently shown directly from above. Create a matching SIDE ORTHOGRAPHIC VIEW of exactly that object, at the same scale, centered on a truly transparent square. Rotate the VIEW around the stationary object by exactly a quarter turn to look along its left-to-right horizontal wingspan. This is an educational pair: preserve the total vertical length and center position of the long dark pine-green raised folded paper spine, but the two broad flat orange wings should now be almost edge-on, overlapping in projection, so their broad apricot faces and cream patches are no longer displayed. Show a clear very slender, tall side silhouette of stacked green folded paper and a narrow apricot edge, with a tiny warm cream paper edge if visible. No silhouette of an insect, no new pieces, no top face in perspective, no cast shadow, no scenery, no text or numbers, no outlines of the original overhead view. Maintain the same matte gouache paper-cut texture and colors, one cutout object only, the same portrait-height extent as the original spine and wings."
+    },
+    "label-problem": {
+      "file": "assets/label-problem.png",
+      "sha256": "612643fd77d5ae28447302a0d253eabbdfd4c2689635510f933d59dcd1f11f6b",
+      "usedBy": [
+        "p01",
+        "p11"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "generator": "Codex 内置 ImageGen",
+      "description": "一张无字橙色折名牌平躺桌面，双手离开名牌，画面不显示原因或解决办法。植物和墙画是装饰。",
+      "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-ea29c6c1-e49d-45c5-aeba-8bd5e9707604.png",
+      "sourceSha256": "fb22c86d566ce5c0eff4d92ed2f2f2f1ce238a571a5dfad104da99a9a8d51fe8",
+      "sourceDimensions": [
+        1536,
+        1024
+      ],
+      "derivative": {
+        "method": "Pillow LANCZOS，1536×1024 至 960×640 RGB，PNG optimize",
+        "dimensions": [
+          960,
+          640
+        ],
+        "mode": "RGB"
+      },
+      "prompt": "Use case: illustration-story. Asset type: a landscape 3:2 original scene for a first-grade science lesson. From a gentle overhead angle, show one plain apricot folding name card that has fallen and is now lying visibly flat on a low creamy oatmeal worktable, its simple center crease still visible. Beside it leave an empty spot reserved for a standing card, with no drawn marking or text. A child's two small relaxed hands rest well back from the paper, without covering it or touching it. Tight and immediately legible composition. The card is the only prop, entirely blank on both halves, with no upright card anywhere. Matte gouache on subtle warm paper, clean simplified paper-cut silhouettes, touches of deep pine green, warm cream and muted apricot. Calm clean first-grade science courseware art. No words, letters, digits, text-like marks, watermarks or logos."
+    },
+    "use-measure": {
+      "file": "assets/use-measure.png",
+      "sha256": "cecbb6178dc173226ff4a72f1706223795d6d3f94688cba62fce85830c511e02",
+      "usedBy": [
+        "p04"
+      ],
+      "kind": "deterministic-geometry",
+      "source": "diagrams/use-measure.svg",
+      "sourceSha256": "506ac0fadbabbae88d8d7f5327bf763a9813f04c2ab70ddc96df080533212c01",
+      "sourceDimensions": [
+        256,
+        256
+      ],
+      "derivative": {
+        "method": "PyMuPDF 1.26.10 以 1× 将 SVG 栅格化并保留 alpha；Pillow PNG optimize",
+        "dimensions": [
+          256,
+          256
+        ],
+        "mode": "RGBA"
+      },
+      "description": "材料搬运站的测量方法托盘。无字直尺，七条刻线每 30 SVG 单位等距，左端第一条更长以标明量的起点。"
+    },
+    "ask-look": {
+      "file": "assets/ask-look.png",
+      "sha256": "979ce63fdc41f92aab0bfdced028dd76287b916d27498e5fa66f282a88ef2202",
+      "usedBy": [
+        "p04"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "description": "材料搬运站的观察问题卡。仅一条纸带，右上角三道平行短纹。23 px 仍见位置明确的小花纹，三道不要求逐条数。",
+      "generator": "Codex 内置 ImageGen",
+      "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-544d9710-859e-4463-a1ff-ce1180f2648f.png",
+      "sourceSha256": "31a0616ae233d5b8b46dbcce600830e25b733941df2188b15c572b64cd359171",
+      "sourceDimensions": [
+        1254,
+        1254
+      ],
+      "derivative": {
+        "method": "Pillow LANCZOS，整幅 1254×1254 至 256×256，保持透明通道，PNG optimize",
+        "dimensions": [
+          256,
+          256
+        ],
+        "mode": "RGBA"
+      },
+      "prompt": "Use case: scientific-educational. A single original transparent square game cutout for a first-grade lesson. Show one broad cream paper ribbon, nearly horizontal, with a single clearly visible group of three short dark pine-green parallel dashes stamped in its upper-right corner. The dashes are an abstract pattern, without any letters or numbers. The strip should fill most of the square horizontally; make the pattern large enough to still be noticed when the entire image is only 23 pixels wide, while remaining a small detail on the strip. Outline the warm cream paper with a thin muted apricot edge to keep the shape visible on light backgrounds. Clean matte gouache and a subtle paper-cut texture. No magnifier, ruler, other objects, background, border, writing, logo or shadow. Leave only modest transparent padding around the object."
+    },
+    "use-look": {
+      "file": "assets/use-look.png",
+      "sha256": "6a5ae2005174f17f74df9b3f74db020d1d5ab9cbf805cbdcc5aa16d3770be513",
+      "usedBy": [
+        "p04"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "description": "材料搬运站的观察方法托盘。粗边圆镜和斜柄在 23 px 仍可辨，背景透明，无字。",
+      "generator": "Codex 内置 ImageGen",
+      "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-5bf02a75-65cb-4f44-9cf8-571c185ee4e4.png",
+      "sourceSha256": "ae11fa1432a79fd4c100490aceb20aa8111fedc48202186fa3c158885d1abc93",
+      "sourceDimensions": [
+        1254,
+        1254
+      ],
+      "derivative": {
+        "method": "Pillow LANCZOS，整幅 1254×1254 至 256×256，保持透明通道，PNG optimize",
+        "dimensions": [
+          256,
+          256
+        ],
+        "mode": "RGBA"
+      },
+      "prompt": "Use case: scientific-educational. One original simple magnifying glass cutout for a first-grade game, in a transparent square. A large clear round cream lens with one thick deep pine-green rim and a thick short dark green handle slanting down to the lower right. Show the whole magnifier, filling about 85 percent of the image, front-facing and instantly recognizable when reduced to 23 pixels. Only the circular lens and handle are present. A tiny muted apricot accent on the handle is allowed. Warm matte gouache and subtle clean paper-cut texture, bold uninterrupted silhouette. No other objects, scene, shadows, checkered background, text, symbols, labels, logos or numbers."
+    },
+    "method-measure": {
+      "file": "assets/method-measure.png",
+      "sha256": "77630b60e2094c8bdc259342809647f562ca35edf62064efb6b0b714711854f6",
+      "usedBy": [
+        "p02"
+      ],
+      "kind": "deterministic-geometry",
+      "description": "两条等宽不同长的纸带共用左端 x=114，尺 0 刻度也在 x=114；末端落在同一把尺的等距刻线。",
+      "source": "diagrams/method-measure.svg",
+      "sourceSha256": "3544c0a9ab46d1cce7ef731e6adfd537234c9d98a3f20d17294996d5783fae9f",
+      "sourceDimensions": [
+        760,
+        570
+      ],
+      "inputs": [
+        {
+          "file": "diagrams/paper-ribbon-surface.png",
+          "sha256": "d58f4185eaee7d26fc4d0e7f2abe5a588b5bae616b4127be841a8f1d91c159d7",
+          "kind": "codex-builtin-imagegen-derived-texture",
+          "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-b19bd4b4-08b4-4eb6-bd73-343c4064cc9b.png",
+          "sourceSha256": "dd6a2f61a410e475cbc222acd929df9065c15e840295cf0b8e76304382f77467",
+          "sourceDimensions": [
+            2172,
+            724
+          ],
+          "prompt": "Use case: scientific-educational. One original cutout of a single plain straight apricot paper ribbon viewed directly from overhead. Make it a clean horizontal rectangle about five times wider than it is tall with flat, clearly defined short ends. The entire ribbon is one uninterrupted muted apricot surface with subtle matte gouache paper grain. It fills most of the square width while leaving a small transparent margin. It will be duplicated and rescaled by code to show two lengths aligned precisely. Truly transparent background. No second ribbon, curl, taper, loose fragments, rulers, shadows, ticks, numbers, symbols, baseline, words or logo.",
+          "derivative": {
+            "cropXYXY": [
+              44,
+              201,
+              2128,
+              520
+            ],
+            "method": "Pillow 裁取内部近全不透明纹理，转 RGB 并 LANCZOS 至 720×110，PNG optimize",
+            "dimensions": [
+              720,
+              110
+            ],
+            "mode": "RGB"
+          }
+        }
+      ],
+      "derivative": {
+        "method": "将 SVG 对纸带纹理的相对引用内嵌为同一 PNG data URI。PyMuPDF 1.26.10 以 1× 栅格化；Pillow PNG optimize",
+        "dimensions": [
+          760,
+          570
+        ],
+        "mode": "RGB"
+      }
+    },
+    "ask-measure": {
+      "file": "assets/ask-measure.png",
+      "sha256": "785d6f3620d4a68d9fee76cba4ac148ef56f4670af265b39cdf55a87f54c6df5",
+      "usedBy": [
+        "p04"
+      ],
+      "kind": "deterministic-geometry",
+      "description": "两条等宽不同长的纸带同起于 x=22，均复用单带纹理。透明背景，无文字，无尺。",
+      "source": "diagrams/ask-measure.svg",
+      "sourceSha256": "0772307beb225172df724228cec659ba88fb1daaa1cf86c2fde9355ec4cb09cd",
+      "sourceDimensions": [
+        256,
+        256
+      ],
+      "inputs": [
+        {
+          "file": "diagrams/paper-ribbon-surface.png",
+          "sha256": "d58f4185eaee7d26fc4d0e7f2abe5a588b5bae616b4127be841a8f1d91c159d7",
+          "kind": "codex-builtin-imagegen-derived-texture",
+          "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-b19bd4b4-08b4-4eb6-bd73-343c4064cc9b.png",
+          "sourceSha256": "dd6a2f61a410e475cbc222acd929df9065c15e840295cf0b8e76304382f77467",
+          "sourceDimensions": [
+            2172,
+            724
+          ],
+          "prompt": "Use case: scientific-educational. One original cutout of a single plain straight apricot paper ribbon viewed directly from overhead. Make it a clean horizontal rectangle about five times wider than it is tall with flat, clearly defined short ends. The entire ribbon is one uninterrupted muted apricot surface with subtle matte gouache paper grain. It fills most of the square width while leaving a small transparent margin. It will be duplicated and rescaled by code to show two lengths aligned precisely. Truly transparent background. No second ribbon, curl, taper, loose fragments, rulers, shadows, ticks, numbers, symbols, baseline, words or logo.",
+          "derivative": {
+            "cropXYXY": [
+              44,
+              201,
+              2128,
+              520
+            ],
+            "method": "Pillow 裁取内部近全不透明纹理，转 RGB 并 LANCZOS 至 720×110，PNG optimize",
+            "dimensions": [
+              720,
+              110
+            ],
+            "mode": "RGB"
+          }
+        }
+      ],
+      "derivative": {
+        "method": "将 SVG 对纸带纹理的相对引用内嵌为同一 PNG data URI。PyMuPDF 1.26.10 以 1× 栅格化；Pillow PNG optimize",
+        "dimensions": [
+          256,
+          256
+        ],
+        "mode": "RGBA"
+      }
+    },
+    "depot-rover": {
+      "file": "assets/depot-rover.png",
+      "sha256": "440d1a692e572a5eb370a3e2e32b917c153dc72aefba06fd39e3944c5f37f3c3",
+      "usedBy": [
+        "p04"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "description": "杏色搬运车，带两个深绿色轮子和深绿短保险杠。23px 静态可辨车辆轮廓，无人物五官或文字。",
+      "generator": "Codex 内置 ImageGen",
+      "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-af2515ad-e65f-4a4a-9763-9b6431987512.png",
+      "sourceSha256": "e266bcc2ae8cbcbcf7aad252abcf187c8136345276cc9981e1dc8cf60da4067f",
+      "sourceDimensions": [
+        1254,
+        1254
+      ],
+      "derivative": {
+        "method": "Pillow LANCZOS，整幅 1254×1254 至 256×256，保持透明通道，PNG optimize",
+        "dimensions": [
+          256,
+          256
+        ],
+        "mode": "RGBA"
+      },
+      "prompt": "Use case: illustration-story. One small friendly wheeled toy science cart for a first-grade warehouse game, isolated on a truly transparent square. Viewed slightly from above so its clear apricot rectangular cart body, pale wood top platform, two visible chunky pine-green wheels, and short flat front bumper are immediately readable even at 26 pixels. Mechanical object only, no eyes or face, no animal or human features, nothing on the flat platform. The bumper is a simple horizontal shape, all wheels and cart edges inside the image, modest even transparent padding. Clean matte gouache on subtly textured paper, with warm cream, deep pine green and muted orange. No shadow, background, scenery, text, numbers, badges, logo or watermark."
+    },
+    "ask-test": {
+      "file": "assets/ask-test.png",
+      "sha256": "a6534ec3e7a745e91973709dfdfe6d047c9e4c67494151850dbcf61d4addf2a0",
+      "usedBy": [
+        "p04"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "description": "两种折纸支座，一低一高，中间单张无字名牌。小屏静态可辨两种轮廓。",
+      "generator": "Codex 内置 ImageGen",
+      "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-81963b49-0b1e-45e8-84d9-0cb38cba83b5.png",
+      "sourceSha256": "6c4d130499de035afe6a5d269123e562751d4115228a41fee154022b479b60f7",
+      "sourceDimensions": [
+        2172,
+        724
+      ],
+      "derivative": {
+        "method": "Pillow LANCZOS 原比例缩至 256×85，居中放在透明 256×256 画布上，不裁物件，PNG optimize",
+        "dimensions": [
+          256,
+          256
+        ],
+        "mode": "RGBA"
+      },
+      "prompt": "Use case: scientific-educational. A simple original transparent square cutout for a first-grade question card, immediately legible at 23 pixels. Show exactly two alternative folded apricot paper supports for the same small name card, side by side, seen in side profile: at left a simple shallow paper stand has tipped low; at right a simple taller triangular paper stand remains upright. One small cream name card with no printing stands apart between the two supports, suggesting the object to test rather than marking an answer. Emphasize the two contrasting large silhouettes, with a clean gap, modest transparent margins, flat matte gouache and warm paper-cut texture. Deep pine-green edges on soft apricot and cream, no written words, digits, arrows, ruler, magnifier, book, hands, check mark, background, border, shadow or logo."
+    },
+    "use-test": {
+      "file": "assets/use-test.png",
+      "sha256": "496a28a3989cca7d55b77b3524d0aa28e0d2a0afe823ad93534e6d8625480df3",
+      "usedBy": [
+        "p04"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "description": "双框对照两种纸牌姿态、下方单眼。23 px 可分高低和眼形，与带斜柄的放大镜图不同。",
+      "generator": "Codex 内置 ImageGen",
+      "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-b98d9e10-2566-443e-93be-a741191fcdef.png",
+      "sourceSha256": "c9a37d668b618ab3384e63524f25bc5c90e1a8abbcf0f42753549dec9bdb7948",
+      "sourceDimensions": [
+        1254,
+        1254
+      ],
+      "derivative": {
+        "method": "Pillow LANCZOS，整幅 1254×1254 至 256×256，保持透明通道，PNG optimize",
+        "dimensions": [
+          256,
+          256
+        ],
+        "mode": "RGBA"
+      },
+      "prompt": "Use case: scientific-educational. One compact square transparent icon for 'try both and compare' in a first-grade game. In its upper two-thirds are two equal simple cream picture panels with thick pine-green outlines. Each panel shows the same plain orange folded paper name card and the same short tabletop line, upright in one panel and tilted low in the other. Under both panels, centered and unmistakable, is one large simple eye icon with a dark green pupil, looking at both trials. Strong graphic silhouettes that are readable at 23 pixels, with minimal detail, and generous separation of the panels. Clean matte gouache, warm cream, muted apricot and pine green. Empty transparent margins. No labels, numbers, letters, arrows, checking symbols, ruler, magnifying glass, book, hands, or scenery."
+    },
+    "ask-make": {
+      "file": "assets/ask-make.png",
+      "sha256": "bd1b5e3df023b64631ff626131dd3663a3e3fb5e5fa2dc8956cb9b54da19c346",
+      "usedBy": [
+        "p04"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "description": "平放空白名牌与另放的未折杏色长纸条，23px 仍为两件可区分的形状，无已制好纸脚或文字。",
+      "generator": "Codex 内置 ImageGen",
+      "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-a9a186af-3e4d-4a11-9656-d3af78d2bfe3.png",
+      "sourceSha256": "7aebf5a99e91254dc324a4f20660bc5f066bd115ec27f82dfe316c778e095b61",
+      "sourceDimensions": [
+        1254,
+        1254
+      ],
+      "derivative": {
+        "method": "Pillow LANCZOS，原比例缩至 256×256，居中放入透明 256×256 画布，PNG optimize",
+        "dimensions": [
+          256,
+          256
+        ],
+        "mode": "RGBA"
+      },
+      "prompt": "Use case: scientific-educational. One original square transparent cutout to show a simple making problem to a first grader. Show only one small blank cream card fallen flat at a diagonal, and beside it one clearly separate long flat apricot paper strip with straight ends, still unfolded. The card should look like a wide rectangle resting low, not a stand. Give each object a bold and different silhouette, dark pine-green edge accents and a clear gap between them, readable when the icon is only 23 pixels wide. Warm subtle matte gouache paper texture. Modest transparent margins. No finished stand, hands, tools, ruler, book, line pattern, text, numbers, markings, logo, scene or shadow."
+    },
+    "use-make": {
+      "file": "assets/use-make.png",
+      "sha256": "09d1204aabe0a2ebd9776386f986f4b1eebfc3c7fa74fc50667258d19987b4d8",
+      "usedBy": [
+        "p04"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "description": "一只手捏住折痕，把杏色纸条弯成三角支撑，23px 静态仍可辨手部动作和纸脚轮廓。",
+      "generator": "Codex 内置 ImageGen",
+      "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-903dc11e-8c5e-456d-af1b-46831f259477.png",
+      "sourceSha256": "4d4aee3f7cd372db5896eb2b79ca4580aaa96c6926599c7040746c480e0fb5f1",
+      "sourceDimensions": [
+        1254,
+        1254
+      ],
+      "derivative": {
+        "method": "Pillow LANCZOS，原比例缩至 256×256，居中放入透明 256×256 画布，PNG optimize",
+        "dimensions": [
+          256,
+          256
+        ],
+        "mode": "RGBA"
+      },
+      "prompt": "Use case: scientific-educational. One original cutout for a first-grade 'make it' game icon. Show exactly one small child's anatomically natural hand, with five fingers total and any hidden by the grip allowed, pinching a wide apricot paper strip as it is being bent into a simple triangular paper foot. The active pinch and the triangular fold must be easy to recognize at 23 pixels. Place both shapes centrally with bold simple pine-green outlines, warm muted orange paper, and matte gouache paper-cut texture. Transparent square background, no full person, no second hand, no tools, no extra object or panels, no cut-off fingers, no shadows, text, numerals, markings, symbols or logos."
+    },
+    "ask-lookup": {
+      "file": "assets/ask-lookup.png",
+      "sha256": "9cfdc3d9c3602f4ac264e73ca61e12bf66ac53e555800a9dab33b879f28cce50",
+      "usedBy": [
+        "p04"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "description": "半折绿纸模型旁为两格图示卡，上格一张折纸图，下格空白。23px 合成实际题卡底色后仍可辨两物件和空格，卡片外底色可透出，无棋盘或文字。",
+      "generator": "Codex 内置 ImageGen",
+      "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-2f4d43f8-a4bf-4614-92aa-8184689c1a22.png",
+      "sourceSha256": "283df35b6383d97a6bc241d99b35597310c4fa9508c942b27f939fbdd8e83305",
+      "sourceDimensions": [
+        1536,
+        1024
+      ],
+      "derivative": {
+        "method": "Pillow LANCZOS，原比例缩至 256×171，居中放入透明 256×256 画布，PNG optimize",
+        "dimensions": [
+          256,
+          256
+        ],
+        "mode": "RGBA"
+      },
+      "prompt": "Use case: scientific-educational. One original transparent square problem icon for a first-grade game. At left, one very simple partly folded dark pine-green paper model with a single bent flap. At right, one small upright cream instruction card divided into exactly two bold large windows. The upper window contains one simple apricot folded-paper picture; the lower window is visibly empty cream. The blank lower window conveys a missing folding step. Large uncomplicated forms with a wide clear gap, visible at 23 pixels, high contrast between each object. Matte gouache, subtle warm paper texture, clean paper-cut edges. Only these two objects with transparent padding, no open book, handwriting, letters, numerals, question marks, arrows, tools, hands, background, shadows or logo."
+    },
+    "use-lookup": {
+      "file": "assets/use-lookup.png",
+      "sha256": "4f64a88ca12866ceff98b56276cc2d65a54885843096f08f55702b0e1e13ac34",
+      "usedBy": [
+        "p04"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "description": "带折纸图的展开图册，23px 可辨横向书页、书脊和两处图示，无印刷字。",
+      "generator": "Codex 内置 ImageGen",
+      "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-b197335e-ac27-41a2-b82c-b81abfd9f8ef.png",
+      "sourceSha256": "ab6f01a7cbc79a9546da34873688c4d7cccbed1fb64e7d0c0b9a303728c8ef38",
+      "sourceDimensions": [
+        1312,
+        1199
+      ],
+      "derivative": {
+        "method": "Pillow LANCZOS，原比例缩至 256×234，居中放入透明 256×256 画布，PNG optimize",
+        "dimensions": [
+          256,
+          256
+        ],
+        "mode": "RGBA"
+      },
+      "prompt": "Use case: scientific-educational. One original open picture book icon for 'look up a folding method' in a first-grade game. Show the open book alone, straight on and slightly from above, broad dark pine-green cover outlines around two large warm cream pages. Each page contains just one bold and simple folded-paper diagram in muted apricot and pine green, with one visible triangular fold. Make the open book outline clear at 23 pixels with no tiny marks. Simple matte gouache and subtle paper-cut texture. Single object centered with transparent square padding. No text, letters, numerals, repeated writing lines, symbols, ruler, scissors, hand, additional papers, background, ground shadow, or logo."
+    },
+    "method-trio": {
+      "file": "assets/method-trio.png",
+      "sha256": "249dc0e99ed8d55fee1c704325e0e864353d1f7b461b52bdeafc14732709b894",
+      "usedBy": [
+        "p03",
+        "p04"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "description": "从左到右是对照两种纸牌摆法、动手折纸脚、翻阅图册。三个场景留缝、无字；p03 讲解图，p04 开始卡用于唤起方法。",
+      "generator": "Codex 内置 ImageGen",
+      "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-d0e9799b-e028-4a4a-b8c1-788b2a2a80d7.png",
+      "sourceSha256": "a44848eb64bbf42513438050233f0cf819d5d179b5ec7877eb339649efcea631",
+      "sourceDimensions": [
+        1536,
+        1024
+      ],
+      "derivative": {
+        "method": "Pillow LANCZOS，1536×1024 至 960×640，原比例 RGB PNG optimize",
+        "dimensions": [
+          960,
+          640
+        ],
+        "mode": "RGB"
+      },
+      "prompt": "Use case: scientific-educational. An original landscape 3:2 first-grade science lesson illustration, arranged as three equal, clearly separated scenes across one warm cream page, with generous neutral gaps and no caption space. Left: test two ways of standing the same plain apricot paper name card on the same level tabletop, one example upright and the other low or tipped, no check marks. Middle: show a single child's hand carefully bending an orange paper strip into a triangular paper foot. Right: show a child's hand turning the page of an open illustrated cream guidebook, with one large diagram of a folded paper stand and no writing. Each scene must be unmistakable at small size, visually separate, centered, and have only the few objects needed. Consistent matte gouache paper-cut style, warm cream paper, muted apricot and dark pine green, clean silhouettes. No labels, words, letters, digits, arrows, logo, watermark, decoration, or extra tools. Full distinct scenes, no overlap between them."
+    },
+    "method-observe": {
+      "file": "assets/method-observe.png",
+      "sha256": "790f9cff159b2165d6e461aa8cff62e7d06e41a93db2abfd25e74c0a5713435f",
+      "usedBy": [
+        "p02"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "description": "一整条纸带的两端都可见，一只手握放大镜，镜内三道等长平行纹样清晰，纸带外无第二组或其他工具。镜沿穿过纸带，可看出放大镜对着纸带。",
+      "generator": "Codex 内置 ImageGen",
+      "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-b688cd2d-3b22-4c94-8008-bc0ead3b421f.png",
+      "sourceSha256": "9f1a13d032ae9d0e124e9b4d783f7f5511e877ee6558306916be65da86d81e7e",
+      "sourceDimensions": [
+        1448,
+        1086
+      ],
+      "derivative": {
+        "method": "Pillow LANCZOS，1448×1086 至 760×570，原比例 RGB PNG optimize",
+        "dimensions": [
+          760,
+          570
+        ],
+        "mode": "RGB"
+      },
+      "prompt": "Use case: scientific-educational. An original landscape 4:3 illustration for a first-grade science lesson, viewed directly from above. A single long cream paper ribbon lies horizontally on a plain warm cream worktable, both ends of the strip entirely visible. In the right quarter of the ribbon, a child holds one dark pine-green magnifying glass above a tiny three-dash pine-green pattern. Through the clear circular lens, that same one little group of three parallel dashes is visibly magnified and easy to point at. The lens shows the cream paper through it and stays over the strip, not off to the side. No other patterns, no second strip, second tool or ruler. One visible anatomically natural small hand grips the handle without hiding the lens or strip. Simple warm matte gouache and clean paper-cut shapes, subtle paper grain, apricot accents. Quiet cropped overhead composition, no letters, digits, text, logo or watermark."
+    },
+    "stand-test": {
+      "file": "assets/stand-test.png",
+      "sha256": "5f268adaa7a09638675448777236d64c44fa03fc05042355fa176b8202e0ec37",
+      "usedBy": [
+        "p07"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "description": "同一桌面左边纸牌平躺、右边由可见深绿三角纸脚托着站立；笔记左右的外形记录分别对应上方结果。只示意两次摆放结果，无尺寸读数。",
+      "generator": "Codex 内置 ImageGen",
+      "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-bead4cc8-5c44-43c0-930d-d6dc5a604d3e.png",
+      "sourceSha256": "378728131d39d4201ba1a00e48fcce49b19a9b7f91072232bd27d204c84232a5",
+      "sourceDimensions": [
+        1448,
+        1086
+      ],
+      "derivative": {
+        "method": "Pillow LANCZOS，1448×1086 至 760×570，原比例 RGB PNG optimize",
+        "dimensions": [
+          760,
+          570
+        ],
+        "mode": "RGB"
+      },
+      "prompt": "Use case: scientific-educational. Original landscape 4:3 first-grade lesson illustration of two trials on a single clearly level light cream worktable. Left trial: one plain flat apricot rectangular name card lies down, without a support. Right trial: an identical plain apricot rectangular name card stands upright, visibly held by one separate deep pine-green triangular folded paper foot behind it; use a slight three-quarter angle so the support is visible. Both apricot cards have exactly the same apparent unfolded size, color and paper texture. Below them is one open simple notebook on the same surface with two large unlabelled drawings side by side: a low line representing the left card lying down, and an upright outline with a triangular foot representing the right card. Avoid check marks and signs, the drawings record what happened. Matte gouache, warm cream paper and clean cut-paper edges. No hands, tools, other objects, words, letters, digits, watermarks or logos."
+    },
+    "record-and-listen": {
+      "file": "assets/record-and-listen.png",
+      "sha256": "bc6a4e1487a03dab986c69619567051ddeadc3dc9628b930b9e86a8b0c35111b",
+      "usedBy": [
+        "p07"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "description": "同伴一人指笔记上站立的纸牌图，另一人朝说话同伴倾听。另页有平躺外形；两图没有文字。此图按口述和共同看记录的情境使用。",
+      "generator": "Codex 内置 ImageGen",
+      "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-5492fc1b-c0dd-4520-9173-0f8cefc0585e.png",
+      "sourceSha256": "97e4cf5df233f69a04b89bb7dca5058aaca4cb5de794717bc7f10b283d52b111",
+      "sourceDimensions": [
+        1448,
+        1086
+      ],
+      "derivative": {
+        "method": "Pillow LANCZOS，1448×1086 至 760×570，原比例 RGB PNG optimize",
+        "dimensions": [
+          760,
+          570
+        ],
+        "mode": "RGB"
+      },
+      "prompt": "Use case: illustration-story. Original landscape 4:3 first-grade classroom science illustration. Two six-year-old classmates sit side by side at a simple warm cream worktable. One points with a naturally shaped hand to a single bold sketch of an upright blank apricot paper name card in their shared open notebook; the other child listens and looks at that exact sketch. On the other notebook page, one simple low outline represents the same name card lying flat. Both faces warm and attentive, eyes and hands anatomically natural, no person looking at the viewer. Simple quiet matte gouache with warm paper-cut silhouettes, pine green accents and muted apricot. Clean composition, open notebook and the two diagrams clearly seen, no other props, words, handwriting, numerals, logo or watermark."
+    },
+    "q3-a": {
+      "file": "assets/q3-a.png",
+      "sha256": "5c912696cf7641ef27656fcf7ee97a35bd889399090f91562dd842139e5ec2f3",
+      "usedBy": [
+        "p08"
+      ],
+      "kind": "deterministic-geometry",
+      "description": "立尺的零刻线悬在左塔半腰，下方离桌面 108 图形单位。 三选项共享同一底图、两塔与尺身，刻线间隔 22 图形单位。",
+      "source": "diagrams/q3-measure-options.svg",
+      "sourceSha256": "0673c4a40aad82e27311b9eb2417cd347933e7458cd30d198dc53cef5fd98a92",
+      "sourceDimensions": [
+        1440,
+        480
+      ],
+      "inputs": [
+        {
+          "file": "diagrams/q3-tower-tall.png",
+          "sha256": "3ea2dcb2fdaf35cb360a6fc6149e974dd95513354973eadad1557918e7bc245a",
+          "kind": "codex-builtin-imagegen-derived-cutout",
+          "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-79eb1db1-4cfb-4f4b-baf7-a49f1ab986c5.png",
+          "sourceSha256": "b22ddfb94148e6951c7de6e972f1d627bb50c2386173db2e2376b3f1ca916f4a",
+          "sourceDimensions": [
+            2172,
+            724
+          ],
+          "prompt": "Use case: scientific-educational. An original transparent asset sheet with exactly two isolated simple wooden block towers, separated by a very wide totally empty transparent gap. Direct front orthographic view, no perspective. The left tower is taller and muted apricot; the right tower is visibly shorter and deep pine green. Both towers have about the same width, clean rectangular stacked block silhouettes, flat level bottoms and flat level tops. Nothing touches or overlaps across the center. The exact same two cutouts will be reused at equal scale in three first-grade measurement-choice images. Warm matte gouache and subtle paper-cut texture, no side shadows or ground shadows, no ruler, table, tick marks, baseline, words, letters, numerals, symbols or watermark. The background between and around both objects must be true alpha transparency.",
+          "derivative": {
+            "cropXYXY": [
+              166,
+              37,
+              415,
+              687
+            ],
+            "method": "按 alpha ≥128 的左右分区外接框分别裁取，再以同一 1:3 比例 LANCZOS、边长取整；PNG optimize",
+            "dimensions": [
+              83,
+              217
+            ],
+            "mode": "RGBA"
+          }
+        },
+        {
+          "file": "diagrams/q3-tower-short.png",
+          "sha256": "36920ba09ad70ab57a8d8008b9f64e5442c79256c572c101f80bf89d96ebecdc",
+          "kind": "codex-builtin-imagegen-derived-cutout",
+          "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-79eb1db1-4cfb-4f4b-baf7-a49f1ab986c5.png",
+          "sourceSha256": "b22ddfb94148e6951c7de6e972f1d627bb50c2386173db2e2376b3f1ca916f4a",
+          "sourceDimensions": [
+            2172,
+            724
+          ],
+          "prompt": "Use case: scientific-educational. An original transparent asset sheet with exactly two isolated simple wooden block towers, separated by a very wide totally empty transparent gap. Direct front orthographic view, no perspective. The left tower is taller and muted apricot; the right tower is visibly shorter and deep pine green. Both towers have about the same width, clean rectangular stacked block silhouettes, flat level bottoms and flat level tops. Nothing touches or overlaps across the center. The exact same two cutouts will be reused at equal scale in three first-grade measurement-choice images. Warm matte gouache and subtle paper-cut texture, no side shadows or ground shadows, no ruler, table, tick marks, baseline, words, letters, numerals, symbols or watermark. The background between and around both objects must be true alpha transparency.",
+          "derivative": {
+            "cropXYXY": [
+              1758,
+              366,
+              2007,
+              687
+            ],
+            "method": "按 alpha ≥128 的左右分区外接框分别裁取，再以同一 1:3 比例 LANCZOS、边长取整；PNG optimize",
+            "dimensions": [
+              83,
+              107
+            ],
+            "mode": "RGBA"
+          }
+        }
+      ],
+      "derivative": {
+        "method": "将两个 PNG 组件的 SVG 相对引用替换为对应 PNG data URI。PyMuPDF 1.26.10 以 1× 栅格化，截取选项格，Pillow PNG optimize",
+        "cropXYXY": [
+          0,
+          0,
+          480,
+          480
+        ],
+        "dimensions": [
+          480,
+          480
+        ],
+        "mode": "RGB"
+      }
+    },
+    "q3-b": {
+      "file": "assets/q3-b.png",
+      "sha256": "adf44767f22f1c56621f2b5f1b6f053c0eda919b0b237a8968744c1fb2aff1b4",
+      "usedBy": [
+        "p08"
+      ],
+      "kind": "deterministic-geometry",
+      "description": "立尺的零刻线与两个塔底同在桌面基准 y=355。 三选项共享同一底图、两塔与尺身，刻线间隔 22 图形单位。",
+      "source": "diagrams/q3-measure-options.svg",
+      "sourceSha256": "0673c4a40aad82e27311b9eb2417cd347933e7458cd30d198dc53cef5fd98a92",
+      "sourceDimensions": [
+        1440,
+        480
+      ],
+      "inputs": [
+        {
+          "file": "diagrams/q3-tower-tall.png",
+          "sha256": "3ea2dcb2fdaf35cb360a6fc6149e974dd95513354973eadad1557918e7bc245a",
+          "kind": "codex-builtin-imagegen-derived-cutout",
+          "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-79eb1db1-4cfb-4f4b-baf7-a49f1ab986c5.png",
+          "sourceSha256": "b22ddfb94148e6951c7de6e972f1d627bb50c2386173db2e2376b3f1ca916f4a",
+          "sourceDimensions": [
+            2172,
+            724
+          ],
+          "prompt": "Use case: scientific-educational. An original transparent asset sheet with exactly two isolated simple wooden block towers, separated by a very wide totally empty transparent gap. Direct front orthographic view, no perspective. The left tower is taller and muted apricot; the right tower is visibly shorter and deep pine green. Both towers have about the same width, clean rectangular stacked block silhouettes, flat level bottoms and flat level tops. Nothing touches or overlaps across the center. The exact same two cutouts will be reused at equal scale in three first-grade measurement-choice images. Warm matte gouache and subtle paper-cut texture, no side shadows or ground shadows, no ruler, table, tick marks, baseline, words, letters, numerals, symbols or watermark. The background between and around both objects must be true alpha transparency.",
+          "derivative": {
+            "cropXYXY": [
+              166,
+              37,
+              415,
+              687
+            ],
+            "method": "按 alpha ≥128 的左右分区外接框分别裁取，再以同一 1:3 比例 LANCZOS、边长取整；PNG optimize",
+            "dimensions": [
+              83,
+              217
+            ],
+            "mode": "RGBA"
+          }
+        },
+        {
+          "file": "diagrams/q3-tower-short.png",
+          "sha256": "36920ba09ad70ab57a8d8008b9f64e5442c79256c572c101f80bf89d96ebecdc",
+          "kind": "codex-builtin-imagegen-derived-cutout",
+          "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-79eb1db1-4cfb-4f4b-baf7-a49f1ab986c5.png",
+          "sourceSha256": "b22ddfb94148e6951c7de6e972f1d627bb50c2386173db2e2376b3f1ca916f4a",
+          "sourceDimensions": [
+            2172,
+            724
+          ],
+          "prompt": "Use case: scientific-educational. An original transparent asset sheet with exactly two isolated simple wooden block towers, separated by a very wide totally empty transparent gap. Direct front orthographic view, no perspective. The left tower is taller and muted apricot; the right tower is visibly shorter and deep pine green. Both towers have about the same width, clean rectangular stacked block silhouettes, flat level bottoms and flat level tops. Nothing touches or overlaps across the center. The exact same two cutouts will be reused at equal scale in three first-grade measurement-choice images. Warm matte gouache and subtle paper-cut texture, no side shadows or ground shadows, no ruler, table, tick marks, baseline, words, letters, numerals, symbols or watermark. The background between and around both objects must be true alpha transparency.",
+          "derivative": {
+            "cropXYXY": [
+              1758,
+              366,
+              2007,
+              687
+            ],
+            "method": "按 alpha ≥128 的左右分区外接框分别裁取，再以同一 1:3 比例 LANCZOS、边长取整；PNG optimize",
+            "dimensions": [
+              83,
+              107
+            ],
+            "mode": "RGBA"
+          }
+        }
+      ],
+      "derivative": {
+        "method": "将两个 PNG 组件的 SVG 相对引用替换为对应 PNG data URI。PyMuPDF 1.26.10 以 1× 栅格化，截取选项格，Pillow PNG optimize",
+        "cropXYXY": [
+          480,
+          0,
+          960,
+          480
+        ],
+        "dimensions": [
+          480,
+          480
+        ],
+        "mode": "RGB"
+      }
+    },
+    "q3-c": {
+      "file": "assets/q3-c.png",
+      "sha256": "e7531d4984766515def93aa86f880338b4c3d312b622eaf2d2b1af1c48919516",
+      "usedBy": [
+        "p08"
+      ],
+      "kind": "deterministic-geometry",
+      "description": "同一把尺转 90 度横放在同一桌面下部，保持刻线样式。 三选项共享同一底图、两塔与尺身，刻线间隔 22 图形单位。",
+      "source": "diagrams/q3-measure-options.svg",
+      "sourceSha256": "0673c4a40aad82e27311b9eb2417cd347933e7458cd30d198dc53cef5fd98a92",
+      "sourceDimensions": [
+        1440,
+        480
+      ],
+      "inputs": [
+        {
+          "file": "diagrams/q3-tower-tall.png",
+          "sha256": "3ea2dcb2fdaf35cb360a6fc6149e974dd95513354973eadad1557918e7bc245a",
+          "kind": "codex-builtin-imagegen-derived-cutout",
+          "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-79eb1db1-4cfb-4f4b-baf7-a49f1ab986c5.png",
+          "sourceSha256": "b22ddfb94148e6951c7de6e972f1d627bb50c2386173db2e2376b3f1ca916f4a",
+          "sourceDimensions": [
+            2172,
+            724
+          ],
+          "prompt": "Use case: scientific-educational. An original transparent asset sheet with exactly two isolated simple wooden block towers, separated by a very wide totally empty transparent gap. Direct front orthographic view, no perspective. The left tower is taller and muted apricot; the right tower is visibly shorter and deep pine green. Both towers have about the same width, clean rectangular stacked block silhouettes, flat level bottoms and flat level tops. Nothing touches or overlaps across the center. The exact same two cutouts will be reused at equal scale in three first-grade measurement-choice images. Warm matte gouache and subtle paper-cut texture, no side shadows or ground shadows, no ruler, table, tick marks, baseline, words, letters, numerals, symbols or watermark. The background between and around both objects must be true alpha transparency.",
+          "derivative": {
+            "cropXYXY": [
+              166,
+              37,
+              415,
+              687
+            ],
+            "method": "按 alpha ≥128 的左右分区外接框分别裁取，再以同一 1:3 比例 LANCZOS、边长取整；PNG optimize",
+            "dimensions": [
+              83,
+              217
+            ],
+            "mode": "RGBA"
+          }
+        },
+        {
+          "file": "diagrams/q3-tower-short.png",
+          "sha256": "36920ba09ad70ab57a8d8008b9f64e5442c79256c572c101f80bf89d96ebecdc",
+          "kind": "codex-builtin-imagegen-derived-cutout",
+          "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-79eb1db1-4cfb-4f4b-baf7-a49f1ab986c5.png",
+          "sourceSha256": "b22ddfb94148e6951c7de6e972f1d627bb50c2386173db2e2376b3f1ca916f4a",
+          "sourceDimensions": [
+            2172,
+            724
+          ],
+          "prompt": "Use case: scientific-educational. An original transparent asset sheet with exactly two isolated simple wooden block towers, separated by a very wide totally empty transparent gap. Direct front orthographic view, no perspective. The left tower is taller and muted apricot; the right tower is visibly shorter and deep pine green. Both towers have about the same width, clean rectangular stacked block silhouettes, flat level bottoms and flat level tops. Nothing touches or overlaps across the center. The exact same two cutouts will be reused at equal scale in three first-grade measurement-choice images. Warm matte gouache and subtle paper-cut texture, no side shadows or ground shadows, no ruler, table, tick marks, baseline, words, letters, numerals, symbols or watermark. The background between and around both objects must be true alpha transparency.",
+          "derivative": {
+            "cropXYXY": [
+              1758,
+              366,
+              2007,
+              687
+            ],
+            "method": "按 alpha ≥128 的左右分区外接框分别裁取，再以同一 1:3 比例 LANCZOS、边长取整；PNG optimize",
+            "dimensions": [
+              83,
+              107
+            ],
+            "mode": "RGBA"
+          }
+        }
+      ],
+      "derivative": {
+        "method": "将两个 PNG 组件的 SVG 相对引用替换为对应 PNG data URI。PyMuPDF 1.26.10 以 1× 栅格化，截取选项格，Pillow PNG optimize",
+        "cropXYXY": [
+          960,
+          0,
+          1440,
+          480
+        ],
+        "dimensions": [
+          480,
+          480
+        ],
+        "mode": "RGB"
+      }
+    },
+    "family-paper-observation": {
+      "file": "assets/family-paper-observation.png",
+      "sha256": "ad93b33b8a64be7c71b5c74b6b40b463e3eb8e04041349ddcaa1c2185e2c842d",
+      "usedBy": [
+        "p10"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "description": "孩子两只手各持同一张纸的一端，画面左侧袖臂弯过纸下回到肩侧，另一臂也连续。成人陪同，笔记本两格留空，256×192 仍可辨，无剪刀或文字。",
+      "generator": "Codex 内置 ImageGen",
+      "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-99c06852-c663-45b1-95b0-916d509f579d.png",
+      "sourceSha256": "14a6471ecb064ac49eb81301d20cda008761fc1fb2ad31db36619a2c346029fe",
+      "sourceDimensions": [
+        1448,
+        1086
+      ],
+      "editReference": {
+        "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-d1b00df2-215e-4ccf-9326-141e574a03ae.png",
+        "sha256": "f4f33d5d5d5b20c84e95e1a18b2eb1a8f2b8bfa125910330495b9bb94eaf3bef",
+        "prompt": "Use case: precise-object-edit. Correct the attached first-grade home-science illustration. Preserve the exact adult and child, faces, background, table, two blank notebook spaces, matte paper-cut texture, framing and color palette. The child should have exactly two arms and two hands. Keep only the upper broad rectangular apricot sheet, gripped by the child's two natural hands at its left and right short ends. Completely remove the lower edge-on orange strip, both extra hands below the upper sheet and both extra sleeve/arm fragments associated with them. Restore the corresponding green shirt and quiet background behind the removed shapes. Show a single moment and exactly one sheet of paper. No duplicates, no extra fingers, no motion echoes, no separate edge view or floating items, no words, numbers, logos, or watermarks. Do not add any new object.",
+        "editReference": {
+          "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-a7a3f08d-49f8-46f1-837d-3d09da38fd5e.png",
+          "sha256": "ab45aea639dc89ed0492fcb4e8b9bb929baaf7b61ffc5e6514861ec28bdc84c0",
+          "reason": "初稿重复画出纸和孩子的手。"
+        }
+      },
+      "derivative": {
+        "method": "Pillow LANCZOS，1448×1086 至 760×570，原比例 RGB PNG optimize",
+        "dimensions": [
+          760,
+          570
+        ],
+        "mode": "RGB"
+      },
+      "prompt": "Use case: precise-object-edit. Fix the child's disconnected arm in the supplied illustration while preserving the same two people, open blank notebook, table, color and wide framing. The child on the right holds one rectangular apricot sheet with two hands. At the viewer-left end of that sheet, the child's hand currently joins a small cream sleeve that ends as an isolated rounded oval in front of empty green wall. Change the child's pose just enough so the cream sleeve becomes ONE continuous anatomically connected arm. Its rounded elbow is bent and its upper sleeve clearly travels back under the orange paper to the child's near shoulder on the left side of the green vest. There must be no green background gap between that upper arm and the torso. You may lower the sheet slightly and bring the two hands closer together if helpful to show both arm connections. The child's other arm remains connected to the right shoulder. Only two child hands, both on the single sheet, no other limbs or paper, no markings or text. Maintain calm warm matte paper-cut art. Repair the arm anatomy and leave all other elements intact."
+    },
+    "q1-scene": {
+      "file": "assets/q1-scene.png",
+      "sha256": "390a0b2c3032c3f8df07c2c3edc50063fffe0f6e6f9e3db32a1207acd5f5250e",
+      "usedBy": [
+        "p08"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "description": "矮桌上立着杏色杯，旁边蓝水迹与杯身有干燥空隙，椅子和书架也可见。没有倾倒、水流或溅迹，水从何来仍未知。",
+      "generator": "Codex 内置 ImageGen",
+      "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-3b32ed74-941f-4613-a149-6ab0f7b2db7d.png",
+      "sourceSha256": "596372f923778eb1339559909f2a02b784440c50c39c449448d4edcde8f5fce7",
+      "sourceDimensions": [
+        1536,
+        1024
+      ],
+      "derivative": {
+        "method": "Pillow LANCZOS，完整画幅缩放，不裁切，不添加标记，PNG optimize",
+        "dimensions": [
+          640,
+          427
+        ],
+        "mode": "RGB"
+      },
+      "prompt": "Use case: scientific-educational. Original wide 3:2 picture for a first-grade science quiz. A low warm cream wooden table fills the middle; on it a single upright apricot cup with its rim up stands close beside a separate shallow pale-blue puddle. There is a small visible dry gap between the cup and puddle. No pouring, splash, leaking, trail, arrows, tipped cups or liquid seen coming from anything. Also show one small dark pine-green wooden chair just to the left and a short shelf with a few unmarked cream and orange book spines on the right. Cup, puddle, chair and shelf all recognizable. Quiet uncluttered room, no people, neutral visual emphasis, matte gouache and subtle warm paper texture, clean simple cut-paper silhouettes. No words, numbers, signs, symbols or watermarks."
+    },
+    "q1-a": {
+      "file": "assets/q1-a.png",
+      "sha256": "81a5ea1df504867cacdb3d1cbcbd5219dc3e3aa0eb36da3e1e9e2e1cf25e39c2",
+      "usedBy": [
+        "p08"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "description": "同款绿椅的局部。自然持手电照干燥椅脚，没有杯或蓝水迹。",
+      "generator": "Codex 内置 ImageGen",
+      "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-3db6ea9b-cee2-4b51-9e28-596b8db3fc5e.png",
+      "sourceSha256": "d84f07901fe4a0ea41075b8e913dfa9cd8f154254199aaa4e0b953dbd38b7e4b",
+      "sourceDimensions": [
+        1254,
+        1254
+      ],
+      "derivative": {
+        "method": "Pillow LANCZOS，完整画幅缩放，不裁切，不添加标记，PNG optimize",
+        "dimensions": [
+          480,
+          480
+        ],
+        "mode": "RGB"
+      },
+      "prompt": "Use case: precise-object-edit. Create a square option crop in the same room, keeping the exact dark green chair design, warm cream floor and paper-cut palette from the reference. Show the lower part of the chair and its feet on completely dry floor. A single natural child's hand holds one small muted apricot flashlight aimed at one chair foot, with a softly visible cream beam only around that dry foot. No cup, water, puddle, other furniture or person in this close view. Large simple shapes at thumbnail size, balanced central framing, matte gouache on warm paper. No labels, numerals, arrows, marks, or logo.",
+      "editReference": {
+        "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-3b32ed74-941f-4613-a149-6ab0f7b2db7d.png",
+        "sha256": "596372f923778eb1339559909f2a02b784440c50c39c449448d4edcde8f5fce7"
+      }
+    },
+    "q1-b": {
+      "file": "assets/q1-b.png",
+      "sha256": "d6bf5d6fd4c13c06bd0a16ab6937b6fe916c740ecbc79a9429ecc4d94058c136",
+      "usedBy": [
+        "p08"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "description": "同一矮桌、正立杏色杯和旁边水迹。孩子用放大镜看水迹边缘，杯和水保持可见间隔。只有本选项观察与问题直接相关的线索。",
+      "generator": "Codex 内置 ImageGen",
+      "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-a020744a-bb59-4cb8-a358-5ff60fc8eaea.png",
+      "sourceSha256": "1e4fcae6b354069aba249d19671c2a8a7a3e345b90cad64eb3bd77ab643a1a80",
+      "sourceDimensions": [
+        1254,
+        1254
+      ],
+      "derivative": {
+        "method": "Pillow LANCZOS，完整画幅缩放，不裁切，不添加标记，PNG optimize",
+        "dimensions": [
+          480,
+          480
+        ],
+        "mode": "RGB"
+      },
+      "prompt": "Use case: precise-object-edit. Create a square option crop of the exact same tabletop, upright apricot cup, and separate shallow pale blue puddle from the reference. Keep the cup upright and a visible dry gap before the puddle, with no trail or evidence of where water came from. One child's attentive side profile and a naturally held dark pine green magnifying glass inspect the tabletop just at the edge of that puddle beside the cup. The lens does not hide the cup or the puddle. Same warm matte gouache and paper-cut scale as the other options. No splashes, tilted cup, symbols, text, numbers, arrows, logo or watermark.",
+      "editReference": {
+        "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-3b32ed74-941f-4613-a149-6ab0f7b2db7d.png",
+        "sha256": "596372f923778eb1339559909f2a02b784440c50c39c449448d4edcde8f5fce7"
+      }
+    },
+    "q1-c": {
+      "file": "assets/q1-c.png",
+      "sha256": "c52bee551b1b019cac474a95ef10d192a4b9b1ebfe46de516e9d8e0fcee1dba5",
+      "usedBy": [
+        "p08"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "description": "同款两层短书架，孩子伸手取书，无杯或水。无字书脊沿用题干配色。",
+      "generator": "Codex 内置 ImageGen",
+      "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-c1e50f85-8741-43d4-8713-f22c60102604.png",
+      "sourceSha256": "e312c789a02f2a6b961af52ab5ef7a59613c060e71d2f78b7cd0b2a974c85bf0",
+      "sourceDimensions": [
+        1254,
+        1254
+      ],
+      "derivative": {
+        "method": "Pillow LANCZOS，完整画幅缩放，不裁切，不添加标记，PNG optimize",
+        "dimensions": [
+          480,
+          480
+        ],
+        "mode": "RGB"
+      },
+      "prompt": "Use case: precise-object-edit. Create a square option crop of the exact same short wooden bookshelf in the reference, keeping the cream and muted apricot unmarked book spines. One child in a dark pine-green top stands at its side and is visibly choosing a book, one natural hand reaching toward a spine. Keep the bookcase and child legible, no other furniture, no cup or water in this crop. Same matte gouache, warm paper texture and neutral visual emphasis. No letters, titles, numbers, signs, marks, logos or watermarks.",
+      "editReference": {
+        "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-3b32ed74-941f-4613-a149-6ab0f7b2db7d.png",
+        "sha256": "596372f923778eb1339559909f2a02b784440c50c39c449448d4edcde8f5fce7"
+      }
+    },
+    "q2-a": {
+      "file": "assets/q2-a.png",
+      "sha256": "c406c40441bb4987e064180e8e6d0f7a5469c06784a22360333a3f104e960bbd",
+      "usedBy": [
+        "p08"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "description": "同一块带细斑的石头，镜内可见同种纹样变大。只有这图的工具能让孩子看清细斑。",
+      "generator": "Codex 内置 ImageGen",
+      "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-ad116ea3-dd05-47b5-b7ad-9b2d230b16bd.png",
+      "sourceSha256": "4ab094daa8f17a8bf1a5c6463ededd571f530cae4195eaf85e4c266a0859a48d",
+      "sourceDimensions": [
+        1254,
+        1254
+      ],
+      "derivative": {
+        "method": "Pillow LANCZOS，完整方形画幅缩至 480×480，PNG optimize",
+        "dimensions": [
+          480,
+          480
+        ],
+        "mode": "RGB"
+      },
+      "prompt": "Edit the provided square first-grade science quiz illustration as a matched alternate choice. Preserve its exact overhead view, warm cream paper, matte gouache flat shapes, and identical gray oval stone at the left with the same small green-gray speckles on its upper-right quadrant. Completely remove the blank book. The only tool now is one handheld magnifying glass, whose round clear lens sits over those same speckles on the stone, its muted forest-green handle angling diagonally down-right into the clear area where the book was. Show a few of the stone's original speckles obviously larger only through the lens, with clean optical continuity and no extra ornament, no hands. Keep the stone and complete silhouette of the magnifier large, distinct, and both fully within the edges, comparable in visual emphasis to the original. No other props, marks, lettering, digits, arrows, checks, borders, or watermarks. Match exact same matte paper-cut gouache and soft lighting.",
+      "editReference": {
+        "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-2db4c53e-4ac4-40f1-bed4-cc0db46b2c4b.png",
+        "sha256": "edc6e6d52917283c853f20731fe656f8bc264477632688448e614ef3b9bb3094"
+      }
+    },
+    "q2-b": {
+      "file": "assets/q2-b.png",
+      "sha256": "bcba5ebb0dbc12b5a4f4ee1227cbb9a2320d7a78c2ff80b3c953c7e4e7db813b",
+      "usedBy": [
+        "p08"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "description": "同一块带细斑的石头旁放无字直尺。尺用来量长度，此图没有放大镜。",
+      "generator": "Codex 内置 ImageGen",
+      "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-c60dfaf0-817d-4390-b036-88d47b238176.png",
+      "sourceSha256": "610e35e48b5b96b90aa6d6319a207b1e514727ccdeb656c00d002e584ae03d2c",
+      "sourceDimensions": [
+        1254,
+        1254
+      ],
+      "derivative": {
+        "method": "Pillow LANCZOS，完整方形画幅缩至 480×480，PNG optimize",
+        "dimensions": [
+          480,
+          480
+        ],
+        "mode": "RGB"
+      },
+      "prompt": "Edit the provided square first-grade science quiz illustration as a matched alternate choice. Retain its exact overhead camera, cream warm paper, soft light, matte paper-cut gouache look, and identical gray oval stone on the left with the same size, shape, placement and small dark sage speckles. Replace only the closed blank book on the right with one simple flat muted pine-green school ruler beside the stone, narrow straight rectangular shape, with a single row of uniformly spaced little cream engraved measurement tick lines along one edge and visibly no numbers. The ruler extends almost the height of the former book and is large enough to be recognizable at a small size. The ruler does not touch or hide the stone. No other tools, props, digits, lettering, arrows, check marks, border, or watermark. Match the original calm composition and the equivalent visual emphasis.",
+      "editReference": {
+        "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-2db4c53e-4ac4-40f1-bed4-cc0db46b2c4b.png",
+        "sha256": "edc6e6d52917283c853f20731fe656f8bc264477632688448e614ef3b9bb3094"
+      }
+    },
+    "q2-c": {
+      "file": "assets/q2-c.png",
+      "sha256": "e8cabeb861248f13b4940b7197e81fcfd94c55ded414fdb0c1145d46377a632a",
+      "usedBy": [
+        "p08"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "description": "同一块带细斑的石头旁放一本合起的空白本。没有放大镜。",
+      "generator": "Codex 内置 ImageGen",
+      "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-2db4c53e-4ac4-40f1-bed4-cc0db46b2c4b.png",
+      "sourceSha256": "edc6e6d52917283c853f20731fe656f8bc264477632688448e614ef3b9bb3094",
+      "sourceDimensions": [
+        1254,
+        1254
+      ],
+      "derivative": {
+        "method": "Pillow LANCZOS，完整方形画幅缩至 480×480，PNG optimize",
+        "dimensions": [
+          480,
+          480
+        ],
+        "mode": "RGB"
+      },
+      "prompt": "Use case: scientific-educational. A square original first-grade science choice image. On a clean cream tabletop, one flat smooth oval light gray river stone lies just left of center. It has a small group of dark green-gray natural speckles near the upper-right of its top face, a very clear oval silhouette, and a soft bluish-gray edge. Beside it to the right lies one clearly closed blank cream notebook with a dark pine-green spine, page edges visible and cover entirely unmarked. Similar weight and scale for the two objects, no hands or other tools. Top-down, matte gouache and warm paper-cut texture, simple and readable at thumbnail size. No symbols, numbers, text, labels or logo."
+    },
+    "q4-a": {
+      "file": "assets/q4-a.png",
+      "sha256": "dd082d403df5a3cd85685e1fa7d7c3e3fa74b7a5613d78d7b820712fd744a861",
+      "usedBy": [
+        "p09"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "description": "孩子在给单条斜坡加纸板，小车停在远处，仍是准备斜坡。",
+      "generator": "Codex 内置 ImageGen",
+      "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-14341bdc-3ea1-47e8-b9fc-dc1680527e4c.png",
+      "sourceSha256": "64121dfe4d33768930d52ee1c867805d5630c60291cc1b75a1ea5340aee93560",
+      "sourceDimensions": [
+        1254,
+        1254
+      ],
+      "derivative": {
+        "method": "Pillow LANCZOS，完整画幅原比例缩至 480×480，保留原构图，PNG optimize",
+        "dimensions": [
+          480,
+          480
+        ],
+        "mode": "RGB"
+      },
+      "prompt": "Create a different choice in the same first-grade science quiz using the provided image as the exact style and prop reference. Square illustration, ONE continuous cream-paper school table scene, no diptych. At left show just one of those same forest-green boards as a shallow ramp with an apricot support block under its raised left end. One hand with the same green cuff is carefully sliding a thin flat pale-brown sheet of cardboard horizontally between the apricot block and the elevated end of the green board to add a shim. Draw the hand pinching the card itself, and draw a clear section of the thin card jutting out on the left. Preserve the tactile paper silhouette and show all layers. At right, on flat ground and a clear visible gap away from the foot of the slope, the very same orange wood toy car is parked, with both wheels on the flat ground. No person is touching or releasing the car. Limit props, large clean shapes, sharp relationship among hand, card, and ramp; at thumbnail size the child can see the card being added. Same gentle matte gouache style, cream backdrop, apricot and deep forest green. No letters, digits, arrows, check marks, borders, or watermarks.",
+      "editReference": {
+        "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-a51851d5-add9-49e4-970a-8a89c9d8dc74.png",
+        "sha256": "6235f8c8b4e2b9126c6fe53c5fe09a23f2450d024c4064db68482233d5e9d2e5"
+      }
+    },
+    "q4-b": {
+      "file": "assets/q4-b.png",
+      "sha256": "0b16af9d71f3ff280eeaa922170487a5269c87e0845710f63ae809095621ef67",
+      "usedBy": [
+        "p09"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "description": "孩子翻看无字图册，两条斜坡都没有正在释放的小车。",
+      "generator": "Codex 内置 ImageGen",
+      "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-acce5509-b066-4b9b-8385-e11ed591f057.png",
+      "sourceSha256": "1ea97110ea3a308889803dc7351aeedf69b6a4a12e6ecd08629982224fe6aa30",
+      "sourceDimensions": [
+        1254,
+        1254
+      ],
+      "derivative": {
+        "method": "Pillow LANCZOS，完整画幅原比例缩至 480×480，保留原构图，PNG optimize",
+        "dimensions": [
+          480,
+          480
+        ],
+        "mode": "RGB"
+      },
+      "prompt": "Make a square companion option for the same first-grade science quiz in the same exact matte cream-paper gouache look. Show both of the same pine-green straight ramps with tall and short apricot supports on one activity table. Put the ramps unobtrusively in the upper portion, left and right, clear enough to recognize. The foreground focal action is one hand with the same pine cuff visibly turning one page of a small open cream-colored picture booklet on the table, clearly pinching the corner of a lifted page. View from a mild three-quarter overhead angle so the opened booklet and the ramps are both readable. On the remaining visible page draw only a simple unlabeled illustration of a green plank and an apricot block. The same little orange toy car sits parked on flat ground to one side of the booklet, no hands near the car. No test underway. Large simple forms centered near one another, limited props, no diptych. No words, letters, digits, motion lines, arrows, checks, decorative border, or watermark. A clear quiet first-grade picture.",
+      "editReference": {
+        "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-a51851d5-add9-49e4-970a-8a89c9d8dc74.png",
+        "sha256": "6235f8c8b4e2b9126c6fe53c5fe09a23f2450d024c4064db68482233d5e9d2e5"
+      }
+    },
+    "q4-c": {
+      "file": "assets/q4-c.png",
+      "sha256": "e85755672a4e451dc3dacab81e44cebb0040c6cf2c6786c95f2bd12eb272b45a",
+      "usedBy": [
+        "p09"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "description": "并排两次比较，同一款小车分别在两条斜坡各自的上端，双轮接触坡面，手与车留缝，表现松手试滚。",
+      "generator": "Codex 内置 ImageGen",
+      "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-a51851d5-add9-49e4-970a-8a89c9d8dc74.png",
+      "sourceSha256": "6235f8c8b4e2b9126c6fe53c5fe09a23f2450d024c4064db68482233d5e9d2e5",
+      "sourceDimensions": [
+        1254,
+        1254
+      ],
+      "derivative": {
+        "method": "Pillow LANCZOS，完整画幅原比例缩至 480×480，保留原构图，PNG optimize",
+        "dimensions": [
+          480,
+          480
+        ],
+        "mode": "RGB"
+      },
+      "prompt": "A single square first-grade science quiz choice illustration, diptych of exactly TWO equal side-by-side square-ish panels separated only by a thin blank cream gutter. Exact matching side-view camera and school activity tabletop in both panels. In each panel one straight muted pine-green board makes a downhill ramp from upper left toward the same flat floor at right. Its high left end is supported by a simple apricot block. Left panel is unmistakably steeper, right panel is visibly shallower because the apricot block is half as tall. The ramp length and toy size stay the same. In both panels show exactly the same easily recognized small apricot wooden toy car in profile (simple rectangular body, rounded roof, two visibly dark wheels), sitting at the very upper left starting end of the board, both wheels in contact with its surface, pointing downhill to the right. Above/behind the car in each panel, one small hand just opened thumb and index finger to let it roll without a push. Draw both hands in exactly the same release pose, with a small visible gap behind the car. No motion lines or distances or results. Large immediately legible forms and clear separation, gentle matte gouache paper-cut forms with subtle warm ivory paper, muted apricot and deep pine green. Unmarked blank ground and background. Do not draw text, digits, symbols, arrows, checks, labels, photo frame embellishments, or another car."
+    },
+    "q5-a": {
+      "file": "assets/q5-a.png",
+      "sha256": "ff5b210554a3a65a2861934e7924b3678643e488b08c8eee54d521500a2807b9",
+      "usedBy": [
+        "p09"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "description": "同一扇窗的一张图，只有一次橙色纸带记录。",
+      "generator": "Codex 内置 ImageGen",
+      "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-064e7ade-e14e-477c-abd5-2f507ce43c18.png",
+      "sourceSha256": "411eec674a1337979359dd3c86830356662a0427342d94acb039b6daab3630f8",
+      "sourceDimensions": [
+        1254,
+        1254
+      ],
+      "derivative": {
+        "method": "Pillow LANCZOS，完整画幅原比例缩至 480×480，保留原构图，PNG optimize",
+        "dimensions": [
+          480,
+          480
+        ],
+        "mode": "RGB"
+      },
+      "prompt": "Make another square choice for this same first-grade science quiz. Edit the attached picture so it contains ONLY ONE observation snapshot. Keep just the single window design from the LEFT reference panel, drawn once centered against the warm cream wall. Keep the identical simple two stacked panes, matching pine-green frame, soft pale sage light and one muted orange narrow paper ribbon taped near the upper-left corner, hanging straight vertically in this one record. Keep the window tall (about 77 percent of the square height and 48 percent of the width) with plenty of blank warm paper on both sides; keep the ribbon large and obvious at 96 pixels. Remove the entire right-hand window and the vertical split; do not add any second window, panel, photo, ribbon or object. Same quiet matte paper-cut gouache and lighting. No letters, digits, marks, arrows, icons, logo or watermark.",
+      "editReference": {
+        "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-b0c0c50d-0312-481a-8cc8-1fef29da86f2.png",
+        "sha256": "b4d4c6dc60c505381df3f9d91c59ef523305f20f9050517b077a0d29d0e518ad"
+      }
+    },
+    "q5-b": {
+      "file": "assets/q5-b.png",
+      "sha256": "002a1490bb1dbd876fecea7fcf02c5b3b0680b7d81ed1a60cf2052bcc756e82e",
+      "usedBy": [
+        "p09"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "description": "同一扇窗的两张记录。左边是宽的青蓝纸带，右边是短的橙色纸带。",
+      "generator": "Codex 内置 ImageGen",
+      "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-10c5886e-5354-43ca-9c7b-a37af52a8ba6.png",
+      "sourceSha256": "a68cc58ef31e15f48e22edc14961ce0aedd3c77dcbe50ecdfc70385b2dfe3485",
+      "sourceDimensions": [
+        1254,
+        1254
+      ],
+      "derivative": {
+        "method": "Pillow LANCZOS，完整画幅原比例缩至 480×480，保留原构图，PNG optimize",
+        "dimensions": [
+          480,
+          480
+        ],
+        "mode": "RGB"
+      },
+      "prompt": "Precisely edit this same square two-snapshot first-grade science illustration to create another quiz choice. Preserve both window scenes exactly: same crops, narrow gutter, framing, cream tape attachment spots and textured matte gouache; do not change anything outside the paper strips. Change the left hanging orange strip to a noticeably wider, long teal-blue paper strip, hanging perfectly straight down from the same tape, with strong contrast against the pale green window panes. Change the right orange strip to a distinctly much shorter narrow orange piece, about half its former length, continuing in its original downward-right direction and attached at the same point. The left strip is now a different, visibly wider, longer, teal-blue object; the right strip is visibly narrow, much shorter and orange. Exactly one strip per snapshot. Make the difference in color, width and length visible in a very small image. No arrows, letters, digits, labels, check marks, decorative elements or watermark.",
+      "editReference": {
+        "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-b0c0c50d-0312-481a-8cc8-1fef29da86f2.png",
+        "sha256": "b4d4c6dc60c505381df3f9d91c59ef523305f20f9050517b077a0d29d0e518ad"
+      }
+    },
+    "q5-c": {
+      "file": "assets/q5-c.png",
+      "sha256": "5628057670c3a763d478119a03dfcf31d2db98591b096822cc6ff2aabebf5ec6",
+      "usedBy": [
+        "p09"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "description": "两张同窗图使用同尺寸橙色纸带和同一固定点，左侧下垂，右侧向一边倾斜。",
+      "generator": "Codex 内置 ImageGen",
+      "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-b0c0c50d-0312-481a-8cc8-1fef29da86f2.png",
+      "sourceSha256": "b4d4c6dc60c505381df3f9d91c59ef523305f20f9050517b077a0d29d0e518ad",
+      "sourceDimensions": [
+        1254,
+        1254
+      ],
+      "derivative": {
+        "method": "Pillow LANCZOS，完整画幅原比例缩至 480×480，保留原构图，PNG optimize",
+        "dimensions": [
+          480,
+          480
+        ],
+        "mode": "RGB"
+      },
+      "prompt": "Make one square first-grade science illustrated quiz choice: two separate illustrated observation snapshots shown side by side, each using almost half the frame width and the same large height, with one narrow cream gutter. Both are exactly the same close front view of an identical simple small pine-green wooden window, same frame and two square panes, same pale cool sage daylight, same cream wall. In both snapshots one single vivid muted-apricot narrow rectangular paper ribbon is taped to the exact same spot under the top-left window frame with one short cream piece of tape. In LEFT snapshot ribbon hangs perfectly straight down from its fixed upper end. In RIGHT snapshot the very same ribbon angles about 50 degrees to the right from that same fixed end, leaning across the pane as it lifts in a gentle draft. Paper ribbon width, physical length and color are identical, only angle changes. Keep the two full ribbons large with crisp contrast and no overlapping props. The visual direction difference must read without any text at 96 pixels. No people, arrows, swirl marks, words, letters, digits, numbers, captions, check marks, logos, or watermarks. School science storybook, clean matte paper-cut gouache with faint warm paper texture, cream, pine green and apricot. Balanced calm composition, tightly crop around the two windows to keep ribbons big."
+    },
+    "q6-a": {
+      "file": "assets/q6-a.png",
+      "sha256": "850a054629662811e9452bcbe290c7b3d4a966669546561b171768c2b039924a",
+      "usedBy": [
+        "p09"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "description": "透明罐带盖密封，孩子和成人隔着一段距离看罐内颗粒。无接触、无取食动作。",
+      "generator": "Codex 内置 ImageGen",
+      "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-7825ee99-c567-4a11-a679-fa47d34de105.png",
+      "sourceSha256": "3f2d02519b8c9adffa7f364ed6d7b641dff071829e08249b848724e5dfe40448",
+      "sourceDimensions": [
+        1254,
+        1254
+      ],
+      "derivative": {
+        "method": "Pillow LANCZOS，完整画幅原比例缩至 480×480，保留原构图，PNG optimize",
+        "dimensions": [
+          480,
+          480
+        ],
+        "mode": "RGB"
+      },
+      "prompt": "Square illustrated answer choice for a first-grade science quiz about safely looking at unfamiliar tiny grains. Clear side-view at a school table. In the foreground center, one squat clear glass jar with broad rounded shoulders and a WIDE clear solid transparent screw lid firmly sealed across the entire opening, with a simple narrow muted pine-green rim. The lid looks visibly seated and shut. Inside the jar at its base only, a few small irregular dull brown and beige grains, visible through the transparent glass. An elementary-age child with short dark hair and a muted apricot sweater stands on the left, and an adult teacher with a pine-green cardigan stands to the right just behind the table. Both are quietly looking down at the sealed jar at comfortable arm's-length distance. Their mouths are closed, hands clearly well away from the jar, eyes open looking at the grains. No grains outside the jar, no other objects, no touching or open lid. Use large, legible, anatomically simple side-profile silhouettes, gentle matte paper-cut gouache with subtle warm paper, warm ivory, deep pine green and apricot. Keep a visible gap between faces and the jar; emphasize the transparent sealed container as a main focal subject. No words, letters, digits, arrows, symbols, check marks, frame, or watermark."
+    },
+    "q6-b": {
+      "file": "assets/q6-b.png",
+      "sha256": "d026d6b79c4afd202701dca38241834209eadaf5dc635191a2cef3710ebfb8cc",
+      "usedBy": [
+        "p09"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "description": "透明罐开着，孩子捏着一粒小颗粒靠近闭着的嘴，颗粒与嘴之间有空隙。",
+      "generator": "Codex 内置 ImageGen",
+      "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-f63ca3ac-5706-4a7d-9d2e-b2fe5c4ae814.png",
+      "sourceSha256": "4dc3e483c030c35f6f32a26f2c0f729c7f0e4ea3170e8f19e181b3f9a3b755bd",
+      "sourceDimensions": [
+        1254,
+        1254
+      ],
+      "derivative": {
+        "method": "Pillow LANCZOS，完整画幅原比例缩至 480×480，保留原构图，PNG optimize",
+        "dimensions": [
+          480,
+          480
+        ],
+        "mode": "RGB"
+      },
+      "prompt": "Edit the reference square illustration into another first-grade quiz choice with the same child, exact apricot sweater and school table, cream paper and color palette, and the same glass jar of irregular brown and beige tiny grains. Remove the adult completely and leave cream negative space to the right. Show the same child in side profile on the left, still with a clearly CLOSED neutral mouth, holding exactly one tiny irregular beige grain between thumb and forefinger just short of the lips. Draw a clear small air gap so the grain is visibly outside the lips and the child has not eaten it; no open mouth, no swallowing, no pleased expression. Keep the pinching hand with correctly jointed fingers, exactly one hand raised, large enough to see in a thumbnail. The same jar now sits visibly OPEN on the table in lower center, with the detached transparent lid with pine-green rim sitting flat to its right and more of the same grains in its bottom. No extra objects, arrows, letters, digits, checkmarks, symbols or watermarks. Matte paper-cut gouache, simple large shapes.",
+      "editReference": {
+        "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-7825ee99-c567-4a11-a679-fa47d34de105.png",
+        "sha256": "3f2d02519b8c9adffa7f364ed6d7b641dff071829e08249b848724e5dfe40448"
+      }
+    },
+    "q6-c": {
+      "file": "assets/q6-c.png",
+      "sha256": "98ec76f99e3372466f93058bd751b9afbc2eca030d268669245bd77e8fdf5225",
+      "usedBy": [
+        "p09"
+      ],
+      "kind": "codex-builtin-imagegen",
+      "description": "同款透明罐已经开盖，孩子脸靠近罐口，脸没有接触罐。",
+      "generator": "Codex 内置 ImageGen",
+      "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-f974f320-7b80-408a-8dac-4ea442203037.png",
+      "sourceSha256": "688ba4cf1e240ca495600e7995555ebaefc2cce3477bff2786907bdc0b3f5315",
+      "sourceDimensions": [
+        1254,
+        1254
+      ],
+      "derivative": {
+        "method": "Pillow LANCZOS，完整画幅原比例缩至 480×480，保留原构图，PNG optimize",
+        "dimensions": [
+          480,
+          480
+        ],
+        "mode": "RGB"
+      },
+      "prompt": "Edit the reference square first-grade science quiz picture to a third option. Use the same child on the left in the same orange sweater, same warm table, same exact squat glass jar and small irregular brown and tan grains in the bottom. Remove the adult. The jar is visibly open: put the detached clear lid with its pine-green rim flat on the table to the right. Keep jar upright on the table. Show the child clearly leaning way down and forward over the jar from the left, head in profile nearly horizontal and nose pointed down very close to the open rim, with a narrow visible gap above it. Mouth CLOSED, hands out of sight, neutral face, not touching or tipping the jar, no grains outside jar, no smoke, smell lines or arrows. The position of the face just above the opening must be clear at small sizes and visually distinct from standing back with the lid shut. Use the exact same muted matte paper-cut gouache and warm ivory, apricot, dark pine palette. No writing, letters, digits, symbols, checkmarks, borders or watermarks.",
+      "editReference": {
+        "source": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-7825ee99-c567-4a11-a679-fa47d34de105.png",
+        "sha256": "3f2d02519b8c9adffa7f364ed6d7b641dff071829e08249b848724e5dfe40448"
+      }
+    }
+  }
+}

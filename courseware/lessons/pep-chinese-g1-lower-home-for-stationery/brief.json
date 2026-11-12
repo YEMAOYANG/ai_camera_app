@@ -1,0 +1,229 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "文具的家",
+  "binding": {
+    "editionId": "pep-chinese-g1-lower-2022-standard",
+    "revisionId": "directory-b30168cf88d5ee5709335698",
+    "nodeId": "fb36216f-9404-4802-869e-20dd762fabc2",
+    "unitId": "e7efd7e6-2a62-4a7b-9ebc-c8a5632c5f11"
+  },
+  "scenario": "孩子当整理员，帮一个虚构小组找文具、安排每件物品的家，再查一遍全部归位。老师用原创串讲对照贝贝的变化。",
+  "goals": [
+    "联系物品和故事认读十三个字，认识皿字底，会规范书写笔、知、道、放、平、安。",
+    "听读与纸书朗读结合，读好长句停顿和不同角色语气，用一……就……说两件紧接的事。",
+    "从图像和故事中说出贝贝怎样从丢文具转为每次放学仔细检查，知道文具盒是文具的家。",
+    "能听辨并认读新、平、伴的组词，用原创情境把文具归位和检查落实为两步。"
+  ],
+  "goalSources": [
+    {
+      "skill": "character-list",
+      "target": "联系物品和故事认读十三个字，认识皿字底，会规范书写笔、知、道、放、平、安。",
+      "source": "印79～80、两课时写字页"
+    },
+    {
+      "skill": "speak-with-pauses",
+      "target": "听读与纸书朗读结合，读好长句停顿和不同角色语气，用一……就……说两件紧接的事。",
+      "source": "印78～79、两课时教案"
+    },
+    {
+      "skill": "story-before-after",
+      "target": "从图像和故事中说出贝贝怎样从丢文具转为每次放学仔细检查，知道文具盒是文具的家。",
+      "source": "印78～80、第二课时教案2"
+    },
+    {
+      "skill": "word-groups-and-application",
+      "target": "能听辨并认读新、平、伴的组词，用原创情境把文具归位和检查落实为两步。",
+      "source": "印80、第二课时练习1"
+    }
+  ],
+  "pageSequence": [
+    {
+      "key": "missing-pencil-and-eraser",
+      "kind": "teaching",
+      "plan": "想再用，文具去哪儿了。文具 · 具。铅笔 · 铅。橡皮 · 新。"
+    },
+    {
+      "key": "mother-helps-beibei",
+      "kind": "teaching",
+      "plan": "两个人怎样把话说出来。着急地说。亲切地提醒。平 · 平安。"
+    },
+    {
+      "key": "one-action-then-the-next",
+      "kind": "teaching",
+      "plan": "一件事刚做完，下一件就来。先做的事。接着做的事。听停顿。"
+    },
+    {
+      "key": "box-and-check",
+      "kind": "teaching",
+      "plan": "文具的家是什么。盒 · 皿字底。这些 · 从此。先归位。"
+    },
+    {
+      "key": "put-and-check",
+      "kind": "teaching",
+      "plan": "放好以后，怎样逐件看看。仔细检查 · 仔、检、查。所有 · 所。小伙伴 · 伙和伴。手边试试。"
+    },
+    {
+      "key": "delivery-practice",
+      "kind": "teaching",
+      "plan": "先听拿什么，再听送哪里。听三种文具。回到盒里。出发前听清。"
+    },
+    {
+      "key": "take-stationery-home",
+      "kind": "game",
+      "plan": "听令送文具回家。"
+    },
+    {
+      "key": "write-bi-zhi",
+      "kind": "teaching",
+      "plan": "笔和知怎样分部写。笔 · 竹字头。知 · 左点右口。各试一格。"
+    },
+    {
+      "key": "write-dao",
+      "kind": "teaching",
+      "plan": "道字的走之怎样写。先写首。再写走之。纸上指给大人看。"
+    },
+    {
+      "key": "write-fang",
+      "kind": "teaching",
+      "plan": "放字左右两边怎样写。先写方。再写右边。试着对照。"
+    },
+    {
+      "key": "write-ping-an",
+      "kind": "teaching",
+      "plan": "平和安的末笔在哪儿。平 · 五笔。安 · 六笔。纸上对照。"
+    },
+    {
+      "key": "new-word-family",
+      "kind": "teaching",
+      "plan": "新字可以和谁搭一搭。新书。新年。新手。清新。"
+    },
+    {
+      "key": "flat-word-family",
+      "kind": "teaching",
+      "plan": "听听平字的几个朋友。平安。平地。平时 · 平常。"
+    },
+    {
+      "key": "companion-word-family",
+      "kind": "teaching",
+      "plan": "几个人怎样一起做。伙伴。结伴。做伴 · 相伴。听清再配图。"
+    },
+    {
+      "key": "listen-and-find-word-family",
+      "kind": "game",
+      "plan": "听词开艇找画面。"
+    },
+    {
+      "key": "picture-quiz",
+      "kind": "quiz",
+      "plan": "听老师说，选合适的图。"
+    },
+    {
+      "key": "all-stationery-at-home",
+      "kind": "teaching",
+      "plan": "文具回家了，再看一看。前后对照。实际整理。回纸书读。"
+    }
+  ],
+  "games": [
+    {
+      "page": "take-stationery-home",
+      "template": "listenDelivery",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.listenDelivery",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "listen_pick_deliver",
+      "selection": "听到工具和收件点后控制送货角色，先在起岸拿对铅笔、橡皮或转笔刀，再跨通道送对文具盒。书本格、绘画盘等图标做同屏非目标收件点，每回合放好才计分，读词和摆放反馈都有语音。",
+      "levels": [
+        "先找铅笔，送到文具盒，单条慢车道。",
+        "橡皮和铅笔两单，每单要分别拿对送对。",
+        "三单覆盖铅笔、橡皮和转笔刀，路上可停等再听。"
+      ],
+      "demo": "指文具图、家和移动键，实际走去拿一件，再回起点清空正式状态。",
+      "teacherAnchors": [
+        "station-first-pencil",
+        "station-first-box",
+        "game-player"
+      ]
+    },
+    {
+      "page": "listen-and-find-word-family",
+      "template": "wordBubbles",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.wordBubbles",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "listen_match",
+      "selection": "选新、平、伴三组中的可图区分实例。听语音理解语义后移小艇并发射泡泡，用画面区分新书、平地、伙伴等；抽象组词仍在教师页示范，避免把一张图硬判为平时或平常。",
+      "levels": [
+        "先听新书、新年，慢漂两到三图。",
+        "听平地、平安，区分平坦路面和到家情境。",
+        "伙伴和结伴用手工、去取纸的口令示范，交叉其他组的实物作干扰。"
+      ],
+      "demo": "亮提示重听与小艇，示范移动发泡泡，进入正式关时重置。",
+      "teacherAnchors": [
+        "word-listen-mark",
+        "word-first-book",
+        "game-player"
+      ]
+    }
+  ],
+  "quiz": [
+    {
+      "id": "stationery-home",
+      "prompt": "贝贝给铅笔和橡皮找了一个家。哪张图画出了那个家？",
+      "skill": "story-before-after",
+      "position": 2,
+      "answer": "书包里的文具盒",
+      "rationale": "贝贝想到了书包里的文具盒，铅笔、橡皮等可以放回盒里。"
+    },
+    {
+      "id": "first-did-not-find",
+      "prompt": "故事开头，贝贝再想用橡皮时，遇到了什么事？",
+      "skill": "story-before-after",
+      "position": 1,
+      "answer": "找不着橡皮",
+      "rationale": "她已经用过橡皮，再想用时找不着。手空空的那幅图表现了这件事。"
+    },
+    {
+      "id": "end-of-school-check",
+      "prompt": "哪张图画了打开文具盒，仔细检查每一件文具？",
+      "skill": "word-groups-and-application",
+      "position": 3,
+      "answer": "打开逐件看",
+      "rationale": "仔细检查要打开盒子，看看铅笔、橡皮和转笔刀每一件在不在。"
+    },
+    {
+      "id": "listen-sequence",
+      "prompt": "一放下画笔，就把盖子盖上。哪组图的顺序对？",
+      "skill": "speak-with-pauses",
+      "position": 1,
+      "answer": "放好再盖",
+      "rationale": "画笔先进盒，手再盖上盖子。放下画笔和盖上紧接着发生。"
+    },
+    {
+      "id": "dish-radical",
+      "prompt": "听文具盒的盒。哪张字卡亮出皿字底？",
+      "skill": "character-list",
+      "position": 3,
+      "answer": "亮了皿字底",
+      "rationale": "皿字底在盒的下面，像一个扁扁的容器。"
+    },
+    {
+      "id": "listen-companion",
+      "prompt": "谁和伙伴结伴，抬着同一张画纸走？",
+      "skill": "word-groups-and-application",
+      "position": 2,
+      "answer": "两人结伴",
+      "rationale": "两个人一起朝同一处走，手里拿着一张画纸，表现结伴做事。"
+    }
+  ],
+  "afterClass": {
+    "familyTask": "成人翻纸书陪读，孩子分角色说原创类似对白，按实际文具逐项放入盒并检查。再写六字，从三组词挑几个口头造句。",
+    "weeklyQuestionSource": [
+      "听词认物或识字",
+      "一……就……先后",
+      "理解贝贝如何变化",
+      "组词与偏旁"
+    ],
+    "evidence": "在线记录操控和图题，纸书朗读、口头表达、书写笔顺及真实收纳由成人观察。"
+  },
+  "artAndLanguage": "所有插画、对白与测试题原创，书页原文由成人翻纸书读。生成美术不含字，规范田字格与笔形用代码并据国标和原书逐笔核。遮掉非目标文本仍凭图片和录音操作。"
+}

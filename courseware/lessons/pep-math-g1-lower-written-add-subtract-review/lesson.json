@@ -1,0 +1,1214 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "整理和复习",
+  "description": "帮自然观察站整理记录棒和竖式，复习一百以内四类笔算，学会用图解释换十和检查。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小数老师",
+      "role": "teacher",
+      "gender": "male",
+      "voice": "Ethan",
+      "avatar": "/teachers/ashu-math-v1.png",
+      "color": "#437763",
+      "persona": "和孩子一起动手整理记录棒，解释笔算中的每一步。"
+    }
+  },
+  "images": {
+    "alignment-add": {
+      "file": "assets/alignment-add.png"
+    },
+    "alignment-sub": {
+      "file": "assets/alignment-sub.png"
+    },
+    "borrow-board": {
+      "file": "assets/borrow-board.png"
+    },
+    "carry-board": {
+      "file": "assets/carry-board.png"
+    },
+    "carry-exact-ten": {
+      "file": "assets/carry-exact-ten.png"
+    },
+    "change-check-board": {
+      "file": "assets/change-check-board.png"
+    },
+    "copy-check-board": {
+      "file": "assets/copy-check-board.png"
+    },
+    "cover": {
+      "file": "assets/cover.png"
+    },
+    "dock-add-carry": {
+      "file": "assets/dock-add-carry.png"
+    },
+    "dock-add-keep": {
+      "file": "assets/dock-add-keep.png"
+    },
+    "dock-sub-borrow": {
+      "file": "assets/dock-sub-borrow.png"
+    },
+    "dock-sub-keep": {
+      "file": "assets/dock-sub-keep.png"
+    },
+    "four-rules": {
+      "file": "assets/four-rules.png"
+    },
+    "leaf-badge": {
+      "file": "assets/leaf-badge.png"
+    },
+    "q1-a": {
+      "file": "assets/q1-a.png"
+    },
+    "q1-b": {
+      "file": "assets/q1-b.png"
+    },
+    "q1-c": {
+      "file": "assets/q1-c.png"
+    },
+    "q1-stem": {
+      "file": "assets/q1-stem.png"
+    },
+    "q2-a": {
+      "file": "assets/q2-a.png"
+    },
+    "q2-b": {
+      "file": "assets/q2-b.png"
+    },
+    "q2-c": {
+      "file": "assets/q2-c.png"
+    },
+    "q2-stem": {
+      "file": "assets/q2-stem.png"
+    },
+    "q3-a": {
+      "file": "assets/q3-a.png"
+    },
+    "q3-b": {
+      "file": "assets/q3-b.png"
+    },
+    "q3-c": {
+      "file": "assets/q3-c.png"
+    },
+    "q3-stem": {
+      "file": "assets/q3-stem.png"
+    },
+    "q4-a": {
+      "file": "assets/q4-a.png"
+    },
+    "q4-b": {
+      "file": "assets/q4-b.png"
+    },
+    "q4-c": {
+      "file": "assets/q4-c.png"
+    },
+    "q4-stem": {
+      "file": "assets/q4-stem.png"
+    },
+    "q5-a": {
+      "file": "assets/q5-a.png"
+    },
+    "q5-b": {
+      "file": "assets/q5-b.png"
+    },
+    "q5-c": {
+      "file": "assets/q5-c.png"
+    },
+    "q5-stem": {
+      "file": "assets/q5-stem.png"
+    },
+    "q6-a": {
+      "file": "assets/q6-a.png"
+    },
+    "q6-b": {
+      "file": "assets/q6-b.png"
+    },
+    "q6-c": {
+      "file": "assets/q6-c.png"
+    },
+    "q6-stem": {
+      "file": "assets/q6-stem.png"
+    },
+    "record-badge": {
+      "file": "assets/record-badge.png"
+    },
+    "repair-backdrop": {
+      "file": "assets/repair-backdrop.png"
+    },
+    "repair-borrow-a": {
+      "file": "assets/repair-borrow-a.png"
+    },
+    "repair-borrow-b": {
+      "file": "assets/repair-borrow-b.png"
+    },
+    "repair-carry-a": {
+      "file": "assets/repair-carry-a.png"
+    },
+    "repair-carry-b": {
+      "file": "assets/repair-carry-b.png"
+    },
+    "repair-copy-minus": {
+      "file": "assets/repair-copy-minus.png"
+    },
+    "repair-copy-plus": {
+      "file": "assets/repair-copy-plus.png"
+    },
+    "result-25": {
+      "file": "assets/result-25.png"
+    },
+    "result-28": {
+      "file": "assets/result-28.png"
+    },
+    "result-35": {
+      "file": "assets/result-35.png"
+    },
+    "result-38": {
+      "file": "assets/result-38.png"
+    },
+    "result-53": {
+      "file": "assets/result-53.png"
+    },
+    "result-63": {
+      "file": "assets/result-63.png"
+    },
+    "result-65": {
+      "file": "assets/result-65.png"
+    },
+    "result-75": {
+      "file": "assets/result-75.png"
+    },
+    "s-36-22": {
+      "file": "assets/s-36-22.png"
+    },
+    "s-39-24": {
+      "file": "assets/s-39-24.png"
+    },
+    "s-48-27": {
+      "file": "assets/s-48-27.png"
+    },
+    "s-52-31": {
+      "file": "assets/s-52-31.png"
+    },
+    "s-61-23": {
+      "file": "assets/s-61-23.png"
+    },
+    "s-63-29": {
+      "file": "assets/s-63-29.png"
+    },
+    "s-68-35": {
+      "file": "assets/s-68-35.png"
+    },
+    "s-77-42": {
+      "file": "assets/s-77-42.png"
+    },
+    "s-85-44": {
+      "file": "assets/s-85-44.png"
+    },
+    "sort-add": {
+      "file": "assets/sort-add.png"
+    },
+    "sort-backdrop": {
+      "file": "assets/sort-backdrop.png"
+    },
+    "sort-mix": {
+      "file": "assets/sort-mix.png"
+    },
+    "sort-sub": {
+      "file": "assets/sort-sub.png"
+    },
+    "tile-borrow-a": {
+      "file": "assets/tile-borrow-a.png"
+    },
+    "tile-borrow-b": {
+      "file": "assets/tile-borrow-b.png"
+    },
+    "tile-carry-a": {
+      "file": "assets/tile-carry-a.png"
+    },
+    "tile-carry-b": {
+      "file": "assets/tile-carry-b.png"
+    },
+    "tile-copy-minus": {
+      "file": "assets/tile-copy-minus.png"
+    },
+    "tile-copy-minus-correct": {
+      "file": "assets/tile-copy-minus-correct.png"
+    },
+    "tile-copy-plus": {
+      "file": "assets/tile-copy-plus.png"
+    },
+    "tile-copy-plus-correct": {
+      "file": "assets/tile-copy-plus-correct.png"
+    },
+    "tile-copy-plus-swapped": {
+      "file": "assets/tile-copy-plus-swapped.png"
+    },
+    "trolley": {
+      "file": "assets/trolley.png"
+    },
+    "use-merge": {
+      "file": "assets/use-merge.png"
+    },
+    "use-remove": {
+      "file": "assets/use-remove.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "station-order",
+      "type": "slide",
+      "title": "观察站的记录棒",
+      "template": "title-picture",
+      "data": {
+        "title": "观察站的记录棒",
+        "picture": "cover"
+      },
+      "script": [
+        {
+          "say": "观察站来了两位小帮手。你看，他们在准备什么？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "他们要给每一组叶子的观察结果做记录。"
+        },
+        {
+          "say": "每观察一次，就在桌上放一根记录棒。"
+        },
+        {
+          "say": "一根一根摆，桌上很快就放不下了。"
+        },
+        {
+          "say": "于是他们每数满十根，就把十根装进一盒。"
+        },
+        {
+          "say": "一盒表示一个十，一根散棒表示一个一。"
+        },
+        {
+          "say": "比如，两盒和四根散棒，一共就是二十四根。"
+        },
+        {
+          "say": "要是另一桌也送来记录棒，该怎样把两份数合起来？"
+        },
+        {
+          "say": "我们把整盒和散棒分开记，做一张竖式记录。"
+        }
+      ]
+    },
+    {
+      "key": "same-place",
+      "type": "slide",
+      "title": "相同的计数单位对齐",
+      "template": "two-columns",
+      "data": {
+        "title": "相同的计数单位对齐",
+        "left": {
+          "heading": "合起来",
+          "body": "十位对十位，个位对个位。"
+        },
+        "left_picture": "alignment-add",
+        "right": {
+          "heading": "拿走一些",
+          "body": "先算个位，再算十位。"
+        },
+        "right_picture": "alignment-sub"
+      },
+      "script": [
+        {
+          "say": "小满想把二十四根和四十三根合起来。"
+        },
+        {
+          "say": "两份数写成竖式，哪个数字跟哪个对齐？"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "左边是整盒，右边是散棒，写在不同的列里。"
+        },
+        {
+          "say": "二和四都表示几盒，写在十位这一列。"
+        },
+        {
+          "say": "四和三都表示几根，写在个位这一列。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "先算个位，四加三是七根，不用再装一盒。"
+        },
+        {
+          "say": "再算十位，两盒加四盒是六盒，合起来是六十七根。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "要从七十六根里拿走三十二根，仍然要对齐。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "个位六减二剩四，十位七减三也剩四。"
+        },
+        {
+          "say": "四盒和四根就是四十四根，这次不用拆盒。"
+        },
+        {
+          "say": "对齐以后，先看看最右边这一列。"
+        }
+      ]
+    },
+    {
+      "key": "exchange-ten",
+      "type": "slide",
+      "title": "个位满十，装成一盒",
+      "template": "two-columns",
+      "data": {
+        "title": "个位满十，装成一盒",
+        "left": {
+          "heading": "十根换一盒",
+          "body": "送一盒去十位。"
+        },
+        "left_picture": "carry-board",
+        "right": {
+          "heading": "正好满十",
+          "body": "个位写零。"
+        },
+        "right_picture": "carry-exact-ten"
+      },
+      "script": [
+        {
+          "say": "二十八根加四十六根，散棒能直接写在个位吗？"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "先算个位，八加六是十四。"
+        },
+        {
+          "say": "个位只写一位数字，十四根散棒要先整理。"
+        },
+        {
+          "say": "从十四根里数十根，装成一盒，剩四根散棒。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "这四根写在个位。十位多了一盒，用小一记下来。"
+        },
+        {
+          "say": "两盒加四盒，再加换来的那盒，一共七盒。"
+        },
+        {
+          "say": "口算也一样。六十加十四，还是七十四。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "看看四十六加二十四。六根加四根正好十根。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "装好一盒后没有散棒，个位要写零。"
+        },
+        {
+          "say": "四盒加两盒再加新装的一盒，十位是七。"
+        },
+        {
+          "say": "个位刚好满十，也要向十位进一。"
+        },
+        {
+          "say": "把新装的那一盒算进去，看看十位和个位是多少。"
+        }
+      ]
+    },
+    {
+      "key": "split-ten",
+      "type": "slide",
+      "title": "个位不够减，拆开一盒",
+      "template": "picture-points",
+      "data": {
+        "title": "个位不够减，拆开一盒",
+        "picture": "borrow-board",
+        "points": [
+          "个位不够减",
+          "拆一盒，换十根",
+          "用拆过后的十位"
+        ]
+      },
+      "script": [
+        {
+          "say": "原来有七十二根，要拿走四十八根。"
+        },
+        {
+          "say": "个位只有两根，怎样才能拿走八根？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "要从原有的两根里拿八根，肯定不够。"
+        },
+        {
+          "say": "这是要从原有的数里取走，不能倒过来算八减二。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "从七盒里拆一盒，把十根散棒放到个位。"
+        },
+        {
+          "say": "现在十位剩六盒，个位有十二根。"
+        },
+        {
+          "say": "在十位上点个小点，提醒自己那里已经少了一盒。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "先算个位，十二减八剩四。"
+        },
+        {
+          "say": "再算十位，用六减四，剩两盒。"
+        },
+        {
+          "say": "两盒和四根合起来是二十四根。"
+        },
+        {
+          "say": "拆盒并没添棒，只是把原来的一盒换了个放法。"
+        },
+        {
+          "say": "别忘了用拆过以后的十位，找出正确的差。"
+        }
+      ]
+    },
+    {
+      "key": "sort-four-rules",
+      "type": "interactive",
+      "title": "把竖式送到合适的托盘",
+      "widgetType": "game",
+      "page": "sort-four-rules",
+      "startImage": "sort-backdrop",
+      "script": [
+        {
+          "setState": {
+            "pause": true,
+            "demo": true,
+            "level": 1
+          }
+        },
+        {
+          "highlight": "#written-rule-card"
+        },
+        {
+          "say": "把加法竖式送到托盘。先看个位加起来满不满十。"
+        },
+        {
+          "highlight": "#game-target"
+        },
+        {
+          "say": "先看第一张。三十六加二十二，个位是六加二。"
+        },
+        {
+          "say": "八根散棒还不满十，所以不需要再装一盒。"
+        },
+        {
+          "highlight": "#first-written-dock"
+        },
+        {
+          "say": "托盘上只有散棒，表示这张加法不进位。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "小车在牌的左边。按右箭头，小车就把牌往右推。"
+        },
+        {
+          "say": "要是推过了，点弯箭头，可以退回刚才那一步。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "我沿这条路把牌推过去。看，它停在托盘里了。"
+        },
+        {
+          "say": "现在换你把牌送过去。先看清卡上的个位，再开小车。"
+        },
+        {
+          "setState": {
+            "pause": false,
+            "demo": false,
+            "level": 1
+          }
+        }
+      ],
+      "gameAudio": {
+        "sort-add-goal": "compare-explanations-18",
+        "sort-sub-goal": "compare-explanations-19",
+        "sort-mixed-goal": "compare-explanations-20",
+        "sort-hint": "same-place-17",
+        "sort-help": "compare-explanations-21",
+        "sort-praise": "compare-explanations-22"
+      }
+    },
+    {
+      "key": "compare-explanations",
+      "type": "slide",
+      "title": "把四类笔算画在一起",
+      "template": "picture-points",
+      "data": {
+        "title": "把四类笔算画在一起",
+        "picture": "four-rules",
+        "points": [
+          "加法散棒不满十",
+          "加法满十进一",
+          "减法散棒够拿",
+          "减法不够拿就退一"
+        ]
+      },
+      "script": [
+        {
+          "say": "小满说，他想画一张图，把四种笔算都记下来。"
+        },
+        {
+          "say": "如果只画一条线，把加法减法分开，够用吗？"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先看上面两格，都是加法。左上四加三是七。"
+        },
+        {
+          "say": "散棒不满十，不用合盒，所以是不进位加。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "右上八加六是十四，要把十根换成一盒。"
+        },
+        {
+          "say": "十位多一个十，叫进位加。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "下面两格都是减法。左下六减二，散棒够拿。"
+        },
+        {
+          "say": "十位没拆盒，叫不退位减。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "右下两根不够拿八根，要拆开一个十。"
+        },
+        {
+          "say": "十位少一个十，叫退位减。"
+        },
+        {
+          "say": "画图时，试着先分加和减，再分换十和不换十。"
+        },
+        {
+          "say": "每一格放一张竖式，讲讲你为什么把它放在那里。"
+        },
+        {
+          "say": "先分加法。用个位满不满十，判断要送到哪个托盘。"
+        },
+        {
+          "say": "再分减法。用散棒够不够拿，判断要送到哪个托盘。"
+        },
+        {
+          "say": "四种都遇到时，先看加减，再看个位要不要换十。"
+        },
+        {
+          "say": "加法看能不能装一盒，减法看散棒够不够拿。"
+        },
+        {
+          "say": "竖式都找到了合适的地方，四种办法一眼就能分清。"
+        }
+      ]
+    },
+    {
+      "key": "repair-pair",
+      "type": "interactive",
+      "title": "让落牌找到正确的记录",
+      "widgetType": "game",
+      "page": "repair-pair",
+      "startImage": "repair-backdrop",
+      "script": [
+        {
+          "setState": {
+            "pause": true,
+            "demo": true,
+            "level": 1
+          }
+        },
+        {
+          "highlight": "#current-record"
+        },
+        {
+          "say": "看左边的原记录。接好落牌，让它贴着抄对的那张。"
+        },
+        {
+          "highlight": "#repair-columns"
+        },
+        {
+          "say": "左边是四十三加十五。第二个数是一个十和五个一。"
+        },
+        {
+          "say": "要是把十五抄成五十一，盒子和散棒就都写错了。"
+        },
+        {
+          "highlight": "#first-repair-cell"
+        },
+        {
+          "say": "我找下面写十五的那张。让落牌挨着它才能配对。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "上面这张牌会往下落。按左右箭头就能移动它。"
+        },
+        {
+          "say": "已经对准的时候，按落下键让它一下落到底。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "看，两张牌碰到一起就配好了。下面空出了一个格子。"
+        },
+        {
+          "say": "轮到你。每次先看左边是哪张原记录，再移动落牌。"
+        },
+        {
+          "setState": {
+            "pause": false,
+            "demo": false,
+            "level": 1
+          }
+        }
+      ],
+      "gameAudio": {
+        "repair-copy-goal": "check-the-record-16",
+        "repair-carry-goal": "exchange-ten-18",
+        "repair-borrow-goal": "split-ten-16",
+        "repair-hint": "check-the-record-17",
+        "repair-help": "check-the-record-18",
+        "repair-praise": "check-the-record-19"
+      }
+    },
+    {
+      "key": "check-the-record",
+      "type": "slide",
+      "title": "从哪一步找错",
+      "template": "two-columns",
+      "data": {
+        "title": "从哪一步找错",
+        "left": {
+          "heading": "先核对原数",
+          "body": "抄倒了，算的就不是原来的题。"
+        },
+        "left_picture": "copy-check-board",
+        "right": {
+          "heading": "再看十位",
+          "body": "把换来的加上，把拆掉的扣掉。"
+        },
+        "right_picture": "change-check-board"
+      },
+      "script": [
+        {
+          "say": "两位小帮手的答案对不上。只把得数再念一遍，有用吗？"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "左边本来是六十七减三十二。另一张把三十二抄倒了。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "抄成二十三，已经是另一道题。应该先把原数抄对。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "再看右边。二十七加四十六，七加六是十三，个位写三。"
+        },
+        {
+          "say": "如果十位只算二加四，就漏了新装的一盒。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "再加上进来的一，正确得数是七十三。"
+        },
+        {
+          "say": "减法里的错法正好不同。八十三减五十七要先拆一盒。"
+        },
+        {
+          "say": "个位十三减七得六。十位要用七减五，而不是八减五。"
+        },
+        {
+          "say": "所以得二十六。检查时先核抄写，再看个位和十位。"
+        },
+        {
+          "say": "先拿原数来对一对，找出把两个数都抄对的那张。"
+        },
+        {
+          "say": "慢一点。看清原式，先核个位，再核十位。"
+        },
+        {
+          "say": "想想原数有没有抄对，十位该多一盒还是少一盒。"
+        },
+        {
+          "say": "你找到了正确的那张记录。可以把它收好了。"
+        }
+      ]
+    },
+    {
+      "key": "use-and-check",
+      "type": "slide",
+      "title": "先问要找的是什么",
+      "template": "two-columns",
+      "data": {
+        "title": "先问要找的是什么",
+        "left": {
+          "heading": "两组放在一起",
+          "body": "要找合计，用加法。"
+        },
+        "left_picture": "use-merge",
+        "right": {
+          "heading": "拿走一部分",
+          "body": "要找剩余，用减法。"
+        },
+        "right_picture": "use-remove"
+      },
+      "script": [
+        {
+          "say": "两张观察单里都有两组数，能都用加法吗？"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "上午有三十五根记录棒，下午又有二十二根。"
+        },
+        {
+          "say": "题目问两次一共有多少，得把两部分合起来。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "用三十五加二十二。个位五加二，十位三加二。"
+        },
+        {
+          "say": "一共五十七根，比原来的任意一组都多。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "另一张说，原有六十九根，带走三十八根。"
+        },
+        {
+          "say": "问题是还剩多少。得从原有的里面去掉带走的。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "用六十九减三十八。九减八是一，六减三是三。"
+        },
+        {
+          "say": "还剩三十一根。剩下的和带走的加起来，仍是六十九根。"
+        },
+        {
+          "say": "遇到新问题，先说你要找的量，再决定用加还是用减。"
+        }
+      ]
+    },
+    {
+      "key": "picture-check-a",
+      "type": "quiz",
+      "title": "看图核对笔算办法",
+      "intro": [
+        "现在换三张新记录。听老师读题，再从图里找一张。"
+      ],
+      "questions": [
+        {
+          "id": "align-new-record",
+          "question": "四十五加二十三，哪张竖式抄对了数，又对齐了？",
+          "skill": "place-value",
+          "answer": [
+            "B"
+          ],
+          "analysis": "十位上的四对二，个位上的五对三。数抄对以后，从个位算，得六十八。",
+          "visual": {
+            "kind": "asset",
+            "image": "q1-stem",
+            "alt": "四盒五根与两盒三根合起来"
+          },
+          "options": {
+            "A": {
+              "label": "第二个数的两位向左错开",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-a",
+                "alt": "第二个数的两位向左错开"
+              }
+            },
+            "B": {
+              "label": "十位四对二，个位五对三",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-b",
+                "alt": "十位四对二，个位五对三"
+              }
+            },
+            "C": {
+              "label": "第二个数写成三十二",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-c",
+                "alt": "第二个数写成三十二"
+              }
+            }
+          }
+        },
+        {
+          "id": "pack-new-ten",
+          "question": "三十七根加四十六根。装好整盒后是哪张图？",
+          "skill": "exchange-ten",
+          "answer": [
+            "C"
+          ],
+          "analysis": "七加六得十三。把十根换成一盒，个位剩三，十位变成八。一共有八十三根。",
+          "visual": {
+            "kind": "asset",
+            "image": "q2-stem",
+            "alt": "三盒七根与四盒六根合起来"
+          },
+          "options": {
+            "A": {
+              "label": "七盒和三根",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-a",
+                "alt": "七盒和三根"
+              }
+            },
+            "B": {
+              "label": "七盒和十三根",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-b",
+                "alt": "七盒和十三根"
+              }
+            },
+            "C": {
+              "label": "八盒和三根",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-c",
+                "alt": "八盒和三根"
+              }
+            }
+          }
+        },
+        {
+          "id": "remove-without-borrowing",
+          "question": "八十六根取走四十三根。哪张图表示直接拿走？",
+          "skill": "classify-four",
+          "answer": [
+            "A"
+          ],
+          "analysis": "六根够取三根，八盒也够取四盒。盒子不用拆，剩四盒和三根。",
+          "visual": {
+            "kind": "asset",
+            "image": "q3-stem",
+            "alt": "从八盒六根中拿走四盒三根"
+          },
+          "options": {
+            "A": {
+              "label": "八盒划去四盒，六根划去三根",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-a",
+                "alt": "八盒划去四盒，六根划去三根"
+              }
+            },
+            "B": {
+              "label": "拆成七盒十六根，再划去四盒三根",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-b",
+                "alt": "拆成七盒十六根，再划去四盒三根"
+              }
+            },
+            "C": {
+              "label": "八盒划去三盒，六根划去四根",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-c",
+                "alt": "八盒划去三盒，六根划去四根"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "picture-check-b",
+      "type": "quiz",
+      "title": "看图查一查新记录",
+      "intro": [
+        "再来三张新记录。先听题，想清要找的，再点图。"
+      ],
+      "questions": [
+        {
+          "id": "unpack-a-ten-first",
+          "question": "七十三根要拿走五十六根。原来的棒先换成哪图？",
+          "skill": "exchange-ten",
+          "answer": [
+            "B"
+          ],
+          "analysis": "三根不够取六根。拆开一盒以后，变成六盒和十三根。继续算，最后剩十七根。",
+          "visual": {
+            "kind": "asset",
+            "image": "q4-stem",
+            "alt": "原有七盒三根，要拿走五盒六根"
+          },
+          "options": {
+            "A": {
+              "label": "七盒和十三根",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-a",
+                "alt": "七盒和十三根"
+              }
+            },
+            "B": {
+              "label": "六盒和十三根",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-b",
+                "alt": "六盒和十三根"
+              }
+            },
+            "C": {
+              "label": "六盒和三根",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-c",
+                "alt": "六盒和三根"
+              }
+            }
+          }
+        },
+        {
+          "id": "check-new-borrow",
+          "question": "九十二减八十五。哪张竖式抄对了原数，也算对了结果？",
+          "skill": "choose-and-debug",
+          "answer": [
+            "C"
+          ],
+          "analysis": "拆掉一盒，十二减五得七。十位只剩八个十，八减八得零，所以只写七。",
+          "visual": {
+            "kind": "asset",
+            "image": "q5-stem",
+            "alt": "从九盒两根中拿走八盒五根"
+          },
+          "options": {
+            "A": {
+              "label": "九十二减八十五，得十七",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-a",
+                "alt": "九十二减八十五，得十七"
+              }
+            },
+            "B": {
+              "label": "九十二减五十八，得三十四",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-b",
+                "alt": "九十二减五十八，得三十四"
+              }
+            },
+            "C": {
+              "label": "九十二减八十五，得七",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-c",
+                "alt": "九十二减八十五，得七"
+              }
+            }
+          }
+        },
+        {
+          "id": "find-the-remainder",
+          "question": "五十八根棒，带走二十四根。哪张图是剩下的？",
+          "skill": "choose-and-debug",
+          "answer": [
+            "A"
+          ],
+          "analysis": "从五十八里减去带走的二十四。个位剩四，十位剩三，还剩三十四根。",
+          "visual": {
+            "kind": "asset",
+            "image": "q6-stem",
+            "alt": "原有五盒八根，带走两盒四根"
+          },
+          "options": {
+            "A": {
+              "label": "五十八减二十四，余下三盒四根",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-a",
+                "alt": "五十八减二十四，余下三盒四根"
+              }
+            },
+            "B": {
+              "label": "五十八加二十四，得到八盒两根",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-b",
+                "alt": "五十八加二十四，得到八盒两根"
+              }
+            },
+            "C": {
+              "label": "五十八减四十二，余下一盒六根",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-c",
+                "alt": "五十八减四十二，余下一盒六根"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "family-recap",
+      "type": "slide",
+      "title": "把你的办法讲给家人听",
+      "template": "summary",
+      "data": {
+        "title": "把你的办法讲给家人听",
+        "items": [
+          "相同数位要对齐",
+          "从个位开始算",
+          "满十进一，不够减退一",
+          "按题意选加减，再查竖式"
+        ]
+      },
+      "script": [
+        {
+          "say": "记录棒放好了。你能教下一位小帮手怎么记吗？"
+        },
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "先把十位和十位对齐，个位和个位对齐。"
+        },
+        {
+          "say": "整盒跟整盒算，散棒跟散棒算。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "从个位算起，才知道接着算十位时要不要动一盒。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "加法里十根装一盒，十位加一。"
+        },
+        {
+          "say": "减法里散棒不够拿，就拆一盒，十位先少一。"
+        },
+        {
+          "say": "这两种办法，都只是给同一批记录棒换一种摆法。"
+        },
+        {
+          "spotlight": "item-4"
+        },
+        {
+          "say": "求合起来有多少，用加法。求还剩多少，用减法。"
+        },
+        {
+          "say": "算完核对抄的数，再看换过的那一盒有没有算进去。"
+        },
+        {
+          "say": "回家找能装成一盒十件的小东西，自己编一道题。"
+        },
+        {
+          "say": "摆一摆，画一画，再用竖式记下来。"
+        },
+        {
+          "say": "请家人看你的图，听你讲有没有换十，为什么。"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,80 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "解决求两数相差几的实际问题",
+  "binding": {
+    "editionId": "pep-math-g1-lower-2022-standard",
+    "revisionId": "directory-6205d2037284e91f10b25edd",
+    "unitId": "bd8045fb-fd3d-42d3-95ed-a1ca984c5126",
+    "nodeId": "64427552-7aab-4c06-b420-3264d18512fa"
+  },
+  "scenario": "小小露营站要核对两块营地的折叠椅、灯和标牌。孩子先看清是哪两组，再给两排物品配对，帮值班员找出数量相差的那一段。",
+  "goals": [
+    "从情境中辨认比较的是哪两组同类事物，找出各自数量、单位和问题方向。",
+    "把两组从同一起点逐一对齐，区分同样多的一段与较大组多出的一段，用图说明相差量。",
+    "用较大数量减去较小数量求相差，说明减去的是与较少组同样多的那一段，并用图核对条件、办法和计算结果。",
+    "把较多一方多几改说成较少一方少几时，能在同一张图上找到同一段相差，并在新情境中避开无关数量和求合计的干扰。"
+  ],
+  "goalEvidence": [
+    {"skill": "select-compared-groups", "source": "印70、教案2及4至5、课件3及14至17"},
+    {"skill": "align-and-find-gap", "source": "印70、课件4至8、任务单1"},
+    {"skill": "subtract-equal-part", "source": "印70、教案3、课件6至9及12至13"},
+    {"skill": "reverse-same-gap", "source": "印70页末、教案3至4、课件10至11及13"}
+  ],
+  "pageSequence": [
+    {"key": "two-camps", "kind": "teaching", "title": "要比哪两排椅子", "plan": "展示带图形旗标的两块营地和各自的椅子。让孩子先指出问的是哪两组，老师逐个点亮两组和计数单位。"},
+    {"key": "match-the-chairs", "kind": "teaching", "title": "一把对一把", "plan": "用11把和7把椅子示范从同一端对齐。先亮7对，再用括线标出多出的4把，把图中的大组、相等部分和多出部分依次连到11减7等于4。"},
+    {"key": "reverse-the-question", "kind": "teaching", "title": "少几也是这一段", "plan": "沿用同一张图切换提问方向，先点实心的4把，再点较短行对应的4个空位。两次都指向同一段差，核对对象、方法与计算。"},
+    {"key": "sort-the-pairing-cards", "kind": "interactive", "title": "把对齐卡送回对应托盘", "plan": "开车推放小卡。小卡中的括线分别指向等量段或相差段，托盘用对齐示意标类。游戏规则见下。"},
+    {"key": "choose-two-counts", "kind": "teaching", "title": "三块牌里找两块", "plan": "三组营地灯牌是36、28、23块。依照口令只框两组，把36和28画成同起点的单位条。逐项辨别8块是这两组的差、64块是这两组合计、13块是和第三组比的差。"},
+    {"key": "light-the-gap", "kind": "interactive", "title": "把弹珠送到相差灯靶", "plan": "先看两组已对齐的记录，再瞄准并修正飞行方向，击中数量与余段相同的灯靶。游戏规则见下。"},
+    {"key": "picture-check-a", "kind": "quiz", "title": "找出那一段", "plan": "老师读题，逐题呈现下列1至3题和三张新图。"},
+    {"key": "picture-check-b", "kind": "quiz", "title": "换个方向再比比", "plan": "老师读题，逐题呈现下列4至6题和三张新图。"},
+    {"key": "say-it-at-home", "kind": "teaching", "title": "把比较办法带回家", "plan": "在一张新图中依次复盘选两组、对齐、找余段、用减法和改问法，交接亲子生活任务。"}
+  ],
+  "games": [
+    {
+      "page": "sort-the-pairing-cards",
+      "template": "sortingDepot",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.sortingDepot",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "classification",
+      "reason": "推箱路线让孩子亲手搬运。托盘只收图中括线指向相应数学区域的小卡。卡片颜色、路线和位置不能单独给出正确分类。",
+      "levels": [
+        "用8对5的两行，开阔区从两个图卡辨认对齐段和余段。",
+        "用13对9的两行，长行改到下方，有转角和让路操作。",
+        "用16对11的两行，把余段与短行等长空位放入同一类，增加卡片和绕柱路径。"
+      ],
+      "demo": "老师逐个点亮图卡的共同起点、括线指向和托盘图示，实推首关一张卡，看到进盘后停住，清掉演示进度再交接。"
+    },
+    {
+      "page": "light-the-gap",
+      "template": "magnetMarbles",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.magnetMarbles",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "pair_match",
+      "reason": "弹珠飞行中可修正方向。每个发射题卡只与一个灯靶配对，命中规则按题卡两组数量的差算出目标值，路线不能替代数量判断。",
+      "levels": [
+        "用9对5等少量物件，靶图为2至6盏的成组灯，靶距宽且慢。",
+        "用14对8等数，图示多出或缺少的那一段，换问法并让靶开始小幅移动。",
+        "三组中依口令选定31和23等两组比较，用单位条或整十标记读图，稍快的靶移动要求孩子再修正一次。"
+      ],
+      "demo": "老师按顺序高亮被问到的两组、两条终点间的余段和对应灯靶，发射一颗弹珠并停在命中结果，复位后交接。"
+    }
+  ],
+  "quizPlan": [
+    {"skill": "select-compared-groups", "task": "风筝展有圆形、三角形、方形牌对应的三排风筝，数量分别是10、6、9。听题只比圆牌和三角牌。", "pictureOptions": ["圆牌与方牌", "圆牌与三角牌", "三角牌与方牌"], "correctPosition": 2, "rationale": "只取问题提到的圆牌与三角牌两组。"},
+    {"skill": "align-and-find-gap", "task": "车站的两排袖标是13和8，用图指出哪一段是相差。", "pictureOptions": ["括线标出配齐的8枚", "外框罩住两组全部", "括线只标长排未配对的5枚"], "correctPosition": 3, "rationale": "短排与长排的前8枚配对，余下5枚。"},
+    {"skill": "subtract-equal-part", "task": "文具摊两盒夹子分别有18枚和14枚。找出配对后多出的数量图。", "pictureOptions": ["4枚夹子", "14枚夹子", "三格十位和两枚夹子"], "correctPosition": 1, "rationale": "18减去与短排同样多的14，剩4枚。"},
+    {"skill": "reverse-same-gap", "task": "两辆小车有19面和12面装饰旗。听完先问多几再问少几，选两次都指对的图。", "pictureOptions": ["两图都括住12个配对格", "长行余下7面与短行7个空位对齐", "两图都括住19格整行"], "correctPosition": 2, "rationale": "多出的7面与另一行少的7面指同一段。"},
+    {"skill": "select-compared-groups", "task": "书架三层分别有30、24、21本。听题比上层和中层，选相差的数量图。", "pictureOptions": ["9本，误比上层与下层", "五个十和4本，误求上层和中层合计", "6本，与两条终点间6个格相同"], "correctPosition": 3, "rationale": "30减24得6，21本属于未问到的一层。"},
+    {"skill": "subtract-equal-part", "task": "两场节奏活动用了27块和16块节奏板，选出按两段复原大组的正确核对图。", "pictureOptions": ["16格配齐段与11格余段接成27格", "16格配齐段与10格余段只接成26格", "把两组整条接成43格"], "correctPosition": 1, "rationale": "27减16得11。拼回相等部分和差，恰好复原较大组。"}
+  ],
+  "presentation": "一屏一件事。故事和图标用原创插画，计数点、成组数量和对齐条用精确图示。两组用形状和固定位置识别，留出明显的共同起点和差的端点。老师预录读题、解释和反馈，遮住非目标文字仍能通过图和声音作答。",
+  "afterClass": {
+    "familyTask": "在家找两组同类小物件，画出对齐的两排，圈出多出的一段，再从另一方说少几并检查单位。口头解释和家庭完成情况待观察。",
+    "weeklyQuestionSource": ["由问题选两组和单位", "同起点逐一对应与余段", "较大数量减较小数量及图示核对", "交换问法保持相差量", "有第三组时剔除无关数量"],
+    "source": "课练1、教案5、课件18"
+  }
+}

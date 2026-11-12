@@ -1,0 +1,30 @@
+#crane-controls { position: absolute; inset: -86px -24px -82px; z-index: 8; pointer-events: none; }
+#crane-controls[hidden] { display: none; }
+#crane-controls button {
+  position: absolute;
+  width: 96px;
+  height: 96px;
+  border: 3px solid #afcfc7;
+  border-radius: 22px;
+  background: #275649;
+  color: #fffaed;
+  font: 750 34px/1 sans-serif;
+  cursor: pointer;
+  pointer-events: auto;
+  touch-action: none;
+}
+#crane-controls button:active { background: #39806b; }
+#crane-controls button:focus-visible { outline: 5px solid #ffbf59; }
+#crane-drop { right: 45px; top: 493px; }
+#crane-replay { left: 30px; top: 504px; }
+#crane-music { right: 132px; top: 24px; }
+#crane-score {
+  position: absolute;
+  left: 170px;
+  top: 35px;
+  padding: 9px 12px;
+  border-radius: 16px;
+  background: #fffaf0;
+  color: #25453b;
+  font: 750 24px/1.2 sans-serif;
+}

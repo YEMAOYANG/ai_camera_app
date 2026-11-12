@@ -1,0 +1,249 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "binding": {
+    "editionId": "smartedu-english-six-year-g1-upper-sync-af05bc77",
+    "revisionId": "20260928-metadata-1",
+    "unitId": "d29dd508-0e3b-3bcd-b26d-765c6af9e2db",
+    "nodeId": "e4a59458-107b-3fc3-b99b-9811315bf782",
+    "officialChapterId": "e4a59458-107b-3fc3-b99b-9811315bf782",
+    "officialMaterialId": "af05bc77-0902-9842-f1b5-37cdfad7c5c8",
+    "legacyActivityId": "7c718c5c-6435-11ab-4a87-e4bd11791bd0",
+    "legacyActivityIds": [
+      "7c718c5c-6435-11ab-4a87-e4bd11791bd0",
+      "8ae68bfb-5df3-3edd-015d-f42804e90026"
+    ],
+    "lessonTitle": "Unit 2 Happy birthday!",
+    "unitTitle": "Module 9",
+    "subject": "english",
+    "gradeCode": "primary_1",
+    "volume": "upper",
+    "schoolSystem": "six_year",
+    "teachingRevision": "1"
+  },
+  "title": "Unit 2 Happy birthday!",
+  "authorModels": [
+    "gpt-6.1-sol"
+  ],
+  "officialNotesSha256": "48e6f92078234a304a0a2be4e9c82b394a048375d32eebf8d828491681d176fe",
+  "catalogSha256": "1f04d478644e68af67bc264bf46227ece3d94d9c4070e8a8dd219846a48f4753",
+  "goals": [
+    "认出生日祝福，能用 Happy birthday! 向对方祝福，收到祝福时用 Thank you.；先听姓名再对人祝福。",
+    "听辨 pen 和 pencil 等礼物，听懂并使用 A … for you. 说明要送的物品，能够用图和实物做赠礼对话。",
+    "能分清赠送者与接受者的说话回合。接受者收到礼物说 Thank you.，赠送者接对方的感谢说 You’re welcome.。",
+    "能跟着生日歌的祝福短句轻拍和开口，听出 birthday 和 thank 里的同类声音。",
+    "在生日活动里复习听年龄回答和找年龄胸签，把数字与正在回答的人相配。"
+  ],
+  "goalReferences": [
+    {
+      "id": "goal-1",
+      "goal": "认出生日祝福，能用 Happy birthday! 向对方祝福，收到祝福时用 Thank you.；先听姓名再对人祝福。",
+      "pageRefs": [
+        53
+      ]
+    },
+    {
+      "id": "goal-2",
+      "goal": "听辨 pen 和 pencil 等礼物，听懂并使用 A … for you. 说明要送的物品，能够用图和实物做赠礼对话。",
+      "pageRefs": [
+        53,
+        54
+      ]
+    },
+    {
+      "id": "goal-3",
+      "goal": "能分清赠送者与接受者的说话回合。接受者收到礼物说 Thank you.，赠送者接对方的感谢说 You’re welcome.。",
+      "pageRefs": [
+        53,
+        54
+      ]
+    },
+    {
+      "id": "goal-4",
+      "goal": "能跟着生日歌的祝福短句轻拍和开口，听出 birthday 和 thank 里的同类声音。",
+      "pageRefs": [
+        54
+      ]
+    },
+    {
+      "id": "goal-5",
+      "goal": "在生日活动里复习听年龄回答和找年龄胸签，把数字与正在回答的人相配。",
+      "pageRefs": [
+        55
+      ]
+    }
+  ],
+  "pages": [
+    {
+      "key": "party-message",
+      "type": "slide",
+      "goalIds": [
+        "goal-1"
+      ],
+      "approach": "根据生日场景猜开口用语，演两人称呼弄错后先谢再纠正。"
+    },
+    {
+      "key": "choose-the-present",
+      "type": "slide",
+      "goalIds": [
+        "goal-2"
+      ],
+      "approach": "在同一组图中听辨笔和铅笔，再换礼物说整句。"
+    },
+    {
+      "key": "gift-boat",
+      "type": "interactive",
+      "goalIds": [
+        "goal-2"
+      ],
+      "approach": "录音说出的礼物才可击中得分，横移小艇和发射时机同时决定是否命中。"
+    },
+    {
+      "key": "whose-turn",
+      "type": "slide",
+      "goalIds": [
+        "goal-3"
+      ],
+      "approach": "递礼后分别高亮收礼者、送礼者，先猜、听两轮，明确致谢和回应顺序。"
+    },
+    {
+      "key": "party-maze",
+      "type": "interactive",
+      "goalIds": [
+        "goal-1",
+        "goal-2",
+        "goal-3"
+      ],
+      "approach": "按录音和交际顺序操控小车找人物或递礼图站，提前碰后一步不能得分，完成顺序才能走出口。"
+    },
+    {
+      "key": "rhythm-wishes",
+      "type": "slide",
+      "goalIds": [
+        "goal-4"
+      ],
+      "approach": "逐个听生日词、感谢词和生日祝福短句，再拍手跟念。"
+    },
+    {
+      "key": "birthday-badges",
+      "type": "slide",
+      "goalIds": [
+        "goal-5"
+      ],
+      "approach": "听两位虚构同学的不同年龄回答，把胸签配给自己说过该数字的人。"
+    },
+    {
+      "key": "picture-check",
+      "type": "quiz",
+      "goalIds": [
+        "goal-1",
+        "goal-2",
+        "goal-3",
+        "goal-5"
+      ],
+      "approach": "六道新情境读题图选，各题唯一答案，正确位置各两次。"
+    },
+    {
+      "key": "finish-around-table",
+      "type": "slide",
+      "goalIds": [
+        "goal-1",
+        "goal-2",
+        "goal-3",
+        "goal-4",
+        "goal-5"
+      ],
+      "approach": "复盘，轮换送卡与收卡，口语待观察。"
+    }
+  ],
+  "games": [
+    {
+      "page": "gift-boat",
+      "template": "wordBubbles",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.wordBubbles",
+      "ownerApprovedOn": "2026-11-09",
+      "rule": "录音说出的礼物才可击中得分，横移小艇和发射时机同时决定是否命中。",
+      "progression": [
+        "静止两图先找 pen 和 pencil",
+        "三图开始缓慢漂动，交叉听文具",
+        "三图漂得更快，换书、书包、球，目标位置变化"
+      ]
+    },
+    {
+      "page": "party-maze",
+      "template": "bubbleMaze",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.bubbleMaze",
+      "ownerApprovedOn": "2026-11-09",
+      "rule": "按录音和交际顺序操控小车找人物或递礼图站，提前碰后一步不能得分，完成顺序才能走出口。",
+      "progression": [
+        "短路走祝福、递礼",
+        "祝福已说过，从递礼走到感谢、回应",
+        "整段四站都要听，更多岔路和一段软墙"
+      ]
+    }
+  ],
+  "quizPlan": [
+    {
+      "id": "wish-in-context",
+      "goalIds": [
+        "goal-1"
+      ],
+      "correct": "b",
+      "variation": "室内图书角迎宾、楼外道别与花房生日场景。"
+    },
+    {
+      "id": "birthday-thanks-speaker",
+      "goalIds": [
+        "goal-1",
+        "goal-3"
+      ],
+      "correct": "c",
+      "variation": "烘焙课堂生日祝福后找小寿星。"
+    },
+    {
+      "id": "listen-eraser-present",
+      "goalIds": [
+        "goal-2"
+      ],
+      "correct": "a",
+      "variation": "新画法文具特写，听整句选择橡皮。"
+    },
+    {
+      "id": "welcome-after-thanks",
+      "goalIds": [
+        "goal-3"
+      ],
+      "correct": "a",
+      "variation": "花台边三人中找接着致谢开口的送礼者。"
+    },
+    {
+      "id": "actually-give-book",
+      "goalIds": [
+        "goal-2",
+        "goal-3"
+      ],
+      "correct": "b",
+      "variation": "新场景中辨别书在递给对方、仅指着或读给自己。"
+    },
+    {
+      "id": "birthday-age-badge",
+      "goalIds": [
+        "goal-5"
+      ],
+      "correct": "c",
+      "variation": "听新数 four 选择四岁胸签。"
+    }
+  ],
+  "afterClassPractice": {
+    "description": "画张贺卡给自己选的一位亲友。轮流做送卡和收卡的人，说祝福、递礼、感谢和回应。可跟着教材唱歌。",
+    "evidence": "待观察"
+  },
+  "weeklyQuestionSources": [
+    "听生日祝福，在新场景中辨别是祝福还是普通见面、告别。",
+    "听赠礼整句，在不同画法的新物件中辨认 pen/pencil 和其他已学物品，再分辨物品是否真的送给对方。",
+    "根据礼物交接前后区分接受者的感谢与赠送者的回应，听完再选说话者或正确图序。",
+    "听姓名或年龄回答，把祝福对象或年龄胸签配给该人物。",
+    "家庭角色换位送卡，口语表现待观察。"
+  ]
+}

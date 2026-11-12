@@ -1,0 +1,2735 @@
+{
+  "schemaVersion": "mira.courseware.asset-sources.v1",
+  "lesson": "fltrp-g1-lower-three-brown-monkeys",
+  "assets": [
+    {
+      "key": "zoo-gate",
+      "file": "assets/zoo-gate.png",
+      "sourceType": "codex_imagegen",
+      "sha256": "0896bc6314c574572de9c457ec4f5e03dd658e6cfacae9fda8febb35b3bb78a3",
+      "size": [
+        826,
+        460
+      ],
+      "derivation": {
+        "operation": "quadrant_crop",
+        "box": [
+          5,
+          5,
+          831,
+          465
+        ]
+      },
+      "provider": "Codex built-in imagegen",
+      "source": "art-source/zoo-environments.png",
+      "sourceSha256": "b7e9d1800cae76df32fc7ac43efa1f47e3608a4a035b99909d7b1f7a892dbd44",
+      "prompt": "Four original matte gouache scene tiles, kiosk with leafy gate, empty sandstone delivery court, pine paper workshop, and model animal park garden; no animals or text.",
+      "packaged": false
+    },
+    {
+      "key": "delivery-court",
+      "file": "assets/delivery-court.png",
+      "sourceType": "codex_imagegen",
+      "sha256": "a0b6c65d461de0058aca326ee4ecb07b68f495a203d2ac85551821ba165f62d2",
+      "size": [
+        826,
+        460
+      ],
+      "derivation": {
+        "operation": "quadrant_crop",
+        "box": [
+          841,
+          5,
+          1667,
+          465
+        ]
+      },
+      "provider": "Codex built-in imagegen",
+      "source": "art-source/zoo-environments.png",
+      "sourceSha256": "b7e9d1800cae76df32fc7ac43efa1f47e3608a4a035b99909d7b1f7a892dbd44",
+      "prompt": "Four original matte gouache scene tiles, kiosk with leafy gate, empty sandstone delivery court, pine paper workshop, and model animal park garden; no animals or text.",
+      "packaged": true
+    },
+    {
+      "key": "printing-workshop",
+      "file": "assets/printing-workshop.png",
+      "sourceType": "codex_imagegen",
+      "sha256": "6f35ab2a1e34b2af8e470dacaa2a5c5ed2ea3717cc92f0a7658f7c1e06d82eec",
+      "size": [
+        826,
+        460
+      ],
+      "derivation": {
+        "operation": "quadrant_crop",
+        "box": [
+          5,
+          475,
+          831,
+          935
+        ]
+      },
+      "provider": "Codex built-in imagegen",
+      "source": "art-source/zoo-environments.png",
+      "sourceSha256": "b7e9d1800cae76df32fc7ac43efa1f47e3608a4a035b99909d7b1f7a892dbd44",
+      "prompt": "Four original matte gouache scene tiles, kiosk with leafy gate, empty sandstone delivery court, pine paper workshop, and model animal park garden; no animals or text.",
+      "packaged": true
+    },
+    {
+      "key": "zoo-park",
+      "file": "assets/zoo-park.png",
+      "sourceType": "codex_imagegen",
+      "sha256": "35480c03c8caa63e28c9382ea72decb1d034941205f139c5ff132d31436962b7",
+      "size": [
+        826,
+        460
+      ],
+      "derivation": {
+        "operation": "quadrant_crop",
+        "box": [
+          841,
+          475,
+          1667,
+          935
+        ]
+      },
+      "provider": "Codex built-in imagegen",
+      "source": "art-source/zoo-environments.png",
+      "sourceSha256": "b7e9d1800cae76df32fc7ac43efa1f47e3608a4a035b99909d7b1f7a892dbd44",
+      "prompt": "Four original matte gouache scene tiles, kiosk with leafy gate, empty sandstone delivery court, pine paper workshop, and model animal park garden; no animals or text.",
+      "packaged": false
+    },
+    {
+      "key": "brown-monkey",
+      "file": "assets/brown-monkey.png",
+      "sourceType": "codex_imagegen",
+      "sha256": "1e7bd29352177f8a2546a9b825dbb0d0b01516e99c6aa01f8c5d6a5d065b3b93",
+      "size": [
+        369,
+        339
+      ],
+      "derivation": {
+        "operation": "crop_chroma",
+        "box": [
+          0,
+          0,
+          441,
+          435
+        ]
+      },
+      "provider": "Codex built-in imagegen",
+      "source": "art-source/teaching-animal-atlas.png",
+      "sourceSha256": "6f1e051af671a0948c596e8871d3a00063333dcc88a9770f3427fe833305b503",
+      "prompt": "Eight single matte gouache animals on chroma blue: brown monkey, white horse, brown horse, yellow-black tiger, yellow songbird, green songbird, grey elephant, green snake.",
+      "packaged": false
+    },
+    {
+      "key": "white-horse",
+      "file": "assets/white-horse.png",
+      "sourceType": "codex_imagegen",
+      "sha256": "5810ed749f9a89347806079414cdb1d82145e4abaf1cbe18796c7bf06569a0f8",
+      "size": [
+        384,
+        389
+      ],
+      "derivation": {
+        "operation": "crop_chroma",
+        "box": [
+          447,
+          0,
+          878,
+          435
+        ]
+      },
+      "provider": "Codex built-in imagegen",
+      "source": "art-source/teaching-animal-atlas.png",
+      "sourceSha256": "6f1e051af671a0948c596e8871d3a00063333dcc88a9770f3427fe833305b503",
+      "prompt": "Eight single matte gouache animals on chroma blue: brown monkey, white horse, brown horse, yellow-black tiger, yellow songbird, green songbird, grey elephant, green snake.",
+      "packaged": false
+    },
+    {
+      "key": "brown-horse",
+      "file": "assets/brown-horse.png",
+      "sourceType": "codex_imagegen",
+      "sha256": "b1b842f7d885df6197b4f9f3f1067da33267a3773171dc51f845503463519a9d",
+      "size": [
+        400,
+        389
+      ],
+      "derivation": {
+        "operation": "crop_chroma",
+        "box": [
+          883,
+          0,
+          1314,
+          435
+        ]
+      },
+      "provider": "Codex built-in imagegen",
+      "source": "art-source/teaching-animal-atlas.png",
+      "sourceSha256": "6f1e051af671a0948c596e8871d3a00063333dcc88a9770f3427fe833305b503",
+      "prompt": "Eight single matte gouache animals on chroma blue: brown monkey, white horse, brown horse, yellow-black tiger, yellow songbird, green songbird, grey elephant, green snake.",
+      "packaged": false
+    },
+    {
+      "key": "striped-tiger",
+      "file": "assets/striped-tiger.png",
+      "sourceType": "codex_imagegen",
+      "sha256": "9bdf3c8cf06781d4ba7bb107ee355f71a42e46db85aacf4c05cc840f6a1a1c77",
+      "size": [
+        432,
+        349
+      ],
+      "derivation": {
+        "operation": "crop_chroma",
+        "box": [
+          1319,
+          0,
+          1774,
+          435
+        ]
+      },
+      "provider": "Codex built-in imagegen",
+      "source": "art-source/teaching-animal-atlas.png",
+      "sourceSha256": "6f1e051af671a0948c596e8871d3a00063333dcc88a9770f3427fe833305b503",
+      "prompt": "Eight single matte gouache animals on chroma blue: brown monkey, white horse, brown horse, yellow-black tiger, yellow songbird, green songbird, grey elephant, green snake.",
+      "packaged": false
+    },
+    {
+      "key": "yellow-bird",
+      "file": "assets/yellow-bird.png",
+      "sourceType": "codex_imagegen",
+      "sha256": "88b951291cfbf87ca0bbecba53fcd91ee2e5c5c98d75a21ab2f975109f11ee80",
+      "size": [
+        345,
+        298
+      ],
+      "derivation": {
+        "operation": "crop_chroma",
+        "box": [
+          0,
+          445,
+          444,
+          887
+        ]
+      },
+      "provider": "Codex built-in imagegen",
+      "source": "art-source/teaching-animal-atlas.png",
+      "sourceSha256": "6f1e051af671a0948c596e8871d3a00063333dcc88a9770f3427fe833305b503",
+      "prompt": "Eight single matte gouache animals on chroma blue: brown monkey, white horse, brown horse, yellow-black tiger, yellow songbird, green songbird, grey elephant, green snake.",
+      "packaged": false
+    },
+    {
+      "key": "green-bird",
+      "file": "assets/green-bird.png",
+      "sourceType": "codex_imagegen",
+      "sha256": "608354bdb9996305aacb6b3aa3ea7a03c675055bbb0f7e71a7f2408af89bb35f",
+      "size": [
+        342,
+        298
+      ],
+      "derivation": {
+        "operation": "crop_chroma",
+        "box": [
+          447,
+          445,
+          868,
+          887
+        ]
+      },
+      "provider": "Codex built-in imagegen",
+      "source": "art-source/teaching-animal-atlas.png",
+      "sourceSha256": "6f1e051af671a0948c596e8871d3a00063333dcc88a9770f3427fe833305b503",
+      "prompt": "Eight single matte gouache animals on chroma blue: brown monkey, white horse, brown horse, yellow-black tiger, yellow songbird, green songbird, grey elephant, green snake.",
+      "packaged": false
+    },
+    {
+      "key": "grey-elephant",
+      "file": "assets/grey-elephant.png",
+      "sourceType": "codex_imagegen",
+      "sha256": "771d299ece786531da37c899e27002056e8f4eb57da3b6337a474132b7b4a7e5",
+      "size": [
+        445,
+        385
+      ],
+      "derivation": {
+        "operation": "crop_chroma",
+        "box": [
+          869,
+          445,
+          1321,
+          887
+        ]
+      },
+      "provider": "Codex built-in imagegen",
+      "source": "art-source/teaching-animal-atlas.png",
+      "sourceSha256": "6f1e051af671a0948c596e8871d3a00063333dcc88a9770f3427fe833305b503",
+      "prompt": "Eight single matte gouache animals on chroma blue: brown monkey, white horse, brown horse, yellow-black tiger, yellow songbird, green songbird, grey elephant, green snake.",
+      "packaged": false
+    },
+    {
+      "key": "green-snake",
+      "file": "assets/green-snake.png",
+      "sourceType": "codex_imagegen",
+      "sha256": "4eedc42fa8623fb4ddd5b5e9beaa5837e7d3f75dbfaf41b0a75aab1ebdcdc6ef",
+      "size": [
+        399,
+        218
+      ],
+      "derivation": {
+        "operation": "crop_chroma",
+        "box": [
+          1324,
+          445,
+          1774,
+          887
+        ]
+      },
+      "provider": "Codex built-in imagegen",
+      "source": "art-source/teaching-animal-atlas.png",
+      "sourceSha256": "6f1e051af671a0948c596e8871d3a00063333dcc88a9770f3427fe833305b503",
+      "prompt": "Eight single matte gouache animals on chroma blue: brown monkey, white horse, brown horse, yellow-black tiger, yellow songbird, green songbird, grey elephant, green snake.",
+      "packaged": false
+    },
+    {
+      "key": "new-brown-monkey",
+      "file": "assets/new-brown-monkey.png",
+      "sourceType": "codex_imagegen",
+      "sha256": "5acf27a5f2fa75026b74b4dd3009a347f7a6506951ac36bed326cb3ff8b5ea14",
+      "size": [
+        308,
+        340
+      ],
+      "derivation": {
+        "operation": "crop_chroma",
+        "box": [
+          12,
+          12,
+          434,
+          433
+        ]
+      },
+      "provider": "Codex built-in imagegen",
+      "source": "art-source/independent-quiz-atlas.png",
+      "sourceSha256": "66d4334cf0512155cb10c3e7658cb862dad35d439a6161d702f7ff50c3143c63",
+      "prompt": "Eight independent matte gouache alternate animals on chroma magenta, one animal per tile: monkey, white horse, brown horse, tiger, yellow bird, green bird, elephant, snake.",
+      "packaged": false
+    },
+    {
+      "key": "new-white-horse",
+      "file": "assets/new-white-horse.png",
+      "sourceType": "codex_imagegen",
+      "sha256": "df0cd87fc246da57efa92316eb5ca55fdaabd088372eae4cc7cbfba401c18248",
+      "size": [
+        401,
+        347
+      ],
+      "derivation": {
+        "operation": "crop_chroma",
+        "box": [
+          456,
+          12,
+          877,
+          433
+        ]
+      },
+      "provider": "Codex built-in imagegen",
+      "source": "art-source/independent-quiz-atlas.png",
+      "sourceSha256": "66d4334cf0512155cb10c3e7658cb862dad35d439a6161d702f7ff50c3143c63",
+      "prompt": "Eight independent matte gouache alternate animals on chroma magenta, one animal per tile: monkey, white horse, brown horse, tiger, yellow bird, green bird, elephant, snake.",
+      "packaged": false
+    },
+    {
+      "key": "new-brown-horse",
+      "file": "assets/new-brown-horse.png",
+      "sourceType": "codex_imagegen",
+      "sha256": "1881e231bf1d5e955843957275c5cf6016f198e249c66219ad66faa7e3565375",
+      "size": [
+        404,
+        353
+      ],
+      "derivation": {
+        "operation": "crop_chroma",
+        "box": [
+          899,
+          12,
+          1321,
+          433
+        ]
+      },
+      "provider": "Codex built-in imagegen",
+      "source": "art-source/independent-quiz-atlas.png",
+      "sourceSha256": "66d4334cf0512155cb10c3e7658cb862dad35d439a6161d702f7ff50c3143c63",
+      "prompt": "Eight independent matte gouache alternate animals on chroma magenta, one animal per tile: monkey, white horse, brown horse, tiger, yellow bird, green bird, elephant, snake.",
+      "packaged": false
+    },
+    {
+      "key": "new-striped-tiger",
+      "file": "assets/new-striped-tiger.png",
+      "sourceType": "codex_imagegen",
+      "sha256": "e4f2ec2d4fe66c18aac66924cbba636cbe5fa7ad8015cb4e17c4dfd8d10b9e92",
+      "size": [
+        414,
+        215
+      ],
+      "derivation": {
+        "operation": "crop_chroma",
+        "box": [
+          1342,
+          12,
+          1763,
+          433
+        ]
+      },
+      "provider": "Codex built-in imagegen",
+      "source": "art-source/independent-quiz-atlas.png",
+      "sourceSha256": "66d4334cf0512155cb10c3e7658cb862dad35d439a6161d702f7ff50c3143c63",
+      "prompt": "Eight independent matte gouache alternate animals on chroma magenta, one animal per tile: monkey, white horse, brown horse, tiger, yellow bird, green bird, elephant, snake.",
+      "packaged": false
+    },
+    {
+      "key": "new-yellow-bird",
+      "file": "assets/new-yellow-bird.png",
+      "sourceType": "codex_imagegen",
+      "sha256": "a952f30725c12b13d4be09d2d0dd7cbac1c1c87a554a0482db85131fdf1e7455",
+      "size": [
+        391,
+        302
+      ],
+      "derivation": {
+        "operation": "crop_chroma",
+        "box": [
+          12,
+          455,
+          434,
+          876
+        ]
+      },
+      "provider": "Codex built-in imagegen",
+      "source": "art-source/independent-quiz-atlas.png",
+      "sourceSha256": "66d4334cf0512155cb10c3e7658cb862dad35d439a6161d702f7ff50c3143c63",
+      "prompt": "Eight independent matte gouache alternate animals on chroma magenta, one animal per tile: monkey, white horse, brown horse, tiger, yellow bird, green bird, elephant, snake.",
+      "packaged": false
+    },
+    {
+      "key": "new-green-bird",
+      "file": "assets/new-green-bird.png",
+      "sourceType": "codex_imagegen",
+      "sha256": "401b82e3e5e5c21f62609208a6f21110f08a63d1f4574d6c368734471addc0e4",
+      "size": [
+        386,
+        278
+      ],
+      "derivation": {
+        "operation": "crop_chroma",
+        "box": [
+          456,
+          455,
+          877,
+          876
+        ]
+      },
+      "provider": "Codex built-in imagegen",
+      "source": "art-source/independent-quiz-atlas.png",
+      "sourceSha256": "66d4334cf0512155cb10c3e7658cb862dad35d439a6161d702f7ff50c3143c63",
+      "prompt": "Eight independent matte gouache alternate animals on chroma magenta, one animal per tile: monkey, white horse, brown horse, tiger, yellow bird, green bird, elephant, snake.",
+      "packaged": false
+    },
+    {
+      "key": "new-grey-elephant",
+      "file": "assets/new-grey-elephant.png",
+      "sourceType": "codex_imagegen",
+      "sha256": "3dc355cfb5157b0faff5e845f213db19b96e8ffb8b52bb7fa6df624661b0d146",
+      "size": [
+        405,
+        296
+      ],
+      "derivation": {
+        "operation": "crop_chroma",
+        "box": [
+          899,
+          455,
+          1321,
+          876
+        ]
+      },
+      "provider": "Codex built-in imagegen",
+      "source": "art-source/independent-quiz-atlas.png",
+      "sourceSha256": "66d4334cf0512155cb10c3e7658cb862dad35d439a6161d702f7ff50c3143c63",
+      "prompt": "Eight independent matte gouache alternate animals on chroma magenta, one animal per tile: monkey, white horse, brown horse, tiger, yellow bird, green bird, elephant, snake.",
+      "packaged": false
+    },
+    {
+      "key": "new-green-snake",
+      "file": "assets/new-green-snake.png",
+      "sourceType": "codex_imagegen",
+      "sha256": "7238ce58d80e20b4c4933bd67cb4bd0aafe3015d4c9fac5408cfcee5a0061a61",
+      "size": [
+        411,
+        113
+      ],
+      "derivation": {
+        "operation": "crop_chroma",
+        "box": [
+          1342,
+          455,
+          1763,
+          876
+        ]
+      },
+      "provider": "Codex built-in imagegen",
+      "source": "art-source/independent-quiz-atlas.png",
+      "sourceSha256": "66d4334cf0512155cb10c3e7658cb862dad35d439a6161d702f7ff50c3143c63",
+      "prompt": "Eight independent matte gouache alternate animals on chroma magenta, one animal per tile: monkey, white horse, brown horse, tiger, yellow bird, green bird, elephant, snake.",
+      "packaged": false
+    },
+    {
+      "key": "zoo-rover",
+      "file": "assets/zoo-rover.png",
+      "sourceType": "codex_imagegen",
+      "sha256": "7467b1460979ac044bd81943dfd9691d5b28312a22be02acfd84957e1b7fa5f8",
+      "size": [
+        467,
+        411
+      ],
+      "derivation": {
+        "operation": "crop_chroma",
+        "box": [
+          0,
+          0,
+          765,
+          510
+        ]
+      },
+      "provider": "Codex built-in imagegen",
+      "source": "art-source/game-props-atlas.png",
+      "sourceSha256": "d52a1fa41454cd91da479f732177c9af932535b65d4c745f74fc50e7b263e26f",
+      "prompt": "Four original vehicle and badge sprites on magenta: teal delivery rover, persimmon obstacle rover, ochre picture-card push cart, brown monkey-tail badge.",
+      "packaged": true
+    },
+    {
+      "key": "obstacle-rover",
+      "file": "assets/obstacle-rover.png",
+      "sourceType": "codex_imagegen",
+      "sha256": "c2a2b5cfe378ec13b63ca870a1b5ac9985c2c236ecda865531d13dd8d0b8dddc",
+      "size": [
+        486,
+        412
+      ],
+      "derivation": {
+        "operation": "crop_chroma",
+        "box": [
+          771,
+          0,
+          1536,
+          510
+        ]
+      },
+      "provider": "Codex built-in imagegen",
+      "source": "art-source/game-props-atlas.png",
+      "sourceSha256": "d52a1fa41454cd91da479f732177c9af932535b65d4c745f74fc50e7b263e26f",
+      "prompt": "Four original vehicle and badge sprites on magenta: teal delivery rover, persimmon obstacle rover, ochre picture-card push cart, brown monkey-tail badge.",
+      "packaged": true
+    },
+    {
+      "key": "print-cart",
+      "file": "assets/print-cart.png",
+      "sourceType": "codex_imagegen",
+      "sha256": "cde33b37196ca5d002f1f205abfa69c0f9cf61ee48af4b1a6c2268cc4559f118",
+      "size": [
+        429,
+        438
+      ],
+      "derivation": {
+        "operation": "crop_chroma",
+        "box": [
+          0,
+          516,
+          765,
+          1024
+        ]
+      },
+      "provider": "Codex built-in imagegen",
+      "source": "art-source/game-props-atlas.png",
+      "sourceSha256": "d52a1fa41454cd91da479f732177c9af932535b65d4c745f74fc50e7b263e26f",
+      "prompt": "Four original vehicle and badge sprites on magenta: teal delivery rover, persimmon obstacle rover, ochre picture-card push cart, brown monkey-tail badge.",
+      "packaged": true
+    },
+    {
+      "key": "monkey-badge",
+      "file": "assets/monkey-badge.png",
+      "sourceType": "codex_imagegen",
+      "sha256": "918c46e0a7f949596ec6dc21286da0bf37d8e915e680bfe808adab011b4e757a",
+      "size": [
+        436,
+        438
+      ],
+      "derivation": {
+        "operation": "crop_chroma",
+        "box": [
+          771,
+          516,
+          1536,
+          1024
+        ]
+      },
+      "provider": "Codex built-in imagegen",
+      "source": "art-source/game-props-atlas.png",
+      "sourceSha256": "d52a1fa41454cd91da479f732177c9af932535b65d4c745f74fc50e7b263e26f",
+      "prompt": "Four original vehicle and badge sprites on magenta: teal delivery rover, persimmon obstacle rover, ochre picture-card push cart, brown monkey-tail badge.",
+      "packaged": true
+    },
+    {
+      "key": "one-monkey",
+      "file": "assets/one-monkey.png",
+      "sourceType": "code_drawn",
+      "sha256": "896f4a666fa3b06091ff72b28c6e24c9563c7339000b050efd53570c001ae420",
+      "size": [
+        560,
+        294
+      ],
+      "derivation": {
+        "operation": "exact_group_layout",
+        "count": 1,
+        "sprite": "brown-monkey",
+        "boxes": [
+          [
+            178,
+            51,
+            382,
+            238
+          ]
+        ],
+        "palette": [
+          "#f4e6cd",
+          "#d7b985",
+          "#876c48"
+        ],
+        "variant": 0
+      },
+      "packaged": true
+    },
+    {
+      "key": "three-monkeys",
+      "file": "assets/three-monkeys.png",
+      "sourceType": "code_drawn",
+      "sha256": "ad4504b14e2cdb980527c91d1b53038ed4af52176b79722a077e9389586d294b",
+      "size": [
+        560,
+        294
+      ],
+      "derivation": {
+        "operation": "exact_group_layout",
+        "count": 3,
+        "sprite": "brown-monkey",
+        "boxes": [
+          [
+            29,
+            75,
+            185,
+            218
+          ],
+          [
+            201,
+            53,
+            356,
+            195
+          ],
+          [
+            373,
+            78,
+            529,
+            221
+          ]
+        ],
+        "palette": [
+          "#dfead7",
+          "#a6c48f",
+          "#72895c"
+        ],
+        "variant": 0
+      },
+      "packaged": true
+    },
+    {
+      "key": "four-monkeys",
+      "file": "assets/four-monkeys.png",
+      "sourceType": "code_drawn",
+      "sha256": "4e52ae6d5fe7137104fbba1543535821051502fc1561d547aacfd51609ed6d42",
+      "size": [
+        560,
+        294
+      ],
+      "derivation": {
+        "operation": "exact_group_layout",
+        "count": 4,
+        "sprite": "brown-monkey",
+        "boxes": [
+          [
+            142,
+            25,
+            256,
+            130
+          ],
+          [
+            292,
+            25,
+            406,
+            130
+          ],
+          [
+            142,
+            141,
+            256,
+            246
+          ],
+          [
+            292,
+            141,
+            406,
+            246
+          ]
+        ],
+        "palette": [
+          "#dfead7",
+          "#a6c48f",
+          "#72895c"
+        ],
+        "variant": 0
+      },
+      "packaged": true
+    },
+    {
+      "key": "two-white-horses",
+      "file": "assets/two-white-horses.png",
+      "sourceType": "code_drawn",
+      "sha256": "5ee3c9e45dbe0ef8f01370419b1e0a8f60957bacabb67ca2091db2d2a26a91e1",
+      "size": [
+        560,
+        294
+      ],
+      "derivation": {
+        "operation": "exact_group_layout",
+        "count": 2,
+        "sprite": "white-horse",
+        "boxes": [
+          [
+            73,
+            54,
+            257,
+            240
+          ],
+          [
+            303,
+            54,
+            487,
+            240
+          ]
+        ],
+        "palette": [
+          "#dfead7",
+          "#a6c48f",
+          "#72895c"
+        ],
+        "variant": 0
+      },
+      "packaged": true
+    },
+    {
+      "key": "three-white-horses",
+      "file": "assets/three-white-horses.png",
+      "sourceType": "code_drawn",
+      "sha256": "5d320cb94bb8da68a7d2440f210c09e42ca45cff08ed75cb48db92f1f1a50066",
+      "size": [
+        560,
+        294
+      ],
+      "derivation": {
+        "operation": "exact_group_layout",
+        "count": 3,
+        "sprite": "white-horse",
+        "boxes": [
+          [
+            32,
+            71,
+            182,
+            223
+          ],
+          [
+            203,
+            48,
+            354,
+            201
+          ],
+          [
+            375,
+            73,
+            527,
+            227
+          ]
+        ],
+        "palette": [
+          "#dfead7",
+          "#a6c48f",
+          "#72895c"
+        ],
+        "variant": 0
+      },
+      "packaged": true
+    },
+    {
+      "key": "four-white-horses",
+      "file": "assets/four-white-horses.png",
+      "sourceType": "code_drawn",
+      "sha256": "50dc4c179c801bdd5fd814b7efae1c91b285e9074c4fda6ff6d626068ec6f7d1",
+      "size": [
+        560,
+        294
+      ],
+      "derivation": {
+        "operation": "exact_group_layout",
+        "count": 4,
+        "sprite": "white-horse",
+        "boxes": [
+          [
+            147,
+            25,
+            251,
+            130
+          ],
+          [
+            297,
+            25,
+            401,
+            130
+          ],
+          [
+            147,
+            141,
+            251,
+            246
+          ],
+          [
+            297,
+            141,
+            401,
+            246
+          ]
+        ],
+        "palette": [
+          "#dfead7",
+          "#a6c48f",
+          "#72895c"
+        ],
+        "variant": 0
+      },
+      "packaged": false
+    },
+    {
+      "key": "five-white-horses",
+      "file": "assets/five-white-horses.png",
+      "sourceType": "code_drawn",
+      "sha256": "8cc81654713824f52f5c05c873bf785c57cf9cf469013a00356a22d8468fa881",
+      "size": [
+        560,
+        294
+      ],
+      "derivation": {
+        "operation": "exact_group_layout",
+        "count": 5,
+        "sprite": "white-horse",
+        "boxes": [
+          [
+            72,
+            25,
+            176,
+            130
+          ],
+          [
+            222,
+            25,
+            326,
+            130
+          ],
+          [
+            372,
+            25,
+            476,
+            130
+          ],
+          [
+            147,
+            141,
+            251,
+            246
+          ],
+          [
+            297,
+            141,
+            401,
+            246
+          ]
+        ],
+        "palette": [
+          "#dfead7",
+          "#a6c48f",
+          "#72895c"
+        ],
+        "variant": 0
+      },
+      "packaged": true
+    },
+    {
+      "key": "one-brown-horse",
+      "file": "assets/one-brown-horse.png",
+      "sourceType": "code_drawn",
+      "sha256": "ab13f6de4ad0c2d4deff039d3d56f3a7b5d977213248b22d65de3034c5d5122f",
+      "size": [
+        560,
+        294
+      ],
+      "derivation": {
+        "operation": "exact_group_layout",
+        "count": 1,
+        "sprite": "brown-horse",
+        "boxes": [
+          [
+            178,
+            46,
+            382,
+            244
+          ]
+        ],
+        "palette": [
+          "#dfead7",
+          "#a6c48f",
+          "#72895c"
+        ],
+        "variant": 0
+      },
+      "packaged": false
+    },
+    {
+      "key": "two-brown-horses",
+      "file": "assets/two-brown-horses.png",
+      "sourceType": "code_drawn",
+      "sha256": "464681d8bd15716150f995389a05f197975b5bbd2e3519651b0f3b4fecab56c5",
+      "size": [
+        560,
+        294
+      ],
+      "derivation": {
+        "operation": "exact_group_layout",
+        "count": 2,
+        "sprite": "brown-horse",
+        "boxes": [
+          [
+            69,
+            54,
+            260,
+            240
+          ],
+          [
+            299,
+            54,
+            490,
+            240
+          ]
+        ],
+        "palette": [
+          "#dfead7",
+          "#a6c48f",
+          "#72895c"
+        ],
+        "variant": 0
+      },
+      "packaged": true
+    },
+    {
+      "key": "four-brown-horses",
+      "file": "assets/four-brown-horses.png",
+      "sourceType": "code_drawn",
+      "sha256": "b83518c1edc7890d4b3cc186cfd6d74d4021e68d5f700058e293bea5de346d89",
+      "size": [
+        560,
+        294
+      ],
+      "derivation": {
+        "operation": "exact_group_layout",
+        "count": 4,
+        "sprite": "brown-horse",
+        "boxes": [
+          [
+            145,
+            25,
+            253,
+            130
+          ],
+          [
+            295,
+            25,
+            403,
+            130
+          ],
+          [
+            145,
+            141,
+            253,
+            246
+          ],
+          [
+            295,
+            141,
+            403,
+            246
+          ]
+        ],
+        "palette": [
+          "#dfead7",
+          "#a6c48f",
+          "#72895c"
+        ],
+        "variant": 0
+      },
+      "packaged": true
+    },
+    {
+      "key": "five-brown-horses",
+      "file": "assets/five-brown-horses.png",
+      "sourceType": "code_drawn",
+      "sha256": "9a58c4f8b859a86cb6692b36b2a5aa153bf311d446a57293383b6e49a7130086",
+      "size": [
+        560,
+        294
+      ],
+      "derivation": {
+        "operation": "exact_group_layout",
+        "count": 5,
+        "sprite": "brown-horse",
+        "boxes": [
+          [
+            70,
+            25,
+            178,
+            130
+          ],
+          [
+            220,
+            25,
+            328,
+            130
+          ],
+          [
+            370,
+            25,
+            478,
+            130
+          ],
+          [
+            145,
+            141,
+            253,
+            246
+          ],
+          [
+            295,
+            141,
+            403,
+            246
+          ]
+        ],
+        "palette": [
+          "#dfead7",
+          "#a6c48f",
+          "#72895c"
+        ],
+        "variant": 0
+      },
+      "packaged": false
+    },
+    {
+      "key": "seven-tigers",
+      "file": "assets/seven-tigers.png",
+      "sourceType": "code_drawn",
+      "sha256": "17746b8244b344b94c0c56793dd7fbc328ce07a9033670d03aa795b77f4b6d08",
+      "size": [
+        560,
+        294
+      ],
+      "derivation": {
+        "operation": "exact_group_layout",
+        "count": 7,
+        "sprite": "striped-tiger",
+        "boxes": [
+          [
+            32,
+            32,
+            144,
+            122
+          ],
+          [
+            156,
+            32,
+            268,
+            122
+          ],
+          [
+            280,
+            32,
+            392,
+            122
+          ],
+          [
+            404,
+            32,
+            516,
+            122
+          ],
+          [
+            94,
+            148,
+            206,
+            238
+          ],
+          [
+            218,
+            148,
+            330,
+            238
+          ],
+          [
+            342,
+            148,
+            454,
+            238
+          ]
+        ],
+        "palette": [
+          "#dfead7",
+          "#a6c48f",
+          "#72895c"
+        ],
+        "variant": 0
+      },
+      "packaged": true
+    },
+    {
+      "key": "one-tiger",
+      "file": "assets/one-tiger.png",
+      "sourceType": "code_drawn",
+      "sha256": "345844263c3bdae42d17554f78289170cb14e0da07126caadb3a32340bbe097f",
+      "size": [
+        560,
+        294
+      ],
+      "derivation": {
+        "operation": "exact_group_layout",
+        "count": 1,
+        "sprite": "striped-tiger",
+        "boxes": [
+          [
+            178,
+            62,
+            382,
+            227
+          ]
+        ],
+        "palette": [
+          "#f4e6cd",
+          "#d7b985",
+          "#876c48"
+        ],
+        "variant": 0
+      },
+      "packaged": true
+    },
+    {
+      "key": "three-tigers",
+      "file": "assets/three-tigers.png",
+      "sourceType": "code_drawn",
+      "sha256": "4941169724fb6b3601af8159ff6bb81738c8666c1a25484dc97d18fd113f1b07",
+      "size": [
+        560,
+        294
+      ],
+      "derivation": {
+        "operation": "exact_group_layout",
+        "count": 3,
+        "sprite": "striped-tiger",
+        "boxes": [
+          [
+            29,
+            84,
+            185,
+            210
+          ],
+          [
+            201,
+            62,
+            356,
+            187
+          ],
+          [
+            373,
+            87,
+            529,
+            213
+          ]
+        ],
+        "palette": [
+          "#dfead7",
+          "#a6c48f",
+          "#72895c"
+        ],
+        "variant": 0
+      },
+      "packaged": true
+    },
+    {
+      "key": "one-yellow-bird",
+      "file": "assets/one-yellow-bird.png",
+      "sourceType": "code_drawn",
+      "sha256": "dea8698d14eb89671ac75fb7eabc1551c0e2719914237514a44b3d00bb919619",
+      "size": [
+        560,
+        294
+      ],
+      "derivation": {
+        "operation": "exact_group_layout",
+        "count": 1,
+        "sprite": "yellow-bird",
+        "boxes": [
+          [
+            178,
+            57,
+            382,
+            233
+          ]
+        ],
+        "palette": [
+          "#dfead7",
+          "#a6c48f",
+          "#72895c"
+        ],
+        "variant": 0
+      },
+      "packaged": true
+    },
+    {
+      "key": "four-yellow-birds",
+      "file": "assets/four-yellow-birds.png",
+      "sourceType": "code_drawn",
+      "sha256": "72e037fd3d30779686029e318976098d0ea1340856cdacd2c6d092b5046d22bc",
+      "size": [
+        560,
+        294
+      ],
+      "derivation": {
+        "operation": "exact_group_layout",
+        "count": 4,
+        "sprite": "yellow-bird",
+        "boxes": [
+          [
+            138,
+            25,
+            260,
+            130
+          ],
+          [
+            288,
+            25,
+            410,
+            130
+          ],
+          [
+            138,
+            141,
+            260,
+            246
+          ],
+          [
+            288,
+            141,
+            410,
+            246
+          ]
+        ],
+        "palette": [
+          "#dfead7",
+          "#a6c48f",
+          "#72895c"
+        ],
+        "variant": 0
+      },
+      "packaged": true
+    },
+    {
+      "key": "five-yellow-birds",
+      "file": "assets/five-yellow-birds.png",
+      "sourceType": "code_drawn",
+      "sha256": "341509c23d2e51a265d678dbbb57bd8fec0f019c3c211e6548e35c630d1f984b",
+      "size": [
+        560,
+        294
+      ],
+      "derivation": {
+        "operation": "exact_group_layout",
+        "count": 5,
+        "sprite": "yellow-bird",
+        "boxes": [
+          [
+            63,
+            25,
+            185,
+            130
+          ],
+          [
+            213,
+            25,
+            335,
+            130
+          ],
+          [
+            363,
+            25,
+            485,
+            130
+          ],
+          [
+            138,
+            141,
+            260,
+            246
+          ],
+          [
+            288,
+            141,
+            410,
+            246
+          ]
+        ],
+        "palette": [
+          "#dfead7",
+          "#a6c48f",
+          "#72895c"
+        ],
+        "variant": 0
+      },
+      "packaged": true
+    },
+    {
+      "key": "one-green-bird",
+      "file": "assets/one-green-bird.png",
+      "sourceType": "code_drawn",
+      "sha256": "af5f9382157eb10af898fab689a9c629c4b25327b0968b9e70cc877569289687",
+      "size": [
+        560,
+        294
+      ],
+      "derivation": {
+        "operation": "exact_group_layout",
+        "count": 1,
+        "sprite": "green-bird",
+        "boxes": [
+          [
+            178,
+            56,
+            382,
+            234
+          ]
+        ],
+        "palette": [
+          "#f4e6cd",
+          "#d7b985",
+          "#876c48"
+        ],
+        "variant": 0
+      },
+      "packaged": true
+    },
+    {
+      "key": "three-green-birds",
+      "file": "assets/three-green-birds.png",
+      "sourceType": "code_drawn",
+      "sha256": "698ced56cf4f95840339eaef985264146d47ee841288587e7f955d796b005e6d",
+      "size": [
+        560,
+        294
+      ],
+      "derivation": {
+        "operation": "exact_group_layout",
+        "count": 3,
+        "sprite": "green-bird",
+        "boxes": [
+          [
+            29,
+            79,
+            185,
+            215
+          ],
+          [
+            201,
+            57,
+            356,
+            192
+          ],
+          [
+            373,
+            82,
+            529,
+            218
+          ]
+        ],
+        "palette": [
+          "#dfead7",
+          "#a6c48f",
+          "#72895c"
+        ],
+        "variant": 0
+      },
+      "packaged": true
+    },
+    {
+      "key": "five-green-birds",
+      "file": "assets/five-green-birds.png",
+      "sourceType": "code_drawn",
+      "sha256": "5f5b31f2892aa21456a43f27e39349659d7cc5b13e63f7df9f4886a33e1b7bdd",
+      "size": [
+        560,
+        294
+      ],
+      "derivation": {
+        "operation": "exact_group_layout",
+        "count": 5,
+        "sprite": "green-bird",
+        "boxes": [
+          [
+            63,
+            25,
+            184,
+            130
+          ],
+          [
+            213,
+            25,
+            334,
+            130
+          ],
+          [
+            363,
+            25,
+            484,
+            130
+          ],
+          [
+            138,
+            141,
+            259,
+            246
+          ],
+          [
+            288,
+            141,
+            409,
+            246
+          ]
+        ],
+        "palette": [
+          "#dfead7",
+          "#a6c48f",
+          "#72895c"
+        ],
+        "variant": 0
+      },
+      "packaged": true
+    },
+    {
+      "key": "six-green-birds",
+      "file": "assets/six-green-birds.png",
+      "sourceType": "code_drawn",
+      "sha256": "0aa63d63e199bb3fc273ce09783568ec76b81b0b6cf56b0c21d433ee30bceef4",
+      "size": [
+        560,
+        294
+      ],
+      "derivation": {
+        "operation": "exact_group_layout",
+        "count": 6,
+        "sprite": "green-bird",
+        "boxes": [
+          [
+            63,
+            25,
+            184,
+            130
+          ],
+          [
+            213,
+            25,
+            334,
+            130
+          ],
+          [
+            363,
+            25,
+            484,
+            130
+          ],
+          [
+            63,
+            141,
+            184,
+            246
+          ],
+          [
+            213,
+            141,
+            334,
+            246
+          ],
+          [
+            363,
+            141,
+            484,
+            246
+          ]
+        ],
+        "palette": [
+          "#dfead7",
+          "#a6c48f",
+          "#72895c"
+        ],
+        "variant": 0
+      },
+      "packaged": true
+    },
+    {
+      "key": "one-elephant",
+      "file": "assets/one-elephant.png",
+      "sourceType": "code_drawn",
+      "sha256": "685ef5b6f13828bf97515b428dd29d0ed53b19671d2d0136eaa07aed8e4ffffe",
+      "size": [
+        560,
+        294
+      ],
+      "derivation": {
+        "operation": "exact_group_layout",
+        "count": 1,
+        "sprite": "grey-elephant",
+        "boxes": [
+          [
+            178,
+            57,
+            382,
+            233
+          ]
+        ],
+        "palette": [
+          "#f4e6cd",
+          "#d7b985",
+          "#876c48"
+        ],
+        "variant": 0
+      },
+      "packaged": true
+    },
+    {
+      "key": "three-elephants",
+      "file": "assets/three-elephants.png",
+      "sourceType": "code_drawn",
+      "sha256": "ead3790c5375ae220cae187b7e6c985318eadfb42d43540a017fa9dd87f4b3dc",
+      "size": [
+        560,
+        294
+      ],
+      "derivation": {
+        "operation": "exact_group_layout",
+        "count": 3,
+        "sprite": "grey-elephant",
+        "boxes": [
+          [
+            29,
+            79,
+            185,
+            214
+          ],
+          [
+            201,
+            57,
+            356,
+            191
+          ],
+          [
+            373,
+            82,
+            529,
+            217
+          ]
+        ],
+        "palette": [
+          "#dfead7",
+          "#a6c48f",
+          "#72895c"
+        ],
+        "variant": 0
+      },
+      "packaged": true
+    },
+    {
+      "key": "five-green-snakes",
+      "file": "assets/five-green-snakes.png",
+      "sourceType": "code_drawn",
+      "sha256": "793cc659589b51013f552023385810fce64144e2ccf711e4a4dcf3a5999c76cc",
+      "size": [
+        560,
+        294
+      ],
+      "derivation": {
+        "operation": "exact_group_layout",
+        "count": 5,
+        "sprite": "green-snake",
+        "boxes": [
+          [
+            55,
+            40,
+            193,
+            115
+          ],
+          [
+            205,
+            40,
+            343,
+            115
+          ],
+          [
+            355,
+            40,
+            493,
+            115
+          ],
+          [
+            130,
+            156,
+            268,
+            231
+          ],
+          [
+            280,
+            156,
+            418,
+            231
+          ]
+        ],
+        "palette": [
+          "#dfead7",
+          "#a6c48f",
+          "#72895c"
+        ],
+        "variant": 0
+      },
+      "packaged": true
+    },
+    {
+      "key": "q1-two-brown-horses",
+      "file": "assets/q1-two-brown-horses.png",
+      "sourceType": "code_drawn",
+      "sha256": "a5f4d88bfd0b983d9d26b9ca7ff320f4618c352baf55088e97a761ff0bf4b6ad",
+      "size": [
+        560,
+        294
+      ],
+      "derivation": {
+        "operation": "exact_group_layout",
+        "count": 2,
+        "sprite": "new-brown-horse",
+        "boxes": [
+          [
+            64,
+            59,
+            266,
+            235
+          ],
+          [
+            294,
+            59,
+            496,
+            235
+          ]
+        ],
+        "palette": [
+          "#e5d4c7",
+          "#ba9f87",
+          "#7f6a55"
+        ],
+        "variant": 1
+      },
+      "packaged": true
+    },
+    {
+      "key": "q1-one-brown-horse",
+      "file": "assets/q1-one-brown-horse.png",
+      "sourceType": "code_drawn",
+      "sha256": "66402e3c6fa8d8b4341bcf6103906398445147c12fce9612a89d323f916ee633",
+      "size": [
+        560,
+        294
+      ],
+      "derivation": {
+        "operation": "exact_group_layout",
+        "count": 1,
+        "sprite": "new-brown-horse",
+        "boxes": [
+          [
+            178,
+            56,
+            382,
+            234
+          ]
+        ],
+        "palette": [
+          "#e5d4c7",
+          "#ba9f87",
+          "#7f6a55"
+        ],
+        "variant": 1
+      },
+      "packaged": true
+    },
+    {
+      "key": "q1-one-monkey",
+      "file": "assets/q1-one-monkey.png",
+      "sourceType": "code_drawn",
+      "sha256": "4583d6d5d76ce68a50ac1e3044dad0664cb2d73ba4b86fd912635b61c5df0315",
+      "size": [
+        560,
+        294
+      ],
+      "derivation": {
+        "operation": "exact_group_layout",
+        "count": 1,
+        "sprite": "new-brown-monkey",
+        "boxes": [
+          [
+            189,
+            45,
+            370,
+            245
+          ]
+        ],
+        "palette": [
+          "#e5d4c7",
+          "#ba9f87",
+          "#7f6a55"
+        ],
+        "variant": 1
+      },
+      "packaged": true
+    },
+    {
+      "key": "q2-four-white-horses",
+      "file": "assets/q2-four-white-horses.png",
+      "sourceType": "code_drawn",
+      "sha256": "b4eccb0bcdb49a2917cea794a3dd27dd83916815a67d4c2c83e00bc9c6944924",
+      "size": [
+        560,
+        294
+      ],
+      "derivation": {
+        "operation": "exact_group_layout",
+        "count": 4,
+        "sprite": "new-white-horse",
+        "boxes": [
+          [
+            138,
+            25,
+            259,
+            130
+          ],
+          [
+            288,
+            25,
+            409,
+            130
+          ],
+          [
+            138,
+            141,
+            259,
+            246
+          ],
+          [
+            288,
+            141,
+            409,
+            246
+          ]
+        ],
+        "palette": [
+          "#d6eadf",
+          "#a2c4af",
+          "#547965"
+        ],
+        "variant": 1
+      },
+      "packaged": true
+    },
+    {
+      "key": "q2-four-brown-horses",
+      "file": "assets/q2-four-brown-horses.png",
+      "sourceType": "code_drawn",
+      "sha256": "72d7ca454a1892f17099723dd397b2d667cd97d6c3b2013389de124272589d06",
+      "size": [
+        560,
+        294
+      ],
+      "derivation": {
+        "operation": "exact_group_layout",
+        "count": 4,
+        "sprite": "new-brown-horse",
+        "boxes": [
+          [
+            139,
+            25,
+            259,
+            130
+          ],
+          [
+            289,
+            25,
+            409,
+            130
+          ],
+          [
+            139,
+            141,
+            259,
+            246
+          ],
+          [
+            289,
+            141,
+            409,
+            246
+          ]
+        ],
+        "palette": [
+          "#d6eadf",
+          "#a2c4af",
+          "#547965"
+        ],
+        "variant": 1
+      },
+      "packaged": true
+    },
+    {
+      "key": "q2-three-white-horses",
+      "file": "assets/q2-three-white-horses.png",
+      "sourceType": "code_drawn",
+      "sha256": "df314a8f73ab3322063337aee18aee4616af2095d311af4cb11f63429df241d2",
+      "size": [
+        560,
+        294
+      ],
+      "derivation": {
+        "operation": "exact_group_layout",
+        "count": 3,
+        "sprite": "new-white-horse",
+        "boxes": [
+          [
+            29,
+            79,
+            185,
+            214
+          ],
+          [
+            201,
+            57,
+            356,
+            191
+          ],
+          [
+            373,
+            82,
+            529,
+            217
+          ]
+        ],
+        "palette": [
+          "#d6eadf",
+          "#a2c4af",
+          "#547965"
+        ],
+        "variant": 1
+      },
+      "packaged": true
+    },
+    {
+      "key": "q3-four-green-birds",
+      "file": "assets/q3-four-green-birds.png",
+      "sourceType": "code_drawn",
+      "sha256": "7ee54db373781f42e0da0ea4d75c2c5b8a29bd04a6e8dfaaf437214f7e1f637d",
+      "size": [
+        560,
+        294
+      ],
+      "derivation": {
+        "operation": "exact_group_layout",
+        "count": 4,
+        "sprite": "new-green-bird",
+        "boxes": [
+          [
+            130,
+            28,
+            268,
+            127
+          ],
+          [
+            280,
+            28,
+            418,
+            127
+          ],
+          [
+            130,
+            144,
+            268,
+            243
+          ],
+          [
+            280,
+            144,
+            418,
+            243
+          ]
+        ],
+        "palette": [
+          "#faeed3",
+          "#d9c183",
+          "#8f7847"
+        ],
+        "variant": 1
+      },
+      "packaged": true
+    },
+    {
+      "key": "q3-five-green-snakes",
+      "file": "assets/q3-five-green-snakes.png",
+      "sourceType": "code_drawn",
+      "sha256": "d7638eb64ec1d29388e6bfeee044bfbda350ff8ea89a38b7301c1440e0cc51f0",
+      "size": [
+        560,
+        294
+      ],
+      "derivation": {
+        "operation": "exact_group_layout",
+        "count": 5,
+        "sprite": "new-green-snake",
+        "boxes": [
+          [
+            130,
+            58,
+            268,
+            96
+          ],
+          [
+            280,
+            58,
+            418,
+            96
+          ],
+          [
+            55,
+            174,
+            193,
+            212
+          ],
+          [
+            205,
+            174,
+            343,
+            212
+          ],
+          [
+            355,
+            174,
+            493,
+            212
+          ]
+        ],
+        "palette": [
+          "#faeed3",
+          "#d9c183",
+          "#8f7847"
+        ],
+        "variant": 1
+      },
+      "packaged": true
+    },
+    {
+      "key": "q3-four-green-snakes",
+      "file": "assets/q3-four-green-snakes.png",
+      "sourceType": "code_drawn",
+      "sha256": "96527175ac98e2828de9df4052665624bdb75c5d4837a3ef86645b46f902ff0b",
+      "size": [
+        560,
+        294
+      ],
+      "derivation": {
+        "operation": "exact_group_layout",
+        "count": 4,
+        "sprite": "new-green-snake",
+        "boxes": [
+          [
+            130,
+            58,
+            268,
+            96
+          ],
+          [
+            280,
+            58,
+            418,
+            96
+          ],
+          [
+            130,
+            174,
+            268,
+            212
+          ],
+          [
+            280,
+            174,
+            418,
+            212
+          ]
+        ],
+        "palette": [
+          "#faeed3",
+          "#d9c183",
+          "#8f7847"
+        ],
+        "variant": 1
+      },
+      "packaged": true
+    },
+    {
+      "key": "q4-five-tigers",
+      "file": "assets/q4-five-tigers.png",
+      "sourceType": "code_drawn",
+      "sha256": "3fee307780e0d59b0a1e63440abcdb78f55ce70d4ee79806e5a87cf51fffa0da",
+      "size": [
+        560,
+        294
+      ],
+      "derivation": {
+        "operation": "exact_group_layout",
+        "count": 5,
+        "sprite": "new-striped-tiger",
+        "boxes": [
+          [
+            130,
+            41,
+            268,
+            113
+          ],
+          [
+            280,
+            41,
+            418,
+            113
+          ],
+          [
+            55,
+            157,
+            193,
+            229
+          ],
+          [
+            205,
+            157,
+            343,
+            229
+          ],
+          [
+            355,
+            157,
+            493,
+            229
+          ]
+        ],
+        "palette": [
+          "#eadfcf",
+          "#c2ac8b",
+          "#837157"
+        ],
+        "variant": 1
+      },
+      "packaged": true
+    },
+    {
+      "key": "q4-six-tigers",
+      "file": "assets/q4-six-tigers.png",
+      "sourceType": "code_drawn",
+      "sha256": "be19ed2170c56b046af91010687b1beb5af908a63d2c7c9c36e0feee152f51dd",
+      "size": [
+        560,
+        294
+      ],
+      "derivation": {
+        "operation": "exact_group_layout",
+        "count": 6,
+        "sprite": "new-striped-tiger",
+        "boxes": [
+          [
+            55,
+            41,
+            193,
+            113
+          ],
+          [
+            205,
+            41,
+            343,
+            113
+          ],
+          [
+            355,
+            41,
+            493,
+            113
+          ],
+          [
+            55,
+            157,
+            193,
+            229
+          ],
+          [
+            205,
+            157,
+            343,
+            229
+          ],
+          [
+            355,
+            157,
+            493,
+            229
+          ]
+        ],
+        "palette": [
+          "#eadfcf",
+          "#c2ac8b",
+          "#837157"
+        ],
+        "variant": 1
+      },
+      "packaged": true
+    },
+    {
+      "key": "q4-seven-tigers",
+      "file": "assets/q4-seven-tigers.png",
+      "sourceType": "code_drawn",
+      "sha256": "f470a8d5f56f907797d1e4e84f96ed1e8dd54259e9c6c8f4884fa83f0fddf88f",
+      "size": [
+        560,
+        294
+      ],
+      "derivation": {
+        "operation": "exact_group_layout",
+        "count": 7,
+        "sprite": "new-striped-tiger",
+        "boxes": [
+          [
+            94,
+            48,
+            206,
+            106
+          ],
+          [
+            218,
+            48,
+            330,
+            106
+          ],
+          [
+            342,
+            48,
+            454,
+            106
+          ],
+          [
+            32,
+            164,
+            144,
+            222
+          ],
+          [
+            156,
+            164,
+            268,
+            222
+          ],
+          [
+            280,
+            164,
+            392,
+            222
+          ],
+          [
+            404,
+            164,
+            516,
+            222
+          ]
+        ],
+        "palette": [
+          "#eadfcf",
+          "#c2ac8b",
+          "#837157"
+        ],
+        "variant": 1
+      },
+      "packaged": true
+    },
+    {
+      "key": "q6-two-elephants",
+      "file": "assets/q6-two-elephants.png",
+      "sourceType": "code_drawn",
+      "sha256": "f7ca631e5e80d9db310867e09aef917bf3d34493d0c1b39010e8c3ea580ac690",
+      "size": [
+        560,
+        294
+      ],
+      "derivation": {
+        "operation": "exact_group_layout",
+        "count": 2,
+        "sprite": "new-grey-elephant",
+        "boxes": [
+          [
+            64,
+            73,
+            266,
+            221
+          ],
+          [
+            294,
+            73,
+            496,
+            221
+          ]
+        ],
+        "palette": [
+          "#dbe7ed",
+          "#adc5d2",
+          "#527988"
+        ],
+        "variant": 1
+      },
+      "packaged": true
+    },
+    {
+      "key": "q6-one-elephant",
+      "file": "assets/q6-one-elephant.png",
+      "sourceType": "code_drawn",
+      "sha256": "48c97a7e8bf05e3a3cf333b762ec9c034c961033d920a0d7e86d3881aa5d065b",
+      "size": [
+        560,
+        294
+      ],
+      "derivation": {
+        "operation": "exact_group_layout",
+        "count": 1,
+        "sprite": "new-grey-elephant",
+        "boxes": [
+          [
+            178,
+            70,
+            382,
+            219
+          ]
+        ],
+        "palette": [
+          "#dbe7ed",
+          "#adc5d2",
+          "#527988"
+        ],
+        "variant": 1
+      },
+      "packaged": true
+    },
+    {
+      "key": "q6-two-tigers",
+      "file": "assets/q6-two-tigers.png",
+      "sourceType": "code_drawn",
+      "sha256": "addd509ceb0f8922ee8c36b248c69597dcd7bb95473e0d2109cf9e0cd9dc8869",
+      "size": [
+        560,
+        294
+      ],
+      "derivation": {
+        "operation": "exact_group_layout",
+        "count": 2,
+        "sprite": "new-striped-tiger",
+        "boxes": [
+          [
+            64,
+            94,
+            266,
+            199
+          ],
+          [
+            294,
+            94,
+            496,
+            199
+          ]
+        ],
+        "palette": [
+          "#dbe7ed",
+          "#adc5d2",
+          "#527988"
+        ],
+        "variant": 1
+      },
+      "packaged": true
+    },
+    {
+      "key": "q5-four-then-two",
+      "file": "assets/q5-four-then-two.png",
+      "sourceType": "code_drawn",
+      "sha256": "f41f7dc86a4d5e9d26591a3799ac6b442ff1eb07d31345b1df4e72646cb3f80d",
+      "size": [
+        640,
+        283
+      ],
+      "derivation": {
+        "operation": "paired_exact_group_layout",
+        "counts": [
+          4,
+          2
+        ],
+        "sprite": "new-green-bird",
+        "boxes": [
+          [
+            [
+              40,
+              60,
+              132,
+              126
+            ],
+            [
+              151,
+              60,
+              243,
+              126
+            ],
+            [
+              40,
+              154,
+              132,
+              220
+            ],
+            [
+              151,
+              154,
+              243,
+              220
+            ]
+          ],
+          [
+            [
+              388,
+              60,
+              480,
+              126
+            ],
+            [
+              499,
+              60,
+              591,
+              126
+            ]
+          ]
+        ]
+      },
+      "packaged": true
+    },
+    {
+      "key": "q5-two-then-three",
+      "file": "assets/q5-two-then-three.png",
+      "sourceType": "code_drawn",
+      "sha256": "35ae653ca16dd96ea0eaf7a79a831be7bac9ff40e6bc06139a5248a18c5c7e71",
+      "size": [
+        640,
+        283
+      ],
+      "derivation": {
+        "operation": "paired_exact_group_layout",
+        "counts": [
+          2,
+          3
+        ],
+        "sprite": "new-green-bird",
+        "boxes": [
+          [
+            [
+              40,
+              60,
+              132,
+              126
+            ],
+            [
+              151,
+              60,
+              243,
+              126
+            ]
+          ],
+          [
+            [
+              388,
+              60,
+              480,
+              126
+            ],
+            [
+              499,
+              60,
+              591,
+              126
+            ],
+            [
+              388,
+              154,
+              480,
+              220
+            ]
+          ]
+        ]
+      },
+      "packaged": true
+    },
+    {
+      "key": "q5-two-then-four",
+      "file": "assets/q5-two-then-four.png",
+      "sourceType": "code_drawn",
+      "sha256": "5b222cb1f1c2f06993d84ff8a6235afa76e2b4a03a12b1ace543f4dd777c89b9",
+      "size": [
+        640,
+        283
+      ],
+      "derivation": {
+        "operation": "paired_exact_group_layout",
+        "counts": [
+          2,
+          4
+        ],
+        "sprite": "new-green-bird",
+        "boxes": [
+          [
+            [
+              40,
+              60,
+              132,
+              126
+            ],
+            [
+              151,
+              60,
+              243,
+              126
+            ]
+          ],
+          [
+            [
+              388,
+              60,
+              480,
+              126
+            ],
+            [
+              499,
+              60,
+              591,
+              126
+            ],
+            [
+              388,
+              154,
+              480,
+              220
+            ],
+            [
+              499,
+              154,
+              591,
+              220
+            ]
+          ]
+        ]
+      },
+      "packaged": true
+    },
+    {
+      "key": "zoo-opening",
+      "file": "assets/zoo-opening.png",
+      "sourceType": "code_drawn",
+      "sha256": "1d0d6c2f22f899d13a0012bcf5bb3ab8df46ec0d2ffe8baeb408723a2ad63a0d",
+      "size": [
+        840,
+        430
+      ],
+      "derivation": {
+        "operation": "compose_story_scene",
+        "background": "zoo-gate",
+        "sprites": [
+          [
+            "brown-monkey",
+            [
+              121,
+              260,
+              157,
+              137
+            ],
+            false
+          ],
+          [
+            "white-horse",
+            [
+              362,
+              258,
+              151,
+              136
+            ],
+            true
+          ],
+          [
+            "green-bird",
+            [
+              603,
+              283,
+              116,
+              92
+            ],
+            false
+          ]
+        ]
+      },
+      "packaged": true
+    },
+    {
+      "key": "zoo-final-map",
+      "file": "assets/zoo-final-map.png",
+      "sourceType": "code_drawn",
+      "sha256": "1cb337cac7068952c8b083f898b7722152f66c41a57fcdae923f080501e06f2e",
+      "size": [
+        840,
+        430
+      ],
+      "derivation": {
+        "operation": "compose_story_scene",
+        "background": "zoo-park",
+        "sprites": [
+          [
+            "four-monkeys",
+            [
+              49,
+              180,
+              337,
+              207
+            ],
+            false
+          ],
+          [
+            "three-white-horses",
+            [
+              453,
+              214,
+              306,
+              175
+            ],
+            false
+          ]
+        ]
+      },
+      "packaged": true
+    },
+    {
+      "key": "marker-sun",
+      "file": "assets/marker-sun.png",
+      "sourceType": "code_drawn",
+      "sha256": "25abc956dfec29e7a509e89152c72392b055ebe8637ee32141cbeaad63665b5b",
+      "size": [
+        180,
+        168
+      ],
+      "derivation": {
+        "operation": "draw_icon",
+        "meaning": "sun",
+        "background": "#fff1d4"
+      },
+      "packaged": true
+    },
+    {
+      "key": "marker-leaf",
+      "file": "assets/marker-leaf.png",
+      "sourceType": "code_drawn",
+      "sha256": "9e62ea3542eb759020dba46dd5db1e1a26acd94c717f275468e980a47352e35b",
+      "size": [
+        180,
+        168
+      ],
+      "derivation": {
+        "operation": "draw_icon",
+        "meaning": "leaf",
+        "background": "#fff1d4"
+      },
+      "packaged": true
+    },
+    {
+      "key": "marker-cloud",
+      "file": "assets/marker-cloud.png",
+      "sourceType": "code_drawn",
+      "sha256": "65f6b69b0f15ad3890a17386aaa4f3b386d893f74d4d629259707d0d945802d6",
+      "size": [
+        180,
+        168
+      ],
+      "derivation": {
+        "operation": "draw_icon",
+        "meaning": "cloud",
+        "background": "#fff1d4"
+      },
+      "packaged": true
+    },
+    {
+      "key": "marker-one",
+      "file": "assets/marker-one.png",
+      "sourceType": "code_drawn",
+      "sha256": "88dc16660e9240f294445ad0611b6f44bc42eb0dc14366840e3515213dc742e8",
+      "size": [
+        180,
+        168
+      ],
+      "derivation": {
+        "operation": "draw_icon",
+        "meaning": "one",
+        "background": "#fff1d4"
+      },
+      "packaged": true
+    },
+    {
+      "key": "marker-many",
+      "file": "assets/marker-many.png",
+      "sourceType": "code_drawn",
+      "sha256": "772b0d510dcbaaa68b54c26b7e02dfe2a74306fd7401c80078a61ff09bed7292",
+      "size": [
+        180,
+        168
+      ],
+      "derivation": {
+        "operation": "draw_icon",
+        "meaning": "many",
+        "background": "#fff1d4"
+      },
+      "packaged": true
+    },
+    {
+      "key": "q1-listen",
+      "file": "assets/q1-listen.png",
+      "sourceType": "code_drawn",
+      "sha256": "94db4862fa2e2315a21f777ac033f9511c96fac62fdb780f652471b57693a4bc",
+      "size": [
+        180,
+        168
+      ],
+      "derivation": {
+        "operation": "draw_icon",
+        "meaning": "sound",
+        "background": "#e5d4c7"
+      },
+      "packaged": true
+    },
+    {
+      "key": "q2-listen",
+      "file": "assets/q2-listen.png",
+      "sourceType": "code_drawn",
+      "sha256": "c8daf07b14f7896c36cc5fa832ee63664fae39173e46b786679ebd8880a57207",
+      "size": [
+        180,
+        168
+      ],
+      "derivation": {
+        "operation": "draw_icon",
+        "meaning": "sound",
+        "background": "#d6eadf"
+      },
+      "packaged": true
+    },
+    {
+      "key": "q3-listen",
+      "file": "assets/q3-listen.png",
+      "sourceType": "code_drawn",
+      "sha256": "a8f54a7eb5dcf6a7d2e163a724d053b13c6091330c4960e270b82698a38a3202",
+      "size": [
+        180,
+        168
+      ],
+      "derivation": {
+        "operation": "draw_icon",
+        "meaning": "sound",
+        "background": "#faeed3"
+      },
+      "packaged": true
+    },
+    {
+      "key": "q4-listen",
+      "file": "assets/q4-listen.png",
+      "sourceType": "code_drawn",
+      "sha256": "b8b0dff0c9d22c249d496dfa0500532da5c767051425ea75bd06e4d2b2e79a95",
+      "size": [
+        180,
+        168
+      ],
+      "derivation": {
+        "operation": "draw_icon",
+        "meaning": "sound",
+        "background": "#eadfcf"
+      },
+      "packaged": true
+    },
+    {
+      "key": "q5-listen",
+      "file": "assets/q5-listen.png",
+      "sourceType": "code_drawn",
+      "sha256": "8db515904445d23ad2d92f351760181e8fa40d7d69cee7058e10c1ece0d8d0cb",
+      "size": [
+        180,
+        168
+      ],
+      "derivation": {
+        "operation": "draw_icon",
+        "meaning": "sound",
+        "background": "#e7e8cb"
+      },
+      "packaged": true
+    },
+    {
+      "key": "q6-listen",
+      "file": "assets/q6-listen.png",
+      "sourceType": "code_drawn",
+      "sha256": "a2c7d76fa49c8e2326a5e150702519b4eddf7f73b5858cb49b3945e7e300f0ce",
+      "size": [
+        180,
+        168
+      ],
+      "derivation": {
+        "operation": "draw_icon",
+        "meaning": "sound",
+        "background": "#dbe7ed"
+      },
+      "packaged": true
+    }
+  ]
+}

@@ -1,0 +1,1093 @@
+{
+  "schemaVersion": "mira.courseware.asset-provenance.v1",
+  "assets": {
+    "harbor-backdrop": {
+      "path": "art-source/harbor-backdrop.png",
+      "sha256": "5c22732b9b715059795dea2c361eb7ac015aa53936d1ebb848bb82f7a8d72ea6",
+      "pixels": [
+        1672,
+        941
+      ],
+      "bytes": 2958313,
+      "mode": "RGB",
+      "sourceKind": "codex_builtin_imagegen",
+      "originalToolOutput": "/Users/sqcopenclaw/.codex/generated_images/01a1bf78-0c06-7fe0-8877-bc245394cec3/exec-d29da813-c609-4323-9c5a-7ef626797b33.png",
+      "generationPrompt": "同一系列儿童图画书游戏美术：细干纸纹与哑光水粉，圆润剪纸轮廓，前后景明度分离，深松绿、暖米色，杏橙和柿红作亮点。轮廓清楚，纹理安静，不用通用教材剪贴画。 宽画幅儿童玩具港湾，俯视略带侧角度，纸质木栈桥和低矮水草在上方和两侧，画面中间下方是一整片明亮平静的海绿水面，留给之后由代码排列三只船。水面只有极淡水纹，没有船、浮标、人、鸟、漂浮物、字、数字、标志、水印。",
+      "transparentBackground": false,
+      "usedBy": [
+        "harbor-call",
+        "listen-and-steer",
+        "cargo-count"
+      ],
+      "visualInspection": {
+        "reviewedAt": "2026-11-09T09:19:33.028865+00:00",
+        "reviewedBy": "/root/english_prep",
+        "result": "正幅 RGB。木栈桥、灯塔和水面完整，水面无船或其他可误数物件，无文字。"
+      }
+    },
+    "wooden-boat-single": {
+      "path": "art-source/wooden-boat-single.png",
+      "sha256": "5668628513ff8193f1c8f8132f1ab8e083f9cfdac3c2c1c7e4e84581da579268",
+      "pixels": [
+        1312,
+        1199
+      ],
+      "bytes": 1479709,
+      "mode": "RGBA",
+      "sourceKind": "codex_builtin_imagegen",
+      "originalToolOutput": "/Users/sqcopenclaw/.codex/generated_images/01a1bf78-0c06-7fe0-8877-bc245394cec3/exec-be1a5284-d09f-4a5b-9129-d433c0aaca72.png",
+      "generationPrompt": "同一系列儿童图画书游戏美术：细干纸纹与哑光水粉，圆润剪纸轮廓，前后景明度分离，深松绿、暖米色，杏橙和柿红作亮点。轮廓清楚，纹理安静，不用通用教材剪贴画。 真透明背景，单独一只完整的玩具小帆船。柿橙单片三角帆，深松绿小木船身，简洁俯侧视，图像填满中央，四周透明边距。小尺寸仍看清船身和帆，边缘干净，影子限于船身底部。仅一个完整物件，没有倒影、第二只船、文字、数字、海面、浮标或装饰。",
+      "transparentBackground": true,
+      "usedBy": [
+        "harbor-call",
+        "tag-boats",
+        "one-to-four",
+        "five-to-seven",
+        "eight-to-ten",
+        "count-after-moving",
+        "cargo-count"
+      ],
+      "visualInspection": {
+        "reviewedAt": "2026-11-09T09:19:33.028865+00:00",
+        "reviewedBy": "/root/english_prep",
+        "result": "一只柿橙帆、松绿色船身的小船。米白和纯白底实看边缘干净，主体不出画，无额外物件或文字。"
+      },
+      "alpha": {
+        "range": [
+          0,
+          255
+        ],
+        "visibleBoundsAt8": [
+          70,
+          12,
+          1240,
+          1187
+        ],
+        "opaqueCoreBoundsAt250": [
+          73,
+          15,
+          1238,
+          1185
+        ]
+      }
+    },
+    "scallop-shell-single": {
+      "path": "art-source/scallop-shell-single.png",
+      "sha256": "a3a57f0365c970283e93cdae7238fbf71ef009de8135cefda32f7d4195222999",
+      "pixels": [
+        1536,
+        1024
+      ],
+      "bytes": 2228326,
+      "mode": "RGBA",
+      "sourceKind": "codex_builtin_imagegen",
+      "originalToolOutput": "/Users/sqcopenclaw/.codex/generated_images/01a1bf78-0c06-7fe0-8877-bc245394cec3/exec-45c6172f-bafa-4558-b4ca-141f06e22e02.png",
+      "generationPrompt": "同一系列儿童图画书游戏美术：细干纸纹与哑光水粉，圆润剪纸轮廓，前后景明度分离，深松绿、暖米色，杏橙和柿红作亮点。轮廓清楚，纹理安静，不用通用教材剪贴画。 真透明背景，正上方视角，单独一枚完整的扇形贝壳，杏粉色扇面，清楚简洁的放射纹，单一闭合轮廓。尺寸缩小后仍好辨认。无背景、倒影、沙粒、第二枚贝壳、文字、数字、标记。",
+      "transparentBackground": true,
+      "usedBy": [
+        "shell-stall-check/shell-five",
+        "shell-stall-check/shell-seven",
+        "shell-stall-check/count-nine",
+        "shell-stall-check/count-ten",
+        "listen-and-steer",
+        "cargo-count"
+      ],
+      "visualInspection": {
+        "reviewedAt": "2026-11-09T09:19:33.028865+00:00",
+        "reviewedBy": "/root/english_prep",
+        "result": "一枚扇形贝壳，纹路清楚。米白和纯白底实看没有可见光晕或杂边，主体不出画，无额外物件或文字。"
+      },
+      "alpha": {
+        "range": [
+          0,
+          254
+        ],
+        "visibleBoundsAt8": [
+          184,
+          40,
+          1340,
+          991
+        ],
+        "opaqueCoreBoundsAt250": [
+          186,
+          42,
+          1338,
+          990
+        ]
+      }
+    },
+    "harbor-three": {
+      "path": "assets/harbor-three.png",
+      "sha256": "fe390fb3ad864f69697549ea38ce52cabb9a210b9e9ba3c65202e909cf609b9b",
+      "pixels": [
+        800,
+        350
+      ],
+      "bytes": 515166,
+      "mode": "RGBA",
+      "sourceKind": "code_composition",
+      "sourceFile": "quantity_compositions.py",
+      "sourceSha256": "7647bbcedfa9f643b1ca55a6e0035c975a6ede0036dbfba92913eb19a3297ea2",
+      "inputs": [
+        {
+          "id": "harbor-backdrop",
+          "sha256": "5c22732b9b715059795dea2c361eb7ac015aa53936d1ebb848bb82f7a8d72ea6"
+        },
+        {
+          "id": "wooden-boat-single",
+          "sha256": "5668628513ff8193f1c8f8132f1ab8e083f9cfdac3c2c1c7e4e84581da579268"
+        }
+      ],
+      "usedBy": [
+        "harbor-call",
+        "listen-and-steer",
+        "cargo-count"
+      ],
+      "visualInspection": {
+        "reviewedAt": "2026-11-09T09:19:33.028865+00:00",
+        "reviewedBy": "/root/english_prep",
+        "result": "640 宽课堂比例复核。水上三只帆船互不遮挡，无可误数的装饰船。"
+      }
+    },
+    "four-boats": {
+      "path": "assets/four-boats.png",
+      "sha256": "bdedba7df7551525c752570596c26f0fcc71d71912d77eaab701b9423f2ec1d3",
+      "pixels": [
+        640,
+        310
+      ],
+      "bytes": 28026,
+      "mode": "RGBA",
+      "sourceKind": "code_composition",
+      "sourceFile": "quantity_compositions.py",
+      "sourceSha256": "7647bbcedfa9f643b1ca55a6e0035c975a6ede0036dbfba92913eb19a3297ea2",
+      "inputs": [
+        {
+          "id": "wooden-boat-single",
+          "sha256": "5668628513ff8193f1c8f8132f1ab8e083f9cfdac3c2c1c7e4e84581da579268"
+        }
+      ],
+      "usedBy": [
+        "tag-boats"
+      ],
+      "visualInspection": {
+        "reviewedAt": "2026-11-09T09:19:33.028865+00:00",
+        "reviewedBy": "/root/english_prep",
+        "result": "课堂比例复核。四只船可按从左到右顺序一一指认。"
+      }
+    },
+    "four-boats-tagged": {
+      "path": "assets/four-boats-tagged.png",
+      "sha256": "9c4250a546e31bc897da509a6a7f5dfed39849cfb3e71b9eb493907473e7cf4a",
+      "pixels": [
+        640,
+        310
+      ],
+      "bytes": 30534,
+      "mode": "RGBA",
+      "sourceKind": "code_composition",
+      "sourceFile": "quantity_compositions.py",
+      "sourceSha256": "7647bbcedfa9f643b1ca55a6e0035c975a6ede0036dbfba92913eb19a3297ea2",
+      "inputs": [
+        {
+          "id": "wooden-boat-single",
+          "sha256": "5668628513ff8193f1c8f8132f1ab8e083f9cfdac3c2c1c7e4e84581da579268"
+        }
+      ],
+      "usedBy": [
+        "tag-boats"
+      ],
+      "visualInspection": {
+        "reviewedAt": "2026-11-09T09:19:33.028865+00:00",
+        "reviewedBy": "/root/english_prep",
+        "result": "课堂比例复核。与未标记图的四只船原位一致，1–4 依次分开，第四个为强调色。"
+      }
+    },
+    "boats-one-four": {
+      "path": "assets/boats-one-four.png",
+      "sha256": "52df25b23d8fac638639a34ae3129a40c8cff3ef7c910f35bbacc03075fd4f93",
+      "pixels": [
+        840,
+        600
+      ],
+      "bytes": 26797,
+      "mode": "RGBA",
+      "sourceKind": "code_composition",
+      "sourceFile": "quantity_compositions.py",
+      "sourceSha256": "7647bbcedfa9f643b1ca55a6e0035c975a6ede0036dbfba92913eb19a3297ea2",
+      "inputs": [
+        {
+          "id": "wooden-boat-single",
+          "sha256": "5668628513ff8193f1c8f8132f1ab8e083f9cfdac3c2c1c7e4e84581da579268"
+        }
+      ],
+      "usedBy": [
+        "one-to-four"
+      ],
+      "visualInspection": {
+        "reviewedAt": "2026-11-09T09:19:33.028865+00:00",
+        "reviewedBy": "/root/english_prep",
+        "result": "课堂比例复核。四排分别 1、2、3、4 只，分隔线清楚。"
+      }
+    },
+    "boats-five-seven": {
+      "path": "assets/boats-five-seven.png",
+      "sha256": "da4c5c32c2c36530c8f914d3430834198baba50570577f4cff2a6e1056af73c3",
+      "pixels": [
+        840,
+        600
+      ],
+      "bytes": 22730,
+      "mode": "RGBA",
+      "sourceKind": "code_composition",
+      "sourceFile": "quantity_compositions.py",
+      "sourceSha256": "7647bbcedfa9f643b1ca55a6e0035c975a6ede0036dbfba92913eb19a3297ea2",
+      "inputs": [
+        {
+          "id": "wooden-boat-single",
+          "sha256": "5668628513ff8193f1c8f8132f1ab8e083f9cfdac3c2c1c7e4e84581da579268"
+        }
+      ],
+      "usedBy": [
+        "five-to-seven"
+      ],
+      "visualInspection": {
+        "reviewedAt": "2026-11-09T09:19:33.028865+00:00",
+        "reviewedBy": "/root/english_prep",
+        "result": "课堂比例复核。三排分别 5、6、7 只，分隔线清楚。"
+      }
+    },
+    "boats-eight-ten": {
+      "path": "assets/boats-eight-ten.png",
+      "sha256": "543d301edab49e1359b12aa1d220cafecdb56bc0ab00ae850978cef582a55411",
+      "pixels": [
+        840,
+        600
+      ],
+      "bytes": 24517,
+      "mode": "RGBA",
+      "sourceKind": "code_composition",
+      "sourceFile": "quantity_compositions.py",
+      "sourceSha256": "7647bbcedfa9f643b1ca55a6e0035c975a6ede0036dbfba92913eb19a3297ea2",
+      "inputs": [
+        {
+          "id": "wooden-boat-single",
+          "sha256": "5668628513ff8193f1c8f8132f1ab8e083f9cfdac3c2c1c7e4e84581da579268"
+        }
+      ],
+      "usedBy": [
+        "eight-to-ten"
+      ],
+      "visualInspection": {
+        "reviewedAt": "2026-11-09T09:19:33.028865+00:00",
+        "reviewedBy": "/root/english_prep",
+        "result": "课堂比例复核。三排分别 8、9、10 只，缩小后各船仍可分辨。"
+      }
+    },
+    "six-boats-line": {
+      "path": "assets/six-boats-line.png",
+      "sha256": "b7fc91c10d04c4f219068c52a87b3c2f299f223c69501f09ff5cd6da00f67a01",
+      "pixels": [
+        640,
+        315
+      ],
+      "bytes": 10607,
+      "mode": "RGBA",
+      "sourceKind": "code_composition",
+      "sourceFile": "quantity_compositions.py",
+      "sourceSha256": "7647bbcedfa9f643b1ca55a6e0035c975a6ede0036dbfba92913eb19a3297ea2",
+      "inputs": [
+        {
+          "id": "wooden-boat-single",
+          "sha256": "5668628513ff8193f1c8f8132f1ab8e083f9cfdac3c2c1c7e4e84581da579268"
+        }
+      ],
+      "usedBy": [
+        "count-after-moving"
+      ],
+      "visualInspection": {
+        "reviewedAt": "2026-11-09T09:19:33.028865+00:00",
+        "reviewedBy": "/root/english_prep",
+        "result": "课堂比例复核。同样六只船排成一行，互不遮挡。"
+      }
+    },
+    "six-boats-pairs": {
+      "path": "assets/six-boats-pairs.png",
+      "sha256": "805cfdd1fb4c9ea925b2bf3424d2f8974cc17c00a937dece30311a62fc4ce94f",
+      "pixels": [
+        640,
+        315
+      ],
+      "bytes": 25924,
+      "mode": "RGBA",
+      "sourceKind": "code_composition",
+      "sourceFile": "quantity_compositions.py",
+      "sourceSha256": "7647bbcedfa9f643b1ca55a6e0035c975a6ede0036dbfba92913eb19a3297ea2",
+      "inputs": [
+        {
+          "id": "wooden-boat-single",
+          "sha256": "5668628513ff8193f1c8f8132f1ab8e083f9cfdac3c2c1c7e4e84581da579268"
+        }
+      ],
+      "usedBy": [
+        "count-after-moving"
+      ],
+      "visualInspection": {
+        "reviewedAt": "2026-11-09T09:19:33.028865+00:00",
+        "reviewedBy": "/root/english_prep",
+        "result": "课堂比例复核。三行各两只，共六只，物件大小与长排相同。"
+      }
+    },
+    "shells-4": {
+      "path": "assets/shells-4.png",
+      "sha256": "6dd96e31e0ca9c5f23f0a457989b3bab8c2f8e7e5df4a2e2f56fe886b8b0482c",
+      "pixels": [
+        528,
+        248
+      ],
+      "bytes": 19716,
+      "mode": "RGBA",
+      "sourceKind": "code_composition",
+      "sourceFile": "quantity_compositions.py",
+      "sourceSha256": "7647bbcedfa9f643b1ca55a6e0035c975a6ede0036dbfba92913eb19a3297ea2",
+      "inputs": [
+        {
+          "id": "scallop-shell-single",
+          "sha256": "a3a57f0365c970283e93cdae7238fbf71ef009de8135cefda32f7d4195222999"
+        }
+      ],
+      "usedBy": [
+        "shell-stall-check/shell-five"
+      ],
+      "visualInspection": {
+        "reviewedAt": "2026-11-09T09:19:33.028865+00:00",
+        "reviewedBy": "/root/english_prep",
+        "result": "按约 153 像素宽预览。逐枚核对恰好 4 枚贝壳，无重叠和其他可误数物件。"
+      }
+    },
+    "shells-5": {
+      "path": "assets/shells-5.png",
+      "sha256": "4d88d366f818315d30304fda9687bd94c543f396eedcff7df925d94ac84e3ee7",
+      "pixels": [
+        528,
+        248
+      ],
+      "bytes": 21489,
+      "mode": "RGBA",
+      "sourceKind": "code_composition",
+      "sourceFile": "quantity_compositions.py",
+      "sourceSha256": "7647bbcedfa9f643b1ca55a6e0035c975a6ede0036dbfba92913eb19a3297ea2",
+      "inputs": [
+        {
+          "id": "scallop-shell-single",
+          "sha256": "a3a57f0365c970283e93cdae7238fbf71ef009de8135cefda32f7d4195222999"
+        }
+      ],
+      "usedBy": [
+        "shell-stall-check/shell-five"
+      ],
+      "visualInspection": {
+        "reviewedAt": "2026-11-09T09:19:33.028865+00:00",
+        "reviewedBy": "/root/english_prep",
+        "result": "按约 153 像素宽预览。逐枚核对恰好 5 枚贝壳，无重叠和其他可误数物件。"
+      }
+    },
+    "shells-6": {
+      "path": "assets/shells-6.png",
+      "sha256": "91ad58fae4130e58dcba24ba07a32bfe3ab9f48bed175904fcc01c82b63488d1",
+      "pixels": [
+        528,
+        248
+      ],
+      "bytes": 22079,
+      "mode": "RGBA",
+      "sourceKind": "code_composition",
+      "sourceFile": "quantity_compositions.py",
+      "sourceSha256": "7647bbcedfa9f643b1ca55a6e0035c975a6ede0036dbfba92913eb19a3297ea2",
+      "inputs": [
+        {
+          "id": "scallop-shell-single",
+          "sha256": "a3a57f0365c970283e93cdae7238fbf71ef009de8135cefda32f7d4195222999"
+        }
+      ],
+      "usedBy": [
+        "shell-stall-check/shell-seven",
+        "shell-stall-check/shell-five"
+      ],
+      "visualInspection": {
+        "reviewedAt": "2026-11-09T09:19:33.028865+00:00",
+        "reviewedBy": "/root/english_prep",
+        "result": "按约 153 像素宽预览。逐枚核对恰好 6 枚贝壳，无重叠和其他可误数物件。"
+      }
+    },
+    "shells-7": {
+      "path": "assets/shells-7.png",
+      "sha256": "d8de87ea9be40a5d3d96f1a8c436c71e5850b7c49560f9beed2e7e8d9f187de3",
+      "pixels": [
+        528,
+        248
+      ],
+      "bytes": 16927,
+      "mode": "RGBA",
+      "sourceKind": "code_composition",
+      "sourceFile": "quantity_compositions.py",
+      "sourceSha256": "7647bbcedfa9f643b1ca55a6e0035c975a6ede0036dbfba92913eb19a3297ea2",
+      "inputs": [
+        {
+          "id": "scallop-shell-single",
+          "sha256": "a3a57f0365c970283e93cdae7238fbf71ef009de8135cefda32f7d4195222999"
+        }
+      ],
+      "usedBy": [
+        "shell-stall-check/shell-seven"
+      ],
+      "visualInspection": {
+        "reviewedAt": "2026-11-09T09:19:33.028865+00:00",
+        "reviewedBy": "/root/english_prep",
+        "result": "按约 153 像素宽预览。逐枚核对恰好 7 枚贝壳，无重叠和其他可误数物件。"
+      }
+    },
+    "shells-8": {
+      "path": "assets/shells-8.png",
+      "sha256": "7310339e5f5f655f4459ecaa89ea9a045c71f4d44299c538c49d2905e365a262",
+      "pixels": [
+        528,
+        248
+      ],
+      "bytes": 17013,
+      "mode": "RGBA",
+      "sourceKind": "code_composition",
+      "sourceFile": "quantity_compositions.py",
+      "sourceSha256": "7647bbcedfa9f643b1ca55a6e0035c975a6ede0036dbfba92913eb19a3297ea2",
+      "inputs": [
+        {
+          "id": "scallop-shell-single",
+          "sha256": "a3a57f0365c970283e93cdae7238fbf71ef009de8135cefda32f7d4195222999"
+        }
+      ],
+      "usedBy": [
+        "shell-stall-check/shell-seven"
+      ],
+      "visualInspection": {
+        "reviewedAt": "2026-11-09T09:19:33.028865+00:00",
+        "reviewedBy": "/root/english_prep",
+        "result": "按约 153 像素宽预览。逐枚核对恰好 8 枚贝壳，无重叠和其他可误数物件。"
+      }
+    },
+    "shells-9": {
+      "path": "assets/shells-9.png",
+      "sha256": "e669b09e3cc9ba148b99d6936b68b98c56459913181d6b5262cd26376928c006",
+      "pixels": [
+        528,
+        248
+      ],
+      "bytes": 17090,
+      "mode": "RGBA",
+      "sourceKind": "code_composition",
+      "sourceFile": "quantity_compositions.py",
+      "sourceSha256": "7647bbcedfa9f643b1ca55a6e0035c975a6ede0036dbfba92913eb19a3297ea2",
+      "inputs": [
+        {
+          "id": "scallop-shell-single",
+          "sha256": "a3a57f0365c970283e93cdae7238fbf71ef009de8135cefda32f7d4195222999"
+        }
+      ],
+      "usedBy": [
+        "shell-stall-check/count-nine"
+      ],
+      "visualInspection": {
+        "reviewedAt": "2026-11-09T09:19:33.028865+00:00",
+        "reviewedBy": "/root/english_prep",
+        "result": "按约 153 像素宽预览。逐枚核对恰好 9 枚贝壳，无重叠和其他可误数物件。"
+      }
+    },
+    "shells-10": {
+      "path": "assets/shells-10.png",
+      "sha256": "dd9d8d33f4d48ac32dfe14b52825b03484b944ebb2272f91643b4d586084232d",
+      "pixels": [
+        528,
+        248
+      ],
+      "bytes": 17088,
+      "mode": "RGBA",
+      "sourceKind": "code_composition",
+      "sourceFile": "quantity_compositions.py",
+      "sourceSha256": "7647bbcedfa9f643b1ca55a6e0035c975a6ede0036dbfba92913eb19a3297ea2",
+      "inputs": [
+        {
+          "id": "scallop-shell-single",
+          "sha256": "a3a57f0365c970283e93cdae7238fbf71ef009de8135cefda32f7d4195222999"
+        }
+      ],
+      "usedBy": [
+        "shell-stall-check/count-ten"
+      ],
+      "visualInspection": {
+        "reviewedAt": "2026-11-09T09:19:33.028865+00:00",
+        "reviewedBy": "/root/english_prep",
+        "result": "按约 153 像素宽预览。逐枚核对恰好 10 枚贝壳，无重叠和其他可误数物件。"
+      }
+    },
+    "digit-1": {
+      "renderedBy": "courseware.tools.build.prepare",
+      "sha256": "d176746eac5e768050d8a98949cf1a4996e5aeb7d6e04bc6761e4b8ae080abd6",
+      "pixels": [
+        480,
+        240
+      ],
+      "bytes": 1694,
+      "mode": "RGBA",
+      "sourceKind": "code_semantic_digit",
+      "sourceFile": "courseware/tools/glyph_picture.py",
+      "sourceSha256": "aca93f29c99390cad67b1c62ec860f80410f006bf4d364de2755b9d645fff5ef",
+      "specFile": "lesson.json",
+      "spec": {
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "1"
+              }
+            ]
+          }
+        ],
+        "size": [
+          480,
+          240
+        ]
+      },
+      "usedBy": [
+        "shell-stall-check/hear-two"
+      ]
+    },
+    "digit-2": {
+      "renderedBy": "courseware.tools.build.prepare",
+      "sha256": "fca5ff65a41f3ebd5811c84c59544b63b72293669517de54eb1c2a8c25b452d0",
+      "pixels": [
+        480,
+        240
+      ],
+      "bytes": 3702,
+      "mode": "RGBA",
+      "sourceKind": "code_semantic_digit",
+      "sourceFile": "courseware/tools/glyph_picture.py",
+      "sourceSha256": "aca93f29c99390cad67b1c62ec860f80410f006bf4d364de2755b9d645fff5ef",
+      "specFile": "lesson.json",
+      "spec": {
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "2"
+              }
+            ]
+          }
+        ],
+        "size": [
+          480,
+          240
+        ]
+      },
+      "usedBy": [
+        "shell-stall-check/hear-two"
+      ]
+    },
+    "digit-3": {
+      "renderedBy": "courseware.tools.build.prepare",
+      "sha256": "02728e4e5961657702d505d471eeaf3ea7149d07ed5655ec18f362ef59146436",
+      "pixels": [
+        480,
+        240
+      ],
+      "bytes": 4228,
+      "mode": "RGBA",
+      "sourceKind": "code_semantic_digit",
+      "sourceFile": "courseware/tools/glyph_picture.py",
+      "sourceSha256": "aca93f29c99390cad67b1c62ec860f80410f006bf4d364de2755b9d645fff5ef",
+      "specFile": "lesson.json",
+      "spec": {
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "3"
+              }
+            ]
+          }
+        ],
+        "size": [
+          480,
+          240
+        ]
+      },
+      "usedBy": [
+        "shell-stall-check/hear-two"
+      ]
+    },
+    "digit-6": {
+      "renderedBy": "courseware.tools.build.prepare",
+      "sha256": "9b83b01bafff357c4e85537e5738c1c1715ccaa604b8155885517f0d21c87e97",
+      "pixels": [
+        480,
+        240
+      ],
+      "bytes": 4674,
+      "mode": "RGBA",
+      "sourceKind": "code_semantic_digit",
+      "sourceFile": "courseware/tools/glyph_picture.py",
+      "sourceSha256": "aca93f29c99390cad67b1c62ec860f80410f006bf4d364de2755b9d645fff5ef",
+      "specFile": "lesson.json",
+      "spec": {
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "6"
+              }
+            ]
+          }
+        ],
+        "size": [
+          480,
+          240
+        ]
+      },
+      "usedBy": [
+        "shell-stall-check/hear-eight"
+      ]
+    },
+    "digit-8": {
+      "renderedBy": "courseware.tools.build.prepare",
+      "sha256": "e28fd32f5980698b5c985024e346b732690cb566983aa8dc31cfad449959f820",
+      "pixels": [
+        480,
+        240
+      ],
+      "bytes": 4760,
+      "mode": "RGBA",
+      "sourceKind": "code_semantic_digit",
+      "sourceFile": "courseware/tools/glyph_picture.py",
+      "sourceSha256": "aca93f29c99390cad67b1c62ec860f80410f006bf4d364de2755b9d645fff5ef",
+      "specFile": "lesson.json",
+      "spec": {
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "8"
+              }
+            ]
+          }
+        ],
+        "size": [
+          480,
+          240
+        ]
+      },
+      "usedBy": [
+        "shell-stall-check/hear-eight",
+        "shell-stall-check/count-nine",
+        "shell-stall-check/count-ten"
+      ]
+    },
+    "digit-9": {
+      "renderedBy": "courseware.tools.build.prepare",
+      "sha256": "819e7ad09c9b82e5c57363271e062973c6a7dc6d38aa6f3390f6b815a38eae2d",
+      "pixels": [
+        480,
+        240
+      ],
+      "bytes": 4563,
+      "mode": "RGBA",
+      "sourceKind": "code_semantic_digit",
+      "sourceFile": "courseware/tools/glyph_picture.py",
+      "sourceSha256": "aca93f29c99390cad67b1c62ec860f80410f006bf4d364de2755b9d645fff5ef",
+      "specFile": "lesson.json",
+      "spec": {
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "9"
+              }
+            ]
+          }
+        ],
+        "size": [
+          480,
+          240
+        ]
+      },
+      "usedBy": [
+        "shell-stall-check/hear-eight",
+        "shell-stall-check/count-nine",
+        "shell-stall-check/count-ten"
+      ]
+    },
+    "digit-10": {
+      "renderedBy": "courseware.tools.build.prepare",
+      "sha256": "201fb69c75988693cfcdaef7a6ffa283301a1797c701a11ab8d642776117223a",
+      "pixels": [
+        480,
+        240
+      ],
+      "bytes": 4574,
+      "mode": "RGBA",
+      "sourceKind": "code_semantic_digit",
+      "sourceFile": "courseware/tools/glyph_picture.py",
+      "sourceSha256": "aca93f29c99390cad67b1c62ec860f80410f006bf4d364de2755b9d645fff5ef",
+      "specFile": "lesson.json",
+      "spec": {
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "10"
+              }
+            ]
+          }
+        ],
+        "size": [
+          480,
+          240
+        ]
+      },
+      "usedBy": [
+        "shell-stall-check/count-nine",
+        "shell-stall-check/count-ten"
+      ]
+    },
+    "rover": {
+      "sourceKind": "codex_builtin_imagegen_reused_public_sprite",
+      "path": "art-source/rover.webp",
+      "sha256": "a56d62690c8896d0d2b8180d7daeca8cb2a2a31279ef963609806bb8f16b9168",
+      "pixels": [
+        300,
+        282
+      ],
+      "bytes": 37434,
+      "mode": "RGBA",
+      "originalToolOutput": "/Users/sqcopenclaw/.codex/generated_images/01a1bf78-0c06-7fe0-8877-bc245394cec3/exec-00dcd8f8-2185-492f-81ff-73754de5dc8b.png",
+      "originalToolOutputSha256": "72badede9f926c6be6c58daa9f00645f8b2f85d244108fd4c1514851d4ba8c31",
+      "generationPrompt": "Use case: stylized-concept. A real transparent RGBA sprite sheet, three equal columns and two equal rows, with six fully isolated sprites, every sprite centered in its own cell with generous transparent gaps and similar size; do not touch one another; no shadows outside silhouettes. Top row three animation frames of the exact same cinnamon rabbit with teal scarf facing right, first resting on all fours, second running with front paws out, third airborne with knees tucked. Bottom row exact positions: first a compact round vermilion bubble rover top-down seen from overhead, its bubble nozzle points RIGHT; second the SAME rover with two pearly bubbles immediately to its right (nozzle points RIGHT); third a single illustrated golden star-shaped collector sticker with embossed paper petals but no text. Premium storybook arcade: matte gouache, fine paper grain, clean cut paper edges, charcoal teal shadows, warm cream, deep spruce, apricot and persimmon highlights. No labels, marks, boxes, ground, background, logos or text. Every sprite entirely visible.",
+      "originalCrop": [
+        35,
+        576,
+        427,
+        945
+      ],
+      "registeredPreviewPath": "output/courseware-production/classic-arcade-v2/assets/rover.webp",
+      "registeredPreviewSha256": "a56d62690c8896d0d2b8180d7daeca8cb2a2a31279ef963609806bb8f16b9168",
+      "usedBy": [
+        "listen-and-steer"
+      ]
+    },
+    "rover-pop": {
+      "sourceKind": "codex_builtin_imagegen_reused_public_sprite",
+      "path": "art-source/rover-pop.webp",
+      "sha256": "2055b2cffbbb45f80af6ceadf7cc6771a5698f0018c340e01bdb2c18b41c257c",
+      "pixels": [
+        298,
+        300
+      ],
+      "bytes": 43168,
+      "mode": "RGBA",
+      "originalToolOutput": "/Users/sqcopenclaw/.codex/generated_images/01a1bf78-0c06-7fe0-8877-bc245394cec3/exec-00dcd8f8-2185-492f-81ff-73754de5dc8b.png",
+      "originalToolOutputSha256": "72badede9f926c6be6c58daa9f00645f8b2f85d244108fd4c1514851d4ba8c31",
+      "generationPrompt": "Use case: stylized-concept. A real transparent RGBA sprite sheet, three equal columns and two equal rows, with six fully isolated sprites, every sprite centered in its own cell with generous transparent gaps and similar size; do not touch one another; no shadows outside silhouettes. Top row three animation frames of the exact same cinnamon rabbit with teal scarf facing right, first resting on all fours, second running with front paws out, third airborne with knees tucked. Bottom row exact positions: first a compact round vermilion bubble rover top-down seen from overhead, its bubble nozzle points RIGHT; second the SAME rover with two pearly bubbles immediately to its right (nozzle points RIGHT); third a single illustrated golden star-shaped collector sticker with embossed paper petals but no text. Premium storybook arcade: matte gouache, fine paper grain, clean cut paper edges, charcoal teal shadows, warm cream, deep spruce, apricot and persimmon highlights. No labels, marks, boxes, ground, background, logos or text. Every sprite entirely visible.",
+      "originalCrop": [
+        506,
+        580,
+        868,
+        944
+      ],
+      "registeredPreviewPath": "output/courseware-production/classic-arcade-v2/assets/rover-pop.webp",
+      "registeredPreviewSha256": "2055b2cffbbb45f80af6ceadf7cc6771a5698f0018c340e01bdb2c18b41c257c",
+      "usedBy": [
+        "listen-and-steer"
+      ]
+    },
+    "game-harbor": {
+      "path": "assets/game-harbor.png",
+      "sha256": "939af7591e7b272ff06e9f3a19a6539d98c88df296bd070c976fcfa00bfb0788",
+      "pixels": [
+        1279,
+        720
+      ],
+      "bytes": 1569129,
+      "mode": "RGB",
+      "sourceKind": "code_transcode",
+      "sourceFile": "game_compositions.py",
+      "sourceSha256": "2580caa88082045185a5ca1c2613dde74f180c9493bcd5f69b79be06c4a9548e",
+      "inputs": [
+        {
+          "id": "harbor-backdrop",
+          "sha256": "5c22732b9b715059795dea2c361eb7ac015aa53936d1ebb848bb82f7a8d72ea6"
+        }
+      ],
+      "usedBy": [
+        "listen-and-steer",
+        "cargo-count"
+      ],
+      "browserVisualStatus": "reviewed_standalone_draft",
+      "visualInspection": {
+        "reviewedAt": "2026-11-09T09:33:08.418413+00:00",
+        "reviewedBy": "/root/english_prep",
+        "result": "640×360 实景开始、交接、正确、提示和挑战态可见。陆地、水面与道路主体区分清楚，无用于计数的背景杂物。"
+      }
+    },
+    "game-rover": {
+      "path": "assets/game-rover.png",
+      "sha256": "cd1536a0ed320bfbd0cf9eb1ca83a781eb11034b2bf8d26ea2bcb672feb82e41",
+      "pixels": [
+        256,
+        241
+      ],
+      "bytes": 99721,
+      "mode": "RGBA",
+      "sourceKind": "code_transcode",
+      "sourceFile": "game_compositions.py",
+      "sourceSha256": "2580caa88082045185a5ca1c2613dde74f180c9493bcd5f69b79be06c4a9548e",
+      "inputs": [
+        {
+          "id": "rover",
+          "sha256": "a56d62690c8896d0d2b8180d7daeca8cb2a2a31279ef963609806bb8f16b9168"
+        }
+      ],
+      "usedBy": [
+        "listen-and-steer"
+      ],
+      "browserVisualStatus": "reviewed_standalone_draft",
+      "visualInspection": {
+        "reviewedAt": "2026-11-09T09:33:08.418413+00:00",
+        "reviewedBy": "/root/english_prep",
+        "result": "640×360 真实页面角色轮廓完整，正向、转向和启动后均可定位。"
+      }
+    },
+    "game-rover-pop": {
+      "path": "assets/game-rover-pop.png",
+      "sha256": "646c4b05b0de70132d235dc2f476ed889ffc402abfa9b3f951a6dc1c0d93d062",
+      "pixels": [
+        254,
+        256
+      ],
+      "bytes": 115500,
+      "mode": "RGBA",
+      "sourceKind": "code_transcode",
+      "sourceFile": "game_compositions.py",
+      "sourceSha256": "2580caa88082045185a5ca1c2613dde74f180c9493bcd5f69b79be06c4a9548e",
+      "inputs": [
+        {
+          "id": "rover-pop",
+          "sha256": "2055b2cffbbb45f80af6ceadf7cc6771a5698f0018c340e01bdb2c18b41c257c"
+        }
+      ],
+      "usedBy": [
+        "listen-and-steer"
+      ],
+      "browserVisualStatus": "reviewed_standalone_draft",
+      "visualInspection": {
+        "reviewedAt": "2026-11-09T09:33:08.418413+00:00",
+        "reviewedBy": "/root/english_prep",
+        "result": "已验的透明泡泡车第二帧，来源及裁切哈希已核对，键盘喷泡泡可打开砖块。"
+      }
+    },
+    "game-shell": {
+      "path": "assets/game-shell.png",
+      "sha256": "796d558a5de5400b85a2007dcf920eff7b41a3e797eb8b4920abed77c08fc9d3",
+      "pixels": [
+        256,
+        211
+      ],
+      "bytes": 70991,
+      "mode": "RGBA",
+      "sourceKind": "code_transcode",
+      "sourceFile": "game_compositions.py",
+      "sourceSha256": "2580caa88082045185a5ca1c2613dde74f180c9493bcd5f69b79be06c4a9548e",
+      "inputs": [
+        {
+          "id": "scallop-shell-single",
+          "sha256": "a3a57f0365c970283e93cdae7238fbf71ef009de8135cefda32f7d4195222999"
+        }
+      ],
+      "usedBy": [
+        "listen-and-steer",
+        "cargo-count"
+      ],
+      "browserVisualStatus": "reviewed_standalone_draft",
+      "visualInspection": {
+        "reviewedAt": "2026-11-09T09:33:08.418413+00:00",
+        "reviewedBy": "/root/english_prep",
+        "result": "640×360 真实页面里的发射物是一枚单独贝壳，命中后作为收到货物的可见记录。"
+      }
+    },
+    "boat-target-1": {
+      "path": "assets/boat-target-1.png",
+      "sha256": "752cca091c838de7f048483bd41ab00a2810a229b1265e197571203827b0cdd7",
+      "pixels": [
+        184,
+        112
+      ],
+      "bytes": 2518,
+      "mode": "RGBA",
+      "sourceKind": "code_composition",
+      "sourceFile": "game_compositions.py",
+      "sourceSha256": "2580caa88082045185a5ca1c2613dde74f180c9493bcd5f69b79be06c4a9548e",
+      "inputs": [
+        {
+          "id": "wooden-boat-single",
+          "sha256": "5668628513ff8193f1c8f8132f1ab8e083f9cfdac3c2c1c7e4e84581da579268"
+        }
+      ],
+      "usedBy": [
+        "cargo-count"
+      ],
+      "browserVisualStatus": "reviewed_standalone_draft",
+      "visualInspection": {
+        "reviewedAt": "2026-11-09T09:33:08.418413+00:00",
+        "reviewedBy": "/root/english_prep",
+        "result": "逐一核对船队图恰好 1 只，各船独立，无数字标签。"
+      }
+    },
+    "boat-target-2": {
+      "path": "assets/boat-target-2.png",
+      "sha256": "842d1804aa4408828e9a539681633da50d64424f51b004b32238b2d6d6a0051c",
+      "pixels": [
+        184,
+        112
+      ],
+      "bytes": 2608,
+      "mode": "RGBA",
+      "sourceKind": "code_composition",
+      "sourceFile": "game_compositions.py",
+      "sourceSha256": "2580caa88082045185a5ca1c2613dde74f180c9493bcd5f69b79be06c4a9548e",
+      "inputs": [
+        {
+          "id": "wooden-boat-single",
+          "sha256": "5668628513ff8193f1c8f8132f1ab8e083f9cfdac3c2c1c7e4e84581da579268"
+        }
+      ],
+      "usedBy": [
+        "cargo-count"
+      ],
+      "browserVisualStatus": "reviewed_standalone_draft",
+      "visualInspection": {
+        "reviewedAt": "2026-11-09T09:33:08.418413+00:00",
+        "reviewedBy": "/root/english_prep",
+        "result": "逐一核对船队图恰好 2 只，各船独立，无数字标签。 隔离浏览器中故意破坏该图链接，确认仅该请求失败，显示两个可数点，未打印数字。"
+      }
+    },
+    "boat-target-3": {
+      "path": "assets/boat-target-3.png",
+      "sha256": "b6904459d546e49cd51a4871e5ce493ea1e51cd1d76c6977bfe6dd26de8e268f",
+      "pixels": [
+        184,
+        112
+      ],
+      "bytes": 2627,
+      "mode": "RGBA",
+      "sourceKind": "code_composition",
+      "sourceFile": "game_compositions.py",
+      "sourceSha256": "2580caa88082045185a5ca1c2613dde74f180c9493bcd5f69b79be06c4a9548e",
+      "inputs": [
+        {
+          "id": "wooden-boat-single",
+          "sha256": "5668628513ff8193f1c8f8132f1ab8e083f9cfdac3c2c1c7e4e84581da579268"
+        }
+      ],
+      "usedBy": [
+        "cargo-count"
+      ],
+      "browserVisualStatus": "reviewed_standalone_draft",
+      "visualInspection": {
+        "reviewedAt": "2026-11-09T09:33:08.418413+00:00",
+        "reviewedBy": "/root/english_prep",
+        "result": "逐一核对船队图恰好 3 只，各船独立，无数字标签。"
+      }
+    },
+    "boat-target-4": {
+      "path": "assets/boat-target-4.png",
+      "sha256": "abfb1a2b6f72b1028b46d630a69b4c3ba476b985054b1a5b5682ba963efcab8b",
+      "pixels": [
+        184,
+        112
+      ],
+      "bytes": 2630,
+      "mode": "RGBA",
+      "sourceKind": "code_composition",
+      "sourceFile": "game_compositions.py",
+      "sourceSha256": "2580caa88082045185a5ca1c2613dde74f180c9493bcd5f69b79be06c4a9548e",
+      "inputs": [
+        {
+          "id": "wooden-boat-single",
+          "sha256": "5668628513ff8193f1c8f8132f1ab8e083f9cfdac3c2c1c7e4e84581da579268"
+        }
+      ],
+      "usedBy": [
+        "cargo-count"
+      ],
+      "browserVisualStatus": "reviewed_standalone_draft",
+      "visualInspection": {
+        "reviewedAt": "2026-11-09T09:33:08.418413+00:00",
+        "reviewedBy": "/root/english_prep",
+        "result": "逐一核对船队图恰好 4 只，各船独立，无数字标签。"
+      }
+    },
+    "boat-target-6": {
+      "path": "assets/boat-target-6.png",
+      "sha256": "0ee54da96d8513d64bd65b0411c7c5902243ab3d4c524d2108e04a5a151cca7c",
+      "pixels": [
+        184,
+        112
+      ],
+      "bytes": 4873,
+      "mode": "RGBA",
+      "sourceKind": "code_composition",
+      "sourceFile": "game_compositions.py",
+      "sourceSha256": "2580caa88082045185a5ca1c2613dde74f180c9493bcd5f69b79be06c4a9548e",
+      "inputs": [
+        {
+          "id": "wooden-boat-single",
+          "sha256": "5668628513ff8193f1c8f8132f1ab8e083f9cfdac3c2c1c7e4e84581da579268"
+        }
+      ],
+      "usedBy": [
+        "cargo-count"
+      ],
+      "browserVisualStatus": "reviewed_standalone_draft",
+      "visualInspection": {
+        "reviewedAt": "2026-11-09T09:33:08.418413+00:00",
+        "reviewedBy": "/root/english_prep",
+        "result": "逐一核对船队图恰好 6 只，各船独立，无数字标签。"
+      }
+    },
+    "boat-target-8": {
+      "path": "assets/boat-target-8.png",
+      "sha256": "09d7003354d88bff6b987e4205c0c90db2531270ea420c224ec451c760c8aeae",
+      "pixels": [
+        184,
+        112
+      ],
+      "bytes": 4871,
+      "mode": "RGBA",
+      "sourceKind": "code_composition",
+      "sourceFile": "game_compositions.py",
+      "sourceSha256": "2580caa88082045185a5ca1c2613dde74f180c9493bcd5f69b79be06c4a9548e",
+      "inputs": [
+        {
+          "id": "wooden-boat-single",
+          "sha256": "5668628513ff8193f1c8f8132f1ab8e083f9cfdac3c2c1c7e4e84581da579268"
+        }
+      ],
+      "usedBy": [
+        "cargo-count"
+      ],
+      "browserVisualStatus": "reviewed_standalone_draft",
+      "visualInspection": {
+        "reviewedAt": "2026-11-09T09:33:08.418413+00:00",
+        "reviewedBy": "/root/english_prep",
+        "result": "逐一核对船队图恰好 8 只，各船独立，无数字标签。"
+      }
+    }
+  }
+}

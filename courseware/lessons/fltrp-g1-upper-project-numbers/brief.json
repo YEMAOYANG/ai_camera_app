@@ -1,0 +1,200 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "Numbers",
+  "binding": {
+    "editionId": "smartedu-english-six-year-g1-upper-sync-af05bc77",
+    "revisionId": "20260928-metadata-1",
+    "nodeId": "128722c5-d099-364f-a3c0-2785e7c43e24",
+    "unitId": "afac75c2-8901-384d-a3e7-90047633e74b"
+  },
+  "scenario": "社区展板缺几块数字拼贴。孩子先听数词，再数准确的图，贴出自己的卡，并用英语向参观者介绍。",
+  "goals": [
+    "听辨和说一到十，按声音匹配数量而不依赖英语文字。",
+    "听数词后准确添图，每枚对应一个数词，重新摆仍能核对。",
+    "听How many?及指定类别，数对并说英语数词。",
+    "展示自己的拼贴，和家人交换问答并逐个核验。"
+  ],
+  "pageSequence": [
+    {
+      "key": "open-the-collage",
+      "kind": "teaching",
+      "plan": "看原创展板上有一格空白。老师先让孩子听一个数词，再揭开相应数量的小图和数字。"
+    },
+    {
+      "key": "one-through-ten",
+      "kind": "teaching",
+      "plan": "用几种摆法分小组亮一到十的数量图，教师逐个读并留跟说。数字或图可以辅助，玩法由音频解释。"
+    },
+    {
+      "key": "catch-and-fill",
+      "kind": "interactive",
+      "plan": "孩子移动小车接住落下的拼贴图串，把两个篮格补到听见的准确数。每个落点和串数可看清。"
+    },
+    {
+      "key": "make-a-small-card",
+      "kind": "teaching",
+      "plan": "教师示范先听目标，再一枚一枚放小图并边数边点亮，最后与目标核对并报数。孩子自己完成一张小卡。"
+    },
+    {
+      "key": "only-this-kind",
+      "kind": "teaching",
+      "plan": "换成两类文具混放。先听问题指哪一类，再亮正确组并数，比较数全部和只数所问对象。"
+    },
+    {
+      "key": "deliver-collage-tiles",
+      "kind": "interactive",
+      "plan": "听英语数量和拼贴卡类别，驾驶取到准确小图组，再送到相应展格。展示可包含一到十。"
+    },
+    {
+      "key": "show-and-ask",
+      "kind": "teaching",
+      "plan": "原创两人示范一问一答，看作品后从另一端重新点数，交换说话者；提示向家人实际展示。"
+    },
+    {
+      "key": "picture-check",
+      "kind": "quiz",
+      "plan": "六道新图题用教师录音问，覆盖听数词、拼贴、只数指定类与展示核查。"
+    },
+    {
+      "key": "closing",
+      "kind": "teaching",
+      "plan": "回顾听、数、摆、问答四步。带一张原创纸卡和口头任务回家。"
+    }
+  ],
+  "games": [
+    {
+      "page": "catch-and-fill",
+      "template": "orchardCatch",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.orchardCatch",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "exact_quantity",
+      "selection": "两个篮显示独立目标数量，语音读两个数词。孩子移动接住不可拆串，须准确分到各篮才能通关。不同图样与颜色不提示篮。",
+      "levels": [
+        "2与3的慢速篮，两到三串且可完成。",
+        "4与5的篮，换落点与四串。",
+        "7与8的篮，增加串数与轻微风偏，每关先校验整串分法可达。"
+      ],
+      "demo": "分别亮左两格与右三格，再亮首串两枚和换篮键。只接第一串，交接时回首关归零。"
+    },
+    {
+      "page": "deliver-collage-tiles",
+      "template": "listenDelivery",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.listenDelivery",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "listen_pick_deliver",
+      "selection": "听种类和数量去取货，再听送到哪格。货牌左区有清楚的大物件图，右区用数字和准确数量点，移动与判定规则不变。",
+      "levels": [
+        "两本书对两号展格；四把尺为干扰。",
+        "依次运五把尺和六把尺，分清同类不同数量。",
+        "依次运九片叶、十枚星、七把尺，九枚星为干扰，按口令过车道。"
+      ],
+      "demo": "依次亮物件、数量组、展格与控制，老师只示范第一步后复位；目标、取送各步与提示提前录制。"
+    }
+  ],
+  "quizPlan": [
+    {
+      "id": "hear-eight",
+      "skill": "听辨 Eight 和八件",
+      "prompt": "Eight leaves. Find the card.",
+      "answer": "八枚叶子",
+      "position": 2,
+      "rationale": "Eight 是八。每枚叶子数一次，第二张正好八枚。"
+    },
+    {
+      "id": "hear-ten",
+      "skill": "听辨 Ten 和十件",
+      "prompt": "Ten rulers. Find the card.",
+      "answer": "两排各五把尺，一共十把",
+      "position": 1,
+      "rationale": "Ten 表示十。正确图两排各五把尺，每把只数一次。"
+    },
+    {
+      "id": "finish-six",
+      "skill": "听目标后放够六枚",
+      "prompt": "Make six. Which card is ready?",
+      "answer": "六枚错开摆的叶子",
+      "position": 3,
+      "rationale": "Six 是六。正确图是六枚叶子，分开摆，没有压在一起。"
+    },
+    {
+      "id": "four-rulers",
+      "skill": "只数所问的尺",
+      "prompt": "How many rulers? Four. Find it.",
+      "answer": "四把尺、两本书",
+      "position": 2,
+      "rationale": "听到 rulers，只数尺。正确图有四把尺，书不用算进去。"
+    },
+    {
+      "id": "nine-books",
+      "skill": "听数量与类别并匹配",
+      "prompt": "How many books? Nine. Find it.",
+      "answer": "九本书和一把尺",
+      "position": 1,
+      "rationale": "Nine 是九。正确图里有九本书和一把尺，只数书。"
+    },
+    {
+      "id": "count-each-once",
+      "skill": "逐件核对后用英语报数",
+      "prompt": "How many? Seven. 哪张图每枚只数一次？",
+      "answer": "七枚叶子，每枚一个计数标记",
+      "position": 3,
+      "rationale": "第三张给七枚叶子各标了一次。第一张重复数一枚，第二张漏数一枚。"
+    }
+  ],
+  "afterClass": {
+    "familyTask": "把若干同类纸图或日常小物摆在一张卡上，先说英语目标数，再逐个放，邀请家人问How many?，交换角色并检查。",
+    "weeklyQuestionSource": [
+      "听辨一到十",
+      "按要求完成准确拼贴",
+      "只数所问的一类",
+      "看作品问答和核对"
+    ],
+    "evidence": "线上记录游戏和图题；实际拼贴、口头表达和准确点数由家人观察。"
+  },
+  "artAndLanguage": "原创展板和贴图，数量与组合用代码精确绘制。使用英语教师预录和图示指令，数字保留为学习目标。",
+  "goalSources": [
+    {
+      "skill": "numbers-by-ear",
+      "target": "听辨和说一到十，按声音匹配数量而不依赖英语文字。",
+      "source": "原书印74数字格"
+    },
+    {
+      "skill": "build-a-collage",
+      "target": "听数词后准确添图，每枚对应一个数词，重新摆仍能核对。",
+      "source": "原书印74～75项目及旧备课课件第9页"
+    },
+    {
+      "skill": "ask-and-count-a-kind",
+      "target": "听How many?及指定类别，数对并说英语数词。",
+      "source": "原书印74～75问答，旧备课课件第8页"
+    },
+    {
+      "skill": "present-and-check",
+      "target": "展示自己的拼贴，和家人交换问答并逐个核验。",
+      "source": "原书印75及旧备课教案第2页的展示练法"
+    }
+  ],
+  "authorship": {
+    "authorModel": "gpt-6.1-sol",
+    "method": "核对原书印74～75、边界和13页旧配套，从原课项目目标原创画面、台词、题目、分组布局和游戏配置。",
+    "attestation": "我是本课作者。讲解文字、题目、画面和版式为原创。图画来自内置 ImageGen，准确数量与数字由代码绘制。未照搬官方原文、图片、题目或版式，未使用 DeepSeek 初稿。",
+    "catalogSha256": "1f04d478644e68af67bc264bf46227ece3d94d9c4070e8a8dd219846a48f4753",
+    "sourceSha256": {
+      "identity.json": "0b7a05fe033a543bb9313144be7e0d1bef8453466a8fdb54cb14bee682aaaa5a",
+      "official-notes.json": "ddc8972c38ea1419f0119e8759a82253a444e87e7e5e2b2796cd02fbbf1ce194",
+      "lesson.json": "b40471268b2cb7021c38ae1a7bc19b64c92f809c7edde57638b3638d7f1f76d5",
+      "asset-provenance.json": "91d6131b67848d47b733715e66a60c669e758f079d1e1553f6a518db1e1ecb27",
+      "art-source/draw_collage.py": "e96838bad2c1b08292a003c556fd0315aad43c9b67e73dcfe079fbb0ffa65a5a",
+      "art-source/project-math.json": "c52a78449bdc83e1d3a16835bcecf5b182c8c3e1b0d74e3e0622aa11b37b35cc",
+      "art-source/project-cutouts.receipt.json": "00aeb287266490decb1330918c63ec0c4bd65a51290603ef66315fffa4769394",
+      "pages/catch-and-fill.html": "12463fd4319af424a649579aadf47c442167182760032aab9c993465ed88be27",
+      "pages/catch-and-fill.js": "43e6d678e41e61d6c23c80c8aae98600a6b3f88235f9b332cc8ea8ef552aa5a0",
+      "pages/deliver-collage-tiles.html": "b507dedb431e7a33d187653305bd407af51607cdaadcf1afa8f4b4fad90bfb97",
+      "pages/deliver-collage-tiles.js": "9ae02ccefd7a20163ac4897a21da2571fc406086d6431052f5d51c8ca64ae832",
+      "tests/game_rules.test.cjs": "d042d71213294cbbda8ae2bc68345afd5102b1dc3ad12638613edf1709a3cbe8",
+      "tests/test_draw_collage.py": "28de4353f363b9ec25eee421de0544a9cef95a0890be762a0944c0df163b83e6"
+    }
+  }
+}

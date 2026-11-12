@@ -1,0 +1,125 @@
+{
+  "atlasId": "model-atlas",
+  "rows": 3,
+  "columns": 3,
+  "background": "transparent",
+  "assets": [
+    {
+      "assetKey": "rover-idle",
+      "description": "橙色车待机帧",
+      "usedBy": [
+        "follow-cardinal-route"
+      ],
+      "crop": [
+        69,
+        59,
+        390,
+        338
+      ]
+    },
+    {
+      "assetKey": "rover-move",
+      "description": "同车行动帧",
+      "usedBy": [
+        "follow-cardinal-route"
+      ],
+      "crop": [
+        510,
+        58,
+        827,
+        344
+      ]
+    },
+    {
+      "assetKey": "garden-cart",
+      "description": "庭院巡游小车",
+      "usedBy": [
+        "follow-cardinal-route"
+      ],
+      "crop": [
+        937,
+        64,
+        1267,
+        319
+      ]
+    },
+    {
+      "assetKey": "stone-bridge",
+      "description": "浅色小石桥",
+      "usedBy": [
+        "follow-cardinal-route"
+      ],
+      "crop": [
+        29,
+        449,
+        412,
+        741
+      ]
+    },
+    {
+      "assetKey": "red-gate",
+      "description": "红门模型",
+      "usedBy": [
+        "read-the-direction-mark"
+      ],
+      "crop": [
+        471,
+        418,
+        846,
+        744
+      ]
+    },
+    {
+      "assetKey": "blue-bucket",
+      "description": "蓝水桶",
+      "usedBy": [
+        "picture-quiz"
+      ],
+      "crop": [
+        948,
+        416,
+        1224,
+        751
+      ]
+    },
+    {
+      "assetKey": "brass-peg",
+      "description": "带底座的竖直模型杆",
+      "usedBy": [
+        "direction-photo-pairs"
+      ],
+      "crop": [
+        125,
+        839,
+        312,
+        1140
+      ]
+    },
+    {
+      "assetKey": "yellow-ball",
+      "description": "黄色模型光球",
+      "usedBy": [
+        "direction-photo-pairs"
+      ],
+      "crop": [
+        554,
+        813,
+        750,
+        1153
+      ]
+    },
+    {
+      "assetKey": "green-pupil",
+      "description": "绿色帽子人偶俯视",
+      "usedBy": [
+        "three-model-facings"
+      ],
+      "crop": [
+        954,
+        795,
+        1216,
+        1146
+      ]
+    }
+  ]
+}

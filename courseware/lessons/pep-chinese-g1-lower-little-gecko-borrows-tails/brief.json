@@ -1,0 +1,235 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "小壁虎借尾巴",
+  "binding": {
+    "editionId": "pep-chinese-g1-lower-2022-standard",
+    "revisionId": "directory-b30168cf88d5ee5709335698",
+    "nodeId": "76a0e116-4644-4b84-98f3-fad95880146d",
+    "unitId": "336f717a-5a30-4b70-87f1-0ac3b195ed88"
+  },
+  "scenario": "小剧场排练借尾巴。孩子听动作和用途为纸偶找布景，再按发生顺序跑跳接画。",
+  "goals": [
+    "借助画、部件、前后句和生活经验猜读并核实壁、借、咬、难、哪、爬、您、拨、赶、摆、过、孩、转，认识走字旁，区分哪的两种语境。",
+    "借图依序讲清遇蛇挣断、向小鱼老牛燕子借尾、回家发现新尾，理解三位在故事中各用尾巴做什么。",
+    "根据到哪儿、看见谁、怎样请求、对方怎样说明来复述，读好带问号的请求与有原因的答复，回纸书分角色。",
+    "在田字格写向、边、行、草、赶、过、找，比较走字旁与走之，书写由成人实际看。"
+  ],
+  "goalSources": [
+    {
+      "goal": "借助画、部件、前后句和生活经验猜读并核实壁、借、咬、难、哪、爬、您、拨、赶、摆、过、孩、转，认识走字旁，区分哪的两种语境。",
+      "source": "印105至108及两课时教学设计"
+    },
+    {
+      "goal": "借图依序讲清遇蛇挣断、向小鱼老牛燕子借尾、回家发现新尾，理解三位在故事中各用尾巴做什么。",
+      "source": "印105至107及两课时课件"
+    },
+    {
+      "goal": "根据到哪儿、看见谁、怎样请求、对方怎样说明来复述，读好带问号的请求与有原因的答复，回纸书分角色。",
+      "source": "印108和第二课时任务单1"
+    },
+    {
+      "goal": "在田字格写向、边、行、草、赶、过、找，比较走字旁与走之，书写由成人实际看。",
+      "source": "印108、国标和两课时田字格"
+    }
+  ],
+  "pageSequence": [
+    {
+      "key": "why-borrow",
+      "kind": "teaching",
+      "plan": "遇蛇挣断、想借。壁借咬难哪。"
+    },
+    {
+      "key": "fish-by-river",
+      "kind": "teaching",
+      "plan": "在河边，爬您拨。"
+    },
+    {
+      "key": "cow-under-tree",
+      "kind": "teaching",
+      "plan": "爬大树，看树下甩尾、赶蝇，走字旁。"
+    },
+    {
+      "key": "swallow-under-eaves",
+      "kind": "teaching",
+      "plan": "房檐下看摆尾定方向。"
+    },
+    {
+      "key": "back-to-mother",
+      "kind": "teaching",
+      "plan": "过孩转，未借到而难过，妈妈提醒后才发现。"
+    },
+    {
+      "key": "look-and-guess",
+      "kind": "teaching",
+      "plan": "遇到没学过的字，可以怎样猜"
+    },
+    {
+      "key": "match-tail-functions",
+      "kind": "teaching",
+      "plan": "给三种尾巴动作找合适的布景"
+    },
+    {
+      "key": "sort-the-tail-use",
+      "kind": "game",
+      "plan": "尾巴动作及作用与角色配对。"
+    },
+    {
+      "key": "story-stops",
+      "kind": "teaching",
+      "plan": "把借尾巴的路接起来"
+    },
+    {
+      "key": "jump-the-journey",
+      "kind": "game",
+      "plan": "按七段片段先后跑跳。"
+    },
+    {
+      "key": "read-questions",
+      "kind": "teaching",
+      "plan": "四句结构和原创礼貌借物读法。"
+    },
+    {
+      "key": "write-xiang-and-xing",
+      "kind": "teaching",
+      "plan": "向和行，笔画从哪里起"
+    },
+    {
+      "key": "write-bian-and-guo",
+      "kind": "teaching",
+      "plan": "边和过，走之最后写"
+    },
+    {
+      "key": "write-cao-and-zhao",
+      "kind": "teaching",
+      "plan": "草和找，两字各从哪儿写"
+    },
+    {
+      "key": "write-gan",
+      "kind": "teaching",
+      "plan": "赶字的走字旁，和走之一样吗"
+    },
+    {
+      "key": "picture-quiz",
+      "kind": "quiz",
+      "plan": "原创图题。"
+    },
+    {
+      "key": "retell-to-family",
+      "kind": "teaching",
+      "plan": "纸书读问号、说地点角色及结果，查其他动物自选。"
+    }
+  ],
+  "games": [
+    {
+      "page": "sort-the-tail-use",
+      "template": "sortingDepot",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.sortingDepot",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "classification",
+      "selection": "把纸偶推到对应动作作用布景，错误地点不收。",
+      "levels": [
+        "鱼和牛：拨水和赶蝇。",
+        "加燕子：飞行方向。",
+        "三角色和结尾小壁虎，区分原来和后来。"
+      ],
+      "teacherAnchors": [
+        "gecko-first-card",
+        "gecko-first-dock",
+        "game-player"
+      ],
+      "demo": "依次亮目标图、目的地与车或角色，首关暂停讲解、实际示范一次，清零交孩子。"
+    },
+    {
+      "page": "jump-the-journey",
+      "template": "platformHop",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.platformHop",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "ordered_route",
+      "selection": "故事下一幕决定跑跳落脚台，不能靠颜色猜。",
+      "levels": [
+        "墙角、河边、大树。",
+        "大树、房檐、回家。",
+        "房檐、没借到回家、妈妈提醒、发现新尾。"
+      ],
+      "teacherAnchors": [
+        "gecko-hop-listen",
+        "gecko-first-platform",
+        "game-player"
+      ],
+      "demo": "依次亮目标图、目的地与车或角色，首关暂停讲解、实际示范一次，清零交孩子。"
+    }
+  ],
+  "quiz": [
+    {
+      "id": "why-borrow-early",
+      "skill": "story-cause",
+      "prompt": "新故事卡要画小壁虎为什么出门借尾巴。哪组小画能说明原因？",
+      "answer": "墙角遇蛇脱身",
+      "position": 2,
+      "rationale": "它在墙角遇蛇，挣断尾巴逃开。没有尾巴才想去借。"
+    },
+    {
+      "id": "cow-tail-use",
+      "skill": "tail-use",
+      "prompt": "新道具牌要画老牛用尾巴做什么。哪张图画得合适？",
+      "answer": "甩尾赶苍蝇",
+      "position": 1,
+      "rationale": "故事里的老牛用尾巴赶苍蝇。这张画里尾巴甩向苍蝇，苍蝇飞开。"
+    },
+    {
+      "id": "where-after-cow",
+      "skill": "where-next",
+      "prompt": "小壁虎刚在大树那儿问过老牛。下一幅卡该放哪儿？",
+      "answer": "房檐下",
+      "position": 3,
+      "rationale": "大树之后它到了房檐下，向燕子借尾巴。"
+    },
+    {
+      "id": "ask-for-a-book",
+      "skill": "polite-question",
+      "prompt": "小禾想向同伴借一本图画书。哪张画最适合读一句礼貌的问话？",
+      "answer": "面对同伴问",
+      "position": 2,
+      "rationale": "先面对同伴，用话问能不能借，等对方回答。这张画表现出这个动作。"
+    },
+    {
+      "id": "turned-to-find",
+      "skill": "discover-or-grow",
+      "prompt": "纸偶演到妈妈让小壁虎转过身。下一幅小画要表现它发现了什么？",
+      "answer": "转身看到新尾",
+      "position": 1,
+      "rationale": "转身后它看到自己已经有一条新尾巴，原来不用再借。"
+    },
+    {
+      "id": "gan-stroke-order",
+      "skill": "stroke-rule",
+      "prompt": "字卡只保留赶字先写的外面部分。应选哪幅图？",
+      "answer": "只画走字旁",
+      "position": 3,
+      "rationale": "赶先写走字旁，再写右边的干。这张只画先写的走字旁。"
+    },
+    {
+      "id": "eaves-picture",
+      "skill": "guess-word",
+      "prompt": "听，小鸟飞到屋子的房檐下。哪幅图能帮助猜出房檐是什么？",
+      "answer": "屋瓦伸出的边下",
+      "position": 2,
+      "rationale": "房檐是屋顶伸出墙外的部分。小鸟正在这一部分的下面。"
+    }
+  ],
+  "afterClass": {
+    "familyTask": "和大人纸书分角色读问句，按图讲三次借尾。成人可以陪查另一种动物尾巴用途；纸笔请成人看。",
+    "weeklyQuestionSource": [
+      "猜读",
+      "问句语气",
+      "借尾因果",
+      "故事动作与作用",
+      "七字笔顺"
+    ],
+    "evidence": "线上记选图、操作，口语和书写待成人观察。"
+  },
+  "artAndLanguage": "画面和台词原创、教材全文留纸书。动作差异先突出尾部和位置，再露角色。画清新尾是在回家后发现。",
+  "officialNotesSha256": "4ab10f0619a2f8b030ace3c2f7327da98468bb638f0ad61f37061143ee0e7315"
+}

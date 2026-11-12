@@ -1,0 +1,147 @@
+{
+  "schemaVersion": "mira.courseware.asset-composition.v1",
+  "key": "parcel-phrases",
+  "canvas": [
+    840,
+    600
+  ],
+  "background": "#fff2d7",
+  "inputs": {
+    "parcel-yellow-leaf": {
+      "file": "assets/parcel-yellow-leaf.png",
+      "sha256": "00b922d178b19898f8a8cababcef5bbb33b8c0bcc46438c7d291d001bf3ff9e3"
+    },
+    "parcel-red-scarf": {
+      "file": "assets/parcel-red-scarf.png",
+      "sha256": "3fe10a9468795a1ae29fa5a0a8b33253943abc83257d37cfd26211b2a2e9f45f"
+    },
+    "parcel-blue-scarf": {
+      "file": "assets/parcel-blue-scarf.png",
+      "sha256": "1a8eddf9f772cb0164b25cfb660e0c9178de55a212c5053df277e498d4514e9e"
+    },
+    "parcel-blue-cap": {
+      "file": "assets/parcel-blue-cap.png",
+      "sha256": "42bb492bb6d04bbe8826d4ce326bb601ff22ede10cb93ce50fef688ae5d079ab"
+    },
+    "recipient-rabbit": {
+      "file": "assets/recipient-rabbit.png",
+      "sha256": "a9dc88cd738357ff6452e9bf41d43f08a4978c0ae18050d572cf822690082a9f"
+    },
+    "recipient-turtle": {
+      "file": "assets/recipient-turtle.png",
+      "sha256": "3e40189f0da6be0949a5cf5ec4d783a48ae1145fabfb59a2be75ebcaf55c9a07"
+    },
+    "recipient-cat": {
+      "file": "assets/recipient-cat.png",
+      "sha256": "21216f56b1201f9330f137cac73c4c765ba5932d72ef0382cfd474180b9def03"
+    }
+  },
+  "layers": [
+    {
+      "op": "roundrect",
+      "box": [
+        18,
+        48,
+        822,
+        383
+      ],
+      "radius": 22,
+      "fill": "#f9e8bc"
+    },
+    {
+      "op": "roundrect",
+      "box": [
+        18,
+        403,
+        822,
+        554
+      ],
+      "radius": 22,
+      "fill": "#f9e8bc"
+    },
+    {
+      "op": "asset",
+      "asset": "parcel-yellow-leaf",
+      "center": [
+        157,
+        215
+      ],
+      "size": [
+        220,
+        220
+      ]
+    },
+    {
+      "op": "asset",
+      "asset": "parcel-red-scarf",
+      "center": [
+        425,
+        136
+      ],
+      "size": [
+        378,
+        167
+      ]
+    },
+    {
+      "op": "asset",
+      "asset": "parcel-blue-scarf",
+      "center": [
+        425,
+        285
+      ],
+      "size": [
+        378,
+        167
+      ]
+    },
+    {
+      "op": "asset",
+      "asset": "parcel-blue-cap",
+      "center": [
+        686,
+        219
+      ],
+      "size": [
+        220,
+        220
+      ]
+    },
+    {
+      "op": "asset",
+      "asset": "recipient-rabbit",
+      "center": [
+        171,
+        478
+      ],
+      "size": [
+        144,
+        144
+      ]
+    },
+    {
+      "op": "asset",
+      "asset": "recipient-turtle",
+      "center": [
+        421,
+        478
+      ],
+      "size": [
+        144,
+        144
+      ]
+    },
+    {
+      "op": "asset",
+      "asset": "recipient-cat",
+      "center": [
+        669,
+        478
+      ],
+      "size": [
+        144,
+        144
+      ]
+    }
+  ]
+}

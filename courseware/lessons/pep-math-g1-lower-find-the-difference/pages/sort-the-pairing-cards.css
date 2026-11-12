@@ -1,0 +1,21 @@
+#cv #ready .pic { object-fit: contain; background: #fff5df; }
+#pairing-legend {
+  position: absolute;
+  left: 30px;
+  top: 222px;
+  width: 164px;
+  display: grid;
+  gap: 13px;
+  z-index: 2;
+  pointer-events: none;
+}
+#pairing-legend[hidden] { display: none; }
+#nearby-pairing-card {
+  width: 100%;
+  height: 132px;
+  object-fit: contain;
+  box-shadow: 0 0 0 4px #74a9a2;
+  border-radius: 10px;
+}
+#pairing-tray-samples { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+#pairing-tray-samples img { width: 100%; height: 76px; object-fit: contain; }

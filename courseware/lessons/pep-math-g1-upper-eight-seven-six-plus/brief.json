@@ -1,0 +1,188 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "8、7、6 加几",
+  "binding": {
+    "editionId": "pep-math-g1-upper-2022-standard",
+    "revisionId": "directory-ede7a8c63c337cf95a03fe79",
+    "nodeId": "761be111-be28-4b60-a16a-514a8dc22e2f",
+    "unitId": "e3561735-f831-494f-ba43-370dccc3ff2a"
+  },
+  "scenario": "海边节庆的灯片准备台。孩子要把散片补进每袋十格的灯盒，并给不同摆法贴上相同总数的标记。",
+  "goals": [
+    "看格位找出8、7、6各需要补的数量。",
+    "按缺口拆开另一组，凑十后与剩余小片合计。",
+    "比较两种拆法与加数对换，指出总量一样。",
+    "在新图与算式中选择方法，能向人说出理由。"
+  ],
+  "pageSequence": [
+    {
+      "key": "light-tile-piles",
+      "kind": "teaching",
+      "plan": "看两群待装灯片，从已有9加几只回想“先找空格”，再问这次8格已亮还能放几片。"
+    },
+    {
+      "key": "find-the-gap",
+      "kind": "teaching",
+      "plan": "逐格比较8、7、6三种十格盒。先请孩子猜各缺多少，再点亮空格核对。"
+    },
+    {
+      "key": "split-the-donor",
+      "kind": "teaching",
+      "plan": "用原创数量图把待装一组分成“补满”和“留下”，再依次显示十格满盒、剩余灯片和总数。换缺口举第二例。"
+    },
+    {
+      "key": "partition-pickup",
+      "kind": "interactive",
+      "plan": "控制移动篮接住灯片串，用原来的盒位决定补满篮和留存篮该接到多少。"
+    },
+    {
+      "key": "two-directions",
+      "kind": "teaching",
+      "plan": "两盒分别从不同一边补十；逐片移动，指着没有增加或拿走的总片数，让孩子解释结果。"
+    },
+    {
+      "key": "swap-order",
+      "kind": "teaching",
+      "plan": "交换两组的观察顺序，先请孩子观察数量是否增减，再对照两道加法式和一个总量。"
+    },
+    {
+      "key": "same-total-targets",
+      "kind": "interactive",
+      "plan": "发射灯片牌，对准同总数且只有一个正确的移动靶；后两关从凑十图进阶到等和交换式。"
+    },
+    {
+      "key": "show-a-way",
+      "kind": "teaching",
+      "plan": "给新灯盒情境留实际回答时间，学生用数量图或一句话说清缺几、怎么补和合起来多少。"
+    },
+    {
+      "key": "picture-check",
+      "kind": "quiz",
+      "plan": "六道新图题用录音说明问题，数学数字和加号留作目标内容，题目图须足以判断数量。"
+    },
+    {
+      "key": "wrap-up",
+      "kind": "teaching",
+      "plan": "按“看缺口、分一分、凑成十、加剩下”回顾，再重看一种交换式并说总数不变。"
+    }
+  ],
+  "games": [
+    {
+      "page": "partition-pickup",
+      "template": "orchardCatch",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.orchardCatch",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "split_quantity",
+      "selection": "补满篮容量对应已有盒的空格，留存篮容量对应剩下。每串不可拆，主动移动、选择装入哪篮，两篮都刚好才通过。",
+      "levels": [
+        "8片差2，散片5分为补2、留3，首串落中间。",
+        "7片差3，7分为补3、留4，从两串拼出3。",
+        "6片差4，9分为补4、留5；允许任何能填满两篮的合法整串组合。"
+      ],
+      "demo": "在实时十格、左篮、车与首串的实际位置说明缺2。放开后等落下，只接一串再重置。"
+    },
+    {
+      "page": "same-total-targets",
+      "template": "magnetMarbles",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.magnetMarbles",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "pair_match",
+      "selection": "弹珠牌是算式或两组数量图，移动靶是成十加余图或另一写法，只按同总数配对。每次保留一个正确靶，发射和轨迹影响实际能否击中。",
+      "levels": [
+        "慢漂移，先用凑十找同样多的数量图。",
+        "找到交换顺序后仍同样多的两组卡，有一个近邻干扰。",
+        "提高移动与飞行速度，交叉比较6、8开头的和与不同满盒余量。"
+      ],
+      "demo": "高亮放大预览、第一张正确靶和发射位置，飞行时讲观察，只命中一发再清零。"
+    }
+  ],
+  "quizPlan": [
+    {
+      "skill": "按十格空位判断七补几",
+      "prompt": "要把这个十格盒填满，还得拿几片？",
+      "correctImage": "q1-b",
+      "position": 2,
+      "rationale": "十格盒已经放了七片，还空三格。拿三片就能填满。"
+    },
+    {
+      "skill": "从六片里分出补六到十的一份",
+      "prompt": "盒里有六片。左盘填空格，另六片怎么分？",
+      "correctImage": "q2-c",
+      "position": 3,
+      "rationale": "六片还差四片到十。把外面的六片分成四片和两片，左边四片填格，右边两片留下。"
+    },
+    {
+      "skill": "先给八补十，再判断余量",
+      "prompt": "把八片补成十片，外面的九片还会剩几片？",
+      "correctImage": "q3-a",
+      "position": 1,
+      "rationale": "从九片里挪两片去补空格，九分成二和七。补满一盒，盒外还剩七片。"
+    },
+    {
+      "skill": "交换两组位置，各自数量保留",
+      "prompt": "两盘只换左右。哪幅图摆完了？",
+      "correctImage": "q4-b",
+      "position": 2,
+      "rationale": "原来左边六片、右边五片。换过来左边五片、右边六片，两堆的总数一样。"
+    },
+    {
+      "skill": "换另一边凑十，按该边空位拆分",
+      "prompt": "七片加九片。先给九补十，七片怎么分？",
+      "correctImage": "q5-c",
+      "position": 3,
+      "rationale": "九还差一。七要分成一和六，把一片填进盒，盒外还剩六片。"
+    },
+    {
+      "skill": "在新图中用凑十表示和",
+      "prompt": "八片合四片。哪幅图能看出合起来有几片？",
+      "correctImage": "q6-a",
+      "position": 1,
+      "rationale": "八还差二，四片分成两片和两片。一个十和两片合起来是十二片。"
+    }
+  ],
+  "afterClass": {
+    "familyTask": "与家人用纽扣、纸片或自己画的卡片练三种题。先说要补几，再移动数一数，最后向家人说出满十与剩下。",
+    "weeklyQuestionSource": [
+      "8、7、6的十格缺口",
+      "拆分另一组后凑十",
+      "加数对换及不同拆法的同和",
+      "新图中选办法并说过程"
+    ],
+    "evidence": "线上记录图题和游戏动作，实际摆放、选择理由与口头说法由家人观察。"
+  },
+  "artAndLanguage": "灯片造型和场景独立创作，数量由代码逐个摆放和核验。录音给出任务，图中仍保留作为数学目标的数字和算式。",
+  "goalBindings": [
+    {
+      "skill": "complement-to-ten",
+      "target": "看格位找出8、7、6各需要补的数量。",
+      "source": "原书印91、课件1～19页"
+    },
+    {
+      "skill": "split-and-make-ten",
+      "target": "按缺口拆开另一组，凑十后与剩余小片合计。",
+      "source": "原书印91、教案2～4页"
+    },
+    {
+      "skill": "same-sum",
+      "target": "比较两种拆法与加数对换，指出总量一样。",
+      "source": "原书印92、课件20～31页"
+    },
+    {
+      "skill": "apply-and-explain",
+      "target": "在新图与算式中选择方法，能向人说出理由。",
+      "source": "原书印92、教案6页、练习1页"
+    }
+  ],
+  "authorship": {
+    "sourceMode": "direct",
+    "authorModels": [
+      "gpt-6.1-sol"
+    ]
+  },
+  "gameCatalog": {
+    "path": "courseware/kit/game_templates/catalog.json",
+    "sha256": "1f04d478644e68af67bc264bf46227ece3d94d9c4070e8a8dd219846a48f4753"
+  }
+}

@@ -1,0 +1,1346 @@
+{
+  "schemaVersion": "mira.courseware.asset-provenance.v1",
+  "assets": {
+    "age-two": {
+      "sourceKind": "deterministic_age_badge_diagram",
+      "path": "assets/age-two.png",
+      "sha256": "f588d21d5b2f8a0c1d893372510ae89639b637a8c8b4803ee23f17c39606a06d",
+      "bytes": 3651,
+      "pixels": [
+        256,
+        256
+      ],
+      "age": 2,
+      "renderer": "age_badges.py",
+      "rendererSha256": "0fde66c105fce5d3f895a1e0489afaba09847601eede9be3978e467eaf8da093",
+      "font": "mobile/test/assets/fonts/NotoSansCJKsc-Regular.otf",
+      "fontSha256": "2c76254f6fc379fddfce0a7e84fb5385bb135d3e399294f6eeb6680d0365b74b"
+    },
+    "age-four": {
+      "sourceKind": "deterministic_age_badge_diagram",
+      "path": "assets/age-four.png",
+      "sha256": "fe716037837fd331aef46cf2a8aebc2f41d986e54c97d5b0d81b57f47daa96ef",
+      "bytes": 2485,
+      "pixels": [
+        256,
+        256
+      ],
+      "age": 4,
+      "renderer": "age_badges.py",
+      "rendererSha256": "0fde66c105fce5d3f895a1e0489afaba09847601eede9be3978e467eaf8da093",
+      "font": "mobile/test/assets/fonts/NotoSansCJKsc-Regular.otf",
+      "fontSha256": "2c76254f6fc379fddfce0a7e84fb5385bb135d3e399294f6eeb6680d0365b74b"
+    },
+    "age-five": {
+      "sourceKind": "deterministic_age_badge_diagram",
+      "path": "assets/age-five.png",
+      "sha256": "09a92bfdacc11c7dd53b922189b7e490fdc091e7bba0bb61e4dbe634142b4276",
+      "bytes": 3684,
+      "pixels": [
+        256,
+        256
+      ],
+      "age": 5,
+      "renderer": "age_badges.py",
+      "rendererSha256": "0fde66c105fce5d3f895a1e0489afaba09847601eede9be3978e467eaf8da093",
+      "font": "mobile/test/assets/fonts/NotoSansCJKsc-Regular.otf",
+      "fontSha256": "2c76254f6fc379fddfce0a7e84fb5385bb135d3e399294f6eeb6680d0365b74b"
+    },
+    "age-eight": {
+      "sourceKind": "deterministic_age_badge_diagram",
+      "path": "assets/age-eight.png",
+      "sha256": "f53cf12dfe66fa6e0def44d9c3bd3eee1dd28580d55ddaec365ad435e64f2a71",
+      "bytes": 5200,
+      "pixels": [
+        256,
+        256
+      ],
+      "age": 8,
+      "renderer": "age_badges.py",
+      "rendererSha256": "0fde66c105fce5d3f895a1e0489afaba09847601eede9be3978e467eaf8da093",
+      "font": "mobile/test/assets/fonts/NotoSansCJKsc-Regular.otf",
+      "fontSha256": "2c76254f6fc379fddfce0a7e84fb5385bb135d3e399294f6eeb6680d0365b74b"
+    },
+    "boat-idle": {
+      "path": "assets/boat-idle.png",
+      "sha256": "c20f9cee3455f454385e4948490dc68322af478b2949291406d0abff8aa21419",
+      "bytes": 54784,
+      "pixels": [
+        260,
+        163
+      ],
+      "renderer": "game_art.py",
+      "rendererSha256": "582218e5c4514ec88202bef6550913eb31d6bb73337aee583ce1817be67a50cd",
+      "sourceKind": "registered_builtin_imagegen_crop",
+      "originalKey": "birthday-game-actors",
+      "originalSha256": "63d0a0fadc8eb07887a0b67798c7f2bbc9c1808e8e409a6f2fd0bbc657b7ad0a",
+      "atlasCell": [
+        0,
+        0,
+        512,
+        512
+      ],
+      "cropInIsolatedCell": [
+        32,
+        110,
+        492,
+        398
+      ],
+      "cropCoordinates": "right and bottom exclusive; out-of-cell area is transparent padding"
+    },
+    "boat-blow": {
+      "path": "assets/boat-blow.png",
+      "sha256": "950672253be9e7afb7cdac9a01615aa55cd8e075e8855119e9a946855fe4b341",
+      "bytes": 57272,
+      "pixels": [
+        260,
+        163
+      ],
+      "renderer": "game_art.py",
+      "rendererSha256": "582218e5c4514ec88202bef6550913eb31d6bb73337aee583ce1817be67a50cd",
+      "sourceKind": "registered_builtin_imagegen_crop",
+      "originalKey": "birthday-game-actors",
+      "originalSha256": "63d0a0fadc8eb07887a0b67798c7f2bbc9c1808e8e409a6f2fd0bbc657b7ad0a",
+      "atlasCell": [
+        512,
+        0,
+        1024,
+        512
+      ],
+      "cropInIsolatedCell": [
+        27,
+        110,
+        487,
+        398
+      ],
+      "cropCoordinates": "right and bottom exclusive; out-of-cell area is transparent padding"
+    },
+    "maze-rover": {
+      "path": "assets/maze-rover.png",
+      "sha256": "1584c0d9c14515dba0756e2c3755e4926ebef6c46fd888fff4490974893b6745",
+      "bytes": 60644,
+      "pixels": [
+        260,
+        185
+      ],
+      "renderer": "game_art.py",
+      "rendererSha256": "582218e5c4514ec88202bef6550913eb31d6bb73337aee583ce1817be67a50cd",
+      "sourceKind": "registered_builtin_imagegen_crop",
+      "originalKey": "birthday-game-actors",
+      "originalSha256": "63d0a0fadc8eb07887a0b67798c7f2bbc9c1808e8e409a6f2fd0bbc657b7ad0a",
+      "atlasCell": [
+        1024,
+        0,
+        1536,
+        512
+      ],
+      "cropInIsolatedCell": [
+        61,
+        91,
+        534,
+        427
+      ],
+      "cropCoordinates": "right and bottom exclusive; out-of-cell area is transparent padding"
+    },
+    "maze-bubble": {
+      "path": "assets/maze-bubble.png",
+      "sha256": "015abc746ed84054c4e02a9164f8258cdb343c88b6dc05fcc5d485b708a604eb",
+      "bytes": 63599,
+      "pixels": [
+        260,
+        185
+      ],
+      "renderer": "game_art.py",
+      "rendererSha256": "582218e5c4514ec88202bef6550913eb31d6bb73337aee583ce1817be67a50cd",
+      "sourceKind": "registered_builtin_imagegen_crop",
+      "originalKey": "birthday-game-actors",
+      "originalSha256": "63d0a0fadc8eb07887a0b67798c7f2bbc9c1808e8e409a6f2fd0bbc657b7ad0a",
+      "atlasCell": [
+        0,
+        512,
+        512,
+        1024
+      ],
+      "cropInIsolatedCell": [
+        29,
+        93,
+        502,
+        429
+      ],
+      "cropCoordinates": "right and bottom exclusive; out-of-cell area is transparent padding"
+    },
+    "birthday-sticker": {
+      "path": "assets/birthday-sticker.png",
+      "sha256": "45fad51499705949765c08c06762aaf3aef08d1fcbede519a8d9077dd4e0a071",
+      "bytes": 101867,
+      "pixels": [
+        253,
+        260
+      ],
+      "renderer": "game_art.py",
+      "rendererSha256": "582218e5c4514ec88202bef6550913eb31d6bb73337aee583ce1817be67a50cd",
+      "sourceKind": "registered_builtin_imagegen_crop",
+      "originalKey": "birthday-game-actors",
+      "originalSha256": "63d0a0fadc8eb07887a0b67798c7f2bbc9c1808e8e409a6f2fd0bbc657b7ad0a",
+      "atlasCell": [
+        512,
+        512,
+        1024,
+        1024
+      ],
+      "cropInIsolatedCell": [
+        28,
+        30,
+        482,
+        497
+      ],
+      "cropCoordinates": "right and bottom exclusive; out-of-cell area is transparent padding"
+    },
+    "gift-pen": {
+      "path": "assets/gift-pen.png",
+      "sha256": "a2c6ab8ce02df8b9d4451901e79e8a747441e89106b31ddb1268f2f2d0277eff",
+      "bytes": 42060,
+      "pixels": [
+        238,
+        260
+      ],
+      "renderer": "game_art.py",
+      "rendererSha256": "582218e5c4514ec88202bef6550913eb31d6bb73337aee583ce1817be67a50cd",
+      "sourceKind": "registered_builtin_imagegen_crop",
+      "originalKey": "workshop-gift-atlas",
+      "originalSha256": "c8486b27c66a020e573434d8f37d984cd6f2cc9d2748a7cd13a1c6442f2d7377",
+      "atlasCell": [
+        0,
+        0,
+        512,
+        512
+      ],
+      "cropInIsolatedCell": [
+        72,
+        46,
+        476,
+        487
+      ],
+      "cropCoordinates": "right and bottom exclusive; out-of-cell area is transparent padding"
+    },
+    "gift-pencil": {
+      "path": "assets/gift-pencil.png",
+      "sha256": "cd17de8a0c0d897b0ebd6fdcada2c02a4da1f1ee600de30e624c63cf7b5a85cd",
+      "bytes": 39654,
+      "pixels": [
+        252,
+        260
+      ],
+      "renderer": "game_art.py",
+      "rendererSha256": "582218e5c4514ec88202bef6550913eb31d6bb73337aee583ce1817be67a50cd",
+      "sourceKind": "registered_builtin_imagegen_crop",
+      "originalKey": "workshop-gift-atlas",
+      "originalSha256": "c8486b27c66a020e573434d8f37d984cd6f2cc9d2748a7cd13a1c6442f2d7377",
+      "atlasCell": [
+        512,
+        0,
+        1024,
+        512
+      ],
+      "cropInIsolatedCell": [
+        48,
+        57,
+        465,
+        487
+      ],
+      "cropCoordinates": "right and bottom exclusive; out-of-cell area is transparent padding"
+    },
+    "gift-ball": {
+      "path": "assets/gift-ball.png",
+      "sha256": "b11c532244e2808e0b9907d4c801a871bd90a2afca5ce8f9c1460d50f4e12291",
+      "bytes": 92543,
+      "pixels": [
+        260,
+        260
+      ],
+      "renderer": "game_art.py",
+      "rendererSha256": "582218e5c4514ec88202bef6550913eb31d6bb73337aee583ce1817be67a50cd",
+      "sourceKind": "registered_builtin_imagegen_crop",
+      "originalKey": "workshop-gift-atlas",
+      "originalSha256": "c8486b27c66a020e573434d8f37d984cd6f2cc9d2748a7cd13a1c6442f2d7377",
+      "atlasCell": [
+        1024,
+        0,
+        1536,
+        512
+      ],
+      "cropInIsolatedCell": [
+        37,
+        64,
+        448,
+        475
+      ],
+      "cropCoordinates": "right and bottom exclusive; out-of-cell area is transparent padding"
+    },
+    "gift-book": {
+      "path": "assets/gift-book.png",
+      "sha256": "39636b8aaba374c6685d05a1c2e4f52d13873a401be5aead16262157d086b1b3",
+      "bytes": 78950,
+      "pixels": [
+        260,
+        241
+      ],
+      "renderer": "game_art.py",
+      "rendererSha256": "582218e5c4514ec88202bef6550913eb31d6bb73337aee583ce1817be67a50cd",
+      "sourceKind": "registered_builtin_imagegen_crop",
+      "originalKey": "workshop-gift-atlas",
+      "originalSha256": "c8486b27c66a020e573434d8f37d984cd6f2cc9d2748a7cd13a1c6442f2d7377",
+      "atlasCell": [
+        0,
+        512,
+        512,
+        1024
+      ],
+      "cropInIsolatedCell": [
+        45,
+        47,
+        497,
+        466
+      ],
+      "cropCoordinates": "right and bottom exclusive; out-of-cell area is transparent padding"
+    },
+    "gift-bag": {
+      "path": "assets/gift-bag.png",
+      "sha256": "05209aae032545813cbd89c7bea5dd1179f48f5dbab56f227b1d8313970cf9c2",
+      "bytes": 91806,
+      "pixels": [
+        252,
+        260
+      ],
+      "renderer": "game_art.py",
+      "rendererSha256": "582218e5c4514ec88202bef6550913eb31d6bb73337aee583ce1817be67a50cd",
+      "sourceKind": "registered_builtin_imagegen_crop",
+      "originalKey": "workshop-gift-atlas",
+      "originalSha256": "c8486b27c66a020e573434d8f37d984cd6f2cc9d2748a7cd13a1c6442f2d7377",
+      "atlasCell": [
+        512,
+        512,
+        1024,
+        1024
+      ],
+      "cropInIsolatedCell": [
+        32,
+        16,
+        479,
+        477
+      ],
+      "cropCoordinates": "right and bottom exclusive; out-of-cell area is transparent padding"
+    },
+    "role-wish": {
+      "path": "assets/role-wish.png",
+      "sha256": "e2b8a3fe54efa42dfcdbc1c7cc8f0f315a0352c27e5ee35058a2a92d480891ff",
+      "bytes": 66605,
+      "pixels": [
+        210,
+        260
+      ],
+      "renderer": "game_art.py",
+      "rendererSha256": "582218e5c4514ec88202bef6550913eb31d6bb73337aee583ce1817be67a50cd",
+      "sourceKind": "registered_builtin_imagegen_crop",
+      "originalKey": "birthday-dialogue-atlas",
+      "originalSha256": "d43a3156098770d6c0588329343a3b8d32277e8dbbb9aa681a7ee4f5db91bdcd",
+      "atlasCell": [
+        0,
+        0,
+        627,
+        627
+      ],
+      "cropInIsolatedCell": [
+        74,
+        28,
+        552,
+        620
+      ],
+      "cropCoordinates": "right and bottom exclusive; out-of-cell area is transparent padding"
+    },
+    "role-give": {
+      "path": "assets/role-give.png",
+      "sha256": "4404808f16d69293c66f27cd61b418ad980755d685b51e3a3b1d1e29dfcf427b",
+      "bytes": 55507,
+      "pixels": [
+        260,
+        137
+      ],
+      "renderer": "game_art.py",
+      "rendererSha256": "582218e5c4514ec88202bef6550913eb31d6bb73337aee583ce1817be67a50cd",
+      "sourceKind": "registered_builtin_imagegen_crop",
+      "originalKey": "birthday-dialogue-atlas",
+      "originalSha256": "d43a3156098770d6c0588329343a3b8d32277e8dbbb9aa681a7ee4f5db91bdcd",
+      "atlasCell": [
+        627,
+        0,
+        1254,
+        627
+      ],
+      "cropInIsolatedCell": [
+        0,
+        177,
+        627,
+        508
+      ],
+      "cropCoordinates": "right and bottom exclusive; out-of-cell area is transparent padding"
+    },
+    "role-thanks": {
+      "path": "assets/role-thanks.png",
+      "sha256": "916dee855651afac96ed101ac02ba8e5277941249c46b80acc9c29aa641be1cc",
+      "bytes": 94970,
+      "pixels": [
+        260,
+        251
+      ],
+      "renderer": "game_art.py",
+      "rendererSha256": "582218e5c4514ec88202bef6550913eb31d6bb73337aee583ce1817be67a50cd",
+      "sourceKind": "registered_builtin_imagegen_crop",
+      "originalKey": "birthday-dialogue-atlas",
+      "originalSha256": "d43a3156098770d6c0588329343a3b8d32277e8dbbb9aa681a7ee4f5db91bdcd",
+      "atlasCell": [
+        0,
+        627,
+        627,
+        1254
+      ],
+      "cropInIsolatedCell": [
+        0,
+        34,
+        601,
+        614
+      ],
+      "cropCoordinates": "right and bottom exclusive; out-of-cell area is transparent padding"
+    },
+    "role-welcome": {
+      "path": "assets/role-welcome.png",
+      "sha256": "65408659077068860d2a656cdedefab63368e4f44792489b36a54396e5669301",
+      "bytes": 70634,
+      "pixels": [
+        237,
+        260
+      ],
+      "renderer": "game_art.py",
+      "rendererSha256": "582218e5c4514ec88202bef6550913eb31d6bb73337aee583ce1817be67a50cd",
+      "sourceKind": "registered_builtin_imagegen_crop",
+      "originalKey": "birthday-dialogue-atlas",
+      "originalSha256": "d43a3156098770d6c0588329343a3b8d32277e8dbbb9aa681a7ee4f5db91bdcd",
+      "atlasCell": [
+        627,
+        627,
+        1254,
+        1254
+      ],
+      "cropInIsolatedCell": [
+        28,
+        3,
+        584,
+        613
+      ],
+      "cropCoordinates": "right and bottom exclusive; out-of-cell area is transparent padding"
+    },
+    "boat-backdrop": {
+      "path": "assets/boat-backdrop.png",
+      "sha256": "2051ba45efff0427e0c6162af0a49a363d3f73fee5febfefbec107b9714f7eff",
+      "bytes": 1158465,
+      "pixels": [
+        1280,
+        720
+      ],
+      "renderer": "game_art.py",
+      "rendererSha256": "582218e5c4514ec88202bef6550913eb31d6bb73337aee583ce1817be67a50cd",
+      "sourceKind": "registered_builtin_imagegen_backdrop",
+      "originalKey": "boat-backdrop",
+      "originalSha256": "f59b6ed7e211c80d05bfdcb7415931febc3dc4913db6f20d64af877c11709244",
+      "playbackDerivation": "center fit LANCZOS to 1280x720 from the uncropped master"
+    },
+    "maze-backdrop": {
+      "path": "assets/maze-backdrop.png",
+      "sha256": "b410db47b1e7d4e7444da19540b313b8a9e5b4b5581a117894f69ab4e063769a",
+      "bytes": 1093620,
+      "pixels": [
+        1280,
+        720
+      ],
+      "renderer": "game_art.py",
+      "rendererSha256": "582218e5c4514ec88202bef6550913eb31d6bb73337aee583ce1817be67a50cd",
+      "sourceKind": "registered_builtin_imagegen_backdrop",
+      "originalKey": "maze-backdrop",
+      "originalSha256": "10477ce635dfb3ebdb5ecfeb8c8e4a1b2ea2e2836ebe02622d1c1bb3f5df4c33",
+      "playbackDerivation": "center fit LANCZOS to 1280x720 from the uncropped master"
+    },
+    "boat-opening": {
+      "path": "assets/boat-opening.png",
+      "sha256": "4af190b792ee4e5b3372f39e0c6d314b0021be5629ca376a1039752cd8f181eb",
+      "bytes": 440075,
+      "pixels": [
+        768,
+        432
+      ],
+      "renderer": "game_art.py",
+      "rendererSha256": "582218e5c4514ec88202bef6550913eb31d6bb73337aee583ce1817be67a50cd",
+      "sourceKind": "deterministic_imagegen_composition",
+      "inputs": {
+        "boat-backdrop": "2051ba45efff0427e0c6162af0a49a363d3f73fee5febfefbec107b9714f7eff",
+        "boat-idle": "c20f9cee3455f454385e4948490dc68322af478b2949291406d0abff8aa21419",
+        "gift-ball": "b11c532244e2808e0b9907d4c801a871bd90a2afca5ce8f9c1460d50f4e12291",
+        "gift-book": "39636b8aaba374c6685d05a1c2e4f52d13873a401be5aead16262157d086b1b3"
+      }
+    },
+    "maze-opening": {
+      "path": "assets/maze-opening.png",
+      "sha256": "9d87525e43898856e394207ed312016a9a5d35d83902eae4b42ff3f2a7a2f813",
+      "bytes": 426960,
+      "pixels": [
+        768,
+        432
+      ],
+      "renderer": "game_art.py",
+      "rendererSha256": "582218e5c4514ec88202bef6550913eb31d6bb73337aee583ce1817be67a50cd",
+      "sourceKind": "deterministic_imagegen_composition",
+      "inputs": {
+        "maze-backdrop": "b410db47b1e7d4e7444da19540b313b8a9e5b4b5581a117894f69ab4e063769a",
+        "maze-rover": "1584c0d9c14515dba0756e2c3755e4926ebef6c46fd888fff4490974893b6745",
+        "role-wish": "e2b8a3fe54efa42dfcdbc1c7cc8f0f315a0352c27e5ee35058a2a92d480891ff",
+        "role-give": "4404808f16d69293c66f27cd61b418ad980755d685b51e3a3b1d1e29dfcf427b"
+      }
+    },
+    "party-cover": {
+      "path": "assets/party-cover.png",
+      "sha256": "dfa3018def83a4cee4d9f5b2e97a09f2925f5ec9c625b75910a97ef85d0670a6",
+      "bytes": 816467,
+      "pixels": [
+        960,
+        540
+      ],
+      "sourceKind": "registered_builtin_imagegen_scene",
+      "originalKey": "party-cover",
+      "originalSha256": "7ff96ffbfb703d852f563ca46c4841dae78ad6244441c52acb5591450c27fb06",
+      "playbackDerivation": "Pillow ImageOps.fit to 960x540 with LANCZOS and centered framing, saved as optimized RGB PNG.",
+      "sceneKey": "party-message"
+    },
+    "rhythm-table": {
+      "path": "assets/rhythm-table.png",
+      "sha256": "9629b41e7cc900ab7de97e8ecfc7c1036ea0ffcb3b053f9cbd792674955abc77",
+      "bytes": 784709,
+      "pixels": [
+        960,
+        540
+      ],
+      "sourceKind": "registered_builtin_imagegen_scene",
+      "originalKey": "rhythm-table",
+      "originalSha256": "85a39ffa30453a0926848f67a5134a175fa08349505b290dd0b9ac4ca7200ce7",
+      "playbackDerivation": "Pillow ImageOps.fit to 960x540 with LANCZOS and centered framing, saved as optimized RGB PNG.",
+      "sceneKey": "rhythm-wishes"
+    },
+    "quiz-wish-farewell": {
+      "path": "assets/quiz-wish-farewell.png",
+      "sha256": "11a8577c341cb3275cd09e0d920b4d54cc3349b8bf8e551cf3dfaa28deec0f8f",
+      "bytes": 167611,
+      "pixels": [
+        320,
+        320
+      ],
+      "sourceKind": "registered_builtin_imagegen_quiz_crop",
+      "originalKey": "quiz-wish-scenes",
+      "originalSha256": "b9e2dbe67e460eb3dba84046e6afdcc5e117813c74c2f5d4a01534e28847a50d",
+      "crop": [
+        14,
+        14,
+        710,
+        710
+      ],
+      "cropCoordinates": "left, top, right, bottom in original atlas pixels; right and bottom exclusive",
+      "renderer": "quiz_art.py",
+      "rendererSha256": "e6b01d3b3bd1c806880452f876abffc0ad956a8c5c46d4e703c82fd5897ef4a3",
+      "sceneKey": "picture-check"
+    },
+    "quiz-wish-birthday": {
+      "path": "assets/quiz-wish-birthday.png",
+      "sha256": "7a19acaaf64db2d9d2131df200e28d32675728948305db3f8f2569aec2474089",
+      "bytes": 178386,
+      "pixels": [
+        320,
+        320
+      ],
+      "sourceKind": "registered_builtin_imagegen_quiz_crop",
+      "originalKey": "quiz-wish-scenes",
+      "originalSha256": "b9e2dbe67e460eb3dba84046e6afdcc5e117813c74c2f5d4a01534e28847a50d",
+      "crop": [
+        738,
+        14,
+        1434,
+        710
+      ],
+      "cropCoordinates": "left, top, right, bottom in original atlas pixels; right and bottom exclusive",
+      "renderer": "quiz_art.py",
+      "rendererSha256": "e6b01d3b3bd1c806880452f876abffc0ad956a8c5c46d4e703c82fd5897ef4a3",
+      "sceneKey": "picture-check"
+    },
+    "quiz-wish-hello": {
+      "path": "assets/quiz-wish-hello.png",
+      "sha256": "4b002a8b8726c00ab499d9c5ce8a3d2371a2d7b8190086b550bf27b19ea7ac18",
+      "bytes": 160256,
+      "pixels": [
+        320,
+        320
+      ],
+      "sourceKind": "registered_builtin_imagegen_quiz_crop",
+      "originalKey": "quiz-wish-scenes",
+      "originalSha256": "b9e2dbe67e460eb3dba84046e6afdcc5e117813c74c2f5d4a01534e28847a50d",
+      "crop": [
+        1462,
+        14,
+        2158,
+        710
+      ],
+      "cropCoordinates": "left, top, right, bottom in original atlas pixels; right and bottom exclusive",
+      "renderer": "quiz_art.py",
+      "rendererSha256": "e6b01d3b3bd1c806880452f876abffc0ad956a8c5c46d4e703c82fd5897ef4a3",
+      "sceneKey": "picture-check"
+    },
+    "quiz-thank-baker": {
+      "path": "assets/quiz-thank-baker.png",
+      "sha256": "2992046626ee51ece9140ebb7c1bdb0ef095bee9a114e8a10aec42eb66921fc2",
+      "bytes": 155214,
+      "pixels": [
+        320,
+        320
+      ],
+      "sourceKind": "registered_builtin_imagegen_quiz_crop",
+      "originalKey": "quiz-thanks-people",
+      "originalSha256": "f7444cc25f6c84779e68c2b2d6026bee22060b0af8beec5bc4a5c0a405910843",
+      "crop": [
+        14,
+        14,
+        710,
+        710
+      ],
+      "cropCoordinates": "left, top, right, bottom in original atlas pixels; right and bottom exclusive",
+      "renderer": "quiz_art.py",
+      "rendererSha256": "e6b01d3b3bd1c806880452f876abffc0ad956a8c5c46d4e703c82fd5897ef4a3",
+      "sceneKey": "picture-check"
+    },
+    "quiz-thank-giver": {
+      "path": "assets/quiz-thank-giver.png",
+      "sha256": "5a9b5a98c193862bf7765375dd4d9131a76b14eb8fbc58a48614a3e879d9cd73",
+      "bytes": 157833,
+      "pixels": [
+        320,
+        320
+      ],
+      "sourceKind": "registered_builtin_imagegen_quiz_crop",
+      "originalKey": "quiz-thanks-people",
+      "originalSha256": "f7444cc25f6c84779e68c2b2d6026bee22060b0af8beec5bc4a5c0a405910843",
+      "crop": [
+        738,
+        14,
+        1434,
+        710
+      ],
+      "cropCoordinates": "left, top, right, bottom in original atlas pixels; right and bottom exclusive",
+      "renderer": "quiz_art.py",
+      "rendererSha256": "e6b01d3b3bd1c806880452f876abffc0ad956a8c5c46d4e703c82fd5897ef4a3",
+      "sceneKey": "picture-check"
+    },
+    "quiz-thank-celebrant": {
+      "path": "assets/quiz-thank-celebrant.png",
+      "sha256": "8614b5964e15925cf8b73c812e02031af685f9629ebdb8c3f30730b28636d1b4",
+      "bytes": 158252,
+      "pixels": [
+        320,
+        320
+      ],
+      "sourceKind": "registered_builtin_imagegen_quiz_crop",
+      "originalKey": "quiz-thanks-people",
+      "originalSha256": "f7444cc25f6c84779e68c2b2d6026bee22060b0af8beec5bc4a5c0a405910843",
+      "crop": [
+        1462,
+        14,
+        2158,
+        710
+      ],
+      "cropCoordinates": "left, top, right, bottom in original atlas pixels; right and bottom exclusive",
+      "renderer": "quiz_art.py",
+      "rendererSha256": "e6b01d3b3bd1c806880452f876abffc0ad956a8c5c46d4e703c82fd5897ef4a3",
+      "sceneKey": "picture-check"
+    },
+    "quiz-item-eraser": {
+      "path": "assets/quiz-item-eraser.png",
+      "sha256": "28641f03331d48a719e3e98dc5a7992998b5af68322700689fc5524d9caafc46",
+      "bytes": 40225,
+      "pixels": [
+        320,
+        320
+      ],
+      "sourceKind": "registered_builtin_imagegen_quiz_crop",
+      "originalKey": "quiz-three-stationery",
+      "originalSha256": "82401586ee9753fb07e478a6b3190b9bc7e172a4877e95c758982b4fe847a6cf",
+      "crop": [
+        14,
+        14,
+        710,
+        710
+      ],
+      "cropCoordinates": "left, top, right, bottom in original atlas pixels; right and bottom exclusive",
+      "renderer": "quiz_art.py",
+      "rendererSha256": "e6b01d3b3bd1c806880452f876abffc0ad956a8c5c46d4e703c82fd5897ef4a3",
+      "sceneKey": "picture-check"
+    },
+    "quiz-item-pencil": {
+      "path": "assets/quiz-item-pencil.png",
+      "sha256": "9e73872c8ef7d27c10406bba0154bf96426f47596355b46ed5bdfe68ff749a56",
+      "bytes": 23790,
+      "pixels": [
+        320,
+        320
+      ],
+      "sourceKind": "registered_builtin_imagegen_quiz_crop",
+      "originalKey": "quiz-three-stationery",
+      "originalSha256": "82401586ee9753fb07e478a6b3190b9bc7e172a4877e95c758982b4fe847a6cf",
+      "crop": [
+        738,
+        14,
+        1434,
+        710
+      ],
+      "cropCoordinates": "left, top, right, bottom in original atlas pixels; right and bottom exclusive",
+      "renderer": "quiz_art.py",
+      "rendererSha256": "e6b01d3b3bd1c806880452f876abffc0ad956a8c5c46d4e703c82fd5897ef4a3",
+      "sceneKey": "picture-check"
+    },
+    "quiz-item-pen": {
+      "path": "assets/quiz-item-pen.png",
+      "sha256": "c92cc40cfaecfe1f4ce075d893eb7bc62d5a177389ff969490feed8886b5cc91",
+      "bytes": 25863,
+      "pixels": [
+        320,
+        320
+      ],
+      "sourceKind": "registered_builtin_imagegen_quiz_crop",
+      "originalKey": "quiz-three-stationery",
+      "originalSha256": "82401586ee9753fb07e478a6b3190b9bc7e172a4877e95c758982b4fe847a6cf",
+      "crop": [
+        1462,
+        14,
+        2158,
+        710
+      ],
+      "cropCoordinates": "left, top, right, bottom in original atlas pixels; right and bottom exclusive",
+      "renderer": "quiz_art.py",
+      "rendererSha256": "e6b01d3b3bd1c806880452f876abffc0ad956a8c5c46d4e703c82fd5897ef4a3",
+      "sceneKey": "picture-check"
+    },
+    "quiz-welcome-giver": {
+      "path": "assets/quiz-welcome-giver-handoff.png",
+      "sha256": "4059747446f6a5e7d9dee9dcd572d0c820d3b0d86fb4f193bb363f2c55235658",
+      "bytes": 162138,
+      "pixels": [
+        320,
+        320
+      ],
+      "sourceKind": "registered_builtin_imagegen_single_quiz_replacement",
+      "originalKey": "quiz-welcome-giver-handoff",
+      "originalSha256": "46f19b88f3c8a824b2cb78aa7ffc605a7481cbabcbba2d2f5aaaf59d47271aef",
+      "playbackDerivation": "Full square source resized to 320x320 with Pillow LANCZOS, optimized RGB PNG, no crop.",
+      "sceneKey": "picture-check",
+      "questionId": "welcome-after-thanks",
+      "supersedes": "sourceOnlyAssets.quiz-welcome-giver-v1"
+    },
+    "quiz-welcome-receiver": {
+      "path": "assets/quiz-welcome-receiver.png",
+      "sha256": "bd0ca1d6d83446a3672ac2a82ec5688cc879aa58e9656234d8568c7f481d8574",
+      "bytes": 156629,
+      "pixels": [
+        320,
+        320
+      ],
+      "sourceKind": "registered_builtin_imagegen_quiz_crop",
+      "originalKey": "quiz-welcome-roles",
+      "originalSha256": "d008811ff7980caaf96f2037ce668d285888da33f4078cc169b527fc45ee21be",
+      "crop": [
+        738,
+        14,
+        1434,
+        710
+      ],
+      "cropCoordinates": "left, top, right, bottom in original atlas pixels; right and bottom exclusive",
+      "renderer": "quiz_art.py",
+      "rendererSha256": "e6b01d3b3bd1c806880452f876abffc0ad956a8c5c46d4e703c82fd5897ef4a3",
+      "sceneKey": "picture-check"
+    },
+    "quiz-welcome-bystander": {
+      "path": "assets/quiz-welcome-bystander.png",
+      "sha256": "de12c3945bcd3725cad4e840dee6d2212ff3d7c5be74f17b0728315313df2b37",
+      "bytes": 158383,
+      "pixels": [
+        320,
+        320
+      ],
+      "sourceKind": "registered_builtin_imagegen_quiz_crop",
+      "originalKey": "quiz-welcome-roles",
+      "originalSha256": "d008811ff7980caaf96f2037ce668d285888da33f4078cc169b527fc45ee21be",
+      "crop": [
+        1462,
+        14,
+        2158,
+        710
+      ],
+      "cropCoordinates": "left, top, right, bottom in original atlas pixels; right and bottom exclusive",
+      "renderer": "quiz_art.py",
+      "rendererSha256": "e6b01d3b3bd1c806880452f876abffc0ad956a8c5c46d4e703c82fd5897ef4a3",
+      "sceneKey": "picture-check"
+    },
+    "quiz-book-reading": {
+      "path": "assets/quiz-book-reading.png",
+      "sha256": "0950132787cd597856416691a4ee5004a538fc121bee3edbd0f138c28a5c860c",
+      "bytes": 152740,
+      "pixels": [
+        320,
+        320
+      ],
+      "sourceKind": "registered_builtin_imagegen_quiz_crop",
+      "originalKey": "quiz-book-actions",
+      "originalSha256": "7c0eaf0a8a64f1edaa5f948d6b9846bab587debaa3aa293c004edc7f22e44571",
+      "crop": [
+        14,
+        14,
+        710,
+        710
+      ],
+      "cropCoordinates": "left, top, right, bottom in original atlas pixels; right and bottom exclusive",
+      "renderer": "quiz_art.py",
+      "rendererSha256": "e6b01d3b3bd1c806880452f876abffc0ad956a8c5c46d4e703c82fd5897ef4a3",
+      "sceneKey": "picture-check"
+    },
+    "quiz-book-giving": {
+      "path": "assets/quiz-book-giving.png",
+      "sha256": "3bd7cea77f328f7e9a59bcc9da91c0a54f398f6ee2a2feed8b57245d96a0bd06",
+      "bytes": 151943,
+      "pixels": [
+        320,
+        320
+      ],
+      "sourceKind": "registered_builtin_imagegen_quiz_crop",
+      "originalKey": "quiz-book-actions",
+      "originalSha256": "7c0eaf0a8a64f1edaa5f948d6b9846bab587debaa3aa293c004edc7f22e44571",
+      "crop": [
+        738,
+        14,
+        1434,
+        710
+      ],
+      "cropCoordinates": "left, top, right, bottom in original atlas pixels; right and bottom exclusive",
+      "renderer": "quiz_art.py",
+      "rendererSha256": "e6b01d3b3bd1c806880452f876abffc0ad956a8c5c46d4e703c82fd5897ef4a3",
+      "sceneKey": "picture-check"
+    },
+    "quiz-book-pointing": {
+      "path": "assets/quiz-book-pointing.png",
+      "sha256": "13f37c8ab871c0f3ca3fd82c9f81173f6a649182e94dca5db4d7ae8f8702e48c",
+      "bytes": 153560,
+      "pixels": [
+        320,
+        320
+      ],
+      "sourceKind": "registered_builtin_imagegen_quiz_crop",
+      "originalKey": "quiz-book-actions",
+      "originalSha256": "7c0eaf0a8a64f1edaa5f948d6b9846bab587debaa3aa293c004edc7f22e44571",
+      "crop": [
+        1462,
+        14,
+        2158,
+        710
+      ],
+      "cropCoordinates": "left, top, right, bottom in original atlas pixels; right and bottom exclusive",
+      "renderer": "quiz_art.py",
+      "rendererSha256": "e6b01d3b3bd1c806880452f876abffc0ad956a8c5c46d4e703c82fd5897ef4a3",
+      "sceneKey": "picture-check"
+    }
+  },
+  "imagegenOriginals": {
+    "birthday-game-actors": {
+      "sourceTool": "Codex built-in imagegen",
+      "path": "assets/originals/birthday-game-actors.png",
+      "toolOutput": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-0d597994-90a5-4e1e-a309-23afeda4b9a3.png",
+      "sha256": "63d0a0fadc8eb07887a0b67798c7f2bbc9c1808e8e409a6f2fd0bbc657b7ad0a",
+      "bytes": 1978232,
+      "pixels": [
+        1536,
+        1024
+      ],
+      "mode": "RGBA",
+      "prompt": "True alpha, exactly three square columns by two square rows with broad transparent gutters. Row-major: (1) tiny cream and apricot toy boat and its nozzle clearly facing RIGHT seen from overhead; (2) same boat pose, size and outline, with a small pale blue bubble attached at the end of nozzle; (3) top-down small pine-green toy party car facing RIGHT with a cream roof; (4) the same car and exact wheel positions facing RIGHT, small attached bubble at front nozzle; (5) one gold-edged birthday-candle celebration sticker, simple rounded cream rosette showing one undecorated candle; (6) entirely transparent empty cell. No off-vehicle bubbles, shadows, ground, people, numbers, writing. Frames must align when toggled. Original first-grade picture-book art, matte gouache and cut-paper silhouettes on fine warm paper grain. Quiet deep pine and cream with restrained apricot and persimmon, clear compact silhouettes, no gradients, no typed or hand-written text, letters, digits, logos, emoji, or watermark. Invent all characters and framing. No textbook art or costume copies. Landscape 3:2 sprite-sheet geometry; the sixth cell is pure transparent negative space. Align the boat and car pairs so the hull, body, wheels and directional nozzle have the same placement in each cell and only the single tiny front bubble changes. Isolated silhouettes with complete borders and true alpha.",
+      "promptSha256": "7d823ef39691987af237c4e86d76779a07de86c1ee33fce0950bf77742f3e7e9",
+      "plannedPrompt": "True alpha, exactly three square columns by two square rows with broad transparent gutters. Row-major: (1) tiny cream and apricot toy boat and its nozzle clearly facing RIGHT seen from overhead; (2) same boat pose, size and outline, with a small pale blue bubble attached at the end of nozzle; (3) top-down small pine-green toy party car facing RIGHT with a cream roof; (4) the same car and exact wheel positions facing RIGHT, small attached bubble at front nozzle; (5) one gold-edged birthday-candle celebration sticker, simple rounded cream rosette showing one undecorated candle; (6) entirely transparent empty cell. No off-vehicle bubbles, shadows, ground, people, numbers, writing. Frames must align when toggled. Original first-grade picture-book art, matte gouache and cut-paper silhouettes on fine warm paper grain. Quiet deep pine and cream with restrained apricot and persimmon, clear compact silhouettes, no gradients, no typed or hand-written text, letters, digits, logos, emoji, or watermark. Invent all characters and framing. No textbook art or costume copies.",
+      "transparentBackground": true,
+      "status": "accepted_master",
+      "receipt": {
+        "path": "/Users/sqcopenclaw/.codex/sessions/2026/11/09/rollout-2026-11-09T19-43-17-01a1c01e-a93e-7483-bc3d-f200aa7be022.jsonl",
+        "requestLine": 14803,
+        "responseLine": 14806,
+        "callId": "call_9e7e8f160af64710be9dfd29de633820",
+        "submittedAt": "2026-11-10T05:19:50.409Z",
+        "returnedAt": "2026-11-10T05:20:12.430Z",
+        "embeddedImageSha256": "63d0a0fadc8eb07887a0b67798c7f2bbc9c1808e8e409a6f2fd0bbc657b7ad0a"
+      }
+    },
+    "workshop-gift-atlas": {
+      "sourceTool": "Codex built-in imagegen",
+      "path": "assets/originals/workshop-gift-atlas.png",
+      "toolOutput": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-0699787a-6e9c-4011-b676-1c763a4d1df8.png",
+      "sha256": "c8486b27c66a020e573434d8f37d984cd6f2cc9d2748a7cd13a1c6442f2d7377",
+      "bytes": 1845254,
+      "pixels": [
+        1536,
+        1024
+      ],
+      "mode": "RGBA",
+      "prompt": "Use case: background-extraction. Keep the five exact existing illustrated objects and their arrangement, shapes, matte gouache texture, orientation and scale in this 3-column by 2-row sprite sheet. Remove EVERY part of the cream paper backgrounds and all six square panel outlines. The entire canvas must be actual transparent alpha except the five clean object cutouts. The bottom-right cell is fully transparent. Keep only capped teal pen, sharply pointed cedar pencil, stitched orange ball, sage book, and apricot backpack. No cards, background color, labels, borders, shadows, captions, marks or added objects.",
+      "promptSha256": "71d2f277d13067510c717dbf61483f0fbf2cc7838848a10a0439749de85aef9e",
+      "plannedPrompt": "Six equally spaced square cells in a 3 columns by 2 rows wide true-alpha sheet. In exact row-major order: cap-on dark teal ink pen with visible side clip and round blunt cap; bright cedar sharpened pencil with exposed wood and graphite tip; orange stitched round play ball; thick closed sage storybook without label; small apricot school backpack with both straps and hand loop; final bottom-right cell fully empty. Only one complete object per occupied cell, similar scale, three-quarter view, no floor, no hands, no loose items, no crop, generous transparent gutters. Pen and pencil have equally strong contrast and are unmistakable at 80 pixels. Original first-grade picture-book art, matte gouache and cut-paper silhouettes on fine warm paper grain. Quiet deep pine and cream with restrained apricot and persimmon, clear compact silhouettes, no gradients, no typed or hand-written text, letters, digits, logos, emoji, or watermark. Invent all characters and framing. No textbook art or costume copies.",
+      "transparentBackground": true,
+      "status": "accepted_master",
+      "receipt": {
+        "path": "/Users/sqcopenclaw/.codex/sessions/2026/11/09/rollout-2026-11-09T19-43-17-01a1c01e-a93e-7483-bc3d-f200aa7be022.jsonl",
+        "requestLine": 14835,
+        "responseLine": 14838,
+        "callId": "call_d4a7b6521c0647688d2c43afedd2d754",
+        "submittedAt": "2026-11-10T05:31:10.660Z",
+        "returnedAt": "2026-11-10T05:31:43.064Z",
+        "embeddedImageSha256": "c8486b27c66a020e573434d8f37d984cd6f2cc9d2748a7cd13a1c6442f2d7377"
+      },
+      "referenceOnly": {
+        "toolOutput": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-cb3a2045-2fbc-43d3-87ba-7165ed584cc5.png",
+        "sha256": "5e4720ba7757af83cddea9043024178ad0e4549be2b87934fd337da6d706d4e5",
+        "status": "reference_only_opaque_panels",
+        "receipt": {
+          "path": "/Users/sqcopenclaw/.codex/sessions/2026/11/09/rollout-2026-11-09T19-43-17-01a1c01e-a93e-7483-bc3d-f200aa7be022.jsonl",
+          "requestLine": 14810,
+          "responseLine": 14813,
+          "callId": "call_263e958091df4772bb40d99c21519e72",
+          "submittedAt": "2026-11-10T05:22:16.666Z",
+          "returnedAt": "2026-11-10T05:22:41.141Z",
+          "embeddedImageSha256": "5e4720ba7757af83cddea9043024178ad0e4549be2b87934fd337da6d706d4e5"
+        }
+      }
+    },
+    "birthday-dialogue-atlas": {
+      "sourceTool": "Codex built-in imagegen",
+      "path": "assets/originals/birthday-dialogue-atlas.png",
+      "toolOutput": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-8a42a8ff-aa60-420a-8b82-f3a6eee7b5b0.png",
+      "sha256": "d43a3156098770d6c0588329343a3b8d32277e8dbbb9aa681a7ee4f5db91bdcd",
+      "bytes": 1593229,
+      "pixels": [
+        1254,
+        1254
+      ],
+      "mode": "RGBA",
+      "prompt": "2×2 true alpha game pictogram sheet, square canvas, each asset perfectly independent and understandable at 52 pixels. Design an original round-faced russet squirrel with dark sage scarf and a cream rabbit with pine vest. Row-major (1) only a cream birthday cake with one tall unnumbered candle, a clean celebratory silhouette, no gift; (2) isolated close-up with one ball passing between two sets of hands from green rabbit sleeve on left toward the other hands on right, no whole bodies; (3) russet squirrel visible from chest up, clearly hugging the just received ball, head tipped in thanks; (4) cream rabbit from chest up with an open empty palm raised gently at chest height and no object in its hand. One unmistakable action per cell, no speech bubble, arrows, emoji, text, drop shadow or background color. Match characters on future cards from their fur and costumes. Original first-grade picture-book art, matte gouache and cut-paper silhouettes on fine warm paper grain. Quiet deep pine and cream with restrained apricot and persimmon, clear compact silhouettes, no gradients, no typed or hand-written text, letters, digits, logos, emoji, or watermark. Invent all characters and framing. No textbook art or costume copies. Square true-alpha sheet, four generously separated equal quadrants, with no visible color in the background alpha. From the supplied sheet take ONLY the orange stitched ball identity for the top-right handover and bottom-left recipient; do not add the other gifts. Top-right has only two distinct people's hands with natural fingers and the ball between them. Bottom-right rabbit has empty open palm visible and absolutely no ball or gift.",
+      "promptSha256": "676bb58ce1408d63347af545177e8110107a649a45f4b03237b863e9da7571e2",
+      "plannedPrompt": "2×2 true alpha game pictogram sheet, square canvas, each asset perfectly independent and understandable at 52 pixels. Design an original round-faced russet squirrel with dark sage scarf and a cream rabbit with pine vest. Row-major (1) only a cream birthday cake with one tall unnumbered candle, a clean celebratory silhouette, no gift; (2) isolated close-up with one ball passing between two sets of hands from green rabbit sleeve on left toward the other hands on right, no whole bodies; (3) russet squirrel visible from chest up, clearly hugging the just received ball, head tipped in thanks; (4) cream rabbit from chest up with an open empty palm raised gently at chest height and no object in its hand. One unmistakable action per cell, no speech bubble, arrows, emoji, text, drop shadow or background color. Match characters on future cards from their fur and costumes. Original first-grade picture-book art, matte gouache and cut-paper silhouettes on fine warm paper grain. Quiet deep pine and cream with restrained apricot and persimmon, clear compact silhouettes, no gradients, no typed or hand-written text, letters, digits, logos, emoji, or watermark. Invent all characters and framing. No textbook art or costume copies.",
+      "transparentBackground": true,
+      "status": "accepted_master",
+      "receipt": {
+        "path": "/Users/sqcopenclaw/.codex/sessions/2026/11/09/rollout-2026-11-09T19-43-17-01a1c01e-a93e-7483-bc3d-f200aa7be022.jsonl",
+        "requestLine": 14844,
+        "responseLine": 14847,
+        "callId": "call_0ad0f1c4014d43c9ad5526fd68cb8a75",
+        "submittedAt": "2026-11-10T05:33:54.023Z",
+        "returnedAt": "2026-11-10T05:34:40.934Z",
+        "embeddedImageSha256": "d43a3156098770d6c0588329343a3b8d32277e8dbbb9aa681a7ee4f5db91bdcd"
+      },
+      "referencedOriginal": "workshop-gift-atlas",
+      "referencedOriginalSha256": "c8486b27c66a020e573434d8f37d984cd6f2cc9d2748a7cd13a1c6442f2d7377"
+    },
+    "boat-backdrop": {
+      "sourceTool": "Codex built-in imagegen",
+      "path": "assets/originals/boat-backdrop.png",
+      "toolOutput": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-1d5d0d25-b8f6-467d-b8e4-dcc1d4f82acf.png",
+      "sha256": "f59b6ed7e211c80d05bfdcb7415931febc3dc4913db6f20d64af877c11709244",
+      "bytes": 2305313,
+      "pixels": [
+        1672,
+        941
+      ],
+      "mode": "RGB",
+      "prompt": "A shallow turquoise paper-craft pond tray at the far side of a birthday workshop, viewed almost straight from the front. Soft pine and warm cream room edges, scraps of tissue at the far outside corners only. Keep the broad center quiet and completely open to accept a programmed game playfield. No boats, bubbles, card frames, party guests, furniture in the center, or control artwork. Original first-grade picture-book art, matte gouache and cut-paper silhouettes on fine warm paper grain. Quiet deep pine and cream with restrained apricot and persimmon, clear compact silhouettes, no gradients, no typed or hand-written text, letters, digits, logos, emoji, or watermark. Invent all characters and framing. No textbook art or costume copies. Wide landscape 16:9. Large central flat muted pale turquoise water surface, smooth like a shallow paper pond without painted waves; at least 82 percent of central rectangle remains free of imagery. Narrow quiet craft tray border at outer edges only. Very low contrast background so the boat and gift targets will read at phone sizes.",
+      "promptSha256": "aa1c6eccfdc808a3e22092dc085f9e0cc22f0509e2f445158d0b2221633d4622",
+      "plannedPrompt": "A shallow turquoise paper-craft pond tray at the far side of a birthday workshop, viewed almost straight from the front. Soft pine and warm cream room edges, scraps of tissue at the far outside corners only. Keep the broad center quiet and completely open to accept a programmed game playfield. No boats, bubbles, card frames, party guests, furniture in the center, or control artwork. Original first-grade picture-book art, matte gouache and cut-paper silhouettes on fine warm paper grain. Quiet deep pine and cream with restrained apricot and persimmon, clear compact silhouettes, no gradients, no typed or hand-written text, letters, digits, logos, emoji, or watermark. Invent all characters and framing. No textbook art or costume copies.",
+      "transparentBackground": false,
+      "status": "accepted_master",
+      "receipt": {
+        "path": "/Users/sqcopenclaw/.codex/sessions/2026/11/09/rollout-2026-11-09T19-43-17-01a1c01e-a93e-7483-bc3d-f200aa7be022.jsonl",
+        "requestLine": 14851,
+        "responseLine": 14854,
+        "callId": "call_8e895fe9ccfb4baaada78fbf178db1f4",
+        "submittedAt": "2026-11-10T05:36:52.443Z",
+        "returnedAt": "2026-11-10T05:37:06.027Z",
+        "embeddedImageSha256": "f59b6ed7e211c80d05bfdcb7415931febc3dc4913db6f20d64af877c11709244"
+      }
+    },
+    "maze-backdrop": {
+      "sourceTool": "Codex built-in imagegen",
+      "path": "assets/originals/maze-backdrop.png",
+      "toolOutput": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-941c3991-a53b-47ed-a1dc-6d7bd0c73890.png",
+      "sha256": "10477ce635dfb3ebdb5ecfeb8c8e4a1b2ea2e2836ebe02622d1c1bb3f5df4c33",
+      "bytes": 1986358,
+      "pixels": [
+        1672,
+        941
+      ],
+      "mode": "RGB",
+      "prompt": "Create the single landscape 16:9 game background specified below, using the entire canvas edge to edge. Crop-safe 5% margins and quiet, near-uniform matte cream throughout the central 85%; the maze tracks and toy car will be rendered separately by code, so no printed tracks or object-like silhouettes in the game area. Top-down view of a warm cream drawing-room tabletop prepared for a handmade party map. Soft sage floor shadows and a cut paper tassel visible at two far corners. Empty central 85 percent of the frame, level and nearly flat, no map, grid, roads, furniture, people, vehicles, or props except the subtle edge decoration. Original first-grade picture-book art, matte gouache and cut-paper silhouettes on fine warm paper grain. Quiet deep pine and cream with restrained apricot and persimmon, clear compact silhouettes, no gradients, no typed or hand-written text, letters, digits, logos, emoji, or watermark. Invent all characters and framing. No textbook art or costume copies.",
+      "promptSha256": "d8c4df5a21009e74b6a857513f659aa27da516586abe02d60f3dd7587573f303",
+      "plannedPrompt": "Top-down view of a warm cream drawing-room tabletop prepared for a handmade party map. Soft sage floor shadows and a cut paper tassel visible at two far corners. Empty central 85 percent of the frame, level and nearly flat, no map, grid, roads, furniture, people, vehicles, or props except the subtle edge decoration. Original first-grade picture-book art, matte gouache and cut-paper silhouettes on fine warm paper grain. Quiet deep pine and cream with restrained apricot and persimmon, clear compact silhouettes, no gradients, no typed or hand-written text, letters, digits, logos, emoji, or watermark. Invent all characters and framing. No textbook art or costume copies.",
+      "transparentBackground": false,
+      "status": "accepted_master",
+      "receipt": {
+        "path": "/Users/sqcopenclaw/.codex/sessions/2026/11/09/rollout-2026-11-09T19-43-17-01a1c01e-a93e-7483-bc3d-f200aa7be022.jsonl",
+        "requestLine": 15021,
+        "responseLine": 15025,
+        "callId": "call_b39d087f78b646a696445961cd060927",
+        "submittedAt": "2026-11-10T05:44:45.682Z",
+        "returnedAt": "2026-11-10T05:45:00.073Z",
+        "embeddedImageSha256": "10477ce635dfb3ebdb5ecfeb8c8e4a1b2ea2e2836ebe02622d1c1bb3f5df4c33"
+      }
+    },
+    "party-cover": {
+      "sourceTool": "Codex built-in imagegen",
+      "path": "assets/originals/party-cover.png",
+      "toolOutput": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-9f2bb40c-a4c7-4707-af8b-658660bdacd5.png",
+      "sha256": "7ff96ffbfb703d852f563ca46c4841dae78ad6244441c52acb5591450c27fb06",
+      "bytes": 2646195,
+      "pixels": [
+        1672,
+        941
+      ],
+      "mode": "RGB",
+      "prompt": "Make one wide 16:9 full-bleed illustrated opening page. The attached original asset sheet is strictly for the children's book finish, animal proportions and cake material. Draw a new coherent room scene. Ensure the small brown deer has clear small paired antlers, a deliberately crooked rust paper crown and visibly unoccupied hands. Put just one little candle on the cake. Use a friendly rabbit as the guest, raising an empty paw to greet. Keep the two characters and the cake in the central 72% with margins at top and edges for crop, making gesture and silhouettes instantly readable. Original paper-craft room birthday, wide and calm. An original little brown deer with a deliberately crooked rust paper crown is the birthday child, easily recognized by small antlers, standing near one cream cake with a single unnumbered candle. Another original guest greets the deer with an open hand while holding no gift. Both fully visible, mouths expressive, no names, no text, no party signs. Leave a broad clear central grouping and natural wall space; no unrelated figures. Original first-grade picture-book art, matte gouache and cut-paper silhouettes on fine warm paper grain. Quiet deep pine and cream with restrained apricot and persimmon, clear compact silhouettes, no gradients, no typed or hand-written text, letters, digits, logos, emoji, or watermark. Invent all characters and framing. No textbook art or costume copies.",
+      "promptSha256": "7c5710c9d688b5ff4e14fecfacdb406f184289f25d553f4092174b374a2f4bad",
+      "plannedPrompt": "Original paper-craft room birthday, wide and calm. An original little brown deer with a deliberately crooked rust paper crown is the birthday child, easily recognized by small antlers, standing near one cream cake with a single unnumbered candle. Another original guest greets the deer with an open hand while holding no gift. Both fully visible, mouths expressive, no names, no text, no party signs. Leave a broad clear central grouping and natural wall space; no unrelated figures. Original first-grade picture-book art, matte gouache and cut-paper silhouettes on fine warm paper grain. Quiet deep pine and cream with restrained apricot and persimmon, clear compact silhouettes, no gradients, no typed or hand-written text, letters, digits, logos, emoji, or watermark. Invent all characters and framing. No textbook art or costume copies.",
+      "transparentBackground": false,
+      "status": "accepted_master",
+      "referencedOriginal": "birthday-dialogue-atlas",
+      "referencedOriginalSha256": "d43a3156098770d6c0588329343a3b8d32277e8dbbb9aa681a7ee4f5db91bdcd",
+      "receipt": {
+        "path": "/Users/sqcopenclaw/.codex/sessions/2026/11/09/rollout-2026-11-09T19-43-17-01a1c01e-a93e-7483-bc3d-f200aa7be022.jsonl",
+        "requestLine": 15160,
+        "responseLine": 15164,
+        "callId": "call_4170b8baddbf47bca8ccab73fc890356",
+        "submittedAt": "2026-11-10T05:49:16.979Z",
+        "returnedAt": "2026-11-10T05:49:41.969Z",
+        "embeddedImageSha256": "7ff96ffbfb703d852f563ca46c4841dae78ad6244441c52acb5591450c27fb06"
+      }
+    },
+    "rhythm-table": {
+      "sourceTool": "Codex built-in imagegen",
+      "path": "assets/originals/rhythm-table.png",
+      "toolOutput": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-753d26e2-df1e-4fdc-a4e3-4d2d65689db5.png",
+      "sha256": "85a39ffa30453a0926848f67a5134a175fa08349505b290dd0b9ac4ca7200ce7",
+      "bytes": 2422478,
+      "pixels": [
+        1672,
+        941
+      ],
+      "mode": "RGB",
+      "prompt": "Make a single full-bleed 16:9 follow-up illustration for the same story. Match the little brown deer with rust crown and pine scarf, cream rabbit with olive vest and original cake materials from the reference. New arrangement around a round table at child eye level. Add a squirrel in warm muted apricot. The rabbit and squirrel are the two clappers: their two pairs of paws are unobstructed, clearly near each other in front of their chests, individually readable. The deer visibly listens with relaxed hands down, interested expression. Keep cake low with one small candle. Wide composition, avoid cropped paws, avoid wall clutter. A warm and calm original gathering around a small round table. A young rabbit and squirrel clap softly while a small deer wearing a loose paper crown listens; hands clear, no posed grin, no balloons obscuring hands. One warm cake low in the composition. A few restrained paper shapes on the wall, no letters, musical notation, numbers or written signs. Wide child-eye-level view with all three visible near center. Original first-grade picture-book art, matte gouache and cut-paper silhouettes on fine warm paper grain. Quiet deep pine and cream with restrained apricot and persimmon, clear compact silhouettes, no gradients, no typed or hand-written text, letters, digits, logos, emoji, or watermark. Invent all characters and framing. No textbook art or costume copies.",
+      "promptSha256": "c7a74aac9488d7bf471dc491bc543b08402878790da49a005d5ee65192c6f213",
+      "plannedPrompt": "A warm and calm original gathering around a small round table. A young rabbit and squirrel clap softly while a small deer wearing a loose paper crown listens; hands clear, no posed grin, no balloons obscuring hands. One warm cake low in the composition. A few restrained paper shapes on the wall, no letters, musical notation, numbers or written signs. Wide child-eye-level view with all three visible near center. Original first-grade picture-book art, matte gouache and cut-paper silhouettes on fine warm paper grain. Quiet deep pine and cream with restrained apricot and persimmon, clear compact silhouettes, no gradients, no typed or hand-written text, letters, digits, logos, emoji, or watermark. Invent all characters and framing. No textbook art or costume copies.",
+      "transparentBackground": false,
+      "status": "accepted_master",
+      "referencedOriginal": "party-cover",
+      "referencedOriginalSha256": "7ff96ffbfb703d852f563ca46c4841dae78ad6244441c52acb5591450c27fb06",
+      "receipt": {
+        "path": "/Users/sqcopenclaw/.codex/sessions/2026/11/09/rollout-2026-11-09T19-43-17-01a1c01e-a93e-7483-bc3d-f200aa7be022.jsonl",
+        "requestLine": 15186,
+        "responseLine": 15189,
+        "callId": "call_de8c0ff95d944318ba68fc1c00f88ae2",
+        "submittedAt": "2026-11-10T05:50:41.684Z",
+        "returnedAt": "2026-11-10T05:51:09.395Z",
+        "embeddedImageSha256": "85a39ffa30453a0926848f67a5134a175fa08349505b290dd0b9ac4ca7200ce7"
+      }
+    },
+    "quiz-wish-scenes": {
+      "sourceTool": "Codex built-in imagegen",
+      "path": "assets/originals/quiz-wish-scenes.png",
+      "toolOutput": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-afe1100b-5bbf-49a8-b46b-5aa813dc155d.png",
+      "sha256": "b9e2dbe67e460eb3dba84046e6afdcc5e117813c74c2f5d4a01534e28847a50d",
+      "bytes": 2464882,
+      "pixels": [
+        2172,
+        724
+      ],
+      "mode": "RGB",
+      "prompt": "Create one wide triptych atlas for first-grade English picture choices. Divide the canvas into three equally sized independent complete pictures at exactly one third and two thirds of its width. Narrow cream gutters centered at these thirds. No subject overlaps a gutter. Keep each important facial cue and hand action centered inside the central square of its third, with breathing room. Match the reference only for paper grain, colour palette and gentle shapes; use new human characters described below. Three completely independent equally scaled square illustrations in a wide triptych, warm cream gutters at exact thirds. Exact order: left two children wave goodbye as one carries a suitcase outside a building with no party objects; middle two different children at a garden conservatory birthday, one with a paper crown near a plainly iced cake with one candle and friend turns to them with hands open; right two children greeting each other normally beside bookcases at a library, no luggage, party props or cake. Show bodies, faces and arms clearly, no arrows, text, brand, or reused illustration from the lesson; subjects readable at 96 pixels. Original first-grade picture-book art, matte gouache and cut-paper silhouettes on fine warm paper grain. Quiet deep pine and cream with restrained apricot and persimmon, clear compact silhouettes, no gradients, no typed or hand-written text, letters, digits, logos, emoji, or watermark. Invent all characters and framing. No textbook art or costume copies.",
+      "promptSha256": "d4a6ab57efb2f92bdfc1d2b28d5b68124d6bc40716210589b4109fe2fcc70f0c",
+      "plannedPrompt": "Three completely independent equally scaled square illustrations in a wide triptych, warm cream gutters at exact thirds. Exact order: left two children wave goodbye as one carries a suitcase outside a building with no party objects; middle two different children at a garden conservatory birthday, one with a paper crown near a plainly iced cake with one candle and friend turns to them with hands open; right two children greeting each other normally beside bookcases at a library, no luggage, party props or cake. Show bodies, faces and arms clearly, no arrows, text, brand, or reused illustration from the lesson; subjects readable at 96 pixels. Original first-grade picture-book art, matte gouache and cut-paper silhouettes on fine warm paper grain. Quiet deep pine and cream with restrained apricot and persimmon, clear compact silhouettes, no gradients, no typed or hand-written text, letters, digits, logos, emoji, or watermark. Invent all characters and framing. No textbook art or costume copies.",
+      "transparentBackground": false,
+      "status": "accepted_master",
+      "referencedOriginal": "rhythm-table",
+      "referencedOriginalSha256": "85a39ffa30453a0926848f67a5134a175fa08349505b290dd0b9ac4ca7200ce7",
+      "receipt": {
+        "generationEventLine": 15264,
+        "executionId": "exec-afe1100b-5bbf-49a8-b46b-5aa813dc155d",
+        "generationId": "c944273b-1143-43a4-a543-77d4683bcb32",
+        "returnedAt": "2026-11-10T05:55:02.852Z",
+        "embeddedImageSha256": "b9e2dbe67e460eb3dba84046e6afdcc5e117813c74c2f5d4a01534e28847a50d",
+        "path": "/Users/sqcopenclaw/.codex/sessions/2026/11/09/rollout-2026-11-09T19-43-17-01a1c01e-a93e-7483-bc3d-f200aa7be022.jsonl",
+        "requestLine": 15261,
+        "batchCallId": "call_cd134b82d7e34b92813089875dbf975c",
+        "wrapperOutputLine": 15266,
+        "displayResponseLine": 15289,
+        "submittedAt": "2026-11-10T05:53:58.495Z",
+        "displayPreviewSha256": "6538cebf7f37f27eff3b0fac21ed6b4ecb82444b0e83e16510b67930f8642270",
+        "displayPreviewPixels": [
+          2048,
+          683
+        ],
+        "displayPreviewAlphaMaxDifference": 0,
+        "displayPreviewRgbMeanDifferences": [
+          0.16189,
+          0.17999,
+          0.17091
+        ]
+      }
+    },
+    "quiz-thanks-people": {
+      "sourceTool": "Codex built-in imagegen",
+      "path": "assets/originals/quiz-thanks-people.png",
+      "toolOutput": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-15a6eceb-6585-44b8-925c-c2748279baa0.png",
+      "sha256": "f7444cc25f6c84779e68c2b2d6026bee22060b0af8beec5bc4a5c0a405910843",
+      "bytes": 2362844,
+      "pixels": [
+        2172,
+        724
+      ],
+      "mode": "RGB",
+      "prompt": "Create one wide triptych atlas for first-grade English picture choices. Divide the canvas into three equally sized independent complete pictures at exactly one third and two thirds of its width. Narrow cream gutters centered at these thirds. No subject overlaps a gutter. Keep each important facial cue and hand action centered inside the central square of its third, with breathing room. Match the reference only for paper grain, colour palette and gentle shapes; use new human characters described below. Three separated square portrait vignettes with equal scale and the same simple neutral apricot bakery workshop backdrop. Exact order: left a child in plain navy apron holding only a wooden spoon near a mixing bowl, busy baking; middle a similarly aged friend extending a blank folded cream birthday card outward with both hands, no cake or crown; right another similarly aged child who wears a round bright paper crown and has one small decorated cake with an unnumbered candle visibly near their folded hands, facing the same direction. All three have equal lighting and card backgrounds and no question marks, answer symbols or text. Role cues should survive at 96 pixels; no front-facing lettering on card. Original first-grade picture-book art, matte gouache and cut-paper silhouettes on fine warm paper grain. Quiet deep pine and cream with restrained apricot and persimmon, clear compact silhouettes, no gradients, no typed or hand-written text, letters, digits, logos, emoji, or watermark. Invent all characters and framing. No textbook art or costume copies.",
+      "promptSha256": "ca5a246488c206a389a2fa368c8bb85e94c52d0339fe91dd6272e48b8ef758ad",
+      "plannedPrompt": "Three separated square portrait vignettes with equal scale and the same simple neutral apricot bakery workshop backdrop. Exact order: left a child in plain navy apron holding only a wooden spoon near a mixing bowl, busy baking; middle a similarly aged friend extending a blank folded cream birthday card outward with both hands, no cake or crown; right another similarly aged child who wears a round bright paper crown and has one small decorated cake with an unnumbered candle visibly near their folded hands, facing the same direction. All three have equal lighting and card backgrounds and no question marks, answer symbols or text. Role cues should survive at 96 pixels; no front-facing lettering on card. Original first-grade picture-book art, matte gouache and cut-paper silhouettes on fine warm paper grain. Quiet deep pine and cream with restrained apricot and persimmon, clear compact silhouettes, no gradients, no typed or hand-written text, letters, digits, logos, emoji, or watermark. Invent all characters and framing. No textbook art or costume copies.",
+      "transparentBackground": false,
+      "status": "accepted_master",
+      "referencedOriginal": "rhythm-table",
+      "referencedOriginalSha256": "85a39ffa30453a0926848f67a5134a175fa08349505b290dd0b9ac4ca7200ce7",
+      "receipt": {
+        "generationEventLine": 15267,
+        "executionId": "exec-15a6eceb-6585-44b8-925c-c2748279baa0",
+        "generationId": "798705da-47bb-4ef5-9701-9a1a8419df58",
+        "returnedAt": "2026-11-10T05:55:59.513Z",
+        "embeddedImageSha256": "f7444cc25f6c84779e68c2b2d6026bee22060b0af8beec5bc4a5c0a405910843",
+        "path": "/Users/sqcopenclaw/.codex/sessions/2026/11/09/rollout-2026-11-09T19-43-17-01a1c01e-a93e-7483-bc3d-f200aa7be022.jsonl",
+        "requestLine": 15261,
+        "batchCallId": "call_cd134b82d7e34b92813089875dbf975c",
+        "wrapperOutputLine": 15266,
+        "displayResponseLine": 15289,
+        "submittedAt": "2026-11-10T05:53:58.495Z",
+        "displayPreviewSha256": "50b729ace70b9f4ab54a4a85aea5bb37fc1141a65eb9db2d6258b0adbfbf7d99",
+        "displayPreviewPixels": [
+          2048,
+          683
+        ],
+        "displayPreviewAlphaMaxDifference": 0,
+        "displayPreviewRgbMeanDifferences": [
+          0.15923,
+          0.17807,
+          0.1694
+        ]
+      }
+    },
+    "quiz-three-stationery": {
+      "sourceTool": "Codex built-in imagegen",
+      "path": "assets/originals/quiz-three-stationery.png",
+      "toolOutput": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-921af5d0-2d08-4595-ad2e-2f2fc2b936bd.png",
+      "sha256": "82401586ee9753fb07e478a6b3190b9bc7e172a4877e95c758982b4fe847a6cf",
+      "bytes": 556128,
+      "pixels": [
+        2172,
+        724
+      ],
+      "mode": "RGBA",
+      "prompt": "Create one landscape atlas for first-grade English picture choices. Three equal columns, invisibly divided exactly at 1/3 and 2/3 of canvas width. Each object entirely contained in its own center third, preserving transparent empty margins; no visible separators. Use the style reference only for paper grain and palette. Three separate equal square cells in one 3:1 transparent landscape atlas, same size and contrast. Exact order: left a single off-white rectangular eraser with a simple unmarked turquoise paper sleeve and visible eraser ends; middle short sunflower-yellow sharpened wood graphite pencil with an intact clearly angled wood point; right capped burgundy ink pen, same length as pencil but with clear black cap and clip. These are new variants, no game shapes or colors. True alpha space between all props, no tabletop, hands, text, numbers or shadows. Each object is complete and unmistakable at 96 pixels. Original first-grade picture-book art, matte gouache and cut-paper silhouettes on fine warm paper grain. Quiet deep pine and cream with restrained apricot and persimmon, clear compact silhouettes, no gradients, no typed or hand-written text, letters, digits, logos, emoji, or watermark. Invent all characters and framing. No textbook art or costume copies.",
+      "promptSha256": "f2afaac0d725f3f5a6a52cef6c63e2da5f8b3678199066ab4f93f1f32c845020",
+      "plannedPrompt": "Three separate equal square cells in one 3:1 transparent landscape atlas, same size and contrast. Exact order: left a single off-white rectangular eraser with a simple unmarked turquoise paper sleeve and visible eraser ends; middle short sunflower-yellow sharpened wood graphite pencil with an intact clearly angled wood point; right capped burgundy ink pen, same length as pencil but with clear black cap and clip. These are new variants, no game shapes or colors. True alpha space between all props, no tabletop, hands, text, numbers or shadows. Each object is complete and unmistakable at 96 pixels. Original first-grade picture-book art, matte gouache and cut-paper silhouettes on fine warm paper grain. Quiet deep pine and cream with restrained apricot and persimmon, clear compact silhouettes, no gradients, no typed or hand-written text, letters, digits, logos, emoji, or watermark. Invent all characters and framing. No textbook art or costume copies.",
+      "transparentBackground": true,
+      "status": "accepted_master",
+      "referencedOriginal": "rhythm-table",
+      "referencedOriginalSha256": "85a39ffa30453a0926848f67a5134a175fa08349505b290dd0b9ac4ca7200ce7",
+      "receipt": {
+        "generationEventLine": 15277,
+        "executionId": "exec-921af5d0-2d08-4595-ad2e-2f2fc2b936bd",
+        "generationId": "54e932b4-91e8-4eec-a500-6c1c49bde6a9",
+        "returnedAt": "2026-11-10T05:56:24.612Z",
+        "embeddedImageSha256": "82401586ee9753fb07e478a6b3190b9bc7e172a4877e95c758982b4fe847a6cf",
+        "path": "/Users/sqcopenclaw/.codex/sessions/2026/11/09/rollout-2026-11-09T19-43-17-01a1c01e-a93e-7483-bc3d-f200aa7be022.jsonl",
+        "requestLine": 15261,
+        "batchCallId": "call_cd134b82d7e34b92813089875dbf975c",
+        "wrapperOutputLine": 15266,
+        "displayResponseLine": 15289,
+        "submittedAt": "2026-11-10T05:53:58.495Z",
+        "displayPreviewSha256": "81861acaf476e86c861c2844bc996c269b596678dc4f344e3b9c479aca60f584",
+        "displayPreviewPixels": [
+          2048,
+          683
+        ],
+        "displayPreviewAlphaMaxDifference": 1,
+        "displayPreviewRgbMeanDifferences": [
+          0.13294,
+          0.08091,
+          0.0659
+        ]
+      }
+    },
+    "quiz-welcome-roles": {
+      "sourceTool": "Codex built-in imagegen",
+      "path": "assets/originals/quiz-welcome-roles.png",
+      "toolOutput": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-0436a08b-c533-47c4-a283-2a622dec01d2.png",
+      "sha256": "d008811ff7980caaf96f2037ce668d285888da33f4078cc169b527fc45ee21be",
+      "bytes": 2370488,
+      "pixels": [
+        2172,
+        724
+      ],
+      "mode": "RGB",
+      "prompt": "Create one wide triptych atlas for first-grade English picture choices. Divide the canvas into three equally sized independent complete pictures at exactly one third and two thirds of its width. Narrow cream gutters centered at these thirds. No subject overlaps a gutter. Keep each important facial cue and hand action centered inside the central square of its third, with breathing room. Match the reference only for paper grain, colour palette and gentle shapes; use new human characters described below. Three independent square scenes after one birthday gift handoff in a new outdoor flower terrace. Same three original human children with a defined role and consistent outfit. LEFT: active striped-cuff giver, no gift left in their own hands, responding with open palm and smiling toward the side where the recipient holds the gift; recipient only a small shoulder at the right edge, and wrapped gift visibly on that recipient side. CENTER: active coral-headband recipient hugging the wrapped gift and smiling; keep wrapped gift held in both of that child’s arms. RIGHT: a separate child standing one step away, holding a simple camera at chest level as a bystander. Keep each featured face and the defining hand action unmistakable and similar in scale at 96 pixels. No gestures shared between options, no text, caption, bubbles, symbols or identical props in all roles. Original first-grade picture-book art, matte gouache and cut-paper silhouettes on fine warm paper grain. Quiet deep pine and cream with restrained apricot and persimmon, clear compact silhouettes, no gradients, no typed or hand-written text, letters, digits, logos, emoji, or watermark. Invent all characters and framing. No textbook art or costume copies.",
+      "promptSha256": "891036486494f174f4029371880ce6e099a75d77d19254a391ca5c0be87707dc",
+      "plannedPrompt": "Three independent square scenes after one birthday gift handoff in a new outdoor flower terrace. Same three original human children with a defined role and consistent outfit. LEFT: active striped-cuff giver, no gift left in their own hands, responding with open palm and smiling toward the side where the recipient holds the gift; recipient only a small shoulder at the right edge, and wrapped gift visibly on that recipient side. CENTER: active coral-headband recipient hugging the wrapped gift and smiling; keep wrapped gift held in both of that child’s arms. RIGHT: a separate child standing one step away, holding a simple camera at chest level as a bystander. Keep each featured face and the defining hand action unmistakable and similar in scale at 96 pixels. No gestures shared between options, no text, caption, bubbles, symbols or identical props in all roles. Original first-grade picture-book art, matte gouache and cut-paper silhouettes on fine warm paper grain. Quiet deep pine and cream with restrained apricot and persimmon, clear compact silhouettes, no gradients, no typed or hand-written text, letters, digits, logos, emoji, or watermark. Invent all characters and framing. No textbook art or costume copies.",
+      "transparentBackground": false,
+      "status": "accepted_master",
+      "referencedOriginal": "rhythm-table",
+      "referencedOriginalSha256": "85a39ffa30453a0926848f67a5134a175fa08349505b290dd0b9ac4ca7200ce7",
+      "receipt": {
+        "generationEventLine": 15263,
+        "executionId": "exec-0436a08b-c533-47c4-a283-2a622dec01d2",
+        "generationId": "78632e62-c667-4901-9fbb-7284bbea52dd",
+        "returnedAt": "2026-11-10T05:54:26.393Z",
+        "embeddedImageSha256": "d008811ff7980caaf96f2037ce668d285888da33f4078cc169b527fc45ee21be",
+        "path": "/Users/sqcopenclaw/.codex/sessions/2026/11/09/rollout-2026-11-09T19-43-17-01a1c01e-a93e-7483-bc3d-f200aa7be022.jsonl",
+        "requestLine": 15261,
+        "batchCallId": "call_cd134b82d7e34b92813089875dbf975c",
+        "wrapperOutputLine": 15266,
+        "displayResponseLine": 15289,
+        "submittedAt": "2026-11-10T05:53:58.495Z",
+        "displayPreviewSha256": "7b30d432820086d3c03c36e35b146d27387c8855f804119e7d9a293ac76e338b",
+        "displayPreviewPixels": [
+          2048,
+          683
+        ],
+        "displayPreviewAlphaMaxDifference": 0,
+        "displayPreviewRgbMeanDifferences": [
+          0.16792,
+          0.17862,
+          0.16956
+        ]
+      }
+    },
+    "quiz-book-actions": {
+      "sourceTool": "Codex built-in imagegen",
+      "path": "assets/originals/quiz-book-actions.png",
+      "toolOutput": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-0cb9ea56-638d-428b-b608-8c058f168487.png",
+      "sha256": "7c0eaf0a8a64f1edaa5f948d6b9846bab587debaa3aa293c004edc7f22e44571",
+      "bytes": 2338104,
+      "pixels": [
+        2172,
+        724
+      ],
+      "mode": "RGB",
+      "prompt": "Create one wide triptych atlas for first-grade English picture choices. Divide the canvas into three equally sized independent complete pictures at exactly one third and two thirds of its width. Narrow cream gutters centered at these thirds. No subject overlaps a gutter. Keep each important facial cue and hand action centered inside the central square of its third, with breathing room. Match the reference only for paper grain, colour palette and gentle shapes; use new human characters described below. Three independent evenly sized square pictures of the same two original children, airy pale sage outdoor reading stand, same clothing, book cover color, framing, distance and lighting. Exact order: left child reads a single opened deep orange book facing inward toward themself; middle a closed deep orange book is visibly being passed between the children, both holding a distinct opposite side of the one book; right the closed deep orange book sits fully on the tabletop, untouched, one child points at it from a distance, other child’s hands down. Keep one book and no other props in each scene. Clear hands and clean empty setting so reading versus giving versus pointing can be told at 96 pixels, no glyphs. Original first-grade picture-book art, matte gouache and cut-paper silhouettes on fine warm paper grain. Quiet deep pine and cream with restrained apricot and persimmon, clear compact silhouettes, no gradients, no typed or hand-written text, letters, digits, logos, emoji, or watermark. Invent all characters and framing. No textbook art or costume copies.",
+      "promptSha256": "b6cd335c375833a4b0c0b9577a3299ce8039d7ead7db0d040e4b3c95cb91520c",
+      "plannedPrompt": "Three independent evenly sized square pictures of the same two original children, airy pale sage outdoor reading stand, same clothing, book cover color, framing, distance and lighting. Exact order: left child reads a single opened deep orange book facing inward toward themself; middle a closed deep orange book is visibly being passed between the children, both holding a distinct opposite side of the one book; right the closed deep orange book sits fully on the tabletop, untouched, one child points at it from a distance, other child’s hands down. Keep one book and no other props in each scene. Clear hands and clean empty setting so reading versus giving versus pointing can be told at 96 pixels, no glyphs. Original first-grade picture-book art, matte gouache and cut-paper silhouettes on fine warm paper grain. Quiet deep pine and cream with restrained apricot and persimmon, clear compact silhouettes, no gradients, no typed or hand-written text, letters, digits, logos, emoji, or watermark. Invent all characters and framing. No textbook art or costume copies.",
+      "transparentBackground": false,
+      "status": "accepted_master",
+      "referencedOriginal": "rhythm-table",
+      "referencedOriginalSha256": "85a39ffa30453a0926848f67a5134a175fa08349505b290dd0b9ac4ca7200ce7",
+      "receipt": {
+        "generationEventLine": 15265,
+        "executionId": "exec-0cb9ea56-638d-428b-b608-8c058f168487",
+        "generationId": "debf2076-7818-4571-a7d9-460fda2c92cd",
+        "returnedAt": "2026-11-10T05:55:27.594Z",
+        "embeddedImageSha256": "7c0eaf0a8a64f1edaa5f948d6b9846bab587debaa3aa293c004edc7f22e44571",
+        "path": "/Users/sqcopenclaw/.codex/sessions/2026/11/09/rollout-2026-11-09T19-43-17-01a1c01e-a93e-7483-bc3d-f200aa7be022.jsonl",
+        "requestLine": 15261,
+        "batchCallId": "call_cd134b82d7e34b92813089875dbf975c",
+        "wrapperOutputLine": 15266,
+        "displayResponseLine": 15289,
+        "submittedAt": "2026-11-10T05:53:58.495Z",
+        "displayPreviewSha256": "f60005de9545bfda8c7ef438c10a4d74f9f0d7ec5569f671c306cf465827c30f",
+        "displayPreviewPixels": [
+          2048,
+          683
+        ],
+        "displayPreviewAlphaMaxDifference": 0,
+        "displayPreviewRgbMeanDifferences": [
+          0.16826,
+          0.17737,
+          0.17024
+        ]
+      }
+    },
+    "quiz-welcome-giver-handoff": {
+      "sourceTool": "Codex built-in imagegen",
+      "path": "assets/originals/quiz-welcome-giver-handoff.png",
+      "toolOutput": "/Users/sqcopenclaw/.codex/generated_images/01a1c01e-a93e-7483-bc3d-f200aa7be022/exec-501a99c0-182e-45d4-aa81-93942217149f.png",
+      "sha256": "46f19b88f3c8a824b2cb78aa7ffc605a7481cbabcbba2d2f5aaaf59d47271aef",
+      "bytes": 2441134,
+      "pixels": [
+        1254,
+        1254
+      ],
+      "mode": "RGB",
+      "prompt": "Create exactly ONE square 1:1 first-grade listening picture choice. Edit the first reference only. Keep the exact same striped-cuff boy, olive vest and rust scarf, his relative height, the same flower terrace, cream railing, full-body framing, palette and gentle matte gouache paper texture. The second reference supplies ONLY the identity of the girl with the coral headband and the same cream gift box with its rust-red ribbon. Show the instant just BEFORE she takes the gift. On the left the striped-cuff boy leans gently toward the girl, extends BOTH arms, and still supports the one wrapped box securely in his own TWO hands. Both wrists visibly connect to his striped cuffs. On the right, show the girl and coral headband clearly. She reaches toward the box with BOTH visibly empty open hands, leaving a small clear air gap between her fingertips and the box. The only box sits on the boy’s hands, never on her hands, lap or side. Show four separate unobstructed hands and the complete box with ribbon centered in the picture and large enough to identify at 96 pixels. Keep the character and prop scale consistent with the reference choices. Keep all heads, hands and the parcel within an 8 percent safe margin. Warm paper grain, same quiet cream, pine and apricot. No text, glyphs, signs, arrows, bubbles, extra people, gifts, borders or watermarks.",
+      "promptSha256": "49092fba82c81b667e559ac6016e903e560df8ec23829ff84019967c043bfc28",
+      "plannedPrompt": "Create exactly ONE square 1:1 first-grade listening picture choice. Edit the first reference only. Keep the exact same striped-cuff boy, olive vest and rust scarf, his relative height, the same flower terrace, cream railing, full-body framing, palette and gentle matte gouache paper texture. The second reference supplies ONLY the identity of the girl with the coral headband and the same cream gift box with its rust-red ribbon. Show the instant just BEFORE she takes the gift. On the left the striped-cuff boy leans gently toward the girl, extends BOTH arms, and still supports the one wrapped box securely in his own TWO hands. Both wrists visibly connect to his striped cuffs. On the right, show the girl and coral headband clearly. She reaches toward the box with BOTH visibly empty open hands, leaving a small clear air gap between her fingertips and the box. The only box sits on the boy’s hands, never on her hands, lap or side. Show four separate unobstructed hands and the complete box with ribbon centered in the picture and large enough to identify at 96 pixels. Keep the character and prop scale consistent with the reference choices. Keep all heads, hands and the parcel within an 8 percent safe margin. Warm paper grain, same quiet cream, pine and apricot. No text, glyphs, signs, arrows, bubbles, extra people, gifts, borders or watermarks.",
+      "transparentBackground": false,
+      "status": "accepted_master",
+      "referenceAssets": [
+        {
+          "path": "assets/quiz-welcome-giver.png",
+          "toolInputPath": "/Users/sqcopenclaw/Desktop/ai_camera_app/courseware/lessons/fltrp-g1-upper-happy-birthday/assets/quiz-welcome-giver.png",
+          "sha256": "6339115b44edd174ed474d13827568ba203a7279a4a1e08c65ec912699aa6bf4"
+        },
+        {
+          "path": "assets/quiz-welcome-receiver.png",
+          "toolInputPath": "/Users/sqcopenclaw/Desktop/ai_camera_app/courseware/lessons/fltrp-g1-upper-happy-birthday/assets/quiz-welcome-receiver.png",
+          "sha256": "bd0ca1d6d83446a3672ac2a82ec5688cc879aa58e9656234d8568c7f481d8574"
+        }
+      ],
+      "receipt": {
+        "path": "/Users/sqcopenclaw/.codex/sessions/2026/11/09/rollout-2026-11-09T19-43-17-01a1c01e-a93e-7483-bc3d-f200aa7be022.jsonl",
+        "requestLine": 15495,
+        "generationEventLine": 15497,
+        "responseLine": 15498,
+        "callId": "call_c1a5e7d02e3e4c65979cc6ed9de68e84",
+        "executionId": "exec-501a99c0-182e-45d4-aa81-93942217149f",
+        "generationId": "f08ee344-7bd8-4c17-8f80-4032f0c2b530",
+        "submittedAt": "2026-11-10T06:15:52.899Z",
+        "returnedAt": "2026-11-10T06:16:13.509Z",
+        "embeddedImageSha256": "46f19b88f3c8a824b2cb78aa7ffc605a7481cbabcbba2d2f5aaaf59d47271aef"
+      }
+    }
+  },
+  "sourceOnlyAssets": {
+    "quiz-welcome-giver-v1": {
+      "path": "assets/quiz-welcome-giver.png",
+      "sha256": "6339115b44edd174ed474d13827568ba203a7279a4a1e08c65ec912699aa6bf4",
+      "bytes": 156870,
+      "pixels": [
+        320,
+        320
+      ],
+      "sourceKind": "registered_builtin_imagegen_quiz_crop",
+      "originalKey": "quiz-welcome-roles",
+      "originalSha256": "d008811ff7980caaf96f2037ce668d285888da33f4078cc169b527fc45ee21be",
+      "crop": [
+        20,
+        14,
+        716,
+        710
+      ],
+      "cropCoordinates": "left, top, right, bottom in original atlas pixels; right and bottom exclusive",
+      "renderer": "quiz_art.py",
+      "rendererSha256": "e6b01d3b3bd1c806880452f876abffc0ad956a8c5c46d4e703c82fd5897ef4a3",
+      "sceneKey": "picture-check",
+      "status": "source_only_superseded_after_independent_review"
+    }
+  }
+}

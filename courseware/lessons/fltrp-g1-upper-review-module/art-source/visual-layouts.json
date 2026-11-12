@@ -1,0 +1,255 @@
+{
+  "ball-3": {
+    "operation": "repeat exact object count",
+    "object": "ball",
+    "count": 3,
+    "other": null
+  },
+  "ball-5": {
+    "operation": "repeat exact object count",
+    "object": "ball",
+    "count": 5,
+    "other": null
+  },
+  "book-4": {
+    "operation": "repeat exact object count",
+    "object": "book",
+    "count": 4,
+    "other": null
+  },
+  "schoolbag-2": {
+    "operation": "repeat exact object count",
+    "object": "schoolbag",
+    "count": 2,
+    "other": null
+  },
+  "schoolbag-4": {
+    "operation": "repeat exact object count",
+    "object": "schoolbag",
+    "count": 4,
+    "other": null
+  },
+  "pencil-6": {
+    "operation": "repeat exact object count",
+    "object": "pencil",
+    "count": 6,
+    "other": null
+  },
+  "pencil-7": {
+    "operation": "repeat exact object count",
+    "object": "pencil",
+    "count": 7,
+    "other": null
+  },
+  "book-6": {
+    "operation": "repeat exact object count",
+    "object": "book",
+    "count": 6,
+    "other": null
+  },
+  "q-pencil-count-1": {
+    "operation": "repeat exact object count",
+    "object": "q-blue-pencil",
+    "count": 6,
+    "other": "q-red-bag"
+  },
+  "q-pencil-count-2": {
+    "operation": "repeat exact object count",
+    "object": "q-blue-pencil",
+    "count": 7,
+    "other": "q-red-bag"
+  },
+  "q-pencil-count-3": {
+    "operation": "repeat exact object count",
+    "object": "q-blue-pencil",
+    "count": 8,
+    "other": "q-red-bag"
+  },
+  "listen-model": {
+    "operation": "frame picture choices",
+    "subjects": [
+      "red-cat",
+      "green-cat",
+      "green-dog"
+    ]
+  },
+  "quiz-animals-one": {
+    "operation": "frame picture choices",
+    "subjects": [
+      "q-green-bird",
+      "q-yellow-bird",
+      "q-green-dog"
+    ]
+  },
+  "quiz-animals-two": {
+    "operation": "frame picture choices",
+    "subjects": [
+      "q-red-cat",
+      "q-orange-dog",
+      "q-orange-cat"
+    ]
+  },
+  "quiz-bag-colors": {
+    "operation": "frame picture choices",
+    "subjects": [
+      "q-red-bag",
+      "q-blue-pencil",
+      "q-blue-bag"
+    ]
+  },
+  "counting-panel": {
+    "operation": "frame picture choices",
+    "subjects": [
+      "ball-3",
+      "book"
+    ]
+  },
+  "age-seven": {
+    "operation": "repeat count dots",
+    "count": 7,
+    "fill": "#236a93"
+  },
+  "age-six": {
+    "operation": "repeat count dots",
+    "count": 6,
+    "fill": "#b57c20"
+  },
+  "q-age-seven": {
+    "operation": "repeat count dots",
+    "count": 7,
+    "fill": "#58784d"
+  },
+  "q-age-eight": {
+    "operation": "repeat count dots",
+    "count": 8,
+    "fill": "#58784d"
+  },
+  "q-age-nine": {
+    "operation": "repeat count dots",
+    "count": 9,
+    "fill": "#58784d"
+  },
+  "q-dots-eight": {
+    "operation": "repeat count dots",
+    "count": 8,
+    "fill": "#9b6442"
+  },
+  "q-dots-nine": {
+    "operation": "repeat count dots",
+    "count": 9,
+    "fill": "#9b6442"
+  },
+  "q-dots-ten": {
+    "operation": "repeat count dots",
+    "count": 10,
+    "fill": "#9b6442"
+  },
+  "badge-star": {
+    "operation": "draw identifier badge",
+    "shape": "star",
+    "frame": "#fff1d7"
+  },
+  "quiz-badge-star": {
+    "operation": "draw identifier badge",
+    "shape": "star",
+    "frame": "#fff8ed"
+  },
+  "badge-sun": {
+    "operation": "draw identifier badge",
+    "shape": "sun",
+    "frame": "#fff1d7"
+  },
+  "quiz-badge-sun": {
+    "operation": "draw identifier badge",
+    "shape": "sun",
+    "frame": "#fff8ed"
+  },
+  "badge-leaf": {
+    "operation": "draw identifier badge",
+    "shape": "leaf",
+    "frame": "#fff1d7"
+  },
+  "quiz-badge-leaf": {
+    "operation": "draw identifier badge",
+    "shape": "leaf",
+    "frame": "#fff8ed"
+  },
+  "volunteer-badges": {
+    "operation": "place role symbols on desk",
+    "markers": [
+      "star",
+      "sun",
+      "leaf"
+    ],
+    "positions": [
+      142,
+      367,
+      602
+    ]
+  },
+  "shelf-open": {
+    "operation": "arrange classroom objects",
+    "counts": {
+      "schoolbags": 4,
+      "books": 3,
+      "pencils": 5
+    }
+  },
+  "shelf-covered": {
+    "operation": "opaque cover over all counted objects",
+    "rectangle": [
+      31,
+      48,
+      700,
+      419
+    ]
+  },
+  "teaching-toys-six": {
+    "operation": "layout picture choices",
+    "columns": 3,
+    "subjects": [
+      "red-cat",
+      "green-cat",
+      "green-dog",
+      "blue-dog",
+      "blue-bird",
+      "yellow-bird"
+    ]
+  },
+  "orders-middle": {
+    "operation": "layout picture choices",
+    "columns": 3,
+    "subjects": [
+      "book-4",
+      "schoolbag-2",
+      "schoolbag-4"
+    ]
+  },
+  "orders-final": {
+    "operation": "layout picture choices",
+    "columns": 3,
+    "subjects": [
+      "pencil-6",
+      "pencil-7",
+      "book-6"
+    ]
+  },
+  "q-number-board": {
+    "operation": "layout picture choices",
+    "columns": 3,
+    "subjects": [
+      "q-dots-ten",
+      "q-dots-eight",
+      "q-dots-nine"
+    ]
+  },
+  "q-role-board": {
+    "operation": "layout picture choices",
+    "columns": 3,
+    "subjects": [
+      "quiz-badge-sun",
+      "quiz-badge-star",
+      "quiz-badge-leaf"
+    ]
+  }
+}

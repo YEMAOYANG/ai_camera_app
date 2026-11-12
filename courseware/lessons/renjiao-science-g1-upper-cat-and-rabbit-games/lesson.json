@@ -1,0 +1,359 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "猫和兔",
+  "description": "沿猫和兔的身体做一张观察记录，用同样的步子比较软垫前后的轻重，再从眼睛、爪子、耳朵和后腿找出本领的线索。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小科老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Serena",
+      "avatar": "/avatars/teacher-2.png",
+      "color": "#57B05A",
+      "persona": "带孩子有序观察，用看见和听见的证据解释猫和兔的特点。"
+    }
+  },
+  "images": {
+    "station": {"file": "assets/station.png"},
+    "cat-orange": {"file": "assets/cat-orange.png"},
+    "cat-gray": {"file": "assets/cat-gray.png"},
+    "rabbit-brown": {"file": "assets/rabbit-brown.png"},
+    "rabbit-white": {"file": "assets/rabbit-white.png"},
+    "cat-tail": {"file": "assets/cat-tail.png"},
+    "cat-ear": {"file": "assets/cat-ear.png"},
+    "pad": {"file": "assets/pad.png"},
+    "table-bare": {"file": "assets/table-bare.png"},
+    "table-soft": {"file": "assets/table-soft.png"},
+    "cat-eyes": {"file": "assets/cat-eyes.png"},
+    "climb-pair": {"file": "assets/climb-pair.png"},
+    "rabbit-ear": {"file": "assets/rabbit-ear.png"},
+    "rabbit-move": {"file": "assets/rabbit-move.png"},
+    "cat-walk": {"file": "assets/cat-walk.png"},
+    "listen-strip": {"file": "assets/listen-strip.png"},
+    "listen-bare": {"file": "assets/listen-bare.png"},
+    "listen-cup": {"file": "assets/listen-cup.png"},
+    "listen-cone": {"file": "assets/listen-cone.png"},
+    "care-strip": {"file": "assets/care-strip.png"},
+    "wash": {"file": "assets/wash.png"},
+    "gloves": {"file": "assets/gloves.png"},
+    "tell-adult": {"file": "assets/tell-adult.png"}
+  },
+  "scenes": [
+    {
+      "key": "compare",
+      "type": "slide",
+      "title": "猫和兔，哪里不一样",
+      "template": "two-columns",
+      "data": {
+        "title": "猫和兔，哪里不一样",
+        "left": {"heading": "橘猫", "body": "这只猫耳较短，尾较长"},
+        "right": {"heading": "棕兔", "body": "这只兔耳较长，尾较短"},
+        "left_picture": "cat-orange",
+        "right_picture": "rabbit-brown"
+      },
+      "script": [
+        {"spotlight": "left-picture"},
+        {"say": "我们先看整只橘猫，能看见它的头、脚和尾巴。"},
+        {"say": "坐在原地，把两只手竖在头旁，学学短短的耳朵。"},
+        {"spotlight": "right-picture"},
+        {"say": "再看这只棕兔，把手伸高一点，学学长耳朵。"},
+        {"say": "比耳朵就两边都看耳朵，别拿耳朵和尾巴比。"},
+        {"spotlight": "left-body"},
+        {"say": "这只猫的耳朵相对短，身后还伸出一条长尾巴。"},
+        {"spotlight": "right-body"},
+        {"say": "这只兔耳朵较长，尾巴却短，像个小团。"},
+        {"say": "记下这两只的样子。遇到别的猫兔，要重新看。"}
+      ]
+    },
+    {
+      "key": "order",
+      "type": "slide",
+      "title": "按顺序看，按看到的画",
+      "template": "picture-points",
+      "data": {
+        "title": "按顺序看，按看到的画",
+        "picture": "station",
+        "points": ["先看整只动物", "头、颈、躯干", "四肢、尾", "看清再记"]
+      },
+      "script": [
+        {"spotlight": "point-1"},
+        {"say": "先看整只动物，知道它的头和尾朝哪里。"},
+        {"spotlight": "picture"},
+        {"say": "看台上的兔，头在前，尾巴缩在身后。"},
+        {"spotlight": "point-2"},
+        {"say": "从头往后看。颈在头和身子中间，把两处连起来。"},
+        {"say": "身子中间的大部分叫躯干，四条腿跟它连在一起。"},
+        {"spotlight": "point-3"},
+        {"say": "再往下找前腿和后腿。四条腿合在一起叫四肢。"},
+        {"say": "最后看尾。猫和兔都有这些部分，样子会不同。"},
+        {"spotlight": "point-4"},
+        {"say": "如果照片挡住一只脚，先换个角度核对，别猜。"},
+        {"say": "把真的看清的样子画下来，就是观察记录。"}
+      ]
+    },
+    {
+      "key": "lens",
+      "type": "interactive",
+      "title": "观察镜走哪边",
+      "page": "lens",
+      "widgetType": "game",
+      "script": [
+        {"setState": {"demo": true, "level": 1}},
+        {"highlight": "#game-goal"},
+        {"say": "先看完整的一只猫，找它的头朝哪边。"},
+        {"highlight": "#game-player"},
+        {"say": "把手按在观察镜上，从头慢慢往后移动。"},
+        {"say": "小满问：我可以先从尾巴滑回来吗？", "by": "xiaoman"},
+        {"highlight": "#game-target"},
+        {"say": "先约好同一个顺序，猫和兔的记录才好比较。"},
+        {"say": "我从头走过颈和躯干，再往下扫到前脚。"},
+        {"say": "镜头经过后脚，最后到尾巴，就不容易漏看。"},
+        {"setState": {"demo": false, "level": 1}},
+        {"say": "轮到你。后面动物会转向，先重新找到头。"}
+      ]
+    },
+    {
+      "key": "soft-pad",
+      "type": "slide",
+      "title": "猫脚下的软垫",
+      "template": "two-columns",
+      "data": {
+        "title": "猫脚下的软垫",
+        "left": {"heading": "指尖直接碰桌面", "body": "同一张桌子，先听一次"},
+        "right": {"heading": "下面加块海绵", "body": "同样轻轻走，再听一次"},
+        "left_picture": "table-bare",
+        "right_picture": "table-soft"
+      },
+      "script": [
+        {"spotlight": "title"},
+        {"say": "猫脚底有软软的肉垫。用什么能帮我们试一试？"},
+        {"spotlight": "left-picture"},
+        {"say": "让手指装成小脚，先在桌上轻轻走几步。"},
+        {"spotlight": "left-body"},
+        {"say": "记下第一遍声音。桌面和用力大小先记住。"},
+        {"spotlight": "right-picture"},
+        {"say": "加垫前我猜声音会变轻，这一步只是猜想。"},
+        {"say": "现在用软海绵模拟肉垫，让小脚隔着海绵碰桌面。"},
+        {"spotlight": "right-body"},
+        {"say": "同一张桌、同样轻的步子，只换碰桌的材料。"},
+        {"say": "软垫让接触更轻，能帮助猫走路的声音变小。"},
+        {"say": "比如垫海绵时只听见小小一声，就把它记下来。"},
+        {"say": "试过才知道，这才是这次观察到的事实。"}
+      ]
+    },
+    {
+      "key": "quiet",
+      "type": "interactive",
+      "title": "轻脚步试验",
+      "page": "quiet",
+      "widgetType": "game",
+      "script": [
+        {"setState": {"demo": true, "level": 1}},
+        {"highlight": "#quiet-test"},
+        {"say": "来看两种模拟脚步。每次跟着同一拍踩下去。"},
+        {"highlight": "#quiet-beat"},
+        {"say": "圆点进宽色带时，点右下角的脚印走一步。"},
+        {"say": "小满说：我用力踩一下，比较得更清楚！", "by": "xiaoman"},
+        {"highlight": "#quiet-test"},
+        {"say": "两次用力要相近。否则分不清是脚重，还是垫子变了。"},
+        {"say": "先看直接碰桌的波纹，再看隔着海绵的波纹。"},
+        {"say": "试验里的软垫让波纹小了，表示脚步声更轻。"},
+        {"setState": {"demo": false, "level": 1}},
+        {"say": "轮到你。两边都试，再用较轻的脚步走过休息区。"}
+      ]
+    },
+    {
+      "key": "listen",
+      "type": "slide",
+      "title": "同一个声音，三种听法",
+      "template": "picture-points",
+      "data": {
+        "title": "同一个声音，三种听法",
+        "picture": "listen-strip",
+        "points": ["先直接听", "手弯起来拢在耳旁", "用纸卷朝着声音"]
+      },
+      "script": [
+        {"spotlight": "picture"},
+        {"say": "兔的耳朵能接收声音。我们用纸卷来模拟一下。"},
+        {"spotlight": "point-1"},
+        {"say": "请大人在桌的另一边轻轻响一下铃，先直接听。"},
+        {"say": "记住这次声音，后两次才有一样的对照。"},
+        {"spotlight": "point-2"},
+        {"say": "把手弯起来放到耳朵旁，用同一个铃再试。"},
+        {"spotlight": "point-3"},
+        {"say": "第三次拿纸卷，把宽口朝向铃声。纸别伸进耳朵。"},
+        {"say": "让铃的位置和响的轻重相近，只换听的方法。"},
+        {"say": "比如直接听只有轻响，拢手后铃声更清楚。"},
+        {"say": "假如加纸卷也听得清，就把这个现象记下来。"},
+        {"say": "手和纸卷像兔耳，能把一些声音收拢到耳朵旁。"},
+        {"say": "如果没有听出不同，也照实记，别把猜想当结果。"}
+      ]
+    },
+    {
+      "key": "cat-special",
+      "type": "slide",
+      "title": "猫靠什么爬和看",
+      "template": "two-columns",
+      "data": {
+        "title": "猫靠什么爬和看",
+        "left": {"heading": "爪抓住树皮", "body": "尖爪帮它抓牢"},
+        "right": {"heading": "亮处和暗处的眼睛", "body": "暗处瞳孔可以变大"},
+        "left_picture": "climb-pair",
+        "right_picture": "cat-eyes"
+      },
+      "script": [
+        {"spotlight": "left-picture"},
+        {"say": "猫往树上爬时，脚趾前面的尖爪可以抓住树皮。"},
+        {"spotlight": "left-body"},
+        {"say": "抓得牢些，向上用力时就比较容易稳住身体。"},
+        {"spotlight": "right-picture"},
+        {"say": "看眼睛中间黑色的地方，那就是瞳孔。"},
+        {"say": "两张图一亮一暗，比较它们中间黑色的大小。"},
+        {"spotlight": "right-body"},
+        {"say": "暗一点时，瞳孔可以变大，让更多光进去。"},
+        {"say": "这样在有微弱光线时，猫也能观察周围。"},
+        {"say": "书里还有猫跳落的图。脚垫和腿能帮它落地。"},
+        {"say": "这里只看图，不自己试跳，也不让猫试跳。"}
+      ]
+    },
+    {
+      "key": "rabbit-special",
+      "type": "slide",
+      "title": "兔靠什么跳和听",
+      "template": "two-columns",
+      "data": {
+        "title": "兔靠什么跳和听",
+        "left": {"heading": "后腿往后蹬", "body": "有力的后腿帮助跳跃"},
+        "right": {"heading": "耳朵接收声音", "body": "耳朵和听声的本领有关"},
+        "left_picture": "rabbit-move",
+        "right_picture": "rabbit-ear"
+      },
+      "script": [
+        {"spotlight": "left-picture"},
+        {"say": "这只兔准备跳时，身体后面的两条腿先用力。"},
+        {"spotlight": "left-body"},
+        {"say": "后腿往后一蹬，就能把身子推向前面。"},
+        {"say": "后腿有力，是兔子善于跳跃的一条身体线索。"},
+        {"spotlight": "right-picture"},
+        {"say": "这只兔有一对长耳朵，长在头的上面。"},
+        {"spotlight": "right-body"},
+        {"say": "耳朵帮助它接收周围的声音，所以耳朵跟听声有关。"},
+        {"say": "刚才的纸卷也朝向声音，那是帮助我们理解的模型。"},
+        {"say": "猫和兔都有腿也都有耳。比较时还要看具体的样子。"}
+      ]
+    },
+    {
+      "key": "care",
+      "type": "slide",
+      "title": "跟动物相处要安全",
+      "template": "picture-points",
+      "data": {
+        "title": "跟动物相处要安全",
+        "picture": "care-strip",
+        "points": ["接触后用肥皂洗手", "清理用具戴手套", "受伤马上告诉大人"]
+      },
+      "script": [
+        {"spotlight": "picture"},
+        {"say": "照顾动物的时候，要爱护动物，也要保护自己。"},
+        {"spotlight": "point-1"},
+        {"say": "摸过动物后，用肥皂洗净手，再去拿点心。"},
+        {"say": "手接触过动物，别拿还没洗的手直接碰食物。"},
+        {"spotlight": "point-2"},
+        {"say": "和大人一起清理动物的碗或笼子，先戴好手套。"},
+        {"say": "手套把手和脏的用具隔开，清理时让大人陪同。"},
+        {"spotlight": "point-3"},
+        {"say": "被抓伤或咬伤，马上告诉大人。"},
+        {"say": "请大人帮忙冲洗，尽快带你去看医生。"},
+        {"say": "伤口怎么处理，让医生来判断。"}
+      ]
+    },
+    {
+      "key": "quick-check",
+      "type": "quiz",
+      "title": "换个情境看看",
+      "intro": ["听完老师的问题，再选一张图。"],
+      "questions": [
+        {
+          "id": "look-at-tail",
+          "question": "想比较两只猫的尾巴，先找哪种近照？",
+          "skill": "比较同一身体部位",
+          "visual": {"kind": "asset", "image": "cat-gray", "alt": "一只灰白猫的全身"},
+          "options": {
+            "A": {"label": "猫尾", "visual": {"kind": "asset", "image": "cat-tail", "alt": "猫尾巴近照"}},
+            "B": {"label": "猫耳", "visual": {"kind": "asset", "image": "cat-ear", "alt": "猫耳朵近照"}},
+            "C": {"label": "猫爪垫", "visual": {"kind": "asset", "image": "pad", "alt": "猫脚底肉垫近照"}}
+          },
+          "answer": ["A"],
+          "analysis": "要比较尾巴，就找尾巴的近照。比较同一个部位，才好说长短。"
+        },
+        {
+          "id": "softer-step",
+          "question": "手指在硬纸板上走，先试哪种做法让声音轻些？",
+          "skill": "猫肉垫的作用与模拟",
+          "visual": {"kind": "asset", "image": "cat-walk", "alt": "一只猫轻轻走过木地板"},
+          "options": {
+            "A": {"label": "直接碰硬板", "visual": {"kind": "asset", "image": "table-bare", "alt": "指尖直接碰桌面"}},
+            "B": {"label": "拢手听", "visual": {"kind": "asset", "image": "listen-cup", "alt": "手拢在耳朵旁"}},
+            "C": {"label": "手指隔着海绵", "visual": {"kind": "asset", "image": "table-soft", "alt": "指尖隔着海绵碰桌面"}}
+          },
+          "answer": ["C"],
+          "analysis": "先试让手指隔着海绵走。软海绵模拟肉垫，用同样的步子比较声音。"
+        },
+        {
+          "id": "first-listen",
+          "question": "想比较加纸卷后的铃声，先选哪种方法做对照？",
+          "skill": "模拟听声的公平比较",
+          "visual": {"kind": "asset", "image": "rabbit-ear", "alt": "一只白兔的长耳朵"},
+          "options": {
+            "A": {"label": "用手拢耳", "visual": {"kind": "asset", "image": "listen-cup", "alt": "手拢在耳朵旁"}},
+            "B": {"label": "直接听", "visual": {"kind": "asset", "image": "listen-bare", "alt": "放下双手直接听"}},
+            "C": {"label": "加纸卷听", "visual": {"kind": "asset", "image": "listen-cone", "alt": "把纸卷朝向声音"}}
+          },
+          "answer": ["B"],
+          "analysis": "先直接听同一个铃声，再加纸卷听。只换这一个条件，才容易比较。"
+        },
+        {
+          "id": "before-snack",
+          "question": "小雨摸过家里的猫，现在要拿点心。先做什么？",
+          "skill": "接触动物后洗手",
+          "visual": {"kind": "asset", "image": "cat-orange", "alt": "一只家养的橘猫"},
+          "options": {
+            "A": {"label": "用肥皂洗手", "visual": {"kind": "asset", "image": "wash", "alt": "用肥皂洗双手"}},
+            "B": {"label": "戴手套清理", "visual": {"kind": "asset", "image": "gloves", "alt": "戴手套清理饲养用具"}},
+            "C": {"label": "把手伸给大人看", "visual": {"kind": "asset", "image": "tell-adult", "alt": "小朋友向蹲下的大人伸出手掌"}}
+          },
+          "answer": ["A"],
+          "analysis": "手接触了动物，要先用肥皂洗干净，再去拿吃的。"
+        }
+      ]
+    },
+    {
+      "key": "recap",
+      "type": "slide",
+      "title": "今天看见了什么",
+      "template": "summary",
+      "data": {
+        "title": "今天看见了什么",
+        "items": ["先看整体，再从头向后看", "同一个部位放在一起比", "模拟时只改变一个条件", "从部位找本领的线索", "接触洗手，遇伤找大人"]
+      },
+      "script": [
+        {"spotlight": "item-1"},
+        {"say": "先看整只动物，再从头到尾找各部分。"},
+        {"spotlight": "item-2"},
+        {"say": "耳朵对耳朵，尾巴对尾巴，把真的看到的画下来。"},
+        {"spotlight": "item-3"},
+        {"say": "听两次脚步，保持桌面和脚步相近，只换垫子。"},
+        {"say": "纸卷试验也一样，只换听的方法，听到什么就说什么。"},
+        {"spotlight": "item-4"},
+        {"say": "猫的肉垫和爪帮它走轻、攀爬。暗处观察还要看眼睛。"},
+        {"say": "兔用后腿蹬地，用耳朵接收声音。"},
+        {"spotlight": "item-5"},
+        {"say": "摸过动物要洗手。清理戴手套，抓咬伤马上找大人。"},
+        {"say": "找张新照片画一画，再把你的发现指给家人看。"},
+        {"say": "屏幕只能记下你选了哪张图。"},
+        {"say": "模拟做得怎样、画得怎样、讲得怎样，请家人看和听。"}
+      ]
+    }
+  ]
+}

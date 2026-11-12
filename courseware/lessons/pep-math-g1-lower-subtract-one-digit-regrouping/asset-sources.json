@@ -1,0 +1,2984 @@
+{
+  "schemaVersion": "mira.courseware.asset-sources.v1",
+  "generatedBy": "73 deterministic SVG mathematics diagrams and two Codex built-in ImageGen atlases",
+  "imagegenPlan": "courseware/lessons/pep-math-g1-lower-subtract-one-digit-regrouping/imagegen-plan.json",
+  "plates": {
+    "picnic-cup-scenes": {
+      "source": "art-source/picnic-cup-scenes.png",
+      "sourceSha256": "d9e488cbf1cee52276ff1e6c39eb6905bb161697706c8b9c8e6e704dbaec4541",
+      "width": 1254,
+      "height": 1254,
+      "transparent": false,
+      "builtInOriginal": "exec-dea9b356-0016-4159-ba26-e85fcb2c36c6.png",
+      "generator": "codex_builtin_imagegen",
+      "prompt": "Use case: illustration-story. Single square asset atlas with exactly four equal independent quadrants in a 2×2 grid. This is an original first-grade Chinese math lesson about getting cups ready for a picnic. No external margin, border, seam decorations or gutters. No artwork crosses either midline. Fine natural paper texture, matte gouache, clean rounded cut-paper silhouettes, warm cream and pine green, muted apricot and persimmon accents. No text, numerals, labels, watermarks, countable loose cups, or visible arithmetic. Upper-left: two Chinese first graders with a warm attendant at a small picnic-supply station, the child in front carefully asks about an unmarked closed cream supply carton on the counter. Put faces and carton around the vertical middle so a wide crop retains the story. Upper-right: empty overhead view of a quiet warm cream wooden tabletop at that station, hints of shelves along the far edge, extremely open light midtone middle 85 percent as a low-contrast slide-puzzle backdrop. Bottom-left: quiet low-contrast front-on oak tabletop and warm window light at the station, very wide empty center and simple forest-green trim at the far left and right, designed to be a background for an aiming game. Bottom-right: parent and Chinese first grader sorting blank colored paper cards together at a small kitchen table. Keep faces and hands within this cell and no legible marks on cards. Distinct picture subjects and consistently professional children's picture-book style across all four cells."
+    },
+    "picnic-cup-sprites": {
+      "source": "art-source/picnic-cup-sprites.png",
+      "sourceSha256": "f2b80b5f8682b6ac43d9435deac300e730379c339d2f8424a42cb048a9d06d5d",
+      "width": 1536,
+      "height": 1024,
+      "transparent": true,
+      "builtInOriginal": "exec-350c241e-8707-4fd7-a287-def5c24644a2.png",
+      "generator": "codex_builtin_imagegen",
+      "prompt": "Use case: stylized-concept. Single 3:2 landscape sprite atlas for the same primary-school picnic cup math lesson. Exactly three equal columns and two equal rows, six square cells, each independent. Actual transparent background with alpha throughout. No visible checkerboard, frames, table, text, badges with numbers, drop shadows, or background props. Every cutout remains centered inside the middle 60 percent of its own cell with broad transparent margins; nothing crosses cell edges. Use rounded children's storybook matte gouache and clean cut-paper silhouettes with delicate cream paper grain, muted pine green and apricot or persimmon accents. Top left: a tiny round mint-green rabbit station helper facing right, all four paws visible in a poised standing pose. Top middle: the identical rabbit (matching green body, cream muzzle and simple orange neck scarf) in a small hopping pose facing right, same scale and silhouette, ears raised. Top right: one isolated spherical amber marble, with small warm highlight and clear round outline. Bottom left: one warm apricot five-point star completion sticker with a small cream edge and simple pine cut-paper detailing. Bottom middle: one deep pine-green paper-cup completion sticker with broad cream edge, handles absent, no words, no tally marks. Bottom right: fully transparent and entirely empty. Keep separation and genuine alpha between all subjects."
+    }
+  },
+  "assets": {
+    "ten-and-one-cups": {
+      "file": "assets/ten-and-one-cups.png",
+      "sha256": "d505c94ededc333c1d45851dca365b6a996b6a748b3a6b8978ae6405757d04a5",
+      "byteSize": 9178,
+      "type": "precise_code_diagram",
+      "width": 731,
+      "height": 251,
+      "sourceRecipe": "picnic-cup-regrouping-v1",
+      "sourceKey": "ten-and-one-cups",
+      "svgSha256": "3e964666a356b3203d16fb684734a17a26f9c60d1e0a995f808a1f18150ab1cd",
+      "semantics": {
+        "boxed": 10,
+        "loose": 1
+      }
+    },
+    "stock-43": {
+      "file": "assets/stock-43.png",
+      "sha256": "4ee2dae3f37c126beb8d79dc9592b42b2da90ffeb6cc1c1af892de2791e20abd",
+      "byteSize": 8034,
+      "type": "precise_code_diagram",
+      "width": 480,
+      "height": 277,
+      "sourceRecipe": "picnic-cup-regrouping-v1",
+      "sourceKey": "stock-43",
+      "svgSha256": "525a5bdbeafd57d5e0afc9f0b9dc690c57773ada52e4c6ec6867806605974fe3",
+      "semantics": {
+        "whole": 43,
+        "boxes": 4,
+        "loose": 3
+      }
+    },
+    "compare-43-take2": {
+      "file": "assets/compare-43-take2.png",
+      "sha256": "c99845de1dd7c22d1b474a2bb19e0c55243a1724ffc4995419c1ce895bd61f37",
+      "byteSize": 12494,
+      "type": "precise_code_diagram",
+      "width": 718,
+      "height": 280,
+      "sourceRecipe": "picnic-cup-regrouping-v1",
+      "sourceKey": "compare-43-take2",
+      "svgSha256": "65b3c6cf9155d3e89ede37e3194aa1d451e69f1887310f3a8759be2f23852ae2",
+      "semantics": {
+        "whole": 43,
+        "ones": 3,
+        "requested": 2,
+        "needsExchange": false
+      }
+    },
+    "compare-43-take8": {
+      "file": "assets/compare-43-take8.png",
+      "sha256": "b21a5c4ff4951978725e3caee9d1b4dd85c831b72610307ee8b00ac51dd27d6b",
+      "byteSize": 13157,
+      "type": "precise_code_diagram",
+      "width": 718,
+      "height": 280,
+      "sourceRecipe": "picnic-cup-regrouping-v1",
+      "sourceKey": "compare-43-take8",
+      "svgSha256": "5ba0426bd7bfb7e2f7fa0bd5a4286d0c038bd0c39a2ca94a30d1fa3ac9a01b9c",
+      "semantics": {
+        "whole": 43,
+        "ones": 3,
+        "requested": 8,
+        "needsExchange": true
+      }
+    },
+    "exchanged-43": {
+      "file": "assets/exchanged-43.png",
+      "sha256": "7108e1d355e8c7b7a19288414dd9e946ccd8acf9e484113a692184d7ea1c6185",
+      "byteSize": 12906,
+      "type": "precise_code_diagram",
+      "width": 706,
+      "height": 277,
+      "sourceRecipe": "picnic-cup-regrouping-v1",
+      "sourceKey": "exchanged-43",
+      "svgSha256": "7eb666e4c039ab9d555ce7b3703a49e8ed0d5c865392677a355b1f96681c08f9",
+      "semantics": {
+        "whole": 43,
+        "before": [
+          4,
+          3
+        ],
+        "after": [
+          3,
+          13
+        ]
+      }
+    },
+    "taken-43-8": {
+      "file": "assets/taken-43-8.png",
+      "sha256": "44fe77d292dde415fcbdfff2e793d7a1f7dbbd4997d07ffdf238954aef4448fd",
+      "byteSize": 13384,
+      "type": "precise_code_diagram",
+      "width": 690,
+      "height": 277,
+      "sourceRecipe": "picnic-cup-regrouping-v1",
+      "sourceKey": "taken-43-8",
+      "svgSha256": "433c1848994d48dac309bf7339d26cbce5940c4643776cf379556f86eb2130e7",
+      "semantics": {
+        "whole": 43,
+        "exchanged": [
+          3,
+          13
+        ],
+        "taken": 8,
+        "remaining": [
+          3,
+          5
+        ],
+        "end": 35
+      }
+    },
+    "remaining-35": {
+      "file": "assets/remaining-35.png",
+      "sha256": "9a1838014ac5a28b22a40423ccc06a32e1646284f35f9aeaef39866422dc3040",
+      "byteSize": 8147,
+      "type": "precise_code_diagram",
+      "width": 480,
+      "height": 277,
+      "sourceRecipe": "picnic-cup-regrouping-v1",
+      "sourceKey": "remaining-35",
+      "svgSha256": "566e6e5eee118370185e2fd2d89d63920577b303fdebd31f4cf0eacdbf3e1023",
+      "semantics": {
+        "whole": 35,
+        "boxes": 3,
+        "loose": 5
+      }
+    },
+    "round-43-to-40": {
+      "file": "assets/round-43-to-40.png",
+      "sha256": "3960a76bd381d4b613b702f80358911beb2755b42e639f8fb035fc9b44c1b176",
+      "byteSize": 13522,
+      "type": "precise_code_diagram",
+      "width": 715,
+      "height": 252,
+      "sourceRecipe": "picnic-cup-regrouping-v1",
+      "sourceKey": "round-43-to-40",
+      "svgSha256": "6dc259f78a9f153a5db805a32cdf16cb83f19f6c7693adca02ebc4d63f1fe8b6",
+      "semantics": {
+        "start": 43,
+        "step": -3,
+        "end": 40
+      }
+    },
+    "round-40-to-35": {
+      "file": "assets/round-40-to-35.png",
+      "sha256": "49934d830c99171253aaebf344370a42fb5e4045281d32392eea57a15dab673f",
+      "byteSize": 13315,
+      "type": "precise_code_diagram",
+      "width": 715,
+      "height": 252,
+      "sourceRecipe": "picnic-cup-regrouping-v1",
+      "sourceKey": "round-40-to-35",
+      "svgSha256": "fff3bad58b469733c7a50b1f55394742355a387723b3f4993b5a70063c592629",
+      "semantics": {
+        "start": 40,
+        "step": -5,
+        "end": 35
+      }
+    },
+    "from-open-ten-43": {
+      "file": "assets/from-open-ten-43.png",
+      "sha256": "73bf5e998c8009b5fdb054f412dd2d5b6812c700b7b5a2670b43917a454a157b",
+      "byteSize": 16803,
+      "type": "precise_code_diagram",
+      "width": 720,
+      "height": 267,
+      "sourceRecipe": "picnic-cup-regrouping-v1",
+      "sourceKey": "from-open-ten-43",
+      "svgSha256": "1f5cfea6ed1590f880a3e65342f81722fd11654cb5192da135e66e9133554734",
+      "semantics": {
+        "whole": 43,
+        "separate": [
+          33,
+          10
+        ],
+        "taken": 8,
+        "openBoxLeft": 2,
+        "end": 35
+      }
+    },
+    "compensate-43": {
+      "file": "assets/compensate-43.png",
+      "sha256": "342db2fe66c51303a4f04243979883f7f7b9551a874a358c9fca5b510f2d3d0e",
+      "byteSize": 13387,
+      "type": "precise_code_diagram",
+      "width": 715,
+      "height": 252,
+      "sourceRecipe": "picnic-cup-regrouping-v1",
+      "sourceKey": "compensate-43",
+      "svgSha256": "3d1834d6cc3e0f8b663462f5450ed536d8638f7d80de9d691758f1d55b829f3e",
+      "semantics": {
+        "start": 43,
+        "assumedTake": 10,
+        "mid": 33,
+        "returned": 2,
+        "end": 35,
+        "requested": 8
+      }
+    },
+    "round-70-before": {
+      "file": "assets/round-70-before.png",
+      "sha256": "932ebd72dcbb91735f45140991ebf78a6adc7792a772c9ea9670ea918b9ca121",
+      "byteSize": 8767,
+      "type": "precise_code_diagram",
+      "width": 480,
+      "height": 277,
+      "sourceRecipe": "picnic-cup-regrouping-v1",
+      "sourceKey": "round-70-before",
+      "svgSha256": "1d38f8498e7e4289990bdada21f341dffc74a2e776e243b83207ba3e5107d1b4",
+      "semantics": {
+        "whole": 70,
+        "boxes": 7,
+        "loose": 0
+      }
+    },
+    "round-70-after": {
+      "file": "assets/round-70-after.png",
+      "sha256": "c2907a40b1513b718a25ff3bddf1605c2056f1d16c04d286e91f4efda00ee203",
+      "byteSize": 13775,
+      "type": "precise_code_diagram",
+      "width": 690,
+      "height": 277,
+      "sourceRecipe": "picnic-cup-regrouping-v1",
+      "sourceKey": "round-70-after",
+      "svgSha256": "a34580a97f316a9fd04be80e36527929b14ba8f37a1432336217afeac6c669b0",
+      "semantics": {
+        "whole": 70,
+        "exchanged": [
+          6,
+          10
+        ],
+        "taken": 6,
+        "remaining": [
+          6,
+          4
+        ],
+        "end": 64
+      }
+    },
+    "check-35-and-8": {
+      "file": "assets/check-35-and-8.png",
+      "sha256": "d02818eda99b29e1d0a330a31dcc9593b67a69dbd3b9483184f9b5392b46255e",
+      "byteSize": 12280,
+      "type": "precise_code_diagram",
+      "width": 695,
+      "height": 267,
+      "sourceRecipe": "picnic-cup-regrouping-v1",
+      "sourceKey": "check-35-and-8",
+      "svgSha256": "4a158be235c4caab3a9ce458ad66b501a4a0f8092b1c150bee0c6053f7e05a3b",
+      "semantics": {
+        "left": 35,
+        "taken": 8,
+        "whole": 43
+      }
+    },
+    "wrong-unmoved-tens": {
+      "file": "assets/wrong-unmoved-tens.png",
+      "sha256": "e60bdd13fafc076d8790110d2ab59c33db85ea61451dd3ad6fcee749d2e1927b",
+      "byteSize": 13412,
+      "type": "precise_code_diagram",
+      "width": 710,
+      "height": 273,
+      "sourceRecipe": "picnic-cup-regrouping-v1",
+      "sourceKey": "wrong-unmoved-tens",
+      "svgSha256": "19efe0db9101c3d2c39939f3476658b30a57eca3a2a2fe09c6b3f9a7fe7a29a5",
+      "semantics": {
+        "whole": 43,
+        "requested": 8,
+        "wrong": [
+          4,
+          5
+        ],
+        "right": [
+          3,
+          5
+        ]
+      }
+    },
+    "slide-order-42": {
+      "file": "assets/slide-order-42.png",
+      "sha256": "063623b5179b3459032629c10925a24335449f79adc3d571be6ae28bb453e8a1",
+      "byteSize": 11257,
+      "type": "precise_code_diagram",
+      "width": 684,
+      "height": 214,
+      "sourceRecipe": "picnic-cup-regrouping-v1",
+      "sourceKey": "slide-order-42",
+      "svgSha256": "6eee3435752334e9c751fa52d18c5bb3ae948bd58e03c3065bbeee0a4513bc7c",
+      "semantics": {
+        "whole": 42,
+        "requested": 7,
+        "untouchedBoxes": 3,
+        "originalSingles": 2,
+        "expandedSingles": 12
+      }
+    },
+    "slide-order-31": {
+      "file": "assets/slide-order-31.png",
+      "sha256": "ccc5dbff4efc541549633a1e52cd794b97d377338f9d1b5e795c16b3a1ddb884",
+      "byteSize": 11142,
+      "type": "precise_code_diagram",
+      "width": 684,
+      "height": 214,
+      "sourceRecipe": "picnic-cup-regrouping-v1",
+      "sourceKey": "slide-order-31",
+      "svgSha256": "8f7380f4975fd2d50f71c7e91d3067aeaf376700f981bcf329c472c43a555b9b",
+      "semantics": {
+        "whole": 31,
+        "requested": 5,
+        "untouchedBoxes": 2,
+        "originalSingles": 1,
+        "expandedSingles": 11
+      }
+    },
+    "slide-order-46": {
+      "file": "assets/slide-order-46.png",
+      "sha256": "eafd18daba9e69784468ccec6804f9fab02d5187464858293c13656db808f19b",
+      "byteSize": 11957,
+      "type": "precise_code_diagram",
+      "width": 684,
+      "height": 214,
+      "sourceRecipe": "picnic-cup-regrouping-v1",
+      "sourceKey": "slide-order-46",
+      "svgSha256": "b0bd641163aa1834ec469d23319eedf9146c19f7e0bb5efa1efa8fa01c831fc1",
+      "semantics": {
+        "whole": 46,
+        "requested": 8,
+        "untouchedBoxes": 3,
+        "originalSingles": 6,
+        "expandedSingles": 16
+      }
+    },
+    "slide-order-60": {
+      "file": "assets/slide-order-60.png",
+      "sha256": "6807493afc9379076aee4032f47d54f2d5c940a30afaf248178ea13221b12229",
+      "byteSize": 12139,
+      "type": "precise_code_diagram",
+      "width": 684,
+      "height": 214,
+      "sourceRecipe": "picnic-cup-regrouping-v1",
+      "sourceKey": "slide-order-60",
+      "svgSha256": "f50ca1ee14d3c52f06a9ddd6388c5bfcdfe5110c08d2def0a51d4fb0fbcb20bb",
+      "semantics": {
+        "whole": 60,
+        "requested": 4,
+        "untouchedBoxes": 5,
+        "originalSingles": 0,
+        "expandedSingles": 10
+      }
+    },
+    "slide-order-54": {
+      "file": "assets/slide-order-54.png",
+      "sha256": "809bc5ba4a09bdcb7b7bd49b365c1761fa79af8f5a8d0d1d0f81d889801902a2",
+      "byteSize": 11427,
+      "type": "precise_code_diagram",
+      "width": 684,
+      "height": 214,
+      "sourceRecipe": "picnic-cup-regrouping-v1",
+      "sourceKey": "slide-order-54",
+      "svgSha256": "55184c09f3cf86a0c64b664d6695e372004b6df4bd5a145eb7ff18c7f37a5793",
+      "semantics": {
+        "whole": 54,
+        "requested": 7,
+        "untouchedBoxes": 4,
+        "originalSingles": 4,
+        "expandedSingles": 14
+      }
+    },
+    "slide-order-77": {
+      "file": "assets/slide-order-77.png",
+      "sha256": "131bfc455b152ef1d5165416476c79cd94b1dccb0f796bd7db6cdd7c64926e53",
+      "byteSize": 11837,
+      "type": "precise_code_diagram",
+      "width": 684,
+      "height": 214,
+      "sourceRecipe": "picnic-cup-regrouping-v1",
+      "sourceKey": "slide-order-77",
+      "svgSha256": "fb42b0e01dbf6c020ea851c04220289ae8e20a59b2fae91f510b1a3980e9f17d",
+      "semantics": {
+        "whole": 77,
+        "requested": 9,
+        "untouchedBoxes": 6,
+        "originalSingles": 7,
+        "expandedSingles": 17
+      }
+    },
+    "closed-ten": {
+      "file": "assets/closed-ten.png",
+      "sha256": "d45c3ee1b8ff16b05925b8842efcb1a06316d95b999b536c4d2aa78ebfd8381b",
+      "byteSize": 4450,
+      "type": "precise_code_diagram",
+      "width": 238,
+      "height": 164,
+      "sourceRecipe": "picnic-cup-regrouping-v1",
+      "sourceKey": "closed-ten",
+      "svgSha256": "68af1c728ebcb8b10e8379008144dc4a7976da52c50465aef028fbd4f8a02391",
+      "semantics": {
+        "unit": "box",
+        "quantity": 10
+      }
+    },
+    "loose-0": {
+      "file": "assets/loose-0.png",
+      "sha256": "f11d94aca6f904cf91b7b85496abb0c5c54b8e47ad5c8c2cb64b2b2b0decb2a8",
+      "byteSize": 4217,
+      "type": "precise_code_diagram",
+      "width": 238,
+      "height": 164,
+      "sourceRecipe": "picnic-cup-regrouping-v1",
+      "sourceKey": "loose-0",
+      "svgSha256": "ed94f62a731675b55e66e1703c90d5557a8e140e26f58947b60ddd6899c06bfe",
+      "semantics": {
+        "quantity": 0,
+        "boxed": 0
+      }
+    },
+    "loose-1": {
+      "file": "assets/loose-1.png",
+      "sha256": "3370cdee9a912f029c0b2fe9475ed3e44ffe51338c886d3a708a9827020ac3ed",
+      "byteSize": 3646,
+      "type": "precise_code_diagram",
+      "width": 238,
+      "height": 164,
+      "sourceRecipe": "picnic-cup-regrouping-v1",
+      "sourceKey": "loose-1",
+      "svgSha256": "0f68ac0243a1f00d065defe94690bf23a0d1e73f4906a7c5a6fdec964b454dcc",
+      "semantics": {
+        "quantity": 1,
+        "boxed": 0
+      }
+    },
+    "loose-2": {
+      "file": "assets/loose-2.png",
+      "sha256": "70572cfd74463842b83b95c8a84ebcf3c9cbf69c91d6def7c2ff93b54507d23b",
+      "byteSize": 3943,
+      "type": "precise_code_diagram",
+      "width": 238,
+      "height": 164,
+      "sourceRecipe": "picnic-cup-regrouping-v1",
+      "sourceKey": "loose-2",
+      "svgSha256": "221656fee619a60dfa288924aaf7ba40511232fd727275cefd3acd1ead632815",
+      "semantics": {
+        "quantity": 2,
+        "boxed": 0
+      }
+    },
+    "loose-4": {
+      "file": "assets/loose-4.png",
+      "sha256": "28f4c344323f27932d551c27e64a113f3dd6f798b42efcfc1bcae75ad0992df2",
+      "byteSize": 3837,
+      "type": "precise_code_diagram",
+      "width": 238,
+      "height": 164,
+      "sourceRecipe": "picnic-cup-regrouping-v1",
+      "sourceKey": "loose-4",
+      "svgSha256": "57e3a2e9a67eca6031c852d98c914c81de1ddc755d3d128ecb9581d9c899a592",
+      "semantics": {
+        "quantity": 4,
+        "boxed": 0
+      }
+    },
+    "loose-6": {
+      "file": "assets/loose-6.png",
+      "sha256": "088ba945331447292827b85cb0c66972e81b5305bf022c3745d843bcd5a1d26e",
+      "byteSize": 4201,
+      "type": "precise_code_diagram",
+      "width": 238,
+      "height": 164,
+      "sourceRecipe": "picnic-cup-regrouping-v1",
+      "sourceKey": "loose-6",
+      "svgSha256": "440af7d08eeb86aff0cc72617b0509866a6c99937beafaab811d18398b4ee719",
+      "semantics": {
+        "quantity": 6,
+        "boxed": 0
+      }
+    },
+    "loose-7": {
+      "file": "assets/loose-7.png",
+      "sha256": "35fdfe14b51ee15788f1329285e3eccb93c8511a8096a0f938de84a533320bbc",
+      "byteSize": 3773,
+      "type": "precise_code_diagram",
+      "width": 238,
+      "height": 164,
+      "sourceRecipe": "picnic-cup-regrouping-v1",
+      "sourceKey": "loose-7",
+      "svgSha256": "a4724b09f4773111f8f74e76e7c18f262a39ff4f048eb84b603724c7de4f6e5d",
+      "semantics": {
+        "quantity": 7,
+        "boxed": 0
+      }
+    },
+    "loose-10": {
+      "file": "assets/loose-10.png",
+      "sha256": "f0214ff74c55d595c84876888e733269146ec4735c4af166fc5c1c721d71b7a0",
+      "byteSize": 4378,
+      "type": "precise_code_diagram",
+      "width": 238,
+      "height": 164,
+      "sourceRecipe": "picnic-cup-regrouping-v1",
+      "sourceKey": "loose-10",
+      "svgSha256": "8829939865158556e3782b8a5be5615908d748dfd3bc4a7f855e638b16a35163",
+      "semantics": {
+        "quantity": 10,
+        "boxed": 0
+      }
+    },
+    "loose-11": {
+      "file": "assets/loose-11.png",
+      "sha256": "626ed7e0f6c3666f0c319b6d72a5a9f96b9fe6c9fe5412bd325817e155a562ec",
+      "byteSize": 3810,
+      "type": "precise_code_diagram",
+      "width": 238,
+      "height": 164,
+      "sourceRecipe": "picnic-cup-regrouping-v1",
+      "sourceKey": "loose-11",
+      "svgSha256": "cabc002a9b9fe2ad5aa1e925876907ee558c4c35d362fab90b8563d6ef165b7b",
+      "semantics": {
+        "quantity": 11,
+        "boxed": 0
+      }
+    },
+    "loose-12": {
+      "file": "assets/loose-12.png",
+      "sha256": "1de77d75729c20b01595c01ed26e62578df6103d0025f91a7451f01f2f5f19ae",
+      "byteSize": 4207,
+      "type": "precise_code_diagram",
+      "width": 238,
+      "height": 164,
+      "sourceRecipe": "picnic-cup-regrouping-v1",
+      "sourceKey": "loose-12",
+      "svgSha256": "b0ba517898eadaa0a6aba93b895dc5ce1d1c1929c38488dde856bfbee2edbc96",
+      "semantics": {
+        "quantity": 12,
+        "boxed": 0
+      }
+    },
+    "loose-14": {
+      "file": "assets/loose-14.png",
+      "sha256": "1de01489f193189a39be5b245116e5f39aa1ea5f341f0c6ad0ba3203e35fdd40",
+      "byteSize": 4045,
+      "type": "precise_code_diagram",
+      "width": 238,
+      "height": 164,
+      "sourceRecipe": "picnic-cup-regrouping-v1",
+      "sourceKey": "loose-14",
+      "svgSha256": "ace276ed49209ed71ef444a21c329f68d0ecaad7d8a54fb17469ead299bca5ed",
+      "semantics": {
+        "quantity": 14,
+        "boxed": 0
+      }
+    },
+    "loose-16": {
+      "file": "assets/loose-16.png",
+      "sha256": "eae4d07e803f431d68390887bd4ddfb3033ad770e6a417f795d992654ab26177",
+      "byteSize": 4447,
+      "type": "precise_code_diagram",
+      "width": 238,
+      "height": 164,
+      "sourceRecipe": "picnic-cup-regrouping-v1",
+      "sourceKey": "loose-16",
+      "svgSha256": "13a73480dc8c5402345ec7bf620a1f68693727c179a6b3139a8bc32b34ac5623",
+      "semantics": {
+        "quantity": 16,
+        "boxed": 0
+      }
+    },
+    "loose-17": {
+      "file": "assets/loose-17.png",
+      "sha256": "e13996ef4f250eb16a96a3c9b53cabe29c9d08520b32c5a46eb8cf27ea3aad49",
+      "byteSize": 3943,
+      "type": "precise_code_diagram",
+      "width": 238,
+      "height": 164,
+      "sourceRecipe": "picnic-cup-regrouping-v1",
+      "sourceKey": "loose-17",
+      "svgSha256": "2742b8b8a67f7b93c1d143543e90ba4d5771a7db7c737ce4ca89aa657ca0b89a",
+      "semantics": {
+        "quantity": 17,
+        "boxed": 0
+      }
+    },
+    "order-51-minus6": {
+      "file": "assets/order-51-minus6.png",
+      "sha256": "3a35294332a6aaa8098471bc4ce7d7194ddea717d427062b24f082d67eabe4b5",
+      "byteSize": 11795,
+      "type": "precise_code_diagram",
+      "width": 690,
+      "height": 277,
+      "sourceRecipe": "picnic-cup-regrouping-v1",
+      "sourceKey": "order-51-minus6",
+      "svgSha256": "5bb253cb3a23831dfe823dc3a9b83bfc4c2ea45fd4674f1ed5140c3472b41583",
+      "semantics": {
+        "whole": 51,
+        "taken": 6,
+        "exchanged": [
+          4,
+          11
+        ],
+        "remainder": 45
+      }
+    },
+    "order-52-minus6": {
+      "file": "assets/order-52-minus6.png",
+      "sha256": "567e6893fbfb51afd1760b8c31f96b2afe0c9da76269282af3e2afeb53045d82",
+      "byteSize": 12107,
+      "type": "precise_code_diagram",
+      "width": 690,
+      "height": 277,
+      "sourceRecipe": "picnic-cup-regrouping-v1",
+      "sourceKey": "order-52-minus6",
+      "svgSha256": "97f6bb7d2a473745e6d7b05a739a4376956bbe9b58b0ae9bde4cf42ab6cc6348",
+      "semantics": {
+        "whole": 52,
+        "taken": 6,
+        "exchanged": [
+          4,
+          12
+        ],
+        "remainder": 46
+      }
+    },
+    "order-65-minus9": {
+      "file": "assets/order-65-minus9.png",
+      "sha256": "f0bffe29cff1a57f324cfaeb2acb38a7796aa8bf26915563e54d0d454b572571",
+      "byteSize": 12797,
+      "type": "precise_code_diagram",
+      "width": 690,
+      "height": 277,
+      "sourceRecipe": "picnic-cup-regrouping-v1",
+      "sourceKey": "order-65-minus9",
+      "svgSha256": "2915fa7c3bd4ec058ede36189f540232e48800ef6ca345975169fc84971f8f50",
+      "semantics": {
+        "whole": 65,
+        "taken": 9,
+        "exchanged": [
+          5,
+          15
+        ],
+        "remainder": 56
+      }
+    },
+    "order-70-minus4": {
+      "file": "assets/order-70-minus4.png",
+      "sha256": "0bc79ac3772806a284aa9ee6ffab57e354053aa14740db5785328fe426aa587c",
+      "byteSize": 12193,
+      "type": "precise_code_diagram",
+      "width": 690,
+      "height": 277,
+      "sourceRecipe": "picnic-cup-regrouping-v1",
+      "sourceKey": "order-70-minus4",
+      "svgSha256": "7ffad50e707e7fd85348262fca0648bba5f58e9f446fc6cd48f76b0814510220",
+      "semantics": {
+        "whole": 70,
+        "taken": 4,
+        "exchanged": [
+          6,
+          10
+        ],
+        "remainder": 66
+      }
+    },
+    "order-84-minus8": {
+      "file": "assets/order-84-minus8.png",
+      "sha256": "719f5b13952c7f8c102f45fd1e0d6da3983c5c1dc14b3488e96b48ea0ea17ffe",
+      "byteSize": 12729,
+      "type": "precise_code_diagram",
+      "width": 690,
+      "height": 277,
+      "sourceRecipe": "picnic-cup-regrouping-v1",
+      "sourceKey": "order-84-minus8",
+      "svgSha256": "a048e1922fe0b8833f869f8d49ddee491a99da37651a910043bd9fac9d6c0d57",
+      "semantics": {
+        "whole": 84,
+        "taken": 8,
+        "exchanged": [
+          7,
+          14
+        ],
+        "remainder": 76
+      }
+    },
+    "answer-5": {
+      "file": "assets/answer-5.png",
+      "sha256": "81a43715c643a2c4b8195ac43bd627408ed6bbe8e0ce41f5a2789c2f882b9750",
+      "byteSize": 5043,
+      "type": "precise_code_diagram",
+      "width": 318,
+      "height": 213,
+      "sourceRecipe": "picnic-cup-regrouping-v1",
+      "sourceKey": "answer-5",
+      "svgSha256": "d83f5b1f933959098f4d78b4d5662502c935588e14c7b4bd2a6d49aa8514061a",
+      "semantics": {
+        "whole": 5,
+        "boxes": 0,
+        "loose": 5
+      }
+    },
+    "answer-6": {
+      "file": "assets/answer-6.png",
+      "sha256": "68f99dff5bb279aa3e3557280e1fc373bc79707f73aa1d7ca659dbec49779ee8",
+      "byteSize": 5187,
+      "type": "precise_code_diagram",
+      "width": 318,
+      "height": 213,
+      "sourceRecipe": "picnic-cup-regrouping-v1",
+      "sourceKey": "answer-6",
+      "svgSha256": "f7af4b1be8e79108a02e5a0aab0bf8fef68fe9ba4d37f07f901099e3401a52a3",
+      "semantics": {
+        "whole": 6,
+        "boxes": 0,
+        "loose": 6
+      }
+    },
+    "answer-45": {
+      "file": "assets/answer-45.png",
+      "sha256": "9eaf26f5c4eae450759afcd5e799ca3408645642ee65a7b9a270fd26301f5f28",
+      "byteSize": 6328,
+      "type": "precise_code_diagram",
+      "width": 318,
+      "height": 213,
+      "sourceRecipe": "picnic-cup-regrouping-v1",
+      "sourceKey": "answer-45",
+      "svgSha256": "da0aaf55935e13e998ad5fc14ce2b1ff2bc6bab6c77e90e57fc6da33c3c4e67c",
+      "semantics": {
+        "whole": 45,
+        "boxes": 4,
+        "loose": 5
+      }
+    },
+    "answer-46": {
+      "file": "assets/answer-46.png",
+      "sha256": "5020e10d7147f7299bdf2c35c5dcf2f39ae60543ea1757e60b6e25fc8183defe",
+      "byteSize": 6465,
+      "type": "precise_code_diagram",
+      "width": 318,
+      "height": 213,
+      "sourceRecipe": "picnic-cup-regrouping-v1",
+      "sourceKey": "answer-46",
+      "svgSha256": "21e1f99ffc9a6f01eefb2bbf267e6d8124f31a5519b9850a6df72c7bf33668c0",
+      "semantics": {
+        "whole": 46,
+        "boxes": 4,
+        "loose": 6
+      }
+    },
+    "answer-50": {
+      "file": "assets/answer-50.png",
+      "sha256": "f3d9f98607cedf9fdfc1af98c73da3944eca0a7d1f78b8775c35c4ef8ccb04f8",
+      "byteSize": 6766,
+      "type": "precise_code_diagram",
+      "width": 318,
+      "height": 213,
+      "sourceRecipe": "picnic-cup-regrouping-v1",
+      "sourceKey": "answer-50",
+      "svgSha256": "0e3c8dc854f1974a74fc4bc91ce12c49c367e2c92eee767a871400a695b7fb3c",
+      "semantics": {
+        "whole": 50,
+        "boxes": 5,
+        "loose": 0
+      }
+    },
+    "answer-55": {
+      "file": "assets/answer-55.png",
+      "sha256": "c2d3cd20bc40ccf95cf14b6f9f08a4481d6920056b498d7a5ab152a050193516",
+      "byteSize": 6593,
+      "type": "precise_code_diagram",
+      "width": 318,
+      "height": 213,
+      "sourceRecipe": "picnic-cup-regrouping-v1",
+      "sourceKey": "answer-55",
+      "svgSha256": "6d0768a3b3b8a7dd594973a1eec8c86900391e76fa78ead57d86412b46ea84af",
+      "semantics": {
+        "whole": 55,
+        "boxes": 5,
+        "loose": 5
+      }
+    },
+    "answer-56": {
+      "file": "assets/answer-56.png",
+      "sha256": "675f163823f1d11b7a20a5a4255b2daea98522d186fb3146e680d3a6b215789b",
+      "byteSize": 6741,
+      "type": "precise_code_diagram",
+      "width": 318,
+      "height": 213,
+      "sourceRecipe": "picnic-cup-regrouping-v1",
+      "sourceKey": "answer-56",
+      "svgSha256": "c316b739ce8fa452d57f6bec31dace55fe3b03787f73f9c093e95a80e8354bbd",
+      "semantics": {
+        "whole": 56,
+        "boxes": 5,
+        "loose": 6
+      }
+    },
+    "answer-66": {
+      "file": "assets/answer-66.png",
+      "sha256": "435e90ac68d8ce917598fe435412367b6a19cd7368392816df23af63fae9ac3f",
+      "byteSize": 6867,
+      "type": "precise_code_diagram",
+      "width": 318,
+      "height": 213,
+      "sourceRecipe": "picnic-cup-regrouping-v1",
+      "sourceKey": "answer-66",
+      "svgSha256": "702e374218359016a5fa0107ba44ee5ad07b6c3684c319100f9fa91216e61a83",
+      "semantics": {
+        "whole": 66,
+        "boxes": 6,
+        "loose": 6
+      }
+    },
+    "answer-76": {
+      "file": "assets/answer-76.png",
+      "sha256": "5acc580c89749b64ea2415cd629c8bb738b283e9ff799e6fabbf9e22334e6992",
+      "byteSize": 6896,
+      "type": "precise_code_diagram",
+      "width": 318,
+      "height": 213,
+      "sourceRecipe": "picnic-cup-regrouping-v1",
+      "sourceKey": "answer-76",
+      "svgSha256": "e3ee70640bc9576c46312d68fc0b4d7f25ea809be761c2bfce56595f7f91e609",
+      "semantics": {
+        "whole": 76,
+        "boxes": 7,
+        "loose": 6
+      }
+    },
+    "answer-86": {
+      "file": "assets/answer-86.png",
+      "sha256": "1e80e8e770883075745eb184f651a4d3d6c965f94cf9f1c8af8861f16aee6614",
+      "byteSize": 7313,
+      "type": "precise_code_diagram",
+      "width": 318,
+      "height": 213,
+      "sourceRecipe": "picnic-cup-regrouping-v1",
+      "sourceKey": "answer-86",
+      "svgSha256": "eee46f7847dceb1e4aab892254dc2dd5f51a5ed191f39a4255f473c33e2833d3",
+      "semantics": {
+        "whole": 86,
+        "boxes": 8,
+        "loose": 6
+      }
+    },
+    "q1-stimulus": {
+      "file": "assets/q1-stimulus.png",
+      "sha256": "f5c3349af77e86eea5a29ab7928ba0f2173a434bf0ea2212c1ddcac293621d23",
+      "byteSize": 4697,
+      "type": "precise_code_diagram",
+      "width": 326,
+      "height": 209,
+      "sourceRecipe": "picnic-cup-regrouping-v1",
+      "sourceKey": "q1-stimulus",
+      "svgSha256": "421fe0c05fd2debbbdf0a9d5317cc632abf7184e271a1e5cf6af05d7e2093b46",
+      "semantics": {
+        "removed": 5
+      }
+    },
+    "q1-a": {
+      "file": "assets/q1-a.png",
+      "sha256": "a55db61661e5f70c984c280422ed5df359972559ae4aa460391a25cf209c3da3",
+      "byteSize": 7257,
+      "type": "precise_code_diagram",
+      "width": 480,
+      "height": 277,
+      "sourceRecipe": "picnic-cup-regrouping-v1",
+      "sourceKey": "q1-a",
+      "svgSha256": "3850a956d76e0aedb55af6ad28947354e028806e0f34cb27e1d31972c52b729a",
+      "semantics": {
+        "displayed": 68,
+        "removed": 5
+      }
+    },
+    "q1-b": {
+      "file": "assets/q1-b.png",
+      "sha256": "55f7b53ea3c564a5664ee6709da148ef9cc86425d26a6714e20937f8719f2b0b",
+      "byteSize": 7284,
+      "type": "precise_code_diagram",
+      "width": 480,
+      "height": 277,
+      "sourceRecipe": "picnic-cup-regrouping-v1",
+      "sourceKey": "q1-b",
+      "svgSha256": "a848ad16ea68fbe8ddddacdccfc4c78e9de962af8e20b6089c71802a908ee5a8",
+      "semantics": {
+        "displayed": 61,
+        "removed": 5
+      }
+    },
+    "q1-c": {
+      "file": "assets/q1-c.png",
+      "sha256": "87b0c9d98e0ca98b432921320cf7e8e936fb9c3b179c52fc7e65d0762722412c",
+      "byteSize": 7249,
+      "type": "precise_code_diagram",
+      "width": 480,
+      "height": 277,
+      "sourceRecipe": "picnic-cup-regrouping-v1",
+      "sourceKey": "q1-c",
+      "svgSha256": "9743245e03cb22ddabb9d1052361516e5725ced6536a929cdd9a165589a22f76",
+      "semantics": {
+        "displayed": 65,
+        "removed": 5
+      }
+    },
+    "q2-stimulus": {
+      "file": "assets/q2-stimulus.png",
+      "sha256": "dfcc7581b3b1d15a54c43cd7df0c135852bef537b760d9f59935db0d6fbaac11",
+      "byteSize": 8771,
+      "type": "precise_code_diagram",
+      "width": 480,
+      "height": 277,
+      "sourceRecipe": "picnic-cup-regrouping-v1",
+      "sourceKey": "q2-stimulus",
+      "svgSha256": "d130d2e42069a9772957bc16b06360a04d8256abbff788e6ce2f7c3d413a7bd2",
+      "semantics": {
+        "start": 53,
+        "original": [
+          5,
+          3
+        ]
+      }
+    },
+    "q2-a": {
+      "file": "assets/q2-a.png",
+      "sha256": "9096875c798ca0e53ad7aa8b0403fbac92ef350588bea526f2ea40ade48ee494",
+      "byteSize": 6756,
+      "type": "precise_code_diagram",
+      "width": 416,
+      "height": 258,
+      "sourceRecipe": "picnic-cup-regrouping-v1",
+      "sourceKey": "q2-a",
+      "svgSha256": "59dc7ccf963a728bca54719a126ebbf01ea112afc50b4149cf789736774c0f24",
+      "semantics": {
+        "displayed": [
+          4,
+          13
+        ],
+        "start": 53,
+        "original": [
+          5,
+          3
+        ]
+      }
+    },
+    "q2-b": {
+      "file": "assets/q2-b.png",
+      "sha256": "96f270b96813c0ef113f4f01f35b9d4c88589a9b94997388a1b33c0b39fffc3a",
+      "byteSize": 6851,
+      "type": "precise_code_diagram",
+      "width": 416,
+      "height": 258,
+      "sourceRecipe": "picnic-cup-regrouping-v1",
+      "sourceKey": "q2-b",
+      "svgSha256": "23b265b6fa966d56f6ad9cbe80a717276cbcf3571d94e68aacffe61eb049a4c3",
+      "semantics": {
+        "displayed": [
+          5,
+          13
+        ],
+        "start": 53,
+        "original": [
+          5,
+          3
+        ]
+      }
+    },
+    "q2-c": {
+      "file": "assets/q2-c.png",
+      "sha256": "eafe261f81daec58987a58e12de2d218a2ef7186621afb0fe3e248ccf583c8fa",
+      "byteSize": 6346,
+      "type": "precise_code_diagram",
+      "width": 416,
+      "height": 258,
+      "sourceRecipe": "picnic-cup-regrouping-v1",
+      "sourceKey": "q2-c",
+      "svgSha256": "f2aae49a9ee403b16fdd42608adf09d0d7a1fb51e0e202744fe1490c53de5727",
+      "semantics": {
+        "displayed": [
+          4,
+          3
+        ],
+        "start": 53,
+        "original": [
+          5,
+          3
+        ]
+      }
+    },
+    "q3-stimulus": {
+      "file": "assets/q3-stimulus.png",
+      "sha256": "07cc4988faaeb990f9ad394255f06edb3c5e2fe1063194414affd6aa2ddc3f89",
+      "byteSize": 12724,
+      "type": "precise_code_diagram",
+      "width": 718,
+      "height": 280,
+      "sourceRecipe": "picnic-cup-regrouping-v1",
+      "sourceKey": "q3-stimulus",
+      "svgSha256": "b105300b3823ccc77515b331f423db8eeb164ec8bf2f68475e484b23fccf9dc9",
+      "semantics": {
+        "start": 47,
+        "removed": 9
+      }
+    },
+    "q3-a": {
+      "file": "assets/q3-a.png",
+      "sha256": "04c2641aa9b4ac60a7ffbeaec703ec52c94d837f7470183929848f7c691077ba",
+      "byteSize": 8174,
+      "type": "precise_code_diagram",
+      "width": 480,
+      "height": 277,
+      "sourceRecipe": "picnic-cup-regrouping-v1",
+      "sourceKey": "q3-a",
+      "svgSha256": "d078b667f1c6bab2c441127f1e4c3b01e014dc64e3547709b74131086ba59daf",
+      "semantics": {
+        "displayed": 48,
+        "start": 47,
+        "removed": 9
+      }
+    },
+    "q3-b": {
+      "file": "assets/q3-b.png",
+      "sha256": "d7186425e3603e35bfe433ad292c8d9f1da5e18ddfb54b547d91e5d470489902",
+      "byteSize": 7059,
+      "type": "precise_code_diagram",
+      "width": 480,
+      "height": 277,
+      "sourceRecipe": "picnic-cup-regrouping-v1",
+      "sourceKey": "q3-b",
+      "svgSha256": "9fa83a02843bc0cac350ce114bb146d362a50deb3370873af07219fe52534aef",
+      "semantics": {
+        "displayed": 8,
+        "start": 47,
+        "removed": 9
+      }
+    },
+    "q3-c": {
+      "file": "assets/q3-c.png",
+      "sha256": "9feca82e0e9aebaac95156e15d1236ca7dd5394c35a93a5a2beab5932ccbf7b3",
+      "byteSize": 8430,
+      "type": "precise_code_diagram",
+      "width": 480,
+      "height": 277,
+      "sourceRecipe": "picnic-cup-regrouping-v1",
+      "sourceKey": "q3-c",
+      "svgSha256": "9ee98325a9ccbb4fa850de421086e04283ab1c067b3ebdcc7ff5c782bbf1278d",
+      "semantics": {
+        "displayed": 38,
+        "start": 47,
+        "removed": 9
+      }
+    },
+    "q4-stimulus": {
+      "file": "assets/q4-stimulus.png",
+      "sha256": "42c21bb954f8df47f43138d28fa24957fc7e222bf15118e14b9252e4f767a0df",
+      "byteSize": 13793,
+      "type": "precise_code_diagram",
+      "width": 718,
+      "height": 280,
+      "sourceRecipe": "picnic-cup-regrouping-v1",
+      "sourceKey": "q4-stimulus",
+      "svgSha256": "6fa23d22f22429963d34892084d6a53d237b5c765f1db4ac0f23a9002276d305",
+      "semantics": {
+        "start": 80,
+        "removed": 7
+      }
+    },
+    "q4-a": {
+      "file": "assets/q4-a.png",
+      "sha256": "25929552eaf213dcadcb28c7fdcf3f632b2016ae4d660941c18a063f37426478",
+      "byteSize": 9120,
+      "type": "precise_code_diagram",
+      "width": 480,
+      "height": 277,
+      "sourceRecipe": "picnic-cup-regrouping-v1",
+      "sourceKey": "q4-a",
+      "svgSha256": "9b4063906dddc8a6ad2cd99a0da7e8c902b23c06818d690d7949cab469b8e1eb",
+      "semantics": {
+        "displayed": 83,
+        "start": 80,
+        "removed": 7
+      }
+    },
+    "q4-b": {
+      "file": "assets/q4-b.png",
+      "sha256": "fc20c94d1bc5723734924c7afe5c0389abd78406f5588409b149031501eb56b0",
+      "byteSize": 8554,
+      "type": "precise_code_diagram",
+      "width": 480,
+      "height": 277,
+      "sourceRecipe": "picnic-cup-regrouping-v1",
+      "sourceKey": "q4-b",
+      "svgSha256": "91f90efdb88104ddd1258ce44247959eeb4e2598b5e97a918a7ce21860aa8ab3",
+      "semantics": {
+        "displayed": 73,
+        "start": 80,
+        "removed": 7
+      }
+    },
+    "q4-c": {
+      "file": "assets/q4-c.png",
+      "sha256": "87874e155a602f652ab3fc275d3000a28b2d3ca914091d9dd45a9c07aa26b367",
+      "byteSize": 6976,
+      "type": "precise_code_diagram",
+      "width": 480,
+      "height": 277,
+      "sourceRecipe": "picnic-cup-regrouping-v1",
+      "sourceKey": "q4-c",
+      "svgSha256": "d41b5fc2ccc1cf5c507f6299589955cdf680ac0ed7438b9f76d3f090ea649cba",
+      "semantics": {
+        "displayed": 3,
+        "start": 80,
+        "removed": 7
+      }
+    },
+    "q5-stimulus": {
+      "file": "assets/q5-stimulus.png",
+      "sha256": "e3244b179734451cc85f7ac63383d36ee9048ad6444c146c5f244ac691992f19",
+      "byteSize": 11084,
+      "type": "precise_code_diagram",
+      "width": 715,
+      "height": 252,
+      "sourceRecipe": "picnic-cup-regrouping-v1",
+      "sourceKey": "q5-stimulus",
+      "svgSha256": "19ca95fbad6d6e6c4f69d1a3769eb7ee39f5ae6ee7192c4bb9c25524024ec6af",
+      "semantics": {
+        "start": 62,
+        "removed": 8,
+        "roundTen": 60
+      }
+    },
+    "q5-a": {
+      "file": "assets/q5-a.png",
+      "sha256": "09e29bf7c36a9a382c0f7394d0716102fca8d614169cd21059b8e1590e9cedc8",
+      "byteSize": 13561,
+      "type": "precise_code_diagram",
+      "width": 715,
+      "height": 252,
+      "sourceRecipe": "picnic-cup-regrouping-v1",
+      "sourceKey": "q5-a",
+      "svgSha256": "0cedca2ddc0607e9e015023e71f0c32e4318eda6797a3e1eec1f2a9a97a62ffd",
+      "semantics": {
+        "displayed": [
+          6,
+          2
+        ],
+        "start": 62,
+        "removed": 8,
+        "roundTen": 60
+      }
+    },
+    "q5-b": {
+      "file": "assets/q5-b.png",
+      "sha256": "3ed5ab6ac192c34ee5f97a04a083b17942d36cb8fc4482c2bf252c8b7cf9bd59",
+      "byteSize": 12004,
+      "type": "precise_code_diagram",
+      "width": 715,
+      "height": 252,
+      "sourceRecipe": "picnic-cup-regrouping-v1",
+      "sourceKey": "q5-b",
+      "svgSha256": "53e96206a3f4c6aefd34b983c2a194534659260bb2a9f875f3b505da3120674e",
+      "semantics": {
+        "displayed": [
+          8,
+          0
+        ],
+        "start": 62,
+        "removed": 8,
+        "roundTen": 60
+      }
+    },
+    "q5-c": {
+      "file": "assets/q5-c.png",
+      "sha256": "448c95d603bba9cab364b05759243eb71208446b6dbb76d86cf5e5d7a4a00946",
+      "byteSize": 13260,
+      "type": "precise_code_diagram",
+      "width": 715,
+      "height": 252,
+      "sourceRecipe": "picnic-cup-regrouping-v1",
+      "sourceKey": "q5-c",
+      "svgSha256": "57f6eda4fbd17950bdce9fcccfa446d569dc6306312c82099a275c42af9887e3",
+      "semantics": {
+        "displayed": [
+          2,
+          6
+        ],
+        "start": 62,
+        "removed": 8,
+        "roundTen": 60
+      }
+    },
+    "q6-stimulus": {
+      "file": "assets/q6-stimulus.png",
+      "sha256": "5cfe2b64c5db8554acb0d23fe8b9403b758926c3d4eaa1e92901b1532c21c237",
+      "byteSize": 11670,
+      "type": "precise_code_diagram",
+      "width": 715,
+      "height": 252,
+      "sourceRecipe": "picnic-cup-regrouping-v1",
+      "sourceKey": "q6-stimulus",
+      "svgSha256": "6d7ab2ad136974b8a43f5301469f1ff533dce574bb03a1bc81994d5c1e7cc94c",
+      "semantics": {
+        "start": 75,
+        "removed": 8,
+        "assumed": 10,
+        "mid": 65
+      }
+    },
+    "q6-a": {
+      "file": "assets/q6-a.png",
+      "sha256": "488929c3541994ef556f3d93c9b6b8d9b5e4c87336ade2c7cc6a98b6255bdc68",
+      "byteSize": 11863,
+      "type": "precise_code_diagram",
+      "width": 715,
+      "height": 252,
+      "sourceRecipe": "picnic-cup-regrouping-v1",
+      "sourceKey": "q6-a",
+      "svgSha256": "1ce9db3eece4a4dd1f3ea1e7eb2b2a0d3bb44665be04a5b9bf13024cdfc05e7c",
+      "semantics": {
+        "displayed": 67,
+        "start": 75,
+        "removed": 8,
+        "assumed": 10,
+        "mid": 65
+      }
+    },
+    "q6-b": {
+      "file": "assets/q6-b.png",
+      "sha256": "27cb8aa3ee393dbeeb31d2d870fbf738554fa6040353be62399115eac5556e7b",
+      "byteSize": 11930,
+      "type": "precise_code_diagram",
+      "width": 715,
+      "height": 252,
+      "sourceRecipe": "picnic-cup-regrouping-v1",
+      "sourceKey": "q6-b",
+      "svgSha256": "b6069af63af822eaeeac4b168a12e4bf5dcb43838dfe705bf75a4d2412f42beb",
+      "semantics": {
+        "displayed": 63,
+        "start": 75,
+        "removed": 8,
+        "assumed": 10,
+        "mid": 65
+      }
+    },
+    "q6-c": {
+      "file": "assets/q6-c.png",
+      "sha256": "e83ed8681be893a68c803f11398cff4232e50ebb9fa3bb176b30e8daa48e9715",
+      "byteSize": 10752,
+      "type": "precise_code_diagram",
+      "width": 715,
+      "height": 252,
+      "sourceRecipe": "picnic-cup-regrouping-v1",
+      "sourceKey": "q6-c",
+      "svgSha256": "3f741d0499d4700f9064dd481864ea84c903df40103011f6858b6e77d7a341f6",
+      "semantics": {
+        "displayed": 65,
+        "start": 75,
+        "removed": 8,
+        "assumed": 10,
+        "mid": 65
+      }
+    },
+    "cover-cups": {
+      "file": "assets/cover-cups.png",
+      "sha256": "2b9993ff06df5445393709e9611b503bd89da09f131f29d7cd9938fd54f7def9",
+      "byteSize": 574999,
+      "type": "formal_illustration",
+      "width": 620,
+      "height": 527,
+      "source": "codex_builtin_imagegen",
+      "plate": "picnic-cup-scenes",
+      "generatedSource": "art-source/picnic-cup-scenes.png",
+      "generatedSourceSha256": "d9e488cbf1cee52276ff1e6c39eb6905bb161697706c8b9c8e6e704dbaec4541",
+      "sourceCrop": [
+        3,
+        47,
+        624,
+        575
+      ],
+      "usedBy": [
+        "open-the-cup-station:left_picture"
+      ],
+      "visualReview": "source_atlas_inspected_browser_pending"
+    },
+    "slide-backdrop": {
+      "file": "assets/slide-backdrop.png",
+      "sha256": "270dfe7c646fe4c8ae7c194117beb536f11079272dbac7564f1c773681b4aa4f",
+      "byteSize": 318464,
+      "type": "formal_illustration",
+      "width": 620,
+      "height": 349,
+      "source": "codex_builtin_imagegen",
+      "plate": "picnic-cup-scenes",
+      "generatedSource": "art-source/picnic-cup-scenes.png",
+      "generatedSourceSha256": "d9e488cbf1cee52276ff1e6c39eb6905bb161697706c8b9c8e6e704dbaec4541",
+      "sourceCrop": [
+        630,
+        15,
+        1250,
+        364
+      ],
+      "usedBy": [
+        "slide-an-open-box-to-the-singles:js",
+        "slide-an-open-box-to-the-singles:startImage"
+      ],
+      "visualReview": "source_atlas_inspected_browser_pending"
+    },
+    "aim-backdrop": {
+      "file": "assets/aim-backdrop.png",
+      "sha256": "b1ce021b6154d9cd69c21ee481fa008550e0967b738893ab8b47746611112300",
+      "byteSize": 340033,
+      "type": "formal_illustration",
+      "width": 620,
+      "height": 349,
+      "source": "codex_builtin_imagegen",
+      "plate": "picnic-cup-scenes",
+      "generatedSource": "art-source/picnic-cup-scenes.png",
+      "generatedSourceSha256": "d9e488cbf1cee52276ff1e6c39eb6905bb161697706c8b9c8e6e704dbaec4541",
+      "sourceCrop": [
+        3,
+        799,
+        623,
+        1148
+      ],
+      "usedBy": [
+        "aim-at-the-actual-remainder:js",
+        "aim-at-the-actual-remainder:startImage"
+      ],
+      "visualReview": "source_atlas_inspected_browser_pending"
+    },
+    "family-cups": {
+      "file": "assets/family-cups.png",
+      "sha256": "ccb5272876785639bfea01442017ac703c60ce72804f86e58f43cea670e7c060",
+      "byteSize": 630796,
+      "type": "formal_illustration",
+      "width": 620,
+      "height": 619,
+      "source": "codex_builtin_imagegen",
+      "plate": "picnic-cup-scenes",
+      "generatedSource": "art-source/picnic-cup-scenes.png",
+      "generatedSourceSha256": "d9e488cbf1cee52276ff1e6c39eb6905bb161697706c8b9c8e6e704dbaec4541",
+      "sourceCrop": [
+        630,
+        631,
+        1250,
+        1250
+      ],
+      "usedBy": [
+        "tell-the-family-about-one-ten:picture"
+      ],
+      "visualReview": "source_atlas_inspected_browser_pending"
+    },
+    "cup-helper": {
+      "file": "assets/cup-helper.png",
+      "sha256": "bd05612cfb2ed51c6bcec6e4f48580fb50935fdefe25b4444420b22cf1607ea7",
+      "byteSize": 78481,
+      "type": "formal_illustration",
+      "width": 210,
+      "height": 256,
+      "source": "codex_builtin_imagegen",
+      "plate": "picnic-cup-sprites",
+      "generatedSource": "art-source/picnic-cup-sprites.png",
+      "generatedSourceSha256": "f2b80b5f8682b6ac43d9435deac300e730379c339d2f8424a42cb048a9d06d5d",
+      "sourceCrop": [
+        68,
+        22,
+        445,
+        482
+      ],
+      "usedBy": [
+        "slide-an-open-box-to-the-singles:js"
+      ],
+      "visualReview": "source_atlas_inspected_browser_pending"
+    },
+    "cup-hop": {
+      "file": "assets/cup-hop.png",
+      "sha256": "be253c876b43ccb42953d1a82dbfec7a7a481cc17c0a98451ffe8044f4c0f1cc",
+      "byteSize": 75919,
+      "type": "formal_illustration",
+      "width": 210,
+      "height": 256,
+      "source": "codex_builtin_imagegen",
+      "plate": "picnic-cup-sprites",
+      "generatedSource": "art-source/picnic-cup-sprites.png",
+      "generatedSourceSha256": "f2b80b5f8682b6ac43d9435deac300e730379c339d2f8424a42cb048a9d06d5d",
+      "sourceCrop": [
+        580,
+        22,
+        957,
+        482
+      ],
+      "usedBy": [
+        "slide-an-open-box-to-the-singles:js"
+      ],
+      "visualReview": "source_atlas_inspected_browser_pending"
+    },
+    "cup-marble": {
+      "file": "assets/cup-marble.png",
+      "sha256": "c8c5f33de74a17a01c82fbd83e925690d28e17c902727d18a19b00a6afa3c81d",
+      "byteSize": 102090,
+      "type": "formal_illustration",
+      "width": 256,
+      "height": 254,
+      "source": "codex_builtin_imagegen",
+      "plate": "picnic-cup-sprites",
+      "generatedSource": "art-source/picnic-cup-sprites.png",
+      "generatedSourceSha256": "f2b80b5f8682b6ac43d9435deac300e730379c339d2f8424a42cb048a9d06d5d",
+      "sourceCrop": [
+        1129,
+        124,
+        1415,
+        408
+      ],
+      "usedBy": [
+        "aim-at-the-actual-remainder:js"
+      ],
+      "visualReview": "source_atlas_inspected_browser_pending"
+    },
+    "cup-slide-award": {
+      "file": "assets/cup-slide-award.png",
+      "sha256": "f14a2d340687da3862f19ca0d897ebb85918abaf6628f1050aadaf3f1f591082",
+      "byteSize": 91574,
+      "type": "formal_illustration",
+      "width": 256,
+      "height": 246,
+      "source": "codex_builtin_imagegen",
+      "plate": "picnic-cup-sprites",
+      "generatedSource": "art-source/picnic-cup-sprites.png",
+      "generatedSourceSha256": "f2b80b5f8682b6ac43d9435deac300e730379c339d2f8424a42cb048a9d06d5d",
+      "sourceCrop": [
+        64,
+        569,
+        466,
+        956
+      ],
+      "usedBy": [
+        "slide-an-open-box-to-the-singles:js"
+      ],
+      "visualReview": "source_atlas_inspected_browser_pending"
+    },
+    "cup-aim-award": {
+      "file": "assets/cup-aim-award.png",
+      "sha256": "dd63f88755fd6398bdbf805dd3a80a5957562ed89d9a7415f23770de995b427c",
+      "byteSize": 103156,
+      "type": "formal_illustration",
+      "width": 235,
+      "height": 256,
+      "source": "codex_builtin_imagegen",
+      "plate": "picnic-cup-sprites",
+      "generatedSource": "art-source/picnic-cup-sprites.png",
+      "generatedSourceSha256": "f2b80b5f8682b6ac43d9435deac300e730379c339d2f8424a42cb048a9d06d5d",
+      "sourceCrop": [
+        583,
+        564,
+        953,
+        967
+      ],
+      "usedBy": [
+        "aim-at-the-actual-remainder:js"
+      ],
+      "visualReview": "source_atlas_inspected_browser_pending"
+    }
+  },
+  "plannedRasterAssets": {
+    "cover-cups": {
+      "file": "assets/cover-cups.png",
+      "plate": "picnic-cup-scenes",
+      "cell": "top-left"
+    },
+    "slide-backdrop": {
+      "file": "assets/slide-backdrop.png",
+      "plate": "picnic-cup-scenes",
+      "cell": "top-right"
+    },
+    "aim-backdrop": {
+      "file": "assets/aim-backdrop.png",
+      "plate": "picnic-cup-scenes",
+      "cell": "bottom-left"
+    },
+    "family-cups": {
+      "file": "assets/family-cups.png",
+      "plate": "picnic-cup-scenes",
+      "cell": "bottom-right"
+    },
+    "cup-helper": {
+      "file": "assets/cup-helper.png",
+      "plate": "picnic-cup-sprites",
+      "cell": "top-left"
+    },
+    "cup-hop": {
+      "file": "assets/cup-hop.png",
+      "plate": "picnic-cup-sprites",
+      "cell": "top-center"
+    },
+    "cup-marble": {
+      "file": "assets/cup-marble.png",
+      "plate": "picnic-cup-sprites",
+      "cell": "top-right"
+    },
+    "cup-slide-award": {
+      "file": "assets/cup-slide-award.png",
+      "plate": "picnic-cup-sprites",
+      "cell": "bottom-left"
+    },
+    "cup-aim-award": {
+      "file": "assets/cup-aim-award.png",
+      "plate": "picnic-cup-sprites",
+      "cell": "bottom-center"
+    }
+  },
+  "plannedCodeAssets": {
+    "ten-and-one-cups": {
+      "file": "assets/ten-and-one-cups.png",
+      "kind": "ten-and-one",
+      "semantics": {
+        "boxed": 10,
+        "loose": 1
+      },
+      "width": 731,
+      "height": 251,
+      "svgBody": "<rect x=\"2\" y=\"2\" width=\"727\" height=\"247\" rx=\"16\" fill=\"#fff5dc\" stroke=\"#decca3\" stroke-width=\"3\"/><rect x=\"15\" y=\"28\" width=\"375\" height=\"200\" rx=\"12\" fill=\"#f9eacb\" stroke=\"#244f43\" stroke-width=\"2.5\"/><rect x=\"422\" y=\"28\" width=\"295\" height=\"200\" rx=\"12\" fill=\"#e9edd0\" stroke=\"#244f43\" stroke-width=\"2.5\"/><g data-role=\"ten\"><g fill=\"#eeb378\"><use href=\"#c\" x=\"68\" y=\"108\"/><use href=\"#c\" x=\"134\" y=\"108\"/><use href=\"#c\" x=\"200\" y=\"108\"/><use href=\"#c\" x=\"266\" y=\"108\"/><use href=\"#c\" x=\"332\" y=\"108\"/><use href=\"#c\" x=\"68\" y=\"154\"/><use href=\"#c\" x=\"134\" y=\"154\"/><use href=\"#c\" x=\"200\" y=\"154\"/><use href=\"#c\" x=\"266\" y=\"154\"/><use href=\"#c\" x=\"332\" y=\"154\"/></g></g><g data-role=\"one\"><g fill=\"#70aa93\"><use href=\"#c\" x=\"568\" y=\"133\"/></g></g>",
+      "definitionKeys": [
+        "c"
+      ],
+      "svgSha256": "3e964666a356b3203d16fb684734a17a26f9c60d1e0a995f808a1f18150ab1cd"
+    },
+    "stock-43": {
+      "file": "assets/stock-43.png",
+      "kind": "quantity",
+      "semantics": {
+        "whole": 43,
+        "boxes": 4,
+        "loose": 3
+      },
+      "width": 480,
+      "height": 277,
+      "svgBody": "<rect x=\"2\" y=\"2\" width=\"476\" height=\"273\" rx=\"16\" fill=\"#fff5dc\" stroke=\"#decca3\" stroke-width=\"3\"/><rect x=\"17\" y=\"17\" width=\"446\" height=\"243\" rx=\"15\" fill=\"#f9eaca\" stroke=\"#8ea38b\" stroke-width=\"2\"/><text x=\"240\" y=\"58\" font-size=\"46\">43</text><g data-role=\"amount\"><use href=\"#b\" x=\"86\" y=\"81\"/><use href=\"#b\" x=\"174\" y=\"81\"/><use href=\"#b\" x=\"262\" y=\"81\"/><use href=\"#b\" x=\"350\" y=\"81\"/><g fill=\"#70aa93\"><use href=\"#c\" x=\"98\" y=\"127\"/><use href=\"#c\" x=\"122\" y=\"127\"/><use href=\"#c\" x=\"146\" y=\"127\"/></g></g>",
+      "definitionKeys": [
+        "c",
+        "b"
+      ],
+      "svgSha256": "525a5bdbeafd57d5e0afc9f0b9dc690c57773ada52e4c6ec6867806605974fe3"
+    },
+    "compare-43-take2": {
+      "file": "assets/compare-43-take2.png",
+      "kind": "need-regrouping",
+      "semantics": {
+        "whole": 43,
+        "ones": 3,
+        "requested": 2,
+        "needsExchange": false
+      },
+      "width": 718,
+      "height": 280,
+      "svgBody": "<rect x=\"2\" y=\"2\" width=\"714\" height=\"276\" rx=\"16\" fill=\"#fff5dc\" stroke=\"#decca3\" stroke-width=\"3\"/><rect x=\"17\" y=\"30\" width=\"394\" height=\"220\" rx=\"12\" fill=\"#f9eaca\" stroke=\"#8ea38b\" stroke-width=\"2\"/><rect x=\"465\" y=\"30\" width=\"236\" height=\"220\" rx=\"13\" fill=\"#f9e3d4\" stroke=\"#a2674e\" stroke-width=\"2\" stroke-dasharray=\"5 4\"/><text x=\"215\" y=\"70\" font-size=\"40\">43</text><text x=\"582\" y=\"70\" font-size=\"40\">2</text><path d=\"M419 130L454 130 M443 137L454 130L443 123\" fill=\"none\" stroke=\"#d98565\" stroke-width=\"3.4\" /><g data-role=\"stock\"><use href=\"#b\" x=\"41\" y=\"84\"/><use href=\"#b\" x=\"129\" y=\"84\"/><use href=\"#b\" x=\"217\" y=\"84\"/><use href=\"#b\" x=\"305\" y=\"84\"/><g fill=\"#70aa93\"><use href=\"#c\" x=\"53\" y=\"130\"/><use href=\"#c\" x=\"77\" y=\"130\"/><use href=\"#c\" x=\"101\" y=\"130\"/></g></g><g data-role=\"requested\"><g fill=\"#d98565\"><use href=\"#c\" x=\"489\" y=\"122\"/><use href=\"#c\" x=\"513\" y=\"122\"/></g></g>",
+      "definitionKeys": [
+        "c",
+        "b"
+      ],
+      "svgSha256": "65b3c6cf9155d3e89ede37e3194aa1d451e69f1887310f3a8759be2f23852ae2"
+    },
+    "compare-43-take8": {
+      "file": "assets/compare-43-take8.png",
+      "kind": "need-regrouping",
+      "semantics": {
+        "whole": 43,
+        "ones": 3,
+        "requested": 8,
+        "needsExchange": true
+      },
+      "width": 718,
+      "height": 280,
+      "svgBody": "<rect x=\"2\" y=\"2\" width=\"714\" height=\"276\" rx=\"16\" fill=\"#fff5dc\" stroke=\"#decca3\" stroke-width=\"3\"/><rect x=\"17\" y=\"30\" width=\"394\" height=\"220\" rx=\"12\" fill=\"#f9eaca\" stroke=\"#8ea38b\" stroke-width=\"2\"/><rect x=\"465\" y=\"30\" width=\"236\" height=\"220\" rx=\"13\" fill=\"#f9e3d4\" stroke=\"#a2674e\" stroke-width=\"2\" stroke-dasharray=\"5 4\"/><text x=\"215\" y=\"70\" font-size=\"40\">43</text><text x=\"582\" y=\"70\" font-size=\"40\">8</text><path d=\"M419 130L454 130 M443 137L454 130L443 123\" fill=\"none\" stroke=\"#d98565\" stroke-width=\"3.4\" /><g data-role=\"stock\"><use href=\"#b\" x=\"41\" y=\"84\"/><use href=\"#b\" x=\"129\" y=\"84\"/><use href=\"#b\" x=\"217\" y=\"84\"/><use href=\"#b\" x=\"305\" y=\"84\"/><g fill=\"#70aa93\"><use href=\"#c\" x=\"53\" y=\"130\"/><use href=\"#c\" x=\"77\" y=\"130\"/><use href=\"#c\" x=\"101\" y=\"130\"/></g></g><g data-role=\"requested\"><g fill=\"#d98565\"><use href=\"#c\" x=\"489\" y=\"122\"/><use href=\"#c\" x=\"513\" y=\"122\"/><use href=\"#c\" x=\"537\" y=\"122\"/><use href=\"#c\" x=\"561\" y=\"122\"/><use href=\"#c\" x=\"585\" y=\"122\"/><use href=\"#c\" x=\"609\" y=\"122\"/><use href=\"#c\" x=\"489\" y=\"146\"/><use href=\"#c\" x=\"513\" y=\"146\"/></g></g>",
+      "definitionKeys": [
+        "c",
+        "b"
+      ],
+      "svgSha256": "5ba0426bd7bfb7e2f7fa0bd5a4286d0c038bd0c39a2ca94a30d1fa3ac9a01b9c"
+    },
+    "exchanged-43": {
+      "file": "assets/exchanged-43.png",
+      "kind": "one-ten-exchange",
+      "semantics": {
+        "whole": 43,
+        "before": [
+          4,
+          3
+        ],
+        "after": [
+          3,
+          13
+        ]
+      },
+      "width": 706,
+      "height": 277,
+      "svgBody": "<rect x=\"2\" y=\"2\" width=\"702\" height=\"273\" rx=\"16\" fill=\"#fff5dc\" stroke=\"#decca3\" stroke-width=\"3\"/><rect x=\"17\" y=\"45\" width=\"305\" height=\"209\" rx=\"12\" fill=\"#f9eacb\" stroke=\"#8ea38b\" stroke-width=\"2\"/><rect x=\"384\" y=\"45\" width=\"305\" height=\"209\" rx=\"12\" fill=\"#e9edd0\" stroke=\"#8ea38b\" stroke-width=\"2\"/><text x=\"169\" y=\"79\" font-size=\"36\">43</text><text x=\"536\" y=\"79\" font-size=\"36\">43</text><path d=\"M330 149L374 149 M363 156L374 149L363 142\" fill=\"none\" stroke=\"#d98565\" stroke-width=\"3.4\" /><g data-role=\"before\"><use href=\"#b\" x=\"33\" y=\"95\"/><use href=\"#b\" x=\"121\" y=\"95\"/><use href=\"#b\" x=\"209\" y=\"95\"/><use href=\"#b\" x=\"33\" y=\"132\"/><g fill=\"#70aa93\"><use href=\"#c\" x=\"45\" y=\"178\"/><use href=\"#c\" x=\"69\" y=\"178\"/><use href=\"#c\" x=\"93\" y=\"178\"/></g></g><g data-role=\"after\"><use href=\"#b\" x=\"402\" y=\"95\"/><use href=\"#b\" x=\"490\" y=\"95\"/><use href=\"#b\" x=\"578\" y=\"95\"/><g fill=\"#70aa93\"><use href=\"#c\" x=\"414\" y=\"141\"/><use href=\"#c\" x=\"438\" y=\"141\"/><use href=\"#c\" x=\"462\" y=\"141\"/><use href=\"#c\" x=\"486\" y=\"141\"/><use href=\"#c\" x=\"510\" y=\"141\"/><use href=\"#c\" x=\"534\" y=\"141\"/><use href=\"#c\" x=\"558\" y=\"141\"/><use href=\"#c\" x=\"582\" y=\"141\"/><use href=\"#c\" x=\"606\" y=\"141\"/><use href=\"#c\" x=\"630\" y=\"141\"/><use href=\"#c\" x=\"414\" y=\"165\"/><use href=\"#c\" x=\"438\" y=\"165\"/><use href=\"#c\" x=\"462\" y=\"165\"/></g></g>",
+      "definitionKeys": [
+        "c",
+        "b"
+      ],
+      "svgSha256": "7eb666e4c039ab9d555ce7b3703a49e8ed0d5c865392677a355b1f96681c08f9"
+    },
+    "taken-43-8": {
+      "file": "assets/taken-43-8.png",
+      "kind": "marked-removal",
+      "semantics": {
+        "whole": 43,
+        "exchanged": [
+          3,
+          13
+        ],
+        "taken": 8,
+        "remaining": [
+          3,
+          5
+        ],
+        "end": 35
+      },
+      "width": 690,
+      "height": 277,
+      "svgBody": "<rect x=\"2\" y=\"2\" width=\"686\" height=\"273\" rx=\"16\" fill=\"#fff5dc\" stroke=\"#decca3\" stroke-width=\"3\"/><rect x=\"20\" y=\"50\" width=\"350\" height=\"191\" rx=\"12\" fill=\"#e9edce\" stroke=\"#8ea38b\" stroke-width=\"2\"/><rect x=\"415\" y=\"50\" width=\"253\" height=\"191\" rx=\"13\" fill=\"#f8e1d3\" stroke=\"#a2674e\" stroke-width=\"2\" stroke-dasharray=\"6 4\"/><text x=\"345\" y=\"38\" font-size=\"41\">43</text><g data-role=\"remaining\"><use href=\"#b\" x=\"44\" y=\"77\"/><use href=\"#b\" x=\"132\" y=\"77\"/><use href=\"#b\" x=\"220\" y=\"77\"/><g fill=\"#70aa93\"><use href=\"#c\" x=\"56\" y=\"123\"/><use href=\"#c\" x=\"80\" y=\"123\"/><use href=\"#c\" x=\"104\" y=\"123\"/><use href=\"#c\" x=\"128\" y=\"123\"/><use href=\"#c\" x=\"152\" y=\"123\"/></g></g><g data-role=\"removed\"><g fill=\"#d98565\"><use href=\"#c\" x=\"440\" y=\"106\"/><use href=\"#c\" x=\"464\" y=\"106\"/><use href=\"#c\" x=\"488\" y=\"106\"/><use href=\"#c\" x=\"512\" y=\"106\"/><use href=\"#c\" x=\"536\" y=\"106\"/><use href=\"#c\" x=\"560\" y=\"106\"/><use href=\"#c\" x=\"584\" y=\"106\"/><use href=\"#c\" x=\"608\" y=\"106\"/></g></g><path d=\"M634 195L666 195 M655 202L666 195L655 188\" fill=\"none\" stroke=\"#d98565\" stroke-width=\"3.4\" /><text x=\"345\" y=\"264\" font-size=\"30\">13 − 8 = 5</text>",
+      "definitionKeys": [
+        "c",
+        "b"
+      ],
+      "svgSha256": "433c1848994d48dac309bf7339d26cbce5940c4643776cf379556f86eb2130e7"
+    },
+    "remaining-35": {
+      "file": "assets/remaining-35.png",
+      "kind": "quantity",
+      "semantics": {
+        "whole": 35,
+        "boxes": 3,
+        "loose": 5
+      },
+      "width": 480,
+      "height": 277,
+      "svgBody": "<rect x=\"2\" y=\"2\" width=\"476\" height=\"273\" rx=\"16\" fill=\"#fff5dc\" stroke=\"#decca3\" stroke-width=\"3\"/><rect x=\"17\" y=\"17\" width=\"446\" height=\"243\" rx=\"15\" fill=\"#f9eaca\" stroke=\"#8ea38b\" stroke-width=\"2\"/><text x=\"240\" y=\"58\" font-size=\"46\">35</text><g data-role=\"amount\"><use href=\"#b\" x=\"86\" y=\"81\"/><use href=\"#b\" x=\"174\" y=\"81\"/><use href=\"#b\" x=\"262\" y=\"81\"/><g fill=\"#70aa93\"><use href=\"#c\" x=\"98\" y=\"127\"/><use href=\"#c\" x=\"122\" y=\"127\"/><use href=\"#c\" x=\"146\" y=\"127\"/><use href=\"#c\" x=\"170\" y=\"127\"/><use href=\"#c\" x=\"194\" y=\"127\"/></g></g>",
+      "definitionKeys": [
+        "c",
+        "b"
+      ],
+      "svgSha256": "566e6e5eee118370185e2fd2d89d63920577b303fdebd31f4cf0eacdbf3e1023"
+    },
+    "round-43-to-40": {
+      "file": "assets/round-43-to-40.png",
+      "kind": "numberline",
+      "semantics": {
+        "start": 43,
+        "step": -3,
+        "end": 40
+      },
+      "width": 715,
+      "height": 252,
+      "svgBody": "<rect x=\"2\" y=\"2\" width=\"711\" height=\"248\" rx=\"16\" fill=\"#fff5dc\" stroke=\"#decca3\" stroke-width=\"3\"/><path d=\"M58 110H665 M58 99V121 M87.75 105V115 M117.5 105V115 M147.25 105V115 M177 105V115 M206.75 99V121 M236.5 105V115 M266.25 105V115 M296 105V115 M325.75 105V115 M355.5 99V121 M385.25 105V115 M415 105V115 M444.75 105V115 M474.5 105V115 M504.25 99V121 M534 105V115 M563.75 105V115 M593.5 105V115 M623.25 105V115 M653 99V121\" fill=\"none\" stroke=\"#244f43\" stroke-width=\"2\" /><text x=\"58\" y=\"140\" font-size=\"18\">30</text><text x=\"206.75\" y=\"140\" font-size=\"18\">35</text><text x=\"504.25\" y=\"140\" font-size=\"18\">45</text><text x=\"653\" y=\"140\" font-size=\"18\">50</text><path d=\"M444.75 104V93\" fill=\"none\" stroke=\"#8ea38b\" stroke-width=\"1.8\" /><circle cx=\"444.75\" cy=\"110\" r=\"5.4\" fill=\"#d98565\" stroke=\"#244f43\" stroke-width=\"1.4\"/><rect x=\"423.75\" y=\"64\" width=\"42\" height=\"29\" rx=\"6\" fill=\"#f7e0ba\" stroke=\"#244f43\" stroke-width=\"1.6\"/><text x=\"444.75\" y=\"84\" font-size=\"20\">43</text><path d=\"M355.5 104V63\" fill=\"none\" stroke=\"#8ea38b\" stroke-width=\"1.8\" /><circle cx=\"355.5\" cy=\"110\" r=\"5.4\" fill=\"#d98565\" stroke=\"#244f43\" stroke-width=\"1.4\"/><rect x=\"334.5\" y=\"34\" width=\"42\" height=\"29\" rx=\"6\" fill=\"#f7e0ba\" stroke=\"#244f43\" stroke-width=\"1.6\"/><text x=\"355.5\" y=\"54\" font-size=\"20\">40</text><g data-from=\"43\" data-to=\"40\"><path d=\"M444.75 172L355.5 172 M366.5 165L355.5 172L366.5 179\" fill=\"none\" stroke=\"#d98565\" stroke-width=\"3.4\" /><text x=\"400.125\" y=\"163\" font-size=\"21\">−3</text></g><text x=\"357.5\" y=\"241\" font-size=\"23\">43 − 3 = 40</text>",
+      "definitionKeys": [],
+      "svgSha256": "6dc259f78a9f153a5db805a32cdf16cb83f19f6c7693adca02ebc4d63f1fe8b6"
+    },
+    "round-40-to-35": {
+      "file": "assets/round-40-to-35.png",
+      "kind": "numberline",
+      "semantics": {
+        "start": 40,
+        "step": -5,
+        "end": 35
+      },
+      "width": 715,
+      "height": 252,
+      "svgBody": "<rect x=\"2\" y=\"2\" width=\"711\" height=\"248\" rx=\"16\" fill=\"#fff5dc\" stroke=\"#decca3\" stroke-width=\"3\"/><path d=\"M58 110H665 M58 99V121 M87.75 105V115 M117.5 105V115 M147.25 105V115 M177 105V115 M206.75 99V121 M236.5 105V115 M266.25 105V115 M296 105V115 M325.75 105V115 M355.5 99V121 M385.25 105V115 M415 105V115 M444.75 105V115 M474.5 105V115 M504.25 99V121 M534 105V115 M563.75 105V115 M593.5 105V115 M623.25 105V115 M653 99V121\" fill=\"none\" stroke=\"#244f43\" stroke-width=\"2\" /><text x=\"58\" y=\"140\" font-size=\"18\">30</text><text x=\"504.25\" y=\"140\" font-size=\"18\">45</text><text x=\"653\" y=\"140\" font-size=\"18\">50</text><path d=\"M355.5 104V93\" fill=\"none\" stroke=\"#8ea38b\" stroke-width=\"1.8\" /><circle cx=\"355.5\" cy=\"110\" r=\"5.4\" fill=\"#d98565\" stroke=\"#244f43\" stroke-width=\"1.4\"/><rect x=\"334.5\" y=\"64\" width=\"42\" height=\"29\" rx=\"6\" fill=\"#f7e0ba\" stroke=\"#244f43\" stroke-width=\"1.6\"/><text x=\"355.5\" y=\"84\" font-size=\"20\">40</text><path d=\"M206.75 104V63\" fill=\"none\" stroke=\"#8ea38b\" stroke-width=\"1.8\" /><circle cx=\"206.75\" cy=\"110\" r=\"5.4\" fill=\"#d98565\" stroke=\"#244f43\" stroke-width=\"1.4\"/><rect x=\"185.75\" y=\"34\" width=\"42\" height=\"29\" rx=\"6\" fill=\"#f7e0ba\" stroke=\"#244f43\" stroke-width=\"1.6\"/><text x=\"206.75\" y=\"54\" font-size=\"20\">35</text><g data-from=\"40\" data-to=\"35\"><path d=\"M355.5 172L206.75 172 M217.75 165L206.75 172L217.75 179\" fill=\"none\" stroke=\"#d98565\" stroke-width=\"3.4\" /><text x=\"281.125\" y=\"163\" font-size=\"21\">−5</text></g><text x=\"357.5\" y=\"241\" font-size=\"23\">40 − 5 = 35</text>",
+      "definitionKeys": [],
+      "svgSha256": "fff3bad58b469733c7a50b1f55394742355a387723b3f4993b5a70063c592629"
+    },
+    "from-open-ten-43": {
+      "file": "assets/from-open-ten-43.png",
+      "kind": "from-one-open-box",
+      "semantics": {
+        "whole": 43,
+        "separate": [
+          33,
+          10
+        ],
+        "taken": 8,
+        "openBoxLeft": 2,
+        "end": 35
+      },
+      "width": 720,
+      "height": 267,
+      "svgBody": "<rect x=\"2\" y=\"2\" width=\"716\" height=\"263\" rx=\"16\" fill=\"#fff5dc\" stroke=\"#decca3\" stroke-width=\"3\"/><rect x=\"16\" y=\"34\" width=\"335\" height=\"183\" rx=\"12\" fill=\"#e9ecd0\" stroke=\"#8ea38b\" stroke-width=\"2\"/><rect x=\"392\" y=\"34\" width=\"311\" height=\"183\" rx=\"12\" fill=\"#f8e8c5\" stroke=\"#8ea38b\" stroke-width=\"2\"/><text x=\"181\" y=\"74\" font-size=\"36\">33</text><text x=\"548\" y=\"74\" font-size=\"36\">10</text><g data-role=\"thirty-three\"><use href=\"#b\" x=\"45\" y=\"95\"/><use href=\"#b\" x=\"133\" y=\"95\"/><use href=\"#b\" x=\"221\" y=\"95\"/><g fill=\"#70aa93\"><use href=\"#c\" x=\"57\" y=\"141\"/><use href=\"#c\" x=\"81\" y=\"141\"/><use href=\"#c\" x=\"105\" y=\"141\"/></g></g><g data-role=\"taken-from-open-ten\"><rect x=\"413\" y=\"93\" width=\"207\" height=\"52\" rx=\"8\" fill=\"#f9e1d3\" stroke=\"#a2674e\" stroke-width=\"2\" stroke-dasharray=\"5 4\"/><g fill=\"#d98565\"><use href=\"#c\" x=\"428\" y=\"119\"/><use href=\"#c\" x=\"452\" y=\"119\"/><use href=\"#c\" x=\"476\" y=\"119\"/><use href=\"#c\" x=\"500\" y=\"119\"/><use href=\"#c\" x=\"524\" y=\"119\"/><use href=\"#c\" x=\"548\" y=\"119\"/><use href=\"#c\" x=\"572\" y=\"119\"/><use href=\"#c\" x=\"596\" y=\"119\"/></g></g><g data-role=\"left-from-open-ten\"><g fill=\"#70aa93\"><use href=\"#c\" x=\"637\" y=\"119\"/><use href=\"#c\" x=\"661\" y=\"119\"/></g></g><text x=\"548\" y=\"191\" font-size=\"27\">10 − 8 = 2</text><text x=\"360\" y=\"249\" font-size=\"34\">33 + 2 = 35</text>",
+      "definitionKeys": [
+        "c",
+        "b"
+      ],
+      "svgSha256": "1f5cfea6ed1590f880a3e65342f81722fd11654cb5192da135e66e9133554734"
+    },
+    "compensate-43": {
+      "file": "assets/compensate-43.png",
+      "kind": "numberline-compensation",
+      "semantics": {
+        "start": 43,
+        "assumedTake": 10,
+        "mid": 33,
+        "returned": 2,
+        "end": 35,
+        "requested": 8
+      },
+      "width": 715,
+      "height": 252,
+      "svgBody": "<rect x=\"2\" y=\"2\" width=\"711\" height=\"248\" rx=\"16\" fill=\"#fff5dc\" stroke=\"#decca3\" stroke-width=\"3\"/><path d=\"M58 110H665 M58 99V121 M87.75 105V115 M117.5 105V115 M147.25 105V115 M177 105V115 M206.75 99V121 M236.5 105V115 M266.25 105V115 M296 105V115 M325.75 105V115 M355.5 99V121 M385.25 105V115 M415 105V115 M444.75 105V115 M474.5 105V115 M504.25 99V121 M534 105V115 M563.75 105V115 M593.5 105V115 M623.25 105V115 M653 99V121\" fill=\"none\" stroke=\"#244f43\" stroke-width=\"2\" /><text x=\"58\" y=\"140\" font-size=\"18\">30</text><text x=\"355.5\" y=\"140\" font-size=\"18\">40</text><text x=\"504.25\" y=\"140\" font-size=\"18\">45</text><text x=\"653\" y=\"140\" font-size=\"18\">50</text><path d=\"M444.75 104V93\" fill=\"none\" stroke=\"#8ea38b\" stroke-width=\"1.8\" /><circle cx=\"444.75\" cy=\"110\" r=\"5.4\" fill=\"#d98565\" stroke=\"#244f43\" stroke-width=\"1.4\"/><rect x=\"423.75\" y=\"64\" width=\"42\" height=\"29\" rx=\"6\" fill=\"#f7e0ba\" stroke=\"#244f43\" stroke-width=\"1.6\"/><text x=\"444.75\" y=\"84\" font-size=\"20\">43</text><path d=\"M147.25 104V63\" fill=\"none\" stroke=\"#8ea38b\" stroke-width=\"1.8\" /><circle cx=\"147.25\" cy=\"110\" r=\"5.4\" fill=\"#d98565\" stroke=\"#244f43\" stroke-width=\"1.4\"/><rect x=\"126.25\" y=\"34\" width=\"42\" height=\"29\" rx=\"6\" fill=\"#f7e0ba\" stroke=\"#244f43\" stroke-width=\"1.6\"/><text x=\"147.25\" y=\"54\" font-size=\"20\">33</text><path d=\"M206.75 104V93\" fill=\"none\" stroke=\"#8ea38b\" stroke-width=\"1.8\" /><circle cx=\"206.75\" cy=\"110\" r=\"5.4\" fill=\"#d98565\" stroke=\"#244f43\" stroke-width=\"1.4\"/><rect x=\"185.75\" y=\"64\" width=\"42\" height=\"29\" rx=\"6\" fill=\"#f7e0ba\" stroke=\"#244f43\" stroke-width=\"1.6\"/><text x=\"206.75\" y=\"84\" font-size=\"20\">35</text><g data-from=\"43\" data-to=\"33\"><path d=\"M444.75 172L147.25 172 M158.25 165L147.25 172L158.25 179\" fill=\"none\" stroke=\"#d98565\" stroke-width=\"3.4\" /><text x=\"296\" y=\"163\" font-size=\"21\">−10</text></g><g data-from=\"33\" data-to=\"35\"><path d=\"M147.25 207L206.75 207 M195.75 214L206.75 207L195.75 200\" fill=\"none\" stroke=\"#70aa93\" stroke-width=\"3.4\" /><text x=\"177\" y=\"198\" font-size=\"21\">+2</text></g>",
+      "definitionKeys": [],
+      "svgSha256": "3d1834d6cc3e0f8b663462f5450ed536d8638f7d80de9d691758f1d55b829f3e"
+    },
+    "round-70-before": {
+      "file": "assets/round-70-before.png",
+      "kind": "quantity",
+      "semantics": {
+        "whole": 70,
+        "boxes": 7,
+        "loose": 0
+      },
+      "width": 480,
+      "height": 277,
+      "svgBody": "<rect x=\"2\" y=\"2\" width=\"476\" height=\"273\" rx=\"16\" fill=\"#fff5dc\" stroke=\"#decca3\" stroke-width=\"3\"/><rect x=\"17\" y=\"17\" width=\"446\" height=\"243\" rx=\"15\" fill=\"#f9eaca\" stroke=\"#8ea38b\" stroke-width=\"2\"/><text x=\"240\" y=\"58\" font-size=\"46\">70</text><g data-role=\"amount\"><use href=\"#b\" x=\"86\" y=\"81\"/><use href=\"#b\" x=\"174\" y=\"81\"/><use href=\"#b\" x=\"262\" y=\"81\"/><use href=\"#b\" x=\"350\" y=\"81\"/><use href=\"#b\" x=\"86\" y=\"118\"/><use href=\"#b\" x=\"174\" y=\"118\"/><use href=\"#b\" x=\"262\" y=\"118\"/><rect x=\"85\" y=\"150\" width=\"76\" height=\"28\" rx=\"6\" fill=\"#fbefcd\" stroke=\"#8ea38b\" stroke-width=\"1.5\" stroke-dasharray=\"4 3\"/></g>",
+      "definitionKeys": [
+        "b"
+      ],
+      "svgSha256": "1d38f8498e7e4289990bdada21f341dffc74a2e776e243b83207ba3e5107d1b4"
+    },
+    "round-70-after": {
+      "file": "assets/round-70-after.png",
+      "kind": "round-ten-removal",
+      "semantics": {
+        "whole": 70,
+        "exchanged": [
+          6,
+          10
+        ],
+        "taken": 6,
+        "remaining": [
+          6,
+          4
+        ],
+        "end": 64
+      },
+      "width": 690,
+      "height": 277,
+      "svgBody": "<rect x=\"2\" y=\"2\" width=\"686\" height=\"273\" rx=\"16\" fill=\"#fff5dc\" stroke=\"#decca3\" stroke-width=\"3\"/><rect x=\"20\" y=\"50\" width=\"350\" height=\"191\" rx=\"12\" fill=\"#e9edce\" stroke=\"#8ea38b\" stroke-width=\"2\"/><rect x=\"415\" y=\"50\" width=\"253\" height=\"191\" rx=\"13\" fill=\"#f8e1d3\" stroke=\"#a2674e\" stroke-width=\"2\" stroke-dasharray=\"6 4\"/><text x=\"345\" y=\"38\" font-size=\"41\">70</text><g data-role=\"remaining\"><use href=\"#b\" x=\"44\" y=\"77\"/><use href=\"#b\" x=\"132\" y=\"77\"/><use href=\"#b\" x=\"220\" y=\"77\"/><use href=\"#b\" x=\"44\" y=\"114\"/><use href=\"#b\" x=\"132\" y=\"114\"/><use href=\"#b\" x=\"220\" y=\"114\"/><g fill=\"#70aa93\"><use href=\"#c\" x=\"56\" y=\"160\"/><use href=\"#c\" x=\"80\" y=\"160\"/><use href=\"#c\" x=\"104\" y=\"160\"/><use href=\"#c\" x=\"128\" y=\"160\"/></g></g><g data-role=\"removed\"><g fill=\"#d98565\"><use href=\"#c\" x=\"440\" y=\"106\"/><use href=\"#c\" x=\"464\" y=\"106\"/><use href=\"#c\" x=\"488\" y=\"106\"/><use href=\"#c\" x=\"512\" y=\"106\"/><use href=\"#c\" x=\"536\" y=\"106\"/><use href=\"#c\" x=\"560\" y=\"106\"/></g></g><path d=\"M634 195L666 195 M655 202L666 195L655 188\" fill=\"none\" stroke=\"#d98565\" stroke-width=\"3.4\" /><text x=\"345\" y=\"264\" font-size=\"30\">10 − 6 = 4</text>",
+      "definitionKeys": [
+        "c",
+        "b"
+      ],
+      "svgSha256": "a34580a97f316a9fd04be80e36527929b14ba8f37a1432336217afeac6c669b0"
+    },
+    "check-35-and-8": {
+      "file": "assets/check-35-and-8.png",
+      "kind": "part-whole-check",
+      "semantics": {
+        "left": 35,
+        "taken": 8,
+        "whole": 43
+      },
+      "width": 695,
+      "height": 267,
+      "svgBody": "<rect x=\"2\" y=\"2\" width=\"691\" height=\"263\" rx=\"16\" fill=\"#fff5dc\" stroke=\"#decca3\" stroke-width=\"3\"/><rect x=\"17\" y=\"26\" width=\"304\" height=\"182\" rx=\"12\" fill=\"#e9ecd0\" stroke=\"#8ea38b\" stroke-width=\"2\"/><rect x=\"394\" y=\"26\" width=\"282\" height=\"182\" rx=\"12\" fill=\"#f8e5c6\" stroke=\"#8ea38b\" stroke-width=\"2\"/><g data-role=\"remaining\"><use href=\"#b\" x=\"33\" y=\"63\"/><use href=\"#b\" x=\"121\" y=\"63\"/><use href=\"#b\" x=\"209\" y=\"63\"/><g fill=\"#70aa93\"><use href=\"#c\" x=\"45\" y=\"109\"/><use href=\"#c\" x=\"69\" y=\"109\"/><use href=\"#c\" x=\"93\" y=\"109\"/><use href=\"#c\" x=\"117\" y=\"109\"/><use href=\"#c\" x=\"141\" y=\"109\"/></g></g><g data-role=\"returned\"><g fill=\"#d98565\"><use href=\"#c\" x=\"420\" y=\"117\"/><use href=\"#c\" x=\"444\" y=\"117\"/><use href=\"#c\" x=\"468\" y=\"117\"/><use href=\"#c\" x=\"492\" y=\"117\"/><use href=\"#c\" x=\"516\" y=\"117\"/><use href=\"#c\" x=\"540\" y=\"117\"/><use href=\"#c\" x=\"564\" y=\"117\"/><use href=\"#c\" x=\"588\" y=\"117\"/></g></g><text x=\"356\" y=\"127\" font-size=\"39\">+</text><text x=\"346\" y=\"246\" font-size=\"39\">35 + 8 = 43</text>",
+      "definitionKeys": [
+        "c",
+        "b"
+      ],
+      "svgSha256": "4a158be235c4caab3a9ce458ad66b501a4a0f8092b1c150bee0c6053f7e05a3b"
+    },
+    "wrong-unmoved-tens": {
+      "file": "assets/wrong-unmoved-tens.png",
+      "kind": "wrong-composition",
+      "semantics": {
+        "whole": 43,
+        "requested": 8,
+        "wrong": [
+          4,
+          5
+        ],
+        "right": [
+          3,
+          5
+        ]
+      },
+      "width": 710,
+      "height": 273,
+      "svgBody": "<rect x=\"2\" y=\"2\" width=\"706\" height=\"269\" rx=\"16\" fill=\"#fff5dc\" stroke=\"#decca3\" stroke-width=\"3\"/><rect x=\"17\" y=\"42\" width=\"306\" height=\"210\" rx=\"12\" fill=\"#f8dfd3\" stroke=\"#ab654c\" stroke-width=\"2\"/><rect x=\"387\" y=\"42\" width=\"306\" height=\"210\" rx=\"12\" fill=\"#e9ecd0\" stroke=\"#8ea38b\" stroke-width=\"2\"/><text x=\"168\" y=\"87\" font-size=\"37\" fill=\"#a65640\">45 ×</text><text x=\"538\" y=\"87\" font-size=\"37\">35 ✓</text><g data-role=\"wrong\"><use href=\"#b\" x=\"34\" y=\"104\"/><use href=\"#b\" x=\"122\" y=\"104\"/><use href=\"#b\" x=\"210\" y=\"104\"/><use href=\"#b\" x=\"34\" y=\"141\"/><g fill=\"#70aa93\"><use href=\"#c\" x=\"46\" y=\"187\"/><use href=\"#c\" x=\"70\" y=\"187\"/><use href=\"#c\" x=\"94\" y=\"187\"/><use href=\"#c\" x=\"118\" y=\"187\"/><use href=\"#c\" x=\"142\" y=\"187\"/></g></g><g data-role=\"right\"><use href=\"#b\" x=\"404\" y=\"104\"/><use href=\"#b\" x=\"492\" y=\"104\"/><use href=\"#b\" x=\"580\" y=\"104\"/><g fill=\"#70aa93\"><use href=\"#c\" x=\"416\" y=\"150\"/><use href=\"#c\" x=\"440\" y=\"150\"/><use href=\"#c\" x=\"464\" y=\"150\"/><use href=\"#c\" x=\"488\" y=\"150\"/><use href=\"#c\" x=\"512\" y=\"150\"/></g></g>",
+      "definitionKeys": [
+        "c",
+        "b"
+      ],
+      "svgSha256": "19efe0db9101c3d2c39939f3476658b30a57eca3a2a2fe09c6b3f9a7fe7a29a5"
+    },
+    "slide-order-42": {
+      "file": "assets/slide-order-42.png",
+      "kind": "exchange-goal",
+      "semantics": {
+        "whole": 42,
+        "requested": 7,
+        "untouchedBoxes": 3,
+        "originalSingles": 2,
+        "expandedSingles": 12
+      },
+      "width": 684,
+      "height": 214,
+      "svgBody": "<rect x=\"2\" y=\"2\" width=\"680\" height=\"210\" rx=\"16\" fill=\"#fff5dc\" stroke=\"#decca3\" stroke-width=\"3\"/><rect x=\"12\" y=\"40\" width=\"432\" height=\"158\" rx=\"12\" fill=\"#e9edce\" stroke=\"#8ea38b\" stroke-width=\"2\"/><rect x=\"459\" y=\"40\" width=\"206\" height=\"158\" rx=\"12\" fill=\"#f7e0d2\" stroke=\"#a2674e\" stroke-width=\"2\" stroke-dasharray=\"5 4\"/><text x=\"229\" y=\"37\" font-size=\"38\">42</text><text x=\"561\" y=\"79\" font-size=\"34\">7</text><g data-role=\"untouched\"><use href=\"#b\" x=\"25\" y=\"55\"/><use href=\"#b\" x=\"116\" y=\"55\"/><use href=\"#b\" x=\"207\" y=\"55\"/></g><g data-role=\"original-singles\"><g fill=\"#70aa93\"><use href=\"#c\" x=\"41\" y=\"151\"/><use href=\"#c\" x=\"65\" y=\"151\"/></g></g><g data-role=\"to-open\"><rect x=\"346\" y=\"145\" width=\"89\" height=\"46\" rx=\"6\" fill=\"#fde0c7\" stroke=\"#b57455\" stroke-width=\"1.6\" stroke-dasharray=\"4 3\"/><use href=\"#b\" x=\"351\" y=\"152\"/></g><g data-role=\"request\"><g fill=\"#d98565\"><use href=\"#c\" x=\"484\" y=\"119\"/><use href=\"#c\" x=\"508\" y=\"119\"/><use href=\"#c\" x=\"532\" y=\"119\"/><use href=\"#c\" x=\"556\" y=\"119\"/><use href=\"#c\" x=\"580\" y=\"119\"/><use href=\"#c\" x=\"604\" y=\"119\"/><use href=\"#c\" x=\"484\" y=\"143\"/></g></g>",
+      "definitionKeys": [
+        "c",
+        "b"
+      ],
+      "svgSha256": "6eee3435752334e9c751fa52d18c5bb3ae948bd58e03c3065bbeee0a4513bc7c"
+    },
+    "slide-order-31": {
+      "file": "assets/slide-order-31.png",
+      "kind": "exchange-goal",
+      "semantics": {
+        "whole": 31,
+        "requested": 5,
+        "untouchedBoxes": 2,
+        "originalSingles": 1,
+        "expandedSingles": 11
+      },
+      "width": 684,
+      "height": 214,
+      "svgBody": "<rect x=\"2\" y=\"2\" width=\"680\" height=\"210\" rx=\"16\" fill=\"#fff5dc\" stroke=\"#decca3\" stroke-width=\"3\"/><rect x=\"12\" y=\"40\" width=\"432\" height=\"158\" rx=\"12\" fill=\"#e9edce\" stroke=\"#8ea38b\" stroke-width=\"2\"/><rect x=\"459\" y=\"40\" width=\"206\" height=\"158\" rx=\"12\" fill=\"#f7e0d2\" stroke=\"#a2674e\" stroke-width=\"2\" stroke-dasharray=\"5 4\"/><text x=\"229\" y=\"37\" font-size=\"38\">31</text><text x=\"561\" y=\"79\" font-size=\"34\">5</text><g data-role=\"untouched\"><use href=\"#b\" x=\"25\" y=\"55\"/><use href=\"#b\" x=\"116\" y=\"55\"/></g><g data-role=\"original-singles\"><g fill=\"#70aa93\"><use href=\"#c\" x=\"41\" y=\"151\"/></g></g><g data-role=\"to-open\"><rect x=\"346\" y=\"145\" width=\"89\" height=\"46\" rx=\"6\" fill=\"#fde0c7\" stroke=\"#b57455\" stroke-width=\"1.6\" stroke-dasharray=\"4 3\"/><use href=\"#b\" x=\"351\" y=\"152\"/></g><g data-role=\"request\"><g fill=\"#d98565\"><use href=\"#c\" x=\"484\" y=\"119\"/><use href=\"#c\" x=\"508\" y=\"119\"/><use href=\"#c\" x=\"532\" y=\"119\"/><use href=\"#c\" x=\"556\" y=\"119\"/><use href=\"#c\" x=\"580\" y=\"119\"/></g></g>",
+      "definitionKeys": [
+        "c",
+        "b"
+      ],
+      "svgSha256": "8f7380f4975fd2d50f71c7e91d3067aeaf376700f981bcf329c472c43a555b9b"
+    },
+    "slide-order-46": {
+      "file": "assets/slide-order-46.png",
+      "kind": "exchange-goal",
+      "semantics": {
+        "whole": 46,
+        "requested": 8,
+        "untouchedBoxes": 3,
+        "originalSingles": 6,
+        "expandedSingles": 16
+      },
+      "width": 684,
+      "height": 214,
+      "svgBody": "<rect x=\"2\" y=\"2\" width=\"680\" height=\"210\" rx=\"16\" fill=\"#fff5dc\" stroke=\"#decca3\" stroke-width=\"3\"/><rect x=\"12\" y=\"40\" width=\"432\" height=\"158\" rx=\"12\" fill=\"#e9edce\" stroke=\"#8ea38b\" stroke-width=\"2\"/><rect x=\"459\" y=\"40\" width=\"206\" height=\"158\" rx=\"12\" fill=\"#f7e0d2\" stroke=\"#a2674e\" stroke-width=\"2\" stroke-dasharray=\"5 4\"/><text x=\"229\" y=\"37\" font-size=\"38\">46</text><text x=\"561\" y=\"79\" font-size=\"34\">8</text><g data-role=\"untouched\"><use href=\"#b\" x=\"25\" y=\"55\"/><use href=\"#b\" x=\"116\" y=\"55\"/><use href=\"#b\" x=\"207\" y=\"55\"/></g><g data-role=\"original-singles\"><g fill=\"#70aa93\"><use href=\"#c\" x=\"41\" y=\"151\"/><use href=\"#c\" x=\"65\" y=\"151\"/><use href=\"#c\" x=\"89\" y=\"151\"/><use href=\"#c\" x=\"113\" y=\"151\"/><use href=\"#c\" x=\"137\" y=\"151\"/><use href=\"#c\" x=\"161\" y=\"151\"/></g></g><g data-role=\"to-open\"><rect x=\"346\" y=\"145\" width=\"89\" height=\"46\" rx=\"6\" fill=\"#fde0c7\" stroke=\"#b57455\" stroke-width=\"1.6\" stroke-dasharray=\"4 3\"/><use href=\"#b\" x=\"351\" y=\"152\"/></g><g data-role=\"request\"><g fill=\"#d98565\"><use href=\"#c\" x=\"484\" y=\"119\"/><use href=\"#c\" x=\"508\" y=\"119\"/><use href=\"#c\" x=\"532\" y=\"119\"/><use href=\"#c\" x=\"556\" y=\"119\"/><use href=\"#c\" x=\"580\" y=\"119\"/><use href=\"#c\" x=\"604\" y=\"119\"/><use href=\"#c\" x=\"484\" y=\"143\"/><use href=\"#c\" x=\"508\" y=\"143\"/></g></g>",
+      "definitionKeys": [
+        "c",
+        "b"
+      ],
+      "svgSha256": "b0bd641163aa1834ec469d23319eedf9146c19f7e0bb5efa1efa8fa01c831fc1"
+    },
+    "slide-order-60": {
+      "file": "assets/slide-order-60.png",
+      "kind": "exchange-goal",
+      "semantics": {
+        "whole": 60,
+        "requested": 4,
+        "untouchedBoxes": 5,
+        "originalSingles": 0,
+        "expandedSingles": 10
+      },
+      "width": 684,
+      "height": 214,
+      "svgBody": "<rect x=\"2\" y=\"2\" width=\"680\" height=\"210\" rx=\"16\" fill=\"#fff5dc\" stroke=\"#decca3\" stroke-width=\"3\"/><rect x=\"12\" y=\"40\" width=\"432\" height=\"158\" rx=\"12\" fill=\"#e9edce\" stroke=\"#8ea38b\" stroke-width=\"2\"/><rect x=\"459\" y=\"40\" width=\"206\" height=\"158\" rx=\"12\" fill=\"#f7e0d2\" stroke=\"#a2674e\" stroke-width=\"2\" stroke-dasharray=\"5 4\"/><text x=\"229\" y=\"37\" font-size=\"38\">60</text><text x=\"561\" y=\"79\" font-size=\"34\">4</text><g data-role=\"untouched\"><use href=\"#b\" x=\"25\" y=\"55\"/><use href=\"#b\" x=\"116\" y=\"55\"/><use href=\"#b\" x=\"207\" y=\"55\"/><use href=\"#b\" x=\"298\" y=\"55\"/><use href=\"#b\" x=\"25\" y=\"92\"/></g><g data-role=\"original-singles\"><rect x=\"28\" y=\"137\" width=\"76\" height=\"28\" rx=\"6\" fill=\"#fbefcd\" stroke=\"#8ea38b\" stroke-width=\"1.5\" stroke-dasharray=\"4 3\"/></g><g data-role=\"to-open\"><rect x=\"346\" y=\"145\" width=\"89\" height=\"46\" rx=\"6\" fill=\"#fde0c7\" stroke=\"#b57455\" stroke-width=\"1.6\" stroke-dasharray=\"4 3\"/><use href=\"#b\" x=\"351\" y=\"152\"/></g><g data-role=\"request\"><g fill=\"#d98565\"><use href=\"#c\" x=\"484\" y=\"119\"/><use href=\"#c\" x=\"508\" y=\"119\"/><use href=\"#c\" x=\"532\" y=\"119\"/><use href=\"#c\" x=\"556\" y=\"119\"/></g></g>",
+      "definitionKeys": [
+        "c",
+        "b"
+      ],
+      "svgSha256": "f50ca1ee14d3c52f06a9ddd6388c5bfcdfe5110c08d2def0a51d4fb0fbcb20bb"
+    },
+    "slide-order-54": {
+      "file": "assets/slide-order-54.png",
+      "kind": "exchange-goal",
+      "semantics": {
+        "whole": 54,
+        "requested": 7,
+        "untouchedBoxes": 4,
+        "originalSingles": 4,
+        "expandedSingles": 14
+      },
+      "width": 684,
+      "height": 214,
+      "svgBody": "<rect x=\"2\" y=\"2\" width=\"680\" height=\"210\" rx=\"16\" fill=\"#fff5dc\" stroke=\"#decca3\" stroke-width=\"3\"/><rect x=\"12\" y=\"40\" width=\"432\" height=\"158\" rx=\"12\" fill=\"#e9edce\" stroke=\"#8ea38b\" stroke-width=\"2\"/><rect x=\"459\" y=\"40\" width=\"206\" height=\"158\" rx=\"12\" fill=\"#f7e0d2\" stroke=\"#a2674e\" stroke-width=\"2\" stroke-dasharray=\"5 4\"/><text x=\"229\" y=\"37\" font-size=\"38\">54</text><text x=\"561\" y=\"79\" font-size=\"34\">7</text><g data-role=\"untouched\"><use href=\"#b\" x=\"25\" y=\"55\"/><use href=\"#b\" x=\"116\" y=\"55\"/><use href=\"#b\" x=\"207\" y=\"55\"/><use href=\"#b\" x=\"298\" y=\"55\"/></g><g data-role=\"original-singles\"><g fill=\"#70aa93\"><use href=\"#c\" x=\"41\" y=\"151\"/><use href=\"#c\" x=\"65\" y=\"151\"/><use href=\"#c\" x=\"89\" y=\"151\"/><use href=\"#c\" x=\"113\" y=\"151\"/></g></g><g data-role=\"to-open\"><rect x=\"346\" y=\"145\" width=\"89\" height=\"46\" rx=\"6\" fill=\"#fde0c7\" stroke=\"#b57455\" stroke-width=\"1.6\" stroke-dasharray=\"4 3\"/><use href=\"#b\" x=\"351\" y=\"152\"/></g><g data-role=\"request\"><g fill=\"#d98565\"><use href=\"#c\" x=\"484\" y=\"119\"/><use href=\"#c\" x=\"508\" y=\"119\"/><use href=\"#c\" x=\"532\" y=\"119\"/><use href=\"#c\" x=\"556\" y=\"119\"/><use href=\"#c\" x=\"580\" y=\"119\"/><use href=\"#c\" x=\"604\" y=\"119\"/><use href=\"#c\" x=\"484\" y=\"143\"/></g></g>",
+      "definitionKeys": [
+        "c",
+        "b"
+      ],
+      "svgSha256": "55184c09f3cf86a0c64b664d6695e372004b6df4bd5a145eb7ff18c7f37a5793"
+    },
+    "slide-order-77": {
+      "file": "assets/slide-order-77.png",
+      "kind": "exchange-goal",
+      "semantics": {
+        "whole": 77,
+        "requested": 9,
+        "untouchedBoxes": 6,
+        "originalSingles": 7,
+        "expandedSingles": 17
+      },
+      "width": 684,
+      "height": 214,
+      "svgBody": "<rect x=\"2\" y=\"2\" width=\"680\" height=\"210\" rx=\"16\" fill=\"#fff5dc\" stroke=\"#decca3\" stroke-width=\"3\"/><rect x=\"12\" y=\"40\" width=\"432\" height=\"158\" rx=\"12\" fill=\"#e9edce\" stroke=\"#8ea38b\" stroke-width=\"2\"/><rect x=\"459\" y=\"40\" width=\"206\" height=\"158\" rx=\"12\" fill=\"#f7e0d2\" stroke=\"#a2674e\" stroke-width=\"2\" stroke-dasharray=\"5 4\"/><text x=\"229\" y=\"37\" font-size=\"38\">77</text><text x=\"561\" y=\"79\" font-size=\"34\">9</text><g data-role=\"untouched\"><use href=\"#b\" x=\"25\" y=\"55\"/><use href=\"#b\" x=\"116\" y=\"55\"/><use href=\"#b\" x=\"207\" y=\"55\"/><use href=\"#b\" x=\"298\" y=\"55\"/><use href=\"#b\" x=\"25\" y=\"92\"/><use href=\"#b\" x=\"116\" y=\"92\"/></g><g data-role=\"original-singles\"><g fill=\"#70aa93\"><use href=\"#c\" x=\"41\" y=\"151\"/><use href=\"#c\" x=\"65\" y=\"151\"/><use href=\"#c\" x=\"89\" y=\"151\"/><use href=\"#c\" x=\"113\" y=\"151\"/><use href=\"#c\" x=\"137\" y=\"151\"/><use href=\"#c\" x=\"161\" y=\"151\"/><use href=\"#c\" x=\"185\" y=\"151\"/></g></g><g data-role=\"to-open\"><rect x=\"346\" y=\"145\" width=\"89\" height=\"46\" rx=\"6\" fill=\"#fde0c7\" stroke=\"#b57455\" stroke-width=\"1.6\" stroke-dasharray=\"4 3\"/><use href=\"#b\" x=\"351\" y=\"152\"/></g><g data-role=\"request\"><g fill=\"#d98565\"><use href=\"#c\" x=\"484\" y=\"119\"/><use href=\"#c\" x=\"508\" y=\"119\"/><use href=\"#c\" x=\"532\" y=\"119\"/><use href=\"#c\" x=\"556\" y=\"119\"/><use href=\"#c\" x=\"580\" y=\"119\"/><use href=\"#c\" x=\"604\" y=\"119\"/><use href=\"#c\" x=\"484\" y=\"143\"/><use href=\"#c\" x=\"508\" y=\"143\"/><use href=\"#c\" x=\"532\" y=\"143\"/></g></g>",
+      "definitionKeys": [
+        "c",
+        "b"
+      ],
+      "svgSha256": "fb42b0e01dbf6c020ea851c04220289ae8e20a59b2fae91f510b1a3980e9f17d"
+    },
+    "closed-ten": {
+      "file": "assets/closed-ten.png",
+      "kind": "bundle-of-ten",
+      "semantics": {
+        "unit": "box",
+        "quantity": 10
+      },
+      "width": 238,
+      "height": 164,
+      "svgBody": "<rect x=\"2\" y=\"2\" width=\"234\" height=\"160\" rx=\"16\" fill=\"#fff5dc\" stroke=\"#decca3\" stroke-width=\"3\"/><rect x=\"13\" y=\"10\" width=\"212\" height=\"143\" rx=\"12\" fill=\"#f9e9c7\" stroke=\"#8ea38b\" stroke-width=\"2\"/><text x=\"119\" y=\"55\" font-size=\"44\">10</text><g data-role=\"closed\"><use href=\"#b\" x=\"80\" y=\"91\"/></g>",
+      "definitionKeys": [
+        "b"
+      ],
+      "svgSha256": "68af1c728ebcb8b10e8379008144dc4a7976da52c50465aef028fbd4f8a02391"
+    },
+    "loose-0": {
+      "file": "assets/loose-0.png",
+      "kind": "loose-cups",
+      "semantics": {
+        "quantity": 0,
+        "boxed": 0
+      },
+      "width": 238,
+      "height": 164,
+      "svgBody": "<rect x=\"2\" y=\"2\" width=\"234\" height=\"160\" rx=\"16\" fill=\"#fff5dc\" stroke=\"#decca3\" stroke-width=\"3\"/><rect x=\"11\" y=\"10\" width=\"216\" height=\"143\" rx=\"12\" fill=\"#f9e9c7\" stroke=\"#8ea38b\" stroke-width=\"2\"/><text x=\"119\" y=\"52\" font-size=\"41\">0</text><g data-role=\"loose\"><rect x=\"17\" y=\"73\" width=\"76\" height=\"28\" rx=\"6\" fill=\"#fbefcd\" stroke=\"#8ea38b\" stroke-width=\"1.5\" stroke-dasharray=\"4 3\"/></g>",
+      "definitionKeys": [],
+      "svgSha256": "ed94f62a731675b55e66e1703c90d5557a8e140e26f58947b60ddd6899c06bfe"
+    },
+    "loose-1": {
+      "file": "assets/loose-1.png",
+      "kind": "loose-cups",
+      "semantics": {
+        "quantity": 1,
+        "boxed": 0
+      },
+      "width": 238,
+      "height": 164,
+      "svgBody": "<rect x=\"2\" y=\"2\" width=\"234\" height=\"160\" rx=\"16\" fill=\"#fff5dc\" stroke=\"#decca3\" stroke-width=\"3\"/><rect x=\"11\" y=\"10\" width=\"216\" height=\"143\" rx=\"12\" fill=\"#f9e9c7\" stroke=\"#8ea38b\" stroke-width=\"2\"/><text x=\"119\" y=\"52\" font-size=\"41\">1</text><g data-role=\"loose\"><g fill=\"#70aa93\"><use href=\"#c\" x=\"30\" y=\"87\"/></g></g>",
+      "definitionKeys": [
+        "c"
+      ],
+      "svgSha256": "0f68ac0243a1f00d065defe94690bf23a0d1e73f4906a7c5a6fdec964b454dcc"
+    },
+    "loose-2": {
+      "file": "assets/loose-2.png",
+      "kind": "loose-cups",
+      "semantics": {
+        "quantity": 2,
+        "boxed": 0
+      },
+      "width": 238,
+      "height": 164,
+      "svgBody": "<rect x=\"2\" y=\"2\" width=\"234\" height=\"160\" rx=\"16\" fill=\"#fff5dc\" stroke=\"#decca3\" stroke-width=\"3\"/><rect x=\"11\" y=\"10\" width=\"216\" height=\"143\" rx=\"12\" fill=\"#f9e9c7\" stroke=\"#8ea38b\" stroke-width=\"2\"/><text x=\"119\" y=\"52\" font-size=\"41\">2</text><g data-role=\"loose\"><g fill=\"#70aa93\"><use href=\"#c\" x=\"30\" y=\"87\"/><use href=\"#c\" x=\"52\" y=\"87\"/></g></g>",
+      "definitionKeys": [
+        "c"
+      ],
+      "svgSha256": "221656fee619a60dfa288924aaf7ba40511232fd727275cefd3acd1ead632815"
+    },
+    "loose-4": {
+      "file": "assets/loose-4.png",
+      "kind": "loose-cups",
+      "semantics": {
+        "quantity": 4,
+        "boxed": 0
+      },
+      "width": 238,
+      "height": 164,
+      "svgBody": "<rect x=\"2\" y=\"2\" width=\"234\" height=\"160\" rx=\"16\" fill=\"#fff5dc\" stroke=\"#decca3\" stroke-width=\"3\"/><rect x=\"11\" y=\"10\" width=\"216\" height=\"143\" rx=\"12\" fill=\"#f9e9c7\" stroke=\"#8ea38b\" stroke-width=\"2\"/><text x=\"119\" y=\"52\" font-size=\"41\">4</text><g data-role=\"loose\"><g fill=\"#70aa93\"><use href=\"#c\" x=\"30\" y=\"87\"/><use href=\"#c\" x=\"52\" y=\"87\"/><use href=\"#c\" x=\"74\" y=\"87\"/><use href=\"#c\" x=\"96\" y=\"87\"/></g></g>",
+      "definitionKeys": [
+        "c"
+      ],
+      "svgSha256": "57e3a2e9a67eca6031c852d98c914c81de1ddc755d3d128ecb9581d9c899a592"
+    },
+    "loose-6": {
+      "file": "assets/loose-6.png",
+      "kind": "loose-cups",
+      "semantics": {
+        "quantity": 6,
+        "boxed": 0
+      },
+      "width": 238,
+      "height": 164,
+      "svgBody": "<rect x=\"2\" y=\"2\" width=\"234\" height=\"160\" rx=\"16\" fill=\"#fff5dc\" stroke=\"#decca3\" stroke-width=\"3\"/><rect x=\"11\" y=\"10\" width=\"216\" height=\"143\" rx=\"12\" fill=\"#f9e9c7\" stroke=\"#8ea38b\" stroke-width=\"2\"/><text x=\"119\" y=\"52\" font-size=\"41\">6</text><g data-role=\"loose\"><g fill=\"#70aa93\"><use href=\"#c\" x=\"30\" y=\"87\"/><use href=\"#c\" x=\"52\" y=\"87\"/><use href=\"#c\" x=\"74\" y=\"87\"/><use href=\"#c\" x=\"96\" y=\"87\"/><use href=\"#c\" x=\"118\" y=\"87\"/><use href=\"#c\" x=\"140\" y=\"87\"/></g></g>",
+      "definitionKeys": [
+        "c"
+      ],
+      "svgSha256": "440af7d08eeb86aff0cc72617b0509866a6c99937beafaab811d18398b4ee719"
+    },
+    "loose-7": {
+      "file": "assets/loose-7.png",
+      "kind": "loose-cups",
+      "semantics": {
+        "quantity": 7,
+        "boxed": 0
+      },
+      "width": 238,
+      "height": 164,
+      "svgBody": "<rect x=\"2\" y=\"2\" width=\"234\" height=\"160\" rx=\"16\" fill=\"#fff5dc\" stroke=\"#decca3\" stroke-width=\"3\"/><rect x=\"11\" y=\"10\" width=\"216\" height=\"143\" rx=\"12\" fill=\"#f9e9c7\" stroke=\"#8ea38b\" stroke-width=\"2\"/><text x=\"119\" y=\"52\" font-size=\"41\">7</text><g data-role=\"loose\"><g fill=\"#70aa93\"><use href=\"#c\" x=\"30\" y=\"87\"/><use href=\"#c\" x=\"52\" y=\"87\"/><use href=\"#c\" x=\"74\" y=\"87\"/><use href=\"#c\" x=\"96\" y=\"87\"/><use href=\"#c\" x=\"118\" y=\"87\"/><use href=\"#c\" x=\"140\" y=\"87\"/><use href=\"#c\" x=\"162\" y=\"87\"/></g></g>",
+      "definitionKeys": [
+        "c"
+      ],
+      "svgSha256": "a4724b09f4773111f8f74e76e7c18f262a39ff4f048eb84b603724c7de4f6e5d"
+    },
+    "loose-10": {
+      "file": "assets/loose-10.png",
+      "kind": "loose-cups",
+      "semantics": {
+        "quantity": 10,
+        "boxed": 0
+      },
+      "width": 238,
+      "height": 164,
+      "svgBody": "<rect x=\"2\" y=\"2\" width=\"234\" height=\"160\" rx=\"16\" fill=\"#fff5dc\" stroke=\"#decca3\" stroke-width=\"3\"/><rect x=\"11\" y=\"10\" width=\"216\" height=\"143\" rx=\"12\" fill=\"#f9e9c7\" stroke=\"#8ea38b\" stroke-width=\"2\"/><text x=\"119\" y=\"52\" font-size=\"41\">10</text><g data-role=\"loose\"><g fill=\"#70aa93\"><use href=\"#c\" x=\"30\" y=\"87\"/><use href=\"#c\" x=\"52\" y=\"87\"/><use href=\"#c\" x=\"74\" y=\"87\"/><use href=\"#c\" x=\"96\" y=\"87\"/><use href=\"#c\" x=\"118\" y=\"87\"/><use href=\"#c\" x=\"140\" y=\"87\"/><use href=\"#c\" x=\"162\" y=\"87\"/><use href=\"#c\" x=\"184\" y=\"87\"/><use href=\"#c\" x=\"206\" y=\"87\"/><use href=\"#c\" x=\"30\" y=\"111\"/></g></g>",
+      "definitionKeys": [
+        "c"
+      ],
+      "svgSha256": "8829939865158556e3782b8a5be5615908d748dfd3bc4a7f855e638b16a35163"
+    },
+    "loose-11": {
+      "file": "assets/loose-11.png",
+      "kind": "loose-cups",
+      "semantics": {
+        "quantity": 11,
+        "boxed": 0
+      },
+      "width": 238,
+      "height": 164,
+      "svgBody": "<rect x=\"2\" y=\"2\" width=\"234\" height=\"160\" rx=\"16\" fill=\"#fff5dc\" stroke=\"#decca3\" stroke-width=\"3\"/><rect x=\"11\" y=\"10\" width=\"216\" height=\"143\" rx=\"12\" fill=\"#f9e9c7\" stroke=\"#8ea38b\" stroke-width=\"2\"/><text x=\"119\" y=\"52\" font-size=\"41\">11</text><g data-role=\"loose\"><g fill=\"#70aa93\"><use href=\"#c\" x=\"30\" y=\"87\"/><use href=\"#c\" x=\"52\" y=\"87\"/><use href=\"#c\" x=\"74\" y=\"87\"/><use href=\"#c\" x=\"96\" y=\"87\"/><use href=\"#c\" x=\"118\" y=\"87\"/><use href=\"#c\" x=\"140\" y=\"87\"/><use href=\"#c\" x=\"162\" y=\"87\"/><use href=\"#c\" x=\"184\" y=\"87\"/><use href=\"#c\" x=\"206\" y=\"87\"/><use href=\"#c\" x=\"30\" y=\"111\"/><use href=\"#c\" x=\"52\" y=\"111\"/></g></g>",
+      "definitionKeys": [
+        "c"
+      ],
+      "svgSha256": "cabc002a9b9fe2ad5aa1e925876907ee558c4c35d362fab90b8563d6ef165b7b"
+    },
+    "loose-12": {
+      "file": "assets/loose-12.png",
+      "kind": "loose-cups",
+      "semantics": {
+        "quantity": 12,
+        "boxed": 0
+      },
+      "width": 238,
+      "height": 164,
+      "svgBody": "<rect x=\"2\" y=\"2\" width=\"234\" height=\"160\" rx=\"16\" fill=\"#fff5dc\" stroke=\"#decca3\" stroke-width=\"3\"/><rect x=\"11\" y=\"10\" width=\"216\" height=\"143\" rx=\"12\" fill=\"#f9e9c7\" stroke=\"#8ea38b\" stroke-width=\"2\"/><text x=\"119\" y=\"52\" font-size=\"41\">12</text><g data-role=\"loose\"><g fill=\"#70aa93\"><use href=\"#c\" x=\"30\" y=\"87\"/><use href=\"#c\" x=\"52\" y=\"87\"/><use href=\"#c\" x=\"74\" y=\"87\"/><use href=\"#c\" x=\"96\" y=\"87\"/><use href=\"#c\" x=\"118\" y=\"87\"/><use href=\"#c\" x=\"140\" y=\"87\"/><use href=\"#c\" x=\"162\" y=\"87\"/><use href=\"#c\" x=\"184\" y=\"87\"/><use href=\"#c\" x=\"206\" y=\"87\"/><use href=\"#c\" x=\"30\" y=\"111\"/><use href=\"#c\" x=\"52\" y=\"111\"/><use href=\"#c\" x=\"74\" y=\"111\"/></g></g>",
+      "definitionKeys": [
+        "c"
+      ],
+      "svgSha256": "b0ba517898eadaa0a6aba93b895dc5ce1d1c1929c38488dde856bfbee2edbc96"
+    },
+    "loose-14": {
+      "file": "assets/loose-14.png",
+      "kind": "loose-cups",
+      "semantics": {
+        "quantity": 14,
+        "boxed": 0
+      },
+      "width": 238,
+      "height": 164,
+      "svgBody": "<rect x=\"2\" y=\"2\" width=\"234\" height=\"160\" rx=\"16\" fill=\"#fff5dc\" stroke=\"#decca3\" stroke-width=\"3\"/><rect x=\"11\" y=\"10\" width=\"216\" height=\"143\" rx=\"12\" fill=\"#f9e9c7\" stroke=\"#8ea38b\" stroke-width=\"2\"/><text x=\"119\" y=\"52\" font-size=\"41\">14</text><g data-role=\"loose\"><g fill=\"#70aa93\"><use href=\"#c\" x=\"30\" y=\"87\"/><use href=\"#c\" x=\"52\" y=\"87\"/><use href=\"#c\" x=\"74\" y=\"87\"/><use href=\"#c\" x=\"96\" y=\"87\"/><use href=\"#c\" x=\"118\" y=\"87\"/><use href=\"#c\" x=\"140\" y=\"87\"/><use href=\"#c\" x=\"162\" y=\"87\"/><use href=\"#c\" x=\"184\" y=\"87\"/><use href=\"#c\" x=\"206\" y=\"87\"/><use href=\"#c\" x=\"30\" y=\"111\"/><use href=\"#c\" x=\"52\" y=\"111\"/><use href=\"#c\" x=\"74\" y=\"111\"/><use href=\"#c\" x=\"96\" y=\"111\"/><use href=\"#c\" x=\"118\" y=\"111\"/></g></g>",
+      "definitionKeys": [
+        "c"
+      ],
+      "svgSha256": "ace276ed49209ed71ef444a21c329f68d0ecaad7d8a54fb17469ead299bca5ed"
+    },
+    "loose-16": {
+      "file": "assets/loose-16.png",
+      "kind": "loose-cups",
+      "semantics": {
+        "quantity": 16,
+        "boxed": 0
+      },
+      "width": 238,
+      "height": 164,
+      "svgBody": "<rect x=\"2\" y=\"2\" width=\"234\" height=\"160\" rx=\"16\" fill=\"#fff5dc\" stroke=\"#decca3\" stroke-width=\"3\"/><rect x=\"11\" y=\"10\" width=\"216\" height=\"143\" rx=\"12\" fill=\"#f9e9c7\" stroke=\"#8ea38b\" stroke-width=\"2\"/><text x=\"119\" y=\"52\" font-size=\"41\">16</text><g data-role=\"loose\"><g fill=\"#70aa93\"><use href=\"#c\" x=\"30\" y=\"87\"/><use href=\"#c\" x=\"52\" y=\"87\"/><use href=\"#c\" x=\"74\" y=\"87\"/><use href=\"#c\" x=\"96\" y=\"87\"/><use href=\"#c\" x=\"118\" y=\"87\"/><use href=\"#c\" x=\"140\" y=\"87\"/><use href=\"#c\" x=\"162\" y=\"87\"/><use href=\"#c\" x=\"184\" y=\"87\"/><use href=\"#c\" x=\"206\" y=\"87\"/><use href=\"#c\" x=\"30\" y=\"111\"/><use href=\"#c\" x=\"52\" y=\"111\"/><use href=\"#c\" x=\"74\" y=\"111\"/><use href=\"#c\" x=\"96\" y=\"111\"/><use href=\"#c\" x=\"118\" y=\"111\"/><use href=\"#c\" x=\"140\" y=\"111\"/><use href=\"#c\" x=\"162\" y=\"111\"/></g></g>",
+      "definitionKeys": [
+        "c"
+      ],
+      "svgSha256": "13a73480dc8c5402345ec7bf620a1f68693727c179a6b3139a8bc32b34ac5623"
+    },
+    "loose-17": {
+      "file": "assets/loose-17.png",
+      "kind": "loose-cups",
+      "semantics": {
+        "quantity": 17,
+        "boxed": 0
+      },
+      "width": 238,
+      "height": 164,
+      "svgBody": "<rect x=\"2\" y=\"2\" width=\"234\" height=\"160\" rx=\"16\" fill=\"#fff5dc\" stroke=\"#decca3\" stroke-width=\"3\"/><rect x=\"11\" y=\"10\" width=\"216\" height=\"143\" rx=\"12\" fill=\"#f9e9c7\" stroke=\"#8ea38b\" stroke-width=\"2\"/><text x=\"119\" y=\"52\" font-size=\"41\">17</text><g data-role=\"loose\"><g fill=\"#70aa93\"><use href=\"#c\" x=\"30\" y=\"87\"/><use href=\"#c\" x=\"52\" y=\"87\"/><use href=\"#c\" x=\"74\" y=\"87\"/><use href=\"#c\" x=\"96\" y=\"87\"/><use href=\"#c\" x=\"118\" y=\"87\"/><use href=\"#c\" x=\"140\" y=\"87\"/><use href=\"#c\" x=\"162\" y=\"87\"/><use href=\"#c\" x=\"184\" y=\"87\"/><use href=\"#c\" x=\"206\" y=\"87\"/><use href=\"#c\" x=\"30\" y=\"111\"/><use href=\"#c\" x=\"52\" y=\"111\"/><use href=\"#c\" x=\"74\" y=\"111\"/><use href=\"#c\" x=\"96\" y=\"111\"/><use href=\"#c\" x=\"118\" y=\"111\"/><use href=\"#c\" x=\"140\" y=\"111\"/><use href=\"#c\" x=\"162\" y=\"111\"/><use href=\"#c\" x=\"184\" y=\"111\"/></g></g>",
+      "definitionKeys": [
+        "c"
+      ],
+      "svgSha256": "2742b8b8a67f7b93c1d143543e90ba4d5771a7db7c737ce4ca89aa657ca0b89a"
+    },
+    "order-51-minus6": {
+      "file": "assets/order-51-minus6.png",
+      "kind": "marked-removal-order",
+      "semantics": {
+        "whole": 51,
+        "taken": 6,
+        "exchanged": [
+          4,
+          11
+        ],
+        "remainder": 45
+      },
+      "width": 690,
+      "height": 277,
+      "svgBody": "<rect x=\"2\" y=\"2\" width=\"686\" height=\"273\" rx=\"16\" fill=\"#fff5dc\" stroke=\"#decca3\" stroke-width=\"3\"/><rect x=\"20\" y=\"50\" width=\"350\" height=\"191\" rx=\"12\" fill=\"#e9edce\" stroke=\"#8ea38b\" stroke-width=\"2\"/><rect x=\"415\" y=\"50\" width=\"253\" height=\"191\" rx=\"13\" fill=\"#f8e1d3\" stroke=\"#a2674e\" stroke-width=\"2\" stroke-dasharray=\"6 4\"/><text x=\"345\" y=\"38\" font-size=\"41\">51</text><g data-role=\"remaining\"><use href=\"#b\" x=\"44\" y=\"77\"/><use href=\"#b\" x=\"132\" y=\"77\"/><use href=\"#b\" x=\"220\" y=\"77\"/><use href=\"#b\" x=\"44\" y=\"114\"/><g fill=\"#70aa93\"><use href=\"#c\" x=\"56\" y=\"160\"/><use href=\"#c\" x=\"80\" y=\"160\"/><use href=\"#c\" x=\"104\" y=\"160\"/><use href=\"#c\" x=\"128\" y=\"160\"/><use href=\"#c\" x=\"152\" y=\"160\"/></g></g><g data-role=\"removed\"><g fill=\"#d98565\"><use href=\"#c\" x=\"440\" y=\"106\"/><use href=\"#c\" x=\"464\" y=\"106\"/><use href=\"#c\" x=\"488\" y=\"106\"/><use href=\"#c\" x=\"512\" y=\"106\"/><use href=\"#c\" x=\"536\" y=\"106\"/><use href=\"#c\" x=\"560\" y=\"106\"/></g></g><path d=\"M634 195L666 195 M655 202L666 195L655 188\" fill=\"none\" stroke=\"#d98565\" stroke-width=\"3.4\" />",
+      "definitionKeys": [
+        "c",
+        "b"
+      ],
+      "svgSha256": "5bb253cb3a23831dfe823dc3a9b83bfc4c2ea45fd4674f1ed5140c3472b41583"
+    },
+    "order-52-minus6": {
+      "file": "assets/order-52-minus6.png",
+      "kind": "marked-removal-order",
+      "semantics": {
+        "whole": 52,
+        "taken": 6,
+        "exchanged": [
+          4,
+          12
+        ],
+        "remainder": 46
+      },
+      "width": 690,
+      "height": 277,
+      "svgBody": "<rect x=\"2\" y=\"2\" width=\"686\" height=\"273\" rx=\"16\" fill=\"#fff5dc\" stroke=\"#decca3\" stroke-width=\"3\"/><rect x=\"20\" y=\"50\" width=\"350\" height=\"191\" rx=\"12\" fill=\"#e9edce\" stroke=\"#8ea38b\" stroke-width=\"2\"/><rect x=\"415\" y=\"50\" width=\"253\" height=\"191\" rx=\"13\" fill=\"#f8e1d3\" stroke=\"#a2674e\" stroke-width=\"2\" stroke-dasharray=\"6 4\"/><text x=\"345\" y=\"38\" font-size=\"41\">52</text><g data-role=\"remaining\"><use href=\"#b\" x=\"44\" y=\"77\"/><use href=\"#b\" x=\"132\" y=\"77\"/><use href=\"#b\" x=\"220\" y=\"77\"/><use href=\"#b\" x=\"44\" y=\"114\"/><g fill=\"#70aa93\"><use href=\"#c\" x=\"56\" y=\"160\"/><use href=\"#c\" x=\"80\" y=\"160\"/><use href=\"#c\" x=\"104\" y=\"160\"/><use href=\"#c\" x=\"128\" y=\"160\"/><use href=\"#c\" x=\"152\" y=\"160\"/><use href=\"#c\" x=\"176\" y=\"160\"/></g></g><g data-role=\"removed\"><g fill=\"#d98565\"><use href=\"#c\" x=\"440\" y=\"106\"/><use href=\"#c\" x=\"464\" y=\"106\"/><use href=\"#c\" x=\"488\" y=\"106\"/><use href=\"#c\" x=\"512\" y=\"106\"/><use href=\"#c\" x=\"536\" y=\"106\"/><use href=\"#c\" x=\"560\" y=\"106\"/></g></g><path d=\"M634 195L666 195 M655 202L666 195L655 188\" fill=\"none\" stroke=\"#d98565\" stroke-width=\"3.4\" />",
+      "definitionKeys": [
+        "c",
+        "b"
+      ],
+      "svgSha256": "97f6bb7d2a473745e6d7b05a739a4376956bbe9b58b0ae9bde4cf42ab6cc6348"
+    },
+    "order-65-minus9": {
+      "file": "assets/order-65-minus9.png",
+      "kind": "marked-removal-order",
+      "semantics": {
+        "whole": 65,
+        "taken": 9,
+        "exchanged": [
+          5,
+          15
+        ],
+        "remainder": 56
+      },
+      "width": 690,
+      "height": 277,
+      "svgBody": "<rect x=\"2\" y=\"2\" width=\"686\" height=\"273\" rx=\"16\" fill=\"#fff5dc\" stroke=\"#decca3\" stroke-width=\"3\"/><rect x=\"20\" y=\"50\" width=\"350\" height=\"191\" rx=\"12\" fill=\"#e9edce\" stroke=\"#8ea38b\" stroke-width=\"2\"/><rect x=\"415\" y=\"50\" width=\"253\" height=\"191\" rx=\"13\" fill=\"#f8e1d3\" stroke=\"#a2674e\" stroke-width=\"2\" stroke-dasharray=\"6 4\"/><text x=\"345\" y=\"38\" font-size=\"41\">65</text><g data-role=\"remaining\"><use href=\"#b\" x=\"44\" y=\"77\"/><use href=\"#b\" x=\"132\" y=\"77\"/><use href=\"#b\" x=\"220\" y=\"77\"/><use href=\"#b\" x=\"44\" y=\"114\"/><use href=\"#b\" x=\"132\" y=\"114\"/><g fill=\"#70aa93\"><use href=\"#c\" x=\"56\" y=\"160\"/><use href=\"#c\" x=\"80\" y=\"160\"/><use href=\"#c\" x=\"104\" y=\"160\"/><use href=\"#c\" x=\"128\" y=\"160\"/><use href=\"#c\" x=\"152\" y=\"160\"/><use href=\"#c\" x=\"176\" y=\"160\"/></g></g><g data-role=\"removed\"><g fill=\"#d98565\"><use href=\"#c\" x=\"440\" y=\"106\"/><use href=\"#c\" x=\"464\" y=\"106\"/><use href=\"#c\" x=\"488\" y=\"106\"/><use href=\"#c\" x=\"512\" y=\"106\"/><use href=\"#c\" x=\"536\" y=\"106\"/><use href=\"#c\" x=\"560\" y=\"106\"/><use href=\"#c\" x=\"584\" y=\"106\"/><use href=\"#c\" x=\"608\" y=\"106\"/><use href=\"#c\" x=\"440\" y=\"130\"/></g></g><path d=\"M634 195L666 195 M655 202L666 195L655 188\" fill=\"none\" stroke=\"#d98565\" stroke-width=\"3.4\" />",
+      "definitionKeys": [
+        "c",
+        "b"
+      ],
+      "svgSha256": "2915fa7c3bd4ec058ede36189f540232e48800ef6ca345975169fc84971f8f50"
+    },
+    "order-70-minus4": {
+      "file": "assets/order-70-minus4.png",
+      "kind": "marked-removal-order",
+      "semantics": {
+        "whole": 70,
+        "taken": 4,
+        "exchanged": [
+          6,
+          10
+        ],
+        "remainder": 66
+      },
+      "width": 690,
+      "height": 277,
+      "svgBody": "<rect x=\"2\" y=\"2\" width=\"686\" height=\"273\" rx=\"16\" fill=\"#fff5dc\" stroke=\"#decca3\" stroke-width=\"3\"/><rect x=\"20\" y=\"50\" width=\"350\" height=\"191\" rx=\"12\" fill=\"#e9edce\" stroke=\"#8ea38b\" stroke-width=\"2\"/><rect x=\"415\" y=\"50\" width=\"253\" height=\"191\" rx=\"13\" fill=\"#f8e1d3\" stroke=\"#a2674e\" stroke-width=\"2\" stroke-dasharray=\"6 4\"/><text x=\"345\" y=\"38\" font-size=\"41\">70</text><g data-role=\"remaining\"><use href=\"#b\" x=\"44\" y=\"77\"/><use href=\"#b\" x=\"132\" y=\"77\"/><use href=\"#b\" x=\"220\" y=\"77\"/><use href=\"#b\" x=\"44\" y=\"114\"/><use href=\"#b\" x=\"132\" y=\"114\"/><use href=\"#b\" x=\"220\" y=\"114\"/><g fill=\"#70aa93\"><use href=\"#c\" x=\"56\" y=\"160\"/><use href=\"#c\" x=\"80\" y=\"160\"/><use href=\"#c\" x=\"104\" y=\"160\"/><use href=\"#c\" x=\"128\" y=\"160\"/><use href=\"#c\" x=\"152\" y=\"160\"/><use href=\"#c\" x=\"176\" y=\"160\"/></g></g><g data-role=\"removed\"><g fill=\"#d98565\"><use href=\"#c\" x=\"440\" y=\"106\"/><use href=\"#c\" x=\"464\" y=\"106\"/><use href=\"#c\" x=\"488\" y=\"106\"/><use href=\"#c\" x=\"512\" y=\"106\"/></g></g><path d=\"M634 195L666 195 M655 202L666 195L655 188\" fill=\"none\" stroke=\"#d98565\" stroke-width=\"3.4\" />",
+      "definitionKeys": [
+        "c",
+        "b"
+      ],
+      "svgSha256": "7ffad50e707e7fd85348262fca0648bba5f58e9f446fc6cd48f76b0814510220"
+    },
+    "order-84-minus8": {
+      "file": "assets/order-84-minus8.png",
+      "kind": "marked-removal-order",
+      "semantics": {
+        "whole": 84,
+        "taken": 8,
+        "exchanged": [
+          7,
+          14
+        ],
+        "remainder": 76
+      },
+      "width": 690,
+      "height": 277,
+      "svgBody": "<rect x=\"2\" y=\"2\" width=\"686\" height=\"273\" rx=\"16\" fill=\"#fff5dc\" stroke=\"#decca3\" stroke-width=\"3\"/><rect x=\"20\" y=\"50\" width=\"350\" height=\"191\" rx=\"12\" fill=\"#e9edce\" stroke=\"#8ea38b\" stroke-width=\"2\"/><rect x=\"415\" y=\"50\" width=\"253\" height=\"191\" rx=\"13\" fill=\"#f8e1d3\" stroke=\"#a2674e\" stroke-width=\"2\" stroke-dasharray=\"6 4\"/><text x=\"345\" y=\"38\" font-size=\"41\">84</text><g data-role=\"remaining\"><use href=\"#b\" x=\"44\" y=\"77\"/><use href=\"#b\" x=\"132\" y=\"77\"/><use href=\"#b\" x=\"220\" y=\"77\"/><use href=\"#b\" x=\"44\" y=\"114\"/><use href=\"#b\" x=\"132\" y=\"114\"/><use href=\"#b\" x=\"220\" y=\"114\"/><use href=\"#b\" x=\"44\" y=\"151\"/><g fill=\"#70aa93\"><use href=\"#c\" x=\"56\" y=\"197\"/><use href=\"#c\" x=\"80\" y=\"197\"/><use href=\"#c\" x=\"104\" y=\"197\"/><use href=\"#c\" x=\"128\" y=\"197\"/><use href=\"#c\" x=\"152\" y=\"197\"/><use href=\"#c\" x=\"176\" y=\"197\"/></g></g><g data-role=\"removed\"><g fill=\"#d98565\"><use href=\"#c\" x=\"440\" y=\"106\"/><use href=\"#c\" x=\"464\" y=\"106\"/><use href=\"#c\" x=\"488\" y=\"106\"/><use href=\"#c\" x=\"512\" y=\"106\"/><use href=\"#c\" x=\"536\" y=\"106\"/><use href=\"#c\" x=\"560\" y=\"106\"/><use href=\"#c\" x=\"584\" y=\"106\"/><use href=\"#c\" x=\"608\" y=\"106\"/></g></g><path d=\"M634 195L666 195 M655 202L666 195L655 188\" fill=\"none\" stroke=\"#d98565\" stroke-width=\"3.4\" />",
+      "definitionKeys": [
+        "c",
+        "b"
+      ],
+      "svgSha256": "a048e1922fe0b8833f869f8d49ddee491a99da37651a910043bd9fac9d6c0d57"
+    },
+    "answer-5": {
+      "file": "assets/answer-5.png",
+      "kind": "quantity",
+      "semantics": {
+        "whole": 5,
+        "boxes": 0,
+        "loose": 5
+      },
+      "width": 318,
+      "height": 213,
+      "svgBody": "<rect x=\"2\" y=\"2\" width=\"314\" height=\"209\" rx=\"16\" fill=\"#fff5dc\" stroke=\"#decca3\" stroke-width=\"3\"/><rect x=\"14\" y=\"14\" width=\"290\" height=\"185\" rx=\"15\" fill=\"#f9eaca\" stroke=\"#8ea38b\" stroke-width=\"2\"/><text x=\"159\" y=\"52\" font-size=\"42\">5</text><g data-role=\"amount\"><g fill=\"#70aa93\"><use href=\"#c\" x=\"42\" y=\"80\"/><use href=\"#c\" x=\"66\" y=\"80\"/><use href=\"#c\" x=\"90\" y=\"80\"/><use href=\"#c\" x=\"114\" y=\"80\"/><use href=\"#c\" x=\"138\" y=\"80\"/></g></g>",
+      "definitionKeys": [
+        "c"
+      ],
+      "svgSha256": "d83f5b1f933959098f4d78b4d5662502c935588e14c7b4bd2a6d49aa8514061a"
+    },
+    "answer-6": {
+      "file": "assets/answer-6.png",
+      "kind": "quantity",
+      "semantics": {
+        "whole": 6,
+        "boxes": 0,
+        "loose": 6
+      },
+      "width": 318,
+      "height": 213,
+      "svgBody": "<rect x=\"2\" y=\"2\" width=\"314\" height=\"209\" rx=\"16\" fill=\"#fff5dc\" stroke=\"#decca3\" stroke-width=\"3\"/><rect x=\"14\" y=\"14\" width=\"290\" height=\"185\" rx=\"15\" fill=\"#f9eaca\" stroke=\"#8ea38b\" stroke-width=\"2\"/><text x=\"159\" y=\"52\" font-size=\"42\">6</text><g data-role=\"amount\"><g fill=\"#70aa93\"><use href=\"#c\" x=\"42\" y=\"80\"/><use href=\"#c\" x=\"66\" y=\"80\"/><use href=\"#c\" x=\"90\" y=\"80\"/><use href=\"#c\" x=\"114\" y=\"80\"/><use href=\"#c\" x=\"138\" y=\"80\"/><use href=\"#c\" x=\"162\" y=\"80\"/></g></g>",
+      "definitionKeys": [
+        "c"
+      ],
+      "svgSha256": "f7af4b1be8e79108a02e5a0aab0bf8fef68fe9ba4d37f07f901099e3401a52a3"
+    },
+    "answer-45": {
+      "file": "assets/answer-45.png",
+      "kind": "quantity",
+      "semantics": {
+        "whole": 45,
+        "boxes": 4,
+        "loose": 5
+      },
+      "width": 318,
+      "height": 213,
+      "svgBody": "<rect x=\"2\" y=\"2\" width=\"314\" height=\"209\" rx=\"16\" fill=\"#fff5dc\" stroke=\"#decca3\" stroke-width=\"3\"/><rect x=\"14\" y=\"14\" width=\"290\" height=\"185\" rx=\"15\" fill=\"#f9eaca\" stroke=\"#8ea38b\" stroke-width=\"2\"/><text x=\"159\" y=\"52\" font-size=\"42\">45</text><g data-role=\"amount\"><use href=\"#b\" x=\"30\" y=\"67\"/><use href=\"#b\" x=\"118\" y=\"67\"/><use href=\"#b\" x=\"206\" y=\"67\"/><use href=\"#b\" x=\"30\" y=\"104\"/><g fill=\"#70aa93\"><use href=\"#c\" x=\"42\" y=\"150\"/><use href=\"#c\" x=\"66\" y=\"150\"/><use href=\"#c\" x=\"90\" y=\"150\"/><use href=\"#c\" x=\"114\" y=\"150\"/><use href=\"#c\" x=\"138\" y=\"150\"/></g></g>",
+      "definitionKeys": [
+        "c",
+        "b"
+      ],
+      "svgSha256": "da0aaf55935e13e998ad5fc14ce2b1ff2bc6bab6c77e90e57fc6da33c3c4e67c"
+    },
+    "answer-46": {
+      "file": "assets/answer-46.png",
+      "kind": "quantity",
+      "semantics": {
+        "whole": 46,
+        "boxes": 4,
+        "loose": 6
+      },
+      "width": 318,
+      "height": 213,
+      "svgBody": "<rect x=\"2\" y=\"2\" width=\"314\" height=\"209\" rx=\"16\" fill=\"#fff5dc\" stroke=\"#decca3\" stroke-width=\"3\"/><rect x=\"14\" y=\"14\" width=\"290\" height=\"185\" rx=\"15\" fill=\"#f9eaca\" stroke=\"#8ea38b\" stroke-width=\"2\"/><text x=\"159\" y=\"52\" font-size=\"42\">46</text><g data-role=\"amount\"><use href=\"#b\" x=\"30\" y=\"67\"/><use href=\"#b\" x=\"118\" y=\"67\"/><use href=\"#b\" x=\"206\" y=\"67\"/><use href=\"#b\" x=\"30\" y=\"104\"/><g fill=\"#70aa93\"><use href=\"#c\" x=\"42\" y=\"150\"/><use href=\"#c\" x=\"66\" y=\"150\"/><use href=\"#c\" x=\"90\" y=\"150\"/><use href=\"#c\" x=\"114\" y=\"150\"/><use href=\"#c\" x=\"138\" y=\"150\"/><use href=\"#c\" x=\"162\" y=\"150\"/></g></g>",
+      "definitionKeys": [
+        "c",
+        "b"
+      ],
+      "svgSha256": "21e1f99ffc9a6f01eefb2bbf267e6d8124f31a5519b9850a6df72c7bf33668c0"
+    },
+    "answer-50": {
+      "file": "assets/answer-50.png",
+      "kind": "quantity",
+      "semantics": {
+        "whole": 50,
+        "boxes": 5,
+        "loose": 0
+      },
+      "width": 318,
+      "height": 213,
+      "svgBody": "<rect x=\"2\" y=\"2\" width=\"314\" height=\"209\" rx=\"16\" fill=\"#fff5dc\" stroke=\"#decca3\" stroke-width=\"3\"/><rect x=\"14\" y=\"14\" width=\"290\" height=\"185\" rx=\"15\" fill=\"#f9eaca\" stroke=\"#8ea38b\" stroke-width=\"2\"/><text x=\"159\" y=\"52\" font-size=\"42\">50</text><g data-role=\"amount\"><use href=\"#b\" x=\"30\" y=\"67\"/><use href=\"#b\" x=\"118\" y=\"67\"/><use href=\"#b\" x=\"206\" y=\"67\"/><use href=\"#b\" x=\"30\" y=\"104\"/><use href=\"#b\" x=\"118\" y=\"104\"/><rect x=\"29\" y=\"136\" width=\"76\" height=\"28\" rx=\"6\" fill=\"#fbefcd\" stroke=\"#8ea38b\" stroke-width=\"1.5\" stroke-dasharray=\"4 3\"/></g>",
+      "definitionKeys": [
+        "b"
+      ],
+      "svgSha256": "0e3c8dc854f1974a74fc4bc91ce12c49c367e2c92eee767a871400a695b7fb3c"
+    },
+    "answer-55": {
+      "file": "assets/answer-55.png",
+      "kind": "quantity",
+      "semantics": {
+        "whole": 55,
+        "boxes": 5,
+        "loose": 5
+      },
+      "width": 318,
+      "height": 213,
+      "svgBody": "<rect x=\"2\" y=\"2\" width=\"314\" height=\"209\" rx=\"16\" fill=\"#fff5dc\" stroke=\"#decca3\" stroke-width=\"3\"/><rect x=\"14\" y=\"14\" width=\"290\" height=\"185\" rx=\"15\" fill=\"#f9eaca\" stroke=\"#8ea38b\" stroke-width=\"2\"/><text x=\"159\" y=\"52\" font-size=\"42\">55</text><g data-role=\"amount\"><use href=\"#b\" x=\"30\" y=\"67\"/><use href=\"#b\" x=\"118\" y=\"67\"/><use href=\"#b\" x=\"206\" y=\"67\"/><use href=\"#b\" x=\"30\" y=\"104\"/><use href=\"#b\" x=\"118\" y=\"104\"/><g fill=\"#70aa93\"><use href=\"#c\" x=\"42\" y=\"150\"/><use href=\"#c\" x=\"66\" y=\"150\"/><use href=\"#c\" x=\"90\" y=\"150\"/><use href=\"#c\" x=\"114\" y=\"150\"/><use href=\"#c\" x=\"138\" y=\"150\"/></g></g>",
+      "definitionKeys": [
+        "c",
+        "b"
+      ],
+      "svgSha256": "6d0768a3b3b8a7dd594973a1eec8c86900391e76fa78ead57d86412b46ea84af"
+    },
+    "answer-56": {
+      "file": "assets/answer-56.png",
+      "kind": "quantity",
+      "semantics": {
+        "whole": 56,
+        "boxes": 5,
+        "loose": 6
+      },
+      "width": 318,
+      "height": 213,
+      "svgBody": "<rect x=\"2\" y=\"2\" width=\"314\" height=\"209\" rx=\"16\" fill=\"#fff5dc\" stroke=\"#decca3\" stroke-width=\"3\"/><rect x=\"14\" y=\"14\" width=\"290\" height=\"185\" rx=\"15\" fill=\"#f9eaca\" stroke=\"#8ea38b\" stroke-width=\"2\"/><text x=\"159\" y=\"52\" font-size=\"42\">56</text><g data-role=\"amount\"><use href=\"#b\" x=\"30\" y=\"67\"/><use href=\"#b\" x=\"118\" y=\"67\"/><use href=\"#b\" x=\"206\" y=\"67\"/><use href=\"#b\" x=\"30\" y=\"104\"/><use href=\"#b\" x=\"118\" y=\"104\"/><g fill=\"#70aa93\"><use href=\"#c\" x=\"42\" y=\"150\"/><use href=\"#c\" x=\"66\" y=\"150\"/><use href=\"#c\" x=\"90\" y=\"150\"/><use href=\"#c\" x=\"114\" y=\"150\"/><use href=\"#c\" x=\"138\" y=\"150\"/><use href=\"#c\" x=\"162\" y=\"150\"/></g></g>",
+      "definitionKeys": [
+        "c",
+        "b"
+      ],
+      "svgSha256": "c316b739ce8fa452d57f6bec31dace55fe3b03787f73f9c093e95a80e8354bbd"
+    },
+    "answer-66": {
+      "file": "assets/answer-66.png",
+      "kind": "quantity",
+      "semantics": {
+        "whole": 66,
+        "boxes": 6,
+        "loose": 6
+      },
+      "width": 318,
+      "height": 213,
+      "svgBody": "<rect x=\"2\" y=\"2\" width=\"314\" height=\"209\" rx=\"16\" fill=\"#fff5dc\" stroke=\"#decca3\" stroke-width=\"3\"/><rect x=\"14\" y=\"14\" width=\"290\" height=\"185\" rx=\"15\" fill=\"#f9eaca\" stroke=\"#8ea38b\" stroke-width=\"2\"/><text x=\"159\" y=\"52\" font-size=\"42\">66</text><g data-role=\"amount\"><use href=\"#b\" x=\"30\" y=\"67\"/><use href=\"#b\" x=\"118\" y=\"67\"/><use href=\"#b\" x=\"206\" y=\"67\"/><use href=\"#b\" x=\"30\" y=\"104\"/><use href=\"#b\" x=\"118\" y=\"104\"/><use href=\"#b\" x=\"206\" y=\"104\"/><g fill=\"#70aa93\"><use href=\"#c\" x=\"42\" y=\"150\"/><use href=\"#c\" x=\"66\" y=\"150\"/><use href=\"#c\" x=\"90\" y=\"150\"/><use href=\"#c\" x=\"114\" y=\"150\"/><use href=\"#c\" x=\"138\" y=\"150\"/><use href=\"#c\" x=\"162\" y=\"150\"/></g></g>",
+      "definitionKeys": [
+        "c",
+        "b"
+      ],
+      "svgSha256": "702e374218359016a5fa0107ba44ee5ad07b6c3684c319100f9fa91216e61a83"
+    },
+    "answer-76": {
+      "file": "assets/answer-76.png",
+      "kind": "quantity",
+      "semantics": {
+        "whole": 76,
+        "boxes": 7,
+        "loose": 6
+      },
+      "width": 318,
+      "height": 213,
+      "svgBody": "<rect x=\"2\" y=\"2\" width=\"314\" height=\"209\" rx=\"16\" fill=\"#fff5dc\" stroke=\"#decca3\" stroke-width=\"3\"/><rect x=\"14\" y=\"14\" width=\"290\" height=\"185\" rx=\"15\" fill=\"#f9eaca\" stroke=\"#8ea38b\" stroke-width=\"2\"/><text x=\"159\" y=\"52\" font-size=\"42\">76</text><g data-role=\"amount\"><use href=\"#b\" x=\"30\" y=\"67\"/><use href=\"#b\" x=\"118\" y=\"67\"/><use href=\"#b\" x=\"206\" y=\"67\"/><use href=\"#b\" x=\"30\" y=\"104\"/><use href=\"#b\" x=\"118\" y=\"104\"/><use href=\"#b\" x=\"206\" y=\"104\"/><use href=\"#b\" x=\"30\" y=\"141\"/><g fill=\"#70aa93\"><use href=\"#c\" x=\"42\" y=\"187\"/><use href=\"#c\" x=\"66\" y=\"187\"/><use href=\"#c\" x=\"90\" y=\"187\"/><use href=\"#c\" x=\"114\" y=\"187\"/><use href=\"#c\" x=\"138\" y=\"187\"/><use href=\"#c\" x=\"162\" y=\"187\"/></g></g>",
+      "definitionKeys": [
+        "c",
+        "b"
+      ],
+      "svgSha256": "e3ee70640bc9576c46312d68fc0b4d7f25ea809be761c2bfce56595f7f91e609"
+    },
+    "answer-86": {
+      "file": "assets/answer-86.png",
+      "kind": "quantity",
+      "semantics": {
+        "whole": 86,
+        "boxes": 8,
+        "loose": 6
+      },
+      "width": 318,
+      "height": 213,
+      "svgBody": "<rect x=\"2\" y=\"2\" width=\"314\" height=\"209\" rx=\"16\" fill=\"#fff5dc\" stroke=\"#decca3\" stroke-width=\"3\"/><rect x=\"14\" y=\"14\" width=\"290\" height=\"185\" rx=\"15\" fill=\"#f9eaca\" stroke=\"#8ea38b\" stroke-width=\"2\"/><text x=\"159\" y=\"52\" font-size=\"42\">86</text><g data-role=\"amount\"><use href=\"#b\" x=\"30\" y=\"67\"/><use href=\"#b\" x=\"118\" y=\"67\"/><use href=\"#b\" x=\"206\" y=\"67\"/><use href=\"#b\" x=\"30\" y=\"104\"/><use href=\"#b\" x=\"118\" y=\"104\"/><use href=\"#b\" x=\"206\" y=\"104\"/><use href=\"#b\" x=\"30\" y=\"141\"/><use href=\"#b\" x=\"118\" y=\"141\"/><g fill=\"#70aa93\"><use href=\"#c\" x=\"42\" y=\"187\"/><use href=\"#c\" x=\"66\" y=\"187\"/><use href=\"#c\" x=\"90\" y=\"187\"/><use href=\"#c\" x=\"114\" y=\"187\"/><use href=\"#c\" x=\"138\" y=\"187\"/><use href=\"#c\" x=\"162\" y=\"187\"/></g></g>",
+      "definitionKeys": [
+        "c",
+        "b"
+      ],
+      "svgSha256": "eee46f7847dceb1e4aab892254dc2dd5f51a5ed191f39a4255f473c33e2833d3"
+    },
+    "q1-stimulus": {
+      "file": "assets/q1-stimulus.png",
+      "kind": "need-regrouping",
+      "semantics": {
+        "removed": 5
+      },
+      "width": 326,
+      "height": 209,
+      "svgBody": "<rect x=\"2\" y=\"2\" width=\"322\" height=\"205\" rx=\"16\" fill=\"#fff5dc\" stroke=\"#decca3\" stroke-width=\"3\"/><rect x=\"27\" y=\"27\" width=\"272\" height=\"156\" rx=\"13\" fill=\"#f7e1d2\" stroke=\"#a2674e\" stroke-width=\"2\" stroke-dasharray=\"6 4\"/><g data-role=\"requested\"><g fill=\"#d98565\"><use href=\"#c\" x=\"92\" y=\"108\"/><use href=\"#c\" x=\"116\" y=\"108\"/><use href=\"#c\" x=\"140\" y=\"108\"/><use href=\"#c\" x=\"164\" y=\"108\"/><use href=\"#c\" x=\"188\" y=\"108\"/></g></g>",
+      "definitionKeys": [
+        "c"
+      ],
+      "svgSha256": "421fe0c05fd2debbbdf0a9d5317cc632abf7184e271a1e5cf6af05d7e2093b46"
+    },
+    "q1-a": {
+      "file": "assets/q1-a.png",
+      "kind": "need-regrouping",
+      "semantics": {
+        "displayed": 68,
+        "removed": 5
+      },
+      "width": 480,
+      "height": 277,
+      "svgBody": "<rect x=\"2\" y=\"2\" width=\"476\" height=\"273\" rx=\"16\" fill=\"#fff5dc\" stroke=\"#decca3\" stroke-width=\"3\"/><rect x=\"17\" y=\"17\" width=\"446\" height=\"243\" rx=\"15\" fill=\"#f9eaca\" stroke=\"#8ea38b\" stroke-width=\"2\"/><g data-role=\"amount\"><use href=\"#b\" x=\"86\" y=\"48\"/><use href=\"#b\" x=\"174\" y=\"48\"/><use href=\"#b\" x=\"262\" y=\"48\"/><use href=\"#b\" x=\"350\" y=\"48\"/><use href=\"#b\" x=\"86\" y=\"85\"/><use href=\"#b\" x=\"174\" y=\"85\"/><g fill=\"#70aa93\"><use href=\"#c\" x=\"98\" y=\"131\"/><use href=\"#c\" x=\"122\" y=\"131\"/><use href=\"#c\" x=\"146\" y=\"131\"/><use href=\"#c\" x=\"170\" y=\"131\"/><use href=\"#c\" x=\"194\" y=\"131\"/><use href=\"#c\" x=\"218\" y=\"131\"/><use href=\"#c\" x=\"242\" y=\"131\"/><use href=\"#c\" x=\"266\" y=\"131\"/></g></g>",
+      "definitionKeys": [
+        "c",
+        "b"
+      ],
+      "svgSha256": "3850a956d76e0aedb55af6ad28947354e028806e0f34cb27e1d31972c52b729a"
+    },
+    "q1-b": {
+      "file": "assets/q1-b.png",
+      "kind": "need-regrouping",
+      "semantics": {
+        "displayed": 61,
+        "removed": 5
+      },
+      "width": 480,
+      "height": 277,
+      "svgBody": "<rect x=\"2\" y=\"2\" width=\"476\" height=\"273\" rx=\"16\" fill=\"#fff5dc\" stroke=\"#decca3\" stroke-width=\"3\"/><rect x=\"17\" y=\"17\" width=\"446\" height=\"243\" rx=\"15\" fill=\"#f9eaca\" stroke=\"#8ea38b\" stroke-width=\"2\"/><g data-role=\"amount\"><use href=\"#b\" x=\"86\" y=\"48\"/><use href=\"#b\" x=\"174\" y=\"48\"/><use href=\"#b\" x=\"262\" y=\"48\"/><use href=\"#b\" x=\"350\" y=\"48\"/><use href=\"#b\" x=\"86\" y=\"85\"/><use href=\"#b\" x=\"174\" y=\"85\"/><g fill=\"#70aa93\"><use href=\"#c\" x=\"98\" y=\"131\"/></g></g>",
+      "definitionKeys": [
+        "c",
+        "b"
+      ],
+      "svgSha256": "a848ad16ea68fbe8ddddacdccfc4c78e9de962af8e20b6089c71802a908ee5a8"
+    },
+    "q1-c": {
+      "file": "assets/q1-c.png",
+      "kind": "need-regrouping",
+      "semantics": {
+        "displayed": 65,
+        "removed": 5
+      },
+      "width": 480,
+      "height": 277,
+      "svgBody": "<rect x=\"2\" y=\"2\" width=\"476\" height=\"273\" rx=\"16\" fill=\"#fff5dc\" stroke=\"#decca3\" stroke-width=\"3\"/><rect x=\"17\" y=\"17\" width=\"446\" height=\"243\" rx=\"15\" fill=\"#f9eaca\" stroke=\"#8ea38b\" stroke-width=\"2\"/><g data-role=\"amount\"><use href=\"#b\" x=\"86\" y=\"48\"/><use href=\"#b\" x=\"174\" y=\"48\"/><use href=\"#b\" x=\"262\" y=\"48\"/><use href=\"#b\" x=\"350\" y=\"48\"/><use href=\"#b\" x=\"86\" y=\"85\"/><use href=\"#b\" x=\"174\" y=\"85\"/><g fill=\"#70aa93\"><use href=\"#c\" x=\"98\" y=\"131\"/><use href=\"#c\" x=\"122\" y=\"131\"/><use href=\"#c\" x=\"146\" y=\"131\"/><use href=\"#c\" x=\"170\" y=\"131\"/><use href=\"#c\" x=\"194\" y=\"131\"/></g></g>",
+      "definitionKeys": [
+        "c",
+        "b"
+      ],
+      "svgSha256": "9743245e03cb22ddabb9d1052361516e5725ced6536a929cdd9a165589a22f76"
+    },
+    "q2-stimulus": {
+      "file": "assets/q2-stimulus.png",
+      "kind": "one-ten-exchange",
+      "semantics": {
+        "start": 53,
+        "original": [
+          5,
+          3
+        ]
+      },
+      "width": 480,
+      "height": 277,
+      "svgBody": "<rect x=\"2\" y=\"2\" width=\"476\" height=\"273\" rx=\"16\" fill=\"#fff5dc\" stroke=\"#decca3\" stroke-width=\"3\"/><rect x=\"17\" y=\"17\" width=\"446\" height=\"243\" rx=\"15\" fill=\"#f9eaca\" stroke=\"#8ea38b\" stroke-width=\"2\"/><text x=\"240\" y=\"58\" font-size=\"46\">53</text><g data-role=\"amount\"><use href=\"#b\" x=\"86\" y=\"81\"/><use href=\"#b\" x=\"174\" y=\"81\"/><use href=\"#b\" x=\"262\" y=\"81\"/><use href=\"#b\" x=\"350\" y=\"81\"/><use href=\"#b\" x=\"86\" y=\"118\"/><g fill=\"#70aa93\"><use href=\"#c\" x=\"98\" y=\"164\"/><use href=\"#c\" x=\"122\" y=\"164\"/><use href=\"#c\" x=\"146\" y=\"164\"/></g></g>",
+      "definitionKeys": [
+        "c",
+        "b"
+      ],
+      "svgSha256": "d130d2e42069a9772957bc16b06360a04d8256abbff788e6ce2f7c3d413a7bd2"
+    },
+    "q2-a": {
+      "file": "assets/q2-a.png",
+      "kind": "one-ten-exchange",
+      "semantics": {
+        "displayed": [
+          4,
+          13
+        ],
+        "start": 53,
+        "original": [
+          5,
+          3
+        ]
+      },
+      "width": 416,
+      "height": 258,
+      "svgBody": "<rect x=\"2\" y=\"2\" width=\"412\" height=\"254\" rx=\"16\" fill=\"#fff5dc\" stroke=\"#decca3\" stroke-width=\"3\"/><rect x=\"22\" y=\"32\" width=\"372\" height=\"202\" rx=\"12\" fill=\"#f9eacb\" stroke=\"#8ea38b\" stroke-width=\"2\"/><g data-role=\"composition\"><use href=\"#b\" x=\"56\" y=\"56\"/><use href=\"#b\" x=\"144\" y=\"56\"/><use href=\"#b\" x=\"232\" y=\"56\"/><use href=\"#b\" x=\"56\" y=\"93\"/><g fill=\"#70aa93\"><use href=\"#c\" x=\"68\" y=\"139\"/><use href=\"#c\" x=\"92\" y=\"139\"/><use href=\"#c\" x=\"116\" y=\"139\"/><use href=\"#c\" x=\"140\" y=\"139\"/><use href=\"#c\" x=\"164\" y=\"139\"/><use href=\"#c\" x=\"188\" y=\"139\"/><use href=\"#c\" x=\"212\" y=\"139\"/><use href=\"#c\" x=\"236\" y=\"139\"/><use href=\"#c\" x=\"260\" y=\"139\"/><use href=\"#c\" x=\"284\" y=\"139\"/><use href=\"#c\" x=\"68\" y=\"163\"/><use href=\"#c\" x=\"92\" y=\"163\"/><use href=\"#c\" x=\"116\" y=\"163\"/></g></g>",
+      "definitionKeys": [
+        "c",
+        "b"
+      ],
+      "svgSha256": "59dc7ccf963a728bca54719a126ebbf01ea112afc50b4149cf789736774c0f24"
+    },
+    "q2-b": {
+      "file": "assets/q2-b.png",
+      "kind": "one-ten-exchange",
+      "semantics": {
+        "displayed": [
+          5,
+          13
+        ],
+        "start": 53,
+        "original": [
+          5,
+          3
+        ]
+      },
+      "width": 416,
+      "height": 258,
+      "svgBody": "<rect x=\"2\" y=\"2\" width=\"412\" height=\"254\" rx=\"16\" fill=\"#fff5dc\" stroke=\"#decca3\" stroke-width=\"3\"/><rect x=\"22\" y=\"32\" width=\"372\" height=\"202\" rx=\"12\" fill=\"#f9eacb\" stroke=\"#8ea38b\" stroke-width=\"2\"/><g data-role=\"composition\"><use href=\"#b\" x=\"56\" y=\"56\"/><use href=\"#b\" x=\"144\" y=\"56\"/><use href=\"#b\" x=\"232\" y=\"56\"/><use href=\"#b\" x=\"56\" y=\"93\"/><use href=\"#b\" x=\"144\" y=\"93\"/><g fill=\"#70aa93\"><use href=\"#c\" x=\"68\" y=\"139\"/><use href=\"#c\" x=\"92\" y=\"139\"/><use href=\"#c\" x=\"116\" y=\"139\"/><use href=\"#c\" x=\"140\" y=\"139\"/><use href=\"#c\" x=\"164\" y=\"139\"/><use href=\"#c\" x=\"188\" y=\"139\"/><use href=\"#c\" x=\"212\" y=\"139\"/><use href=\"#c\" x=\"236\" y=\"139\"/><use href=\"#c\" x=\"260\" y=\"139\"/><use href=\"#c\" x=\"284\" y=\"139\"/><use href=\"#c\" x=\"68\" y=\"163\"/><use href=\"#c\" x=\"92\" y=\"163\"/><use href=\"#c\" x=\"116\" y=\"163\"/></g></g>",
+      "definitionKeys": [
+        "c",
+        "b"
+      ],
+      "svgSha256": "23b265b6fa966d56f6ad9cbe80a717276cbcf3571d94e68aacffe61eb049a4c3"
+    },
+    "q2-c": {
+      "file": "assets/q2-c.png",
+      "kind": "one-ten-exchange",
+      "semantics": {
+        "displayed": [
+          4,
+          3
+        ],
+        "start": 53,
+        "original": [
+          5,
+          3
+        ]
+      },
+      "width": 416,
+      "height": 258,
+      "svgBody": "<rect x=\"2\" y=\"2\" width=\"412\" height=\"254\" rx=\"16\" fill=\"#fff5dc\" stroke=\"#decca3\" stroke-width=\"3\"/><rect x=\"22\" y=\"32\" width=\"372\" height=\"202\" rx=\"12\" fill=\"#f9eacb\" stroke=\"#8ea38b\" stroke-width=\"2\"/><g data-role=\"composition\"><use href=\"#b\" x=\"56\" y=\"56\"/><use href=\"#b\" x=\"144\" y=\"56\"/><use href=\"#b\" x=\"232\" y=\"56\"/><use href=\"#b\" x=\"56\" y=\"93\"/><g fill=\"#70aa93\"><use href=\"#c\" x=\"68\" y=\"139\"/><use href=\"#c\" x=\"92\" y=\"139\"/><use href=\"#c\" x=\"116\" y=\"139\"/></g></g>",
+      "definitionKeys": [
+        "c",
+        "b"
+      ],
+      "svgSha256": "f2aae49a9ee403b16fdd42608adf09d0d7a1fb51e0e202744fe1490c53de5727"
+    },
+    "q3-stimulus": {
+      "file": "assets/q3-stimulus.png",
+      "kind": "remainder",
+      "semantics": {
+        "start": 47,
+        "removed": 9
+      },
+      "width": 718,
+      "height": 280,
+      "svgBody": "<rect x=\"2\" y=\"2\" width=\"714\" height=\"276\" rx=\"16\" fill=\"#fff5dc\" stroke=\"#decca3\" stroke-width=\"3\"/><rect x=\"17\" y=\"30\" width=\"394\" height=\"220\" rx=\"12\" fill=\"#f9eaca\" stroke=\"#8ea38b\" stroke-width=\"2\"/><rect x=\"465\" y=\"30\" width=\"236\" height=\"220\" rx=\"13\" fill=\"#f9e3d4\" stroke=\"#a2674e\" stroke-width=\"2\" stroke-dasharray=\"5 4\"/><text x=\"215\" y=\"70\" font-size=\"40\">47</text><text x=\"582\" y=\"70\" font-size=\"40\">9</text><path d=\"M419 130L454 130 M443 137L454 130L443 123\" fill=\"none\" stroke=\"#d98565\" stroke-width=\"3.4\" /><g data-role=\"stock\"><use href=\"#b\" x=\"41\" y=\"84\"/><use href=\"#b\" x=\"129\" y=\"84\"/><use href=\"#b\" x=\"217\" y=\"84\"/><use href=\"#b\" x=\"305\" y=\"84\"/><g fill=\"#70aa93\"><use href=\"#c\" x=\"53\" y=\"130\"/><use href=\"#c\" x=\"77\" y=\"130\"/><use href=\"#c\" x=\"101\" y=\"130\"/><use href=\"#c\" x=\"125\" y=\"130\"/><use href=\"#c\" x=\"149\" y=\"130\"/><use href=\"#c\" x=\"173\" y=\"130\"/><use href=\"#c\" x=\"197\" y=\"130\"/></g></g><g data-role=\"requested\"><g fill=\"#d98565\"><use href=\"#c\" x=\"489\" y=\"122\"/><use href=\"#c\" x=\"513\" y=\"122\"/><use href=\"#c\" x=\"537\" y=\"122\"/><use href=\"#c\" x=\"561\" y=\"122\"/><use href=\"#c\" x=\"585\" y=\"122\"/><use href=\"#c\" x=\"609\" y=\"122\"/><use href=\"#c\" x=\"489\" y=\"146\"/><use href=\"#c\" x=\"513\" y=\"146\"/><use href=\"#c\" x=\"537\" y=\"146\"/></g></g>",
+      "definitionKeys": [
+        "c",
+        "b"
+      ],
+      "svgSha256": "b105300b3823ccc77515b331f423db8eeb164ec8bf2f68475e484b23fccf9dc9"
+    },
+    "q3-a": {
+      "file": "assets/q3-a.png",
+      "kind": "remainder",
+      "semantics": {
+        "displayed": 48,
+        "start": 47,
+        "removed": 9
+      },
+      "width": 480,
+      "height": 277,
+      "svgBody": "<rect x=\"2\" y=\"2\" width=\"476\" height=\"273\" rx=\"16\" fill=\"#fff5dc\" stroke=\"#decca3\" stroke-width=\"3\"/><rect x=\"17\" y=\"17\" width=\"446\" height=\"243\" rx=\"15\" fill=\"#f9eaca\" stroke=\"#8ea38b\" stroke-width=\"2\"/><text x=\"240\" y=\"58\" font-size=\"46\">48</text><g data-role=\"amount\"><use href=\"#b\" x=\"86\" y=\"81\"/><use href=\"#b\" x=\"174\" y=\"81\"/><use href=\"#b\" x=\"262\" y=\"81\"/><use href=\"#b\" x=\"350\" y=\"81\"/><g fill=\"#70aa93\"><use href=\"#c\" x=\"98\" y=\"127\"/><use href=\"#c\" x=\"122\" y=\"127\"/><use href=\"#c\" x=\"146\" y=\"127\"/><use href=\"#c\" x=\"170\" y=\"127\"/><use href=\"#c\" x=\"194\" y=\"127\"/><use href=\"#c\" x=\"218\" y=\"127\"/><use href=\"#c\" x=\"242\" y=\"127\"/><use href=\"#c\" x=\"266\" y=\"127\"/></g></g>",
+      "definitionKeys": [
+        "c",
+        "b"
+      ],
+      "svgSha256": "d078b667f1c6bab2c441127f1e4c3b01e014dc64e3547709b74131086ba59daf"
+    },
+    "q3-b": {
+      "file": "assets/q3-b.png",
+      "kind": "remainder",
+      "semantics": {
+        "displayed": 8,
+        "start": 47,
+        "removed": 9
+      },
+      "width": 480,
+      "height": 277,
+      "svgBody": "<rect x=\"2\" y=\"2\" width=\"476\" height=\"273\" rx=\"16\" fill=\"#fff5dc\" stroke=\"#decca3\" stroke-width=\"3\"/><rect x=\"17\" y=\"17\" width=\"446\" height=\"243\" rx=\"15\" fill=\"#f9eaca\" stroke=\"#8ea38b\" stroke-width=\"2\"/><text x=\"240\" y=\"58\" font-size=\"46\">8</text><g data-role=\"amount\"><g fill=\"#70aa93\"><use href=\"#c\" x=\"98\" y=\"94\"/><use href=\"#c\" x=\"122\" y=\"94\"/><use href=\"#c\" x=\"146\" y=\"94\"/><use href=\"#c\" x=\"170\" y=\"94\"/><use href=\"#c\" x=\"194\" y=\"94\"/><use href=\"#c\" x=\"218\" y=\"94\"/><use href=\"#c\" x=\"242\" y=\"94\"/><use href=\"#c\" x=\"266\" y=\"94\"/></g></g>",
+      "definitionKeys": [
+        "c"
+      ],
+      "svgSha256": "9fa83a02843bc0cac350ce114bb146d362a50deb3370873af07219fe52534aef"
+    },
+    "q3-c": {
+      "file": "assets/q3-c.png",
+      "kind": "remainder",
+      "semantics": {
+        "displayed": 38,
+        "start": 47,
+        "removed": 9
+      },
+      "width": 480,
+      "height": 277,
+      "svgBody": "<rect x=\"2\" y=\"2\" width=\"476\" height=\"273\" rx=\"16\" fill=\"#fff5dc\" stroke=\"#decca3\" stroke-width=\"3\"/><rect x=\"17\" y=\"17\" width=\"446\" height=\"243\" rx=\"15\" fill=\"#f9eaca\" stroke=\"#8ea38b\" stroke-width=\"2\"/><text x=\"240\" y=\"58\" font-size=\"46\">38</text><g data-role=\"amount\"><use href=\"#b\" x=\"86\" y=\"81\"/><use href=\"#b\" x=\"174\" y=\"81\"/><use href=\"#b\" x=\"262\" y=\"81\"/><g fill=\"#70aa93\"><use href=\"#c\" x=\"98\" y=\"127\"/><use href=\"#c\" x=\"122\" y=\"127\"/><use href=\"#c\" x=\"146\" y=\"127\"/><use href=\"#c\" x=\"170\" y=\"127\"/><use href=\"#c\" x=\"194\" y=\"127\"/><use href=\"#c\" x=\"218\" y=\"127\"/><use href=\"#c\" x=\"242\" y=\"127\"/><use href=\"#c\" x=\"266\" y=\"127\"/></g></g>",
+      "definitionKeys": [
+        "c",
+        "b"
+      ],
+      "svgSha256": "9ee98325a9ccbb4fa850de421086e04283ab1c067b3ebdcc7ff5c782bbf1278d"
+    },
+    "q4-stimulus": {
+      "file": "assets/q4-stimulus.png",
+      "kind": "round-ten",
+      "semantics": {
+        "start": 80,
+        "removed": 7
+      },
+      "width": 718,
+      "height": 280,
+      "svgBody": "<rect x=\"2\" y=\"2\" width=\"714\" height=\"276\" rx=\"16\" fill=\"#fff5dc\" stroke=\"#decca3\" stroke-width=\"3\"/><rect x=\"17\" y=\"30\" width=\"394\" height=\"220\" rx=\"12\" fill=\"#f9eaca\" stroke=\"#8ea38b\" stroke-width=\"2\"/><rect x=\"465\" y=\"30\" width=\"236\" height=\"220\" rx=\"13\" fill=\"#f9e3d4\" stroke=\"#a2674e\" stroke-width=\"2\" stroke-dasharray=\"5 4\"/><text x=\"215\" y=\"70\" font-size=\"40\">80</text><text x=\"582\" y=\"70\" font-size=\"40\">7</text><path d=\"M419 130L454 130 M443 137L454 130L443 123\" fill=\"none\" stroke=\"#d98565\" stroke-width=\"3.4\" /><g data-role=\"stock\"><use href=\"#b\" x=\"41\" y=\"84\"/><use href=\"#b\" x=\"129\" y=\"84\"/><use href=\"#b\" x=\"217\" y=\"84\"/><use href=\"#b\" x=\"305\" y=\"84\"/><use href=\"#b\" x=\"41\" y=\"121\"/><use href=\"#b\" x=\"129\" y=\"121\"/><use href=\"#b\" x=\"217\" y=\"121\"/><use href=\"#b\" x=\"305\" y=\"121\"/><rect x=\"40\" y=\"153\" width=\"76\" height=\"28\" rx=\"6\" fill=\"#fbefcd\" stroke=\"#8ea38b\" stroke-width=\"1.5\" stroke-dasharray=\"4 3\"/></g><g data-role=\"requested\"><g fill=\"#d98565\"><use href=\"#c\" x=\"489\" y=\"122\"/><use href=\"#c\" x=\"513\" y=\"122\"/><use href=\"#c\" x=\"537\" y=\"122\"/><use href=\"#c\" x=\"561\" y=\"122\"/><use href=\"#c\" x=\"585\" y=\"122\"/><use href=\"#c\" x=\"609\" y=\"122\"/><use href=\"#c\" x=\"489\" y=\"146\"/></g></g>",
+      "definitionKeys": [
+        "c",
+        "b"
+      ],
+      "svgSha256": "6fa23d22f22429963d34892084d6a53d237b5c765f1db4ac0f23a9002276d305"
+    },
+    "q4-a": {
+      "file": "assets/q4-a.png",
+      "kind": "round-ten",
+      "semantics": {
+        "displayed": 83,
+        "start": 80,
+        "removed": 7
+      },
+      "width": 480,
+      "height": 277,
+      "svgBody": "<rect x=\"2\" y=\"2\" width=\"476\" height=\"273\" rx=\"16\" fill=\"#fff5dc\" stroke=\"#decca3\" stroke-width=\"3\"/><rect x=\"17\" y=\"17\" width=\"446\" height=\"243\" rx=\"15\" fill=\"#f9eaca\" stroke=\"#8ea38b\" stroke-width=\"2\"/><text x=\"240\" y=\"58\" font-size=\"46\">83</text><g data-role=\"amount\"><use href=\"#b\" x=\"86\" y=\"81\"/><use href=\"#b\" x=\"174\" y=\"81\"/><use href=\"#b\" x=\"262\" y=\"81\"/><use href=\"#b\" x=\"350\" y=\"81\"/><use href=\"#b\" x=\"86\" y=\"118\"/><use href=\"#b\" x=\"174\" y=\"118\"/><use href=\"#b\" x=\"262\" y=\"118\"/><use href=\"#b\" x=\"350\" y=\"118\"/><g fill=\"#70aa93\"><use href=\"#c\" x=\"98\" y=\"164\"/><use href=\"#c\" x=\"122\" y=\"164\"/><use href=\"#c\" x=\"146\" y=\"164\"/></g></g>",
+      "definitionKeys": [
+        "c",
+        "b"
+      ],
+      "svgSha256": "9b4063906dddc8a6ad2cd99a0da7e8c902b23c06818d690d7949cab469b8e1eb"
+    },
+    "q4-b": {
+      "file": "assets/q4-b.png",
+      "kind": "round-ten",
+      "semantics": {
+        "displayed": 73,
+        "start": 80,
+        "removed": 7
+      },
+      "width": 480,
+      "height": 277,
+      "svgBody": "<rect x=\"2\" y=\"2\" width=\"476\" height=\"273\" rx=\"16\" fill=\"#fff5dc\" stroke=\"#decca3\" stroke-width=\"3\"/><rect x=\"17\" y=\"17\" width=\"446\" height=\"243\" rx=\"15\" fill=\"#f9eaca\" stroke=\"#8ea38b\" stroke-width=\"2\"/><text x=\"240\" y=\"58\" font-size=\"46\">73</text><g data-role=\"amount\"><use href=\"#b\" x=\"86\" y=\"81\"/><use href=\"#b\" x=\"174\" y=\"81\"/><use href=\"#b\" x=\"262\" y=\"81\"/><use href=\"#b\" x=\"350\" y=\"81\"/><use href=\"#b\" x=\"86\" y=\"118\"/><use href=\"#b\" x=\"174\" y=\"118\"/><use href=\"#b\" x=\"262\" y=\"118\"/><g fill=\"#70aa93\"><use href=\"#c\" x=\"98\" y=\"164\"/><use href=\"#c\" x=\"122\" y=\"164\"/><use href=\"#c\" x=\"146\" y=\"164\"/></g></g>",
+      "definitionKeys": [
+        "c",
+        "b"
+      ],
+      "svgSha256": "91f90efdb88104ddd1258ce44247959eeb4e2598b5e97a918a7ce21860aa8ab3"
+    },
+    "q4-c": {
+      "file": "assets/q4-c.png",
+      "kind": "round-ten",
+      "semantics": {
+        "displayed": 3,
+        "start": 80,
+        "removed": 7
+      },
+      "width": 480,
+      "height": 277,
+      "svgBody": "<rect x=\"2\" y=\"2\" width=\"476\" height=\"273\" rx=\"16\" fill=\"#fff5dc\" stroke=\"#decca3\" stroke-width=\"3\"/><rect x=\"17\" y=\"17\" width=\"446\" height=\"243\" rx=\"15\" fill=\"#f9eaca\" stroke=\"#8ea38b\" stroke-width=\"2\"/><text x=\"240\" y=\"58\" font-size=\"46\">3</text><g data-role=\"amount\"><g fill=\"#70aa93\"><use href=\"#c\" x=\"98\" y=\"94\"/><use href=\"#c\" x=\"122\" y=\"94\"/><use href=\"#c\" x=\"146\" y=\"94\"/></g></g>",
+      "definitionKeys": [
+        "c"
+      ],
+      "svgSha256": "d41b5fc2ccc1cf5c507f6299589955cdf680ac0ed7438b9f76d3f090ea649cba"
+    },
+    "q5-stimulus": {
+      "file": "assets/q5-stimulus.png",
+      "kind": "two-step-to-ten",
+      "semantics": {
+        "start": 62,
+        "removed": 8,
+        "roundTen": 60
+      },
+      "width": 715,
+      "height": 252,
+      "svgBody": "<rect x=\"2\" y=\"2\" width=\"711\" height=\"248\" rx=\"16\" fill=\"#fff5dc\" stroke=\"#decca3\" stroke-width=\"3\"/><path d=\"M58 110H665 M58 99V121 M97.6667 105V115 M137.333 105V115 M177 105V115 M216.667 105V115 M256.333 99V121 M296 105V115 M335.667 105V115 M375.333 105V115 M415 105V115 M454.667 99V121 M494.333 105V115 M534 105V115 M573.667 105V115 M613.333 105V115 M653 99V121\" fill=\"none\" stroke=\"#244f43\" stroke-width=\"2\" /><text x=\"58\" y=\"140\" font-size=\"18\">50</text><text x=\"256.333\" y=\"140\" font-size=\"18\">55</text><text x=\"653\" y=\"140\" font-size=\"18\">65</text><path d=\"M534 104V93\" fill=\"none\" stroke=\"#8ea38b\" stroke-width=\"1.8\" /><circle cx=\"534\" cy=\"110\" r=\"5.4\" fill=\"#d98565\" stroke=\"#244f43\" stroke-width=\"1.4\"/><rect x=\"513\" y=\"64\" width=\"42\" height=\"29\" rx=\"6\" fill=\"#f7e0ba\" stroke=\"#244f43\" stroke-width=\"1.6\"/><text x=\"534\" y=\"84\" font-size=\"20\">62</text><path d=\"M454.667 104V63\" fill=\"none\" stroke=\"#8ea38b\" stroke-width=\"1.8\" /><circle cx=\"454.667\" cy=\"110\" r=\"5.4\" fill=\"#d98565\" stroke=\"#244f43\" stroke-width=\"1.4\"/><rect x=\"433.667\" y=\"34\" width=\"42\" height=\"29\" rx=\"6\" fill=\"#f7e0ba\" stroke=\"#244f43\" stroke-width=\"1.6\"/><text x=\"454.667\" y=\"54\" font-size=\"20\">60</text>",
+      "definitionKeys": [],
+      "svgSha256": "19ca95fbad6d6e6c4f69d1a3769eb7ee39f5ae6ee7192c4bb9c25524024ec6af"
+    },
+    "q5-a": {
+      "file": "assets/q5-a.png",
+      "kind": "two-step-to-ten",
+      "semantics": {
+        "displayed": [
+          6,
+          2
+        ],
+        "start": 62,
+        "removed": 8,
+        "roundTen": 60
+      },
+      "width": 715,
+      "height": 252,
+      "svgBody": "<rect x=\"2\" y=\"2\" width=\"711\" height=\"248\" rx=\"16\" fill=\"#fff5dc\" stroke=\"#decca3\" stroke-width=\"3\"/><path d=\"M58 110H665 M58 99V121 M97.6667 105V115 M137.333 105V115 M177 105V115 M216.667 105V115 M256.333 99V121 M296 105V115 M335.667 105V115 M375.333 105V115 M415 105V115 M454.667 99V121 M494.333 105V115 M534 105V115 M573.667 105V115 M613.333 105V115 M653 99V121\" fill=\"none\" stroke=\"#244f43\" stroke-width=\"2\" /><text x=\"58\" y=\"140\" font-size=\"18\">50</text><text x=\"256.333\" y=\"140\" font-size=\"18\">55</text><text x=\"454.667\" y=\"140\" font-size=\"18\">60</text><text x=\"653\" y=\"140\" font-size=\"18\">65</text><path d=\"M534 104V93\" fill=\"none\" stroke=\"#8ea38b\" stroke-width=\"1.8\" /><circle cx=\"534\" cy=\"110\" r=\"5.4\" fill=\"#d98565\" stroke=\"#244f43\" stroke-width=\"1.4\"/><rect x=\"513\" y=\"64\" width=\"42\" height=\"29\" rx=\"6\" fill=\"#f7e0ba\" stroke=\"#244f43\" stroke-width=\"1.6\"/><text x=\"534\" y=\"84\" font-size=\"20\">62</text><path d=\"M296 104V63\" fill=\"none\" stroke=\"#8ea38b\" stroke-width=\"1.8\" /><circle cx=\"296\" cy=\"110\" r=\"5.4\" fill=\"#d98565\" stroke=\"#244f43\" stroke-width=\"1.4\"/><rect x=\"275\" y=\"34\" width=\"42\" height=\"29\" rx=\"6\" fill=\"#f7e0ba\" stroke=\"#244f43\" stroke-width=\"1.6\"/><text x=\"296\" y=\"54\" font-size=\"20\">56</text><path d=\"M216.667 104V93\" fill=\"none\" stroke=\"#8ea38b\" stroke-width=\"1.8\" /><circle cx=\"216.667\" cy=\"110\" r=\"5.4\" fill=\"#d98565\" stroke=\"#244f43\" stroke-width=\"1.4\"/><rect x=\"195.667\" y=\"64\" width=\"42\" height=\"29\" rx=\"6\" fill=\"#f7e0ba\" stroke=\"#244f43\" stroke-width=\"1.6\"/><text x=\"216.667\" y=\"84\" font-size=\"20\">54</text><g data-from=\"62\" data-to=\"56\"><path d=\"M534 172L296 172 M307 165L296 172L307 179\" fill=\"none\" stroke=\"#d98565\" stroke-width=\"3.4\" /><text x=\"415\" y=\"163\" font-size=\"21\">−6</text></g><g data-from=\"56\" data-to=\"54\"><path d=\"M296 207L216.667 207 M227.667 200L216.667 207L227.667 214\" fill=\"none\" stroke=\"#d98565\" stroke-width=\"3.4\" /><text x=\"256.333\" y=\"198\" font-size=\"21\">−2</text></g>",
+      "definitionKeys": [],
+      "svgSha256": "0cedca2ddc0607e9e015023e71f0c32e4318eda6797a3e1eec1f2a9a97a62ffd"
+    },
+    "q5-b": {
+      "file": "assets/q5-b.png",
+      "kind": "two-step-to-ten",
+      "semantics": {
+        "displayed": [
+          8,
+          0
+        ],
+        "start": 62,
+        "removed": 8,
+        "roundTen": 60
+      },
+      "width": 715,
+      "height": 252,
+      "svgBody": "<rect x=\"2\" y=\"2\" width=\"711\" height=\"248\" rx=\"16\" fill=\"#fff5dc\" stroke=\"#decca3\" stroke-width=\"3\"/><path d=\"M58 110H665 M58 99V121 M97.6667 105V115 M137.333 105V115 M177 105V115 M216.667 105V115 M256.333 99V121 M296 105V115 M335.667 105V115 M375.333 105V115 M415 105V115 M454.667 99V121 M494.333 105V115 M534 105V115 M573.667 105V115 M613.333 105V115 M653 99V121\" fill=\"none\" stroke=\"#244f43\" stroke-width=\"2\" /><text x=\"58\" y=\"140\" font-size=\"18\">50</text><text x=\"256.333\" y=\"140\" font-size=\"18\">55</text><text x=\"454.667\" y=\"140\" font-size=\"18\">60</text><text x=\"653\" y=\"140\" font-size=\"18\">65</text><path d=\"M534 104V93\" fill=\"none\" stroke=\"#8ea38b\" stroke-width=\"1.8\" /><circle cx=\"534\" cy=\"110\" r=\"5.4\" fill=\"#d98565\" stroke=\"#244f43\" stroke-width=\"1.4\"/><rect x=\"513\" y=\"64\" width=\"42\" height=\"29\" rx=\"6\" fill=\"#f7e0ba\" stroke=\"#244f43\" stroke-width=\"1.6\"/><text x=\"534\" y=\"84\" font-size=\"20\">62</text><path d=\"M216.667 104V63\" fill=\"none\" stroke=\"#8ea38b\" stroke-width=\"1.8\" /><circle cx=\"216.667\" cy=\"110\" r=\"5.4\" fill=\"#d98565\" stroke=\"#244f43\" stroke-width=\"1.4\"/><rect x=\"195.667\" y=\"34\" width=\"42\" height=\"29\" rx=\"6\" fill=\"#f7e0ba\" stroke=\"#244f43\" stroke-width=\"1.6\"/><text x=\"216.667\" y=\"54\" font-size=\"20\">54</text><g data-from=\"62\" data-to=\"54\"><path d=\"M534 172L216.667 172 M227.667 165L216.667 172L227.667 179\" fill=\"none\" stroke=\"#d98565\" stroke-width=\"3.4\" /><text x=\"375.333\" y=\"163\" font-size=\"21\">−8</text></g>",
+      "definitionKeys": [],
+      "svgSha256": "53e96206a3f4c6aefd34b983c2a194534659260bb2a9f875f3b505da3120674e"
+    },
+    "q5-c": {
+      "file": "assets/q5-c.png",
+      "kind": "two-step-to-ten",
+      "semantics": {
+        "displayed": [
+          2,
+          6
+        ],
+        "start": 62,
+        "removed": 8,
+        "roundTen": 60
+      },
+      "width": 715,
+      "height": 252,
+      "svgBody": "<rect x=\"2\" y=\"2\" width=\"711\" height=\"248\" rx=\"16\" fill=\"#fff5dc\" stroke=\"#decca3\" stroke-width=\"3\"/><path d=\"M58 110H665 M58 99V121 M97.6667 105V115 M137.333 105V115 M177 105V115 M216.667 105V115 M256.333 99V121 M296 105V115 M335.667 105V115 M375.333 105V115 M415 105V115 M454.667 99V121 M494.333 105V115 M534 105V115 M573.667 105V115 M613.333 105V115 M653 99V121\" fill=\"none\" stroke=\"#244f43\" stroke-width=\"2\" /><text x=\"58\" y=\"140\" font-size=\"18\">50</text><text x=\"256.333\" y=\"140\" font-size=\"18\">55</text><text x=\"653\" y=\"140\" font-size=\"18\">65</text><path d=\"M534 104V93\" fill=\"none\" stroke=\"#8ea38b\" stroke-width=\"1.8\" /><circle cx=\"534\" cy=\"110\" r=\"5.4\" fill=\"#d98565\" stroke=\"#244f43\" stroke-width=\"1.4\"/><rect x=\"513\" y=\"64\" width=\"42\" height=\"29\" rx=\"6\" fill=\"#f7e0ba\" stroke=\"#244f43\" stroke-width=\"1.6\"/><text x=\"534\" y=\"84\" font-size=\"20\">62</text><path d=\"M454.667 104V63\" fill=\"none\" stroke=\"#8ea38b\" stroke-width=\"1.8\" /><circle cx=\"454.667\" cy=\"110\" r=\"5.4\" fill=\"#d98565\" stroke=\"#244f43\" stroke-width=\"1.4\"/><rect x=\"433.667\" y=\"34\" width=\"42\" height=\"29\" rx=\"6\" fill=\"#f7e0ba\" stroke=\"#244f43\" stroke-width=\"1.6\"/><text x=\"454.667\" y=\"54\" font-size=\"20\">60</text><path d=\"M216.667 104V93\" fill=\"none\" stroke=\"#8ea38b\" stroke-width=\"1.8\" /><circle cx=\"216.667\" cy=\"110\" r=\"5.4\" fill=\"#d98565\" stroke=\"#244f43\" stroke-width=\"1.4\"/><rect x=\"195.667\" y=\"64\" width=\"42\" height=\"29\" rx=\"6\" fill=\"#f7e0ba\" stroke=\"#244f43\" stroke-width=\"1.6\"/><text x=\"216.667\" y=\"84\" font-size=\"20\">54</text><g data-from=\"62\" data-to=\"60\"><path d=\"M534 172L454.667 172 M465.667 165L454.667 172L465.667 179\" fill=\"none\" stroke=\"#d98565\" stroke-width=\"3.4\" /><text x=\"494.333\" y=\"163\" font-size=\"21\">−2</text></g><g data-from=\"60\" data-to=\"54\"><path d=\"M454.667 207L216.667 207 M227.667 200L216.667 207L227.667 214\" fill=\"none\" stroke=\"#d98565\" stroke-width=\"3.4\" /><text x=\"335.667\" y=\"198\" font-size=\"21\">−6</text></g>",
+      "definitionKeys": [],
+      "svgSha256": "57f6eda4fbd17950bdce9fcccfa446d569dc6306312c82099a275c42af9887e3"
+    },
+    "q6-stimulus": {
+      "file": "assets/q6-stimulus.png",
+      "kind": "compensation",
+      "semantics": {
+        "start": 75,
+        "removed": 8,
+        "assumed": 10,
+        "mid": 65
+      },
+      "width": 715,
+      "height": 252,
+      "svgBody": "<rect x=\"2\" y=\"2\" width=\"711\" height=\"248\" rx=\"16\" fill=\"#fff5dc\" stroke=\"#decca3\" stroke-width=\"3\"/><path d=\"M58 110H665 M58 99V121 M87.75 105V115 M117.5 105V115 M147.25 105V115 M177 105V115 M206.75 99V121 M236.5 105V115 M266.25 105V115 M296 105V115 M325.75 105V115 M355.5 99V121 M385.25 105V115 M415 105V115 M444.75 105V115 M474.5 105V115 M504.25 99V121 M534 105V115 M563.75 105V115 M593.5 105V115 M623.25 105V115 M653 99V121\" fill=\"none\" stroke=\"#244f43\" stroke-width=\"2\" /><text x=\"58\" y=\"140\" font-size=\"18\">60</text><text x=\"355.5\" y=\"140\" font-size=\"18\">70</text><text x=\"653\" y=\"140\" font-size=\"18\">80</text><path d=\"M504.25 104V93\" fill=\"none\" stroke=\"#8ea38b\" stroke-width=\"1.8\" /><circle cx=\"504.25\" cy=\"110\" r=\"5.4\" fill=\"#d98565\" stroke=\"#244f43\" stroke-width=\"1.4\"/><rect x=\"483.25\" y=\"64\" width=\"42\" height=\"29\" rx=\"6\" fill=\"#f7e0ba\" stroke=\"#244f43\" stroke-width=\"1.6\"/><text x=\"504.25\" y=\"84\" font-size=\"20\">75</text><path d=\"M206.75 104V63\" fill=\"none\" stroke=\"#8ea38b\" stroke-width=\"1.8\" /><circle cx=\"206.75\" cy=\"110\" r=\"5.4\" fill=\"#d98565\" stroke=\"#244f43\" stroke-width=\"1.4\"/><rect x=\"185.75\" y=\"34\" width=\"42\" height=\"29\" rx=\"6\" fill=\"#f7e0ba\" stroke=\"#244f43\" stroke-width=\"1.6\"/><text x=\"206.75\" y=\"54\" font-size=\"20\">65</text><g data-from=\"75\" data-to=\"65\"><path d=\"M504.25 172L206.75 172 M217.75 165L206.75 172L217.75 179\" fill=\"none\" stroke=\"#d98565\" stroke-width=\"3.4\" /><text x=\"355.5\" y=\"163\" font-size=\"21\">−10</text></g>",
+      "definitionKeys": [],
+      "svgSha256": "6d7ab2ad136974b8a43f5301469f1ff533dce574bb03a1bc81994d5c1e7cc94c"
+    },
+    "q6-a": {
+      "file": "assets/q6-a.png",
+      "kind": "compensation",
+      "semantics": {
+        "displayed": 67,
+        "start": 75,
+        "removed": 8,
+        "assumed": 10,
+        "mid": 65
+      },
+      "width": 715,
+      "height": 252,
+      "svgBody": "<rect x=\"2\" y=\"2\" width=\"711\" height=\"248\" rx=\"16\" fill=\"#fff5dc\" stroke=\"#decca3\" stroke-width=\"3\"/><path d=\"M58 110H665 M58 99V121 M87.75 105V115 M117.5 105V115 M147.25 105V115 M177 105V115 M206.75 99V121 M236.5 105V115 M266.25 105V115 M296 105V115 M325.75 105V115 M355.5 99V121 M385.25 105V115 M415 105V115 M444.75 105V115 M474.5 105V115 M504.25 99V121 M534 105V115 M563.75 105V115 M593.5 105V115 M623.25 105V115 M653 99V121\" fill=\"none\" stroke=\"#244f43\" stroke-width=\"2\" /><text x=\"58\" y=\"140\" font-size=\"18\">60</text><text x=\"355.5\" y=\"140\" font-size=\"18\">70</text><text x=\"504.25\" y=\"140\" font-size=\"18\">75</text><text x=\"653\" y=\"140\" font-size=\"18\">80</text><path d=\"M206.75 104V93\" fill=\"none\" stroke=\"#8ea38b\" stroke-width=\"1.8\" /><circle cx=\"206.75\" cy=\"110\" r=\"5.4\" fill=\"#d98565\" stroke=\"#244f43\" stroke-width=\"1.4\"/><rect x=\"185.75\" y=\"64\" width=\"42\" height=\"29\" rx=\"6\" fill=\"#f7e0ba\" stroke=\"#244f43\" stroke-width=\"1.6\"/><text x=\"206.75\" y=\"84\" font-size=\"20\">65</text><path d=\"M266.25 104V63\" fill=\"none\" stroke=\"#8ea38b\" stroke-width=\"1.8\" /><circle cx=\"266.25\" cy=\"110\" r=\"5.4\" fill=\"#d98565\" stroke=\"#244f43\" stroke-width=\"1.4\"/><rect x=\"245.25\" y=\"34\" width=\"42\" height=\"29\" rx=\"6\" fill=\"#f7e0ba\" stroke=\"#244f43\" stroke-width=\"1.6\"/><text x=\"266.25\" y=\"54\" font-size=\"20\">67</text><g data-from=\"65\" data-to=\"67\"><path d=\"M206.75 172L266.25 172 M255.25 179L266.25 172L255.25 165\" fill=\"none\" stroke=\"#70aa93\" stroke-width=\"3.4\" /><text x=\"236.5\" y=\"163\" font-size=\"21\">+2</text></g>",
+      "definitionKeys": [],
+      "svgSha256": "1ce9db3eece4a4dd1f3ea1e7eb2b2a0d3bb44665be04a5b9bf13024cdfc05e7c"
+    },
+    "q6-b": {
+      "file": "assets/q6-b.png",
+      "kind": "compensation",
+      "semantics": {
+        "displayed": 63,
+        "start": 75,
+        "removed": 8,
+        "assumed": 10,
+        "mid": 65
+      },
+      "width": 715,
+      "height": 252,
+      "svgBody": "<rect x=\"2\" y=\"2\" width=\"711\" height=\"248\" rx=\"16\" fill=\"#fff5dc\" stroke=\"#decca3\" stroke-width=\"3\"/><path d=\"M58 110H665 M58 99V121 M87.75 105V115 M117.5 105V115 M147.25 105V115 M177 105V115 M206.75 99V121 M236.5 105V115 M266.25 105V115 M296 105V115 M325.75 105V115 M355.5 99V121 M385.25 105V115 M415 105V115 M444.75 105V115 M474.5 105V115 M504.25 99V121 M534 105V115 M563.75 105V115 M593.5 105V115 M623.25 105V115 M653 99V121\" fill=\"none\" stroke=\"#244f43\" stroke-width=\"2\" /><text x=\"58\" y=\"140\" font-size=\"18\">60</text><text x=\"355.5\" y=\"140\" font-size=\"18\">70</text><text x=\"504.25\" y=\"140\" font-size=\"18\">75</text><text x=\"653\" y=\"140\" font-size=\"18\">80</text><path d=\"M206.75 104V93\" fill=\"none\" stroke=\"#8ea38b\" stroke-width=\"1.8\" /><circle cx=\"206.75\" cy=\"110\" r=\"5.4\" fill=\"#d98565\" stroke=\"#244f43\" stroke-width=\"1.4\"/><rect x=\"185.75\" y=\"64\" width=\"42\" height=\"29\" rx=\"6\" fill=\"#f7e0ba\" stroke=\"#244f43\" stroke-width=\"1.6\"/><text x=\"206.75\" y=\"84\" font-size=\"20\">65</text><path d=\"M147.25 104V63\" fill=\"none\" stroke=\"#8ea38b\" stroke-width=\"1.8\" /><circle cx=\"147.25\" cy=\"110\" r=\"5.4\" fill=\"#d98565\" stroke=\"#244f43\" stroke-width=\"1.4\"/><rect x=\"126.25\" y=\"34\" width=\"42\" height=\"29\" rx=\"6\" fill=\"#f7e0ba\" stroke=\"#244f43\" stroke-width=\"1.6\"/><text x=\"147.25\" y=\"54\" font-size=\"20\">63</text><g data-from=\"65\" data-to=\"63\"><path d=\"M206.75 172L147.25 172 M158.25 165L147.25 172L158.25 179\" fill=\"none\" stroke=\"#d98565\" stroke-width=\"3.4\" /><text x=\"177\" y=\"163\" font-size=\"21\">−2</text></g>",
+      "definitionKeys": [],
+      "svgSha256": "b6069af63af822eaeeac4b168a12e4bf5dcb43838dfe705bf75a4d2412f42beb"
+    },
+    "q6-c": {
+      "file": "assets/q6-c.png",
+      "kind": "compensation",
+      "semantics": {
+        "displayed": 65,
+        "start": 75,
+        "removed": 8,
+        "assumed": 10,
+        "mid": 65
+      },
+      "width": 715,
+      "height": 252,
+      "svgBody": "<rect x=\"2\" y=\"2\" width=\"711\" height=\"248\" rx=\"16\" fill=\"#fff5dc\" stroke=\"#decca3\" stroke-width=\"3\"/><path d=\"M58 110H665 M58 99V121 M87.75 105V115 M117.5 105V115 M147.25 105V115 M177 105V115 M206.75 99V121 M236.5 105V115 M266.25 105V115 M296 105V115 M325.75 105V115 M355.5 99V121 M385.25 105V115 M415 105V115 M444.75 105V115 M474.5 105V115 M504.25 99V121 M534 105V115 M563.75 105V115 M593.5 105V115 M623.25 105V115 M653 99V121\" fill=\"none\" stroke=\"#244f43\" stroke-width=\"2\" /><text x=\"58\" y=\"140\" font-size=\"18\">60</text><text x=\"355.5\" y=\"140\" font-size=\"18\">70</text><text x=\"504.25\" y=\"140\" font-size=\"18\">75</text><text x=\"653\" y=\"140\" font-size=\"18\">80</text><path d=\"M206.75 104V93\" fill=\"none\" stroke=\"#8ea38b\" stroke-width=\"1.8\" /><circle cx=\"206.75\" cy=\"110\" r=\"5.4\" fill=\"#d98565\" stroke=\"#244f43\" stroke-width=\"1.4\"/><rect x=\"185.75\" y=\"64\" width=\"42\" height=\"29\" rx=\"6\" fill=\"#f7e0ba\" stroke=\"#244f43\" stroke-width=\"1.6\"/><text x=\"206.75\" y=\"84\" font-size=\"20\">65</text><g data-from=\"65\" data-to=\"65\"><circle cx=\"206.75\" cy=\"172\" r=\"8\" fill=\"#eddfb7\" stroke=\"#244f43\" stroke-width=\"1.6\"/><text x=\"206.75\" y=\"163\" font-size=\"21\">0</text></g>",
+      "definitionKeys": [],
+      "svgSha256": "3f741d0499d4700f9064dd481864ea84c903df40103011f6858b6e77d7a341f6"
+    }
+  },
+  "svgRecipe": {
+    "wrapper": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"{width}\" height=\"{height}\" viewBox=\"0 0 {width} {height}\" fill=\"#244f43\" text-anchor=\"middle\" font-family=\"PingFang SC,Arial,sans-serif\" font-weight=\"700\" stroke-linecap=\"round\" stroke-linejoin=\"round\">{definitions}{body}</svg>",
+    "definitions": {
+      "c": "<g id=\"c\"><path d=\"M-8-8H8L5 8H-5Z\" stroke=\"#28483f\" stroke-width=\"1.5\"/></g>",
+      "b": "<g id=\"b\"><rect width=\"78\" height=\"31\" rx=\"6\" fill=\"#f1d1a2\" stroke=\"#28483f\" stroke-width=\"1.6\"/><path d=\"M10 11H66 M10 21H66 M10 10V22 M16 10V22 M22 10V22 M28 10V22 M34 10V22 M40 10V22 M46 10V22 M52 10V22 M58 10V22 M64 10V22 M70 10V22\" fill=\"none\" stroke=\"#57755d\" stroke-width=\"1.5\"/></g>"
+    },
+    "assembly": "Use definitionKeys in listed order to join matching definitions, wrap in <defs> only when nonempty, then format wrapper with width, height, definitions and svgBody as body."
+  },
+  "diagramSourceVersion": "picnic-cup-regrouping-v1",
+  "rasterizationState": "precise_diagrams_and_formal_illustrations_registered_browser_review_pending",
+  "diagramValidation": {
+    "testSourceSha256": "7b77dbcc6b9627b2e950d228922d449b98e90718c9e593ebcefdad7253314d03",
+    "testVectorSha256": "a19d3d7ec918b229819517be3c4c8f753194b95111f85f37fb99041be16a63dc",
+    "testVectors": {
+      "roleCountSamples": {
+        "exchanged-43": {
+          "before": [
+            4,
+            3
+          ],
+          "after": [
+            3,
+            13
+          ]
+        },
+        "loose-10": {
+          "loose": [
+            0,
+            10
+          ]
+        },
+        "taken-43-8": {
+          "remaining": [
+            3,
+            5
+          ],
+          "removed": [
+            0,
+            8
+          ]
+        },
+        "round-70-after": {
+          "remaining": [
+            6,
+            4
+          ],
+          "removed": [
+            0,
+            6
+          ]
+        }
+      },
+      "quizUniqueAnswers": [
+        "B",
+        "A",
+        "C",
+        "B",
+        "C",
+        "A"
+      ],
+      "inMemoryPngSamples": [
+        "exchanged-43",
+        "loose-10",
+        "taken-43-8",
+        "round-70-after",
+        "q1-b",
+        "q2-a",
+        "q3-c",
+        "q4-b",
+        "q5-c",
+        "q6-a"
+      ]
+    },
+    "inMemoryPngs": {
+      "exchanged-43": {
+        "dimensions": [
+          706,
+          277
+        ],
+        "pngSha256": "7108e1d355e8c7b7a19288414dd9e946ccd8acf9e484113a692184d7ea1c6185",
+        "pngBytes": 12906
+      },
+      "loose-10": {
+        "dimensions": [
+          238,
+          164
+        ],
+        "pngSha256": "f0214ff74c55d595c84876888e733269146ec4735c4af166fc5c1c721d71b7a0",
+        "pngBytes": 4378
+      },
+      "taken-43-8": {
+        "dimensions": [
+          690,
+          277
+        ],
+        "pngSha256": "44fe77d292dde415fcbdfff2e793d7a1f7dbbd4997d07ffdf238954aef4448fd",
+        "pngBytes": 13384
+      },
+      "round-70-after": {
+        "dimensions": [
+          690,
+          277
+        ],
+        "pngSha256": "c2907a40b1513b718a25ff3bddf1605c2056f1d16c04d286e91f4efda00ee203",
+        "pngBytes": 13775
+      },
+      "q1-b": {
+        "dimensions": [
+          480,
+          277
+        ],
+        "pngSha256": "55f7b53ea3c564a5664ee6709da148ef9cc86425d26a6714e20937f8719f2b0b",
+        "pngBytes": 7284
+      },
+      "q2-a": {
+        "dimensions": [
+          416,
+          258
+        ],
+        "pngSha256": "9096875c798ca0e53ad7aa8b0403fbac92ef350588bea526f2ea40ade48ee494",
+        "pngBytes": 6756
+      },
+      "q3-c": {
+        "dimensions": [
+          480,
+          277
+        ],
+        "pngSha256": "9feca82e0e9aebaac95156e15d1236ca7dd5394c35a93a5a2beab5932ccbf7b3",
+        "pngBytes": 8430
+      },
+      "q4-b": {
+        "dimensions": [
+          480,
+          277
+        ],
+        "pngSha256": "fc20c94d1bc5723734924c7afe5c0389abd78406f5588409b149031501eb56b0",
+        "pngBytes": 8554
+      },
+      "q5-c": {
+        "dimensions": [
+          715,
+          252
+        ],
+        "pngSha256": "448c95d603bba9cab364b05759243eb71208446b6dbb76d86cf5e5d7a4a00946",
+        "pngBytes": 13260
+      },
+      "q6-a": {
+        "dimensions": [
+          715,
+          252
+        ],
+        "pngSha256": "488929c3541994ef556f3d93c9b6b8d9b5e4c87336ade2c7cc6a98b6255bdc68",
+        "pngBytes": 11863
+      }
+    },
+    "persistedPngCount": 0
+  },
+  "rasterizationReceipt": {
+    "sourceBeforeSha256": "2bdf05f4dc5d46844e537846c873b9b9f2c5ba01061e229b6c3eca6e9f9f3cda",
+    "deterministicPngTotalBytes": 657202,
+    "assetCount": 73,
+    "preflightMode": "full_73_in_memory",
+    "format": "sharp_png_toBuffer"
+  },
+  "formalIllustrationIntake": {
+    "mode": "codex_builtin_imagegen",
+    "observedAt": "2026-11-10T22:33:56.016181+00:00",
+    "previousManifestSha256": "6413e1a7a324ca74d334a4c80d648aab69acecce5e034953fe4fe3d114d984ef",
+    "newAssetCount": 9,
+    "unmodifiedPreciseDiagrams": 73,
+    "atlases": [
+      "picnic-cup-scenes",
+      "picnic-cup-sprites"
+    ]
+  }
+}

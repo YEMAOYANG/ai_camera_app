@@ -1,21 +1,182 @@
 {
   "schemaVersion": "mira.courseware.brief.v1",
   "lesson": "Where's the bird? 小鸟在哪里",
-  "objectives": ["辨认bird、hat和where的位置询问。", "把in、on、under与具体位置对应。", "听懂Where's the bird?并尝试用It's回答。", "新情境听辨位置，与家人练习；口语待观察。"],
-  "goals": ["听懂并辨认bird、hat及where的位置询问。", "用in、on、under说明具体位置，听指令移动鸟。", "尝试用Where's the bird?和It's进行位置问答。", "在新物品画面中听辨位置，与家人练习，口语待观察。"],
+  "objectives": [
+    "辨认bird、hat和where的位置询问。",
+    "把in、on、under与具体位置对应。",
+    "听懂Where's the bird?并尝试用It's回答。",
+    "新情境听辨位置，与家人练习；口语待观察。"
+  ],
+  "goals": [
+    "听简短原创节奏句，辨认cat、bird、bag和hat，借图明确正在找什么。",
+    "听懂Where’s the bird?是在问位置，知道Where’s是Where is的缩写。",
+    "从清楚的开口、接触面和上下关系理解in、on、under，并尝试用完整的It’s句子答位置。",
+    "听辨新物品和参照物，轮流问答并用实物核对。完整课本对话与歌谣用纸书跟读，口头表现请成人观察。"
+  ],
   "pageOrder": [
-    {"key": "p01", "type": "slide", "goal": "bird、hat与询问位置", "play": "原创鸟与帽子情境，老师预录音引入。"},
-    {"key": "p02", "type": "slide", "goal": "三种位置的画面解释", "play": "in、on、under逐点高亮，明确里面、上面、下面。"},
-    {"key": "p03", "type": "interactive", "goal": "理解in", "play": "把正式小鸟图片放入帽子开口，鸟身进入帽内并被帽前部遮住。"},
-    {"key": "p04", "type": "interactive", "goal": "理解on", "play": "把小鸟放在帽沿上，脚与上表面接触。"},
-    {"key": "p05", "type": "interactive", "goal": "理解under", "play": "把小鸟放在悬浮魔术帽下方，形成明确上下关系。"},
-    {"key": "p06", "type": "slide", "goal": "询问与回答", "play": "老师读Where's the bird?并用It's回答，邀请向家人说，表现待观察。"},
-    {"key": "p07", "type": "quiz", "goal": "新物品情境听辨位置", "play": "红球和蓝箱图片选项，三题正确位置A/B/C，预录读题。"},
-    {"key": "p08", "type": "slide", "goal": "回顾和课后迁移", "play": "回顾位置词和问答，邀请用家中物品练习，口语待观察。"}
+    {
+      "key": "p01",
+      "kind": "slide",
+      "title": "今天找什么"
+    },
+    {
+      "key": "find-the-bag",
+      "kind": "slide",
+      "title": "先找袋子里的布猫"
+    },
+    {
+      "key": "p02",
+      "kind": "slide",
+      "title": "里面和上面"
+    },
+    {
+      "key": "lift-the-hat",
+      "kind": "slide",
+      "title": "帽子下面也能藏"
+    },
+    {
+      "key": "p06",
+      "kind": "slide",
+      "title": "一句问，一句答"
+    },
+    {
+      "key": "choose-a-delivery",
+      "kind": "slide",
+      "title": "道具要去哪一站"
+    },
+    {
+      "key": "more-deliveries",
+      "kind": "slide",
+      "title": "道具还会换地方"
+    },
+    {
+      "key": "carry-bird",
+      "kind": "interactive",
+      "title": "帮道具到正确的场景"
+    },
+    {
+      "key": "other-props",
+      "kind": "slide",
+      "title": "换一件道具继续听"
+    },
+    {
+      "key": "listen-bird-scenes",
+      "kind": "interactive",
+      "title": "听位置，吹泡泡"
+    },
+    {
+      "key": "practice-at-home",
+      "kind": "slide",
+      "title": "在家轮流问和答"
+    },
+    {
+      "key": "picture-check",
+      "kind": "quiz",
+      "title": "听两条线索，选新图"
+    },
+    {
+      "key": "p08",
+      "kind": "slide",
+      "title": "位置小回顾"
+    }
   ],
   "adjacentMechanismReason": "p03到p05保留同一鸟与帽、同一放置控制，只改变目标关系。控制物品和操作负担，让一年级儿童专注比较三个位置词。教师示范和学生操作有显式交接。",
-  "pictureQuiz": {"skills": ["position-in", "position-on", "position-under"], "newContext": "课堂鸟与帽，小检查改为红球与蓝箱，不复用课堂示范图作检查。", "correctAnswerPositions": ["A", "B", "C"]},
-  "afterClass": {"sourceRefs": ["第一份设计第4页、课件第14页", "第二份设计第4页、课件第26页"], "destination": "老师领读后与家人玩藏物找物；实际朗读、表达待成人观察。"},
-  "weeklyQuestionSource": {"skills": ["position-in", "position-on", "position-under", "where-question"], "sourceOnly": true},
-  "evidenceBoundary": "点击和拖放只证明图片位置对应；发音、朗读、会话表达均待成人观察。"
+  "pictureQuiz": [
+    {
+      "skill": "listen-object-and-reference",
+      "prompt": "Where's the car? It's in the bag.",
+      "answer": "小车在红袋子里",
+      "position": 2,
+      "rationale": "问的是小车。袋口和前沿显示小车在袋子里面。"
+    },
+    {
+      "skill": "hear-in-on-under",
+      "prompt": "The ball is on the box.",
+      "answer": "红球落在蓝盒盖上",
+      "position": 1,
+      "rationale": "球接触盒盖的上表面。它在盒子上。"
+    },
+    {
+      "skill": "hear-in-on-under",
+      "prompt": "It's under the stool.",
+      "answer": "小车在小凳子下面",
+      "position": 3,
+      "rationale": "小车在凳面以下、凳脚之间。"
+    },
+    {
+      "skill": "listen-object-and-reference",
+      "prompt": "Where's the cat? It's under the hat.",
+      "answer": "小猫在帽子下方",
+      "position": 2,
+      "rationale": "找的是小猫，帽子抬起后它露在下方。"
+    },
+    {
+      "skill": "update-position",
+      "prompt": "First in the box, then on the stool.",
+      "answer": "小车先在盒子里，再到凳面上",
+      "position": 1,
+      "rationale": "同一辆小车先在盒子里，后来停到凳面上。"
+    },
+    {
+      "skill": "ask-and-answer-location",
+      "prompt": "The pencil is in the box.",
+      "answer": "铅笔在蓝盒子里",
+      "position": 3,
+      "rationale": "听到铅笔和盒子。盒前沿挡住了铅笔的一部分。"
+    }
+  ],
+  "afterClass": "用安全的小道具、空盒和凳面轮流问答，家人按听到的答案寻找并核对。口头表达待观察。",
+  "weeklyQuestionSource": [
+    "听辨物品和参照物",
+    "识别in、on、under",
+    "跟随同一物品的位置改变",
+    "位置问答"
+  ],
+  "evidenceBoundary": "点击和拖放只证明图片位置对应；发音、朗读、会话表达均待成人观察。",
+  "binding": {
+    "editionId": "smartedu-english-six-year-g1-lower-sync-c8ae9406",
+    "revisionId": "directory-057e330e9b4c19ff0e6ab21e",
+    "unitId": "73a56a93-8bda-3c3b-9819-032cd5d10a2e",
+    "nodeId": "ca990a10-5463-37f9-b361-3c624d108f05"
+  },
+  "teacherCode": "mira_english_standard",
+  "authoring": {
+    "sourceMode": "direct_with_legacy_narration_reuse",
+    "modernizationModel": "gpt-6.1-sol",
+    "legacyAuthorModel": "reconcile_before_independent_G7",
+    "legacySourceSnapshot": "output/courseware-lessons/g1-english-23b3193916c0929d/legacy-editable-source-before-modernization"
+  },
+  "sourceScope": "印8–10四项。包内热身、帽子三位置、物品迁移与家庭问答；完整原版由合法纸书跟读。",
+  "games": [
+    {
+      "page": "carry-bird",
+      "template": "listenDelivery",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.listenDelivery",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "listen_pick_deliver",
+      "selection": "先听取道具，穿过玩具小路，送到听见的位置图。关卡调换人物与目的地图位置。",
+      "levels": [
+        "鸟到帽里，1单。",
+        "猫到袋里、鸟到帽沿，2单。",
+        "鸟到帽下、猫到凳上、鸟到盒内，3单。"
+      ],
+      "demo": "圈小车、首件小鸟和目的地图。示范只拿起小鸟，交接复位。"
+    },
+    {
+      "page": "listen-bird-scenes",
+      "template": "wordBubbles",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.wordBubbles",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "listen_match",
+      "selection": "听名词、参照物与位置关系后主动瞄准。换题时上一幅命中图保留原位置，画面反馈和命中一致。",
+      "levels": [
+        "同一只鸟，两种帽上和帽内位置。",
+        "同一只猫，三种参照关系。",
+        "更换球、铅笔、布心并比较空间。"
+      ],
+      "demo": "圈出图区、首张帽内图和小艇，命中一次后复位交接。"
+    }
+  ]
 }

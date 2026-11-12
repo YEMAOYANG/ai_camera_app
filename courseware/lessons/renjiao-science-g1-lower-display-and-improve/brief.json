@@ -1,0 +1,181 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "展示与改进",
+  "binding": {
+    "editionId": "smartedu-science-six-year-g1-lower-e231dd57",
+    "revisionId": "directory-359f40a6afba915101f297d3",
+    "unitId": "0d3a4b18-821e-4949-ae08-414e58db0e6d",
+    "nodeId": "ef1dcd07-e12a-401c-95c2-68576e6236af"
+  },
+  "scenario": "学校有一面共享工具墙。孩子把已做好的笔筒带到观察台，先向同伴介绍材料和用途，用真实的取放图找问题，再画出一个有针对性的改动。",
+  "goals": [
+    "能展示笔筒并说明用的材料和用途，听一条同伴建议，再用看到的现象说出作品的一个优点和一个可以改进的地方。",
+    "能按稳定、容量、高度、收纳合理和美观几方面看作品，并用真实或图示的装入、拿取结果判断哪一点遇到了问题。",
+    "能针对观察到的不足选择合适的改法，在设计图上记下来，再用相同的用途检查改动有没有改善。",
+    "能把展示、评价、测试和改进的经验用于家庭收纳，画出一个安全、能整理不同物品的收纳方案。"
+  ],
+  "goalEvidence": [
+    {
+      "skill": "show-and-listen",
+      "target": "能展示笔筒并说明用的材料和用途，听一条同伴建议，再用看到的现象说出作品的一个优点和一个可以改进的地方。",
+      "source": "印62、教案1至2"
+    },
+    {
+      "skill": "evaluate-from-test",
+      "target": "能按稳定、容量、高度、收纳合理和美观几方面看作品，并用真实或图示的装入、拿取结果判断哪一点遇到了问题。",
+      "source": "印62、课件20至31"
+    },
+    {
+      "skill": "improve-and-recheck",
+      "target": "能针对观察到的不足选择合适的改法，在设计图上记下来，再用相同的用途检查改动有没有改善。",
+      "source": "印63、教案2至3和课件32至47"
+    },
+    {
+      "skill": "transfer-to-home",
+      "target": "能把展示、评价、测试和改进的经验用于家庭收纳，画出一个安全、能整理不同物品的收纳方案。",
+      "source": "印64、任务单2和课件48"
+    }
+  ],
+  "pageSequence": [
+    {
+      "key": "share-example",
+      "kind": "teaching",
+      "title": "给伙伴介绍自己的笔筒"
+    },
+    {
+      "key": "listen-to-review",
+      "kind": "teaching",
+      "title": "听一条建议，再找图中证据"
+    },
+    {
+      "key": "five-checks",
+      "kind": "teaching",
+      "title": "装进去、拿出来，再按五项观察"
+    },
+    {
+      "key": "sort-evidence",
+      "kind": "interactive",
+      "title": "把测试结果送到对的评价格"
+    },
+    {
+      "key": "record-the-change",
+      "kind": "teaching",
+      "title": "发现一个问题，画出一个改动"
+    },
+    {
+      "key": "match-a-fix",
+      "kind": "interactive",
+      "title": "给不同问题配对有效的改法"
+    },
+    {
+      "key": "repeat-and-extend",
+      "kind": "teaching",
+      "title": "同样用一次，再换一种物品想一想"
+    },
+    {
+      "key": "picture-check-a",
+      "kind": "quiz",
+      "title": "从图里找一条可靠的评价"
+    },
+    {
+      "key": "picture-check-b",
+      "kind": "quiz",
+      "title": "选改法、复查和家庭收纳"
+    },
+    {
+      "key": "family-recap",
+      "kind": "teaching",
+      "title": "给家人看设计和使用结果"
+    }
+  ],
+  "teachingPlan": [
+    "两件原创款式相近的作品进入同一试用桌。先口述材料、用途与亮点，再让同伴建议看短笔是否好拿；保留原作品值得学习的部分。",
+    "逐个点亮不易倒、装得下、高矮合适、能分区好找、外观整洁五个可见线索。用同一套用品画取放过程。明确漂亮是可讨论的评价，不能替代稳定和方便。",
+    "把短笔埋住、摆上长尺后倾倒、软头笔和夹子找不到各画成不同现象。教师分别示范降低一格高度、用平底托盘固定、增设低位小格。给出原图和改后图，标记改动处并用相同用品再试。",
+    "将同一过程迁移到摆放手工纸与胶带的小盒。孩子先说想收哪两样、画出分隔，再请家长观察实际取放，课堂只核图示和选择。"
+  ],
+  "games": [
+    {
+      "page": "sort-evidence",
+      "template": "sortingDepot",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.sortingDepot",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "classification",
+      "levels": [
+        "在开阔区把倒下图和拿不到图送到稳定、高度两格。",
+        "按装不下和混在一起分别送到容量、收纳两格。",
+        "混合复核三类证据，从不同作品看到同一种问题。"
+      ],
+      "demo": "逐个点亮测试图、对应评价格和操作区，完成一次实际正确投放，等状态确认再复位交接。"
+    },
+    {
+      "page": "match-a-fix",
+      "template": "fallingTiles",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.fallingTiles",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "pair_match",
+      "levels": [
+        "为放进去就倾倒的笔筒找底部可稳住的改法图。",
+        "为短用品不好拿的作品找降低高度的改法图。",
+        "为小物混在一起的盒子找有独立小格的改法图。"
+      ],
+      "demo": "点亮发现的问题、改动位置和操作图标，做一次实际配对并等完成信号，复位交给孩子。"
+    }
+  ],
+  "quizPlan": [
+    {
+      "skill": "show-and-listen",
+      "task": "同伴提出试放纸尺，选下一幅真实采纳建议的图片。",
+      "correctPosition": 2,
+      "rationale": "把纸尺放入并看能否站稳，是听到建议后的可观察行动。"
+    },
+    {
+      "skill": "evaluate-from-test",
+      "task": "三只外形不同的笔筒里，选能直接支持不易倒的试用图。",
+      "correctPosition": 3,
+      "rationale": "相同物品装入后仍平稳站立才是稳定证据。"
+    },
+    {
+      "skill": "evaluate-from-test",
+      "task": "一只筒装得下全部短笔，但手拿不到。找图中该检查的方面。",
+      "correctPosition": 1,
+      "rationale": "用品已装入，困难在于短笔相对筒口太低，属于取放时的高度。"
+    },
+    {
+      "skill": "improve-and-recheck",
+      "task": "长尺放入后筒朝一侧倾倒，选有针对性的改动图。",
+      "correctPosition": 2,
+      "rationale": "把筒固定在平整宽底的图方案直接针对倾倒；装饰或加筒没有验证这个问题。"
+    },
+    {
+      "skill": "improve-and-recheck",
+      "task": "设计图已给短棒画出矮格，选下一步最能看出改动是否有效的图。",
+      "correctPosition": 3,
+      "rationale": "把同一批短棒再放回，能否顺利取出是针对原问题的复查。"
+    },
+    {
+      "skill": "transfer-to-home",
+      "task": "想把手工纸和胶带整理进一只盒里，选画有两个可取分区的方案。",
+      "correctPosition": 1,
+      "rationale": "纸平放在浅格，胶带另放易取的小格，满足两种用途。"
+    }
+  ],
+  "afterClass": {
+    "familyTask": "请和家人用干净、无尖角的空纸盒设计一种收纳。先画两个分区，试放适合的物品，再讲一处改法。需剪切或粘牢时请大人协助，家庭实际取放由家长观察。",
+    "weeklyQuestionSource": [
+      "展示中说清材料和用途并听取一条建议",
+      "按图识别五项评价维度",
+      "用试用现象选择改法并看改前改后",
+      "设计两个不同功能的生活收纳区域"
+    ]
+  },
+  "artAndLanguage": "用原创笔筒和用品图，重要区别由形状、相对高度、大小和动作承载。遮住非目标文字后仍能凭画面和真人学科录音完成，反馈后保留正常再试。课堂小测使用不同于老师例子的原创图。",
+  "authoring": {
+    "sourceMode": "direct",
+    "authorModels": [
+      "gpt-6.1-sol"
+    ]
+  }
+}

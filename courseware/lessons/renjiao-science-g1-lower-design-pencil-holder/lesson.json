@@ -1,0 +1,1022 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "设计制作笔筒",
+  "grade": 1,
+  "description": "画材角从收纳需求出发，选纸材、画图、照图做，再用同一次摆放的两个角度看效果。",
+  "roster": {
+    "teacher": {
+      "name": "小科老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Serena",
+      "avatar": "/avatars/teacher-2.png",
+      "color": "#287B94",
+      "persona": "和孩子观察同一件东西，说明看见什么，慢一点等孩子试。"
+    }
+  },
+  "images": {
+    "desk-scene": {
+      "file": "assets/desk-scene.png"
+    },
+    "material-bench": {
+      "file": "assets/material-bench.png"
+    },
+    "sort-workbench": {
+      "file": "assets/sort-workbench.png"
+    },
+    "photo-workbench": {
+      "file": "assets/photo-workbench.png"
+    },
+    "part-wall-study": {
+      "file": "assets/part-wall-study.png"
+    },
+    "holder-front-study": {
+      "file": "assets/holder-front-study.png"
+    },
+    "design-plan": {
+      "file": "assets/design-plan.png"
+    },
+    "materials-kit": {
+      "file": "assets/materials-kit.png"
+    },
+    "assembled-empty": {
+      "file": "assets/assembled-empty.png"
+    },
+    "family-check": {
+      "file": "assets/family-check.png"
+    },
+    "parts-cart": {
+      "file": "assets/parts-cart.png"
+    },
+    "camera-badge": {
+      "file": "assets/camera-badge.png"
+    },
+    "green-mark": {
+      "file": "assets/green-mark.png"
+    },
+    "part-tall": {
+      "file": "assets/part-tall.png"
+    },
+    "part-low": {
+      "file": "assets/part-low.png"
+    },
+    "part-base": {
+      "file": "assets/part-base.png"
+    },
+    "part-divider": {
+      "file": "assets/part-divider.png"
+    },
+    "part-tray": {
+      "file": "assets/part-tray.png"
+    },
+    "use-tall": {
+      "file": "assets/use-tall.png"
+    },
+    "use-low": {
+      "file": "assets/use-low.png"
+    },
+    "use-base": {
+      "file": "assets/use-base.png"
+    },
+    "use-divider": {
+      "file": "assets/use-divider.png"
+    },
+    "use-tray": {
+      "file": "assets/use-tray.png"
+    },
+    "trial-1-top": {
+      "file": "assets/trial-1-top.png"
+    },
+    "trial-1-side": {
+      "file": "assets/trial-1-side.png"
+    },
+    "trial-2-top": {
+      "file": "assets/trial-2-top.png"
+    },
+    "trial-2-side": {
+      "file": "assets/trial-2-side.png"
+    },
+    "trial-3-top": {
+      "file": "assets/trial-3-top.png"
+    },
+    "trial-3-side": {
+      "file": "assets/trial-3-side.png"
+    },
+    "q1-single": {
+      "file": "assets/q1-single.png"
+    },
+    "q1-split": {
+      "file": "assets/q1-split.png"
+    },
+    "q1-tray": {
+      "file": "assets/q1-tray.png"
+    },
+    "q2-low": {
+      "file": "assets/q2-low.png"
+    },
+    "q2-high": {
+      "file": "assets/q2-high.png"
+    },
+    "q2-flat": {
+      "file": "assets/q2-flat.png"
+    },
+    "q3-both-low": {
+      "file": "assets/q3-both-low.png"
+    },
+    "q3-no-base": {
+      "file": "assets/q3-no-base.png"
+    },
+    "q3-complete": {
+      "file": "assets/q3-complete.png"
+    },
+    "q4-child-tool": {
+      "file": "assets/q4-child-tool.png"
+    },
+    "q4-ask-adult": {
+      "file": "assets/q4-ask-adult.png"
+    },
+    "q4-guess": {
+      "file": "assets/q4-guess.png"
+    },
+    "q5-top": {
+      "file": "assets/q5-top.png"
+    },
+    "q5-side": {
+      "file": "assets/q5-side.png"
+    },
+    "q5-empty": {
+      "file": "assets/q5-empty.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "find-a-need",
+      "title": "先看看要收好什么",
+      "type": "slide",
+      "template": "picture-points",
+      "data": {
+        "title": "先看看要收好什么",
+        "picture": "desk-scene",
+        "points": [
+          "长尺不乱倒",
+          "短笔露出头",
+          "橡皮一眼能找到"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "画材角刚用过，长尺、短笔和橡皮散在桌上。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "先别急着选筒。想一想，我们要收好哪几样？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "长尺高高的，要找能围住它下半截的地方。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "短笔放得太深，手指伸进去就不好抓。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "橡皮可以住在浅浅的小托里，一眼就能找到。"
+        },
+        {
+          "say": "还要想想每一格够不够用，筒放平后站不站得住。"
+        }
+      ]
+    },
+    {
+      "key": "look-at-parts",
+      "title": "笔筒的部件做什么",
+      "type": "slide",
+      "template": "two-columns",
+      "data": {
+        "title": "笔筒的部件做什么",
+        "left": {
+          "heading": "看筒壁",
+          "body": "围住长尺的一截"
+        },
+        "left_picture": "part-wall-study",
+        "right": {
+          "heading": "看底和分隔",
+          "body": "托住、隔开、方便取用"
+        },
+        "right_picture": "holder-front-study"
+      },
+      "script": [
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "这个笔筒像一座小站。我们看看它怎样收纳。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "上面是开口，尺子从这里放进去。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "四周的筒壁围着尺子，不让它往旁边滑出去。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "筒口比长尺低，尺头露出来，手能捏住。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "下面的底板托着各格，也让它们站在一块。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "筒壁和浅托分出位置，短笔和橡皮不用挤在一起。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "看清部件做什么，再给这几样文具找位置。"
+        }
+      ]
+    },
+    {
+      "key": "choose-materials",
+      "title": "选材料时，先想用途",
+      "type": "slide",
+      "template": "picture-points",
+      "data": {
+        "title": "选材料时，先想用途",
+        "picture": "material-bench",
+        "points": [
+          "高筒围住长尺",
+          "纸板托住各格",
+          "隔片把文具分开"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "找清洁、干燥的旧纸材，做我们这一个笔筒。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "图里这些都能挑。先看高低和用处，颜色可以换。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "高筒围住长尺，给它留一个能伸手的开口。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "平平的厚纸板放下面，可以托住几个小格。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "两件容易混在一起，就用隔片把它们分开。"
+        },
+        {
+          "say": "下一轮有浅托和矮筒。想想哪样更好拿橡皮。"
+        },
+        {
+          "say": "短笔别藏太深。选能让笔头露出来的格。"
+        },
+        {
+          "say": "比比它是围住、托住，还是隔开，再推。"
+        },
+        {
+          "say": "绕到部件后面，往它的用途图那边推。"
+        },
+        {
+          "say": "每个部件都有自己的用处，等你来找。"
+        }
+      ]
+    },
+    {
+      "key": "sort-parts",
+      "title": "把部件送到用途图",
+      "type": "interactive",
+      "page": "sort-parts",
+      "widgetType": "learning-arcade",
+      "startImage": "sort-workbench",
+      "gameAudio": {
+        "sort-first": "choose-materials-6",
+        "sort-next": "choose-materials-11",
+        "sort-mixed": "choose-materials-12",
+        "sort-hint": "choose-materials-13",
+        "sort-help": "choose-materials-14",
+        "sort-praise": "choose-materials-15"
+      },
+      "script": [
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "老师用这辆小车，把部件推到用途图。"
+        },
+        {
+          "highlight": "#game-target"
+        },
+        {
+          "say": "眼前是空高筒。它的筒壁能围住长尺。"
+        },
+        {
+          "highlight": "#parts-first-dock"
+        },
+        {
+          "say": "这张图里，长尺站在高筒里。我要往这边推。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "看高筒往哪里走。碰到用途图时，看看它停没停。"
+        },
+        {
+          "say": "下一次找底板。它在下面托东西，不用围住尺子。"
+        },
+        {
+          "say": "轮到你。看图再推，推错了先重看用途。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ]
+    },
+    {
+      "key": "draw-plan",
+      "title": "把想法画到同一张图",
+      "type": "slide",
+      "template": "picture-points",
+      "data": {
+        "title": "把想法画到同一张图",
+        "picture": "design-plan",
+        "points": [
+          "画出宽底板",
+          "画好一高一矮两格",
+          "标出浅托和用途"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "部件选好，我们先画一张能看懂的设计图。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "看图边的材料小图。厚纸板连底下，卷纸连纸筒。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "同样装法，先画能托住三格的宽底板，做完再试稳不稳。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "高格收长尺。矮格的虚圆给第二支短笔留位置。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "再画个浅托放橡皮。拿橡皮时不用翻找笔。"
+        },
+        {
+          "say": "图边还画了笔和胶带。做的时候照图准备工具。"
+        }
+      ]
+    },
+    {
+      "key": "prepare-to-make",
+      "title": "把材料按图找齐",
+      "type": "slide",
+      "template": "picture-points",
+      "data": {
+        "title": "把材料按图找齐",
+        "picture": "materials-kit",
+        "points": [
+          "找齐干净的纸件",
+          "在桌面先摆一摆",
+          "要改先记在图上"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "开始制作前，把图放在手边，对着图找材料。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "照图拿笔和纸胶带。笔画记号，胶带把纸件固定住。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "看看每一件是否干净，边沿有没有翘起。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "先在底板上空摆一次，留一点伸手的地方。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "要换矮筒，先在图上圈出那一处。大家照新图一起做。"
+        },
+        {
+          "say": "硬材料交给大人用合适的工具。小手只用预裁纸件。"
+        }
+      ]
+    },
+    {
+      "key": "build-and-try",
+      "title": "照图做好，再装文具",
+      "type": "slide",
+      "template": "two-columns",
+      "data": {
+        "title": "照图做好，再装文具",
+        "left": {
+          "heading": "先把部件固定",
+          "body": "纸筒和浅托贴在底板上"
+        },
+        "left_picture": "assembled-empty",
+        "right": {
+          "heading": "放进去试一下",
+          "body": "尺、短笔和橡皮各找位置"
+        },
+        "right_picture": "trial-1-side"
+      },
+      "script": [
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "在平桌上做。先摆底板，再按图摆好三个部件。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "先别急着粘，看看矮筒会不会挡住浅托。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "位置合适，再用纸胶带把部件固定在底板上。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "筒没有贴牢时，先放回桌面，请大人帮忙。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "现在开始试用。长尺放高筒，短笔放矮筒。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "橡皮放浅托。看看短笔有没有露出一截。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "一次摆好先别换位置。我们从两个方向看看。"
+        },
+        {
+          "say": "第一回是尺子、短笔和橡皮，各有自己的格。"
+        },
+        {
+          "say": "第二回短笔也放进高筒。看它还能不能露头。"
+        },
+        {
+          "say": "第三回多放了笔。看看哪一格放了两支。"
+        }
+      ]
+    },
+    {
+      "key": "take-two-views",
+      "title": "给同一次试用拍两张",
+      "type": "interactive",
+      "page": "take-two-views",
+      "widgetType": "learning-arcade",
+      "startImage": "photo-workbench",
+      "gameAudio": {
+        "photo-load-1": "build-and-try-15",
+        "photo-load-2": "build-and-try-16",
+        "photo-load-3": "build-and-try-17",
+        "photo-top": "compare-photos-5",
+        "photo-side": "compare-photos-12",
+        "photo-hint": "compare-photos-18",
+        "photo-help": "compare-photos-19",
+        "photo-praise": "compare-photos-20"
+      },
+      "script": [
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#game-goal"
+        },
+        {
+          "say": "先看上方的小图。它告诉我这一张要从上面拍。"
+        },
+        {
+          "highlight": "#game-target"
+        },
+        {
+          "say": "画面换个角度，筒里的文具还在原来的格。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "虚线是取景框。用方向键移动框，对准笔筒。"
+        },
+        {
+          "highlight": "#pencil-shutter"
+        },
+        {
+          "say": "和小图同一角度时，按这个圆圆的快门。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "看镜头先追到哪里。等角度对上，再看有没有拍到。"
+        },
+        {
+          "say": "轮到你了。每一回要拍齐两种角度，画面才成一对。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "observationCard": {
+        "title": "同一笔筒三次试用的俯视和侧视",
+        "familyTask": "和家人用清洁预裁纸材画图、制作，放入安全的文具试用。从上面和侧面各看一次，说一处实际看到的线索。较硬材料请成人处理，没试到的先留空。",
+        "levels": [
+          {
+            "label": "文具分开放",
+            "trials": [
+              {
+                "id": "same-load-views",
+                "label": "文具分开放的两张取景",
+                "top": {
+                  "trial-1-top": {
+                    "label": "俯看高筒的尺、矮筒的短笔和浅托的橡皮",
+                    "image": "trial-1-top"
+                  }
+                },
+                "side": {
+                  "trial-1-side": {
+                    "label": "侧看同一次摆放，尺和短笔都从各自的筒口露出",
+                    "image": "trial-1-side"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "label": "短笔移进高筒",
+            "trials": [
+              {
+                "id": "same-load-views",
+                "label": "短笔移进高筒的两张取景",
+                "top": {
+                  "trial-2-top": {
+                    "label": "俯看高筒里同时有尺和短笔，矮筒空着",
+                    "image": "trial-2-top"
+                  }
+                },
+                "side": {
+                  "trial-2-side": {
+                    "label": "侧看同一次摆放，只看见高筒口上方的尺头",
+                    "image": "trial-2-side"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "label": "多放几支文具",
+            "trials": [
+              {
+                "id": "same-load-views",
+                "label": "多放几支文具的两张取景",
+                "top": {
+                  "trial-3-top": {
+                    "label": "俯看高筒有尺和蓝笔，矮筒有两支短笔",
+                    "image": "trial-3-top"
+                  }
+                },
+                "side": {
+                  "trial-3-side": {
+                    "label": "侧看同一次摆放，两个筒里都能看见露出的笔头",
+                    "image": "trial-3-side"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "key": "compare-photos",
+      "title": "把两张图放在一起看",
+      "type": "slide",
+      "template": "two-columns",
+      "data": {
+        "title": "把两张图放在一起看",
+        "left": {
+          "heading": "从上面看",
+          "body": "高筒里有尺和短笔"
+        },
+        "left_picture": "trial-2-top",
+        "right": {
+          "heading": "从侧面看",
+          "body": "高筒口上方只露尺头"
+        },
+        "right_picture": "trial-2-side"
+      },
+      "script": [
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "这里是第二回摆放的示例。左边和右边是同一次。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "从上方看进去，能找到每一格装了什么。"
+        },
+        {
+          "say": "俯着看开口。找找这一格里有什么。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "高筒里有一把尺，还有一支短笔。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "矮筒空着。短笔是移进了高筒，不是消失了。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "从侧边看筒口，看看哪样东西露在边沿上面。"
+        },
+        {
+          "say": "侧着看边沿。找找哪样东西露了头。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "尺头露出来。短笔在里面，侧面看不见。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "要好拿短笔，试试把它放回矮筒，再看一眼。"
+        },
+        {
+          "say": "看清是不是同一回，再用两张图说一条发现。"
+        },
+        {
+          "say": "先认小图的角度，别把俯着看和侧着看弄反。"
+        },
+        {
+          "say": "等画面进了框、角度也对，再按快门。"
+        },
+        {
+          "say": "两个角度都取到了，才能放进同一份记录。"
+        }
+      ]
+    },
+    {
+      "key": "picture-check",
+      "title": "看新图，选一选",
+      "type": "quiz",
+      "intro": [
+        "换一套文具和草图。听清要解决什么，再看图。",
+        "每一题选一幅。选完也说说你看到了哪一处。"
+      ],
+      "questions": [
+        {
+          "id": "separate-brush-and-chalk",
+          "question": "长画笔和短粉笔要分开放。选哪种结构？",
+          "skill": "observe-form-use",
+          "answer": [
+            "B"
+          ],
+          "analysis": "有高格和低格两个开口。长画笔进高格，短粉笔留在低格。",
+          "options": {
+            "A": {
+              "label": "只有一个深开口",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-single",
+                "alt": "只有一个深开口"
+              }
+            },
+            "B": {
+              "label": "一个高开口和一个低开口",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-split",
+                "alt": "一个高开口和一个低开口"
+              }
+            },
+            "C": {
+              "label": "一只没有分隔的浅托",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-tray",
+                "alt": "一只没有分隔的浅托"
+              }
+            }
+          }
+        },
+        {
+          "id": "reachable-stub",
+          "question": "想把短蜡笔收进格里，手指又能捏到它。选哪张图？",
+          "skill": "choose-and-design",
+          "answer": [
+            "A"
+          ],
+          "analysis": "低格让蜡笔露出一截，手指好捏。",
+          "options": {
+            "A": {
+              "label": "短蜡笔从低格露出一截",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-low",
+                "alt": "短蜡笔从低格露出一截"
+              }
+            },
+            "B": {
+              "label": "从剖开处看到短蜡笔藏在高筒里",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-high",
+                "alt": "从剖开处看到短蜡笔藏在高筒里"
+              }
+            },
+            "C": {
+              "label": "蜡笔平放在纸板上",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-flat",
+                "alt": "蜡笔平放在纸板上"
+              }
+            }
+          }
+        },
+        {
+          "id": "pieces-for-sketch",
+          "question": "图上要宽底板、一高一矮两个纸筒。选哪套备料？",
+          "skill": "make-from-plan",
+          "answer": [
+            "C"
+          ],
+          "analysis": "宽底板、高纸筒和矮纸筒都与计划相合。",
+          "options": {
+            "A": {
+              "label": "一块宽底板、两个矮筒",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-both-low",
+                "alt": "一块宽底板、两个矮筒"
+              }
+            },
+            "B": {
+              "label": "一个高筒、一个矮筒，缺底板",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-no-base",
+                "alt": "一个高筒、一个矮筒，缺底板"
+              }
+            },
+            "C": {
+              "label": "宽底板、一个高筒、一个矮筒",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-complete",
+                "alt": "宽底板、一个高筒、一个矮筒"
+              }
+            }
+          }
+        },
+        {
+          "id": "adult-hard-material",
+          "question": "这块硬材料剪不开。接下来怎么做？",
+          "skill": "make-from-plan",
+          "answer": [
+            "B"
+          ],
+          "analysis": "先在图上标记要改的地方，请大人处理硬材料。",
+          "options": {
+            "A": {
+              "label": "孩子独自拿剪刀对着硬材料",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-child-tool",
+                "alt": "孩子独自拿剪刀对着硬材料"
+              }
+            },
+            "B": {
+              "label": "孩子指设计图并请大人帮忙",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-ask-adult",
+                "alt": "孩子指设计图并请大人帮忙"
+              }
+            },
+            "C": {
+              "label": "一个孩子把另一只筒放到桌上，旁边有张图",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-guess",
+                "alt": "一个孩子把另一只筒放到桌上，旁边有张图"
+              }
+            }
+          }
+        },
+        {
+          "id": "see-inside-both",
+          "question": "同一次摆放，侧面看不见短蜡笔。哪张能看清它在哪格？",
+          "skill": "compare-actual-tryout",
+          "answer": [
+            "A"
+          ],
+          "analysis": "俯看能看进两个筒口，确认短蜡笔在矮格。侧面只看得到长画笔露出的部分。",
+          "options": {
+            "A": {
+              "label": "从上面看到装了画笔和蜡笔的两个开口",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-top",
+                "alt": "从上面看到装了画笔和蜡笔的两个开口"
+              }
+            },
+            "B": {
+              "label": "同一次摆放的侧面，能看到筒壁和露出的长画笔",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-side",
+                "alt": "同一次摆放的侧面，能看到筒壁和露出的长画笔"
+              }
+            },
+            "C": {
+              "label": "从上面看到未装文具的空筒",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-empty",
+                "alt": "从上面看到未装文具的空筒"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "family-observation",
+      "title": "把图和实际试用对起来",
+      "type": "slide",
+      "template": "picture-points",
+      "data": {
+        "title": "把图和实际试用对起来",
+        "picture": "family-check",
+        "points": [
+          "先说明要收什么",
+          "画图再照图制作",
+          "装进去，用眼睛核对"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "今天先想收纳需要，再选部件和材料。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "设计图能让别人知道，你打算怎样摆这些部件。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "长短文具要好拿，也要给每样留够位置。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "按图准备和制作。较硬材料交给大人处理。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "用安全的文具试装。从上面和侧面都看一看。"
+        },
+        {
+          "say": "家里能做时，和大人说一条实际看见的发现。"
+        },
+        {
+          "say": "没做过的、没看到的先留空。下回带着实物来讲。"
+        }
+      ]
+    }
+  ]
+}

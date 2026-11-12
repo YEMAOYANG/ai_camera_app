@@ -1,25 +1,32 @@
 """Build a lesson folder into a classroom and its media.
 
 The source has lesson.json, pages/<id>.html and pages/<id>.js, an optional
-pages/<id>.css, and PNG images under assets/. Page HTML is the #play body;
+pages/<id>.css, and media under assets/. Page HTML is the #play body;
 its script uses the shared kit's K object. Voices are supplied separately.
+Registered recordings may be referenced with __AUDIO:<key>__.
 """
 import argparse
 from copy import deepcopy
 import hashlib
+import io
 import json
 from pathlib import Path
 import re
 import struct
 import sys
 import time
+import wave
 
-from courseware.kit import page, slides
-from courseware.tools import glyph_picture, quiz_upgrade
+from courseware.kit import game, page, slides
+from courseware.tools import game_audio, glyph_picture, observation_card, quiz_upgrade
 
 
 class BuildError(Exception):
     pass
+
+
+AUDIO_REFERENCE = re.compile(r'__AUDIO:([a-z0-9-]+)__')
+MAX_AUDIO_BYTES = 16 * 1024 * 1024
 
 
 def _fail(code, detail):
@@ -65,12 +72,39 @@ def _resolve_assets(value, urls, where):
     return value
 
 
+def _read_audio_assets(source, specs):
+    if not isinstance(specs, dict):
+        _fail('audio_asset_invalid', 'audio must map keys to local recordings')
+    assets_dir = (source / 'assets').resolve()
+    assets = {}
+    for key, spec in specs.items():
+        if (not re.fullmatch(r'[a-z0-9-]+', key) or not isinstance(spec, dict)
+                or set(spec) != {'file', 'sha256'} or not _string(spec['file'])
+                or not _string(spec['sha256']) or not re.fullmatch(r'[0-9a-f]{64}', spec['sha256'])):
+            _fail('audio_asset_invalid', key)
+        try:
+            path = (source / spec['file']).resolve()
+            if (not assets_dir.is_relative_to(source.resolve()) or not path.is_relative_to(assets_dir)
+                    or path.suffix.lower() != '.wav' or not 0 < path.stat().st_size <= MAX_AUDIO_BYTES):
+                raise ValueError('expected a bounded PCM WAV under assets/')
+            raw = path.read_bytes()
+            if hashlib.sha256(raw).hexdigest() != spec['sha256']:
+                raise ValueError('source SHA-256 mismatch')
+            with wave.open(io.BytesIO(raw), 'rb') as wav:
+                if wav.getnframes() <= 0:
+                    raise ValueError('empty audio stream')
+        except (OSError, ValueError, EOFError, wave.Error) as exc:
+            raise BuildError('audio_asset_invalid', f'{key}: {exc}') from exc
+        assets[key] = ('recording-' + spec['sha256'] + '.wav', raw)
+    return assets
+
+
 def prepare(lesson_dir, out_dir, *, stage_id, now_ms=None):
     source, out = Path(lesson_dir), Path(out_dir)
     lesson = _read(source / 'lesson.json', 'lesson_invalid', 'lesson.json')
     if not isinstance(lesson, dict) or lesson.get('schemaVersion') != 'mira.courseware.lesson.v1':
         _fail('lesson_invalid', 'schemaVersion')
-    if set(lesson) - {'schemaVersion', 'title', 'description', 'grade', 'roster', 'images', 'scenes'}:
+    if set(lesson) - {'schemaVersion', 'title', 'description', 'grade', 'roster', 'images', 'audio', 'scenes'}:
         _fail('lesson_invalid', 'unknown lesson fields')
     if not all(_string(lesson.get(k)) for k in ('title', 'description')) or type(lesson.get('grade')) is not int or lesson['grade'] not in range(1, 7):
         _fail('lesson_invalid', 'title, description or grade')
@@ -108,6 +142,8 @@ def prepare(lesson_dir, out_dir, *, stage_id, now_ms=None):
     images = lesson.get('images')
     if not isinstance(scenes, list) or not scenes or not isinstance(images, dict):
         _fail('lesson_invalid', 'scenes or images')
+    audio_assets = _read_audio_assets(source, lesson.get('audio', {}))
+    used_audio = set()
     media = out / 'media'
     media.mkdir(parents=True, exist_ok=True)
     urls, aspects = {}, {}
@@ -139,6 +175,7 @@ def prepare(lesson_dir, out_dir, *, stage_id, now_ms=None):
     body = {'stage': {'id': stage_id, 'name': lesson['title'], 'agentIds': [c['id'] for c in configs], 'createdAt': now, 'updatedAt': now, 'description': lesson['description'], 'generatedAgentConfigs': configs}, 'scenes': []}
     quiz_specs = []
     speakers = {}
+    game_audio_requests = {}
     seen = set()
     for index, item in enumerate(scenes, 1):
         if not isinstance(item, dict):
@@ -147,7 +184,11 @@ def prepare(lesson_dir, out_dir, *, stage_id, now_ms=None):
         if not isinstance(key, str) or not re.fullmatch(r'[a-z0-9-]+', key) or key in seen or kind not in ('slide', 'interactive', 'quiz') or not _string(item.get('title')):
             _fail('lesson_invalid', f'scene {index} key, type or title')
         seen.add(key)
-        fields = {'key', 'type', 'title', 'script'} | {'slide': {'template', 'data'}, 'interactive': {'page', 'widgetType', 'startImage'}, 'quiz': {'intro', 'questions'}}[kind]
+        fields = {'key', 'type', 'title', 'script'} | {
+            'slide': {'template', 'data'},
+            'interactive': {'page', 'widgetType', 'startImage', 'gameAudio', 'observationCard'},
+            'quiz': {'intro', 'questions'},
+        }[kind]
         if set(item) - fields:
             _fail('lesson_invalid', f'{key} unknown fields')
         script = item.get('script', [] if kind == 'quiz' else None)
@@ -193,6 +234,27 @@ def prepare(lesson_dir, out_dir, *, stage_id, now_ms=None):
                     _fail('image_missing', f'{key} {image_key}')
                 return urls[image_key]
             html = re.sub(r'__IMG:([^_]+)__', replace_image, html)
+            def replace_audio(match):
+                audio_key = match.group(1)
+                if audio_key not in audio_assets:
+                    _fail('audio_asset_missing', f'{key} {audio_key}')
+                used_audio.add(audio_key)
+                return f'/api/classroom-media/{stage_id}/media/{audio_assets[audio_key][0]}'
+            html = AUDIO_REFERENCE.sub(replace_audio, html)
+            if '__AUDIO:' in html:
+                _fail('audio_asset_invalid', f'{key} malformed recording reference')
+            if 'gameAudio' in item:
+                if not game.uses_game(js):
+                    _fail('game_audio_invalid', f'{key}: gameAudio requires K.game')
+                game_audio_requests['scene-' + key] = item['gameAudio']
+            if 'observationCard' in item:
+                if not game.uses_game(js):
+                    _fail('observation_card_invalid', f'{key}: observationCard requires K.game')
+                try:
+                    html = observation_card.embed(html, item['observationCard'],
+                                                  scene_id='scene-' + key, image_urls=urls)
+                except ValueError as exc:
+                    raise BuildError('observation_card_invalid', f'{key}: {exc}') from exc
             content = {'url': '', 'html': html, 'type': 'interactive', 'widgetType': widget, 'widgetConfig': {'type': widget, 'description': item['title']}}
         else:
             questions = item.get('questions')
@@ -247,6 +309,15 @@ def prepare(lesson_dir, out_dir, *, stage_id, now_ms=None):
                 _fail('lesson_invalid', f'{key} script {number} {op}')
             actions.append(action)
         body['scenes'].append({'id': 'scene-' + key, 'type': kind, 'order': index, 'title': item['title'], 'actions': actions, 'content': content, 'stageId': stage_id, 'createdAt': now, 'outlineId': key, 'updatedAt': now})
+    if used_audio != audio_assets.keys():
+        _fail('audio_asset_unreferenced', ', '.join(sorted(audio_assets.keys() - used_audio)))
+    for name, raw in audio_assets.values():
+        (media / name).write_bytes(raw)
+    try:
+        game_audio.compile_cues(body, game_audio_requests,
+                                {action_id for action_id, speaker in speakers.items() if speaker == teacher_key})
+    except ValueError as exc:
+        raise BuildError('game_audio_invalid', str(exc)) from exc
     quiz_actions = {scene['id']: scene['actions'] for scene in body['scenes'] if scene['type'] == 'quiz'}
     try:
         body, needed = quiz_upgrade.upgrade_quiz(body, {'scenes': quiz_specs}, stage_id=stage_id, media_dir=media)
@@ -285,6 +356,10 @@ def finish(draft, out_dir, files):
         if scene['type'] == 'quiz':
             for question in scene['content']['questions']:
                 question['questionAudioUrl'] = urls[draft['questionAudio'][question['id']]]
+    try:
+        game_audio.bind_recordings(body)
+    except ValueError as exc:
+        raise BuildError('game_audio_invalid', str(exc)) from exc
     from courseware.tools.check import MEDIA_URL, strings
     referenced = {match.group().split('/media/', 1)[1] for value in strings(body) for match in MEDIA_URL.finditer(value)}
     for path in media.iterdir():

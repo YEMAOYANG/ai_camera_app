@@ -1,0 +1,225 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "lesson": {
+    "editionId": "pep-math-g1-lower-2022-standard",
+    "revisionId": "directory-6205d2037284e91f10b25edd",
+    "nodeId": "9823a8e5-a56c-45c8-9a93-7297fb92ee00",
+    "unitId": "ac9164b9-5eba-4c7e-9436-214fc2df042b",
+    "subject": "math",
+    "officialActivityId": "76f1acd4-1865-08ef-90a2-8c3561d32249",
+    "lessonTitle": "口算减法-两位数减一位数和整十数（不退位）",
+    "unitTitle": "100以内的口算加、减法",
+    "gradeCode": "primary_1",
+    "volume": "lower",
+    "schoolSystem": "six_year"
+  },
+  "teacher": {
+    "code": "mira_math_standard",
+    "voice": "Ethan",
+    "gender": "male"
+  },
+  "goals": [
+    {
+      "id": "g-ones",
+      "goal": "从总量里去掉几个一，个位够减时从一里取，原有几个十不动。",
+      "pageRefs": [
+        "印47例1第1问",
+        "教案p2–3",
+        "课件p5–10"
+      ]
+    },
+    {
+      "id": "g-tens",
+      "goal": "减整十数时从几个十里拿走，原有几个一不动，比较减几与减几十。",
+      "pageRefs": [
+        "印47例1第2问与说一说",
+        "教案p3–4",
+        "课件p11–14"
+      ]
+    },
+    {
+      "id": "g-both",
+      "goal": "两个两位数都带十和一时，各从同单位里去掉相应个数，再合成剩下的数。",
+      "pageRefs": [
+        "印47试一试",
+        "教案p4",
+        "课件p15–19",
+        "任务单p1–2"
+      ]
+    },
+    {
+      "id": "g-use",
+      "goal": "听清原来、取走、还剩，能列对应减式；辨别把减写成加、减错数位或把零写错。",
+      "pageRefs": [
+        "印47例1",
+        "印48上部做一做",
+        "教案p5",
+        "课件p20–24",
+        "作业p1"
+      ]
+    }
+  ],
+  "keyPoint": "从同一计数单位里去掉相应个数，再合成剩下的数。",
+  "difficultPoint": "分清减几和减几十；两个数都有十和一时分别减，并将十和一的剩余合在一起。",
+  "authoring": {
+    "method": "direct_authoring",
+    "author": "Codex GPT-6",
+    "nativeGenerationSubmitted": false,
+    "reviewedOfficialHours": [
+      "lesson_1"
+    ],
+    "gameTemplates": [
+      {
+        "id": "listenDelivery",
+        "version": 1,
+        "knowledgeRule": "listen_pick_deliver",
+        "levels": 3,
+        "progression": "分别听取走几个一、几个十、十和一组合；数量近似或十与一颠倒无法装货，错站无法卸货。"
+      },
+      {
+        "id": "magnetMarbles",
+        "version": 1,
+        "knowledgeRule": "pair_match",
+        "levels": 3,
+        "progression": "先两种基本减法，加入个位或十位剩零，最后混合两位数的两单位都减少。"
+      }
+    ]
+  },
+  "pageSequence": [
+    {
+      "page": 1,
+      "type": "slide",
+      "title": "种苗站还剩多少",
+      "play": "从一盘原来有多少和送出去多少，引出求余用减法。",
+      "pageRefs": [
+        "印47例1"
+      ]
+    },
+    {
+      "page": 2,
+      "type": "slide",
+      "title": "一盘十盆，散盆数一",
+      "play": "盘是十，散盆是几个一；读同一量的十位个位。",
+      "pageRefs": [
+        "印47例1"
+      ]
+    },
+    {
+      "page": 3,
+      "type": "slide",
+      "title": "取走几盆散苗",
+      "play": "从个位份中取走几个一，十盘不拆。",
+      "pageRefs": [
+        "印47例1第1问"
+      ]
+    },
+    {
+      "page": 4,
+      "type": "slide",
+      "title": "取走几整盘",
+      "play": "在十里去掉整盘，个位散盆保持；对照两式。",
+      "pageRefs": [
+        "印47例1第2问"
+      ]
+    },
+    {
+      "page": 5,
+      "type": "slide",
+      "title": "两种都要取走",
+      "play": "十里减十、一里减一，合成剩余。",
+      "pageRefs": [
+        "印47试一试"
+      ]
+    },
+    {
+      "page": 6,
+      "type": "interactive",
+      "title": "开车送走指定的一份",
+      "play": "先从候选拿准确的取走量，后送到口令指定站，正确交付才展示架上余量。",
+      "pageRefs": [
+        "印47例1与试一试"
+      ]
+    },
+    {
+      "page": 7,
+      "type": "slide",
+      "title": "一位剩零，怎样说",
+      "play": "分别展示十位余零和个位余零；不把十和一换位。",
+      "pageRefs": [
+        "印48上部做一做"
+      ]
+    },
+    {
+      "page": 8,
+      "type": "interactive",
+      "title": "瞄准架上的剩余",
+      "play": "听减式，看原有和取走两份，瞄准余数图。逐关混合三类。",
+      "pageRefs": [
+        "印48上部做一做"
+      ]
+    },
+    {
+      "page": 9,
+      "type": "quiz",
+      "title": "种苗站的新任务",
+      "play": "六道全新数字与独立精确数量图。",
+      "pageRefs": [
+        "印47例1与试一试",
+        "印48上部"
+      ]
+    },
+    {
+      "page": 10,
+      "type": "slide",
+      "title": "把取走和剩下讲清楚",
+      "play": "回顾三型并和家人摆新例说哪一个单位变。",
+      "pageRefs": [
+        "作业p1"
+      ]
+    }
+  ],
+  "quiz": [
+    {
+      "id": "nob-q1",
+      "skill": "两位数减一位数",
+      "correctPositionOneBased": 1
+    },
+    {
+      "id": "nob-q2",
+      "skill": "两位数减整十数",
+      "correctPositionOneBased": 2
+    },
+    {
+      "id": "nob-q3",
+      "skill": "两位数减两位数不退位",
+      "correctPositionOneBased": 3
+    },
+    {
+      "id": "nob-q4",
+      "skill": "个位减完余零",
+      "correctPositionOneBased": 1
+    },
+    {
+      "id": "nob-q5",
+      "skill": "比较减几个一与几个十",
+      "correctPositionOneBased": 3
+    },
+    {
+      "id": "nob-q6",
+      "skill": "从图中求剩余",
+      "correctPositionOneBased": 2
+    }
+  ],
+  "afterClass": {
+    "official": [
+      "家庭说清算理",
+      "数字卡组不退位算式"
+    ],
+    "atHome": "摆几组整十和几枚散物，先约定取走哪一份，再说剩下多少。不要求录音。",
+    "weekly": "三型不退位减法、数位余零、原有和取走关系进入周题源。"
+  },
+  "artPlan": {
+    "status": "pending_builtin_imagegen_disk_hold",
+    "exactDiagrams": "每盘十格和散盆数由代码安排，取走和剩余用隔开及箭头显示。"
+  }
+}

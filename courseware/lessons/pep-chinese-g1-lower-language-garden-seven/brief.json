@@ -1,0 +1,252 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "语文园地七",
+  "binding": {
+    "editionId": "pep-chinese-g1-lower-2022-standard",
+    "revisionId": "directory-b30168cf88d5ee5709335698",
+    "nodeId": "f0c530ea-9bdc-498d-8f4b-cf4549fb3456",
+    "unitId": "e7efd7e6-2a62-4a7b-9ebc-c8a5632c5f11"
+  },
+  "scenario": "图画广播站要录生活小故事。先拿对用品、听懂字词，再用镜头卡排好故事。",
+  "goals": [
+    "在卫生间生活情境中认读刷、梳、巾、皂、洗、澡、脸、盆，认识立刀旁，并说出五组用品和动作的联系。",
+    "在动物词里观察虫字旁、鸟字边、反犬旁，用偏旁推想字义并听整词确认，用给定词语说两三句相连的话。",
+    "写巾、洗，观察房、老、看、包的包围位置，按先外后内在纸上练写。",
+    "借原创生活例子理解三条学习名言的不同意思，回到纸书由成人陪读。",
+    "听《小猫种鱼》时按图记人和事，复述让听者听清，和大人读《狐狸和乌鸦》并用图解释开口和肉掉下来的因果。"
+  ],
+  "goalSources": [
+    {
+      "goal": "在卫生间生活情境中认读刷、梳、巾、皂、洗、澡、脸、盆，认识立刀旁，并说出五组用品和动作的联系。",
+      "source": "印93、课件3至23、教案1至2"
+    },
+    {
+      "goal": "在动物词里观察虫字旁、鸟字边、反犬旁，用偏旁推想字义并听整词确认，用给定词语说两三句相连的话。",
+      "source": "印93至94、课件25至29、任务单2"
+    },
+    {
+      "goal": "写巾、洗，观察房、老、看、包的包围位置，按先外后内在纸上练写。",
+      "source": "印93至94、教案1至2、GF 0023—2020"
+    },
+    {
+      "goal": "借原创生活例子理解三条学习名言的不同意思，回到纸书由成人陪读。",
+      "source": "印94日积月累"
+    },
+    {
+      "goal": "听《小猫种鱼》时按图记人和事，复述让听者听清，和大人读《狐狸和乌鸦》并用图解释开口和肉掉下来的因果。",
+      "source": "印95口语交际、印96至97亲子共读"
+    }
+  ],
+  "pageSequence": [
+    {
+      "key": "washroom-kit",
+      "kind": "teaching",
+      "plan": "用品和动作，认识刷梳及立刀旁。"
+    },
+    {
+      "key": "water-and-towel",
+      "kind": "teaching",
+      "plan": "读巾皂洗澡脸盆。"
+    },
+    {
+      "key": "delivery-list",
+      "kind": "teaching",
+      "plan": "先听动作，再拿对东西"
+    },
+    {
+      "key": "delivery-last-stop",
+      "kind": "teaching",
+      "plan": "到站前先看一眼"
+    },
+    {
+      "key": "take-to-the-sink",
+      "kind": "game",
+      "plan": "听用途选用品，操控邮车送到接物处。"
+    },
+    {
+      "key": "insect-bird-beast",
+      "kind": "teaching",
+      "plan": "认识三个动物偏旁。"
+    },
+    {
+      "key": "radical-hints",
+      "kind": "teaching",
+      "plan": "从偏旁猜词，听整词确认并迁移到马、鱼。"
+    },
+    {
+      "key": "say-it-together",
+      "kind": "teaching",
+      "plan": "选词说两三句连贯的话。"
+    },
+    {
+      "key": "write-towel-and-wash",
+      "kind": "teaching",
+      "plan": "巾三画，洗九画，成人看纸笔。"
+    },
+    {
+      "key": "outside-left",
+      "kind": "teaching",
+      "plan": "房、老、看左上先外后内。"
+    },
+    {
+      "key": "outside-right",
+      "kind": "teaching",
+      "plan": "包的右上先外后内。"
+    },
+    {
+      "key": "three-habits",
+      "kind": "teaching",
+      "plan": "三条名言分别迁移到新生活例子。"
+    },
+    {
+      "key": "cat-notebook",
+      "kind": "teaching",
+      "plan": "印95听讲六图，区分发生和想象。"
+    },
+    {
+      "key": "microphone-voice",
+      "kind": "teaching",
+      "plan": "根据图听和讲，声音让人听清。"
+    },
+    {
+      "key": "story-tram",
+      "kind": "game",
+      "plan": "走正确图序路线，接图留在画框。"
+    },
+    {
+      "key": "what-the-fox-wants",
+      "kind": "teaching",
+      "plan": "亲子前导，三次说话到肉掉的因果。"
+    },
+    {
+      "key": "what-fell",
+      "kind": "teaching",
+      "plan": "乌鸦开口以后，哪件事接着发生"
+    },
+    {
+      "key": "picture-quiz",
+      "kind": "quiz",
+      "plan": "原创图题。"
+    },
+    {
+      "key": "bring-the-book",
+      "kind": "teaching",
+      "plan": "回顾目标，回纸书和家人练。"
+    }
+  ],
+  "games": [
+    {
+      "page": "take-to-the-sink",
+      "template": "listenDelivery",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.listenDelivery",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "listen_pick_deliver",
+      "selection": "听动作选用品并实际开车取送，选错用品或工位无法交接。",
+      "levels": [
+        "一单梳头，梳子与毛巾备选，取物后过单车道送到等梳头的孩子。",
+        "刷牙、洗脸和干扰用品。",
+        "三次取送，增用品和岔路。"
+      ],
+      "teacherAnchors": [
+        "garden-seven-first-comb",
+        "garden-seven-first-hair",
+        "game-player"
+      ],
+      "demo": "先按台词亮本课画面和车，首关完成一个动作停住，清空得分和进度后交给孩子。"
+    },
+    {
+      "page": "story-tram",
+      "template": "bubbleMaze",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.bubbleMaze",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "listen_order",
+      "selection": "走过实际图序才收录；车是整理图画的场记。",
+      "levels": [
+        "种玉米、收玉米、种花生、收花生。",
+        "衔接花生与小猫的举动、梦里的鱼。",
+        "迁移到原创丢帽归还的图序。"
+      ],
+      "teacherAnchors": [
+        "garden-seven-story-listen",
+        "garden-seven-story-first",
+        "game-player"
+      ],
+      "demo": "先按台词亮本课画面和车，首关完成一个动作停住，清空得分和进度后交给孩子。"
+    }
+  ],
+  "quiz": [
+    {
+      "id": "choose-a-comb",
+      "skill": "tools-in-context",
+      "prompt": "演出前小演员头发乱了，想把头发梳顺。该从托盘拿哪件？",
+      "answer": "便携梳子",
+      "position": 2,
+      "rationale": "梳子有一排梳齿，用来梳头。"
+    },
+    {
+      "id": "radical-clue",
+      "skill": "radical-evidence",
+      "prompt": "你听到一个带鸟字边的动物词。哪组画面最能给这个词的意思提供线索？",
+      "answer": "鹅和鹊",
+      "position": 1,
+      "rationale": "鸟字边常给人想到鸟一类的线索。这组是鸟的图。"
+    },
+    {
+      "id": "connected-words",
+      "skill": "connected-sentences",
+      "prompt": "听，雨停后，姐姐在湿石路上跑，听见弟弟的笑声。哪组图把这件事讲完整？",
+      "answer": "湿路跑和笑",
+      "position": 3,
+      "rationale": "两幅都在雨后湿石路上，前面姐姐跑，后面弟弟笑，是相连的一件事。"
+    },
+    {
+      "id": "outside-ink",
+      "skill": "outside-before-inside",
+      "prompt": "给房字做写字卡。只留下先写的外面四笔，应选哪张图？",
+      "answer": "先画户",
+      "position": 2,
+      "rationale": "房先写左上包围的户。外面四笔写好后，才接方。"
+    },
+    {
+      "id": "meaning-of-saying",
+      "skill": "meaning-of-saying",
+      "prompt": "小云不懂怎么折船，去问大人，再跟着练。哪组新画和她的做法最像？",
+      "answer": "请教练绳结",
+      "position": 1,
+      "rationale": "不懂就请教，不会就学习。问清如何系结后再跟着试，是同一个办法。"
+    },
+    {
+      "id": "put-the-picture-after",
+      "skill": "story-pictures",
+      "prompt": "小鹿把果篮放在门边，再抬手敲门。放下果篮那张之后接哪张？",
+      "answer": "放篮敲门",
+      "position": 3,
+      "rationale": "听到放下果篮后再敲门。篮子在地上，小鹿抬手敲门。"
+    },
+    {
+      "id": "what-made-it-drop",
+      "skill": "fox-cause",
+      "prompt": "小狗嘴里叼着纸叶。哪组小画能说清它叫的时候叶子为什么掉下来？",
+      "answer": "张嘴后掉",
+      "position": 2,
+      "rationale": "叫时嘴张开，嘴没叼住纸叶，所以纸叶掉下来。"
+    }
+  ],
+  "afterClass": {
+    "familyTask": "读识字加油站词语，选常见物品说用途，纸上仿写。成人陪读印94和印96至97，听孩子借印95图把故事讲清。",
+    "weeklyQuestionSource": [
+      "用品词语",
+      "偏旁线索",
+      "连贯说话",
+      "先外后内",
+      "名言意思",
+      "口语图序",
+      "共读因果"
+    ],
+    "evidence": "记录图题与游戏。朗读、口语、书写待成人观察。"
+  },
+  "artAndLanguage": "生活实物、动物、场记与图序原创，字形按国标画。名言和共读全文留纸书。",
+  "officialNotesSha256": "12c190b916b4df74552d57d7ee252e327107841e9528e0b5f0f4f96c664c7a33"
+}

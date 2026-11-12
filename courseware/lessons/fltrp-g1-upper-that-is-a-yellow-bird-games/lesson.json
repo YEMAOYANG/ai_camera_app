@@ -1,0 +1,995 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "Unit 2 That is a yellow bird.",
+  "description": "在公园寻鸟、舞台听音和教室参观中，听懂 bag、that 和近远介绍。",
+  "grade": 1,
+  "roster": {
+    "mia": {
+      "name": "Mia 老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Jennifer",
+      "avatar": "/teachers/coco-english-v1.png",
+      "color": "#557B76",
+      "persona": "先让孩子听清关键词，再用可见站位和真实物品示范英语近远表达。"
+    }
+  },
+  "images": {
+    "bird-park-cover": {
+      "file": "assets/playback/bird-park-cover.png"
+    },
+    "lookout-background": {
+      "file": "assets/playback/lookout-background.png"
+    },
+    "lookout-guide": {
+      "file": "assets/playback/lookout-guide.png"
+    },
+    "yellow-bird": {
+      "file": "assets/playback/yellow-bird.png"
+    },
+    "black-bird": {
+      "file": "assets/playback/black-bird.png"
+    },
+    "teaching-bag": {
+      "file": "assets/playback/teaching-bag.png"
+    },
+    "cat-prop": {
+      "file": "assets/playback/cat-prop.png"
+    },
+    "cap-prop": {
+      "file": "assets/playback/cap-prop.png"
+    },
+    "hat-prop": {
+      "file": "assets/playback/hat-prop.png"
+    },
+    "rhythm-stage": {
+      "file": "assets/playback/rhythm-stage.png"
+    },
+    "near-desk-example": {
+      "file": "assets/near-desk-example.png"
+    },
+    "far-desk-example": {
+      "file": "assets/far-desk-example.png"
+    },
+    "three-stage-props": {
+      "file": "assets/three-stage-props.png"
+    },
+    "quiz-reporter-stimulus": {
+      "file": "assets/quiz-reporter-stimulus.png"
+    },
+    "quiz-fair-cat": {
+      "file": "assets/quiz-fair-cat.png"
+    },
+    "quiz-fair-blue-bird": {
+      "file": "assets/quiz-fair-blue-bird.png"
+    },
+    "quiz-reporter-right-near-black": {
+      "file": "assets/quiz-reporter-right-near-black.png"
+    },
+    "quiz-reporter-left-far-black": {
+      "file": "assets/quiz-reporter-left-far-black.png"
+    },
+    "quiz-reporter-right-near-blue": {
+      "file": "assets/quiz-reporter-right-near-blue.png"
+    },
+    "quiz-school-near-desk": {
+      "file": "assets/quiz-school-near-desk.png"
+    },
+    "quiz-school-far-desk": {
+      "file": "assets/quiz-school-far-desk.png"
+    },
+    "near-blue-example": {
+      "file": "assets/near-blue-example.png"
+    },
+    "far-black-example": {
+      "file": "assets/far-black-example.png"
+    },
+    "game-scout-rover": {
+      "file": "assets/playback/game-scout-rover.png"
+    },
+    "game-scout-rover-pop": {
+      "file": "assets/playback/game-scout-rover-pop.png"
+    },
+    "game-stage-marble": {
+      "file": "assets/playback/game-stage-marble.png"
+    },
+    "quiz-courtyard-near-blue": {
+      "file": "assets/quiz-courtyard-near-blue.png"
+    },
+    "quiz-courtyard-far-black": {
+      "file": "assets/quiz-courtyard-far-black.png"
+    },
+    "quiz-courtyard-far-blue": {
+      "file": "assets/quiz-courtyard-far-blue.png"
+    },
+    "quiz-courtyard-display-cat": {
+      "file": "assets/quiz-courtyard-display-cat.png"
+    },
+    "quiz-courtyard-display-knit-hat": {
+      "file": "assets/quiz-courtyard-display-knit-hat.png"
+    },
+    "quiz-courtyard-display-baseball-cap": {
+      "file": "assets/quiz-courtyard-display-baseball-cap.png"
+    },
+    "quiz-fair-schoolbag": {
+      "file": "assets/quiz-fair-schoolbag.png"
+    },
+    "quiz-school-far-schoolbag": {
+      "file": "assets/quiz-school-far-schoolbag.png"
+    },
+    "classroom-door-distance": {
+      "file": "assets/classroom-door-distance.png"
+    },
+    "classroom-desk-closeup": {
+      "file": "assets/playback/classroom-desk-closeup.png"
+    },
+    "quiz-courtyard-near-black-cat": {
+      "file": "assets/quiz-courtyard-near-black-cat.png"
+    },
+    "quiz-courtyard-far-black-cat": {
+      "file": "assets/quiz-courtyard-far-black-cat.png"
+    },
+    "quiz-courtyard-near-cream-cat": {
+      "file": "assets/quiz-courtyard-near-cream-cat.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "bag-and-bird",
+      "type": "slide",
+      "title": "包和鸟，听名字再找图",
+      "template": "two-columns",
+      "data": {
+        "title": "包和鸟，听名字再找图",
+        "left": {
+          "heading": "bag",
+          "body": "能装东西，有提带"
+        },
+        "left_picture": "teaching-bag",
+        "right": {
+          "heading": "bird",
+          "body": "有鸟喙和翅膀"
+        },
+        "right_picture": "yellow-bird"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "欢迎来当小小观察员。先看看身边这件东西。"
+        },
+        {
+          "say": "它有包身和背带。拉起背带，包能跟人一起走。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "Bag. 这是能装东西的包。跟我念完整个词。Bag."
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "指给旁边的人看，可以说整句。"
+        },
+        {
+          "say": "This is a yellow bag."
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "另一幅图有一张小鸟嘴和一对翅膀。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "Bird. 听到 bird，就把手指移到小鸟图。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "两个词开头有点像。听完整，再用外形核对。"
+        }
+      ]
+    },
+    {
+      "key": "from-the-speaker",
+      "type": "slide",
+      "title": "近和远，从谁的位置看",
+      "template": "two-columns",
+      "data": {
+        "title": "近和远，从谁的位置看",
+        "left": {
+          "heading": "This is a desk.",
+          "body": "说话的人和桌子挨得近"
+        },
+        "left_picture": "near-desk-example",
+        "right": {
+          "heading": "That is a desk.",
+          "body": "说话的人站得离桌子较远"
+        },
+        "right_picture": "far-desk-example"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "两张图里桌子一样。先找说话的小导游。"
+        },
+        {
+          "say": "第一张她站在桌子边，几乎伸手就到。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "离说话人近，开头用 This is。"
+        },
+        {
+          "say": "This is a desk."
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "桌子近，和它有多大、是什么颜色没关系。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "第二张桌子还在原位。小导游走到另一头。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "离她较远了，开头要换成 That is。"
+        },
+        {
+          "say": "That is a desk."
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "换站位，重新看她离桌子有多远。"
+        }
+      ]
+    },
+    {
+      "key": "listen-three-clues",
+      "type": "slide",
+      "title": "一句话里听三条线索",
+      "template": "picture-points",
+      "data": {
+        "title": "一句话里听三条线索",
+        "picture": "bird-park-cover",
+        "points": [
+          "先听 This is 或 That is",
+          "再听颜色",
+          "最后听是什么"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "小导游站在栈道这头，看见池塘对面的东西。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "从她脚下往对面看，隔着池塘，比身边远。"
+        },
+        {
+          "say": "所以她会用 That is 开头。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "她还要告诉伙伴颜色。黄色说 yellow。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "这只会飞的动物叫 bird，放在颜色后面说。"
+        },
+        {
+          "say": "把三条线索连起来听。"
+        },
+        {
+          "say": "That is a yellow bird."
+        },
+        {
+          "say": "要是还有黄包，只听 yellow 就分不清。"
+        },
+        {
+          "say": "把距离、颜色和名字都对上，才找对。"
+        }
+      ]
+    },
+    {
+      "key": "bird-colour-practice",
+      "type": "slide",
+      "title": "换颜色，也要听站位",
+      "template": "two-columns",
+      "data": {
+        "title": "换颜色，也要听站位",
+        "left": {
+          "heading": "This is a blue bird.",
+          "body": "蓝鸟在说话人身边"
+        },
+        "right": {
+          "heading": "That is a black bird.",
+          "body": "黑鸟离说话人较远"
+        },
+        "left_picture": "near-blue-example",
+        "right_picture": "far-black-example"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "看这一张练习图。先找哪位小导游正在说。"
+        },
+        {
+          "say": "她离蓝鸟很近，开头用 This is。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "This is a blue bird."
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "听见 this，手指先移到她身边，再找蓝鸟。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "换一张，她和另一只鸟隔了一片空地。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "That is a black bird."
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "black 是黑色。距离还要听前面的 That is。"
+        },
+        {
+          "say": "想一想，走到黄鸟旁边，开头该用哪个词？"
+        },
+        {
+          "say": "This is a yellow bird."
+        },
+        {
+          "say": "要是黑鸟也在身边，句首不用跟着颜色变。"
+        },
+        {
+          "say": "This is a black bird."
+        },
+        {
+          "say": "听不清就重听一句，先看小导游站在哪儿。"
+        },
+        {
+          "say": "两次还没找到，就跟着亮起来的记号。"
+        },
+        {
+          "say": "每只鸟都找到后，就沿小路开到旗子旁。"
+        },
+        {
+          "say": "听准距离和颜色，小导游就收到消息啦！"
+        }
+      ]
+    },
+    {
+      "key": "lookout-camera",
+      "type": "interactive",
+      "title": "泡泡车找鸟",
+      "widgetType": "courseware_game",
+      "page": "lookout-camera",
+      "startImage": "bird-park-cover",
+      "script": [
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "say": "等会儿会看到两只黄鸟。小导游要找哪一只呀？"
+        },
+        {
+          "say": "先找谁在说话。小导游在左边不动，泡泡车会走。"
+        },
+        {
+          "highlight": "#game-speaker"
+        },
+        {
+          "highlight": "#demo-near-perch"
+        },
+        {
+          "say": "听见句首是 This，我就从小导游脚边看。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "两只一样黄。泡泡车停在离她更近的鸟站。"
+        },
+        {
+          "say": "鸟旁亮了，说明这一站找对了。"
+        },
+        {
+          "say": "按方向键或点箭头，车就朝那个方向走。"
+        },
+        {
+          "say": "轮到你啦。先听一句，再从她的位置找鸟。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "near-yellow": "bird-colour-practice-15",
+        "far-yellow": "listen-three-clues-11",
+        "near-black": "bird-colour-practice-17",
+        "far-black": "bird-colour-practice-11",
+        "maze-hint": "bird-colour-practice-18",
+        "maze-help": "bird-colour-practice-19",
+        "maze-exit": "bird-colour-practice-20",
+        "maze-praise": "bird-colour-practice-21"
+      }
+    },
+    {
+      "key": "cat-cap-hat-beat",
+      "type": "slide",
+      "title": "听名字，跟着节奏拍",
+      "template": "picture-points",
+      "data": {
+        "title": "听名字，跟着节奏拍",
+        "picture": "three-stage-props",
+        "points": [
+          "cat 小猫",
+          "cap 这顶棒球帽",
+          "hat 这顶针织帽"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "来看看舞台上的三位朋友。名字听起来有点像。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "左边有尖耳朵和尾巴，是一只小猫。"
+        },
+        {
+          "say": "A cat."
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "中间这顶棒球帽有向前伸的帽舌。"
+        },
+        {
+          "say": "A cap."
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "右边这顶是针织帽，顶上有个小球。"
+        },
+        {
+          "say": "A hat."
+        },
+        {
+          "say": "我说一个词，你先找图。每次听完整个词。"
+        },
+        {
+          "say": "A cat! A cap! Tap, tap, tap."
+        },
+        {
+          "say": "A hat! A hat! Clap, clap, clap."
+        },
+        {
+          "say": "来，跟我念完 cat、cap、hat，再边拍边念刚才两句。"
+        },
+        {
+          "say": "先重听，再看帽舌、帽球或猫尾巴。"
+        },
+        {
+          "say": "再听一遍。亮起来的图能帮你瞄准。"
+        },
+        {
+          "say": "能听出哪件道具，舞台就准备好啦！"
+        }
+      ]
+    },
+    {
+      "key": "costume-rhythm-run",
+      "type": "interactive",
+      "title": "舞台听音弹珠",
+      "widgetType": "courseware_game",
+      "page": "costume-rhythm-run",
+      "startImage": "rhythm-stage",
+      "script": [
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#demo-listen"
+        },
+        {
+          "say": "舞台缺一样道具。耳朵能帮我们找出来吗？"
+        },
+        {
+          "say": "听我的口令。A hat. 我找有小球的针织帽。"
+        },
+        {
+          "highlight": "#demo-knit-hat"
+        },
+        {
+          "say": "小满说：我看见猫尾巴了，先看看另一张吧。",
+          "by": "xiaoman"
+        },
+        {
+          "say": "小猫有尾巴，帽球在另一张。我瞄准那张图。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "按左右键或点箭头，再按空格或发射键。"
+        },
+        {
+          "say": "飞出去还可以拐一点。贴纸留在了对的图上。"
+        },
+        {
+          "say": "轮到你。先听要哪件道具，再转好方向发射。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ],
+      "gameAudio": {
+        "a-cat": "cat-cap-hat-beat-5",
+        "a-cap": "cat-cap-hat-beat-8",
+        "a-hat": "cat-cap-hat-beat-11",
+        "stage-hint": "cat-cap-hat-beat-16",
+        "stage-help": "cat-cap-hat-beat-17",
+        "stage-praise": "cat-cap-hat-beat-18"
+      }
+    },
+    {
+      "key": "visit-our-classroom",
+      "type": "slide",
+      "title": "和同学参观教室",
+      "template": "two-columns",
+      "data": {
+        "title": "和同学参观教室",
+        "left": {
+          "heading": "从教室门口看",
+          "body": "先找说话的同学，再看老师和课桌"
+        },
+        "right": {
+          "heading": "走近看他的课桌",
+          "body": "桌面上放着一本绿书"
+        },
+        "left_picture": "classroom-door-distance",
+        "right_picture": "classroom-desk-closeup"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "来了一位访客。穿黄衣的同学请他进教室。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "先看穿黄衣的同学。他说话，近远就从他脚边看。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "他站在教室门口。瞧，这里有黑板和一排排课桌。"
+        },
+        {
+          "say": "This is our classroom."
+        },
+        {
+          "say": "老师就在他前面，介绍老师也能用 This is。"
+        },
+        {
+          "say": "This is our teacher."
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "从门口看，圈出的课桌离他远。右图放大给我们看。"
+        },
+        {
+          "say": "That is my desk. 这里的 my 就是我的。"
+        }
+      ]
+    },
+    {
+      "key": "point-then-say",
+      "type": "slide",
+      "title": "先指对，再说完整",
+      "template": "picture-points",
+      "data": {
+        "title": "先指对，再说完整",
+        "picture": "classroom-desk-closeup",
+        "points": [
+          "听一个词，找到位置",
+          "指给对方看",
+          "说清楚你指的东西"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "你和家人也可以做两人导游。先商量谁说话。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "家人先说 This。你找离自己很近的一件东西。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "指一指它，让家人知道你要介绍哪一件。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "如果你指身边的书，就说 This is a book."
+        },
+        {
+          "say": "家人说 That，你换找远处的。要把名字说全。"
+        },
+        {
+          "say": "比如指着那边的窗，说 That is a window."
+        },
+        {
+          "say": "换你发口令。家人说整句。以家人为起点，This 找近，That 找远。"
+        }
+      ]
+    },
+    {
+      "key": "picture-check",
+      "type": "quiz",
+      "title": "听一听，选一选",
+      "intro": [
+        "听清老师说什么，再选一张图。想再听一遍，点一下喇叭。"
+      ],
+      "questions": [
+        {
+          "id": "hear-bag-at-fair",
+          "question": "Find the bag. 听物品名，选一张图。",
+          "skill": "听懂 bag",
+          "analysis": "bag 是包。这张图里的包有提手，可以装东西。翅膀和喙的是鸟，带胡须的是猫。",
+          "answer": [
+            "b"
+          ],
+          "options": {
+            "a": {
+              "label": "展台上的奶油色小猫",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-fair-cat",
+                "alt": "展台上的奶油色小猫"
+              }
+            },
+            "b": {
+              "label": "展台上的橙红色双肩书包",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-fair-schoolbag",
+                "alt": "展台上的橙红色双肩书包"
+              }
+            },
+            "c": {
+              "label": "展台上的蓝鸟",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-fair-blue-bird",
+                "alt": "展台上的蓝鸟"
+              }
+            }
+          }
+        },
+        {
+          "id": "hear-far-blue-bird",
+          "question": "That is a blue bird. 选一张图。",
+          "skill": "同时听懂距离、颜色和鸟",
+          "analysis": "that 指离说话者较远，blue bird 是蓝鸟。只对颜色或只对距离都不够。",
+          "answer": [
+            "c"
+          ],
+          "options": {
+            "a": {
+              "label": "离小导游较近的蓝鸟",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-courtyard-near-blue",
+                "alt": "离小导游较近的蓝鸟"
+              }
+            },
+            "b": {
+              "label": "离小导游较远的黑鸟",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-courtyard-far-black",
+                "alt": "离小导游较远的黑鸟"
+              }
+            },
+            "c": {
+              "label": "离小导游较远的蓝鸟",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-courtyard-far-blue",
+                "alt": "离小导游较远的蓝鸟"
+              }
+            }
+          }
+        },
+        {
+          "id": "hear-near-black-cat",
+          "question": "This is a black cat. 选一张图。",
+          "skill": "同时听懂距离、颜色和动物名",
+          "analysis": "this 指离说话人近，black cat 是黑猫。只有小导游身边的黑猫同时符合这两条。",
+          "answer": [
+            "a"
+          ],
+          "options": {
+            "a": {
+              "label": "小导游身边的黑猫",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-courtyard-near-black-cat",
+                "alt": "小导游身边的黑猫"
+              }
+            },
+            "b": {
+              "label": "离小导游较远的黑猫",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-courtyard-far-black-cat",
+                "alt": "离小导游较远的黑猫"
+              }
+            },
+            "c": {
+              "label": "小导游身边的浅橘奶油色猫",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-courtyard-near-cream-cat",
+                "alt": "小导游身边的浅橘奶油色猫"
+              }
+            }
+          }
+        },
+        {
+          "id": "hear-cap-in-display",
+          "question": "Listen. A cap. 选一张图。",
+          "skill": "听辨 cat、cap、hat",
+          "analysis": "本课用 cap 指这顶棒球帽。cat 是猫，这里的 hat 是另一顶针织帽。",
+          "answer": [
+            "c"
+          ],
+          "options": {
+            "a": {
+              "label": "展台上的奶油色小猫",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-courtyard-display-cat",
+                "alt": "展台上的奶油色小猫"
+              }
+            },
+            "b": {
+              "label": "展台上的青色针织帽",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-courtyard-display-knit-hat",
+                "alt": "展台上的青色针织帽"
+              }
+            },
+            "c": {
+              "label": "展台上有帽舌的棒球帽",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-courtyard-display-baseball-cap",
+                "alt": "展台上有帽舌的棒球帽"
+              }
+            }
+          }
+        },
+        {
+          "id": "new-speaker-near-black-bird",
+          "question": "听图上这位同学。This is a black bird. 选图。",
+          "skill": "换发话站位后重新判断近远",
+          "analysis": "先找图上发话的孩子，再从她的位置看。this 指离她较近，black bird 是黑鸟。",
+          "answer": [
+            "a"
+          ],
+          "options": {
+            "a": {
+              "label": "右边的小导游身边有一只黑鸟",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-reporter-right-near-black",
+                "alt": "右边的小导游身边有一只黑鸟"
+              }
+            },
+            "b": {
+              "label": "小导游还在左边，黑鸟离她较远",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-reporter-left-far-black",
+                "alt": "小导游还在左边，黑鸟离她较远"
+              }
+            },
+            "c": {
+              "label": "右边的小导游身边有一只蓝鸟",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-reporter-right-near-blue",
+                "alt": "右边的小导游身边有一只蓝鸟"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "quiz-reporter-stimulus",
+            "alt": "带相机的小导游站在庭院右边发话"
+          }
+        },
+        {
+          "id": "hear-far-my-desk",
+          "question": "That is my desk. 选对的一张。",
+          "skill": "在新参观情境里听懂远处物品",
+          "analysis": "that 提醒你看说话人远处，my desk 是“我的课桌”。选图里离小导游较远的课桌。",
+          "answer": [
+            "b"
+          ],
+          "options": {
+            "a": {
+              "label": "小导游身边的课桌",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-school-near-desk",
+                "alt": "小导游身边的课桌"
+              }
+            },
+            "b": {
+              "label": "离小导游较远的课桌",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-school-far-desk",
+                "alt": "离小导游较远的课桌"
+              }
+            },
+            "c": {
+              "label": "离小导游较远的橙红色双肩书包",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-school-far-schoolbag",
+                "alt": "离小导游较远的橙红色双肩书包"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "recap-lookout",
+      "type": "slide",
+      "title": "把观察口令带回家",
+      "template": "summary",
+      "data": {
+        "title": "把观察口令带回家",
+        "items": [
+          "听见 bag，找能装东西的包",
+          "近远从说话人站位看",
+          "听距离、颜色和名称",
+          "分清 cat、cap、hat，再跟拍",
+          "先指给对方看，再说完整句"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "今天听见 bag，我们会去找能装东西的包。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "离说话人近，用 This is。离得较远，用 That is。"
+        },
+        {
+          "say": "换了站位，先重新看。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "听整句时，距离、颜色和物品名一起对照。"
+        },
+        {
+          "spotlight": "item-4"
+        },
+        {
+          "say": "听 cat、cap 和 hat，听完整再按节奏拍。"
+        },
+        {
+          "spotlight": "item-5"
+        },
+        {
+          "say": "家里轮流指一件近的和一件远的，说给家人听。"
+        },
+        {
+          "say": "请家人看你指哪儿，听你有没有说全。"
+        }
+      ]
+    }
+  ]
+}

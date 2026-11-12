@@ -1,0 +1,1590 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "语文园地六",
+  "description": "在原创小镇和阅读情境里认字辨音、看图说话、练写汉字，并回到纸书读诗和亲子共读。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小语老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Serena",
+      "avatar": "/avatars/teacher-2.png",
+      "color": "#D65A8A",
+      "persona": "亲切清楚的女老师，带孩子看图找线索、读词、书空和共读。"
+    }
+  },
+  "images": {
+    "school-clinic": {
+      "file": "assets/illustrations/school-clinic.png"
+    },
+    "factory-gate": {
+      "file": "assets/illustrations/factory-gate.png"
+    },
+    "street-signs": {
+      "file": "assets/illustrations/street-signs.png"
+    },
+    "rainy-courtyard": {
+      "file": "assets/illustrations/rainy-courtyard.png"
+    },
+    "moon-imagery": {
+      "file": "assets/illustrations/moon-imagery.png"
+    },
+    "squirrel-mole": {
+      "file": "assets/illustrations/squirrel-mole.png"
+    },
+    "peanut-clue": {
+      "file": "assets/illustrations/peanut-clue.png"
+    },
+    "garden-bubble-start": {
+      "file": "assets/illustrations/garden-bubble-start.png"
+    },
+    "bubble-backdrop": {
+      "file": "assets/illustrations/bubble-backdrop.png"
+    },
+    "bubble-boat": {
+      "file": "assets/illustrations/bubble-boat.png"
+    },
+    "bubble-boat-pop": {
+      "file": "assets/illustrations/bubble-boat-pop.png"
+    },
+    "garden-depot-start": {
+      "file": "assets/illustrations/garden-depot-start.png"
+    },
+    "depot-backdrop": {
+      "file": "assets/illustrations/depot-backdrop.png"
+    },
+    "depot-cart": {
+      "file": "assets/illustrations/depot-cart.png"
+    },
+    "depot-cart-push": {
+      "file": "assets/illustrations/depot-cart-push.png"
+    },
+    "garden-reward": {
+      "file": "assets/illustrations/garden-reward.png"
+    },
+    "q-library": {
+      "file": "assets/illustrations/q-library.png"
+    },
+    "q-infirmary": {
+      "file": "assets/illustrations/q-infirmary.png"
+    },
+    "q-dessert-shop": {
+      "file": "assets/illustrations/q-dessert-shop.png"
+    },
+    "q-bridge-closing": {
+      "file": "assets/illustrations/q-bridge-closing.png"
+    },
+    "q-bridge-opening": {
+      "file": "assets/illustrations/q-bridge-opening.png"
+    },
+    "q-bridge-pair": {
+      "file": "assets/illustrations/q-bridge-pair.png"
+    },
+    "q-curved-banana": {
+      "file": "assets/illustrations/q-curved-banana.png"
+    },
+    "q-round-cookie": {
+      "file": "assets/illustrations/q-round-cookie.png"
+    },
+    "q-square-towel": {
+      "file": "assets/illustrations/q-square-towel.png"
+    },
+    "q-peanut-soil": {
+      "file": "assets/illustrations/q-peanut-soil.png"
+    },
+    "q-peanut-bowl": {
+      "file": "assets/illustrations/q-peanut-bowl.png"
+    },
+    "q-peanut-flower": {
+      "file": "assets/illustrations/q-peanut-flower.png"
+    },
+    "grid-gong": {
+      "file": "assets/code/grid-gong.png"
+    },
+    "grid-chang": {
+      "file": "assets/code/grid-chang.png"
+    },
+    "grid-men": {
+      "file": "assets/code/grid-men.png"
+    },
+    "grid-wei": {
+      "file": "assets/code/grid-wei.png"
+    },
+    "grid-yun": {
+      "file": "assets/code/grid-yun.png"
+    },
+    "grid-nan": {
+      "file": "assets/code/grid-nan.png"
+    },
+    "grid-ye": {
+      "file": "assets/code/grid-ye.png"
+    },
+    "grid-zhu": {
+      "file": "assets/code/grid-zhu.png"
+    },
+    "phonics-comparison": {
+      "file": "assets/code/phonics-comparison.png"
+    },
+    "radical-comparison": {
+      "file": "assets/code/radical-comparison.png"
+    },
+    "dock-mu": {
+      "file": "assets/code/dock-mu.png"
+    },
+    "q-tip-lower": {
+      "file": "assets/code/q-tip-lower.png"
+    },
+    "q-tip-complete": {
+      "file": "assets/code/q-tip-complete.png"
+    },
+    "q-tip-upper": {
+      "file": "assets/code/q-tip-upper.png"
+    },
+    "initial-n": {
+      "glyph": {
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "n"
+              }
+            ]
+          }
+        ],
+        "size": [
+          240,
+          240
+        ]
+      }
+    },
+    "initial-l": {
+      "glyph": {
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "l"
+              }
+            ]
+          }
+        ],
+        "size": [
+          240,
+          240
+        ]
+      }
+    },
+    "initial-sh": {
+      "glyph": {
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "sh"
+              }
+            ]
+          }
+        ],
+        "size": [
+          240,
+          240
+        ]
+      }
+    },
+    "initial-s": {
+      "glyph": {
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "s"
+              }
+            ]
+          }
+        ],
+        "size": [
+          240,
+          240
+        ]
+      }
+    },
+    "initial-z": {
+      "glyph": {
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "z"
+              }
+            ]
+          }
+        ],
+        "size": [
+          240,
+          240
+        ]
+      }
+    },
+    "initial-zh": {
+      "glyph": {
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "zh"
+              }
+            ]
+          }
+        ],
+        "size": [
+          240,
+          240
+        ]
+      }
+    },
+    "radical-song": {
+      "file": "assets/code/radical-song.png"
+    },
+    "radical-miao": {
+      "file": "assets/code/radical-miao.png"
+    },
+    "radical-zhi": {
+      "file": "assets/code/radical-zhi.png"
+    },
+    "radical-fen": {
+      "file": "assets/code/radical-fen.png"
+    },
+    "radical-jing": {
+      "file": "assets/code/radical-jing.png"
+    },
+    "radical-bai": {
+      "file": "assets/code/radical-bai.png"
+    },
+    "radical-feng": {
+      "file": "assets/code/radical-feng.png"
+    },
+    "radical-yin": {
+      "file": "assets/code/radical-yin.png"
+    },
+    "radical-mo": {
+      "file": "assets/code/radical-mo.png"
+    },
+    "dock-cao": {
+      "file": "assets/code/dock-cao.png"
+    },
+    "q-glyph-sugar": {
+      "glyph": {
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "糖"
+              }
+            ]
+          }
+        ],
+        "size": [
+          480,
+          240
+        ]
+      }
+    },
+    "q-glyph-cotton": {
+      "glyph": {
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "棉"
+              }
+            ]
+          }
+        ],
+        "size": [
+          480,
+          240
+        ]
+      }
+    },
+    "q-glyph-scallion": {
+      "glyph": {
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "葱"
+              }
+            ]
+          }
+        ],
+        "size": [
+          480,
+          240
+        ]
+      }
+    }
+  },
+  "scenes": [
+    {
+      "key": "p01",
+      "type": "slide",
+      "title": "谁把诊室的灯打开了",
+      "template": "picture-points",
+      "data": {
+        "title": "谁把诊室的灯打开了",
+        "picture": "school-clinic",
+        "points": [
+          "学校里，老师在上课",
+          "医院里，医生在看病",
+          "院字左边是双耳旁"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "谁刚打开诊室的灯？看看这两间屋，先找找哪边有听诊器。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "有课桌和黑板的这一间在学校。带大家学习的人是老师。"
+        },
+        {
+          "say": "说一声老师。老在前，师在后。看字，再读一遍。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "另一间有听诊器。这里是医院，正在给人看病的是医生。"
+        },
+        {
+          "say": "医院和医生都有医。院是医院的第二个字，生是医生的第二个字。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "看院字左边这小块，有点像竖着的小耳朵。它叫双耳旁。"
+        },
+        {
+          "say": "合起来读院。诊室的灯亮了，医生要接待病人啦。"
+        }
+      ]
+    },
+    {
+      "key": "p02",
+      "type": "slide",
+      "title": "两张工作证该送去哪儿",
+      "template": "picture-points",
+      "data": {
+        "title": "两张工作证该送去哪儿",
+        "picture": "factory-gate",
+        "points": [
+          "工厂里，工人操作机器",
+          "传达室里，门卫值班",
+          "说清谁在哪里工作"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "两张工作证弄混了。看看车间和大门，谁的工作证送哪边？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先看车间。有一排机器，工人正在把零件放到传送带上。"
+        },
+        {
+          "say": "工厂和工人都从工起头。再读厂，厂是工厂的第二个字。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "门口小屋是传达室。守在大门边、接待来访的人是门卫。"
+        },
+        {
+          "say": "门卫两个字连起来读。门是大门的门，卫也是保卫的卫。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "我来说一遍。门卫在学校门口值班，进来的人先和他打招呼。"
+        },
+        {
+          "say": "想一个你见过的职业。先说那个人是谁，再告诉我他在哪儿工作。"
+        }
+      ]
+    },
+    {
+      "key": "p03",
+      "type": "slide",
+      "title": "用田字格写工和厂",
+      "template": "two-columns",
+      "data": {
+        "title": "用田字格写工和厂",
+        "left": {
+          "heading": "工",
+          "body": "横、竖、横"
+        },
+        "left_picture": "grid-gong",
+        "right": {
+          "heading": "厂",
+          "body": "横、撇"
+        },
+        "right_picture": "grid-chang"
+      },
+      "script": [
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "这两个字连起来是工厂。它们都从横开始，后面会走一样的路吗？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "工字上面先写一横，下面还空着。你的手指跟着红笔走。"
+        },
+        {
+          "say": "第二笔竖落在中间。最后一横托住竖，比第一横长一点。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "我边写边说。横、竖、横。试着在空中慢慢写一遍。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "厂字也从横起笔。第二笔从横的左边往下走，再往左撇。"
+        },
+        {
+          "say": "看这条撇，末尾往左出来。它和刚才工字的中间竖不一样。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "把工、厂各写一个。写完圈出最满意的字，请大人看看你从哪一笔开始。"
+        },
+        {
+          "say": "下次看到工厂这个词，可以找一找刚才写过的两个字。"
+        }
+      ]
+    },
+    {
+      "key": "p04",
+      "type": "slide",
+      "title": "用田字格写门和卫",
+      "template": "two-columns",
+      "data": {
+        "title": "用田字格写门和卫",
+        "left": {
+          "heading": "门",
+          "body": "点、竖、横折钩"
+        },
+        "left_picture": "grid-men",
+        "right": {
+          "heading": "卫",
+          "body": "横折钩、竖、横"
+        },
+        "right_picture": "grid-wei"
+      },
+      "script": [
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "门卫的门和卫都有横折钩。想想它们会在第几笔出现。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "门先落一个点，再在点的左下边写竖。两笔各自分开。"
+        },
+        {
+          "say": "右边从横开始，折下去，末尾往里钩。这一整笔叫横折钩。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "跟我慢写。点、竖、横折钩。看看门口还留着空隙。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "卫换了开头，先写横折钩。折下再钩，手不用抬起来。"
+        },
+        {
+          "say": "第二笔竖在中间，最后用一长横收住。看看第一笔和门哪里不同。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "暂停一下，在田字格里写门和卫。请大人看你是怎么起笔的。"
+        },
+        {
+          "say": "写完对照范字，先找写对的一笔，再挑一处慢慢改。"
+        }
+      ]
+    },
+    {
+      "key": "p05",
+      "type": "slide",
+      "title": "字音开头不一样",
+      "template": "picture-points",
+      "data": {
+        "title": "字音开头不一样",
+        "picture": "phonics-comparison",
+        "points": [
+          "鼻音和边音　n / l",
+          "平舌和翘舌　s / sh",
+          "平舌和翘舌　z / zh",
+          "先听整词，再找开头"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "有些字听着很像，只要把开头听清，整个词就不容易读错。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "听，泥土的泥，离开的离。两个字的尾音很像，开头一样吗？"
+        },
+        {
+          "say": "泥的开头，气从鼻子过。离的开头，气从舌头两边过。"
+        },
+        {
+          "say": "轻声读泥、离。听清开头以后，再把泥土和离开读完整。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "丝带的丝是平舌，舌尖平。狮子的狮是翘舌，舌尖翘。"
+        },
+        {
+          "say": "把丝带和狮子各说一遍。舌尖一变，开头的声音就变了。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "再听栽树的栽、摘花的摘。栽的开头是平舌，摘的开头是翘舌。"
+        },
+        {
+          "say": "从图卡上找出开头的字母，再读一遍栽树和摘花。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "我们来听几个新词。先听词里指出的那个字，抓住它的开头。"
+        },
+        {
+          "say": "听小牛的牛。找牛的开头。"
+        },
+        {
+          "say": "听梨子的梨。找梨的开头。"
+        },
+        {
+          "say": "听石头的石。找石的开头。"
+        },
+        {
+          "say": "听小伞的伞。找伞的开头。"
+        },
+        {
+          "say": "听洗手的手。找手的开头。"
+        },
+        {
+          "say": "听红枣的枣。找枣的开头。"
+        },
+        {
+          "say": "听小钟的钟。找钟的开头。"
+        },
+        {
+          "say": "听落叶的落。找落的开头。"
+        },
+        {
+          "say": "听四个的四。找四的开头。"
+        },
+        {
+          "say": "没听清就再听一遍，先找刚才那个字的开头。"
+        },
+        {
+          "say": "玩的时候，对准亮起来的声母，再发一个泡泡。"
+        },
+        {
+          "say": "抓住了字音的开头！听到别的词，也可以用这个办法。"
+        }
+      ]
+    },
+    {
+      "key": "p06",
+      "type": "interactive",
+      "title": "听准开头再发泡泡",
+      "page": "listen-initials",
+      "widgetType": "listen-initials",
+      "startImage": "garden-bubble-start",
+      "gameAudio": {
+        "cow": "p05-15",
+        "pear": "p05-16",
+        "stone": "p05-17",
+        "umbrella": "p05-18",
+        "hand": "p05-19",
+        "date": "p05-20",
+        "bell": "p05-21",
+        "fall": "p05-22",
+        "four": "p05-23",
+        "sound-hint": "p05-24",
+        "sound-help": "p05-25",
+        "sound-praise": "p05-26"
+      },
+      "script": [
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#game-goal"
+        },
+        {
+          "say": "小艇上方漂着两张声母卡。我们只找听到的那个字的开头。"
+        },
+        {
+          "highlight": "#game-target"
+        },
+        {
+          "say": "这一回听小牛的牛。先听开头，再看我把小艇对准这一张。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "左右键挪小艇。对准之后，按圆圈键吹一个泡泡。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "我先把小艇挪过去。看，泡泡碰到声母卡，接住一次就停。"
+        },
+        {
+          "say": "接下来由你开船。先听词，没听清就点小喇叭重听。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ]
+    },
+    {
+      "key": "p07",
+      "type": "slide",
+      "title": "偏旁悄悄告诉你什么",
+      "template": "picture-points",
+      "data": {
+        "title": "偏旁悄悄告诉你什么",
+        "picture": "radical-comparison",
+        "points": [
+          "树、林、桃、桥　找左边",
+          "花、草、莲、菜　找上面",
+          "部件像，读音可能不同",
+          "先听字词，再看卡片"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "两张字卡摞在一起，露出来的小部件竟然很像。你先找哪里？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "看树和桃，左边都有木字旁。林的左右都有像木的部分。"
+        },
+        {
+          "say": "桥的左边也有木。想想看，以前有些桥是用木头搭起来的。"
+        },
+        {
+          "say": "木字旁常能给我们树木或木材的线索。左边这一小块要看准。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "花、草、莲、菜的上面，都有像两小丛草的部分。它叫草字头。"
+        },
+        {
+          "say": "看到草字头，可以先想想植物。还要把整个字读进词里确认。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "桃和桥的左边像，读起来却不同。认字时，既看部件，也听整个词。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "一会儿要给新字卡找托盘。先听下面这些词，再看看卡片是什么样。"
+        },
+        {
+          "say": "听，松树的松，禾苗的苗。先看字的左边和上边。"
+        },
+        {
+          "say": "听，枝条的枝，芬芳的芬，花茎的茎。看看小部件。"
+        },
+        {
+          "say": "听，柏树的柏，枫树的枫，树荫的荫，茉莉的茉。"
+        },
+        {
+          "say": "先找字上的小部件，再看哪个托盘的部件和它一样。"
+        },
+        {
+          "say": "小车只能推。绕到字卡另一边，或者用回转键退一步。"
+        },
+        {
+          "say": "你看的是字上的小部件。这个办法还能帮你认识别的字。"
+        }
+      ]
+    },
+    {
+      "key": "p08",
+      "type": "interactive",
+      "title": "字卡搬到哪个托盘",
+      "page": "radical-depot",
+      "widgetType": "radical-depot",
+      "startImage": "garden-depot-start",
+      "gameAudio": {
+        "two-cards": "p07-14",
+        "three-cards": "p07-15",
+        "four-cards": "p07-16",
+        "radical-hint": "p07-17",
+        "radical-help": "p07-18",
+        "radical-praise": "p07-19"
+      },
+      "script": [
+        {
+          "setState": {
+            "demo": true,
+            "level": 1,
+            "pause": true
+          }
+        },
+        {
+          "highlight": "#first-tray"
+        },
+        {
+          "say": "托盘上只有一个小部件。先看看这一只，记住它的样子。"
+        },
+        {
+          "highlight": "#game-target"
+        },
+        {
+          "say": "这是松树的松。看左边，它和刚才托盘上的部件一样。"
+        },
+        {
+          "highlight": "#game-player"
+        },
+        {
+          "say": "小车只能推。让车到字卡后面，再按方向键往前送。"
+        },
+        {
+          "setState": {
+            "pause": false
+          }
+        },
+        {
+          "say": "我把松卡推入这只托盘。小车送好一张就停。"
+        },
+        {
+          "say": "轮到你了。听完这关的字，先认小部件，再找送卡的路。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1,
+            "pause": false
+          }
+        }
+      ]
+    },
+    {
+      "key": "p09",
+      "type": "slide",
+      "title": "在街上捡到一个字",
+      "template": "picture-points",
+      "data": {
+        "title": "在街上捡到一个字",
+        "picture": "street-signs",
+        "points": [
+          "先找招牌在哪里",
+          "认出一个熟字",
+          "用场景帮忙，再请人确认"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "没带课本，能认新字吗？跟我在这条街上找一找。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "一边是等公交的站台，一边是放还书箱的入口。两处都有牌子。"
+        },
+        {
+          "say": "先找最显眼的牌，再找你见过的字。不用一下子读完。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "我在站牌上看见站字。站在这里等车，也能帮我记住站。"
+        },
+        {
+          "say": "再看有书和还书箱的地方。你能在牌上指出书字吗？"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "牌上的字有一个不认识，先看看附近有什么、大家在做什么。"
+        },
+        {
+          "say": "猜了以后，问问大人读得对不对。回家说说你在哪儿认出了这个字。"
+        }
+      ]
+    },
+    {
+      "key": "p10",
+      "type": "slide",
+      "title": "三张词卡变成两句话",
+      "template": "picture-points",
+      "data": {
+        "title": "三张词卡变成两句话",
+        "picture": "rainy-courtyard",
+        "points": [
+          "从屋檐看到脚边",
+          "选三个会写的词",
+          "把话说完整，再接一句"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "雨停了。小鸟和两个孩子都到了院子里，你先看见了谁？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "我先看高处，屋檐边停着一只小鸟。再往下，地上有一小片水。"
+        },
+        {
+          "say": "两个孩子在院子里。一个伸手指着小鸟，另一个抬头看。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "我会写小鸟、水、人，就把这三个词分开写进田字格。"
+        },
+        {
+          "say": "你可以选图中别的词。先说给大人听，再写自己会写的三个词。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "我先说谁在哪里做什么。两个小朋友在院子里看小鸟。"
+        },
+        {
+          "say": "接着说，地上的水映出了天光。你也按顺序说一两句给家人听。"
+        }
+      ]
+    },
+    {
+      "key": "p11",
+      "type": "slide",
+      "title": "先写上面，再写下面",
+      "template": "two-columns",
+      "data": {
+        "title": "先写上面，再写下面",
+        "left": {
+          "heading": "云",
+          "body": "先上面的两横，再写下面"
+        },
+        "left_picture": "grid-yun",
+        "right": {
+          "heading": "男",
+          "body": "先田，再力"
+        },
+        "right_picture": "grid-nan"
+      },
+      "script": [
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "云和男的笔画长得不一样。把它们放一起，能看出同一个写法吗？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "云的上边有两横。第一横短一些，第二横长一些。"
+        },
+        {
+          "say": "先写两横，再写下面的撇折和点。手指在空中跟我走一次。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "上半部分写完，才轮到下半部分。我们的手是在从上往下写。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "男像两块积木上下放。先把上边的田写好，再写下边的力。"
+        },
+        {
+          "say": "看我写到横中线附近。田和力上下挨着，中间不用隔得很开。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "暂停一下，给云和男各写一格。让大人看哪一部分先出现。"
+        },
+        {
+          "say": "下次看见上下排的字，先看看上面是哪一部分，再对照范字写。"
+        }
+      ]
+    },
+    {
+      "key": "p12",
+      "type": "slide",
+      "title": "先写左边，再写右边",
+      "template": "two-columns",
+      "data": {
+        "title": "先写左边，再写右边",
+        "left": {
+          "heading": "叶",
+          "body": "先口，再十"
+        },
+        "left_picture": "grid-ye",
+        "right": {
+          "heading": "竹",
+          "body": "先左三笔，再右三笔"
+        },
+        "right_picture": "grid-zhu"
+      },
+      "script": [
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "两边像并排站的小伙伴。谁该先写，谁稍后写呢？"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "叶和刚才的男不同。口在左边，十在右边。"
+        },
+        {
+          "say": "先写左边小小的口，再写右边的十。两边给彼此留一点位置。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "跟我书空。写好左边，再把手移到右边。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "竹的左右有点像。还是先写左半，再到右半。"
+        },
+        {
+          "say": "看左边竖笔和右边带钩的竖笔，收笔的样子不一样。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "暂停给叶和竹各写一格。请大人看你有没有先写完左边。"
+        },
+        {
+          "say": "上面和下面分开看，左边和右边也分开看。先找结构，再决定先写哪部分。"
+        }
+      ]
+    },
+    {
+      "key": "p13",
+      "type": "slide",
+      "title": "李白眼里的月亮",
+      "template": "picture-points",
+      "data": {
+        "title": "李白眼里的月亮",
+        "picture": "moon-imagery",
+        "points": [
+          "唐代诗人李白",
+          "月亮像白玉盘",
+          "月亮像云端的镜子"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "夜空里一个亮圆圈。要是不知道它叫月亮，你会把它想成什么？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "唐代李白写了古朗月行，行读行走的行。书上选了开头四句。"
+        },
+        {
+          "say": "诗里的小孩子抬头看月亮，那会儿他还不认得它。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "看这只浅白色的盘子。它圆圆的，还带一点亮光。"
+        },
+        {
+          "say": "月亮也又圆又亮。李白顺着这个相像的地方，想到了白玉盘。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "他又想，它会不会像瑶台上的镜子，飘到高高的云边？"
+        },
+        {
+          "say": "这是诗里的想象。两个比喻都让我们看见圆和亮，第二个还把眼睛带到天上。"
+        },
+        {
+          "say": "你见过弯弯的月亮吗？换一种月亮想想，它会像你见过的什么东西？"
+        }
+      ]
+    },
+    {
+      "key": "p14",
+      "type": "slide",
+      "title": "听停顿，借两幅图背诗",
+      "template": "picture-points",
+      "data": {
+        "title": "听停顿，借两幅图背诗",
+        "picture": "moon-imagery",
+        "points": [
+          "先听四句，注意停顿",
+          "第82页，暂停跟读四句",
+          "看两组图，再试背"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "翻到第八十二页。按暂停，找到第一句，再按继续听我读。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "小时　不识月，呼作　白玉盘。又疑　瑶台镜，飞在　青云端。"
+        },
+        {
+          "say": "每句前两字后轻停，后三字连着读。逗号轻停，句号多歇一会儿。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "镜是镜子的镜，青是青草的青。跟读时听清它们的收尾。"
+        },
+        {
+          "say": "按暂停，请大人领读四句，你指着拼音跟读。读完再按继续。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "先看圆盘，想起第一组两句。再看云边的镜子，想起后面两句。"
+        },
+        {
+          "say": "跟家人轮流接一句。合上书，按这两幅图的顺序，从头试背给家人听。"
+        }
+      ]
+    },
+    {
+      "key": "p15",
+      "type": "slide",
+      "title": "等花落了，为什么还没看见",
+      "template": "picture-points",
+      "data": {
+        "title": "等花落了，为什么还没看见",
+        "picture": "squirrel-mole",
+        "points": [
+          "第83页，找五个自然段",
+          "先听一问，再听一答",
+          "暂停，按角色读前两段"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "小松鼠遇到一位懂花的朋友。猜猜，它是怎么开口问的？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "打开第八十三页，看小松鼠找花生。每个段落开头往里空了一点。"
+        },
+        {
+          "say": "用手指找到五个开头。前两段里，小松鼠遇到了鼹鼠。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "我换一句自己的话来试。那朵黄花叫什么呀？听，问的人很想知道。"
+        },
+        {
+          "say": "我用回答的语气试试。那是花生开的花，你凑近看看吧。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "暂停课件。先借拼音读第一段，找写黄花的地方。"
+        },
+        {
+          "say": "第二段你读小松鼠，请大人读鼹鼠。小松鼠心里想的话，和说出口的话分开读。"
+        },
+        {
+          "say": "请大人也读讲故事的句子。轮到谁开口，就换谁读。"
+        },
+        {
+          "say": "读完再回来。想一想，它知道花会结果以后，心里是什么滋味？"
+        }
+      ]
+    },
+    {
+      "key": "p16",
+      "type": "slide",
+      "title": "线索在泥土下面",
+      "template": "picture-points",
+      "data": {
+        "title": "线索在泥土下面",
+        "picture": "peanut-clue",
+        "points": [
+          "第83页，读完第3到第5段",
+          "从地上花朵找到地下果实",
+          "把整篇读给大人听"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "等呀等，小松鼠还是看不见花生。要是你在现场，会朝哪里找？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先暂停，把书上第三到第五段读完。听听小松鼠是越来越高兴，还是越来越奇怪。"
+        },
+        {
+          "say": "自言自语是跟自己说话。我轻声说，就是小声说：咦，帽子呢？"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "先看纸书插图。小松鼠只看地面，你能发现插图里泥土下面的线索吗？"
+        },
+        {
+          "say": "花生在地上开黄花，果实长在地下。你看，带壳的花生在土里。"
+        },
+        {
+          "say": "所以小松鼠只看枝叶，看不到果实。故事留了一个问号，图画给了我们线索。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "现在请用拼音帮忙，把第八十三页整个故事读给大人听，再分享你发现的线索。"
+        },
+        {
+          "say": "也问一问大人最爱听哪一段。下次可以从书店或图书馆找另一本童话共读。"
+        }
+      ]
+    },
+    {
+      "key": "p17",
+      "type": "quiz",
+      "title": "试试把今天学的用起来",
+      "intro": [
+        "换些新图，试试今天学到的办法。",
+        "听我说问题。想好了，再点你选的图。"
+      ],
+      "questions": [
+        {
+          "id": "garden-job-library",
+          "question": "管理员推着刚还回来的书。她该把小车推去哪儿？",
+          "skill": "职业与场所对应",
+          "answer": [
+            "A"
+          ],
+          "analysis": "图书馆有成排书架，可以借书和还书。管理员能把还回来的书放回书架。",
+          "options": {
+            "A": {
+              "label": "有借阅台和成排书架的图书馆",
+              "visual": {
+                "kind": "asset",
+                "image": "q-library",
+                "alt": "有借阅台和成排书架的图书馆"
+              }
+            },
+            "B": {
+              "label": "有检查床的校医室",
+              "visual": {
+                "kind": "asset",
+                "image": "q-infirmary",
+                "alt": "有检查床的校医室"
+              }
+            },
+            "C": {
+              "label": "有蛋糕柜的甜点店",
+              "visual": {
+                "kind": "asset",
+                "image": "q-dessert-shop",
+                "alt": "有蛋糕柜的甜点店"
+              }
+            }
+          }
+        },
+        {
+          "id": "garden-hear-comb",
+          "question": "听梳头的梳。它开头的声母是哪一张？",
+          "skill": "辨听平舌与翘舌声母",
+          "answer": [
+            "C"
+          ],
+          "analysis": "梳开头是翘舌音。声母写作 sh，和声母 s 不同。",
+          "options": {
+            "A": {
+              "label": "声母 s",
+              "visual": {
+                "kind": "asset",
+                "image": "initial-s",
+                "alt": "声母 s"
+              }
+            },
+            "B": {
+              "label": "声母 zh",
+              "visual": {
+                "kind": "asset",
+                "image": "initial-zh",
+                "alt": "声母 zh"
+              }
+            },
+            "C": {
+              "label": "声母 sh",
+              "visual": {
+                "kind": "asset",
+                "image": "initial-sh",
+                "alt": "声母 sh"
+              }
+            }
+          }
+        },
+        {
+          "id": "garden-radical-cotton",
+          "question": "这三个字里，哪一个的左边是木字旁？",
+          "skill": "识别木字旁",
+          "answer": [
+            "B"
+          ],
+          "analysis": "棉的左边是木字旁，糖的左边是米字旁，葱的草字头在上面。",
+          "options": {
+            "A": {
+              "label": "糖字",
+              "visual": {
+                "kind": "asset",
+                "image": "q-glyph-sugar",
+                "alt": "糖字"
+              }
+            },
+            "B": {
+              "label": "棉字",
+              "visual": {
+                "kind": "asset",
+                "image": "q-glyph-cotton",
+                "alt": "棉字"
+              }
+            },
+            "C": {
+              "label": "葱字",
+              "visual": {
+                "kind": "asset",
+                "image": "q-glyph-scallion",
+                "alt": "葱字"
+              }
+            }
+          }
+        },
+        {
+          "id": "garden-picture-sentence",
+          "question": "桥边只有一个人，他把伞收起来。你听到的是哪幅图？",
+          "skill": "按图理解完整语句",
+          "answer": [
+            "A"
+          ],
+          "analysis": "这一幅在桥边，只有一个人。他正用手把伞收拢。",
+          "options": {
+            "A": {
+              "label": "桥边一个人正在收伞",
+              "visual": {
+                "kind": "asset",
+                "image": "q-bridge-closing",
+                "alt": "桥边一个人正在收伞"
+              }
+            },
+            "B": {
+              "label": "桥边一个人撑着打开的伞",
+              "visual": {
+                "kind": "asset",
+                "image": "q-bridge-opening",
+                "alt": "桥边一个人撑着打开的伞"
+              }
+            },
+            "C": {
+              "label": "桥边两个人各拿着一把伞",
+              "visual": {
+                "kind": "asset",
+                "image": "q-bridge-pair",
+                "alt": "桥边两个人各拿着一把伞"
+              }
+            }
+          }
+        },
+        {
+          "id": "garden-write-tip",
+          "question": "尖字上下两部分挨着。先写哪一部分？",
+          "skill": "迁移从上到下的书写规则",
+          "answer": [
+            "C"
+          ],
+          "analysis": "尖字上面是小，下面是大。从上到下，先写上面的部分。",
+          "options": {
+            "A": {
+              "label": "尖字范例中下方的大先着色",
+              "visual": {
+                "kind": "asset",
+                "image": "q-tip-lower",
+                "alt": "尖字范例中下方的大先着色"
+              }
+            },
+            "B": {
+              "label": "尖字范例上下两部分同时着色",
+              "visual": {
+                "kind": "asset",
+                "image": "q-tip-complete",
+                "alt": "尖字范例上下两部分同时着色"
+              }
+            },
+            "C": {
+              "label": "尖字范例中上方的小先着色",
+              "visual": {
+                "kind": "asset",
+                "image": "q-tip-upper",
+                "alt": "尖字范例中上方的小先着色"
+              }
+            }
+          }
+        },
+        {
+          "id": "garden-moon-shape",
+          "question": "月亮圆圆的。哪样东西的形状最像这样的月亮？",
+          "skill": "把观察到的形状说成比喻",
+          "answer": [
+            "B"
+          ],
+          "analysis": "圆饼和这轮月亮都是圆形。香蕉弯弯的，方毛巾有直边和角。",
+          "options": {
+            "A": {
+              "label": "弯香蕉",
+              "visual": {
+                "kind": "asset",
+                "image": "q-curved-banana",
+                "alt": "弯香蕉"
+              }
+            },
+            "B": {
+              "label": "一块圆饼",
+              "visual": {
+                "kind": "asset",
+                "image": "q-round-cookie",
+                "alt": "一块圆饼"
+              }
+            },
+            "C": {
+              "label": "一块铺平的方毛巾",
+              "visual": {
+                "kind": "asset",
+                "image": "q-square-towel",
+                "alt": "一块铺平的方毛巾"
+              }
+            }
+          }
+        },
+        {
+          "id": "garden-peanut-clue",
+          "question": "家人在菜园收花生。哪幅图能看出花生果实原来长在哪儿？",
+          "skill": "用图解答花生果实所在",
+          "answer": [
+            "A"
+          ],
+          "analysis": "第一幅能看到果实还连在植株上，长在泥土下面。碗里的花生已经采下来了。",
+          "options": {
+            "A": {
+              "label": "泥土切面下仍连着植株的花生果实",
+              "visual": {
+                "kind": "asset",
+                "image": "q-peanut-soil",
+                "alt": "泥土切面下仍连着植株的花生果实"
+              }
+            },
+            "B": {
+              "label": "装在碗里的花生",
+              "visual": {
+                "kind": "asset",
+                "image": "q-peanut-bowl",
+                "alt": "装在碗里的花生"
+              }
+            },
+            "C": {
+              "label": "泥土上方的黄色花朵",
+              "visual": {
+                "kind": "asset",
+                "image": "q-peanut-flower",
+                "alt": "泥土上方的黄色花朵"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p18",
+      "type": "slide",
+      "title": "把园地里的发现带回家",
+      "template": "summary",
+      "data": {
+        "title": "把园地里的发现带回家",
+        "items": [
+          "职业场所与识字　回纸书第80页",
+          "听清开头、看清部件　找生活招牌",
+          "看图写词说话，练两种书写顺序",
+          "第82页读诗试背　第83页亲子共读"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "想想这趟小镇探险，你在哪儿看见老师、工人、医生和门卫？"
+        },
+        {
+          "say": "回到书上第八十页，指着九个生字读给大人听。工、厂、门、卫也可以各写一遍。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "听到相近的词，先听开头。看到新字，先看看左边和上面。"
+        },
+        {
+          "say": "下次和家人出门，挑一块安全能看清的招牌，说说你认出哪个字。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "看图时按顺序找，挑三个会写的词，再说一两句完整的话。"
+        },
+        {
+          "say": "纸上练字的时候，请家人看一看，你有没有先写上边或左边。"
+        },
+        {
+          "spotlight": "item-4"
+        },
+        {
+          "say": "用圆盘和镜子想起诗的两组画面，把第八十二页的四句试背一次。"
+        },
+        {
+          "say": "再把第八十三页的故事读给家人听。最后，说说你是怎么找到花生线索的。"
+        }
+      ]
+    }
+  ]
+}

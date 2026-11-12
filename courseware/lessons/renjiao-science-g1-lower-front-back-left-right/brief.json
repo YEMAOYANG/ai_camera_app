@@ -1,0 +1,194 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "前后左右",
+  "binding": {
+    "editionId": "smartedu-science-six-year-g1-lower-e231dd57",
+    "revisionId": "directory-359f40a6afba915101f297d3",
+    "unitId": "133c2c07-4952-4ded-962b-03d98fd0358b",
+    "nodeId": "65670362-d056-427e-967e-f33109d0f514"
+  },
+  "scenario": "纸偶小剧团正给舞台、道具架和观众席排位置。小朋友先帮演员听懂方位，再换到演员的站位看一看，最后给新朋友指座。",
+  "goals": [
+    "能用前、后、左、右描述人和物的位置，并能用上、下、远、近补充说明。",
+    "能先指出站在哪里、以谁或什么为参照、朝向哪里，再判断方位；原地转半圈时记录两次发现。",
+    "能以别人或其他地点为参照，听清线索找对象，或说明目标相对位置并让同伴检查。",
+    "能从示意座号等生活数字找一个位置，并与前后左右的描述相联系。"
+  ],
+  "pageSequence": [
+    {
+      "key": "where-to-put-it",
+      "kind": "teaching",
+      "plan": "舞台入口两位演员对同一件道具说的方向不同。用地面站位、脸朝向和可见物把话补完整，再找架子上面、下面和离谁较近的道具。"
+    },
+    {
+      "key": "stand-then-face",
+      "kind": "teaching",
+      "plan": "镜头固定，使用俯视小舞台和人物面向图。先从角色本人判断四向，再原地转半圈，把两次的四张位置记录并排对照。"
+    },
+    {
+      "key": "another-person",
+      "kind": "teaching",
+      "plan": "保持地图，换另一位朝向不同的角色为参照。先让学生指站位和朝向，再用方位和远近猜新道具。"
+    },
+    {
+      "key": "costume-delivery",
+      "kind": "interactive",
+      "plan": "听方位后驾车去取并送道具。每岸中间的有朝向角色图是本岸参照；两边各有可用图站，正确交付按该角色的左右或前后判断。"
+    },
+    {
+      "key": "two-places",
+      "kind": "teaching",
+      "plan": "改站在两个地点之一，各说明同一物件在哪里。把站点和面向图画出来，请同伴试着重现，核对台词与箭头。"
+    },
+    {
+      "key": "camera-compare",
+      "kind": "interactive",
+      "plan": "同一场景在各关分别面向舞台、原地转半圈和朝侧边。看小图选择俯拍或侧拍，只把孩子实际拍到的同姿态两张照片写入完成和家长观察卡。"
+    },
+    {
+      "key": "near-and-far",
+      "kind": "teaching",
+      "plan": "俯看木桌，用同一张桌子的边比较沙锤、球、旗之间的空隙；换新物件做迁移题。"
+    },
+    {
+      "key": "ticket-row",
+      "kind": "teaching",
+      "plan": "用原创剧场小票和可辨数字，示范先按排再按座定位。回到该座位面向舞台再辨相邻方位。"
+    },
+    {
+      "key": "picture-check",
+      "kind": "quiz",
+      "plan": "六道图题和正式读题，覆盖四向、转身换参照、补足朝向、远近和数字位置。"
+    },
+    {
+      "key": "try-it-together",
+      "kind": "teaching",
+      "plan": "家长固定摆四件小物，两人轮流描述前后左右并转半圈画两张记录；最后互换角色用完整句描述。"
+    }
+  ],
+  "games": [
+    {
+      "page": "costume-delivery",
+      "template": "listenDelivery",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.listenDelivery",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "listen_pick_deliver",
+      "selection": "每岸各设三或四站，中央参照物以醒目朝向图标占一个可配站；订单只选旁边两个可取送站点。用其朝向计算目标栏并对照录音，使用不同参照 token 对应不同朝向；不依赖车头或屏幕阅读。",
+      "levels": [
+        "俯视角色面向舞台，左右两站，慢车道一单。",
+        "将两岸角色画为面向相反，左/右不等于屏幕同侧；两单更换起站和收站。",
+        "侧向角色以横排两侧表示身前、身后，混合方位和换参照，不超过三单。"
+      ],
+      "demo": "教师亮参照和面向，指重听键与对应的正确站点，示范一次拿取，正式重置。",
+      "teacherAnchors": [
+        "game-goal",
+        "game-player",
+        "game-target"
+      ]
+    },
+    {
+      "page": "camera-compare",
+      "template": "shutterScout",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.shutterScout",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "observe_state",
+      "selection": "比较同一站点和四件固定道具在两个相机角度的图。每关的俯视和侧视来自同一姿态，正确对上目标视角才记录。",
+      "levels": [
+        "俯后侧，演员面对舞台",
+        "侧俯侧，演员原地转半圈",
+        "俯侧俯侧，演员面对蓝灯"
+      ],
+      "demo": "老师示范小图、虚线框和快门，再回第1关；正式拍摄才产出观察卡。",
+      "teacherAnchors": [
+        "camera-first-preview",
+        "game-player",
+        "game-target"
+      ]
+    }
+  ],
+  "quiz": [
+    {
+      "id": "right-of-player",
+      "skill": "角色视角的右",
+      "prompt": "演员朝门口看。哪件道具在演员的右边？",
+      "answer": "蓝色灯笼",
+      "position": 2,
+      "rationale": "站在圆垫上的演员朝右边的门看，他的右手边朝图的下方，所以选蓝灯。"
+    },
+    {
+      "id": "turn-half-circle",
+      "skill": "原地转向后前后互换",
+      "prompt": "演员原先面对鼓。他原地转半圈，哪张图对？",
+      "answer": "演员朝下，鼓在演员身后",
+      "position": 3,
+      "rationale": "鼓和圆垫都不挪。演员转半圈朝另一边，原来身前的鼓现在在身后。"
+    },
+    {
+      "id": "different-reference",
+      "skill": "换参照和朝向",
+      "prompt": "哪件道具在戴星帽的演员左边？",
+      "answer": "三角沙锤",
+      "position": 1,
+      "rationale": "按星帽演员的箭头看。他朝图的左侧看，他左手边是三角沙锤。"
+    },
+    {
+      "id": "clear-directions",
+      "skill": "同时说清站位和朝向",
+      "prompt": "要让同伴看懂左和右，哪张图说全了？",
+      "answer": "圆垫标站位，箭头朝门",
+      "position": 2,
+      "rationale": "图上同时有圆垫和朝门的箭头，同伴能站到同一处、面向同一处。"
+    },
+    {
+      "id": "nearer-table",
+      "skill": "距离以同一参照比较",
+      "prompt": "从木桌边看，哪个玩具离桌子最近？",
+      "answer": "绒布小熊",
+      "position": 1,
+      "rationale": "以木桌为同一个参照。小熊和桌边的空隙最小。"
+    },
+    {
+      "id": "ticket-number",
+      "skill": "按排与座的数字定位",
+      "prompt": "票上写第2排第3座。图里应该坐哪里？",
+      "answer": "第2排第3座",
+      "position": 3,
+      "rationale": "先找标着二的第二排，再找这排座椅上写的三。"
+    }
+  ],
+  "afterClass": {
+    "familyTask": "成人在平坦室内固定四个软物件，孩子站同一块垫子，分别面向窗户和背向窗户画两张四向记录，再换参照给家人一句完整描述。另找一张虚构座号图说怎么定位。",
+    "weeklyQuestionSource": [
+      "用同一参照判断前后左右或远近",
+      "原地转半圈比较位置关系",
+      "换站点与参照",
+      "座号表示位置"
+    ],
+    "evidence": "线上只记录图题和可观测的游戏动作。实际转身、作画与口头描述由成人观察。"
+  },
+  "artAndLanguage": "人物朝向由脸、脚和地面箭头共同指示，固定俯视图；相对方位有完整教师口令，遮掉非目标文字仍能操作。数字与方位图标用于对应目标。",
+  "goalSources": [
+    {
+      "skill": "describe-position",
+      "target": "能用前、后、左、右描述人和物的位置，并能用上、下、远、近补充说明。",
+      "source": "印2、教案1、课件5～6"
+    },
+    {
+      "skill": "fixed-and-facing",
+      "target": "能先指出站在哪里、以谁或什么为参照、朝向哪里，再判断方位；原地转半圈时记录两次发现。",
+      "source": "印3、教案2、课件7～12"
+    },
+    {
+      "skill": "change-reference",
+      "target": "能以别人或其他地点为参照，听清线索找对象，或说明目标相对位置并让同伴检查。",
+      "source": "印3～4、课件13～19、任务单2"
+    },
+    {
+      "skill": "numbered-position",
+      "target": "能从示意座号等生活数字找一个位置，并与前后左右的描述相联系。",
+      "source": "印4、课件20～21、教案3"
+    }
+  ]
+}

@@ -1,0 +1,284 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "lesson": {
+    "editionId": "pep-math-g1-upper-2022-standard",
+    "revisionId": "directory-ede7a8c63c337cf95a03fe79",
+    "nodeId": "fdeead26-c1bc-4602-969c-fc1fcb341008",
+    "unitId": "3889582b-7958-49f7-ba4d-905b1dcc8761",
+    "lessonTitle": "整理和复习",
+    "unitTitle": "二 6～10的认识和加、减法",
+    "classHour": "lesson_1",
+    "classHours": [
+      "lesson_1"
+    ],
+    "gradeCode": "primary_1",
+    "subject": "math",
+    "volume": "upper",
+    "schoolSystem": "six_year",
+    "teachingRevision": "1"
+  },
+  "goals": [
+    "按顺序读写、数出并比较0～10的数，借助一一对应解释大小，分清一共有几个和从指定方向数第几个。",
+    "用两组物件和分合图解释同一个总数的不同拆法，并用已知的整体与部分选择加法或减法。",
+    "整理10以内加、减法算式。会横看、竖看或斜看，找出规律、补全缺卡，并解释加0和减0为什么得原数。",
+    "在图片中挑出问题需要的条件，解释合并和去掉各用什么算式；按从左到右的顺序完成两步加减。"
+  ],
+  "keyPoint": "用真实数量解释算式之间的关系，补卡可以有两条证据。",
+  "difficultPoint": "总数和第几；同一行的和、同一列的不变加数；算式顺序与画面先后。",
+  "scenario": "学校修理站的工具箱少了一张卡。数清零件，整理数字和算式，找回缺卡。",
+  "pageSequence": [
+    {
+      "key": "open-box",
+      "title": "工具箱里少了哪张卡",
+      "purpose": "用图串起数、算、用三件工具，引出找缺卡悬念。"
+    },
+    {
+      "key": "number-path",
+      "title": "一共几个？排第几个？",
+      "purpose": "沿箭头逐个读全0～10，辨一共几个和第几个，再一一对应比较七和九。"
+    },
+    {
+      "key": "write-ten",
+      "title": "写十，要用几个格？",
+      "purpose": "先猜占几格，先看左半写1，再看右半补0，核对完整的10同在一个田字格。纸上书写由家人观察。"
+    },
+    {
+      "key": "cloud-route",
+      "title": "云梯按数序跳",
+      "purpose": "平台跑跳。按连续数序停靠才记检查点，踩错回到上一个检查点。"
+    },
+    {
+      "key": "part-whole",
+      "title": "十枚圆片分两盘",
+      "purpose": "十格图展示6与4、7与3的分合，再把整体和部分对应到两加两减。"
+    },
+    {
+      "key": "orchard-sort",
+      "title": "整串果子进双篮",
+      "purpose": "实时接串，按两个篮的剩余格选篮；一串不能拆，超容量复位。"
+    },
+    {
+      "key": "add-table",
+      "title": "缺的加法卡在哪里",
+      "purpose": "用同和行和同加数列独立推回同一缺卡，解释转移一个但总数不变。"
+    },
+    {
+      "key": "subtract-table",
+      "title": "减法卡怎么排",
+      "purpose": "固定前数看减去的数增加时结果变小，再比较加0和减0。"
+    },
+    {
+      "key": "add-diagonal",
+      "title": "沿斜线还能发现什么？",
+      "purpose": "沿表中的斜线追踪第一个加数不变，解释另一部分多1时总数增加1。找到和为10的下一张。"
+    },
+    {
+      "key": "tile-fit",
+      "title": "落块配对工坊",
+      "purpose": "移动和快落，数字凑同和或算式找得数；错误块留在格中，二次错误恢复上一个可解状态。"
+    },
+    {
+      "key": "pick-clues",
+      "title": "修理站该数哪一盒？",
+      "purpose": "用两种形状的计数片表示需要和不需要的条件。分别示范合并两个部分与已知全体求余量。"
+    },
+    {
+      "key": "two-steps",
+      "title": "小车两次进出",
+      "purpose": "用三格逐帧图演示连加、连减和混合式的从左往右。"
+    },
+    {
+      "key": "picture-check",
+      "title": "换一套工具来检查",
+      "purpose": "独立的七张图题，朗读题干，数字和图形作答。"
+    },
+    {
+      "key": "close-box",
+      "title": "把方法放回工具箱",
+      "purpose": "回扣缺卡，点亮数、算、用和家庭活动。"
+    }
+  ],
+  "games": [
+    {
+      "page": "cloud-route",
+      "id": "platformHop",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.platformHop",
+      "rule": "按听到的起点和方向跳到下一块连续整数平台才前进。",
+      "levels": [
+        "从6起顺数到9，近距宽台。",
+        "从10起倒数到6，落点错开。",
+        "从5起顺数到10，额外干扰平台和更快的移动。"
+      ],
+      "noReading": "只读教学目标数字，听语音辨方向和起点，看起跳和箭头。"
+    },
+    {
+      "page": "orchard-sort",
+      "id": "orchardCatch",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.orchardCatch",
+      "rule": "接到整串且当前篮容得下才入篮，两篮正好填满才通关。",
+      "levels": [
+        "6分成2和4，慢落。",
+        "8分成3和5，一个篮装两串。",
+        "10分成4和6，四串，落点有风偏。"
+      ],
+      "noReading": "看串的数量、空格和落点，听目标与提示，箭头移动和双箭头换篮。"
+    },
+    {
+      "page": "tile-fit",
+      "id": "fallingTiles",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.fallingTiles",
+      "rule": "落块与底行相邻时必须满足数对或算式得数关系才消除。",
+      "levels": [
+        "两数合起来是8，慢落。",
+        "落下的加法块找相等得数。",
+        "混合加减式找相等得数，连续四块。"
+      ],
+      "noReading": "目标数字、算式、方向箭头可见，语音说明关系和手势。"
+    }
+  ],
+  "quiz": [
+    {
+      "id": "next-stop",
+      "goal": "在新的倒数图找缺失站位",
+      "answer": 4,
+      "answerPosition": "A",
+      "visual": "确定性绘图，三张等式、数字或数量图，录音读题和讲理由。"
+    },
+    {
+      "id": "seventh-peg",
+      "goal": "从箭头端找第七位，辨总量与位置",
+      "answer": "第七位",
+      "answerPosition": "B",
+      "visual": "确定性绘图，三张等式、数字或数量图，录音读题和讲理由。"
+    },
+    {
+      "id": "part-of-nine",
+      "goal": "用新珠架补九的另一部分",
+      "answer": 5,
+      "answerPosition": "C",
+      "visual": "确定性绘图，三张等式、数字或数量图，录音读题和讲理由。"
+    },
+    {
+      "id": "missing-sum",
+      "goal": "看同和行和固定第二个加数列补加法卡",
+      "answer": "6＋2",
+      "answerPosition": "B",
+      "visual": "确定性绘图，三张等式、数字或数量图，录音读题和讲理由。"
+    },
+    {
+      "id": "less-by-one",
+      "goal": "看减法两张相邻卡比较结果",
+      "answer": "＜",
+      "answerPosition": "C",
+      "visual": "确定性绘图，三张等式、数字或数量图，录音读题和讲理由。"
+    },
+    {
+      "id": "tool-bag",
+      "goal": "从两类物件图筛出相关条件并选减法",
+      "answer": "9－2",
+      "answerPosition": "A",
+      "visual": "确定性绘图，三张等式、数字或数量图，录音读题和讲理由。"
+    },
+    {
+      "id": "two-moves",
+      "goal": "按新画面中先出后进的时间顺序算",
+      "answer": 9,
+      "answerPosition": "B",
+      "visual": "确定性绘图，三张等式、数字或数量图，录音读题和讲理由。"
+    }
+  ],
+  "weeklyReviewSource": {
+    "source": "只交本课原创小测题源，周末卷由出卷人另做。",
+    "questionIds": [
+      "next-stop",
+      "seventh-peg",
+      "part-of-nine",
+      "missing-sum",
+      "less-by-one",
+      "tool-bag",
+      "two-moves"
+    ]
+  },
+  "afterClassPractice": {
+    "task": "和家人用不超过十枚纽扣摆两部分，交换加数试一试；再固定九，写三张减法卡，看每多拿走一枚会怎样。",
+    "status": "待观察",
+    "officialRef": "国家平台作业练习第1页与教材印刷66页成长记录。",
+    "writingObservation": "请家人看孩子在纸上写10时的起点、走向、左右占格。"
+  },
+  "artPlan": {
+    "imagegen": [
+      "修理站空工具箱封面，作为真实插画。",
+      "三个游戏优先复用有正式来源的背景、兔帧、果车、单苹果和星贴。"
+    ],
+    "semanticDiagrams": [
+      "数轴、一一对应、十格图、分合、算式行列和逐步操作示意。",
+      "七道题的题图与三张图形或数字卡均由代码生成。",
+      "两个田字格分步写10，用原创矢量路径画起点、走向与左右占格。"
+    ]
+  },
+  "authorship": {
+    "authorModel": "gpt-6.1-sol",
+    "method": "逐页审读本课教材和官方四类资料后直接原创，数学图由代码精确绘制，三款游戏使用目录获批模板的本课新配置。",
+    "catalogSha256": "1f04d478644e68af67bc264bf46227ece3d94d9c4070e8a8dd219846a48f4753",
+    "sourceSha256": {
+      "identity.json": "4f69b30245ee28a4f709c4abe802f7d0ba63d71d308ac745291e3cb8abc864e5",
+      "official-notes.json": "5ebc7a428c175ddbe824b248e99440330f5f3a55caef9fa0c23cc0a1c7ce0695",
+      "lesson.json": "ec8d01c19fcfb22bcaaefc3ff2de7a303af9a0044b9939f97ecf21e8478156f0",
+      "asset-provenance.json": "3dff74adfd317599c347dfc8ec42e01ec8f4e1d71d141e5d53e36ed8e5e25873",
+      "art-source/draw_math.py": "88fa989d591b1b420669f3226a0411c32b052b950459ba04c81220fbf0047905",
+      "tests/test_draw_math.py": "3d9db4bd4ff81aa30124bebb246e8b6dcbf11b570f004e5cbc20ae2a01f4ccb1",
+      "tests/game_rules.test.cjs": "e9caa062c6114c42453fa78b4a27a7a0558052b4484de1abf0be7326ed919931",
+      "pages/cloud-route.html": "9db1d5265ca4366df6a33ce431d66a45b2be7f7cf3df47567e448ae9dbd6e1f7",
+      "pages/cloud-route.js": "4b8fd61a5df1ad077267b7af1e219f24392472edf0e4f5dc630b1ed02da98980",
+      "pages/orchard-sort.html": "b40732ca09be5166f817a2d1bbd513de9a4c6874b3d3967d492eb93f216f66d2",
+      "pages/orchard-sort.js": "d911308c5071965c453b5521dc74c3d729350028d6587d14790552079c1c7f89",
+      "pages/tile-fit.html": "28c8aefc0fa61bf7f5fcf3efda98fd4f1b4295c2225ba212307ae69ec623b38d",
+      "pages/tile-fit.js": "b326b2c94a1e84b6fd0c3c75f335cddbe1d2ef535c9503fcfd2c8ed92399e3e9"
+    },
+    "attestation": "Codex直接写成课件。教材原图仅用于核对。正文、图题和关卡配置均为本课原创。游戏美术保留内置ImageGen来源和批准衍生件哈希。未使用DeepSeek初稿。",
+    "preVoicePlan": {
+      "generator": "courseware.tools.build prepare",
+      "teacherVoice": "Ethan",
+      "gameCueBindings": 18,
+      "quizRecordings": 7,
+      "recordingStatus": "pending",
+      "fullSourceBuild": "prepared",
+      "artifact": "lines.json",
+      "work": "output/courseware-lessons/pep-math-g1-upper-6to10-review-arcade/prevoice-v2",
+      "sha256": "7965d57d163c2d1ab1df840d7fe06e7224a3cb890f6c6f62f0cc282ddbfb13d3",
+      "draftSha256": "21d776ef11c4b95afa45b55caf37443857da3b0c3e22388ea56eea29a3473208",
+      "speechCount": 138,
+      "longestLine": 34
+    },
+    "preVoiceReviewRevision": {
+      "status": "goal_1_changes_ready_for_independent_recheck",
+      "priorVerificationReceipt": "output/courseware-lessons/pep-math-g1-upper-6to10-review-arcade/prevoice-v1/verification-prevoice.json",
+      "priorVerificationReceiptSha256": "2f8c977d402c8d33b39e5765bb4163fab9ac68ade8ab25e589352efc844ebfda",
+      "priorEvidence": "output/courseware-lessons/pep-math-g1-upper-6to10-review-arcade/prevoice-v1/verification-evidence-prevoice.json",
+      "priorEvidenceSha256": "9c3844b3591d2b3ce92f4788807cd8d209c632f930d429369a77f1e46c70882e",
+      "priorVoicePlanSha256": "e2482349c62019146f4f2162d880973c7084f72c17d6beb59a8f8400339b53d2",
+      "revisedItems": [
+        "goal-1"
+      ],
+      "changedSpeechIds": [
+        "number-path-5",
+        "number-path-16"
+      ],
+      "addedSpeechIds": [
+        "write-ten-1",
+        "write-ten-3",
+        "write-ten-5",
+        "write-ten-7",
+        "write-ten-8",
+        "write-ten-10",
+        "write-ten-11",
+        "write-ten-13",
+        "write-ten-14",
+        "write-ten-15"
+      ]
+    }
+  }
+}

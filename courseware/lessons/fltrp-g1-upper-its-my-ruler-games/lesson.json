@@ -1,0 +1,887 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "Unit 2 It's my ruler.",
+  "description": "到文具工作台问名字、找主人，再听物品和颜色，把东西送对、涂对。",
+  "grade": 1,
+  "roster": {
+    "mia": {
+      "name": "Mia 老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Jennifer",
+      "avatar": "/teachers/coco-english-v1.png",
+      "color": "#557B76",
+      "persona": "听图辨物、按说话人理解 my、用原创文具情境自然示范口语。"
+    }
+  },
+  "images": {
+    "stationery-workbench": {
+      "file": "assets/stationery-workbench.png"
+    },
+    "pen": {
+      "file": "assets/pen.png"
+    },
+    "pencil": {
+      "file": "assets/pencil.png"
+    },
+    "ruler": {
+      "file": "assets/ruler.png"
+    },
+    "eraser": {
+      "file": "assets/eraser.png"
+    },
+    "pencil-case": {
+      "file": "assets/pencil-case.png"
+    },
+    "crayon": {
+      "file": "assets/crayon.png"
+    },
+    "schoolbag": {
+      "file": "assets/schoolbag.png"
+    },
+    "desk": {
+      "file": "assets/desk.png"
+    },
+    "book": {
+      "file": "assets/book.png"
+    },
+    "chair": {
+      "file": "assets/chair.png"
+    },
+    "wood-pencil": {
+      "file": "assets/wood-pencil.png"
+    },
+    "ink-pen": {
+      "file": "assets/ink-pen.png"
+    },
+    "owner-violet": {
+      "file": "assets/owner-violet.png"
+    },
+    "owner-teal": {
+      "file": "assets/owner-teal.png"
+    },
+    "owner-peach": {
+      "file": "assets/owner-peach.png"
+    },
+    "delivery-trolley": {
+      "file": "assets/delivery-trolley.png"
+    },
+    "paint-roller": {
+      "file": "assets/paint-roller.png"
+    },
+    "drawn-eraser": {
+      "file": "assets/drawn-eraser.png"
+    },
+    "colour-practice-board": {
+      "file": "assets/colour-practice-board.png"
+    },
+    "quiz-pencil-case": {
+      "file": "assets/quiz-pencil-case.png"
+    },
+    "quiz-eraser": {
+      "file": "assets/quiz-eraser.png"
+    },
+    "quiz-ruler": {
+      "file": "assets/quiz-ruler.png"
+    },
+    "quiz-crayon": {
+      "file": "assets/quiz-crayon.png"
+    },
+    "quiz-owner-braids": {
+      "file": "assets/quiz-owner-braids.png"
+    },
+    "quiz-owner-purple": {
+      "file": "assets/quiz-owner-purple.png"
+    },
+    "quiz-book-blue": {
+      "file": "assets/quiz-book-blue.png"
+    },
+    "quiz-book-red": {
+      "file": "assets/quiz-book-red.png"
+    },
+    "quiz-pencil": {
+      "file": "assets/quiz-pencil.png"
+    },
+    "quiz-pen": {
+      "file": "assets/quiz-pen.png"
+    },
+    "quiz-crayon-green": {
+      "file": "assets/quiz-crayon-green.png"
+    },
+    "quiz-braids-eraser": {
+      "file": "assets/quiz-braids-eraser.png"
+    },
+    "quiz-orange-ruler": {
+      "file": "assets/quiz-orange-ruler.png"
+    },
+    "quiz-braids-ruler": {
+      "file": "assets/quiz-braids-ruler.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "a-ruler-and-an-eraser",
+      "type": "slide",
+      "title": "先问这是什么",
+      "template": "two-columns",
+      "data": {
+        "title": "先问这是什么",
+        "left": {
+          "heading": "ruler",
+          "body": "直尺"
+        },
+        "right": {
+          "heading": "eraser",
+          "body": "橡皮"
+        },
+        "left_picture": "ruler",
+        "right_picture": "eraser"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "欢迎来到文具工作台。来认一认桌上的新朋友。"
+        },
+        {
+          "say": "看这件扁扁的用品，长边直，还有一排刻线。"
+        },
+        {
+          "say": "指着它问 What's this? 就是在问这是什么。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "It's a ruler. 知道是直尺，就用名字回答。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "另一件是橡皮。铅笔画错了，可以用这块橡皮擦一擦。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "听我说，It's an eraser. 跟着连起来说。"
+        },
+        {
+          "say": "问的是名字，回答里说出你看见的那一种用品。"
+        }
+      ]
+    },
+    {
+      "key": "case-and-crayon",
+      "type": "slide",
+      "title": "文具盒里有什么",
+      "template": "two-columns",
+      "data": {
+        "title": "文具盒里有什么",
+        "left": {
+          "heading": "pencil case",
+          "body": "文具盒"
+        },
+        "right": {
+          "heading": "crayon",
+          "body": "蜡笔"
+        },
+        "left_picture": "pencil-case",
+        "right_picture": "crayon"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "左边有拉链，里面能收好几支笔。它是个文具盒。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "It's a pencil case. 这两个词一起说。"
+        },
+        {
+          "say": "看到盒子就说 pencil case。看到单独一支铅笔才说 pencil。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "右边这支短短的笔，有纸套，还露出彩色的蜡尖。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "It's a crayon. 用它能画出彩色的线。"
+        },
+        {
+          "say": "我说 crayon，你指能画彩色线的那支。"
+        },
+        {
+          "say": "听到 pencil case，换到能装笔的盒子。"
+        }
+      ]
+    },
+    {
+      "key": "pen-pencil-beat",
+      "type": "slide",
+      "title": "笔和铅笔打拍子",
+      "template": "two-columns",
+      "data": {
+        "title": "笔和铅笔打拍子",
+        "left": {
+          "heading": "pen",
+          "body": "墨水笔"
+        },
+        "right": {
+          "heading": "pencil",
+          "body": "铅笔"
+        },
+        "left_picture": "pen",
+        "right_picture": "pencil"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "左边有金属笔尖和笔帽，这一支是墨水笔。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "Pen. 先说词，再轻拍一下桌面。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "右边削开了木头，尖尖的地方露出黑色笔芯。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "Pencil. 这个词后面还有一小段，听完整再拍。"
+        },
+        {
+          "say": "听第一拍。Pen down, tap."
+        },
+        {
+          "say": "换第二拍。Pencil up, tap."
+        },
+        {
+          "say": "两种笔轮着说。听见哪个名字，就指那支，再跟着拍。"
+        }
+      ]
+    },
+    {
+      "key": "say-who-owns-it",
+      "type": "slide",
+      "title": "名字和主人都能说",
+      "template": "picture-points",
+      "data": {
+        "title": "名字和主人都能说",
+        "picture": "ruler",
+        "points": [
+          "What's this?",
+          "It's a ruler.",
+          "It's my ruler."
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "桌上只有一把尺。我们可以问它的名字，也可以说是谁的。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先指着尺问 What's this? 对方就知道你在问哪件。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "It's a ruler. 这句告诉你，它是一把尺。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "我拿着自己的尺说 It's my ruler. my 指我的。"
+        },
+        {
+          "say": "小满要认领他的尺，他说 my，就是小满自己的。"
+        },
+        {
+          "say": "物品一样，换一个人说，my 指的主人就换了。"
+        },
+        {
+          "say": "换成自己的橡皮，也可以说 It's my eraser."
+        }
+      ]
+    },
+    {
+      "key": "return-the-stationery",
+      "type": "interactive",
+      "title": "文具小车送回家",
+      "page": "return-the-stationery",
+      "widgetType": "courseware_game",
+      "startImage": "stationery-workbench",
+      "script": [
+        {
+          "setState": {
+            "demo": true,
+            "level": 1
+          }
+        },
+        {
+          "highlight": "#return-speech"
+        },
+        {
+          "say": "发话牌亮在露露头上。她开口说这件文具是自己的。"
+        },
+        {
+          "say": "It's my ruler."
+        },
+        {
+          "say": "小满说：我离车最近，尺子肯定要给我。",
+          "by": "xiaoman"
+        },
+        {
+          "say": "先找是谁说了 my。离小车近，也不一定是主人。"
+        },
+        {
+          "highlight": "#return-shelf"
+        },
+        {
+          "say": "到亮起的取物台找尺。尺上有刻线，边是直的。"
+        },
+        {
+          "highlight": "#return-trolley"
+        },
+        {
+          "say": "按住画面带小车去取。再绕开挡路台，把尺送给发话的人。"
+        },
+        {
+          "say": "下一轮可能还是同一把尺，先看是谁在说，再决定往哪开。"
+        },
+        {
+          "say": "换物品也一样。It's my crayon. 把蜡笔送给发话的人。"
+        },
+        {
+          "say": "轮到你了。键盘可以用方向键，触屏就按住画面带车走。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1
+          }
+        }
+      ]
+    },
+    {
+      "key": "hear-item-then-colour",
+      "type": "slide",
+      "title": "听两条线索再涂色",
+      "template": "picture-points",
+      "data": {
+        "title": "听两条线索再涂色",
+        "picture": "colour-practice-board",
+        "points": [
+          "听是哪件物品",
+          "再听用什么颜色",
+          "涂完回看两条线索"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "这里摆着书包、书、课桌、墨水笔和铅笔。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "听见 desk，先找到有宽桌面和桌腿的书桌。"
+        },
+        {
+          "say": "Colour the desk red."
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "句子最后听到 red，找红色。先把刷子蘸成红色。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "滚过那张课桌后回看，东西是课桌，颜色是红色。"
+        },
+        {
+          "say": "我换一个口令。Colour the pencil yellow."
+        },
+        {
+          "say": "听到 pencil 先找木铅笔，听到 yellow 再找黄色。"
+        }
+      ]
+    },
+    {
+      "key": "paint-the-parade",
+      "type": "interactive",
+      "title": "跟着传送带涂色",
+      "page": "paint-the-parade",
+      "widgetType": "courseware_game",
+      "startImage": "stationery-workbench",
+      "script": [
+        {
+          "setState": {
+            "demo": true,
+            "level": 1
+          }
+        },
+        {
+          "highlight": "#paint-mission"
+        },
+        {
+          "say": "先看任务窗。桌子的图和红色样片放在一起。"
+        },
+        {
+          "say": "Colour the desk red."
+        },
+        {
+          "say": "小满说：我漏听了颜色，先选了蓝色。",
+          "by": "xiaoman"
+        },
+        {
+          "say": "还要听颜色。刷子没蘸成红色，桌子就变不成红色。"
+        },
+        {
+          "highlight": "#paint-palette"
+        },
+        {
+          "say": "我把滚轮移到红色颜料，再等桌子走到手边。"
+        },
+        {
+          "highlight": "#paint-roller"
+        },
+        {
+          "say": "同一处划过一半还不够，要让滚轮跟住，涂满这一件。"
+        },
+        {
+          "say": "练习里会换文具和颜色。每回看物品图，再看颜色样片。"
+        },
+        {
+          "say": "Colour the schoolbag blue."
+        },
+        {
+          "say": "Colour the pen red."
+        },
+        {
+          "say": "按住画面推滚轮。键盘方向键也能移滚轮。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "level": 1
+          }
+        }
+      ]
+    },
+    {
+      "key": "mime-and-guess",
+      "type": "slide",
+      "title": "看动作再猜物品",
+      "template": "two-columns",
+      "data": {
+        "title": "看动作再猜物品",
+        "left": {
+          "heading": "chair",
+          "body": "椅子"
+        },
+        "right": {
+          "heading": "desk",
+          "body": "书桌"
+        },
+        "left_picture": "chair",
+        "right_picture": "desk"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "伙伴做出坐下的动作。带靠背的椅子可以坐。"
+        },
+        {
+          "say": "你指着他的动作问 What's this? 猜是一把椅子。"
+        },
+        {
+          "say": "It's a chair. 猜中了，伙伴可以说 Yes。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "再看他把书摊开放，手在平桌面上写字。"
+        },
+        {
+          "say": "小满先猜 It's a chair. 伙伴说 No。"
+        },
+        {
+          "say": "看清平平的桌面，换成 It's a desk. 这次就猜对了。"
+        },
+        {
+          "say": "听见 No，可以再看一个动作、再猜一次。"
+        }
+      ]
+    },
+    {
+      "key": "draw-and-ask",
+      "type": "slide",
+      "title": "画一件，再让家人猜",
+      "template": "picture-points",
+      "data": {
+        "title": "画一件，再让家人猜",
+        "picture": "drawn-eraser",
+        "points": [
+          "画一件文具",
+          "问 What's this?",
+          "答名字，再说是谁的"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "我用短短的四边形和一个纸套，画出一块橡皮。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "你可以画一件真实文具，先画它最容易认出的地方。"
+        },
+        {
+          "say": "画直尺就画长边和刻线，伙伴能靠这些线索猜。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "指着自己的画问 What's this? 等伙伴猜。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "如果他认出画上的是橡皮，可以答 It's an eraser."
+        },
+        {
+          "say": "画的是自己那块时，再说 It's my eraser."
+        },
+        {
+          "say": "轮到家人画，你来猜。请家人听一轮，告诉你哪句听清了。"
+        }
+      ]
+    },
+    {
+      "key": "stationery-fair-check",
+      "type": "quiz",
+      "title": "文具手工节小检查",
+      "intro": [
+        "来到新摊位了。听完一题选一张图，没听清可以再听。"
+      ],
+      "questions": [
+        {
+          "id": "hear-case",
+          "question": "What's this? It's a pencil case. 找出来。",
+          "skill": "听懂物品名称问答和 pencil case",
+          "analysis": "听到 pencil case，要找能收好笔、带拉链的文具盒。",
+          "answer": [
+            "b"
+          ],
+          "options": {
+            "a": {
+              "label": "带淡紫色套的白橡皮",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-eraser",
+                "alt": "带淡紫色套的白橡皮"
+              }
+            },
+            "b": {
+              "label": "芥黄色拉链文具盒",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-pencil-case",
+                "alt": "芥黄色拉链文具盒"
+              }
+            },
+            "c": {
+              "label": "木色直尺",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-ruler",
+                "alt": "木色直尺"
+              }
+            }
+          }
+        },
+        {
+          "id": "hear-eraser",
+          "question": "It's an eraser. 听物品名，选一张图。",
+          "skill": "听辨自然表达 an eraser",
+          "analysis": "听到 eraser，选能擦铅笔痕迹的那块橡皮。",
+          "answer": [
+            "a"
+          ],
+          "options": {
+            "a": {
+              "label": "带淡紫色套的白橡皮",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-eraser",
+                "alt": "带淡紫色套的白橡皮"
+              }
+            },
+            "b": {
+              "label": "橘色蜡笔",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-crayon",
+                "alt": "橘色蜡笔"
+              }
+            },
+            "c": {
+              "label": "木色直尺",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-ruler",
+                "alt": "木色直尺"
+              }
+            }
+          }
+        },
+        {
+          "id": "hear-speaker-my",
+          "question": "听图上这位同学。It's my ruler. 选归还图。",
+          "skill": "从 my 和文具名同时识别归还对象",
+          "analysis": "my 指图上发话的女孩，ruler 是直尺。要选同时有她和直尺的组合。",
+          "answer": [
+            "c"
+          ],
+          "options": {
+            "a": {
+              "label": "双辫女孩和一块橡皮",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-braids-eraser",
+                "alt": "双辫女孩和一块橡皮"
+              }
+            },
+            "b": {
+              "label": "穿橙色背带裤的男孩和一把直尺",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-orange-ruler",
+                "alt": "穿橙色背带裤的男孩和一把直尺"
+              }
+            },
+            "c": {
+              "label": "双辫女孩和一把直尺",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-braids-ruler",
+                "alt": "双辫女孩和一把直尺"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "quiz-owner-braids",
+            "alt": "发话的女孩穿绿衣、扎双辫"
+          }
+        },
+        {
+          "id": "hear-claimed-crayon",
+          "question": "It's my crayon. 该还给小画家哪件？",
+          "skill": "从所属句听出认领的物品",
+          "analysis": "my 说明是说话者自己的东西，crayon 是蜡笔，选粗短的橘色蜡笔。",
+          "answer": [
+            "b"
+          ],
+          "options": {
+            "a": {
+              "label": "削尖的绿色木铅笔",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-pencil",
+                "alt": "削尖的绿色木铅笔"
+              }
+            },
+            "b": {
+              "label": "带纸套的橘色蜡笔",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-crayon",
+                "alt": "带纸套的橘色蜡笔"
+              }
+            },
+            "c": {
+              "label": "芥黄色拉链文具盒",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-pencil-case",
+                "alt": "芥黄色拉链文具盒"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "quiz-owner-purple",
+            "alt": "紫色连帽衫的小画家"
+          }
+        },
+        {
+          "id": "hear-colour-book",
+          "question": "Colour the book blue. 选涂对了的图。",
+          "skill": "同时听懂物品和颜色",
+          "analysis": "book 告诉你涂书，blue 告诉你涂蓝。只有蓝封面书同时符合。",
+          "answer": [
+            "a"
+          ],
+          "options": {
+            "a": {
+              "label": "蓝色封皮绘本",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-book-blue",
+                "alt": "蓝色封皮绘本"
+              }
+            },
+            "b": {
+              "label": "红色封皮绘本",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-book-red",
+                "alt": "红色封皮绘本"
+              }
+            },
+            "c": {
+              "label": "绿色木铅笔",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-pencil",
+                "alt": "绿色木铅笔"
+              }
+            }
+          }
+        },
+        {
+          "id": "hear-pencil",
+          "question": "新摊位做记号。Point to the pencil. 选图。",
+          "skill": "听辨 pen 与 pencil",
+          "analysis": "pencil 是铅笔。看木头削尖后露出的黑芯。紫色那支有笔夹，是一支圆珠笔。",
+          "answer": [
+            "c"
+          ],
+          "options": {
+            "a": {
+              "label": "紫色带笔夹的圆珠笔",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-pen",
+                "alt": "紫色带笔夹的圆珠笔"
+              }
+            },
+            "b": {
+              "label": "绿色粗短蜡笔",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-crayon-green",
+                "alt": "绿色粗短蜡笔"
+              }
+            },
+            "c": {
+              "label": "削尖的绿色木铅笔",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-pencil",
+                "alt": "削尖的绿色木铅笔"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "recap-workshop",
+      "type": "slide",
+      "title": "把文具问答带回家",
+      "template": "summary",
+      "data": {
+        "title": "把文具问答带回家",
+        "items": [
+          "听名字，看是哪件用品",
+          "问名字或认领自己的物品",
+          "听物品和颜色，再上色",
+          "画一件、猜一猜、换角色"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "直尺 ruler，橡皮 eraser。听到名字可以指给家人看。"
+        },
+        {
+          "say": "文具盒叫 pencil case，蜡笔叫 crayon。"
+        },
+        {
+          "say": "墨水笔叫 pen，木铅笔叫 pencil，两个词别听串了。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "What's this? 问名字。It's a ruler. 回答名称。"
+        },
+        {
+          "say": "It's my ruler. 多说一个 my，就说出了是我的。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "涂色先听物品，再听颜色。回头看两条线索都对不对。"
+        },
+        {
+          "spotlight": "item-4"
+        },
+        {
+          "say": "画一件文具请家人猜，再换人来画。猜错还可以看线索。"
+        },
+        {
+          "say": "也可以指实物跟拍一遍。请家人听听你说得怎样。"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,413 @@
+{
+  "schemaVersion": "mira.courseware.official-notes.v1",
+  "binding": {
+    "editionId": "pep-math-g1-lower-2022-standard",
+    "revisionId": "directory-6205d2037284e91f10b25edd",
+    "unitId": "3118eaa6-4e44-470a-b7ec-dab2ae9b29b5",
+    "nodeId": "50b6d028-968b-449b-bd4c-f29b04919156",
+    "classHours": [
+      "lesson_1"
+    ]
+  },
+  "reviewedBy": "Codex quiz_support",
+  "reviewedAt": "2026-11-11T07:57:20+08:00",
+  "officialActivityId": "65341bfd-219f-82c0-4f1c-76f0887b205c",
+  "officialTextbook": {
+    "resourceId": "6bf8ae7e-d987-40b4-8fb3-bbb98fcb50b5",
+    "assetRevision": "1772437367206",
+    "printedPages": [
+      84
+    ],
+    "assetPages": [
+      89
+    ],
+    "relatedContextPrintedPages": [
+      83
+    ],
+    "editionEvidence": "同册官方电子书、目录和活动索引一致。教案、任务单和课练表头均标人民教育出版社2024年10月版一年级下册。",
+    "boundary": "本课目录正文从印84数与运算标题起，至同页数量关系标题前。印83上方知识图用于本课复习导入和相关练习，印83下方数量关系框为单元背景。印84下方数量关系另有独立节点和活动。",
+    "pageProof": [
+      {
+        "path": "output/courseware-lessons/pep-math-g1-lower-renminbi-small-talk/official/ebook-088.jpg",
+        "bytes": 519403,
+        "sha256": "8026dbdcef929ba9db421db45f7681fcb123b7ac696844995ce0903d0befb573",
+        "printedPage": 83,
+        "ebookPage": 88,
+        "role": "unit_overview_and_related_practice",
+        "includedRegion": "上方数与运算两框",
+        "finding": "第七单元复习与关联的知识图同时包括数、运算与数量关系。上方两框用25、99再添1复习数的组成，用46加35、34减18的捆棒图表现进位和退位。后两道图也被本课课件和任务单作为练习。",
+        "visualVerified": true
+      },
+      {
+        "path": "output/courseware-lessons/pep-math-g1-lower-renminbi-small-talk/official/ebook-089.jpg",
+        "bytes": 539809,
+        "sha256": "b2b2ff761fe6ec81203d0a3cbe325292f715996f6d3edc38ca8edfdf3d7096ef",
+        "printedPage": 84,
+        "ebookPage": 89,
+        "role": "current_lesson_until_next_heading",
+        "includedRegion": "数与运算标题至数量关系标题之前",
+        "finding": "上方数与运算用百格、百十个位、计数器和小棒复习10个十为1个百、十进位值、同位相加、十个一换一个十。下方数量关系开始用加减法解决生活问题，是另一目录节点。",
+        "visualVerified": true
+      }
+    ]
+  },
+  "sourceEvidence": {
+    "directory": {
+      "path": "backend/content/textbooks/official-directories-v1/pep-math-g1-lower-2022-standard.directory-6205d2037284e91f10b25edd.json",
+      "bytes": 23319,
+      "sha256": "e2362ac58e2093b1941e7e2d16afb8367f35a237ecd2d0c2bfc1503723113e05"
+    },
+    "officialActivityIndex": {
+      "path": "output/courseware-lessons/pep-math-g1-lower-counting-and-composition-to-100/official/activity-index-part_100.json",
+      "bytes": 896932,
+      "sha256": "d09dd9e4f6b7d12e3751a1ee39fb2c470e7858f1deb6c39a311eec1bccbb2a83",
+      "url": "https://s-file-1.ykt.cbern.com.cn/zxx/ndrs/national_lesson/teachingmaterials/b4dae36a-0d48-4149-820e-f532dad7607b/resources/part_100.json"
+    },
+    "activityDetail": {
+      "path": "output/courseware-lessons/pep-math-g1-lower-number-operations-review/official/exact-activity-details.json",
+      "bytes": 64114,
+      "sha256": "775e9835f3def1e0a80dd7f5f0d2f47c07abfa98d71496f6c8885931507c5560",
+      "url": "https://s-file-1.ykt.cbern.com.cn/zxx/ndrv2/national_lesson/resources/details/65341bfd-219f-82c0-4f1c-76f0887b205c.json"
+    },
+    "fetchPlan": {
+      "path": "output/courseware-lessons/pep-math-g1-lower-number-operations-review/official/request-manifest.json",
+      "bytes": 16158,
+      "sha256": "848d2bb2bc9e90164020696b8873a17e4cfb6c34f54fc6df48e3374a761a3769"
+    },
+    "fetchReceipt": {
+      "path": "output/courseware-lessons/pep-math-g1-lower-number-operations-review/official/fetch-receipt.json",
+      "bytes": 29560,
+      "sha256": "849fc86638f7b9ba120b17f79900904ffd45ef958d56335597a96454fbcb1949"
+    },
+    "rights": "官方原页及学生作品仅本机审读。教学画面、图示、台词和练习均原创。"
+  },
+  "excludedScope": {
+    "sharedPageActivity": {
+      "nodeId": "609b84ce-34f1-42d6-9b70-872f882efdd3",
+      "activityId": "22f54a6b-8710-7589-0914-26c6b81b4b15",
+      "title": "数量关系",
+      "printedPage": 84
+    },
+    "relatedActivities": [
+      {
+        "activityId": "b65b0d65-ae4e-4f79-a308-379f06138c59",
+        "title": "整数连加"
+      }
+    ],
+    "reason": "本课按活动的完整单元及节点路径绑定。跨章节标签的整数连加和同页另一目录节点各有独立范围。"
+  },
+  "classHourCoverage": "官方索引和详情均指向唯一 lesson_1。目读印83关联图与印84全页定位边界，逐页审读29课件、8教案、3任务单、1课练。视频按标准豁免。",
+  "objectives": [
+    "能在100以内按一定步长数数，借助数轴或数位比较大小，并说明10个十与1个百的关系。",
+    "能用十和一表示一个数并读写，理解相同数字在不同数位代表不同数量。",
+    "能把100以内加减法的相同数位对应起来，用小棒或计数器说明满十进一和不够减时退一，并与口算或竖式对应。",
+    "能围绕一个100以内的数整理读写、组成、比较和运算的联系，并指着图说明其中一处。"
+  ],
+  "keyPoint": "在数与运算中辨认同一计数单位，用数位模型解释同位相加减与十和一的交换。",
+  "difficultPoint": "把10个一与1个十的交换同时连到实物数量和数位记号。能说明进位、退位后两个数位如何分别变化。",
+  "contentBoundary": "本课复习100以内数的认识和运算。印83上方对应图只作复习和练习依据，印84数量关系及应用题分类属于另一节点。",
+  "evidenceBoundary": "课堂记录可显示数序、选图和运算答题。纸笔知识图和口头解释需要现场观察，未观察时记待观察。",
+  "resources": {
+    "courseware": {
+      "status": "reviewed",
+      "classHourId": "lesson_1",
+      "resourceId": "5d806636-4965-d697-ac25-29d46f1c201d",
+      "pageRefs": [
+        "output/courseware-lessons/pep-math-g1-lower-number-operations-review/official/courseware-01.jpg",
+        "output/courseware-lessons/pep-math-g1-lower-number-operations-review/official/courseware-02.jpg",
+        "output/courseware-lessons/pep-math-g1-lower-number-operations-review/official/courseware-03.jpg",
+        "output/courseware-lessons/pep-math-g1-lower-number-operations-review/official/courseware-04.jpg",
+        "output/courseware-lessons/pep-math-g1-lower-number-operations-review/official/courseware-05.jpg",
+        "output/courseware-lessons/pep-math-g1-lower-number-operations-review/official/courseware-06.jpg",
+        "output/courseware-lessons/pep-math-g1-lower-number-operations-review/official/courseware-07.jpg",
+        "output/courseware-lessons/pep-math-g1-lower-number-operations-review/official/courseware-08.jpg",
+        "output/courseware-lessons/pep-math-g1-lower-number-operations-review/official/courseware-09.jpg",
+        "output/courseware-lessons/pep-math-g1-lower-number-operations-review/official/courseware-10.jpg",
+        "output/courseware-lessons/pep-math-g1-lower-number-operations-review/official/courseware-11.jpg",
+        "output/courseware-lessons/pep-math-g1-lower-number-operations-review/official/courseware-12.jpg",
+        "output/courseware-lessons/pep-math-g1-lower-number-operations-review/official/courseware-13.jpg",
+        "output/courseware-lessons/pep-math-g1-lower-number-operations-review/official/courseware-14.jpg",
+        "output/courseware-lessons/pep-math-g1-lower-number-operations-review/official/courseware-15.jpg",
+        "output/courseware-lessons/pep-math-g1-lower-number-operations-review/official/courseware-16.jpg",
+        "output/courseware-lessons/pep-math-g1-lower-number-operations-review/official/courseware-17.jpg",
+        "output/courseware-lessons/pep-math-g1-lower-number-operations-review/official/courseware-18.jpg",
+        "output/courseware-lessons/pep-math-g1-lower-number-operations-review/official/courseware-19.jpg",
+        "output/courseware-lessons/pep-math-g1-lower-number-operations-review/official/courseware-20.jpg",
+        "output/courseware-lessons/pep-math-g1-lower-number-operations-review/official/courseware-21.jpg",
+        "output/courseware-lessons/pep-math-g1-lower-number-operations-review/official/courseware-22.jpg",
+        "output/courseware-lessons/pep-math-g1-lower-number-operations-review/official/courseware-23.jpg",
+        "output/courseware-lessons/pep-math-g1-lower-number-operations-review/official/courseware-24.jpg",
+        "output/courseware-lessons/pep-math-g1-lower-number-operations-review/official/courseware-25.jpg",
+        "output/courseware-lessons/pep-math-g1-lower-number-operations-review/official/courseware-26.jpg",
+        "output/courseware-lessons/pep-math-g1-lower-number-operations-review/official/courseware-27.jpg",
+        "output/courseware-lessons/pep-math-g1-lower-number-operations-review/official/courseware-28.jpg",
+        "output/courseware-lessons/pep-math-g1-lower-number-operations-review/official/courseware-29.jpg"
+      ],
+      "findings": [
+        "第1页：封面确认人教一年级数学第七单元复习与关联之数与运算。",
+        "第2页：从全册内容回顾引入，聚焦100以内的数和加减法。",
+        "第3页：用数的认识与数的运算两个方向整理学生画的知识图。",
+        "第4页：在44、45、46的片段中回顾逐个数和顺序。",
+        "第5页：从45起每次添5，解释55中十位5和个位5分别表示不同计数单位。",
+        "第6页：从60起十个十个数，展示10根十条的数量。",
+        "第7页：把10个十组成1个百，用百格图联结计数单位。",
+        "第8页：请孩子举一个比45大的数、一个比45小的数并说理由。",
+        "第9页：比较位数、十位与个位，示例包括3、40、60、100与45的大小。",
+        "第10页：用区间及接近的整十数估计两面旗子所在数的位置。",
+        "第11页：补出细刻度，对照定位69和94。",
+        "第12页：用小棒、小方块、计数器表示45，明确十位和个位。",
+        "第13页：并列45的三种图示，都是4个十和5个一。",
+        "第14页：用6个一和7个十读写76，突出数位顺序。",
+        "第15页：将3颗珠子在十位和个位有序分配，得到3、12、21、30。",
+        "第16页：汇总数数、顺序、组成、读写和大小比较的知识图。",
+        "第17页：回到学生作品，观察100以内数与运算的多种整理方式。",
+        "第18页：按口算笔算或按加减及进退位分类，说明分类依据不同。",
+        "第19页：用45减3和45减30并列，示范几个一减几个一、几个十减几个十。",
+        "第20页：对照38加7与26加19的拆数口算和列竖式。",
+        "第21页：把100以内进位加法连回20以内的个位进位。",
+        "第22页：用52减7及61减16示范退位，把一个十换成十个一并连接20以内退位减法。",
+        "第23页：并列口算与笔算，归纳数位对齐、从个位算、满十进一及不够减时退一。",
+        "第24页：给出两张教材捆棒图与空竖式，要求从操作写成计算。",
+        "第25页：核对46加35得81及34减18得16。",
+        "第26页：辨认哪两题在某个相同数位用到7减3，结合计数器区分十和一。",
+        "第27页：回顾数的认识、运算知识图及相同计数单位相加减。",
+        "第28页：课后把学习收获说给家人听。",
+        "第29页：尾页再次核对数与运算课名、单元及制作单位人民教育出版社。"
+      ]
+    },
+    "teachingDesign": {
+      "status": "reviewed",
+      "classHourId": "lesson_1",
+      "resourceId": "6c76ec03-2769-21b9-4669-bbb3818a29a7",
+      "pageRefs": [
+        "output/courseware-lessons/pep-math-g1-lower-number-operations-review/official/teachingDesign-01.jpg",
+        "output/courseware-lessons/pep-math-g1-lower-number-operations-review/official/teachingDesign-02.jpg",
+        "output/courseware-lessons/pep-math-g1-lower-number-operations-review/official/teachingDesign-03.jpg",
+        "output/courseware-lessons/pep-math-g1-lower-number-operations-review/official/teachingDesign-04.jpg",
+        "output/courseware-lessons/pep-math-g1-lower-number-operations-review/official/teachingDesign-05.jpg",
+        "output/courseware-lessons/pep-math-g1-lower-number-operations-review/official/teachingDesign-06.jpg",
+        "output/courseware-lessons/pep-math-g1-lower-number-operations-review/official/teachingDesign-07.jpg",
+        "output/courseware-lessons/pep-math-g1-lower-number-operations-review/official/teachingDesign-08.jpg"
+      ],
+      "findings": [
+        "第1页：表头标人教2024年10月版一年级下册，范围为教材84页及相关练习。目标是读写组成、比较、十进位值、口算笔算和复习整理。难点是计数单位在认识数和运算中的联系。",
+        "第2页：用45的学生知识图整理读写、组成、比较、计数及运算，开始逐个数及以5为步长数数。",
+        "第3页：用55比较相同数字所在数位，再用十个十组成1个百。按位数和数位比较大小，并用数轴估计数的位置。",
+        "第4页：用小棒、小方块、计数器表示45的4个十和5个一，读写76。开始固定珠子总量的组成题。",
+        "第5页：有序列出三颗珠子在两列能组成的四个数，汇总数的认识。分类运算并用45减3和45减30说明同位相减。",
+        "第6页：分解38加7、26加19与52减7、61减16，结合口算、竖式及20以内基本加减。",
+        "第7页：归纳相同数位对齐、个位算起、满十进一及不够减退一。用两道捆棒题写竖式，再判哪些算式在同一数位用7减3。",
+        "第8页：总结十和一在数与运算中的作用，安排向家人分享复习收获。"
+      ]
+    },
+    "learningTaskSheet": {
+      "status": "reviewed",
+      "classHourId": "lesson_1",
+      "resourceId": "20166a7a-06dc-87e0-a675-fe3ca6201ed2",
+      "pageRefs": [
+        "output/courseware-lessons/pep-math-g1-lower-number-operations-review/official/learningTaskSheet-01.jpg",
+        "output/courseware-lessons/pep-math-g1-lower-number-operations-review/official/learningTaskSheet-02.jpg",
+        "output/courseware-lessons/pep-math-g1-lower-number-operations-review/official/learningTaskSheet-03.jpg"
+      ],
+      "findings": [
+        "第1页：表头确认人民教育出版社2024年10月一年级下册。课前围绕45画知识图，课堂写出更大和更小的数并说明。",
+        "第2页：用小棒、小方块、计数器表示45，读写6个一和7个十组成的数，再做珠子组成及两道进位加法。",
+        "第3页：第六项延续用两幅捆棒图列进位加法和退位减法竖式。"
+      ]
+    },
+    "afterClassExercise": {
+      "status": "reviewed",
+      "classHourId": "lesson_1",
+      "resourceId": "f72a98f6-db1a-b5f3-55aa-8af12b550598",
+      "pageRefs": [
+        "output/courseware-lessons/pep-math-g1-lower-number-operations-review/official/afterClassExercise-01.jpg"
+      ],
+      "findings": [
+        "第1页：把100以内数的认识和运算复习收获讲给家人，强调十和一是理解关键。"
+      ]
+    },
+    "textbook": {
+      "status": "reviewed",
+      "classHourId": "lesson_1",
+      "resourceId": "6bf8ae7e-d987-40b4-8fb3-bbb98fcb50b5",
+      "pageRefs": [
+        "output/courseware-lessons/pep-math-g1-lower-renminbi-small-talk/official/ebook-088.jpg",
+        "output/courseware-lessons/pep-math-g1-lower-renminbi-small-talk/official/ebook-089.jpg"
+      ],
+      "findings": [
+        "第七单元复习与关联的知识图同时包括数、运算与数量关系。上方两框用25、99再添1复习数的组成，用46加35、34减18的捆棒图表现进位和退位。后两道图也被本课课件和任务单作为练习。",
+        "上方数与运算用百格、百十个位、计数器和小棒复习10个十为1个百、十进位值、同位相加、十个一换一个十。下方数量关系开始用加减法解决生活问题，是另一目录节点。"
+      ]
+    },
+    "video": {
+      "status": "waived",
+      "resourceId": "e27522e8-2330-9f7c-2428-c7c00fdc1e0a",
+      "getCount": 0,
+      "classHourId": "lesson_1",
+      "evidence": "课件制作标准第1条允许豁免。"
+    }
+  },
+  "factChecks": [
+    {
+      "claims": [
+        "10个十是1个百。同样的数字在十位表示几个十，在个位表示几个一。"
+      ],
+      "sources": [
+        {
+          "resource": "textbook",
+          "pageRefs": [
+            "output/courseware-lessons/pep-math-g1-lower-renminbi-small-talk/official/ebook-088.jpg",
+            "output/courseware-lessons/pep-math-g1-lower-renminbi-small-talk/official/ebook-089.jpg"
+          ],
+          "finding": "印83用99再添1、印84用百格与计数器表现百和各数位。"
+        },
+        {
+          "resource": "courseware",
+          "pageRefs": [
+            "output/courseware-lessons/pep-math-g1-lower-number-operations-review/official/courseware-05.jpg",
+            "output/courseware-lessons/pep-math-g1-lower-number-operations-review/official/courseware-06.jpg",
+            "output/courseware-lessons/pep-math-g1-lower-number-operations-review/official/courseware-07.jpg",
+            "output/courseware-lessons/pep-math-g1-lower-number-operations-review/official/courseware-13.jpg",
+            "output/courseware-lessons/pep-math-g1-lower-number-operations-review/official/courseware-14.jpg",
+            "output/courseware-lessons/pep-math-g1-lower-number-operations-review/official/courseware-15.jpg"
+          ],
+          "finding": "比较55两个数字含义，数到100，配合实物和计数器读写。"
+        },
+        {
+          "resource": "teachingDesign",
+          "pageRefs": [
+            "output/courseware-lessons/pep-math-g1-lower-number-operations-review/official/teachingDesign-03.jpg",
+            "output/courseware-lessons/pep-math-g1-lower-number-operations-review/official/teachingDesign-04.jpg",
+            "output/courseware-lessons/pep-math-g1-lower-number-operations-review/official/teachingDesign-05.jpg"
+          ],
+          "finding": "说明数位含义、十与一的组成及固定颗数的不同分配。"
+        }
+      ]
+    },
+    {
+      "claims": [
+        "比较100以内的数可以看位数，再按十位、个位比较，也可用数轴判断相对位置。"
+      ],
+      "sources": [
+        {
+          "resource": "courseware",
+          "pageRefs": [
+            "output/courseware-lessons/pep-math-g1-lower-number-operations-review/official/courseware-08.jpg",
+            "output/courseware-lessons/pep-math-g1-lower-number-operations-review/official/courseware-09.jpg",
+            "output/courseware-lessons/pep-math-g1-lower-number-operations-review/official/courseware-10.jpg",
+            "output/courseware-lessons/pep-math-g1-lower-number-operations-review/official/courseware-11.jpg",
+            "output/courseware-lessons/pep-math-g1-lower-number-operations-review/official/courseware-16.jpg"
+          ],
+          "finding": "用大于小于、位数、十位及数轴说明大小比较。"
+        },
+        {
+          "resource": "teachingDesign",
+          "pageRefs": [
+            "output/courseware-lessons/pep-math-g1-lower-number-operations-review/official/teachingDesign-03.jpg"
+          ],
+          "finding": "写数卡比较并用数轴估计两面旗所在数。"
+        },
+        {
+          "resource": "learningTaskSheet",
+          "pageRefs": [
+            "output/courseware-lessons/pep-math-g1-lower-number-operations-review/official/learningTaskSheet-01.jpg"
+          ],
+          "finding": "写一个比45大和一个比45小的数，再说明依据。"
+        }
+      ]
+    },
+    {
+      "claims": [
+        "运算时同数位按同计数单位相加减。个位相加达到10要向十位进1。个位不够减时把一个十换成十个一。"
+      ],
+      "sources": [
+        {
+          "resource": "textbook",
+          "pageRefs": [
+            "output/courseware-lessons/pep-math-g1-lower-renminbi-small-talk/official/ebook-088.jpg",
+            "output/courseware-lessons/pep-math-g1-lower-renminbi-small-talk/official/ebook-089.jpg"
+          ],
+          "finding": "教材图示以十条和散棒呈现同位加减、超过10的一组进位示例和退位。"
+        },
+        {
+          "resource": "courseware",
+          "pageRefs": [
+            "output/courseware-lessons/pep-math-g1-lower-number-operations-review/official/courseware-19.jpg",
+            "output/courseware-lessons/pep-math-g1-lower-number-operations-review/official/courseware-20.jpg",
+            "output/courseware-lessons/pep-math-g1-lower-number-operations-review/official/courseware-21.jpg",
+            "output/courseware-lessons/pep-math-g1-lower-number-operations-review/official/courseware-22.jpg",
+            "output/courseware-lessons/pep-math-g1-lower-number-operations-review/official/courseware-23.jpg"
+          ],
+          "finding": "列出同位相减、进位与退位，23页归纳相加满十即进一。"
+        },
+        {
+          "resource": "teachingDesign",
+          "pageRefs": [
+            "output/courseware-lessons/pep-math-g1-lower-number-operations-review/official/teachingDesign-05.jpg",
+            "output/courseware-lessons/pep-math-g1-lower-number-operations-review/official/teachingDesign-06.jpg",
+            "output/courseware-lessons/pep-math-g1-lower-number-operations-review/official/teachingDesign-07.jpg"
+          ],
+          "finding": "对照口算竖式，归纳满十进一和不够减退一。"
+        }
+      ]
+    },
+    {
+      "claims": [
+        "本课关联练习46加35得81，34减18得16。两题由印83上方运算图和本课配套交叉核实。"
+      ],
+      "sources": [
+        {
+          "resource": "textbook",
+          "pageRefs": [
+            "output/courseware-lessons/pep-math-g1-lower-renminbi-small-talk/official/ebook-088.jpg"
+          ],
+          "finding": "印83上方运算框列出两题和捆棒图。"
+        },
+        {
+          "resource": "courseware",
+          "pageRefs": [
+            "output/courseware-lessons/pep-math-g1-lower-number-operations-review/official/courseware-24.jpg",
+            "output/courseware-lessons/pep-math-g1-lower-number-operations-review/official/courseware-25.jpg"
+          ],
+          "finding": "先给两幅图及空竖式，再给完整结果。"
+        },
+        {
+          "resource": "learningTaskSheet",
+          "pageRefs": [
+            "output/courseware-lessons/pep-math-g1-lower-number-operations-review/official/learningTaskSheet-03.jpg"
+          ],
+          "finding": "同一图示的竖式填写练习。"
+        }
+      ]
+    },
+    {
+      "claims": [
+        "本课可用知识图把认识数与运算联系起来，并让孩子分享一处发现。"
+      ],
+      "sources": [
+        {
+          "resource": "textbook",
+          "pageRefs": [
+            "output/courseware-lessons/pep-math-g1-lower-renminbi-small-talk/official/ebook-088.jpg"
+          ],
+          "finding": "第七单元展示整理知识图的方式。"
+        },
+        {
+          "resource": "teachingDesign",
+          "pageRefs": [
+            "output/courseware-lessons/pep-math-g1-lower-number-operations-review/official/teachingDesign-02.jpg",
+            "output/courseware-lessons/pep-math-g1-lower-number-operations-review/official/teachingDesign-08.jpg"
+          ],
+          "finding": "用学生的知识图整理并在总结中表达收获。"
+        },
+        {
+          "resource": "afterClassExercise",
+          "pageRefs": [
+            "output/courseware-lessons/pep-math-g1-lower-number-operations-review/official/afterClassExercise-01.jpg"
+          ],
+          "finding": "向家人分享数与运算的学习收获。"
+        }
+      ]
+    }
+  ]
+}

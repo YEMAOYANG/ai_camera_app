@@ -1,0 +1,200 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "雨点儿",
+  "binding": {
+    "editionId": "pep-chinese-g1-upper-2022-standard",
+    "revisionId": "20260924-directory-3",
+    "unitId": "unit-8-reading",
+    "nodeId": "u8-l3"
+  },
+  "scenario": "云间广播站的小小配音员收到两位雨点角色的消息，先听懂词和声音，再协助它们找到故事里的两处目的地。",
+  "goals": [
+    "在雨点、颜色、位置和问答语境认读12字，认识两个偏旁和横钩，观察并纸笔练写来、半、你、有。",
+    "听辨“数”和“长”在词里的读音、“不”的两种读法，跟着录音练儿化和适当停顿。",
+    "分清大小雨点谁先问、分别去哪里，能从故事前后图说出两处不同变化。",
+    "用原创对话先练问答和语气，再和家人使用纸书做分角色朗读。"
+  ],
+  "pageSequence": [
+    {
+      "key": "cloud-radio",
+      "kind": "teaching",
+      "plan": "看一大片云下落的大小雨点，先辨角色和落下动作，再听题名及儿化。"
+    },
+    {
+      "key": "words-above",
+      "kind": "teaching",
+      "plan": "点、数、彩、半、空、方的语境和四点底、穴字头。"
+    },
+    {
+      "key": "words-in-talk",
+      "kind": "teaching",
+      "plan": "问、回、答、久、更、长的语境和长的两种读音。"
+    },
+    {
+      "key": "listen-to-pauses",
+      "kind": "teaching",
+      "plan": "用原创成对词或原书指定短词听“不”的不同读法。示范长句按画面意义分组停顿，留跟读时间。"
+    },
+    {
+      "key": "listen-for-a-scene",
+      "kind": "interactive",
+      "plan": "听目标短词或一句原创提示，在摇动图卡间移动瞄准，击中相符的数数、长出、问或答的场景。"
+    },
+    {
+      "key": "first-writing",
+      "kind": "teaching",
+      "plan": "示范来、半的田字格字形及关键笔画，留纸笔练习，第一课时收束到听说。"
+    },
+    {
+      "key": "two-rain-voices",
+      "kind": "teaching",
+      "plan": "第二课时听两位雨点的原创对话，依次点亮问、回答并反问和另一方回答，用两处图标说目的地。"
+    },
+    {
+      "key": "deliver-a-role",
+      "kind": "interactive",
+      "plan": "接听指令先取对应大或小雨点角色牌，再沿开放道路送到听到的目的地。后期交换左右位置。"
+    },
+    {
+      "key": "two-endings",
+      "kind": "teaching",
+      "plan": "并列两处各自的前后状态。同样出现花草，但一处原先就有，另一处到结尾才出现。先猜再揭开，并用自己的话说。"
+    },
+    {
+      "key": "second-writing",
+      "kind": "teaching",
+      "plan": "原创田字格示范你、有，突出你的横钩和有的关键占位，留纸笔观察时间。"
+    },
+    {
+      "key": "role-rehearsal",
+      "kind": "teaching",
+      "plan": "老师用原创简短对话示范问答、语气、停顿和角色交接。孩子可选角色跟读，再回合法纸书与家人读原文。"
+    },
+    {
+      "key": "picture-check",
+      "kind": "quiz",
+      "plan": "六道原创图题听教师和角色音，检验语境字词、人物地点、变化和听辨停顿。真实朗读及纸笔另记。"
+    },
+    {
+      "key": "closing",
+      "kind": "teaching",
+      "plan": "回看两个角色、两处前后图和问答动作，安排家人共读与书写。"
+    }
+  ],
+  "games": [
+    {
+      "page": "listen-for-a-scene",
+      "template": "wordBubbles",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.wordBubbles",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "listen_match",
+      "selection": "每轮录音只描述一个可观察语义，孩子驾船吹泡泡击中正确图卡。数的动作、长出的过程、问答用语境和动作绘制；不依赖读标签。",
+      "levels": [
+        "用数灯笼和长出叶的两图练两个慢速动作。",
+        "同一组语义在更快的三幅图中改位置，加上提问。",
+        "四轮中加入回答的反应，图卡加快且第二次失误才降速高亮。"
+      ],
+      "demo": "点亮听声、场景卡、移动和泡泡按钮，带着做首轮一次后重置。目标、步骤、纠错、提示与表扬使用录音，voiceLead和stepVoiceLead均启用。"
+    },
+    {
+      "page": "deliver-a-role",
+      "template": "listenDelivery",
+      "version": 1,
+      "entryPoint": "K.gameTemplates.listenDelivery",
+      "ownerApprovedOn": "2026-11-09",
+      "knowledgeRule": "listen_pick_deliver",
+      "selection": "一个订单需要听对角色并送到正确的地点。大、小体形可以辅助辨认，地点用原先有花草或无花草的图。站点换位置，必须先听清目标再驾驶。",
+      "levels": [
+        "一单、短地图、无花和有花草的站图明显分开。",
+        "两单，角色牌取货点和站点左右对调。",
+        "三单换新画法，加一条安全可避让路线，需连续听角色和地点。"
+      ],
+      "demo": "点亮角色、目标地点、道路和停止键，老师只拿首单走一步，再回首关清空。教师先说，孩子后做。"
+    }
+  ],
+  "quizPlan": [
+    {
+      "skill": "words-and-sounds",
+      "prompt": "听到数一数珠子。哪张图里的孩子也在数？",
+      "answer": "数珠子",
+      "position": 2,
+      "rationale": "一个一个指着珠子，想知道一共有几个，是在数。这个数读第三声。"
+    },
+    {
+      "skill": "words-and-sounds",
+      "prompt": "哪个花坛原先只见土，后来长出一丛草？",
+      "answer": "从土到草",
+      "position": 1,
+      "rationale": "第一个花坛从一开始没有草，变成后来有草，这里的长读第三声。"
+    },
+    {
+      "skill": "who-goes-where",
+      "prompt": "想想小雨点自己挑的落脚处。出发时它会指哪张图？",
+      "answer": "有花有草",
+      "position": 3,
+      "rationale": "小雨点要去已经有花草的一处。花和草两样都要在出发时看得见。"
+    },
+    {
+      "skill": "before-and-after",
+      "prompt": "大雨点去的那处，哪组图从没有花草变成有花有草？",
+      "answer": "后来才有花草",
+      "position": 1,
+      "rationale": "先看左边有没有花草，再看右边。两样都是后来才有，符合大雨点去处的变化。"
+    },
+    {
+      "skill": "before-and-after",
+      "prompt": "哪组图表示花和草原来就有，后来颜色更鲜明？",
+      "answer": "两样更鲜明",
+      "position": 2,
+      "rationale": "这一组的左图已经有花和草。右图的花草还在，花更红，草更绿。"
+    },
+    {
+      "skill": "read-in-roles",
+      "prompt": "小雨点先问，大雨点随后答。哪组图的麦克风顺序对？",
+      "answer": "小先大后",
+      "position": 3,
+      "rationale": "先让戴叶帽的小雨点拿麦克风提问，再把麦克风交给戴围巾的大雨点回答。"
+    },
+    {
+      "skill": "pause-in-reading",
+      "prompt": "听老师读。雨棚下的灯笼，轻轻摇起来。哪组图顺序对？",
+      "answer": "先灯笼，后摇动",
+      "position": 1,
+      "rationale": "前面先说雨棚下的灯笼，后面再说灯笼摇起来。中间可以轻轻停一下。"
+    }
+  ],
+  "afterClass": {
+    "familyTask": "与家人打开纸书分角色读，交换角色再读一次。家人听语气、儿化、读音和停顿，另用田字格核看来、半、你、有。",
+    "weeklyQuestionSource": [
+      "语境中辨读数和长及“不”的读音",
+      "听辨角色与去处",
+      "比较两处故事的前后",
+      "问答角色、停顿与纸书朗读"
+    ],
+    "evidence": "线上记录图题和游戏动作。实际朗读、停顿、角色表达和书写待观察。"
+  },
+  "artAndLanguage": "原创云间广播站、两位雨点角色和两处故事前后图。声音说明玩法和对话，目标字可保留练认读，遮住其他文字不妨碍操作。",
+  "goalDetails": [
+    {
+      "skill": "words-and-sounds",
+      "target": "借图认字，分辨“数”和“长”在具体词里的读音及“不”的变读，留纸笔练四字。",
+      "source": "原书印100、第一课时课件3～23、第二课时课件2～4及14～16"
+    },
+    {
+      "skill": "who-goes-where",
+      "target": "区分问答者，听清大小雨点各去哪里。",
+      "source": "原书印99第二至四段、第二课时课件5～10"
+    },
+    {
+      "skill": "before-and-after",
+      "target": "对照两处故事画面，辨认已经有花草与后来才有花草的不同变化。",
+      "source": "原书印99第五段、第二课时课件11～13"
+    },
+    {
+      "skill": "read-in-roles",
+      "target": "从停顿、疑问语气和角色切换练有声对话，在纸书做分角色朗读。",
+      "source": "原书印100三项练习、第二课时教案与练习1页"
+    }
+  ]
+}

@@ -1,0 +1,158 @@
+{
+  "schemaVersion": "mira.courseware.imagegen-plan.v1",
+  "state": "realized_single_native_plate",
+  "generator": "Codex built-in image_gen",
+  "source": "art-source/craft-sticker-exhibition-atlas.png",
+  "sourceSha256": "cf7be28fda28dbd77bcb140fc39c6f298e65be7fbbbaf743b9c43b1720e8908b",
+  "sourceNativePath": "/Users/sqcopenclaw/.codex/generated_images/01a1c77a-d547-72b1-a262-029c7f4a40e5/exec-6840fd38-baf9-48f9-814f-4759aa40f14d.png",
+  "prompt": "Make one crop-ready 2-row by 3-column art atlas for an original first-grade school craft exhibition. Landscape 1536 by 1024 composition, six equal 512 by 512 cells, one fully separate asset in each cell, generous transparent margins. Genuine transparent alpha around all assets and between cells, never a checkerboard. Unified fine paper grain, matte gouache, clean cut-paper silhouettes, deep pine and warm cream with light apricot and persimmon accents. No words, letters, digits, labels, borders around the sheet, or watermarks.\n\nTop left: a clean 16:9 rectangular landscape image of two first-grade Chinese children preparing a school craft-exhibition display. The girl has a short black bob and persimmon sweater, the boy a moss-green top. Their friendly faces are in the upper half, above a spacious pale birch exhibition counter. Put their hands and any workshop props to the far sides, leaving the bottom third of the counter calm and completely unobstructed for two mathematically precise trays to be added later. There are no stickers, quantity objects or printed marks anywhere in this picture.\nTop center: one independent clean 16:9 front-facing empty craft-exhibition sorting room, warm cream central wall and bright wood floor, pine shelves and rounded cupboards only along the edges. Leave the center completely quiet for a grid. No children, carts, trays, or loose props.\nTop right: one independent clean 16:9 front-facing empty exhibition workshop for a falling-block game, distinct from the sorting room, warm apricot plaster wall and sage wainscoting, soft sunlight from a distant window, the center visually quiet and open. No people, blocks, quantity objects, or signage.\nBottom left: isolated right-facing light yellow wood handcart at rest, simple low open basket, dark pine-green wheels and a small persimmon handle grip. Its silhouette and wheels must be legible in a tiny square icon. Complete side profile, transparent cutout, no ground or shadows.\nBottom center: the identical handcart in a second action pose, still right-facing with the exact same colors, proportions, open basket and wheel style, tipped forward very slightly with a tiny cream dust puff behind a wheel. Keep full silhouette separated from adjacent cells. Transparent cutout, no ground.\nBottom right: one isolated round persimmon paper craft award badge with a small warm cream pinwheel pictogram in the center and two short pine-green folded ribbons. No lettering, numerals or branding. Transparent cutout.",
+  "promptSha256": "a88be5dfef98fe8e59331683af4724bf6c740d8dd1cf6b28bc4d4380b9d9efa0",
+  "sourcePixels": [
+    1536,
+    1024
+  ],
+  "requestedTransparency": true,
+  "officialReferencesAttached": false,
+  "recordedAt": "2026-11-11T06:59:52.624613+08:00",
+  "assets": {
+    "craft-sticker-table-base": {
+      "file": "art-source/craft-sticker-table-base.png",
+      "sha256": "8dce9d740265039c6f37bba0c376572c64ff4c568548ecf6e4603a6a5c7d3679",
+      "bytes": 523331,
+      "pixels": [
+        864,
+        486
+      ],
+      "type": "imagegen_plate_crop",
+      "sourceAtlas": "art-source/craft-sticker-exhibition-atlas.png",
+      "sourceAtlasSha256": "cf7be28fda28dbd77bcb140fc39c6f298e65be7fbbbaf743b9c43b1720e8908b",
+      "sourceCropPx": [
+        32,
+        147,
+        490,
+        445
+      ],
+      "visualReview": "source image inspected; rendered use pending",
+      "cropRule": "center fitted RGB with warm cream matte",
+      "usedBy": [
+        "craft-show-stickers"
+      ]
+    },
+    "sort-yard": {
+      "file": "assets/sort-yard.png",
+      "sha256": "883b83664177992e67efce3796e427ec0ce6898f2e6079e54192353b279b759c",
+      "bytes": 165519,
+      "pixels": [
+        480,
+        270
+      ],
+      "type": "imagegen_plate_crop",
+      "sourceAtlas": "art-source/craft-sticker-exhibition-atlas.png",
+      "sourceAtlasSha256": "cf7be28fda28dbd77bcb140fc39c6f298e65be7fbbbaf743b9c43b1720e8908b",
+      "sourceCropPx": [
+        532,
+        146,
+        999,
+        446
+      ],
+      "visualReview": "source image inspected; rendered use pending",
+      "cropRule": "center fitted RGB with warm cream matte",
+      "usedBy": [
+        "sort-the-counting-units"
+      ]
+    },
+    "tile-yard": {
+      "file": "assets/tile-yard.png",
+      "sha256": "d7f93e9cf015d4030a6a0b372e59891c8371a5c96f82b5821f735e8fcd86be5a",
+      "bytes": 180354,
+      "pixels": [
+        480,
+        270
+      ],
+      "type": "imagegen_plate_crop",
+      "sourceAtlas": "art-source/craft-sticker-exhibition-atlas.png",
+      "sourceAtlasSha256": "cf7be28fda28dbd77bcb140fc39c6f298e65be7fbbbaf743b9c43b1720e8908b",
+      "sourceCropPx": [
+        1042,
+        146,
+        1503,
+        446
+      ],
+      "visualReview": "source image inspected; rendered use pending",
+      "cropRule": "center fitted RGB with warm cream matte",
+      "usedBy": [
+        "match-the-order-total"
+      ]
+    },
+    "craft-cart": {
+      "file": "assets/craft-cart.png",
+      "sha256": "9ab4f489251928c0dd2f1fa4fb442df6781a22a34b763b7eb125248cf6a9452c",
+      "bytes": 217600,
+      "pixels": [
+        480,
+        345
+      ],
+      "type": "imagegen_plate_crop",
+      "sourceAtlas": "art-source/craft-sticker-exhibition-atlas.png",
+      "sourceAtlasSha256": "cf7be28fda28dbd77bcb140fc39c6f298e65be7fbbbaf743b9c43b1720e8908b",
+      "sourceCropPx": [
+        31,
+        586,
+        511,
+        931
+      ],
+      "visualReview": "source image inspected; rendered use pending",
+      "cropRule": "cropped without changing source alpha",
+      "usedBy": [
+        "sort-the-counting-units"
+      ]
+    },
+    "craft-cart-push": {
+      "file": "assets/craft-cart-push.png",
+      "sha256": "bf1b504fb52d81a568cba96f2a08aea57c36f7850b551c79a4caf6a3e0295d6f",
+      "bytes": 222584,
+      "pixels": [
+        482,
+        345
+      ],
+      "type": "imagegen_plate_crop",
+      "sourceAtlas": "art-source/craft-sticker-exhibition-atlas.png",
+      "sourceAtlasSha256": "cf7be28fda28dbd77bcb140fc39c6f298e65be7fbbbaf743b9c43b1720e8908b",
+      "sourceCropPx": [
+        512,
+        586,
+        994,
+        931
+      ],
+      "visualReview": "source image inspected; rendered use pending",
+      "cropRule": "cropped without changing source alpha",
+      "usedBy": [
+        "sort-the-counting-units"
+      ]
+    },
+    "craft-sticker-badge": {
+      "file": "assets/craft-sticker-badge.png",
+      "sha256": "a817cbcb5a42a85359b78b4fa29dca49f3a885b7de5c380ffba6cb46de899d12",
+      "bytes": 217901,
+      "pixels": [
+        342,
+        405
+      ],
+      "type": "imagegen_plate_crop",
+      "sourceAtlas": "art-source/craft-sticker-exhibition-atlas.png",
+      "sourceAtlasSha256": "cf7be28fda28dbd77bcb140fc39c6f298e65be7fbbbaf743b9c43b1720e8908b",
+      "sourceCropPx": [
+        1102,
+        534,
+        1444,
+        939
+      ],
+      "visualReview": "source image inspected; rendered use pending",
+      "cropRule": "cropped without changing source alpha",
+      "usedBy": [
+        "sort-the-counting-units",
+        "match-the-order-total"
+      ]
+    }
+  }
+}

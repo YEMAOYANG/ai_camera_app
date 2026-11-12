@@ -1,0 +1,296 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "影子",
+  "description": "小语老师带孩子读出影子的陪伴感，用前后左右说清位置，比较四个字的笔顺。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小语老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Serena",
+      "avatar": "/avatars/teacher-2.png",
+      "color": "#D65A8A",
+      "persona": "用亲切清楚的普通话带一年级孩子看图识字、听读和表达。"
+    }
+  },
+  "images": {
+    "yard": {"file": "assets/yard.png"},
+    "dog": {"file": "assets/dog.png"},
+    "friends": {"file": "assets/friends.png"},
+    "hand-shadow": {"file": "assets/hand-shadow.png"},
+    "rover": {"file": "assets/rover.png"},
+    "rover-carry": {"file": "assets/rover-carry.png"},
+    "patrol": {"file": "assets/patrol.png"},
+    "lamp": {"file": "assets/lamp.png"},
+    "leaf": {"file": "assets/leaf.png"},
+    "bell": {"file": "assets/bell.png"},
+    "bookmark": {"file": "assets/bookmark.png"},
+    "station-front": {"file": "assets/station-front.png"},
+    "station-back": {"file": "assets/station-back.png"},
+    "station-left": {"file": "assets/station-left.png"},
+    "station-right": {"file": "assets/station-right.png"},
+    "direction-map": {"file": "assets/direction-map.png"},
+    "write-left-right": {"file": "assets/write-left-right.png"},
+    "write-at-me": {"file": "assets/write-at-me.png"},
+    "front-choice-a": {"file": "assets/front-choice-a.png"},
+    "front-choice-b": {"file": "assets/front-choice-b.png"},
+    "front-choice-c": {"file": "assets/front-choice-c.png"},
+    "left-choice-a": {"file": "assets/left-choice-a.png"},
+    "left-choice-b": {"file": "assets/left-choice-b.png"},
+    "left-choice-c": {"file": "assets/left-choice-c.png"},
+    "lamp-choice-a": {"file": "assets/lamp-choice-a.png"},
+    "lamp-choice-b": {"file": "assets/lamp-choice-b.png"},
+    "lamp-choice-c": {"file": "assets/lamp-choice-c.png"},
+    "follow-choice-a": {"file": "assets/follow-choice-a.png"},
+    "follow-choice-b": {"file": "assets/follow-choice-b.png"},
+    "follow-choice-c": {"file": "assets/follow-choice-c.png"},
+    "radical-choice-a": {"glyph":{"groups":[{"cells":[{"glyph":"影"}]}]}},
+    "radical-choice-b": {"glyph":{"groups":[{"cells":[{"glyph":"狗"}]}]}},
+    "radical-choice-c": {"glyph":{"groups":[{"cells":[{"glyph":"朋"}]}]}},
+    "stroke-choice-a": {"file": "assets/stroke-choice-a.png"},
+    "stroke-choice-b": {"file": "assets/stroke-choice-b.png"},
+    "stroke-choice-c": {"file": "assets/stroke-choice-c.png"}
+  },
+  "scenes": [
+    {
+      "key": "p01",
+      "type": "slide",
+      "title": "谁跟到门口了",
+      "template": "title-picture",
+      "data": {"title":"谁跟到门口了","picture":"yard","caption":"脚边的轮廓跟着动"},
+      "script": [
+        {"say":"小满跑到院门口，地上也有个小人跑过去。"},
+        {"spotlight":"picture"},
+        {"say":"看看小人的脚从哪儿伸出来，你猜它是谁？"},
+        {"say":"阳光下，影子贴在小满脚边，也跟着动起来。"},
+        {"say":"试试自己迈一步，想想影子会怎么动。"},
+        {"spotlight":"caption"},
+        {"say":"再翻到自己的课本，看看两节都写了什么。"},
+        {"say":"今天我们要找方位，也给影子编个小故事。"}
+      ]
+    },
+    {
+      "key":"p02","type":"slide","title":"影子总在同一个地方吗","template":"picture-points",
+      "data":{"title":"影子总在同一个地方吗","picture":"yard","points":["影 · 三撇","前 · 后","左 · 右","常 · 常常"]},
+      "script":[
+        {"say":"小满停下来，想给脚边这个小伙伴起个名字。"},
+        {"spotlight":"point-1"},
+        {"say":"这个字是影，右边斜着排了三撇。"},
+        {"say":"听我念，影子。影读第三声，后面的子轻轻带过去。"},
+        {"spotlight":"point-2"},
+        {"say":"前读第二声。脸朝门，门在前，背对的是后方。"},
+        {"spotlight":"point-3"},
+        {"say":"左读第三声，右读第四声。先看说的是谁。"},
+        {"spotlight":"point-4"},
+        {"say":"常，第二声。常常跟着，意思是很多时候都跟着。"},
+        {"say":"现在用手指一指，你面前是什么？"},
+        {"say":"这页要认影、前、常、左、右。影子和常常是帮我们认字的词。"}
+      ]
+    },
+    {
+      "key":"p03","type":"slide","title":"跟着和陪着","template":"picture-points",
+      "data":{"title":"跟着和陪着","picture":"dog","points":["黑 · 狗","它","好 · 朋 · 友","跟着 · 陪着"]},
+      "script":[
+        {"say":"小满弯腰时，身旁那团影子也弯了弯。"},
+        {"spotlight":"point-1"},
+        {"say":"黑是一声，狗是三声。看黑和狗，左边有反犬旁的是狗。"},
+        {"spotlight":"point-2"},
+        {"say":"小狗和影子都能用它来指。它读第一声。"},
+        {"spotlight":"point-3"},
+        {"say":"好是三声。朋的左边是月字旁，朋读第二声。"},
+        {"say":"友单读第三声。听我连起来念，好朋友，最后的友轻轻读。"},
+        {"spotlight":"point-4"},
+        {"say":"跟着是一路跟过去，陪着是留在你身边。"},
+        {"say":"跟我念，跟着，陪着。两个着都读得轻，连着前一个字。"},
+        {"say":"这页要认黑、狗、它、好、朋、友。小黑狗和好朋友能帮我们记字。"}
+      ]
+    },
+    {
+      "key":"p04","type":"slide","title":"先看清他朝哪儿","template":"picture-points",
+      "data":{"title":"先看清他朝哪儿","picture":"direction-map","points":["看前面","看后面","看左边","看右边"]},
+      "script":[
+        {"say":"送道具时，有人说左，有人说右，该听谁的？"},
+        {"spotlight":"picture"},
+        {"say":"图中深绿色纸偶是参照，先找它面对的地方。"},
+        {"spotlight":"point-1"},
+        {"say":"它面朝小门，小门这一边就是它的前方。"},
+        {"say":"送给纸偶前面的小伙伴。"},
+        {"spotlight":"point-2"},
+        {"say":"它背朝的那一边就是后方，像我们背后的书包。"},
+        {"say":"送给纸偶后面的小伙伴。"},
+        {"spotlight":"point-3"},
+        {"say":"跟纸偶朝同一个方向，举一举你的左手。"},
+        {"say":"送给纸偶左边的小伙伴。"},
+        {"spotlight":"point-4"},
+        {"say":"换右手。纸偶转身时，四个方位也跟着转。"},
+        {"say":"送给纸偶右边的小伙伴。"},
+        {"say":"先看清纸偶朝哪儿，再去找小伙伴。"},
+        {"say":"找到位置后，再说清楚谁在谁的哪边。"},
+        {"say":"剧场要用三件道具，先听我把名字说清。"},
+        {"say":"先拿叶子。"},
+        {"say":"先拿铃铛。"},
+        {"say":"先拿书签。"}
+      ]
+    },
+    {
+      "key":"p05","type":"interactive","title":"听方位送道具","page":"direction-delivery","widgetType":"game","startImage":"direction-map",
+      "script":[
+        {"say":"给影子剧场送道具啦，你能听清两步吗？"},
+        {"setState":{"demo":true,"level":1,"pause":true}},
+        {"highlight":"#game-target"},
+        {"say":"先听要拿什么。叶子的边上尖尖的，我先找它。"},
+        {"highlight":"#game-player"},
+        {"say":"按箭头把小车开到叶子旁，按方块按钮取件。"},
+        {"highlight":"#shadow-delivery-demo-drop"},
+        {"say":"取件以后再听方位，先从图上找纸偶朝哪边。"},
+        {"say":"从车道过去时，等巡车离开再向前。"},
+        {"setState":{"pause":false}},
+        {"say":"现在让小车去取叶子。等轮到你，再听要送哪儿。"},
+        {"say":"等我把小车放回起点，你从第一单开始。"},
+        {"setState":{"demo":false,"level":1,"pause":false}}
+      ],
+      "gameAudio":{
+        "pick-leaf":"p04-19","pick-bell":"p04-20","pick-bookmark":"p04-21",
+        "send-front":"p04-6","send-back":"p04-9","send-left":"p04-12","send-right":"p04-15",
+        "delivery-hint":"p04-16","delivery-hint-again":"p04-17","delivery-praise":"p11-4"
+      }
+    },
+    {
+      "key":"p06","type":"slide","title":"为什么像小黑狗","template":"picture-points",
+      "data":{"title":"为什么像小黑狗","picture":"friends","points":["第一节 · 跟着","第二节 · 陪着","停一停，再接着读","换个方向看影子"]},
+      "script":[
+        {"say":"两节都在说影子，为什么一会儿像狗，一会儿像朋友？"},
+        {"spotlight":"point-1"},
+        {"say":"第一节里，影子变换位置，像一只跟着你跑的小狗。"},
+        {"spotlight":"point-2"},
+        {"say":"第二节把影子想成朋友，好像走到哪里都有它作伴。"},
+        {"say":"有时在这边，有时在那边，小满也觉得有趣。"},
+        {"spotlight":"point-3"},
+        {"say":"听我读一句新的：小小脚印，跟我到门边。"},
+        {"say":"逗号处轻轻停一下，后半句连起来说。"},
+        {"say":"轮到你用手上的课本读两小节，读出亲近的感觉。"},
+        {"spotlight":"point-4"},
+        {"say":"接下来换一换灯的位置，看看幕上的影子。"},
+        {"say":"灯朝哪边移？先猜一猜，再看深色轮廓。"},
+        {"say":"慢一点，把深色轮廓移进虚线。"},
+        {"say":"轮廓对齐了，就能把这个样子留下来。"}
+      ]
+    },
+    {
+      "key":"p07","type":"interactive","title":"把影子照进框","page":"shadow-projection","widgetType":"game","startImage":"hand-shadow",
+      "script":[
+        {"say":"影子剧场开灯啦。你能让影子站进虚线吗？"},
+        {"setState":{"demo":true,"level":1,"pause":true}},
+        {"highlight":"#game-player"},
+        {"say":"你操控的是下面的小灯，先用左右箭头移灯。"},
+        {"highlight":"#shadow-paper"},
+        {"say":"这块纸片留在中间，灯在它的右边时，看看幕布。"},
+        {"highlight":"#game-target"},
+        {"say":"我想把深色影子挪到左边的框里，先看看对齐没有。"},
+        {"say":"对好了，再按圆形按钮，把这一刻定住。"},
+        {"setState":{"pause":false}},
+        {"say":"看灯往右挪，影子就往左挪。等影子进框再定住。"},
+        {"say":"我会把灯放回中间。轮到你，先看目标再挪灯。"},
+        {"setState":{"demo":false,"level":1,"pause":false}}
+      ],
+      "gameAudio":{"shadow-goal":"p06-12","shadow-hint":"p06-13","shadow-hint-again":"p06-14","shadow-praise":"p06-15"}
+    },
+    {
+      "key":"p08","type":"slide","title":"左和右下面有区别","template":"picture-points",
+      "data":{"title":"左和右下面有区别","picture":"write-left-right","points":["先横，再撇","左 · 横竖横","右 · 竖横折横"]},
+      "script":[
+        {"say":"小满把左写在两张票上，右边那张怎么改？"},
+        {"spotlight":"picture"},
+        {"say":"从每行的小格依次看，每一格添上一笔。"},
+        {"spotlight":"point-1"},
+        {"say":"两个字都先写横，再写向左下的撇。"},
+        {"say":"手指跟着画一遍，看看撇是从哪里出发的。"},
+        {"spotlight":"point-2"},
+        {"say":"左的下部是工，先短横，再竖，最后长横托住。"},
+        {"spotlight":"point-3"},
+        {"say":"右的下部是口，先写竖，再写横折，末笔横封口。"},
+        {"say":"看田字格对比，下边一个开着，一个围了起来。"},
+        {"say":"先写在纸上，让家人看看你的两笔起笔顺不顺。"}
+      ]
+    },
+    {
+      "key":"p09","type":"slide","title":"我和在怎么写","template":"picture-points",
+      "data":{"title":"我和在怎么写","picture":"write-at-me","points":["在 · 第三笔是竖","我 · 第五笔是斜钩","慢写再比对"]},
+      "script":[
+        {"say":"现在写在和我，这次哪两笔最容易漏掉？"},
+        {"spotlight":"picture"},
+        {"say":"上排是在，下排是我，先看看每次添在哪里。"},
+        {"spotlight":"point-1"},
+        {"say":"写在，先横、撇，再写左边的竖。"},
+        {"say":"接着写横、竖、横，和左字比一比那一竖。"},
+        {"spotlight":"point-2"},
+        {"say":"写我，先撇、横、竖钩、提；第五笔是斜钩。"},
+        {"say":"斜钩向右下走，末端往上轻轻钩起。"},
+        {"say":"写完斜钩再写撇，最后一点，整个字才写完。"},
+        {"spotlight":"point-3"},
+        {"say":"看看画里的笔顺小格，慢写一次，请家人观察。"}
+      ]
+    },
+    {
+      "key":"p10","type":"quiz","title":"听老师问，看图找",
+      "intro":["听完问题，在三张图里选一张。"],
+      "questions":[
+        {"id":"shadow-q1","question":"绿衣纸偶面朝小门。哪幅图的小铃在它前面？","skill":"chinese-shadow-position","answer":["B"],"analysis":"先找绿衣纸偶朝着的门；小铃和门在纸偶的同一侧，这就是它的前面。",
+          "options":{
+            "A":{"label":"铃在侧面","visual":{"kind":"asset","image":"front-choice-a","alt":"小铃位于绿衣纸偶的左边，小门在前"}},
+            "B":{"label":"铃在门前一侧","visual":{"kind":"asset","image":"front-choice-b","alt":"小铃处在绿衣纸偶和正前方小门之间"}},
+            "C":{"label":"铃在背后","visual":{"kind":"asset","image":"front-choice-c","alt":"小铃位于绿衣纸偶的后面，小门在前"}}
+          }},
+        {"id":"shadow-q2","question":"和纸偶一起面向小门。哪张图的叶子在它左边？","skill":"chinese-shadow-position","answer":["A"],"analysis":"想象和纸偶朝同一边，举起左手。叶子在它左手伸向的那一侧。",
+          "options":{
+            "A":{"label":"叶子在左","visual":{"kind":"asset","image":"left-choice-a","alt":"纸偶朝画面右边的门，叶子在纸偶左手侧，也就是图的上方"}},
+            "B":{"label":"叶子在右","visual":{"kind":"asset","image":"left-choice-b","alt":"纸偶朝画面右边的门，叶子在纸偶右手侧，也就是图的下方"}},
+            "C":{"label":"叶子在前","visual":{"kind":"asset","image":"left-choice-c","alt":"纸偶朝画面右边的门，叶子在纸偶和门之间"}}
+          }},
+        {"id":"shadow-q3","question":"小灯在纸片右边。哪幅图的影子落在纸片左边？","skill":"chinese-shadow-light-context","answer":["C"],"analysis":"图上小灯和纸片的位置都相同。找纸片左边的深色轮廓，就能选出剧场里的位置。",
+          "options":{
+            "A":{"label":"影子在正中","visual":{"kind":"asset","image":"lamp-choice-a","alt":"小灯在纸片右边，影子画在纸片上方的正中"}},
+            "B":{"label":"影子在右边","visual":{"kind":"asset","image":"lamp-choice-b","alt":"小灯在纸片右边，深色轮廓画在幕布的右侧"}},
+            "C":{"label":"影子在左边","visual":{"kind":"asset","image":"lamp-choice-c","alt":"小灯在纸片右边，深色轮廓落在幕布的左侧"}}
+          }},
+        {"id":"shadow-q4","question":"哪一幅图最像朋友一路陪着你？","skill":"chinese-shadow-language","answer":["A"],"analysis":"两个人并排朝同一方向走，像一直相伴。各走各的或放着两件道具，都没表现这种陪伴。",
+          "options":{
+            "A":{"label":"一起走","visual":{"kind":"asset","image":"follow-choice-a","alt":"两个朋友在小路上朝同一个方向一起走"}},
+            "B":{"label":"分别离开","visual":{"kind":"asset","image":"follow-choice-b","alt":"两个小朋友朝相反方向分别走开"}},
+            "C":{"label":"物品留在原地","visual":{"kind":"asset","image":"follow-choice-c","alt":"长椅上放着一顶帽子和一把雨伞，没有人物"}}
+          }},
+        {"id":"shadow-q5","question":"看三个字，哪个字的左边是反犬旁？","skill":"chinese-shadow-components","answer":["B"],"analysis":"狗的左边是反犬旁。影的三撇在右边，朋的左边是月字旁。",
+          "options":{
+            "A":{"label":"影","visual":{"kind":"asset","image":"radical-choice-a","alt":"影字"}},
+            "B":{"label":"狗","visual":{"kind":"asset","image":"radical-choice-b","alt":"狗字"}},
+            "C":{"label":"朋","visual":{"kind":"asset","image":"radical-choice-c","alt":"朋字"}}
+          }},
+        {"id":"shadow-q6","question":"看同一个我字，哪张图的橙色笔画是斜钩？","skill":"chinese-shadow-writing","answer":["C"],"analysis":"斜钩从上方往右下走，末端向上钩。这是我字的第五笔。",
+          "options":{
+            "A":{"label":"橙色是短撇","visual":{"kind":"asset","image":"stroke-choice-a","alt":"我字左上方的第一笔短撇为橙色"}},
+            "B":{"label":"橙色是竖钩","visual":{"kind":"asset","image":"stroke-choice-b","alt":"我字左侧第三笔竖钩为橙色"}},
+            "C":{"label":"橙色是斜钩","visual":{"kind":"asset","image":"stroke-choice-c","alt":"我字右侧第五笔，从上方向右下并向上钩的笔画为橙色"}}
+          }}
+      ]
+    },
+    {
+      "key":"p11","type":"slide","title":"影子小演员","template":"summary",
+      "data":{"title":"影子小演员","items":["说方位 · 先看参照","读儿歌 · 想一想陪伴","写四字 · 看准关键笔画","和家人演个手影故事"]},
+      "script":[
+        {"say":"回到院门口，你知道地上那个小人是谁了吧？"},
+        {"spotlight":"item-1"},
+        {"say":"想说谁在前后左右，先找那个人面朝哪儿。"},
+        {"say":"先听清再找到位置，送道具的顺序就对了。"},
+        {"spotlight":"item-2"},
+        {"say":"儿歌把常跟着的影子想成小狗，也想成朋友。"},
+        {"say":"轻声接着读，逗号停一停，听起来就有节奏。"},
+        {"spotlight":"item-3"},
+        {"say":"左下是工，右下是口。在多一竖，我有斜钩。"},
+        {"spotlight":"item-4"},
+        {"say":"今天找一位家人，一起演个短短的手影故事。"},
+        {"say":"请家人听听你怎么读，再看看纸上的字。"}
+      ]
+    }
+  ]
+}

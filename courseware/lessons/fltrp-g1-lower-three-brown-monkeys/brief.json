@@ -1,0 +1,291 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "lesson": {
+    "editionId": "smartedu-english-six-year-g1-lower-sync-c8ae9406",
+    "revisionId": "directory-057e330e9b4c19ff0e6ab21e",
+    "nodeId": "515fe8a2-ca81-31ae-a753-1459a1cda2b3",
+    "unitId": "d75cd9c6-f998-39e2-b88a-2bdf6c67d1d3",
+    "lessonTitle": "Unit 2 There are three brown monkeys.",
+    "unitTitle": "Module 7",
+    "subject": "english",
+    "gradeCode": "primary_1",
+    "volume": "lower",
+    "schoolSystem": "six_year"
+  },
+  "teacher": {
+    "code": "mira_english_standard",
+    "voice": "Jennifer",
+    "gender": "female"
+  },
+  "goals": [
+    {
+      "id": "g-exists",
+      "goal": "听懂 There is 用于图上的一只，There are 用于图上的多只同类动物；some 表示有一些，本身不交代具体几只。",
+      "pageRefs": [
+        "印41 活动1–2",
+        "智慧教案1–2页",
+        "精品任务单1、3页"
+      ]
+    },
+    {
+      "id": "g-attributes",
+      "goal": "听出数量、颜色、动物类别，逐一核对并选图；黑黄两色可以在同一只虎身上。",
+      "pageRefs": [
+        "印41 活动2",
+        "智慧课件8–12、17页",
+        "精品任务单1–3页"
+      ]
+    },
+    {
+      "id": "g-place",
+      "goal": "看图理解 at the zoo 指动物园里的场景；借图用 There are 介绍一组动物。",
+      "pageRefs": [
+        "印42 活动3–4",
+        "外研218256第3–5页",
+        "外研218271第3–4页"
+      ]
+    },
+    {
+      "id": "g-compare",
+      "goal": "比较同类动物在两张图里的数量、颜色哪些变了，自己画图后试着向家人介绍。",
+      "pageRefs": [
+        "印43 活动5–6",
+        "外研218271第5–11页",
+        "精品作业第1页"
+      ]
+    }
+  ],
+  "keyPoint": "用 There are 说明有多只，听清数量、颜色与动物名并对上具体一组。",
+  "difficultPoint": "把一只与多只分清，比较两图时只比较同一种动物，逐个核对数量和颜色。",
+  "authoring": {
+    "method": "direct_authoring",
+    "author": "Codex GPT-6",
+    "nativeGenerationSubmitted": false,
+    "reviewedOfficialHours": [
+      "smartedu_elite_lesson_1",
+      "smartedu_legacy_lesson_1",
+      "publisher_module7_period_2"
+    ],
+    "gameTemplates": [
+      {
+        "id": "listenDelivery",
+        "version": 1,
+        "knowledgeRule": "listen_pick_deliver",
+        "levels": 3,
+        "progression": "先听单一显著差异，再让数量、颜色、种类的干扰并存，跨车道送到口令指定展位。",
+        "page": "deliver-the-group"
+      },
+      {
+        "id": "sortingDepot",
+        "version": 1,
+        "knowledgeRule": "classification",
+        "levels": 3,
+        "progression": "一只和多只分架，逐步加入相同颜色不同只数或同数量不同种类，错放不计分。",
+        "page": "sort-one-or-many"
+      }
+    ]
+  },
+  "pageSequence": [
+    {
+      "page": 1,
+      "type": "slide",
+      "title": "小小动物园开门啦",
+      "play": "口头分辨种类，故事设悬念。",
+      "bookActivities": [
+        1
+      ],
+      "sceneId": "zoo-opening"
+    },
+    {
+      "page": 2,
+      "type": "slide",
+      "title": "一只和多只",
+      "play": "用相同物种两张卡和同一方向点数，明确单复数句式。",
+      "bookActivities": [
+        1,
+        2
+      ],
+      "sceneId": "one-or-more"
+    },
+    {
+      "page": 3,
+      "type": "slide",
+      "title": "有一些，还是正好有几只",
+      "play": "听有一些，再逐个点数后说出具体数量；用新的动物组合。",
+      "bookActivities": [
+        1,
+        2
+      ],
+      "sceneId": "some-or-exact"
+    },
+    {
+      "page": 4,
+      "type": "slide",
+      "title": "三个线索，少一个就会找错",
+      "play": "按三条信息挑相符组，示范 at the zoo。",
+      "bookActivities": [
+        2,
+        3
+      ],
+      "sceneId": "numbers-colours-animals"
+    },
+    {
+      "page": 5,
+      "type": "interactive",
+      "title": "听完整口令再送图",
+      "play": "控制运输车，正确的数量、颜色、种类一起决定能否装货，并送到指定站。",
+      "bookActivities": [
+        2,
+        3
+      ],
+      "sceneId": "deliver-the-group"
+    },
+    {
+      "page": 6,
+      "type": "slide",
+      "title": "两张图，哪些地方变了",
+      "play": "原创同一类动物，两图对比数量和颜色变化。",
+      "bookActivities": [
+        5
+      ],
+      "sceneId": "find-the-changes"
+    },
+    {
+      "type": "slide",
+      "title": "看只数，选图架",
+      "play": "先数图卡，看见一只或多只后选对应图案的图架。",
+      "bookActivities": [
+        1,
+        5
+      ],
+      "page": 7,
+      "sceneId": "one-or-many-racks"
+    },
+    {
+      "page": 8,
+      "type": "interactive",
+      "title": "一只、多只，送对图架",
+      "play": "推画片进单只或多只图架；物种颜色改变仍按只数。",
+      "bookActivities": [
+        1,
+        3,
+        5
+      ],
+      "sceneId": "sort-one-or-many"
+    },
+    {
+      "page": 9,
+      "type": "quiz",
+      "title": "听一听新动物园",
+      "play": "六题用独立图，检句式、三信息、比较和 some。",
+      "bookActivities": [
+        2,
+        3,
+        5,
+        6
+      ],
+      "sceneId": "picture-check"
+    },
+    {
+      "page": 10,
+      "type": "slide",
+      "title": "画自己的动物园",
+      "play": "复习数量、颜色、动物和 at the zoo，请家人观察口头描述。",
+      "bookActivities": [
+        4,
+        6
+      ],
+      "sceneId": "draw-your-zoo"
+    }
+  ],
+  "quiz": [
+    {
+      "id": "zoo-q1",
+      "skill": "分辨一只与多只的存在句",
+      "correctPositionOneBased": 2,
+      "page": 9,
+      "question": "There is a brown horse.",
+      "reason": "There is 和 a 说的是一只。第二张有一匹棕马；第一张有两匹，第三张是一只棕猴。",
+      "optionAssetIds": [
+        "q1-two-brown-horses",
+        "q1-one-brown-horse",
+        "q1-one-monkey"
+      ]
+    },
+    {
+      "id": "zoo-q2",
+      "skill": "听数量和颜色找到同类动物",
+      "correctPositionOneBased": 1,
+      "page": 9,
+      "question": "There are four white horses.",
+      "reason": "第一张正好四匹白马。第二张数量对却是棕色，第三张颜色对却只有三匹。",
+      "optionAssetIds": [
+        "q2-four-white-horses",
+        "q2-four-brown-horses",
+        "q2-three-white-horses"
+      ]
+    },
+    {
+      "id": "zoo-q3",
+      "skill": "听清数量颜色和动物名",
+      "correctPositionOneBased": 3,
+      "page": 9,
+      "question": "There are four green snakes.",
+      "reason": "要找四条绿色的蛇。第一张四只绿色鸟，动物不对；第二张有五条绿蛇，数量不对。",
+      "optionAssetIds": [
+        "q3-four-green-birds",
+        "q3-five-green-snakes",
+        "q3-four-green-snakes"
+      ]
+    },
+    {
+      "id": "zoo-q4",
+      "skill": "逐个数清指定的同类组",
+      "correctPositionOneBased": 2,
+      "page": 9,
+      "question": "There are six tigers.",
+      "reason": "按两排逐只点数，第二张正好六只老虎。其余两张是五只和七只。",
+      "optionAssetIds": [
+        "q4-five-tigers",
+        "q4-six-tigers",
+        "q4-seven-tigers"
+      ]
+    },
+    {
+      "id": "zoo-q5",
+      "skill": "比较两图同种动物的数量",
+      "correctPositionOneBased": 3,
+      "page": 9,
+      "question": "Two green birds here. Four there.",
+      "reason": "先找左边两只绿鸟，再看右边四只。第一张顺序反了，第二张右边只有三只。",
+      "optionAssetIds": [
+        "q5-four-then-two",
+        "q5-two-then-three",
+        "q5-two-then-four"
+      ]
+    },
+    {
+      "id": "zoo-q6",
+      "skill": "听懂 some 在复数动物语境里的意思",
+      "correctPositionOneBased": 1,
+      "page": 9,
+      "question": "There are some elephants.",
+      "reason": "some 没有说具体几只。这题要看见多只象。第一张有两头象；另一张一头，最后一张画的是老虎。",
+      "optionAssetIds": [
+        "q6-two-elephants",
+        "q6-one-elephant",
+        "q6-two-tigers"
+      ]
+    }
+  ],
+  "afterClass": {
+    "official": [
+      "回纸书印41听读",
+      "画图并介绍",
+      "可以向家人介绍身边事物"
+    ],
+    "inLesson": "原创图片、听辨任务和六道小检查。",
+    "atHome": "用纸画两个动物区，指出是哪种、有几只、什么颜色，试说 There are…；家人观察口头表达，不要求拍照、录音或外出。",
+    "weekly": "句式、三条线索、两图比较、some 和具体数量的区别进入周题源。"
+  }
+}

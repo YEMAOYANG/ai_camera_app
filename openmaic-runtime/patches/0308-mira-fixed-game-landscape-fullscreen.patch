@@ -1,0 +1,96 @@
+diff --git a/components/edit/PlaybackChromeRoot.tsx b/components/edit/PlaybackChromeRoot.tsx
+--- a/components/edit/PlaybackChromeRoot.tsx
++++ b/components/edit/PlaybackChromeRoot.tsx
+@@ -171,6 +171,11 @@
+       [currentScene?.actions],
+     );
+ 
++    const fixedTextbook = (stage as { fixedTextbook?: boolean } | null)?.fixedTextbook;
++    const fixedGameCanvas = studentMode && fixedTextbook === true
++      && currentScene?.type === 'interactive'
++      && currentScene.content.type === 'interactive'
++      && currentScene.content.html?.includes('K.game=function');
+     const pictureCourse = studentMode && scenes.some((scene) => Boolean(scene.miraActivity));
+     const [studentSidebarCollapsed, setStudentSidebarCollapsed] = useState(true);
+     const [studentChatCollapsed, setStudentChatCollapsed] = useState(true);
+@@ -1890,7 +1895,6 @@
+     // when entering Pro mode.
+     const sceneViewerHeight = (() => {
+       const headerHeight = isPresenting || hideHeader ? 0 : studentMode ? 48 : 80;
+-      const fixedTextbook = (stage as { fixedTextbook?: boolean } | null)?.fixedTextbook;
+       const roundtableHeight =
+         mode === 'playback' && !isPresenting ? (fixedTextbook ? 216 : 192) : 0;
+       return `calc(100% - ${headerHeight + roundtableHeight}px)`;
+@@ -1900,6 +1904,7 @@
+       <div
+         ref={stageRef}
+         data-mira-playback-shell={studentMode ? 'storybook' : undefined}
++        data-mira-fixed-game-landscape={fixedGameCanvas ? '' : undefined}
+         data-mira-picture-course={pictureCourse ? 'true' : undefined}
+         className={cn(
+           'flex-1 flex overflow-hidden relative bg-gray-50 dark:bg-gray-900',
+diff --git a/app/mira-student-orbit.css b/app/mira-student-orbit.css
+--- a/app/mira-student-orbit.css
++++ b/app/mira-student-orbit.css
+@@ -1914,3 +1914,61 @@
+     font-weight: 500;
+   }
+ }
++
++/* A fixed-canvas game needs a larger fitted viewport than reflowing activities.
++ * Keep the same toolbar and discussion controls in a bottom row and side gutters
++ * on short landscape screens. The existing fullscreen root and iframe stay put. */
++@media (min-width: 640px) and (min-height: 352px) and (max-height: 500px) and (orientation: landscape) {
++  [data-mira-classroom-root]:fullscreen [data-mira-fixed-game-landscape] [data-mira-canvas-area] {
++    box-sizing: border-box;
++    padding: 0 56px 52px;
++  }
++  [data-mira-classroom-root]:fullscreen [data-mira-fixed-game-landscape] [data-mira-canvas-surround] {
++    padding: 0;
++  }
++  [data-mira-classroom-root]:fullscreen [data-mira-fixed-game-landscape] [data-mira-presentation-toolbar] {
++    right: 0 !important;
++    padding-inline: 4px;
++    opacity: 1;
++    translate: none;
++    transform: none;
++  }
++  [data-mira-classroom-root]:fullscreen [data-mira-fixed-game-landscape] [data-mira-presentation-toolbar] > div {
++    box-sizing: border-box;
++    width: 100%;
++    padding: 0;
++    margin: 0 0 2px;
++  }
++  [data-mira-classroom-root]:fullscreen [data-mira-fixed-game-landscape] [data-mira-presentation-chrome] [data-mira-chrome='playback-controls'] {
++    display: flex !important;
++    flex-wrap: nowrap;
++    height: 48px;
++    min-height: 48px;
++    gap: 0;
++  }
++  [data-mira-classroom-root]:fullscreen [data-mira-fixed-game-landscape] [data-mira-chrome='playback-controls'] > .flex-1 {
++    width: auto;
++  }
++  [data-mira-classroom-root]:fullscreen [data-mira-fixed-game-landscape] [data-mira-chrome='playback-controls'] > .flex-1 > div {
++    width: auto;
++  }
++  [data-mira-classroom-root]:fullscreen [data-mira-fixed-game-landscape] [data-mira-chrome='playback-controls'] [data-mira-whiteboard-toggle],
++  [data-mira-classroom-root]:fullscreen [data-mira-fixed-game-landscape] [data-mira-chrome='playback-controls'] [data-mira-live-control='continue'] {
++    position: relative;
++    top: auto;
++    right: auto;
++  }
++  [data-mira-classroom-root]:fullscreen [data-mira-fixed-game-landscape] [data-mira-presentation-dock] {
++    right: 4px !important;
++    bottom: 64px;
++  }
++  [data-mira-classroom-root]:fullscreen [data-mira-fixed-game-landscape] [data-mira-discussion-rail='dock'] {
++    flex-direction: column;
++    gap: 2px;
++    padding: 0;
++  }
++  [data-mira-classroom-root]:fullscreen [data-mira-fixed-game-landscape] [data-mira-left-speech] {
++    left: 4px;
++    bottom: 64px;
++  }
++}

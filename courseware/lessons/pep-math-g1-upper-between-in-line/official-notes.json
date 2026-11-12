@@ -1,0 +1,62 @@
+{
+  "schemaVersion": "mira.courseware.official-notes.v1",
+  "binding": {
+    "editionId": "pep-math-g1-upper-2022-standard",
+    "revisionId": "directory-ede7a8c63c337cf95a03fe79",
+    "nodeId": "a6b85a1c-cfda-4627-9115-2aa6ab16ca69",
+    "unitId": "ae4d78e6-9ed7-4bec-a5a4-26ed49147600",
+    "classHours": ["lesson_1"]
+  },
+  "reviewedBy": "Codex production_support",
+  "reviewedAt": "2026-11-10T15:39:32+08:00",
+  "officialTextbook": {
+    "title": "义务教育教科书 数学一年级上册",
+    "publisher": "人民教育出版社",
+    "publication": "2024年7月，见教学设计第1页",
+    "resourceId": "c3e06fe4-c6b3-49cb-8727-4f8ff69bbfbc",
+    "printedPages": [82, 83, 84],
+    "pdfPages": [87, 88, 89],
+    "scope": "印82例6与印83开头的做一做是本课正文和当堂练习。印83余下和印84是单元共用练习，回读其中与端点计数相关的第4、8题。印81是前课，印85开启第四单元整理和复习。",
+    "findings": [
+      "印82先读排队人物的位置和问题，再用直接数和点图求中间人数，最后回看所数的人是否都在两名人物之间。",
+      "印83把排队从正着说换成反着说，两端的相对次序不影响中间是谁。",
+      "印84第4题把同样的间隔迁移到楼层；第8题的阅读范围与‘两端之间’不同，起止页均已读。其余共用练习留给单元复习。"
+    ]
+  },
+  "sourceEvidence": {
+    "officialIndex": "output/courseware-lessons/pep-math-g1-upper-6to10-review-arcade/official/resource-part-01.json",
+    "officialIndexSha256": "62e7e927c0e1372ef1ca1420a019239572de7a94aaa6c29a8b2448ce5f6091a3",
+    "officialActivityId": "f385cfca-6868-a298-0fe4-63a319709359",
+    "officialDetailsUrl": "https://s-file-1.ykt.cbern.com.cn/zxx/ndrv2/national_lesson/resources/details/f385cfca-6868-a298-0fe4-63a319709359.json",
+    "officialDetailsSha256": "9d36863d580ccb7261fd321c1ac3407e585550ea9eba9c67a9d4f33ad93e80fc",
+    "materialsManifest": "output/courseware-lessons/pep-math-g1-upper-between-in-line/official/manifest.json",
+    "materialsManifestSha256": "20a9bb5694c9b3874e669b878484984b985f9ac259dfec4fb24cf313acbf7f6c",
+    "textbookPageManifest": "output/courseware-lessons/pep-math-g1-upper-recognize11to20/official/textbook-pages.json",
+    "textbookPageManifestSha256": "891995bd8e578eff030f1d7aacac183032bde7ea1aad7293ea997f6a10d6862d",
+    "scopePages": [
+      {"printedPage": 81, "pdfPage": 86, "scope": "前页", "path": "output/courseware-lessons/pep-math-g1-upper-recognize11to20/official/textbook/ebook-086.jpg", "sha256": "75a5d611732a1fe890876f36c3ebb574b0ea09d54208bc3cb7bbb539dab997e2"},
+      {"printedPage": 82, "pdfPage": 87, "scope": "例6", "path": "output/courseware-lessons/pep-math-g1-upper-recognize11to20/official/textbook/ebook-087.jpg", "sha256": "10daba8701ff33fd67f8cc63966cfd0c8c3aa3cd56e9954666888bc100c43bad"},
+      {"printedPage": 83, "pdfPage": 88, "scope": "做一做及共用练习前半", "path": "output/courseware-lessons/pep-math-g1-upper-recognize11to20/official/textbook/ebook-088.jpg", "sha256": "21da984967d5fad25fd0443bf21b821cb33ff9d012a3db16c4259bf9f81ad754"},
+      {"printedPage": 84, "pdfPage": 89, "scope": "共用练习后半", "path": "output/courseware-lessons/pep-math-g1-upper-recognize11to20/official/textbook/ebook-089.jpg", "sha256": "13e1faeb0cb8d922363a5b8a0c11cb9c8d588d1e2ad5508964bcaddefc61a261"},
+      {"printedPage": 85, "pdfPage": 90, "scope": "后页", "path": "output/courseware-lessons/pep-math-g1-upper-recognize11to20/official/textbook/ebook-090.jpg", "sha256": "ca82ab640cc2a7feec286c37bf75b003ffb4d3cb1844899da31743e906ed4ec5"}
+    ]
+  },
+  "classHourCoverage": "唯一官方课时。逐页审读教案6页、课件18页、学习任务单2页、课后练习1页，共27页，全部按清单回读SHA-256。视频按既有授权豁免。",
+  "objectives": [
+    "从同一队列读懂两个序号各指哪个位置，分清第几位和一共有多少。",
+    "指着画面说明两人之间的范围，两个端点只作定位；相邻位置之间没有人。",
+    "用顺着数或一人一点的图求中间人数，能说明从哪里开始、在哪里停，再用另一种方法核对。",
+    "把端点规则迁移到楼层或站点，再按问题用词辨别何时应该计入两端。"
+  ],
+  "keyPoint": "把‘之间’说成有边界的连续位置，画出或数出这两处里面的人。",
+  "difficultPoint": "起止两个序号只定范围，终点要停在它前一位；把所列序号和最后的人数区别开。",
+  "contentBoundary": "本课只解决20以内的简单有序位置问题。列式作理解后的选学方法，数数与画图为主。植树模型只作教案中的背景思路。立体图形同名课、连加减、日历推迟等题另有范围。",
+  "resources": {
+    "teachingDesign": {"status": "reviewed", "resourceId": "4d991c76-d53a-7131-105e-766920c0e768", "pageRefs": [1, 2, 3, 4, 5, 6], "findings": ["第1页界定例6及相关练习，难点是两端是否计入。第2～3页读位置和‘之间’，用排队活动验证端点排除。", "第3～5页比较数尺、画全队和只画局部的方法。可在图示理解后解释较大序号减较小序号得到的是从起点后数到终点的数量，最后还要排除终点。", "第5～6页用另一种办法检查，再迁移到新队列和站点。回顾同样的数在问题用词不同的情况下范围可以不同。"]},
+    "courseware": {"status": "reviewed", "resourceId": "c067a2a7-7d4e-0530-5f48-b099e6e522f7", "pageRefs": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18], "findings": ["第1～6页回到顺数、位置和两端范围，通过真实队列看中间有哪些人。第7～11页对照数数、不同画法和图解计算。", "第12～15页回看解题步骤、用不同方法验算，再练不同情境。第16～18页归纳端点边界、生活任务及课件署名。"]},
+    "learningTaskSheet": {"status": "reviewed", "resourceId": "06b1b298-66a2-eab1-cbce-ec825e525916", "pageRefs": [1, 2], "findings": ["第1页让孩子用自选方法求排队中间人数。第2页更换排队情况，再把同一规则迁移到中间站点。"]},
+    "afterClassExercise": {"status": "reviewed", "resourceId": "e52711e5-909d-dcb9-79e3-7abeda1f82e7", "pageRefs": [1], "findings": ["实际定位自己的位置，再找与首位之间有几人。转为原创亲子摆位和周测题源，真实口述和动作待观察。"]},
+    "video": {"status": "waived", "resourceId": "29ff88b3-94f1-471a-7850-604fda8712aa"}
+  },
+  "factChecks": []
+}

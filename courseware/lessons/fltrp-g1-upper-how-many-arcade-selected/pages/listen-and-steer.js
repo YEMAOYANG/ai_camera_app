@@ -1,0 +1,23 @@
+K.ready({title:'泡泡车找号码星',sub:'听英语数词，再开向那颗号码星。'});
+
+K.game(K.gameTemplates.bubbleMaze({
+  art:{backdrop:'__IMG:game-harbor__',sticker:'__IMG:game-shell__',
+       frames:['__IMG:game-rover__','__IMG:game-rover-pop__']},
+  doneText:'号码星都找齐啦！',
+  cues:[
+    {steps:['word-one','word-four'],goal:'maze-exit',hint:'maze-hint',hint2:'maze-help',praise:'maze-praise'},
+    {steps:['word-nine','word-three','word-six'],goal:'maze-exit',hint:'maze-hint',hint2:'maze-help',praise:'maze-praise'},
+    {steps:['word-ten','word-five','word-seven','word-three'],goal:'maze-exit',hint:'maze-hint',hint2:'maze-help',praise:'maze-praise'},
+  ],
+  levels:[
+    {map:['#########','#S..4.E.#','#.#.#.#.#','#..1+...#','#.......#','#########'],
+     route:['1','4'],step:.34,listenOnly:true,hints:['再听一次刚才的数。','慢一点，看看亮起来的星。']},
+    {map:['###########','#S.9+....E#','#.#.###.#.#','#.3..6....#','#.#.###.#.#','#.........#','###########'],
+     route:['9','3','6'],step:.27,listenOnly:true,patrols:[{y:5,from:2,to:8,speed:1.2}],
+     hints:['再听一次刚才的数。','慢一点，看看亮起来的星。']},
+    {map:['#############','#S..A+.....E#','#.##.#####.##','#..5..7..3..#','###.##.##.#.#','#...........#','#############'],
+     route:['A','5','7','3'],labels:{A:'10'},step:.20,listenOnly:true,
+     patrols:[{y:1,from:6,to:10,speed:1.7},{y:5,from:2,to:10,speed:1.5}],
+     hints:['再听一次刚才的数。','慢一点，看看亮起来的星。']},
+  ],
+}));
