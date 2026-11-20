@@ -411,9 +411,9 @@ class _StudentSpaceIntro extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AppSurface(
-      color: AppColors.brandWash.withValues(alpha: 0.74),
-      borderColor: AppColors.brand.withValues(alpha: 0.10),
-      radius: AppRadii.cardLarge,
+      color: AppColors.brandSageWash,
+      borderColor: AppColors.brandSageWash,
+      radius: AppRadii.cardMedium,
       padding: const EdgeInsets.all(16),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -487,7 +487,9 @@ class _PinSetupPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AppSurface(
-      radius: AppRadii.cardLarge,
+      color: AppColors.surface,
+      borderColor: AppColors.shellRule,
+      radius: AppRadii.cardMedium,
       padding: const EdgeInsets.fromLTRB(16, 18, 16, 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -604,13 +606,7 @@ class _PairingCodePanel extends StatelessWidget {
               Expanded(
                 child: Text(
                   expired ? '配对码已过期' : '配对码已准备好',
-                  style: const TextStyle(
-                    color: AppColors.ink,
-                    fontFamily: AppTypography.systemFont,
-                    fontSize: 19,
-                    fontWeight: FontWeight.w900,
-                    height: 1.2,
-                  ),
+                  style: AppTypography.sectionHeading,
                 ),
               ),
               _CountdownBadge(remaining: remaining),

@@ -4,10 +4,10 @@ import 'package:flutter/services.dart';
 import 'package:warm_sight/src/core/theme/app_system_ui.dart';
 import 'package:warm_sight/src/core/theme/app_tokens.dart';
 import 'package:warm_sight/src/shared/widgets/app_background.dart';
-import 'package:warm_sight/src/shared/widgets/app_glass_surface.dart';
+import 'package:warm_sight/src/shared/widgets/app_viewport.dart';
 
 const _refreshIndicatorTextStyle = TextStyle(
-  color: Color(0xFF9AA6B6),
+  color: Color(0xFF74858A),
   fontFamily: AppTypography.systemFont,
   fontSize: 12,
   fontWeight: FontWeight.w600,
@@ -28,6 +28,7 @@ class AppScreen extends StatelessWidget {
     this.fixedHeader = true,
     this.showHeader = true,
     this.plainBackground = false,
+    this.backgroundColor,
     this.reserveBottomNavigation = true,
     this.avoidFooterOverlap = false,
     this.pinnedHeaderHeight = AppChrome.pinnedHeaderHeight,
@@ -55,6 +56,7 @@ class AppScreen extends StatelessWidget {
   final bool fixedHeader;
   final bool showHeader;
   final bool plainBackground;
+  final Color? backgroundColor;
   final bool reserveBottomNavigation;
   final bool avoidFooterOverlap;
   final double pinnedHeaderHeight;
@@ -69,6 +71,11 @@ class AppScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final safeArea = MediaQuery.paddingOf(context);
+    final width = MediaQuery.sizeOf(context).width;
+    final extraInset = ((width - AppChrome.readingWidth) / 2).clamp(
+      0.0,
+      double.infinity,
+    );
     final basePadding = padding.resolve(Directionality.of(context));
     final hasFooter = footer != null;
     final useEasyRefresh = onRefresh != null || onLoadMore != null;
@@ -77,7 +84,9 @@ class AppScreen extends StatelessWidget {
     final scrollTopInset = scrollBelowPinnedHeader
         ? safeArea.top + pinnedHeaderHeight
         : 0.0;
-    final chromeBottom = reserveBottomNavigation
+    final chromeBottom =
+        reserveBottomNavigation &&
+            AppViewport.verticalBarEdgeOf(context) == null
         ? AppChrome.tabBarBottomGap(safeArea.bottom) +
               AppChrome.tabBarHeight +
               AppChrome.tabBarContentGap
@@ -100,19 +109,19 @@ class AppScreen extends StatelessWidget {
               : safeArea.top + pinnedHeaderHeight + basePadding.top)
         : basePadding.top + safeArea.top + 2;
     final adjustedPadding = EdgeInsets.fromLTRB(
-      basePadding.left,
+      basePadding.left + extraInset,
       topPadding,
-      basePadding.right,
+      basePadding.right + extraInset,
       bottomPadding,
     );
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: AppSystemUi.light(),
       child: Scaffold(
-        backgroundColor: AppColors.appBackground,
+        backgroundColor: backgroundColor ?? AppColors.appBackground,
         body: Stack(
           children: [
-            if (!plainBackground)
+            if (!plainBackground && backgroundColor == null)
               const Positioned.fill(child: AppScreenBackground()),
             Positioned(
               top: scrollTopInset,
@@ -129,14 +138,20 @@ class AppScreen extends StatelessWidget {
                 title: title,
                 subtitle: subtitle,
                 safeTop: safeArea.top,
+                horizontalInset: AppSpacing.pageHorizontal + extraInset,
                 onBack: onBack,
                 backLabel: backLabel,
                 trailing: trailing,
                 headerContent: headerContent,
                 headerHeight: pinnedHeaderHeight,
+                backgroundColor: backgroundColor,
               ),
             if (footer != null)
-              _AppScreenFooter(safeBottom: safeArea.bottom, child: footer!),
+              _AppScreenFooter(
+                safeBottom: safeArea.bottom,
+                horizontalInset: AppSpacing.pageHorizontal + extraInset,
+                child: footer!,
+              ),
           ],
         ),
       ),
@@ -245,9 +260,14 @@ class AppScreen extends StatelessWidget {
 }
 
 class _AppScreenFooter extends StatelessWidget {
-  const _AppScreenFooter({required this.safeBottom, required this.child});
+  const _AppScreenFooter({
+    required this.safeBottom,
+    required this.horizontalInset,
+    required this.child,
+  });
 
   final double safeBottom;
+  final double horizontalInset;
   final Widget child;
 
   @override
@@ -271,9 +291,9 @@ class _AppScreenFooter extends StatelessWidget {
         ),
         child: Padding(
           padding: EdgeInsets.fromLTRB(
-            AppSpacing.pageHorizontal,
+            horizontalInset,
             12,
-            AppSpacing.pageHorizontal,
+            horizontalInset,
             safeBottom + 12,
           ),
           child: child,
@@ -303,23 +323,13 @@ class _AppLargeHeader extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                title,
-                style: const TextStyle(
-                  color: AppColors.ink,
-                  fontFamily: AppTypography.systemFont,
-                  fontSize: 28,
-                  fontWeight: FontWeight.w800,
-                  height: 1.12,
-                  letterSpacing: 0,
-                ),
-              ),
+              Text(title, style: AppTypography.pageHeading),
               if (subtitle != null) ...[
                 const SizedBox(height: 7),
                 Text(
                   subtitle!,
                   style: const TextStyle(
-                    color: AppColors.muted,
+                    color: AppColors.mutedStrong,
                     fontFamily: AppTypography.systemFont,
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -342,21 +352,37 @@ class _AppPinnedHeader extends StatelessWidget {
     required this.title,
     required this.subtitle,
     required this.safeTop,
+    required this.horizontalInset,
     required this.backLabel,
     this.onBack,
     this.trailing,
     this.headerContent,
     this.headerHeight = AppChrome.pinnedHeaderHeight,
+    this.backgroundColor,
   });
 
   final String title;
   final String? subtitle;
   final double safeTop;
+  final double horizontalInset;
   final VoidCallback? onBack;
   final String backLabel;
   final Widget? trailing;
   final Widget? headerContent;
   final double headerHeight;
+  final Color? backgroundColor;
+
+  Widget _surface(Widget child) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: backgroundColor ?? AppColors.shellPaper,
+        border: headerContent != null
+            ? null
+            : const Border(bottom: BorderSide(color: AppColors.shellRule)),
+      ),
+      child: child,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -366,13 +392,12 @@ class _AppPinnedHeader extends StatelessWidget {
       left: 0,
       right: 0,
       top: 0,
-      child: AppGlassSurface(
-        style: AppGlassStyle.header,
-        child: Padding(
+      child: _surface(
+        Padding(
           padding: EdgeInsets.fromLTRB(
-            AppSpacing.pageHorizontal,
+            horizontalInset,
             safeTop,
-            AppSpacing.pageHorizontal,
+            horizontalInset,
             0,
           ),
           child: SizedBox(
@@ -399,13 +424,8 @@ class _AppPinnedHeader extends StatelessWidget {
                             title,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              color: AppColors.ink,
-                              fontFamily: AppTypography.systemFont,
+                            style: AppTypography.pageHeading.copyWith(
                               fontSize: hasBack ? 24 : 28,
-                              fontWeight: FontWeight.w700,
-                              height: hasBack ? 1.14 : 1.12,
-                              letterSpacing: 0,
                             ),
                           ),
                           if (subtitle != null) ...[
@@ -456,12 +476,9 @@ class AppIconButton extends StatelessWidget {
       onPressed: onTap,
       style: IconButton.styleFrom(
         fixedSize: const Size.square(AppControls.iconButtonSize),
-        backgroundColor: AppColors.surfaceElevated,
+        backgroundColor: Colors.transparent,
         foregroundColor: AppColors.ink,
-        side: const BorderSide(color: AppColors.borderSoft),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppRadii.control),
-        ),
+        shape: const CircleBorder(),
       ),
       icon: Icon(icon, size: 18),
     );

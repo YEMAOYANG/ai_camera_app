@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:warm_sight/src/shared/widgets/app_viewport.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
@@ -32,6 +33,8 @@ class _LiveMonitorScreenState extends ConsumerState<LiveMonitorScreen>
   var _initializing = true;
   var _connected = false;
   var _landscapeMode = false;
+  var _enteredMonitor = false;
+  var _supportsFolding = false;
   var _ptzSpeed = 4;
   String _message = '正在连接实时画面';
 
@@ -39,7 +42,19 @@ class _LiveMonitorScreenState extends ConsumerState<LiveMonitorScreen>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    unawaited(_enterMonitorMode());
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final previous = _supportsFolding;
+    _supportsFolding = AppViewport.supportsFoldingOf(context);
+    if (!_enteredMonitor) {
+      _enteredMonitor = true;
+      unawaited(_enterMonitorMode());
+    } else if (!previous && _supportsFolding) {
+      unawaited(SystemChrome.setPreferredOrientations(const []));
+    }
   }
 
   @override
@@ -77,20 +92,25 @@ class _LiveMonitorScreenState extends ConsumerState<LiveMonitorScreen>
       SystemUiMode.manual,
       overlays: SystemUiOverlay.values,
     );
-    await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+    await _setOrientations(const [DeviceOrientation.portraitUp]);
     _applyPortraitChromeStyle();
   }
 
   Future<void> _restoreAppChrome() async {
     SystemChrome.setSystemUIOverlayStyle(AppSystemUi.light());
     await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
-    await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+    await _setOrientations(const [DeviceOrientation.portraitUp]);
     SystemChrome.setSystemUIOverlayStyle(AppSystemUi.light());
   }
 
   void _applyPortraitChromeStyle() {
     SystemChrome.setSystemUIOverlayStyle(_portraitChromeStyle);
   }
+
+  Future<void> _setOrientations(List<DeviceOrientation> orientations) =>
+      SystemChrome.setPreferredOrientations(
+        _supportsFolding ? const [] : orientations,
+      );
 
   void _restorePortraitChromeAfterFrame() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -281,7 +301,7 @@ class _LiveMonitorScreenState extends ConsumerState<LiveMonitorScreen>
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: _portraitChromeStyle,
       child: Scaffold(
-        backgroundColor: AppColors.appBackgroundMid,
+        backgroundColor: AppColors.shellPaper,
         body: SafeArea(
           child: CustomScrollView(
             slivers: [
@@ -294,6 +314,7 @@ class _LiveMonitorScreenState extends ConsumerState<LiveMonitorScreen>
                   connected: _connected,
                   initializing: _initializing,
                   message: _message,
+                  fullscreenLabel: _supportsFolding ? '全屏' : '横屏',
                   onLandscape: () => unawaited(_setLandscapeMode(true)),
                 ),
               ),
@@ -322,7 +343,7 @@ class _LiveMonitorScreenState extends ConsumerState<LiveMonitorScreen>
     if (enabled) {
       SystemChrome.setSystemUIOverlayStyle(_landscapeChromeStyle);
       await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
-      await SystemChrome.setPreferredOrientations([
+      await _setOrientations(const [
         DeviceOrientation.landscapeLeft,
         DeviceOrientation.landscapeRight,
       ]);
@@ -355,6 +376,7 @@ class _LiveMonitorScreenState extends ConsumerState<LiveMonitorScreen>
               child: SafeArea(
                 bottom: false,
                 child: _LandscapeExitButton(
+                  label: _supportsFolding ? '退出全屏' : '退出横屏',
                   onTap: () => unawaited(_setLandscapeMode(false)),
                 ),
               ),
@@ -411,26 +433,14 @@ class _MonitorHeader extends StatelessWidget {
                   '实时画面',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: AppColors.ink,
-                    fontFamily: AppTypography.systemFont,
-                    fontSize: 22,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: 0,
-                  ),
+                  style: AppTypography.sectionHeading,
                 ),
                 const SizedBox(height: 4),
                 Text(
                   message,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: AppColors.muted,
-                    fontFamily: AppTypography.systemFont,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 0,
-                  ),
+                  style: AppTypography.caption,
                 ),
               ],
             ),
@@ -454,10 +464,10 @@ class _MonitorHeaderButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Colors.white.withValues(alpha: 0.86),
-      borderRadius: BorderRadius.circular(16),
+      color: AppColors.surfaceStrong,
+      shape: const CircleBorder(),
+      clipBehavior: Clip.antiAlias,
       child: InkWell(
-        borderRadius: BorderRadius.circular(16),
         onTap: onTap,
         child: SizedBox(
           width: 44,
@@ -475,6 +485,7 @@ class _PortraitVideoPanel extends StatelessWidget {
     required this.connected,
     required this.initializing,
     required this.message,
+    required this.fullscreenLabel,
     required this.onLandscape,
   });
 
@@ -482,6 +493,7 @@ class _PortraitVideoPanel extends StatelessWidget {
   final bool connected;
   final bool initializing;
   final String message;
+  final String fullscreenLabel;
   final VoidCallback onLandscape;
 
   @override
@@ -489,14 +501,14 @@ class _PortraitVideoPanel extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
       child: AppSurface(
-        color: const Color(0xFF0B1220),
+        color: const Color(0xFF131E22),
         borderColor: Colors.white.withValues(alpha: 0.08),
-        radius: 22,
+        radius: AppRadii.cardMedium,
         padding: EdgeInsets.zero,
         child: AspectRatio(
           aspectRatio: 16 / 9,
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(22),
+            borderRadius: BorderRadius.circular(AppRadii.cardMedium),
             child: Stack(
               children: [
                 Positioned.fill(child: _VideoLayer(renderer: renderer)),
@@ -512,7 +524,7 @@ class _PortraitVideoPanel extends StatelessWidget {
                   bottom: 12,
                   child: _VideoOverlayButton(
                     icon: Icons.open_in_full_rounded,
-                    label: '横屏',
+                    label: fullscreenLabel,
                     onTap: onLandscape,
                   ),
                 ),
@@ -570,8 +582,9 @@ class _VideoOverlayButton extends StatelessWidget {
 }
 
 class _LandscapeExitButton extends StatelessWidget {
-  const _LandscapeExitButton({required this.onTap});
+  const _LandscapeExitButton({required this.label, required this.onTap});
 
+  final String label;
   final VoidCallback onTap;
 
   @override
@@ -582,16 +595,20 @@ class _LandscapeExitButton extends StatelessWidget {
       child: InkWell(
         borderRadius: BorderRadius.circular(13),
         onTap: onTap,
-        child: const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.chevron_left_rounded, color: Colors.white, size: 24),
-              SizedBox(width: 2),
+              const Icon(
+                Icons.chevron_left_rounded,
+                color: Colors.white,
+                size: 24,
+              ),
+              const SizedBox(width: 2),
               Text(
-                '退出横屏',
-                style: TextStyle(
+                label,
+                style: const TextStyle(
                   color: Colors.white,
                   fontFamily: AppTypography.systemFont,
                   fontSize: 13,
@@ -707,22 +724,16 @@ class _MonitorPtzPanel extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
       child: AppSurface(
+        color: AppColors.surface,
+        borderColor: AppColors.shellRule,
+        radius: AppRadii.cardMedium,
         padding: const EdgeInsets.fromLTRB(18, 18, 18, 20),
         child: Column(
           children: [
             Row(
               children: [
                 const Expanded(
-                  child: Text(
-                    '云台控制',
-                    style: TextStyle(
-                      color: AppColors.ink,
-                      fontFamily: AppTypography.systemFont,
-                      fontSize: 17,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: 0,
-                    ),
-                  ),
+                  child: Text('云台控制', style: AppTypography.sectionHeading),
                 ),
                 StatusChip(
                   label: enabled ? '可控制' : '不可用',
@@ -733,21 +744,14 @@ class _MonitorPtzPanel extends StatelessWidget {
             const SizedBox(height: 6),
             Align(
               alignment: Alignment.centerLeft,
-              child: Text(
-                description,
-                style: const TextStyle(
-                  color: AppColors.muted,
-                  fontFamily: AppTypography.systemFont,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                  height: 1.35,
-                  letterSpacing: 0,
-                ),
-              ),
+              child: Text(description, style: AppTypography.caption),
             ),
             const SizedBox(height: 24),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            Wrap(
+              alignment: WrapAlignment.spaceEvenly,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: 4,
+              runSpacing: 12,
               children: [
                 _ResetButton(enabled: enabled, onTap: onReset),
                 _PtzPad(enabled: enabled, onMove: onMove),
@@ -831,9 +835,9 @@ class _PtzPad extends StatelessWidget {
         height: 150,
         child: DecoratedBox(
           decoration: BoxDecoration(
-            color: AppColors.surfaceStrong,
+            color: AppColors.brandSageWash,
             shape: BoxShape.circle,
-            border: Border.all(color: AppColors.border),
+            border: Border.all(color: AppColors.shellRule),
           ),
           child: Stack(
             children: [
@@ -860,11 +864,15 @@ class _PtzPad extends StatelessWidget {
                   onTap: enabled ? () => onMove('home') : null,
                   child: DecoratedBox(
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppColors.surface,
                       shape: BoxShape.circle,
                       border: Border.all(color: AppColors.borderSoft),
                     ),
-                    child: const SizedBox(width: 54, height: 54),
+                    child: const SizedBox(
+                      width: 54,
+                      height: 54,
+                      child: Icon(Icons.adjust, color: AppColors.brandDeep),
+                    ),
                   ),
                 ),
               ),

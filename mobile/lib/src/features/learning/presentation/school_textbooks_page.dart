@@ -606,8 +606,8 @@ class _SchoolTerm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Material(
-    color: AppColors.surfaceStrong,
-    borderRadius: BorderRadius.circular(AppRadii.card),
+    color: AppColors.brandSageWash,
+    borderRadius: BorderRadius.circular(AppRadii.cardMedium),
     child: Padding(
       padding: const EdgeInsets.fromLTRB(12, 12, 4, 12),
       child: Row(
@@ -615,7 +615,7 @@ class _SchoolTerm extends StatelessWidget {
           const Icon(
             Icons.calendar_today_outlined,
             size: 20,
-            color: AppColors.mutedStrong,
+            color: AppColors.brandDeep,
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -633,11 +633,7 @@ class _SchoolTerm extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   '${catalog.year}—${catalog.year + 1} · ${catalog.termSource == 'parent' ? '家长已确认' : '按日期建议'}',
-                  style: const TextStyle(
-                    fontSize: 11,
-                    height: 1.5,
-                    color: AppColors.mutedStrong,
-                  ),
+                  style: AppTypography.caption,
                 ),
               ],
             ),

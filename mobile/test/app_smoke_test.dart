@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -847,8 +849,18 @@ void main() {
     expect(find.text('今日安排'), findsOneWidget);
     expect(find.text('当前没有需要你处理的事'), findsNothing);
 
+    final selection = find.descendant(
+      of: find.byKey(const ValueKey('bottomNavSelection')),
+      matching: find.byType(CustomPaint),
+    );
+    final homeX = tester.getCenter(selection).dx;
     await tester.tap(find.text('任务').last);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 85));
+    final slidingX = tester.getCenter(selection).dx;
     await tester.pumpAndSettle();
+    final tasksX = tester.getCenter(selection).dx;
+    expect(slidingX, inExclusiveRange(homeX, tasksX));
     expect(find.text('户外活动'), findsWidgets);
     expect(find.text('+0 分'), findsNothing);
 
@@ -879,6 +891,102 @@ void main() {
     expect(find.text('摄像头管理'), findsOneWidget);
     expect(find.text('设备与看护'), findsNothing);
     expect(find.text('紧急联系人'), findsNothing);
+  });
+
+  testWidgets('Duo moves the tabs with the window and reflows the home page', (
+    tester,
+  ) async {
+    final geometry = StreamController<Object?>();
+    addTearDown(geometry.close);
+    await _pumpApp(
+      tester,
+      displayGeometryEvents: geometry.stream,
+      initialGradeCode: 'primary_1',
+      preferences: const {
+        hasSeenOnboardingKey: true,
+        hasCompletedInitialSetupKey: true,
+      },
+    );
+    await tester.pump(const Duration(milliseconds: 500));
+    await _loginSuccessfully(tester);
+    addTearDown(tester.view.resetViewPadding);
+    addTearDown(tester.view.resetPadding);
+
+    Future<void> resize(
+      Size size,
+      FakeViewPadding padding,
+      String edge, {
+      double? systemBarBottom,
+    }) async {
+      tester.view.physicalSize = size * tester.view.devicePixelRatio;
+      tester.view.viewPadding = padding;
+      tester.view.padding = padding;
+      geometry.add({
+        'width': size.width,
+        'height': size.height,
+        'barEdge': edge,
+        'foldable': true,
+        'divisions': <List<double>>[],
+        'systemBarBottom': systemBarBottom,
+      });
+      await tester.pumpAndSettle();
+    }
+
+    const rail = ValueKey('sideNavigation');
+    final selection = find.descendant(
+      of: find.byKey(const ValueKey('bottomNavSelection')),
+      matching: find.byType(CustomPaint),
+    );
+    await resize(
+      const Size(466, 678),
+      const FakeViewPadding(left: 36, right: 138, bottom: 60),
+      'right',
+    );
+    expect(tester.getRect(find.byKey(rail)).right, 420);
+    await resize(
+      const Size(466, 678),
+      const FakeViewPadding(left: 36, right: 246, bottom: 60),
+      'right',
+      systemBarBottom: 170,
+    );
+    expect(tester.getCenter(find.byKey(rail)).dx, 425);
+    expect(tester.getTopLeft(find.byKey(rail)).dy, greaterThan(170));
+    await tester.tap(find.text('选教材'));
+    await tester.pumpAndSettle();
+    final textbookHeader = tester.element(find.text('教材设置'));
+    expect(MediaQuery.sizeOf(textbookHeader).width, 372);
+    await tester.tap(find.byIcon(Icons.arrow_back_ios_new));
+    await tester.pumpAndSettle();
+    expect(tester.getCenter(find.byKey(rail)).dx, 425);
+    final homeY = tester.getCenter(selection).dy;
+    await tester.tap(find.text('任务').last);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 85));
+    final slidingY = tester.getCenter(selection).dy;
+    await tester.pumpAndSettle();
+    expect(slidingY, inExclusiveRange(homeY, tester.getCenter(selection).dy));
+
+    await resize(
+      const Size(402, 669),
+      const FakeViewPadding(left: 138, right: 36),
+      'left',
+    );
+    expect(find.byKey(rail), findsNothing);
+    expect(find.text('户外活动'), findsWidgets);
+
+    await resize(
+      const Size(951, 669),
+      const FakeViewPadding(left: 120, right: 36),
+      'left',
+    );
+    expect(tester.getRect(find.byKey(rail)).left, 40);
+    await tester.tap(find.text('首页').last);
+    await tester.pumpAndSettle();
+    expect(
+      tester.getTopLeft(find.text('教材与课程')).dx,
+      lessThan(tester.getTopLeft(find.text('看护报告')).dx),
+    );
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('rejecting a confirmation task is final in V1 copy', (
@@ -1554,6 +1662,8 @@ Future<void> _pumpApp(
   bool hasDevice = false,
   bool failTaskTemplates = false,
   bool seedTasks = true,
+  String? initialGradeCode,
+  Stream<Object?>? displayGeometryEvents,
 }) async {
   tester.view
     ..physicalSize = logicalSize * devicePixelRatio
@@ -1576,6 +1686,7 @@ Future<void> _pumpApp(
     failTaskTemplates: failTaskTemplates,
     seedTasks: seedTasks,
   );
+  if (initialGradeCode != null) fakeApi._childGradeCode = initialGradeCode;
   final fakeDio = fakeApi.dio;
 
   await tester.pumpWidget(
@@ -1612,7 +1723,7 @@ Future<void> _pumpApp(
         sharedPreferencesProvider.overrideWithValue(sharedPreferences),
         authSessionStoreProvider.overrideWithValue(authSessionStore),
       ],
-      child: const GuardianApp(),
+      child: GuardianApp(displayGeometryEvents: displayGeometryEvents),
     ),
   );
   await tester.pump(const Duration(milliseconds: 50));

@@ -30,6 +30,7 @@ class ProfileScreen extends ConsumerWidget {
 
     return AppScreen(
       title: '我的',
+      backgroundColor: AppColors.shellPaper,
       fixedHeader: false,
       showHeader: false,
       padding: const EdgeInsets.fromLTRB(
@@ -217,46 +218,22 @@ class _FamilySpaceHero extends StatelessWidget {
           final rightReserve = compact ? 92.0 : 112.0;
 
           return ClipRRect(
-            borderRadius: BorderRadius.circular(AppRadii.hero),
+            borderRadius: BorderRadius.circular(AppRadii.cardMedium),
             child: DecoratedBox(
-              decoration: BoxDecoration(
-                color: const Color(0xFFEAF3EF),
-                border: Border.all(
-                  color: AppColors.brandSage.withValues(alpha: 0.12),
-                ),
-                gradient: const LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [Color(0xFFE7F1ED), Color(0xFFF7FAFB)],
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                  colors: [
+                    AppColors.shellPaper,
+                    AppColors.shellPaper,
+                    AppColors.brandSageWash,
+                  ],
+                  stops: [0, .32, 1],
                 ),
               ),
               child: Stack(
                 children: [
-                  Positioned.fill(
-                    child: Opacity(
-                      opacity: 0.18,
-                      child: Image.asset(
-                        'assets/images/guardian/guardian_family.png',
-                        fit: BoxFit.cover,
-                        alignment: Alignment.centerRight,
-                      ),
-                    ),
-                  ),
-                  Positioned.fill(
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.centerLeft,
-                          end: Alignment.centerRight,
-                          colors: [
-                            const Color(0xFFF6FAF8).withValues(alpha: 0.96),
-                            const Color(0xFFF6FAF8).withValues(alpha: 0.74),
-                            const Color(0xFFF6FAF8).withValues(alpha: 0.36),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
                   Positioned(
                     right: artRight,
                     bottom: compact ? -2 : -1,
@@ -267,7 +244,7 @@ class _FamilySpaceHero extends StatelessWidget {
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 15, 16, 12),
+                    padding: const EdgeInsets.fromLTRB(2, 15, 10, 12),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
@@ -284,14 +261,10 @@ class _FamilySpaceHero extends StatelessWidget {
                                       summary.spaceTitle,
                                       maxLines: 2,
                                       overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(
-                                        color: AppColors.ink,
-                                        fontFamily: AppTypography.systemFont,
-                                        fontSize: 24,
-                                        fontWeight: FontWeight.w900,
-                                        height: 1.05,
-                                        letterSpacing: 0,
-                                      ),
+                                      style: AppTypography.shellHeading
+                                          .copyWith(
+                                            fontSize: compact ? 25 : 29,
+                                          ),
                                     ),
                                   ),
                                   const SizedBox(width: 6),
@@ -679,31 +652,22 @@ class _ProfileCategoryPanel extends StatelessWidget {
               color: AppColors.ink,
               fontFamily: AppTypography.systemFont,
               fontSize: 16,
-              fontWeight: FontWeight.w900,
+              fontWeight: FontWeight.w700,
               height: 1.2,
               letterSpacing: 0,
             ),
           ),
         ),
-        DecoratedBox(
-          decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.76),
-            borderRadius: BorderRadius.circular(AppRadii.cardLarge),
-            border: Border.all(color: AppColors.borderSoft),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 6),
-            child: Column(
-              children: [
-                for (var index = 0; index < section.rows.length; index++)
-                  _ProfileCategoryRow(
-                    category: section.rows[index],
-                    emphasized: index == 0,
-                    last: index == section.rows.length - 1,
-                  ),
-              ],
-            ),
-          ),
+        const Divider(height: 1, color: AppColors.shellRule),
+        Column(
+          children: [
+            for (var index = 0; index < section.rows.length; index++)
+              _ProfileCategoryRow(
+                category: section.rows[index],
+                emphasized: index == 0,
+                last: index == section.rows.length - 1,
+              ),
+          ],
         ),
       ],
     );
@@ -724,8 +688,8 @@ class _ProfileCategoryRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tone = _toneData(category.tone);
-    final vertical = emphasized ? 14.0 : 12.0;
-    final iconSize = emphasized ? 46.0 : 40.0;
+    final vertical = emphasized ? 12.0 : 10.0;
+    const iconSize = 34.0;
 
     return _CategoryPressable(
       onTap: () => context.push(category.path),
@@ -733,13 +697,13 @@ class _ProfileCategoryRow extends StatelessWidget {
       child: Column(
         children: [
           Padding(
-            padding: EdgeInsets.fromLTRB(14, vertical, 12, vertical),
+            padding: EdgeInsets.fromLTRB(2, vertical, 4, vertical),
             child: Row(
               children: [
                 DecoratedBox(
                   decoration: BoxDecoration(
                     color: tone.background,
-                    borderRadius: BorderRadius.circular(emphasized ? 16 : 14),
+                    borderRadius: BorderRadius.circular(AppRadii.card),
                   ),
                   child: SizedBox(
                     width: iconSize,
@@ -748,7 +712,7 @@ class _ProfileCategoryRow extends StatelessWidget {
                       child: Icon(
                         category.icon,
                         color: tone.foreground,
-                        size: 21,
+                        size: 19,
                       ),
                     ),
                   ),
@@ -766,7 +730,7 @@ class _ProfileCategoryRow extends StatelessWidget {
                           color: AppColors.ink,
                           fontFamily: AppTypography.systemFont,
                           fontSize: emphasized ? 15.5 : 14.5,
-                          fontWeight: FontWeight.w900,
+                          fontWeight: FontWeight.w700,
                           height: 1.18,
                           letterSpacing: 0,
                         ),
@@ -798,12 +762,12 @@ class _ProfileCategoryRow extends StatelessWidget {
             ),
           ),
           if (!last)
-            Padding(
-              padding: EdgeInsets.only(left: 14 + iconSize + 12, right: 12),
+            const Padding(
+              padding: EdgeInsets.only(left: 2 + iconSize + 12, right: 4),
               child: Divider(
                 height: 1,
                 thickness: 1,
-                color: AppColors.borderSoft.withValues(alpha: 0.72),
+                color: AppColors.shellRule,
               ),
             ),
         ],

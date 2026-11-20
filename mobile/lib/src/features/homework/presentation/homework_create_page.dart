@@ -128,13 +128,21 @@ class _HomeworkCreatePageState extends ConsumerState<HomeworkCreatePage> {
           style: TextStyle(color: AppColors.mutedStrong, height: 1.7),
         ),
       ),
-      CheckboxListTile(
-        contentPadding: EdgeInsets.zero,
-        controlAffinity: ListTileControlAffinity.leading,
-        value: consent,
-        onChanged: busy ? null : (v) => setState(() => consent = v == true),
-        title: const Text('同意分析本次上传的照片'),
-        subtitle: const Text('照片将提交给所配置的 AI 批改与讲解服务，分析记录仅本家庭可查看，可随时删除该份作业。'),
+      Material(
+        color: AppColors.warningWash,
+        borderRadius: BorderRadius.circular(AppRadii.cardMedium),
+        clipBehavior: Clip.antiAlias,
+        child: CheckboxListTile(
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 8,
+            vertical: 6,
+          ),
+          controlAffinity: ListTileControlAffinity.leading,
+          value: consent,
+          onChanged: busy ? null : (v) => setState(() => consent = v == true),
+          title: const Text('同意分析本次上传的照片'),
+          subtitle: const Text('照片将提交给所配置的 AI 批改与讲解服务，分析记录仅本家庭可查看，可随时删除该份作业。'),
+        ),
       ),
       if (error != null)
         Padding(

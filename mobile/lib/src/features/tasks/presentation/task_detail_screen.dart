@@ -57,6 +57,11 @@ class _TaskDetailScreenState extends ConsumerState<TaskDetailScreen> {
         onBack: () => context.go(AppRoute.tasks.path),
         padding: const EdgeInsets.fromLTRB(20, 16, 20, 118),
         children: [
+          _EvidencePanel(
+            task: task,
+            ref: ref,
+            hasCameraDevice: hasCameraDevice,
+          ),
           if (task.type == 'learning')
             AppListRow(
               icon: Icons.assignment_outlined,
@@ -67,11 +72,6 @@ class _TaskDetailScreenState extends ConsumerState<TaskDetailScreen> {
               ),
               trailing: const Icon(Icons.chevron_right),
             ),
-          _EvidencePanel(
-            task: task,
-            ref: ref,
-            hasCameraDevice: hasCameraDevice,
-          ),
           if (!hasCameraDevice) ...[
             const SizedBox(height: 14),
             const AppListRow(
@@ -82,10 +82,14 @@ class _TaskDetailScreenState extends ConsumerState<TaskDetailScreen> {
             ),
           ],
           const SizedBox(height: 14),
-          AppSurface(
+          DecoratedBox(
+            decoration: const BoxDecoration(
+              border: Border(top: BorderSide(color: AppColors.shellRule)),
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                const SizedBox(height: 16),
                 const _SectionTitle('时间和奖励'),
                 const SizedBox(height: 8),
                 AppListRow(
@@ -143,10 +147,14 @@ class _TaskEventsPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AppSurface(
+    return DecoratedBox(
+      decoration: const BoxDecoration(
+        border: Border(top: BorderSide(color: AppColors.shellRule)),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          const SizedBox(height: 16),
           const _SectionTitle('任务记录'),
           const SizedBox(height: 8),
           events.when(
@@ -169,7 +177,8 @@ class _TaskEventsPanel extends StatelessWidget {
                     var index = 0;
                     index < items.length && index < 5;
                     index++
-                  )
+                  ) ...[
+                    if (index > 0) const Divider(height: 1),
                     AppListRow(
                       icon: _eventIcon(items[index].eventType),
                       title: items[index].title,
@@ -177,6 +186,7 @@ class _TaskEventsPanel extends StatelessWidget {
                           '${_formatEventTime(items[index].createdAt)} · ${items[index].displayMessage}',
                       tone: _eventTone(items[index].tone),
                     ),
+                  ],
                 ],
               );
             },
@@ -480,36 +490,27 @@ class _HeroActionButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final foreground = switch (data.tone) {
-      _HeroActionTone.primary => AppColors.ink,
-      _HeroActionTone.secondary => Colors.white,
+      _HeroActionTone.primary => AppColors.onPrimary,
+      _HeroActionTone.secondary => AppColors.ink,
       _HeroActionTone.danger => AppColors.danger,
     };
     final background = switch (data.tone) {
-      _HeroActionTone.primary => Colors.white,
-      _HeroActionTone.secondary => Colors.white.withValues(alpha: 0.10),
+      _HeroActionTone.primary => AppColors.ink,
+      _HeroActionTone.secondary => AppColors.surface,
       _HeroActionTone.danger => AppColors.dangerWash,
     };
-    final border = switch (data.tone) {
-      _HeroActionTone.primary => Colors.white,
-      _HeroActionTone.secondary => Colors.white.withValues(alpha: 0.14),
-      _HeroActionTone.danger => AppColors.dangerWash,
-    };
-
     return Material(
-      color: Colors.transparent,
+      color: background,
+      borderRadius: BorderRadius.circular(AppRadii.button),
+      clipBehavior: Clip.antiAlias,
       child: InkWell(
-        borderRadius: BorderRadius.circular(15),
         onTap: data.onTap,
-        splashColor: Colors.white.withValues(alpha: 0.08),
-        highlightColor: Colors.white.withValues(alpha: 0.06),
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            color: background,
-            borderRadius: BorderRadius.circular(15),
-            border: Border.all(color: border),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(
+            minHeight: AppControls.buttonHeight,
           ),
-          child: SizedBox(
-            height: AppControls.buttonHeight,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -518,8 +519,9 @@ class _HeroActionButton extends StatelessWidget {
                 Flexible(
                   child: Text(
                     data.label,
-                    maxLines: 1,
+                    maxLines: 2,
                     overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
                     style: TextStyle(
                       color: foreground,
                       fontFamily: AppTypography.systemFont,
@@ -552,22 +554,24 @@ class _EvidencePanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AppSurface(
-      color: AppColors.ink,
-      borderColor: AppColors.ink,
-      radius: 24,
+      color: AppColors.brandSageWash,
+      borderColor: AppColors.brandSageWash,
+      radius: AppRadii.cardMedium,
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
+          Wrap(
+            spacing: 10,
+            runSpacing: 6,
+            crossAxisAlignment: WrapCrossAlignment.center,
             children: [
               StatusChip(label: task.status.label, tone: task.status.tone),
               if (_heroTrailingLabel(task).isNotEmpty) ...[
-                const Spacer(),
                 Text(
                   _heroTrailingLabel(task),
                   style: const TextStyle(
-                    color: Color(0xFFFDBA74),
+                    color: AppColors.warning,
                     fontFamily: AppTypography.systemFont,
                     fontSize: 13,
                     fontWeight: FontWeight.w800,
@@ -577,22 +581,12 @@ class _EvidencePanel extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 14),
-          Text(
-            _heroTitle(task),
-            style: const TextStyle(
-              color: Colors.white,
-              fontFamily: AppTypography.systemFont,
-              fontSize: 20,
-              fontWeight: FontWeight.w900,
-              height: 1.2,
-              letterSpacing: 0,
-            ),
-          ),
+          Text(_heroTitle(task), style: AppTypography.sectionHeading),
           const SizedBox(height: 8),
           Text(
             _heroDescription(task, hasCameraDevice: hasCameraDevice),
-            style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.78),
+            style: const TextStyle(
+              color: AppColors.mutedStrong,
               fontFamily: AppTypography.systemFont,
               fontSize: 13,
               fontWeight: FontWeight.w600,
@@ -622,9 +616,8 @@ class _HeroInsightCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(AppRadii.card),
       ),
       child: Padding(
         padding: const EdgeInsets.all(14),
@@ -633,8 +626,8 @@ class _HeroInsightCard extends StatelessWidget {
           children: [
             DecoratedBox(
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(16),
+                color: AppColors.brandSageWash,
+                borderRadius: BorderRadius.circular(AppRadii.card),
               ),
               child: SizedBox(
                 width: 48,
@@ -642,7 +635,7 @@ class _HeroInsightCard extends StatelessWidget {
                 child: Center(
                   child: Icon(
                     _heroInsightIcon(task),
-                    color: Colors.white,
+                    color: AppColors.brandDeep,
                     size: 24,
                   ),
                 ),
@@ -656,7 +649,7 @@ class _HeroInsightCard extends StatelessWidget {
                   Text(
                     _heroInsightTitle(task),
                     style: const TextStyle(
-                      color: Colors.white,
+                      color: AppColors.ink,
                       fontFamily: AppTypography.systemFont,
                       fontSize: 15,
                       fontWeight: FontWeight.w800,
@@ -669,8 +662,8 @@ class _HeroInsightCard extends StatelessWidget {
                     _heroInsightBody(task),
                     maxLines: 4,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.70),
+                    style: const TextStyle(
+                      color: AppColors.mutedStrong,
                       fontFamily: AppTypography.systemFont,
                       fontSize: 12.5,
                       fontWeight: FontWeight.w600,
@@ -695,16 +688,7 @@ class _SectionTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(
-      title,
-      style: const TextStyle(
-        color: AppColors.ink,
-        fontFamily: AppTypography.systemFont,
-        fontSize: 16,
-        fontWeight: FontWeight.w800,
-        letterSpacing: 0,
-      ),
-    );
+    return Text(title, style: AppTypography.sectionHeading);
   }
 }
 

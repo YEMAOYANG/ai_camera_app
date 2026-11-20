@@ -21,64 +21,27 @@ class AppHeroPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final panel = ClipRRect(
-      borderRadius: BorderRadius.circular(AppRadii.hero),
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: dark ? AppColors.ink : AppColors.surfaceSoft,
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors:
-                colors ??
-                (dark
-                    ? const [Color(0xFF17243A), Color(0xFF101827)]
-                    : const [Color(0xF7FFFFFF), Color(0xEAF1F6F8)]),
-          ),
-          border: Border.all(
-            color:
-                borderColor ??
-                (dark
-                    ? Colors.white.withValues(alpha: 0.08)
-                    : AppColors.borderSoft),
-          ),
-        ),
-        child: Stack(
-          children: [
-            if (dark)
-              Positioned.fill(
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    gradient: RadialGradient(
-                      center: const Alignment(0.75, -0.85),
-                      radius: 1.2,
-                      colors: [
-                        AppColors.brandSage.withValues(alpha: 0.32),
-                        Colors.transparent,
-                      ],
-                    ),
-                  ),
-                ),
-              )
-            else
-              Positioned.fill(
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    gradient: RadialGradient(
-                      center: const Alignment(0.8, -0.7),
-                      radius: 1.1,
-                      colors: [
-                        AppColors.brandSage.withValues(alpha: 0.13),
-                        Colors.transparent,
-                      ],
-                    ),
-                  ),
-                ),
+    final gradientColors = colors;
+    final panel = DecoratedBox(
+      decoration: BoxDecoration(
+        color: dark ? AppColors.brandDeep : AppColors.surface,
+        gradient: gradientColors == null
+            ? null
+            : LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: gradientColors,
               ),
-            Padding(padding: padding, child: child),
-          ],
+        borderRadius: BorderRadius.circular(AppRadii.hero),
+        border: Border.all(
+          color:
+              borderColor ??
+              (dark
+                  ? Colors.white.withValues(alpha: .12)
+                  : AppColors.shellRule),
         ),
       ),
+      child: Padding(padding: padding, child: child),
     );
 
     if (onTap == null) return panel;

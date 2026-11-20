@@ -14,7 +14,6 @@ import 'package:warm_sight/src/features/devices/application/selected_device_cont
 import 'package:warm_sight/src/features/live_care/application/camera_repository.dart';
 import 'package:warm_sight/src/features/live_care/domain/camera_models.dart';
 import 'package:warm_sight/src/shared/widgets/app_list_row.dart';
-import 'package:warm_sight/src/shared/widgets/app_page_header.dart';
 import 'package:warm_sight/src/shared/widgets/app_screen.dart';
 import 'package:warm_sight/src/shared/widgets/app_state_view.dart';
 import 'package:warm_sight/src/shared/widgets/app_surface.dart';
@@ -53,6 +52,7 @@ class _LiveCareScreenState extends ConsumerState<LiveCareScreen> {
     if (isInitialAsyncLoad(selectedDevice)) {
       return const AppScreen(
         title: '实时看护',
+        backgroundColor: AppColors.shellPaper,
         fixedHeader: false,
         showHeader: false,
         padding: EdgeInsets.fromLTRB(
@@ -61,12 +61,17 @@ class _LiveCareScreenState extends ConsumerState<LiveCareScreen> {
           AppSpacing.pageHorizontal,
           AppSpacing.pageBottom,
         ),
-        children: [_LoadingLiveCareState()],
+        children: [
+          _LiveCareHeading(title: '实时看护'),
+          SizedBox(height: 15),
+          _LoadingLiveCareState(),
+        ],
       );
     }
     if (selectedDevice.hasError) {
       return AppScreen(
         title: '实时看护',
+        backgroundColor: AppColors.shellPaper,
         fixedHeader: false,
         showHeader: false,
         padding: const EdgeInsets.fromLTRB(
@@ -76,6 +81,8 @@ class _LiveCareScreenState extends ConsumerState<LiveCareScreen> {
           AppSpacing.pageBottom,
         ),
         children: [
+          const _LiveCareHeading(title: '实时看护'),
+          const SizedBox(height: 15),
           AppStateView(
             variant: AppStateVariant.serviceUnavailable,
             title: '摄像头状态暂时无法同步',
@@ -92,6 +99,7 @@ class _LiveCareScreenState extends ConsumerState<LiveCareScreen> {
     if (titleDevice == null) {
       return AppScreen(
         title: '实时看护',
+        backgroundColor: AppColors.shellPaper,
         fixedHeader: false,
         showHeader: false,
         padding: const EdgeInsets.fromLTRB(
@@ -101,6 +109,8 @@ class _LiveCareScreenState extends ConsumerState<LiveCareScreen> {
           AppSpacing.pageBottom,
         ),
         children: [
+          const _LiveCareHeading(title: '实时看护'),
+          const SizedBox(height: 15),
           AppStateView(
             variant: AppStateVariant.deviceOffline,
             title: '还没有连接摄像头',
@@ -120,6 +130,7 @@ class _LiveCareScreenState extends ConsumerState<LiveCareScreen> {
 
     return AppScreen(
       title: '实时看护',
+      backgroundColor: AppColors.shellPaper,
       fixedHeader: false,
       showHeader: false,
       padding: const EdgeInsets.fromLTRB(
@@ -225,56 +236,65 @@ class _LiveCareHero extends StatelessWidget {
         ? StatusTone.warning
         : care?.tone ?? StatusTone.neutral;
 
-    return AppHeroPanel(
-      dark: true,
-      padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _LiveCareHeading(
+          title: title,
+          subtitle: subtitle,
+          trailing: StatusChip(label: label, tone: tone),
+        ),
+        const SizedBox(height: 15),
+        _LiveViewport(
+          status: status,
+          snapshot: snapshot,
+          previewRefreshing: previewRefreshing,
+          onRefresh: onRefresh,
+        ),
+      ],
+    );
+  }
+}
+
+class _LiveCareHeading extends StatelessWidget {
+  const _LiveCareHeading({required this.title, this.subtitle, this.trailing});
+
+  final String title;
+  final String? subtitle;
+  final Widget? trailing;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(2, 7, 2, 0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      subtitle,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.66),
-                        fontFamily: AppTypography.systemFont,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: 0,
-                      ),
-                    ),
-                    const SizedBox(height: 5),
-                    Text(
-                      title,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontFamily: AppTypography.systemFont,
-                        fontSize: 24,
-                        fontWeight: FontWeight.w900,
-                        height: 1.08,
-                        letterSpacing: 0,
-                      ),
-                    ),
-                  ],
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: AppTypography.shellHeading.copyWith(fontSize: 29),
                 ),
-              ),
-              StatusChip(label: label, tone: tone),
-            ],
+                if (subtitle != null) ...[
+                  const SizedBox(height: 5),
+                  Text(
+                    subtitle!,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: AppColors.mutedStrong,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ],
+            ),
           ),
-          const SizedBox(height: 13),
-          _LiveViewport(
-            status: status,
-            snapshot: snapshot,
-            previewRefreshing: previewRefreshing,
-            onRefresh: onRefresh,
-          ),
+          if (trailing != null) ...[const SizedBox(width: 10), trailing!],
         ],
       ),
     );
@@ -328,25 +348,25 @@ class _LiveViewport extends StatelessWidget {
     final copy = _viewportCopy(status, snapshot);
 
     return AppSurface(
-      color: const Color(0xFF0E1725),
+      color: const Color(0xFF18262B),
       borderColor: Colors.white.withValues(alpha: 0.08),
-      radius: 22,
+      radius: AppRadii.cardMedium,
       padding: EdgeInsets.zero,
       child: AspectRatio(
         aspectRatio: 16 / 9.4,
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(22),
+          borderRadius: BorderRadius.circular(AppRadii.cardMedium),
           child: Stack(
             children: [
               Positioned.fill(
                 child: DecoratedBox(
                   decoration: BoxDecoration(
-                    color: const Color(0xFF101A28),
+                    color: const Color(0xFF1B2A30),
                     gradient: available
                         ? const LinearGradient(
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
-                            colors: [Color(0xFF182A3E), Color(0xFF0F172A)],
+                            colors: [Color(0xFF24363C), Color(0xFF16242A)],
                           )
                         : null,
                   ),
@@ -435,108 +455,59 @@ class _ViewportPlaceholder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final accent = switch (tone) {
+      StatusTone.success => AppColors.success,
+      StatusTone.warning => AppColors.warning,
+      StatusTone.danger => AppColors.danger,
+      StatusTone.neutral => AppColors.navInactiveFg,
+    };
+
     return AppSurface(
-      color: const Color(0xFF0E1725),
-      borderColor: Colors.white.withValues(alpha: 0.08),
-      radius: 22,
-      padding: EdgeInsets.zero,
-      child: AspectRatio(
-        aspectRatio: 16 / 9.4,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(22),
-          child: Stack(
-            children: [
-              const Positioned.fill(
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [Color(0xFF1A2A3C), Color(0xFF0B111C)],
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 14,
-                top: 14,
-                child: StatusChip(label: label, tone: tone),
-              ),
-              Center(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        icon,
-                        color: Colors.white.withValues(alpha: 0.76),
-                        size: 46,
-                      ),
-                      const SizedBox(height: 13),
-                      Text(
-                        title,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontFamily: AppTypography.systemFont,
-                          fontSize: 17,
-                          fontWeight: FontWeight.w900,
-                          letterSpacing: 0,
-                        ),
-                      ),
-                      const SizedBox(height: 7),
-                      Text(
-                        message,
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.64),
-                          fontFamily: AppTypography.systemFont,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w700,
-                          height: 1.45,
-                          letterSpacing: 0,
-                        ),
-                      ),
-                      if (onRefresh != null) ...[
-                        const SizedBox(height: 14),
-                        GestureDetector(
-                          behavior: HitTestBehavior.opaque,
-                          onTap: onRefresh,
-                          child: DecoratedBox(
-                            decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.12),
-                              borderRadius: BorderRadius.circular(999),
-                              border: Border.all(
-                                color: Colors.white.withValues(alpha: 0.10),
-                              ),
-                            ),
-                            child: const Padding(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 14,
-                                vertical: 9,
-                              ),
-                              child: Text(
-                                '刷新状态',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontFamily: AppTypography.systemFont,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w900,
-                                  letterSpacing: 0,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
-              ),
-            ],
+      color: AppColors.brandSageWash.withValues(alpha: .40),
+      borderColor: AppColors.shellRule,
+      radius: AppRadii.cardMedium,
+      padding: const EdgeInsets.fromLTRB(16, 13, 16, 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Align(
+            alignment: AlignmentDirectional.centerStart,
+            child: StatusChip(label: label, tone: tone),
           ),
-        ),
+          const SizedBox(height: 13),
+          Icon(icon, color: accent, size: 34),
+          const SizedBox(height: 11),
+          Text(
+            title,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              color: AppColors.ink,
+              fontSize: 17,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            message,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              color: AppColors.mutedStrong,
+              fontSize: 13,
+              height: 1.45,
+            ),
+          ),
+          if (onRefresh != null) ...[
+            const SizedBox(height: 8),
+            Center(
+              child: TextButton.icon(
+                onPressed: onRefresh,
+                icon: const Icon(Icons.refresh, size: 17),
+                label: const Text('刷新状态'),
+              ),
+            ),
+          ] else
+            const SizedBox(height: 12),
+        ],
       ),
     );
   }

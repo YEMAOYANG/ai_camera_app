@@ -95,7 +95,12 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
 
     return AppScreen(
       title: '任务',
-      pinnedHeaderHeight: 148,
+      backgroundColor: AppColors.shellPaper,
+      pinnedHeaderHeight:
+          164 +
+          (MediaQuery.textScalerOf(context).scale(85) - 85)
+              .clamp(0, 128)
+              .toDouble(),
       padding: const EdgeInsets.fromLTRB(
         AppSpacing.pageHorizontal,
         2,
@@ -343,33 +348,38 @@ class _WeekHeader extends StatelessWidget {
         children: [
           Row(
             children: [
-              _WeekNavButton(icon: Icons.chevron_left, onTap: onPrevious),
-              SizedBox(width: compact ? 6 : 8),
               Expanded(
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      isCurrentWeek ? '本周' : '安排周',
-                      style: const TextStyle(
-                        color: AppColors.muted,
-                        fontFamily: AppTypography.systemFont,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: 0,
-                      ),
-                    ),
-                    const SizedBox(height: 3),
-                    Text(
-                      '${_dateShort(weekStart)} - ${_dateShort(weekEnd)}',
+                      '任务',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
+                      style: AppTypography.shellHeading.copyWith(
+                        fontSize: compact ? 25 : 28,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    DefaultTextStyle(
                       style: const TextStyle(
-                        color: AppColors.ink,
+                        color: AppColors.mutedStrong,
                         fontFamily: AppTypography.systemFont,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: 0,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      child: Row(
+                        children: [
+                          Text(isCurrentWeek ? '本周' : '安排周'),
+                          const SizedBox(width: 6),
+                          Flexible(
+                            child: Text(
+                              '${_dateShort(weekStart)}–${_dateShort(weekEnd)}',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
@@ -380,6 +390,7 @@ class _WeekHeader extends StatelessWidget {
                 _BackToThisWeekButton(onTap: onToday),
                 SizedBox(width: compact ? 6 : 8),
               ],
+              _WeekNavButton(icon: Icons.chevron_left, onTap: onPrevious),
               _WeekNavButton(icon: Icons.chevron_right, onTap: onNext),
             ],
           ),
@@ -399,6 +410,8 @@ class _WeekHeader extends StatelessWidget {
               ],
             ],
           ),
+          const SizedBox(height: 7),
+          const Divider(height: 1, color: AppColors.shellRule),
         ],
       ),
     );
@@ -449,17 +462,9 @@ class _WeekNavButton extends StatelessWidget {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: onTap,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: AppColors.surfaceStrong.withValues(alpha: 0.90),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.72)),
-        ),
-        child: SizedBox(
-          width: 34,
-          height: 34,
-          child: Center(child: Icon(icon, color: AppColors.ink, size: 19)),
-        ),
+      child: SizedBox.square(
+        dimension: AppControls.minTouchTarget,
+        child: Icon(icon, color: AppColors.navActiveFg, size: 23),
       ),
     );
   }
@@ -494,18 +499,10 @@ class _DayChip extends StatelessWidget {
           vertical: compact ? 4 : 6,
         ),
         decoration: BoxDecoration(
-          color: selected
-              ? AppColors.ink
-              : isToday
-              ? AppColors.brandSageWash.withValues(alpha: 0.80)
-              : Colors.white.withValues(alpha: 0.36),
-          borderRadius: BorderRadius.circular(13),
+          color: selected ? AppColors.brandSageWash : Colors.transparent,
+          borderRadius: BorderRadius.circular(AppRadii.card),
           border: Border.all(
-            color: selected
-                ? AppColors.ink
-                : isToday
-                ? AppColors.brandSage.withValues(alpha: 0.18)
-                : Colors.white.withValues(alpha: 0.58),
+            color: isToday ? AppColors.shellRule : Colors.transparent,
           ),
         ),
         child: Column(
@@ -515,9 +512,7 @@ class _DayChip extends StatelessWidget {
             Text(
               _weekdayShort(date),
               style: TextStyle(
-                color: selected
-                    ? Colors.white.withValues(alpha: 0.72)
-                    : AppColors.muted,
+                color: selected ? AppColors.navActiveFg : AppColors.muted,
                 fontFamily: AppTypography.systemFont,
                 fontSize: compact ? 10 : 11,
                 fontWeight: FontWeight.w600,
@@ -529,7 +524,7 @@ class _DayChip extends StatelessWidget {
             Text(
               '${date.day}',
               style: TextStyle(
-                color: selected ? Colors.white : AppColors.ink,
+                color: selected ? AppColors.navActiveFg : AppColors.ink,
                 fontFamily: AppTypography.systemFont,
                 fontSize: compact ? 17 : 19,
                 fontWeight: FontWeight.w700,
@@ -543,9 +538,7 @@ class _DayChip extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                color: selected
-                    ? Colors.white.withValues(alpha: 0.72)
-                    : isToday
+                color: selected || isToday
                     ? AppColors.brandSage
                     : AppColors.muted,
                 fontFamily: AppTypography.systemFont,
@@ -719,29 +712,29 @@ class _TaskTimelineCard extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SizedBox(
-          width: 34,
+          width: 30,
           child: Column(
             children: [
               DecoratedBox(
                 decoration: BoxDecoration(
                   color: tone.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(14),
+                  shape: BoxShape.circle,
                 ),
                 child: SizedBox(
-                  width: 32,
-                  height: 32,
+                  width: 26,
+                  height: 26,
                   child: Center(
-                    child: Icon(_iconForTask(task), color: tone, size: 18),
+                    child: Icon(_iconForTask(task), color: tone, size: 15),
                   ),
                 ),
               ),
               if (!isLast)
                 Container(
-                  width: 2,
+                  width: 1,
                   height: 56,
                   margin: const EdgeInsets.symmetric(vertical: 4),
                   decoration: BoxDecoration(
-                    color: AppColors.muted.withValues(alpha: 0.14),
+                    color: AppColors.shellRule,
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -752,11 +745,10 @@ class _TaskTimelineCard extends StatelessWidget {
         Expanded(
           child: AppSurface(
             onTap: onTap,
-            padding: const EdgeInsets.fromLTRB(13, 12, 12, 12),
-            radius: 16,
-            color: muted
-                ? Colors.white.withValues(alpha: 0.44)
-                : Colors.white.withValues(alpha: 0.74),
+            padding: const EdgeInsets.fromLTRB(8, 3, 0, 12),
+            radius: AppRadii.card,
+            color: Colors.transparent,
+            borderColor: Colors.transparent,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -772,7 +764,7 @@ class _TaskTimelineCard extends StatelessWidget {
                           color: muted ? AppColors.muted : AppColors.ink,
                           fontFamily: AppTypography.systemFont,
                           fontSize: 16,
-                          fontWeight: FontWeight.w900,
+                          fontWeight: FontWeight.w700,
                           height: 1.25,
                           letterSpacing: 0,
                         ),
@@ -783,6 +775,12 @@ class _TaskTimelineCard extends StatelessWidget {
                       label: task.status.label,
                       tone: task.status.tone,
                     ),
+                    const SizedBox(width: 3),
+                    const Icon(
+                      Icons.chevron_right,
+                      size: 18,
+                      color: AppColors.navInactiveFg,
+                    ),
                   ],
                 ),
                 const SizedBox(height: 7),
@@ -790,8 +788,8 @@ class _TaskTimelineCard extends StatelessWidget {
                   spacing: 6,
                   runSpacing: 6,
                   children: [
-                    _TaskMetaPill(label: task.typeLabel),
                     _TaskMetaPill(label: task.timeLabel),
+                    _TaskMetaPill(label: task.typeLabel),
                     if (task.rewardPoints > 0)
                       _TaskMetaPill(label: '+${task.rewardPoints} 分'),
                     if (task.requiresParentConfirmation)
@@ -814,6 +812,10 @@ class _TaskTimelineCard extends StatelessWidget {
                     ),
                   ),
                 ],
+                if (!isLast) ...[
+                  const SizedBox(height: 10),
+                  const Divider(height: 1, color: AppColors.shellRule),
+                ],
               ],
             ),
           ),
@@ -832,8 +834,8 @@ class _TaskMetaPill extends StatelessWidget {
   Widget build(BuildContext context) {
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: AppColors.appBackgroundMid.withValues(alpha: 0.72),
-        borderRadius: BorderRadius.circular(10),
+        color: AppColors.surfaceTinted.withValues(alpha: .65),
+        borderRadius: BorderRadius.circular(6),
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
@@ -1508,6 +1510,7 @@ class _TaskFormSheetState extends ConsumerState<TaskFormSheet> {
   Future<void> _pickDate() async {
     final now = DateTime.now();
     final picked = await NativeDatePicker.pickDate(
+      context: context,
       title: '选择日期',
       initialDate: _date,
       minDate: DateTime(now.year - 1, now.month, now.day),
@@ -3381,9 +3384,9 @@ Color _toneColor(GuardianTask task) {
   return switch (task.status) {
     GuardianTaskStatus.inProgress => AppColors.primary,
     GuardianTaskStatus.completed ||
-    GuardianTaskStatus.confirmed => const Color(0xFF2F8F68),
+    GuardianTaskStatus.confirmed => AppColors.success,
     GuardianTaskStatus.awaitingParentConfirmation ||
-    GuardianTaskStatus.delayed => const Color(0xFFD8922B),
+    GuardianTaskStatus.delayed => AppColors.warning,
     GuardianTaskStatus.rejected ||
     GuardianTaskStatus.missed ||
     GuardianTaskStatus.expired => AppColors.danger,

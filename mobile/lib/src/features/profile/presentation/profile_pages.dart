@@ -344,15 +344,8 @@ class _CompactPersonalHeader extends StatelessWidget {
       height: headerHeight,
       child: DecoratedBox(
         decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              AppColors.surfaceElevated,
-              AppColors.appBackgroundMid,
-              AppColors.brandSageWash,
-            ],
-          ),
+          color: AppColors.brandSageWash,
+          border: Border(bottom: BorderSide(color: AppColors.shellRule)),
         ),
         child: Stack(
           children: [
@@ -369,14 +362,7 @@ class _CompactPersonalHeader extends StatelessWidget {
                       '个人信息',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color: AppColors.ink,
-                        fontFamily: AppTypography.systemFont,
-                        fontSize: 20,
-                        fontWeight: FontWeight.w900,
-                        height: 1.15,
-                        letterSpacing: 0,
-                      ),
+                      style: AppTypography.sectionHeading,
                     ),
                   ),
                 ],
@@ -414,14 +400,7 @@ class _CompactPersonalHeader extends StatelessWidget {
                     identityLabel,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: AppColors.ink,
-                      fontFamily: AppTypography.systemFont,
-                      fontSize: 26,
-                      fontWeight: FontWeight.w900,
-                      height: 1.06,
-                      letterSpacing: 0,
-                    ),
+                    style: AppTypography.pageHeading,
                   ),
                   const SizedBox(height: 6),
                   Text(
@@ -722,7 +701,7 @@ class _AccountSecurityOverview extends StatelessWidget {
         .where((item) => item.active)
         .length;
     return AppSurface(
-      color: const Color(0xFFEFF8F4),
+      color: AppColors.successWash,
       borderColor: AppColors.brandSage.withValues(alpha: 0.12),
       child: Row(
         children: [
@@ -1616,7 +1595,7 @@ class _FamilyCodePanel extends StatelessWidget {
         border: Border.all(color: AppColors.brand.withValues(alpha: 0.14)),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF557A86).withValues(alpha: 0.06),
+            color: AppColors.ink.withValues(alpha: 0.06),
             blurRadius: 14,
             offset: const Offset(0, 8),
           ),
@@ -1818,59 +1797,20 @@ class _FamilyPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DecoratedBox(
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.90),
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: AppColors.borderSoft),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF31445A).withValues(alpha: 0.045),
-            blurRadius: 12,
-            offset: const Offset(0, 7),
-          ),
-        ],
+      decoration: const BoxDecoration(
+        border: Border(top: BorderSide(color: AppColors.shellRule)),
       ),
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(15, 15, 15, 13),
+        padding: const EdgeInsets.only(top: 14, bottom: 12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              children: [
-                DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: accent.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(9),
-                  ),
-                  child: SizedBox(
-                    width: 7,
-                    height: 24,
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        color: accent.withValues(alpha: 0.32),
-                        borderRadius: BorderRadius.circular(99),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(title, style: _sectionTitleStyle),
-                      const SizedBox(height: 3),
-                      Text(
-                        subtitle,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: _mutedText,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+            Text(
+              title,
+              style: AppTypography.sectionHeading.copyWith(color: accent),
             ),
+            const SizedBox(height: 3),
+            Text(subtitle, style: _mutedText),
             const SizedBox(height: 10),
             child,
           ],
@@ -4379,21 +4319,17 @@ class _BooleanSettingsPageState extends ConsumerState<_BooleanSettingsPage> {
         data: (data) {
           _draft ??= Map<String, dynamic>.from(data.value);
           return [
-            AppSurface(
-              child: Column(
-                children: [
-                  for (final row in widget.rows)
-                    _SwitchRow(
-                      title: row.title,
-                      subtitle: row.subtitle,
-                      value: _draft![row.key] == true,
-                      onChanged: canManageSetting
-                          ? (value) => setState(() => _draft![row.key] = value)
-                          : null,
-                    ),
-                ],
+            for (final row in widget.rows) ...[
+              _SwitchRow(
+                title: row.title,
+                subtitle: row.subtitle,
+                value: _draft![row.key] == true,
+                onChanged: canManageSetting
+                    ? (value) => setState(() => _draft![row.key] = value)
+                    : null,
               ),
-            ),
+              const Divider(),
+            ],
             if (!canManageSetting) ...[
               const SizedBox(height: 12),
               AppListRow(
@@ -4461,14 +4397,16 @@ class LegalRemoteDocumentPage extends ConsumerWidget {
       ),
       children: document.when(
         data: (data) => [
-          AppSurface(child: Text(data.summary, style: _bodyText)),
-          const SizedBox(height: 14),
+          Text(data.summary, style: _bodyText),
+          const SizedBox(height: 22),
           for (final section in data.sections) ...[
-            AppSurface(
+            const Divider(),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(section.title, style: _sectionTitleStyle),
+                  Text(section.title, style: AppTypography.sectionHeading),
                   const SizedBox(height: 8),
                   for (final paragraph in section.paragraphs)
                     Padding(
@@ -4478,7 +4416,6 @@ class LegalRemoteDocumentPage extends ConsumerWidget {
                 ],
               ),
             ),
-            const SizedBox(height: 12),
           ],
           Text(
             '版本 ${data.version} · ${data.effectiveDate}',
@@ -5321,7 +5258,7 @@ class _PaywallValueCell extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(item.icon, color: const Color(0xFFB8F2CF), size: 19),
+            Icon(item.icon, color: const Color(0xFFBFE0C8), size: 19),
             const SizedBox(height: 7),
             Text(item.title, style: _paywallValueTitle),
           ],
@@ -5399,7 +5336,7 @@ class _PaywallPlanCard extends StatelessWidget {
         ? Colors.white
         : Colors.white.withValues(alpha: 0.90);
     final borderColor = recommended
-        ? const Color(0xFFB8F2CF).withValues(alpha: selected ? 0.72 : 0.36)
+        ? const Color(0xFFBFE0C8).withValues(alpha: selected ? 0.72 : 0.36)
         : Colors.white.withValues(alpha: 0.18);
     return DecoratedBox(
       decoration: BoxDecoration(
@@ -5674,18 +5611,8 @@ class _PaywallBottomBar extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: active || !canManageSubscription
                         ? Colors.white.withValues(alpha: 0.16)
-                        : const Color(0xFFB8F2CF),
-                    borderRadius: BorderRadius.circular(AppRadii.full),
-                    boxShadow: [
-                      if (!active && canManageSubscription)
-                        BoxShadow(
-                          color: const Color(
-                            0xFFB8F2CF,
-                          ).withValues(alpha: 0.24),
-                          blurRadius: 20,
-                          offset: const Offset(0, 10),
-                        ),
-                    ],
+                        : AppColors.brandWarmWash,
+                    borderRadius: BorderRadius.circular(AppRadii.button),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -5975,9 +5902,9 @@ class _ReportHero extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AppSurface(
-      color: AppColors.ink,
-      borderColor: AppColors.ink,
-      radius: 24,
+      color: AppColors.brandSageWash,
+      borderColor: AppColors.shellRule,
+      radius: AppRadii.cardLarge,
       padding: const EdgeInsets.fromLTRB(16, 17, 16, 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -5987,18 +5914,18 @@ class _ReportHero extends StatelessWidget {
               Expanded(
                 child: Text(
                   data.headline.isEmpty ? data.summary : data.headline,
-                  style: _darkTitle,
+                  style: AppTypography.sectionHeading,
                 ),
               ),
               if (data.periodLabel.isNotEmpty) ...[
                 const SizedBox(width: 10),
-                _ReportDarkPill(label: data.periodLabel),
+                _ReportPeriodLabel(label: data.periodLabel),
               ],
             ],
           ),
           if (data.body.isNotEmpty) ...[
             const SizedBox(height: 9),
-            Text(data.body, style: _darkSub),
+            Text(data.body, style: AppTypography.caption),
           ],
           const SizedBox(height: 16),
           Row(
@@ -6023,8 +5950,8 @@ class _ReportHero extends StatelessWidget {
   }
 }
 
-class _ReportDarkPill extends StatelessWidget {
-  const _ReportDarkPill({required this.label});
+class _ReportPeriodLabel extends StatelessWidget {
+  const _ReportPeriodLabel({required this.label});
 
   final String label;
 
@@ -6034,7 +5961,7 @@ class _ReportDarkPill extends StatelessWidget {
       constraints: const BoxConstraints(maxWidth: 184),
       child: DecoratedBox(
         decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.12),
+          color: AppColors.surface,
           borderRadius: BorderRadius.circular(AppRadii.full),
         ),
         child: Padding(
@@ -6044,7 +5971,7 @@ class _ReportDarkPill extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.78),
+              color: AppColors.mutedStrong,
               fontFamily: AppTypography.systemFont,
               fontSize: 11,
               fontWeight: FontWeight.w800,
@@ -6067,24 +5994,20 @@ class _ReportAttentionBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: AppColors.warning.withValues(alpha: 0.18),
+        color: AppColors.warningWash,
         borderRadius: BorderRadius.circular(14),
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
         child: Row(
           children: [
-            const Icon(
-              Icons.flag_outlined,
-              color: AppColors.brandWarm,
-              size: 17,
-            ),
+            const Icon(Icons.flag_outlined, color: AppColors.warning, size: 17),
             const SizedBox(width: 8),
             Expanded(
               child: Text(
                 '还有 $count 项需要家长处理',
                 style: const TextStyle(
-                  color: Color(0xFFFFD08A),
+                  color: AppColors.warning,
                   fontFamily: AppTypography.systemFont,
                   fontSize: 12,
                   fontWeight: FontWeight.w800,
@@ -6717,14 +6640,7 @@ class _HubHeaderContent extends StatelessWidget {
           title,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: const TextStyle(
-            color: AppColors.ink,
-            fontFamily: AppTypography.systemFont,
-            fontSize: 22,
-            fontWeight: FontWeight.w900,
-            height: 1.12,
-            letterSpacing: 0,
-          ),
+          style: AppTypography.sectionHeading,
         ),
         const SizedBox(height: 5),
         Text(
@@ -6732,10 +6648,10 @@ class _HubHeaderContent extends StatelessWidget {
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: const TextStyle(
-            color: AppColors.muted,
+            color: AppColors.mutedStrong,
             fontFamily: AppTypography.systemFont,
             fontSize: 12,
-            fontWeight: FontWeight.w700,
+            fontWeight: FontWeight.w500,
             height: 1.24,
             letterSpacing: 0,
           ),
@@ -6754,218 +6670,26 @@ class _HubSectionDeck extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (section.rows.isEmpty) return const SizedBox.shrink();
-    final leading = section.rows.first;
-    final remaining = section.rows.skip(1).toList();
 
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        if (showTitle)
-          Padding(
-            padding: const EdgeInsets.only(left: 2, bottom: 10),
-            child: Text(section.title, style: _hubSectionTitleStyle),
+        if (showTitle) ...[
+          Text(section.title, style: AppTypography.sectionHeading),
+          const SizedBox(height: 9),
+        ],
+        const Divider(height: 1),
+        for (final row in section.rows) ...[
+          AppListRow(
+            icon: row.icon,
+            title: row.title,
+            subtitle: row.subtitle,
+            tone: row.tone,
+            onTap: () => context.push(row.path),
           ),
-        _HubFeatureLane(row: leading),
-        if (remaining.isNotEmpty) ...[
-          const SizedBox(height: 10),
-          LayoutBuilder(
-            builder: (context, constraints) {
-              final useCompactPair =
-                  constraints.maxWidth >= 340 && remaining.length == 2;
-              if (useCompactPair) {
-                return Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(child: _HubMiniLane(row: remaining[0])),
-                    const SizedBox(width: 10),
-                    Expanded(child: _HubMiniLane(row: remaining[1])),
-                  ],
-                );
-              }
-              return Column(
-                children: [
-                  for (var index = 0; index < remaining.length; index++) ...[
-                    _HubActionLane(row: remaining[index]),
-                    if (index != remaining.length - 1)
-                      const SizedBox(height: 10),
-                  ],
-                ],
-              );
-            },
-          ),
+          const Divider(height: 1),
         ],
       ],
-    );
-  }
-}
-
-class _HubFeatureLane extends StatelessWidget {
-  const _HubFeatureLane({required this.row});
-
-  final _HubRow row;
-
-  @override
-  Widget build(BuildContext context) {
-    final color = _toneColor(row.tone);
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: () => context.push(row.path),
-      child: AppSurface(
-        radius: 18,
-        padding: const EdgeInsets.fromLTRB(16, 16, 14, 15),
-        child: Row(
-          children: [
-            DecoratedBox(
-              decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: SizedBox(
-                width: 48,
-                height: 48,
-                child: Center(child: Icon(row.icon, color: color, size: 22)),
-              ),
-            ),
-            const SizedBox(width: 13),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(row.title, style: _hubFeatureTitleStyle),
-                  const SizedBox(height: 5),
-                  Text(row.subtitle, style: _hubSubtitleStyle),
-                ],
-              ),
-            ),
-            const SizedBox(width: 10),
-            _HubArrow(color: color),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _HubMiniLane extends StatelessWidget {
-  const _HubMiniLane({required this.row});
-
-  final _HubRow row;
-
-  @override
-  Widget build(BuildContext context) {
-    final color = _toneColor(row.tone);
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: () => context.push(row.path),
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.58),
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.74)),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(14, 14, 12, 13),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              DecoratedBox(
-                decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.11),
-                  borderRadius: BorderRadius.circular(13),
-                ),
-                child: SizedBox(
-                  width: 36,
-                  height: 36,
-                  child: Center(child: Icon(row.icon, color: color, size: 18)),
-                ),
-              ),
-              const SizedBox(height: 11),
-              Text(row.title, style: _hubMiniTitleStyle),
-              const SizedBox(height: 5),
-              Text(
-                row.subtitle,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: _hubMiniSubtitleStyle,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _HubActionLane extends StatelessWidget {
-  const _HubActionLane({required this.row});
-
-  final _HubRow row;
-
-  @override
-  Widget build(BuildContext context) {
-    final color = _toneColor(row.tone);
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: () => context.push(row.path),
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.54),
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.72)),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(14, 12, 12, 12),
-          child: Row(
-            children: [
-              DecoratedBox(
-                decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.10),
-                  borderRadius: BorderRadius.circular(13),
-                ),
-                child: SizedBox(
-                  width: 38,
-                  height: 38,
-                  child: Center(child: Icon(row.icon, color: color, size: 19)),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(row.title, style: _hubMiniTitleStyle),
-                    const SizedBox(height: 4),
-                    Text(row.subtitle, style: _hubSubtitleStyle),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 8),
-              _HubArrow(color: color),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _HubArrow extends StatelessWidget {
-  const _HubArrow({required this.color});
-
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(999),
-      ),
-      child: SizedBox(
-        width: 30,
-        height: 30,
-        child: Center(child: Icon(Icons.chevron_right, color: color, size: 18)),
-      ),
     );
   }
 }
@@ -7004,7 +6728,7 @@ class _Metric extends StatelessWidget {
     return Expanded(
       child: DecoratedBox(
         decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.1),
+          color: AppColors.surface.withValues(alpha: .82),
           borderRadius: BorderRadius.circular(14),
         ),
         child: Padding(
@@ -7015,7 +6739,7 @@ class _Metric extends StatelessWidget {
               Text(
                 value,
                 style: const TextStyle(
-                  color: Colors.white,
+                  color: AppColors.ink,
                   fontFamily: AppTypography.systemFont,
                   fontSize: 18,
                   fontWeight: FontWeight.w800,
@@ -7024,8 +6748,8 @@ class _Metric extends StatelessWidget {
               const SizedBox(height: 4),
               Text(
                 label,
-                style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.6),
+                style: const TextStyle(
+                  color: AppColors.mutedStrong,
                   fontFamily: AppTypography.systemFont,
                   fontSize: 11,
                   fontWeight: FontWeight.w700,
@@ -7348,7 +7072,7 @@ class _SwitchRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(vertical: 12),
       child: Row(
         children: [
           Expanded(
@@ -7361,6 +7085,7 @@ class _SwitchRow extends StatelessWidget {
               ],
             ),
           ),
+          const SizedBox(width: 12),
           AppCompactToggle(value: value, onChanged: onChanged, label: title),
         ],
       ),
@@ -8672,16 +8397,6 @@ ButtonStyle _inlineTextButtonStyle({bool danger = false}) {
   );
 }
 
-Color _toneColor(AppListRowTone tone) {
-  return switch (tone) {
-    AppListRowTone.blue => AppColors.brand,
-    AppListRowTone.green => AppColors.success,
-    AppListRowTone.amber => AppColors.warning,
-    AppListRowTone.red => AppColors.danger,
-    AppListRowTone.neutral => AppColors.ink,
-  };
-}
-
 Color _reportToneColor(String tone) {
   return switch (tone) {
     'blue' => AppColors.brand,
@@ -8735,47 +8450,6 @@ const _reportMetaStyle = TextStyle(
   fontSize: 11,
   fontWeight: FontWeight.w700,
   height: 1.25,
-  letterSpacing: 0,
-);
-
-const _hubSectionTitleStyle = TextStyle(
-  color: AppColors.ink,
-  fontFamily: AppTypography.systemFont,
-  fontSize: 18,
-  fontWeight: FontWeight.w900,
-  height: 1.16,
-  letterSpacing: 0,
-);
-const _hubFeatureTitleStyle = TextStyle(
-  color: AppColors.ink,
-  fontFamily: AppTypography.systemFont,
-  fontSize: 16,
-  fontWeight: FontWeight.w900,
-  height: 1.18,
-  letterSpacing: 0,
-);
-const _hubMiniTitleStyle = TextStyle(
-  color: AppColors.ink,
-  fontFamily: AppTypography.systemFont,
-  fontSize: 14,
-  fontWeight: FontWeight.w800,
-  height: 1.22,
-  letterSpacing: 0,
-);
-const _hubSubtitleStyle = TextStyle(
-  color: AppColors.muted,
-  fontFamily: AppTypography.systemFont,
-  fontSize: 12,
-  fontWeight: FontWeight.w600,
-  height: 1.4,
-  letterSpacing: 0,
-);
-const _hubMiniSubtitleStyle = TextStyle(
-  color: AppColors.muted,
-  fontFamily: AppTypography.systemFont,
-  fontSize: 11.5,
-  fontWeight: FontWeight.w600,
-  height: 1.35,
   letterSpacing: 0,
 );
 

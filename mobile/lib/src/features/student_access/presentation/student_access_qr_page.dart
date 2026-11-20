@@ -677,7 +677,7 @@ class _MobileStudentQrScannerState extends State<_MobileStudentQrScanner>
       fit: BoxFit.cover,
       onDetect: _handleCapture,
       placeholderBuilder: (_) => const ColoredBox(
-        color: Color(0xFF152033),
+        color: Color(0xFF18262B),
         child: Center(
           child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
         ),
@@ -770,7 +770,7 @@ class _ScannerFrame extends StatelessWidget {
             child: Stack(
               fit: StackFit.expand,
               children: [
-                ColoredBox(color: const Color(0xFF152033), child: child),
+                ColoredBox(color: const Color(0xFF18262B), child: child),
                 const IgnorePointer(child: _QrScanOverlay()),
               ],
             ),
@@ -807,7 +807,7 @@ class _QrScanOverlay extends StatelessWidget {
               padding: EdgeInsets.only(bottom: 12),
               child: DecoratedBox(
                 decoration: BoxDecoration(
-                  color: Color(0xAA111827),
+                  color: Color(0xAA18262B),
                   borderRadius: BorderRadius.all(Radius.circular(999)),
                 ),
                 child: Padding(
@@ -843,7 +843,7 @@ class _ScannerCameraError extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ColoredBox(
-      color: const Color(0xFF152033),
+      color: const Color(0xFF18262B),
       child: Center(
         child: Padding(
           padding: const EdgeInsets.all(24),
@@ -1018,9 +1018,8 @@ class _DisplayCodePanel extends StatelessWidget {
   Widget build(BuildContext context) {
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: AppColors.brandWash.withValues(alpha: 0.78),
-        borderRadius: BorderRadius.circular(AppRadii.control),
-        border: Border.all(color: AppColors.brand.withValues(alpha: 0.16)),
+        color: AppColors.brandSageWash,
+        borderRadius: BorderRadius.circular(AppRadii.cardMedium),
       ),
       child: Padding(
         padding: const EdgeInsets.fromLTRB(14, 13, 14, 12),
@@ -1037,12 +1036,9 @@ class _DisplayCodePanel extends StatelessWidget {
               code.split('').join('  '),
               key: const ValueKey('studentQrDisplayCode'),
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: AppTypography.pageHeading.copyWith(
                 color: AppColors.brandDeep,
-                fontFamily: AppTypography.systemFont,
-                fontSize: 28,
-                fontWeight: FontWeight.w900,
-                letterSpacing: 3,
+                letterSpacing: 2,
               ),
             ),
             const SizedBox(height: 5),

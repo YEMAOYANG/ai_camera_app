@@ -5,12 +5,21 @@ class AppTheme {
   const AppTheme._();
 
   static ThemeData get light {
-    final scheme = ColorScheme.fromSeed(
-      seedColor: AppColors.primary,
-      brightness: Brightness.light,
-      surface: AppColors.appBackground,
-      error: AppColors.danger,
-    );
+    final scheme =
+        ColorScheme.fromSeed(
+          seedColor: AppColors.primary,
+          brightness: Brightness.light,
+          surface: AppColors.appBackground,
+          error: AppColors.danger,
+        ).copyWith(
+          primary: AppColors.primary,
+          onPrimary: AppColors.onPrimary,
+          secondary: AppColors.brandSage,
+          onSurface: AppColors.ink,
+          onSurfaceVariant: AppColors.muted,
+          outline: AppColors.border,
+          outlineVariant: AppColors.borderSoft,
+        );
     final inputShape = OutlineInputBorder(
       borderRadius: BorderRadius.circular(AppRadii.input),
       borderSide: const BorderSide(color: AppColors.borderSoft),
@@ -21,19 +30,24 @@ class AppTheme {
       colorScheme: scheme,
       scaffoldBackgroundColor: AppColors.appBackground,
       fontFamily: AppTypography.systemFont,
+      dividerTheme: const DividerThemeData(
+        color: AppColors.shellRule,
+        thickness: 1,
+        space: 1,
+      ),
+      progressIndicatorTheme: const ProgressIndicatorThemeData(
+        color: AppColors.brandSage,
+        linearTrackColor: AppColors.border,
+        circularTrackColor: Colors.transparent,
+      ),
+      textSelectionTheme: TextSelectionThemeData(
+        cursorColor: AppColors.ink,
+        selectionColor: AppColors.brandSoft.withValues(alpha: 0.42),
+        selectionHandleColor: AppColors.brandSage,
+      ),
       textTheme: const TextTheme(
-        headlineSmall: TextStyle(
-          color: AppColors.ink,
-          fontSize: 24,
-          fontWeight: FontWeight.w700,
-          height: 1.18,
-        ),
-        titleLarge: TextStyle(
-          color: AppColors.ink,
-          fontSize: 20,
-          fontWeight: FontWeight.w700,
-          height: 1.22,
-        ),
+        headlineSmall: AppTypography.pageHeading,
+        titleLarge: AppTypography.sectionHeading,
         titleMedium: TextStyle(
           color: AppColors.ink,
           fontSize: 16,
@@ -42,7 +56,7 @@ class AppTheme {
         ),
         bodyLarge: TextStyle(color: AppColors.ink, fontSize: 16, height: 1.45),
         bodyMedium: TextStyle(
-          color: AppColors.muted,
+          color: AppColors.mutedStrong,
           fontSize: 14,
           height: 1.45,
         ),
@@ -57,6 +71,8 @@ class AppTheme {
         backgroundColor: AppColors.appBackground,
         foregroundColor: AppColors.ink,
         elevation: 0,
+        scrolledUnderElevation: 0,
+        surfaceTintColor: Colors.transparent,
         centerTitle: false,
       ),
       cardTheme: CardThemeData(
@@ -85,14 +101,14 @@ class AppTheme {
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: AppColors.surfaceSoft,
+        fillColor: AppColors.surface,
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 14,
           vertical: 13,
         ),
         isDense: true,
         hintStyle: const TextStyle(
-          color: AppColors.subtle,
+          color: AppColors.mutedStrong,
           fontSize: 14,
           fontWeight: FontWeight.w500,
         ),
@@ -161,10 +177,10 @@ class AppTheme {
             if (states.contains(WidgetState.disabled)) {
               return AppColors.disabledInk;
             }
-            return Colors.white;
+            return AppColors.onPrimary;
           }),
           textStyle: const WidgetStatePropertyAll(
-            TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+            TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
           ),
           elevation: const WidgetStatePropertyAll(0),
           shape: WidgetStatePropertyAll(
@@ -242,7 +258,7 @@ class AppTheme {
             return AppColors.disabledInk;
           }
           if (states.contains(WidgetState.selected)) {
-            return AppColors.primary;
+            return AppColors.surfaceElevated;
           }
           return AppColors.subtle;
         }),
@@ -251,13 +267,13 @@ class AppTheme {
             return AppColors.disabledFill;
           }
           if (states.contains(WidgetState.selected)) {
-            return AppColors.primary.withValues(alpha: 0.20);
+            return AppColors.brandSage;
           }
           return AppColors.disabledBg;
         }),
         trackOutlineColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
-            return AppColors.primary.withValues(alpha: 0.14);
+            return AppColors.brandSage;
           }
           return AppColors.border;
         }),
@@ -322,17 +338,17 @@ class AppTheme {
         ),
       ),
       bottomSheetTheme: const BottomSheetThemeData(
-        backgroundColor: AppColors.appBackgroundWarm,
-        modalBackgroundColor: AppColors.appBackgroundWarm,
+        backgroundColor: AppColors.surface,
+        modalBackgroundColor: AppColors.surface,
         surfaceTintColor: Colors.transparent,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
         ),
       ),
       dialogTheme: DialogThemeData(
         backgroundColor: AppColors.surfaceElevated,
         surfaceTintColor: Colors.transparent,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
         titleTextStyle: const TextStyle(
           color: AppColors.ink,
           fontFamily: AppTypography.systemFont,

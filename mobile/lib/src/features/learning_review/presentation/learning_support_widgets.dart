@@ -47,21 +47,20 @@ class LearningHeading extends StatelessWidget {
   final Widget? trailing;
   @override
   Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.only(top: 20, bottom: 8),
-    child: Row(
-      children: [
-        Expanded(
-          child: Text(
-            title,
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
-              color: AppColors.ink,
-            ),
-          ),
+    padding: const EdgeInsets.only(top: 16, bottom: 8),
+    child: DecoratedBox(
+      decoration: const BoxDecoration(
+        border: Border(top: BorderSide(color: AppColors.shellRule)),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.only(top: 9),
+        child: Row(
+          children: [
+            Expanded(child: Text(title, style: AppTypography.sectionHeading)),
+            ?trailing,
+          ],
         ),
-        ?trailing,
-      ],
+      ),
     ),
   );
 }
@@ -134,22 +133,10 @@ class ReviewReportEvidence extends StatelessWidget {
               if (item.sourceTitle.isNotEmpty) Text('对应课件：${item.sourceTitle}'),
               Text(textValue(item.data['prompt'])),
               Text(
-                '孩子的作答：${textValue(
-                      item.data['answerLabel'] ??
-                          learningAnswerLabel(
-                            item.data['answer'],
-                            item.data['options'],
-                          ),
-                    )}',
+                '孩子的作答：${textValue(item.data['answerLabel'] ?? learningAnswerLabel(item.data['answer'], item.data['options']))}',
               ),
               Text(
-                '参考答案：${textValue(
-                      item.data['correctAnswerLabel'] ??
-                          learningAnswerLabel(
-                            item.data['correctAnswer'],
-                            item.data['options'],
-                          ),
-                    )}',
+                '参考答案：${textValue(item.data['correctAnswerLabel'] ?? learningAnswerLabel(item.data['correctAnswer'], item.data['options']))}',
               ),
               if (textValue(item.data['explanation']).isNotEmpty)
                 Text(textValue(item.data['explanation'])),

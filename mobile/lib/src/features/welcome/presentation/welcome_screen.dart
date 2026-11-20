@@ -274,48 +274,9 @@ class _CopyAtmosphere extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      clipBehavior: Clip.none,
-      children: [
-        Positioned(
-          left: -26,
-          right: -26,
-          top: -34,
-          height: 210,
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              gradient: RadialGradient(
-                center: const Alignment(-0.18, -0.24),
-                radius: 0.9,
-                colors: [
-                  Colors.white.withValues(alpha: 0.78),
-                  AppColors.appBackgroundMid.withValues(alpha: 0.46),
-                  Colors.white.withValues(alpha: 0),
-                ],
-                stops: const [0, 0.46, 1],
-              ),
-            ),
-          ),
-        ),
-        Positioned(
-          left: 4,
-          right: 32,
-          top: -12,
-          height: 1,
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Colors.white.withValues(alpha: 0),
-                  Colors.white.withValues(alpha: 0.82),
-                  Colors.white.withValues(alpha: 0),
-                ],
-              ),
-            ),
-          ),
-        ),
-        Padding(padding: const EdgeInsets.fromLTRB(2, 0, 2, 0), child: child),
-      ],
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(2, 0, 2, 0),
+      child: child,
     );
   }
 }
@@ -383,42 +344,15 @@ class _DescriptionBlock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          width: 2,
-          height: compact ? 34 : 44,
-          margin: const EdgeInsets.only(top: 5, right: 12),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(AppRadii.full),
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                AppColors.brand.withValues(alpha: 0),
-                AppColors.brand.withValues(alpha: 0.42),
-                AppColors.brand.withValues(alpha: 0),
-              ],
-            ),
-          ),
-        ),
-        Expanded(
-          child: Text(
-            text,
-            maxLines: compact ? 2 : 3,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              color: AppColors.muted,
-              fontFamily: AppTypography.systemFont,
-              fontSize: compact ? 14 : 15,
-              fontWeight: FontWeight.w500,
-              height: compact ? 1.5 : 1.72,
-              letterSpacing: 0,
-            ),
-          ),
-        ),
-      ],
+    return Text(
+      text,
+      maxLines: compact ? 2 : 3,
+      overflow: TextOverflow.ellipsis,
+      style: TextStyle(
+        color: AppColors.mutedStrong,
+        fontSize: compact ? 14 : 15,
+        height: 1.5,
+      ),
     );
   }
 }
@@ -443,23 +377,11 @@ class _WelcomeArt extends StatelessWidget {
         height: height,
         child: DecoratedBox(
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(AppRadii.welcomeArt),
-            color: const Color(0xFFEDF3FB),
-            gradient: const LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [Color(0xB8FFFFFF), Color(0xBDE6EEFD)],
-            ),
-            boxShadow: const [
-              BoxShadow(
-                color: Color(0x1430204C),
-                blurRadius: 18,
-                offset: Offset(0, 12),
-              ),
-            ],
+            borderRadius: BorderRadius.circular(AppRadii.hero),
+            color: AppColors.surfaceStrong,
           ),
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(AppRadii.welcomeArt),
+            borderRadius: BorderRadius.circular(AppRadii.hero),
             child: Stack(
               children: [
                 Positioned(
@@ -512,17 +434,6 @@ class _WelcomeArt extends StatelessWidget {
                   ),
                 ),
                 const Positioned.fill(child: _ArtOverlay()),
-                Positioned.fill(
-                  child: Padding(
-                    padding: const EdgeInsets.all(15),
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(24),
-                        border: Border.all(color: const Color(0x52FFFFFF)),
-                      ),
-                    ),
-                  ),
-                ),
               ],
             ),
           ),
@@ -542,9 +453,9 @@ class _Pill extends StatelessWidget {
   Widget build(BuildContext context) {
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: const Color(0xC7FFFFFF),
+        color: const Color(0xD9FFFDF8),
         borderRadius: BorderRadius.circular(AppRadii.full),
-        border: Border.all(color: const Color(0x0F2C3E5C)),
+        border: Border.all(color: const Color(0x14284048)),
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -592,7 +503,7 @@ class _WelcomeProgress extends StatelessWidget {
         color: Colors.white.withValues(alpha: 0.28),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF4C6685).withValues(alpha: 0.04),
+            color: AppColors.ink.withValues(alpha: 0.04),
             blurRadius: 14,
             offset: const Offset(0, 8),
           ),
@@ -634,7 +545,7 @@ class _WelcomeDot extends StatelessWidget {
         width: active ? 34 : 8,
         height: active ? 10 : 8,
         decoration: BoxDecoration(
-          color: active ? null : const Color(0x3266758A),
+          color: active ? null : const Color(0x325A6C70),
           gradient: active
               ? const LinearGradient(
                   begin: Alignment.centerLeft,
@@ -744,7 +655,7 @@ class _ArtOverlay extends StatelessWidget {
                 colors: [
                   Color(0x05FFFFFF),
                   Color(0x00FFFFFF),
-                  Color(0x57F5F8FC),
+                  Color(0x57FAF5EA),
                 ],
                 stops: [0, 0.58, 1],
               ),
@@ -758,9 +669,9 @@ class _ArtOverlay extends StatelessWidget {
                 begin: Alignment.centerLeft,
                 end: Alignment.centerRight,
                 colors: [
-                  Color(0x292F6CF6),
+                  Color(0x1F90B098),
                   Color(0x00FFFFFF),
-                  Color(0x1F6D65E7),
+                  Color(0x1FE0A838),
                 ],
                 stops: [0, 0.44, 1],
               ),

@@ -7,7 +7,7 @@ class AppSurface extends StatelessWidget {
     this.padding = const EdgeInsets.all(16),
     this.color,
     this.borderColor,
-    this.radius = 16,
+    this.radius = AppRadii.cardMedium,
     this.onTap,
     super.key,
   });
@@ -23,7 +23,7 @@ class AppSurface extends StatelessWidget {
   Widget build(BuildContext context) {
     final box = DecoratedBox(
       decoration: BoxDecoration(
-        color: color ?? AppColors.surfaceSoft,
+        color: color ?? AppColors.surface,
         borderRadius: BorderRadius.circular(radius),
         border: Border.all(color: borderColor ?? AppColors.borderSoft),
       ),

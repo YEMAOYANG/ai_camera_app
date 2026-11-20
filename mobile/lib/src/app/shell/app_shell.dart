@@ -15,8 +15,8 @@ import 'package:warm_sight/src/features/profile/presentation/privacy_authorizati
 import 'package:warm_sight/src/features/tasks/application/task_repository.dart';
 import 'package:warm_sight/src/features/tasks/presentation/tasks_screen.dart';
 import 'package:warm_sight/src/shared/widgets/app_state_view.dart';
-import 'package:warm_sight/src/shared/widgets/app_glass_surface.dart';
 import 'package:warm_sight/src/shared/widgets/app_toast.dart';
+import 'package:warm_sight/src/shared/widgets/app_viewport.dart';
 
 class AppShell extends ConsumerWidget {
   const AppShell({required this.child, super.key});
@@ -30,31 +30,61 @@ class AppShell extends ConsumerWidget {
     final canAddTask =
         ref.watch(profileSummaryProvider).asData?.value.can('manage_tasks') ??
         false;
+    final rail = AppViewport.sideNavigationOf(context);
+    final hasRail = rail != null;
+    final onLeft = rail?.edge == AppVerticalBarEdge.left;
+    final railWidth = rail?.width ?? 0;
+    final navigation = _AppTabNavigation(
+      selectedRoute: selectedRoute,
+      onSelected: (route) => context.go(route.path),
+      canAddTask: canAddTask,
+      onAddTask: () => _openTaskSheet(context, ref),
+      vertical: hasRail,
+    );
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: AppSystemUi.light(),
       child: Scaffold(
-        backgroundColor: AppColors.appBackground,
+        backgroundColor: AppColors.shellPaper,
         extendBody: true,
         body: Stack(
           children: [
             Positioned.fill(
-              child: PrivacyAuthorizationGate(
-                secondaryOverlayBuilder: (content) =>
-                    OnvifAutoDiscoveryGate(child: content),
-                child: child,
+              left: hasRail && onLeft ? railWidth : 0,
+              right: hasRail && !onLeft ? railWidth : 0,
+              child: Builder(
+                builder: (context) {
+                  final media = MediaQuery.of(context);
+                  return MediaQuery(
+                    data: hasRail
+                        ? media
+                              .removePadding(
+                                removeLeft: onLeft,
+                                removeRight: !onLeft,
+                              )
+                              .copyWith(
+                                size: Size(
+                                  media.size.width - railWidth,
+                                  media.size.height,
+                                ),
+                              )
+                        : media,
+                    child: PrivacyAuthorizationGate(
+                      secondaryOverlayBuilder: (content) =>
+                          OnvifAutoDiscoveryGate(child: content),
+                      child: child,
+                    ),
+                  );
+                },
               ),
             ),
             Positioned(
-              left: 0,
-              right: 0,
+              left: !hasRail || onLeft ? 0 : null,
+              right: !hasRail || !onLeft ? 0 : null,
+              top: rail?.top,
               bottom: 0,
-              child: _AppBottomNavigation(
-                selectedRoute: selectedRoute,
-                onSelected: (route) => context.go(route.path),
-                canAddTask: canAddTask,
-                onAddTask: () => _openTaskSheet(context, ref),
-              ),
+              width: hasRail ? railWidth : null,
+              child: navigation,
             ),
           ],
         ),
@@ -178,18 +208,20 @@ class AppShell extends ConsumerWidget {
   }
 }
 
-class _AppBottomNavigation extends StatelessWidget {
-  const _AppBottomNavigation({
+class _AppTabNavigation extends StatelessWidget {
+  const _AppTabNavigation({
     required this.selectedRoute,
     required this.onSelected,
     required this.canAddTask,
     required this.onAddTask,
+    required this.vertical,
   });
 
   final AppRoute selectedRoute;
   final ValueChanged<AppRoute> onSelected;
   final bool canAddTask;
   final VoidCallback onAddTask;
+  final bool vertical;
 
   static const _tabRoutes = [
     AppRoute.home,
@@ -197,141 +229,200 @@ class _AppBottomNavigation extends StatelessWidget {
     AppRoute.live,
     AppRoute.profile,
   ];
-  static const _addSlotWidth = 60.0;
-  static const _indicatorHeight = 48.0;
+  static const _addSlotWidth = 64.0;
+  static const _railItemHeight = 52.0;
 
   @override
   Widget build(BuildContext context) {
     final bottomInset = MediaQuery.paddingOf(context).bottom;
-    final width = MediaQuery.sizeOf(context).width;
-    final horizontalInset = width <= 360 ? 18.0 : 22.0;
-    final bottomGap = AppChrome.tabBarBottomGap(bottomInset);
-    final selectedIndex = _selectedTabIndex(selectedRoute);
-    final duration = AppMotion.duration(context, 210);
-    final isAndroid = Theme.of(context).platform == TargetPlatform.android;
-
-    return Padding(
-      padding: EdgeInsets.fromLTRB(
-        horizontalInset,
-        0,
-        horizontalInset,
-        bottomGap,
-      ),
-      child: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 420),
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(AppChrome.tabBarDockRadius),
-              boxShadow: const [AppGlass.dockShadow],
-            ),
-            child: AppGlassSurface(
-              style: AppGlassStyle.navigation,
-              borderRadius: BorderRadius.circular(AppChrome.tabBarDockRadius),
+    if (vertical) {
+      return ColoredBox(
+        color: AppColors.navDockBg,
+        child: SafeArea(
+          left: false,
+          right: false,
+          minimum: const EdgeInsets.only(bottom: 8),
+          child: Align(
+            alignment: Alignment.bottomCenter,
+            child: SingleChildScrollView(
+              reverse: true,
               child: SizedBox(
-                height: AppChrome.tabBarHeight,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 6,
-                    vertical: 4,
-                  ),
-                  child: LayoutBuilder(
-                    builder: (context, constraints) {
-                      final addSlotWidth = canAddTask ? _addSlotWidth : 0.0;
-                      final itemWidth =
-                          (constraints.maxWidth - addSlotWidth) /
-                          _tabRoutes.length;
-                      final indicatorLeft =
-                          selectedIndex * itemWidth +
-                          (canAddTask && selectedIndex >= 2
-                              ? _addSlotWidth
-                              : 0) +
-                          2;
-                      final indicatorWidth = itemWidth - 4;
-                      final indicatorTop =
-                          (constraints.maxHeight - _indicatorHeight) / 2;
+                key: const ValueKey('sideNavigation'),
+                height:
+                    _railItemHeight *
+                    (_tabRoutes.length + (canAddTask ? 1 : 0)),
+                width: AppChrome.sideNavigationWidth,
+                child: LayoutBuilder(builder: _buildTabs),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
 
-                      return Stack(
-                        children: [
-                          AnimatedPositioned(
-                            duration: duration,
-                            curve: Curves.easeOutCubic,
-                            left: indicatorLeft,
-                            top: indicatorTop,
-                            width: indicatorWidth,
-                            height: _indicatorHeight,
-                            child: DecoratedBox(
-                              decoration: BoxDecoration(
-                                color: isAndroid ? AppColors.navActiveBg : null,
-                                gradient: isAndroid
-                                    ? null
-                                    : const LinearGradient(
-                                        begin: Alignment.topCenter,
-                                        end: Alignment.bottomCenter,
-                                        colors: [
-                                          AppGlass.selectionTop,
-                                          AppGlass.selectionBottom,
-                                        ],
-                                      ),
-                                border: Border.all(
-                                  color: AppGlass.selectionBorder,
-                                  width: 0.8,
-                                ),
-                                borderRadius: BorderRadius.circular(
-                                  AppRadii.full,
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: AppColors.navDockShadow.withValues(
-                                      alpha: 0.035,
-                                    ),
-                                    blurRadius: 4,
-                                    offset: const Offset(0, 2),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              for (final route in _tabRoutes) ...[
-                                if (route == AppRoute.live && canAddTask)
-                                  SizedBox(
-                                    width: _addSlotWidth,
-                                    child: Center(
-                                      child: _BottomNavAddAction(
-                                        onTap: onAddTask,
-                                      ),
-                                    ),
-                                  ),
-                                Expanded(
-                                  child: _BottomNavItem(
-                                    route: route,
-                                    selected: selectedRoute == route,
-                                    onTap: () => onSelected(route),
-                                  ),
-                                ),
-                              ],
-                            ],
-                          ),
-                        ],
-                      );
-                    },
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        Positioned(
+          top: -AppChrome.tabBarContentGap,
+          height: AppChrome.tabBarContentGap,
+          left: 0,
+          right: 0,
+          child: IgnorePointer(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    AppColors.navDockBg.withValues(alpha: 0),
+                    AppColors.navDockBg,
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+        ColoredBox(
+          color: AppColors.navDockBg,
+          child: Padding(
+            padding: EdgeInsets.only(
+              bottom: AppChrome.tabBarBottomGap(bottomInset),
+            ),
+            child: Center(
+              heightFactor: 1,
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 520),
+                child: SizedBox(
+                  height: AppChrome.tabBarHeight,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    child: LayoutBuilder(builder: _buildTabs),
                   ),
                 ),
               ),
             ),
           ),
         ),
+      ],
+    );
+  }
+
+  Widget _buildTabs(BuildContext context, BoxConstraints constraints) {
+    final selectedIndex = _tabRoutes.indexOf(selectedRoute);
+    final addIndex = _tabRoutes.indexOf(AppRoute.live);
+    final addExtent = canAddTask
+        ? (vertical ? _railItemHeight : _addSlotWidth)
+        : 0.0;
+    final extent = vertical ? constraints.maxHeight : constraints.maxWidth;
+    final tabExtent = (extent - addExtent) / _tabRoutes.length;
+    final selectedStart =
+        selectedIndex * tabExtent + (selectedIndex >= addIndex ? addExtent : 0);
+
+    return Stack(
+      fit: StackFit.expand,
+      clipBehavior: Clip.none,
+      children: [
+        if (selectedIndex >= 0)
+          AnimatedPositionedDirectional(
+            key: const ValueKey('bottomNavSelection'),
+            start: vertical ? 0 : selectedStart,
+            end: vertical ? 0 : null,
+            top: vertical ? selectedStart : 0,
+            bottom: vertical ? null : 0,
+            width: vertical ? null : tabExtent,
+            height: vertical ? tabExtent : null,
+            duration: AppMotion.duration(context, 320),
+            curve: const Cubic(.22, .80, .22, 1),
+            child: const IgnorePointer(
+              child: Align(
+                alignment: Alignment(0, -.58),
+                child: SizedBox(
+                  width: 56,
+                  height: 36,
+                  child: CustomPaint(painter: _NavigationWashPainter()),
+                ),
+              ),
+            ),
+          ),
+        Flex(
+          direction: vertical ? Axis.vertical : Axis.horizontal,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            for (var index = 0; index < _tabRoutes.length; index++) ...[
+              if (index == addIndex && canAddTask)
+                SizedBox(
+                  width: vertical ? null : addExtent,
+                  height: vertical ? addExtent : null,
+                  child: Center(child: _BottomNavAddAction(onTap: onAddTask)),
+                ),
+              Expanded(
+                child: _BottomNavItem(
+                  route: _tabRoutes[index],
+                  selected: selectedIndex == index,
+                  onTap: () => onSelected(_tabRoutes[index]),
+                ),
+              ),
+            ],
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class _NavigationWashPainter extends CustomPainter {
+  const _NavigationWashPainter();
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    _paintWash(
+      canvas,
+      center: Offset(size.width * .61, size.height * .56),
+      radiusX: 20,
+      radiusY: 13,
+      gradient: const RadialGradient(
+        colors: [AppColors.navWashSecondary, AppColors.navWashSecondaryEdge],
+        stops: [.13, 1],
+      ),
+    );
+    _paintWash(
+      canvas,
+      center: Offset(size.width * .43, size.height * .50),
+      radiusX: 22,
+      radiusY: 16,
+      gradient: const RadialGradient(
+        colors: [
+          AppColors.navWashCenter,
+          AppColors.navWashFade,
+          AppColors.navWashEdge,
+        ],
+        stops: [.06, .62, 1],
       ),
     );
   }
 
-  int _selectedTabIndex(AppRoute route) {
-    final index = _tabRoutes.indexOf(route);
-    return index < 0 ? 0 : index;
+  void _paintWash(
+    Canvas canvas, {
+    required Offset center,
+    required double radiusX,
+    required double radiusY,
+    required RadialGradient gradient,
+  }) {
+    final shaderBounds = Rect.fromCircle(center: Offset.zero, radius: 1);
+    canvas.save();
+    canvas.translate(center.dx, center.dy);
+    canvas.scale(radiusX, radiusY);
+    canvas.drawCircle(
+      Offset.zero,
+      1,
+      Paint()..shader = gradient.createShader(shaderBounds),
+    );
+    canvas.restore();
   }
+
+  @override
+  bool shouldRepaint(_NavigationWashPainter oldDelegate) => false;
 }
 
 class _BottomNavItem extends StatelessWidget {
@@ -350,8 +441,6 @@ class _BottomNavItem extends StatelessWidget {
     final duration = AppMotion.duration(context, 200);
     final foreground = selected
         ? AppColors.navActiveFg
-        : Theme.of(context).platform == TargetPlatform.android
-        ? AppColors.ink
         : AppColors.navInactiveFg;
     return Semantics(
       button: true,
@@ -360,77 +449,50 @@ class _BottomNavItem extends StatelessWidget {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(AppRadii.full),
+          borderRadius: BorderRadius.circular(AppRadii.control),
           focusColor: AppColors.navActiveBg.withValues(alpha: 0.52),
           highlightColor: Colors.transparent,
           hoverColor: Colors.transparent,
           onTap: onTap,
           splashColor: Colors.transparent,
           child: SizedBox(
-            height: AppControls.minTouchTarget,
-            child: Center(
-              child: AnimatedScale(
-                scale: selected ? 1.03 : 1,
-                duration: duration,
-                curve: Curves.easeOutCubic,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    AnimatedSwitcher(
-                      duration: duration,
-                      switchInCurve: Curves.easeOutCubic,
-                      switchOutCurve: Curves.easeOutCubic,
-                      transitionBuilder: (child, animation) {
-                        final scale = Tween<double>(begin: 0.96, end: 1)
-                            .animate(
-                              CurvedAnimation(
-                                parent: animation,
-                                curve: Curves.easeOutCubic,
-                              ),
-                            );
-                        return FadeTransition(
-                          opacity: animation,
-                          child: ScaleTransition(scale: scale, child: child),
-                        );
-                      },
-                      child: TweenAnimationBuilder<Color?>(
-                        key: ValueKey('${route.name}-$selected'),
-                        tween: ColorTween(end: foreground),
-                        duration: duration,
-                        curve: Curves.easeOutCubic,
-                        builder: (context, color, _) {
-                          return Icon(
-                            selected ? route.selectedIcon : route.icon,
-                            color: color,
-                            size: selected ? 21 : 20,
-                          );
-                        },
-                      ),
+            height: AppChrome.tabBarHeight,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                AnimatedScale(
+                  scale: selected ? 1.08 : 1,
+                  duration: duration,
+                  curve: Curves.easeOutCubic,
+                  child: SizedBox(
+                    height: 26,
+                    child: Icon(
+                      selected ? route.selectedIcon : route.icon,
+                      color: foreground,
+                      size: 22,
                     ),
-                    const SizedBox(height: 2),
-                    AnimatedDefaultTextStyle(
-                      duration: duration,
-                      curve: Curves.easeOutCubic,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Flexible(
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      route.label,
+                      maxLines: 1,
                       style: TextStyle(
                         color: foreground,
                         fontFamily: AppTypography.systemFont,
-                        fontSize: 11,
+                        fontSize: 12,
                         fontWeight: selected
                             ? FontWeight.w700
-                            : FontWeight.w600,
-                        height: 1.0,
-                        letterSpacing: 0,
-                      ),
-                      child: Text(
-                        route.label,
-                        maxLines: 1,
-                        overflow: TextOverflow.clip,
+                            : FontWeight.w500,
+                        height: 1.12,
                       ),
                     ),
-                  ],
+                  ),
                 ),
-              ),
+              ],
             ),
           ),
         ),
@@ -461,6 +523,7 @@ class _BottomNavAddActionState extends State<_BottomNavAddAction> {
         key: const ValueKey('bottomNavAddAction'),
         dimension: AppControls.minTouchTarget,
         child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
           onTapDown: (_) => setState(() => _pressed = true),
           onTapCancel: () => setState(() => _pressed = false),
           onTapUp: (_) => setState(() => _pressed = false),
@@ -469,13 +532,16 @@ class _BottomNavAddActionState extends State<_BottomNavAddAction> {
             scale: reduceMotion || !_pressed ? 1 : 0.965,
             duration: AppMotion.duration(context, 120),
             curve: Curves.easeOutCubic,
-            child: Material(
-              color: AppColors.navFabBg,
-              shape: const CircleBorder(),
-              elevation: 0,
-              shadowColor: Colors.transparent,
-              child: const Center(
-                child: Icon(Icons.add, color: AppColors.navFabFg, size: 24),
+            child: const Center(
+              child: Material(
+                color: AppColors.navFabBg,
+                shape: CircleBorder(
+                  side: BorderSide(color: AppColors.navFabBorder),
+                ),
+                child: SizedBox.square(
+                  dimension: 34,
+                  child: Icon(Icons.add, color: AppColors.navFabFg, size: 21),
+                ),
               ),
             ),
           ),

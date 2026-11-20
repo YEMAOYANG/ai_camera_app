@@ -32,20 +32,13 @@ class AppListRow extends StatelessWidget {
     };
 
     final child = Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
+      padding: const EdgeInsets.symmetric(vertical: 11),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          DecoratedBox(
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(13),
-            ),
-            child: SizedBox(
-              width: 38,
-              height: 38,
-              child: Center(child: Icon(icon, color: color, size: 19)),
-            ),
+          SizedBox.square(
+            dimension: 32,
+            child: Icon(icon, color: color, size: 21),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -54,12 +47,12 @@ class AppListRow extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  maxLines: 1,
+                  maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
                     color: AppColors.ink,
                     fontFamily: AppTypography.systemFont,
-                    fontSize: 14,
+                    fontSize: 15,
                     fontWeight: FontWeight.w700,
                     height: 1.25,
                     letterSpacing: 0,
@@ -71,7 +64,7 @@ class AppListRow extends StatelessWidget {
                   maxLines: subtitleMaxLines,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
-                    color: AppColors.muted,
+                    color: AppColors.mutedStrong,
                     fontFamily: AppTypography.systemFont,
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
@@ -93,10 +86,13 @@ class AppListRow extends StatelessWidget {
 
     if (onTap == null) return child;
 
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: onTap,
-      child: child,
+    return Material(
+      type: MaterialType.transparency,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(AppRadii.card),
+        child: child,
+      ),
     );
   }
 }

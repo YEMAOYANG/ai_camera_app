@@ -131,123 +131,103 @@ class _RewardBalancePanel extends StatelessWidget {
     final pendingCount = _pendingRedemptions(redemptions).length;
 
     return AppSurface(
-      color: AppColors.ink,
-      borderColor: AppColors.ink,
-      radius: 24,
+      color: AppColors.brandWarmWash,
+      borderColor: AppColors.brandWarmWash,
+      radius: AppRadii.cardMedium,
       padding: const EdgeInsets.fromLTRB(18, 18, 18, 17),
       onTap: onOpenPoints,
-      child: Stack(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Positioned(
-            right: -34,
-            top: -48,
-            width: 156,
-            height: 156,
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: RadialGradient(
-                  colors: [
-                    AppColors.warning.withValues(alpha: 0.23),
-                    Colors.transparent,
+          Row(
+            children: [
+              DecoratedBox(
+                decoration: BoxDecoration(
+                  color: AppColors.surface,
+                  borderRadius: BorderRadius.circular(17),
+                ),
+                child: const SizedBox(
+                  width: 50,
+                  height: 50,
+                  child: Center(
+                    child: Icon(
+                      Icons.redeem_outlined,
+                      color: AppColors.warning,
+                      size: 24,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 13),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      pointsLoading
+                          ? '正在同步${settings.unitLabel}'
+                          : '当前可兑换${settings.unitLabel}',
+                      style: TextStyle(
+                        color: AppColors.mutedStrong,
+                        fontFamily: AppTypography.systemFont,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 0,
+                      ),
+                    ),
+                    const SizedBox(height: 5),
+                    Text(
+                      pointsLoading ? '同步中' : settings.amount(value),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: AppColors.ink,
+                        fontFamily: AppTypography.systemFont,
+                        fontSize: 25,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 0,
+                      ),
+                    ),
                   ],
                 ),
               ),
-            ),
+            ],
           ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          const SizedBox(height: 16),
+          Row(
             children: [
-              Row(
-                children: [
-                  DecoratedBox(
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.10),
-                      borderRadius: BorderRadius.circular(17),
-                    ),
-                    child: const SizedBox(
-                      width: 50,
-                      height: 50,
-                      child: Center(
-                        child: Icon(
-                          Icons.redeem_outlined,
-                          color: Color(0xFFFDBA74),
-                          size: 24,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 13),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          pointsLoading
-                              ? '正在同步${settings.unitLabel}'
-                              : '当前可兑换${settings.unitLabel}',
-                          style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.66),
-                            fontFamily: AppTypography.systemFont,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: 0,
-                          ),
-                        ),
-                        const SizedBox(height: 5),
-                        Text(
-                          pointsLoading ? '同步中' : settings.amount(value),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontFamily: AppTypography.systemFont,
-                            fontSize: 25,
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: 0,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+              Expanded(
+                child: _CompactStageDots(
+                  threshold: threshold,
+                  remainder: remainder,
+                ),
               ),
-              const SizedBox(height: 16),
-              Row(
-                children: [
-                  Expanded(
-                    child: _CompactStageDots(
-                      threshold: threshold,
-                      remainder: remainder,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Text(
-                    '$fullStages 阶段',
-                    style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.72),
-                      fontFamily: AppTypography.systemFont,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 0,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
+              const SizedBox(width: 12),
               Text(
-                pendingCount > 0
-                    ? '$pendingCount 个兑换待兑现，先处理再承诺新的奖励。'
-                    : '兑换由家长确认并手动兑现，不自动承诺奖励。',
+                '$fullStages 阶段',
                 style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.62),
+                  color: AppColors.mutedStrong,
                   fontFamily: AppTypography.systemFont,
                   fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  height: 1.42,
+                  fontWeight: FontWeight.w800,
                   letterSpacing: 0,
                 ),
               ),
             ],
+          ),
+          const SizedBox(height: 12),
+          Text(
+            pendingCount > 0
+                ? '$pendingCount 个兑换待兑现，先处理再承诺新的奖励。'
+                : '兑换由家长确认并手动兑现，不自动承诺奖励。',
+            style: TextStyle(
+              color: AppColors.mutedStrong,
+              fontFamily: AppTypography.systemFont,
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              height: 1.42,
+              letterSpacing: 0,
+            ),
           ),
         ],
       ),
@@ -270,8 +250,8 @@ class _CompactStageDots extends StatelessWidget {
             child: DecoratedBox(
               decoration: BoxDecoration(
                 color: index < remainder
-                    ? const Color(0xFFFDBA74)
-                    : Colors.white.withValues(alpha: 0.18),
+                    ? AppColors.brandWarm
+                    : AppColors.border,
                 borderRadius: BorderRadius.circular(AppRadii.full),
               ),
               child: const SizedBox(height: 7),
@@ -526,18 +506,7 @@ class _PanelTitle extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Expanded(
-          child: Text(
-            title,
-            style: const TextStyle(
-              color: AppColors.ink,
-              fontFamily: AppTypography.systemFont,
-              fontSize: 16,
-              fontWeight: FontWeight.w900,
-              letterSpacing: 0,
-            ),
-          ),
-        ),
+        Expanded(child: Text(title, style: AppTypography.sectionHeading)),
         if (meta != null) StatusChip(label: meta!, tone: StatusTone.neutral),
       ],
     );

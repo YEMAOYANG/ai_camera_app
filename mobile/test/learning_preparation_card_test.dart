@@ -16,6 +16,7 @@ import 'package:warm_sight/src/features/learning/domain/learning_models.dart';
 import 'package:warm_sight/src/features/learning/domain/learning_availability_models.dart';
 import 'package:warm_sight/src/features/learning/domain/learning_preparation_models.dart';
 import 'package:warm_sight/src/features/learning/presentation/widgets/learning_preparation_card.dart';
+import 'package:warm_sight/src/features/learning/presentation/widgets/textbook_cover.dart';
 import 'package:warm_sight/src/features/profile/application/profile_repository.dart';
 import 'package:warm_sight/src/features/profile/domain/profile_models.dart';
 import 'package:warm_sight/src/features/profile/presentation/profile_pages.dart';
@@ -293,6 +294,7 @@ void main() {
     expect(find.textContaining('语文、数学、英语智能轮换'), findsNothing);
     expect(learning.todayCalls, 0);
 
+    await _loadTextbookCovers(tester);
     await expectLater(
       find.byKey(const ValueKey('goldenSurface')),
       matchesGoldenFile('goldens/learning_preparation_home_queued.png'),
@@ -317,11 +319,28 @@ void main() {
 
     expect(find.byType(ChildProfilePage), findsOneWidget);
 
+    await _loadTextbookCovers(tester);
     await expectLater(
       find.byKey(const ValueKey('goldenSurface')),
       matchesGoldenFile('goldens/learning_preparation_profile_failed.png'),
     );
   });
+}
+
+Future<void> _loadTextbookCovers(WidgetTester tester) async {
+  final covers = find.byType(TextbookCover);
+  final context = tester.element(covers.first);
+  final artwork = tester
+      .widgetList<TextbookCover>(covers)
+      .map((cover) => TextbookSubjectStyle.forSubject(cover.subject).art)
+      .whereType<String>()
+      .toSet();
+  await tester.runAsync(() async {
+    await Future.wait(
+      artwork.map((asset) => precacheImage(AssetImage(asset), context)),
+    );
+  });
+  await tester.pumpAndSettle();
 }
 
 Future<void> _pumpCard(

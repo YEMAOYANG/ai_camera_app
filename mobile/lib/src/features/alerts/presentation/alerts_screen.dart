@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:warm_sight/src/core/theme/app_tokens.dart';
 import 'package:warm_sight/src/shared/widgets/app_screen.dart';
 import 'package:warm_sight/src/shared/widgets/app_state_view.dart';
 
@@ -9,6 +10,7 @@ class AlertsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return const AppScreen(
       title: '告警',
+      backgroundColor: AppColors.shellPaper,
       subtitle: '安全提醒能力会在后续版本开启',
       children: [
         AppStateView(

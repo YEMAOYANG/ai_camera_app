@@ -155,72 +155,54 @@ class _RewardHero extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AppSurface(
-      color: AppColors.ink,
-      borderColor: AppColors.ink,
-      radius: 24,
+      color: AppColors.brandWarmWash,
+      borderColor: AppColors.brandWarmWash,
+      radius: AppRadii.cardMedium,
       padding: const EdgeInsets.fromLTRB(18, 18, 18, 18),
-      child: Stack(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Positioned(
-            right: -42,
-            bottom: -50,
-            width: 150,
-            height: 150,
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: RadialGradient(
-                  colors: [
-                    AppColors.brandSoft.withValues(alpha: 0.24),
-                    Colors.transparent,
-                  ],
-                ),
-              ),
-            ),
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          Wrap(
+            spacing: 12,
+            runSpacing: 6,
+            crossAxisAlignment: WrapCrossAlignment.center,
             children: [
-              Row(
-                children: [
-                  StatusChip(label: item.statusLabel),
-                  const Spacer(),
-                  Text(
-                    '余额 ${settings.amount(balance)}',
-                    style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.68),
-                      fontFamily: AppTypography.systemFont,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 0,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 18),
+              StatusChip(label: item.statusLabel),
               Text(
-                item.title,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontFamily: AppTypography.systemFont,
-                  fontSize: 26,
-                  fontWeight: FontWeight.w900,
-                  height: 1.16,
-                  letterSpacing: 0,
-                ),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                '${settings.amount(item.pointsCost)}兑换，家长手动兑现。',
+                '余额 ${settings.amount(balance)}',
                 style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.72),
+                  color: AppColors.mutedStrong,
                   fontFamily: AppTypography.systemFont,
                   fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  height: 1.55,
+                  fontWeight: FontWeight.w700,
                   letterSpacing: 0,
                 ),
               ),
             ],
+          ),
+          const SizedBox(height: 18),
+          Text(
+            item.title,
+            style: const TextStyle(
+              color: AppColors.ink,
+              fontFamily: AppTypography.systemFont,
+              fontSize: 26,
+              fontWeight: FontWeight.w900,
+              height: 1.16,
+              letterSpacing: 0,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Text(
+            '${settings.amount(item.pointsCost)}兑换，家长手动兑现。',
+            style: TextStyle(
+              color: AppColors.mutedStrong,
+              fontFamily: AppTypography.systemFont,
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              height: 1.55,
+              letterSpacing: 0,
+            ),
           ),
         ],
       ),

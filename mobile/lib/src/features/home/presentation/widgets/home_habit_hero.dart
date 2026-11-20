@@ -3,340 +3,129 @@ import 'package:warm_sight/src/core/theme/app_tokens.dart';
 import 'package:warm_sight/src/features/home/domain/home_models.dart';
 import 'package:warm_sight/src/features/home/presentation/widgets/home_shared.dart';
 import 'package:warm_sight/src/shared/widgets/status_chip.dart';
-import 'package:warm_sight/src/shared/widgets/app_glass_surface.dart';
 
 class HomeHabitHero extends StatelessWidget {
   const HomeHabitHero({
-    super.key,
     required this.focus,
-    required this.safeTop,
-    required this.scrollOffset,
     required this.isLoading,
-    required this.panelOverlap,
-    this.onOpenPending,
-    this.pendingCount = 0,
+    this.learnerName,
+    super.key,
   });
 
   final HabitFocusCopy focus;
-  final double safeTop;
-  final double scrollOffset;
   final bool isLoading;
-  final double panelOverlap;
-  final VoidCallback? onOpenPending;
-  final int pendingCount;
+  final String? learnerName;
 
-  static const _heroImage = 'assets/images/home/home-hero-desk-evening.png';
+  static const _heroImage = 'assets/images/home/home-hero-paper.webp';
 
   @override
   Widget build(BuildContext context) {
-    final reduceMotion = MediaQuery.of(context).disableAnimations;
-    final progress = (scrollOffset / 260).clamp(0.0, 1.0).toDouble();
-    final translateY = reduceMotion ? 0.0 : -scrollOffset * 0.16;
-    final scale = reduceMotion ? 1.0 : 1.0 + progress * 0.035;
-    final imageOpacity = reduceMotion ? 1.0 : 1.0 - progress * 0.14;
-    final compact =
-        MediaQuery.sizeOf(context).width <= 340 ||
-        MediaQuery.sizeOf(context).height <= 620;
-    final bottomPadding = panelOverlap + (compact ? 4 : 8);
-    final topInset = safeTop > 0 ? safeTop : 24.0;
-    final topPadding = topInset + (compact ? 12 : 14);
-
-    return ClipRect(
-      child: Stack(
-        children: [
-          const Positioned.fill(child: _HomeHeroFallback()),
-          Positioned.fill(
-            child: Transform.translate(
-              offset: Offset(0, translateY),
-              child: Transform.scale(
-                scale: scale,
-                alignment: Alignment.centerRight,
-                child: Opacity(
-                  opacity: imageOpacity,
-                  child: Image.asset(
-                    _heroImage,
-                    fit: BoxFit.cover,
-                    alignment: Alignment.centerRight,
-                    errorBuilder: (_, _, _) => const _HomeHeroFallback(),
-                  ),
-                ),
-              ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final compact = constraints.maxWidth <= 360;
+        final expanded = constraints.maxWidth >= 636;
+        final name = learnerName;
+        final artWidth = (constraints.maxWidth * (name == null ? .76 : .66))
+            .clamp(0.0, expanded ? 245.0 : 410.0);
+        final copyWidth =
+            ((constraints.maxWidth - AppSpacing.pageHorizontalExpanded * 2) *
+                    .68)
+                .clamp(0.0, 410.0);
+        return ConstrainedBox(
+          constraints: BoxConstraints(
+            minHeight: constraints.constrainHeight(
+              artWidth / (name == null ? 1.5 : 1.58),
             ),
           ),
-          Positioned.fill(
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.centerLeft,
-                  end: Alignment.centerRight,
-                  colors: [
-                    const Color(0xFF111827).withValues(alpha: 0.86),
-                    const Color(0xFF111827).withValues(alpha: 0.56),
-                    const Color(0xFF111827).withValues(alpha: 0.18),
-                  ],
-                  stops: const [0, 0.42, 1],
+          child: Stack(
+            children: [
+              Positioned(
+                top: -5,
+                right: -10,
+                width: artWidth,
+                child: Image.asset(
+                  _heroImage,
+                  excludeFromSemantics: true,
+                  fit: BoxFit.fitWidth,
                 ),
               ),
-            ),
-          ),
-          Positioned.fill(
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Colors.black.withValues(alpha: 0.18),
-                    Colors.transparent,
-                    Colors.black.withValues(alpha: 0.50),
-                  ],
-                  stops: const [0, 0.48, 1],
+              Padding(
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.pageHorizontalExpanded,
+                  16,
+                  AppSpacing.pageHorizontalExpanded,
+                  16,
                 ),
-              ),
-            ),
-          ),
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 0,
-            height: compact ? 44 : 52,
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    AppColors.surfaceElevated.withValues(alpha: 0),
-                    AppColors.surfaceElevated.withValues(alpha: 0.72),
-                    AppColors.surfaceElevated,
-                  ],
-                  stops: const [0, 0.55, 1],
-                ),
-              ),
-            ),
-          ),
-          Positioned.fill(
-            child: LayoutBuilder(
-              builder: (context, heroConstraints) {
-                final rawContentHeight =
-                    heroConstraints.maxHeight - topPadding - bottomPadding;
-                final tightHero = rawContentHeight < 132;
-                final effectiveTopPadding = tightHero
-                    ? topInset + (compact ? 6 : 8)
-                    : topPadding;
-                final effectiveBottomPadding = tightHero
-                    ? (panelOverlap * 0.52 + 6)
-                          .clamp(28.0, bottomPadding)
-                          .toDouble()
-                    : bottomPadding;
-                return Padding(
-                  padding: EdgeInsets.fromLTRB(
-                    AppSpacing.pageHorizontal,
-                    effectiveTopPadding,
-                    AppSpacing.pageHorizontal,
-                    effectiveBottomPadding,
-                  ),
-                  child: LayoutBuilder(
-                    builder: (context, contentConstraints) {
-                      final showChips =
-                          focus.chips.isNotEmpty &&
-                          contentConstraints.maxHeight >= 122;
-                      final statusGap = tightHero
-                          ? 6.0
-                          : (compact ? 10.0 : 16.0);
-                      final chipGap = tightHero ? 3.0 : (compact ? 4.0 : 8.0);
-                      final chipHeight = tightHero
-                          ? 24.0
-                          : (compact ? 26.0 : 28.0);
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth: copyWidth),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 4,
                         children: [
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      focus.headerTime,
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
-                                        color: Colors.white.withValues(
-                                          alpha: 0.72,
-                                        ),
-                                        fontFamily: AppTypography.systemFont,
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w800,
-                                        height: 1.1,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      focus.headerTitle,
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontFamily: AppTypography.systemFont,
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w900,
-                                        height: 1.1,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(width: 10),
-                              // The real button is a top Stack layer in
-                              // HomeScreen so the opaque scroll view cannot
-                              // intercept its hit test. Keep its layout space.
-                              const SizedBox(width: 48, height: 48),
-                              // V1: notification entry has no destination page yet.
-                              // if (onOpenPending != null) ...[
-                              // const SizedBox(width: 10),
-                              // HomePressable(
-                              //   onTap: onOpenPending!,
-                              //   child: Semantics(
-                              //     button: true,
-                              //     label: pendingCount > 0
-                              //         ? '待处理 $pendingCount 项'
-                              //         : '未处理提醒',
-                              //     child: DecoratedBox(
-                              //       decoration: BoxDecoration(
-                              //         color: Colors.black.withValues(
-                              //           alpha: 0.20,
-                              //         ),
-                              //         borderRadius: BorderRadius.circular(16),
-                              //         border: Border.all(
-                              //           color: Colors.white.withValues(
-                              //             alpha: 0.18,
-                              //           ),
-                              //         ),
-                              //       ),
-                              //       child: SizedBox(
-                              //         width: AppControls.minTouchTarget,
-                              //         height: AppControls.minTouchTarget,
-                              //         child: Center(
-                              //           child: Stack(
-                              //             clipBehavior: Clip.none,
-                              //             children: [
-                              //               Icon(
-                              //                 Icons.notifications_outlined,
-                              //                 color: Colors.white,
-                              //                 size: 19,
-                              //               ),
-                              //               if (pendingCount > 0)
-                              //                 Positioned(
-                              //                   right: -2,
-                              //                   top: -2,
-                              //                   child: _HeroPendingBadge(
-                              //                     count: pendingCount,
-                              //                   ),
-                              //                 ),
-                              //             ],
-                              //           ),
-                              //         ),
-                              //       ),
-                              //     ),
-                              //   ),
-                              // ),
-                              // ],
-                            ],
-                          ),
-                          SizedBox(height: statusGap),
-                          if (isLoading)
-                            _HeroSkeleton(compact: compact || tightHero)
-                          else ...[
-                            Flexible(
-                              fit: FlexFit.tight,
-                              child: LayoutBuilder(
-                                builder: (context, constraints) {
-                                  if (constraints.maxHeight <= 0 ||
-                                      constraints.maxWidth <= 0) {
-                                    return const SizedBox.shrink();
-                                  }
-                                  final tight =
-                                      tightHero ||
-                                      compact ||
-                                      constraints.maxHeight < 74;
-                                  final titleStyle = TextStyle(
-                                    color: Colors.white,
-                                    fontFamily: AppTypography.systemFont,
-                                    fontSize: tight ? 21 : 26,
-                                    fontWeight: FontWeight.w900,
-                                    height: tight ? 1.08 : 1.16,
-                                  );
-                                  final detailStyle = TextStyle(
-                                    color: Colors.white.withValues(alpha: 0.74),
-                                    fontFamily: AppTypography.systemFont,
-                                    fontSize: tight ? 12 : 13,
-                                    fontWeight: FontWeight.w600,
-                                    height: tight ? 1.24 : 1.45,
-                                  );
-                                  final content = SizedBox(
-                                    width: constraints.maxWidth,
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Text(
-                                          focus.title,
-                                          maxLines: tight ? 1 : 2,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: titleStyle,
-                                        ),
-                                        SizedBox(height: tight ? 4 : 8),
-                                        Text(
-                                          focus.detail,
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: detailStyle,
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                  return Align(
-                                    alignment: Alignment.topLeft,
-                                    child: FittedBox(
-                                      alignment: Alignment.topLeft,
-                                      fit: BoxFit.scaleDown,
-                                      child: content,
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-                            if (showChips) ...[
-                              SizedBox(height: chipGap),
-                              SizedBox(
-                                height: chipHeight,
-                                child: ListView.separated(
-                                  scrollDirection: Axis.horizontal,
-                                  padding: EdgeInsets.zero,
-                                  itemCount: focus.chips.length,
-                                  separatorBuilder: (_, _) =>
-                                      SizedBox(width: compact ? 6 : 8),
-                                  itemBuilder: (context, index) =>
-                                      _HeroStatusPill(chip: focus.chips[index]),
-                                ),
-                              ),
-                            ],
+                          Text(focus.headerTime, style: _eyebrow),
+                          if (name == null) ...[
+                            const Text('·', style: _eyebrow),
+                            Text(focus.headerTitle, style: _eyebrow),
                           ],
                         ],
-                      );
-                    },
+                      ),
+                      const SizedBox(height: 8),
+                      if (isLoading)
+                        const _HeroSkeleton()
+                      else ...[
+                        Text(
+                          name == null ? focus.title : '$name的学习',
+                          style: AppTypography.shellHeading.copyWith(
+                            fontSize: compact ? 29 : 33,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 7),
+                        Text(
+                          name == null ? focus.detail : focus.title,
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: AppColors.mutedStrong,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            height: 1.4,
+                          ),
+                        ),
+                        if (focus.chips.isNotEmpty) ...[
+                          const SizedBox(height: 15),
+                          Wrap(
+                            spacing: 15,
+                            runSpacing: 7,
+                            children: [
+                              for (final chip in focus.chips)
+                                _HeroStatus(chip: chip),
+                            ],
+                          ),
+                        ],
+                      ],
+                    ],
                   ),
-                );
-              },
-            ),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
+
+  static const _eyebrow = TextStyle(
+    color: AppColors.mutedStrong,
+    fontSize: 12,
+    fontWeight: FontWeight.w600,
+    height: 1.3,
+  );
 }
 
 class HomeStudentQrButton extends StatelessWidget {
@@ -352,25 +141,18 @@ class HomeStudentQrButton extends StatelessWidget {
         button: true,
         enabled: onTap != null,
         label: '扫码登录学习网页',
-        child: AppGlassSurface(
-          style: AppGlassStyle.overlayControl,
-          borderRadius: BorderRadius.circular(16),
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              key: const ValueKey('homeStudentQrScanButton'),
-              onTap: onTap,
-              borderRadius: BorderRadius.circular(16),
-              child: SizedBox(
-                width: 48,
-                height: 48,
-                child: Icon(
-                  Icons.qr_code_scanner_rounded,
-                  color: Colors.white.withValues(
-                    alpha: onTap == null ? 0.58 : 1,
-                  ),
-                  size: 23,
-                ),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            key: const ValueKey('homeStudentQrScanButton'),
+            onTap: onTap,
+            borderRadius: BorderRadius.circular(AppRadii.control),
+            child: SizedBox.square(
+              dimension: 48,
+              child: Icon(
+                Icons.qr_code_scanner_rounded,
+                color: onTap == null ? AppColors.disabledInk : AppColors.ink,
+                size: 23,
               ),
             ),
           ),
@@ -381,143 +163,64 @@ class HomeStudentQrButton extends StatelessWidget {
 }
 
 class _HeroSkeleton extends StatelessWidget {
-  const _HeroSkeleton({required this.compact});
-
-  final bool compact;
+  const _HeroSkeleton();
 
   @override
   Widget build(BuildContext context) {
-    final color = Colors.white.withValues(alpha: 0.16);
+    final decoration = BoxDecoration(
+      color: AppColors.brandSageWash.withValues(alpha: .87),
+      borderRadius: BorderRadius.circular(6),
+    );
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(
-          width: compact ? 220 : 240,
-          height: compact ? 28 : 32,
-          decoration: BoxDecoration(
-            color: color,
-            borderRadius: BorderRadius.circular(10),
-          ),
+        DecoratedBox(
+          decoration: decoration,
+          child: const SizedBox(width: 192, height: 30),
         ),
-        const SizedBox(height: 10),
-        Container(
-          width: compact ? 260 : 280,
-          height: 16,
-          decoration: BoxDecoration(
-            color: color,
-            borderRadius: BorderRadius.circular(8),
-          ),
+        const SizedBox(height: 12),
+        DecoratedBox(
+          decoration: decoration,
+          child: const SizedBox(width: 148, height: 12),
         ),
       ],
     );
   }
 }
 
-// V1: kept for when notification entry returns.
-// class _HeroPendingBadge extends StatelessWidget {
-//   const _HeroPendingBadge({required this.count});
-//
-//   final int count;
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     final label = count > 9 ? '9+' : '$count';
-//     return DecoratedBox(
-//       decoration: BoxDecoration(
-//         color: AppColors.warning,
-//         borderRadius: BorderRadius.circular(AppRadii.full),
-//         border: Border.all(color: Colors.white.withValues(alpha: 0.85)),
-//       ),
-//       child: Padding(
-//         padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
-//         child: Text(
-//           label,
-//           style: const TextStyle(
-//             color: Colors.white,
-//             fontFamily: AppTypography.systemFont,
-//             fontSize: 10,
-//             fontWeight: FontWeight.w900,
-//             height: 1.1,
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-// }
-
-class _HeroStatusPill extends StatelessWidget {
-  const _HeroStatusPill({required this.chip});
+class _HeroStatus extends StatelessWidget {
+  const _HeroStatus({required this.chip});
 
   final HomeChipSpec chip;
 
   @override
   Widget build(BuildContext context) {
-    final compact = MediaQuery.sizeOf(context).width <= 340;
-    final color = _heroPillIconColor(chip.tone);
+    final color = switch (chip.tone) {
+      StatusTone.success => AppColors.success,
+      StatusTone.warning => AppColors.warning,
+      StatusTone.danger => AppColors.danger,
+      StatusTone.neutral => AppColors.mutedStrong,
+    };
 
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: Colors.black.withValues(alpha: 0.26),
-        borderRadius: BorderRadius.circular(AppRadii.full),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.24)),
-      ),
-      child: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: compact ? 8 : 10,
-          vertical: compact ? 5 : 6,
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              homeChipIcon(chip.kind),
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(homeChipIcon(chip.kind), color: color, size: 14),
+        const SizedBox(width: 5),
+        Flexible(
+          child: Text(
+            chip.label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
               color: color,
-              size: compact ? 12 : 13,
+              fontSize: 11.5,
+              fontWeight: FontWeight.w600,
             ),
-            SizedBox(width: compact ? 4 : 5),
-            Text(
-              chip.label,
-              style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.90),
-                fontFamily: AppTypography.systemFont,
-                fontSize: compact ? 11 : 11.5,
-                fontWeight: FontWeight.w800,
-                height: 1,
-              ),
-            ),
-          ],
+          ),
         ),
-      ),
-    );
-  }
-}
-
-Color _heroPillIconColor(StatusTone tone) {
-  return switch (tone) {
-    StatusTone.success => const Color(0xFFBFF3D3),
-    StatusTone.warning => const Color(0xFFFFE1A8),
-    StatusTone.danger => const Color(0xFFFFC7C7),
-    StatusTone.neutral => Colors.white,
-  };
-}
-
-class _HomeHeroFallback extends StatelessWidget {
-  const _HomeHeroFallback();
-
-  @override
-  Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            const Color(0xFF1C2940),
-            AppColors.brandSage.withValues(alpha: 0.88),
-            AppColors.brandWarm.withValues(alpha: 0.72),
-          ],
-        ),
-      ),
+      ],
     );
   }
 }

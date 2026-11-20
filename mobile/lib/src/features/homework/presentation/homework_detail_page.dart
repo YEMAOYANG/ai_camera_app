@@ -6,6 +6,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:warm_sight/src/core/theme/app_tokens.dart';
 import 'package:warm_sight/src/shared/widgets/app_button.dart';
 import 'package:warm_sight/src/shared/widgets/app_list_row.dart';
+import 'package:warm_sight/src/shared/widgets/app_surface.dart';
 import 'package:warm_sight/src/shared/widgets/app_screen.dart';
 import 'package:warm_sight/src/shared/widgets/app_toast.dart';
 import '../../learning_review/application/learning_review_repository.dart';
@@ -372,7 +373,12 @@ class _HomeworkDetailPageState extends ConsumerState<HomeworkDetailPage>
           ),
         ],
         if (pending.isNotEmpty) ...[
-          Text('还有 ${pending.length} 张照片尚未上传，请先继续上传或移除，再提交分析。'),
+          AppListRow(
+            icon: Icons.cloud_upload_outlined,
+            title: '还有 ${pending.length} 张照片尚未上传',
+            subtitle: '请先继续上传或移除，再提交分析。',
+            tone: AppListRowTone.amber,
+          ),
           Wrap(
             spacing: 8,
             children: [
@@ -428,9 +434,11 @@ class _HomeworkDetailPageState extends ConsumerState<HomeworkDetailPage>
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         if (analysisSubmissionUnconfirmed) ...[
-          const Text(
-            '提交结果暂未确认，照片已保存。请先刷新确认状态，不要重复提交分析。',
-            style: TextStyle(color: AppColors.mutedStrong, height: 1.6),
+          const AppListRow(
+            icon: Icons.pending_outlined,
+            title: '提交结果暂未确认，照片已保存。',
+            subtitle: '请先刷新确认状态，不要重复提交分析。',
+            tone: AppListRowTone.amber,
           ),
           const SizedBox(height: 12),
           AppSecondaryButton(
@@ -521,13 +529,11 @@ class _HomeworkDetailPageState extends ConsumerState<HomeworkDetailPage>
             ],
           ),
         if (s.pages.isEmpty)
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 32),
-            child: Text(
-              '还没有照片\n放平纸张、避开反光，拍下整页题目与答案。',
-              textAlign: TextAlign.center,
-              style: TextStyle(color: AppColors.mutedStrong, height: 1.8),
-            ),
+          const AppListRow(
+            icon: Icons.description_outlined,
+            title: '还没有照片',
+            subtitle: '放平纸张、避开反光，拍下整页题目与答案。',
+            subtitleMaxLines: 3,
           ),
         if (current != null) ...[
           const SizedBox(height: 12),
@@ -574,12 +580,18 @@ class _HomeworkDetailPageState extends ConsumerState<HomeworkDetailPage>
                 style: const TextStyle(color: AppColors.danger, height: 1.6),
               ),
             ),
-          _AnnotatedPage(
-            submission: s,
-            page: current,
-            items: items,
-            selectedId: selectedItem,
-            onSelect: (id) => setState(() => selectedItem = id),
+          AppSurface(
+            color: AppColors.surfaceStrong,
+            borderColor: AppColors.shellRule,
+            radius: AppRadii.cardMedium,
+            padding: const EdgeInsets.all(8),
+            child: _AnnotatedPage(
+              submission: s,
+              page: current,
+              items: items,
+              selectedId: selectedItem,
+              onSelect: (id) => setState(() => selectedItem = id),
+            ),
           ),
           Wrap(
             alignment: WrapAlignment.center,

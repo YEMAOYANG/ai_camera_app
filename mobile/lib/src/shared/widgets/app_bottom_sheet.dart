@@ -3,7 +3,6 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:warm_sight/src/core/theme/app_tokens.dart';
 import 'package:warm_sight/src/shared/widgets/app_button.dart';
-import 'package:warm_sight/src/shared/widgets/app_glass_surface.dart';
 import 'package:warm_sight/src/shared/widgets/app_surface.dart';
 
 Future<T?> showAppBottomSheet<T>({
@@ -15,6 +14,7 @@ Future<T?> showAppBottomSheet<T>({
     context: context,
     useRootNavigator: true,
     isScrollControlled: true,
+    constraints: const BoxConstraints(maxWidth: 560),
     backgroundColor: Colors.transparent,
     elevation: 0,
     barrierColor: AppColors.ink.withValues(alpha: 0.32),
@@ -95,14 +95,19 @@ class AppBottomSheetFrame extends StatelessWidget {
     final viewPadding = MediaQuery.viewPaddingOf(context);
     final topGap = viewPadding.top + 12;
     final availableHeight = math.max(0.0, size.height - bottomInset - topGap);
-    final preferredHeight = size.height * maxHeightFactor.clamp(0.32, 0.94);
-    final maxHeight = math.min(preferredHeight, availableHeight);
+    final maxHeight = availableHeight < 450
+        ? availableHeight
+        : math.min(
+            size.height * maxHeightFactor.clamp(0.32, 0.94),
+            availableHeight,
+          );
     return Padding(
       padding: EdgeInsets.only(bottom: bottomInset),
       child: ConstrainedBox(
         constraints: BoxConstraints(maxHeight: maxHeight),
-        child: AppGlassSurface(
-          style: AppGlassStyle.sheet,
+        child: Material(
+          color: AppColors.surface,
+          clipBehavior: Clip.antiAlias,
           borderRadius: const BorderRadius.vertical(
             top: Radius.circular(AppGlass.sheetRadius),
           ),
@@ -152,13 +157,7 @@ class AppBottomSheetBody extends StatelessWidget {
         SizedBox(height: handleTitleGap),
         Text(
           title,
-          style: TextStyle(
-            color: AppColors.ink,
-            fontFamily: AppTypography.systemFont,
-            fontSize: titleFontSize,
-            fontWeight: FontWeight.w700,
-            letterSpacing: 0,
-          ),
+          style: AppTypography.sectionHeading.copyWith(fontSize: titleFontSize),
         ),
         if (subtitle != null) ...[
           const SizedBox(height: 6),
@@ -180,25 +179,41 @@ class AppBottomSheetBody extends StatelessWidget {
 
     final content = Padding(
       padding: padding,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          header,
-          if (scrollable)
-            Expanded(
-              child: wrapScrollableChild
-                  ? SingleChildScrollView(
-                      keyboardDismissBehavior:
-                          ScrollViewKeyboardDismissBehavior.onDrag,
-                      padding: const EdgeInsets.only(bottom: 12),
-                      child: child,
-                    )
-                  : child,
-            )
-          else
-            child,
-          if (footer != null) ...[const SizedBox(height: 12), footer!],
-        ],
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final headerScrolls =
+              scrollable && wrapScrollableChild && constraints.maxHeight < 370;
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (!headerScrolls) header,
+              if (scrollable)
+                Expanded(
+                  key: const ValueKey('sheetBody'),
+                  child: wrapScrollableChild
+                      ? SingleChildScrollView(
+                          keyboardDismissBehavior:
+                              ScrollViewKeyboardDismissBehavior.onDrag,
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              if (headerScrolls) header,
+                              KeyedSubtree(
+                                key: const ValueKey('sheetContent'),
+                                child: child,
+                              ),
+                            ],
+                          ),
+                        )
+                      : child,
+                )
+              else
+                child,
+              if (footer != null) ...[const SizedBox(height: 12), footer!],
+            ],
+          );
+        },
       ),
     );
 
@@ -412,7 +427,7 @@ class AppPickerTile<T> extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: AppSurface(
-        radius: 18,
+        radius: AppRadii.cardMedium,
         color: selected ? AppColors.brandWash : AppColors.surfaceSoft,
         borderColor: selected
             ? AppColors.brand.withValues(alpha: 0.22)

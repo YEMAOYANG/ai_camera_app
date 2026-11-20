@@ -46,34 +46,52 @@ class _HomeworkPageEditorState extends ConsumerState<HomeworkPageEditor> {
     );
     final image = ref.watch(homeworkImageProvider(key));
     return Scaffold(
-      appBar: AppBar(title: const Text('旋转与裁剪')),
+      appBar: AppBar(
+        title: const Text('旋转与裁剪', style: AppTypography.sectionHeading),
+        bottom: const PreferredSize(
+          preferredSize: Size.fromHeight(1),
+          child: Divider(height: 1, color: AppColors.shellRule),
+        ),
+      ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
             children: [
-              const Text('拖动画出需要保留的区域。尽量保留题号和完整作答。'),
+              const Text(
+                '拖动画出需要保留的区域。尽量保留题号和完整作答。',
+                style: AppTypography.caption,
+              ),
               const SizedBox(height: 12),
               Expanded(
-                child: image.when(
-                  loading: () => const LearningLoading(),
-                  error: (e, _) => LearningError(
-                    e,
-                    () => ref.invalidate(homeworkImageProvider(key)),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: AppColors.surfaceStrong,
+                    borderRadius: BorderRadius.circular(AppRadii.cardMedium),
                   ),
-                  data: (bytes) => Center(
-                    child: AspectRatio(
-                      aspectRatio: rotation % 180 == 0
-                          ? widget.page.aspectRatio
-                          : 1 / widget.page.aspectRatio,
-                      child: _canvas(bytes),
+                  clipBehavior: Clip.antiAlias,
+                  padding: const EdgeInsets.all(8),
+                  child: image.when(
+                    loading: () => const LearningLoading(),
+                    error: (e, _) => LearningError(
+                      e,
+                      () => ref.invalidate(homeworkImageProvider(key)),
+                    ),
+                    data: (bytes) => Center(
+                      child: AspectRatio(
+                        aspectRatio: rotation % 180 == 0
+                            ? widget.page.aspectRatio
+                            : 1 / widget.page.aspectRatio,
+                        child: _canvas(bytes),
+                      ),
                     ),
                   ),
                 ),
               ),
               const SizedBox(height: 12),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+              Wrap(
+                alignment: WrapAlignment.center,
+                spacing: 12,
                 children: [
                   TextButton.icon(
                     onPressed: () => setState(() {

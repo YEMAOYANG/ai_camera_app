@@ -397,7 +397,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: AppSystemUi.light(),
       child: Scaffold(
-        backgroundColor: AppColors.appBackgroundWarm,
+        backgroundColor: AppColors.shellPaper,
         body: Stack(
           children: [
             const Positioned.fill(child: _LoginBackground()),
@@ -483,21 +483,7 @@ class _LoginBackground extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const DecoratedBox(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            AppColors.appBackground,
-            AppColors.appBackgroundMid,
-            AppColors.appBackgroundWarm,
-            AppColors.appBackgroundWarm,
-          ],
-          stops: [0, 0.5, 0.78, 1],
-        ),
-      ),
-    );
+    return const ColoredBox(color: AppColors.shellPaper);
   }
 }
 
@@ -597,124 +583,41 @@ class _LoginHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      clipBehavior: Clip.none,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Positioned(
-          right: -78,
-          top: -70,
-          width: 210,
-          height: 190,
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              gradient: RadialGradient(
-                colors: [
-                  AppColors.brand.withValues(alpha: 0.13),
-                  AppColors.brand.withValues(alpha: 0),
-                ],
-              ),
-            ),
-          ),
-        ),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        Row(
           children: [
-            Row(
-              children: [
-                SizedBox(
-                  width: 46,
-                  height: 46,
-                  child: ClipRect(
-                    child: Transform.scale(
-                      scale: 1.22,
-                      child: Image.asset(
-                        _brandLogoMarkAsset,
-                        semanticLabel: '暖瞳',
-                        fit: BoxFit.contain,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 10),
-                const Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '暖瞳',
-                      style: TextStyle(
-                        color: AppColors.ink,
-                        fontFamily: AppTypography.systemFont,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w800,
-                        height: 1.1,
-                        letterSpacing: 0,
-                      ),
-                    ),
-                    SizedBox(height: 3),
-                    Text(
-                      'WarmSight',
-                      style: TextStyle(
-                        color: Color(0x8A526579),
-                        fontFamily: AppTypography.systemFont,
-                        fontSize: 11,
-                        fontWeight: FontWeight.w700,
-                        height: 1,
-                        letterSpacing: 0,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+            Image.asset(
+              _brandLogoMarkAsset,
+              width: 34,
+              height: 34,
+              excludeFromSemantics: true,
             ),
-            const SizedBox(height: 24),
+            const SizedBox(width: 8),
             const Text(
-              '登录暖瞳',
+              '暖瞳',
               style: TextStyle(
                 color: AppColors.ink,
-                fontFamily: AppTypography.systemFont,
-                fontSize: 30,
+                fontSize: 18,
                 fontWeight: FontWeight.w700,
-                height: 1.12,
-                letterSpacing: 0,
               ),
-            ),
-            const SizedBox(height: 10),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                DecoratedBox(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(AppRadii.full),
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        AppColors.brand.withValues(alpha: 0),
-                        AppColors.brand.withValues(alpha: 0.42),
-                        AppColors.brand.withValues(alpha: 0),
-                      ],
-                    ),
-                  ),
-                  child: const SizedBox(width: 2, height: 34),
-                ),
-                const SizedBox(width: 11),
-                const Expanded(
-                  child: Text(
-                    '手机号验证后继续；未注册手机号会自动创建家庭账户。',
-                    style: TextStyle(
-                      color: AppColors.muted,
-                      fontFamily: AppTypography.systemFont,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      height: 1.55,
-                      letterSpacing: 0,
-                    ),
-                  ),
-                ),
-              ],
             ),
           ],
         ),
+        const SizedBox(height: 26),
+        const Text('登录暖瞳', style: AppTypography.pageHeading),
+        const SizedBox(height: 9),
+        const Text(
+          '手机号验证后继续；未注册手机号会自动创建家庭账户。',
+          style: TextStyle(
+            color: AppColors.mutedStrong,
+            fontSize: 14,
+            height: 1.5,
+          ),
+        ),
+        const SizedBox(height: 18),
+        const Divider(height: 1),
       ],
     );
   }
@@ -749,16 +652,9 @@ class _LoginForm extends StatelessWidget {
   Widget build(BuildContext context) {
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.5),
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.76)),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF4C6685).withValues(alpha: 0.07),
-            blurRadius: 22,
-            offset: const Offset(0, 14),
-          ),
-        ],
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(AppRadii.cardMedium),
+        border: Border.all(color: AppColors.shellRule),
       ),
       child: Padding(
         padding: const EdgeInsets.fromLTRB(14, 16, 14, 14),
@@ -1226,12 +1122,12 @@ class _StatusPanel extends StatelessWidget {
               key: ValueKey('$success-$message'),
               decoration: BoxDecoration(
                 color: success
-                    ? const Color(0xFF2F8F68).withValues(alpha: 0.1)
+                    ? AppColors.success.withValues(alpha: 0.1)
                     : AppColors.brand.withValues(alpha: 0.09),
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
                   color: success
-                      ? const Color(0xFF2F8F68).withValues(alpha: 0.18)
+                      ? AppColors.success.withValues(alpha: 0.18)
                       : AppColors.brand.withValues(alpha: 0.14),
                 ),
               ),
@@ -1246,9 +1142,7 @@ class _StatusPanel extends StatelessWidget {
                       success
                           ? Icons.check_circle_outline
                           : Icons.mark_email_read_outlined,
-                      color: success
-                          ? const Color(0xFF2F8F68)
-                          : AppColors.brand,
+                      color: success ? AppColors.success : AppColors.brand,
                       size: 18,
                     ),
                     const SizedBox(width: 9),
@@ -1256,9 +1150,7 @@ class _StatusPanel extends StatelessWidget {
                       child: Text(
                         message!,
                         style: TextStyle(
-                          color: success
-                              ? const Color(0xFF2F6F55)
-                              : AppColors.ink,
+                          color: success ? AppColors.success : AppColors.ink,
                           fontFamily: AppTypography.systemFont,
                           fontSize: 12,
                           fontWeight: FontWeight.w700,
@@ -1460,7 +1352,7 @@ class _PendingJoinHero extends StatelessWidget {
         border: Border.all(color: AppColors.brandSage.withValues(alpha: 0.14)),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF4B7568).withValues(alpha: 0.08),
+            color: AppColors.brandSage.withValues(alpha: 0.08),
             blurRadius: 18,
             offset: const Offset(0, 10),
           ),
@@ -1783,7 +1675,7 @@ class _TrustNote extends StatelessWidget {
         '儿童音视频采集会在绑定设备后单独授权',
         textAlign: TextAlign.center,
         style: TextStyle(
-          color: Color(0x85526579),
+          color: Color(0xFF5A6C70),
           fontFamily: AppTypography.systemFont,
           fontSize: 12,
           fontWeight: FontWeight.w700,

@@ -30,14 +30,7 @@ class TextbookLearningSummary extends ConsumerWidget {
         Row(
           children: [
             const Expanded(
-              child: Text(
-                '教材与课程',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.ink,
-                ),
-              ),
+              child: Text('教材与课程', style: AppTypography.sectionHeading),
             ),
             TextButton(
               onPressed: onManage,
@@ -74,14 +67,23 @@ class TextbookLearningSummary extends ConsumerWidget {
               ),
             ),
           ),
-        AppListRow(
-          icon: Icons.assignment_outlined,
-          title: '作业检查与周末复习',
-          subtitle: '查看具体错题和学习进步',
-          onTap: () => context.push(
-            '$learningCenterPath?childId=${Uri.encodeQueryComponent(childId)}',
+        DecoratedBox(
+          decoration: BoxDecoration(
+            color: AppColors.warningWash.withValues(alpha: .72),
+            borderRadius: BorderRadius.circular(AppRadii.cardMedium),
           ),
-          trailing: const Icon(Icons.chevron_right),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: AppListRow(
+              icon: Icons.assignment_outlined,
+              tone: AppListRowTone.amber,
+              title: '作业检查与周末复习',
+              subtitle: '查看具体错题和学习进步',
+              onTap: () => context.push(
+                '$learningCenterPath?childId=${Uri.encodeQueryComponent(childId)}',
+              ),
+            ),
+          ),
         ),
         catalog.when(
           skipLoadingOnRefresh: false,
@@ -106,13 +108,9 @@ class TextbookLearningSummary extends ConsumerWidget {
           data: (data) => Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(
-                data.termLabel,
-                style: const TextStyle(
-                  fontSize: 12,
-                  color: AppColors.mutedStrong,
-                ),
-              ),
+              const SizedBox(height: 12),
+              Text(data.termLabel, style: AppTypography.caption),
+
               for (final journey in data.journeys) ...[
                 const SizedBox(height: 12),
                 Semantics(
@@ -198,40 +196,17 @@ class TextbookLearningSummary extends ConsumerWidget {
                   ),
                 ),
               ],
-              const SizedBox(height: 16),
-              LayoutBuilder(
-                builder: (context, constraints) {
-                  final columns =
-                      constraints.maxWidth < 310 ||
-                          MediaQuery.textScalerOf(context).scale(14) > 19
-                      ? 1
-                      : 2;
-                  return Wrap(
-                    spacing: 24,
-                    runSpacing: 18,
-                    children: [
-                      for (final subject in const [
-                        ('chinese', '语文'),
-                        ('math', '数学'),
-                        ('english', '英语'),
-                        ('science', '科学'),
-                      ])
-                        SizedBox(
-                          width:
-                              (constraints.maxWidth - (columns - 1) * 24) /
-                              columns,
-                          child: _SubjectBook(
-                            subject: subject,
-                            catalog: data,
-                            onTap: onManage,
-                          ),
-                        ),
-                    ],
-                  );
-                },
-              ),
-              const SizedBox(height: 18),
-              const Divider(height: 1, color: AppColors.border),
+              const SizedBox(height: 6),
+              const Divider(height: 1),
+              for (final subject in const [
+                ('chinese', '语文'),
+                ('math', '数学'),
+                ('english', '英语'),
+                ('science', '科学'),
+              ]) ...[
+                _SubjectBook(subject: subject, catalog: data, onTap: onManage),
+                const Divider(height: 1),
+              ],
             ],
           ),
         ),
@@ -265,75 +240,94 @@ class _SubjectBook extends StatelessWidget {
               (learning.available > 0 || learning.status == 'locked')
         ? learning.label
         : '课程待上架';
+    final progress = learning != null && learning.available > 0
+        ? (learning.completed / learning.available).clamp(0.0, 1.0)
+        : null;
+    final ink = TextbookSubjectStyle.forSubject(subject.$1).ink;
+    final narrow = MediaQuery.sizeOf(context).width < 370;
     return Semantics(
       container: true,
       button: onTap != null,
       child: Material(
-        color: Colors.transparent,
+        type: MaterialType.transparency,
         child: InkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(AppRadii.card),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  TextbookCover(
-                    subject: subject.$1,
-                    volumeLabel: book?.volumeLabel,
-                    placeholder: book == null && !unavailable,
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          subject.$2,
-                          style: const TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.ink,
-                          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 7),
+            child: Row(
+              children: [
+                TextbookCover(
+                  subject: subject.$1,
+                  width: 44,
+                  volumeLabel: book?.volumeLabel,
+                  placeholder: book == null && !unavailable,
+                ),
+                const SizedBox(width: 13),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        subject.$2,
+                        style: const TextStyle(
+                          color: AppColors.ink,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          height: 1.2,
                         ),
-                        const SizedBox(height: 5),
-                        Text(
-                          book == null
-                              ? '学校教材'
-                              : '${book.versionLabel} · ${book.volumeLabel}',
-                          style: const TextStyle(
-                            fontSize: 12,
-                            height: 1.45,
-                            color: AppColors.mutedStrong,
+                      ),
+                      if (book != null) ...[
+                        const SizedBox(height: 2),
+                        Semantics(
+                          label: '${book.versionLabel} · ${book.volumeLabel}',
+                          excludeSemantics: true,
+                          child: Text(
+                            narrow
+                                ? book.versionLabel
+                                : '${book.versionLabel} · ${book.volumeLabel}',
+                            style: AppTypography.caption,
                           ),
                         ),
                       ],
+                      const SizedBox(height: 3),
+                      Text(
+                        status,
+                        style: AppTypography.caption.copyWith(
+                          color: progress != null
+                              ? AppColors.success
+                              : AppColors.mutedStrong,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      if (progress != null) ...[
+                        const SizedBox(height: 4),
+                        SizedBox(
+                          width: 80,
+                          child: LinearProgressIndicator(
+                            value: progress,
+                            minHeight: 2,
+                            borderRadius: BorderRadius.circular(AppRadii.full),
+                            color: ink,
+                            backgroundColor: AppColors.borderSoft,
+                            semanticsLabel: '${subject.$2}已开放课程的学习进度',
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+                if (onTap != null)
+                  const Padding(
+                    padding: EdgeInsets.only(left: 5),
+                    child: Icon(
+                      Icons.chevron_right,
+                      size: 17,
+                      color: AppColors.mutedStrong,
                     ),
                   ),
-                ],
-              ),
-              const SizedBox(height: 10),
-              Text(
-                status,
-                style: const TextStyle(
-                  fontSize: 12,
-                  height: 1.5,
-                  color: AppColors.mutedStrong,
-                ),
-              ),
-              if (learning != null && learning.available > 0) ...[
-                const SizedBox(height: 7),
-                LinearProgressIndicator(
-                  value: (learning.completed / learning.available).clamp(0, 1),
-                  minHeight: 3,
-                  borderRadius: BorderRadius.circular(AppRadii.full),
-                  color: TextbookSubjectStyle.forSubject(subject.$1).ink,
-                  backgroundColor: AppColors.borderSoft,
-                  semanticsLabel: '${subject.$2}已开放课程的学习进度',
-                ),
               ],
-            ],
+            ),
           ),
         ),
       ),
@@ -343,26 +337,54 @@ class _SubjectBook extends StatelessWidget {
 
 class _BooksLoading extends StatelessWidget {
   const _BooksLoading();
+
   @override
   Widget build(BuildContext context) => Semantics(
     label: '正在读取课本状态',
     child: Padding(
-      padding: const EdgeInsets.symmetric(vertical: 16),
-      child: Row(
+      padding: const EdgeInsets.only(top: 12),
+      child: Column(
         children: [
-          for (var i = 0; i < 4; i++)
-            Expanded(
-              child: Container(
-                height: 78,
-                margin: EdgeInsets.only(right: i == 3 ? 0 : 14),
-                decoration: BoxDecoration(
-                  color: AppColors.surfaceStrong,
-                  borderRadius: BorderRadius.circular(AppRadii.card),
-                ),
+          for (var row = 0; row < 3; row++) ...[
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 9),
+              child: Row(
+                children: [
+                  _PlaceholderStroke(width: 42, height: 55),
+                  SizedBox(width: 13),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _PlaceholderStroke(width: 86, height: 12),
+                        SizedBox(height: 8),
+                        _PlaceholderStroke(width: 136, height: 9),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ),
+            const Divider(height: 1),
+          ],
         ],
       ),
     ),
+  );
+}
+
+class _PlaceholderStroke extends StatelessWidget {
+  const _PlaceholderStroke({required this.width, required this.height});
+
+  final double width;
+  final double height;
+
+  @override
+  Widget build(BuildContext context) => DecoratedBox(
+    decoration: BoxDecoration(
+      color: AppColors.surfaceStrong,
+      borderRadius: BorderRadius.circular(4),
+    ),
+    child: SizedBox(width: width, height: height),
   );
 }

@@ -1130,6 +1130,7 @@ class ChildProfileSetupScreen extends ConsumerWidget {
     final initialDate = _clampDate(parsed ?? fallbackDate, firstDate, now);
 
     return NativeDatePicker.pickDate(
+      context: context,
       title: '选择出生日期',
       initialDate: initialDate,
       minDate: firstDate,
@@ -1426,7 +1427,7 @@ class _ChildGenderSelector extends StatelessWidget {
       value: 'male',
       label: '男孩',
       assetPath: 'assets/images/children/child_boy_avatar.png',
-      tint: Color(0xFFE9F2F5),
+      tint: Color(0xFFE3ECE2),
     ),
     _ChildGenderOption(
       value: 'female',
@@ -2180,17 +2181,9 @@ class _SetupActionDock extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DecoratedBox(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            AppColors.appBackgroundWarm.withValues(alpha: 0),
-            AppColors.appBackgroundWarm.withValues(alpha: 0.92),
-            AppColors.appBackgroundWarm,
-          ],
-          stops: const [0, 0.28, 1],
-        ),
+      decoration: const BoxDecoration(
+        color: AppColors.shellPaper,
+        border: Border(top: BorderSide(color: AppColors.shellRule)),
       ),
       child: Padding(
         padding: EdgeInsets.fromLTRB(20, 12, 20, bottomInset + 12),
@@ -2217,21 +2210,7 @@ class _SetupBackground extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const DecoratedBox(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            AppColors.appBackground,
-            AppColors.appBackgroundMid,
-            AppColors.appBackgroundWarm,
-            AppColors.appBackgroundWarm,
-          ],
-          stops: [0, 0.45, 0.78, 1],
-        ),
-      ),
-    );
+    return const ColoredBox(color: AppColors.shellPaper);
   }
 }
 
@@ -2335,78 +2314,39 @@ class _SetupHero extends StatelessWidget {
         ? null
         : (step! / _setupTotalSteps).clamp(0.0, 1.0).toDouble();
 
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: AppColors.surfaceSoft,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: AppColors.borderSoft),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(18, 18, 18, 17),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
           children: [
-            Row(
-              children: [
-                DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: AppColors.brandDeep,
-                    borderRadius: BorderRadius.circular(13),
-                  ),
-                  child: SizedBox(
-                    width: 36,
-                    height: 36,
-                    child: Center(
-                      child: Icon(icon, color: Colors.white, size: 19),
-                    ),
-                  ),
+            Icon(icon, color: AppColors.navActiveFg, size: 26),
+            if (progress != null) ...[
+              const Spacer(),
+              SizedBox(
+                width: 86,
+                child: LinearProgressIndicator(
+                  value: progress,
+                  minHeight: 3,
+                  borderRadius: BorderRadius.circular(AppRadii.full),
                 ),
-                if (progress != null) ...[
-                  const Spacer(),
-                  SizedBox(
-                    width: 88,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(AppRadii.full),
-                      child: LinearProgressIndicator(
-                        value: progress,
-                        minHeight: 6,
-                        backgroundColor: AppColors.brandWash,
-                        valueColor: const AlwaysStoppedAnimation<Color>(
-                          AppColors.brand,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ],
-            ),
-            const SizedBox(height: 18),
-            Text(
-              title,
-              style: const TextStyle(
-                color: AppColors.ink,
-                fontFamily: AppTypography.systemFont,
-                fontSize: 28,
-                fontWeight: FontWeight.w800,
-                height: 1.12,
-                letterSpacing: 0,
               ),
-            ),
-            const SizedBox(height: 9),
-            Text(
-              subtitle,
-              style: const TextStyle(
-                color: AppColors.muted,
-                fontFamily: AppTypography.systemFont,
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                height: 1.6,
-                letterSpacing: 0,
-              ),
-            ),
+            ],
           ],
         ),
-      ),
+        const SizedBox(height: 13),
+        Text(title, style: AppTypography.pageHeading),
+        const SizedBox(height: 8),
+        Text(
+          subtitle,
+          style: const TextStyle(
+            color: AppColors.mutedStrong,
+            fontSize: 14,
+            height: 1.55,
+          ),
+        ),
+        const SizedBox(height: 16),
+        const Divider(height: 1),
+      ],
     );
   }
 }
@@ -2418,17 +2358,7 @@ class _SetupPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.54),
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.76)),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 15),
-        child: child,
-      ),
-    );
+    return Padding(padding: const EdgeInsets.only(bottom: 10), child: child);
   }
 }
 
@@ -2752,8 +2682,8 @@ class _SetupStatusPanel extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = switch (tone) {
       _SetupTone.green => (
-        background: const Color(0xFFE9F6EF),
-        foreground: const Color(0xFF236044),
+        background: AppColors.successWash,
+        foreground: AppColors.success,
       ),
       _SetupTone.blue => (
         background: AppColors.brand.withValues(alpha: 0.1),

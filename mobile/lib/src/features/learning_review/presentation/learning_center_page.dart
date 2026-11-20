@@ -10,6 +10,7 @@ import 'package:warm_sight/src/features/homework/domain/homework_models.dart';
 import 'package:warm_sight/src/features/profile/application/profile_repository.dart';
 import 'package:warm_sight/src/shared/widgets/app_list_row.dart';
 import 'package:warm_sight/src/shared/widgets/app_screen.dart';
+import 'package:warm_sight/src/shared/widgets/app_surface.dart';
 import '../application/learning_review_repository.dart';
 import '../domain/learning_review_models.dart';
 import 'learning_support_widgets.dart';
@@ -180,12 +181,19 @@ class _CenterState extends ConsumerState<_Center> with WidgetsBindingObserver {
             recovery.error!,
             () => ref.invalidate(homeworkPhotoRecoveryProvider(childId)),
           ),
-        AppListRow(
-          icon: Icons.add_a_photo_outlined,
-          title: '拍作业或试卷',
-          subtitle: '家长上传照片，孩子在学生端跟老师订正',
+        AppSurface(
+          color: AppColors.brandSageWash,
+          borderColor: AppColors.brandSageWash,
+          radius: AppRadii.cardMedium,
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
           onTap: () => _open(homeworkCreatePath),
-          trailing: const Icon(Icons.chevron_right),
+          child: const AppListRow(
+            icon: Icons.add_a_photo_outlined,
+            title: '拍作业或试卷',
+            subtitle: '家长上传照片，孩子在学生端跟老师订正',
+            tone: AppListRowTone.green,
+            trailing: Icon(Icons.arrow_forward, color: AppColors.brandDeep),
+          ),
         ),
         AppListRow(
           icon: Icons.photo_camera_back_outlined,
@@ -194,7 +202,6 @@ class _CenterState extends ConsumerState<_Center> with WidgetsBindingObserver {
           onTap: () => _open(homeworkCaptureAuthorizationPath),
           trailing: const Icon(Icons.chevron_right),
         ),
-        const Divider(),
         LearningHeading(
           '周末小复习',
           trailing: TextButton(
@@ -212,9 +219,9 @@ class _CenterState extends ConsumerState<_Center> with WidgetsBindingObserver {
             () => ref.invalidate(reviewListProvider(childId)),
           ),
           data: (items) => items.isEmpty
-              ? const Text(
+              ? const _LearningEmpty(
+                  Icons.event_available_outlined,
                   '本周还没有复习安排。系统会根据已完成课程的作答记录准备短复习。',
-                  style: TextStyle(color: AppColors.mutedStrong, height: 1.6),
                 )
               : Column(
                   children: [
@@ -245,9 +252,9 @@ class _CenterState extends ConsumerState<_Center> with WidgetsBindingObserver {
           error: (e, _) =>
               LearningError(e, () => unawaited(_refreshHomework())),
           data: (items) => items.isEmpty
-              ? const Text(
+              ? const _LearningEmpty(
+                  Icons.description_outlined,
                   '还没有上传记录。先拍清楚整张纸，分析结果会保留在这里。',
-                  style: TextStyle(color: AppColors.mutedStrong, height: 1.6),
                 )
               : Column(
                   children: [
@@ -281,13 +288,35 @@ class _CenterState extends ConsumerState<_Center> with WidgetsBindingObserver {
             () => ref.invalidate(learningWeaknessesProvider(childId)),
           ),
           data: (items) => items.isEmpty
-              ? const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 16),
-                  child: Text('还需要更多作答记录，暂不判断孩子的薄弱点。'),
+              ? const _LearningEmpty(
+                  Icons.insights_outlined,
+                  '还需要更多作答记录，暂不判断孩子的薄弱点。',
                 )
               : Column(children: items.map((e) => _Weakness(e)).toList()),
         ),
       ],
+    );
+  }
+}
+
+class _LearningEmpty extends StatelessWidget {
+  const _LearningEmpty(this.icon, this.message);
+
+  final IconData icon;
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, color: AppColors.mutedStrong, size: 20),
+          const SizedBox(width: 12),
+          Expanded(child: Text(message, style: AppTypography.caption)),
+        ],
+      ),
     );
   }
 }

@@ -23,64 +23,24 @@ class AppPrimaryButton extends StatelessWidget {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(AppRadii.button),
         child: DecoratedBox(
+          // One flat ink fill: the primary action is the only dark block on a
+          // page, so it needs no gradient or sheen to stand out.
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(AppRadii.button),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                if (enabled || loading) ...[
-                  AppColors.primaryButtonStart,
-                  AppColors.primaryButtonEnd,
-                ] else ...[
-                  AppColors.disabledFill,
-                  AppColors.disabledFill,
-                ],
-              ],
-            ),
+            color: enabled || loading
+                ? AppColors.primaryButtonStart
+                : AppColors.disabledFill,
             boxShadow: [
-              BoxShadow(
-                color: AppColors.primaryButtonShadow.withValues(
-                  alpha: enabled || loading ? 0.16 : 0.02,
+              if (enabled || loading)
+                BoxShadow(
+                  color: AppColors.primaryButtonShadow.withValues(alpha: 0.14),
+                  blurRadius: 12,
+                  offset: const Offset(0, 5),
                 ),
-                blurRadius: 14,
-                offset: const Offset(0, 8),
-              ),
             ],
           ),
           child: Stack(
             children: [
-              Positioned(
-                left: 18,
-                right: 18,
-                top: 1,
-                height: 1,
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        Colors.white.withValues(alpha: 0),
-                        Colors.white.withValues(alpha: 0.42),
-                        Colors.white.withValues(alpha: 0),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              const Positioned(
-                left: -80,
-                top: -70,
-                width: 210,
-                height: 160,
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    gradient: RadialGradient(
-                      colors: [Color(0x123B82F6), Color(0x003B82F6)],
-                    ),
-                  ),
-                ),
-              ),
               SizedBox(
                 height: AppControls.buttonHeight,
                 width: double.infinity,
@@ -91,11 +51,11 @@ class AppPrimaryButton extends StatelessWidget {
                       label,
                       style: TextStyle(
                         color: enabled || loading
-                            ? Colors.white
+                            ? AppColors.onPrimary
                             : AppColors.disabledInk,
                         fontFamily: AppTypography.systemFont,
-                        fontSize: 14.5,
-                        fontWeight: FontWeight.w600,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
                         letterSpacing: 0,
                       ),
                     ),
@@ -137,24 +97,9 @@ class AppSecondaryButton extends StatelessWidget {
         opacity: enabled ? 1 : 0.58,
         child: DecoratedBox(
           decoration: BoxDecoration(
+            color: AppColors.surfaceElevated,
             borderRadius: BorderRadius.circular(AppRadii.buttonSecondary),
-            border: Border.all(color: AppColors.borderSoft),
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                AppColors.surface.withValues(alpha: 0.82),
-                AppColors.surfaceSoft.withValues(alpha: 0.70),
-              ],
-            ),
-            boxShadow: [
-              if (enabled)
-                BoxShadow(
-                  color: const Color(0xFF4C6685).withValues(alpha: 0.035),
-                  blurRadius: 9,
-                  offset: const Offset(0, 5),
-                ),
-            ],
+            border: Border.all(color: AppColors.border),
           ),
           child: SizedBox(
             height: height,
@@ -167,7 +112,7 @@ class AppSecondaryButton extends StatelessWidget {
                   style: TextStyle(
                     color: enabled ? AppColors.ink : AppColors.disabledInk,
                     fontFamily: AppTypography.systemFont,
-                    fontSize: 14,
+                    fontSize: 15,
                     fontWeight: FontWeight.w600,
                     letterSpacing: 0,
                   ),

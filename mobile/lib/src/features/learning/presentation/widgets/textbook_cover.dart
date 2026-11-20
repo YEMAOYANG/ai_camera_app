@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:warm_sight/src/core/theme/app_tokens.dart';
 
-/// App-owned subject identifiers, not reproductions of a publisher's cover.
-/// Edition, publisher and school system remain readable alongside them.
+/// Small illustrated jackets for subjects. Edition details are shown in the
+/// surrounding row so this artwork can be shared across textbook versions.
 class TextbookCover extends StatelessWidget {
   const TextbookCover({
     required this.subject,
@@ -20,75 +20,78 @@ class TextbookCover extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final style = TextbookSubjectStyle.forSubject(subject);
+    final art = style.art;
+    final captionHeight = width * .34;
+    final fallback = Center(
+      child: Icon(
+        Icons.auto_stories_outlined,
+        size: width * .38,
+        color: style.ink,
+      ),
+    );
+
     return ExcludeSemantics(
       child: SizedBox(
         width: width,
-        height: width * 1.36,
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            color: style.paper,
-            borderRadius: const BorderRadius.horizontal(
-              left: Radius.circular(3),
-              right: Radius.circular(7),
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: style.ink.withValues(alpha: 0.10),
-                blurRadius: 5,
-                offset: const Offset(1, 3),
-              ),
-            ],
+        height: width * 1.39,
+        child: ClipRRect(
+          borderRadius: const BorderRadius.horizontal(
+            left: Radius.circular(2),
+            right: Radius.circular(5),
           ),
-          child: Stack(
-            children: [
-              Positioned(
-                left: 5,
-                top: 0,
-                bottom: 0,
-                child: ColoredBox(
-                  color: style.ink.withValues(alpha: 0.14),
-                  child: const SizedBox(width: 1),
-                ),
-              ),
-              Positioned.fill(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(12, 8, 6, 8),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      FittedBox(
-                        fit: BoxFit.scaleDown,
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          style.mark,
-                          maxLines: 1,
-                          textScaler: TextScaler.noScaling,
-                          style: TextStyle(
-                            fontSize: width * 0.35,
-                            height: 1.15,
-                            fontWeight: FontWeight.w700,
-                            color: style.ink,
+          child: ColoredBox(
+            color: style.paper,
+            child: Stack(
+              children: [
+                Positioned(
+                  left: width * .07,
+                  right: 0,
+                  top: 0,
+                  bottom: captionHeight,
+                  child: Opacity(
+                    opacity: placeholder ? .48 : 1,
+                    child: art == null
+                        ? fallback
+                        : Image.asset(
+                            art,
+                            fit: BoxFit.cover,
+                            excludeFromSemantics: true,
+                            errorBuilder: (_, _, _) => fallback,
                           ),
-                        ),
-                      ),
-                      const Spacer(),
-                      if (placeholder)
-                        Icon(Icons.add, size: 14, color: style.ink)
-                      else
-                        Text(
-                          volumeLabel ?? '课本',
-                          textScaler: TextScaler.noScaling,
-                          style: TextStyle(
-                            fontSize: 10,
-                            height: 1.2,
-                            color: style.ink,
-                          ),
-                        ),
-                    ],
                   ),
                 ),
-              ),
-            ],
+                Positioned(
+                  left: width * .07,
+                  right: 0,
+                  bottom: 0,
+                  height: captionHeight,
+                  child: Center(
+                    child: placeholder
+                        ? Icon(Icons.add, size: width * .28, color: style.ink)
+                        : FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              volumeLabel ?? '课本',
+                              textScaler: TextScaler.noScaling,
+                              style: TextStyle(
+                                fontSize: width * .205,
+                                fontWeight: FontWeight.w700,
+                                height: 1,
+                                color: style.ink,
+                              ),
+                            ),
+                          ),
+                  ),
+                ),
+                Positioned(
+                  left: 0,
+                  top: 0,
+                  bottom: 0,
+                  width: width * .07,
+                  child: ColoredBox(color: style.ink.withValues(alpha: .28)),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -97,34 +100,36 @@ class TextbookCover extends StatelessWidget {
 }
 
 class TextbookSubjectStyle {
-  const TextbookSubjectStyle(this.mark, this.paper, this.ink);
+  const TextbookSubjectStyle(this.paper, this.ink, {this.art});
 
-  final String mark;
-  final Color paper, ink;
+  final Color paper;
+  final Color ink;
+  final String? art;
+
+  static const _assetDirectory = 'assets/images/bookplates';
 
   static TextbookSubjectStyle forSubject(String subject) => switch (subject) {
     'chinese' => const TextbookSubjectStyle(
-      '文',
-      Color(0xFFF8E6DF),
-      Color(0xFF924933),
+      Color(0xFFF3E4D7),
+      Color(0xFF843F32),
+      art: '$_assetDirectory/chinese.webp',
     ),
     'math' => const TextbookSubjectStyle(
-      '数',
-      AppColors.brandWash,
-      Color(0xFF345AA0),
+      Color(0xFFE6EBDD),
+      Color(0xFF3E6054),
+      art: '$_assetDirectory/math.webp',
     ),
     'english' => const TextbookSubjectStyle(
-      'Aa',
-      AppColors.brandWarmWash,
-      Color(0xFF885719),
+      Color(0xFFF4E8C8),
+      Color(0xFF745217),
+      art: '$_assetDirectory/english.webp',
     ),
     'science' => const TextbookSubjectStyle(
-      '科',
-      AppColors.brandSageWash,
-      Color(0xFF376E5D),
+      Color(0xFFE2EDDE),
+      Color(0xFF376251),
+      art: '$_assetDirectory/science.webp',
     ),
     _ => const TextbookSubjectStyle(
-      '书',
       AppColors.surfaceStrong,
       AppColors.mutedStrong,
     ),

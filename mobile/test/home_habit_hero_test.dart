@@ -20,10 +20,7 @@ void main() {
               width: 360,
               height: 190,
               child: HomeHabitHero(
-                safeTop: 44,
-                scrollOffset: 0,
                 isLoading: false,
-                panelOverlap: 58,
                 focus: HabitFocusCopy(
                   headerTime: '今天中午',
                   headerTitle: '小爱现在',

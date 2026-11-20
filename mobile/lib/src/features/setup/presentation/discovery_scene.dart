@@ -489,7 +489,7 @@ class CameraDevicePainter extends CustomPainter {
         end: Alignment.bottomRight,
         colors: [
           Colors.white,
-          const Color(0xFFF1F5F2),
+          const Color(0xFFF4EEE1),
           AppColors.brandSageWash.withValues(alpha: 0.48),
         ],
         stops: const [0, 0.58, 1],
@@ -528,7 +528,7 @@ class CameraDevicePainter extends CustomPainter {
           center: const Alignment(-0.35, -0.35),
           colors: [
             AppColors.brandSoft.withValues(alpha: 0.34),
-            const Color(0xFF101823),
+            const Color(0xFF18262B),
           ],
         ).createShader(Rect.fromCircle(center: lensCenter, radius: lensRadius)),
     );
@@ -585,7 +585,7 @@ class CameraDevicePainter extends CustomPainter {
       baseRect,
       Paint()
         ..shader = LinearGradient(
-          colors: [const Color(0xFFE6ECE8), AppColors.surfaceElevated],
+          colors: [const Color(0xFFECE5D6), AppColors.surfaceElevated],
         ).createShader(baseRect.outerRect),
     );
     canvas.drawRRect(

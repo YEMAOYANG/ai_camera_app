@@ -1,4 +1,6 @@
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:warm_sight/src/shared/widgets/app_viewport.dart';
 
 class NativeDatePicker {
   const NativeDatePicker._();
@@ -8,11 +10,24 @@ class NativeDatePicker {
   );
 
   static Future<DateTime?> pickDate({
+    required BuildContext context,
     required DateTime initialDate,
     required DateTime minDate,
     required DateTime maxDate,
     String title = '选择日期',
   }) async {
+    if (AppViewport.supportsFoldingOf(context)) {
+      return showDatePicker(
+        context: context,
+        initialDate: initialDate,
+        firstDate: minDate,
+        lastDate: maxDate,
+        helpText: title,
+        initialEntryMode: MediaQuery.sizeOf(context).height < 410
+            ? DatePickerEntryMode.input
+            : DatePickerEntryMode.calendar,
+      );
+    }
     try {
       final value = await _channel.invokeMethod<String>('pickDate', {
         'title': title,

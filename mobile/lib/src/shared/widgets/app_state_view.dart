@@ -72,8 +72,8 @@ class AppStateView extends StatelessWidget {
             ? constraints.maxWidth
             : MediaQuery.sizeOf(context).width - 40;
         final primaryIcon = _primaryIcon;
-        final artSize = (compact ? width * 0.34 : width * 0.48)
-            .clamp(compact ? 78.0 : 118.0, compact ? 112.0 : 174.0)
+        final artSize = (compact ? width * .27 : width * .40)
+            .clamp(compact ? 68.0 : 100.0, compact ? 96.0 : 148.0)
             .toDouble();
         final buttonWidth = math.min(width, compact ? 240.0 : 286.0);
 
@@ -91,13 +91,8 @@ class AppStateView extends StatelessWidget {
             Text(
               title,
               textAlign: TextAlign.center,
-              style: TextStyle(
-                color: AppColors.ink,
-                fontFamily: AppTypography.systemFont,
-                fontSize: compact ? 16 : 19,
-                fontWeight: FontWeight.w800,
-                height: 1.22,
-                letterSpacing: 0,
+              style: AppTypography.sectionHeading.copyWith(
+                fontSize: compact ? 18 : 21,
               ),
             ),
             const SizedBox(height: 8),
@@ -107,7 +102,7 @@ class AppStateView extends StatelessWidget {
                 message,
                 textAlign: TextAlign.center,
                 style: const TextStyle(
-                  color: AppColors.muted,
+                  color: AppColors.mutedStrong,
                   fontFamily: AppTypography.systemFont,
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
@@ -152,9 +147,9 @@ class AppStateView extends StatelessWidget {
     }
 
     return AppSurface(
-      color: Colors.white.withValues(alpha: 0.34),
-      borderColor: Colors.white.withValues(alpha: 0.58),
-      radius: 16,
+      color: AppColors.surface,
+      borderColor: AppColors.shellRule,
+      radius: AppRadii.cardMedium,
       padding: padding ?? const EdgeInsets.fromLTRB(16, 18, 16, 18),
       child: content,
     );
@@ -520,11 +515,11 @@ extension on AppStateVariant {
   Color get _accent {
     return switch (this) {
       AppStateVariant.emptyRewards ||
-      AppStateVariant.emptyLedger => const Color(0xFFD8922B),
-      AppStateVariant.saved => const Color(0xFF2F8F68),
+      AppStateVariant.emptyLedger => AppColors.brandWarm,
+      AppStateVariant.saved => AppColors.success,
       AppStateVariant.deviceOffline ||
       AppStateVariant.cameraUnavailable ||
-      AppStateVariant.permission => const Color(0xFF58728C),
+      AppStateVariant.permission => AppColors.muted,
       AppStateVariant.emptyTasks ||
       AppStateVariant.searchEmpty => AppColors.brand,
       AppStateVariant.serviceUnavailable ||

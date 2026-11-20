@@ -121,6 +121,7 @@ class _PreferencesFormState extends ConsumerState<_PreferencesForm> {
         onTap: busy ? null : () => chooseTime('time'),
       ),
       Text('时区：${textValue(values['timezone'])}'),
+      const LearningHeading('提醒方式'),
       SwitchListTile(
         contentPadding: EdgeInsets.zero,
         title: const Text('温和提醒'),
@@ -153,6 +154,7 @@ class _PreferencesFormState extends ConsumerState<_PreferencesForm> {
         trailing: Text(textValue(values['allowedEnd'])),
         onTap: busy ? null : () => chooseTime('allowedEnd'),
       ),
+      const Divider(),
       ListTile(
         contentPadding: EdgeInsets.zero,
         title: const Text('暂时暂停'),

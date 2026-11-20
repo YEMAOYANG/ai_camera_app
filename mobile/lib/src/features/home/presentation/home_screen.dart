@@ -1,7 +1,7 @@
 import 'dart:async';
-import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:warm_sight/src/shared/widgets/app_viewport.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -19,6 +19,7 @@ import 'package:warm_sight/src/features/home/application/home_summary.dart';
 import 'package:warm_sight/src/features/home/presentation/widgets/home_habit_hero.dart';
 import 'package:warm_sight/src/features/home/presentation/widgets/home_primary_cta.dart';
 import 'package:warm_sight/src/features/home/presentation/widgets/home_primary_learning_preview.dart';
+import 'package:warm_sight/src/features/home/presentation/widgets/home_rhythm_arc.dart';
 import 'package:warm_sight/src/features/home/presentation/widgets/home_rhythm_rail.dart';
 import 'package:warm_sight/src/features/home/presentation/widgets/home_shared.dart';
 import 'package:warm_sight/src/features/student_access/application/student_access_availability.dart';
@@ -31,9 +32,6 @@ import 'package:warm_sight/src/shared/domain/child_grade.dart';
 import 'package:warm_sight/src/shared/widgets/app_toast.dart';
 import 'package:warm_sight/src/shared/widgets/status_chip.dart';
 
-const _homePanelSurface = AppColors.surfaceElevated;
-const _homeScaffoldBackground = AppColors.surfaceElevated;
-
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
@@ -43,26 +41,20 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen>
     with WidgetsBindingObserver {
-  final _scrollController = ScrollController();
   final _refreshGuard = RefreshGuard();
   var _localTodayText = homeDateText(DateTime.now());
-  var _scrollOffset = 0.0;
   var _refreshGeneration = 0;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _scrollController.addListener(_handleScroll);
   }
 
   @override
   void dispose() {
     _refreshGeneration++;
     WidgetsBinding.instance.removeObserver(this);
-    _scrollController
-      ..removeListener(_handleScroll)
-      ..dispose();
     super.dispose();
   }
 
@@ -93,12 +85,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
   void _invalidateHomeProviders() {
     unawaited(_refreshHomeSilently());
-  }
-
-  void _handleScroll() {
-    final nextOffset = _scrollController.offset.clamp(0.0, 360.0);
-    if ((nextOffset - _scrollOffset).abs() < 0.5) return;
-    setState(() => _scrollOffset = nextOffset);
   }
 
   void _openStudentQrScanner(AsyncValue<ProfileSummary> profile) {
@@ -261,6 +247,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     final isPrimaryLearning =
         child?.contentMode == 'primary_learning' &&
         childGrade?.isPrimary == true;
+    final showRhythmArc =
+        !summary.isInitialLoading &&
+        !input.tasksError &&
+        summary.rhythmNodes.isNotEmpty;
     if (childId != null && childId.isNotEmpty) {
       ref.listen(careSummaryProvider(childId), (previous, next) {
         if (next.hasValue) {
@@ -270,123 +260,116 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       });
     }
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final safeArea = MediaQuery.paddingOf(context);
-        final size = MediaQuery.sizeOf(context);
-        final heroHeight = _resolveHeroHeight(size, safeArea, constraints);
-        final panelOverlap = _resolvePanelOverlap(size);
-        final topSpacer = math.max(0.0, heroHeight - panelOverlap);
-        final bottomPadding =
-            AppChrome.tabBarBottomGap(safeArea.bottom) +
-            AppChrome.tabBarHeight +
-            AppChrome.tabBarContentGap +
-            18;
-        final minPanelHeight = math.max(0.0, constraints.maxHeight - topSpacer);
+    final safeBottom = MediaQuery.paddingOf(context).bottom;
+    final bottomPadding = AppViewport.verticalBarEdgeOf(context) == null
+        ? AppChrome.tabBarBottomGap(safeBottom) +
+              AppChrome.tabBarHeight +
+              AppChrome.tabBarContentGap +
+              18
+        : safeBottom + 18;
 
-        return AnnotatedRegion<SystemUiOverlayStyle>(
-          value: AppSystemUi.dark().copyWith(
-            systemNavigationBarIconBrightness: Brightness.dark,
-          ),
-          child: Scaffold(
-            backgroundColor: _homeScaffoldBackground,
-            body: Stack(
-              children: [
-                const Positioned.fill(
-                  child: ColoredBox(color: _homeScaffoldBackground),
-                ),
-                Positioned(
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  height: heroHeight,
-                  child: HomeHabitHero(
-                    focus: summary.habitFocus,
-                    safeTop: safeArea.top,
-                    scrollOffset: _scrollOffset,
-                    isLoading: summary.isInitialLoading,
-                    panelOverlap: panelOverlap,
-                    // pendingCount: summary.pendingCount,
-                    // onOpenPending: summary.pendingItems.isEmpty
-                    //     ? null
-                    //     : () => showHomePendingSheet(
-                    //         context,
-                    //         ref,
-                    //         summary.pendingItems,
-                    //       ),
-                  ),
-                ),
-                RefreshIndicator(
-                  color: AppColors.brandDeep,
-                  onRefresh: _refreshHome,
-                  child: CustomScrollView(
-                    controller: _scrollController,
-                    keyboardDismissBehavior:
-                        ScrollViewKeyboardDismissBehavior.onDrag,
-                    physics: const BouncingScrollPhysics(
-                      parent: AlwaysScrollableScrollPhysics(),
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: AppSystemUi.light(),
+      child: Scaffold(
+        backgroundColor: AppColors.shellPaper,
+        body: RefreshIndicator(
+          color: AppColors.navActiveFg,
+          onRefresh: _refreshHome,
+          child: CustomScrollView(
+            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+            physics: const BouncingScrollPhysics(
+              parent: AlwaysScrollableScrollPhysics(),
+            ),
+            slivers: [
+              SliverToBoxAdapter(
+                child: SafeArea(
+                  bottom: false,
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(
+                      AppSpacing.pageHorizontalExpanded,
+                      5,
+                      AppSpacing.pageHorizontalExpanded,
+                      2,
                     ),
-                    slivers: [
-                      SliverToBoxAdapter(
-                        child: SizedBox(
-                          height: topSpacer,
-                          child: Padding(
-                            padding: EdgeInsets.only(
-                              top:
-                                  (safeArea.top > 0 ? safeArea.top : 24) +
-                                  (size.width <= 340 || size.height <= 620
-                                      ? 12
-                                      : 14),
-                              right: AppSpacing.pageHorizontal,
-                            ),
-                            child: Align(
-                              alignment: Alignment.topRight,
-                              child: HomeStudentQrButton(
-                                onTap: () =>
-                                    _openStudentQrScanner(profileSummary),
-                              ),
+                    child: Row(
+                      children: [
+                        Image.asset(
+                          'assets/brand/nuantong-logo-mark.png',
+                          width: 27,
+                          height: 27,
+                          excludeFromSemantics: true,
+                        ),
+                        const SizedBox(width: 8),
+                        const Expanded(
+                          child: Text(
+                            '暖瞳',
+                            style: TextStyle(
+                              color: AppColors.ink,
+                              fontSize: 20,
+                              fontWeight: FontWeight.w800,
                             ),
                           ),
                         ),
-                      ),
-                      SliverToBoxAdapter(
-                        child: DecoratedBox(
-                          decoration: BoxDecoration(
-                            color: _homePanelSurface,
-                            borderRadius: const BorderRadius.vertical(
-                              top: Radius.circular(30),
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppColors.ink.withValues(alpha: 0.07),
-                                blurRadius: 24,
-                                offset: const Offset(0, -8),
-                              ),
-                            ],
-                          ),
-                          child: ConstrainedBox(
-                            constraints: BoxConstraints(
-                              minHeight: minPanelHeight,
-                            ),
-                            child: Padding(
-                              padding: EdgeInsets.fromLTRB(
-                                AppSpacing.pageHorizontal,
-                                20,
-                                AppSpacing.pageHorizontal,
-                                bottomPadding,
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                children: [
-                                  if (isPrimaryLearning && child != null)
-                                    HomePrimaryLearningPreview(
+                        HomeStudentQrButton(
+                          onTap: () => _openStudentQrScanner(profileSummary),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              SliverToBoxAdapter(
+                child: HomeHabitHero(
+                  focus: summary.habitFocus,
+                  isLoading: summary.isInitialLoading,
+                  learnerName:
+                      isPrimaryLearning &&
+                          (summary.hasNoDevice || summary.deviceIssue)
+                      ? childDisplayName(input.profile)
+                      : null,
+                ),
+              ),
+              if (showRhythmArc && !isPrimaryLearning)
+                SliverToBoxAdapter(
+                  child: HomeRhythmArc(
+                    nodes: summary.rhythmNodes,
+                    now: input.now,
+                  ),
+                ),
+              SliverToBoxAdapter(
+                child: DecoratedBox(
+                  decoration: const BoxDecoration(
+                    border: Border(top: BorderSide(color: AppColors.shellRule)),
+                  ),
+                  child: Padding(
+                    padding: EdgeInsets.fromLTRB(
+                      AppSpacing.pageHorizontalExpanded,
+                      isPrimaryLearning ? 14 : 20,
+                      AppSpacing.pageHorizontalExpanded,
+                      bottomPadding,
+                    ),
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        final twoColumns = constraints.maxWidth >= 600;
+                        return Flex(
+                          direction: twoColumns
+                              ? Axis.horizontal
+                              : Axis.vertical,
+                          crossAxisAlignment: twoColumns
+                              ? CrossAxisAlignment.start
+                              : CrossAxisAlignment.stretch,
+                          children: [
+                            Flexible(
+                              flex: twoColumns ? 6 : 0,
+                              fit: FlexFit.tight,
+                              child: isPrimaryLearning && child != null
+                                  ? HomePrimaryLearningPreview(
                                       key: ValueKey(
                                         'primaryLearningPreviewChild_${child.id}',
                                       ),
                                       child: child,
                                     )
-                                  else
-                                    HomeRhythmRail(
+                                  : HomeRhythmRail(
                                       mode: summary.rhythmMode,
                                       nodes: summary.rhythmNodes,
                                       isLoading:
@@ -395,57 +378,69 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                       hasTaskError: input.tasksError,
                                       hasNoDevice: summary.hasNoDevice,
                                     ),
-                                  const SizedBox(height: 14),
-                                  _HomeReportSummaryCard(
-                                    daily: dailyReport,
-                                    weekly: weeklyReport,
-                                    onOpen: () =>
-                                        context.go(profileReportsHubPath),
-                                  ),
-                                  const SizedBox(height: 14),
-                                  HomePrimaryCtaBar(
-                                    cta: summary.primaryCta,
-                                    showLiveCareLink: summary.showLiveCareLink,
-                                  ),
-                                ],
+                            ),
+                            SizedBox(width: twoColumns ? 28 : 0),
+                            Flexible(
+                              flex: twoColumns ? 4 : 0,
+                              fit: FlexFit.tight,
+                              child: Container(
+                                decoration: twoColumns
+                                    ? const BoxDecoration(
+                                        border: BorderDirectional(
+                                          start: BorderSide(
+                                            color: AppColors.shellRule,
+                                          ),
+                                        ),
+                                      )
+                                    : null,
+                                padding: twoColumns
+                                    ? const EdgeInsetsDirectional.only(
+                                        start: 22,
+                                      )
+                                    : EdgeInsets.zero,
+                                child: Column(
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
+                                  children: [
+                                    if (showRhythmArc && isPrimaryLearning) ...[
+                                      if (!twoColumns)
+                                        const SizedBox(height: 22),
+                                      HomeRhythmArc(
+                                        nodes: summary.rhythmNodes,
+                                        now: input.now,
+                                        padding: EdgeInsets.zero,
+                                      ),
+                                      const SizedBox(height: 22),
+                                    ] else if (!twoColumns)
+                                      const SizedBox(height: 22),
+                                    _HomeReportSummaryCard(
+                                      daily: dailyReport,
+                                      weekly: weeklyReport,
+                                      onOpen: () =>
+                                          context.go(profileReportsHubPath),
+                                    ),
+                                    const SizedBox(height: 16),
+                                    HomePrimaryCtaBar(
+                                      cta: summary.primaryCta,
+                                      showLiveCareLink:
+                                          summary.showLiveCareLink,
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                        ),
-                      ),
-                    ],
+                          ],
+                        );
+                      },
+                    ),
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-        );
-      },
+        ),
+      ),
     );
-  }
-
-  double _resolveHeroHeight(
-    Size size,
-    EdgeInsets safeArea,
-    BoxConstraints constraints,
-  ) {
-    final width = constraints.maxWidth.isFinite
-        ? constraints.maxWidth
-        : size.width;
-    if (size.height <= 620) {
-      final compactRaw = size.height * 0.63 + safeArea.top * 0.22;
-      return compactRaw.clamp(352.0, 372.0).toDouble();
-    }
-    final byHeight = size.height * 0.46;
-    final byWidth = width * 0.92;
-    final raw = math.min(byHeight, byWidth) + safeArea.top * 0.36;
-    return raw.clamp(AppHomeHero.minHeight, AppHomeHero.maxHeight).toDouble();
-  }
-
-  double _resolvePanelOverlap(Size size) {
-    if (size.height < 720) return 96;
-    if (size.height > 880) return AppHomeHero.panelOverlap + 78;
-    return AppHomeHero.panelOverlap + 58;
   }
 }
 

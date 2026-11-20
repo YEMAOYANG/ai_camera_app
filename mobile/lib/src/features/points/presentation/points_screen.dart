@@ -174,9 +174,9 @@ class _IncentiveHero extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AppSurface(
-      color: AppColors.surfaceElevated,
-      borderColor: AppColors.borderSoft,
-      radius: 24,
+      color: AppColors.brandSageWash,
+      borderColor: AppColors.brandSageWash,
+      radius: AppRadii.cardMedium,
       padding: const EdgeInsets.fromLTRB(18, 18, 18, 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -692,18 +692,7 @@ class _PanelTitle extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Expanded(
-          child: Text(
-            title,
-            style: const TextStyle(
-              color: AppColors.ink,
-              fontFamily: AppTypography.systemFont,
-              fontSize: 16,
-              fontWeight: FontWeight.w900,
-              letterSpacing: 0,
-            ),
-          ),
-        ),
+        Expanded(child: Text(title, style: AppTypography.sectionHeading)),
         ?trailing,
       ],
     );
